@@ -1,8 +1,27 @@
 import sbt._
 import Keys._
+import com.lightbend.paradox.sbt.ParadoxPlugin
 import com.lightbend.paradox.sbt.ParadoxPlugin.autoImport.{builtinParadoxTheme, paradoxProperties, paradoxTheme}
+import sbtunidoc.Plugin.UnidocKeys.unidoc
+import Def.SettingsDefinition.unwrapSettingsDefinition
 
 object Settings {
+
+  lazy val Local = config("local")
+
+  def docsSettings(p: Project): Seq[Setting[_]] = Seq(
+    name := "csw",
+    paradoxProperties in Local ++= Map(
+      // point API doc links to locally generated API docs
+      "scaladoc.csw.base_url" -> rebase(
+        (baseDirectory in p).value, "../../../../../"
+      )((unidoc in p in Compile).value.head).get
+    )
+  ) ++ Seq(
+    inConfig(Compile)(Settings.defaultParadoxSettings),
+    ParadoxPlugin.paradoxSettings(Local),
+    inConfig(Local)(Settings.defaultParadoxSettings)
+  ).flatten
 
   lazy val defaultParadoxSettings: Seq[Setting[_]] = Seq(
     paradoxTheme := Some(builtinParadoxTheme("generic")),
