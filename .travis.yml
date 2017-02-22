@@ -1,0 +1,53 @@
+language: scala
+
+sudo: required
+
+scala:
+  - "2.12.1"
+
+jdk:
+  - oraclejdk8
+
+notifications:
+  email:
+    recipients:
+    - kpritam@thoughtworks.com
+    - uvjoshi@thoughtworks.com
+    on_success: never
+    on_failure: always
+
+
+#services:
+#  - docker
+
+#before_install:
+#  - docker-compose up -d
+
+script:
+  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION ";test;docs/paradox"
+
+before_cache:
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
+  - find $HOME/.sbt  -name "*.lock"               -print -delete
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot
+
+deploy:
+  provider: script
+  script:
+    - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION publish && curl -I https://ci.tmt.org/job/techhub-publisher/build?token=$TECH_HUB_TOKEN
+  on:
+    tags: true
+    repo: tmt/csw
+
+env:
+  global:
+    # encrypt with: travis encrypt BINTRAY_USER=...
+    - secure: ""
+    # encrypt with: travis encrypt BINTRAY_PASS=...
+    - secure: ""
+    # encrypt with travis encrypt TECH_HUB_TOKEN=...
+    - secure: ""

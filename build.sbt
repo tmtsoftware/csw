@@ -1,13 +1,11 @@
 import Dependencies._
-import Settings._
 
 lazy val csw = project
   .in(file("."))
-  .enablePlugins(PublishUnidoc)
+  .enablePlugins(PublishUnidoc, NoPublish)
   .aggregate(`csw-location`)
 
 lazy val `csw-location` = project
-  .settings(commonSettings)
   .settings(
     libraryDependencies += scalatest % Test
   )
@@ -19,9 +17,9 @@ lazy val docs = project
   .disablePlugins(BintrayPlugin)
   .settings(
     name := "csw",
-    inConfig(Compile)(defaultParadoxSettings),
+    inConfig(Compile)(Settings.defaultParadoxSettings),
     ParadoxPlugin.paradoxSettings(Local),
-    inConfig(Local)(defaultParadoxSettings),
+    inConfig(Local)(Settings.defaultParadoxSettings),
     paradoxProperties in Local ++= Map(
       // point API doc links to locally generated API docs
       "scaladoc.csw.base_url" -> rebase(
