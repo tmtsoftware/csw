@@ -1,9 +1,9 @@
-import sbt._
-import Keys._
 import com.lightbend.paradox.sbt.ParadoxPlugin
 import com.lightbend.paradox.sbt.ParadoxPlugin.autoImport.{builtinParadoxTheme, paradoxProperties, paradoxTheme}
+import com.typesafe.sbt.site.paradox.ParadoxSitePlugin.autoImport
+import sbt.Keys._
+import sbt._
 import sbtunidoc.Plugin.UnidocKeys.unidoc
-import Def.SettingsDefinition.unwrapSettingsDefinition
 
 object Settings {
 
@@ -18,8 +18,8 @@ object Settings {
       )((unidoc in p in Compile).value.head).get
     )
   ) ++ Seq(
-    inConfig(Compile)(Settings.defaultParadoxSettings),
-    ParadoxPlugin.paradoxSettings(Local),
+    inConfig(autoImport.Paradox)(Settings.defaultParadoxSettings),
+//    ParadoxPlugin.paradoxSettings(1),
     inConfig(Local)(Settings.defaultParadoxSettings)
   ).flatten
 
