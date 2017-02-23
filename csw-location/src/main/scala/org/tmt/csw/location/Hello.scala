@@ -1,8 +1,9 @@
 package org.tmt.csw.location
 
 object Hello extends Greeting with App {
-  1 + 1
-  println("")
+ def square(x : Int) : Int = {
+   x * x
+ }
 }
 
 trait Greeting {

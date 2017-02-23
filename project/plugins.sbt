@@ -8,6 +8,7 @@ addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0-8-g6d0c3f8")
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.2.0")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
 
 resolvers += Resolver.url("2m-sbt-plugin-releases", url("https://dl.bintray.com/2m/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
 resolvers += Resolver.bintrayRepo("twtmt", "maven")
