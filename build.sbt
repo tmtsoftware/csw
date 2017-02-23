@@ -11,6 +11,6 @@ lazy val `csw-location` = project
   )
 
 lazy val docs = project
-  .enablePlugins(ParadoxSitePlugin, NoPublish)
+  .enablePlugins(ParadoxSitePlugin, GhpagesPlugin, NoPublish)
   .disablePlugins(BintrayPlugin)
   .settings(Settings.docsSettings(csw))

@@ -1,5 +1,7 @@
 import com.lightbend.paradox.sbt.ParadoxPlugin
 import com.lightbend.paradox.sbt.ParadoxPlugin.autoImport.{builtinParadoxTheme, paradoxProperties, paradoxTheme}
+import com.typesafe.sbt.SbtGit.git
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport._
 import com.typesafe.sbt.site.paradox.ParadoxSitePlugin.autoImport
 import sbt.Keys._
 import sbt._
@@ -11,6 +13,8 @@ object Settings {
 
   def docsSettings(p: Project): Seq[Setting[_]] = Seq(
     name := "csw",
+    git.remoteRepo := "git@github.com:tmtsoftware/csw-prod.git",
+    ghpagesNoJekyll := true,
     paradoxProperties in Local ++= Map(
       // point API doc links to locally generated API docs
       "scaladoc.csw.base_url" -> rebase(
