@@ -2,15 +2,15 @@ import Dependencies._
 
 lazy val csw = project
   .in(file("."))
-  .enablePlugins(PublishUnidoc)
+  .enablePlugins(PublishUnidoc, Publish)
   .aggregate(`csw-location`)
 
 lazy val `csw-location` = project
+  .enablePlugins(Publish, Coverage)
   .settings(
     libraryDependencies += scalatest % Test
   )
 
 lazy val docs = project
   .enablePlugins(ParadoxSitePlugin, GhpagesPlugin, NoPublish)
-  .disablePlugins(BintrayPlugin)
   .settings(Settings.docsSettings(csw))

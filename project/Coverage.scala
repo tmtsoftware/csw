@@ -4,7 +4,6 @@ object Coverage extends AutoPlugin {
   import scoverage._
   import scoverage.ScoverageSbtPlugin.autoImport._
 
-  override def trigger = allRequirements
   override def requires = ScoverageSbtPlugin
 
   override def projectSettings = Seq(
@@ -15,6 +14,5 @@ object Coverage extends AutoPlugin {
     coverageOutputCobertura := false,
     coverageOutputXML := false
   )
+
 }
-
-
