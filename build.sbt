@@ -2,7 +2,7 @@ import Dependencies._
 
 lazy val csw = project
   .in(file("."))
-  .enablePlugins(Publish, PublishUnidoc, GhpagesPlugin)
+  .enablePlugins(Publish, PublishUnidoc)
   .aggregate(`csw-location`)
 
 lazy val `csw-location` = project
@@ -12,5 +12,4 @@ lazy val `csw-location` = project
   )
 
 lazy val docs = project
-  .enablePlugins(ParadoxSitePlugin, GhpagesPlugin, NoPublish)
-  .settings(Settings.docsSettings(csw))
+  .enablePlugins(PublishParadox, NoPublish)
