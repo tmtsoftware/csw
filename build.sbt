@@ -2,8 +2,13 @@ import Dependencies._
 
 lazy val csw = project
   .in(file("."))
-  .enablePlugins(Publish, PublishUnidoc)
-  .aggregate(`csw-location`)
+  .enablePlugins(Publish, PublishUnidoc, PublishGithub)
+  .aggregate(`csw-location`, docs)
+  .settings(
+    (mappings in makeSite) := {
+      (mappings in makeSite).value ++ (mappings in makeSite in docs).value
+    }
+  )
 
 lazy val `csw-location` = project
   .enablePlugins(Publish, Coverage)
@@ -12,4 +17,4 @@ lazy val `csw-location` = project
   )
 
 lazy val docs = project
-  .enablePlugins(PublishParadox, NoPublish)
+  .enablePlugins(NoPublish, PublishParadox)
