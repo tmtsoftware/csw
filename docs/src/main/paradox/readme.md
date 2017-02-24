@@ -1,1 +1,0 @@
-# Testing gh-pages and sbt-sit

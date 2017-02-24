@@ -35,10 +35,21 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot
 
+before_deploy:
+  # Record minimal build information via the Git user ident
+  - git config --global user.name "$USER"
+  - git config --global user.email "$TRAVIS_BUILD_NUMBER@$TRAVIS_COMMIT"
+  # Decrypt the secret deploy key using instructions from `travis encrypt-file`
+  - openssl aes-256-cbc -K $encrypted_3afbfedfa397_key -iv $encrypted_3afbfedfa397_iv -in project/travis-deploy-key.enc -out project/travis-deploy-key -d
+  - chmod 600 project/travis-deploy-key
+  # Start ssh-agent in the background and load the deploy key
+  - eval "$(ssh-agent -s)"
+  - ssh-add project/travis-deploy-key
+
 deploy:
   provider: script
   script:
-    - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION publish && curl -I https://ci.tmt.org/job/techhub-publisher/build?token=$TECH_HUB_TOKEN
+    - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION ";publish;ghpagesPushSite"
   on:
     tags: true
     repo: tmt/csw
@@ -48,6 +59,4 @@ env:
     # encrypt with: travis encrypt BINTRAY_USER=...
     - secure: ""
     # encrypt with: travis encrypt BINTRAY_PASS=...
-    - secure: ""
-    # encrypt with travis encrypt TECH_HUB_TOKEN=...
     - secure: ""

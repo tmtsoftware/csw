@@ -1,4 +1,3 @@
-import com.lightbend.paradox.sbt.ParadoxPlugin
 import com.lightbend.paradox.sbt.ParadoxPlugin.autoImport.{builtinParadoxTheme, paradoxProperties, paradoxTheme}
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport._
