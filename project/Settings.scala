@@ -1,10 +1,12 @@
+import com.lightbend.paradox.sbt.ParadoxPlugin
 import com.lightbend.paradox.sbt.ParadoxPlugin.autoImport.{builtinParadoxTheme, paradoxProperties, paradoxTheme}
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport._
 import com.typesafe.sbt.site.paradox.ParadoxSitePlugin.autoImport
 import sbt.Keys._
 import sbt._
-import sbtunidoc.Plugin.UnidocKeys.unidoc
+import sbtunidoc.BaseUnidocPlugin
+//import sbtunidoc.Plugin.UnidocKeys.unidoc
 
 object Settings {
 
@@ -18,11 +20,11 @@ object Settings {
       // point API doc links to locally generated API docs
       "scaladoc.csw.base_url" -> rebase(
         (baseDirectory in p).value, "../../../../../"
-      )((unidoc in p in Compile).value.head).get
+      )((BaseUnidocPlugin.autoImport.unidoc in p in Compile).value.head).get
     )
   ) ++ Seq(
     inConfig(autoImport.Paradox)(Settings.defaultParadoxSettings),
-//    ParadoxPlugin.paradoxSettings(1),
+    inConfig(Local)(ParadoxPlugin.paradoxSettings),
     inConfig(Local)(Settings.defaultParadoxSettings)
   ).flatten
 

@@ -2,7 +2,7 @@ import Dependencies._
 
 lazy val csw = project
   .in(file("."))
-  .enablePlugins(PublishUnidoc, Publish)
+  .enablePlugins(Publish, PublishUnidoc, GhpagesPlugin)
   .aggregate(`csw-location`)
 
 lazy val `csw-location` = project

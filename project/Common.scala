@@ -13,6 +13,7 @@ object Common extends AutoPlugin {
       organization := "org.tmt",
       organizationName := "TMT Org",
       scalaVersion := "2.12.1",
+
       homepage := Some(url("https://github.com/tmtsoftware/csw-prod")),
       scmInfo := Some(ScmInfo(url("https://github.com/tmtsoftware/csw-prod"), "git@github.com:tmtsoftware/csw-prod.git")),
       licenses := Seq(("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))),
@@ -30,11 +31,11 @@ object Common extends AutoPlugin {
       ),
 
       javacOptions ++= Seq(
-        "-Xlint:unchecked"
+//        "-Xlint:unchecked"
       ),
       autoAPIMappings := true,
 
-      apiURL := Some(url(s"http://tmtsoftware.github.io/csw-prod/api/${version.value}")),
+//      apiURL := Some(url(s"http://tmtsoftware.github.io/csw-prod/api/${version.value}")),
       // show full stack traces and test case durations
       testOptions in Test += Tests.Argument("-oDF"),
       // -v Log "test run started" / "test started" / "test run finished" events on log level "info" instead of "debug".

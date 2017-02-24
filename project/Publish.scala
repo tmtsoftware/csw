@@ -1,4 +1,7 @@
-import sbt._, Keys._
+import sbt._
+import Keys._
+import sbtunidoc.BaseUnidocPlugin.autoImport
+import sbtunidoc.{JavaUnidocPlugin, ScalaUnidocPlugin}
 
 /**
  * For projects that are not to be published.
@@ -26,20 +29,23 @@ object Publish extends AutoPlugin {
 }
 
 object PublishUnidoc extends AutoPlugin {
-  import sbtunidoc.Plugin._
-  import sbtunidoc.Plugin.UnidocKeys._
+  import com.typesafe.sbt.SbtGit.GitKeys._
+  import ScalaUnidocPlugin.autoImport._
+  import com.typesafe.sbt.site.SitePlugin.autoImport._
 
-  override def requires = plugins.JvmPlugin
+  override def requires = ScalaUnidocPlugin && JavaUnidocPlugin
 
-  def publishOnly(artifactType: String)(config: PublishConfiguration) = {
-    val newArts = config.artifacts.filterKeys(_.`type` == artifactType)
-    new PublishConfiguration(config.ivyFile, config.resolverName, newArts, config.checksums, config.logging)
-  }
-
-  override def projectSettings = unidocSettings ++ Seq(
-    doc in Compile := (doc in ScalaUnidoc).value,
-    target in unidoc in ScalaUnidoc := crossTarget.value / "api",
-    publishConfiguration ~= publishOnly(Artifact.DocType),
-    publishLocalConfiguration ~= publishOnly(Artifact.DocType)
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    siteSubdirName in ScalaUnidoc := "latest/api",
+    siteSubdirName in JavaUnidocPlugin.autoImport.JavaUnidoc := "java/api",
+    addMappingsToSiteDir(
+      mappings in (ScalaUnidoc, packageDoc),
+      siteSubdirName in ScalaUnidoc
+    ),
+    addMappingsToSiteDir(
+      mappings in (JavaUnidocPlugin.autoImport.JavaUnidoc, packageDoc),
+      siteSubdirName in JavaUnidocPlugin.autoImport.JavaUnidoc
+    ),
+    gitRemoteRepo := "git@github.com:tmtsoftware/csw-prod.git"
   )
 }
