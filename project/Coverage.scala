@@ -1,8 +1,8 @@
 import sbt._
 
 object Coverage extends AutoPlugin {
-  import scoverage._
-  import scoverage.ScoverageSbtPlugin.autoImport._
+  import scoverage.ScoverageSbtPlugin
+  import ScoverageSbtPlugin.autoImport._
 
   override def requires = ScoverageSbtPlugin
 
