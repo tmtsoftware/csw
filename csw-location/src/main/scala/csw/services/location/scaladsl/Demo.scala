@@ -1,4 +1,4 @@
-package org.tmt.csw.location.scaladsl
+package csw.services.location.scaladsl
 
 trait Demo {
 

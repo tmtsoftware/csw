@@ -1,4 +1,4 @@
-package org.tmt.csw.location
+package csw.services.location
 
 import org.scalatest._
 

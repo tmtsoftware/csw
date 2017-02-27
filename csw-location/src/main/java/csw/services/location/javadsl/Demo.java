@@ -1,4 +1,4 @@
-package org.tmt.csw.location.javadsl;
+package csw.services.location.javadsl;
 
 import java.util.List;
 

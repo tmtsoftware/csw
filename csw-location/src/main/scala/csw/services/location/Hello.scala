@@ -1,4 +1,4 @@
-package org.tmt.csw.location
+package csw.services.location
 
 object Hello extends Greeting with App {
  def square(x : Int) : Int = {
