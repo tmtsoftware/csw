@@ -9,7 +9,11 @@ lazy val csw = project
 lazy val `csw-location` = project
   .enablePlugins(Coverage, PublishBintray)
   .settings(
-    libraryDependencies += scalatest % Test
+    libraryDependencies ++= Seq(
+      `akka-stream`,
+      `jmdns`,
+      scalatest % Test
+    )
   )
 
 lazy val docs = project
