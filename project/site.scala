@@ -34,7 +34,8 @@ object ParadoxSite extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     sourceDirectory in Paradox := baseDirectory.value / "src" / "main",
     paradoxProperties in Paradox ++= Map(
-      "extref.rfc.base_url" -> "http://tools.ietf.org/html/rfc%s"
+      "scaladoc.csw.base_url" -> "https://tmtsoftware.github.io/csw-prod/api/scala",
+      "javadoc.csw.base_url" -> "https://tmtsoftware.github.io/csw-prod/api/java"
     )
   )
 }
