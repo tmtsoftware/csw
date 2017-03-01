@@ -48,7 +48,7 @@ object LocationService {
   val DnsType = "_csw._tcp.local."
   val PathKey = "path"
 
-  private val jmDNS: JmDNS = JmDNS.create(NetworkInterface.getByName("eth0").getInetAddresses().nextElement());
+  val jmDNS: JmDNS = JmDNS.create(NetworkInterface.getByName("eth0").getInetAddresses().nextElement());
   private val actorSystem = ActorSystem("location-service")
 
   def make(): LocationService = make(jmDNS, actorSystem)

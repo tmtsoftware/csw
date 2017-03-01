@@ -18,9 +18,18 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     val componentId = ComponentId("redis1", ComponentType.Service)
     val connection = TcpConnection(componentId)
 
-    val locationService = LocationService.make()
+    val jmDNS: JmDNS = JmDNS.create(NetworkInterface.getByName("eth0").getInetAddresses().nextElement());
+
+    val actorSystem = ActorSystem("location-service")
+
+    val locationService = LocationService.make(jmDNS, actorSystem)
+
 
     val registrationResult = locationService.register(TcpRegistration(connection, Port)).await
+
+    jmDNS.getServiceInfo(LocationService.DnsType, connection.toString) should be ""
+
+    jmDNS.list(LocationService.DnsType) should be ""
 
     registrationResult.componentId shouldBe componentId
 
@@ -52,5 +61,5 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     )
   }
   */
-  
+
 }
