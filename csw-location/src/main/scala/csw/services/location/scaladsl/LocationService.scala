@@ -1,5 +1,6 @@
 package csw.services.location.scaladsl
 
+import java.net.InetAddress
 import javax.jmdns.JmDNS
 
 import akka.actor.ActorSystem
@@ -47,7 +48,7 @@ object LocationService {
   val DnsType = "_csw._tcp.local."
   val PathKey = "path"
 
-  private val jmDNS: JmDNS = JmDNS.create(Networks.getPrimaryIpv4Address)
+  private val jmDNS: JmDNS = JmDNS.create(InetAddress.getByName("10.10.8.137"))
   private val actorSystem = ActorSystem("location-service")
 
   def make(): LocationService = make(jmDNS, actorSystem)
