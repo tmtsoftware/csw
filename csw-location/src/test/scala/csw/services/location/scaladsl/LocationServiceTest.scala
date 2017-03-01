@@ -9,11 +9,20 @@ import csw.services.location.common.{ActorRuntime, Networks}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
-class LocationServiceTest extends FunSuite with Matchers with MockFactory {
+class LocationServiceTest
+    extends FunSuite
+    with Matchers
+    with MockFactory
+    with BeforeAndAfter {
 
   private val actorSystem = ActorRuntime.make("test")
+  var registrationResult: RegistrationResult = _
+
+  after {
+    registrationResult.unregister().await
+  }
 
   test("tcp integration") {
 
@@ -23,7 +32,7 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
 
     val locationService = LocationService.make(actorSystem)
 
-    val registrationResult = locationService.register(TcpRegistration(connection, Port)).await
+    registrationResult = locationService.register(TcpRegistration(connection, Port)).await
 
     registrationResult.componentId shouldBe componentId
 
@@ -44,11 +53,12 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
 
     val locationService = LocationService.make(actorSystem)
 
-    val registrationResult = locationService.register(HttpRegistration(connection, Port, Path)).await
+    registrationResult =
+      locationService.register(HttpRegistration(connection, Port, Path)).await
 
     registrationResult.componentId shouldBe componentId
 
-    val uri = new URI(s"http://${Networks.getPrimaryIpv4Address.getHostName}:$Port/$Path")
+    val uri = new URI(s"http://${Networks.getPrimaryIpv4Address.getHostAddress}:$Port/$Path")
 
     locationService.list.await shouldBe List(
       ResolvedHttpLocation(connection, uri, Path)
@@ -58,7 +68,6 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
 
     locationService.list.await shouldBe List.empty
   }
-
 
   test("akka integration") {
     val componentId = ComponentId("hcd1", ComponentType.HCD)
