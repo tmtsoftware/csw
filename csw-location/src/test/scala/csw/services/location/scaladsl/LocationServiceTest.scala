@@ -25,7 +25,7 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     registrationResult.componentId shouldBe componentId
 
     locationService.list.await shouldBe List(
-      ResolvedTcpLocation(connection, Networks.getPrimaryIpv4Address.getHostName, Port)
+      ResolvedTcpLocation(connection, Networks.getPrimaryIpv4Address.toString, Port)
     )
   }
 
