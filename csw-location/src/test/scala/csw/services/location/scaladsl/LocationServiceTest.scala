@@ -17,7 +17,9 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     val componentId = ComponentId("redis1", ComponentType.Service)
     val tcpConnection = TcpConnection(componentId)
 
-    val jmDNS: JmDNS = JmDNS.create()
+    println(Networks.getPrimaryIpv4Address.toString)
+
+    val jmDNS: JmDNS = JmDNS.create(Networks.getPrimaryIpv4Address)
 
     val actorSystem = ActorSystem("test")
     val locationService = LocationService.make(jmDNS, actorSystem)
