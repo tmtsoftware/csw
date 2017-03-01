@@ -1,12 +1,14 @@
 language: scala
 
-sudo: required
+sudo: true
 
 scala:
   - "2.12.1"
 
 jdk:
   - oraclejdk8
+
+-Djava.net.preferIPv4Stack=true
 
 notifications:
   email:

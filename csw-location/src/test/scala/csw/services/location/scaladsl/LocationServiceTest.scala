@@ -29,6 +29,7 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     )
   }
 
+/*
   test("http integration") {
     val Port = 1234
     val componentId = ComponentId("config", ComponentType.Service)
@@ -50,4 +51,6 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
       ResolvedHttpLocation(connection, uri, Path)
     )
   }
+  */
+  
 }
