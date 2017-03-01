@@ -6,6 +6,7 @@ import javax.jmdns.ServiceInfo
 
 import akka.actor.ActorRef
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.scaladsl.LocationService
 
 import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
@@ -18,21 +19,20 @@ object Location {
   def fromServiceInfo(serviceInfo: ServiceInfo): List[Location] = {
     val connection = Connection.parse(serviceInfo.getName).get
 
-    def getUri(uriStr: String): Option[URI] = {
-      connection match {
-        case _: AkkaConnection => ???
-        case _                 =>
-          println((uriStr, "aaa"))
-          Some(new URI(uriStr))
-      }
+    def getUri(uriStr: String): Option[URI] = connection match {
+      case _: AkkaConnection => ???
+      case _                 =>
+        Some(new URI(uriStr))
     }
 
     serviceInfo.getURLs(connection.connectionType.name).toList.flatMap(getUri).map { uri =>
       connection match {
-        case tcp: TcpConnection =>
-          // A TCP-based connection is ended here
-          ResolvedTcpLocation(tcp, uri.getHost, uri.getPort)
-        case x                  => ???
+        case conn: TcpConnection  =>
+          ResolvedTcpLocation(conn, uri.getHost, uri.getPort)
+        case conn: HttpConnection =>
+          val path = serviceInfo.getPropertyString(LocationService.PathKey)
+          ResolvedHttpLocation(conn, uri, path)
+        case conn: AkkaConnection => ???
       }
     }
   }

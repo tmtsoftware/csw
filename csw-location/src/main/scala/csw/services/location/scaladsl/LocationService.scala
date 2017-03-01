@@ -14,8 +14,8 @@ import scala.concurrent.Future
 trait LocationService {
 
   def register(reg: TcpRegistration): Future[RegistrationResult]
-  def register(reg: AkkaRegistration): Future[RegistrationResult]
   def register(reg: HttpRegistration): Future[RegistrationResult]
+  def register(reg: AkkaRegistration): Future[RegistrationResult]
 
   /**
     * Unregisters the connection from the location service
