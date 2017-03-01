@@ -1,6 +1,6 @@
 package csw.services.location.scaladsl
 
-import java.net.URI
+import java.net.{NetworkInterface, URI}
 import javax.jmdns.JmDNS
 
 import akka.actor.ActorSystem
@@ -25,7 +25,7 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     registrationResult.componentId shouldBe componentId
 
     locationService.list.await shouldBe List(
-      ResolvedTcpLocation(connection, Networks.getPrimaryIpv4Address.toString, Port)
+      ResolvedTcpLocation(connection, NetworkInterface.getByName("eth0").getInetAddresses().nextElement().toString, Port)
     )
   }
 
