@@ -11,7 +11,6 @@ object Networks {
     .getOrElse(Pair.default)
     .addr
 
-
   private case class Pair(index: Int, addr: InetAddress) {
     def isIpv4: Boolean = {
       // Don't use ipv6 addresses yet, since it seems to not be working with the current akka version
