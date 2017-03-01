@@ -17,7 +17,7 @@ notifications:
     on_failure: always
 
 script:
-  - sh ifconfig -a
+  - ifconfig -a
   - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION ";scalastyle;test;coverageReport"
 
 before_cache:
