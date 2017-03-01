@@ -4,7 +4,7 @@ trait Demo {
 
   /**
     * @param xs some this that
-    * @return asdasd asdasdasd
+    * @return Testing return
     */
   def run(xs: List[Int]): String
 
