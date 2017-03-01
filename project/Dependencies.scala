@@ -6,6 +6,7 @@ object Dependencies {
   val `jmdns` = "org.jmdns" % "jmdns" % "3.5.1"
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
   val `scalamock-scalatest-support` = "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0"
+  val `akka-remote` = "com.typesafe.akka" %% "akka-remote" % "2.4.17"
 }
 
 object Akka {

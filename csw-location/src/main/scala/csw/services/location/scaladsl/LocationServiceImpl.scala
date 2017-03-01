@@ -1,14 +1,16 @@
 package csw.services.location.scaladsl
 
+import java.net.URI
 import javax.jmdns.{JmDNS, ServiceInfo}
 
 import akka.Done
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
+import akka.serialization.Serialization
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
 import csw.services.location.models._
-import collection.JavaConverters._
 
+import collection.JavaConverters._
 import scala.concurrent.Future
 
 private class LocationServiceImpl(jmDNS: JmDNS, actorSystem: ActorSystem) extends LocationService { outer =>
@@ -30,14 +32,25 @@ private class LocationServiceImpl(jmDNS: JmDNS, actorSystem: ActorSystem) extend
     registrationResult(reg.connection)
   }(jmDnsDispatcher)
 
+  override def register(reg: AkkaRegistration): Future[RegistrationResult] = Future {
+    val uri = new URI(Serialization.serializedActorPath(reg.component))
+    val values = Map(
+      LocationService.PathKey -> uri.getPath,
+      LocationService.SystemKey -> uri.getUserInfo,
+      LocationService.PrefixKey -> reg.prefix
+    ).asJava
+    jmDNS.registerService(
+      ServiceInfo.create(LocationService.DnsType, reg.connection.toString, uri.getPort, 0, 0, values)
+    )
+    registrationResult(reg.connection)
+  }(jmDnsDispatcher)
+
   private def registrationResult(connection: Connection) = new RegistrationResult {
     override def componentId: ComponentId = connection.componentId
 
     override def unregister(): Future[Done] = outer.unregister(connection)
   }
 
-
-  override def register(reg: AkkaRegistration): Future[RegistrationResult] = ???
 
   override def unregister(connection: Connection): Future[Done] = ???
 

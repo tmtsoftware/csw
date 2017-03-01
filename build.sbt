@@ -13,6 +13,7 @@ lazy val `csw-location` = project
       `akka-stream`,
       `jmdns`,
       `scala-java8-compat`,
+      `akka-remote`,
       `scalatest` % Test,
       `scalamock-scalatest-support` % Test
     )

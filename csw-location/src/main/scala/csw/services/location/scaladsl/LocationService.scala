@@ -46,14 +46,12 @@ trait LocationService {
 
 object LocationService {
   val DnsType = "_csw._tcp.local."
+
   val PathKey = "path"
+  val SystemKey = "system"
+  val PrefixKey = "prefix"
 
-  val jmDNS: JmDNS = JmDNS.create(NetworkInterface.getByName("eth0").getInetAddresses().nextElement());
-  private val actorSystem = ActorSystem("location-service")
+  private val jmDNS: JmDNS = JmDNS.create(Networks.getPrimaryIpv4Address)
 
-  def make(): LocationService = make(jmDNS, actorSystem)
-
-  private[scaladsl] def make(jmDNS: JmDNS, actorSystem: ActorSystem): LocationService = {
-    new LocationServiceImpl(jmDNS, actorSystem)
-  }
+  def make(actorSystem: ActorSystem): LocationService = new LocationServiceImpl(jmDNS, actorSystem)
 }

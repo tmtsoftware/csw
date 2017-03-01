@@ -16,26 +16,42 @@ sealed trait Location {
 
 object Location {
 
-  def fromServiceInfo(serviceInfo: ServiceInfo): List[Location] = {
-    val connection = Connection.parse(serviceInfo.getName).get
+  def fromServiceInfo(info: ServiceInfo): List[Location] = {
+    val connection = Connection.parse(info.getName).get
 
     def getUri(uriStr: String): Option[URI] = connection match {
-      case _: AkkaConnection => ???
+      case _: AkkaConnection =>
+        val path = info.getPropertyString(LocationService.PathKey)
+        if (path == null) None
+        else getAkkaUri(uriStr, info.getPropertyString(LocationService.SystemKey))
       case _                 =>
         Some(new URI(uriStr))
     }
 
-    serviceInfo.getURLs(connection.connectionType.name).toList.flatMap(getUri).map { uri =>
+    info.getURLs(connection.connectionType.name).toList.flatMap(getUri).map { uri =>
       connection match {
         case conn: TcpConnection  =>
           ResolvedTcpLocation(conn, uri.getHost, uri.getPort)
         case conn: HttpConnection =>
-          val path = serviceInfo.getPropertyString(LocationService.PathKey)
+          val path = info.getPropertyString(LocationService.PathKey)
           ResolvedHttpLocation(conn, uri, path)
-        case conn: AkkaConnection => ???
+        case conn: AkkaConnection =>
+          val prefix = info.getPropertyString(LocationService.PrefixKey)
+          ResolvedAkkaLocation(conn, uri, prefix)
       }
     }
   }
+
+  private def getAkkaUri(uriStr: String, userInfo: String): Option[URI] = try {
+    val uri = new URI(uriStr)
+    Some(new URI("akka.tcp", userInfo, uri.getHost, uri.getPort, uri.getPath, uri.getQuery, uri.getFragment))
+  } catch {
+    case e: Exception =>
+      // some issue with ipv6 addresses?
+      println(s"Couldn't make URI from $uriStr and userInfo $userInfo")
+      None
+  }
+
 }
 
 final case class Unresolved(connection: Connection) extends Location

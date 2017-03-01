@@ -1,12 +1,12 @@
 package csw.services.location.scaladsl
 
-import java.net.{NetworkInterface, URI}
-import javax.jmdns.JmDNS
+import java.net.URI
 
-import akka.actor.ActorSystem
-import csw.services.location.common.Networks
+import akka.actor.{Actor, ActorPath, Props}
+import akka.serialization.Serialization
 import csw.services.location.common.TestFutureExtension.RichFuture
-import csw.services.location.models.Connection.{HttpConnection, TcpConnection}
+import csw.services.location.common.{ActorRuntime, Networks}
+import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSuite, Matchers}
@@ -18,37 +18,24 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     val componentId = ComponentId("redis1", ComponentType.Service)
     val connection = TcpConnection(componentId)
 
-    val jmDNS: JmDNS = JmDNS.create(NetworkInterface.getByName("eth0").getInetAddresses().nextElement());
-
-    val actorSystem = ActorSystem("location-service")
-
-    val locationService = LocationService.make(jmDNS, actorSystem)
-
+    val locationService = LocationService.make(ActorRuntime.make("test"))
 
     val registrationResult = locationService.register(TcpRegistration(connection, Port)).await
-
-    jmDNS.getServiceInfo(LocationService.DnsType, connection.toString) should be ""
-
-    jmDNS.list(LocationService.DnsType) should be ""
 
     registrationResult.componentId shouldBe componentId
 
     locationService.list.await shouldBe List(
-      ResolvedTcpLocation(connection, NetworkInterface.getByName("eth0").getInetAddresses().nextElement().toString, Port)
+      ResolvedTcpLocation(connection, Networks.getPrimaryIpv4Address.getHostAddress, Port)
     )
   }
 
-/*
   test("http integration") {
     val Port = 1234
-    val componentId = ComponentId("config", ComponentType.Service)
+    val componentId = ComponentId("config-service", ComponentType.Service)
     val connection = HttpConnection(componentId)
     val Path = "path123"
 
-    val jmDNS: JmDNS = JmDNS.create()
-
-    val actorSystem = ActorSystem("test")
-    val locationService = LocationService.make(jmDNS, actorSystem)
+    val locationService = LocationService.make(ActorRuntime.make("test"))
 
     val registrationResult = locationService.register(HttpRegistration(connection, Port, Path)).await
 
@@ -60,6 +47,32 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
       ResolvedHttpLocation(connection, uri, Path)
     )
   }
-  */
 
+
+  test("akka integration") {
+    val Port = 1234
+    val componentId = ComponentId("hcd1", ComponentType.HCD)
+    val connection = AkkaConnection(componentId)
+    val Prefix = "prefix"
+    val actorSystem = ActorRuntime.make("test")
+
+    val locationService = LocationService.make(actorSystem)
+    val actorRef = actorSystem.actorOf(
+      Props(new Actor {
+        override def receive: Receive = Actor.emptyBehavior
+      }),
+      "my-actor-1"
+    )
+
+    val registrationResult = locationService.register(AkkaRegistration(connection, actorRef, Prefix)).await
+
+    registrationResult.componentId shouldBe componentId
+
+    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
+    val uri = new URI(actorPath.toString)
+
+    locationService.list.await shouldBe List(
+      ResolvedAkkaLocation(connection, uri, Prefix)
+    )
+  }
 }
