@@ -8,8 +8,6 @@ scala:
 jdk:
   - oraclejdk8
 
--Djava.net.preferIPv4Stack=true
-
 notifications:
   email:
     recipients:
@@ -20,7 +18,7 @@ notifications:
 
 script:
   - ifconfig -a
-  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION ";scalastyle;test;coverageReport"
+  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION -Djava.net.preferIPv4Stack=true ";scalastyle;test;coverageReport"
 
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
