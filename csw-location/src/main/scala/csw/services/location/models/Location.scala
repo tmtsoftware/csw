@@ -1,10 +1,11 @@
-package csw.services.location.scaladsl
+package csw.services.location.models
 
 import java.net.URI
 import java.util.Optional
+import javax.jmdns.ServiceInfo
 
 import akka.actor.ActorRef
-import csw.services.location.scaladsl.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
@@ -12,7 +13,33 @@ sealed trait Location {
   def connection: Connection
 }
 
+object Location {
+
+  def fromServiceInfo(serviceInfo: ServiceInfo): List[Location] = {
+    val connection = Connection.parse(serviceInfo.getName).get
+
+    def getUri(uriStr: String): Option[URI] = {
+      connection match {
+        case _: AkkaConnection => ???
+        case _                 =>
+          println((uriStr, "aaa"))
+          Some(new URI(uriStr))
+      }
+    }
+
+    serviceInfo.getURLs(connection.connectionType.name).toList.flatMap(getUri).map { uri =>
+      connection match {
+        case tcp: TcpConnection =>
+          // A TCP-based connection is ended here
+          ResolvedTcpLocation(tcp, uri.getHost, uri.getPort)
+        case x                  => ???
+      }
+    }
+  }
+}
+
 final case class Unresolved(connection: Connection) extends Location
+
 final case class Removed(connection: Connection) extends Location
 
 sealed trait Resolved extends Location
@@ -25,6 +52,7 @@ final case class ResolvedAkkaLocation(connection: AkkaConnection, uri: URI, pref
 
   /**
     * Java API to get actorRef
+    *
     * @return
     */
   def getActorRef: Optional[ActorRef] = actorRef.asJava

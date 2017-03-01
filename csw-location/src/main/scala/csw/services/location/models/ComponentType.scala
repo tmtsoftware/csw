@@ -1,4 +1,4 @@
-package csw.services.location.scaladsl
+package csw.services.location.models
 
 import scala.util.{Failure, Success, Try}
 
@@ -36,7 +36,7 @@ object ComponentType {
   /**
    * Returns the named component type or an UnknownComponentTypeException exception if not known
    */
-  def apply(name: String): Try[ComponentType] = name.toLowerCase match {
+  def parse(name: String): Try[ComponentType] = name.toLowerCase match {
     case "container" => Success(Container)
     case "assembly"  => Success(Assembly)
     case "hcd"       => Success(HCD)

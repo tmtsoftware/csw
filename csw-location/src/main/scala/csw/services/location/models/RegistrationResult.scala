@@ -1,4 +1,4 @@
-package csw.services.location.scaladsl
+package csw.services.location.models
 
 import akka.Done
 
@@ -17,5 +17,5 @@ trait RegistrationResult {
   /**
     * Identifies the registered component
     */
-  def componentId: Future[ComponentId]
+  def componentId: ComponentId
 }

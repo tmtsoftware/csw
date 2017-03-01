@@ -1,7 +1,7 @@
-package csw.services.location.scaladsl
+package csw.services.location.models
 
 import akka.actor.ActorRef
-import csw.services.location.scaladsl.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 /**
   * Represents a registered connection to a service

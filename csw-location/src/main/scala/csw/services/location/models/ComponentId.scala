@@ -1,4 +1,4 @@
-package csw.services.location.scaladsl
+package csw.services.location.models
 
 import scala.util.Try
 
@@ -16,9 +16,9 @@ object ComponentId {
   /**
    * Gets a ComponentId from a string, as output by ComponentId.toString
    */
-  def apply(s: String): Try[ComponentId] = {
+  def parse(s: String): Try[ComponentId] = {
     val (name, typ) = s.splitAt(s.lastIndexOf('-'))
-    ComponentType(typ.drop(1)).map(ComponentId(name, _))
+    ComponentType.parse(typ.drop(1)).map(ComponentId(name, _))
   }
 }
 

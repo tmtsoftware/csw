@@ -1,4 +1,4 @@
-package csw.services.location.scaladsl
+package csw.services.location.models
 
 import scala.util.{Failure, Success, Try}
 
@@ -42,7 +42,7 @@ object ConnectionType {
   /**
    * Gets a ConnectionType from the string value ("akka" or "http") or an UnknownConnectionTypeException
    */
-  def apply(name: String): Try[ConnectionType] = name match {
+  def parse(name: String): Try[ConnectionType] = name match {
     case "http" => Success(HttpType)
     case "akka" => Success(AkkaType)
     case "tcp"  => Success(TcpType)

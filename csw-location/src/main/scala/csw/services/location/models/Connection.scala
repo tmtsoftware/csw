@@ -1,6 +1,6 @@
-package csw.services.location.scaladsl
+package csw.services.location.models
 
-import csw.services.location.scaladsl.ConnectionType.{AkkaType, HttpType, TcpType}
+import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
 
 import scala.util.{Failure, Success, Try}
 
@@ -57,12 +57,12 @@ object Connection {
   /**
    * Gets a Connection from a string as output by toString
    */
-  def apply(s: String): Try[Connection] = {
+  def parse(s: String): Try[Connection] = {
     val (id, typ) = s.splitAt(s.lastIndexOf('-')) // To strings
-    ConnectionType(typ.drop(1)) match {
-      case Success(AkkaType) => ComponentId(id).map(AkkaConnection)
-      case Success(HttpType) => ComponentId(id).map(HttpConnection)
-      case Success(TcpType)  => ComponentId(id).map(TcpConnection)
+    ConnectionType.parse(typ.drop(1)) match {
+      case Success(AkkaType) => ComponentId.parse(id).map(AkkaConnection)
+      case Success(HttpType) => ComponentId.parse(id).map(HttpConnection)
+      case Success(TcpType)  => ComponentId.parse(id).map(TcpConnection)
       case Failure(ex)       => Failure(ex)
     }
   }
