@@ -51,8 +51,11 @@ private class LocationServiceImpl(jmDNS: JmDNS, actorSystem: ActorSystem) extend
     override def unregister(): Future[Done] = outer.unregister(connection)
   }
 
-
-  override def unregister(connection: Connection): Future[Done] = ???
+  override def unregister(connection: Connection): Future[Done.type] = Future {
+    jmDNS.unregisterService(ServiceInfo.create(LocationService.DnsType, connection.toString, 0, ""))
+    Thread.sleep(2000)
+    Done
+  }(jmDnsDispatcher)
 
   override def resolve(connections: Set[Connection]): Future[Set[Location]] = ???
 

@@ -13,12 +13,15 @@ import org.scalatest.{FunSuite, Matchers}
 
 class LocationServiceTest extends FunSuite with Matchers with MockFactory {
 
+  private val actorSystem = ActorRuntime.make("test")
+
   test("tcp integration") {
+
     val Port = 1234
     val componentId = ComponentId("redis1", ComponentType.Service)
     val connection = TcpConnection(componentId)
 
-    val locationService = LocationService.make(ActorRuntime.make("test"))
+    val locationService = LocationService.make(actorSystem)
 
     val registrationResult = locationService.register(TcpRegistration(connection, Port)).await
 
@@ -27,6 +30,10 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     locationService.list.await shouldBe List(
       ResolvedTcpLocation(connection, Networks.getPrimaryIpv4Address.getHostAddress, Port)
     )
+
+    registrationResult.unregister().await
+
+    locationService.list.await shouldBe List.empty
   }
 
   test("http integration") {
@@ -35,7 +42,7 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     val connection = HttpConnection(componentId)
     val Path = "path123"
 
-    val locationService = LocationService.make(ActorRuntime.make("test"))
+    val locationService = LocationService.make(actorSystem)
 
     val registrationResult = locationService.register(HttpRegistration(connection, Port, Path)).await
 
@@ -46,15 +53,17 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     locationService.list.await shouldBe List(
       ResolvedHttpLocation(connection, uri, Path)
     )
+
+    registrationResult.unregister().await
+
+    locationService.list.await shouldBe List.empty
   }
 
 
   test("akka integration") {
-    val Port = 1234
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
     val Prefix = "prefix"
-    val actorSystem = ActorRuntime.make("test")
 
     val locationService = LocationService.make(actorSystem)
     val actorRef = actorSystem.actorOf(
@@ -74,5 +83,9 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     locationService.list.await shouldBe List(
       ResolvedAkkaLocation(connection, uri, Prefix)
     )
+
+    registrationResult.unregister().await
+
+    locationService.list.await shouldBe List.empty
   }
 }
