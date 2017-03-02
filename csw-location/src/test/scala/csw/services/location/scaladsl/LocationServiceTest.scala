@@ -24,7 +24,7 @@ class LocationServiceTest
     registrationResult.unregister().await
   }
 
-  test("tcp integration") {
+  test("tcp location") {
 
     val Port = 1234
     val componentId = ComponentId("redis1", ComponentType.Service)
@@ -45,7 +45,7 @@ class LocationServiceTest
     locationService.list.await shouldBe List.empty
   }
 
-  test("http integration") {
+  test("http location") {
     val Port = 1234
     val componentId = ComponentId("config-service", ComponentType.Service)
     val connection = HttpConnection(componentId)
@@ -69,7 +69,7 @@ class LocationServiceTest
     locationService.list.await shouldBe List.empty
   }
 
-  test("akka integration") {
+  test("akka location") {
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
     val Prefix = "prefix"
