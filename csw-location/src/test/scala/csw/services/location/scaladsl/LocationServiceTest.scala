@@ -5,6 +5,7 @@ import java.net.URI
 import akka.actor.{Actor, ActorPath, Props}
 import akka.serialization.Serialization
 import akka.stream.scaladsl.{Keep, Sink}
+import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.common.{ActorRuntime, Networks}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -100,33 +101,30 @@ class LocationServiceTest
 
   test("tracking") {
 
-    val Port = 1234
-    val componentId = ComponentId("redis2", ComponentType.Service)
-    val connection = TcpConnection(componentId)
+    val reg = TcpRegistration(TcpConnection(ComponentId("redis2", ComponentType.Service)), 1234)
+    val reg2 = TcpRegistration(TcpConnection(ComponentId("redis3", ComponentType.Service)), 1111)
 
-    import actorRuntime.mat
+    import actorRuntime._
 
-    val (switch, events) = locationService.track(connection).take(3).toMat(Sink.seq)(Keep.both).run()
+    val source = locationService.track(reg.connection)
 
-    val registrationResult = locationService.register(TcpRegistration(connection, Port)).await
+    val (switch, probe) = source.toMat(TestSink.probe[Location])(Keep.both).run()
 
-    registrationResult.componentId shouldBe componentId
+    val registrationResult2 = locationService.register(reg2).await
+    registrationResult2.unregister().await
 
-    locationService.list.await shouldBe List(
-      ResolvedTcpLocation(connection, Networks.getPrimaryIpv4Address.getHostAddress, Port)
-    )
-
+    val registrationResult = locationService.register(reg).await
     registrationResult.unregister().await
 
-    locationService.list.await shouldBe List.empty
-
-    events.await shouldBe List(
-      Unresolved(connection),
-      ResolvedTcpLocation(connection, Networks.getPrimaryIpv4Address.getHostAddress, Port),
-      Removed(connection)
-    )
+    probe
+      .request(3)
+      .expectNext(Unresolved(reg.connection))
+      .expectNext(ResolvedTcpLocation(reg.connection, Networks.getPrimaryIpv4Address.getHostAddress, reg.port))
+      .expectNext(Removed(reg.connection))
 
     switch.shutdown()
-  }
 
+    probe.expectComplete()
+
+  }
 }

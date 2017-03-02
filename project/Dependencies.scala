@@ -7,6 +7,8 @@ object Dependencies {
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
   val `scalamock-scalatest-support` = "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0"
   val `akka-remote` = "com.typesafe.akka" %% "akka-remote" % "2.4.17"
+  val `akka-stream-testkit` = "com.typesafe.akka" %% "akka-stream-testkit" % "2.4.17"
+
 }
 
 object Akka {
