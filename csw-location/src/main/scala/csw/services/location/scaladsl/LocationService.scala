@@ -24,6 +24,7 @@ trait LocationService {
     * comments in registry.unregisterService())
     */
   def unregister(connection: Connection): Future[Done]
+  def unregisterAll(): Future[Done]
 
   /**
     * Convenience method that gets the location service information for a given set of services.

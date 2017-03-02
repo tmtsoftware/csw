@@ -10,19 +10,24 @@ import csw.services.location.common.{ActorRuntime, Networks}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
+import org.scalatest._
 
 class LocationServiceTest
   extends FunSuite
     with Matchers
     with MockFactory
-    with BeforeAndAfter {
+    with BeforeAndAfterEach
+    with BeforeAndAfterAll {
 
   private val actorRuntime = new ActorRuntime("test")
-  var registrationResult: RegistrationResult = _
+  private val locationService = LocationService.make(actorRuntime)
 
-  after {
-    registrationResult.unregister().await
+  override protected def afterEach(): Unit = {
+    locationService.unregisterAll().await
+  }
+
+  override protected def afterAll(): Unit = {
+    actorRuntime.actorSystem.terminate().await
   }
 
   test("tcp integration") {
@@ -31,9 +36,7 @@ class LocationServiceTest
     val componentId = ComponentId("redis1", ComponentType.Service)
     val connection = TcpConnection(componentId)
 
-    val locationService = LocationService.make(actorRuntime)
-
-    registrationResult = locationService.register(TcpRegistration(connection, Port)).await
+    val registrationResult = locationService.register(TcpRegistration(connection, Port)).await
 
     registrationResult.componentId shouldBe componentId
 
@@ -52,10 +55,7 @@ class LocationServiceTest
     val connection = HttpConnection(componentId)
     val Path = "path123"
 
-    val locationService = LocationService.make(actorRuntime)
-
-    registrationResult =
-      locationService.register(HttpRegistration(connection, Port, Path)).await
+    val registrationResult = locationService.register(HttpRegistration(connection, Port, Path)).await
 
     registrationResult.componentId shouldBe componentId
 
@@ -75,7 +75,6 @@ class LocationServiceTest
     val connection = AkkaConnection(componentId)
     val Prefix = "prefix"
 
-    val locationService = LocationService.make(actorRuntime)
     val actorRef = actorRuntime.actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior
@@ -102,15 +101,14 @@ class LocationServiceTest
   test("tracking") {
 
     val Port = 1234
-    val componentId = ComponentId("redis1", ComponentType.Service)
+    val componentId = ComponentId("redis2", ComponentType.Service)
     val connection = TcpConnection(componentId)
 
-    val locationService = LocationService.make(actorRuntime)
     import actorRuntime.mat
 
     val (switch, events) = locationService.track(connection).take(3).toMat(Sink.seq)(Keep.both).run()
 
-    registrationResult = locationService.register(TcpRegistration(connection, Port)).await
+    val registrationResult = locationService.register(TcpRegistration(connection, Port)).await
 
     registrationResult.componentId shouldBe componentId
 
