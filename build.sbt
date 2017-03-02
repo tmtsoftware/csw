@@ -3,7 +3,7 @@ import Dependencies._
 lazy val csw = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, PublishBintray)
-  .aggregate(`csw-location`)
+  .aggregate(`csw-location`, `integration-tests`)
   .settings(Settings.mergeSiteWith(docs))
 
 lazy val `csw-location` = project
@@ -22,5 +22,10 @@ lazy val `csw-location` = project
     )
   )
 
+lazy val `integration-tests` = project
+  .dependsOn(`csw-location` % "compile->compile;test->test")
+
 lazy val docs = project
   .enablePlugins(ParadoxSite, NoPublish)
+
+mainClass in (Compile,run) := Some("csw.services.location.integration.HCDApp")

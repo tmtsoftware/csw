@@ -10,6 +10,7 @@ class ActorRuntime(name: String) {
 
   private def config = ConfigFactory
     .parseString(s"akka.remote.netty.tcp.hostname=${Networks.getPrimaryIpv4Address.getHostAddress}")
+
     .withFallback(ConfigFactory.load())
 
   implicit val actorSystem: ActorSystem =  ActorSystem(name, config)
