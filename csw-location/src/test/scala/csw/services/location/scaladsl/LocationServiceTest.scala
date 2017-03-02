@@ -41,8 +41,10 @@ class LocationServiceTest
 
     registrationResult.componentId shouldBe componentId
 
+    val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$Port")
+
     locationService.list.await shouldBe List(
-      ResolvedTcpLocation(connection, Networks.getPrimaryIpv4Address.getHostAddress, Port)
+      ResolvedTcpLocation(connection, uri)
     )
 
     registrationResult.unregister().await
@@ -116,10 +118,12 @@ class LocationServiceTest
     val registrationResult = locationService.register(reg).await
     registrationResult.unregister().await
 
+    val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:${reg.port}")
+
     probe
       .request(3)
       .expectNext(Unresolved(reg.connection))
-      .expectNext(ResolvedTcpLocation(reg.connection, Networks.getPrimaryIpv4Address.getHostAddress, reg.port))
+      .expectNext(ResolvedTcpLocation(reg.connection, uri))
       .expectNext(Removed(reg.connection))
 
     switch.shutdown()

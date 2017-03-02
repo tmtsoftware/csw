@@ -18,7 +18,9 @@ final case class Unresolved(connection: Connection) extends Location
 
 final case class Removed(connection: Connection) extends Location
 
-sealed trait Resolved extends Location
+sealed trait Resolved extends Location {
+  def uri: URI
+}
 
 final case class ResolvedAkkaLocation(connection: AkkaConnection, uri: URI, prefix: String = "", actorRef: Option[ActorRef] = None) extends Resolved {
   /**
@@ -36,4 +38,4 @@ final case class ResolvedAkkaLocation(connection: AkkaConnection, uri: URI, pref
 
 final case class ResolvedHttpLocation(connection: HttpConnection, uri: URI, path: String) extends Resolved
 
-final case class ResolvedTcpLocation(connection: TcpConnection, host: String, port: Int) extends Resolved
+final case class ResolvedTcpLocation(connection: TcpConnection, uri: URI) extends Resolved

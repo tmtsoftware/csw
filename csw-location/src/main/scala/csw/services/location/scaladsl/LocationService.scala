@@ -32,15 +32,15 @@ trait LocationService {
     * @param connections set of requested connections
     * @return a future object describing the services found
     */
-  def resolve(connections: Set[Connection]): Future[Set[Location]]
+  def resolve(connections: Set[Connection]): Future[Set[Resolved]]
 
-  def resolve(connection: Connection): Future[Location]
+  def resolve(connection: Connection): Future[Resolved]
 
   def list: Future[List[Location]]
 
   def list(componentType: ComponentType): Future[List[Location]]
 
-  def list(hostname: String): Future[List[Location]]
+  def list(hostname: String): Future[List[Resolved]]
 
   def list(connectionType: ConnectionType): Future[List[Location]]
 

@@ -8,7 +8,7 @@ object Dependencies {
   val `scalamock-scalatest-support` = "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0"
   val `akka-remote` = "com.typesafe.akka" %% "akka-remote" % "2.4.17"
   val `akka-stream-testkit` = "com.typesafe.akka" %% "akka-stream-testkit" % "2.4.17"
-
+  val `scala-async` = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
 }
 
 object Akka {

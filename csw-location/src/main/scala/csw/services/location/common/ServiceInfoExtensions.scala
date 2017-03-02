@@ -28,7 +28,7 @@ object ServiceInfoExtensions {
       urls.flatMap(getUri).map { uri =>
         connection match {
           case conn: TcpConnection  =>
-            ResolvedTcpLocation(conn, uri.getHost, uri.getPort)
+            ResolvedTcpLocation(conn, uri)
           case conn: HttpConnection =>
             val path = info.getPropertyString(LocationService.PathKey)
             ResolvedHttpLocation(conn, uri, path)

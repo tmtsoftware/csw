@@ -13,6 +13,7 @@ import csw.services.location.models._
 
 import collection.JavaConverters._
 import scala.concurrent.Future
+import async.Async._
 
 private class LocationServiceImpl(
   jmDNS: JmDNS,
@@ -60,8 +61,9 @@ private class LocationServiceImpl(
 
   override def unregister(connection: Connection): Future[Done] = {
     val (switch, locationF) = jmDnsEventStream.source
-      .filter(loc => loc.connection == connection)
-      .filter(loc => loc.isInstanceOf[Removed])
+      .collect {
+        case x: Removed if x.connection == connection => x
+      }
       .toMat(Sink.head)(Keep.both).run()
 
     locationF.onComplete(_ => switch.shutdown())
@@ -76,14 +78,15 @@ private class LocationServiceImpl(
     Done
   }(jmDnsDispatcher)
 
-  override def resolve(connections: Set[Connection]): Future[Set[Location]] = {
+  override def resolve(connections: Set[Connection]): Future[Set[Resolved]] = {
     Future.traverse(connections)(resolve)
   }
 
-  override def resolve(connection: Connection): Future[Location] = {
+  override def resolve(connection: Connection): Future[Resolved] = {
     val (switch, locationF) = jmDnsEventStream.source
-      .filter(loc => loc.connection == connection)
-      .filter(loc => loc.isInstanceOf[Resolved])
+      .collect {
+        case x: Resolved if x.connection == connection => x
+      }
       .toMat(Sink.head)(Keep.both).run()
 
     locationF.onComplete(_ => switch.shutdown())
@@ -96,11 +99,19 @@ private class LocationServiceImpl(
     jmDNS.list(LocationService.DnsType).toList.flatMap(_.locations)
   }(jmDnsDispatcher)
 
-  override def list(componentType: ComponentType): Future[List[Location]] = ???
+  override def list(componentType: ComponentType): Future[List[Location]] = async {
+    await(list).filter(_.connection.componentId.componentType == componentType)
+  }
 
-  override def list(hostname: String): Future[List[Location]] = ???
+  override def list(hostname: String): Future[List[Resolved]] = async {
+    await(list).collect {
+      case x: Resolved if x.uri.getHost == hostname => x
+    }
+  }
 
-  override def list(connectionType: ConnectionType): Future[List[Location]] = ???
+  override def list(connectionType: ConnectionType): Future[List[Location]] = async {
+    await(list).filter(_.connection.connectionType == connectionType)
+  }
 
   override def track(connection: Connection): Source[Location, KillSwitch] = {
     jmDNS.requestServiceInfo(LocationService.DnsType, connection.toString, true)

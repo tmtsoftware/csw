@@ -13,7 +13,8 @@ lazy val `csw-location` = project
       `akka-stream`,
       `jmdns`,
       `scala-java8-compat`,
-      `akka-remote`
+      `akka-remote`,
+      `scala-async`
     ),
     libraryDependencies ++= Seq(
       `akka-stream-testkit` % Test,
