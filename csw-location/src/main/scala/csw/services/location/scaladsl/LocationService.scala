@@ -7,7 +7,7 @@ import akka.actor.ActorSystem
 import akka.stream.KillSwitch
 import akka.{Done, NotUsed}
 import akka.stream.scaladsl.Source
-import csw.services.location.common.Networks
+import csw.services.location.common.{ActorRuntime, Networks}
 import csw.services.location.models._
 
 import scala.concurrent.Future
@@ -51,7 +51,9 @@ object LocationService {
   val SystemKey = "system"
   val PrefixKey = "prefix"
 
-  private val jmDNS: JmDNS = JmDNS.create(Networks.getPrimaryIpv4Address)
-
-  def make(actorSystem: ActorSystem): LocationService = new LocationServiceImpl(jmDNS, actorSystem)
+  def make(actorRuntime: ActorRuntime): LocationService = {
+    val jmDNS = JmDNS.create(Networks.getPrimaryIpv4Address)
+    val jmDnsEventStream = new JmDnsEventStream(jmDNS, actorRuntime)
+    new LocationServiceImpl(jmDNS, actorRuntime, jmDnsEventStream)
+  }
 }
