@@ -8,14 +8,20 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.serialization.Serialization
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
+import csw.services.location.common.ActorRuntime
+import csw.services.location.common.ServiceInfoExtensions.RichServiceInfo
 import csw.services.location.models._
 
 import collection.JavaConverters._
 import scala.concurrent.Future
 
-private class LocationServiceImpl(jmDNS: JmDNS, actorSystem: ActorSystem) extends LocationService { outer =>
+private class LocationServiceImpl(
+  jmDNS: JmDNS,
+  actorRuntime: ActorRuntime,
+  jmDnsEventStream: JmDnsEventStream
+) extends LocationService { outer =>
 
-  private val jmDnsDispatcher = actorSystem.dispatchers.lookup("jmdns.dispatcher")
+  private val jmDnsDispatcher = actorRuntime.actorSystem.dispatchers.lookup("jmdns.dispatcher")
 
   override def register(reg: TcpRegistration): Future[RegistrationResult] = Future {
     jmDNS.registerService(
@@ -51,16 +57,22 @@ private class LocationServiceImpl(jmDNS: JmDNS, actorSystem: ActorSystem) extend
     override def unregister(): Future[Done] = outer.unregister(connection)
   }
 
-  override def unregister(connection: Connection): Future[Done.type] = Future {
+  override def unregister(connection: Connection): Future[Done] = Future {
     jmDNS.unregisterService(ServiceInfo.create(LocationService.DnsType, connection.toString, 0, ""))
     Thread.sleep(2000)
+    Done
+  }(jmDnsDispatcher)
+
+  override def unregisterAll(): Future[Done] = Future {
+    jmDNS.unregisterAllServices()
+    Thread.sleep(4000)
     Done
   }(jmDnsDispatcher)
 
   override def resolve(connections: Set[Connection]): Future[Set[Location]] = ???
 
   override def list: Future[List[Location]] = Future {
-    jmDNS.list(LocationService.DnsType).toList.flatMap(Location.fromServiceInfo)
+    jmDNS.list(LocationService.DnsType).toList.flatMap(_.locations)
   }(jmDnsDispatcher)
 
   override def list(componentType: ComponentType): Future[List[Location]] = ???
@@ -69,6 +81,8 @@ private class LocationServiceImpl(jmDNS: JmDNS, actorSystem: ActorSystem) extend
 
   override def list(connectionType: ConnectionType): Future[List[Location]] = ???
 
-  override def track(connection: Connection): Source[Location, KillSwitch] = ???
+  override def track(connection: Connection): Source[Location, KillSwitch] = {
+    jmDnsEventStream.source.filter(_.connection == connection)
+  }
 
 }
