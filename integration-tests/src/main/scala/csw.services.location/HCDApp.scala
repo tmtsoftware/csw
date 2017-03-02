@@ -8,7 +8,7 @@ import csw.services.location.scaladsl.LocationService
 
 
 object HCDApp {
-  private val actorRuntime = new ActorRuntime("AssemblySystem", 2553)
+  private val actorRuntime = new ActorRuntime("HCDSystem", 2553)
   private var registration : AkkaRegistration = _
   private var future: RegistrationResult = _
 

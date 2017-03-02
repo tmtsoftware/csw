@@ -12,9 +12,7 @@ object AssemblyApp {
   private val actorRuntime = new ActorRuntime("AssemblySystem")
 
   def start : LocationService = {
-    val config = ConfigFactory.parseString(s"akka.remote.netty.tcp.port=2553").
-      withFallback(ConfigFactory.load())
-    val componentId = ComponentId("hcd1", ComponentType.HCD)
+ val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
     locationService = LocationService.make(actorRuntime)
     locationService
