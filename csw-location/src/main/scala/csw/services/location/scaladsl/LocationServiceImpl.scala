@@ -71,6 +71,8 @@ private class LocationServiceImpl(
 
   override def resolve(connections: Set[Connection]): Future[Set[Location]] = ???
 
+  override def resolve(connection: Connection): Future[Location] = ???
+
   override def list: Future[List[Location]] = Future {
     jmDNS.list(LocationService.DnsType).toList.flatMap(_.locations)
   }(jmDnsDispatcher)

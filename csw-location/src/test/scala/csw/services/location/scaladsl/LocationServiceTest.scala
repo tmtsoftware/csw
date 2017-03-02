@@ -124,7 +124,9 @@ class LocationServiceTest
 
     switch.shutdown()
 
-    probe.expectComplete()
+    probe
+      .request(1)
+      .expectComplete()
 
   }
 }

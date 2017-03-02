@@ -34,6 +34,8 @@ trait LocationService {
     */
   def resolve(connections: Set[Connection]): Future[Set[Location]]
 
+  def resolve(connection: Connection): Future[Location]
+
   def list: Future[List[Location]]
 
   def list(componentType: ComponentType): Future[List[Location]]
