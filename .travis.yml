@@ -15,6 +15,9 @@ notifications:
     on_success: never
     on_failure: always
 
+before_script:
+  - sudo apt-get install gawk
+
 script:
 #  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION -Djava.net.preferIPv4Stack=true ";scalastyle;test;coverageReport"
   - ./integration/scripts/execute.sh
