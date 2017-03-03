@@ -10,11 +10,13 @@ sleep 20
 echo "Waking up ..."
 date
 
-
 echo "------------ Starting integration test execution -------------"
 integration_test_command='sbt -DPORT=2553 integration/test'
 $integration_test_command
 
+echo "Printing processes ..............."
+ps -ef
+awk -version
 
 echo "killing HCD process : $hcd_app_pid"
 kill -9 $hcd_app_pid
