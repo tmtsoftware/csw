@@ -23,6 +23,16 @@ lazy val `csw-location` = project
     )
   )
 
+lazy val `trackLocation` = Project(id = "trackLocation", base = file("apps/trackLocation"))
+  .enablePlugins(Coverage, PublishBintray)
+  .settings(
+    libraryDependencies ++= Seq(
+      `akka-actor`,
+      `scopt`,
+      `scalatest` % Test,
+      `scalamock-scalatest-support` % Test
+    )
+  ) dependsOn(`csw-location`)
 lazy val `integration-tests` = project
   .dependsOn(`csw-location` % "compile->compile;test->test")
 
