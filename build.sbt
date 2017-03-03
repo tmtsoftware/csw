@@ -3,7 +3,7 @@ import Dependencies._
 lazy val csw = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, PublishBintray)
-  .aggregate(`csw-location`, `integration-tests`)
+  .aggregate(`csw-location`)
   .settings(Settings.mergeSiteWith(docs))
 
 lazy val `csw-location` = project
@@ -33,12 +33,12 @@ lazy val `trackLocation` = project
       `scalatest` % Test,
       `scalamock-scalatest-support` % Test
     )
-  ).dependsOn(`csw-location`)
+  )
+  .dependsOn(`csw-location`)
 
-lazy val `integration-tests` = project
+lazy val integration = project
+  .enablePlugins(NoPublish)
   .dependsOn(`csw-location` % "compile->compile;test->test")
 
 lazy val docs = project
   .enablePlugins(ParadoxSite, NoPublish)
-
-mainClass in (Compile,run) := Some("csw.services.location.integration.HCDApp")
