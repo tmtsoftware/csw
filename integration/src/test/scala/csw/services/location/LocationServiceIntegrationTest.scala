@@ -1,10 +1,11 @@
 package csw.services.location
 
-import csw.services.location.integration.Assembly
+import csw.services.location.common.ActorRuntime
+import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.models.{Location, ResolvedAkkaLocation}
+import csw.services.location.scaladsl.LocationService
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{BeforeAndAfter, FunSuite, Matchers, Tag}
-object IntegrationTest extends Tag("IntegrationTest")
+import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
 class LocationServiceIntegrationTest
     extends FunSuite
@@ -12,16 +13,12 @@ class LocationServiceIntegrationTest
     with MockFactory
     with BeforeAndAfter {
 
-  test("resolves remote HCD", IntegrationTest) {
+  private val actorRuntime = new ActorRuntime("AssemblySystem")
+  private val locationService = LocationService.make(actorRuntime)
 
-    println("#################")
-    println("#################")
-    println("#################")
-    println("#################")
-    /*
-    Assembly.start
+  test("resolves remote HCD") {
 
-    val listOfLocations = Assembly.listLocations
+    val listOfLocations = locationService.list.await
     val hcdLocation: Location = listOfLocations(0)
 
     listOfLocations should not be empty
@@ -31,6 +28,5 @@ class LocationServiceIntegrationTest
       .asInstanceOf[ResolvedAkkaLocation]
       .uri
       .toString should not be empty
-      */
   }
 }

@@ -11,6 +11,7 @@ notifications:
     recipients:
     - kpritam@thoughtworks.com
     - uvjoshi@thoughtworks.com
+    - tmt-csw@thoughtworks.com
     on_success: never
     on_failure: always
 

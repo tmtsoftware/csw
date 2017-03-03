@@ -7,13 +7,14 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
 
-class ActorRuntime(name: String, port: Int = 2552) {
+class ActorRuntime(name: String) {
 
   private def config = {
-    val configs = Map("akka.remote.netty.tcp.hostname" -> Networks.getPrimaryIpv4Address.getHostAddress,
-      "akka.remote.netty.tcp.port" -> port).asJava
+    val configs: Map[String, String] = Map(
+      "akka.remote.netty.tcp.hostname" -> Networks.getPrimaryIpv4Address.getHostAddress
+    )
 
-    ConfigFactory.parseMap(configs)
+    ConfigFactory.parseMap(configs.asJava)
       .withFallback(ConfigFactory.load())
   }
 
