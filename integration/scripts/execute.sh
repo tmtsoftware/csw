@@ -1,34 +1,33 @@
 #!/usr/bin/env bash
+
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+ORANGE='\033[0;33m'
+PURPLE='\033[0;35m'
+NC='\033[0m' # No Color
+
 start_hcd_command='sbt integration/run'
-$start_hcd_command &
+${start_hcd_command} &
 hcd_app_pid=$!
-echo "------------ Starting HCD process with id : $hcd_app_pid ------------"
 
-echo "Sleeping for 20 seconds : "
-date
-sleep 20
-echo "Waking up ..."
-date
+printf "${YELLOW}------------ Starting HCD process with id : $hcd_app_pid ------------${NC}\n"
 
-echo "------------ Starting integration test execution -------------"
+sleep 10
+
+printf "${YELLOW}------------ Starting Integration Test execution ------------${NC}\n"
 integration_test_command='sbt -DPORT=2553 integration/test'
-$integration_test_command
+${integration_test_command}
 
-echo "Printing processes ..............."
-ps -ef
-awk -version
-
-echo "killing HCD process : $hcd_app_pid"
-kill -9 $hcd_app_pid
-
-echo "Searching for process : sbt"
-
-ps -ef | awk '$NF~"sbt" {print $2}'
-
-echo "Searching for process : integration/run"
-
-ps -ef | awk '$NF~"integration/run" {print $2}'
+if [ -n ${hcd_app_pid} ]
+then
+    printf "${PURPLE}Killing HCD process : $hcd_app_pid ${NC}\n"
+    kill -9 ${hcd_app_pid}
+fi
 
 int_tests_pid=`ps -ef | awk '$NF~"integration/run" {print $2}'`
 
-kill -9 $int_tests_pid
+if [ -n ${int_tests_pid} ]
+then
+    printf "${PURPLE}Killing integration/run process : $int_tests_pid ${NC}\n"
+    kill -9 ${int_tests_pid}
+fi
