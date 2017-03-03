@@ -7,27 +7,26 @@ import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentTyp
 import csw.services.location.scaladsl.LocationService
 
 
-object HCDApp {
-  private val actorRuntime = new ActorRuntime("HCDSystem", 2553)
+object TromboneHCD {
+  private val PORT : Int = 2553
+  private val actorRuntime = new ActorRuntime("trombone-hcd", PORT)
   private var registration : AkkaRegistration = _
-  private var future: RegistrationResult = _
+
+  private var registrationResult : RegistrationResult = _
 
   def main(args: Array[String]): Unit = {
 
-    val hcdActorRef = actorRuntime.actorSystem.actorOf(Props[TromboneHCD], "hcd1")
-    val componentId = ComponentId("hcd1", ComponentType.HCD)
+    val tromboneHcdActorRef = actorRuntime.actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
+    val componentId = ComponentId("trombone-hcd", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
 
-    registration = AkkaRegistration(connection, hcdActorRef, "nfiraos.ncc.tromboneHCD")
-    future = LocationService.make(actorRuntime).register(registration).await
-
-    hcdActorRef ! "SUCEESS"
-
+    registration = AkkaRegistration(connection, tromboneHcdActorRef, "nfiraos.ncc.tromboneHCD")
+    registrationResult = LocationService.make(actorRuntime).register(registration).await
   }
 }
 
 class TromboneHCD extends Actor {
   override def receive: Receive = {
-    case _ => println("Trombone HCD is registered to JmDns.")
+    case "Unregister" => TromboneHCD.registrationResult.unregister()
   }
 }

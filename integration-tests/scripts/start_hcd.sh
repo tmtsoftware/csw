@@ -7,4 +7,10 @@ sleep 10
 
 integration_test_command='sbt integration-tests/test'
 $integration_test_command
+
+
 kill -9 $hcd_app_pid
+
+int_tests_pid=`ps -ef | awk '$NF~"integration-tests/run" {print $2}'`
+
+kill -9 $int_tests_pid
