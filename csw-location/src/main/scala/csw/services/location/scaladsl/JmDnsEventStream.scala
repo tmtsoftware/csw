@@ -2,27 +2,22 @@ package csw.services.location.scaladsl
 
 import javax.jmdns.{JmDNS, ServiceEvent, ServiceListener}
 
-import akka.stream.scaladsl.{BroadcastHub, Keep, Sink, Source}
-import akka.stream.{KillSwitch, KillSwitches, OverflowStrategy}
+import akka.stream.KillSwitch
+import akka.stream.scaladsl.Source
 import csw.services.location.common.ServiceInfoExtensions.RichServiceInfo
-import csw.services.location.common.{ActorRuntime, StreamExtensions}
+import csw.services.location.common.SourceExtensions.RichSource
+import csw.services.location.common.{ActorRuntime, SourceExtensions}
 import csw.services.location.models.{Connection, Location, Removed, Unresolved}
 
 class JmDnsEventStream(jmDns: JmDNS, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 
+  private val (source, queueF) = SourceExtensions.coupling[Location]
+
+  val broadcast: LocationBroadcast = new LocationBroadcast(source, actorRuntime)
+
   jmDns.addServiceListener(LocationService.DnsType, makeListener())
-
-  private val (_source, queueF) = StreamExtensions.coupling[Location]
-
-  val source: Source[Location, KillSwitch] = _source
-    .runWith(BroadcastHub.sink[Location])
-    .viaMat(KillSwitches.single)(Keep.right)
-    .buffer(256, OverflowStrategy.dropNew)
-
-  // Ensure that the Broadcast output is dropped if there are no listening parties.
-  source.runWith(Sink.ignore)
 
   private def makeListener() = new ServiceListener {
     override def serviceAdded(event: ServiceEvent): Unit = {

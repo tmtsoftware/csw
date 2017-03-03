@@ -1,11 +1,9 @@
 package csw.services.location.scaladsl
 
-import java.net.{InetAddress, NetworkInterface}
 import javax.jmdns.JmDNS
 
-import akka.actor.ActorSystem
+import akka.Done
 import akka.stream.KillSwitch
-import akka.{Done, NotUsed}
 import akka.stream.scaladsl.Source
 import csw.services.location.common.{ActorRuntime, Networks}
 import csw.services.location.models._
@@ -14,9 +12,7 @@ import scala.concurrent.Future
 
 trait LocationService {
 
-  def register(reg: TcpRegistration): Future[RegistrationResult]
-  def register(reg: HttpRegistration): Future[RegistrationResult]
-  def register(reg: AkkaRegistration): Future[RegistrationResult]
+  def register(reg: Registration): Future[RegistrationResult]
 
   /**
     * Unregisters the connection from the location service
