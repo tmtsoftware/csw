@@ -18,7 +18,7 @@ printf "${YELLOW}------------ Starting Integration Test execution ------------${
 integration_test_command='sbt -DPORT=2553 integration/test'
 ${integration_test_command}
 
-if [ -n ${hcd_app_pid} ]
+if [ -n "${hcd_app_pid}" ]
 then
     printf "${PURPLE}Killing HCD process : $hcd_app_pid ${NC}\n"
     kill -9 ${hcd_app_pid}
@@ -26,7 +26,7 @@ fi
 
 int_tests_pid=`ps -ef | awk '$NF~"integration/run" {print $2}'`
 
-if [ -n ${int_tests_pid} ]
+if [ -n "${int_tests_pid}" ]
 then
     printf "${PURPLE}Killing integration/run process : $int_tests_pid ${NC}\n"
     kill -9 ${int_tests_pid}
