@@ -2,10 +2,7 @@ package csw.services.location.scaladsl
 
 import javax.jmdns.{JmDNS, ServiceEvent, ServiceListener}
 
-import akka.stream.KillSwitch
-import akka.stream.scaladsl.Source
 import csw.services.location.common.ServiceInfoExtensions.RichServiceInfo
-import csw.services.location.common.SourceExtensions.RichSource
 import csw.services.location.common.{ActorRuntime, SourceExtensions}
 import csw.services.location.models.{Connection, Location, Removed, Unresolved}
 

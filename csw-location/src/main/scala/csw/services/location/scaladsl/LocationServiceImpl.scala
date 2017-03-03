@@ -1,19 +1,16 @@
 package csw.services.location.scaladsl
 
-import java.net.URI
 import javax.jmdns.{JmDNS, ServiceInfo}
 
 import akka.Done
-import akka.serialization.Serialization
 import akka.stream.KillSwitch
-import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.scaladsl.Source
 import csw.services.location.common.ActorRuntime
 import csw.services.location.common.ServiceInfoExtensions.RichServiceInfo
 import csw.services.location.models._
 
-import collection.JavaConverters._
+import scala.async.Async._
 import scala.concurrent.Future
-import async.Async._
 
 private class LocationServiceImpl(
   jmDNS: JmDNS,
@@ -29,12 +26,6 @@ private class LocationServiceImpl(
     jmDNS.registerService(reg.serviceInfo)
     registrationResult(reg.connection)
   }(jmDnsDispatcher)
-
-  private def registrationResult(connection: Connection) = new RegistrationResult {
-    override def componentId: ComponentId = connection.componentId
-
-    override def unregister(): Future[Done] = outer.unregister(connection)
-  }
 
   override def unregister(connection: Connection): Future[Done] = {
     val locationF = jmDnsEventStream.broadcast.removed(connection)
@@ -81,4 +72,9 @@ private class LocationServiceImpl(
     jmDnsEventStream.broadcast.filter(connection)
   }
 
+  private def registrationResult(connection: Connection) = new RegistrationResult {
+    override def componentId: ComponentId = connection.componentId
+
+    override def unregister(): Future[Done] = outer.unregister(connection)
+  }
 }

@@ -16,6 +16,7 @@ sealed trait Registration {
   def connection: Connection
   def port: Int
   def values: Map[String, String]
+
   def serviceInfo: ServiceInfo = ServiceInfo.create(LocationService.DnsType, connection.toString, port, 0, 0, values.asJava)
 }
 
@@ -30,7 +31,9 @@ final case class TcpRegistration(connection: TcpConnection, port: Int) extends R
   * Represents a registered connection to a HTTP based service
   */
 final case class HttpRegistration(connection: HttpConnection, port: Int, path: String) extends Registration {
-  override def values: Map[String, String] = Map(LocationService.PathKey -> path)
+  override def values: Map[String, String] = Map(
+    LocationService.PathKey -> path
+  )
 }
 
 /**
