@@ -23,7 +23,8 @@ lazy val `csw-location` = project
     )
   )
 
-lazy val `trackLocation` = Project(id = "trackLocation", base = file("apps/trackLocation"))
+lazy val `trackLocation` = project
+  .in(file("apps/trackLocation"))
   .enablePlugins(Coverage, PublishBintray)
   .settings(
     libraryDependencies ++= Seq(
@@ -32,7 +33,8 @@ lazy val `trackLocation` = Project(id = "trackLocation", base = file("apps/track
       `scalatest` % Test,
       `scalamock-scalatest-support` % Test
     )
-  ) dependsOn(`csw-location`)
+  ).dependsOn(`csw-location`)
+
 lazy val `integration-tests` = project
   .dependsOn(`csw-location` % "compile->compile;test->test")
 
