@@ -16,8 +16,8 @@ notifications:
     on_failure: always
 
 script:
-  - ifconfig -a
-  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION -Djava.net.preferIPv4Stack=true ";scalastyle;test;coverageReport"
+#  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION -Djava.net.preferIPv4Stack=true ";scalastyle;test;coverageReport"
+  - ./integration/scripts/execute.sh
 
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
