@@ -18,3 +18,5 @@ RUN java -version
 RUN sbt --version
 CMD cd /source && sbt -J-XX:ReservedCodeCacheSize=128m -Djava.net.preferIPv4Stack=true scalastyle test coverageReport
 CMD cd /source && sbt run
+RUN yum install -y epel-release
+RUN yum install -y iperf
