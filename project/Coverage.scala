@@ -13,7 +13,7 @@ object Coverage extends AutoPlugin {
     coverageFailOnMinimum := true,
     coverageHighlighting := true,
     coverageOutputCobertura := true,
-    coverageOutputXML := false
+    coverageOutputXML := true
   )
 
 }
