@@ -1,6 +1,5 @@
 package csw.services.location.models
 
-import csw.services.location.models.ComponentType._
 import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType, UnknownConnectionTypeException}
 import org.scalatest.{FunSuite, Matchers}
 
@@ -15,7 +14,7 @@ class ConnectionTypeTest extends FunSuite with Matchers {
   }
 
   test("should fail to parse invalid connection type string") {
-    val parsedConnection = ConnectionType.parse("ftp")
-    parsedConnection.shouldEqual(Failure(UnknownConnectionTypeException("ftp")))
+    val parsedConnectionType = ConnectionType.parse("ftp")
+    parsedConnectionType.shouldEqual(Failure(UnknownConnectionTypeException("ftp")))
   }
 }
