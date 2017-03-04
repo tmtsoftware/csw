@@ -19,7 +19,7 @@ before_Script:
   - awk -version
 
 script:
-  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION -Djava.net.preferIPv4Stack=true ";scalastyle;coverage;test;coverageReport"
+  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION -Djava.net.preferIPv4Stack=true ";clean;scalastyle;coverage;test;coverageReport"
   - ./integration/scripts/execute.sh
 
 before_cache:
