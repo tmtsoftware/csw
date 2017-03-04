@@ -16,7 +16,7 @@ RUN curl -LO "https://dl.bintray.com/sbt/native-packages/sbt/0.13.13/sbt-0.13.13
 ENV PATH="/usr/local/jdk1.8.0_121/bin/:/usr/local/sbt-launcher-packaging-0.13.13/bin/:${PATH}"
 RUN java -version
 RUN sbt --version
-CMD cd /source && sbt -J-XX:ReservedCodeCacheSize=128m -Djava.net.preferIPv4Stack=true scalastyle test coverageReport
-CMD cd /source && sbt run
 RUN yum install -y epel-release
 RUN yum install -y iperf
+RUN yum install -y net-tools
+RUN yum install -y tcpdump
