@@ -15,12 +15,25 @@ notifications:
     on_success: never
     on_failure: always
 
-before_Script:
-  - awk -version
-
 script:
   - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION -Djava.net.preferIPv4Stack=true ";clean;scalastyle;coverage;test;coverageReport"
   - ./integration/scripts/execute.sh
+
+after_success:
+  deploy:
+    provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    repo: "kpritam/travis-ci-sample"
+    local_dir: csw-location/target/scala-2.12/scoverage-report
+
+after_faliure:
+  deploy:
+    provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    repo: "kpritam/travis-ci-sample"
+    local_dir: csw-location/target/scala-2.12/scoverage-report
 
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
@@ -42,3 +55,5 @@ env:
   - secure: FP9ZHimQ3AqRr6S4Ukfy5LVac13h6RypHO9sV4I9OlsUNviyxP5IDVvMGBM15wg1cngqQ7xlmoOtW6AHy+m6+Yq5BH+H6yGOc6YpnoWK4JR3c2vOE2oK3CX8hwQLCRNgy1vJ44XWUwvC9XMku0MVvLHILUCl/hwppb7R+Vp9PA2GobZPRQlaAbH4iBLjOKiwaXZ1I7MnB4Fwz/1jOwJBzgGo270cnS4gnZdweQEZrVJjl4eY5UGoGDoH95bApq28t5uBSNQOwQHH++WbN8x2bTh4mrSAqNy6nVJ9jYQ6f1BGX6D8tbvJ+MCMzrZSjK/T4L4Eo/YiKkLXi/kdfdel1mHTGM+6Dn77+qGNqro3uW9abuueOZdi+Hp4t4fqZN/oYz5o23yJvNGYJ7+6btUK8Ma08nvFg+z6dAM+UAkGv8iXpHMgi+iY3BLbqoUSlFq/TIA7GnggRp1VU2xPb0Ig3YEGTu3Oe0+yS8JlAdtfC6t8NfnWGIFhqS6HLAQ8xI+JOXUnN0LEqf6arKijYjLUfWwvk8BB9Vl4zw2LXfc0/WQ/I/QGIm/lws93aog15YDKpT2ypHE8XaaO0DdHiGbcwq8fIqY/N97XvZVYrD2gmt8C7ljaPN8TtEzQQe1g2Kiwse00G+c3bJ0feO1sl0dWs+9ST/mQQ/Ej2Lsz1hTMmd0=
   # encrypted with: travis encrypt BINTRAY_PASS=...
   - secure: h4j2bwnmvJXIzhItT++TXLA2PrlhQ1SyHZFpg1Rb6bNhA6sGBPIhUtp3ofsmuGeccrt6jLJZQo7VS8vE7AQV4+5G9uBDSo9AYreQlpfnKCBEHY0cOCC8DhKHplVA+GNPxStcusY4gTdmSUlw5xT0/uhr8WTa5mKyjmvIV+8CQYEciwYZ44y7U/4Dr/UoXgqLCe3XKrhShOKH13syUc5g2wS1wpKfwlGNppmKK6BruRsC7IpZENL7k8nlNdhZJqvp/PJquIZ7pxVFvEzI7cSBYq9e7RcMEMluzGt/DKTtEV0Q0Hjfk3tvRl7SIVhBlXIE48eWkQfxlb7dHpbxU/01OGU+F67gk4ulD+PM7TcYBR7E+zwU2ONbsBjCVWp2i8e6j0B6AeFChRg+QtgAfXpLtYxzkbpS2A5Yv2hGcaKLwUApkADaifIujhhvaAotWX6OdQegE/dcGBEWdDNVh29RMXypzdeXMqFCiVtK5T7FBHQ2Jg5Pq1i6S0FTEFrhp+NbbVn7yaecbrUf2+43Y0goEpxHyZrZh1JZQsUhNPhWU5NXwFmgnqFrqiFSX4tzdEEQfCYObK89aUvoo7/qEZ6Fccs7TVmbjbEB6M2YYW+nSrnBG3fuf/XIuzbOqJcbbRMl4NH552ATUVuzd8ExB8OvQ/b+VMUkUCww2+YgX0zX42U=
+  # encrypted GITHUB_TOKEN
+  - secure: Pe0YleOP9FejTG4/L3z+aATNeZEdJCYgV8TgwxUQ+Anr+844tHVDZ4sALzWkRyN8YAL+CXrcJf+09/thelt9bgnrkfgMasfnrmbXmA3ZmHMNLZJMPlDRDUT4CNCmhEjkfVSFb9DwlxXlwKIS4Y447fU4lladyoEZuE6qurD6VAxiU82OoFY68btdvYfjwiMwwovItDtGMk5KTYq3CeECHTuvbT1KoYFfh7X8lSq+hoDpJwTa+YvB8WO6JjPncVGrmuUsoEonT3hwZ3ZiDsz6NlQ+6r3Ef1oEeYdEj6n92fuyIAwOvn5+fth3iyxMl5IPOcWJhbsGr1tXuEaRQo3wpUqSP6Wu+WfJBG+c3YdvVpydT5LK7lK2Z4IRNEFyUKB1IBaA8DjPO4OFIRNT9TmSrXOVe7wBW6ph9sokq9dfaX0QfgXET6eUORfPthrVYQGTe2A3u7PZs7J6jpPXwQYOamR9XzIPo04jLQaDGxspSM/kmV1TtJGH0DF7qz00S8rh6Mqawht9GlEpfmCIx7CVAbV8gGfSewI4II3gTMHE+zNTawTwVFkk09WAw7+TUyOcsZU6SOgdqdaporp6ktNZlBOOdVh0j2RaBj4XkvMTbqpKgmiOcmoePb3YFR8spLvM0Pu3M3ypxnr+7lcfwRD8ZkxrMTFI05mBpTpjAkrHAeQ=
