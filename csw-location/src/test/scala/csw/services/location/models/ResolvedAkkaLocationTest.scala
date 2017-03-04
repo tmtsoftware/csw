@@ -9,7 +9,7 @@ class ResolvedAkkaLocationTest extends FunSuite {
   test("resolves actor referece") {
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
-    ResolvedAkkaLocation(connection, new URI("akka://hcd1"))
+    ResolvedAkkaLocation(connection, new URI("akka://hcd1"), "prefix")
   }
 
 }
