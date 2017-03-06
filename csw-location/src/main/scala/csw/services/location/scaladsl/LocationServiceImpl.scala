@@ -5,8 +5,8 @@ import javax.jmdns.{JmDNS, ServiceInfo}
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.services.location.common.ActorRuntime
-import csw.services.location.common.ServiceInfoExtensions.RichServiceInfo
+import csw.services.location.common.{ActorRuntime, Constants}
+import csw.services.location.models.ServiceInfoExtensions.RichServiceInfo
 import csw.services.location.models._
 
 import scala.async.Async._
@@ -29,7 +29,7 @@ private class LocationServiceImpl(
 
   override def unregister(connection: Connection): Future[Done] = {
     val locationF = jmDnsEventStream.broadcast.removed(connection)
-    jmDNS.unregisterService(ServiceInfo.create(LocationService.DnsType, connection.toString, 0, ""))
+    jmDNS.unregisterService(ServiceInfo.create(Constants.DnsType, connection.toString, 0, ""))
     locationF.map(_ => Done)
   }
 
@@ -45,12 +45,12 @@ private class LocationServiceImpl(
 
   override def resolve(connection: Connection): Future[Resolved] = {
     val locationF = jmDnsEventStream.broadcast.resolved(connection)
-    jmDNS.requestServiceInfo(LocationService.DnsType, connection.toString)
+    jmDNS.requestServiceInfo(Constants.DnsType, connection.toString)
     locationF
   }
 
   override def list: Future[List[Location]] = Future {
-    jmDNS.list(LocationService.DnsType).toList.flatMap(_.locations)
+    jmDNS.list(Constants.DnsType).toList.flatMap(_.locations)
   }(jmDnsDispatcher)
 
   override def list(componentType: ComponentType): Future[List[Location]] = async {
@@ -68,7 +68,7 @@ private class LocationServiceImpl(
   }
 
   override def track(connection: Connection): Source[Location, KillSwitch] = {
-    jmDNS.requestServiceInfo(LocationService.DnsType, connection.toString, true)
+    jmDNS.requestServiceInfo(Constants.DnsType, connection.toString, true)
     jmDnsEventStream.broadcast.filter(connection)
   }
 

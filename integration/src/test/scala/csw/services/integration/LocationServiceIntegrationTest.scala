@@ -3,7 +3,7 @@ package csw.services.integration
 import csw.services.location.common.ActorRuntime
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.{Location, ResolvedAkkaLocation}
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
@@ -14,7 +14,7 @@ class LocationServiceIntegrationTest
     with BeforeAndAfter {
 
   private val actorRuntime = new ActorRuntime("AssemblySystem")
-  private val locationService = LocationService.make(actorRuntime)
+  private val locationService = LocationServiceFactory.make(actorRuntime)
 
   test("resolves remote HCD") {
 

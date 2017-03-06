@@ -9,7 +9,7 @@ import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
 import csw.services.tracklocation.models.Options
 import csw.services.tracklocation.utils.{CmdLineArgsParser, PortOptHandler, StringOptHandler}
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.scaladsl.LocationServiceFactory
 
 import scala.sys.process._
 import scala.concurrent.duration._
@@ -77,7 +77,7 @@ object TrackLocation extends App {
 
     val runtime = new ActorRuntime("track-location-app")
     implicit val dispatcher = runtime.actorSystem.dispatcher
-    val locationService = LocationService.make(runtime)
+    val locationService = LocationServiceFactory.make(runtime)
 
     def registerNames: Future[List[RegistrationResult]] = Future.sequence(names.map{ name =>
       val componentId = ComponentId(name, ComponentType.Service)

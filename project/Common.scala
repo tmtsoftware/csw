@@ -1,6 +1,7 @@
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
+import Dependencies._
 
 object Common extends AutoPlugin {
 
@@ -27,7 +28,8 @@ object Common extends AutoPlugin {
         "-Xlint",
         "-Yno-adapted-args",
         "-Ywarn-dead-code",
-        "-Xfuture"
+        "-Xfuture",
+        "-P:acyclic:force"
       ),
 
       javacOptions ++= Seq(
@@ -40,6 +42,12 @@ object Common extends AutoPlugin {
       testOptions in Test += Tests.Argument("-oDF"),
       // -v Log "test run started" / "test started" / "test run finished" events on log level "info" instead of "debug".
       // -a Show stack traces and exception class name for AssertionErrors.
-      testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
+      testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-a"),
+
+      libraryDependencies += `acyclic`,
+
+      autoCompilerPlugins := true,
+
+      addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7")
     )
 }

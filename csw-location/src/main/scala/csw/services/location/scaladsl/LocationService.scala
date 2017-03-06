@@ -1,11 +1,8 @@
 package csw.services.location.scaladsl
 
-import javax.jmdns.JmDNS
-
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.services.location.common.{ActorRuntime, Networks}
 import csw.services.location.models._
 
 import scala.concurrent.Future
@@ -41,18 +38,4 @@ trait LocationService {
   def list(connectionType: ConnectionType): Future[List[Location]]
 
   def track(connection: Connection): Source[Location, KillSwitch]
-}
-
-object LocationService {
-  val DnsType = "_csw._tcp.local."
-
-  val PathKey = "path"
-  val ActorPathKey = "actor-path"
-  val PrefixKey = "prefix"
-
-  def make(actorRuntime: ActorRuntime): LocationService = {
-    val jmDNS = JmDNS.create(Networks.getPrimaryIpv4Address)
-    val jmDnsEventStream = new JmDnsEventStream(jmDNS, actorRuntime)
-    new LocationServiceImpl(jmDNS, actorRuntime, jmDnsEventStream)
-  }
 }

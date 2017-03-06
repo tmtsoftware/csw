@@ -1,14 +1,13 @@
 package csw.services.location.models
 
-import java.net.URI
 import javax.jmdns.ServiceInfo
 
 import akka.actor.{ActorPath, ActorRef}
 import akka.serialization.Serialization
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.common.Constants
 
-import collection.JavaConverters._
+import scala.collection.JavaConverters._
 
 /**
   * Represents a registered connection to a service
@@ -18,7 +17,7 @@ sealed trait Registration {
   def port: Int
   def values: Map[String, String]
 
-  def serviceInfo: ServiceInfo = ServiceInfo.create(LocationService.DnsType, connection.toString, port, 0, 0, values.asJava)
+  def serviceInfo: ServiceInfo = ServiceInfo.create(Constants.DnsType, connection.toString, port, 0, 0, values.asJava)
 }
 
 /**
@@ -33,7 +32,7 @@ final case class TcpRegistration(connection: TcpConnection, port: Int) extends R
   */
 final case class HttpRegistration(connection: HttpConnection, port: Int, path: String) extends Registration {
   override def values: Map[String, String] = Map(
-    LocationService.PathKey -> path
+    Constants.PathKey -> path
   )
 }
 
@@ -49,8 +48,8 @@ final case class AkkaRegistration(connection: AkkaConnection, component: ActorRe
 
   override def values: Map[String, String] = {
     Map(
-      LocationService.ActorPathKey -> actorPath.toSerializationFormat,
-      LocationService.PrefixKey -> prefix
+      Constants.ActorPathKey -> actorPath.toSerializationFormat,
+      Constants.PrefixKey -> prefix
     )
   }
 }

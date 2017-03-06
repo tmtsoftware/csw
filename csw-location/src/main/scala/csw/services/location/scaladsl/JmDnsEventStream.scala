@@ -2,8 +2,8 @@ package csw.services.location.scaladsl
 
 import javax.jmdns.{JmDNS, ServiceEvent, ServiceListener}
 
-import csw.services.location.common.ServiceInfoExtensions.RichServiceInfo
-import csw.services.location.common.{ActorRuntime, SourceExtensions}
+import csw.services.location.models.ServiceInfoExtensions.RichServiceInfo
+import csw.services.location.common.{ActorRuntime, Constants, SourceExtensions}
 import csw.services.location.models.{Connection, Location, Removed, Unresolved}
 
 class JmDnsEventStream(jmDns: JmDNS, actorRuntime: ActorRuntime) {
@@ -14,7 +14,7 @@ class JmDnsEventStream(jmDns: JmDNS, actorRuntime: ActorRuntime) {
 
   val broadcast: LocationBroadcast = new LocationBroadcast(source, actorRuntime)
 
-  jmDns.addServiceListener(LocationService.DnsType, makeListener())
+  jmDns.addServiceListener(Constants.DnsType, makeListener())
 
   private def makeListener() = new ServiceListener {
     override def serviceAdded(event: ServiceEvent): Unit = {

@@ -21,7 +21,7 @@ class LocationServiceTest
     with BeforeAndAfterAll {
 
   private val actorRuntime = new ActorRuntime("test")
-  private val locationService = LocationService.make(actorRuntime)
+  private val locationService = LocationServiceFactory.make(actorRuntime)
 
   override protected def afterEach(): Unit = {
     locationService.unregisterAll().await

@@ -2,11 +2,9 @@ package csw.services.location.models
 
 import java.net.URI
 import java.util.Optional
-import javax.jmdns.ServiceInfo
 
 import akka.actor.ActorRef
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.services.location.scaladsl.LocationService
 
 import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 

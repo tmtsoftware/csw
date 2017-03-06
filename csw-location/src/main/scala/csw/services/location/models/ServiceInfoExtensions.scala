@@ -1,13 +1,11 @@
-package csw.services.location.common
+package csw.services.location.models
 
 import java.net.URI
 import javax.jmdns.ServiceInfo
 
 import akka.actor.{ActorPath, ActorRef, ActorSystem, ExtendedActorSystem, Extension, ExtensionKey}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.services.location.models._
-import csw.services.location.scaladsl.LocationService
-
+import csw.services.location.common.Constants
 import scala.util.control.NonFatal
 
 object ServiceInfoExtensions {
@@ -25,11 +23,11 @@ object ServiceInfoExtensions {
         case conn: TcpConnection  =>
           ResolvedTcpLocation(conn, new URI(url))
         case conn: HttpConnection =>
-          val path = info.getPropertyString(LocationService.PathKey)
+          val path = info.getPropertyString(Constants.PathKey)
           ResolvedHttpLocation(conn, new URI(url), path)
         case conn: AkkaConnection =>
-          val prefix = info.getPropertyString(LocationService.PrefixKey)
-          val actorPathString = info.getPropertyString(LocationService.ActorPathKey)
+          val prefix = info.getPropertyString(Constants.PrefixKey)
+          val actorPathString = info.getPropertyString(Constants.ActorPathKey)
           val actorRef = RemoteAddressExtension(actorSystem).resolveActorRef(actorPathString)
           val uri = new URI(ActorPath.fromString(actorPathString).toString)
           ResolvedAkkaLocation(conn, uri, prefix, Some(actorRef))

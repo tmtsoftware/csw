@@ -1,12 +1,12 @@
 package csw.services.integtration.apps
 
 import akka.actor.{Actor, Props}
-import csw.services.integtration.common.TestFutureExtension.RichFuture
 import akka.pattern.pipe
+import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.common.ActorRuntime
-import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 object TromboneHCD extends App {
   private val actorRuntime = new ActorRuntime("trombone-hcd")
@@ -16,7 +16,7 @@ object TromboneHCD extends App {
   val connection = AkkaConnection(componentId)
 
   val registration = AkkaRegistration(connection, tromboneHcdActorRef, "nfiraos.ncc.tromboneHCD")
-  val registrationResult = LocationService.make(actorRuntime).register(registration).await
+  val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
 
 }
 
