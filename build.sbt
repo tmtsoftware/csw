@@ -37,9 +37,5 @@ lazy val `trackLocation` = project
   )
   .dependsOn(`csw-location`)
 
-lazy val integration = project
-  .enablePlugins(NoPublish)
-  .dependsOn(`csw-location` % "compile->compile;test->test")
-
 lazy val docs = project
   .enablePlugins(ParadoxSite, NoPublish)

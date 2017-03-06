@@ -1,7 +1,7 @@
-package csw.services.location
+package csw.services.integration
 
 import csw.services.location.common.ActorRuntime
-import csw.services.location.common.TestFutureExtension.RichFuture
+import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.{Location, ResolvedAkkaLocation}
 import csw.services.location.scaladsl.LocationService
 import org.scalamock.scalatest.MockFactory

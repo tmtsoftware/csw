@@ -6,7 +6,7 @@ ORANGE='\033[0;33m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
-start_hcd_command='sbt integration/run'
+start_hcd_command='sbt run'
 ${start_hcd_command} &
 hcd_app_pid=$!
 
@@ -15,7 +15,7 @@ printf "${YELLOW}------------ Starting HCD process with id : $hcd_app_pid ------
 sleep 10
 
 printf "${YELLOW}------------ Starting Integration Test execution ------------${NC}\n"
-integration_test_command='sbt -DPORT=2553 integration/test'
+integration_test_command='sbt -DPORT=2553 test'
 ${integration_test_command}
 
 if [ -n "${hcd_app_pid}" ]
@@ -24,10 +24,10 @@ then
     kill -9 ${hcd_app_pid}
 fi
 
-int_tests_pid=`ps -ef | awk '$NF~"integration/run" {print $2}'`
+int_tests_pid=`ps -ef | awk '$NF~"run" {print $2}'`
 
 if [ -n "${int_tests_pid}" ]
 then
-    printf "${PURPLE}Killing integration/run process : $int_tests_pid ${NC}\n"
+    printf "${PURPLE}Killing run process : $int_tests_pid ${NC}\n"
     kill -9 ${int_tests_pid}
 fi

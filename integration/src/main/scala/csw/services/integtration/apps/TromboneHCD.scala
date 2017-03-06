@@ -1,12 +1,12 @@
-package csw.services.location.apps
+package csw.services.integtration.apps
 
 import akka.actor.{Actor, Props}
-import csw.services.location.common.ActorRuntime
-import csw.services.location.common.TestFutureExtension.RichFuture
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
-import csw.services.location.scaladsl.LocationService
+import csw.services.integtration.common.TestFutureExtension.RichFuture
 import akka.pattern.pipe
+import csw.services.location.common.ActorRuntime
+import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.services.location.models.Connection.AkkaConnection
+import csw.services.location.scaladsl.LocationService
 
 object TromboneHCD extends App {
   private val actorRuntime = new ActorRuntime("trombone-hcd")

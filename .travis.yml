@@ -19,7 +19,7 @@ script:
   - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION -Djava.net.preferIPv4Stack=true ";clean;scalastyle;coverage;test;coverageReport"
   - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION coverageAggregate
   - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION coveralls
-  - ./integration/scripts/execute.sh
+  - cd integration & ./scripts/execute.sh & cd ..
 
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
