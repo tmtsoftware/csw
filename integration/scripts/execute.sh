@@ -6,6 +6,8 @@ ORANGE='\033[0;33m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
+sbt clean compile
+
 start_hcd_command='sbt run'
 ${start_hcd_command} &
 hcd_app_pid=$!
