@@ -11,6 +11,7 @@ object Dependencies {
   val `scala-async` = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
   val `akka-actor` = "com.typesafe.akka" %% "akka-actor" % "2.4.17"
   val `scopt` = "com.github.scopt" %% "scopt" % "3.5.0"
+  val `scala-logging` = "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"
 }
 
 object Akka {

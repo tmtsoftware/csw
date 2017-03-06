@@ -31,7 +31,8 @@ lazy val `trackLocation` = project
       `akka-actor`,
       `scopt`,
       `scalatest` % Test,
-      `scalamock-scalatest-support` % Test
+      `scalamock-scalatest-support` % Test,
+      `scala-logging` % Test
     )
   )
   .dependsOn(`csw-location`)

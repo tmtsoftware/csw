@@ -2,20 +2,19 @@ package csw.services.location.common
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
 
-class ActorRuntime(name: String) {
+class ActorRuntime(name: String, _settings: Map[String, Any] = Map.empty) {
 
-  private def config = {
-    val configs: Map[String, String] = Map(
+  val config: Config = {
+    val settings: Map[String, Any] = Map(
       "akka.remote.netty.tcp.hostname" -> Networks.getPrimaryIpv4Address.getHostAddress
-    )
+    ) ++ _settings
 
-    ConfigFactory.parseMap(configs.asJava)
-      .withFallback(ConfigFactory.load())
+    ConfigFactory.parseMap(settings.asJava).withFallback(ConfigFactory.load())
   }
 
   implicit val actorSystem: ActorSystem = ActorSystem(name, config)
