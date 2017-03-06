@@ -9,7 +9,7 @@ import csw.services.location.common.ActorRuntime
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
 import csw.services.tracklocation.models.Options
-import csw.services.tracklocation.utils.{CmdLineArgsParser, PortOptHandler, StringOptHandler}
+import csw.services.tracklocation.utils.{CmdLineArgsParser, OptionsHandler}
 import csw.services.location.scaladsl.LocationServiceFactory
 
 import scala.sys.process._
@@ -50,23 +50,25 @@ object TrackLocation extends App {
     if (file.exists()) {
       Some(ConfigFactory.parseFileAnySyntax(file).resolve(ConfigResolveOptions.noSystem()))
     }
-    else
+    else {
       None
+    }
   }
 
   // Run the application
   private def run(options: Options): Unit = {
     if (options.names.isEmpty) error("Please specify one or more application names, separated by commas")
-    //. Get the app config file, if given
 
+    //. Get the app config file, if given
     val appConfig: Option[Config] = options.appConfigFile.flatMap(getAppConfig)
+    val optHandler: OptionsHandler = OptionsHandler(options, appConfig)
 
     // Gets the String value of an option from the command line or the app's config file, or None if not found
     // Use the value of the --port option, or use a random, free port
-    val port = PortOptHandler("port", options.port, options, appConfig)
+    val port = optHandler.portOpt("port", options.port)
 
     // Replace %port in the command
-    val command = StringOptHandler("command", options.command, options, appConfig)
+    val command = optHandler.stringOpt("command", options.command)
       .get
       .replace("%port", port.toString)
 
