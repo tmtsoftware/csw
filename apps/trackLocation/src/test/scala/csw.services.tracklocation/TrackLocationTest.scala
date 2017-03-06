@@ -8,7 +8,7 @@ import com.typesafe.scalalogging.LazyLogging
 import csw.services.location.common.{ActorRuntime, Networks}
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.tracklocation.common.TestFutureExtension._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
 
@@ -39,7 +39,7 @@ class TrackLocationTest
 
     val runtime = new ActorRuntime("track-location-test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
     val system = runtime.actorSystem
-    val locationService = LocationService.make(runtime)
+    val locationService = LocationServiceFactory.make(runtime)
     implicit val dispatcher = system.dispatcher
 
     Future {
@@ -76,7 +76,7 @@ class TrackLocationTest
 
     val runtime = new ActorRuntime("track-location-test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
     val system = runtime.actorSystem
-    val locationService = LocationService.make(runtime)
+    val locationService = LocationServiceFactory.make(runtime)
     implicit val dispatcher = system.dispatcher
 
     Future {
