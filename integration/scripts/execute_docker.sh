@@ -6,13 +6,13 @@ HOST_DIR_MAPPING=$1
 echo "$HOST_DIR_MAPPING"
 
 echo "Starting HCD docker container"
-docker run -d --rm --name node1 $HOST_DIR_MAPPING centos-csw bash -c 'cd /source && sbt integration/run'
+docker run -it --rm --name node1 $HOST_DIR_MAPPING centos-csw bash -c 'cd /source/integration && sbt run'
 
 echo "Waiting for 10 seconds"
 sleep 10
 
 echo "Starting integration test docker container"
-docker run -it --rm --name node2 $HOST_DIR_MAPPING centos-csw bash -c 'cd /source && sbt -DPORT=2552 integration/test'
+docker run -it --rm --name node2 $HOST_DIR_MAPPING centos-csw bash -c 'cd /source/integration && sbt -DPORT=2552 test'
 
 echo "stopping HCD docker container"
 docker stop node1
