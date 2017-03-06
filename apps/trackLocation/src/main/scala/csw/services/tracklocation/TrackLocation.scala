@@ -6,13 +6,12 @@ import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory, ConfigResolveOptions}
 import csw.services.location.common.ActorRuntime
 import csw.services.location.models.Connection.TcpConnection
-import csw.services.location.models.{ComponentId, ComponentType, TcpRegistration}
+import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
 import csw.services.tracklocation.models.Options
 import csw.services.tracklocation.utils.{CmdLineArgsParser, PortOptHandler, StringOptHandler}
-
 import csw.services.location.scaladsl.LocationService
-import scala.sys.process._
 
+import scala.sys.process._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
@@ -69,7 +68,8 @@ object TrackLocation extends App {
       .get
       .replace("%port", port.toString)
 
-    startApp(options.names, command, port, options.delay.getOrElse(1000), options.noExit)
+    val defaultDelay = 1000
+    startApp(options.names, command, port, options.delay.getOrElse(defaultDelay), options.noExit)
   }
 
   // Starts the command and registers it with the given name on the given port
@@ -79,7 +79,7 @@ object TrackLocation extends App {
     implicit val dispatcher = runtime.actorSystem.dispatcher
     val locationService = LocationService.make(runtime)
 
-    def registerNames = Future.sequence(names.map{ name =>
+    def registerNames: Future[List[RegistrationResult]] = Future.sequence(names.map{ name =>
       val componentId = ComponentId(name, ComponentType.Service)
       val connection = TcpConnection(componentId)
       locationService.register(TcpRegistration(connection, port))
