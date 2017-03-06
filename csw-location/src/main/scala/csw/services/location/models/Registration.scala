@@ -3,10 +3,11 @@ package csw.services.location.models
 import java.net.URI
 import javax.jmdns.ServiceInfo
 
-import akka.actor.ActorRef
+import akka.actor.{ActorPath, ActorRef}
 import akka.serialization.Serialization
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.scaladsl.LocationService
+
 import collection.JavaConverters._
 
 /**
@@ -40,14 +41,15 @@ final case class HttpRegistration(connection: HttpConnection, port: Int, path: S
   * Represents a registered connection to an Akka service
   */
 final case class AkkaRegistration(connection: AkkaConnection, component: ActorRef, prefix: String = "") extends Registration {
-  private val uri = new URI(Serialization.serializedActorPath(component))
+  private val actorPath = ActorPath.fromString(Serialization.serializedActorPath(component))
 
-  override def port: Int = uri.getPort
+  override def port: Int = {
+    actorPath.address.port.getOrElse(throw new RuntimeException(s"missing port for actorRef=$component"))
+  }
 
   override def values: Map[String, String] = {
     Map(
-      LocationService.PathKey -> uri.getPath,
-      LocationService.SystemKey -> uri.getUserInfo,
+      LocationService.ActorPathKey -> actorPath.toSerializationFormat,
       LocationService.PrefixKey -> prefix
     )
   }

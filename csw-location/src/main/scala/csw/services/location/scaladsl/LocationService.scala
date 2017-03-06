@@ -47,7 +47,7 @@ object LocationService {
   val DnsType = "_csw._tcp.local."
 
   val PathKey = "path"
-  val SystemKey = "system"
+  val ActorPathKey = "actor-path"
   val PrefixKey = "prefix"
 
   def make(actorRuntime: ActorRuntime): LocationService = {

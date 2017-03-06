@@ -93,7 +93,7 @@ class LocationServiceTest
     val uri = new URI(actorPath.toString)
 
     locationService.list.await shouldBe List(
-      ResolvedAkkaLocation(connection, uri, Prefix)
+      ResolvedAkkaLocation(connection, uri, Prefix, Some(actorRef))
     )
 
     registrationResult.unregister().await
