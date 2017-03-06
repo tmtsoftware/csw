@@ -1,7 +1,7 @@
+import Dependencies._
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
-import Dependencies._
 
 object Common extends AutoPlugin {
 
@@ -48,6 +48,13 @@ object Common extends AutoPlugin {
 
       autoCompilerPlugins := true,
 
-      addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7")
+      addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
+
+      version := {
+        sys.props.get("prod.publish") match {
+          case Some("true") => version.value
+          case _            => "10000"
+        }
+      }
     )
 }

@@ -2,7 +2,7 @@ import Dependencies._
 
 lazy val csw = project
   .in(file("."))
-  .enablePlugins(UnidocSite, PublishGithub, PublishBintray)
+  .enablePlugins(UnidocSite, PublishGithub, PublishBintray, GitBranchPrompt)
   .aggregate(`csw-location`)
   .settings(Settings.mergeSiteWith(docs))
 
