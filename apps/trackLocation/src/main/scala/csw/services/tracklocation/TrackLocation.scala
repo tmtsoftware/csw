@@ -2,6 +2,7 @@ package csw.services.tracklocation
 
 import java.io.File
 
+import akka.actor.Terminated
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory, ConfigResolveOptions}
 import csw.services.location.common.ActorRuntime
@@ -21,6 +22,7 @@ import scala.concurrent.{Await, Future}
   */
 object TrackLocation extends App {
 
+  val runtime = new ActorRuntime("track-location-app")
   implicit val timeout = Timeout(10.seconds)
 
   // Parse the command line options
@@ -75,7 +77,6 @@ object TrackLocation extends App {
   // Starts the command and registers it with the given name on the given port
   private def startApp(names: List[String], command: String, port: Int, delay: Int, noExit: Boolean): Unit = {
 
-    val runtime = new ActorRuntime("track-location-app")
     implicit val dispatcher = runtime.actorSystem.dispatcher
     val locationService = LocationServiceFactory.make(runtime)
 
@@ -102,4 +103,6 @@ object TrackLocation extends App {
 
     if (!noExit) System.exit(exitCode)
   }
+
+  def shutdown(): Future[Terminated] = runtime.actorSystem.terminate()
 }

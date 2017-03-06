@@ -28,37 +28,31 @@ class TrackLocationTest
 
   private val actorRuntimePort = 2553
 
-  val runtime = new ActorRuntime("track-location-test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
-  private val system = runtime.actorSystem
-  val locationService = LocationService.make(runtime)
-
-  implicit val dispatcher = system.dispatcher
-
   override protected def afterEach(): Unit = {
-    locationService.unregisterAll().await
-  }
-
-  override protected def afterAll(): Unit = {
-    runtime.actorSystem.terminate().await
   }
 
   implicit val timeout = Timeout(60.seconds)
+
   test("Test with command line args") {
-    logger.debug("Test1 started")
     val name = "test1"
     val port = 9999
 
+    val runtime = new ActorRuntime("track-location-test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
+    val system = runtime.actorSystem
+    val locationService = LocationService.make(runtime)
+    implicit val dispatcher = system.dispatcher
+
     Future {
       TrackLocation.main(
-      Array(
-      "--name",
-      name,
-      "--command",
-      "sleep 10",
-      "--port",
-      port.toString,
-      "--no-exit"
-      ))
+        Array(
+          "--name",
+          name,
+          "--command",
+          "sleep 10",
+          "--port",
+          port.toString,
+          "--no-exit"
+        ))
     }
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
@@ -69,29 +63,33 @@ class TrackLocationTest
 
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
 
-    logger.debug(s"$name passed")
-    logger.debug("Test1 done")
+    locationService.unregisterAll().await
+    runtime.actorSystem.terminate().await
+    TrackLocation.shutdown().await
   }
 
-    test("Test with config file") {
-      logger.debug("Test2 started")
-      val name = "test2"
-      val port = 8888
-      val url = getClass.getResource("/test2.conf")
-      val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
+  test("Test with config file") {
+    val name = "test2"
+    val port = 8888
+    val url = getClass.getResource("/test2.conf")
+    val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
 
-      Future {
-        TrackLocation.main(Array("--name", name, "--no-exit", configFile))
-      }
+    val runtime = new ActorRuntime("track-location-test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
+    val system = runtime.actorSystem
+    val locationService = LocationService.make(runtime)
+    implicit val dispatcher = system.dispatcher
 
-      val connection = TcpConnection(ComponentId(name, ComponentType.Service))
-      val resolvedConnection: Resolved = locationService.resolve(connection).await
-      val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
-      resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
-
-      logger.debug(s"$name passed")
-      logger.debug("Test1 done")
-      logger.debug(s"$name passed")
-      logger.debug("Test2 done")
+    Future {
+      TrackLocation.main(Array("--name", name, "--no-exit", configFile))
     }
+
+    val connection = TcpConnection(ComponentId(name, ComponentType.Service))
+    val resolvedConnection: Resolved = locationService.resolve(connection).await
+    val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
+    resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
+
+    locationService.unregisterAll().await
+    runtime.actorSystem.terminate().await
+    TrackLocation.shutdown().await
+  }
 }
