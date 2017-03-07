@@ -2,7 +2,7 @@ FROM centos:7
 ENV	HOME /root
 ENV	LANG en_US.UTF-8
 ENV	LC_ALL en_US.UTF-8
-
+ADD integration/ /source/integration
 RUN yum install -y curl; yum upgrade -y; yum update -y;  yum clean all
 
 ENV JDK_VERSION 8u11
@@ -16,7 +16,5 @@ RUN curl -LO "https://dl.bintray.com/sbt/native-packages/sbt/0.13.13/sbt-0.13.13
 ENV PATH="/usr/local/jdk1.8.0_121/bin/:/usr/local/sbt-launcher-packaging-0.13.13/bin/:${PATH}"
 RUN java -version
 RUN sbt --version
-RUN yum install -y epel-release
-RUN yum install -y iperf
-RUN yum install -y net-tools
-RUN yum install -y tcpdump
+
+WORKDIR /source/integration

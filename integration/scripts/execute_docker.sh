@@ -1,27 +1,23 @@
 #!/usr/bin/env bash
 
 RED='\033[0;31m'
+YELLOW='\033[1;33m'
+ORANGE='\033[0;33m'
+PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
-#Map local project directories and .ivy directory from host to docker container
-#e.g.  ./integration/scripts/execute_docker.sh '-v /home/unmesh/work/csw-prod:/source -v /home/unmesh/.ivy2:/root/.ivy2'
-HOST_DIR_MAPPING=$1
-echo "$HOST_DIR_MAPPING"
+printf "${YELLOW}------------ Building Docker Image------------${NC}\n"
+#docker build -t tmt/csw-centos .
 
-if [ "$#" -eq  "0" ]
-   then
-     printf "${RED} Please provide host directory mappings for source root and .ivy. e.g. ${NC} ./integration/scripts/execute_docker.sh '-v /home/unmesh/work/csw-prod:/source -v /home/unmesh/.ivy2:/root/.ivy2' \n"
-     exit 1
-fi
-
-echo "Starting HCD docker container"
-docker run -d --rm --name node1 $HOST_DIR_MAPPING centos-csw bash -c 'cd /source/integration && sbt run'
-
-echo "Waiting for 10 seconds"
+printf "${YELLOW}----------- Starting HCD Docker container -----------${NC}\n"
+docker run -d --rm --name node1 -v ~/.ivy2/:/root/.ivy2/ tmt/csw-centos bash -c 'sbt run'
+printf "${PURPLE}------ Waiting for 10 seconds to let HCD gets started ------${NC}\n"
 sleep 10
+printf "${YELLOW}----------- Printing logs from HCD Docker container -----------${NC}\n"
+docker logs node1
 
-echo "Starting integration test docker container"
-docker run -it --rm --name node2 $HOST_DIR_MAPPING centos-csw bash -c 'cd /source/integration && sbt -DPORT=2552 test'
+printf "${YELLOW}------ Starting another Docker container to execute tests ------${NC}\n"
+docker run -it --rm --name node2 -v ~/.ivy2/:/root/.ivy2/ tmt/csw-centos bash -c 'sbt -DPORT=2552 test'
 
-echo "stopping HCD docker container"
+printf "${PURPLE}------ Stopping Docker container ------${NC}\n"
 docker stop node1
