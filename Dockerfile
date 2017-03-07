@@ -2,7 +2,7 @@ FROM centos:7
 ENV	HOME /root
 ENV	LANG en_US.UTF-8
 ENV	LC_ALL en_US.UTF-8
-ADD integration/ /source/integration
+ADD . /source/csw/
 RUN yum install -y curl; yum upgrade -y; yum update -y;  yum clean all
 
 ENV JDK_VERSION 8u11
@@ -17,4 +17,4 @@ ENV PATH="/usr/local/jdk1.8.0_121/bin/:/usr/local/sbt-launcher-packaging-0.13.13
 RUN java -version
 RUN sbt --version
 
-WORKDIR /source/integration
+WORKDIR /source/csw
