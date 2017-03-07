@@ -13,14 +13,14 @@ case class Command(
 )
 
 object Command{
+  val defaultDelay = 1000
   def parse(options:Options): Command = {
     val appConfig: Option[Config] = options.appConfigFile.flatMap(getAppConfig)
     val optionsHandler = OptionsHandler(options, appConfig)
     val port = optionsHandler.portOpt("port", options.port)
     val command = optionsHandler.stringOpt("command", options.command)
-      .get
+      .getOrElse("false") //if command is not specified, registration will proceed with "false" command.
       .replace("%port", port.toString)
-    val defaultDelay = 1000
     Command(command, port, options.delay.getOrElse(defaultDelay), options.noExit)
   }
 
