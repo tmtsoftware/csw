@@ -18,3 +18,6 @@ docker logs hcd-node
 
 printf "${YELLOW}------ Starting another Docker container to execute tests ------${NC}\n"
 docker run -it --rm --name it-node -v ~/.ivy2/:/root/.ivy2/ tmt/local-csw-centos bash -c 'cd integration && sbt -DPORT=2552 test'
+
+printf "${YELLOW}------------ force killing hcd node"
+docker rm -f hcd-node

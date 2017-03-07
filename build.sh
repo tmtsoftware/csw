@@ -9,5 +9,8 @@ NC='\033[0m' # No Color
 printf "${YELLOW}------------ Building Docker Image : tmt/csw-centos ------------${NC}\n"
 docker build -t tmt/local-csw-centos .
 
+printf "${YELLOW}------------ force killing hcd node"
+docker rm -f hcd-node
+
 printf "${YELLOW}----------- Starting docker container with name : test -----------${NC}\n"
 docker run -it --rm --name test-node tmt/local-csw-centos bash -c 'sbt -Dcheck.cycles=true clean scalastyle test coverageReport coverageAggregate coveralls'
