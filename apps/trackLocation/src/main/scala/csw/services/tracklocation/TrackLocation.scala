@@ -24,7 +24,7 @@ object TrackLocation extends App {
   CmdLineArgsParser.parser.parse(args, Options()) match {
     case Some(options) =>
       try {
-        new TrackLocation().startApp(options.names, Command.parse(options))
+        new TrackLocation().startApp(options.names, Command.parse(options), runtime)
       } catch {
         case e: Throwable =>
           e.printStackTrace()
@@ -38,11 +38,12 @@ object TrackLocation extends App {
 
 class TrackLocation {
 
-  def startApp(names: List[String], command: Command): Unit = {
+  private def startApp(names: List[String], command: Command,actorRuntime: ActorRuntime): Unit = {
 
     implicit val timeout = Timeout(10.seconds)
-    implicit val dispatcher = TrackLocation.runtime.actorSystem.dispatcher
-    val locationService = LocationServiceFactory.make(TrackLocation.runtime)
+    implicit val dispatcher = actorRuntime.actorSystem.dispatcher
+
+    val locationService = LocationServiceFactory.make(actorRuntime)
 
     def registerNames: Future[List[RegistrationResult]] =
       Future.sequence(names.map { name =>
