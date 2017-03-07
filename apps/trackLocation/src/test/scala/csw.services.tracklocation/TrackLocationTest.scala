@@ -48,7 +48,7 @@ class TrackLocationTest
     val name = "test1"
     val port = 9999
 
-    Future {
+    val future: Future[Unit] = Future {
       TrackLocation.main(
         Array(
           "--name", name,
@@ -63,6 +63,11 @@ class TrackLocationTest
     val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
     val resolvedConnection: Resolved = locationService.resolve(connection).await
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
+
+    //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
+    Thread.sleep(10000)
+
+    locationService.list.await shouldBe List.empty
   }
 
   test("Test with config file") {

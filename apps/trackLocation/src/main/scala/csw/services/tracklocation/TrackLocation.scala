@@ -62,10 +62,9 @@ class TrackLocation {
     val exitCode = command.commandText.!
 
     println(s"$command exited with exit code $exitCode")
-
     // Unregister from the location service and exit
     val registration = Await.result(f, timeout.duration)
-    registration.foreach(_.unregister())
+    locationService.unregisterAll()
 
     if (!command.noExit) System.exit(exitCode)
   }
