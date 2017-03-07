@@ -21,9 +21,7 @@ notifications:
     on_failure: always
 
 script:
-  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION -Dcheck.cycles=true -Djava.net.preferIPv4Stack=true ";clean;scalastyle;test;coverageReport"
-  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION coverageAggregate
-  - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION coveralls
+  - ./build.sh
   - sbt -DenableCoverage=false clean publishLocal
   - ./integration/scripts/execute_docker.sh
 

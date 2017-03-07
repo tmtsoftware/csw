@@ -10,4 +10,4 @@ printf "${YELLOW}------------ Building Docker Image : tmt/csw-centos -----------
 docker build -t tmt/csw-centos .
 
 printf "${YELLOW}----------- Starting docker container with name : test -----------${NC}\n"
-docker run -it --rm --name test-node tmt/csw-centos-test bash -c 'sbt -Dcheck.cycles=true clean scalastyle test coverageReport coverageAggregate coveralls'
+docker run -it --rm --name test-node tmt/csw-centos bash -c 'sbt -Dcheck.cycles=true clean scalastyle test coverageReport coverageAggregate coveralls'
