@@ -6,7 +6,7 @@ HOST_DIR_MAPPING=$1
 echo "$HOST_DIR_MAPPING"
 
 echo "Starting HCD docker container"
-docker run -it --rm --name node1 $HOST_DIR_MAPPING centos-csw bash -c 'cd /source/integration && sbt run'
+docker run -d --rm --name node1 $HOST_DIR_MAPPING centos-csw bash -c 'cd /source/integration && sbt run'
 
 echo "Waiting for 10 seconds"
 sleep 10
