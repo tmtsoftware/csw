@@ -1,5 +1,6 @@
 package csw.services.tracklocation
 
+import akka.Done
 import akka.actor.Terminated
 import akka.util.Timeout
 import csw.services.location.common.ActorRuntime
@@ -20,11 +21,18 @@ import scala.sys.process._
 // Parse the command line options
 object TrackLocation extends App {
   val runtime = new ActorRuntime("track-location-app")
+  val trackLocation = new TrackLocation(runtime)
+
+  sys addShutdownHook {
+    println("Shutdown hook reached, unregistering services.")
+    trackLocation.unregisterServices()
+    println(s"Exiting the application.")
+  }
 
   CmdLineArgsParser.parser.parse(args, Options()) match {
     case Some(options) =>
       try {
-        new TrackLocation().startApp(options.names, Command.parse(options), runtime)
+          trackLocation.startApp(options.names, Command.parse(options))
       } catch {
         case e: Throwable =>
           e.printStackTrace()
@@ -36,14 +44,13 @@ object TrackLocation extends App {
   def shutdown(): Future[Terminated] = runtime.actorSystem.terminate()
 }
 
-class TrackLocation {
+class TrackLocation(actorRuntime: ActorRuntime) {
 
-  private def startApp(names: List[String], command: Command,actorRuntime: ActorRuntime): Unit = {
+  implicit val timeout = Timeout(10.seconds)
+  implicit val dispatcher = actorRuntime.actorSystem.dispatcher
+  val locationService = LocationServiceFactory.make(actorRuntime)
 
-    implicit val timeout = Timeout(10.seconds)
-    implicit val dispatcher = actorRuntime.actorSystem.dispatcher
-
-    val locationService = LocationServiceFactory.make(actorRuntime)
+  private def startApp(names: List[String], command: Command): Unit = {
 
     def registerNames: Future[List[RegistrationResult]] =
       Future.sequence(names.map { name =>
@@ -62,10 +69,15 @@ class TrackLocation {
     val exitCode = command.commandText.!
 
     println(s"$command exited with exit code $exitCode")
-    // Unregister from the location service and exit
-    val registration = Await.result(f, timeout.duration)
-    locationService.unregisterAll()
+    Await.result(f, timeout.duration)
+    unregisterServices()
 
     if (!command.noExit) System.exit(exitCode)
+  }
+
+  private def unregisterServices() = {
+    val x: Future[Done] = locationService.unregisterAll()
+    Thread.sleep(7000)
+    println(s"Services are unregistered.")
   }
 }
