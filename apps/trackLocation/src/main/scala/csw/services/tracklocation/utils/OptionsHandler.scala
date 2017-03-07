@@ -1,7 +1,5 @@
 package csw.services.tracklocation.utils
 
-import java.net.ServerSocket
-
 import com.typesafe.config.Config
 import csw.services.tracklocation.models.Options
 
@@ -24,14 +22,6 @@ final case class OptionsHandler(val options: Options, val appConfig: Option[Conf
   }
 
   def portOpt(portKey:String, portValue: Option[Int]): Int ={
-    intOpt(portKey, portValue).getOrElse(getFreePort)
-  }
-
-  // Find a random, free port to use
-  def getFreePort: Int = {
-    val sock = new ServerSocket(0)
-    val port = sock.getLocalPort
-    sock.close()
-    port
+    intOpt(portKey, portValue).getOrElse(Utils.getFreePort)
   }
 }
