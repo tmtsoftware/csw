@@ -21,6 +21,7 @@ notifications:
     on_failure: always
 
 script:
+  - ifconfig -a
   - ./build.sh
   - sbt -DenableCoverage=false clean publishLocal
   - ./integration/scripts/execute_docker.sh
