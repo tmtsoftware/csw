@@ -6,8 +6,21 @@ ORANGE='\033[0;33m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
-printf "${YELLOW}------------ Building Docker Image : tmt/csw-centos ------------${NC}\n"
-docker build -t tmt/local-csw-centos .
+docker ps -a
+docker images
+
+printf "${YELLOW}------------ Killing existing docker containers if exists  ------------${NC}\n"
+docker rm -f $(docker ps -a -q)
+
+printf "${YELLOW}------------ Checking if Docker image already exists! ------------${NC}\n"
+images=$(docker images)
+if [[ ${images} == *"tmt/local-csw-centos"* ]]; then
+  printf "${YELLOW} Image exists ${NC}\n"
+else
+    printf "${YELLOW} Image does not exists ${NC}\n"
+    printf "${YELLOW}------------ Building Docker Image : tmt/csw-centos ------------${NC}\n"
+    docker build -t tmt/local-csw-centos .
+fi
 
 printf "${YELLOW}------------ force killing hcd node"
 docker rm -f hcd-node
