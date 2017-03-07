@@ -10,14 +10,11 @@ NC='\033[0m' # No Color
 #docker build -t tmt/csw-centos .
 
 printf "${YELLOW}----------- Starting HCD Docker container -----------${NC}\n"
-docker run -d --name hcd-node -v ~/.ivy2/:/root/.ivy2/ local-tmt bash -c 'cd integration && sbt run'
+docker run -d --name hcd-node -v ~/.ivy2/:/root/.ivy2/ tmt/local-csw-centos bash -c 'cd integration && sbt run'
 printf "${PURPLE}------ Waiting for 10 seconds to let HCD gets started ------${NC}\n"
-sleep 10
+sleep 20
 printf "${YELLOW}----------- Printing logs from HCD Docker container -----------${NC}\n"
 docker logs hcd-node
 
 printf "${YELLOW}------ Starting another Docker container to execute tests ------${NC}\n"
-docker run -it --rm --name it-node -v ~/.ivy2/:/root/.ivy2/ local-tmt bash -c 'cd integration && sbt -DPORT=2552 test'
-
-printf "${PURPLE}------ Stopping Docker container for hcd-node ------${NC}\n"
-docker stop hcd-node
+docker run -it --rm --name it-node -v ~/.ivy2/:/root/.ivy2/ tmt/local-csw-centos bash -c 'cd integration && sbt -DPORT=2552 test'
