@@ -1,13 +1,22 @@
 import Dependencies._
 
+
+val enableCoverage = System.getProperty("enableCoverage", "true")
+val plugins:Seq[Plugins] = if(enableCoverage.toBoolean)
+  Seq(Coverage, PublishBintray)
+else
+  Seq(PublishBintray)
+
 lazy val csw = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, PublishBintray, GitBranchPrompt)
   .aggregate(`csw-location`)
   .settings(Settings.mergeSiteWith(docs))
 
+
+
 lazy val `csw-location` = project
-  .enablePlugins(Coverage, PublishBintray)
+  .enablePlugins(plugins:_*)
   .settings(
     libraryDependencies ++= Seq(
       `akka-stream`,
