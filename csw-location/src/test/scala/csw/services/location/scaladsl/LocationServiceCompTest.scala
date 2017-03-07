@@ -18,7 +18,9 @@ class LocationServiceCompTest
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val actorRuntime = new ActorRuntime("test")
+  val actorRuntimePort = 2554
+
+  private val actorRuntime = new ActorRuntime("test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
   private val locationService = LocationServiceFactory.make(actorRuntime)
 
   override protected def afterEach(): Unit = {
