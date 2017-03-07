@@ -21,7 +21,7 @@ notifications:
     on_failure: always
 
 script:
-  - sudo iptables -L
+  - sudo iptables -L -v
   - ifconfig -a
   - docker version
   - docker network inspect bridge
