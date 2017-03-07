@@ -22,6 +22,7 @@ notifications:
 
 script:
   - ifconfig -a
+  - docker version
   - docker network inspect bridge
   - ./build.sh
   - sbt -DenableCoverage=false clean publishLocal
