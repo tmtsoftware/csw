@@ -19,7 +19,7 @@ class JmDnsEventStream(jmDns: JmDNS, actorRuntime: ActorRuntime) {
   private def makeListener() = new ServiceListener {
     override def serviceAdded(event: ServiceEvent): Unit = {
       queueF.foreach { queue =>
-        queue.offer(Unresolved(Connection.parse(event.getName).get))
+        Connection.parse(event.getName).map(conn => queue.offer(Unresolved(conn)))
       }
     }
 
@@ -31,7 +31,7 @@ class JmDnsEventStream(jmDns: JmDNS, actorRuntime: ActorRuntime) {
 
     override def serviceRemoved(event: ServiceEvent): Unit = {
       queueF.foreach { queue =>
-        queue.offer(Removed(Connection.parse(event.getName).get))
+        Connection.parse(event.getName).map(conn => queue.offer(Removed(conn)))
       }
     }
   }

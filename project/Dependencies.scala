@@ -13,6 +13,7 @@ object Dependencies {
   val `scopt` = "com.github.scopt" %% "scopt" % "3.5.0"
   val `scala-logging` = "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"
   val `acyclic` = "com.lihaoyi" %% "acyclic" % "0.1.7" % "provided"
+  val `enumeratum` = "com.beachape" %% "enumeratum" % "1.5.8"
 }
 
 object Akka {

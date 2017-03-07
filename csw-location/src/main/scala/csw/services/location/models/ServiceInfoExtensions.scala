@@ -6,16 +6,19 @@ import javax.jmdns.ServiceInfo
 import akka.actor.{ActorPath, ActorRef, ActorSystem, ExtendedActorSystem, Extension, ExtensionKey}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.common.Constants
+
+import scala.util.Success
 import scala.util.control.NonFatal
 
 object ServiceInfoExtensions {
 
   implicit class RichServiceInfo(val info: ServiceInfo) extends AnyVal {
 
-    def locations(implicit actorSystem: ActorSystem): List[Location] = {
-      val connection = Connection.parse(info.getName).get
-      val urls = info.getURLs(connection.connectionType.name).toList
-      urls.map(url => resolve(connection, url))
+    def locations(implicit actorSystem: ActorSystem): List[Location] = Connection.parse(info.getName) match {
+      case Success(connection) =>
+        val urls = info.getURLs(connection.connectionType.name).toList
+        urls.map(url => resolve(connection, url))
+      case _                   => List.empty
     }
 
     private def resolve(connection: Connection, url: String)(implicit actorSystem: ActorSystem): Resolved = try {

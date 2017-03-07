@@ -17,7 +17,7 @@ sealed trait Registration {
   def port: Int
   def values: Map[String, String]
 
-  def serviceInfo: ServiceInfo = ServiceInfo.create(Constants.DnsType, connection.toString, port, 0, 0, values.asJava)
+  def serviceInfo: ServiceInfo = ServiceInfo.create(Constants.DnsType, connection.name, port, 0, 0, values.asJava)
 }
 
 /**

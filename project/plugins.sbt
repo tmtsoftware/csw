@@ -1,5 +1,5 @@
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
-addSbtPlugin("com.geirsson" % "sbt-scalafmt" % "0.5.6")
+addSbtPlugin("com.geirsson" % "sbt-scalafmt" % "0.6.1")
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "1.1.0")
 addSbtPlugin("com.lightbend.paradox" % "sbt-paradox" % "0.2.8")
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.0")

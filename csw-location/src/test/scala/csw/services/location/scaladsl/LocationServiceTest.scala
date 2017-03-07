@@ -54,7 +54,7 @@ class LocationServiceTest
 
   test("http location") {
     val Port = 1234
-    val componentId = ComponentId("config-service", ComponentType.Service)
+    val componentId = ComponentId("configService", ComponentType.Service)
     val connection = HttpConnection(componentId)
     val Path = "path123"
 

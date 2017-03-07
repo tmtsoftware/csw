@@ -11,5 +11,4 @@ class ResolvedAkkaLocationTest extends FunSuite {
     val connection = AkkaConnection(componentId)
     ResolvedAkkaLocation(connection, new URI("akka://hcd1"), "prefix")
   }
-
 }

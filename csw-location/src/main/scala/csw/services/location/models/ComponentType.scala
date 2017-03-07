@@ -1,13 +1,20 @@
 package csw.services.location.models
 
-import scala.util.{Failure, Success, Try}
+import enumeratum.EnumEntry.Lowercase
+import enumeratum.{Enum, EnumEntry}
+
+import scala.collection.immutable.IndexedSeq
 
 /**
  * CSW Component types
  */
-sealed trait ComponentType
+sealed trait ComponentType extends EnumEntry with Lowercase {
+  def name: String = entryName
+}
 
-object ComponentType {
+object ComponentType extends Enum[ComponentType]{
+
+  def values: IndexedSeq[ComponentType] = findValues
 
   /**
    * A container for components (assemblies and HCDs)
@@ -28,19 +35,4 @@ object ComponentType {
    * A general purpose service component (actor and/or web service application)
    */
   case object Service extends ComponentType
-  /**
-   * Exception thrown when a string can not be parsed to a component type
-   */
-  case class UnknownComponentTypeException(message: String) extends Exception(message)
-
-  /**
-   * Returns the named component type or an UnknownComponentTypeException exception if not known
-   */
-  def parse(name: String): Try[ComponentType] = name.toLowerCase match {
-    case "container" => Success(Container)
-    case "assembly"  => Success(Assembly)
-    case "hcd"       => Success(HCD)
-    case "service"   => Success(Service)
-    case x           => Failure(UnknownComponentTypeException(x))
-  }
 }

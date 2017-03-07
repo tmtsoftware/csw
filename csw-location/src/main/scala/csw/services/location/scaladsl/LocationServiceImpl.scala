@@ -29,7 +29,7 @@ private class LocationServiceImpl(
 
   override def unregister(connection: Connection): Future[Done] = {
     val locationF = jmDnsEventStream.broadcast.removed(connection)
-    jmDNS.unregisterService(ServiceInfo.create(Constants.DnsType, connection.toString, 0, ""))
+    jmDNS.unregisterService(ServiceInfo.create(Constants.DnsType, connection.name, 0, ""))
     locationF.map(_ => Done)
   }
 
@@ -45,7 +45,7 @@ private class LocationServiceImpl(
 
   override def resolve(connection: Connection): Future[Resolved] = {
     val locationF = jmDnsEventStream.broadcast.resolved(connection)
-    jmDNS.requestServiceInfo(Constants.DnsType, connection.toString)
+    jmDNS.requestServiceInfo(Constants.DnsType, connection.name)
     locationF
   }
 
@@ -68,7 +68,7 @@ private class LocationServiceImpl(
   }
 
   override def track(connection: Connection): Source[Location, KillSwitch] = {
-    jmDNS.requestServiceInfo(Constants.DnsType, connection.toString, true)
+    jmDNS.requestServiceInfo(Constants.DnsType, connection.name, true)
     jmDnsEventStream.broadcast.filter(connection)
   }
 

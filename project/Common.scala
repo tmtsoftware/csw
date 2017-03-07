@@ -9,52 +9,55 @@ object Common extends AutoPlugin {
 
   override def requires = JvmPlugin
 
-  override lazy val projectSettings =
-    Seq(
-      organization := "org.tmt",
-      organizationName := "TMT Org",
-      scalaVersion := "2.12.1",
+  override lazy val projectSettings = Seq(
+    organization := "org.tmt",
+    organizationName := "TMT Org",
+    scalaVersion := "2.12.1",
 
-      homepage := Some(url("https://github.com/tmtsoftware/csw-prod")),
-      scmInfo := Some(ScmInfo(url("https://github.com/tmtsoftware/csw-prod"), "git@github.com:tmtsoftware/csw-prod.git")),
-      licenses := Seq(("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))),
+    homepage := Some(url("https://github.com/tmtsoftware/csw-prod")),
+    scmInfo := Some(ScmInfo(url("https://github.com/tmtsoftware/csw-prod"), "git@github.com:tmtsoftware/csw-prod.git")),
+    licenses := Seq(("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))),
 
-      scalacOptions ++= Seq(
-        "-encoding", "UTF-8",
-        "-feature",
-        "-unchecked",
-        "-deprecation",
-        //"-Xfatal-warnings",
-        "-Xlint",
-        "-Yno-adapted-args",
-        "-Ywarn-dead-code",
-        "-Xfuture",
-        "-P:acyclic:force"
-      ),
+    scalacOptions ++= extraSettings ++ Seq(
+      "-encoding", "UTF-8",
+      "-feature",
+      "-unchecked",
+      "-deprecation",
+      //"-Xfatal-warnings",
+      "-Xlint",
+      "-Yno-adapted-args",
+      "-Ywarn-dead-code",
+      "-Xfuture"
+    ),
 
-      javacOptions ++= Seq(
-//        "-Xlint:unchecked"
-      ),
-      autoAPIMappings := true,
+    javacOptions ++= Seq(
+      //        "-Xlint:unchecked"
+    ),
+    autoAPIMappings := true,
 
-//      apiURL := Some(url(s"http://tmtsoftware.github.io/csw-prod/api/${version.value}")),
-      // show full stack traces and test case durations
-      testOptions in Test += Tests.Argument("-oDF"),
-      // -v Log "test run started" / "test started" / "test run finished" events on log level "info" instead of "debug".
-      // -a Show stack traces and exception class name for AssertionErrors.
-      testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-a"),
+    //      apiURL := Some(url(s"http://tmtsoftware.github.io/csw-prod/api/${version.value}")),
+    // show full stack traces and test case durations
+    testOptions in Test += Tests.Argument("-oDF"),
+    // -v Log "test run started" / "test started" / "test run finished" events on log level "info" instead of "debug".
+    // -a Show stack traces and exception class name for AssertionErrors.
+    testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-a"),
 
-      libraryDependencies += `acyclic`,
+    libraryDependencies += `acyclic`,
 
-      autoCompilerPlugins := true,
+    autoCompilerPlugins := true,
 
-      addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
+    addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
 
-      version := {
-        sys.props.get("prod.publish") match {
-          case Some("true") => version.value
-          case _            => "10000"
-        }
+    version := {
+      sys.props.get("prod.publish") match {
+        case Some("true") => version.value
+        case _            => "10000"
       }
-    )
+    }
+  )
+
+  private def extraSettings = sys.env.get("check.cycles") match {
+    case Some("true") => List("-P:acyclic:force")
+    case _            => List.empty
+  }
 }

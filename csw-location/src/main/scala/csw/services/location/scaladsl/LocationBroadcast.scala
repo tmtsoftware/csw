@@ -27,7 +27,7 @@ class LocationBroadcast(source: Source[Location, NotUsed], actorRuntime: ActorRu
     broadcast.filter(_.connection == connection)
   }
 
-  def find[T](pf: PartialFunction[Location, T]): Future[T] = {
+  private def find[T](pf: PartialFunction[Location, T]): Future[T] = {
     val (switch, locationF) = broadcast
       .collect(pf)
       .toMat(Sink.head)(Keep.both).run()
