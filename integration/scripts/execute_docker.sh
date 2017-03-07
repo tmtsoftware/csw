@@ -15,6 +15,9 @@ docker inspect --format='' hcd-node
 printf "${PURPLE}------ Waiting for 10 seconds to let HCD gets started ------${NC}\n"
 sleep 60
 
+printf "${YELLOW}------ Starting tcpdump"
+sudo timeout 60 tcpdump -i docker0 -n "(igmp or (multicast and port mdns))"
+
 printf "${YELLOW}------ Starting another Docker container to execute tests ------${NC}\n"
 docker run -it --rm -e no_proxy="*.local, 169.254/16" --name it-node -v ~/.ivy2/:/root/.ivy2/ tmt/local-csw-centos bash -c 'cd integration && sbt -DPORT=2552 test'
 docker inspect --format='' it-node
