@@ -2,7 +2,8 @@ package csw.services.location.models
 
 import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
 
-import scala.util.Try
+import scala.util.{Failure, Try}
+import scala.util.control.NonFatal
 
 /**
   * Describes a component and the way it is accessed (http, akka)
@@ -47,11 +48,18 @@ object Connection {
   /**
     * Gets a Connection from a string as output by toString
     */
-  def parse(s: String): Try[Connection] = Try {
-    val Array(name, compType, connType) = s.split("-")
-    val componentId = ComponentId(name, ComponentType.withName(compType))
-    val connectionType = ConnectionType.withName(connType)
-    apply(componentId, connectionType)
+  def parse(s: String): Try[Connection] = tryParse(s) recoverWith {
+    case NonFatal(ex) => Failure(new InvalidConnectionStringException(ex.getMessage))
+  }
+
+  private def tryParse(s: String): Try[Connection] = Try {
+    s.split("-") match {
+      case Array(name, compType, connType) =>
+        val componentId = ComponentId(name, ComponentType.withName(compType))
+        val connectionType = ConnectionType.withName(connType)
+        apply(componentId, connectionType)
+      case _ => throw new RuntimeException("connection string should have exactly 3 parts separated by '-', e.g, compName-hcd-akka")
+    }
   }
 
   /**
@@ -62,4 +70,10 @@ object Connection {
     case HttpType => HttpConnection(componentId)
     case TcpType  => TcpConnection(componentId)
   }
+
+  /**
+    * Exception throws for an invalid connection strings
+    */
+  class InvalidConnectionStringException(message: String) extends Exception(message)
+
 }

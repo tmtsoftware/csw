@@ -9,7 +9,7 @@ object Common extends AutoPlugin {
 
   override def requires = JvmPlugin
 
-  override lazy val projectSettings = Seq(
+  override lazy val projectSettings = extraSettings ++ Seq(
     organization := "org.tmt",
     organizationName := "TMT Org",
     scalaVersion := "2.12.1",
@@ -18,7 +18,7 @@ object Common extends AutoPlugin {
     scmInfo := Some(ScmInfo(url("https://github.com/tmtsoftware/csw-prod"), "git@github.com:tmtsoftware/csw-prod.git")),
     licenses := Seq(("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))),
 
-    scalacOptions ++= extraSettings ++ Seq(
+    scalacOptions ++= Seq(
       "-encoding", "UTF-8",
       "-feature",
       "-unchecked",
@@ -42,11 +42,6 @@ object Common extends AutoPlugin {
     // -a Show stack traces and exception class name for AssertionErrors.
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-a"),
 
-    libraryDependencies += `acyclic`,
-
-    autoCompilerPlugins := true,
-
-    addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
 
     version := {
       sys.props.get("prod.publish") match {
@@ -57,7 +52,13 @@ object Common extends AutoPlugin {
   )
 
   private def extraSettings = sys.env.get("check.cycles") match {
-    case Some("true") => List("-P:acyclic:force")
-    case _            => List.empty
+    case Some("true") => Seq(
+      libraryDependencies += `acyclic`,
+      autoCompilerPlugins := true,
+      addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
+      scalacOptions += "-P:acyclic:force"
+    )
+    case _            =>
+      List.empty
   }
 }
