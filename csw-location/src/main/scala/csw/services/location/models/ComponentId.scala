@@ -8,6 +8,8 @@ package csw.services.location.models
   */
 case class ComponentId(name: String, componentType: ComponentType) {
   //jmDNS auto-trims names which leads to surprising effects during unregistration
-  require(name == name.trim, "component name does not have leading and trailing whitespaces")
-  require(!name.contains("-"), "component name does not have '-'")
+  require(name == name.trim, "component name has leading and trailing whitespaces")
+
+  //'-' in the name leads to confusing connection strings in the UI listing services
+  require(!name.contains("-"), "component name has '-'")
 }
