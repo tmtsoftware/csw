@@ -7,6 +7,7 @@ lazy val integration = project
       `akka-stream-testkit` % Test,
       `scalatest` % Test,
       `scalamock-scalatest-support` % Test,
-      `csw-location-local`
+      `csw-location-local`,
+      `jmdns`
     )
   )

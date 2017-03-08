@@ -5,4 +5,6 @@ object Dependencies {
   val `scalamock-scalatest-support` = "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0"
   val `akka-stream-testkit` = "com.typesafe.akka" %% "akka-stream-testkit" % "2.4.17"
   val `csw-location-local` = "org.tmt" %% "csw-location" % "10000"
+  val `jmdns` = "org.jmdns" % "jmdns" % "3.5.1"
+
 }
