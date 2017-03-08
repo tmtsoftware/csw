@@ -18,7 +18,9 @@ object ServiceInfoExtensions {
       case Success(connection) =>
         val urls = info.getURLs(connection.connectionType.name).toList
         urls.map(url => resolve(connection, url))
-      case _                   => List.empty
+      case _                   =>
+        println(s"could not parse connection-string=${info.getName}")
+        List.empty
     }
 
     private def resolve(connection: Connection, url: String)(implicit actorSystem: ActorSystem): Resolved = try {
