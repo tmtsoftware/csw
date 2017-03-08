@@ -1,5 +1,5 @@
 ignore
-
+.vagrant
 logs
 project/project
 project/target
@@ -34,3 +34,5 @@ shared/.jvm
 bin/
 journal
 snapshots
+Vagrantfile
+provisioning

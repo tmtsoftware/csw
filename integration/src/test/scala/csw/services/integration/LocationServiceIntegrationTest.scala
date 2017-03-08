@@ -24,20 +24,30 @@ class LocationServiceIntegrationTest
 
   val listner:ServiceListener = new ServiceListener {
     override def serviceAdded(event: ServiceEvent) = {
-      println(s"EVENT ADDED event")
+      println(s"EVENT ADDED $event")
     }
 
     override def serviceResolved(event: ServiceEvent) = {
-      println(s"EVENT RESOLVED $event")
+
+      println("Validating that we are able to resolve HCD registred in separate container")
+
+      val listOfLocations = locationService.list.await
+      val hcdLocation: Location = listOfLocations(0)
+
+      listOfLocations should not be empty
+      listOfLocations should have size 1
+      hcdLocation shouldBe a[ResolvedAkkaLocation]
+      hcdLocation
+        .asInstanceOf[ResolvedAkkaLocation]
+        .uri
+        .toString should not be empty
     }
 
     override def serviceRemoved(event: ServiceEvent) = {
-      println(s"EVENT REMOVED $event")
     }
   }
 
   test("resolves remote HCD") {
-
     jmDNS.addServiceListener("_csw._tcp.local.", listner)
     Thread.sleep(10000)
   }
