@@ -4,7 +4,7 @@ import java.net.URI
 
 import akka.actor.{Actor, ActorPath, Props}
 import akka.serialization.Serialization
-import akka.stream.scaladsl.{Keep, Sink}
+import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.common.{ActorRuntime, Networks}
@@ -133,4 +133,17 @@ class LocationServiceCompTest
       .expectComplete()
 
   }
+
+  test("Registration should validate unique name of service"){
+    val reg = TcpRegistration(TcpConnection(ComponentId("redis4", ComponentType.Service)), 1234)
+    val reg2 = TcpRegistration(TcpConnection(ComponentId("redis4", ComponentType.Service)), 1111)
+
+    locationService.register(reg2).await
+
+    val illegalStateException = intercept[IllegalStateException]{
+      locationService.register(reg).await
+    }
+    illegalStateException.getMessage shouldBe (s"A service with name ${reg.connection.name} is already registered")
+  }
+
 }

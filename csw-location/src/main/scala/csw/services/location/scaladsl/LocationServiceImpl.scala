@@ -22,10 +22,12 @@ private class LocationServiceImpl(
 
   private val jmDnsDispatcher = actorRuntime.actorSystem.dispatchers.lookup("jmdns.dispatcher")
 
-  override def register(reg: Registration): Future[RegistrationResult] = Future {
-    jmDNS.registerService(reg.serviceInfo)
-    registrationResult(reg.connection)
-  }(jmDnsDispatcher)
+  override def register(reg: Registration): Future[RegistrationResult] = async {
+    await(list).find(_.connection.name == reg.connection.name) match {
+      case Some(_) => throw new IllegalStateException(s"A service with name ${reg.connection.name} is already registered")
+      case None => await(registerUniqueService(reg))
+    }
+  }
 
   override def unregister(connection: Connection): Future[Done] = {
     val locationF = jmDnsEventStream.broadcast.removed(connection)
@@ -71,4 +73,9 @@ private class LocationServiceImpl(
 
     override def unregister(): Future[Done] = outer.unregister(connection)
   }
+
+  private def registerUniqueService(reg: Registration) = Future{
+    jmDNS.registerService(reg.serviceInfo)
+    registrationResult(reg.connection)
+  }(jmDnsDispatcher)
 }
