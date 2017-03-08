@@ -10,9 +10,8 @@ else
 lazy val csw = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, PublishBintray, GitBranchPrompt)
-  .aggregate(`csw-location`)
+  .aggregate(`csw-location`, `trackLocation`)
   .settings(Settings.mergeSiteWith(docs))
-
 
 
 lazy val `csw-location` = project
@@ -35,7 +34,8 @@ lazy val `csw-location` = project
 
 lazy val `trackLocation` = project
   .in(file("apps/trackLocation"))
-  .enablePlugins(Coverage, PublishBintray)
+  .enablePlugins(DeployApp)
+  .dependsOn(`csw-location`)
   .settings(
     libraryDependencies ++= Seq(
       `akka-actor`,
@@ -45,7 +45,6 @@ lazy val `trackLocation` = project
       `scala-logging` % Test
     )
   )
-  .dependsOn(`csw-location`)
 
 lazy val docs = project
   .enablePlugins(ParadoxSite, NoPublish)
