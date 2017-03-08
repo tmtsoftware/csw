@@ -33,12 +33,6 @@ private class LocationServiceImpl(
     locationF.map(_ => Done)
   }
 
-  override def unregisterAll(): Future[Done] = Future {
-    jmDNS.unregisterAllServices()
-    Thread.sleep(4000)
-    Done
-  }(jmDnsDispatcher)
-
   override def resolve(connection: Connection): Future[Resolved] = {
     val locationF = jmDnsEventStream.broadcast.resolved(connection)
     jmDNS.requestServiceInfo(Constants.DnsType, connection.name)

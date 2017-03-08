@@ -24,7 +24,7 @@ class LocationServiceCompTest
   private val locationService = LocationServiceFactory.make(actorRuntime)
 
   override protected def afterEach(): Unit = {
-    locationService.unregisterAll().await
+    //TODO: write and invoke test utility method for unregistering all services
   }
 
   override protected def afterAll(): Unit = {

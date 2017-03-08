@@ -12,8 +12,6 @@ trait LocationService {
 
   def unregister(connection: Connection): Future[Done]
 
-  def unregisterAll(): Future[Done]
-
   def resolve(connection: Connection): Future[Resolved]
 
   def resolve(connections: Set[Connection]): Future[Set[Resolved]]

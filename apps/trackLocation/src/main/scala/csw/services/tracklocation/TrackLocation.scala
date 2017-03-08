@@ -76,7 +76,6 @@ class TrackLocation(actorRuntime: ActorRuntime) {
   }
 
   private def unregisterServices() = {
-    val x: Future[Done] = locationService.unregisterAll()
     Thread.sleep(7000)
     println(s"Services are unregistered.")
   }

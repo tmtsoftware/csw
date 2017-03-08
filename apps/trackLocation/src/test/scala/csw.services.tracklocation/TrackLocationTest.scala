@@ -34,7 +34,7 @@ class TrackLocationTest
   implicit val dispatcher = system.dispatcher
 
   override protected def afterEach(): Unit = {
-    locationService.unregisterAll().await
+    //TODO: write and invoke test utility method for unregistering all services
     TrackLocation.shutdown().await
   }
 
