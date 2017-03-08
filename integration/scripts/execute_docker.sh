@@ -11,23 +11,17 @@ NC='\033[0m' # No Color
 
 printf "${YELLOW}----------- Starting HCD Docker container -----------${NC}\n"
 docker run -d --name hcd-node -v ~/.ivy2/:/root/.ivy2/ tmt/local-csw-centos bash -c 'cd integration && sbt run'
-docker inspect --format='' hcd-node
 printf "${PURPLE}------ Waiting for 10 seconds to let HCD gets started ------${NC}\n"
 sleep 10
 
-
-printf "${YELLOW}------ Starting tcpdump"
+printf "${ORANGE}------ Starting tcpdump for hcd-node ------${NC}"
 sudo timeout 60 tcpdump -i docker0 -n "(igmp or (multicast and port mdns))"
-
 
 printf "${YELLOW}------ Starting another Docker container to execute tests ------${NC}\n"
 docker run -it --rm --name it-node -v ~/.ivy2/:/root/.ivy2/ tmt/local-csw-centos bash -c 'cd integration && sbt -DPORT=2552 test'
-docker inspect --format='' it-node
 
-
-printf "${YELLOW}------ Starting tcpdump"
+printf "${ORANGE}------ Starting tcpdump for it-node ------${NC}"
 sudo timeout 120 tcpdump -i docker0 -n "(igmp or (multicast and port mdns))"
 
-
-printf "${YELLOW}------------ force killing hcd node"
+printf "${PURPLE}---------- killing hcd node ---------- {$NC}"
 docker rm -f hcd-node

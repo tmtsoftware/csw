@@ -20,17 +20,7 @@ notifications:
     on_success: never
     on_failure: always
 
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install docker
-  - sudo apt-get install docker-engine
-
 script:
-  - sudo iptables -L -v
-  - ifconfig -a
-  - docker version
-  - docker network inspect bridge
-  - docker info
   - ./build.sh
   - sbt -DenableCoverage=false clean publishLocal
   - ./integration/scripts/execute_docker.sh
