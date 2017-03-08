@@ -6,8 +6,8 @@ val plugins:Seq[Plugins] = if(enableCoverage.toBoolean) Seq(Coverage) else Seq.e
 
 lazy val csw = project
   .in(file("."))
-  .enablePlugins(UnidocSite, PublishGithub, PublishBintray, GitBranchPrompt)
-  .aggregate(`csw-location`)
+  .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
+  .aggregate(`csw-location`, `trackLocation`)
   .settings(Settings.mergeSiteWith(docs))
 
 

@@ -42,7 +42,7 @@ object DeployApp extends AutoPlugin {
   import com.typesafe.sbt.packager.universal.UniversalPlugin
   import UniversalPlugin.autoImport.{Universal, UniversalDocs}
 
-  override def requires: Plugins = UniversalPlugin && JavaAppPackaging
+  override def requires: Plugins = UniversalPlugin && JavaAppPackaging && PublishBintray
 
   override def projectSettings: Seq[Setting[_]] =
     SettingsHelper.makeDeploymentSettings(Universal, packageBin in Universal, "zip") ++
