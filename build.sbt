@@ -2,19 +2,17 @@ import Dependencies._
 
 
 val enableCoverage = System.getProperty("enableCoverage", "true")
-val plugins:Seq[Plugins] = if(enableCoverage.toBoolean)
-  Seq(Coverage, PublishBintray)
-else
-  Seq(PublishBintray)
+val plugins:Seq[Plugins] = if(enableCoverage.toBoolean) Seq(Coverage) else Seq.empty
 
 lazy val csw = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, PublishBintray, GitBranchPrompt)
-  .aggregate(`csw-location`, `trackLocation`)
+  .aggregate(`csw-location`)
   .settings(Settings.mergeSiteWith(docs))
 
 
 lazy val `csw-location` = project
+  .enablePlugins(PublishBintray)
   .enablePlugins(plugins:_*)
   .settings(
     libraryDependencies ++= Seq(
