@@ -39,14 +39,14 @@ private class LocationServiceImpl(
     Done
   }(jmDnsDispatcher)
 
-  override def resolve(connections: Set[Connection]): Future[Set[Resolved]] = {
-    Future.traverse(connections)(resolve)
-  }
-
   override def resolve(connection: Connection): Future[Resolved] = {
     val locationF = jmDnsEventStream.broadcast.resolved(connection)
     jmDNS.requestServiceInfo(Constants.DnsType, connection.name)
     locationF
+  }
+
+  override def resolve(connections: Set[Connection]): Future[Set[Resolved]] = {
+    Future.traverse(connections)(resolve)
   }
 
   override def list: Future[List[Location]] = Future {
