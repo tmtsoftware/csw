@@ -28,40 +28,40 @@ class TrackLocationTest
 
   private val actorRuntimePort = 2553
 
-  val runtime = new ActorRuntime("track-location-test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
-  val system = runtime.actorSystem
-  val locationService = LocationServiceFactory.make(runtime)
-  implicit val dispatcher = system.dispatcher
+  private val actorRuntime = new ActorRuntime("track-location-test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
+  import actorRuntime._
+  private val locationService = LocationServiceFactory.make(actorRuntime)
+
+  implicit val timeout = Timeout(60.seconds)
 
   override protected def afterEach(): Unit = {
     //TODO: write and invoke test utility method for unregistering all services
-    TrackLocation.shutdown().await
+    TrackLocationApp.shutdown().await
   }
 
   override protected def afterAll(): Unit = {
-    runtime.actorSystem.terminate().await
+    actorSystem.terminate().await
   }
-
-  implicit val timeout = Timeout(60.seconds)
 
   test("Test with command line args") {
     val name = "test1"
     val port = 9999
 
-    val future: Future[Unit] = Future {
-      TrackLocation.main(
+    Future {
+      TrackLocationApp.main(
         Array(
           "--name", name,
           "--command",
-          "sleep 10",
+          "sleep 5",
           "--port", port.toString,
           "--no-exit"
-        ))
+        )
+      )
     }
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
-    val resolvedConnection: Resolved = locationService.resolve(connection).await
+    val resolvedConnection = locationService.resolve(connection).await
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
@@ -77,11 +77,17 @@ class TrackLocationTest
     val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
 
     Future {
-      TrackLocation.main(Array("--name", name, "--no-exit", configFile))
+      TrackLocationApp.main(
+        Array(
+          "--name",
+          name,
+          "--no-exit",
+          configFile)
+      )
     }
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
-    val resolvedConnection: Resolved = locationService.resolve(connection).await
+    val resolvedConnection = locationService.resolve(connection).await
     val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
   }
