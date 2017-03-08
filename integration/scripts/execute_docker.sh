@@ -31,4 +31,3 @@ sudo timeout 120 tcpdump -i docker0 -n "(igmp or (multicast and port mdns))"
 
 printf "${YELLOW}------------ force killing hcd node"
 docker rm -f hcd-node
-docker rm -f it-node
