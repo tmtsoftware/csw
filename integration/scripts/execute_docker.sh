@@ -21,7 +21,7 @@ sudo timeout 60 tcpdump -i docker0 -n "(igmp or (multicast and port mdns))"
 
 
 printf "${YELLOW}------ Starting another Docker container to execute tests ------${NC}\n"
-docker run -d --rm -e no_proxy="*.local, 169.254/16" --name it-node -v ~/.ivy2/:/root/.ivy2/ tmt/local-csw-centos bash -c 'cd integration && sbt -DPORT=2552 test'
+docker run -it --rm -e no_proxy="*.local, 169.254/16" --name it-node -v ~/.ivy2/:/root/.ivy2/ tmt/local-csw-centos bash -c 'cd integration && sbt -DPORT=2552 test'
 docker inspect --format='' it-node
 
 
