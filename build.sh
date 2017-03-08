@@ -23,4 +23,4 @@ else
 fi
 
 printf "${YELLOW}----------- Starting docker container with name : test -----------${NC}\n"
-docker run -it --rm -e TRAVIS_JOB_ID=$TRAVIS_JOB_ID --name test-node tmt/local-csw-centos bash -c 'sbt -Dcheck.cycles=true ";clean;scalastyle;test;coverageReport;coverageAggregate;coveralls"'
+docker run -it --rm -e TRAVIS_JOB_ID=$TRAVIS_JOB_ID --name test-node tmt/local-csw-centos bash -c 'sbt -Dcheck.cycles=true ";clean;scalastyle;test;coverageReport" && sbt coverageAggregate coveralls'
