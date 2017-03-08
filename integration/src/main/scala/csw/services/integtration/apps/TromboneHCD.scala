@@ -12,7 +12,7 @@ object TromboneHCD extends App {
   private val actorRuntime = new ActorRuntime("trombone-hcd")
 
   val tromboneHcdActorRef = actorRuntime.actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
-  val componentId = ComponentId("trombone-hcd", ComponentType.HCD)
+  val componentId = ComponentId("trombonehcd", ComponentType.HCD)
   val connection = AkkaConnection(componentId)
 
   val registration = AkkaRegistration(connection, tromboneHcdActorRef, "nfiraos.ncc.tromboneHCD")

@@ -23,4 +23,4 @@ else
 fi
 
 printf "${YELLOW}----------- Starting docker container with name : test -----------${NC}\n"
-docker run -it --rm -e no_proxy="*.local, 169.254/16" --name test-node tmt/local-csw-centos bash -c 'sbt -Dcheck.cycles=true clean scalastyle test coverageReport coverageAggregate coveralls'
+docker run -it --rm --name test-node tmt/local-csw-centos bash -c 'sbt -Dcheck.cycles=true clean scalastyle test coverageReport coverageAggregate coveralls'
