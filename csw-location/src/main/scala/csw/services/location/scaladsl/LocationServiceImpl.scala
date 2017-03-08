@@ -44,7 +44,7 @@ private class LocationServiceImpl(
   }
 
   override def list: Future[List[Location]] = Future {
-    jmDNS.list(Constants.DnsType).toList.flatMap(_.locations)
+    jmDNS.list(Constants.DnsType, 10000L).toList.flatMap(_.locations)
   }(jmDnsDispatcher)
 
   override def list(componentType: ComponentType): Future[List[Location]] = async {
