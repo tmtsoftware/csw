@@ -24,7 +24,7 @@ class LocationServiceCompTest
   private val locationService = LocationServiceFactory.make(actorRuntime)
 
   override protected def afterEach(): Unit = {
-    //TODO: write and invoke test utility method for unregistering all services
+    locationService.unregisterAll()
   }
 
   override protected def afterAll(): Unit = {
@@ -135,15 +135,19 @@ class LocationServiceCompTest
   }
 
   test("Registration should validate unique name of service"){
-    val reg = TcpRegistration(TcpConnection(ComponentId("redis4", ComponentType.Service)), 1234)
-    val reg2 = TcpRegistration(TcpConnection(ComponentId("redis4", ComponentType.Service)), 1111)
+    val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
-    locationService.register(reg2).await
+    val duplicateReg = TcpRegistration(connection, 1234)
+    val reg = TcpRegistration(connection, 1111)
+
+    locationService.register(reg).await
 
     val illegalStateException = intercept[IllegalStateException]{
-      locationService.register(reg).await
+      locationService.register(duplicateReg).await
     }
-    illegalStateException.getMessage shouldBe (s"A service with name ${reg.connection.name} is already registered")
+    illegalStateException.getMessage shouldBe (s"A service with name ${duplicateReg.connection.name} is already registered")
+
+    locationService.unregister(connection).await
   }
 
 }

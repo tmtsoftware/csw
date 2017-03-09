@@ -68,6 +68,12 @@ private class LocationServiceImpl(
     jmDnsEventStream.broadcast.filter(connection)
   }
 
+  override def unregisterAll(): Future[Done] = Future {
+    jmDNS.unregisterAllServices()
+    Thread.sleep(4000)
+    Done
+  }(jmDnsDispatcher)
+
   private def registrationResult(connection: Connection) = new RegistrationResult {
     override def componentId: ComponentId = connection.componentId
 
