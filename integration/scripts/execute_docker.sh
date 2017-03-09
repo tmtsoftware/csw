@@ -27,7 +27,7 @@ printf "${PURPLE}------ Waiting for 10 seconds to let HCD gets started ------${N
 sleep 10
 
 printf "${ORANGE}------ Starting tcpdump for hcd-node ------${NC}"
-sudo timeout 30 tcpdump -i docker0 -n "(igmp or (multicast and port mdns))"
+sudo timeout 60 tcpdump -i docker0 -n "(igmp or (multicast and port mdns))"
 
 printf "${YELLOW}------ Starting another Docker container to execute tests ------${NC}\n"
 docker run -it --rm --name it-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/integration && sbt -DPORT=2552 test'
