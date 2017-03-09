@@ -22,8 +22,7 @@ notifications:
 
 script:
   - pwd
-  - ./build.sh '-v /home/travis/build/tmtsoftware/csw-prod:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
-  - sudo rm -rf /home/travis/.ivy2/local/org.tmt
+  - ./build.sh
   - sudo rm -rf /home/travis/build/tmtsoftware/apps/trackLocation/target/
   - sudo rm -rf /home/travis/build/tmtsoftware/csw-prod/csw-location/target
   - sudo rm -rf /home/travis/build/tmtsoftware/target
