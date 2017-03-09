@@ -34,11 +34,6 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot
 
-deploy:
-  provider: script
-  script:
-    - sbt -J-XX:ReservedCodeCacheSize=128m ++$TRAVIS_SCALA_VERSION -Dprod.publish=true publish
-
 env:
   global:
   # encrypted with: travis encrypt BINTRAY_USER=...
