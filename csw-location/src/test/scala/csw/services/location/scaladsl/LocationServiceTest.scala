@@ -6,13 +6,23 @@ import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, TcpRegistration}
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import csw.services.location.common.{ActorRuntime, Constants}
 
 import scala.util.Failure
 
-class LocationServiceTest extends FunSuite with Matchers with MockFactory {
+class LocationServiceTest
+  extends FunSuite
+    with Matchers
+    with MockFactory
+    with BeforeAndAfterAll {
 
+  val actorRuntime = new ActorRuntime("test")
+
+  override protected def afterAll(): Unit = {
+    actorRuntime.actorSystem.terminate().await
+  }
+  
   test("future should contain a exception in case jmDNS throws an error") {
     val registration = TcpRegistration(TcpConnection(ComponentId("", ComponentType.HCD)), 100)
 
@@ -21,8 +31,7 @@ class LocationServiceTest extends FunSuite with Matchers with MockFactory {
     (jmDNS.registerService _).when(registration.serviceInfo).throws(CustomExp)
     (jmDNS.list(_:String)).when(Constants.DnsType).returns(new Array[ServiceInfo](0))
 
-    val runtime = new ActorRuntime("test")
-    val locationService: LocationService = new LocationServiceImpl(jmDNS, runtime, null)
+    val locationService: LocationService = new LocationServiceImpl(jmDNS, actorRuntime, null)
 
     locationService.register(registration).done.value.get shouldBe Failure(CustomExp)
   }
