@@ -9,7 +9,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 #Map local project directories and .ivy directory from host to docker container
-#e.g.  ./build.sh '-v /home/unmesh/work/csw-prod:/source -v /home/unmesh/.ivy2:/root/.ivy2'
+#e.g.  ./build.sh '-v /home/unmesh/work/csw-prod:/source:z -v /home/unmesh/.ivy2:/root/.ivy2:z'
 HOST_DIR_MAPPING=$1
 echo "$HOST_DIR_MAPPING"
 
