@@ -23,7 +23,7 @@ private class LocationServiceImpl(
   private val jmDnsDispatcher = actorRuntime.actorSystem.dispatchers.lookup("jmdns.dispatcher")
 
   override def register(reg: Registration): Future[RegistrationResult] = async {
-    await(list).find(_.connection.name == reg.connection.name) match {
+    await(list).find(_.connection == reg.connection) match {
       case Some(_) => throw new IllegalStateException(s"A service with name ${reg.connection.name} is already registered")
       case None => await(registerUniqueService(reg))
     }
