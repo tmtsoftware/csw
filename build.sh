@@ -23,4 +23,4 @@ docker build -t tmt/local-csw-centos .
 
 printf "${YELLOW}----------- Starting docker container with name : test -----------${NC}\n"
 docker run -it --rm --name test-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source && sbt -Dcheck.cycles=true clean scalastyle test;'
-docker run -it --rm --name test-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source && -DenableCoverage=false clean publishLocal;'
+docker run -it --rm --name test-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source && sbt -DenableCoverage=false clean publishLocal;'
