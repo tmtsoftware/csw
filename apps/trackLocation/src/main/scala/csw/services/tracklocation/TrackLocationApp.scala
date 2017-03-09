@@ -19,6 +19,7 @@ object TrackLocationApp extends App {
     case Some(options) =>
       try {
         val command = Command.parse(options)
+        println(s"commandText: ${command.commandText}, command: $command")
         val trackLocation = new TrackLocation(options.names, command, actorRuntime)
         trackLocation.run()
       } catch {

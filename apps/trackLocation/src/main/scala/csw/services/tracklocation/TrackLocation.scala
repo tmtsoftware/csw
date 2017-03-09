@@ -46,6 +46,7 @@ class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRu
     }
 
     isRunning = true
+    println(s"Executing specified command: ${command.commandText}")
     val exitCode = command.commandText.!
     println(s"$command exited with exit code $exitCode")
 

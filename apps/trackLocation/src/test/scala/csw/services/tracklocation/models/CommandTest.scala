@@ -41,4 +41,27 @@ class CommandTest
     c.delay shouldBe Command.defaultDelay
     c.noExit shouldBe false
   }
+
+  test("testParse with config file port, command parameters are overrideable from command line") {
+    val url = getClass.getResource("/redisTest.conf")
+    val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
+    val configFile = new File(configFilePath)
+    val opt = Options(List("redisTest"), Some("sleep"), Some(8888), Option(configFile))
+    val c: Command = Command.parse(opt)
+
+    c.commandText shouldBe "sleep"
+    c.port shouldBe 8888
+    c.delay shouldBe Command.defaultDelay
+    c.noExit shouldBe false
+  }
+
+  test("testParse when empty command is specified, should execute a 'false' command") {
+    val opt = Options(List("redisTest"), None, Some(4444), None)
+    val c: Command = Command.parse(opt)
+
+    c.commandText shouldBe "false"
+    c.port shouldBe 4444
+    c.delay shouldBe Command.defaultDelay
+    c.noExit shouldBe false
+  }
 }

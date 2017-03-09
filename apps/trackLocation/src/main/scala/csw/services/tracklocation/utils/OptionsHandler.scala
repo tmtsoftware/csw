@@ -5,12 +5,12 @@ import csw.services.tracklocation.models.Options
 
 final case class OptionsHandler(val options: Options, val appConfig: Option[Config]) {
 
-  def stringOpt(opt: String, arg: Option[String] = None): Option[String] = {
+  def stringOpt(entry: String, arg: Option[String] = None): Option[String] = {
     val value = if (arg.isDefined) { arg }
     else {
       appConfig.flatMap { c =>
         // XXX: Using only first name here
-        val path = s"${options.names.head}.$opt"
+        val path = s"${options.names.head}.$entry"
         if (c.hasPath(path)) Some(c.getString(path)) else None
       }
     }

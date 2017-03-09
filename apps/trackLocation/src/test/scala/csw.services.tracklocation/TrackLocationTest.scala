@@ -71,7 +71,7 @@ class TrackLocationTest
     locationService.list.await shouldBe List.empty
   }
 
-  /*test("Test with config file") {
+  test("Test with config file") {
     val name = "test2"
     val port = 8888
     val url = getClass.getResource("/test2.conf")
@@ -91,7 +91,11 @@ class TrackLocationTest
     val resolvedConnection = locationService.resolve(connection).await
     val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
-  }*/
+
+    //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
+    Thread.sleep(10000)
+    locationService.list.await shouldBe List.empty
+  }
 
   test("should not contain leading or trailing spaces in service names") {
 
