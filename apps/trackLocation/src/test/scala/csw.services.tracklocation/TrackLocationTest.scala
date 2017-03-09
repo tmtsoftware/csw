@@ -10,6 +10,7 @@ import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.tracklocation.common.TestFutureExtension._
+import csw.services.tracklocation.models.Command
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
 
 import scala.concurrent.Future
@@ -90,5 +91,30 @@ class TrackLocationTest
     val resolvedConnection = locationService.resolve(connection).await
     val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
+  }
+
+  test("should not contain leading or trailing spaces in service names") {
+
+    val services = List(" test1 ")
+    val port = 9999
+
+    val illegalArgumentException = intercept[IllegalArgumentException] {
+      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime)
+      trackLocation.run().await
+    }
+
+    illegalArgumentException.getMessage shouldBe "requirement failed: component name has leading and trailing whitespaces"
+  }
+
+  test("should not contain '-' in service names") {
+    val services = List("test-1")
+    val port = 9999
+
+    val illegalArgumentException = intercept[IllegalArgumentException] {
+      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime)
+      trackLocation.run().await
+    }
+
+    illegalArgumentException.getMessage shouldBe "requirement failed: component name has '-'"
   }
 }

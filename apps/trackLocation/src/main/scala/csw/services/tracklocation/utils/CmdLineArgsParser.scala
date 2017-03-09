@@ -12,11 +12,11 @@ object CmdLineArgsParser {
 
     opt[String]("name") valueName "<name1>[,<name2>,...]" action { (x, c) =>
       c.copy(names = x.split(',').toList)
-    } text "Required: The name (or names, separated by comma) used to register the application (also root name in config file)"
+    } text "Required: The name (or names, separated by comma) used to register the application (also root name in config file). The names should not have 1) leading and/or trailing spaces 2) '-'"
 
     opt[String]('c', "command") valueName "<name>" action { (x, c) =>
       c.copy(command = Some(x))
-    } text "The command that starts the target application: use %port to insert the port number (default: use $name.command from config file: Required)"
+    } text "The command that starts the target application: use %port to insert the port number (default: use $name.command from config file: Required). The command is optional. If not provided, the service names provided will be registered via Location Service."
 
     opt[Int]('p', "port") valueName "<number>" action { (x, c) =>
       c.copy(port = Some(x))
