@@ -21,9 +21,9 @@ notifications:
     on_failure: always
 
 script:
-  - ./build.sh -v $TRAVIS_BUILD_DIR:/source -v $HOME/.ivy2:/root/.ivy2
+  - ./build.sh '-v /home/travis/tmtsoftware/csw-prod:/source -v /home/travis/.ivy2:/root/.ivy2'
   - sbt -DenableCoverage=false clean publishLocal
-  - ./integration/scripts/execute_docker.sh -v $TRAVIS_BUILD_DIR:/source -v $HOME/.ivy2:/root/.ivy2
+  - ./integration/scripts/execute_docker.sh '-v /home/travis/tmtsoftware/csw-prod:/source -v /home/travis/.ivy2:/root/.ivy2'
 
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
