@@ -25,7 +25,7 @@ script:
   - ./build.sh '-v /home/travis/build/tmtsoftware/csw-prod:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
   - sudo rm -rf /home/travis/build/tmtsoftware/apps/trackLocation/target/
   - sudo rm -rf /home/travis/build/tmtsoftware/csw-prod/csw-location/target
-  - sudo rm -rf target
+  - sudo rm -rf /home/travis/build/tmtsoftware/target
   - sbt -DenableCoverage=false clean publishLocal
   - ./integration/scripts/execute_docker.sh '-v /home/travis/build/tmtsoftware/csw-prod:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
 
