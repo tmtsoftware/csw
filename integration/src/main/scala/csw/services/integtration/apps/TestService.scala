@@ -15,5 +15,5 @@ object TestService extends App{
   val registration = HttpRegistration(connection, port=9999, "testService.org/test")
   val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
 
-  print("Test Service Started")
+  print("Test Service Registered")
 }
