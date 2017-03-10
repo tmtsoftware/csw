@@ -9,11 +9,11 @@ import csw.services.location.scaladsl.LocationServiceFactory
 object TestService extends App{
   private val actorRuntime = new ActorRuntime("test-service")
 
-  val componentId = ComponentId("testservice", ComponentType.Service)
+  val componentId = ComponentId("redisservice", ComponentType.Service)
   val connection = HttpConnection(componentId)
 
-  val registration = HttpRegistration(connection, port=9999, "testService.org/test")
+  val registration = HttpRegistration(connection, port=9999, "redisservice.org/test")
   val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
 
-  print("Test Service Registered")
+  print("Redis Service Registered")
 }

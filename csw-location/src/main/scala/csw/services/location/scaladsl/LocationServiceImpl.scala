@@ -35,10 +35,11 @@ private class LocationServiceImpl(
     locationF.map(_ => Done)
   }
 
-  override def resolve(connection: Connection): Future[Resolved] = {
-    val locationF = jmDnsEventStream.broadcast.resolved(connection)
-    jmDNS.requestServiceInfo(Constants.DnsType, connection.name)
-    locationF
+  override def resolve(connection: Connection): Future[Resolved] = async {
+    await(list).find(_.connection == connection) match {
+      case Some(location : Resolved) => location
+      case _ => await(resolveService(connection))
+    }
   }
 
   override def resolve(connections: Set[Connection]): Future[Set[Resolved]] = {
@@ -84,4 +85,10 @@ private class LocationServiceImpl(
     jmDNS.registerService(reg.serviceInfo)
     registrationResult(reg.connection)
   }(jmDnsDispatcher)
+
+  private def resolveService(connection: Connection) = {
+    val locationF = jmDnsEventStream.broadcast.resolved(connection)
+    jmDNS.requestServiceInfo(Constants.DnsType, connection.name)
+    locationF
+  }
 }

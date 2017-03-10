@@ -38,6 +38,20 @@ class LocationServiceIntegrationTest
     listOfLocations should have size 2
   }
 
+  test("resolves remote Service") {
+
+    val componentId = ComponentId("redisservice", ComponentType.Service)
+    val connection = HttpConnection(componentId)
+
+    val hcdLocation = locationService.resolve(connection).await
+
+    hcdLocation shouldBe a[ResolvedHttpLocation]
+    hcdLocation
+      .asInstanceOf[ResolvedHttpLocation]
+      .uri
+      .toString should not be empty
+  }
+
   test("Registration should validate unique name of service"){
     val tromboneHcdActorRef = actorRuntime.actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
     val componentId = ComponentId("trombonehcd", ComponentType.HCD)
