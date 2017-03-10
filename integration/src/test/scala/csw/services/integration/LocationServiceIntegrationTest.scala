@@ -2,7 +2,8 @@ package csw.services.integration
 
 import csw.services.location.common.ActorRuntime
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.models.{Location, ResolvedAkkaLocation}
+import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
+import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
@@ -17,15 +18,21 @@ class LocationServiceIntegrationTest
   private val locationService = LocationServiceFactory.make(actorRuntime)
 
   test("resolves remote HCD") {
-    val listOfLocations = locationService.list.await
-    val hcdLocation: Location = listOfLocations(0)
+    val componentId = ComponentId("trombonehcd", ComponentType.HCD)
+    val connection = AkkaConnection(componentId)
+    val hcdLocation = locationService.resolve(connection).await
 
-    listOfLocations should not be empty
-    listOfLocations should have size 1
     hcdLocation shouldBe a[ResolvedAkkaLocation]
     hcdLocation
-      .asInstanceOf[ResolvedAkkaLocation]
-      .uri
-      .toString should not be empty
+          .asInstanceOf[ResolvedAkkaLocation]
+          .uri
+          .toString should not be empty
+  }
+
+  test("resolve list of all locations"){
+    val listOfLocations = locationService.list.await
+
+    listOfLocations should not be empty
+    listOfLocations should have size 2
   }
 }

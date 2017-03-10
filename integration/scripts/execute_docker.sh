@@ -22,8 +22,13 @@ fi
 #docker build -t tmt/csw-centos .
 
 printf "${YELLOW}----------- Starting HCD Docker container -----------${NC}\n"
-docker run -d --name hcd-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/integration && sbt run'
+docker run -d --name hcd-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/integration && sbt "run-main csw.services.integtration.apps.TromboneHCD"'
 printf "${PURPLE}------ Waiting for 10 seconds to let HCD gets started ------${NC}\n"
+sleep 10
+
+printf "${YELLOW}----------- Starting Service Docker container -----------${NC}\n"
+docker run -d --name service-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/integration && sbt "run-main csw.services.integtration.apps.TestService"'
+printf "${PURPLE}------ Waiting for 10 seconds to let Service gets started ------${NC}\n"
 sleep 10
 
 printf "${ORANGE}------ Starting tcpdump for hcd-node ------${NC}"
@@ -34,3 +39,5 @@ docker run -it --rm --name it-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -
 
 printf "${PURPLE}---------- killing hcd node ---------- {$NC}"
 docker rm -f hcd-node
+printf "${PURPLE}---------- killing service node ---------- {$NC}"
+docker rm -f service-node
