@@ -8,16 +8,22 @@ import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, 
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
+import org.scalatest._
 
 class LocationServiceIntegrationTest
   extends FunSuite
     with Matchers
     with MockFactory
-    with BeforeAndAfter {
+    with BeforeAndAfter
+    with BeforeAndAfterAll {
 
   private val actorRuntime = new ActorRuntime("AssemblySystem")
+  import actorRuntime._
   private val locationService = LocationServiceFactory.make(actorRuntime)
+
+  override protected def afterAll(): Unit = {
+    actorSystem.terminate().await
+  }
 
   test("resolves remote HCD") {
     val componentId = ComponentId("trombonehcd", ComponentType.HCD)

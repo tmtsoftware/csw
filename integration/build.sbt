@@ -8,6 +8,7 @@ lazy val integration = project
       `scalatest` % Test,
       `scalamock-scalatest-support` % Test,
       `csw-location-local`,
+      `track-location-local`,
       `jmdns`
     )
   )

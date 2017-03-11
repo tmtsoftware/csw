@@ -1,5 +1,7 @@
 package csw.services.tracklocation
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.Timeout
 import csw.services.location.common.ActorRuntime
@@ -17,7 +19,7 @@ class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRu
 
   import actorRuntime._
 
-  private var isRunning = false
+  private var isRunning = new AtomicBoolean(true)
 
   private implicit val timeout = Timeout(10.seconds)
   private val locationService = LocationServiceFactory.make(actorRuntime)

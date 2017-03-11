@@ -14,6 +14,7 @@ object Common extends AutoPlugin {
       organizationName := "TMT Org",
       scalaVersion := "2.12.1",
 
+      concurrentRestrictions in Global += Tags.limit(Tags.Test, 1),
       homepage := Some(url("https://github.com/tmtsoftware/csw-prod")),
       scmInfo := Some(ScmInfo(url("https://github.com/tmtsoftware/csw-prod"), "git@github.com:tmtsoftware/csw-prod.git")),
       licenses := Seq(("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))),
