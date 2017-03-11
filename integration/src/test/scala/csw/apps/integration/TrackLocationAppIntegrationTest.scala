@@ -87,7 +87,7 @@ class TrackLocationAppIntegrationTest
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
-    Thread.sleep(10000)
+    Thread.sleep(15000)
 
     val locations: Seq[Location] = locationService.list.await
     locations.contains(resolvedConnection) shouldBe false
