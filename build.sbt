@@ -27,7 +27,8 @@ lazy val `csw-location` = project
       `akka-stream-testkit` % Test,
       `scalatest` % Test,
       `scalamock-scalatest-support` % Test,
-      `junit` % Test
+      `junit` % Test,
+      `junit-interface` % Test
     )
   )
 
