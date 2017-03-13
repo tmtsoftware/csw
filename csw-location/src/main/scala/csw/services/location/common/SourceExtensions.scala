@@ -9,16 +9,19 @@ import scala.concurrent.{Future, Promise}
 object SourceExtensions {
 
   def coupling[T]: (Source[T, NotUsed], Future[SourceQueueWithComplete[T]]) = {
-    Source.queue[T](256, OverflowStrategy.backpressure).splitMat
+    Source.queue[T](256, OverflowStrategy.dropHead).splitMat
   }
 
   implicit class RichSource[Out, Mat](val source: Source[Out, Mat]) extends AnyVal {
 
-    def broadcast()(implicit mat: Materializer): Source[Out, KillSwitch] = {
+    def broadcast(
+      bufferSize: Int = 256,
+      overflowStrategy: OverflowStrategy = OverflowStrategy.dropHead
+    )(implicit mat: Materializer): Source[Out, KillSwitch] = {
       val hub = source
-        .runWith(BroadcastHub.sink[Out])
+        .runWith(BroadcastHub.sink[Out](bufferSize/2))
         .viaMat(KillSwitches.single)(Keep.right)
-        .buffer(256, OverflowStrategy.dropNew)
+        .buffer(bufferSize/2, overflowStrategy)
 
       // Ensure that the Broadcast output is dropped if there are no listening parties.
       hub.runWith(Sink.ignore)
