@@ -14,6 +14,7 @@ object Dependencies {
   val `scala-logging` = "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"
   val `acyclic` = "com.lihaoyi" %% "acyclic" % "0.1.7" % "provided"
   val `enumeratum` = "com.beachape" %% "enumeratum" % "1.5.8"
+  val `junit` = "junit" % "junit" % "4.12"
 }
 
 object Akka {

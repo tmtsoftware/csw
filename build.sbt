@@ -26,7 +26,8 @@ lazy val `csw-location` = project
     libraryDependencies ++= Seq(
       `akka-stream-testkit` % Test,
       `scalatest` % Test,
-      `scalamock-scalatest-support` % Test
+      `scalamock-scalatest-support` % Test,
+      `junit` % Test
     )
   )
 
