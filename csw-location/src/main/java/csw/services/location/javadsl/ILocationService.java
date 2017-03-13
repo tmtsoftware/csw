@@ -1,9 +1,7 @@
 package csw.services.location.javadsl;
 
 import akka.Done;
-import csw.services.location.models.Location;
-import csw.services.location.models.Registration;
-import csw.services.location.models.RegistrationResult;
+import csw.services.location.models.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -14,4 +12,6 @@ public interface ILocationService {
         public CompletableFuture<List<Location>> list();
 
         public CompletableFuture<Done> unregisterAll();
+
+        public CompletableFuture<Resolved> resolve(Connection connection);
 }
