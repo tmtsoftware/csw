@@ -8,6 +8,11 @@ import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
 
 class ActorRuntime(name: String, _settings: Map[String, Any] = Map.empty) {
+  /**
+    * Java constructor
+    */
+  def this(name: String, settings: java.util.Map[String, Object]) =
+    this(name, settings.asScala.toMap)
 
   val config: Config = {
     val settings: Map[String, Any] = Map(

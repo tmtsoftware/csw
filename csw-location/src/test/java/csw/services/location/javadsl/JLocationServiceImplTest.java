@@ -5,8 +5,8 @@ import akka.actor.ActorPaths;
 import akka.actor.ActorRef;
 import akka.serialization.Serialization;
 import akka.testkit.TestProbe;
-import csw.services.location.common.ActorRuntime;
-import csw.services.location.common.Networks;
+import csw.services.location.common.*;
+import csw.services.location.common.JActorRuntime;
 import csw.services.location.models.*;
 import csw.services.location.models.Connection.*;
 import org.junit.*;
@@ -40,7 +40,7 @@ public class JLocationServiceImplTest {
 
     @BeforeClass
     public static void setUp() {
-        actorRuntime = JActorRuntime.create("test-java");
+        actorRuntime = JActorRuntime.actorRuntime("test-java");
         locationService = new JLocationServiceImpl(actorRuntime);
     }
 

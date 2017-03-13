@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface ILocationService {
-        public CompletableFuture<RegistrationResult> register(Registration registration);
+    CompletableFuture<RegistrationResult> register(Registration registration);
 
-        public CompletableFuture<List<Location>> list();
+    CompletableFuture<List<Location>> list();
 
-        public CompletableFuture<Done> unregisterAll();
+    CompletableFuture<Done> unregisterAll();
 
-        public CompletableFuture<Resolved> resolve(Connection connection);
+    CompletableFuture<Resolved> resolve(Connection connection);
 }
