@@ -40,7 +40,7 @@ public class JLocationServiceImplTest {
 
     @BeforeClass
     public static void setUp() {
-        actorRuntime = JActorRuntimeTemp.actorRuntime("test-java", null);
+        actorRuntime = JActorRuntime.create("test-java");
         locationService = new JLocationServiceImpl(actorRuntime);
     }
 
