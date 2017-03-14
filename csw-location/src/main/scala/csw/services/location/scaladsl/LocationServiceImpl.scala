@@ -35,6 +35,12 @@ private class LocationServiceImpl(
     locationF.map(_ => Done)
   }
 
+  override def unregisterAll(): Future[Done] = Future {
+    jmDNS.unregisterAllServices()
+    Thread.sleep(4000)
+    Done
+  }(jmDnsDispatcher)
+
   override def resolve(connection: Connection): Future[Resolved] = async {
     await(list).find(_.connection == connection) match {
       case Some(location : Resolved) => location
@@ -68,12 +74,6 @@ private class LocationServiceImpl(
     jmDNS.requestServiceInfo(Constants.DnsType, connection.name, true)
     jmDnsEventStream.broadcast.filter(connection)
   }
-
-  override def unregisterAll(): Future[Done] = Future {
-    jmDNS.unregisterAllServices()
-    Thread.sleep(4000)
-    Done
-  }(jmDnsDispatcher)
 
   private def registrationResult(connection: Connection) = new RegistrationResult {
     override def componentId: ComponentId = connection.componentId

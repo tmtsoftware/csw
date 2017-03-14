@@ -1,24 +1,49 @@
 package csw.services.location.javadsl
+
 import java.util
-import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionStage
 
 import akka.Done
+import akka.stream.KillSwitch
+import akka.stream.javadsl.Source
 import csw.services.location.common.ActorRuntime
 import csw.services.location.models._
-import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.location.scaladsl.LocationService
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 
-class JLocationServiceImpl(actorRuntime: ActorRuntime) extends ILocationService{
-  import actorRuntime.actorSystem.dispatcher
-  val locationService = LocationServiceFactory.make(actorRuntime)
+private class JLocationServiceImpl(locationService: LocationService, actorRuntime: ActorRuntime) extends ILocationService{
 
-  override def register(registration: Registration): CompletableFuture[RegistrationResult] = locationService.register(registration).toJava.toCompletableFuture
+  import actorRuntime._
 
-  override def list(): CompletableFuture[util.List[Location]] =  locationService.list.map(_.asJava).toJava.toCompletableFuture
+  override def register(registration: Registration): CompletionStage[RegistrationResult] =
+    locationService.register(registration).toJava
 
-  override def unregisterAll(): CompletableFuture[Done] = locationService.unregisterAll().toJava.toCompletableFuture;
+  override def unregister(connection: Connection): CompletionStage[Done] =
+    locationService.unregister(connection).toJava
 
-  override def resolve(connection: Connection): CompletableFuture[Resolved] = locationService.resolve(connection).toJava.toCompletableFuture
+  override def unregisterAll(): CompletionStage[Done] =
+    locationService.unregisterAll().toJava
+
+  override def resolve(connection: Connection): CompletionStage[Resolved] =
+    locationService.resolve(connection).toJava
+
+  override def resolve(connections: util.Set[Connection]): CompletionStage[util.Set[Resolved]] =
+    locationService.resolve(connections.asScala.toSet).map(_.asJava).toJava
+
+  override def list(): CompletionStage[util.List[Location]] =
+    locationService.list.map(_.asJava).toJava
+
+  override def list(componentType: ComponentType): CompletionStage[util.List[Location]] =
+    locationService.list(componentType).map(_.asJava).toJava
+
+  override def list(hostname: String): CompletionStage[util.List[Resolved]] =
+    locationService.list(hostname).map(_.asJava).toJava
+
+  override def list(connectionType: ConnectionType): CompletionStage[util.List[Location]] =
+    locationService.list(connectionType).map(_.asJava).toJava
+
+  override def track(connection: Connection): Source[Location, KillSwitch] =
+    locationService.track(connection).asJava
 }

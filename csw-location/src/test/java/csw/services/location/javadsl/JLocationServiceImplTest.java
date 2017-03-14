@@ -41,7 +41,7 @@ public class JLocationServiceImplTest {
     @BeforeClass
     public static void setUp() {
         actorRuntime = JActorRuntime.actorRuntime("test-java");
-        locationService = new JLocationServiceImpl(actorRuntime);
+        locationService = JLocationServiceFactory.make(actorRuntime);
     }
 
     @After
@@ -56,7 +56,7 @@ public class JLocationServiceImplTest {
 
     @Test
     public void testRegistrationOfHttpComponent() throws ExecutionException, InterruptedException {
-        RegistrationResult registrationResult = locationService.register(JRegistration.httpRegistration(httpServiceConnection, Port, Path)).get();
+        RegistrationResult registrationResult = locationService.register(JRegistration.httpRegistration(httpServiceConnection, Port, Path)).toCompletableFuture().get();
         Assert.assertEquals(httpServiceComponentId, registrationResult.componentId());
     }
 
@@ -64,13 +64,13 @@ public class JLocationServiceImplTest {
     public void testListComponents() throws ExecutionException, InterruptedException, URISyntaxException {
         String Path = "path123";
 
-        locationService.register(JRegistration.httpRegistration(httpServiceConnection, Port, Path)).get();
+        locationService.register(JRegistration.httpRegistration(httpServiceConnection, Port, Path)).toCompletableFuture().get();
         URI uri = new URI("http://" + Networks.getPrimaryIpv4Address().getHostAddress() + ":" + Port + "/" + Path);
 
         ArrayList<Location> locations = new ArrayList<>();
         locations.add(JLocation.resolvedHttpLocation(httpServiceConnection, uri, Path));
 
-        Assert.assertEquals(locations, locationService.list().get());
+        Assert.assertEquals(locations, locationService.list().toCompletableFuture().get());
     }
 
     @Test
@@ -78,34 +78,34 @@ public class JLocationServiceImplTest {
 
         URI uri = new URI("tcp://" + Networks.getPrimaryIpv4Address().getHostAddress() + ":" + Port);
 
-        RegistrationResult registrationResult = locationService.register(JRegistration.tcpRegistaration(tcpServiceConnection, Port)).get();
+        RegistrationResult registrationResult = locationService.register(JRegistration.tcpRegistaration(tcpServiceConnection, Port)).toCompletableFuture().get();
 
-        Assert.assertEquals(JLocation.resolvedTcpLocation(tcpServiceConnection, uri), locationService.resolve(tcpServiceConnection).get());
+        Assert.assertEquals(JLocation.resolvedTcpLocation(tcpServiceConnection, uri), locationService.resolve(tcpServiceConnection).toCompletableFuture().get());
     }
 
     @Test
     public void testResolveAkkaConnection() throws ExecutionException, InterruptedException, URISyntaxException {
 
         URI uri = new URI(actorPath.toString());
-        RegistrationResult registrationResult = locationService.register(JRegistration.akkaRegistration(akkaHcdConnection, actorRef, prefix)).get();
-        Assert.assertEquals(JLocation.resolvedAkkaLocation(akkaHcdConnection, uri, prefix, Optional.ofNullable(actorRef)), locationService.resolve(akkaHcdConnection).get());
+        RegistrationResult registrationResult = locationService.register(JRegistration.akkaRegistration(akkaHcdConnection, actorRef, prefix)).toCompletableFuture().get();
+        Assert.assertEquals(JLocation.resolvedAkkaLocation(akkaHcdConnection, uri, prefix, Optional.ofNullable(actorRef)), locationService.resolve(akkaHcdConnection).toCompletableFuture().get());
     }
 
     @Test
     public void testLocationServiceRegisterWithAkkaHttpTcpAsSequence() throws ExecutionException, InterruptedException, URISyntaxException {
 
-        RegistrationResult akkaRegistrationResult = locationService.register(JRegistration.akkaRegistration(akkaHcdConnection, actorRef, prefix)).get();
-        RegistrationResult httpRegistrationResult = locationService.register(JRegistration.httpRegistration(httpServiceConnection, Port, Path)).get();
-        RegistrationResult tcpRegistrationResult = locationService.register(JRegistration.tcpRegistaration(tcpServiceConnection, Port)).get();
+        RegistrationResult akkaRegistrationResult = locationService.register(JRegistration.akkaRegistration(akkaHcdConnection, actorRef, prefix)).toCompletableFuture().get();
+        RegistrationResult httpRegistrationResult = locationService.register(JRegistration.httpRegistration(httpServiceConnection, Port, Path)).toCompletableFuture().get();
+        RegistrationResult tcpRegistrationResult = locationService.register(JRegistration.tcpRegistaration(tcpServiceConnection, Port)).toCompletableFuture().get();
 
         URI tcpUri = new URI("tcp://" + Networks.getPrimaryIpv4Address().getHostAddress() + ":" + Port);
         URI akkaUri = new URI(actorPath.toString());
         URI httpUri = new URI("http://" + Networks.getPrimaryIpv4Address().getHostAddress() + ":" + Port + "/" + Path);
 
-        Assert.assertEquals(3, locationService.list().get().size());
-        Assert.assertEquals(JLocation.resolvedAkkaLocation(akkaHcdConnection, akkaUri, prefix, Optional.ofNullable(actorRef)), locationService.resolve(akkaHcdConnection).get());
-        Assert.assertEquals(JLocation.resolvedHttpLocation(httpServiceConnection, httpUri, Path), locationService.resolve(httpServiceConnection).get());
-        Assert.assertEquals(JLocation.resolvedTcpLocation(tcpServiceConnection, tcpUri), locationService.resolve(tcpServiceConnection).get());
+        Assert.assertEquals(3, locationService.list().toCompletableFuture().get().size());
+        Assert.assertEquals(JLocation.resolvedAkkaLocation(akkaHcdConnection, akkaUri, prefix, Optional.ofNullable(actorRef)), locationService.resolve(akkaHcdConnection).toCompletableFuture().get());
+        Assert.assertEquals(JLocation.resolvedHttpLocation(httpServiceConnection, httpUri, Path), locationService.resolve(httpServiceConnection).toCompletableFuture().get());
+        Assert.assertEquals(JLocation.resolvedTcpLocation(tcpServiceConnection, tcpUri), locationService.resolve(tcpServiceConnection).toCompletableFuture().get());
 
     }
 
