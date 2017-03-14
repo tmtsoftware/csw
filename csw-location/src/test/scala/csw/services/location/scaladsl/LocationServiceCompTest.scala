@@ -53,7 +53,7 @@ class LocationServiceCompTest
 
     locationService.list.await shouldBe List.empty
   }
-
+  // #hello_example
   test("http location") {
     val Port = 1234
     val componentId = ComponentId("configService", ComponentType.Service)
@@ -74,7 +74,7 @@ class LocationServiceCompTest
 
     locationService.list.await shouldBe List.empty
   }
-
+  // #hello_example
   test("akka location") {
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection = AkkaConnection(componentId)

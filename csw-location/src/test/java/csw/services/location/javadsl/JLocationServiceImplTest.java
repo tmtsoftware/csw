@@ -73,7 +73,7 @@ public class JLocationServiceImplTest {
 
         Assert.assertEquals(locations, locationService.list().toCompletableFuture().get());
     }
-
+    // #hello_example
     @Test
     public void testResolveTcpConnection() throws ExecutionException, InterruptedException, URISyntaxException {
 
@@ -83,7 +83,7 @@ public class JLocationServiceImplTest {
 
         Assert.assertEquals(JLocation.resolvedTcpLocation(tcpServiceConnection, uri), locationService.resolve(tcpServiceConnection).toCompletableFuture().get());
     }
-
+    // #hello_example
     @Test
     public void testResolveAkkaConnection() throws ExecutionException, InterruptedException, URISyntaxException {
 

@@ -11,3 +11,9 @@ Complete user guide on how to use common software platform, Scaladoc and Javadoc
 ### @extref[User Manual](manual:)
 ### @javadoc[Javadoc](.index)
 ### @scaladoc[Scaladoc](index)
+
+java
+:   @@snip [JLocationServiceImplTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/JLocationServiceImplTest.java) { #hello_example }
+
+scala
+:   @@snip [LocationServiceCompTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/LocationServiceCompTest.scala) { #hello_example }
