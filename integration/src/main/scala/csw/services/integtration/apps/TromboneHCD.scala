@@ -4,8 +4,8 @@ import akka.actor.{Actor, Props}
 import akka.pattern.pipe
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.common.ActorRuntime
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.services.location.scaladsl.models.Connection.AkkaConnection
+import csw.services.location.scaladsl.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.services.location.scaladsl.LocationServiceFactory
 
 object TromboneHCD extends App {

@@ -1,6 +1,10 @@
-package csw.services.location.models;
+package csw.services.location.javadsl.models;
 
-import csw.services.location.models.Connection.*;
+import csw.services.location.scaladsl.models.ComponentId;
+import csw.services.location.scaladsl.models.Connection;
+import csw.services.location.scaladsl.models.Connection$;
+import csw.services.location.scaladsl.models.Connection.*;
+import csw.services.location.scaladsl.models.ConnectionType;
 
 public class JConnection {
     /**

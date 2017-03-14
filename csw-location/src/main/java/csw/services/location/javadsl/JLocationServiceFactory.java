@@ -1,6 +1,7 @@
 package csw.services.location.javadsl;
 
-import csw.services.location.common.ActorRuntime;
+import csw.services.location.impl.JLocationServiceImpl;
+import csw.services.location.scaladsl.ActorRuntime;
 import csw.services.location.scaladsl.LocationService;
 import csw.services.location.scaladsl.LocationServiceFactory;
 

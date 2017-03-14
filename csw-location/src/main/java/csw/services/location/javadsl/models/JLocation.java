@@ -1,10 +1,15 @@
-package csw.services.location.models;
+package csw.services.location.javadsl.models;
 
 import akka.actor.ActorRef;
-import csw.services.location.models.Connection.*;
+import csw.services.location.scaladsl.models.Connection;
+import csw.services.location.scaladsl.models.Connection.*;
 
 import java.net.URI;
 import java.util.Optional;
+
+import csw.services.location.scaladsl.models.ResolvedAkkaLocation;
+import csw.services.location.scaladsl.models.ResolvedHttpLocation;
+import csw.services.location.scaladsl.models.ResolvedTcpLocation;
 import scala.compat.java8.OptionConverters;
 
 public class JLocation {

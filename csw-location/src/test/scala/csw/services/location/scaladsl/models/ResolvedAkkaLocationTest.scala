@@ -1,8 +1,8 @@
-package csw.services.location.models
+package csw.services.location.scaladsl.models
 
 import java.net.URI
 
-import csw.services.location.models.Connection.AkkaConnection
+import csw.services.location.scaladsl.models.Connection.AkkaConnection
 import org.scalatest.FunSuite
 
 class ResolvedAkkaLocationTest extends FunSuite {

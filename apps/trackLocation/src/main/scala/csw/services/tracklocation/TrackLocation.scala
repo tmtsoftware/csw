@@ -4,10 +4,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.Timeout
-import csw.services.location.common.ActorRuntime
-import csw.services.location.models.Connection.TcpConnection
-import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
-import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.location.scaladsl.models.Connection.TcpConnection
+import csw.services.location.scaladsl.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
+import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import csw.services.tracklocation.models.Command
 
 import scala.collection.immutable.Seq

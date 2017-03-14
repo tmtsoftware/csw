@@ -1,10 +1,10 @@
-package csw.services.location.models
+package csw.services.location.scaladsl.models
 
 import java.net.URI
 import java.util.Optional
 
 import akka.actor.ActorRef
-import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.scaladsl.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 import scala.compat.java8.OptionConverters.RichOptionForJava8
 

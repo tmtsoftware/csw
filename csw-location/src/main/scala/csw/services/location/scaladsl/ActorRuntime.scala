@@ -1,11 +1,12 @@
-package csw.services.location.common
+package csw.services.location.scaladsl
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.services.location.common.Networks
 
-import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext
 
 class ActorRuntime(name: String, _settings: Map[String, Any] = Map.empty) {
 

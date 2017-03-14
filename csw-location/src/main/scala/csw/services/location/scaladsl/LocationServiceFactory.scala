@@ -2,7 +2,8 @@ package csw.services.location.scaladsl
 
 import javax.jmdns.JmDNS
 
-import csw.services.location.common.{ActorRuntime, Networks}
+import csw.services.location.impl.{JmDnsEventStream, LocationServiceImpl}
+import csw.services.location.common.Networks
 
 object LocationServiceFactory {
   def make(actorRuntime: ActorRuntime): LocationService = {

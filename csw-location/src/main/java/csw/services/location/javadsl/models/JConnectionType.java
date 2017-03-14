@@ -1,4 +1,6 @@
-package csw.services.location.models;
+package csw.services.location.javadsl.models;
+
+import csw.services.location.scaladsl.models.ConnectionType;
 
 /**
  * Java API for location service connection type: Indicates if it is an http server or an akka actor.

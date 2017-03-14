@@ -51,7 +51,7 @@ object Common extends AutoPlugin {
     }
   )
 
-  private def extraSettings = sys.env.get("check.cycles") match {
+  private def extraSettings =  sys.props.get("check.cycles") match {
     case Some("true") => Seq(
       libraryDependencies += `acyclic`,
       autoCompilerPlugins := true,

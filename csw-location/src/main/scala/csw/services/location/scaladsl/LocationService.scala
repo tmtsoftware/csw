@@ -3,7 +3,7 @@ package csw.services.location.scaladsl
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.services.location.models._
+import csw.services.location.scaladsl.models._
 
 import scala.concurrent.Future
 

@@ -2,7 +2,7 @@ package csw.services.location.javadsl;
 
 import akka.Done;
 import akka.stream.KillSwitch;
-import csw.services.location.models.*;
+import csw.services.location.scaladsl.models.*;
 
 import java.util.List;
 import java.util.Set;

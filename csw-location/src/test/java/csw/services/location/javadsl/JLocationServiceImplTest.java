@@ -5,10 +5,11 @@ import akka.actor.ActorPaths;
 import akka.actor.ActorRef;
 import akka.serialization.Serialization;
 import akka.testkit.TestProbe;
+import csw.services.location.javadsl.models.*;
+import csw.services.location.scaladsl.ActorRuntime;
 import csw.services.location.common.*;
-import csw.services.location.common.JActorRuntime;
-import csw.services.location.models.*;
-import csw.services.location.models.Connection.*;
+import csw.services.location.scaladsl.models.*;
+import csw.services.location.scaladsl.models.Connection.*;
 import org.junit.*;
 
 import java.net.URI;

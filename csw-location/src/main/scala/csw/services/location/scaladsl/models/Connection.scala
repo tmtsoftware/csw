@@ -1,6 +1,6 @@
-package csw.services.location.models
+package csw.services.location.scaladsl.models
 
-import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
+import csw.services.location.scaladsl.models.ConnectionType.{AkkaType, HttpType, TcpType}
 
 import scala.util.{Failure, Try}
 import scala.util.control.NonFatal

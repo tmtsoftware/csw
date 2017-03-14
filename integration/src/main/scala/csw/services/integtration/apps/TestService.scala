@@ -2,8 +2,8 @@ package csw.services.integtration.apps
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.common.ActorRuntime
-import csw.services.location.models.Connection.HttpConnection
-import csw.services.location.models.{ComponentId, ComponentType, HttpRegistration}
+import csw.services.location.scaladsl.models.Connection.HttpConnection
+import csw.services.location.scaladsl.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.services.location.scaladsl.LocationServiceFactory
 
 object TestService extends App{

@@ -1,18 +1,19 @@
-package csw.services.location.scaladsl
+package csw.services.location.impl
 
 import javax.jmdns.{JmDNS, ServiceInfo}
 
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.services.location.common.{ActorRuntime, Constants}
-import csw.services.location.models.ServiceInfoExtensions.RichServiceInfo
-import csw.services.location.models._
+import csw.services.location.scaladsl.{ActorRuntime, LocationService}
+import csw.services.location.common.Constants
+import csw.services.location.scaladsl.models.ServiceInfoExtensions.RichServiceInfo
+import csw.services.location.scaladsl.models._
 
 import scala.async.Async._
 import scala.concurrent.Future
 
-private class LocationServiceImpl(
+private[location] class LocationServiceImpl(
   jmDNS: JmDNS,
   actorRuntime: ActorRuntime,
   jmDnsEventStream: JmDnsEventStream

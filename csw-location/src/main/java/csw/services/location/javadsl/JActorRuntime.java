@@ -1,4 +1,7 @@
-package csw.services.location.common;
+package csw.services.location.javadsl;
+
+import csw.services.location.scaladsl.ActorRuntime;
+import csw.services.location.common.ScalaCompat;
 
 import java.util.Collections;
 import java.util.Map;

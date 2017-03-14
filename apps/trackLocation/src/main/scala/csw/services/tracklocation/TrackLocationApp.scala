@@ -1,7 +1,7 @@
 package csw.services.tracklocation
 
 import akka.actor.Terminated
-import csw.services.location.common.ActorRuntime
+import csw.services.location.scaladsl.ActorRuntime
 import csw.services.tracklocation.models.{Command, Options}
 import csw.services.tracklocation.utils.CmdLineArgsParser
 

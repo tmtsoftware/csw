@@ -1,6 +1,10 @@
-package csw.services.location.models;
+package csw.services.location.javadsl.models;
 
 import akka.actor.ActorRef;
+import csw.services.location.scaladsl.models.AkkaRegistration;
+import csw.services.location.scaladsl.models.Connection;
+import csw.services.location.scaladsl.models.HttpRegistration;
+import csw.services.location.scaladsl.models.TcpRegistration;
 
 /**
  * Java API for Registration service.
@@ -14,7 +18,7 @@ public class JRegistration {
         return new TcpRegistration(connection,port);
     }
 
-    public static HttpRegistration httpRegistration(Connection.HttpConnection connection,int port, String path){
+    public static HttpRegistration httpRegistration(Connection.HttpConnection connection, int port, String path){
         return new HttpRegistration(connection,port,path);
     }
 

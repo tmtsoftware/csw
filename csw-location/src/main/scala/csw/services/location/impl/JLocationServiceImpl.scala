@@ -1,4 +1,4 @@
-package csw.services.location.javadsl
+package csw.services.location.impl
 
 import java.util
 import java.util.concurrent.CompletionStage
@@ -6,9 +6,9 @@ import java.util.concurrent.CompletionStage
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
-import csw.services.location.common.ActorRuntime
-import csw.services.location.models._
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.javadsl.ILocationService
+import csw.services.location.scaladsl.{ActorRuntime, LocationService}
+import csw.services.location.scaladsl.models._
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
