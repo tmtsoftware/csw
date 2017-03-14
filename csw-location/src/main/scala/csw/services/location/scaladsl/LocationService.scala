@@ -8,7 +8,12 @@ import csw.services.location.models._
 import scala.concurrent.Future
 
 trait LocationService {
-  def register(reg: Registration): Future[RegistrationResult]
+
+  /**
+    * @param registration object
+    * @return registration-result which can be used to unregister
+    */
+  def register(registration: Registration): Future[RegistrationResult]
 
   def unregister(connection: Connection): Future[Done]
 

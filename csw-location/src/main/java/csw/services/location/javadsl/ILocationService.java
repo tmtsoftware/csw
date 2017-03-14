@@ -10,6 +10,11 @@ import java.util.concurrent.CompletionStage;
 import akka.stream.javadsl.Source;
 
 public interface ILocationService {
+
+    /**
+     * @param registration object
+     * @return registration-result which can be used to unregister
+     */
     CompletionStage<RegistrationResult> register(Registration registration);
 
     CompletionStage<Done> unregister(Connection connection);
