@@ -16,3 +16,5 @@ sudo curl -LO "https://dl.bintray.com/sbt/native-packages/sbt/0.13.13/sbt-0.13.1
 
 sudo apt-get install iproute2
 sudo apt-get install iperf
+
+echo 'export PATH="/usr/local/sbt-launcher-packaging-0.13.13/bin/:$PATH"' >> /home/vagrant/.bashrc
