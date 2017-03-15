@@ -20,7 +20,8 @@ object UnidocSite extends AutoPlugin {
     addMappingsToSiteDir(
       mappings in (JavaUnidoc, packageDoc),
       siteSubdirName in JavaUnidoc
-    )
+    ),
+    autoAPIMappings := true
   )
 }
 

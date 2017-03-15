@@ -12,7 +12,7 @@ lazy val csw = project
 
 
 lazy val `csw-location` = project
-  .enablePlugins(PublishBintray)
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
   .enablePlugins(plugins:_*)
   .settings(
     libraryDependencies ++= Seq(

@@ -23,8 +23,6 @@ sealed trait Resolved extends Location {
 final case class ResolvedAkkaLocation(connection: AkkaConnection, uri: URI, prefix: String = "", actorRef: Option[ActorRef] = None) extends Resolved {
   /**
     * Java API to get actorRef
-    *
-    * @return
     */
   def getActorRef: Optional[ActorRef] = actorRef.asJava
 }

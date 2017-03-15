@@ -11,7 +11,7 @@ trait LocationService {
 
   /**
     * @param registration object
-    * @return registration-result which can be used to unregister
+    * returns registration-result which can be used to unregister
     */
   def register(registration: Registration): Future[RegistrationResult]
 
