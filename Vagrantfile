@@ -49,8 +49,8 @@ Vagrant.configure(2) do |config|
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
   config.vm.network "private_network", ip: "192.168.33.10"
-  
-  create_synced_dir(config, "/home/unmesh/.ivy2", "/home/vagrant/.ivy2", { create: true })
+  user_home_directory = File.expand_path('~')
+  create_synced_dir(config, "#{user_home_directory}/.ivy2", "/home/vagrant/.ivy2", { create: true })
   create_synced_dir(config, "./cache/images", "/var/docker-image-cache",{ create: true })
 
 
