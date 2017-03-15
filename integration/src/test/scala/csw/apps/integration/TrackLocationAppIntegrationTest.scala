@@ -4,10 +4,10 @@ import java.net.URI
 import java.nio.file.Paths
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.common.{ActorRuntime, Networks}
+import csw.services.location.common.Networks
 import csw.services.location.scaladsl.models.Connection.TcpConnection
 import csw.services.location.scaladsl.models.{ComponentId, ComponentType, ResolvedTcpLocation}
-import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import csw.services.tracklocation.TrackLocationApp
 import org.scalamock.scalatest.MockFactory
 import org.scalatest._
