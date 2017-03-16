@@ -22,8 +22,19 @@ class CmdLineArgsParserTest
     x should contain (new Options(List("redis", "alarm", "watchdog"), Some("sleep 5"), Some(port), None, None, false))
   }
 
+  test("test parser with invalid service name combinations") {
+    val port = 5555
+    val listOfInvalidServices: List[String] = List("re-dis,alarm", "redis, alarm", " redis,alarm-service", "redis, alarm ", "redis, ,alarm")
+
+    listOfInvalidServices.foreach{ service =>
+      val argv = Array("--name", service,
+        "--port", port.toString,
+        "--command", "sleep 5")
+      CmdLineArgsParser.parser.parse(argv, Options()) shouldEqual None
+    }
+  }
+
   test("test parser with only --name option, should be allowed") {
-    //CmdLineArgsParser.parser.terminate(Left("no-op"))
     val argv = Array[String]("--name", "myService")
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
 

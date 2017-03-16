@@ -11,7 +11,6 @@ import scala.concurrent.Future
   * A utility application that starts a given external program, registers it with the location service and
   * unregisters it when the program exits.
   */
-// Parse the command line options
 object TrackLocationApp extends App {
   val actorRuntime = new ActorRuntime("track-location-app")
 
