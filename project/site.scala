@@ -2,9 +2,10 @@ import sbt.Keys._
 import sbt._
 
 object UnidocSite extends AutoPlugin {
-  import sbtunidoc.{JavaUnidocPlugin, ScalaUnidocPlugin}
+  import sbtunidoc.{JavaUnidocPlugin, ScalaUnidocPlugin, BaseUnidocPlugin}
   import JavaUnidocPlugin.autoImport._
   import ScalaUnidocPlugin.autoImport._
+  import BaseUnidocPlugin.autoImport.unidoc
 
   import com.typesafe.sbt.site.SitePlugin.autoImport._
 
@@ -12,17 +13,19 @@ object UnidocSite extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     siteSubdirName in ScalaUnidoc := "api/scala",
+//    filterNotSources(sources in (ScalaUnidoc, unidoc), Set("impl", "javadsl")),
+    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
+
     siteSubdirName in JavaUnidoc := "api/java",
-    addMappingsToSiteDir(
-      mappings in (ScalaUnidoc, packageDoc),
-      siteSubdirName in ScalaUnidoc
-    ),
-    addMappingsToSiteDir(
-      mappings in (JavaUnidoc, packageDoc),
-      siteSubdirName in JavaUnidoc
-    ),
+    filterNotSources(sources in (JavaUnidoc, unidoc), Set("impl", "scaladsl")),
+    addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
+
     autoAPIMappings := true
   )
+
+  def filterNotSources(filesKey: TaskKey[Seq[File]], subPaths: Set[String]): Setting[Task[Seq[File]]] = {
+    filesKey := filesKey.value.filterNot(file => subPaths.exists(file.getAbsolutePath.contains))
+  }
 }
 
 object ParadoxSite extends AutoPlugin {

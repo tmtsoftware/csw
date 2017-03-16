@@ -7,8 +7,9 @@ val plugins:Seq[Plugins] = if(enableCoverage.toBoolean) Seq(Coverage) else Seq.e
 lazy val csw = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
-  .aggregate(`csw-location`, `trackLocation`, docs)
+  .aggregate(`csw-location`, trackLocation, docs)
   .settings(Settings.mergeSiteWith(docs))
+  .settings(unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(trackLocation))
 
 
 lazy val `csw-location` = project
@@ -32,7 +33,7 @@ lazy val `csw-location` = project
     )
   )
 
-lazy val `trackLocation` = project
+lazy val trackLocation = project
   .in(file("apps/trackLocation"))
   .enablePlugins(DeployApp)
   .dependsOn(`csw-location`)
@@ -43,7 +44,8 @@ lazy val `trackLocation` = project
       `scalatest` % Test,
       `scalamock-scalatest-support` % Test,
       `scala-logging` % Test
-    )
+    ),
+    sources in (Compile, doc) := Seq.empty
   )
 
 lazy val docs = project
