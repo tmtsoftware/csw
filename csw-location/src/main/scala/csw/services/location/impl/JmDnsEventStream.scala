@@ -2,11 +2,9 @@ package csw.services.location.impl
 
 import javax.jmdns.{JmDNS, ServiceEvent, ServiceListener}
 
-import akka.actor.ActorRef
-import csw.services.location.scaladsl.{ActorRuntime, DeathwatchActor}
-import csw.services.location.common.{Constants, SourceExtensions}
-import csw.services.location.models.ServiceInfoExtensions.RichServiceInfo
+import csw.services.location.impl.ServiceInfoExtensions.RichServiceInfo
 import csw.services.location.models.{Connection, Location, Removed, Unresolved}
+import csw.services.location.scaladsl.{ActorRuntime, DeathwatchActor}
 
 class JmDnsEventStream(jmDns: JmDNS, actorRuntime: ActorRuntime) {
 

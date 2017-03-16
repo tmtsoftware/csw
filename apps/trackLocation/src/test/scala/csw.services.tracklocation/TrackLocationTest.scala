@@ -5,7 +5,7 @@ import java.nio.file.Paths
 
 import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
-import csw.services.location.common.Networks
+import csw.services.location.impl.Networks
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}

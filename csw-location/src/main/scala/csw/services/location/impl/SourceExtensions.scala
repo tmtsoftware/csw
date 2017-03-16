@@ -1,8 +1,8 @@
-package csw.services.location.common
+package csw.services.location.impl
 
 import akka.NotUsed
-import akka.stream.{KillSwitch, KillSwitches, Materializer, OverflowStrategy}
 import akka.stream.scaladsl.{BroadcastHub, Keep, Sink, Source, SourceQueueWithComplete}
+import akka.stream.{KillSwitch, KillSwitches, Materializer, OverflowStrategy}
 
 import scala.concurrent.{Future, Promise}
 

@@ -1,7 +1,8 @@
-package csw.services.location.common
+package csw.services.location.impl
+
+import java.net.{Inet6Address, InetAddress, NetworkInterface}
 
 import scala.collection.JavaConverters._
-import java.net.{Inet6Address, InetAddress, NetworkInterface}
 
 object Networks {
 

@@ -3,7 +3,7 @@ package csw.services.location.scaladsl
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.location.common.Networks
+import csw.services.location.impl.Networks
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext

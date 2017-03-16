@@ -7,8 +7,7 @@ import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, TcpRegistration}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-import csw.services.location.common.Constants
-import csw.services.location.impl.LocationServiceImpl
+import csw.services.location.impl.{Constants, LocationServiceImpl}
 
 import scala.util.Failure
 
