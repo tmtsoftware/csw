@@ -5,10 +5,10 @@ import javax.jmdns.{JmDNS, ServiceInfo}
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 import csw.services.location.common.Constants
 import csw.services.location.models.ServiceInfoExtensions.RichServiceInfo
 import csw.services.location.models._
+import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -20,6 +20,7 @@ private[location] class LocationServiceImpl(
 ) extends LocationService { outer =>
 
   import actorRuntime._
+  import jmDnsEventStream.deathWatchActorRef
 
   private val jmDnsDispatcher = actorRuntime.actorSystem.dispatchers.lookup("jmdns.dispatcher")
 
@@ -54,7 +55,7 @@ private[location] class LocationServiceImpl(
   }
 
   override def list: Future[List[Location]] = Future {
-    jmDNS.list(Constants.DnsType).toList.flatMap(_.locations)
+    jmDNS.list(Constants.DnsType).toList.flatMap(_.locations(deathWatchActorRef))
   }(jmDnsDispatcher)
 
   override def list(componentType: ComponentType): Future[List[Location]] = async {
