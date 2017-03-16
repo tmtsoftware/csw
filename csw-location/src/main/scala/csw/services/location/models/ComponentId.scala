@@ -1,4 +1,4 @@
-package csw.services.location.scaladsl.models
+package csw.services.location.models
 
 /**
   * Used to identify a component

@@ -4,8 +4,8 @@ import javax.jmdns.{JmDNS, ServiceEvent, ServiceListener}
 
 import csw.services.location.scaladsl.ActorRuntime
 import csw.services.location.common.{Constants, SourceExtensions}
-import csw.services.location.scaladsl.models.ServiceInfoExtensions.RichServiceInfo
-import csw.services.location.scaladsl.models.{Connection, Location, Removed, Unresolved}
+import csw.services.location.models.ServiceInfoExtensions.RichServiceInfo
+import csw.services.location.models.{Connection, Location, Removed, Unresolved}
 
 class JmDnsEventStream(jmDns: JmDNS, actorRuntime: ActorRuntime) {
 

@@ -1,10 +1,10 @@
-package csw.services.location.scaladsl.models
+package csw.services.location.models
 
 import javax.jmdns.ServiceInfo
 
 import akka.actor.{ActorPath, ActorRef}
 import akka.serialization.Serialization
-import csw.services.location.scaladsl.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.common.Constants
 
 import scala.collection.JavaConverters._
@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 /**
   * Represents a registered connection to a service
   */
-sealed trait Registration {
+sealed abstract class Registration {
   def connection: Connection
   def port: Int
   def values: Map[String, String]

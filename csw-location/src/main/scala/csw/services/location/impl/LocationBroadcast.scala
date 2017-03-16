@@ -5,7 +5,7 @@ import akka.stream.KillSwitch
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.services.location.scaladsl.ActorRuntime
 import csw.services.location.common.SourceExtensions.RichSource
-import csw.services.location.scaladsl.models.{Connection, Location, Removed, Resolved}
+import csw.services.location.models.{Connection, Location, Removed, Resolved}
 
 import scala.concurrent.Future
 

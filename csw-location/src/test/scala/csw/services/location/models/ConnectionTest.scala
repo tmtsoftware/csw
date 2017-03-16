@@ -1,6 +1,6 @@
-package csw.services.location.scaladsl.models
+package csw.services.location.models
 
-import csw.services.location.scaladsl.models.Connection.InvalidConnectionStringException
+import csw.services.location.models.Connection.InvalidConnectionStringException
 import org.scalatest.{FunSuite, Matchers}
 
 class ConnectionTest extends FunSuite with Matchers {

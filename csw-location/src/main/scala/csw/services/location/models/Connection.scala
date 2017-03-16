@@ -1,6 +1,6 @@
-package csw.services.location.scaladsl.models
+package csw.services.location.models
 
-import csw.services.location.scaladsl.models.ConnectionType.{AkkaType, HttpType, TcpType}
+import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
 
 import scala.util.{Failure, Try}
 import scala.util.control.NonFatal
@@ -8,7 +8,7 @@ import scala.util.control.NonFatal
 /**
   * Describes a component and the way it is accessed (http, akka)
   */
-sealed trait Connection {
+sealed abstract class Connection {
   /**
     * Holds the component name and type (assembly, hcd, etc.)
     */

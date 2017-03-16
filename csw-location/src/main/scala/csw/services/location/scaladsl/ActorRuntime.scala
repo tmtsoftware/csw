@@ -8,7 +8,9 @@ import csw.services.location.common.Networks
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 
-class ActorRuntime(name: String, _settings: Map[String, Any] = Map.empty) {
+class ActorRuntime(name: String, _settings: Map[String, Any]) {
+
+  def this(name: String) = this(name, Map.empty)
 
   val config: Config = {
     val settings: Map[String, Any] = Map(

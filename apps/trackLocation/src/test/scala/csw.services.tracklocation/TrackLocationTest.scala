@@ -6,8 +6,8 @@ import java.nio.file.Paths
 import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
 import csw.services.location.common.Networks
-import csw.services.location.scaladsl.models.Connection.TcpConnection
-import csw.services.location.scaladsl.models._
+import csw.services.location.models.Connection.TcpConnection
+import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import csw.services.tracklocation.common.TestFutureExtension._
 import csw.services.tracklocation.models.Command

@@ -3,8 +3,8 @@ package csw.services.location.scaladsl
 import javax.jmdns.{JmDNS, ServiceInfo}
 
 import csw.services.location.common.TestFutureExtension.RichFuture
-import csw.services.location.scaladsl.models.Connection.TcpConnection
-import csw.services.location.scaladsl.models.{ComponentId, ComponentType, TcpRegistration}
+import csw.services.location.models.Connection.TcpConnection
+import csw.services.location.models.{ComponentId, ComponentType, TcpRegistration}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import csw.services.location.common.Constants

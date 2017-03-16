@@ -1,6 +1,6 @@
-package csw.services.location.javadsl.models;
+package csw.services.location.javadsl;
 
-import csw.services.location.scaladsl.models.ComponentType;
+import csw.services.location.models.ComponentType;
 
 /**
  * Java API for location service component types.

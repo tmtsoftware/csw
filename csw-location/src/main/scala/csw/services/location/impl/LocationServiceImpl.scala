@@ -7,8 +7,8 @@ import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
 import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 import csw.services.location.common.Constants
-import csw.services.location.scaladsl.models.ServiceInfoExtensions.RichServiceInfo
-import csw.services.location.scaladsl.models._
+import csw.services.location.models.ServiceInfoExtensions.RichServiceInfo
+import csw.services.location.models._
 
 import scala.async.Async._
 import scala.concurrent.Future

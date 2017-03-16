@@ -8,12 +8,12 @@ import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.{ActorRuntime, LocationService}
-import csw.services.location.scaladsl.models._
+import csw.services.location.models._
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 
-private class JLocationServiceImpl(locationService: LocationService, actorRuntime: ActorRuntime) extends ILocationService{
+private[location] class JLocationServiceImpl(locationService: LocationService, actorRuntime: ActorRuntime) extends ILocationService{
 
   import actorRuntime._
 
@@ -32,7 +32,7 @@ private class JLocationServiceImpl(locationService: LocationService, actorRuntim
   override def resolve(connections: util.Set[Connection]): CompletionStage[util.Set[Resolved]] =
     locationService.resolve(connections.asScala.toSet).map(_.asJava).toJava
 
-  override def list(): CompletionStage[util.List[Location]] =
+  override def list: CompletionStage[util.List[Location]] =
     locationService.list.map(_.asJava).toJava
 
   override def list(componentType: ComponentType): CompletionStage[util.List[Location]] =

@@ -1,12 +1,12 @@
-package csw.services.location.scaladsl.models
+package csw.services.location.models
 
 import java.net.URI
 import java.util.Optional
 
 import akka.actor.ActorRef
-import csw.services.location.scaladsl.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
-import scala.compat.java8.OptionConverters.RichOptionForJava8
+import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
 sealed trait Location {
   def connection: Connection
@@ -21,6 +21,12 @@ sealed trait Resolved extends Location {
 }
 
 final case class ResolvedAkkaLocation(connection: AkkaConnection, uri: URI, prefix: String = "", actorRef: Option[ActorRef] = None) extends Resolved {
+
+  /**
+    * Java constructor
+    */
+  def this(connection: AkkaConnection, uri: URI, prefix: String, actorRef: Optional[ActorRef]) = this(connection, uri, prefix, actorRef.asScala)
+
   /**
     * Java API to get actorRef
     */

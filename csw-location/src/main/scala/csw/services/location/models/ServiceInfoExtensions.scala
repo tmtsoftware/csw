@@ -1,10 +1,10 @@
-package csw.services.location.scaladsl.models
+package csw.services.location.models
 
 import java.net.URI
 import javax.jmdns.ServiceInfo
 
 import akka.actor.{ActorPath, ActorRef, ActorSystem, ExtendedActorSystem, Extension, ExtensionKey}
-import csw.services.location.scaladsl.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.common.Constants
 
 import scala.util.Success
