@@ -61,7 +61,7 @@ class TrackLocationTest
     }
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
-    val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
+    val uri = new URI(s"tcp://${actorRuntime.ipaddr.getHostAddress}:$port")
     val resolvedConnection = locationService.resolve(connection).await
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
 
@@ -89,7 +89,7 @@ class TrackLocationTest
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedConnection = locationService.resolve(connection).await
-    val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
+    val uri = new URI(s"tcp://${actorRuntime.ipaddr.getHostAddress}:$port")
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService

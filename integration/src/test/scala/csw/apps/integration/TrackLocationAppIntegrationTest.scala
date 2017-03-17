@@ -4,7 +4,6 @@ import java.net.URI
 import java.nio.file.Paths
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.common.Networks
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, Location, ResolvedTcpLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
@@ -53,7 +52,7 @@ class TrackLocationAppIntegrationTest
     }
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
-    val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
+    val uri = new URI(s"tcp://${actorRuntime.ipaddr.getHostAddress}:$port")
     val resolvedConnection = locationService.resolve(connection).await
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
 
@@ -82,7 +81,7 @@ class TrackLocationAppIntegrationTest
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedConnection = locationService.resolve(connection).await
-    val uri = new URI(s"tcp://${Networks.getPrimaryIpv4Address.getHostAddress}:$port")
+    val uri = new URI(s"tcp://${actorRuntime.ipaddr.getHostAddress}:$port")
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService

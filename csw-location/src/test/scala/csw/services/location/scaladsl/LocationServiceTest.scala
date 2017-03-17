@@ -7,7 +7,7 @@ import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, TcpRegistration}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-import csw.services.location.impl.{Constants, LocationServiceImpl}
+import csw.services.location.impl.{Constants, JmDnsEventStream, LocationEventStream, LocationServiceImpl}
 
 import scala.util.Failure
 
@@ -27,11 +27,12 @@ class LocationServiceTest
     val registration = TcpRegistration(TcpConnection(ComponentId("", ComponentType.HCD)), 100)
 
     val jmDNS = stub[JmDNS]
-
+    val jmDnsEventStream = new JmDnsEventStream(jmDNS, actorRuntime)
+    val locationEventStream: LocationEventStream = new LocationEventStream(jmDnsEventStream, jmDNS, actorRuntime)
     (jmDNS.registerService _).when(registration.serviceInfo).throws(CustomExp)
     (jmDNS.list(_:String)).when(Constants.DnsType).returns(new Array[ServiceInfo](0))
 
-    val locationService: LocationService = new LocationServiceImpl(jmDNS, actorRuntime, null)
+    val locationService: LocationService = new LocationServiceImpl(jmDNS, actorRuntime, locationEventStream)
 
     locationService.register(registration).done.value.get shouldBe Failure(CustomExp)
   }

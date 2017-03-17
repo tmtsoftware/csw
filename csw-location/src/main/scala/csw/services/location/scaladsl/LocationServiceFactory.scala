@@ -6,7 +6,7 @@ import csw.services.location.impl.{LocationEventStream, JmDnsEventStream, Locati
 
 object LocationServiceFactory {
   def make(actorRuntime: ActorRuntime): LocationService = {
-    val jmDNS = JmDNS.create(Networks.getPrimaryIpv4Address)
+    val jmDNS = JmDNS.create(actorRuntime.ipaddr)
     val jmDnsEventStream = new JmDnsEventStream(jmDNS, actorRuntime)
     val locationEventStream = new LocationEventStream(jmDnsEventStream, jmDNS, actorRuntime)
     new LocationServiceImpl(jmDNS, actorRuntime, locationEventStream)

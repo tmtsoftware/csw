@@ -13,7 +13,7 @@ Complete user guide on how to use common software platform, Scaladoc and Javadoc
 ### @scaladoc[Scaladoc](index)
 
 java
-:   @@snip [JLocationServiceImplTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/JLocationServiceImplTest.java) { #hello_example }
+:   @@snip [JLocationServiceImplTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/JLocationServiceImplTest.java) { #resolve_tcp_connection_test }
 
 scala
-:   @@snip [LocationServiceCompTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/LocationServiceCompTest.scala) { #hello_example }
+:   @@snip [LocationServiceCompTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/LocationServiceCompTest.scala) { #http_location_test }
