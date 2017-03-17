@@ -32,12 +32,14 @@ printf "${PURPLE}------ Waiting for 10 seconds to let Service gets started -----
 sleep 10
 
 printf "${ORANGE}------ Starting tcpdump for hcd-node ------${NC}"
-sudo timeout 60 tcpdump -i docker0 -n "(igmp or (multicast and port mdns))"
+timeout 60 tcpdump -i docker0 -n "(igmp or (multicast and port mdns))"
 
 printf "${YELLOW}------ Starting another Docker container to execute tests ------${NC}\n"
 docker run -it --rm --name it-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/integration && sbt -DPORT=2552 test'
+test_exit_code=$?
 
-printf "${PURPLE}---------- killing hcd node ---------- {$NC}"
+printf "${PURPLE}---------- killing hcd node ---------- ${NC}"
 docker rm -f hcd-node
-printf "${PURPLE}---------- killing service node ---------- {$NC}"
+printf "${PURPLE}---------- killing service node ---------- ${NC}"
 docker rm -f service-node
+exit ${test_exit_code}
