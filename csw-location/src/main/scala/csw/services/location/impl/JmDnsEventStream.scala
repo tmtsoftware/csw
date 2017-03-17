@@ -2,20 +2,19 @@ package csw.services.location.impl
 
 import javax.jmdns.{JmDNS, ServiceEvent, ServiceListener}
 
+import akka.NotUsed
+import akka.stream.scaladsl.Source
 import csw.services.location.impl.ServiceInfoExtensions.RichServiceInfo
 import csw.services.location.models.{Connection, Location, Removed, Unresolved}
-import csw.services.location.scaladsl.{ActorRuntime, DeathwatchActor}
+import csw.services.location.scaladsl.ActorRuntime
 
 class JmDnsEventStream(jmDns: JmDNS, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 
-  val deathWatchActorRef = actorRuntime.actorSystem.actorOf(DeathwatchActor.props(this))
+  private val (_source, queueF) = SourceExtensions.coupling[Location]
 
-
-  private val (source, queueF) = SourceExtensions.coupling[Location]
-
-  val broadcast: LocationBroadcast = new LocationBroadcast(source, actorRuntime)
+  val locationStream: Source[Location, NotUsed] = _source
 
   jmDns.addServiceListener(Constants.DnsType, makeListener())
 
@@ -28,7 +27,7 @@ class JmDnsEventStream(jmDns: JmDNS, actorRuntime: ActorRuntime) {
 
     override def serviceResolved(event: ServiceEvent): Unit = {
       queueF.foreach { queue =>
-        event.getInfo.locations(deathWatchActorRef).foreach(location => queue.offer(location))
+        event.getInfo.locations.foreach(location => queue.offer(location))
       }
     }
 
@@ -39,9 +38,4 @@ class JmDnsEventStream(jmDns: JmDNS, actorRuntime: ActorRuntime) {
     }
   }
 
-  def actorTerminated(conn:Connection): Unit = {
-    queueF.foreach { queue =>
-      queue.offer(Removed(conn))
-    }
-  }
 }

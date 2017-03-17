@@ -9,7 +9,7 @@ import csw.services.location.models.{Connection, Location, Removed, Resolved}
 
 import scala.concurrent.Future
 
-class LocationBroadcast(source: Source[Location, NotUsed], actorRuntime: ActorRuntime) {
+class LocationBroadcast(source: Source[Location, KillSwitch], actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 

@@ -12,8 +12,6 @@ import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, 
 import csw.services.location.models._
 import org.scalatest._
 
-import scala.concurrent.Future
-
 class LocationServiceCompTest
   extends FunSuite
     with Matchers

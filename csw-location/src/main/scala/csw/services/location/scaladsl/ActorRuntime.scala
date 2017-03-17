@@ -1,12 +1,15 @@
 package csw.services.location.scaladsl
 
 import akka.actor.ActorSystem
+import akka.dispatch.MessageDispatcher
 import akka.stream.{ActorMaterializer, Materializer}
+import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.location.impl.Networks
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationLong
 
 class ActorRuntime(name: String, _settings: Map[String, Any]) {
 
@@ -23,6 +26,10 @@ class ActorRuntime(name: String, _settings: Map[String, Any]) {
   implicit val actorSystem: ActorSystem = ActorSystem(name, config)
   implicit val ec: ExecutionContext = actorSystem.dispatcher
   implicit val mat: Materializer = makeMat()
+  implicit val timeout: Timeout = Timeout(2.seconds)
 
   def makeMat(): Materializer = ActorMaterializer()
+
+  val jmDnsDispatcher: MessageDispatcher = actorSystem.dispatchers.lookup("jmdns.dispatcher")
+
 }

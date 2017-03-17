@@ -15,23 +15,20 @@ import scala.concurrent.Future
 private[location] class LocationServiceImpl(
   jmDNS: JmDNS,
   actorRuntime: ActorRuntime,
-  jmDnsEventStream: JmDnsEventStream
+  locationEventStream: LocationEventStream
 ) extends LocationService { outer =>
 
   import actorRuntime._
-  import jmDnsEventStream.deathWatchActorRef
-
-  private val jmDnsDispatcher = actorRuntime.actorSystem.dispatchers.lookup("jmdns.dispatcher")
 
   override def register(reg: Registration): Future[RegistrationResult] = async {
     await(list).find(_.connection == reg.connection) match {
       case Some(_) => throw new IllegalStateException(s"A service with name ${reg.connection.name} is already registered")
-      case None => await(registerUniqueService(reg))
+      case None    => await(registerUniqueService(reg))
     }
   }
 
   override def unregister(connection: Connection): Future[Done] = {
-    val locationF = jmDnsEventStream.broadcast.removed(connection)
+    val locationF = locationEventStream.broadcast.removed(connection)
     jmDNS.unregisterService(ServiceInfo.create(Constants.DnsType, connection.name, 0, ""))
     locationF.map(_ => Done)
   }
@@ -44,8 +41,8 @@ private[location] class LocationServiceImpl(
 
   override def resolve(connection: Connection): Future[Resolved] = async {
     await(list).find(_.connection == connection) match {
-      case Some(location : Resolved) => location
-      case _ => await(resolveService(connection))
+      case Some(location: Resolved) => location
+      case _                        => await(resolveService(connection))
     }
   }
 
@@ -53,9 +50,7 @@ private[location] class LocationServiceImpl(
     Future.traverse(connections)(resolve)
   }
 
-  override def list: Future[List[Location]] = Future {
-    jmDNS.list(Constants.DnsType).toList.flatMap(_.locations(deathWatchActorRef))
-  }(jmDnsDispatcher)
+  override def list: Future[List[Location]] = locationEventStream.list
 
   override def list(componentType: ComponentType): Future[List[Location]] = async {
     await(list).filter(_.connection.componentId.componentType == componentType)
@@ -73,7 +68,7 @@ private[location] class LocationServiceImpl(
 
   override def track(connection: Connection): Source[Location, KillSwitch] = {
     jmDNS.requestServiceInfo(Constants.DnsType, connection.name, true)
-    jmDnsEventStream.broadcast.filter(connection)
+    locationEventStream.broadcast.filter(connection)
   }
 
   private def registrationResult(connection: Connection) = new RegistrationResult {
@@ -82,13 +77,13 @@ private[location] class LocationServiceImpl(
     override def unregister(): Future[Done] = outer.unregister(connection)
   }
 
-  private def registerUniqueService(reg: Registration) = Future{
+  private def registerUniqueService(reg: Registration) = Future {
     jmDNS.registerService(reg.serviceInfo)
     registrationResult(reg.connection)
   }(jmDnsDispatcher)
 
   private def resolveService(connection: Connection) = {
-    val locationF = jmDnsEventStream.broadcast.resolved(connection)
+    val locationF = locationEventStream.broadcast.resolved(connection)
     jmDNS.requestServiceInfo(Constants.DnsType, connection.name)
     locationF
   }
