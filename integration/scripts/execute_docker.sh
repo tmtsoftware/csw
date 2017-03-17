@@ -35,7 +35,7 @@ printf "${ORANGE}------ Starting tcpdump for hcd-node ------${NC}"
 timeout 60 tcpdump -i docker0 -n "(igmp or (multicast and port mdns))"
 
 printf "${YELLOW}------ Starting another Docker container to execute tests ------${NC}\n"
-docker run -it --rm --name it-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/integration && sbt -DPORT=2552 test'
+docker run -it --rm --name it-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/integration && sbt -DPORT=2552 "test-only csw.services.integration.LocationServiceIntegrationTest csw.services.integration.TrackLocationAppIntegrationTest"'
 test_exit_code=$?
 
 printf "${PURPLE}---------- killing hcd node ---------- ${NC}"

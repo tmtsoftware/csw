@@ -25,9 +25,9 @@ notifications:
     on_failure: always
 
 script:
-  - pwd
   - ./build.sh '-v /home/travis/build/tmtsoftware/csw-prod:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
   - ./integration/scripts/execute_docker.sh '-v /home/travis/build/tmtsoftware/csw-prod:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
+  - ./integration/scripts/multiple_nic_test.sh '-v /home/travis/build/tmtsoftware/csw-prod:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
 
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
