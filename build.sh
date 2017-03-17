@@ -23,4 +23,5 @@ docker build -t tmt/local-csw-centos .
 
 printf "${YELLOW}----------- Starting docker container with name : test -----------${NC}\n"
 docker run -it --rm -e TRAVIS_JOB_ID=$TRAVIS_JOB_ID --name test-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source && sbt -Dcheck.cycles=true clean scalastyle test coverageReport coverageAggregate coveralls;'
+test_exit_code=$?
 docker run -it --rm --name test-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source && sbt -DenableCoverage=false clean publishLocal;'

@@ -32,6 +32,8 @@ class LocationEventStream(jmDnsEventStream: JmDnsEventStream, jmDns: JmDNS, acto
 
   queueF.foreach { queue =>
     val currentLocations = Source.fromFuture(jmDnsList).mapConcat(identity)
+//  temp solution to fix failing tests #todo -> remove sleep
+    Thread.sleep(500)
     val allLocations = currentLocations.concat(stream)
     actorRefOpt = Some(actorSystem.actorOf(DeathwatchActor.props(allLocations, queue)))
   }
