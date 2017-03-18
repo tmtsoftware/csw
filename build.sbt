@@ -9,7 +9,10 @@ lazy val csw = project
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
   .aggregate(`csw-location`, trackLocation, docs, integration)
   .settings(Settings.mergeSiteWith(docs))
-  .settings(unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(trackLocation, integration))
+  .settings(
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(trackLocation, integration),
+    aggregate in test := false
+  )
 
 
 lazy val `csw-location` = project
