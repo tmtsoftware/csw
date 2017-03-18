@@ -1,24 +1,27 @@
 package csw.services.location.impl
 
-import akka.NotUsed
 import akka.actor.{Actor, ActorRef, Props, Terminated}
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source, SourceQueueWithComplete}
+import akka.stream.{ActorMaterializer, KillSwitch}
 import csw.services.location.impl.DeathwatchActor.{GetLiveAkkaConnections, LiveAkkaConnections, WatchIt}
 import csw.services.location.models.{Connection, Location, Removed, ResolvedAkkaLocation}
 
 class DeathwatchActor(
-  stream: Source[Location, NotUsed],
+  currentLocations: List[Location],
+  stream: Source[Location, KillSwitch],
   queue: SourceQueueWithComplete[Removed]
 ) extends Actor {
 
   var watchedAkkaLocations: Map[ActorRef, Connection] = Map.empty
   implicit val mat = ActorMaterializer()
 
-  stream.collect {
-    case ResolvedAkkaLocation(connection, _, _, Some(actorRef)) =>
-      self ! WatchIt(actorRef, connection)
-  }.runWith(Sink.ignore)
+  override def preStart(): Unit = {
+    val watch: PartialFunction[Location, Unit] = {
+      case ResolvedAkkaLocation(connection, _, _, Some(actorRef)) => self ! WatchIt(actorRef, connection)
+    }
+    currentLocations.collect(watch)
+    stream.collect(watch).runWith(Sink.ignore)
+  }
 
   override def receive: Receive = {
     case WatchIt(actorRef, connection) =>
@@ -36,9 +39,10 @@ class DeathwatchActor(
 
 object DeathwatchActor {
   def props(
-    stream: Source[Location, NotUsed],
+    currentLocations: List[Location],
+    stream: Source[Location, KillSwitch],
     queue: SourceQueueWithComplete[Removed]
-  ): Props = Props(new DeathwatchActor(stream, queue))
+  ): Props = Props(new DeathwatchActor(currentLocations, stream, queue))
 
   case class WatchIt(actorRef: ActorRef, connection: Connection)
   case object GetLiveAkkaConnections
