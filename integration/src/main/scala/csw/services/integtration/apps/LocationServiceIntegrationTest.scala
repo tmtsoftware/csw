@@ -1,7 +1,6 @@
-package csw.services.integration
+package csw.services.integtration.apps
 
 import akka.actor.Props
-import csw.services.integtration.apps.TromboneHCD
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._

@@ -7,9 +7,9 @@ val plugins:Seq[Plugins] = if(enableCoverage.toBoolean) Seq(Coverage) else Seq.e
 lazy val csw = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
-  .aggregate(`csw-location`, trackLocation, docs)
+  .aggregate(`csw-location`, trackLocation, docs, integration)
   .settings(Settings.mergeSiteWith(docs))
-  .settings(unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(trackLocation))
+  .settings(unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(trackLocation, integration))
 
 
 lazy val `csw-location` = project
@@ -50,3 +50,17 @@ lazy val trackLocation = project
 
 lazy val docs = project
   .enablePlugins(ParadoxSite, NoPublish)
+
+lazy val integration = project
+  .enablePlugins(DeployApp)
+  .dependsOn(`csw-location`)
+  .dependsOn(trackLocation)
+  .settings(
+    libraryDependencies ++= Seq(
+      `akka-stream-testkit`,
+      `scalatest`,
+      `scalamock-scalatest-support`,
+      `jmdns`
+    ),
+    sources in Test := (sources in Compile).value
+  )

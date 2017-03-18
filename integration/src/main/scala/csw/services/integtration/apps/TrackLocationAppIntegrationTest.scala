@@ -1,4 +1,4 @@
-package csw.services.integration
+package csw.services.integtration.apps
 
 import java.net.URI
 import java.nio.file.Paths
