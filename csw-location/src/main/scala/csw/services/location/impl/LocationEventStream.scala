@@ -26,9 +26,9 @@ class LocationEventStream(jmDnsEventStream: JmDnsEventStream, jmDns: JmDNS, acto
   }
 
   private val actorRefFuture = async {
-    val queue = await(queueF)
-    val currentLocations = await(jmDnsList)
-    actorSystem.actorOf(DeathwatchActor.props(currentLocations, stream, queue))
+    actorSystem.actorOf(
+      DeathwatchActor.props(await(jmDnsList), stream, await(queueF))
+    )
   }
 
   def list: Future[List[Location]] = async {
