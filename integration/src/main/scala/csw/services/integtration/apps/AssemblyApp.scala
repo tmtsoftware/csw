@@ -21,7 +21,6 @@ object AssemblyApp extends App {
 class AssemblyApp extends Actor{
   override def receive: Receive = {
  	case "Unregister" => {
-      	println("Unregistered the connection.")
       	AssemblyApp.registrationResult.unregister()
     }
 }

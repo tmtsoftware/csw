@@ -22,11 +22,24 @@ fi
 docker build -t tmt/local-csw-centos .
 
 printf "${YELLOW}----------- Starting docker container with name : test -----------${NC}\n"
-docker run -d -e TRAVIS_JOB_ID=$TRAVIS_JOB_ID --name test-node $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
-docker exec test-node bash -c 'cd /source && sbt -Dcheck.cycles=true clean scalastyle test coverageReport;'
-exit_code=$?
-docker exec test-node bash -c 'cd /source && sbt coverageAggregate coveralls;'
-docker stop test-node
-docker rm test-node
-docker run -it --rm --name test-node $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source && sbt -DenableCoverage=false clean publishLocal;'
-exit $exit_code
+docker run -d -e TRAVIS_JOB_ID=$TRAVIS_JOB_ID --name build-container $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
+docker exec build-container bash -c 'cd /source && sbt -Dcheck.cycles=true clean scalastyle'
+exit_code_cmd_1=$?
+docker exec build-container bash -c 'cd /source && sbt csw-location/test'
+exit_code_cmd_2=$?
+docker exec build-container bash -c 'cd /source && sbt trackLocation/test'
+exit_code_cmd_3=$?
+docker exec build-container bash -c 'cd /source && sbt coverageReport'
+exit_code_cmd_4=$?
+docker exec build-container bash -c 'cd /source && sbt coverageAggregate coveralls;'
+docker exec build-container bash -c 'cd /source && ./universal_package.sh'
+
+docker stop build-container
+docker rm build-container
+
+if [[ $exit_code_cmd_1 -eq "0" && $exit_code_cmd_2 -eq "0" && $exit_code_cmd_3 -eq "0" && $exit_code_cmd_4 -eq "0" ]]
+then
+    exit 0
+else
+    exit 1
+fi
