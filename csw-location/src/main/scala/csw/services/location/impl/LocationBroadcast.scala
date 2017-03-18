@@ -1,19 +1,15 @@
 package csw.services.location.impl
 
-import akka.NotUsed
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import csw.services.location.scaladsl.ActorRuntime
-import SourceExtensions.RichSource
 import csw.services.location.models.{Connection, Location, Removed, Resolved}
+import csw.services.location.scaladsl.ActorRuntime
 
 import scala.concurrent.Future
 
-class LocationBroadcast(source: Source[Location, KillSwitch], actorRuntime: ActorRuntime) {
+class LocationBroadcast(broadcast: Source[Location, KillSwitch], actorRuntime: ActorRuntime) {
 
   import actorRuntime._
-
-  private val broadcast = source.broadcast()
 
   def removed(connection: Connection): Future[Removed] = find {
     case x: Removed if x.connection == connection => x

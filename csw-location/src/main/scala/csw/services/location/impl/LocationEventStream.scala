@@ -5,7 +5,6 @@ import javax.jmdns.JmDNS
 import akka.pattern.ask
 import csw.services.location.impl.DeathwatchActor.{GetLiveAkkaConnections, LiveAkkaConnections}
 import csw.services.location.impl.ServiceInfoExtensions.RichServiceInfo
-import csw.services.location.impl.SourceExtensions.RichSource
 import csw.services.location.models.{Connection, Location, Removed, ResolvedAkkaLocation}
 import csw.services.location.scaladsl.ActorRuntime
 
@@ -16,18 +15,18 @@ class LocationEventStream(jmDnsEventStream: JmDnsEventStream, jmDns: JmDNS, acto
 
   import actorRuntime._
 
-  private val (removedStream, queueF) = SourceExtensions.coupling[Removed]
+  private val (queue, removedStream) = StreamExt.coupling[Removed]
 
-  private val stream = jmDnsEventStream.locationStream.broadcast()
+  private val stream = jmDnsEventStream.locationStream
 
   val broadcast: LocationBroadcast = {
-    val completeStream = stream.merge(removedStream)
+    val completeStream = stream.merge(removedStream, eagerComplete = true)
     new LocationBroadcast(completeStream, actorRuntime)
   }
 
   private val actorRefFuture = async {
     actorSystem.actorOf(
-      DeathwatchActor.props(await(jmDnsList), stream, await(queueF))
+      DeathwatchActor.props(await(jmDnsList), stream, queue)
     )
   }
 
