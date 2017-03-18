@@ -1,4 +1,4 @@
-import Dependencies._
+import Libs._
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin

@@ -5,13 +5,11 @@ import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
-import org.scalamock.scalatest.MockFactory
 import org.scalatest._
 
 class LocationServiceIntegrationTest
   extends FunSuite
     with Matchers
-    with MockFactory
     with BeforeAndAfter
     with BeforeAndAfterAll {
 

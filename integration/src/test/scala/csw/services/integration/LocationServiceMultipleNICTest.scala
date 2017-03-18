@@ -4,12 +4,10 @@ import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType, ResolvedAkkaLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuite, Matchers}
 
 class LocationServiceMultipleNICTest extends FunSuite
   with Matchers
-  with MockFactory
   with BeforeAndAfter
   with BeforeAndAfterAll{
   private val actorRuntime = new ActorRuntime("AssemblySystem", "eth1")
