@@ -21,7 +21,7 @@ fi
 
 docker build -t tmt/local-csw-centos .
 
-printf "${YELLOW}----------- Starting docker container with name : test -----------${NC}\n"
+printf "${YELLOW}----------- Starting docker container with name : build-container -----------${NC}\n"
 docker run -d -e TRAVIS_JOB_ID=$TRAVIS_JOB_ID --name build-container $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
 docker exec build-container bash -c 'cd /source && sbt -Dcheck.cycles=true clean scalastyle'
 exit_code_cmd_1=$?
