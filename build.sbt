@@ -61,5 +61,6 @@ lazy val integration = project
       Libs.`scalatest`,
       Libs.`jmdns`
     ),
-    sources in Test := (sources in Compile).value
+    sources in Test := (sources in Compile).value,
+    resources in Test := (resources in Compile).value
   )
