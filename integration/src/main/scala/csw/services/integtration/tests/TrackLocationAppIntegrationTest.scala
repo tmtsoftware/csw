@@ -1,13 +1,13 @@
 package csw.services.integtration.tests
 
+import java.io.{BufferedWriter, FileWriter}
 import java.net.URI
-import java.nio.file.Paths
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, Location, ResolvedTcpLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
-import csw.services.tracklocation.{TrackLocation, TrackLocationApp}
+import csw.services.tracklocation.TrackLocationApp
 import org.scalatest._
 
 import scala.concurrent.Future
@@ -24,7 +24,7 @@ class TrackLocationAppIntegrationTest
   import actorRuntime._
 
   private val locationService = LocationServiceFactory.make(actorRuntime)
-  var trackLocationApp: TrackLocationApp = null
+  var trackLocationApp: TrackLocationApp = _
 
   override protected def afterEach(): Unit = {
     //TODO: write and invoke test utility method for unregistering all services
@@ -70,8 +70,17 @@ class TrackLocationAppIntegrationTest
   test("Test with config file") {
     val name = "test2"
     val port = 8888
-    val url = getClass.getResource("/test2.conf")
-    val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
+
+    val tempFile = java.io.File.createTempFile("trackLocationApp-test2", ".conf")
+    val bw = new BufferedWriter(new FileWriter(tempFile))
+    bw.write(s"""test2 {
+      port = 8888
+      command = sleep 5
+    }""")
+    bw.close()
+
+    val configFile: String = tempFile.getPath
+    println(configFile)
 
     trackLocationApp = new TrackLocationApp()
 
@@ -95,5 +104,7 @@ class TrackLocationAppIntegrationTest
 
     val locations: Seq[Location] = locationService.list.await
     locations.contains(resolvedConnection) shouldBe false
+
+    tempFile.delete()
   }
 }
