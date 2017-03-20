@@ -12,9 +12,9 @@ printf "${PURPLE} Creating docker subnet : tmt_net_1 ${NC}\n"
 
 docker network create -d macvlan --subnet=192.168.210.0/24 --subnet=192.168.220.0/24 --gateway=192.168.210.254 --gateway=192.168.220.254 -o parent=eth0.10 -o macvlan_mode=bridge macvlan-10
 
-docker run --name=lan10.1 --net=macvlan-10 --ip=192.168.210.10 -d -v /vagrant/:/source/ -v /home/vagrant/.ivy2/:/root/.ivy2 tmt/local-csw-centos tail -f /dev/null
-docker run --name=lan10.2 --net=macvlan-10 --ip=192.168.220.10 -d -v /vagrant/:/source/ -v /home/vagrant/.ivy2/:/root/.ivy2 tmt/local-csw-centos tail -f /dev/null
-docker run --name=lan10.3 --net=macvlan-10 --ip=192.168.210.5 -d -v /vagrant/:/source/ -v /home/vagrant/.ivy2/:/root/.ivy2 tmt/local-csw-centos tail -f /dev/null
+docker run --name=lan10.1 --net=macvlan-10 --ip=192.168.210.10 -d -v $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
+docker run --name=lan10.2 --net=macvlan-10 --ip=192.168.220.10 -d -v $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
+docker run --name=lan10.3 --net=macvlan-10 --ip=192.168.210.5 -d -v $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
 
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
 docker exec -d lan10.1 bash -c 'cd source && export PORT=2555;./integration/target/universal/integration-10000/bin/trombone-h-c-d'
