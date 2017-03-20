@@ -174,7 +174,7 @@ class LocationServiceCompTest
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior
       }),
-      "my-actor-1"
+      "my-actor-2"
     )
     locationService.register(AkkaRegistration(connection, actorRef, Prefix)).await
 
