@@ -1,4 +1,4 @@
-package csw.services.integtration.apps
+package csw.services.integtration.tests
 
 import java.net.URI
 import java.nio.file.Paths
@@ -7,7 +7,7 @@ import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, Location, ResolvedTcpLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
-import csw.services.tracklocation.TrackLocationApp
+import csw.services.tracklocation.{TrackLocation, TrackLocationApp}
 import org.scalatest._
 
 import scala.concurrent.Future
@@ -19,26 +19,32 @@ class TrackLocationAppIntegrationTest
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val actorRuntimePort = 2553
-  private val actorRuntime = new ActorRuntime("track-location-test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
+  private val actorRuntime = new ActorRuntime("track-location-test", 2557)
+
   import actorRuntime._
+
   private val locationService = LocationServiceFactory.make(actorRuntime)
+  var trackLocationApp: TrackLocationApp = null
 
   override protected def afterEach(): Unit = {
     //TODO: write and invoke test utility method for unregistering all services
-    TrackLocationApp.shutdown().await
+    trackLocationApp.shutdown().await
   }
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await
+    locationService.shutdown().await
   }
+
 
   test("launch the trackLocationApp") {
     val name = "test1"
     val port = 9999
 
+    trackLocationApp = new TrackLocationApp()
+
     Future {
-      TrackLocationApp.main(
+      trackLocationApp.start(
         Array(
           "--name", name,
           "--command",
@@ -67,8 +73,10 @@ class TrackLocationAppIntegrationTest
     val url = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
 
+    trackLocationApp = new TrackLocationApp()
+
     Future {
-      TrackLocationApp.main(
+      trackLocationApp.start(
         Array(
           "--name",
           name,

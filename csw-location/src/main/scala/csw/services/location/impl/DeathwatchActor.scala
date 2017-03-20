@@ -16,24 +16,29 @@ class DeathwatchActor(
   implicit val mat = ActorMaterializer()
 
   override def preStart(): Unit = {
-    val watch: PartialFunction[Location, Unit] = {
-      case ResolvedAkkaLocation(connection, _, _, Some(actorRef)) => self ! WatchIt(actorRef, connection)
+    currentLocations.collect {
+      case ResolvedAkkaLocation(connection, _, _, Some(actorRef)) => watchIt(actorRef, connection)
     }
-    currentLocations.collect(watch)
-    stream.collect(watch).runWith(Sink.ignore)
+    stream.collect {
+      case ResolvedAkkaLocation(connection, _, _, Some(actorRef)) => self ! WatchIt(actorRef, connection)
+    }.runWith(Sink.ignore)
   }
 
   override def receive: Receive = {
     case WatchIt(actorRef, connection) =>
-      watchedAkkaLocations += actorRef -> connection
-      context.watch(actorRef)
-    case Terminated(deadActorRef) =>
+      watchIt(actorRef, connection)
+    case Terminated(deadActorRef)      =>
       watchedAkkaLocations.get(deadActorRef).foreach { connection =>
         queue.offer(Removed(connection))
       }
       watchedAkkaLocations -= deadActorRef
-    case GetLiveAkkaConnections =>
+    case GetLiveAkkaConnections        =>
       sender() ! LiveAkkaConnections(watchedAkkaLocations.values.toSet)
+  }
+
+  def watchIt(actorRef: ActorRef, connection: Connection): Unit = {
+    watchedAkkaLocations += actorRef -> connection
+    context.watch(actorRef)
   }
 }
 
@@ -45,6 +50,9 @@ object DeathwatchActor {
   ): Props = Props(new DeathwatchActor(currentLocations, stream, queue))
 
   case class WatchIt(actorRef: ActorRef, connection: Connection)
+
   case object GetLiveAkkaConnections
+
   case class LiveAkkaConnections(connections: Set[Connection])
+
 }

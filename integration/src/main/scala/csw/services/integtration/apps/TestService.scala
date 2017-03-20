@@ -10,7 +10,7 @@ import csw.services.location.models.Connection.HttpConnection
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object TestService extends App {
-  private val actorRuntime = new ActorRuntime("test-service")
+  private val actorRuntime = new ActorRuntime("test-service", 2553)
 
   val componentId = ComponentId("redisservice", ComponentType.Service)
   val connection = HttpConnection(componentId)

@@ -2,6 +2,7 @@ package csw.services.tracklocation
 
 import java.util.concurrent.atomic.AtomicBoolean
 
+import akka.Done
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.Timeout
 import csw.services.location.models.Connection.TcpConnection
@@ -25,6 +26,7 @@ class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRu
   private val locationService = LocationServiceFactory.make(actorRuntime)
 
   def run(): Future[Unit] = register().map(awaitTermination)
+  def shutdown(): Future[Done] = locationService.shutdown()
 
   private def register(): Future[Seq[RegistrationResult]] = Source(names)
     .initialDelay(command.delay.millis) //delay to give the app a chance to start

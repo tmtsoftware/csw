@@ -32,12 +32,13 @@ class TrackLocationTest
   private val actorRuntime = new ActorRuntime("track-location-test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
   import actorRuntime._
   private val locationService = LocationServiceFactory.make(actorRuntime)
+  var trackLocationApp: TrackLocationApp = null
 
   implicit val timeout = Timeout(60.seconds)
 
   override protected def afterEach(): Unit = {
     //TODO: write and invoke test utility method for unregistering all services
-    TrackLocationApp.shutdown().await
+    trackLocationApp.shutdown().await
   }
 
   override protected def afterAll(): Unit = {
@@ -48,8 +49,10 @@ class TrackLocationTest
     val name = "test1"
     val port = 9999
 
+    trackLocationApp = new TrackLocationApp()
+
     Future {
-      TrackLocationApp.main(
+      trackLocationApp.start(
         Array(
           "--name", name,
           "--command",
@@ -77,8 +80,10 @@ class TrackLocationTest
     val url = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
 
+    trackLocationApp = new TrackLocationApp()
+
     Future {
-      TrackLocationApp.main(
+      trackLocationApp.start(
         Array(
           "--name",
           name,

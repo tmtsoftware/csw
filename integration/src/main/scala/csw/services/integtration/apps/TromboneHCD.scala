@@ -8,7 +8,7 @@ import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentTyp
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object TromboneHCD extends App {
-  private val actorRuntime = new ActorRuntime("trombone-hcd")
+  private val actorRuntime = new ActorRuntime("trombone-hcd", 2554)
 
   val tromboneHcdActorRef = actorRuntime.actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
   val componentId = ComponentId("trombonehcd", ComponentType.HCD)

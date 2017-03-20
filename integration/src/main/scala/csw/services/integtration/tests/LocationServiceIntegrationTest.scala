@@ -1,6 +1,5 @@
-package csw.services.integtration.apps
+package csw.services.integtration.tests
 
-import akka.actor.Props
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
@@ -13,12 +12,13 @@ class LocationServiceIntegrationTest
     with BeforeAndAfter
     with BeforeAndAfterAll {
 
-  private val actorRuntime = new ActorRuntime("AssemblySystem")
+  private val actorRuntime = new ActorRuntime("AssemblySystem", 2555)
   import actorRuntime._
   private val locationService = LocationServiceFactory.make(actorRuntime)
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await
+    locationService.shutdown().await
   }
 
   test("resolves remote HCD") {

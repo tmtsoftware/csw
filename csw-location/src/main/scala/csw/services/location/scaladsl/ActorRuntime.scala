@@ -13,10 +13,16 @@ import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationLong
 
-class ActorRuntime(name: String, _settings: Map[String, Any], interfaceName: String = "") {
-  def this(name: String) = this(name, Map.empty, "")
-  def this(name: String,_settings: Map[String, Any]) = this(name, _settings, "")
-  def this(name: String, interfaceName: String ) = this(name, Map.empty, interfaceName)
+class ActorRuntime(name: String, _settings: Map[String, Any]) {
+  def this(name: String) = this(name, Map.empty[String, Any])
+
+  def this(name: String, interfaceName: String) = this(name, Map("interfaceName" -> interfaceName))
+
+  def this(name: String, port: Int) = this(name, Map("akka.remote.netty.tcp.port" -> port))
+
+  def this(name: String, interfaceName: String, port: Int) = this(name, Map("akka.remote.netty.tcp.port" -> port, "interfaceName" -> interfaceName))
+
+  private val interfaceName = _settings.getOrElse("interfaceName", "").toString
 
   val ipaddr: InetAddress = Networks.getIpv4Address(interfaceName)
 

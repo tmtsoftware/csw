@@ -1,9 +1,12 @@
 package csw.services.integtration.apps
 
-object TestApp extends App {
+import csw.services.integtration.tests.{LocationServiceIntegrationTest, TrackLocationAppIntegrationTest}
+
+object TestApp {
   import org.scalatest
 
-//  TODO: this app does not get terminated when this test enabled.
-//  scalatest.run(new TrackLocationAppIntegrationTest)
-  scalatest.run(new LocationServiceIntegrationTest)
+  def main(args: Array[String]): Unit = {
+    scalatest.run(new TrackLocationAppIntegrationTest)
+    scalatest.run(new LocationServiceIntegrationTest)
+  }
 }
