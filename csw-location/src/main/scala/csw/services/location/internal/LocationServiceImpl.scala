@@ -1,11 +1,11 @@
-package csw.services.location.impl
+package csw.services.location.internal
 
 import javax.jmdns.{JmDNS, ServiceInfo}
 
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.services.location.impl.ServiceInfoExtensions.RichServiceInfo
+import csw.services.location.internal.ServiceInfoExtensions.RichServiceInfo
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 

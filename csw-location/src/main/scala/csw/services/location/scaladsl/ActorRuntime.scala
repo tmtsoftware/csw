@@ -7,7 +7,7 @@ import akka.dispatch.MessageDispatcher
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.location.impl.Networks
+import csw.services.location.internal.Networks
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext

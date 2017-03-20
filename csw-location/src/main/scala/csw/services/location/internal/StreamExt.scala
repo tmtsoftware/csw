@@ -1,4 +1,4 @@
-package csw.services.location.impl
+package csw.services.location.internal
 
 import akka.stream.scaladsl.{BroadcastHub, Keep, Sink, Source, SourceQueueWithComplete}
 import akka.stream.{KillSwitch, KillSwitches, Materializer, OverflowStrategy}

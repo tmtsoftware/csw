@@ -1,9 +1,9 @@
-package csw.services.location.impl
+package csw.services.location.internal
 
 import akka.actor.{Actor, ActorRef, Props, Terminated}
 import akka.stream.scaladsl.{Sink, Source, SourceQueueWithComplete}
 import akka.stream.{ActorMaterializer, KillSwitch}
-import csw.services.location.impl.DeathwatchActor.{GetLiveAkkaConnections, LiveAkkaConnections, WatchIt}
+import csw.services.location.internal.DeathwatchActor.{GetLiveAkkaConnections, LiveAkkaConnections, WatchIt}
 import csw.services.location.models.{Connection, Location, Removed, ResolvedAkkaLocation}
 
 class DeathwatchActor(

@@ -4,7 +4,7 @@ import javax.jmdns.ServiceInfo
 
 import akka.actor.{ActorPath, ActorRef}
 import akka.serialization.Serialization
-import csw.services.location.impl.Constants
+import csw.services.location.internal.Constants
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 import scala.collection.JavaConverters._

@@ -1,10 +1,10 @@
-package csw.services.location.impl
+package csw.services.location.internal
 
 import javax.jmdns.JmDNS
 
 import akka.pattern.ask
-import csw.services.location.impl.DeathwatchActor.{GetLiveAkkaConnections, LiveAkkaConnections}
-import csw.services.location.impl.ServiceInfoExtensions.RichServiceInfo
+import csw.services.location.internal.DeathwatchActor.{GetLiveAkkaConnections, LiveAkkaConnections}
+import csw.services.location.internal.ServiceInfoExtensions.RichServiceInfo
 import csw.services.location.models.{Connection, Location, Removed, ResolvedAkkaLocation}
 import csw.services.location.scaladsl.ActorRuntime
 

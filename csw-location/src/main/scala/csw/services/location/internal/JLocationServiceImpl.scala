@@ -1,4 +1,4 @@
-package csw.services.location.impl
+package csw.services.location.internal
 
 import java.util
 import java.util.concurrent.CompletionStage

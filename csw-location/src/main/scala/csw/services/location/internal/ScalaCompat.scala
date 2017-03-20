@@ -1,4 +1,4 @@
-package csw.services.location.impl
+package csw.services.location.internal
 
 import scala.collection.JavaConverters._
 

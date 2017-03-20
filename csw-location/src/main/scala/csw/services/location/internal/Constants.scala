@@ -1,4 +1,4 @@
-package csw.services.location.impl
+package csw.services.location.internal
 
 object Constants {
   val DnsType = "_csw._tcp.local."

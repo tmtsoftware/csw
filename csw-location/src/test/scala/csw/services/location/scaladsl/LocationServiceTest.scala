@@ -3,7 +3,7 @@ package csw.services.location.scaladsl
 import javax.jmdns.JmDNS
 
 import csw.services.location.common.TestFutureExtension.RichFuture
-import csw.services.location.impl.{LocationEventStream, LocationServiceImpl}
+import csw.services.location.internal.{LocationEventStream, LocationServiceImpl}
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, TcpRegistration}
 import org.scalatest.mockito.MockitoSugar

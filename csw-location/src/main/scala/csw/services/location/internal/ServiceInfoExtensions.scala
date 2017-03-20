@@ -1,4 +1,4 @@
-package csw.services.location.impl
+package csw.services.location.internal
 
 import java.net.URI
 import javax.jmdns.ServiceInfo
