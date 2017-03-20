@@ -1,14 +1,17 @@
 package csw.services.location.scaladsl
 
-import javax.jmdns.JmDNS
-
-import csw.services.location.internal.{LocationEventStream, JmDnsEventStream, LocationServiceImpl, Networks}
+import csw.services.location.internal._
+import csw.services.location.internal.wrappers.{JmDnsApiFactory, JmDnsReal}
+import csw.services.location.models.Location
 
 object LocationServiceFactory {
-  def make(actorRuntime: ActorRuntime): LocationService = {
-    val jmDNS = JmDNS.create(actorRuntime.ipaddr)
-    val jmDnsEventStream = new JmDnsEventStream(jmDNS, actorRuntime)
-    val locationEventStream = new LocationEventStream(jmDnsEventStream, jmDNS, actorRuntime)
-    new LocationServiceImpl(jmDNS, actorRuntime, locationEventStream)
+  def make(actorRuntime: ActorRuntime): LocationService = make(actorRuntime, JmDnsReal)
+
+  def make(actorRuntime: ActorRuntime, jmDnsApiFactory: JmDnsApiFactory): LocationService = {
+    import actorRuntime._
+    val (queue, locationStream) = StreamExt.coupling[Location]
+    val jmDnsApi = jmDnsApiFactory.make(actorRuntime, queue)
+    val locationEventStream = new LocationEventStream(locationStream, jmDnsApi, actorRuntime)
+    new LocationServiceImpl(jmDnsApi, actorRuntime, locationEventStream)
   }
 }

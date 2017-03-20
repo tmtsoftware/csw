@@ -6,6 +6,7 @@ import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
 import csw.services.location.internal.ServiceInfoExtensions.RichServiceInfo
+import csw.services.location.internal.wrappers.JmDnsApi
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 
@@ -13,7 +14,7 @@ import scala.async.Async._
 import scala.concurrent.Future
 
 private[location] class LocationServiceImpl(
-  jmDNS: JmDNS,
+  jmDnsApi: JmDnsApi,
   actorRuntime: ActorRuntime,
   locationEventStream: LocationEventStream
 ) extends LocationService { outer =>
@@ -29,12 +30,12 @@ private[location] class LocationServiceImpl(
 
   override def unregister(connection: Connection): Future[Done] = {
     val locationF = locationEventStream.broadcast.removed(connection)
-    jmDNS.unregisterService(ServiceInfo.create(Constants.DnsType, connection.name, 0, ""))
+    jmDnsApi.unregisterService(connection)
     locationF.map(_ => Done)
   }
 
   override def unregisterAll(): Future[Done] = Future {
-    jmDNS.unregisterAllServices()
+    jmDnsApi.unregisterAllServices()
     Thread.sleep(4000)
     Done
   }(jmDnsDispatcher)
@@ -67,12 +68,11 @@ private[location] class LocationServiceImpl(
   }
 
   override def track(connection: Connection): Source[Location, KillSwitch] = {
-    jmDNS.requestServiceInfo(Constants.DnsType, connection.name, true)
     locationEventStream.broadcast.filter(connection)
   }
 
   override def shutdown(): Future[Done] = Future {
-    jmDNS.close()
+    jmDnsApi.close()
     Done
   }(jmDnsDispatcher)
 
@@ -83,13 +83,13 @@ private[location] class LocationServiceImpl(
   }
 
   private def registerUniqueService(reg: Registration) = Future {
-    jmDNS.registerService(reg.serviceInfo)
+    jmDnsApi.registerService(reg)
     registrationResult(reg.connection)
   }(jmDnsDispatcher)
 
   private def resolveService(connection: Connection) = {
     val locationF = locationEventStream.broadcast.resolved(connection)
-    jmDNS.requestServiceInfo(Constants.DnsType, connection.name)
+    jmDnsApi.requestServiceInfo(connection)
     locationF
   }
 }

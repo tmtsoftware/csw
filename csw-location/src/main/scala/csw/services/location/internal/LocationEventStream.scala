@@ -1,32 +1,30 @@
 package csw.services.location.internal
 
-import javax.jmdns.JmDNS
-
 import akka.pattern.ask
+import akka.stream.KillSwitch
+import akka.stream.scaladsl.Source
 import csw.services.location.internal.DeathwatchActor.{GetLiveAkkaConnections, LiveAkkaConnections}
-import csw.services.location.internal.ServiceInfoExtensions.RichServiceInfo
+import csw.services.location.internal.wrappers.JmDnsApi
 import csw.services.location.models.{Connection, Location, Removed, ResolvedAkkaLocation}
 import csw.services.location.scaladsl.ActorRuntime
 
 import scala.async.Async._
 import scala.concurrent.Future
 
-class LocationEventStream(jmDnsEventStream: JmDnsEventStream, jmDns: JmDNS, actorRuntime: ActorRuntime) {
+class LocationEventStream(locationStream: Source[Location, KillSwitch], jmDnsApi: JmDnsApi, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 
   private val (queue, removedStream) = StreamExt.coupling[Removed]
 
-  private val stream = jmDnsEventStream.locationStream
-
   val broadcast: LocationBroadcast = {
-    val completeStream = stream.merge(removedStream, eagerComplete = true)
+    val completeStream = locationStream.merge(removedStream, eagerComplete = true)
     new LocationBroadcast(completeStream, actorRuntime)
   }
 
   private val actorRefFuture = async {
     actorSystem.actorOf(
-      DeathwatchActor.props(await(jmDnsList), stream, queue)
+      DeathwatchActor.props(await(jmDnsList), locationStream, queue)
     )
   }
 
@@ -44,7 +42,7 @@ class LocationEventStream(jmDnsEventStream: JmDnsEventStream, jmDns: JmDNS, acto
   }
 
   private def jmDnsList: Future[List[Location]] = Future {
-    jmDns.list(Constants.DnsType).toList.flatMap(_.locations)
+    jmDnsApi.list(Constants.DnsType)
   }(jmDnsDispatcher)
 
 }
