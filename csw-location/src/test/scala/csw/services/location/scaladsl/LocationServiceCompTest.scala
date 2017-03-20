@@ -165,4 +165,27 @@ class LocationServiceCompTest
 
     resolvedCon.connection shouldBe connection
   }
+
+  test("Should filter components with component type") {
+    val componentId = ComponentId("hcd1", ComponentType.HCD)
+    val connection = AkkaConnection(componentId)
+    val Prefix = "prefix"
+    val actorRef = actorRuntime.actorSystem.actorOf(
+      Props(new Actor {
+        override def receive: Receive = Actor.emptyBehavior
+      }),
+      "my-actor-1"
+    )
+    locationService.register(AkkaRegistration(connection, actorRef, Prefix)).await
+
+    val tcpConnection = TcpConnection(ComponentId("redis5", ComponentType.Service))
+    locationService.register(TcpRegistration(tcpConnection, 1234)).await
+
+    val filteredLocations = locationService.list(ComponentType.HCD).await
+
+    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
+    val uri = new URI(actorPath.toString)
+    filteredLocations shouldBe List(ResolvedAkkaLocation(connection, uri, Prefix, Some(actorRef)))
+
+  }
 }
