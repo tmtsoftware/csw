@@ -18,6 +18,8 @@ object StreamExt {
     BroadcastHub.sink[T](bufferSize / 2).mapMaterializedValue { hub =>
       val cancellableHub = hub
         .viaMat(KillSwitches.single)(Keep.right)
+        //buffering is only required to define custom overflow strategy
+        //it will go away if BroadcastHub.sink is not hardcoded to backpressure
         .buffer(bufferSize / 2, overflowStrategy)
 
       // Ensure that the Broadcast output is dropped if there are no listening parties.

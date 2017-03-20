@@ -32,4 +32,6 @@ trait LocationService {
   def list(connectionType: ConnectionType): Future[List[Location]]
 
   def track(connection: Connection): Source[Location, KillSwitch]
+
+  def shutdown(): Future[Done]
 }
