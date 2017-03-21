@@ -7,11 +7,12 @@ object Libs {
   val `scala-async` = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
   val `scopt` = "com.github.scopt" %% "scopt" % "3.5.0"
   val `scala-logging` = "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"
-  val `acyclic` = "com.lihaoyi" %% "acyclic" % "0.1.7" % "provided"
+  val `acyclic` = "com.lihaoyi" %% "acyclic" % "0.1.7" % Provided
   val `enumeratum` = "com.beachape" %% "enumeratum" % "1.5.8"
   val `junit` = "junit" % "junit" % "4.12"
   val `junit-interface` = "com.novocode" % "junit-interface" % "0.11"
   val `mockito-core` = "org.mockito" % "mockito-core" % "2.7.17"
+  val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.1.3" % Runtime
 }
 
 object Akka {

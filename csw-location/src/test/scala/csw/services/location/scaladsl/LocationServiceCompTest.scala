@@ -219,15 +219,6 @@ class LocationServiceCompTest
   }
 
   test("should filter connections based on hostname") {
-    val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorRef = actorRuntime.actorSystem.actorOf(
-      Props(new Actor {
-        override def receive: Receive = Actor.emptyBehavior
-      }),
-      "my-actor-4"
-    )
-    locationService.register(AkkaRegistration(akkaConnection, actorRef, "prefix")).await
-
     val tcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
     locationService.register(TcpRegistration(tcpConnection, 1234)).await
 
@@ -236,7 +227,7 @@ class LocationServiceCompTest
 
     val filteredLocations = locationService.list(actorRuntime.ipaddr.getHostName).await
 
-    filteredLocations.map(_.connection).toSet shouldBe Set(akkaConnection, tcpConnection, httpConnection)
+    filteredLocations.map(_.connection).toSet shouldBe Set(tcpConnection, httpConnection)
 
     locationService.list("Invalid_hostname").await shouldBe List.empty
   }
