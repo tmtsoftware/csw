@@ -12,14 +12,23 @@ import csw.services.location.models._
 import csw.services.location.scaladsl.ActorRuntime
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import csw.services.location.common.TestFutureExtension.RichFuture
 
-class RichServiceInfoTest extends FunSuite with Matchers with MockitoSugar {
+class RichServiceInfoTest
+  extends FunSuite
+    with Matchers
+    with MockitoSugar
+    with BeforeAndAfterAll{
 
   val actorRuntimePort = 2554
   private val actorRuntime = new ActorRuntime("test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
 
   import actorRuntime.actorSystem
+
+  override protected def afterAll(): Unit = {
+    actorRuntime.actorSystem.terminate().await
+  }
 
   test("test HTTP ServiceInfo to HTTP Service Locations when location information is present") {
     val componentId = ComponentId("configService", ComponentType.Service)
