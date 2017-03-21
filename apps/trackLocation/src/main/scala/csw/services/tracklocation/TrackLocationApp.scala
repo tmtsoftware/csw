@@ -16,7 +16,7 @@ class TrackLocationApp {
   val actorRuntime = new ActorRuntime("track-location-app")
   import actorRuntime._
 
-  var trackLocation: TrackLocation = null
+  var trackLocation: TrackLocation = _
 
   def start(args: Array[String]): Unit = {
     CmdLineArgsParser.parser.parse(args, Options()) match {

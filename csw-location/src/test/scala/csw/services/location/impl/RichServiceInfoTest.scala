@@ -96,5 +96,4 @@ class RichServiceInfoTest extends FunSuite with Matchers with MockitoSugar {
 
     locations should contain(resolvedAkkaLocation)
   }
-
 }

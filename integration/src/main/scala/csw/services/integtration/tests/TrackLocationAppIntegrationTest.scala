@@ -36,7 +36,6 @@ class TrackLocationAppIntegrationTest
     locationService.shutdown().await
   }
 
-
   test("launch the trackLocationApp") {
     val name = "test1"
     val port = 9999

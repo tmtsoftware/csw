@@ -18,10 +18,10 @@ object AssemblyApp extends App {
 
 }
 
-class AssemblyApp extends Actor{
+class AssemblyApp extends Actor {
   override def receive: Receive = {
- 	case "Unregister" => {
-      	AssemblyApp.registrationResult.unregister()
+    case "Unregister" => {
+      AssemblyApp.registrationResult.unregister()
     }
-}
+  }
 }

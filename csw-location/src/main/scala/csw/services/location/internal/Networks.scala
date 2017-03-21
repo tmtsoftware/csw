@@ -27,19 +27,20 @@ object Networks {
       a <- iface.getInetAddresses.asScala
     } yield Pair(iface.getIndex, a)
 
-    def default: Pair = Pair(0, InetAddress.getLocalHost)
-  }
-
-  def getNetworkInterfacesList(interfaceName: String): List[NetworkInterface] ={
-    if (interfaceName.isEmpty) {
-      NetworkInterface.getNetworkInterfaces.asScala.toList
-    }
-    else {
+    def getNetworkInterfacesList(interfaceName: String): List[NetworkInterface] ={
+      if (interfaceName.isEmpty) {
+        NetworkInterface.getNetworkInterfaces.asScala.toList
+      }
+      else {
         Option(NetworkInterface.getByName(interfaceName)) match {
           case None => throw new NetworkInterfaceNotFound(s"Network interface=${interfaceName} not found.")
           case Some(nic : NetworkInterface) => nic::Nil
         }
       }
     }
+
+    def default: Pair = Pair(0, InetAddress.getLocalHost)
+  }
+
   case class NetworkInterfaceNotFound(message: String) extends Exception(message)
 }
