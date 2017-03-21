@@ -225,7 +225,7 @@ class LocationServiceCompTest
     val httpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
     val registrationResult = locationService.register(HttpRegistration(httpConnection, 1234, "path123")).await
 
-    val filteredLocations = locationService.list(actorRuntime.ipaddr.getHostName).await
+    val filteredLocations = locationService.list(actorRuntime.ipaddr.getHostAddress).await
 
     filteredLocations.map(_.connection).toSet shouldBe Set(tcpConnection, httpConnection)
 
