@@ -7,7 +7,7 @@ import akka.serialization.Serialization
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.common.TestFutureExtension.RichFuture
-import csw.services.location.internal.Networks
+import csw.services.location.internal.wrappers.JmDnsDouble
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import org.scalatest._
@@ -21,10 +21,10 @@ class LocationServiceCompTest
   val actorRuntimePort = 2554
 
   private val actorRuntime = new ActorRuntime("test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
-  private val locationService = LocationServiceFactory.make(actorRuntime)
+  private val locationService = LocationServiceFactory.make(actorRuntime, JmDnsDouble)
 
   override protected def afterEach(): Unit = {
-    locationService.unregisterAll()
+    locationService.unregisterAll().await
   }
 
   override protected def afterAll(): Unit = {
@@ -94,6 +94,7 @@ class LocationServiceCompTest
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
     val uri = new URI(actorPath.toString)
 
+    Thread.sleep(10)
     locationService.list.await shouldBe List(
       ResolvedAkkaLocation(connection, uri, Prefix, Some(actorRef))
     )

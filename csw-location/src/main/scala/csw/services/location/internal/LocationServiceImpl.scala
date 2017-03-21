@@ -25,10 +25,13 @@ private[location] class LocationServiceImpl(
     }
   }
 
-  override def unregister(connection: Connection): Future[Done] = {
-    val locationF = locationEventStream.broadcast.removed(connection)
-    jmDnsApi.unregisterService(connection)
-    locationF.map(_ => Done)
+  override def unregister(connection: Connection): Future[Done] = async {
+    val locationF = locationEventStream.broadcast.removed(
+      connection,
+      jmDnsApi.unregisterService(connection)
+    )
+    await(locationF)
+    Done
   }
 
   override def unregisterAll(): Future[Done] = Future {
@@ -84,9 +87,8 @@ private[location] class LocationServiceImpl(
     registrationResult(reg.connection)
   }(jmDnsDispatcher)
 
-  private def resolveService(connection: Connection) = {
-    val locationF = locationEventStream.broadcast.resolved(connection)
+  private def resolveService(connection: Connection) = locationEventStream.broadcast.resolved(
+    connection,
     jmDnsApi.requestServiceInfo(connection)
-    locationF
-  }
+  )
 }
