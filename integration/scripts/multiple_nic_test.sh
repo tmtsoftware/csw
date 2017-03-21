@@ -27,7 +27,7 @@ printf "${PURPLE}------ Waiting for 10 seconds to let Assembly gets started ----
 sleep 10
 
 printf "${YELLOW} Executing test in network : tmt_net_2 ${NC}\n"
-docker exec -it Test-App bash -c 'cd source && export PORT=2557;./integration/target/universal/integration-10000/bin/test-mulitple-nic-app'
+docker exec Test-App bash -c 'cd source && export PORT=2557;./integration/target/universal/integration-10000/bin/test-mulitple-nic-app'
 exit_code=$?
 
 printf "${ORANGE}------ [Debug] Inspecting docker bridge ------${NC}"

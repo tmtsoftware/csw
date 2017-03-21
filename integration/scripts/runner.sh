@@ -38,7 +38,7 @@ printf "${PURPLE}------ Waiting for 10 seconds to boot up Reddis ------${NC}\n"
 sleep 10
 
 printf "${YELLOW}------ Starting Test App ------${NC}\n"
-docker exec -it Test-App bash -c 'cd source && export PORT=2557;./integration/target/universal/integration-10000/bin/test-app'
+docker exec Test-App bash -c 'cd source && export PORT=2557;./integration/target/universal/integration-10000/bin/test-app'
 test_exit_code=$?
 
 printf "${PURPLE}---------- Stopping and Removing all docker containers ---------- ${NC}"
