@@ -155,9 +155,7 @@ class LocationServiceCompTest
 
   test ("Resolve tcp connection") {
     val connection = TcpConnection(ComponentId("redis5", ComponentType.Service))
-    locationService.register(TcpRegistration(connection, 1234))
-
-    val locations = locationService.list.await
+    locationService.register(TcpRegistration(connection, 1234)).await
 
     val resolvedCon = locationService.resolve(connection).await
 
