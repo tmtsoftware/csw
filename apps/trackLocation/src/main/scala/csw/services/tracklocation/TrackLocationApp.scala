@@ -1,19 +1,21 @@
 package csw.services.tracklocation
 
 import akka.actor.Terminated
-import csw.services.location.scaladsl.ActorRuntime
+import csw.services.location.internal.wrappers.{JmDnsApiFactory, JmDnsReal}
+import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import csw.services.tracklocation.models.{Command, Options}
 import csw.services.tracklocation.utils.CmdLineArgsParser
-import async.Async._
 
+import async.Async._
 import scala.concurrent.Future
 
 /**
   * A utility application that starts a given external program, registers it with the location service and
   * unregisters it when the program exits.
   */
-class TrackLocationApp {
+class TrackLocationApp(jmDnsApiFactory: JmDnsApiFactory) {
   val actorRuntime = new ActorRuntime("track-location-app")
+  val locationService = LocationServiceFactory.make(actorRuntime, jmDnsApiFactory)
   import actorRuntime._
 
   var trackLocation: TrackLocation = _
@@ -24,7 +26,7 @@ class TrackLocationApp {
         try {
           val command = Command.parse(options)
           println(s"commandText: ${command.commandText}, command: $command")
-          trackLocation = new TrackLocation(options.names, command, actorRuntime)
+          trackLocation = new TrackLocation(options.names, command, actorRuntime, locationService)
           trackLocation.run()
         } catch {
           case e: Throwable =>
@@ -42,5 +44,5 @@ class TrackLocationApp {
 }
 
 object TrackLocationApp extends App {
-  new TrackLocationApp().start(args)
+  new TrackLocationApp(JmDnsReal).start(args)
 }

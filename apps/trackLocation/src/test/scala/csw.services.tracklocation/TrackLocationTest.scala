@@ -6,6 +6,7 @@ import java.nio.file.Paths
 import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
 import csw.services.location.common.TestFutureExtension.RichFuture
+import csw.services.location.internal.wrappers.JmDnsDouble
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
@@ -30,7 +31,6 @@ class TrackLocationTest
 
   private val actorRuntime = new ActorRuntime("track-location-test", Map("akka.remote.netty.tcp.port" -> actorRuntimePort))
   import actorRuntime._
-  private val locationService = LocationServiceFactory.make(actorRuntime)
   var trackLocationApp: TrackLocationApp = null
 
   implicit val timeout = Timeout(60.seconds)
@@ -48,7 +48,8 @@ class TrackLocationTest
     val name = "test1"
     val port = 9999
 
-    trackLocationApp = new TrackLocationApp()
+    trackLocationApp = new TrackLocationApp(JmDnsDouble)
+    val locationService = trackLocationApp.locationService
 
     Future {
       trackLocationApp.start(
@@ -79,7 +80,8 @@ class TrackLocationTest
     val url = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
 
-    trackLocationApp = new TrackLocationApp()
+    trackLocationApp = new TrackLocationApp(JmDnsDouble)
+    val locationService = trackLocationApp.locationService
 
     Future {
       trackLocationApp.start(
@@ -107,7 +109,7 @@ class TrackLocationTest
     val port = 9999
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
-      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime)
+      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime, LocationServiceFactory.make(actorRuntime, JmDnsDouble))
       trackLocation.run().await
     }
 
@@ -119,7 +121,7 @@ class TrackLocationTest
     val port = 9999
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
-      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime)
+      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime, LocationServiceFactory.make(actorRuntime, JmDnsDouble))
       trackLocation.run().await
     }
 

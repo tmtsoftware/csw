@@ -7,7 +7,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.util.Timeout
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
-import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
+import csw.services.location.scaladsl.{ActorRuntime, LocationService, LocationServiceFactory}
 import csw.services.tracklocation.models.Command
 
 import scala.collection.immutable.Seq
@@ -16,14 +16,13 @@ import scala.concurrent.{Await, Future}
 import scala.sys.ShutdownHookThread
 import sys.process._
 
-class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRuntime) {
+class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRuntime, locationService: LocationService) {
 
   import actorRuntime._
 
   private var isRunning = new AtomicBoolean(true)
 
   private implicit val timeout = Timeout(10.seconds)
-  private val locationService = LocationServiceFactory.make(actorRuntime)
 
   def run(): Future[Unit] = register().map(awaitTermination)
   def shutdown(): Future[Done] = locationService.shutdown()
