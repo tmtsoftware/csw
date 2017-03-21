@@ -5,11 +5,11 @@ import java.nio.file.Paths
 
 import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
+import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
-import csw.services.tracklocation.common.TestFutureExtension._
 import csw.services.tracklocation.models.Command
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
 

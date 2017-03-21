@@ -37,7 +37,7 @@ lazy val `csw-location` = project
 lazy val trackLocation = project
   .in(file("apps/trackLocation"))
   .enablePlugins(DeployApp)
-  .dependsOn(`csw-location`)
+  .dependsOn(`csw-location` % "compile->compile;test->test")
   .settings(
     libraryDependencies ++= Seq(
       Akka.`akka-actor`,

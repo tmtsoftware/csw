@@ -5,6 +5,8 @@ import akka.actor.ActorPaths;
 import akka.actor.ActorRef;
 import akka.serialization.Serialization;
 import akka.testkit.TestProbe;
+import csw.services.location.internal.wrappers.JmDnsDouble;
+import csw.services.location.internal.wrappers.JmDnsDouble$;
 import csw.services.location.scaladsl.ActorRuntime;
 import csw.services.location.models.*;
 import csw.services.location.models.Connection.*;
@@ -40,7 +42,7 @@ public class JLocationServiceImplTest {
     @BeforeClass
     public static void setUp() {
         actorRuntime = new ActorRuntime("test-java");
-        locationService = JLocationServiceFactory.make(actorRuntime);
+        locationService = JLocationServiceFactory.make(actorRuntime, JmDnsDouble$.MODULE$);
     }
 
     @After
