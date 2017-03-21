@@ -44,8 +44,8 @@ public class JLocationServiceImplTest {
     }
 
     @After
-    public void unregisterAllServices() {
-        locationService.unregisterAll();
+    public void unregisterAllServices() throws ExecutionException, InterruptedException {
+        locationService.unregisterAll().toCompletableFuture().get();
     }
 
     @AfterClass
