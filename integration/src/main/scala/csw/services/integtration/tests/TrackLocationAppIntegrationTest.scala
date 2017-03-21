@@ -4,6 +4,7 @@ import java.io.{BufferedWriter, FileWriter}
 import java.net.URI
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
+import csw.services.location.internal.wrappers.JmDnsReal
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, Location, ResolvedTcpLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
@@ -40,7 +41,7 @@ class TrackLocationAppIntegrationTest
     val name = "test1"
     val port = 9999
 
-    trackLocationApp = new TrackLocationApp()
+    trackLocationApp = new TrackLocationApp(JmDnsReal)
 
     Future {
       trackLocationApp.start(
@@ -81,7 +82,7 @@ class TrackLocationAppIntegrationTest
     val configFile: String = tempFile.getPath
     println(configFile)
 
-    trackLocationApp = new TrackLocationApp()
+    trackLocationApp = new TrackLocationApp(JmDnsReal)
 
     Future {
       trackLocationApp.start(
