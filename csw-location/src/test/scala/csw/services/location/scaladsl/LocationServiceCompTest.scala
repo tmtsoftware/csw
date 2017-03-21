@@ -165,25 +165,58 @@ class LocationServiceCompTest
   }
 
   test("Should filter components with component type") {
-    val componentId = ComponentId("hcd1", ComponentType.HCD)
-    val connection = AkkaConnection(componentId)
-    val Prefix = "prefix"
+    val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
     val actorRef = actorRuntime.actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior
       }),
       "my-actor-2"
     )
-    locationService.register(AkkaRegistration(connection, actorRef, Prefix)).await
+    locationService.register(AkkaRegistration(hcdConnection, actorRef, "prefix")).await
 
-    val tcpConnection = TcpConnection(ComponentId("redis5", ComponentType.Service))
-    locationService.register(TcpRegistration(tcpConnection, 1234)).await
+    val redisConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
+    locationService.register(TcpRegistration(redisConnection, 1234)).await
 
-    val filteredLocations = locationService.list(ComponentType.HCD).await
+    val configServiceConnection = TcpConnection(ComponentId("configservice", ComponentType.Service))
+    locationService.register(TcpRegistration(configServiceConnection, 1234)).await
 
-    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
-    val uri = new URI(actorPath.toString)
-    filteredLocations shouldBe List(ResolvedAkkaLocation(connection, uri, Prefix, Some(actorRef)))
+    val filteredHCDs = locationService.list(ComponentType.HCD).await
 
+    filteredHCDs.map(_.connection) shouldBe List(hcdConnection)
+
+    val filteredServices = locationService.list(ComponentType.Service).await
+
+    filteredServices.map(_.connection).toSet shouldBe Set(redisConnection, configServiceConnection)
   }
+
+  test("should filter connections based on Connection type") {
+    val hcdAkkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+    val actorRef = actorRuntime.actorSystem.actorOf(
+      Props(new Actor {
+        override def receive: Receive = Actor.emptyBehavior
+      }),
+      "my-actor-3"
+    )
+    locationService.register(AkkaRegistration(hcdAkkaConnection, actorRef, "prefix")).await
+
+    val redisTcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
+    locationService.register(TcpRegistration(redisTcpConnection, 1234)).await
+
+    val configTcpConnection = TcpConnection(ComponentId("configservice", ComponentType.Service))
+    locationService.register(TcpRegistration(configTcpConnection, 1234)).await
+
+    val assemblyHttpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
+    val registrationResult = locationService.register(HttpRegistration(assemblyHttpConnection, 1234, "path123")).await
+
+    val tcpConnections = locationService.list(ConnectionType.TcpType).await
+    tcpConnections.map(_.connection).toSet shouldBe Set(redisTcpConnection, configTcpConnection)
+
+    val httpConnections = locationService.list(ConnectionType.HttpType).await
+    httpConnections.map(_.connection).toSet shouldBe Set(assemblyHttpConnection)
+
+    val akkaConnections = locationService.list(ConnectionType.AkkaType).await
+    akkaConnections.map(_.connection).toSet shouldBe Set(hcdAkkaConnection)
+  }
+
+
 }
