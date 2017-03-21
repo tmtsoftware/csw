@@ -36,7 +36,6 @@ private[location] class LocationServiceImpl(
 
   override def unregisterAll(): Future[Done] = Future {
     jmDnsApi.unregisterAllServices()
-    Thread.sleep(4000)
     Done
   }(jmDnsDispatcher)
 

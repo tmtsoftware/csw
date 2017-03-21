@@ -25,7 +25,6 @@ class LocationBroadcast(broadcast: Source[Location, KillSwitch], actorRuntime: A
   }
 
   private def find[T](trigger: => Unit)(pf: PartialFunction[Location, T]): Future[T] = {
-    implicit val mat = actorRuntime.makeMat()
     val (switch, locationF) = broadcast
       .collect(pf)
       .toMat(Sink.head)(Keep.both).run()
