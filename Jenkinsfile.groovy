@@ -6,40 +6,66 @@ node {
             git 'https://github.com/tmtsoftware/csw-prod.git'
         }
 
-        stage('Clean') {
-            sh "sbt clean"
+        stage('Build') {
+            sh "sbt -Dcheck.cycles=true clean scalastyle compile"
         }
 
         stage('Test') {
             try {
-                sh "./build.sh '-v /var/lib/jenkins/workspace/csw-prod:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
+                sh "sbt csw-location/test"
             }
-            catch (Exception ex) {
+            catch (Exception e) {
                 currentBuild.result = 'FAILED'
                 failBuild = true
             }
             try {
-                sh "./integration/scripts/runner.sh '-v /var/lib/jenkins/workspace/csw-prod/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
+                sh "sbt trackLocation/test"
             }
-            catch (Exception ex) {
+            catch (Exception e) {
                 currentBuild.result = 'FAILED'
                 failBuild = true
-//                throw ex
             }
-//            if(failBuild == true)
-//                sh "exit 1"
+            try{
+                sh "sbt coverageReport"
+            }
+            catch (Exception ex){
+                failBuild = true
+            }
+            sh "sbt coverageAggregate"
+            if(failBuild == true)
+                sh "exit 1"
+        }
+
+        stage('Package') {
+            sh "./universal_package.sh"
+        }
+
+        stage('Integration') {
+            sh "./integration/scripts/runner.sh '-v /var/lib/jenkins/workspace/csw-prod/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
         }
 
         stage('Infra Test') {
             parallel(
                     "Multiple NIC's": {
                         stage("NIC") {
+                            try {
                                 sh "./integration/scripts/multiple_nic_test.sh '-v /var/lib/jenkins/workspace/csw-prod/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
+                            }
+                            catch (Exception ex) {
+                                currentBuild.result = 'FAILED'
+                                throw ex
+                            }
                         }
                     },
                     "Multiple Subnet's": {
                         stage("Subnet") {
-                            sh "./integration/scripts/multiple_subnets_test.sh '-v /var/lib/jenkins/workspace/csw-prod/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
+                            try {
+                                sh "./integration/scripts/multiple_subnets_test.sh '-v /var/lib/jenkins/workspace/csw-prod/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
+                            }
+                            catch (Exception ex) {
+                                currentBuild.result = 'FAILED'
+                                throw ex
+                            }
                         }
                     }
             )
@@ -52,8 +78,8 @@ node {
 //        notifyBuild(currentBuild.result)
     }
 }
-
 /*
+
 def notifyBuild(String buildStatus = 'STARTED') {
     // build status of null means successful
     buildStatus =  buildStatus ?: 'SUCCESSFUL'
@@ -84,7 +110,6 @@ def notifyBuild(String buildStatus = 'STARTED') {
     emailext(
             subject: subject,
             body: details,
-            recipientProviders: "kpritam@thoughtworks.com"
+            recipientProviders: [[$class: 'DevelopersRecipientProvider']]
     )
-}
-*/
+}*/
