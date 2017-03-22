@@ -2,7 +2,7 @@
 val enableCoverage = System.getProperty("enableCoverage", "true")
 val plugins:Seq[Plugins] = if(enableCoverage.toBoolean) Seq(Coverage) else Seq.empty
 
-lazy val csw = project
+lazy val `csw-prod` = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
   .aggregate(`csw-location`, trackLocation, docs, integration)
@@ -57,9 +57,7 @@ lazy val integration = project
   .dependsOn(trackLocation)
   .settings(
     libraryDependencies ++= Seq(
-      Akka.`akka-stream-testkit`,
-      Libs.`scalatest`,
-      Libs.`jmdns`
+      Libs.`scalatest`
     ),
     sources in Test := (sources in Compile).value,
     resources in Test := (resources in Compile).value

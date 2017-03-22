@@ -15,7 +15,7 @@ object TromboneHCD extends App {
   val connection = AkkaConnection(componentId)
 
   val registration = AkkaRegistration(connection, tromboneHcdActorRef, "nfiraos.ncc.tromboneHCD")
-  val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
+  lazy val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
 
   println("Trombone HCD registered")
 }
