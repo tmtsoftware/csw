@@ -21,7 +21,7 @@ echo "$HOST_DIR_MAPPING"
 
 docker run -d --name=HCD $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd source && ./integration/target/universal/integration-10000/bin/trombone-h-c-d-crdt'
 
-akkaSeed=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD)
+akkaSeed=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q))
 
 docker run -d --name=Reddis --env akkaSeed=$akkaSeed $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd source && ./integration/target/universal/integration-10000/bin/test-service-crdt -DakkaSeed=$akkaSeed'
 
