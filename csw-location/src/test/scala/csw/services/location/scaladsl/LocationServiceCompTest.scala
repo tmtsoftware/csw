@@ -94,7 +94,6 @@ class LocationServiceCompTest
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
     val uri = new URI(actorPath.toString)
 
-    Thread.sleep(10)
     locationService.list.await shouldBe List(
       ResolvedAkkaLocation(connection, uri, Prefix, Some(actorRef))
     )
@@ -105,7 +104,7 @@ class LocationServiceCompTest
   }
 
   test("crashing akka location") {
-    val componentId = ComponentId("hcd1", ComponentType.HCD)
+    val componentId = ComponentId("hcdToDie", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
     val Prefix = "prefix"
 
@@ -123,7 +122,6 @@ class LocationServiceCompTest
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
     val uri = new URI(actorPath.toString)
 
-    Thread.sleep(10)
     locationService.list.await shouldBe List(
       ResolvedAkkaLocation(connection, uri, Prefix, Some(actorRef))
     )
