@@ -67,7 +67,7 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
 
   def resolve(connection: Connection): Future[Option[Resolved]] = {
     val key = LWWRegisterKey[Option[Resolved]](connection.name)
-    val get = Get(key, ReadLocal)
+    val get = Get(key, ReadMajority(10.seconds))
     (replicator ? get).map {
       case x@GetSuccess(`key`, _) => x.get(key).value
       case _                      => throw new RuntimeException(s"unable to find $connection")
@@ -75,7 +75,7 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
   }
 
   def list: Future[List[Resolved]] = {
-    val get = Get(registryKey, ReadLocal)
+    val get = Get(registryKey, ReadMajority(10.seconds))
     (replicator ? get).map {
       case x@GetSuccess(`registryKey`, _) => x.get(registryKey).elements.toList
       case _                              => throw new RuntimeException(s"unable to get the list of registered locations")

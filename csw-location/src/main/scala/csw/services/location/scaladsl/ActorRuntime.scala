@@ -46,7 +46,7 @@ class ActorRuntime(name: String, _settings: Map[String, Any]) {
   implicit val actorSystem: ActorSystem = ActorSystem(name, config)
   implicit val ec: ExecutionContext = actorSystem.dispatcher
   implicit val mat: Materializer = makeMat()
-  implicit val timeout: Timeout = Timeout(2.seconds)
+  implicit val timeout: Timeout = Timeout(5.seconds)
   implicit val node = Cluster(actorSystem)
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
