@@ -20,11 +20,14 @@ echo "$HOST_DIR_MAPPING"
 
 
 docker run -d --name=HCD $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd source && ./integration/target/universal/integration-10000/bin/trombone-h-c-d-crdt'
-docker run -d --name=Reddis $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd source && ./integration/target/universal/integration-10000/bin/test-service-crdt -DakkaSeed=172.17.0.2'
+
+akkaSeed=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD)
+
+docker run -d --name=Reddis --env akkaSeed=$akkaSeed $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd source && ./integration/target/universal/integration-10000/bin/test-service-crdt -DakkaSeed=$akkaSeed'
 
 sleep 5
 
-docker run -d --name=Test-App $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd source && ./integration/target/universal/integration-10000/bin/test-crdt-app -DakkaSeed=172.17.0.2'
+docker run -d --name=Test-App --env akkaSeed=$akkaSeed $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd source && ./integration/target/universal/integration-10000/bin/test-crdt-app -DakkaSeed=$akkaSeed'
 
 test_exit_code=$?
 
