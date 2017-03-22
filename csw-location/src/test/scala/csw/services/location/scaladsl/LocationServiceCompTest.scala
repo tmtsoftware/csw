@@ -94,6 +94,7 @@ class LocationServiceCompTest
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
     val uri = new URI(actorPath.toString)
 
+    Thread.sleep(10)
     locationService.list.await shouldBe List(
       ResolvedAkkaLocation(connection, uri, Prefix, Some(actorRef))
     )
@@ -122,6 +123,7 @@ class LocationServiceCompTest
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
     val uri = new URI(actorPath.toString)
 
+    Thread.sleep(10)
     locationService.list.await shouldBe List(
       ResolvedAkkaLocation(connection, uri, Prefix, Some(actorRef))
     )
