@@ -19,11 +19,13 @@ lazy val `csw-location` = project
   .settings(
     libraryDependencies ++= Seq(
       Akka.`akka-stream`,
+      Akka.`akka-distributed-data`,
       Libs.`jmdns`,
       Libs.`scala-java8-compat`,
       Akka.`akka-remote`,
       Libs.`scala-async`,
-      Libs.`enumeratum`
+      Libs.`enumeratum`,
+      Libs.`chill-akka`
     ),
     libraryDependencies ++= Seq(
       Akka.`akka-stream-testkit` % Test,

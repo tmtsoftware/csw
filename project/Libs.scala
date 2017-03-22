@@ -13,6 +13,7 @@ object Libs {
   val `junit-interface` = "com.novocode" % "junit-interface" % "0.11"
   val `mockito-core` = "org.mockito" % "mockito-core" % "2.7.17"
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.1.3" % Runtime
+  val `chill-akka` = "com.twitter" %% "chill-akka" % "0.9.2"
 }
 
 object Akka {
@@ -21,4 +22,5 @@ object Akka {
   val `akka-remote` = "com.typesafe.akka" %% "akka-remote" % Version
   val `akka-stream-testkit` = "com.typesafe.akka" %% "akka-stream-testkit" % Version
   val `akka-actor` = "com.typesafe.akka" %% "akka-actor" % Version
+  val `akka-distributed-data` = "com.typesafe.akka" %% "akka-distributed-data" % Version
 }

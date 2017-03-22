@@ -1,7 +1,11 @@
 package csw.services.location.internal
 
+import akka.NotUsed
+import akka.actor.ActorRef
 import akka.stream.scaladsl.{BroadcastHub, Keep, Sink, Source, SourceQueueWithComplete}
 import akka.stream.{KillSwitch, KillSwitches, Materializer, OverflowStrategy}
+
+import scala.concurrent.{Future, Promise}
 
 object StreamExt {
 
@@ -9,6 +13,10 @@ object StreamExt {
     Source
       .queue[T](8, OverflowStrategy.dropHead)
       .toMat(broadcastSink[T](8, OverflowStrategy.dropHead))(Keep.both).run()
+  }
+
+  def actorCoupling[T]: (Source[T, NotUsed], Future[ActorRef]) = {
+    Source.actorRef[T](256, OverflowStrategy.dropHead).splitMat
   }
 
   def broadcastSink[T](
@@ -32,6 +40,17 @@ object StreamExt {
 
     def broadcast()(implicit mat: Materializer): Source[Out, KillSwitch] =
       source.runWith(broadcastSink[Out](16, OverflowStrategy.dropHead))
+
+    def splitMat: (Source[Out, NotUsed], Future[Mat]) = {
+      val p = Promise[Mat]
+      val s = source.mapMaterializedValue { m =>
+        p.trySuccess(m)
+        NotUsed
+      }
+      (s, p.future)
+    }
+
+    def cancellable: Source[Out, KillSwitch] = source.viaMat(KillSwitches.single)(Keep.right)
   }
 
 }

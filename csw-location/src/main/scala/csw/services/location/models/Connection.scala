@@ -8,7 +8,7 @@ import scala.util.control.NonFatal
 /**
   * Describes a component and the way it is accessed (http, akka)
   */
-sealed abstract class Connection {
+sealed abstract class Connection extends Serializable {
   /**
     * Holds the component name and type (assembly, hcd, etc.)
     */

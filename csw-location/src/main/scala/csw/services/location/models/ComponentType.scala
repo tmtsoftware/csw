@@ -8,7 +8,7 @@ import scala.collection.immutable.IndexedSeq
 /**
  * CSW Component types
  */
-sealed abstract class ComponentType extends EnumEntry with Lowercase {
+sealed abstract class ComponentType extends EnumEntry with Lowercase with Serializable {
   def name: String = entryName
 }
 

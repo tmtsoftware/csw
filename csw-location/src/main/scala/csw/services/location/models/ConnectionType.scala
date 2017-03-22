@@ -7,7 +7,7 @@ import scala.collection.immutable.IndexedSeq
 /**
  * Connection type: Indicate if it is an http server or an akka actor.
  */
-sealed abstract class ConnectionType(override val entryName: String) extends EnumEntry {
+sealed abstract class ConnectionType(override val entryName: String) extends EnumEntry with Serializable {
   def name: String = entryName
 }
 
