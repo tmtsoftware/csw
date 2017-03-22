@@ -41,7 +41,7 @@ node {
         }
 
         stage('Integration') {
-            sh "./integration/scripts/runner.sh '-v /var/lib/jenkins/workspace/csw-prod/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
+            sh "./integration/scripts/runner.sh '-v /var/lib/jenkins/jobs/csw-prod/workspace/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
         }
 
         stage('Infra Test') {
@@ -49,7 +49,7 @@ node {
                     "Multiple NIC's": {
                         stage("NIC") {
                             try {
-                                sh "./integration/scripts/multiple_nic_test.sh '-v /var/lib/jenkins/workspace/csw-prod/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
+                                sh "./integration/scripts/multiple_nic_test.sh '-v /var/lib/jenkins/jobs/csw-prod/workspace/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
                             }
                             catch (Exception ex) {
                                 currentBuild.result = 'FAILED'
@@ -60,7 +60,7 @@ node {
                     "Multiple Subnet's": {
                         stage("Subnet") {
                             try {
-                                sh "./integration/scripts/multiple_subnets_test.sh '-v /var/lib/jenkins/workspace/csw-prod/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
+                                sh "./integration/scripts/multiple_subnets_test.sh '-v /var/lib/jenkins/jobs/csw-prod/workspace/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
                             }
                             catch (Exception ex) {
                                 currentBuild.result = 'FAILED'
