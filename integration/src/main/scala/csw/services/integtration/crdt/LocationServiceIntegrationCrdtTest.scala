@@ -7,13 +7,12 @@ import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import org.scalatest._
 
-class LocationServiceIntegrationCrdtTest
+class LocationServiceIntegrationCrdtTest(actorRuntime: ActorRuntime)
   extends FunSuite
     with Matchers
     with BeforeAndAfter
     with BeforeAndAfterAll {
 
-  private val actorRuntime = new ActorRuntime("crdt", 2554)
   import actorRuntime._
   private val locationService = LocationServiceFactory.make(actorRuntime)
 

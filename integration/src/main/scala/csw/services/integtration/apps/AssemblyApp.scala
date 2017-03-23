@@ -9,8 +9,8 @@ import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType, ResolvedAkkaLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
-object AssemblyApp extends App {
-  private val actorRuntime = new ActorRuntime("assembly", "eth1", 2552)
+object AssemblyApp {
+  private val actorRuntime = new ActorRuntime("crdt", "eth1")
 
   val assemblyActorRef = actorRuntime.actorSystem.actorOf(Props[AssemblyApp], "assembly")
   val componentId = ComponentId("assembly", ComponentType.Assembly)
@@ -19,7 +19,11 @@ object AssemblyApp extends App {
   val actorPath = ActorPath.fromString(Serialization.serializedActorPath(assemblyActorRef))
   val uri = new URI(actorPath.toString)
   val registration = ResolvedAkkaLocation(connection, uri, "tmt.assembly", Some(assemblyActorRef))
-  lazy val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
+  val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
+
+  def main(args: Array[String]): Unit = {
+
+  }
 
 }
 

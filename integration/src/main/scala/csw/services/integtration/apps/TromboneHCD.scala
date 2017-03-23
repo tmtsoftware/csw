@@ -10,8 +10,8 @@ import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType, ResolvedAkkaLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
-object TromboneHCD extends App {
-  private val actorRuntime = new ActorRuntime("trombone-hcd", 2554)
+object TromboneHCD {
+  private val actorRuntime = new ActorRuntime("crdt")
 
   val tromboneHcdActorRef = actorRuntime.actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
   val componentId = ComponentId("trombonehcd", ComponentType.HCD)
@@ -20,9 +20,13 @@ object TromboneHCD extends App {
   val actorPath = ActorPath.fromString(Serialization.serializedActorPath(tromboneHcdActorRef))
   val uri = new URI(actorPath.toString)
   val registration = ResolvedAkkaLocation(connection, uri, "nfiraos.ncc.tromboneHCD", Some(tromboneHcdActorRef))
-  lazy val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
+  val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
 
   println("Trombone HCD registered")
+
+  def main(args: Array[String]): Unit = {
+
+  }
 }
 
 class TromboneHCD extends Actor {

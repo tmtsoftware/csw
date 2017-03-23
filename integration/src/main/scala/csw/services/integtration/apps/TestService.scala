@@ -7,8 +7,8 @@ import csw.services.location.models.{ComponentId, ComponentType, HttpRegistratio
 import csw.services.location.models.Connection.HttpConnection
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
-object TestService extends App {
-  private val actorRuntime = new ActorRuntime("test-service", 2553)
+object TestService {
+  private val actorRuntime = new ActorRuntime("crdt")
 
   val componentId = ComponentId("redisservice", ComponentType.Service)
   val connection = HttpConnection(componentId)
@@ -22,4 +22,8 @@ object TestService extends App {
     LocationServiceFactory.make(actorRuntime).register(registration).await
 
   print("Redis Service Registered")
+
+  def main(args: Array[String]): Unit = {
+
+  }
 }

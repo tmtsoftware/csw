@@ -13,34 +13,20 @@ import org.scalatest._
 
 import scala.concurrent.Future
 
-class TrackLocationAppIntegrationTest
+class TrackLocationAppIntegrationTest(actorRuntime: ActorRuntime)
   extends FunSuite
     with Matchers
     with BeforeAndAfter
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val actorRuntime = new ActorRuntime("track-location-test", 2557)
-
-  import actorRuntime._
-
   private val locationService = LocationServiceFactory.make(actorRuntime)
-  var trackLocationApp: TrackLocationApp = _
-
-  override protected def afterEach(): Unit = {
-    //TODO: write and invoke test utility method for unregistering all services
-    trackLocationApp.shutdown().await
-  }
-
-  override protected def afterAll(): Unit = {
-    actorSystem.terminate().await
-  }
+  import actorRuntime._
+  val trackLocationApp = new TrackLocationApp(new ActorRuntime("crdt", 2556))
 
   test("launch the trackLocationApp") {
     val name = "test1"
     val port = 9999
-
-    trackLocationApp = new TrackLocationApp(JmDnsReal)
 
     Future {
       trackLocationApp.start(
@@ -54,13 +40,15 @@ class TrackLocationAppIntegrationTest
       )
     }
 
+    Thread.sleep(2000)
+
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val uri = new URI(s"tcp://${actorRuntime.ipaddr.getHostAddress}:$port")
-    val resolvedConnection = locationService.resolve(connection).await
+    val resolvedConnection = locationService.resolve(connection).await.get
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
-    Thread.sleep(10000)
+    Thread.sleep(6000)
 
     val locations: Seq[Location] = locationService.list.await
     locations.contains(resolvedConnection) shouldBe false
@@ -81,8 +69,6 @@ class TrackLocationAppIntegrationTest
     val configFile: String = tempFile.getPath
     println(configFile)
 
-    trackLocationApp = new TrackLocationApp(JmDnsReal)
-
     Future {
       trackLocationApp.start(
         Array(
@@ -93,13 +79,15 @@ class TrackLocationAppIntegrationTest
       )
     }
 
+    Thread.sleep(2000)
+
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
-    val resolvedConnection = locationService.resolve(connection).await
+    val resolvedConnection = locationService.resolve(connection).await.get
     val uri = new URI(s"tcp://${actorRuntime.ipaddr.getHostAddress}:$port")
     resolvedConnection shouldBe ResolvedTcpLocation(connection, uri)
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
-    Thread.sleep(15000)
+    Thread.sleep(6000)
 
     val locations: Seq[Location] = locationService.list.await
     locations.contains(resolvedConnection) shouldBe false

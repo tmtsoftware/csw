@@ -6,24 +6,20 @@ import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import org.scalatest._
 
-class LocationServiceIntegrationTest
+class LocationServiceIntegrationTest(actorRuntime: ActorRuntime)
   extends FunSuite
     with Matchers
     with BeforeAndAfter
     with BeforeAndAfterAll {
 
-  private val actorRuntime = new ActorRuntime("AssemblySystem", 2555)
   import actorRuntime._
   private val locationService = LocationServiceFactory.make(actorRuntime)
 
-  override protected def afterAll(): Unit = {
-    actorSystem.terminate().await
-  }
 
   test("resolves remote HCD") {
     val componentId = ComponentId("trombonehcd", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
-    val hcdLocation = locationService.resolve(connection).await
+    val hcdLocation = locationService.resolve(connection).await.get
 
     hcdLocation shouldBe a[ResolvedAkkaLocation]
     hcdLocation
@@ -44,7 +40,7 @@ class LocationServiceIntegrationTest
     val componentId = ComponentId("redisservice", ComponentType.Service)
     val connection = HttpConnection(componentId)
 
-    val hcdLocation = locationService.resolve(connection).await
+    val hcdLocation = locationService.resolve(connection).await.get
 
     hcdLocation shouldBe a[ResolvedHttpLocation]
     hcdLocation

@@ -6,17 +6,12 @@ import csw.services.location.models.{ComponentId, ComponentType, ResolvedAkkaLoc
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuite, Matchers}
 
-class LocationServiceMultipleNICTest extends FunSuite
+class LocationServiceMultipleNICTest(actorRuntime: ActorRuntime) extends FunSuite
   with Matchers
   with BeforeAndAfter
   with BeforeAndAfterAll{
-  private val actorRuntime = new ActorRuntime("AssemblySystem", "eth1", 2556)
 
   private val locationService = LocationServiceFactory.make(actorRuntime)
-
-  override protected def afterAll(): Unit = {
-    actorRuntime.actorSystem.terminate().await
-  }
 
   test("should list and resolve component having multiple-nic's"){
 
