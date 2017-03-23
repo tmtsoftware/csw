@@ -1,12 +1,12 @@
 package csw.services.tracklocation
 
+import java.net.URI
 import java.util.concurrent.atomic.AtomicBoolean
 
-import akka.Done
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.Timeout
 import csw.services.location.models.Connection.TcpConnection
-import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
+import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationService, LocationServiceFactory}
 import csw.services.tracklocation.models.Command
 
@@ -14,18 +14,18 @@ import scala.collection.immutable.Seq
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 import scala.sys.ShutdownHookThread
-import sys.process._
+import scala.sys.process._
 
-class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRuntime, locationService: LocationService) {
+class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
+  private val locationService = LocationServiceFactory.make(actorRuntime)
 
   private var isRunning = new AtomicBoolean(true)
 
   private implicit val timeout = Timeout(10.seconds)
 
   def run(): Future[Unit] = register().map(awaitTermination)
-  def shutdown(): Future[Done] = locationService.shutdown()
 
   private def register(): Future[Seq[RegistrationResult]] = Source(names)
     .initialDelay(command.delay.millis) //delay to give the app a chance to start
@@ -35,7 +35,8 @@ class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRu
   private def registerName(name: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
     val connection = TcpConnection(componentId)
-    locationService.register(TcpRegistration(connection, command.port))
+    val tcpUri = new URI(s"tcp://${actorRuntime.hostname}:${command.port}")
+    locationService.register(ResolvedTcpLocation(connection, tcpUri))
   }
 
 

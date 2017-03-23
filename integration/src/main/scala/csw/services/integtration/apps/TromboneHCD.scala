@@ -1,10 +1,13 @@
 package csw.services.integtration.apps
 
-import akka.actor.{Actor, Props}
+import java.net.URI
+
+import akka.actor.{Actor, ActorPath, Props}
 import akka.pattern.pipe
+import akka.serialization.Serialization
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType, ResolvedAkkaLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object TromboneHCD extends App {
@@ -14,7 +17,9 @@ object TromboneHCD extends App {
   val componentId = ComponentId("trombonehcd", ComponentType.HCD)
   val connection = AkkaConnection(componentId)
 
-  val registration = AkkaRegistration(connection, tromboneHcdActorRef, "nfiraos.ncc.tromboneHCD")
+  val actorPath = ActorPath.fromString(Serialization.serializedActorPath(tromboneHcdActorRef))
+  val uri = new URI(actorPath.toString)
+  val registration = ResolvedAkkaLocation(connection, uri, "nfiraos.ncc.tromboneHCD", Some(tromboneHcdActorRef))
   lazy val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
 
   println("Trombone HCD registered")

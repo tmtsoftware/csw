@@ -39,7 +39,7 @@ lazy val `csw-location` = project
 lazy val trackLocation = project
   .in(file("apps/trackLocation"))
   .enablePlugins(DeployApp)
-  .dependsOn(`csw-location` % "compile->compile;test->test")
+  .dependsOn(`csw-location`)
   .settings(
     libraryDependencies ++= Seq(
       Akka.`akka-actor`,
@@ -61,6 +61,5 @@ lazy val integration = project
     libraryDependencies ++= Seq(
       Libs.`scalatest`
     ),
-    sources in Test := (sources in Compile).value,
-    resources in Test := (resources in Compile).value
+    sources in Test := (sources in Compile).value
   )

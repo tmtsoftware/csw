@@ -10,28 +10,25 @@ import scala.concurrent.Future
 trait LocationService {
 
   /**
-    * @param registration object
+    * @param location object
     * returns registration-result which can be used to unregister
     */
-  def register(registration: Registration): Future[RegistrationResult]
+  def register(location: Resolved): Future[RegistrationResult]
 
   def unregister(connection: Connection): Future[Done]
 
   def unregisterAll(): Future[Done]
 
-  def resolve(connection: Connection): Future[Resolved]
+  def resolve(connection: Connection): Future[Option[Resolved]]
 
-  def resolve(connections: Set[Connection]): Future[Set[Resolved]]
+  def list: Future[List[Resolved]]
 
-  def list: Future[List[Location]]
-
-  def list(componentType: ComponentType): Future[List[Location]]
+  def list(componentType: ComponentType): Future[List[Resolved]]
 
   def list(hostname: String): Future[List[Resolved]]
 
-  def list(connectionType: ConnectionType): Future[List[Location]]
+  def list(connectionType: ConnectionType): Future[List[Resolved]]
 
-  def track(connection: Connection): Source[Location, KillSwitch]
+  def track(connection: Connection): Source[TrackingEvent, KillSwitch]
 
-  def shutdown(): Future[Done]
 }

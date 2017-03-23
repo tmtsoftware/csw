@@ -13,9 +13,7 @@ import scala.concurrent.Future
   * A utility application that starts a given external program, registers it with the location service and
   * unregisters it when the program exits.
   */
-class TrackLocationApp(jmDnsApiFactory: JmDnsApiFactory) {
-  val actorRuntime = new ActorRuntime("track-location-app")
-  val locationService = LocationServiceFactory.make(actorRuntime, jmDnsApiFactory)
+class TrackLocationApp(actorRuntime: ActorRuntime) {
   import actorRuntime._
 
   var trackLocation: TrackLocation = _
@@ -26,7 +24,7 @@ class TrackLocationApp(jmDnsApiFactory: JmDnsApiFactory) {
         try {
           val command = Command.parse(options)
           println(s"commandText: ${command.commandText}, command: $command")
-          trackLocation = new TrackLocation(options.names, command, actorRuntime, locationService)
+          trackLocation = new TrackLocation(options.names, command, actorRuntime)
           trackLocation.run()
         } catch {
           case e: Throwable =>
@@ -38,11 +36,10 @@ class TrackLocationApp(jmDnsApiFactory: JmDnsApiFactory) {
   }
 
   def shutdown(): Future[Terminated] = async {
-    await(trackLocation.shutdown())
     await(actorRuntime.actorSystem.terminate())
   }
 }
 
 object TrackLocationApp extends App {
-  new TrackLocationApp(JmDnsReal).start(args)
+  new TrackLocationApp(new ActorRuntime("crdt", 2553)).start(args)
 }

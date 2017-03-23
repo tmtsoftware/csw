@@ -9,7 +9,7 @@ import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.internal.LocationServiceCrdtImpl
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType, ResolvedAkkaLocation}
-import csw.services.location.scaladsl.ActorRuntime
+import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object TromboneHCDCrdt {
   private val actorRuntime = new ActorRuntime("crdt", 2552)
@@ -21,7 +21,7 @@ object TromboneHCDCrdt {
   val actorPath = ActorPath.fromString(Serialization.serializedActorPath(tromboneHcdActorRef))
   val uri = new URI(actorPath.toString)
   val location = ResolvedAkkaLocation(connection, uri, "nfiraos.ncc.tromboneHCD", Some(tromboneHcdActorRef))
-  val serviceCrdtImpl = new LocationServiceCrdtImpl(actorRuntime)
+  val serviceCrdtImpl = LocationServiceFactory.make(actorRuntime)
   val registrationResult = serviceCrdtImpl.register(location).await
   println("Trombone HCD registered")
 

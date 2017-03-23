@@ -34,7 +34,6 @@ class TrackLocationAppIntegrationTest
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await
-    locationService.shutdown().await
   }
 
   test("launch the trackLocationApp") {

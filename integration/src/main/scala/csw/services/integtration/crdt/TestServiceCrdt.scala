@@ -17,7 +17,7 @@ object TestServiceCrdt {
   private val uri = new URI(s"http://${actorRuntime.hostname}:9999/$Path")
   val registration = ResolvedHttpLocation(connection, uri, Path)
 
-  private val locationService = new LocationServiceCrdtImpl(actorRuntime)
+  private val locationService = LocationServiceFactory.make(actorRuntime)
 
   val registrationResult = locationService.register(registration).await
 

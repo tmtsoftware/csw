@@ -1,6 +1,6 @@
 package csw.services.location.models
 
-sealed trait TrackingEvent {
+sealed abstract class TrackingEvent {
   def connection: Connection
 }
 

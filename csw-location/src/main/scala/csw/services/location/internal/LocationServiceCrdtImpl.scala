@@ -6,16 +6,15 @@ import akka.cluster.ddata._
 import akka.pattern.ask
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import akka.util.Timeout
 import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.models._
-import csw.services.location.scaladsl.ActorRuntime
+import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 
 import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
-class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
+private[location] class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) extends LocationService {
   outer =>
 
   import actorRuntime._
@@ -24,12 +23,12 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
 
   def register(location: Resolved): Future[RegistrationResult] = {
     val key = LWWRegisterKey[Option[Resolved]](location.connection.name)
-    val updateValue = Update(key, LWWRegister(Option.empty[Resolved]), WriteLocal) {
+    val updateValue = Update(key, LWWRegister(Option.empty[Resolved]), WriteMajority(5.seconds)) {
       case r@LWWRegister(None)  => r.withValue(Some(location))
       case LWWRegister(Some(x)) => throw new IllegalStateException(s"can not register against already registered connection=${location.connection.name}. Current value=$x")
     }
 
-    val updateRegistry = Update(registryKey, LWWMap.empty[Connection, Resolved], WriteLocal)(_ + (location.connection → location))
+    val updateRegistry = Update(registryKey, LWWMap.empty[Connection, Resolved], WriteMajority(5.seconds))(_ + (location.connection → location))
 
     (replicator ? updateValue).flatMap {
       case _: UpdateSuccess[_]               => (replicator ? updateRegistry).map {
@@ -43,18 +42,18 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
 
   def unregister(connection: Connection): Future[Done] = {
     val key = LWWRegisterKey[Option[Resolved]](connection.name)
-    val updateValue = Update(key, LWWRegister(Option.empty[Resolved]), WriteLocal) {
+    val updateValue = Update(key, LWWRegister(Option.empty[Resolved]), WriteMajority(5.seconds)) {
       case r@LWWRegister(Some(_)) => r.withValue(None)
       case LWWRegister(None)      => throw new IllegalStateException(s"can not unregister already unregistered connection=${connection.name}")
     }
-    val deleteFromRegistry = Update(registryKey, LWWMap.empty[Connection, Resolved], WriteLocal)(_ - connection)
+    val deleteFromRegistry = Update(registryKey, LWWMap.empty[Connection, Resolved], WriteMajority(5.seconds))(_ - connection)
     (replicator ? updateValue).flatMap {
       case x: UpdateSuccess[_]               => (replicator ? deleteFromRegistry).map {
         case _: UpdateSuccess[_] => Done
-        case _                   => throw new RuntimeException(s"unable to unregister ${connection}")
+        case _                   => throw new RuntimeException(s"unable to unregister $connection")
       }
       case ModifyFailure(`key`, _, cause, _) => throw cause
-      case _                                 => Future.failed(new RuntimeException(s"unable to unregister ${connection}"))
+      case _                                 => Future.failed(new RuntimeException(s"unable to unregister $connection"))
     }
   }
 
@@ -64,10 +63,9 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
     Done
   }
 
-
   def resolve(connection: Connection): Future[Option[Resolved]] = {
     val key = LWWRegisterKey[Option[Resolved]](connection.name)
-    val get = Get(key, ReadMajority(10.seconds))
+    val get = Get(key, ReadMajority(5.seconds))
     (replicator ? get).map {
       case x@GetSuccess(`key`, _) => x.get(key).value
       case _                      => throw new RuntimeException(s"unable to find $connection")
@@ -75,7 +73,7 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
   }
 
   def list: Future[List[Resolved]] = {
-    val get = Get(registryKey, ReadMajority(10.seconds))
+    val get = Get(registryKey, ReadMajority(5.seconds))
     (replicator ? get).map {
       case x@GetSuccess(`registryKey`, _) => x.get(registryKey).entries.values.toList
       case _                              => throw new RuntimeException(s"unable to get the list of registered locations")

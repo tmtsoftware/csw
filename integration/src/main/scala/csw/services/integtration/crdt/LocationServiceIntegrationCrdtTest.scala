@@ -4,7 +4,7 @@ import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.internal.LocationServiceCrdtImpl
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
-import csw.services.location.scaladsl.ActorRuntime
+import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import org.scalatest._
 
 class LocationServiceIntegrationCrdtTest
@@ -15,7 +15,7 @@ class LocationServiceIntegrationCrdtTest
 
   private val actorRuntime = new ActorRuntime("crdt", 2554)
   import actorRuntime._
-  private val locationService = new LocationServiceCrdtImpl(actorRuntime)
+  private val locationService = LocationServiceFactory.make(actorRuntime)
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await

@@ -18,7 +18,6 @@ class LocationServiceIntegrationTest
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await
-    locationService.shutdown().await
   }
 
   test("resolves remote HCD") {

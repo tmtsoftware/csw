@@ -16,7 +16,7 @@ final case class Unresolved(connection: Connection) extends Location
 
 final case class Removed(connection: Connection) extends Location
 
-sealed trait Resolved extends Location with Serializable {
+sealed trait Resolved extends Location with TmtSerializable {
   def uri: URI
 }
 

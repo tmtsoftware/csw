@@ -16,7 +16,6 @@ class LocationServiceMultipleNICTest extends FunSuite
 
   override protected def afterAll(): Unit = {
     actorRuntime.actorSystem.terminate().await
-    locationService.shutdown().await
   }
 
   test("should list and resolve component having multiple-nic's"){

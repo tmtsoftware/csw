@@ -10,26 +10,24 @@ import java.{util => ju}
 
 trait ILocationService {
   /**
-    * @param registration object
+    * @param location object
     * returns registration-result which can be used to unregister
     */
-  def register(registration: Registration): CompletionStage[RegistrationResult]
+  def register(location: Resolved): CompletionStage[RegistrationResult]
 
   def unregister(connection: Connection): CompletionStage[Done]
 
   def unregisterAll(): CompletionStage[Done]
 
-  def resolve(connection: Connection): CompletionStage[Resolved]
+  def resolve(connection: Connection): CompletionStage[Option[Resolved]]
 
-  def resolve(connections: ju.Set[Connection]): CompletionStage[ju.Set[Resolved]]
+  def list: CompletionStage[ju.List[Resolved]]
 
-  def list: CompletionStage[ju.List[Location]]
-
-  def list(componentType: ComponentType): CompletionStage[ju.List[Location]]
+  def list(componentType: ComponentType): CompletionStage[ju.List[Resolved]]
 
   def list(hostname: String): CompletionStage[ju.List[Resolved]]
 
-  def list(connectionType: ConnectionType): CompletionStage[ju.List[Location]]
+  def list(connectionType: ConnectionType): CompletionStage[ju.List[Resolved]]
 
-  def track(connection: Connection): Source[Location, KillSwitch]
+  def track(connection: Connection): Source[TrackingEvent, KillSwitch]
 }

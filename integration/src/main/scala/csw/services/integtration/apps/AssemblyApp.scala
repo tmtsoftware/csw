@@ -1,9 +1,12 @@
 package csw.services.integtration.apps
 
-import akka.actor.{Actor, Props}
+import java.net.URI
+
+import akka.actor.{Actor, ActorPath, Props}
+import akka.serialization.Serialization
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType, ResolvedAkkaLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object AssemblyApp extends App {
@@ -13,7 +16,9 @@ object AssemblyApp extends App {
   val componentId = ComponentId("assembly", ComponentType.Assembly)
   val connection = AkkaConnection(componentId)
 
-  val registration = AkkaRegistration(connection, assemblyActorRef, "tmt.assembly")
+  val actorPath = ActorPath.fromString(Serialization.serializedActorPath(assemblyActorRef))
+  val uri = new URI(actorPath.toString)
+  val registration = ResolvedAkkaLocation(connection, uri, "tmt.assembly", Some(assemblyActorRef))
   lazy val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
 
 }
