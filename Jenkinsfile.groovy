@@ -2,54 +2,61 @@
 node {
     def failBuild = false
     try{
-        stage('Checkout') {
-            git 'https://github.com/tmtsoftware/csw-prod.git'
+        node('master'){
+            stage('Checkout') {
+                git 'https://github.com/tmtsoftware/csw-prod.git'
+            }
+
+            stage('Build') {
+                sh "sbt -Dcheck.cycles=true clean scalastyle compile"
+            }
+
+            stage('Test') {
+                try {
+                    sh "sbt csw-location/test"
+                }
+                catch (Exception e) {
+                    currentBuild.result = 'FAILED'
+                    failBuild = true
+                }
+                try {
+                    sh "sbt trackLocation/test"
+                }
+                catch (Exception e) {
+                    currentBuild.result = 'FAILED'
+                    failBuild = true
+                }
+                try{
+                    sh "sbt coverageReport"
+                }
+                catch (Exception ex){
+                    failBuild = true
+                }
+                sh "sbt coverageAggregate"
+                if(failBuild == true)
+                    sh "exit 1"
+            }
+
+            stage('Package') {
+                sh "./universal_package.sh"
+                stash name: "repo"
+            }
         }
 
-        stage('Build') {
-            sh "sbt -Dcheck.cycles=true clean scalastyle compile"
+        node('JenkinsNode1'){
+            stage('Integration') {
+                unstash "repo"
+                sh "./integration/scripts/runner.sh '-v /home/ubuntu/workspace/csw-prod/:/source'"
+            }
         }
 
-        stage('Test') {
-            try {
-                sh "sbt csw-location/test"
-            }
-            catch (Exception e) {
-                currentBuild.result = 'FAILED'
-                failBuild = true
-            }
-            try {
-                sh "sbt trackLocation/test"
-            }
-            catch (Exception e) {
-                currentBuild.result = 'FAILED'
-                failBuild = true
-            }
-            try{
-                sh "sbt coverageReport"
-            }
-            catch (Exception ex){
-                failBuild = true
-            }
-            sh "sbt coverageAggregate"
-            if(failBuild == true)
-                sh "exit 1"
-        }
-
-        stage('Package') {
-            sh "./universal_package.sh"
-        }
-
-        stage('Integration') {
-            sh "./integration/scripts/runner.sh '-v /var/lib/jenkins/jobs/csw-prod/workspace/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
-        }
-
-        stage('Infra Test') {
-            parallel(
+        node('JenkinsNode1'){
+            stage('Infra Test') {
+                parallel(
                     "Multiple NIC's": {
                         stage("NIC") {
                             try {
-                                sh "./integration/scripts/multiple_nic_test.sh '-v /var/lib/jenkins/jobs/csw-prod/workspace/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
+                                sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/csw-prod/:/source'"
                             }
                             catch (Exception ex) {
                                 currentBuild.result = 'FAILED'
@@ -60,7 +67,7 @@ node {
                     "Multiple Subnet's": {
                         stage("Subnet") {
                             try {
-                                sh "./integration/scripts/multiple_subnets_test.sh '-v /var/lib/jenkins/jobs/csw-prod/workspace/:/source -v /var/lib/jenkins/.ivy2/:/root/.ivy2'"
+                                   sh "./integration/scripts/multiple_subnets_test.sh '-v /home/ubuntu/workspace/csw-prod/:/source'"
                             }
                             catch (Exception ex) {
                                 currentBuild.result = 'FAILED'
@@ -68,19 +75,25 @@ node {
                             }
                         }
                     }
-            )
+                )
+            }
         }
     }
     catch (Exception e) {
         currentBuild.result = "FAILED"
         throw e
     } finally {
-//        notifyBuild(currentBuild.result)
+        node('master'){
+            stage("Report") {
+                sendNotification(currentBuild.result)
+                publishJunitReport()
+                publishScoverageReport()
+            }
+        }
     }
 }
-/*
 
-def notifyBuild(String buildStatus = 'STARTED') {
+def sendNotification(String buildStatus = 'STARTED') {
     // build status of null means successful
     buildStatus =  buildStatus ?: 'SUCCESSFUL'
 
@@ -90,7 +103,7 @@ def notifyBuild(String buildStatus = 'STARTED') {
     def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
     def summary = "${subject} (${env.BUILD_URL})"
     def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>"""
+    <p>Check console output at <a href='${env.JENKINS_URL}/blue/organizations/jenkins/${env.JOB_NAME}/detail/${env.JOB_NAME}/${env.BUILD_NUMBER}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>"""
 
     // Override default values based on build status
     if (buildStatus == 'STARTED') {
@@ -104,12 +117,25 @@ def notifyBuild(String buildStatus = 'STARTED') {
         colorCode = '#FF0000'
     }
 
-    // Send notifications
-//    slackSend (color: colorCode, message: summary)
-
     emailext(
             subject: subject,
             body: details,
-            recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+            recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+            to: "tmt-csw@thoughtworks.com"
     )
-}*/
+}
+
+def publishJunitReport(){
+    junit '**/target/test-reports/*.xml'
+}
+
+def publishScoverageReport() {
+    publishHTML (target: [
+            allowMissing: true,
+            alwaysLinkToLastBuild: false,
+            keepAll: true,
+            reportDir: './target/scala-2.12/scoverage-report',
+            reportFiles: 'index.html',
+            reportName: "Scoverage Report"
+    ])
+}
