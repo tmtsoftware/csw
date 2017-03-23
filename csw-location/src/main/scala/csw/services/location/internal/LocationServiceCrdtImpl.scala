@@ -14,6 +14,7 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
+// scalastyle:off
 private[location] class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) extends LocationService {
   outer =>
 
@@ -109,3 +110,4 @@ private[location] class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) exte
   }
 
 }
+// scalastyle:off
