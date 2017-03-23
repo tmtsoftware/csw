@@ -5,10 +5,24 @@ import org.scalatest.{FunSuite, Matchers}
 
 class ConnectionTest extends FunSuite with Matchers {
 
-  test("should successfully parse a valid Connection string representation.") {
+  test("should successfully parse a valid Akka Connection string representation.") {
     Connection.parse("lgsTromboneHCD-hcd-akka").get shouldBe Connection(
       ComponentId("lgsTromboneHCD", ComponentType.HCD),
       ConnectionType.AkkaType
+    )
+  }
+
+  test("should successfully parse a valid Http Connection string representation.") {
+    Connection.parse("tromboneContainer-container-http").get shouldBe Connection(
+      ComponentId("tromboneContainer", ComponentType.Container),
+      ConnectionType.HttpType
+    )
+  }
+
+  test("should successfully parse a valid Tcp Connection string representation.") {
+    Connection.parse("tromboneAssembly-assembly-tcp").get shouldBe Connection(
+      ComponentId("tromboneAssembly", ComponentType.Assembly),
+      ConnectionType.TcpType
     )
   }
 
