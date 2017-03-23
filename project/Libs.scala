@@ -2,7 +2,6 @@ import sbt._
 
 object Libs {
   val `scalatest` = "org.scalatest" %% "scalatest" % "3.0.1"
-  val `jmdns` = "org.jmdns" % "jmdns" % "3.5.1"
   val `scala-java8-compat` = "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
   val `scala-async` = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
   val `scopt` = "com.github.scopt" %% "scopt" % "3.5.0"

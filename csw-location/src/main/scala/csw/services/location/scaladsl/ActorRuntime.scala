@@ -52,7 +52,4 @@ class ActorRuntime(name: String, _settings: Map[String, Any]) {
 
   def makeMat(): Materializer = ActorMaterializer()
   def terminate(): Future[Terminated] = actorSystem.terminate()
-
-  val jmDnsDispatcher: MessageDispatcher = actorSystem.dispatchers.lookup("jmdns.dispatcher")
-
 }
