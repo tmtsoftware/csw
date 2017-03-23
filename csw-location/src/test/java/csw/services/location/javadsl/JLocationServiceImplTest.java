@@ -5,8 +5,6 @@ import akka.actor.ActorPaths;
 import akka.actor.ActorRef;
 import akka.serialization.Serialization;
 import akka.testkit.TestProbe;
-import csw.services.location.internal.wrappers.JmDnsDouble;
-import csw.services.location.internal.wrappers.JmDnsDouble$;
 import csw.services.location.scaladsl.ActorRuntime;
 import csw.services.location.models.*;
 import csw.services.location.models.Connection.*;

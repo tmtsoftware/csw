@@ -1,7 +1,6 @@
 package csw.services.tracklocation
 
 import akka.actor.Terminated
-import csw.services.location.internal.wrappers.{JmDnsApiFactory, JmDnsReal}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import csw.services.tracklocation.models.{Command, Options}
 import csw.services.tracklocation.utils.CmdLineArgsParser

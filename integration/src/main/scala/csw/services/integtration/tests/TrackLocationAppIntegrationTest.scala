@@ -4,7 +4,6 @@ import java.io.{BufferedWriter, FileWriter}
 import java.net.URI
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.internal.wrappers.JmDnsReal
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, Location, ResolvedTcpLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
