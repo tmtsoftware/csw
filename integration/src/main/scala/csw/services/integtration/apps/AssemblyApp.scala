@@ -6,7 +6,7 @@ import akka.actor.{Actor, ActorPath, Props}
 import akka.serialization.Serialization
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType, ResolvedAkkaLocation}
+import csw.services.location.models.{ComponentId, ComponentType, ResolvedAkkaLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object AssemblyApp {

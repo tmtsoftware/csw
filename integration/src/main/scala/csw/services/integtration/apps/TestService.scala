@@ -3,7 +3,7 @@ package csw.services.integtration.apps
 import java.net.URI
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.models.{ComponentId, ComponentType, HttpRegistration, ResolvedHttpLocation}
+import csw.services.location.models.{ComponentId, ComponentType, ResolvedHttpLocation}
 import csw.services.location.models.Connection.HttpConnection
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
