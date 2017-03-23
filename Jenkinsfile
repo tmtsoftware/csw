@@ -2,80 +2,82 @@
 node {
     def failBuild = false
     try{
-        node('master'){
-            stage('Checkout') {
-                git 'https://github.com/tmtsoftware/csw-prod.git'
-            }
+        ansiColor('xterm') {
+            node('master'){
+                stage('Checkout') {
+                    git 'https://github.com/tmtsoftware/csw-prod.git'
+                }
 
-            stage('Build') {
-                sh "sbt -Dcheck.cycles=true clean scalastyle compile"
-            }
+                stage('Build') {
+                    sh "sbt -Dcheck.cycles=true clean scalastyle compile"
+                }
 
-            stage('Test') {
-                try {
-                    sh "sbt csw-location/test"
-                }
-                catch (Exception e) {
-                    currentBuild.result = 'FAILED'
-                    failBuild = true
-                }
-                try {
-                    sh "sbt trackLocation/test"
-                }
-                catch (Exception e) {
-                    currentBuild.result = 'FAILED'
-                    failBuild = true
-                }
-                try{
-                    sh "sbt coverageReport"
-                }
-                catch (Exception ex){
-                    failBuild = true
-                }
-                sh "sbt coverageAggregate"
-                if(failBuild == true)
-                    sh "exit 1"
-            }
-
-            stage('Package') {
-                sh "./universal_package.sh"
-                stash name: "repo"
-            }
-        }
-
-        node('JenkinsNode1'){
-            stage('Integration') {
-                unstash "repo"
-                sh "./integration/scripts/runner.sh '-v /home/ubuntu/workspace/csw-prod/:/source'"
-            }
-        }
-
-        node('JenkinsNode1'){
-            stage('Infra Test') {
-                parallel(
-                    "Multiple NIC's": {
-                        stage("NIC") {
-                            try {
-                                sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/csw-prod/:/source'"
-                            }
-                            catch (Exception ex) {
-                                currentBuild.result = 'FAILED'
-                                throw ex
-                            }
-                        }
-                    },
-                    "Multiple Subnet's": {
-                        stage("Subnet") {
-                            try {
-                                   sh "./integration/scripts/multiple_subnets_test.sh '-v /home/ubuntu/workspace/csw-prod/:/source'"
-                            }
-                            catch (Exception ex) {
-                                currentBuild.result = 'FAILED'
-                                throw ex
-                            }
-                        }
+                stage('Test') {
+                    try {
+                        sh "sbt csw-location/test"
                     }
-                )
+                    catch (Exception e) {
+                        currentBuild.result = 'FAILED'
+                        failBuild = true
+                    }
+                    try {
+                        sh "sbt trackLocation/test"
+                    }
+                    catch (Exception e) {
+                        currentBuild.result = 'FAILED'
+                        failBuild = true
+                    }
+                    try{
+                        sh "sbt coverageReport"
+                    }
+                    catch (Exception ex){
+                        failBuild = true
+                    }
+                    sh "sbt coverageAggregate"
+                    if(failBuild == true)
+                        sh "exit 1"
+                }
+
+                stage('Package') {
+                    sh "./universal_package.sh"
+                    stash name: "repo"
+                }
+            }
+
+            node('JenkinsNode1'){
+                stage('Integration') {
+                    unstash "repo"
+                    sh "./integration/scripts/runner.sh '-v /home/ubuntu/workspace/csw-prod/:/source'"
+                }
+            }
+
+            node('JenkinsNode1'){
+                stage('Infra Test') {
+                    parallel(
+                        "Multiple NIC's": {
+                            stage("NIC") {
+                                try {
+                                    sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/csw-prod/:/source'"
+                                }
+                                catch (Exception ex) {
+                                    currentBuild.result = 'FAILED'
+                                    throw ex
+                                }
+                            }
+                        },
+                        "Multiple Subnet's": {
+                            stage("Subnet") {
+                                try {
+                                       sh "./integration/scripts/multiple_subnets_test.sh '-v /home/ubuntu/workspace/csw-prod/:/source'"
+                                }
+                                catch (Exception ex) {
+                                    currentBuild.result = 'FAILED'
+                                    throw ex
+                                }
+                            }
+                        }
+                    )
+                }
             }
         }
     }
