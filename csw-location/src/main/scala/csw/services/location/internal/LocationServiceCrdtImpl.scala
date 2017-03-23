@@ -20,7 +20,7 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 
-  private val registryKey = ORSetKey[Resolved](Constants.RegistryKey)
+  private val registryKey = LWWMapKey[Connection, Resolved](Constants.RegistryKey)
 
   def register(location: Resolved): Future[RegistrationResult] = {
     val key = LWWRegisterKey[Option[Resolved]](location.connection.name)
@@ -29,11 +29,11 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
       case LWWRegister(Some(x)) => throw new IllegalStateException(s"can not register against already registered connection=${location.connection.name}. Current value=$x")
     }
 
-    val updateRegistry = Update(registryKey, ORSet.empty[Resolved], WriteLocal)(_ + location)
+    val updateRegistry = Update(registryKey, LWWMap.empty[Connection, Resolved], WriteLocal)(_ + (location.connection → location))
 
     (replicator ? updateValue).flatMap {
       case _: UpdateSuccess[_]               => (replicator ? updateRegistry).map {
-        case _: UpdateSuccess[_] => registrationResult(location)
+        case _: UpdateSuccess[_] => registrationResult(location.connection)
         case _                   => throw new RuntimeException(s"unable to register ${location.connection}")
       }
       case ModifyFailure(`key`, _, cause, _) => throw cause
@@ -41,26 +41,26 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
     }
   }
 
-  def unregister(location: Resolved): Future[Done] = {
-    val key = LWWRegisterKey[Option[Resolved]](location.connection.name)
+  def unregister(connection: Connection): Future[Done] = {
+    val key = LWWRegisterKey[Option[Resolved]](connection.name)
     val updateValue = Update(key, LWWRegister(Option.empty[Resolved]), WriteLocal) {
       case r@LWWRegister(Some(_)) => r.withValue(None)
-      case LWWRegister(None)      => throw new IllegalStateException(s"can not unregister already unregistered connection=${location.connection.name}")
+      case LWWRegister(None)      => throw new IllegalStateException(s"can not unregister already unregistered connection=${connection.name}")
     }
-    val deleteFromRegistry = Update(registryKey, ORSet.empty[Resolved], WriteLocal)(_ - location)
+    val deleteFromRegistry = Update(registryKey, LWWMap.empty[Connection, Resolved], WriteLocal)(_ - connection)
     (replicator ? updateValue).flatMap {
       case x: UpdateSuccess[_]               => (replicator ? deleteFromRegistry).map {
         case _: UpdateSuccess[_] => Done
-        case _                   => throw new RuntimeException(s"unable to unregister ${location.connection}")
+        case _                   => throw new RuntimeException(s"unable to unregister ${connection}")
       }
       case ModifyFailure(`key`, _, cause, _) => throw cause
-      case _                                 => Future.failed(new RuntimeException(s"unable to unregister ${location.connection}"))
+      case _                                 => Future.failed(new RuntimeException(s"unable to unregister ${connection}"))
     }
   }
 
   def unregisterAll(): Future[Done] = async {
     val locations = await(list)
-    await(Future.traverse(locations)(unregister))
+    await(Future.traverse(locations)(loc ⇒ unregister(loc.connection)))
     Done
   }
 
@@ -77,7 +77,7 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
   def list: Future[List[Resolved]] = {
     val get = Get(registryKey, ReadMajority(10.seconds))
     (replicator ? get).map {
-      case x@GetSuccess(`registryKey`, _) => x.get(registryKey).elements.toList
+      case x@GetSuccess(`registryKey`, _) => x.get(registryKey).entries.values.toList
       case _                              => throw new RuntimeException(s"unable to get the list of registered locations")
     }
   }
@@ -104,12 +104,10 @@ class LocationServiceCrdtImpl(actorRuntime: ActorRuntime) {
     }.cancellable
   }
 
-  private def registrationResult(location: Resolved): RegistrationResult = new RegistrationResult {
-    override def componentId: ComponentId = location.connection.componentId
+  private def registrationResult(connection: Connection): RegistrationResult = new RegistrationResult {
+    override def componentId: ComponentId = connection.componentId
 
-    override def unregister(): Future[Done] = outer.unregister(location)
+    override def unregister(): Future[Done] = outer.unregister(connection)
   }
-
-  case class DDEx(s: String) extends RuntimeException(s)
 
 }
