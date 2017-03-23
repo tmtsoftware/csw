@@ -102,8 +102,7 @@ def sendNotification(String buildStatus = 'STARTED') {
     def colorCode = '#FF0000'
     def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
     def summary = "${subject} (${env.BUILD_URL})"
-    def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-    <p>Check console output at <a href='${env.JENKINS_URL}/blue/organizations/jenkins/${env.JOB_NAME}/detail/${env.JOB_NAME}/${env.BUILD_NUMBER}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>"""
+    def details = '${JELLY_SCRIPT,template="html"}'
 
     // Override default values based on build status
     if (buildStatus == 'STARTED') {
@@ -120,7 +119,6 @@ def sendNotification(String buildStatus = 'STARTED') {
     emailext(
             subject: subject,
             body: details,
-            recipientProviders: [[$class: 'DevelopersRecipientProvider']],
             to: "tmt-csw@thoughtworks.com"
     )
 }
