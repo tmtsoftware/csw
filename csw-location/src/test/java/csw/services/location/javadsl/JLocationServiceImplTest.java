@@ -5,14 +5,18 @@ import akka.actor.ActorPaths;
 import akka.actor.ActorRef;
 import akka.serialization.Serialization;
 import akka.testkit.TestProbe;
-import csw.services.location.scaladsl.ActorRuntime;
+import csw.services.location.internal.Networks;
 import csw.services.location.models.*;
-import csw.services.location.models.Connection.*;
+import csw.services.location.models.Connection.AkkaConnection;
+import csw.services.location.models.Connection.HttpConnection;
+import csw.services.location.models.Connection.TcpConnection;
+import csw.services.location.scaladsl.ActorRuntime;
 import org.junit.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -54,10 +58,47 @@ public class JLocationServiceImplTest {
     }
 
     @Test
-    public void testRegistrationOfHttpComponent() throws ExecutionException, InterruptedException, URISyntaxException {
+    public void testRegistrationAndUnregistrationOfHttpComponent() throws ExecutionException, InterruptedException, URISyntaxException {
         URI httpURI = new URI("http://" + actorRuntime.ipaddr().getHostAddress() + ":" + Port + "/" + Path);
         RegistrationResult registrationResult = locationService.register(new ResolvedHttpLocation(httpServiceConnection, httpURI, Path)).toCompletableFuture().get();
         Assert.assertEquals(httpServiceComponentId, registrationResult.componentId());
+        locationService.unregister(httpServiceConnection).toCompletableFuture().get();
+        Assert.assertEquals(Collections.emptyList(), locationService.list().toCompletableFuture().get());
+    }
+
+    @Test
+    public void testLocationServiceRegisterWithAkkaHttpTcpAsSequence() throws ExecutionException, InterruptedException, URISyntaxException {
+
+        URI akkaUri = new URI(actorPath.toString());
+        URI tcpUri = new URI("tcp://" + actorRuntime.ipaddr().getHostAddress() + ":" + Port);
+        URI httpUri = new URI("http://" + actorRuntime.ipaddr().getHostAddress() + ":" + Port + "/" + Path);
+
+        locationService.register(new ResolvedAkkaLocation(akkaHcdConnection, akkaUri, prefix, Optional.of(actorRef))).toCompletableFuture().get();
+        locationService.register(new ResolvedHttpLocation(httpServiceConnection, httpUri, Path)).toCompletableFuture().get();
+        locationService.register(new ResolvedTcpLocation(tcpServiceConnection, tcpUri)).toCompletableFuture().get();
+
+        Assert.assertEquals(3, locationService.list().toCompletableFuture().get().size());
+        Assert.assertEquals(new ResolvedAkkaLocation(akkaHcdConnection, akkaUri, prefix, Optional.ofNullable(actorRef)), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(new ResolvedHttpLocation(httpServiceConnection, httpUri, Path), locationService.resolve(httpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(new ResolvedTcpLocation(tcpServiceConnection, tcpUri), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+
+    }
+
+    // #resolve_tcp_connection_test
+    @Test
+    public void testResolveTcpConnection() throws ExecutionException, InterruptedException, URISyntaxException {
+        URI uri = new URI("tcp://" + actorRuntime.ipaddr().getHostAddress() + ":" + Port);
+        locationService.register(new ResolvedTcpLocation(tcpServiceConnection, uri)).toCompletableFuture().get();
+        Assert.assertEquals(new ResolvedTcpLocation(tcpServiceConnection, uri), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+    }
+    // #resolve_tcp_connection_test
+
+    @Test
+    public void testResolveAkkaConnection() throws ExecutionException, InterruptedException, URISyntaxException {
+
+        URI uri = new URI(actorPath.toString());
+        locationService.register(new ResolvedAkkaLocation(akkaHcdConnection, uri, prefix, Optional.of(actorRef))).toCompletableFuture().get();
+        Assert.assertEquals(new ResolvedAkkaLocation(akkaHcdConnection, uri, prefix, Optional.ofNullable(actorRef)), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
     }
 
     @Test
@@ -72,41 +113,39 @@ public class JLocationServiceImplTest {
 
         Assert.assertEquals(locations, locationService.list().toCompletableFuture().get());
     }
-    // #resolve_tcp_connection_test
+
     @Test
-    public void testResolveTcpConnection() throws ExecutionException, InterruptedException, URISyntaxException {
-
-        URI uri = new URI("tcp://" + actorRuntime.ipaddr().getHostAddress() + ":" + Port);
-
-        RegistrationResult registrationResult = locationService.register(new ResolvedTcpLocation(tcpServiceConnection, uri)).toCompletableFuture().get();
-
-        Assert.assertEquals(new ResolvedTcpLocation(tcpServiceConnection, uri), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
-    }
-    // #resolve_tcp_connection_test
-    @Test
-    public void testResolveAkkaConnection() throws ExecutionException, InterruptedException, URISyntaxException {
-
+    public void testListComponentsByComponentType() throws ExecutionException, InterruptedException, URISyntaxException {
         URI uri = new URI(actorPath.toString());
-        RegistrationResult registrationResult = locationService.register(new ResolvedAkkaLocation(akkaHcdConnection, uri, prefix, Optional.of(actorRef))).toCompletableFuture().get();
-        Assert.assertEquals(new ResolvedAkkaLocation(akkaHcdConnection, uri, prefix, Optional.ofNullable(actorRef)), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
+        locationService.register(new ResolvedAkkaLocation(akkaHcdConnection, uri, prefix, Optional.of(actorRef))).toCompletableFuture().get();
+        ArrayList<Location> locations = new ArrayList<>();
+        locations.add(new ResolvedAkkaLocation(akkaHcdConnection, uri, prefix, Optional.of(actorRef)));
+        Assert.assertEquals(locations, locationService.list(JComponentType.HCD).toCompletableFuture().get());
     }
 
     @Test
-    public void testLocationServiceRegisterWithAkkaHttpTcpAsSequence() throws ExecutionException, InterruptedException, URISyntaxException {
-
-        URI akkaUri = new URI(actorPath.toString());
+    public void testListComponentsByHostname() throws ExecutionException, InterruptedException, URISyntaxException {
         URI tcpUri = new URI("tcp://" + actorRuntime.ipaddr().getHostAddress() + ":" + Port);
-        URI httpUri = new URI("http://" + actorRuntime.ipaddr().getHostAddress() + ":" + Port + "/" + Path);
+        locationService.register(new ResolvedTcpLocation(tcpServiceConnection, tcpUri)).toCompletableFuture().get();
 
-        RegistrationResult akkaRegistrationResult = locationService.register(new ResolvedAkkaLocation(akkaHcdConnection, akkaUri, prefix, Optional.of(actorRef))).toCompletableFuture().get();
-        RegistrationResult httpRegistrationResult = locationService.register(new ResolvedHttpLocation(httpServiceConnection, httpUri, Path)).toCompletableFuture().get();
-        RegistrationResult tcpRegistrationResult = locationService.register(new ResolvedTcpLocation(tcpServiceConnection, tcpUri)).toCompletableFuture().get();
+        URI akkUri = new URI(actorPath.toString());
+        locationService.register(new ResolvedAkkaLocation(akkaHcdConnection, akkUri, prefix, Optional.of(actorRef))).toCompletableFuture().get();
 
-        Assert.assertEquals(3, locationService.list().toCompletableFuture().get().size());
-        Assert.assertEquals(new ResolvedAkkaLocation(akkaHcdConnection, akkaUri, prefix, Optional.ofNullable(actorRef)), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
-        Assert.assertEquals(new ResolvedHttpLocation(httpServiceConnection, httpUri, Path), locationService.resolve(httpServiceConnection).toCompletableFuture().get().get());
-        Assert.assertEquals(new ResolvedTcpLocation(tcpServiceConnection, tcpUri), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+        ArrayList<Location> locations = new ArrayList<>();
+        locations.add(new ResolvedTcpLocation(tcpServiceConnection, tcpUri));
+        locations.add(new ResolvedAkkaLocation(akkaHcdConnection, akkUri, prefix, Optional.of(actorRef)));
 
+        Assert.assertTrue(locations.size() == 2);
+        Assert.assertEquals(locations, locationService.list(Networks.getIpv4Address("").getHostName()).toCompletableFuture().get());
     }
 
+    @Test
+    public void testListComponentsByConnectionType() throws ExecutionException, InterruptedException, URISyntaxException {
+        URI uri = new URI("tcp://" + actorRuntime.ipaddr().getHostAddress() + ":" + Port);
+        locationService.register(new ResolvedTcpLocation(tcpServiceConnection, uri)).toCompletableFuture().get();
+        ArrayList<Location> locations = new ArrayList<>();
+        locations.add(new ResolvedTcpLocation(tcpServiceConnection, uri));
+        Assert.assertEquals(locations, locationService.list(JConnectionType.TcpType).toCompletableFuture().get());
+    }
+    
 }
