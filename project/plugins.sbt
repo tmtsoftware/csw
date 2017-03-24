@@ -11,6 +11,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.2.0")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
 addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.1.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.2.0-M8")
+addSbtPlugin("com.github.tototoshi" % "sbt-build-files-watcher" % "0.1.1")
 
 resolvers += Resolver.url("2m-sbt-plugin-releases", url("https://dl.bintray.com/2m/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
 resolvers += Resolver.bintrayRepo("twtmt", "maven")

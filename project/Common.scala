@@ -2,6 +2,8 @@ import Libs._
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
+import com.github.tototoshi.sbt.buildfileswatcher.Plugin
+import com.typesafe.sbt.SbtGit.GitCommand
 
 object Common extends AutoPlugin {
 
@@ -9,7 +11,7 @@ object Common extends AutoPlugin {
 
   override def requires = JvmPlugin
 
-  override lazy val projectSettings = extraSettings ++ Seq(
+  override lazy val projectSettings: Seq[Setting[_]] = extraSettings ++ Seq(
     organization := "org.tmt",
     organizationName := "TMT Org",
     scalaVersion := "2.12.1",
@@ -42,6 +44,9 @@ object Common extends AutoPlugin {
     // -a Show stack traces and exception class name for AssertionErrors.
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-a"),
 
+    shellPrompt := { state =>
+      Plugin.messageOnBuildFilesChanged(state) + GitCommand.prompt(state)
+    },
 
     version := {
       sys.props.get("prod.publish") match {
