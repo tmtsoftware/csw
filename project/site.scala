@@ -38,6 +38,8 @@ object ParadoxSite extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     sourceDirectory in Paradox := baseDirectory.value / "src" / "main",
     paradoxProperties in Paradox ++= Map(
+      "version" -> version.value,
+      "scala.binaryVersion" -> scalaBinaryVersion.value,
       "scaladoc.base_url" -> "https://tmtsoftware.github.io/csw-prod/api/scala",
       "javadoc.base_url" -> "https://tmtsoftware.github.io/csw-prod/api/java",
       "extref.manual.base_url" -> "https://tmtsoftware.github.io/csw-prod/manual/index.html"
