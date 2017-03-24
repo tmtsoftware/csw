@@ -14,22 +14,20 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
-// scalastyle:off
-private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends LocationService {
-  outer =>
+private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends LocationService { outer =>
 
   import actorRuntime._
-
-  private val registryKey = LWWMapKey[Connection, Location](Constants.RegistryKey)
 
   def register(location: Location): Future[RegistrationResult] = {
     val key = LWWRegisterKey[Option[Location]](location.connection.name)
     val updateValue = Update(key, LWWRegister(Option.empty[Location]), WriteMajority(5.seconds)) {
-      case r@LWWRegister(None)  => r.withValue(Some(location))
-      case LWWRegister(Some(x)) => throw new IllegalStateException(s"can not register against already registered connection=${location.connection.name}. Current value=$x")
+      case LWWRegister(Some(loc)) if loc != location => throw new IllegalStateException(
+        s"there is another location=$loc registered against name=${location.connection.name}."
+      )
+      case r@LWWRegister(_)                          => r.withValue(Some(location))
     }
 
-    val updateRegistry = Update(registryKey, LWWMap.empty[Connection, Location], WriteMajority(5.seconds))(_ + (location.connection → location))
+    val updateRegistry = Update(Constants.RegistryKey, LWWMap.empty[Connection, Location], WriteMajority(5.seconds))(_ + (location.connection → location))
 
     (replicator ? updateValue).flatMap {
       case _: UpdateSuccess[_]               => (replicator ? updateRegistry).map {
@@ -43,13 +41,10 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
 
   def unregister(connection: Connection): Future[Done] = {
     val key = LWWRegisterKey[Option[Location]](connection.name)
-    val updateValue = Update(key, LWWRegister(Option.empty[Location]), WriteMajority(5.seconds)) {
-      case r@LWWRegister(Some(_)) => r.withValue(None)
-      case LWWRegister(None)      => throw new IllegalStateException(s"can not unregister already unregistered connection=${connection.name}")
-    }
-    val deleteFromRegistry = Update(registryKey, LWWMap.empty[Connection, Location], WriteMajority(5.seconds))(_ - connection)
+    val updateValue = Update(key, LWWRegister(Option.empty[Location]), WriteMajority(5.seconds))(_.withValue(None))
+    val deleteFromRegistry = Update(Constants.RegistryKey, LWWMap.empty[Connection, Location], WriteMajority(5.seconds))(_ - connection)
     (replicator ? updateValue).flatMap {
-      case x: UpdateSuccess[_]               => (replicator ? deleteFromRegistry).map {
+      case x: UpdateSuccess[_] => (replicator ? deleteFromRegistry).map {
         case _: UpdateSuccess[_] => Done
         case _                   => throw new RuntimeException(s"unable to unregister $connection")
       }
@@ -64,20 +59,16 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     Done
   }
 
-  def resolve(connection: Connection): Future[Option[Location]] = {
-    val key = LWWRegisterKey[Option[Location]](connection.name)
-    val get = Get(key, ReadMajority(5.seconds))
-    (replicator ? get).map {
-      case x@GetSuccess(`key`, _) => x.get(key).value
-      case _                      => throw new RuntimeException(s"unable to find $connection")
-    }
+  def resolve(connection: Connection): Future[Option[Location]] = async {
+    await(list).find(_.connection == connection)
   }
 
   def list: Future[List[Location]] = {
-    val get = Get(registryKey, ReadMajority(5.seconds))
+    val get = Get(Constants.RegistryKey, ReadMajority(5.seconds))
     (replicator ? get).map {
-      case x@GetSuccess(`registryKey`, _) => x.get(registryKey).entries.values.toList
-      case _                              => throw new RuntimeException(s"unable to get the list of registered locations")
+      case x@GetSuccess(Constants.RegistryKey, _) => x.get(Constants.RegistryKey).entries.values.toList
+      case NotFound(Constants.RegistryKey, _)     ⇒ List.empty
+      case _                                      => throw new RuntimeException(s"unable to get the list of registered locations")
     }
   }
 
@@ -110,4 +101,3 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
   }
 
 }
-// scalastyle:off

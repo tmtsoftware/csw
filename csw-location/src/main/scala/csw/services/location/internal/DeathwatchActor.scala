@@ -1,58 +1,37 @@
 package csw.services.location.internal
 
-import akka.actor.{Actor, ActorRef, Props, Terminated}
-import akka.stream.scaladsl.{Sink, Source, SourceQueueWithComplete}
-import akka.stream.{ActorMaterializer, KillSwitch}
-import csw.services.location.internal.DeathwatchActor.{GetLiveAkkaConnections, LiveAkkaConnections, WatchIt}
-import csw.services.location.models.{Connection, Location, Removed, ResolvedAkkaLocation}
+import akka.actor.{Actor, Props, Terminated}
+import akka.cluster.ddata.DistributedData
+import akka.cluster.ddata.Replicator.{Changed, Subscribe}
+import csw.services.location.models._
+import csw.services.location.scaladsl.LocationService
 
-class DeathwatchActor(
-  currentLocations: List[Location],
-  stream: Source[Location, KillSwitch],
-  queue: SourceQueueWithComplete[Removed]
-) extends Actor {
+class DeathwatchActor(locationService: LocationService) extends Actor {
 
-  var watchedAkkaLocations: Map[ActorRef, Connection] = Map.empty
-  implicit val mat = ActorMaterializer()
+  var watchedLocations: Set[ResolvedAkkaLocation] = Set.empty
 
   override def preStart(): Unit = {
-    currentLocations.collect {
-      case ResolvedAkkaLocation(connection, _, actorRef) => watchIt(actorRef, connection)
-    }
-    stream.collect {
-      case ResolvedAkkaLocation(connection, _, actorRef) => self ! WatchIt(actorRef, connection)
-    }.runWith(Sink.ignore)
+    DistributedData(context.system).replicator ! Subscribe(Constants.RegistryKey, self)
   }
 
   override def receive: Receive = {
-    case WatchIt(actorRef, connection) =>
-      watchIt(actorRef, connection)
-    case Terminated(deadActorRef)      =>
-      watchedAkkaLocations.get(deadActorRef).foreach { connection =>
-        queue.offer(Removed(connection))
+    case c@Changed(Constants.RegistryKey) ⇒
+      val allLocations = c.get(Constants.RegistryKey).entries.values.toSet
+      val locations = allLocations.collect { case x: ResolvedAkkaLocation ⇒ x }
+      val addedLocations = locations diff watchedLocations
+      addedLocations.foreach(loc ⇒ context.watch(loc.actorRef))
+      watchedLocations = locations
+    case Terminated(deadActorRef)         =>
+      context.unwatch(deadActorRef)
+      val maybeLocation = watchedLocations.find(_.actorRef == deadActorRef)
+      maybeLocation.foreach { location =>
+        locationService.unregister(location.connection)
+        watchedLocations -= location
       }
-      watchedAkkaLocations -= deadActorRef
-    case GetLiveAkkaConnections        =>
-      sender() ! LiveAkkaConnections(watchedAkkaLocations.values.toSet)
   }
 
-  def watchIt(actorRef: ActorRef, connection: Connection): Unit = {
-    watchedAkkaLocations += actorRef -> connection
-    context.watch(actorRef)
-  }
 }
 
 object DeathwatchActor {
-  def props(
-    currentLocations: List[Location],
-    stream: Source[Location, KillSwitch],
-    queue: SourceQueueWithComplete[Removed]
-  ): Props = Props(new DeathwatchActor(currentLocations, stream, queue))
-
-  case class WatchIt(actorRef: ActorRef, connection: Connection)
-
-  case object GetLiveAkkaConnections
-
-  case class LiveAkkaConnections(connections: Set[Connection])
-
+  def props(locationService: LocationService): Props = Props(new DeathwatchActor(locationService))
 }
