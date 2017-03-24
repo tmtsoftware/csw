@@ -10,5 +10,6 @@ object TestApp {
     val actorRuntime = new ActorRuntime("crdt")
     scalatest.run(new TrackLocationAppIntegrationTest(actorRuntime))
     scalatest.run(new LocationServiceIntegrationTest(actorRuntime))
+    actorRuntime.terminate()
   }
 }

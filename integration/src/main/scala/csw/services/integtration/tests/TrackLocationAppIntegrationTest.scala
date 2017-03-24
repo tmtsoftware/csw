@@ -23,6 +23,10 @@ class TrackLocationAppIntegrationTest(actorRuntime: ActorRuntime)
   import actorRuntime._
   val trackLocationApp = new TrackLocationApp(new ActorRuntime("crdt", 2556))
 
+  override protected def afterAll(): Unit = {
+    trackLocationApp.shutdown()
+  }
+
   test("launch the trackLocationApp") {
     val name = "test1"
     val port = 9999
