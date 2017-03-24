@@ -43,9 +43,19 @@ Gradle
 
 An Application, Sequencer, Assembly, HCD, or Service component may need to be used by another component as part of normal operations. It must register its location information with Location service so that other components can find it.
 
+#### Register a component offering http endpoint 
 
 scala
-:   @@snip [LocationServiceCompTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/LocationServiceCompTest.scala) { #http_location_test }
+:   @@snip [LocationServiceCompTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/LocationServiceCompTest.scala) {#declarations #register_http_connection }
 
 java
-:   @@snip [JLocationServiceImplTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/JLocationServiceImplTest.java) { #resolve_tcp_connection_test }
+:   @@snip [JLocationServiceImplTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/JLocationServiceImplTest.java) {#declarations #declare_http_component #register_http_connection}
+
+#### Register a component offering tcp endpoint 
+
+scala
+:   @@snip [LocationServiceCompTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/LocationServiceCompTest.scala) {#declarations #register_tcp_connection }
+
+java
+:   @@snip [JLocationServiceImplTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/JLocationServiceImplTest.java) {#declarations #declare_tcp_component #register_tcp_connection}
+    

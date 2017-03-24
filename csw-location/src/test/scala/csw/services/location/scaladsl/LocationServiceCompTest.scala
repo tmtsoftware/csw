@@ -6,10 +6,13 @@ import akka.actor.{Actor, ActorPath, Props}
 import akka.serialization.Serialization
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
+import com.esotericsoftware.kryo.Registration
 import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+
+import scala.concurrent.Future
 
 class LocationServiceCompTest
   extends FunSuite
@@ -17,8 +20,10 @@ class LocationServiceCompTest
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  val actorRuntime = new ActorRuntime("test")
+  // #declarations
+  val actorRuntime = new ActorRuntime("some_component")
   val locationService: LocationService = LocationServiceFactory.make(actorRuntime)
+  // #declarations
 
   override protected def afterEach(): Unit = {
     locationService.unregisterAll().await
@@ -29,31 +34,40 @@ class LocationServiceCompTest
   }
 
   test("tcp location") {
-    val Port = 1234
-    val componentId = ComponentId("redis1", ComponentType.Service)
-    val connection = TcpConnection(componentId)
-    val location = new TcpLocation(connection,actorRuntime.hostname,Port)
+    //#register_tcp_connection
 
-    val result = locationService.register(location).await
+    val componentId: ComponentId = ComponentId("exampleTCPService", ComponentType.Service)
+    val connection: TcpConnection = TcpConnection(componentId)
+    val Port: Int = 1234
+
+    //To register a tcp endpoint on host tcp://10.1.2.22:1234
+    val location: TcpLocation = new TcpLocation(connection, actorRuntime.hostname, Port)
+
+    val result: Future[RegistrationResult] = locationService.register(location)
+    //#register_tcp_connection
 
     locationService.resolve(connection).await.get shouldBe location
     locationService.list.await shouldBe List(location)
 
-    result.unregister().await
+    result.await.unregister().await
 
     locationService.resolve(connection).await shouldBe None
     locationService.list.await shouldBe List.empty
   }
 
-  //#http_location_test
   test("http location") {
-    val Port = 1234
-    val componentId = ComponentId("configService", ComponentType.Service)
-    val connection = HttpConnection(componentId)
-    val Path = "path123"
+    //#register_http_connection
 
-    val resolvedHttpLocation = new HttpLocation(connection, actorRuntime.hostname, Port, Path)
-    val registrationResult = locationService.register(resolvedHttpLocation).await
+    val componentId: ComponentId = ComponentId("exampleHTTPService", ComponentType.Service)
+    val httpConnection: HttpConnection = HttpConnection(componentId)
+    val Port: Int = 8080
+    val Path: String = "path/to/resource"
+
+    //To register a http endpoint on host http://10.1.2.22:8080/path/to/resource
+    val resolvedHttpLocation: Location = new HttpLocation(httpConnection, actorRuntime.hostname, Port, Path)
+    val registrationResultF: Future[RegistrationResult] = locationService.register(resolvedHttpLocation)
+    //#register_http_connection
+    val registrationResult = registrationResultF.await
     registrationResult.componentId shouldBe componentId
 
     locationService.list.await shouldBe List(resolvedHttpLocation)
@@ -61,7 +75,6 @@ class LocationServiceCompTest
     registrationResult.unregister().await
     locationService.list.await shouldBe List.empty
   }
-  //#http_location_test
 
   test("akka location") {
     val componentId = ComponentId("hcd1", ComponentType.HCD)
