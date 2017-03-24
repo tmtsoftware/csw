@@ -36,7 +36,7 @@ class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRu
     val componentId = ComponentId(name, ComponentType.Service)
     val connection = TcpConnection(componentId)
     val tcpUri = new URI(s"tcp://${actorRuntime.hostname}:${command.port}")
-    locationService.register(ResolvedTcpLocation(connection, tcpUri))
+    locationService.register(TcpLocation(connection, tcpUri))
   }
 
 

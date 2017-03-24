@@ -7,7 +7,7 @@ import akka.pattern.pipe
 import akka.serialization.Serialization
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{ComponentId, ComponentType, ResolvedAkkaLocation}
+import csw.services.location.models.{ComponentId, ComponentType, AkkaLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object TromboneHCD {
@@ -18,7 +18,7 @@ object TromboneHCD {
   val connection = AkkaConnection(componentId)
 
   val actorPath = ActorPath.fromString(Serialization.serializedActorPath(tromboneHcdActorRef))
-  val registration = new ResolvedAkkaLocation(connection, tromboneHcdActorRef)
+  val registration = new AkkaLocation(connection, tromboneHcdActorRef)
   val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
 
   println("Trombone HCD registered")

@@ -8,7 +8,7 @@ import csw.services.location.scaladsl.LocationService
 
 class DeathwatchActor(locationService: LocationService) extends Actor {
 
-  var watchedLocations: Set[ResolvedAkkaLocation] = Set.empty
+  var watchedLocations: Set[AkkaLocation] = Set.empty
 
   override def preStart(): Unit = {
     DistributedData(context.system).replicator ! Subscribe(Constants.RegistryKey, self)
@@ -17,7 +17,7 @@ class DeathwatchActor(locationService: LocationService) extends Actor {
   override def receive: Receive = {
     case c@Changed(Constants.RegistryKey) ⇒
       val allLocations = c.get(Constants.RegistryKey).entries.values.toSet
-      val locations = allLocations.collect { case x: ResolvedAkkaLocation ⇒ x }
+      val locations = allLocations.collect { case x: AkkaLocation ⇒ x }
       val addedLocations = locations diff watchedLocations
       addedLocations.foreach(loc ⇒ context.watch(loc.actorRef))
       watchedLocations = locations

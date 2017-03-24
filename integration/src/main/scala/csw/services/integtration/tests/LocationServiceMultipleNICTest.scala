@@ -2,7 +2,7 @@ package csw.services.integtration.tests
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{ComponentId, ComponentType, ResolvedAkkaLocation}
+import csw.services.location.models.{ComponentId, ComponentType, AkkaLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -25,9 +25,9 @@ class LocationServiceMultipleNICTest(actorRuntime: ActorRuntime) extends FunSuit
 
     val assemblyLocation = locationService.resolve(connection).await
 
-    assemblyLocation shouldBe a[ResolvedAkkaLocation]
+    assemblyLocation shouldBe a[AkkaLocation]
     assemblyLocation
-      .asInstanceOf[ResolvedAkkaLocation]
+      .asInstanceOf[AkkaLocation]
       .uri
       .toString should not be empty
   }

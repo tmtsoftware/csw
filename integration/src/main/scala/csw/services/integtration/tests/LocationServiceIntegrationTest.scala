@@ -21,9 +21,9 @@ class LocationServiceIntegrationTest(actorRuntime: ActorRuntime)
     val connection = AkkaConnection(componentId)
     val hcdLocation = locationService.resolve(connection).await.get
 
-    hcdLocation shouldBe a[ResolvedAkkaLocation]
+    hcdLocation shouldBe a[AkkaLocation]
     hcdLocation
-      .asInstanceOf[ResolvedAkkaLocation]
+      .asInstanceOf[AkkaLocation]
       .uri
       .toString should not be empty
   }
@@ -42,9 +42,9 @@ class LocationServiceIntegrationTest(actorRuntime: ActorRuntime)
 
     val hcdLocation = locationService.resolve(connection).await.get
 
-    hcdLocation shouldBe a[ResolvedHttpLocation]
+    hcdLocation shouldBe a[HttpLocation]
     hcdLocation
-      .asInstanceOf[ResolvedHttpLocation]
+      .asInstanceOf[HttpLocation]
       .uri
       .toString should not be empty
   }
