@@ -15,9 +15,8 @@ object TestService {
 
   private val Path = "redisservice.org/test"
   private  val Port = 9999
-  private val uri = new URI(s"http://${actorRuntime.hostname}:$Port/$Path")
 
-  val registration = ResolvedHttpLocation(connection, uri, Path)
+  val registration = new ResolvedHttpLocation(connection, actorRuntime.hostname, Port, Path)
   val registrationResult =
     LocationServiceFactory.make(actorRuntime).register(registration).await
 

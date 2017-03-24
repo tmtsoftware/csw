@@ -17,10 +17,10 @@ class DeathwatchActor(
 
   override def preStart(): Unit = {
     currentLocations.collect {
-      case ResolvedAkkaLocation(connection, _, _, Some(actorRef)) => watchIt(actorRef, connection)
+      case ResolvedAkkaLocation(connection, _, actorRef) => watchIt(actorRef, connection)
     }
     stream.collect {
-      case ResolvedAkkaLocation(connection, _, _, Some(actorRef)) => self ! WatchIt(actorRef, connection)
+      case ResolvedAkkaLocation(connection, _, actorRef) => self ! WatchIt(actorRef, connection)
     }.runWith(Sink.ignore)
   }
 

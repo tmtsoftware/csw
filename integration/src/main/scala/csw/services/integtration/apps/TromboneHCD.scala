@@ -18,8 +18,7 @@ object TromboneHCD {
   val connection = AkkaConnection(componentId)
 
   val actorPath = ActorPath.fromString(Serialization.serializedActorPath(tromboneHcdActorRef))
-  val uri = new URI(actorPath.toString)
-  val registration = ResolvedAkkaLocation(connection, uri, "nfiraos.ncc.tromboneHCD", Some(tromboneHcdActorRef))
+  val registration = new ResolvedAkkaLocation(connection, tromboneHcdActorRef)
   val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
 
   println("Trombone HCD registered")

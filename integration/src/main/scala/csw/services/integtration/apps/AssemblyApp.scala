@@ -17,8 +17,7 @@ object AssemblyApp {
   val connection = AkkaConnection(componentId)
 
   val actorPath = ActorPath.fromString(Serialization.serializedActorPath(assemblyActorRef))
-  val uri = new URI(actorPath.toString)
-  val registration = ResolvedAkkaLocation(connection, uri, "tmt.assembly", Some(assemblyActorRef))
+  val registration = new ResolvedAkkaLocation(connection, assemblyActorRef)
   val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
 
   def main(args: Array[String]): Unit = {
