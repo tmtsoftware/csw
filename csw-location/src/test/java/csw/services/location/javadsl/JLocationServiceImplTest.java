@@ -24,8 +24,8 @@ import java.util.concurrent.ExecutionException;
 
 public class JLocationServiceImplTest {
     // #declarations
-    static ActorRuntime actorRuntime = new ActorRuntime("some_component");
-    ILocationService locationService =JLocationServiceFactory.make(actorRuntime);
+    static ActorRuntime actorRuntime = new ActorRuntime("test-java");
+    ILocationService locationService = JLocationServiceFactory.make(actorRuntime);
 
     // #declarations
 

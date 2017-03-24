@@ -21,7 +21,7 @@ class LocationServiceCompTest
     with BeforeAndAfterAll {
 
   // #declarations
-  val actorRuntime = new ActorRuntime("some_component")
+  val actorRuntime = new ActorRuntime("test")
   val locationService: LocationService = LocationServiceFactory.make(actorRuntime)
   // #declarations
 
@@ -46,10 +46,12 @@ class LocationServiceCompTest
     val result: Future[RegistrationResult] = locationService.register(location)
     //#register_tcp_connection
 
+    val registrationResult = result.await
+
     locationService.resolve(connection).await.get shouldBe location
     locationService.list.await shouldBe List(location)
 
-    result.await.unregister().await
+    registrationResult.unregister().await
 
     locationService.resolve(connection).await shouldBe None
     locationService.list.await shouldBe List.empty
