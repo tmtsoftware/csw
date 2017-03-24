@@ -8,19 +8,16 @@ import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, 
 
 import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
-sealed trait Location {
+sealed trait Location extends TmtSerializable {
   def connection: Connection
-}
-
-final case class Unresolved(connection: Connection) extends Location
-
-final case class Removed(connection: Connection) extends Location
-
-sealed trait Resolved extends Location with TmtSerializable {
   def uri: URI
 }
 
-final case class ResolvedAkkaLocation(connection: AkkaConnection, uri: URI, prefix: String = "", actorRef: Option[ActorRef] = None) extends Resolved {
+final case class Removed(connection: Connection) extends Location {
+  override def uri: URI = ???
+}
+
+final case class ResolvedAkkaLocation(connection: AkkaConnection, uri: URI, prefix: String = "", actorRef: Option[ActorRef] = None) extends Location {
 
   /**
     * Java constructor
@@ -33,6 +30,6 @@ final case class ResolvedAkkaLocation(connection: AkkaConnection, uri: URI, pref
   def getActorRef: Optional[ActorRef] = actorRef.asJava
 }
 
-final case class ResolvedHttpLocation(connection: HttpConnection, uri: URI, path: String) extends Resolved
+final case class ResolvedHttpLocation(connection: HttpConnection, uri: URI, path: String) extends Location
 
-final case class ResolvedTcpLocation(connection: TcpConnection, uri: URI) extends Resolved
+final case class ResolvedTcpLocation(connection: TcpConnection, uri: URI) extends Location

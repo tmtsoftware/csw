@@ -17,7 +17,7 @@ private[location] class JLocationServiceImpl(locationService: LocationService, a
 
   import actorRuntime._
 
-  override def register(location: Resolved): CompletionStage[RegistrationResult] =
+  override def register(location: Location): CompletionStage[RegistrationResult] =
     locationService.register(location).toJava
 
   override def unregister(connection: Connection): CompletionStage[Done] =
@@ -26,19 +26,19 @@ private[location] class JLocationServiceImpl(locationService: LocationService, a
   override def unregisterAll(): CompletionStage[Done] =
     locationService.unregisterAll().toJava
 
-  override def resolve(connection: Connection): CompletionStage[Option[Resolved]] =
+  override def resolve(connection: Connection): CompletionStage[Option[Location]] =
     locationService.resolve(connection).toJava
 
-  override def list: CompletionStage[util.List[Resolved]] =
+  override def list: CompletionStage[util.List[Location]] =
     locationService.list.map(_.asJava).toJava
 
-  override def list(componentType: ComponentType): CompletionStage[util.List[Resolved]] =
+  override def list(componentType: ComponentType): CompletionStage[util.List[Location]] =
     locationService.list(componentType).map(_.asJava).toJava
 
-  override def list(hostname: String): CompletionStage[util.List[Resolved]] =
+  override def list(hostname: String): CompletionStage[util.List[Location]] =
     locationService.list(hostname).map(_.asJava).toJava
 
-  override def list(connectionType: ConnectionType): CompletionStage[util.List[Resolved]] =
+  override def list(connectionType: ConnectionType): CompletionStage[util.List[Location]] =
     locationService.list(connectionType).map(_.asJava).toJava
 
   override def track(connection: Connection): Source[TrackingEvent, KillSwitch] =

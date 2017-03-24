@@ -20,16 +20,16 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
 
   import actorRuntime._
 
-  private val registryKey = LWWMapKey[Connection, Resolved](Constants.RegistryKey)
+  private val registryKey = LWWMapKey[Connection, Location](Constants.RegistryKey)
 
-  def register(location: Resolved): Future[RegistrationResult] = {
-    val key = LWWRegisterKey[Option[Resolved]](location.connection.name)
-    val updateValue = Update(key, LWWRegister(Option.empty[Resolved]), WriteMajority(5.seconds)) {
+  def register(location: Location): Future[RegistrationResult] = {
+    val key = LWWRegisterKey[Option[Location]](location.connection.name)
+    val updateValue = Update(key, LWWRegister(Option.empty[Location]), WriteMajority(5.seconds)) {
       case r@LWWRegister(None)  => r.withValue(Some(location))
       case LWWRegister(Some(x)) => throw new IllegalStateException(s"can not register against already registered connection=${location.connection.name}. Current value=$x")
     }
 
-    val updateRegistry = Update(registryKey, LWWMap.empty[Connection, Resolved], WriteMajority(5.seconds))(_ + (location.connection → location))
+    val updateRegistry = Update(registryKey, LWWMap.empty[Connection, Location], WriteMajority(5.seconds))(_ + (location.connection → location))
 
     (replicator ? updateValue).flatMap {
       case _: UpdateSuccess[_]               => (replicator ? updateRegistry).map {
@@ -42,12 +42,12 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
   }
 
   def unregister(connection: Connection): Future[Done] = {
-    val key = LWWRegisterKey[Option[Resolved]](connection.name)
-    val updateValue = Update(key, LWWRegister(Option.empty[Resolved]), WriteMajority(5.seconds)) {
+    val key = LWWRegisterKey[Option[Location]](connection.name)
+    val updateValue = Update(key, LWWRegister(Option.empty[Location]), WriteMajority(5.seconds)) {
       case r@LWWRegister(Some(_)) => r.withValue(None)
       case LWWRegister(None)      => throw new IllegalStateException(s"can not unregister already unregistered connection=${connection.name}")
     }
-    val deleteFromRegistry = Update(registryKey, LWWMap.empty[Connection, Resolved], WriteMajority(5.seconds))(_ - connection)
+    val deleteFromRegistry = Update(registryKey, LWWMap.empty[Connection, Location], WriteMajority(5.seconds))(_ - connection)
     (replicator ? updateValue).flatMap {
       case x: UpdateSuccess[_]               => (replicator ? deleteFromRegistry).map {
         case _: UpdateSuccess[_] => Done
@@ -64,8 +64,8 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     Done
   }
 
-  def resolve(connection: Connection): Future[Option[Resolved]] = {
-    val key = LWWRegisterKey[Option[Resolved]](connection.name)
+  def resolve(connection: Connection): Future[Option[Location]] = {
+    val key = LWWRegisterKey[Option[Location]](connection.name)
     val get = Get(key, ReadMajority(5.seconds))
     (replicator ? get).map {
       case x@GetSuccess(`key`, _) => x.get(key).value
@@ -73,7 +73,7 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     }
   }
 
-  def list: Future[List[Resolved]] = {
+  def list: Future[List[Location]] = {
     val get = Get(registryKey, ReadMajority(5.seconds))
     (replicator ? get).map {
       case x@GetSuccess(`registryKey`, _) => x.get(registryKey).entries.values.toList
@@ -81,21 +81,21 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     }
   }
 
-  def list(componentType: ComponentType): Future[List[Resolved]] = async {
+  def list(componentType: ComponentType): Future[List[Location]] = async {
     await(list).filter(_.connection.componentId.componentType == componentType)
   }
 
-  def list(hostname: String): Future[List[Resolved]] = async {
+  def list(hostname: String): Future[List[Location]] = async {
     await(list).filter(_.uri.getHost == hostname)
   }
 
-  def list(connectionType: ConnectionType): Future[List[Resolved]] = async {
+  def list(connectionType: ConnectionType): Future[List[Location]] = async {
     await(list).filter(_.connection.connectionType == connectionType)
   }
 
   def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
     val (source, actorRefF) = StreamExt.actorCoupling[Any]
-    val key = LWWRegisterKey[Option[Resolved]](connection.name)
+    val key = LWWRegisterKey[Option[Location]](connection.name)
     actorRefF.foreach(actorRef ⇒ replicator ! Subscribe(key, actorRef))
     source.collect {
       case c@Changed(`key`) if c.get(key).value.isDefined => LocationUpdated(c.get(key).value.get)

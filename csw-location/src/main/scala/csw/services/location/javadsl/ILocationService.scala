@@ -13,21 +13,21 @@ trait ILocationService {
     * @param location object
     * returns registration-result which can be used to unregister
     */
-  def register(location: Resolved): CompletionStage[RegistrationResult]
+  def register(location: Location): CompletionStage[RegistrationResult]
 
   def unregister(connection: Connection): CompletionStage[Done]
 
   def unregisterAll(): CompletionStage[Done]
 
-  def resolve(connection: Connection): CompletionStage[Option[Resolved]]
+  def resolve(connection: Connection): CompletionStage[Option[Location]]
 
-  def list: CompletionStage[ju.List[Resolved]]
+  def list: CompletionStage[ju.List[Location]]
 
-  def list(componentType: ComponentType): CompletionStage[ju.List[Resolved]]
+  def list(componentType: ComponentType): CompletionStage[ju.List[Location]]
 
-  def list(hostname: String): CompletionStage[ju.List[Resolved]]
+  def list(hostname: String): CompletionStage[ju.List[Location]]
 
-  def list(connectionType: ConnectionType): CompletionStage[ju.List[Resolved]]
+  def list(connectionType: ConnectionType): CompletionStage[ju.List[Location]]
 
   def track(connection: Connection): Source[TrackingEvent, KillSwitch]
 }

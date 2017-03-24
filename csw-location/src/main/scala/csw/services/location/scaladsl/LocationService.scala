@@ -13,21 +13,21 @@ trait LocationService {
     * @param location object
     * returns registration-result which can be used to unregister
     */
-  def register(location: Resolved): Future[RegistrationResult]
+  def register(location: Location): Future[RegistrationResult]
 
   def unregister(connection: Connection): Future[Done]
 
   def unregisterAll(): Future[Done]
 
-  def resolve(connection: Connection): Future[Option[Resolved]]
+  def resolve(connection: Connection): Future[Option[Location]]
 
-  def list: Future[List[Resolved]]
+  def list: Future[List[Location]]
 
-  def list(componentType: ComponentType): Future[List[Resolved]]
+  def list(componentType: ComponentType): Future[List[Location]]
 
-  def list(hostname: String): Future[List[Resolved]]
+  def list(hostname: String): Future[List[Location]]
 
-  def list(connectionType: ConnectionType): Future[List[Resolved]]
+  def list(connectionType: ConnectionType): Future[List[Location]]
 
   def track(connection: Connection): Source[TrackingEvent, KillSwitch]
 
