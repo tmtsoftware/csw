@@ -136,7 +136,7 @@ public class JLocationServiceImplTest {
         locations.add(new ResolvedAkkaLocation(akkaHcdConnection, akkUri, prefix, Optional.of(actorRef)));
 
         Assert.assertTrue(locations.size() == 2);
-        Assert.assertEquals(locations, locationService.list(Networks.getIpv4Address("").getHostName()).toCompletableFuture().get());
+        Assert.assertEquals(locations, locationService.list(Networks.getIpv4Address("").getHostAddress()).toCompletableFuture().get());
     }
 
     @Test
