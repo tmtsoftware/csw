@@ -1,6 +1,7 @@
 package csw.services.tracklocation
 
 import akka.actor.Terminated
+import csw.services.location.internal.Settings
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import csw.services.tracklocation.models.{Command, Options}
 import csw.services.tracklocation.utils.CmdLineArgsParser
@@ -40,5 +41,5 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
 }
 
 object TrackLocationApp extends App {
-  new TrackLocationApp(new ActorRuntime("crdt", 2553)).start(args)
+  new TrackLocationApp(new ActorRuntime("crdt", Settings().withPort(2553))).start(args)
 }

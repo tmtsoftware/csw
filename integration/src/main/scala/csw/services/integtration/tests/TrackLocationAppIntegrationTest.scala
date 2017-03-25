@@ -4,6 +4,7 @@ import java.io.{BufferedWriter, FileWriter}
 import java.net.URI
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
+import csw.services.location.internal.Settings
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, Location, TcpLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
@@ -21,7 +22,7 @@ class TrackLocationAppIntegrationTest(actorRuntime: ActorRuntime)
 
   private val locationService = LocationServiceFactory.make(actorRuntime)
   import actorRuntime._
-  val trackLocationApp = new TrackLocationApp(new ActorRuntime("crdt", 2556))
+  val trackLocationApp = new TrackLocationApp(new ActorRuntime("crdt", Settings().withPort(2556)))
 
   override protected def afterAll(): Unit = {
     trackLocationApp.shutdown()
@@ -47,7 +48,7 @@ class TrackLocationAppIntegrationTest(actorRuntime: ActorRuntime)
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedConnection = locationService.resolve(connection).await.get
-    resolvedConnection shouldBe new TcpLocation(connection, actorRuntime.ipaddr.getHostAddress, port)
+    resolvedConnection shouldBe new TcpLocation(connection, actorRuntime.hostname, port)
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
     Thread.sleep(6000)
@@ -85,7 +86,7 @@ class TrackLocationAppIntegrationTest(actorRuntime: ActorRuntime)
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedConnection = locationService.resolve(connection).await.get
-    resolvedConnection shouldBe new TcpLocation(connection, actorRuntime.ipaddr.getHostAddress, port)
+    resolvedConnection shouldBe new TcpLocation(connection, actorRuntime.hostname, port)
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
     Thread.sleep(6000)

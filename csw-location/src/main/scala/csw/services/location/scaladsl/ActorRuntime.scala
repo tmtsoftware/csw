@@ -1,49 +1,22 @@
 package csw.services.location.scaladsl
 
-import java.net.InetAddress
-
 import akka.actor.{ActorRef, ActorSystem, Terminated}
 import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
-import akka.dispatch.MessageDispatcher
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
-import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.location.internal.Networks
+import csw.services.location.internal.{ConfigData, Settings}
 
-import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.DurationLong
+import scala.concurrent.{ExecutionContext, Future}
 
-class ActorRuntime(name: String, _settings: Map[String, Any]) {
-  def this(name: String) = this(name, Map.empty[String, Any])
+class ActorRuntime(_actorSystem: ActorSystem) {
+  def this(name: String, settings: Settings) = this(ActorSystem(name, ConfigData(settings.values).config(name)))
+  def this(name: String) = this(name, Settings())
 
-  def this(name: String, interfaceName: String) = this(name, Map("interfaceName" -> interfaceName))
+  val hostname: String = _actorSystem.settings.config.getString("akka.remote.netty.tcp.hostname")
 
-  def this(name: String, port: Int) = this(name, Map("akka.remote.netty.tcp.port" -> port))
-
-  def this(name: String, interfaceName: String, port: Int) = this(name, Map("akka.remote.netty.tcp.port" -> port, "interfaceName" -> interfaceName))
-
-  private val interfaceName = _settings.getOrElse("interfaceName", "").toString
-
-  val ipaddr: InetAddress = Networks.getIpv4Address(interfaceName)
-  val hostname: String = ipaddr.getHostAddress
-
-  private val port = sys.props.getOrElse("akkaPort", "2552")
-  private val seedHost = sys.props.getOrElse("akkaSeed", hostname)
-  private val seedNode = s"akka.tcp://$name@$seedHost:2552"
-
-  val config: Config = {
-    val settings: Map[String, Any] = Map(
-      "akka.remote.netty.tcp.hostname" -> hostname,
-      "akka.remote.netty.tcp.port" -> port,
-      "akka.cluster.seed-nodes" -> List(seedNode).asJavaCollection
-    ) ++ _settings
-
-    ConfigFactory.parseMap(settings.asJava).withFallback(ConfigFactory.load())
-  }
-
-  implicit val actorSystem: ActorSystem = ActorSystem(name, config)
+  implicit val actorSystem: ActorSystem = _actorSystem
   implicit val ec: ExecutionContext = actorSystem.dispatcher
   implicit val mat: Materializer = makeMat()
   implicit val timeout: Timeout = Timeout(5.seconds)

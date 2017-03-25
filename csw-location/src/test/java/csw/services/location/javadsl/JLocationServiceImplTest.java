@@ -82,13 +82,13 @@ public class JLocationServiceImplTest {
     public void testLocationServiceRegisterWithAkkaHttpTcpAsSequence() throws ExecutionException, InterruptedException {
         int port = 8080;
         locationService.register(new AkkaLocation(akkaHcdConnection, actorRef)).toCompletableFuture().get();
-        locationService.register(new HttpLocation(httpServiceConnection, actorRuntime.ipaddr().getHostAddress(), port, Path)).toCompletableFuture().get();
-        locationService.register(new TcpLocation(tcpServiceConnection, actorRuntime.ipaddr().getHostAddress(), port)).toCompletableFuture().get();
+        locationService.register(new HttpLocation(httpServiceConnection, actorRuntime.hostname(), port, Path)).toCompletableFuture().get();
+        locationService.register(new TcpLocation(tcpServiceConnection, actorRuntime.hostname(), port)).toCompletableFuture().get();
 
         Assert.assertEquals(3, locationService.list().toCompletableFuture().get().size());
         Assert.assertEquals(new AkkaLocation(akkaHcdConnection, actorRef), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
-        Assert.assertEquals(new HttpLocation(httpServiceConnection, actorRuntime.ipaddr().getHostAddress(), port, Path), locationService.resolve(httpServiceConnection).toCompletableFuture().get().get());
-        Assert.assertEquals(new TcpLocation(tcpServiceConnection, actorRuntime.ipaddr().getHostAddress(), port), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(new HttpLocation(httpServiceConnection, actorRuntime.hostname(), port, Path), locationService.resolve(httpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(new TcpLocation(tcpServiceConnection, actorRuntime.hostname(), port), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
     }
 
     @Test
@@ -139,7 +139,7 @@ public class JLocationServiceImplTest {
     @Test
     public void testListComponentsByHostname() throws ExecutionException, InterruptedException {
         int port = 8080;
-        TcpLocation tcpLocation = new TcpLocation(tcpServiceConnection, actorRuntime.ipaddr().getHostAddress(), port);
+        TcpLocation tcpLocation = new TcpLocation(tcpServiceConnection, actorRuntime.hostname(), port);
         locationService.register(tcpLocation).toCompletableFuture().get();
 
         AkkaLocation akkaLocation = new AkkaLocation(akkaHcdConnection, actorRef);
@@ -156,7 +156,7 @@ public class JLocationServiceImplTest {
     @Test
     public void testListComponentsByConnectionType() throws ExecutionException, InterruptedException {
         int port = 8080;
-        TcpLocation tcpLocation = new TcpLocation(tcpServiceConnection, actorRuntime.ipaddr().getHostAddress(), port);
+        TcpLocation tcpLocation = new TcpLocation(tcpServiceConnection, actorRuntime.hostname(), port);
         locationService.register(tcpLocation).toCompletableFuture().get();
         ArrayList<Location> locations = new ArrayList<>();
         locations.add(tcpLocation);

@@ -4,6 +4,7 @@ import java.nio.file.Paths
 
 import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
+import csw.services.location.internal.Settings
 import csw.services.tracklocation.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
@@ -28,7 +29,7 @@ class TrackLocationTest
   private val actorRuntime = new ActorRuntime("crdt")
   private val locationService = LocationServiceFactory.make(actorRuntime)
   import actorRuntime._
-  val trackLocationApp = new TrackLocationApp(new ActorRuntime("crdt", 2553))
+  val trackLocationApp = new TrackLocationApp(new ActorRuntime("crdt", Settings().withPort(2553)))
 
   implicit val timeout = Timeout(60.seconds)
 
@@ -57,7 +58,7 @@ class TrackLocationTest
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedConnection = locationService.resolve(connection).await.get
-    resolvedConnection shouldBe new TcpLocation(connection, actorRuntime.ipaddr.getHostAddress, port)
+    resolvedConnection shouldBe new TcpLocation(connection, actorRuntime.hostname, port)
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
     Thread.sleep(6000)
@@ -85,7 +86,7 @@ class TrackLocationTest
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedConnection = locationService.resolve(connection).await.get
-    resolvedConnection shouldBe new TcpLocation(connection, actorRuntime.ipaddr.getHostAddress, port)
+    resolvedConnection shouldBe new TcpLocation(connection, actorRuntime.hostname, port)
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
     Thread.sleep(6000)
