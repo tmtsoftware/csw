@@ -5,13 +5,13 @@ import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
-import csw.services.location.internal.{ConfigData, Settings}
+import csw.services.location.internal.Settings
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 class ActorRuntime(_actorSystem: ActorSystem) {
-  def this(name: String, settings: Settings) = this(ActorSystem(name, ConfigData(settings.values).config(name)))
+  def this(name: String, settings: Settings) = this(ActorSystem(name, settings.config(name)))
   def this(name: String) = this(name, Settings())
 
   val hostname: String = _actorSystem.settings.config.getString("akka.remote.netty.tcp.hostname")
@@ -21,6 +21,7 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val mat: Materializer = makeMat()
   implicit val timeout: Timeout = Timeout(5.seconds)
   implicit val node = Cluster(actorSystem)
+
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
   def makeMat(): Materializer = ActorMaterializer()
