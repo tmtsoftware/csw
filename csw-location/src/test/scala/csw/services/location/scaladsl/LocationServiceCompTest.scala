@@ -167,8 +167,6 @@ class LocationServiceCompTest
       }),
       "my-actor-2"
     )
-    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
-    val akkaUri = new URI(actorPath.toString)
 
     locationService.register(new AkkaLocation(hcdConnection, actorRef)).await
 
@@ -196,8 +194,6 @@ class LocationServiceCompTest
       "my-actor-3"
     )
 
-    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
-    val akkaUri = new URI(actorPath.toString)
 
     locationService.register(new AkkaLocation(hcdAkkaConnection, actorRef)).await
 
