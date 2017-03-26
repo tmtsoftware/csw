@@ -131,7 +131,7 @@ class LocationServiceCompTest
     probe.expectComplete()
   }
 
-  test("Can not register against already registered name and can not unregister already unregistered connection"){
+  test("Can not register a different connection against already registered name"){
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
     val duplicateLocation = new TcpLocation(connection, actorRuntime.hostname, 1234)
@@ -143,11 +143,37 @@ class LocationServiceCompTest
       locationService.register(duplicateLocation).await
     }
 
-//    illegalStateException1.getMessage shouldBe s"can not register against already registered connection=${duplicateLocation.connection.name}. Current value=${location}"
+    illegalStateException1.getMessage shouldBe s"there is other location=$location registered against name=${duplicateLocation.connection.name}."
+
+    result.unregister().await
+  }
+
+  test("registering an already registered connection does not result in failure"){
+    val componentId = ComponentId("redis4", ComponentType.Service)
+    val connection = TcpConnection(componentId)
+
+    val duplicateLocation = new TcpLocation(connection, actorRuntime.hostname, 1234)
+    val location = new TcpLocation(connection, actorRuntime.hostname, 1234)
+
+    val result = locationService.register(location).await
+
+    val result2 = locationService.register(duplicateLocation).await
+
+    result2.componentId shouldBe componentId
+
+    result.unregister().await
+    result2.unregister().await
+  }
+
+  test("unregistering an already unregistered connection does not result in failure"){
+    val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
+
+    val location = new TcpLocation(connection, actorRuntime.hostname, 1111)
+
+    val result = locationService.register(location).await
 
     result.unregister().await
     result.unregister().await
-    ////////////// update test
   }
 
   test ("Resolve tcp connection") {
