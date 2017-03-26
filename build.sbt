@@ -17,7 +17,7 @@ lazy val `csw-location` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .enablePlugins(plugins:_*)
   .configs(MultiJvmKeys.MultiJvm)
-  .settings(SbtMultiJvm.multiJvmSettings: _*)
+  .settings(SbtMultiJvm.multiJvmSettings)
   .settings(
     libraryDependencies ++= Seq(
       Akka.`akka-stream`,
