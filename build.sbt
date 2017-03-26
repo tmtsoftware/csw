@@ -1,3 +1,4 @@
+import com.typesafe.sbt.SbtMultiJvm
 
 val enableCoverage = System.getProperty("enableCoverage", "true")
 val plugins:Seq[Plugins] = if(enableCoverage.toBoolean) Seq(Coverage) else Seq.empty
@@ -14,8 +15,9 @@ lazy val `csw-prod` = project
 
 lazy val `csw-location` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
-  .configs(MultiJvm)
   .enablePlugins(plugins:_*)
+  .configs(MultiJvmKeys.MultiJvm)
+  .settings(SbtMultiJvm.multiJvmSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
       Akka.`akka-stream`,
