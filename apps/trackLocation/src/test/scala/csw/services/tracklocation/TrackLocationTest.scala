@@ -29,7 +29,7 @@ class TrackLocationTest
   private val actorRuntime = new ActorRuntime("crdt")
   private val locationService = LocationServiceFactory.make(actorRuntime)
   import actorRuntime._
-  val trackLocationApp = new TrackLocationApp(new ActorRuntime("crdt", Settings().withPort(2553)))
+  val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings("crdt").withPort(2553)))
 
   implicit val timeout = Timeout(60.seconds)
 

@@ -41,5 +41,5 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
 }
 
 object TrackLocationApp extends App {
-  new TrackLocationApp(new ActorRuntime("crdt", Settings().withPort(2553))).start(args)
+  new TrackLocationApp(new ActorRuntime(Settings("crdt").withPort(2553))).start(args)
 }

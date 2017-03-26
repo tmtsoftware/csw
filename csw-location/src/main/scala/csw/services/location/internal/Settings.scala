@@ -1,17 +1,18 @@
 package csw.services.location.internal
 
+import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.JavaConverters._
 
-case class Settings(values: Map[String, Any] = Map.empty) {
-  def withEntry(key: String, value: Any): Settings = Settings(values + (key → value))
+case class Settings(name: String, values: Map[String, Any] = Map.empty) {
+  def withEntry(key: String, value: Any): Settings = copy(values = values + (key → value))
 
   def withInterface(name: String): Settings = withEntry("interfaceName", name)
 
   def withPort(port: Int): Settings = withEntry("akka.remote.netty.tcp.port", port)
 
-  def config(name: String): Config = {
+  def config: Config = {
     val interfaceName = values.getOrElse("interfaceName", "").toString
     val hostname: String = Networks.getIpv4Address(interfaceName).getHostAddress
 
