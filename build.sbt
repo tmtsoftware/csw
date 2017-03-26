@@ -12,9 +12,9 @@ lazy val `csw-prod` = project
     aggregate in test := false
   )
 
-
 lazy val `csw-location` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .configs(MultiJvm)
   .enablePlugins(plugins:_*)
   .settings(
     libraryDependencies ++= Seq(
@@ -31,7 +31,8 @@ lazy val `csw-location` = project
       Libs.`scalatest` % Test,
       Libs.`junit` % Test,
       Libs.`junit-interface` % Test,
-      Libs.`mockito-core` % Test
+      Libs.`mockito-core` % Test,
+      Akka.`akka-multi-node-testkit` % Test
     )
   )
 

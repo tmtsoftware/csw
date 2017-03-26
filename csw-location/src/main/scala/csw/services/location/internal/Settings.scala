@@ -1,6 +1,5 @@
 package csw.services.location.internal
 
-import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.JavaConverters._
