@@ -7,10 +7,10 @@ import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, TcpLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
-class SimpleRegistrationTestMultiJvmNode1 extends SimpleRegistrationTest
-class SimpleRegistrationTestMultiJvmNode2 extends SimpleRegistrationTest
+class SimpleRegistrationTestMultiJvmNode1 extends SimpleRegistrationTest(0)
+class SimpleRegistrationTestMultiJvmNode2 extends SimpleRegistrationTest(0)
 
-class SimpleRegistrationTest extends LSMultiNodeSpec(new LSMultiNodeConfig) {
+class SimpleRegistrationTest(ignore: Int) extends LSMultiNodeSpec(new LSMultiNodeConfig) {
 
   import config._
 
