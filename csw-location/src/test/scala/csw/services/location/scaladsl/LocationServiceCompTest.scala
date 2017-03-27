@@ -8,6 +8,7 @@ import akka.serialization.Serialization
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.common.TestFutureExtension.RichFuture
+import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -38,8 +39,8 @@ class LocationServiceCompTest
 
     val registrationResult = locationService.register(location).await
 
-    locationService.resolve(connection).await.get shouldBe location.location(actorRuntime.hostname)
-    locationService.list.await shouldBe List(location.location(actorRuntime.hostname))
+    locationService.resolve(connection).await.get shouldBe location.location(Networks.hostname())
+    locationService.list.await shouldBe List(location.location(Networks.hostname()))
 
     registrationResult.unregister().await
 
@@ -57,7 +58,7 @@ class LocationServiceCompTest
     val registrationResult = locationService.register(resolvedHttpLocation).await
     registrationResult.componentId shouldBe componentId
 
-    locationService.list.await shouldBe List(resolvedHttpLocation.location(actorRuntime.hostname))
+    locationService.list.await shouldBe List(resolvedHttpLocation.location(Networks.hostname()))
 
     registrationResult.unregister().await
     locationService.list.await shouldBe List.empty
@@ -82,7 +83,7 @@ class LocationServiceCompTest
 
     Thread.sleep(10)
 
-    locationService.list.await shouldBe List(AkkaRegistration(connection, actorRef).location(actorRuntime.hostname))
+    locationService.list.await shouldBe List(AkkaRegistration(connection, actorRef).location(Networks.hostname()))
 
     registrationResult.unregister().await
 
@@ -108,7 +109,7 @@ class LocationServiceCompTest
 
     Thread.sleep(10)
 
-    locationService.list.await shouldBe List(AkkaRegistration(connection, actorRef).location(actorRuntime.hostname))
+    locationService.list.await shouldBe List(AkkaRegistration(connection, actorRef).location(Networks.hostname()))
 
     actorRef ! PoisonPill
 
@@ -132,7 +133,7 @@ class LocationServiceCompTest
     val result = locationService.register(redis1Location).await
     val result2 = locationService.register(redis2Location).await
     probe.request(1)
-    probe.expectNext(LocationUpdated(redis1Location.location(actorRuntime.hostname)))
+    probe.expectNext(LocationUpdated(redis1Location.location(Networks.hostname())))
 
     result.unregister().await
     result2.unregister().await
@@ -260,7 +261,7 @@ class LocationServiceCompTest
     val httpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
     val registrationResult = locationService.register(HttpRegistration(httpConnection,  1234, "path123")).await
 
-    val filteredLocations = locationService.list(actorRuntime.hostname).await
+    val filteredLocations = locationService.list(Networks.hostname()).await
 
     filteredLocations.map(_.connection).toSet shouldBe Set(tcpConnection, httpConnection)
 

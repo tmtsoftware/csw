@@ -75,9 +75,9 @@ public class JLocationServiceImplTest {
         locationService.register(tcpRegistration).toCompletableFuture().get();
 
         Assert.assertEquals(3, locationService.list().toCompletableFuture().get().size());
-        Assert.assertEquals(akkaRegistration.location(actorRuntime.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
-        Assert.assertEquals(httpRegistration.location(actorRuntime.hostname()), locationService.resolve(httpServiceConnection).toCompletableFuture().get().get());
-        Assert.assertEquals(tcpRegistration.location(actorRuntime.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(akkaRegistration.location(Networks.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(httpRegistration.location(Networks.hostname()), locationService.resolve(httpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(tcpRegistration.location(Networks.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class JLocationServiceImplTest {
         TcpRegistration tcpLocation = new TcpRegistration(tcpServiceConnection, port);
 
         locationService.register(tcpLocation).toCompletableFuture().get();
-        Assert.assertEquals(tcpLocation.location(actorRuntime.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(tcpLocation.location(Networks.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class JLocationServiceImplTest {
 
         AkkaRegistration registration = new AkkaRegistration(akkaHcdConnection, actorRef);
         locationService.register(registration).toCompletableFuture().get();
-        Assert.assertEquals(registration.location(actorRuntime.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(registration.location(Networks.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class JLocationServiceImplTest {
         locationService.register(httpLocation).toCompletableFuture().get();
 
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(httpLocation.location(actorRuntime.hostname()));
+        locations.add(httpLocation.location(Networks.hostname()));
 
         Assert.assertEquals(locations, locationService.list().toCompletableFuture().get());
     }
@@ -115,7 +115,7 @@ public class JLocationServiceImplTest {
         AkkaRegistration akkaLocation = new AkkaRegistration(akkaHcdConnection, actorRef);
         locationService.register(akkaLocation).toCompletableFuture().get();
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(akkaLocation.location(actorRuntime.hostname()));
+        locations.add(akkaLocation.location(Networks.hostname()));
         Assert.assertEquals(locations, locationService.list(JComponentType.HCD).toCompletableFuture().get());
     }
 
@@ -129,8 +129,8 @@ public class JLocationServiceImplTest {
         locationService.register(akkaLocation).toCompletableFuture().get();
 
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(tcpLocation.location(actorRuntime.hostname()));
-        locations.add(akkaLocation.location(actorRuntime.hostname()));
+        locations.add(tcpLocation.location(Networks.hostname()));
+        locations.add(akkaLocation.location(Networks.hostname()));
 
         Assert.assertTrue(locations.size() == 2);
         Assert.assertEquals(locations, locationService.list(Networks.getIpv4Address("").getHostAddress()).toCompletableFuture().get());
@@ -142,7 +142,7 @@ public class JLocationServiceImplTest {
         TcpRegistration tcpLocation = new TcpRegistration(tcpServiceConnection, port);
         locationService.register(tcpLocation).toCompletableFuture().get();
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(tcpLocation.location(actorRuntime.hostname()));
+        locations.add(tcpLocation.location(Networks.hostname()));
         Assert.assertEquals(locations, locationService.list(JConnectionType.TcpType).toCompletableFuture().get());
     }
     

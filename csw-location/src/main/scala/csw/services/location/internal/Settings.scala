@@ -15,7 +15,7 @@ case class Settings(values: Map[String, Any] = Map.empty) {
 
   def config: Config = {
     val interfaceName = values.getOrElse("interfaceName", "").toString
-    val hostname: String = Networks.getIpv4Address(interfaceName).getHostAddress
+    val hostname: String = Networks.hostname(interfaceName)
 
     val port = sys.props.getOrElse("akkaPort", "2552")
     val seedHost = sys.props.getOrElse("akkaSeed", hostname)

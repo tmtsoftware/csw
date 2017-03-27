@@ -7,6 +7,10 @@ import scala.collection.JavaConverters._
 
 object Networks {
 
+  def hostname(): String = hostname("")
+
+  def hostname(interfaceName: String): String = getIpv4Address(interfaceName).getHostAddress
+
   def getIpv4Address(interfaceName: String = ""): InetAddress = Pair.all(interfaceName)
     .sortBy(_.index)
     .find(_.isIpv4)

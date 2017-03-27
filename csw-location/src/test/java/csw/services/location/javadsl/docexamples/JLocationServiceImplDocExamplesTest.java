@@ -4,6 +4,7 @@ import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
+import csw.services.location.internal.Networks;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JComponentType;
 import csw.services.location.javadsl.JLocationServiceFactory;
@@ -69,7 +70,7 @@ public class JLocationServiceImplDocExamplesTest {
         RegistrationResult registrationResult = completableFuture.get();
         //#register_tcp_connection
 
-        Assert.assertEquals(tcpLocation.location(actorRuntime.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(tcpLocation.location(Networks.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
 
         locationService.unregisterAll().toCompletableFuture().get();
         actorRuntime.terminate();
@@ -95,7 +96,7 @@ public class JLocationServiceImplDocExamplesTest {
         RegistrationResult registrationResult = completableFuture.get();
         //#register_akka_connection
 
-        Assert.assertEquals(akkaLocation.location(actorRuntime.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(akkaLocation.location(Networks.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
 
         locationService.unregisterAll().toCompletableFuture().get();
         actorRuntime.terminate();
