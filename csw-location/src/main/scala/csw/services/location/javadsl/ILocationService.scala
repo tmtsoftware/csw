@@ -30,4 +30,6 @@ trait ILocationService {
   def list(connectionType: ConnectionType): CompletionStage[ju.List[Location]]
 
   def track(connection: Connection): Source[TrackingEvent, KillSwitch]
+
+  def shutdown(): CompletionStage[Done]
 }

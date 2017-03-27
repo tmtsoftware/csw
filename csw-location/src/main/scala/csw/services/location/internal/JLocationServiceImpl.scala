@@ -43,4 +43,6 @@ private[location] class JLocationServiceImpl(locationService: LocationService, a
 
   override def track(connection: Connection): Source[TrackingEvent, KillSwitch] =
     locationService.track(connection).asJava
+
+  override def shutdown(): CompletionStage[Done] = locationService.shutdown().toJava
 }

@@ -90,6 +90,8 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     }.cancellable
   }
 
+  def shutdown(): Future[Done] = actorSystem.terminate().map(_ ⇒ Done)
+
   private def registrationResult(connection: Connection): RegistrationResult = new RegistrationResult {
     override def componentId: ComponentId = connection.componentId
 

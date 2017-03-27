@@ -31,4 +31,5 @@ trait LocationService {
 
   def track(connection: Connection): Source[TrackingEvent, KillSwitch]
 
+  def shutdown(): Future[Done]
 }
