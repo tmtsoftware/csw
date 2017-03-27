@@ -37,41 +37,28 @@ Gradle
     @@@
 
 
+## Location service creation examples
+
+scala
+:   @@snip [LocationServiceFactoryTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/LocationServiceFactoryTest.scala) { #Location-service-creation-using-actor-runtime }
+
+java
+:   @@snip [JLocationServiceFactoryTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/JLocationServiceFactoryTest.java) {#Location-service-creation-using-actor-runtime}
+
+###  ActorRuntime variations in scala
+
+variation1
+:   @@snip [LocationServiceFactoryTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/ActorRuntimeTest.scala) { #actor-runtime-creation }
+
+variation2
+:   @@snip [LocationServiceFactoryTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/ActorRuntimeTest.scala) { #actor-runtime-creation-with-Settings }
+
+variation3
+:   @@snip [LocationServiceFactoryTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/ActorRuntimeTest.scala) { #actor-runtime-creation-with-system }
+
+###  ActorRuntime variations in java
+???
+
+
 ## API Usage Examples
-
-### Register a component
-
-An Application, Sequencer, Assembly, HCD, or Service component may need to be used by another component as part of normal operations. It must register its location information with Location service so that other components can find it.
-
-#### Register a component offering http endpoint 
-
-scala
-:   @@snip [LocationServiceCompDocExamplesTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/docexamples/LocationServiceCompDocExamplesTest.scala) { #register_http_connection }
-
-java
-:   @@snip [JLocationServiceImplDocExamplesTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/docexamples/JLocationServiceImplDocExamplesTest.java) {#register_http_connection}
-
-#### Register a component offering tcp endpoint 
-
-scala
-:   @@snip [LocationServiceCompDocExamplesTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/docexamples/LocationServiceCompDocExamplesTest.scala) { #register_tcp_connection }
-
-java
-:   @@snip [JLocationServiceImplDocExamplesTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/docexamples/JLocationServiceImplDocExamplesTest.java) {#register_tcp_connection}
-
-#### Register a component offering akka actor reference 
-
-scala
-:   @@snip [LocationServiceCompDocExamplesTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/docexamples/LocationServiceCompDocExamplesTest.scala) { #register_akka_connection }
-
-java
-:   @@snip [JLocationServiceImplDocExamplesTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/docexamples/JLocationServiceImplDocExamplesTest.java) {#register_akka_connection}
-
-### Unregister a component
-
-scala
-:   @@snip [LocationServiceCompDocExamplesTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/docexamples/LocationServiceCompDocExamplesTest.scala) { #register_http_connection }
-
-java
-:   @@snip [JLocationServiceImplDocExamplesTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/docexamples/JLocationServiceImplDocExamplesTest.java) {#register_http_connection}
 
