@@ -2,7 +2,7 @@ package csw.services.location.scaladsl
 
 import java.net.URI
 
-import akka.actor.{Actor, ActorPath, Props}
+import akka.actor.{Actor, ActorPath, PoisonPill, Props}
 import akka.serialization.Serialization
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
@@ -100,6 +100,34 @@ class LocationServiceCompTest
     locationService.list.await shouldBe List(new AkkaLocation(connection, actorRef))
 
     registrationResult.unregister().await
+
+    locationService.list.await shouldBe List.empty
+  }
+
+  test("akka location death watch actor should unregister services whose actorRef is terminated") {
+    val componentId = ComponentId("hcd1", ComponentType.HCD)
+    val connection = AkkaConnection(componentId)
+    val Prefix = "prefix"
+
+    val actorRef = actorRuntime.actorSystem.actorOf(
+      Props(new Actor {
+        override def receive: Receive = Actor.emptyBehavior
+      }),
+      "my-actor-to-die"
+    )
+    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
+
+    val registrationResult = locationService.register(new AkkaLocation(connection, actorRef)).await
+
+    registrationResult.componentId shouldBe componentId
+
+    Thread.sleep(10)
+
+    locationService.list.await shouldBe List(new AkkaLocation(connection, actorRef))
+
+    actorRef ! PoisonPill
+
+    Thread.sleep(2000)
 
     locationService.list.await shouldBe List.empty
   }

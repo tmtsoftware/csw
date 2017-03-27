@@ -23,4 +23,5 @@ object Akka {
   val `akka-actor` = "com.typesafe.akka" %% "akka-actor" % Version
   val `akka-distributed-data` = "com.typesafe.akka" %% "akka-distributed-data" % Version
   val `akka-multi-node-testkit` = "com.typesafe.akka" %% "akka-multi-node-testkit" % Version
+  val `akka-cluster-tools` = "com.typesafe.akka" %% "akka-cluster-tools" % Version
 }

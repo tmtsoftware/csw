@@ -1,11 +1,12 @@
 package csw.services.location.internal
 
-import akka.actor.{Actor, Props, Terminated}
+import akka.actor.{Actor, ActorRef, PoisonPill, Props, Terminated}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{Changed, Subscribe}
+import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.models._
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 
 class DeathwatchActor(locationService: LocationService) extends Actor {
 
@@ -34,5 +35,17 @@ class DeathwatchActor(locationService: LocationService) extends Actor {
 }
 
 object DeathwatchActor {
-  def props(locationService: LocationService): Props = Props(new DeathwatchActor(locationService))
+
+  def startSingleton(actorRuntime: ActorRuntime, locationService: LocationService): ActorRef = {
+    import actorRuntime._
+    actorSystem.actorOf(
+      ClusterSingletonManager.props(
+        singletonProps = Props(new DeathwatchActor(locationService)),
+        terminationMessage = PoisonPill,
+        settings = ClusterSingletonManagerSettings(actorSystem)
+      ),
+      name = "location-service-death-watch-actor"
+    )
+  }
+
 }

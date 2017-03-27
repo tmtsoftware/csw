@@ -22,8 +22,9 @@ lazy val `csw-location` = project
     libraryDependencies ++= Seq(
       Akka.`akka-stream`,
       Akka.`akka-distributed-data`,
-      Libs.`scala-java8-compat`,
       Akka.`akka-remote`,
+      Akka.`akka-cluster-tools`,
+      Libs.`scala-java8-compat`,
       Libs.`scala-async`,
       Libs.`enumeratum`,
       Libs.`chill-akka`
