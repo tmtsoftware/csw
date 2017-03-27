@@ -18,24 +18,17 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
 public class JLocationServiceImplTest {
-    // #declarations
     static ActorRuntime actorRuntime = new ActorRuntime();
     static ILocationService locationService = JLocationServiceFactory.make(actorRuntime);
-
-    // #declarations
 
     private ComponentId akkaHcdComponentId = new ComponentId("hcd1", JComponentType.HCD);
     private AkkaConnection akkaHcdConnection = new Connection.AkkaConnection(akkaHcdComponentId);
 
-    //#declare_tcp_component
     ComponentId tcpServiceComponentId = new ComponentId("exampleTcpService", JComponentType.Service);
     TcpConnection tcpServiceConnection = new Connection.TcpConnection(tcpServiceComponentId);
-    //#declare_tcp_component
 
     private TestProbe actorTestProbe = new TestProbe(actorRuntime.actorSystem(), "test-actor");
     private ActorRef actorRef = actorTestProbe.ref();
@@ -43,11 +36,9 @@ public class JLocationServiceImplTest {
 
     private String prefix = "prefix";
 
-    //#declare_http_component
     ComponentId httpServiceComponentId = new ComponentId("exampleHTTPService", JComponentType.Service);
     HttpConnection httpServiceConnection = new Connection.HttpConnection(httpServiceComponentId);
     String Path = "/path/to/resource";
-    //#declare_http_component
 
 
     @After
@@ -62,17 +53,11 @@ public class JLocationServiceImplTest {
 
     @Test
     public void testRegistrationAndUnregistrationOfHttpComponent() throws ExecutionException, InterruptedException {
-        //#register_http_connection
         int port = 8080;
 
-        //To register a http endpoint on host http://10.1.2.22:8080/path/to/resource
         HttpLocation httpLocation = new HttpLocation(httpServiceConnection, actorRuntime.hostname(), port, Path);
 
-        CompletionStage<RegistrationResult> completionStage = locationService.register(httpLocation);
-        CompletableFuture<RegistrationResult> completableFuture = completionStage.toCompletableFuture();
-
-        RegistrationResult registrationResult = completableFuture.get();
-        //#register_http_connection
+        RegistrationResult registrationResult = locationService.register(httpLocation).toCompletableFuture().get();
         Assert.assertEquals(httpServiceComponentId, registrationResult.componentId());
         locationService.unregister(httpServiceConnection).toCompletableFuture().get();
         Assert.assertEquals(Collections.emptyList(), locationService.list().toCompletableFuture().get());
@@ -93,17 +78,10 @@ public class JLocationServiceImplTest {
 
     @Test
     public void testResolveTcpConnection() throws ExecutionException, InterruptedException {
-        //#register_tcp_connection
-
         int port = 1234;
         TcpLocation tcpLocation = new TcpLocation(tcpServiceConnection, actorRuntime.hostname(), port);
 
-        //To register a tcp endpoint on host tcp://10.1.2.22:1234
-        CompletionStage<RegistrationResult> completionStage = locationService.register(tcpLocation);
-        CompletableFuture<RegistrationResult> completableFuture = completionStage.toCompletableFuture();
-
-        RegistrationResult registrationResult = completableFuture.get();
-        //#register_tcp_connection
+        locationService.register(tcpLocation).toCompletableFuture().get();
         Assert.assertEquals(tcpLocation, locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
     }
 

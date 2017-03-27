@@ -46,16 +46,32 @@ An Application, Sequencer, Assembly, HCD, or Service component may need to be us
 #### Register a component offering http endpoint 
 
 scala
-:   @@snip [LocationServiceCompTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/LocationServiceCompTest.scala) {#declarations #register_http_connection }
+:   @@snip [LocationServiceCompDocExamplesTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/docexamples/LocationServiceCompDocExamplesTest.scala) { #register_http_connection }
 
 java
-:   @@snip [JLocationServiceImplTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/JLocationServiceImplTest.java) {#declarations #declare_http_component #register_http_connection}
+:   @@snip [JLocationServiceImplDocExamplesTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/docexamples/JLocationServiceImplDocExamplesTest.java) {#register_http_connection}
 
 #### Register a component offering tcp endpoint 
 
 scala
-:   @@snip [LocationServiceCompTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/LocationServiceCompTest.scala) {#declarations #register_tcp_connection }
+:   @@snip [LocationServiceCompDocExamplesTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/docexamples/LocationServiceCompDocExamplesTest.scala) { #register_tcp_connection }
 
 java
-:   @@snip [JLocationServiceImplTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/JLocationServiceImplTest.java) {#declarations #declare_tcp_component #register_tcp_connection}
-    
+:   @@snip [JLocationServiceImplDocExamplesTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/docexamples/JLocationServiceImplDocExamplesTest.java) {#register_tcp_connection}
+
+#### Register a component offering akka actor reference 
+
+scala
+:   @@snip [LocationServiceCompDocExamplesTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/docexamples/LocationServiceCompDocExamplesTest.scala) { #register_akka_connection }
+
+java
+:   @@snip [JLocationServiceImplDocExamplesTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/docexamples/JLocationServiceImplDocExamplesTest.java) {#register_akka_connection}
+
+### Unregister a component
+
+scala
+:   @@snip [LocationServiceCompDocExamplesTest.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/docexamples/LocationServiceCompDocExamplesTest.scala) { #register_http_connection }
+
+java
+:   @@snip [JLocationServiceImplDocExamplesTest.java](../../../csw-location/src/test/java/csw/services/location/javadsl/docexamples/JLocationServiceImplDocExamplesTest.java) {#register_http_connection}
+
