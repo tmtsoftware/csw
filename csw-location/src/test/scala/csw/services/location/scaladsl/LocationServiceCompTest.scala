@@ -1,9 +1,6 @@
 package csw.services.location.scaladsl
 
-import java.net.URI
-
 import akka.actor.{Actor, ActorPath, PoisonPill, Props}
-import akka.actor.{Actor, ActorPath, Props}
 import akka.serialization.Serialization
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
@@ -35,12 +32,12 @@ class LocationServiceCompTest
     val connection: TcpConnection = TcpConnection(componentId)
     val Port: Int = 1234
 
-    val location = TcpRegistration(connection,  Port)
+    val tcpRegistration = TcpRegistration(connection,  Port)
 
-    val registrationResult = locationService.register(location).await
+    val registrationResult = locationService.register(tcpRegistration).await
 
-    locationService.resolve(connection).await.get shouldBe location.location(Networks.hostname())
-    locationService.list.await shouldBe List(location.location(Networks.hostname()))
+    locationService.resolve(connection).await.get shouldBe tcpRegistration.location(Networks.hostname())
+    locationService.list.await shouldBe List(tcpRegistration.location(Networks.hostname()))
 
     registrationResult.unregister().await
 
@@ -123,17 +120,17 @@ class LocationServiceCompTest
 
     val Port = 1234
     val redis1Connection = TcpConnection(ComponentId("redis1", ComponentType.Service))
-    val redis1Location = TcpRegistration(redis1Connection,  Port)
+    val redis1Registration = TcpRegistration(redis1Connection,  Port)
 
     val redis2Connection = TcpConnection(ComponentId("redis2", ComponentType.Service))
-    val redis2Location = TcpRegistration(redis2Connection,  Port)
+    val redis2registration = TcpRegistration(redis2Connection,  Port)
 
     val (switch, probe) = locationService.track(redis1Connection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
-    val result = locationService.register(redis1Location).await
-    val result2 = locationService.register(redis2Location).await
+    val result = locationService.register(redis1Registration).await
+    val result2 = locationService.register(redis2registration).await
     probe.request(1)
-    probe.expectNext(LocationUpdated(redis1Location.location(Networks.hostname())))
+    probe.expectNext(LocationUpdated(redis1Registration.location(Networks.hostname())))
 
     result.unregister().await
     result2.unregister().await
@@ -148,13 +145,13 @@ class LocationServiceCompTest
   test("Can not register a different connection against already registered name"){
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
-    val duplicateLocation = TcpRegistration(connection,  1234)
-    val location = TcpRegistration(connection,  1111)
+    val duplicateTcpRegistration = TcpRegistration(connection,  1234)
+    val tcpRegistration = TcpRegistration(connection,  1111)
 
-    val result = locationService.register(location).await
+    val result = locationService.register(tcpRegistration).await
 
     val illegalStateException1 = intercept[IllegalStateException]{
-      locationService.register(duplicateLocation).await
+      locationService.register(duplicateTcpRegistration).await
     }
 
     result.unregister().await
@@ -180,9 +177,9 @@ class LocationServiceCompTest
   test("unregistering an already unregistered connection does not result in failure"){
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
-    val location = TcpRegistration(connection,  1111)
+    val tcpRegistration = TcpRegistration(connection,  1111)
 
-    val result = locationService.register(location).await
+    val result = locationService.register(tcpRegistration).await
 
     result.unregister().await
     result.unregister().await
