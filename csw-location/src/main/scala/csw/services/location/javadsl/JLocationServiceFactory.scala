@@ -5,6 +5,8 @@ import csw.services.location.scaladsl.{ActorRuntime, LocationService, LocationSe
 
 object JLocationServiceFactory {
 
+  def make(): ILocationService = make(new ActorRuntime())
+
   def make(actorRuntime: ActorRuntime): ILocationService = {
     val locationService: LocationService = LocationServiceFactory.make(actorRuntime)
     new JLocationServiceImpl(locationService, actorRuntime)
