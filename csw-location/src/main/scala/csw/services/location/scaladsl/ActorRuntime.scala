@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ActorRuntime(_actorSystem: ActorSystem) {
   def this(settings: Settings) = this(ActorSystem(settings.name, settings.config))
-  def this(name: String) = this(Settings(name))
+  def this() = this(Settings())
 
   val hostname: String = _actorSystem.settings.config.getString("akka.remote.netty.tcp.hostname")
 

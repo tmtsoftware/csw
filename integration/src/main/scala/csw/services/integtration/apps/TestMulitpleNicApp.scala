@@ -7,6 +7,6 @@ import org.scalatest
 
 object TestMulitpleNicApp {
   def main(args: Array[String]): Unit = {
-    scalatest.run(new LocationServiceMultipleNICTest(new ActorRuntime(Settings("crdt").withInterface("eth1"))))
+    scalatest.run(new LocationServiceMultipleNICTest(new ActorRuntime(Settings().withInterface("eth1"))))
   }
 }

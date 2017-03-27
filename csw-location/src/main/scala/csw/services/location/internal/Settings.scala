@@ -4,7 +4,9 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.JavaConverters._
 
-case class Settings(name: String, values: Map[String, Any] = Map.empty) {
+case class Settings(values: Map[String, Any] = Map.empty) {
+  def name: String = Constants.ClusterName
+
   def withEntry(key: String, value: Any): Settings = copy(values = values + (key → value))
 
   def withInterface(name: String): Settings = withEntry("interfaceName", name)

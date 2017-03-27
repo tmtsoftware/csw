@@ -11,7 +11,7 @@ import csw.services.location.models.{ComponentId, ComponentType, AkkaLocation}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object TromboneHCD {
-  private val actorRuntime = new ActorRuntime("crdt")
+  private val actorRuntime = new ActorRuntime()
 
   val tromboneHcdActorRef = actorRuntime.actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
   val componentId = ComponentId("trombonehcd", ComponentType.HCD)

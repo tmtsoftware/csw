@@ -26,10 +26,10 @@ class TrackLocationTest
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val actorRuntime = new ActorRuntime("crdt")
+  private val actorRuntime = new ActorRuntime()
   private val locationService = LocationServiceFactory.make(actorRuntime)
   import actorRuntime._
-  val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings("crdt").withPort(2553)))
+  val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings().withPort(2553)))
 
   implicit val timeout = Timeout(60.seconds)
 

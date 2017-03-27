@@ -22,7 +22,7 @@ class TrackLocationAppIntegrationTest(actorRuntime: ActorRuntime)
 
   private val locationService = LocationServiceFactory.make(actorRuntime)
   import actorRuntime._
-  val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings("crdt").withPort(2556)))
+  val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings().withPort(2556)))
 
   override protected def afterAll(): Unit = {
     trackLocationApp.shutdown()

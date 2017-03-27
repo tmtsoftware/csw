@@ -21,7 +21,7 @@ class LocationServiceCompTest
     with BeforeAndAfterAll {
 
   // #declarations
-  val actorRuntime = new ActorRuntime("test")
+  val actorRuntime = new ActorRuntime()
   val locationService: LocationService = LocationServiceFactory.make(actorRuntime)
   // #declarations
 

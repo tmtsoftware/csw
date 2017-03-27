@@ -6,4 +6,5 @@ object Constants {
   val PrefixKey = "prefix"
 
   val RegistryKey = "location-service-registry"
+  val ClusterName = "location-service"
 }
