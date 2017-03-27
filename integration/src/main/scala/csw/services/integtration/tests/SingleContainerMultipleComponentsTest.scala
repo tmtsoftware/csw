@@ -1,17 +1,21 @@
 package csw.services.integtration.tests
 
-import akka.actor.{ActorPath, Props}
+import akka.actor.{ActorPath, ActorSystem, Props}
 import akka.serialization.Serialization
 import csw.services.integtration.apps.TromboneHCD
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationService, LocationServiceFactory}
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-class SingleContainerMultipleComponentsTest extends FunSuite with Matchers {
+class SingleContainerMultipleComponentsTest extends FunSuite with Matchers with BeforeAndAfterAll {
   private val actorRuntime = new ActorRuntime()
   private val locationService: LocationService = LocationServiceFactory.make(actorRuntime)
+
+  override protected def afterAll(): Unit = {
+    actorRuntime.terminate()
+  }
 
   test("should be able to register and discover multiple components in single container") {
     val tromboneHcdActorRef = actorRuntime.actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
@@ -36,6 +40,5 @@ class SingleContainerMultipleComponentsTest extends FunSuite with Matchers {
 
     location.get shouldBe(registration)
     location1.get shouldBe(registration1)
-    actorRuntime.terminate()
   }
 }
