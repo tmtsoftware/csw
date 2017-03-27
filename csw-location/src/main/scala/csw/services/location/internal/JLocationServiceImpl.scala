@@ -6,9 +6,9 @@ import java.util.concurrent.CompletionStage
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
-import csw.services.location.javadsl.ILocationService
-import csw.services.location.scaladsl.{ActorRuntime, LocationService}
+import csw.services.location.javadsl.{ILocationService, IRegistrationResult}
 import csw.services.location.models._
+import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
@@ -17,8 +17,8 @@ private[location] class JLocationServiceImpl(locationService: LocationService, a
 
   import actorRuntime._
 
-  override def register(registration: Registration): CompletionStage[RegistrationResult] =
-    locationService.register(registration).toJava
+  override def register(registration: Registration): CompletionStage[IRegistrationResult] =
+    locationService.register(registration).map(JRegistrationResultsFactory.from).toJava
 
   override def unregister(connection: Connection): CompletionStage[Done] =
     locationService.unregister(connection).toJava

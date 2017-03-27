@@ -40,7 +40,7 @@ class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRu
 
 
   private def awaitTermination(results: Seq[RegistrationResult]): Unit = {
-    println(results.map(_.componentId))
+    println(results.map(_.location.connection.componentId))
 
     val sysShutDownHook: ShutdownHookThread = sys.addShutdownHook {
       println("Shutdown hook reached, unregistering services.")

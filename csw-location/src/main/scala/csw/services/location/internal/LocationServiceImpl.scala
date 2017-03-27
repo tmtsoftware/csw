@@ -32,7 +32,7 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
 
     (replicator ? updateValue).flatMap {
       case _: UpdateSuccess[_]                     => (replicator ? updateRegistry).map {
-        case _: UpdateSuccess[_] => registrationResult(location.connection)
+        case _: UpdateSuccess[_] => registrationResult(location)
         case _                   => registrationFailedError(location.connection)
       }
       case ModifyFailure(service.Key, _, cause, _) => throw cause
@@ -92,10 +92,10 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
 
   def shutdown(): Future[Done] = actorSystem.terminate().map(_ ⇒ Done)
 
-  private def registrationResult(connection: Connection): RegistrationResult = new RegistrationResult {
-    override def componentId: ComponentId = connection.componentId
+  private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {
+    override def location: Location = loc
 
-    override def unregister(): Future[Done] = outer.unregister(connection)
+    override def unregister(): Future[Done] = outer.unregister(location.connection)
   }
 
   private def registrationFailedError(connection: Connection) = throw new RuntimeException(s"unable to register $connection")

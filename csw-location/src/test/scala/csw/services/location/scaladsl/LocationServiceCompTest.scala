@@ -54,11 +54,11 @@ class LocationServiceCompTest
     val Port: Int = 8080
     val Path: String = "path/to/resource"
 
-    val resolvedHttpLocation = HttpRegistration(httpConnection,  Port, Path)
-    val registrationResult = locationService.register(resolvedHttpLocation).await
-    registrationResult.componentId shouldBe componentId
+    val httpRegistration = HttpRegistration(httpConnection,  Port, Path)
+    val registrationResult = locationService.register(httpRegistration).await
+    registrationResult.location.connection shouldBe httpConnection
 
-    locationService.list.await shouldBe List(resolvedHttpLocation.location(Networks.hostname()))
+    locationService.list.await shouldBe List(httpRegistration.location(Networks.hostname()))
 
     registrationResult.unregister().await
     locationService.list.await shouldBe List.empty
@@ -79,7 +79,7 @@ class LocationServiceCompTest
 
     val registrationResult = locationService.register(AkkaRegistration(connection, actorRef)).await
 
-    registrationResult.componentId shouldBe componentId
+    registrationResult.location.connection shouldBe connection
 
     Thread.sleep(10)
 
@@ -105,7 +105,7 @@ class LocationServiceCompTest
 
     val registrationResult = locationService.register(AkkaRegistration(connection, actorRef)).await
 
-    registrationResult.componentId shouldBe componentId
+    registrationResult.location.connection shouldBe connection
 
     Thread.sleep(10)
 
@@ -164,14 +164,14 @@ class LocationServiceCompTest
     val componentId = ComponentId("redis4", ComponentType.Service)
     val connection = TcpConnection(componentId)
 
-    val duplicateLocation = TcpRegistration(connection,  1234)
-    val location = TcpRegistration(connection,  1234)
+    val duplicateTcpRegistration = TcpRegistration(connection,  1234)
+    val tcpRegistration = TcpRegistration(connection,  1234)
 
-    val result = locationService.register(location).await
+    val result = locationService.register(tcpRegistration).await
 
-    val result2 = locationService.register(duplicateLocation).await
+    val result2 = locationService.register(duplicateTcpRegistration).await
 
-    result2.componentId shouldBe componentId
+    result2.location.connection shouldBe connection
 
     result.unregister().await
     result2.unregister().await

@@ -17,5 +17,5 @@ trait RegistrationResult {
   /**
     * Identifies the registered component
     */
-  def componentId: ComponentId
+  def location: Location
 }

@@ -55,10 +55,10 @@ public class JLocationServiceImplTest {
     public void testRegistrationAndUnregistrationOfHttpComponent() throws ExecutionException, InterruptedException {
         int port = 8080;
 
-        HttpRegistration httpLocation = new HttpRegistration(httpServiceConnection, port, Path);
+        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
 
-        RegistrationResult registrationResult = locationService.register(httpLocation).toCompletableFuture().get();
-        Assert.assertEquals(httpServiceComponentId, registrationResult.componentId());
+        IRegistrationResult registrationResult = locationService.register(httpRegistration).toCompletableFuture().get();
+        Assert.assertEquals(httpRegistration.location(Networks.hostname()), registrationResult.location());
         locationService.unregister(httpServiceConnection).toCompletableFuture().get();
         Assert.assertEquals(Collections.emptyList(), locationService.list().toCompletableFuture().get());
     }
@@ -83,10 +83,10 @@ public class JLocationServiceImplTest {
     @Test
     public void testResolveTcpConnection() throws ExecutionException, InterruptedException {
         int port = 1234;
-        TcpRegistration tcpLocation = new TcpRegistration(tcpServiceConnection, port);
+        TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
-        locationService.register(tcpLocation).toCompletableFuture().get();
-        Assert.assertEquals(tcpLocation.location(Networks.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+        locationService.register(tcpRegistration).toCompletableFuture().get();
+        Assert.assertEquals(tcpRegistration.location(Networks.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
     }
 
     @Test
@@ -101,36 +101,36 @@ public class JLocationServiceImplTest {
     public void testListComponents() throws ExecutionException, InterruptedException {
         String Path = "path123";
         int port = 8080;
-        HttpRegistration httpLocation = new HttpRegistration(httpServiceConnection, port, Path);
-        locationService.register(httpLocation).toCompletableFuture().get();
+        HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
+        locationService.register(httpRegistration).toCompletableFuture().get();
 
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(httpLocation.location(Networks.hostname()));
+        locations.add(httpRegistration.location(Networks.hostname()));
 
         Assert.assertEquals(locations, locationService.list().toCompletableFuture().get());
     }
 
     @Test
     public void testListComponentsByComponentType() throws ExecutionException, InterruptedException {
-        AkkaRegistration akkaLocation = new AkkaRegistration(akkaHcdConnection, actorRef);
-        locationService.register(akkaLocation).toCompletableFuture().get();
+        AkkaRegistration akkaRegistration = new AkkaRegistration(akkaHcdConnection, actorRef);
+        locationService.register(akkaRegistration).toCompletableFuture().get();
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(akkaLocation.location(Networks.hostname()));
+        locations.add(akkaRegistration.location(Networks.hostname()));
         Assert.assertEquals(locations, locationService.list(JComponentType.HCD).toCompletableFuture().get());
     }
 
     @Test
     public void testListComponentsByHostname() throws ExecutionException, InterruptedException {
         int port = 8080;
-        TcpRegistration tcpLocation = new TcpRegistration(tcpServiceConnection, port);
-        locationService.register(tcpLocation).toCompletableFuture().get();
+        TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
+        locationService.register(tcpRegistration).toCompletableFuture().get();
 
-        AkkaRegistration akkaLocation = new AkkaRegistration(akkaHcdConnection, actorRef);
-        locationService.register(akkaLocation).toCompletableFuture().get();
+        AkkaRegistration akkaRegistration = new AkkaRegistration(akkaHcdConnection, actorRef);
+        locationService.register(akkaRegistration).toCompletableFuture().get();
 
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(tcpLocation.location(Networks.hostname()));
-        locations.add(akkaLocation.location(Networks.hostname()));
+        locations.add(tcpRegistration.location(Networks.hostname()));
+        locations.add(akkaRegistration.location(Networks.hostname()));
 
         Assert.assertTrue(locations.size() == 2);
         Assert.assertEquals(locations, locationService.list(Networks.getIpv4Address("").getHostAddress()).toCompletableFuture().get());
@@ -139,10 +139,10 @@ public class JLocationServiceImplTest {
     @Test
     public void testListComponentsByConnectionType() throws ExecutionException, InterruptedException {
         int port = 8080;
-        TcpRegistration tcpLocation = new TcpRegistration(tcpServiceConnection, port);
-        locationService.register(tcpLocation).toCompletableFuture().get();
+        TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
+        locationService.register(tcpRegistration).toCompletableFuture().get();
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(tcpLocation.location(Networks.hostname()));
+        locations.add(tcpRegistration.location(Networks.hostname()));
         Assert.assertEquals(locations, locationService.list(JConnectionType.TcpType).toCompletableFuture().get());
     }
     

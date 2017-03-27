@@ -13,7 +13,7 @@ trait ILocationService {
     * @param registration object
     * returns registration-result which can be used to unregister
     */
-  def register(registration: Registration): CompletionStage[RegistrationResult]
+  def register(registration: Registration): CompletionStage[IRegistrationResult]
 
   def unregister(connection: Connection): CompletionStage[Done]
 
