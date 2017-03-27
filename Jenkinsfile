@@ -118,6 +118,8 @@ def sendNotification(String buildStatus = 'STARTED') {
         colorCode = '#FF0000'
     }
 
+    slackSend (color: colorCode, message: summary)
+
     emailext(
             subject: subject,
             body: details,
