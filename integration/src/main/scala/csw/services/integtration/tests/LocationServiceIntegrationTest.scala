@@ -11,8 +11,6 @@ class LocationServiceIntegrationTest(actorRuntime: ActorRuntime)
     with Matchers
     with BeforeAndAfter
     with BeforeAndAfterAll {
-
-  import actorRuntime._
   private val locationService = LocationServiceFactory.make(actorRuntime)
 
 
