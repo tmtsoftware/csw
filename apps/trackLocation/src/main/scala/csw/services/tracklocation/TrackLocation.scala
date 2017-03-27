@@ -35,7 +35,7 @@ class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRu
   private def registerName(name: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
     val connection = TcpConnection(componentId)
-    locationService.register(new TcpLocation(connection, actorRuntime.hostname, command.port))
+    locationService.register(TcpRegistration(connection,  command.port))
   }
 
 

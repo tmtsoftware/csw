@@ -5,12 +5,12 @@ import akka.serialization.Serialization
 import csw.services.integtration.apps.TromboneHCD
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaLocation, ComponentId, ComponentType, Location}
+import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationService, LocationServiceFactory}
 import org.scalatest.{FunSuite, Matchers}
 
 class SingleContainerMultipleComponentsTest extends FunSuite with Matchers {
-  private val actorRuntime = new ActorRuntime("crdt")
+  private val actorRuntime = new ActorRuntime()
   private val locationService: LocationService = LocationServiceFactory.make(actorRuntime)
 
   test("should be able to register and discover multiple components in single container") {
@@ -23,10 +23,10 @@ class SingleContainerMultipleComponentsTest extends FunSuite with Matchers {
     val connection1 = AkkaConnection(componentId1)
 
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(tromboneHcdActorRef))
-    val registration = new AkkaLocation(connection, tromboneHcdActorRef)
+    val registration = AkkaRegistration(connection, tromboneHcdActorRef)
 
     val actorPath1 = ActorPath.fromString(Serialization.serializedActorPath(tromboneHcd1ActorRef))
-    val registration1 = new AkkaLocation(connection1, tromboneHcd1ActorRef)
+    val registration1 = AkkaRegistration(connection1, tromboneHcd1ActorRef)
 
     val registrationResult = locationService.register(registration).await
     val registrationResult1 = locationService.register(registration1).await

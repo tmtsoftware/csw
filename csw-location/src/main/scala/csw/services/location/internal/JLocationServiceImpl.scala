@@ -13,12 +13,12 @@ import csw.services.location.models._
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 
-private[location] class JLocationServiceImpl(locationService: LocationService, actorRuntime: ActorRuntime) extends ILocationService{
+private[location] class JLocationServiceImpl(locationService: LocationService, actorRuntime: ActorRuntime) extends ILocationService {
 
   import actorRuntime._
 
-  override def register(location: Location): CompletionStage[RegistrationResult] =
-    locationService.register(location).toJava
+  override def register(registration: Registration): CompletionStage[RegistrationResult] =
+    locationService.register(registration).toJava
 
   override def unregister(connection: Connection): CompletionStage[Done] =
     locationService.unregister(connection).toJava

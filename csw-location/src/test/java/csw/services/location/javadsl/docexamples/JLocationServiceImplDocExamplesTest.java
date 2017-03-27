@@ -34,7 +34,7 @@ public class JLocationServiceImplDocExamplesTest {
         String Path = "/path/to/resource";
         int port = 8080;
 
-        HttpLocation httpLocation = new HttpLocation(httpServiceConnection, actorRuntime.hostname(), port, Path);
+        HttpRegistration httpLocation = new HttpRegistration(httpServiceConnection, port, Path);
 
         CompletionStage<RegistrationResult> completionStage = locationService.register(httpLocation);
         CompletableFuture<RegistrationResult> completableFuture = completionStage.toCompletableFuture();
@@ -61,7 +61,7 @@ public class JLocationServiceImplDocExamplesTest {
         TcpConnection tcpServiceConnection = new Connection.TcpConnection(tcpServiceComponentId);
         int port = 1234;
 
-        TcpLocation tcpLocation = new TcpLocation(tcpServiceConnection, actorRuntime.hostname(), port);
+        TcpRegistration tcpLocation = new TcpRegistration(tcpServiceConnection, port);
 
         CompletionStage<RegistrationResult> completionStage = locationService.register(tcpLocation);
         CompletableFuture<RegistrationResult> completableFuture = completionStage.toCompletableFuture();
@@ -69,7 +69,7 @@ public class JLocationServiceImplDocExamplesTest {
         RegistrationResult registrationResult = completableFuture.get();
         //#register_tcp_connection
 
-        Assert.assertEquals(tcpLocation, locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(tcpLocation.location(actorRuntime.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
 
         locationService.unregisterAll().toCompletableFuture().get();
         actorRuntime.terminate();
@@ -87,7 +87,7 @@ public class JLocationServiceImplDocExamplesTest {
         //Create an actor ref using Props for your actor
         ActorRef actorRef = actorRuntime.actorSystem().actorOf(Props.create(MyActor.class), "Test-System");
 
-        AkkaLocation akkaLocation = new AkkaLocation(akkaHcdConnection, actorRef);
+        AkkaRegistration akkaLocation = new AkkaRegistration(akkaHcdConnection, actorRef);
 
         CompletionStage<RegistrationResult> completionStage = locationService.register(akkaLocation);
         CompletableFuture<RegistrationResult> completableFuture = completionStage.toCompletableFuture();
@@ -95,7 +95,7 @@ public class JLocationServiceImplDocExamplesTest {
         RegistrationResult registrationResult = completableFuture.get();
         //#register_akka_connection
 
-        Assert.assertEquals(akkaLocation, locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(akkaLocation.location(actorRuntime.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
 
         locationService.unregisterAll().toCompletableFuture().get();
         actorRuntime.terminate();

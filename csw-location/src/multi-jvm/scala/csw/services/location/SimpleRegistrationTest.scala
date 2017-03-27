@@ -4,7 +4,7 @@ import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import csw.services.location.helpers.{LSMultiNodeConfig, LSMultiNodeSpec}
 import csw.services.location.models.Connection.TcpConnection
-import csw.services.location.models.{ComponentId, ComponentType, TcpLocation}
+import csw.services.location.models.{ComponentId, ComponentType, TcpLocation, TcpRegistration}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 class SimpleRegistrationTestMultiJvmNode1 extends SimpleRegistrationTest(0)
@@ -26,7 +26,7 @@ class SimpleRegistrationTest(ignore: Int) extends LSMultiNodeSpec(new LSMultiNod
   }
 
   test("ensure that a component registered by one node is listed on all the nodes") {
-    val tcpLocation = new TcpLocation(TcpConnection(ComponentId("abc", ComponentType.Service)), actorRuntime.hostname, 10)
+    val tcpLocation = TcpRegistration(TcpConnection(ComponentId("abc", ComponentType.Service)),  10)
 
     runOn(node1) {
       locationService.register(tcpLocation)

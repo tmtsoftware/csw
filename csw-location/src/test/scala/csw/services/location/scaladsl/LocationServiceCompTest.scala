@@ -34,12 +34,12 @@ class LocationServiceCompTest
     val connection: TcpConnection = TcpConnection(componentId)
     val Port: Int = 1234
 
-    val location: TcpLocation = new TcpLocation(connection, actorRuntime.hostname, Port)
+    val location = TcpRegistration(connection,  Port)
 
     val registrationResult = locationService.register(location).await
 
-    locationService.resolve(connection).await.get shouldBe location
-    locationService.list.await shouldBe List(location)
+    locationService.resolve(connection).await.get shouldBe location.location(actorRuntime.hostname)
+    locationService.list.await shouldBe List(location.location(actorRuntime.hostname))
 
     registrationResult.unregister().await
 
@@ -53,11 +53,11 @@ class LocationServiceCompTest
     val Port: Int = 8080
     val Path: String = "path/to/resource"
 
-    val resolvedHttpLocation: Location = new HttpLocation(httpConnection, actorRuntime.hostname, Port, Path)
+    val resolvedHttpLocation = HttpRegistration(httpConnection,  Port, Path)
     val registrationResult = locationService.register(resolvedHttpLocation).await
     registrationResult.componentId shouldBe componentId
 
-    locationService.list.await shouldBe List(resolvedHttpLocation)
+    locationService.list.await shouldBe List(resolvedHttpLocation.location(actorRuntime.hostname))
 
     registrationResult.unregister().await
     locationService.list.await shouldBe List.empty
@@ -76,13 +76,13 @@ class LocationServiceCompTest
     )
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
 
-    val registrationResult = locationService.register(new AkkaLocation(connection, actorRef)).await
+    val registrationResult = locationService.register(AkkaRegistration(connection, actorRef)).await
 
     registrationResult.componentId shouldBe componentId
 
     Thread.sleep(10)
 
-    locationService.list.await shouldBe List(new AkkaLocation(connection, actorRef))
+    locationService.list.await shouldBe List(AkkaRegistration(connection, actorRef).location(actorRuntime.hostname))
 
     registrationResult.unregister().await
 
@@ -102,13 +102,13 @@ class LocationServiceCompTest
     )
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
 
-    val registrationResult = locationService.register(new AkkaLocation(connection, actorRef)).await
+    val registrationResult = locationService.register(AkkaRegistration(connection, actorRef)).await
 
     registrationResult.componentId shouldBe componentId
 
     Thread.sleep(10)
 
-    locationService.list.await shouldBe List(new AkkaLocation(connection, actorRef))
+    locationService.list.await shouldBe List(AkkaRegistration(connection, actorRef).location(actorRuntime.hostname))
 
     actorRef ! PoisonPill
 
@@ -122,17 +122,17 @@ class LocationServiceCompTest
 
     val Port = 1234
     val redis1Connection = TcpConnection(ComponentId("redis1", ComponentType.Service))
-    val redis1Location = new TcpLocation(redis1Connection, actorRuntime.hostname, Port)
+    val redis1Location = TcpRegistration(redis1Connection,  Port)
 
     val redis2Connection = TcpConnection(ComponentId("redis2", ComponentType.Service))
-    val redis2Location = new TcpLocation(redis2Connection, actorRuntime.hostname, Port)
+    val redis2Location = TcpRegistration(redis2Connection,  Port)
 
     val (switch, probe) = locationService.track(redis1Connection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
     val result = locationService.register(redis1Location).await
     val result2 = locationService.register(redis2Location).await
     probe.request(1)
-    probe.expectNext(LocationUpdated(redis1Location))
+    probe.expectNext(LocationUpdated(redis1Location.location(actorRuntime.hostname)))
 
     result.unregister().await
     result2.unregister().await
@@ -147,16 +147,14 @@ class LocationServiceCompTest
   test("Can not register a different connection against already registered name"){
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
-    val duplicateLocation = new TcpLocation(connection, actorRuntime.hostname, 1234)
-    val location = new TcpLocation(connection, actorRuntime.hostname, 1111)
+    val duplicateLocation = TcpRegistration(connection,  1234)
+    val location = TcpRegistration(connection,  1111)
 
     val result = locationService.register(location).await
 
     val illegalStateException1 = intercept[IllegalStateException]{
       locationService.register(duplicateLocation).await
     }
-
-    illegalStateException1.getMessage shouldBe s"there is other location=$location registered against name=${duplicateLocation.connection.name}."
 
     result.unregister().await
   }
@@ -165,8 +163,8 @@ class LocationServiceCompTest
     val componentId = ComponentId("redis4", ComponentType.Service)
     val connection = TcpConnection(componentId)
 
-    val duplicateLocation = new TcpLocation(connection, actorRuntime.hostname, 1234)
-    val location = new TcpLocation(connection, actorRuntime.hostname, 1234)
+    val duplicateLocation = TcpRegistration(connection,  1234)
+    val location = TcpRegistration(connection,  1234)
 
     val result = locationService.register(location).await
 
@@ -181,7 +179,7 @@ class LocationServiceCompTest
   test("unregistering an already unregistered connection does not result in failure"){
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
-    val location = new TcpLocation(connection, actorRuntime.hostname, 1111)
+    val location = TcpRegistration(connection,  1111)
 
     val result = locationService.register(location).await
 
@@ -191,7 +189,7 @@ class LocationServiceCompTest
 
   test ("Resolve tcp connection") {
     val connection = TcpConnection(ComponentId("redis5", ComponentType.Service))
-    locationService.register(new TcpLocation(connection, actorRuntime.hostname, 1234)).await
+    locationService.register(TcpRegistration(connection,  1234)).await
 
     val resolvedCon = locationService.resolve(connection).await.get
 
@@ -207,13 +205,13 @@ class LocationServiceCompTest
       "my-actor-2"
     )
 
-    locationService.register(new AkkaLocation(hcdConnection, actorRef)).await
+    locationService.register(AkkaRegistration(hcdConnection, actorRef)).await
 
     val redisConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
-    locationService.register(new TcpLocation(redisConnection, actorRuntime.hostname, 1234)).await
+    locationService.register(TcpRegistration(redisConnection,  1234)).await
 
     val configServiceConnection = TcpConnection(ComponentId("configservice", ComponentType.Service))
-    locationService.register(new TcpLocation(configServiceConnection, actorRuntime.hostname, 1234)).await
+    locationService.register(TcpRegistration(configServiceConnection,  1234)).await
 
     val filteredHCDs = locationService.list(ComponentType.HCD).await
 
@@ -234,16 +232,16 @@ class LocationServiceCompTest
     )
 
 
-    locationService.register(new AkkaLocation(hcdAkkaConnection, actorRef)).await
+    locationService.register(AkkaRegistration(hcdAkkaConnection, actorRef)).await
 
     val redisTcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
-    locationService.register(new TcpLocation(redisTcpConnection, actorRuntime.hostname, 1234)).await
+    locationService.register(TcpRegistration(redisTcpConnection,  1234)).await
 
     val configTcpConnection = TcpConnection(ComponentId("configservice", ComponentType.Service))
-    locationService.register(new TcpLocation(configTcpConnection, actorRuntime.hostname, 1234)).await
+    locationService.register(TcpRegistration(configTcpConnection,  1234)).await
 
     val assemblyHttpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
-    val registrationResult = locationService.register(new HttpLocation(assemblyHttpConnection, actorRuntime.hostname, 1234, "path123")).await
+    val registrationResult = locationService.register(HttpRegistration(assemblyHttpConnection,  1234, "path123")).await
 
     val tcpConnections = locationService.list(ConnectionType.TcpType).await
     tcpConnections.map(_.connection).toSet shouldBe Set(redisTcpConnection, configTcpConnection)
@@ -257,10 +255,10 @@ class LocationServiceCompTest
 
   test("should filter connections based on hostname") {
     val tcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
-    locationService.register(new TcpLocation(tcpConnection, actorRuntime.hostname, 1234)).await
+    locationService.register(TcpRegistration(tcpConnection,  1234)).await
 
     val httpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
-    val registrationResult = locationService.register(new HttpLocation(httpConnection, actorRuntime.hostname, 1234, "path123")).await
+    val registrationResult = locationService.register(HttpRegistration(httpConnection,  1234, "path123")).await
 
     val filteredLocations = locationService.list(actorRuntime.hostname).await
 

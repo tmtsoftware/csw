@@ -10,10 +10,10 @@ import java.{util => ju}
 
 trait ILocationService {
   /**
-    * @param location object
+    * @param registration object
     * returns registration-result which can be used to unregister
     */
-  def register(location: Location): CompletionStage[RegistrationResult]
+  def register(registration: Registration): CompletionStage[RegistrationResult]
 
   def unregister(connection: Connection): CompletionStage[Done]
 

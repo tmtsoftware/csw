@@ -18,7 +18,9 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
 
   import actorRuntime._
 
-  def register(location: Location): Future[RegistrationResult] = {
+  def register(registration: Registration): Future[RegistrationResult] = {
+    val location = registration.location(actorRuntime.hostname)
+
     val service = new Registry.Service(location.connection)
 
     val updateValue = service.update {

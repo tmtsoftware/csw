@@ -10,10 +10,10 @@ import scala.concurrent.Future
 trait LocationService {
 
   /**
-    * @param location object
+    * @param registration object
     * returns registration-result which can be used to unregister
     */
-  def register(location: Location): Future[RegistrationResult]
+  def register(registration: Registration): Future[RegistrationResult]
 
   def unregister(connection: Connection): Future[Done]
 

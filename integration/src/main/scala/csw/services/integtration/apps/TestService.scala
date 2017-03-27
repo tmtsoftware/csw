@@ -3,7 +3,7 @@ package csw.services.integtration.apps
 import java.net.URI
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.models.{ComponentId, ComponentType, HttpLocation}
+import csw.services.location.models.{ComponentId, ComponentType, HttpLocation, HttpRegistration}
 import csw.services.location.models.Connection.HttpConnection
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
@@ -16,7 +16,7 @@ object TestService {
   private val Path = "redisservice.org/test"
   private  val Port = 9999
 
-  val registration = new HttpLocation(connection, actorRuntime.hostname, Port, Path)
+  val registration = HttpRegistration(connection,  Port, Path)
   val registrationResult =
     LocationServiceFactory.make(actorRuntime).register(registration).await
 
