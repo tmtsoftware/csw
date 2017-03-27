@@ -2,6 +2,7 @@ package csw.services.location.scaladsl
 
 import csw.services.location.internal.Settings
 import org.scalatest.{FunSuite, Matchers}
+import csw.services.location.common.TestFutureExtension.RichFuture
 
 class LocationServiceFactoryTest
   extends FunSuite
@@ -19,6 +20,6 @@ class LocationServiceFactoryTest
     val actorRuntime = new ActorRuntime()
     val locationService= LocationServiceFactory.make(actorRuntime)
     //#Location-service-creation-using-actor-runtime
-    actorRuntime.terminate()
+    actorRuntime.terminate().await
   }
 }

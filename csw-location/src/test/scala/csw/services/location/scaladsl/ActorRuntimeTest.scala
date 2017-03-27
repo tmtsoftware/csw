@@ -1,8 +1,10 @@
 package csw.services.location.scaladsl
 
-import akka.actor.ActorSystem
+import
+akka.actor.ActorSystem
 import csw.services.location.internal.Settings
 import org.scalatest.{FunSuite, Matchers}
+import csw.services.location.common.TestFutureExtension.RichFuture
 
 class ActorRuntimeTest
   extends FunSuite
@@ -14,7 +16,7 @@ class ActorRuntimeTest
     //#actor-runtime-creation
 
     actorRuntime.isInstanceOf[ActorRuntime] shouldBe true
-    actorRuntime.terminate()
+    actorRuntime.terminate().await
   }
 
   test("able to create actor runtime with custom settings") {
@@ -24,7 +26,7 @@ class ActorRuntimeTest
     val actorRuntime = new ActorRuntime(settings)
     //#actor-runtime-creation-with-Settings
     actorRuntime.actorSystem.settings.config.getString("akka.remote.netty.tcp.port") shouldBe port.toString
-    actorRuntime.terminate()
+    actorRuntime.terminate().await
   }
 
   test("able to create actor runtime with actor system") {
@@ -33,6 +35,6 @@ class ActorRuntimeTest
     val actorRuntime = new ActorRuntime(actorSystem)
     //#actor-runtime-creation-with-system
     actorRuntime.actorSystem shouldBe actorSystem
-    actorRuntime.terminate()
+    actorRuntime.terminate().await
   }
 }
