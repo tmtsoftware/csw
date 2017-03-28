@@ -31,36 +31,25 @@ class LocationServiceCompTest
   }
 
   test("tcp location") {
-    //#register_tcp_connection
     val componentId: ComponentId = ComponentId("exampleTCPService", ComponentType.Service)
     val connection: TcpConnection = TcpConnection(componentId)
     val Port: Int = 1234
 
     val tcpRegistration: TcpRegistration = TcpRegistration(connection,  Port)
 
-    val registrationResultF: Future[RegistrationResult] = locationService.register(tcpRegistration)
-    //#register_tcp_connection
-    val registrationResult = registrationResultF.await
+    locationService.register(tcpRegistration).await
 
     locationService.resolve(connection).await.get shouldBe tcpRegistration.location(Networks.hostname())
 
-    //#list_all_components
-    val listF: Future[List[Location]] = locationService.list
-    //#list_all_components
+    locationService.list.await shouldBe List(tcpRegistration.location(Networks.hostname()))
 
-    listF.await shouldBe List(tcpRegistration.location(Networks.hostname()))
-
-    //#unregister_using_result
-    val unregisterF: Future[Done] = registrationResult.unregister()
-    //#unregister_using_result
-    unregisterF.await
+    locationService.register(tcpRegistration).await.unregister().await
 
     locationService.resolve(connection).await shouldBe None
     locationService.list.await shouldBe List.empty
   }
 
   test("http location") {
-    //#register_http_connection
     val componentId: ComponentId = ComponentId("exampleHTTPService", ComponentType.Service)
     val httpConnection: HttpConnection = HttpConnection(componentId)
     val Port: Int = 8080
@@ -68,22 +57,15 @@ class LocationServiceCompTest
 
     val httpRegistration: HttpRegistration = HttpRegistration(httpConnection,  Port, Path)
 
-    val registrationResultF: Future[RegistrationResult] = locationService.register(httpRegistration)
-    //#register_http_connection
-    val registrationResult = registrationResultF.await
-    registrationResult.location.connection shouldBe httpConnection
+    locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
 
     locationService.list.await shouldBe List(httpRegistration.location(Networks.hostname()))
 
-    //#unregister_using_connection
-    val unregisterF: Future[Done] = locationService.unregister(httpConnection)
-    //#unregister_using_connection
-    unregisterF.await
+    locationService.unregister(httpConnection).await
     locationService.list.await shouldBe List.empty
   }
 
   test("akka location") {
-    //#register_akka_connection
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
     val Prefix = "prefix"
@@ -97,17 +79,13 @@ class LocationServiceCompTest
 
     val akkaRegistration = AkkaRegistration(connection, actorRef)
 
-    val registrationResultF: Future[RegistrationResult] = locationService.register(akkaRegistration)
-    //#register_akka_connection
-    val registrationResult = registrationResultF.await
-
-    registrationResult.location.connection shouldBe connection
+    locationService.register(akkaRegistration).await.location.connection shouldBe connection
 
     Thread.sleep(10)
 
     locationService.list.await shouldBe List(akkaRegistration.location(Networks.hostname()))
 
-    registrationResult.unregister().await
+    locationService.register(akkaRegistration).await.unregister().await
 
     locationService.list.await shouldBe List.empty
   }
@@ -125,9 +103,7 @@ class LocationServiceCompTest
     )
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
 
-    val registrationResult = locationService.register(AkkaRegistration(connection, actorRef)).await
-
-    registrationResult.location.connection shouldBe connection
+    locationService.register(AkkaRegistration(connection, actorRef)).await.location.connection shouldBe connection
 
     Thread.sleep(10)
 
@@ -214,13 +190,7 @@ class LocationServiceCompTest
     val connection = TcpConnection(ComponentId("redis5", ComponentType.Service))
     locationService.register(TcpRegistration(connection,  1234)).await
 
-    //#resolve_connection
-    val resolveF: Future[Option[Location]] = locationService.resolve(connection)
-    //#resolve_connection
-
-    val resolvedCon = resolveF.await.get
-
-    resolvedCon.connection shouldBe connection
+    locationService.resolve(connection).await.get.connection shouldBe connection
   }
 
   test("Should filter components with component type") {
@@ -240,13 +210,7 @@ class LocationServiceCompTest
     val configServiceConnection = TcpConnection(ComponentId("configservice", ComponentType.Service))
     locationService.register(TcpRegistration(configServiceConnection,  1234)).await
 
-    //#list_components_using_type
-    val listF: Future[List[Location]] = locationService.list(ComponentType.HCD)
-    //#list_components_using_type
-
-    val filteredHCDs = listF.await
-
-    filteredHCDs.map(_.connection) shouldBe List(hcdConnection)
+    locationService.list(ComponentType.HCD).await.map(_.connection) shouldBe List(hcdConnection)
 
     val filteredServices = locationService.list(ComponentType.Service).await
 
@@ -274,12 +238,7 @@ class LocationServiceCompTest
     val assemblyHttpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
     val registrationResult = locationService.register(HttpRegistration(assemblyHttpConnection,  1234, "path123")).await
 
-    //#list_components_using_connection_type
-    val listF: Future[List[Location]] = locationService.list(ConnectionType.TcpType)
-    //#list_components_using_connection_type
-
-    val tcpConnections = listF.await
-    tcpConnections.map(_.connection).toSet shouldBe Set(redisTcpConnection, configTcpConnection)
+    locationService.list(ConnectionType.TcpType).await.map(_.connection).toSet shouldBe Set(redisTcpConnection, configTcpConnection)
 
     val httpConnections = locationService.list(ConnectionType.HttpType).await
     httpConnections.map(_.connection).toSet shouldBe Set(assemblyHttpConnection)
@@ -295,13 +254,7 @@ class LocationServiceCompTest
     val httpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
     val registrationResult = locationService.register(HttpRegistration(httpConnection,  1234, "path123")).await
 
-    //#list_components_using_hostname
-    val listF: Future[List[Location]] = locationService.list(Networks.hostname())
-    //#list_components_using_hostname
-
-    val filteredLocations = listF.await
-
-    filteredLocations.map(_.connection).toSet shouldBe Set(tcpConnection, httpConnection)
+    locationService.list(Networks.hostname()).await.map(_.connection).toSet shouldBe Set(tcpConnection, httpConnection)
 
     locationService.list("Invalid_hostname").await shouldBe List.empty
   }
@@ -317,15 +270,8 @@ class LocationServiceCompTest
     locationService.register(redis1Registration).await
     locationService.register(redis2registration).await
 
-    val locations = locationService.list.await
-    locations.map(_.connection).toSet shouldBe Set(redis1Connection, redis2Connection)
-
-    //#unregister_all_components
-    val unregisterAllF: Future[Done] = locationService.unregisterAll()
-    //#unregister_all_components
-    unregisterAllF.await
-
+    locationService.list.await.map(_.connection).toSet shouldBe Set(redis1Connection, redis2Connection)
+    locationService.unregisterAll().await
     locationService.list.await shouldBe List.empty
-
   }
 }
