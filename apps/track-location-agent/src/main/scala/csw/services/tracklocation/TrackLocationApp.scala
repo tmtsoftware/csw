@@ -36,6 +36,7 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
   }
 
   def shutdown(): Future[Terminated] = async {
+    locationService.shutdown()
     await(actorSystem.terminate())
   }
 }

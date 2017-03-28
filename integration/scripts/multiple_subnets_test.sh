@@ -16,20 +16,23 @@ docker run --name=lan10.1 --net=macvlan-10 --ip=192.168.210.10 -d $HOST_DIR_MAPP
 docker run --name=lan10.2 --net=macvlan-10 --ip=192.168.220.10 -d $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
 docker run --name=lan10.3 --net=macvlan-10 --ip=192.168.210.5 -d $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
 
+akkaSeed=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' lan10.1)
+printf "${PURPLE}----------- Akka Seed Node is : ${akkaSeed}-----------${NC}\n"
+
+
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
-docker exec -d lan10.1 bash -c 'cd /source && export PORT=2555;./integration/target/universal/integration-10000/bin/trombone-h-c-d'
+docker exec -d lan10.1 bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/trombone-h-c-d'
 
 printf "${PURPLE}------ Waiting for 10 seconds to boot up HCD ------${NC}\n"
 sleep 10
 
 printf "${YELLOW}----------- Starting Redis App -----------${NC}\n"
-docker exec -d lan10.2 bash -c 'cd /source && export PORT=2556;./integration/target/universal/integration-10000/bin/test-service'
-
+docker exec -d --env akkaSeed=$akkaSeed lan10.2 bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-service -DakkaSeed=$akkaSeed'
 printf "${PURPLE}------ Waiting for 10 seconds to boot up Reddis ------${NC}\n"
 sleep 10
 
 printf "${YELLOW}------ Starting Test App ------${NC}\n"
-docker exec lan10.3 bash -c 'cd /source && export PORT=2557;./integration/target/universal/integration-10000/bin/test-app'
+docker exec --env akkaSeed=$akkaSeed lan10.3 bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-app -DakkaSeed=$akkaSeed'
 test_exit_code=$?
 
 printf "${ORANGE}------ [Debug] Inspecting network information ------${NC}"

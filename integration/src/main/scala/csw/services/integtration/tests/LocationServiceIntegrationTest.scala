@@ -3,16 +3,14 @@ package csw.services.integtration.tests
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
-import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationService
 import org.scalatest._
 
-class LocationServiceIntegrationTest(actorRuntime: ActorRuntime)
+class LocationServiceIntegrationTest(locationService: LocationService)
   extends FunSuite
     with Matchers
     with BeforeAndAfter
     with BeforeAndAfterAll {
-  private val locationService = LocationServiceFactory.make(actorRuntime)
-
 
   test("resolves remote HCD") {
     val componentId = ComponentId("trombonehcd", ComponentType.HCD)
@@ -29,7 +27,6 @@ class LocationServiceIntegrationTest(actorRuntime: ActorRuntime)
   test("list all components"){
     val listOfLocations = locationService.list.await
 
-    listOfLocations should not be empty
     listOfLocations should have size 2
   }
 

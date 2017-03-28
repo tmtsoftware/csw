@@ -1,15 +1,11 @@
 package csw.services.integtration.apps
 
-import java.net.URI
-
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.models.{ComponentId, ComponentType, HttpLocation, HttpRegistration}
 import csw.services.location.models.Connection.HttpConnection
-import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
+import csw.services.location.models.{ComponentId, ComponentType, HttpRegistration}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 object TestService {
-  private val actorRuntime = new ActorRuntime()
-
   val componentId = ComponentId("redisservice", ComponentType.Service)
   val connection = HttpConnection(componentId)
 
@@ -18,7 +14,7 @@ object TestService {
 
   val registration = HttpRegistration(connection,  Port, Path)
   val registrationResult =
-    LocationServiceFactory.make(actorRuntime).register(registration).await
+    LocationServiceFactory.make().register(registration).await
 
   print("Redis Service Registered")
 

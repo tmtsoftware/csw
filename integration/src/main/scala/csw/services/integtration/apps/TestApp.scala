@@ -1,15 +1,17 @@
 package csw.services.integtration.apps
 
 import csw.services.integtration.tests.{LocationServiceIntegrationTest, TrackLocationAppIntegrationTest}
-import csw.services.location.scaladsl.ActorRuntime
+import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object TestApp {
   import org.scalatest
 
   def main(args: Array[String]): Unit = {
     val actorRuntime = new ActorRuntime()
-    scalatest.run(new TrackLocationAppIntegrationTest(actorRuntime))
-    scalatest.run(new LocationServiceIntegrationTest(actorRuntime))
+    val locationService = LocationServiceFactory.make(actorRuntime)
+    scalatest.run(new LocationServiceIntegrationTest(locationService))
+    scalatest.run(new TrackLocationAppIntegrationTest(locationService))
     actorRuntime.terminate()
+    locationService.shutdown()
   }
 }
