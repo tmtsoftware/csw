@@ -65,8 +65,7 @@ node {
                         },
                         "Multiple Subnet's": {
                             stage("Subnet") {
-                                   sh "./integration/scripts/multiple_subnets_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
-                                }
+                                sh "./integration/scripts/multiple_subnets_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
                             }
                         }
                     )
@@ -95,10 +94,8 @@ node {
 }
 
 def sendNotification(String buildStatus = 'STARTED') {
-    // build status of null means successful
     buildStatus =  buildStatus ?: 'SUCCESSFUL'
 
-    // Default values
     def colorName = 'RED'
     def colorCode = '#FF0000'
     def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
