@@ -27,7 +27,7 @@ class LocationServiceCompTest
   }
 
   override protected def afterAll(): Unit = {
-    actorRuntime.terminate().await
+    locationService.shutdown()
   }
 
   test("tcp location") {
