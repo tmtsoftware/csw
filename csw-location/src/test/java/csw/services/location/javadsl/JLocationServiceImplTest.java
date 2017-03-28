@@ -114,7 +114,7 @@ public class JLocationServiceImplTest {
         IRegistrationResult registrationResult = completableFuture.get();
         Assert.assertEquals(httpServiceComponentId, registrationResult.location().connection().componentId());
         CompletionStage<Done> uCompletionStage = locationService.unregister(httpServiceConnection);
-        CompletableFuture<Done> uCompletableFuture = uCompletionStage.toCompletableFuture();
+        Done uCompletableFuture = uCompletionStage.toCompletableFuture().get();
         Assert.assertEquals(Collections.emptyList(), locationService.list().toCompletableFuture().get());
     }
 
@@ -181,7 +181,11 @@ public class JLocationServiceImplTest {
         locations.add(akkaRegistration.location(new Networks().hostname()));
 
         Assert.assertTrue(locations.size() == 2);
-        Assert.assertEquals(locations, locationService.list(new Networks().getIpv4Address().getHostAddress()).toCompletableFuture().get());
+
+        ArrayList<Location> locations2 = new ArrayList<>();
+        locations2.add(tcpRegistration.location(new Networks().hostname()));
+
+        Assert.assertEquals(locations2, locationService.list(new Networks().hostname()).toCompletableFuture().get());
     }
 
     @Test
