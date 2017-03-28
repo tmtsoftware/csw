@@ -15,10 +15,31 @@ import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 import scala.async.Async._
 import scala.concurrent.Future
 
+/**
+  * A `LocationService` implementation which manages registration data on akka cluster. The data is kept in two formats.
+  * One with [[akka.cluster.ddata.LWWRegister]] with `Connection.name` as key and `Option[Location]`  as value and
+  * other with [[akka.cluster.ddata.LWWMap]] with a constant key and a map of `Connection` to `Location` as value
+  *
+  * @param actorRuntime ActorRuntime which gives handle to ActorSystem of akka cluster
+  */
 private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends LocationService { outer =>
 
   import actorRuntime._
 
+  /**
+    * Registers a `Location` against connection name in `LWWRegister` and then `Connection` to Location` in `LWWMap`.
+    * The returned `Future` fails in following cases :
+    *
+    * {{{
+    *     - If the connection name is already present in LWWRegister
+    *     - If update in LWWRegister fails then LWWMap will not be updated
+    *     - If update in LWWRegister is successful but LWWMap failed (This breaks the atomicity of
+    *         data being present in LWWRegister as well as LWWMap. The user is expected to register
+    *         again with the same Registration to make data consistent)
+    * }}}
+    *
+    * If update in `LWWRegister` and `LWWMap` is successful the `Future` is returned with `RegistrationResult`
+    */
   def register(registration: Registration): Future[RegistrationResult] = {
     val location = registration.location(actorRuntime.hostname)
 
