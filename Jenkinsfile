@@ -38,13 +38,17 @@ node {
                         sh "exit 1"
                 }
 
+                stage('Mult-Jvm Test') {
+                    sh "sbt csw-location/multi-jvm-test"
+                }
+
                 stage('Package') {
                     sh "./universal_package.sh"
                     stash name: "repo"
                 }
             }
 
-            node('JenkinsNode1'){
+            node('JenkinsNode1') {
                 stage('Integration') {
                     unstash "repo"
                     sh "./integration/scripts/runner.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
