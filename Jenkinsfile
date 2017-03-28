@@ -39,7 +39,7 @@ node {
                 }
 
                 stage('Mult-Jvm Test') {
-                    sh "sbt csw-location/multi-jvm-test"
+                    sh "sbt csw-location/multi-jvm:test"
                 }
 
                 stage('Package') {
