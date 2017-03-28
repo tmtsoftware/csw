@@ -17,19 +17,19 @@ docker run --name=lan10.2 --net=macvlan-10 --ip=192.168.220.10 -d $HOST_DIR_MAPP
 docker run --name=lan10.3 --net=macvlan-10 --ip=192.168.210.5 -d $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
 
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
-docker exec -d lan10.1 bash -c 'cd source && export PORT=2555;./integration/target/universal/integration-10000/bin/trombone-h-c-d'
+docker exec -d lan10.1 bash -c 'cd /source && export PORT=2555;./integration/target/universal/integration-10000/bin/trombone-h-c-d'
 
 printf "${PURPLE}------ Waiting for 10 seconds to boot up HCD ------${NC}\n"
 sleep 10
 
 printf "${YELLOW}----------- Starting Redis App -----------${NC}\n"
-docker exec -d lan10.2 bash -c 'cd source && export PORT=2556;./integration/target/universal/integration-10000/bin/test-service'
+docker exec -d lan10.2 bash -c 'cd /source && export PORT=2556;./integration/target/universal/integration-10000/bin/test-service'
 
 printf "${PURPLE}------ Waiting for 10 seconds to boot up Reddis ------${NC}\n"
 sleep 10
 
 printf "${YELLOW}------ Starting Test App ------${NC}\n"
-docker exec lan10.3 bash -c 'cd source && export PORT=2557;./integration/target/universal/integration-10000/bin/test-app'
+docker exec lan10.3 bash -c 'cd /source && export PORT=2557;./integration/target/universal/integration-10000/bin/test-app'
 test_exit_code=$?
 
 printf "${ORANGE}------ [Debug] Inspecting network information ------${NC}"
