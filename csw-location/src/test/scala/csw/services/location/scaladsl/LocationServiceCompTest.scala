@@ -1,6 +1,7 @@
 package csw.services.location.scaladsl
 
 import akka.actor.{Actor, ActorPath, ActorSystem, PoisonPill, Props}
+import akka.actor.{Actor, ActorPath, PoisonPill, Props}
 import akka.serialization.Serialization
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
