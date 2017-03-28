@@ -60,23 +60,12 @@ node {
                     parallel(
                         "Multiple NIC's": {
                             stage("NIC") {
-                                try {
-                                    sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
-                                }
-                                catch (Exception ex) {
-                                    currentBuild.result = 'FAILED'
-                                    throw ex
-                                }
+                                sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
                             }
                         },
                         "Multiple Subnet's": {
                             stage("Subnet") {
-                                try {
-                                       sh "./integration/scripts/multiple_subnets_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
-                                }
-                                catch (Exception ex) {
-                                    currentBuild.result = 'FAILED'
-                                    throw ex
+                                   sh "./integration/scripts/multiple_subnets_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
                                 }
                             }
                         }
