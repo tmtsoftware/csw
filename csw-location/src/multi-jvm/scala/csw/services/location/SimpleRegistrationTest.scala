@@ -2,10 +2,9 @@ package csw.services.location
 
 import java.net.URI
 
-import akka.actor.{Actor, ActorPath, Props}
+import akka.actor.{Actor, Props}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
-import akka.serialization.Serialization
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
@@ -74,8 +73,6 @@ class LocationServiceTest(ignore: Int)
   test("ensure that a component registered on one node is tracked on all the nodes") {
     val componentId = ComponentId("tromboneHcd", ComponentType.HCD)
     val akkaConnection = AkkaConnection(componentId)
-    val Prefix = "prefix"
-
 
     runOn(node1) {
       val actorRef = actorRuntime.actorSystem.actorOf(
@@ -84,8 +81,7 @@ class LocationServiceTest(ignore: Int)
         }),
         "trombone-hcd"
       )
-      val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
-      val registrationResult = locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
+      locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await
@@ -93,7 +89,6 @@ class LocationServiceTest(ignore: Int)
     }
 
     runOn(node2) {
-
       val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
       probe.request(1)
@@ -101,8 +96,7 @@ class LocationServiceTest(ignore: Int)
         case LocationUpdated(_) => ()
       })
       enterBarrier("Registration")
-
-
+      
       probe.request(1)
       probe.expectNextPF({
         case LocationRemoved(_) => ()
@@ -112,9 +106,7 @@ class LocationServiceTest(ignore: Int)
       switch.shutdown()
       probe.request(1)
       probe.expectComplete()
-
     }
-
     enterBarrier("after-3")
   }
 }
