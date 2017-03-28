@@ -21,7 +21,7 @@ node {
                         failBuild = true
                     }
                     try {
-                        sh "sbt trackLocation/test"
+                        sh "sbt track-location-agent/test"
                     }
                     catch (Exception e) {
                         currentBuild.result = 'FAILED'
