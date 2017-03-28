@@ -15,7 +15,7 @@ import scala.concurrent.Future
   */
 class TrackLocationApp(actorRuntime: ActorRuntime) {
   import actorRuntime._
-
+  val locationService= LocationServiceFactory.make(actorRuntime)
   var trackLocation: TrackLocation = _
 
   def start(args: Array[String]): Unit = {
@@ -24,7 +24,7 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
         try {
           val command = Command.parse(options)
           println(s"commandText: ${command.commandText}, command: $command")
-          trackLocation = new TrackLocation(options.names, command, actorRuntime)
+          trackLocation = new TrackLocation(options.names, command, actorRuntime, locationService)
           trackLocation.run()
         } catch {
           case e: Throwable =>
@@ -36,7 +36,7 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
   }
 
   def shutdown(): Future[Terminated] = async {
-    await(actorRuntime.actorSystem.terminate())
+    await(actorSystem.terminate())
   }
 }
 

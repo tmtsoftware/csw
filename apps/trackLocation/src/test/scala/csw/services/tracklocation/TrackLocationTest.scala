@@ -1,14 +1,15 @@
 package csw.services.tracklocation
 
+import java.net.URI
 import java.nio.file.Paths
 
 import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
-import csw.services.location.internal.Settings
-import csw.services.tracklocation.common.TestFutureExtension.RichFuture
+import csw.services.location.internal.{Networks, Settings}
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
+import csw.services.tracklocation.common.TestFutureExtension.RichFuture
 import csw.services.tracklocation.models.Command
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
 
@@ -57,8 +58,9 @@ class TrackLocationTest
     Thread.sleep(2000)
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
-    val resolvedConnection = locationService.resolve(connection).await.get
-    resolvedConnection shouldBe TcpRegistration(connection,  port)
+    val resolvedLocation = locationService.resolve(connection).await.get
+    val tcpLocation = new TcpLocation(connection, new URI(s"tcp://${Networks.hostname()}:$port"))
+    resolvedLocation shouldBe tcpLocation
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
     Thread.sleep(6000)
@@ -85,8 +87,9 @@ class TrackLocationTest
     Thread.sleep(2000)
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
-    val resolvedConnection = locationService.resolve(connection).await.get
-    resolvedConnection shouldBe TcpRegistration(connection,  port)
+    val resolvedLocation = locationService.resolve(connection).await.get
+    val tcpLocation = new TcpLocation(connection, new URI(s"tcp://${Networks.hostname()}:$port"))
+    resolvedLocation shouldBe tcpLocation
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
     Thread.sleep(6000)
@@ -99,7 +102,7 @@ class TrackLocationTest
     val port = 9999
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
-      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime)
+      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime, locationService)
       trackLocation.run().await
     }
 
@@ -111,7 +114,7 @@ class TrackLocationTest
     val port = 9999
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
-      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime)
+      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime, locationService)
       trackLocation.run().await
     }
 
