@@ -6,6 +6,7 @@ import akka.cluster.ddata._
 import akka.pattern.ask
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
+import csw.services.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed, RegistrationListingFailed, UnregistrationFailed}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.models._
@@ -25,7 +26,7 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
 
     val updateValue = service.update {
       case r@LWWRegister(Some(`location`) | None) => r.withValue(Some(location))
-      case LWWRegister(Some(otherLocation))       => otherLocationRegisteredError(location, otherLocation)
+      case LWWRegister(Some(otherLocation))       => throw OtherLocationIsRegistered(location, otherLocation)
     }
 
     val updateRegistry = AllServices.update(_ + (location.connection → location))
@@ -33,10 +34,10 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     (replicator ? updateValue).flatMap {
       case _: UpdateSuccess[_]                     => (replicator ? updateRegistry).map {
         case _: UpdateSuccess[_] => registrationResult(location)
-        case _                   => registrationFailedError(location.connection)
+        case _                   => throw RegistrationFailed(location.connection)
       }
       case ModifyFailure(service.Key, _, cause, _) => throw cause
-      case _                                       => registrationFailedError(location.connection)
+      case _                                       => throw RegistrationFailed(location.connection)
     }
   }
 
@@ -46,9 +47,9 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     (replicator ? service.update(_.withValue(None))).flatMap {
       case x: UpdateSuccess[_] => (replicator ? AllServices.update(_ - connection)).map {
         case _: UpdateSuccess[_] => Done
-        case _                   => unregistrationFailedError(connection)
+        case _                   => throw UnregistrationFailed(connection)
       }
-      case _                   => unregistrationFailedError(connection)
+      case _                   => throw UnregistrationFailed(connection)
     }
   }
 
@@ -65,7 +66,7 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
   def list: Future[List[Location]] = (replicator ? AllServices.get).map {
     case x@GetSuccess(AllServices.Key, _) => x.get(AllServices.Key).entries.values.toList
     case NotFound(AllServices.Key, _)     ⇒ List.empty
-    case _                                => listingError()
+    case _                                => throw RegistrationListingFailed
   }
 
   def list(componentType: ComponentType): Future[List[Location]] = async {
@@ -97,15 +98,4 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
 
     override def unregister(): Future[Done] = outer.unregister(location.connection)
   }
-
-  private def registrationFailedError(connection: Connection) = throw new RuntimeException(s"unable to register $connection")
-
-  private def unregistrationFailedError(connection: Connection) = throw new RuntimeException(s"unable to unregister $connection")
-
-  private def otherLocationRegisteredError(location: Location, otherLocation: Location) = throw new IllegalStateException(
-    s"there is other location=$otherLocation registered against name=${location.connection.name}."
-  )
-
-  private def listingError() = throw new RuntimeException(s"unable to get the list of registered locations")
-
 }

@@ -6,6 +6,7 @@ import akka.serialization.Serialization
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.common.TestFutureExtension.RichFuture
+import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
@@ -151,7 +152,7 @@ class LocationServiceCompTest
 
     val result = locationService.register(tcpRegistration).await
 
-    val illegalStateException1 = intercept[IllegalStateException]{
+    val illegalStateException1 = intercept[OtherLocationIsRegistered]{
       locationService.register(duplicateTcpRegistration).await
     }
 
