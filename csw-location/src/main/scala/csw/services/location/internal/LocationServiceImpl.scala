@@ -143,6 +143,15 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     await(list).filter(_.connection.connectionType == connectionType)
   }
 
+  /**
+    * Creates an `ActorRef` that subscribes for `Changed` messages for a given `Connection` from `LWWRegister` and pass
+    * it to [[akka.stream.scaladsl.Source]]. The `Source` will then map the `Changed` event to
+    * [[csw.services.location.models.LocationUpdated]] if the `LWWRegister` contains the `Location` against `Connection`
+    * or to [[csw.services.location.models.LocationRemoved]] if there is no value against `Connection`.
+    *
+    * Un-track a given connection using [[akka.stream.KillSwitch]]
+    *
+    */
   def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
     val (source, actorRefF) = StreamExt.actorCoupling[Any]
     val service = new Registry.Service(connection)
@@ -153,6 +162,9 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     }.cancellable
   }
 
+  /**
+    * Terminate `ActorSystem` and un-register from akka cluster.
+    */
   def shutdown(): Future[Done] = actorSystem.terminate().map(_ ⇒ Done)
 
   private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {
