@@ -42,9 +42,9 @@ class LocationServiceCompTest
 
     locationService.register(tcpRegistration).await
 
-    locationService.resolve(connection).await.get shouldBe tcpRegistration.location(Networks.hostname())
+    locationService.resolve(connection).await.get shouldBe tcpRegistration.location(new Networks().hostname())
 
-    locationService.list.await shouldBe List(tcpRegistration.location(Networks.hostname()))
+    locationService.list.await shouldBe List(tcpRegistration.location(new Networks().hostname()))
 
     locationService.register(tcpRegistration).await.unregister().await
 
@@ -62,7 +62,7 @@ class LocationServiceCompTest
 
     locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
 
-    locationService.list.await shouldBe List(httpRegistration.location(Networks.hostname()))
+    locationService.list.await shouldBe List(httpRegistration.location(new Networks().hostname()))
 
     locationService.unregister(httpConnection).await
     locationService.list.await shouldBe List.empty
@@ -86,7 +86,7 @@ class LocationServiceCompTest
 
     Thread.sleep(10)
 
-    locationService.list.await shouldBe List(akkaRegistration.location(Networks.hostname()))
+    locationService.list.await shouldBe List(akkaRegistration.location(new Networks().hostname()))
 
     locationService.register(akkaRegistration).await.unregister().await
 
@@ -110,7 +110,7 @@ class LocationServiceCompTest
 
     Thread.sleep(10)
 
-    locationService.list.await shouldBe List(AkkaRegistration(connection, actorRef).location(Networks.hostname()))
+    locationService.list.await shouldBe List(AkkaRegistration(connection, actorRef).location(new Networks().hostname()))
 
     actorRef ! PoisonPill
 
@@ -132,7 +132,7 @@ class LocationServiceCompTest
     val result = locationService.register(redis1Registration).await
     val result2 = locationService.register(redis2registration).await
     probe.request(1)
-    probe.expectNext(LocationUpdated(redis1Registration.location(Networks.hostname())))
+    probe.expectNext(LocationUpdated(redis1Registration.location(new Networks().hostname())))
 
     result.unregister().await
     result2.unregister().await
@@ -255,7 +255,7 @@ class LocationServiceCompTest
     val httpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
     val registrationResult = locationService.register(HttpRegistration(httpConnection,  1234, "path123")).await
 
-    locationService.list(Networks.hostname()).await.map(_.connection).toSet shouldBe Set(tcpConnection, httpConnection)
+    locationService.list(new Networks().hostname()).await.map(_.connection).toSet shouldBe Set(tcpConnection, httpConnection)
 
     locationService.list("Invalid_hostname").await shouldBe List.empty
   }

@@ -1,50 +1,58 @@
 package csw.services.location.internal
 
 import java.net.{Inet6Address, InetAddress, NetworkInterface}
-import scala.collection.JavaConverters._
 
 import scala.collection.JavaConverters._
 
-object Networks {
+case class NetworkInterfaceNotFound(message: String) extends Exception(message)
 
-  def hostname(): String = hostname("")
+class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider) {
 
-  def hostname(interfaceName: String): String = getIpv4Address(interfaceName).getHostAddress
+  def this(interfaceName: String) = this(interfaceName, new NetworkInterfaceProvider())
+  def this() = this("")
 
-  def getIpv4Address(interfaceName: String = ""): InetAddress = Pair.all(interfaceName)
-    .sortBy(_.index)
-    .find(_.isIpv4)
-    .getOrElse(Pair.default)
-    .addr
+  def hostname(): String = getIpv4Address().getHostAddress
 
-  private case class Pair(index: Int, addr: InetAddress) {
-    def isIpv4: Boolean = {
-      // Don't use ipv6 addresses yet, since it seems to not be working with the current akka version
-      !addr.isLoopbackAddress && !addr.isInstanceOf[Inet6Address]
-    }
+  def getIpv4Address(): InetAddress = all()
+    .sortBy(_._1)
+    .find(pair => isIpv4(pair._2))
+    .getOrElse((0, InetAddress.getLocalHost))
+    ._2
+
+  def isIpv4(addr: InetAddress): Boolean = {
+    // Don't use ipv6 addresses yet, since it seems to not be working with the current akka version
+    !addr.isLoopbackAddress && !addr.isInstanceOf[Inet6Address]
   }
 
-  private object Pair {
-    def all(interfaceName: String): List[Pair] = for {
-      iface <- getNetworkInterfacesList(interfaceName)
-      if iface.isUp && iface.supportsMulticast
-      a <- iface.getInetAddresses.asScala
-    } yield Pair(iface.getIndex, a)
-
-    def getNetworkInterfacesList(interfaceName: String): List[NetworkInterface] ={
-      if (interfaceName.isEmpty) {
-        NetworkInterface.getNetworkInterfaces.asScala.toList
-      }
-      else {
-        Option(NetworkInterface.getByName(interfaceName)) match {
-          case None => throw new NetworkInterfaceNotFound(s"Network interface=${interfaceName} not found.")
-          case Some(nic : NetworkInterface) => nic::Nil
-        }
-      }
-    }
-
-    def default: Pair = Pair(0, InetAddress.getLocalHost)
+  def all(): Seq[(Int, InetAddress)] = {
+    for {
+      tuple <- getNetworkInterfaceList()
+      a <- tuple._2
+    } yield (tuple._1, a)
   }
 
-  case class NetworkInterfaceNotFound(message: String) extends Exception(message)
+  def getNetworkInterfaceList(): Seq[(Int, List[InetAddress])] = {
+    if (interfaceName.isEmpty)
+      networkProvider.getAllInterfaces()
+    else
+      networkProvider.getInterface(interfaceName)
+  }
+
+}
+
+case class NetworkInterfaceDecorator(networkInterface: NetworkInterface) {
+
+}
+
+class NetworkInterfaceProvider() {
+  def getAllInterfaces(): Seq[(Int, List[InetAddress])] = {
+    NetworkInterface.getNetworkInterfaces.asScala.toList.map(iface=>(iface.getIndex, iface.getInetAddresses().asScala.toList))
+  }
+
+  def getInterface(interfaceName: String): Seq[(Int, List[InetAddress])] = {
+    Option(NetworkInterface.getByName(interfaceName)) match {
+      case None => throw new NetworkInterfaceNotFound(s"Network interface=${interfaceName} not found.")
+      case s@Some(nic:NetworkInterface) => s.map(iface=>(iface.getIndex, iface.getInetAddresses().asScala.toList)).get :: Nil
+    }
+  }
 }

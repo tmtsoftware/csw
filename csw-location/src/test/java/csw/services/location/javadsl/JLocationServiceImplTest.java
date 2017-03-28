@@ -65,7 +65,7 @@ public class JLocationServiceImplTest {
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
 
         IRegistrationResult registrationResult = locationService.register(httpRegistration).toCompletableFuture().get();
-        Assert.assertEquals(httpRegistration.location(Networks.hostname()), registrationResult.location());
+        Assert.assertEquals(httpRegistration.location(new Networks().hostname()), registrationResult.location());
         locationService.unregister(httpServiceConnection).toCompletableFuture().get();
         Assert.assertEquals(Collections.emptyList(), locationService.list().toCompletableFuture().get());
     }
@@ -82,9 +82,9 @@ public class JLocationServiceImplTest {
         locationService.register(tcpRegistration).toCompletableFuture().get();
 
         Assert.assertEquals(3, locationService.list().toCompletableFuture().get().size());
-        Assert.assertEquals(akkaRegistration.location(Networks.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
-        Assert.assertEquals(httpRegistration.location(Networks.hostname()), locationService.resolve(httpServiceConnection).toCompletableFuture().get().get());
-        Assert.assertEquals(tcpRegistration.location(Networks.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(akkaRegistration.location(new Networks().hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(httpRegistration.location(new Networks().hostname()), locationService.resolve(httpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class JLocationServiceImplTest {
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
         locationService.register(tcpRegistration).toCompletableFuture().get();
-        Assert.assertEquals(tcpRegistration.location(Networks.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class JLocationServiceImplTest {
 
         AkkaRegistration registration = new AkkaRegistration(akkaHcdConnection, actorRef);
         locationService.register(registration).toCompletableFuture().get();
-        Assert.assertEquals(registration.location(Networks.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(registration.location(new Networks().hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
     }
 
     @Test
@@ -161,7 +161,7 @@ public class JLocationServiceImplTest {
         locationService.register(httpRegistration).toCompletableFuture().get();
 
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(httpRegistration.location(Networks.hostname()));
+        locations.add(httpRegistration.location(new Networks().hostname()));
 
         Assert.assertEquals(locations, locationService.list().toCompletableFuture().get());
     }
@@ -171,7 +171,7 @@ public class JLocationServiceImplTest {
         AkkaRegistration akkaRegistration = new AkkaRegistration(akkaHcdConnection, actorRef);
         locationService.register(akkaRegistration).toCompletableFuture().get();
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(akkaRegistration.location(Networks.hostname()));
+        locations.add(akkaRegistration.location(new Networks().hostname()));
         Assert.assertEquals(locations, locationService.list(JComponentType.HCD).toCompletableFuture().get());
     }
 
@@ -185,11 +185,11 @@ public class JLocationServiceImplTest {
         locationService.register(akkaRegistration).toCompletableFuture().get();
 
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(tcpRegistration.location(Networks.hostname()));
-        locations.add(akkaRegistration.location(Networks.hostname()));
+        locations.add(tcpRegistration.location(new Networks().hostname()));
+        locations.add(akkaRegistration.location(new Networks().hostname()));
 
         Assert.assertTrue(locations.size() == 2);
-        Assert.assertEquals(locations, locationService.list(Networks.getIpv4Address("").getHostAddress()).toCompletableFuture().get());
+        Assert.assertEquals(locations, locationService.list(new Networks().getIpv4Address().getHostAddress()).toCompletableFuture().get());
     }
 
     @Test
@@ -198,7 +198,7 @@ public class JLocationServiceImplTest {
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
         locationService.register(tcpRegistration).toCompletableFuture().get();
         ArrayList<Location> locations = new ArrayList<>();
-        locations.add(tcpRegistration.location(Networks.hostname()));
+        locations.add(tcpRegistration.location(new Networks().hostname()));
         Assert.assertEquals(locations, locationService.list(JConnectionType.TcpType).toCompletableFuture().get());
     }
 

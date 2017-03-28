@@ -14,8 +14,8 @@ case class Settings(values: Map[String, Any] = Map.empty) {
   def withPort(port: Int): Settings = withEntry("akka.remote.netty.tcp.port", port)
 
   def config: Config = {
-    val interfaceName = values.getOrElse("interfaceName", "").toString
-    val hostname: String = Networks.hostname(interfaceName)
+    val interfaceName: String = values.getOrElse("interfaceName", "").toString
+    val hostname: String = new Networks(interfaceName).hostname()
 
     val port = sys.props.getOrElse("akkaPort", "2552")
     val seedHost = sys.props.getOrElse("akkaSeed", hostname)
