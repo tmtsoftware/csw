@@ -1,9 +1,11 @@
 package csw.services.tracklocation
 
+import java.io.File
 import java.net.URI
 import java.nio.file.Paths
 
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import csw.services.location.internal.{Networks, Settings}
 import csw.services.location.models.Connection.TcpConnection
@@ -70,9 +72,11 @@ class TrackLocationTest
 
   test("Test with config file") {
     val name = "test2"
-    val port = 8888
     val url = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
+
+    val config = ConfigFactory.parseFile(new File(configFile))
+    val port = config.getString("test2.port")
 
     Future {
       trackLocationApp.start(
