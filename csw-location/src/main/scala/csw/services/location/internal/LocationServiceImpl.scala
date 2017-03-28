@@ -28,7 +28,7 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
 
   /**
     * Registers a `Location` against connection name in `LWWRegister` and then `Connection` to Location` in `LWWMap`.
-    * The returned `Future` fails in following cases :
+    * A `Future` is returned with `Failure` :
     *
     * {{{
     *     - If the connection name is already present in LWWRegister
@@ -38,7 +38,7 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     *         again with the same Registration to make data consistent)
     * }}}
     *
-    * If update in `LWWRegister` and `LWWMap` is successful the `Future` is returned with `RegistrationResult`
+    * If update in `LWWRegister` and `LWWMap` is successful then a `Future` is returned with `RegistrationResult`
     */
   def register(registration: Registration): Future[RegistrationResult] = {
     val location = registration.location(actorRuntime.hostname)
@@ -62,6 +62,19 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     }
   }
 
+  /**
+    * Unregisters `Location` for `Connection` from `LWWRegister` and then from `LWWMap`.
+    * A `Future` is returned with `Failure` :
+    *
+    * {{{
+    *     - If update in LWWRegister fails then LWWMap will not be updated
+    *     - If update in LWWRegister is successful but LWWMap failed (This breaks the atomicity of
+    *         data being present in LWWRegister as well as LWWMap. The user is expected to unregister
+    *         again with the same Connection to make data consistent)
+    * }}}
+    *
+    * If update in `LWWRegister` and `LWWMap` is successful then a `Future` is returned with `Success`
+    */
   def unregister(connection: Connection): Future[Done] = {
     val service = new Registry.Service(connection)
 
@@ -74,30 +87,58 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     }
   }
 
+  /**
+    * List all locations from `LWWMap` and unregister them one after another. A `Future` is returned with `Success` if
+    * all locations are unregistered successfully or will `Failure` if list from `LWWMap` fails or un-registration of
+    * any of the location fails
+    */
   def unregisterAll(): Future[Done] = async {
     val locations = await(list)
     await(Future.traverse(locations)(loc ⇒ unregister(loc.connection)))
     Done
   }
 
+  /**
+    * List all entries from `LWWMap` and find a `Location` for the given `Connection`. A `Future` is returned
+    * with `None` if no location is found or with `Failure` if list from `LWWMap` fails
+    */
   def resolve(connection: Connection): Future[Option[Location]] = async {
     await(list).find(_.connection == connection)
   }
 
+  /**
+    * List all entries from `LWWMap` and complete the `Future` with `Location` values. A `Future` is returned with
+    * empty list if no constant key is found for `LWWMap`. The returned `Future` will fail if list from `LWWMap` fails
+    */
   def list: Future[List[Location]] = (replicator ? AllServices.get).map {
     case x@GetSuccess(AllServices.Key, _) => x.get(AllServices.Key).entries.values.toList
     case NotFound(AllServices.Key, _)     ⇒ List.empty
     case _                                => throw RegistrationListingFailed
   }
 
+  /**
+    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `ComponentType`. A
+    * `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
+    * against the given `ComponentType`. The returned `Future` will fail if list from `LWWMap` fails
+    */
   def list(componentType: ComponentType): Future[List[Location]] = async {
     await(list).filter(_.connection.componentId.componentType == componentType)
   }
 
+  /**
+    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `Hostname`. A
+    * `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
+    * against the given `Hostname`. The returned `Future` will fail if list from `LWWMap` fails
+    */
   def list(hostname: String): Future[List[Location]] = async {
     await(list).filter(_.uri.getHost == hostname)
   }
 
+  /**
+    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `ConnectionType`. A
+    * `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
+    * against the given `ComponentType`. The returned `Future` will fail if list from `LWWMap` fails
+    */
   def list(connectionType: ConnectionType): Future[List[Location]] = async {
     await(list).filter(_.connection.connectionType == connectionType)
   }

@@ -33,7 +33,7 @@ trait LocationService {
   /**
     * Asynchronously unregisters all connections registered via `LocationService`
     *
-    * @return A `Future` which completes after un-registration happens successfully and fails otherwise
+    * @return A `Future` which completes with `Success` after all locations are unregistered successfully or fails otherwise
     */
   def unregisterAll(): Future[Done]
 
