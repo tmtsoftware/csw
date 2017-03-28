@@ -13,6 +13,10 @@ class LocationServiceMultipleNICTest(actorRuntime: ActorRuntime) extends FunSuit
 
   private val locationService = LocationServiceFactory.make(actorRuntime)
 
+  override protected def afterAll(): Unit = {
+    locationService.shutdown()
+  }
+
   test("should list and resolve component having multiple-nic's"){
 
     val componentId = ComponentId("assembly", ComponentType.Assembly)
@@ -20,16 +24,12 @@ class LocationServiceMultipleNICTest(actorRuntime: ActorRuntime) extends FunSuit
 
     val listOfLocations = locationService.list.await
 
-    listOfLocations should not be empty
     listOfLocations should have size 1
 
-    val assemblyLocation = locationService.resolve(connection).await
+    val assemblyLocation = locationService.resolve(connection).await.get
 
     assemblyLocation shouldBe a[AkkaLocation]
-    assemblyLocation
-      .asInstanceOf[AkkaLocation]
-      .uri
-      .toString should not be empty
+
   }
 
 }
