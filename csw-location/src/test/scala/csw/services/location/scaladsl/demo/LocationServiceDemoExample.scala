@@ -27,7 +27,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers {
     "my-actor-1"
   )
 
-  private val locationService = LocationServiceFactory.make()
+  private lazy val locationService = LocationServiceFactory.make()
 
   val tcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
   val tcpRegistration = TcpRegistration(tcpConnection, 6380)
