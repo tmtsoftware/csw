@@ -52,8 +52,8 @@ public class JLocationServiceImplTest {
     }
 
     @AfterClass
-    public static void shutdown() {
-        locationService.shutdown();
+    public static void shutdown() throws ExecutionException, InterruptedException {
+        locationService.shutdown().toCompletableFuture().get();
     }
 
     @Test
@@ -109,12 +109,9 @@ public class JLocationServiceImplTest {
 
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
 
-        CompletionStage<IRegistrationResult> completionStage = locationService.register(httpRegistration);
-        CompletableFuture<IRegistrationResult> completableFuture = completionStage.toCompletableFuture();
-        IRegistrationResult registrationResult = completableFuture.get();
+        IRegistrationResult registrationResult = locationService.register(httpRegistration).toCompletableFuture().get();
         Assert.assertEquals(httpServiceComponentId, registrationResult.location().connection().componentId());
-        CompletionStage<Done> uCompletionStage = locationService.unregister(httpServiceConnection);
-        Done uCompletableFuture = uCompletionStage.toCompletableFuture().get();
+        locationService.unregister(httpServiceConnection).toCompletableFuture().get();
         Assert.assertEquals(Collections.emptyList(), locationService.list().toCompletableFuture().get());
     }
 
@@ -124,14 +121,11 @@ public class JLocationServiceImplTest {
 
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
-        CompletionStage<IRegistrationResult> completionStage = locationService.register(tcpRegistration);
-        CompletableFuture<IRegistrationResult> completableFuture = completionStage.toCompletableFuture();
-        IRegistrationResult registrationResult = completableFuture.get();
+        locationService.register(tcpRegistration).toCompletableFuture().get();
         Assert.assertEquals(1, locationService.list().toCompletableFuture().get().size());
         Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
 
-        CompletionStage<Done> uCompletionStage = locationService.unregister(tcpServiceConnection);
-        CompletableFuture<Done> uCompletableFuture = uCompletionStage.toCompletableFuture();
+        locationService.unregister(tcpServiceConnection).toCompletableFuture().get();
     }
 
     @Test
@@ -139,7 +133,7 @@ public class JLocationServiceImplTest {
 
         AkkaRegistration registration = new AkkaRegistration(akkaHcdConnection, actorRef);
 
-        CompletionStage<IRegistrationResult> completionStage = locationService.register(registration).toCompletableFuture();
+        locationService.register(registration).toCompletableFuture().get();
         Assert.assertEquals(registration.location(new Networks().hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
 
         locationService.unregister(akkaHcdConnection).toCompletableFuture().get();
