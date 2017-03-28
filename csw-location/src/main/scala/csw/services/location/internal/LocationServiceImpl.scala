@@ -16,9 +16,12 @@ import scala.async.Async._
 import scala.concurrent.Future
 
 /**
-  * A `LocationService` implementation which manages registration data on akka cluster. The data is kept in two formats.
-  * One with [[akka.cluster.ddata.LWWRegister]] with `Connection.name` as key and `Option[Location]`  as value and
-  * other with [[akka.cluster.ddata.LWWMap]] with a constant key and a map of `Connection` to `Location` as value
+  * A `LocationService` implementation which manages registration data on akka cluster.
+  *
+  * The data is kept in two formats. One with [[akka.cluster.ddata.LWWRegister]] with `Connection.name`
+  * as key and `Option[Location]` as value and
+  *
+  * the other with [[akka.cluster.ddata.LWWMap]] with a constant key and a map of `Connection` to `Location` as value
   *
   * @param actorRuntime ActorRuntime which gives handle to ActorSystem of akka cluster
   */
@@ -88,9 +91,11 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
   }
 
   /**
-    * List all locations from `LWWMap` and unregister them one after another. A `Future` is returned with `Success` if
-    * all locations are unregistered successfully or will `Failure` if list from `LWWMap` fails or un-registration of
-    * any of the location fails
+    * List all locations from `LWWMap` and unregister them one after another.
+    *
+    * A `Future` is returned with `Success` if all locations are unregistered successfully
+    *
+    * or with `Failure` if list from `LWWMap` fails or un-registration of any of the location fails
     */
   def unregisterAll(): Future[Done] = async {
     val locations = await(list)
@@ -99,16 +104,22 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
   }
 
   /**
-    * List all entries from `LWWMap` and find a `Location` for the given `Connection`. A `Future` is returned
-    * with `None` if no location is found or with `Failure` if list from `LWWMap` fails
+    * List all entries from `LWWMap` and find a `Location` for the given `Connection`.
+    *
+    * A `Future` is returned with `None` if no location is found
+    *
+    * or with `Failure` if list from `LWWMap` fails
     */
   def resolve(connection: Connection): Future[Option[Location]] = async {
     await(list).find(_.connection == connection)
   }
 
   /**
-    * List all entries from `LWWMap` and complete the `Future` with `Location` values. A `Future` is returned with
-    * empty list if no constant key is found for `LWWMap`. The returned `Future` will fail if list from `LWWMap` fails
+    * List all entries from `LWWMap` and complete the `Future` with `Location` values.
+    *
+    * A `Future` is returned with empty list if no constant key is found for `LWWMap`.
+    *
+    * The returned `Future` will fail if list from `LWWMap` fails
     */
   def list: Future[List[Location]] = (replicator ? AllServices.get).map {
     case x@GetSuccess(AllServices.Key, _) => x.get(AllServices.Key).entries.values.toList
@@ -117,27 +128,36 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
   }
 
   /**
-    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `ComponentType`. A
-    * `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
-    * against the given `ComponentType`. The returned `Future` will fail if list from `LWWMap` fails
+    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `ComponentType`.
+    *
+    * A `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
+    * against the given `ComponentType`.
+    *
+    * The returned `Future` will fail if list from `LWWMap` fails
     */
   def list(componentType: ComponentType): Future[List[Location]] = async {
     await(list).filter(_.connection.componentId.componentType == componentType)
   }
 
   /**
-    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `Hostname`. A
-    * `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
-    * against the given `Hostname`. The returned `Future` will fail if list from `LWWMap` fails
+    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `Hostname`.
+    *
+    * A `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
+    * against the given `Hostname`.
+    *
+    * The returned `Future` will fail if list from `LWWMap` fails
     */
   def list(hostname: String): Future[List[Location]] = async {
     await(list).filter(_.uri.getHost == hostname)
   }
 
   /**
-    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `ConnectionType`. A
-    * `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
-    * against the given `ComponentType`. The returned `Future` will fail if list from `LWWMap` fails
+    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `ConnectionType`.
+    *
+    * A `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
+    * against the given `ComponentType`.
+    *
+    * The returned `Future` will fail if list from `LWWMap` fails
     */
   def list(connectionType: ConnectionType): Future[List[Location]] = async {
     await(list).filter(_.connection.connectionType == connectionType)
@@ -145,8 +165,11 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
 
   /**
     * Creates an `ActorRef` that subscribes for `Changed` messages for a given `Connection` from `LWWRegister` and pass
-    * it to [[akka.stream.scaladsl.Source]]. The `Source` will then map the `Changed` event to
-    * [[csw.services.location.models.LocationUpdated]] if the `LWWRegister` contains the `Location` against `Connection`
+    * it to [[akka.stream.scaladsl.Source]].
+    *
+    * The `Source` will then map the `Changed` event to [[csw.services.location.models.LocationUpdated]]
+    * if the `LWWRegister` contains the `Location` against `Connection`
+    *
     * or to [[csw.services.location.models.LocationRemoved]] if there is no value against `Connection`.
     *
     * Un-track a given connection using [[akka.stream.KillSwitch]]
@@ -163,7 +186,9 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
   }
 
   /**
-    * Terminate `ActorSystem` and un-register from akka cluster.
+    * Terminate `ActorSystem` that was part of akka cluster.
+    *
+    * It is recommended not to perform any operation on `LocationService` after shutdown
     */
   def shutdown(): Future[Done] = actorSystem.terminate().map(_ ⇒ Done)
 
