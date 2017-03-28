@@ -29,6 +29,6 @@ case class Settings(values: Map[String, Any] = Map.empty) {
 
     val allValues: Map[String, Any] = computedValues ++ values
 
-    ConfigFactory.parseMap(allValues.asJava).withFallback(ConfigFactory.load())
+    ConfigFactory.parseMap(allValues.asJava).withFallback(ConfigFactory.load("location-service.conf"))
   }
 }
