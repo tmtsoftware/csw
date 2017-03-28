@@ -1,10 +1,11 @@
 package csw.services.location.scaladsl
 
-import akka.Done
-import akka.actor.{Actor, ActorPath, PoisonPill, Props}
+import akka.actor.{Actor, ActorPath, ActorSystem, PoisonPill, Props}
 import akka.serialization.Serialization
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
+import akka.stream.{ActorMaterializer, Materializer}
+import com.typesafe.config.ConfigFactory
 import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
@@ -12,16 +13,16 @@ import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, 
 import csw.services.location.models._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-import scala.concurrent.Future
-
 class LocationServiceCompTest
   extends FunSuite
     with Matchers
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  val actorRuntime = new ActorRuntime()
-  val locationService: LocationService = LocationServiceFactory.make(actorRuntime)
+  val locationService: LocationService = LocationServiceFactory.make()
+
+  implicit val actorSystem = ActorSystem("test-actor-system",ConfigFactory.parseString("akka.remote.netty.tcp.port=2554"))
+  implicit val mat: Materializer = ActorMaterializer()
 
   override protected def afterEach(): Unit = {
     locationService.unregisterAll().await
@@ -71,7 +72,7 @@ class LocationServiceCompTest
     val connection = AkkaConnection(componentId)
     val Prefix = "prefix"
 
-    val actorRef = actorRuntime.actorSystem.actorOf(
+    val actorRef = actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior
       }),
@@ -96,7 +97,7 @@ class LocationServiceCompTest
     val connection = AkkaConnection(componentId)
     val Prefix = "prefix"
 
-    val actorRef = actorRuntime.actorSystem.actorOf(
+    val actorRef = actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior
       }),
@@ -118,8 +119,6 @@ class LocationServiceCompTest
   }
 
   test("tracking") {
-    import actorRuntime._
-
     val Port = 1234
     val redis1Connection = TcpConnection(ComponentId("redis1", ComponentType.Service))
     val redis1Registration = TcpRegistration(redis1Connection,  Port)
@@ -196,7 +195,7 @@ class LocationServiceCompTest
 
   test("Should filter components with component type") {
     val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorRef = actorRuntime.actorSystem.actorOf(
+    val actorRef = actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior
       }),
@@ -220,7 +219,7 @@ class LocationServiceCompTest
 
   test("should filter connections based on Connection type") {
     val hcdAkkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorRef = actorRuntime.actorSystem.actorOf(
+    val actorRef = actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior
       }),
