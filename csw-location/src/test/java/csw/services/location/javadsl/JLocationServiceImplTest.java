@@ -211,7 +211,7 @@ public class JLocationServiceImplTest {
         IRegistrationResult result2 = locationService.register(redis2registration).toCompletableFuture().get();
 
         source.second().request(1);
-        source.second().expectNext(new LocationUpdated(redis1Registration.location(Networks.hostname())));
+        source.second().expectNext(new LocationUpdated(redis1Registration.location(new Networks().hostname())));
 
         result.unregister().toCompletableFuture().get();
         result2.unregister().toCompletableFuture().get();
@@ -242,7 +242,7 @@ public class JLocationServiceImplTest {
         Thread.sleep(10);
 
         ArrayList<Location> locations = new ArrayList<>();
-        Location location = new AkkaRegistration(connection, actorRef).location(Networks.hostname());
+        Location location = new AkkaRegistration(connection, actorRef).location(new Networks().hostname());
         locations.add(location);
         Assert.assertEquals(locations, locationService.list().toCompletableFuture().get());
 
