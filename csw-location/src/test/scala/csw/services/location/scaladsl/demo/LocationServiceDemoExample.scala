@@ -9,9 +9,9 @@ import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest._
 
-import async.Async._
-import scala.concurrent.{Await, Future}
+import scala.async.Async._
 import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, Future}
 
 class LocationServiceDemoExample extends FunSuite with Matchers {
 
@@ -27,8 +27,12 @@ class LocationServiceDemoExample extends FunSuite with Matchers {
     "my-actor-1"
   )
 
-  private lazy val locationService = LocationServiceFactory.make()
 
+  //#create-location-service
+  lazy val locationService = LocationServiceFactory.make()
+  //#create-location-service
+
+  //#Components-Connections-Registrations
   val tcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
   val tcpRegistration = TcpRegistration(tcpConnection, 6380)
 
@@ -37,9 +41,12 @@ class LocationServiceDemoExample extends FunSuite with Matchers {
 
   val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
   val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
+  //#Components-Connections-Registrations
 
   test("demo") {
-    val assertionF: Future[Assertion] = async {
+    val assertionF: Future[Assertion] =
+      //#register-list-resolve-unregister
+      async {
       val registrationResult = await(locationService.register(tcpRegistration))
 
       registrationResult.location.connection shouldBe tcpConnection
@@ -54,12 +61,13 @@ class LocationServiceDemoExample extends FunSuite with Matchers {
       await(locationService.list) shouldBe List.empty
       await(locationService.resolve(tcpConnection)) shouldBe None
     }
-
     Await.result(assertionF, 5.seconds)
+    //#register-list-resolve-unregister
   }
 
   test("tracking") {
-    val (switch, doneF) = locationService.track(tcpConnection).toMat(Sink.foreach(println))(Keep.both).run()
+    //#tracking
+    val (killSwitch, doneF) = locationService.track(tcpConnection).toMat(Sink.foreach(println))(Keep.both).run()
 
     Thread.sleep(200)
 
@@ -73,31 +81,33 @@ class LocationServiceDemoExample extends FunSuite with Matchers {
       await(locationService.unregister(httpConnection))
 
       Thread.sleep(200)
-      switch.shutdown()
+      killSwitch.shutdown()
     }
 
     Await.result(doneF, 5.seconds)
+    //#tracking
   }
 
   test("filtering") {
-
+    //#filtering
     val assertionF: Future[Assertion] = async {
-      val registrationResult = await(locationService.register(tcpRegistration))
-      val registrationResult2 = await(locationService.register(httpRegistration))
-      val registrationResult3 = await(locationService.register(akkaRegistration))
+      val tcpRegistrationResult = await(locationService.register(tcpRegistration))
+      val httpRegistrationResult = await(locationService.register(httpRegistration))
+      val akkaRegistrationResult = await(locationService.register(akkaRegistration))
 
-      await(locationService.list).toSet shouldBe Set(registrationResult.location, registrationResult2.location, registrationResult3.location)
-
-      await(locationService.list(ConnectionType.AkkaType)).toSet shouldBe Set(registrationResult3.location)
-      await(locationService.list(ComponentType.Service)).toSet shouldBe Set(registrationResult.location, registrationResult2.location)
-      await(locationService.list(new Networks().hostname())).toSet shouldBe Set(registrationResult.location, registrationResult2.location)
+      await(locationService.list).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location, akkaRegistrationResult.location)
+      await(locationService.list(ConnectionType.AkkaType)).toSet shouldBe Set(akkaRegistrationResult.location)
+      await(locationService.list(ComponentType.Service)).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location)
+      await(locationService.list(new Networks().hostname())).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location)
     }
 
     Await.result(assertionF, 5.seconds)
-
+    //#filtering
   }
 
   test("shutdown") {
+    //#shutdown
     Await.result(locationService.shutdown(), 5.seconds)
+    //#shutdown
   }
 }
