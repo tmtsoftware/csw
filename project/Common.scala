@@ -51,7 +51,7 @@ object Common extends AutoPlugin {
     version := {
       sys.props.get("prod.publish") match {
         case Some("true") => version.value
-        case _            => "10000"
+        case _            => "0.1-SNAPSHOT"
       }
     }
   )
