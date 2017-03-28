@@ -90,7 +90,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers {
 
       await(locationService.list(ConnectionType.AkkaType)).toSet shouldBe Set(registrationResult3.location)
       await(locationService.list(ComponentType.Service)).toSet shouldBe Set(registrationResult.location, registrationResult2.location)
-      await(locationService.list(Networks.hostname())).toSet shouldBe Set(registrationResult.location, registrationResult2.location)
+      await(locationService.list(new Networks().hostname())).toSet shouldBe Set(registrationResult.location, registrationResult2.location)
     }
 
     Await.result(assertionF, 5.seconds)
