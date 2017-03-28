@@ -47,7 +47,7 @@ node {
             node('JenkinsNode1'){
                 stage('Integration') {
                     unstash "repo"
-                    sh "./integration/scripts/runner.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source'"
+                    sh "./integration/scripts/runner.sh '-v /home/ubuntu/workspace/tw-csw-prod/:source'"
                 }
             }
 
@@ -57,7 +57,7 @@ node {
                         "Multiple NIC's": {
                             stage("NIC") {
                                 try {
-                                    sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source'"
+                                    sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:source'"
                                 }
                                 catch (Exception ex) {
                                     currentBuild.result = 'FAILED'
@@ -68,7 +68,7 @@ node {
                         "Multiple Subnet's": {
                             stage("Subnet") {
                                 try {
-                                       sh "./integration/scripts/multiple_subnets_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source'"
+                                       sh "./integration/scripts/multiple_subnets_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:source'"
                                 }
                                 catch (Exception ex) {
                                     currentBuild.result = 'FAILED'
