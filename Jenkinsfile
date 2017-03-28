@@ -38,7 +38,7 @@ node {
                         sh "exit 1"
                 }
 
-                stage('Mult-Jvm Test') {
+                stage('Multi-Jvm Test') {
                     sh "sbt csw-location/multi-jvm:test"
                 }
 
@@ -81,6 +81,12 @@ node {
                             }
                         }
                     )
+                }
+            }
+
+            node('master'){
+                stage('Deploy'){
+                    sh "./publish.sh"
                 }
             }
         }

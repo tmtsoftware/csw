@@ -3,7 +3,6 @@ package csw.services.integtration.tests
 import java.io.{BufferedWriter, FileWriter}
 import java.net.URI
 
-import akka.actor.ActorSystem
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.internal.{Networks, Settings}
 import csw.services.location.models.Connection.TcpConnection
@@ -21,16 +20,12 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-//  private val locationService = LocationServiceFactory.make()
-  private val actorSystem = ActorSystem("test")
-  import actorSystem.dispatcher
-
-  val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings().withPort(2556)))
+  private val actorRuntime = new ActorRuntime(Settings().withPort(2556))
+  val trackLocationApp = new TrackLocationApp(actorRuntime)
+  import actorRuntime._
 
   override protected def afterAll(): Unit = {
-    actorSystem.terminate()
     trackLocationApp.shutdown().await
-//    locationService.shutdown().await
   }
 
   test("launch the trackLocationApp") {

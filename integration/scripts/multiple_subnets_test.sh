@@ -10,7 +10,7 @@ HOST_DIR_MAPPING=$1
 printf "${YELLOW} Executing multiple subnet test... ${NC}\n"
 printf "${PURPLE} Creating docker subnet : tmt_net_1 ${NC}\n"
 
-docker network create -d macvlan --subnet=192.168.210.0/24 --subnet=192.168.220.0/24 --gateway=192.168.210.254 --gateway=192.168.220.254 -o parent=eth0.10 -o macvlan_mode=bridge macvlan-10
+docker network create -d macvlan --subnet=192.168.210.0/24 --subnet=192.168.220.0/24 --gateway=192.168.210.254 --gateway=192.168.220.254 -o parent=ens3 -o macvlan_mode=bridge macvlan-10
 
 docker run --name=lan10.1 --net=macvlan-10 --ip=192.168.210.10 -d $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
 docker run --name=lan10.2 --net=macvlan-10 --ip=192.168.220.10 -d $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
