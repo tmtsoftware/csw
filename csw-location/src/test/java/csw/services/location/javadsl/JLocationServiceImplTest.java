@@ -4,8 +4,9 @@ import akka.Done;
 import akka.actor.*;
 import akka.japi.Pair;
 import akka.japi.pf.ReceiveBuilder;
-import akka.serialization.Serialization;
+import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitch;
+import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.javadsl.TestSink;
@@ -15,7 +16,6 @@ import csw.services.location.models.*;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.models.Connection.TcpConnection;
-import csw.services.location.scaladsl.ActorRuntime;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -28,24 +28,22 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
 public class JLocationServiceImplTest {
-    static ActorRuntime actorRuntime = new ActorRuntime();
-    static ILocationService locationService = JLocationServiceFactory.make(actorRuntime);
+    private static ILocationService locationService = JLocationServiceFactory.make();
+    private ActorSystem actorSystem = ActorSystem.create("test-actor-system");
+    private Materializer mat = ActorMaterializer.create(actorSystem);
 
     private ComponentId akkaHcdComponentId = new ComponentId("hcd1", JComponentType.HCD);
     private AkkaConnection akkaHcdConnection = new Connection.AkkaConnection(akkaHcdComponentId);
 
-    ComponentId tcpServiceComponentId = new ComponentId("exampleTcpService", JComponentType.Service);
-    TcpConnection tcpServiceConnection = new Connection.TcpConnection(tcpServiceComponentId);
+    private ComponentId tcpServiceComponentId = new ComponentId("exampleTcpService", JComponentType.Service);
+    private TcpConnection tcpServiceConnection = new Connection.TcpConnection(tcpServiceComponentId);
 
-    private TestProbe actorTestProbe = new TestProbe(actorRuntime.actorSystem(), "test-actor");
+    private TestProbe actorTestProbe = new TestProbe(actorSystem, "test-actor");
     private ActorRef actorRef = actorTestProbe.ref();
-    private ActorPath actorPath = ActorPaths.fromString(Serialization.serializedActorPath(actorRef));
 
-    private String prefix = "prefix";
-
-    ComponentId httpServiceComponentId = new ComponentId("exampleHTTPService", JComponentType.Service);
-    HttpConnection httpServiceConnection = new Connection.HttpConnection(httpServiceComponentId);
-    String Path = "/path/to/resource";
+    private ComponentId httpServiceComponentId = new ComponentId("exampleHTTPService", JComponentType.Service);
+    private HttpConnection httpServiceConnection = new Connection.HttpConnection(httpServiceComponentId);
+    private String Path = "/path/to/resource";
 
 
     @After
@@ -55,7 +53,7 @@ public class JLocationServiceImplTest {
 
     @AfterClass
     public static void shutdown() {
-        actorRuntime.terminate();
+        locationService.shutdown();
     }
 
     @Test
@@ -117,7 +115,6 @@ public class JLocationServiceImplTest {
         Assert.assertEquals(httpServiceComponentId, registrationResult.location().connection().componentId());
         CompletionStage<Done> uCompletionStage = locationService.unregister(httpServiceConnection);
         CompletableFuture<Done> uCompletableFuture = uCompletionStage.toCompletableFuture();
-        Done done = uCompletableFuture.get();
         Assert.assertEquals(Collections.emptyList(), locationService.list().toCompletableFuture().get());
     }
 
@@ -131,11 +128,10 @@ public class JLocationServiceImplTest {
         CompletableFuture<IRegistrationResult> completableFuture = completionStage.toCompletableFuture();
         IRegistrationResult registrationResult = completableFuture.get();
         Assert.assertEquals(1, locationService.list().toCompletableFuture().get().size());
-        Assert.assertEquals(tcpRegistration.location(actorRuntime.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(tcpRegistration.location(Networks.hostname()), locationService.resolve(tcpServiceConnection).toCompletableFuture().get().get());
 
         CompletionStage<Done> uCompletionStage = locationService.unregister(tcpServiceConnection);
         CompletableFuture<Done> uCompletableFuture = uCompletionStage.toCompletableFuture();
-        Done done = uCompletableFuture.get();
     }
 
     @Test
@@ -143,14 +139,10 @@ public class JLocationServiceImplTest {
 
         AkkaRegistration registration = new AkkaRegistration(akkaHcdConnection, actorRef);
 
-        CompletionStage<IRegistrationResult> completionStage = locationService.register(registration);
-        CompletableFuture<IRegistrationResult> completableFuture = completionStage.toCompletableFuture();
-        IRegistrationResult registrationResult = completableFuture.get();
-        Assert.assertEquals(registration.location(actorRuntime.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
+        CompletionStage<IRegistrationResult> completionStage = locationService.register(registration).toCompletableFuture();
+        Assert.assertEquals(registration.location(Networks.hostname()), locationService.resolve(akkaHcdConnection).toCompletableFuture().get().get());
 
-        CompletionStage<Done> uCompletionStage = locationService.unregister(akkaHcdConnection);
-        CompletableFuture<Done> uCompletableFuture = uCompletionStage.toCompletableFuture();
-        Done done = uCompletableFuture.get();
+        locationService.unregister(akkaHcdConnection).toCompletableFuture().get();
     }
 
     @Test
@@ -212,7 +204,7 @@ public class JLocationServiceImplTest {
         TcpRegistration redis2registration = new TcpRegistration(redis2Connection, Port);
 
 
-        Pair<KillSwitch, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(actorRuntime.actorSystem()), Keep.both()).run(actorRuntime.mat());
+        Pair<KillSwitch, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(actorSystem), Keep.both()).run(mat);
 
 
         IRegistrationResult result = locationService.register(redis1Registration).toCompletableFuture().get();
@@ -235,9 +227,8 @@ public class JLocationServiceImplTest {
     public void testUnregisteringDeadActorByDeathWatch() throws ExecutionException, InterruptedException {
         ComponentId componentId = new ComponentId("hcd1", JComponentType.HCD);
         AkkaConnection connection = new AkkaConnection(componentId);
-        String Prefix = "prefix";
 
-        ActorRef actorRef = actorRuntime.actorSystem().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
+        ActorRef actorRef = actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
                     public Receive createReceive() {
                         return ReceiveBuilder.create().build();

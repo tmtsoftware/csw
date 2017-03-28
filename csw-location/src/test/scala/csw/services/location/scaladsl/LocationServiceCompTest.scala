@@ -22,7 +22,7 @@ class LocationServiceCompTest
 
   val locationService: LocationService = LocationServiceFactory.make()
 
-  implicit val actorSystem = ActorSystem("test-actor-system",ConfigFactory.parseString("akka.remote.netty.tcp.port=2554"))
+  implicit val actorSystem = ActorSystem("test-actor-system")
   implicit val mat: Materializer = ActorMaterializer()
 
   override protected def afterEach(): Unit = {
