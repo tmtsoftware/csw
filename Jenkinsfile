@@ -38,8 +38,12 @@ node {
                         sh "exit 1"
                 }
 
-                stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine
+                stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine.
                     sh "sbt csw-location/multi-jvm:test"
+                }
+
+                stage('Multi-Node Test') { // These tests cover the scenario of multiple components in across machines.
+                   sh "sbt csw-location/multi-node-test"
                 }
 
                 stage('Package') {
