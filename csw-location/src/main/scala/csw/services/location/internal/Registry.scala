@@ -18,17 +18,15 @@ import scala.concurrent.duration.DurationDouble
   */
 class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) {
   /**
-    * Creates [[akka.cluster.ddata.Replicator.Update]] with the `Key`, `EmptyValue` and function `f`
+    * Creates [[akka.cluster.ddata.Replicator.Update]] with the `Key`, `EmptyValue` and function `f` which will update
+    * majority nodes in cluster
     *
     * @param f A callback function which is passed to Update
-    * @return An `Update` that will write to majority nodes in cluster
     */
   def update(f: V ⇒ V): Update[V] = Update(Key, EmptyValue, WriteMajority(5.seconds))(f)
 
   /**
-    * Creates [[akka.cluster.ddata.Replicator.Get]] with `Key`
-    *
-    * @return A `Get` that will read from majority nodes in cluster
+    * Creates [[akka.cluster.ddata.Replicator.Get]] with `Key` which will read from majority nodes in cluster
     */
   def get: Get[V] = Get(Key, ReadMajority(5.seconds))
 }
