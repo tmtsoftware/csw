@@ -20,9 +20,7 @@ class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRu
   import actorRuntime._
 
   private var isRunning = new AtomicBoolean(true)
-
-  private implicit val timeout = Timeout(10.seconds)
-
+  
   def run(): Future[Unit] = register().map(awaitTermination)
 
   private def register(): Future[Seq[RegistrationResult]] = Source(names)
@@ -54,6 +52,9 @@ class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRu
     unregisterServices(results)
     sysShutDownHook.remove()
     println("Shutdown hook is removed.")
+
+    Await.ready(locationService.shutdown(), 10.seconds)
+
     if (!command.noExit) System.exit(exitCode)
   }
 

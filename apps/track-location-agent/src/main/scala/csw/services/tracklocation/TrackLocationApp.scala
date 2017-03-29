@@ -1,13 +1,11 @@
 package csw.services.tracklocation
 
 import akka.Done
-import akka.actor.Terminated
 import csw.services.location.internal.Settings
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 import csw.services.tracklocation.models.{Command, Options}
 import csw.services.tracklocation.utils.CmdLineArgsParser
 
-import async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
@@ -21,7 +19,7 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
   val locationService= LocationServiceFactory.make(actorRuntime)
   var trackLocation: TrackLocation = _
 
-  def start(args: Array[String]): Unit = {
+  def start(args: Array[String]): Any = {
     CmdLineArgsParser.parser.parse(args, Options()) match {
       case Some(options) =>
         try {
@@ -31,23 +29,23 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
           trackLocation.run().recover {
             case NonFatal(ex) =>
               ex.printStackTrace()
-              Await.ready(locationService.shutdown(), 10.seconds)
+              shutdown()
           }
         } catch {
           case e: Throwable =>
             e.printStackTrace()
-            Await.ready(locationService.shutdown(), 10.seconds)
+            shutdown()
             System.exit(1)
         }
       case None          =>
-        Await.ready(locationService.shutdown(), 10.seconds)
+        shutdown()
         System.exit(1)
     }
   }
 
-  def shutdown(): Future[Done] = locationService.shutdown()
+  def shutdown(): Future[Done] = Await.ready(locationService.shutdown(), 10.seconds)
 }
 
 object TrackLocationApp extends App {
-  new TrackLocationApp(new ActorRuntime(Settings().withPort(2553))).start(args)
+  new TrackLocationApp(new ActorRuntime(Settings())).start(args)
 }

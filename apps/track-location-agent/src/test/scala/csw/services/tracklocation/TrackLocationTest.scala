@@ -32,34 +32,30 @@ class TrackLocationTest
   private val actorRuntime = new ActorRuntime()
   private val locationService = LocationServiceFactory.make(actorRuntime)
   import actorRuntime._
-  val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings().withPort(2553)))
-
-  implicit val timeout = Timeout(60.seconds)
-
   override protected def afterAll(): Unit = {
-    trackLocationApp.shutdown().await
     actorSystem.terminate().await
   }
 
   test("Test with command line args") {
+    val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings().withPort(2553)))
     val name = "test1"
     val port = 9999
 
     Future {
       trackLocationApp.start(
-        Array(
-          "--name", name,
-          "--command",
-          "sleep 5",
-          "--port", port.toString,
-          "--no-exit"
-        )
+      Array(
+      "--name", name,
+      "--command",
+      "sleep 5",
+      "--port", port.toString,
+      "--no-exit"
+      )
       )
     }
 
     Thread.sleep(2000)
-
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
+
     val resolvedLocation = locationService.resolve(connection).await.get
     val tcpLocation = new TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
@@ -71,6 +67,7 @@ class TrackLocationTest
   }
 
   test("Test with config file") {
+    val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings().withPort(2553)))
     val name = "test2"
     val url = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
