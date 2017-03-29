@@ -30,9 +30,8 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
   import actorRuntime._
 
   /**
-    * Registers a `Location` against connection name in `LWWRegister` and then `Connection` to Location` in `LWWMap`.
+    * Registers a `Location` against connection name in `LWWRegister` and then `Connection` to `Location` in `LWWMap`.
     * A `Future` is returned with `Failure` :
-    *
     * {{{
     * - If the connection name is already present in LWWRegister with
     *   some other Location different than current Location
@@ -74,7 +73,6 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
   /**
     * Unregisters `Location` for `Connection` from `LWWRegister` and then from `LWWMap`.
     * A `Future` is returned with `Failure` :
-    *
     * {{{
     * - If update in LWWRegister fails, which will skip subsequent update in LWWMap
     *
