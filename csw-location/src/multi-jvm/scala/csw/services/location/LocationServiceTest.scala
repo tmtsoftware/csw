@@ -5,6 +5,7 @@ import java.net.URI
 import akka.actor.{Actor, Props}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
+import akka.remote.testconductor.RoleName
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
@@ -26,9 +27,20 @@ class LocationServiceTest(ignore: Int)
 
   private val actorRuntime = new ActorRuntime(system)
   private val locationService = LocationServiceFactory.make(actorRuntime)
-  implicit val materializer = ActorMaterializer()
+  import actorRuntime.mat
+  import actorRuntime.cluster
+
+  def join(from: RoleName, to: RoleName): Unit = {
+    runOn(from) {
+      cluster.join(node(to).address)
+    }
+    enterBarrier(from.name + "-joined")
+  }
 
   test("ensure that the cluster is up") {
+    join(node1, node1)
+    join(node2, node1)
+
     awaitAssert {
       DistributedData(system).replicator ! GetReplicaCount
       expectMsg(ReplicaCount(roles.size))
