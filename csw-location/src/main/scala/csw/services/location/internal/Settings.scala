@@ -13,6 +13,8 @@ case class Settings(values: Map[String, Any] = Map.empty) {
 
   def withPort(port: Int): Settings = withEntry("akka.remote.netty.tcp.port", port)
 
+  def withSeeds(seeds: List[String]): Settings = withEntry("akka.cluster.seed-nodes", seeds.asJava)
+
   def config: Config = {
     val interfaceName: String = values.getOrElse("interfaceName", "").toString
     val hostname: String = new Networks(interfaceName).hostname()
