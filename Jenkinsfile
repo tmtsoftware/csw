@@ -49,14 +49,14 @@ node {
             }
 
             node('JenkinsNode1') {
-                stage('Multiple containers on separate machines') {
+                stage('Multi-Container Docker') {
                     unstash "repo"
                     sh "./integration/scripts/runner.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
                 }
             }
 
             node('JenkinsNode1') {
-                stage('Containers with Multiple NICs') {
+                stage('Multi-NICs Docker') {
                     sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
                 }
             }
