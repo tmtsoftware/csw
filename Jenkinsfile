@@ -1,9 +1,9 @@
 #!groovy
 node {
     def failBuild = false
-    try{
+    try {
         ansiColor('xterm') {
-            node('master'){
+            node('master') {
                 stage('Checkout') {
                     git 'https://github.com/tmtsoftware/csw-prod.git'
                 }
@@ -27,14 +27,14 @@ node {
                         currentBuild.result = 'FAILED'
                         failBuild = true
                     }
-                    try{
+                    try {
                         sh "sbt coverageReport"
                     }
-                    catch (Exception ex){
+                    catch (Exception ex) {
                         failBuild = true
                     }
                     sh "sbt coverageAggregate"
-                    if(failBuild == true)
+                    if (failBuild == true)
                         sh "exit 1"
                 }
 
@@ -49,31 +49,20 @@ node {
             }
 
             node('JenkinsNode1') {
-                stage('Integration') {
+                stage('Multiple containers on separate machines') {
                     unstash "repo"
                     sh "./integration/scripts/runner.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
                 }
             }
 
-            node('JenkinsNode1'){
-                stage('Infra Test') {
-                    parallel(
-                        "Multiple NIC's": {
-                            stage("NIC") {
-                                sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
-                            }
-                        },
-                        "Multiple Subnet's": {
-                            stage("Subnet") {
-                                sh "./integration/scripts/multiple_subnets_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
-                            }
-                        }
-                    )
+            node('JenkinsNode1') {
+                stage('Containers with Multiple NICs') {
+                    sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
                 }
             }
 
-            node('master'){
-                stage('Deploy'){
+            node('master') {
+                stage('Deploy') {
                     sh "./publish.sh"
                 }
             }
@@ -83,7 +72,7 @@ node {
         currentBuild.result = "FAILED"
         throw e
     } finally {
-        node('master'){
+        node('master') {
             stage("Report") {
                 sendNotification(currentBuild.result)
                 publishJunitReport()
@@ -94,7 +83,7 @@ node {
 }
 
 def sendNotification(String buildStatus = 'STARTED') {
-    buildStatus =  buildStatus ?: 'SUCCESSFUL'
+    buildStatus = buildStatus ?: 'SUCCESSFUL'
 
     def colorName = 'RED'
     def colorCode = '#FF0000'
@@ -114,7 +103,7 @@ def sendNotification(String buildStatus = 'STARTED') {
         colorCode = '#FF0000'
     }
 
-    slackSend (color: colorCode, message: summary)
+    slackSend(color: colorCode, message: summary)
 
     emailext(
             subject: subject,
@@ -123,17 +112,17 @@ def sendNotification(String buildStatus = 'STARTED') {
     )
 }
 
-def publishJunitReport(){
+def publishJunitReport() {
     junit '**/target/test-reports/*.xml'
 }
 
 def publishScoverageReport() {
-    publishHTML (target: [
-            allowMissing: true,
+    publishHTML(target: [
+            allowMissing         : true,
             alwaysLinkToLastBuild: false,
-            keepAll: true,
-            reportDir: './target/scala-2.12/scoverage-report',
-            reportFiles: 'index.html',
-            reportName: "Scoverage Report"
+            keepAll              : true,
+            reportDir            : './target/scala-2.12/scoverage-report',
+            reportFiles          : 'index.html',
+            reportName           : "Scoverage Report"
     ])
 }
