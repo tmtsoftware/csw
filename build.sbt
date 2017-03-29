@@ -1,23 +1,18 @@
-import com.typesafe.sbt.SbtMultiJvm
-
 val enableCoverage = System.getProperty("enableCoverage", "true")
 val plugins:Seq[Plugins] = if(enableCoverage.toBoolean) Seq(Coverage) else Seq.empty
 
 lazy val `csw-prod` = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
-  .aggregate(`csw-location`, `track-location-agent`, docs, integration)
+  .aggregate(`csw-location`, `track-location-agent`)
   .settings(Settings.mergeSiteWith(docs))
   .settings(
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(`track-location-agent`, integration),
-    aggregate in test := false
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(`track-location-agent`)
   )
 
 lazy val `csw-location` = project
-  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm)
   .enablePlugins(plugins:_*)
-  .configs(MultiJvmKeys.MultiJvm)
-  .settings(SbtMultiJvm.multiJvmSettings)
   .settings(
     libraryDependencies ++= Seq(
       Akka.`akka-stream`,

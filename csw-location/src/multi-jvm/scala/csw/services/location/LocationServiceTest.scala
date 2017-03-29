@@ -3,11 +3,9 @@ package csw.services.location
 import java.net.URI
 
 import akka.actor.{Actor, Props}
-import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.remote.testconductor.RoleName
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.helpers.{LSMultiNodeConfig, LSMultiNodeSpec}
@@ -28,8 +26,7 @@ class LocationServiceTest(ignore: Int)
 
   private val actorRuntime = new ActorRuntime(system)
   private val locationService = LocationServiceFactory.make(actorRuntime)
-  import actorRuntime.mat
-  import actorRuntime.cluster
+  import actorRuntime.{cluster, mat}
 
   def join(from: RoleName, to: RoleName): Unit = {
     runOn(from) {
