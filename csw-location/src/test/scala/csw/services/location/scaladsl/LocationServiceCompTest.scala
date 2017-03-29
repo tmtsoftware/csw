@@ -30,7 +30,7 @@ class LocationServiceCompTest
   }
 
   override protected def afterAll(): Unit = {
-    locationService.shutdown()
+    locationService.shutdown().await
   }
 
   test("tcp location") {

@@ -16,7 +16,7 @@ object Terminator {
     cluster.leave(cluster.selfAddress)
     cluster.registerOnMemberRemoved(actorSystem.terminate().onComplete(p.complete))
     p.future.map { _ =>
-      Thread.sleep(300)
+      Thread.sleep(1000)
       Done
     }
   }

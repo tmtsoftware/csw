@@ -3,6 +3,7 @@ package csw.services.location.scaladsl.demo
 import akka.actor.{Actor, ActorSystem, Props}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink}
+import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
@@ -13,7 +14,7 @@ import scala.async.Async._
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-class LocationServiceDemoExample extends FunSuite with Matchers {
+class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAfterAll {
 
   private implicit val actorSystem = ActorSystem("demo")
   import actorSystem.dispatcher
@@ -31,6 +32,11 @@ class LocationServiceDemoExample extends FunSuite with Matchers {
   //#create-location-service
   lazy val locationService = LocationServiceFactory.make()
   //#create-location-service
+
+
+  override protected def afterAll(): Unit = {
+    locationService.shutdown().await
+  }
 
   //#Components-Connections-Registrations
   val tcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
@@ -107,7 +113,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers {
 
   test("shutdown") {
     //#shutdown
-    Await.result(locationService.shutdown(), 5.seconds)
+    Await.result(locationService.shutdown(), 20.seconds)
     //#shutdown
   }
 }
