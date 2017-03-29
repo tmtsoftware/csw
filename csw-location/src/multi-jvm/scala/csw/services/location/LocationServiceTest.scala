@@ -3,6 +3,7 @@ package csw.services.location
 import java.net.URI
 
 import akka.actor.{Actor, Props}
+import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.remote.testconductor.RoleName
@@ -32,6 +33,7 @@ class LocationServiceTest(ignore: Int)
 
   def join(from: RoleName, to: RoleName): Unit = {
     runOn(from) {
+      println(s"**** cluster=${cluster.selfAddress} **** from:${node(from)} **** to:${node(to)}")
       cluster.join(node(to).address)
     }
     enterBarrier(from.name + "-joined")
