@@ -70,6 +70,16 @@ This example demonstrates:
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #register-list-resolve-unregister }
 
+@@@ note { title="Short note on scala async" }
+
+Below code snippets use scala's async library to demonstrate LocationService API. The use of this library is optional and the API will work just fine with higher order functions provided by scala. 
+
+However, this library makes it easy to work with asynchronous code portions. The `async` marks a block of asynchronous code. It contains one or more await calls, which marks a point at which the computation will be suspended until the awaited Future is complete.
+
+For more info, please refer: https://github.com/scala/async
+
+@@@
+
 ## Tracking
 
 This example:
@@ -103,12 +113,3 @@ This example demonstrates how to shutdown a location service.
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #shutdown }
 
-@@@ note { title="Short note on scala async" }
-
-Below code snippets use scala's async library to demonstrate LocationService API. The use of this library is optional and the API will work just fine with higher order functions provided by scala. 
-
-However, this library makes it easy to work with asynchronous code portions. The `async` marks a block of asynchronous code. It contains one or more await calls, which marks a point at which the computation will be suspended until the awaited Future is complete.
-
-For more info, please refer: https://github.com/scala/async
-
-@@@
