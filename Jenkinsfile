@@ -43,7 +43,7 @@ node {
                 }
 
                 stage('Multi-Node Test') { // These tests cover the scenario of multiple components in across machines.
-                   sh "sbt -DenanbleCoverage=false csw-location/multi-node-test"
+                   sh "sbt -DenableCoverage=false csw-location/multi-node-test"
                 }
 
                 stage('Package') {
