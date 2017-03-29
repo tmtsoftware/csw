@@ -1,5 +1,6 @@
 package csw.services.integtration.apps
 
+import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.integtration.tests.LocationServiceMultipleNICTest
 import csw.services.location.internal.Settings
 import csw.services.location.scaladsl.ActorRuntime
@@ -9,6 +10,6 @@ object TestMultipleNicApp {
   def main(args: Array[String]): Unit = {
     val actorRuntime = new ActorRuntime(Settings().withInterface("eth1"))
     scalatest.run(new LocationServiceMultipleNICTest(actorRuntime))
-    actorRuntime.terminate()
+    actorRuntime.terminate().await
   }
 }

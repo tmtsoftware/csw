@@ -6,6 +6,7 @@ import akka.cluster.ddata._
 import akka.pattern.ask
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
+import akka.util.Timeout
 import csw.services.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed, RegistrationListingFailed, UnregistrationFailed}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.internal.StreamExt.RichSource
@@ -14,6 +15,7 @@ import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 
 import scala.async.Async._
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationDouble
 
 /**
   * A `LocationService` implementation which manages registration data on akka cluster.
@@ -28,6 +30,8 @@ import scala.concurrent.Future
 private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends LocationService { outer =>
 
   import actorRuntime._
+  implicit val timeout: Timeout = Timeout(5.seconds)
+
 
   /**
     * Registers a `Location` against connection name in `LWWRegister` and then `Connection` to `Location` in `LWWMap`.
@@ -197,7 +201,7 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     *
     * ''Note : ''It is recommended not to perform any operation on `LocationService` after shutdown
     */
-  def shutdown(): Future[Done] = actorSystem.terminate().map(_ ⇒ Done)
+  def shutdown(): Future[Done] = actorRuntime.terminate()
 
   private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {
     override def location: Location = loc

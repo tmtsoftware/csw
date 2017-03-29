@@ -1,5 +1,6 @@
 package csw.services.tracklocation
 
+import akka.Done
 import akka.actor.Terminated
 import csw.services.location.internal.Settings
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
@@ -7,7 +8,9 @@ import csw.services.tracklocation.models.{Command, Options}
 import csw.services.tracklocation.utils.CmdLineArgsParser
 
 import async.Async._
-import scala.concurrent.Future
+import scala.concurrent.duration.DurationLong
+import scala.concurrent.{Await, Future}
+import scala.util.control.NonFatal
 
 /**
   * A utility application that starts a given external program, registers it with the location service and
@@ -25,20 +28,24 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
           val command = Command.parse(options)
           println(s"commandText: ${command.commandText}, command: $command")
           trackLocation = new TrackLocation(options.names, command, actorRuntime, locationService)
-          trackLocation.run()
+          trackLocation.run().recover {
+            case NonFatal(ex) =>
+              ex.printStackTrace()
+              Await.ready(locationService.shutdown(), 10.seconds)
+          }
         } catch {
           case e: Throwable =>
             e.printStackTrace()
+            Await.ready(locationService.shutdown(), 10.seconds)
             System.exit(1)
         }
-      case None          => System.exit(1)
+      case None          =>
+        Await.ready(locationService.shutdown(), 10.seconds)
+        System.exit(1)
     }
   }
 
-  def shutdown(): Future[Terminated] = async {
-    locationService.shutdown()
-    await(actorSystem.terminate())
-  }
+  def shutdown(): Future[Done] = locationService.shutdown()
 }
 
 object TrackLocationApp extends App {

@@ -1,13 +1,12 @@
 package csw.services.location.scaladsl
 
-import akka.actor.{ActorRef, ActorSystem, Terminated}
+import akka.Done
+import akka.actor.{ActorRef, ActorSystem}
 import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.util.Timeout
-import csw.services.location.internal.Settings
+import csw.services.location.internal.{Settings, Terminator}
 
-import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 class ActorRuntime(_actorSystem: ActorSystem) {
@@ -19,11 +18,12 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val actorSystem: ActorSystem = _actorSystem
   implicit val ec: ExecutionContext = actorSystem.dispatcher
   implicit val mat: Materializer = makeMat()
-  implicit val timeout: Timeout = Timeout(5.seconds)
   implicit val cluster = Cluster(actorSystem)
 
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
   def makeMat(): Materializer = ActorMaterializer()
-  def terminate(): Future[Terminated] = actorSystem.terminate()
+
+  def terminate(): Future[Done] = Terminator.terminate(actorSystem)
 }
+
