@@ -10,7 +10,6 @@ import scala.concurrent.Future
 trait RegistrationResult {
   /**
     * Unregisters the previously registered service.
-    * Note that all services are automatically unregistered on shutdown.
     */
   def unregister(): Future[Done]
 
