@@ -1,14 +1,18 @@
 package csw.services.location.models
 
 /**
-  * Used to identify a component
+  * Represents a unique component based on `Name` and `ComponentType`.
   *
-  * @param name          the service name
-  * @param componentType HCD, Assembly, Service
+  * @param name          Name for the `Component`. ''Note :'' Name should not contain
+  *            {{{
+  *            - leading or trailing spaces
+  *            - and hyphen (-)
+  *            }}}
+  * @param componentType Type for the `Component`
   */
 case class ComponentId(name: String, componentType: ComponentType) extends TmtSerializable {
+
   require(name == name.trim, "component name has leading and trailing whitespaces")
 
-  //'-' in the name leads to confusing connection strings in the UI listing services
   require(!name.contains("-"), "component name has '-'")
 }
