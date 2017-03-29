@@ -43,7 +43,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
   val tcpRegistration = TcpRegistration(tcpConnection, 6380)
 
   val httpConnection = HttpConnection(ComponentId("configuration", ComponentType.Service))
-  val httpRegistration = HttpRegistration(httpConnection, 6380, "path123")
+  val httpRegistration = HttpRegistration(httpConnection, 8080, "path123")
 
   val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
   val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
@@ -53,16 +53,16 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
     val assertionF: Future[Assertion] =
       //#register-list-resolve-unregister
       async {
-      val registrationResult = await(locationService.register(tcpRegistration))
+      val tcpRegistrationResult = await(locationService.register(tcpRegistration))
 
-      registrationResult.location.connection shouldBe tcpConnection
+      tcpRegistrationResult.location.connection shouldBe tcpConnection
 
-      await(locationService.list) shouldBe List(registrationResult.location)
-      await(locationService.resolve(tcpConnection)) shouldBe Some(registrationResult.location)
+      await(locationService.list) shouldBe List(tcpRegistrationResult.location)
+      await(locationService.resolve(tcpConnection)) shouldBe Some(tcpRegistrationResult.location)
 
-      println(registrationResult.location.uri)
+      println(tcpRegistrationResult.location.uri)
 
-      await(registrationResult.unregister())
+      await(tcpRegistrationResult.unregister())
 
       await(locationService.list) shouldBe List.empty
       await(locationService.resolve(tcpConnection)) shouldBe None
@@ -78,12 +78,12 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
     Thread.sleep(200)
 
     async {
-      val registrationResult = await(locationService.register(tcpRegistration))
-      val registrationResult2 = await(locationService.register(httpRegistration))
+      val tcpRegistrationResult = await(locationService.register(tcpRegistration))
+      val httpRegistrationResult = await(locationService.register(httpRegistration))
 
       Thread.sleep(200)
 
-      await(registrationResult.unregister())
+      await(tcpRegistrationResult.unregister())
       await(locationService.unregister(httpConnection))
 
       Thread.sleep(200)
