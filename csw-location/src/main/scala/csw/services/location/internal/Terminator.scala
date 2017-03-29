@@ -15,9 +15,6 @@ object Terminator {
     val p = Promise[Terminated]
     cluster.leave(cluster.selfAddress)
     cluster.registerOnMemberRemoved(actorSystem.terminate().onComplete(p.complete))
-    p.future.map { _ =>
-      Thread.sleep(1000)
-      Done
-    }
+    p.future.map(_ => Done)
   }
 }

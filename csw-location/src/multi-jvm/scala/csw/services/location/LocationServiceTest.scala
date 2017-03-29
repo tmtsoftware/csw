@@ -65,7 +65,7 @@ class LocationServiceTest(ignore: Int)
       val resolvedHttpLocation = locationService.resolve(httpConnection).await.get
       resolvedHttpLocation shouldBe HttpLocation(httpConnection, new URI(s"http://${new Networks().hostname()}:$httpPort/$httpPath"))
 
-      locationService.list.await shouldBe List(tcpRegistration.location(new Networks().hostname()), httpRegistration.location(new Networks().hostname()))
+      locationService.list.await.toSet shouldBe Set(tcpRegistration.location(new Networks().hostname()), httpRegistration.location(new Networks().hostname()))
     }
 
     runOn(node2) {
@@ -75,7 +75,7 @@ class LocationServiceTest(ignore: Int)
       val resolvedTcpLocation = locationService.resolve(tcpConnection).await.get
       resolvedTcpLocation shouldBe TcpLocation(tcpConnection, new URI(s"tcp://${new Networks().hostname()}:$tcpPort"))
 
-      locationService.list.await shouldBe List(tcpRegistration.location(new Networks().hostname()), httpRegistration.location(new Networks().hostname))
+      locationService.list.await.toSet shouldBe Set(tcpRegistration.location(new Networks().hostname()), httpRegistration.location(new Networks().hostname))
     }
 
     enterBarrier("after-2")

@@ -1,7 +1,7 @@
 package csw.services.location.internal
 
 import akka.cluster.Cluster
-import akka.cluster.ddata.Replicator.{Get, ReadMajority, Update, WriteMajority}
+import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata._
 import csw.services.location.models.{Connection, Location}
 
@@ -28,7 +28,7 @@ class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) 
   /**
     * Creates [[akka.cluster.ddata.Replicator.Get]] with `Key` which will read from majority nodes in cluster
     */
-  def get: Get[V] = Get(Key, ReadMajority(5.seconds))
+  def get: Get[V] = Get(Key, ReadLocal)
 }
 
 object Registry {
