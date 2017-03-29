@@ -45,7 +45,8 @@ lazy val `track-location-agent` = project
       Libs.`scalatest` % Test,
       Libs.`scala-logging` % Test
     ),
-    sources in (Compile, doc) := Seq.empty
+    sources in (Compile, doc) := Seq.empty,
+    bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
 
 lazy val docs = project
