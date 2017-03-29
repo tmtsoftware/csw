@@ -12,7 +12,7 @@ node {
                     sh "sbt -Dcheck.cycles=true clean scalastyle compile"
                 }
 
-                stage('Test') {
+                stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
                     try {
                         sh "sbt csw-location/test"
                     }
@@ -38,7 +38,7 @@ node {
                         sh "exit 1"
                 }
 
-                stage('Multi-Jvm Test') {
+                stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine
                     sh "sbt csw-location/multi-jvm:test"
                 }
 
