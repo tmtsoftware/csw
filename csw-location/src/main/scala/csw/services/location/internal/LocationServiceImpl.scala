@@ -34,11 +34,17 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     * A `Future` is returned with `Failure` :
     *
     * {{{
-    *     - If the connection name is already present in LWWRegister
-    *     - If update in LWWRegister fails then LWWMap will not be updated
-    *     - If update in LWWRegister is successful but LWWMap failed (This breaks the atomicity of
-    *         data being present in LWWRegister as well as LWWMap. The user is expected to register
-    *         again with the same Registration to make data consistent)
+    * - If the connection name is already present in LWWRegister with
+    *   some other Location different than current Location
+    *
+    * - If update in LWWRegister fails, which will skip subsequent
+    *   update in LWWMap as well
+    *
+    * - If update in LWWRegister is successful but LWWMap fails
+    *   (This makes data inconsistent between LWWRegister and LWWMap. The
+    *   user is expected to register again with same Registration so that
+    *   LWWRegister will be updated again with same Option of Location and
+    *   LWWMap will be updated with new entry of Connection to Location)
     * }}}
     *
     * If update in `LWWRegister` and `LWWMap` is successful then a `Future` is returned with `RegistrationResult`
@@ -70,10 +76,13 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     * A `Future` is returned with `Failure` :
     *
     * {{{
-    *     - If update in LWWRegister fails then LWWMap will not be updated
-    *     - If update in LWWRegister is successful but LWWMap failed (This breaks the atomicity of
-    *         data being present in LWWRegister as well as LWWMap. The user is expected to unregister
-    *         again with the same Connection to make data consistent)
+    * - If update in LWWRegister fails, which will skip subsequent update in LWWMap
+    *
+    * - If update in LWWRegister is successful but in LWWMap fails
+    *   (This makes data inconsistent between LWWRegister and LWWMap.
+    *   The user is expected to unregister again with the same Connection
+    *   so that LWWRegister will be updated again with None and
+    *   LWWMap will be updated to remove entry of Connection to Location)
     * }}}
     *
     * If update in `LWWRegister` and `LWWMap` is successful then a `Future` is returned with `Success`
