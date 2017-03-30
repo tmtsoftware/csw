@@ -22,6 +22,7 @@ class LocationServiceMultipleNICTest(actorRuntime: ActorRuntime) extends FunSuit
     val componentId = ComponentId("assembly", ComponentType.Assembly)
     val connection = AkkaConnection(componentId)
 
+    Thread.sleep(2000)
     val listOfLocations = locationService.list.await
 
     listOfLocations should have size 1

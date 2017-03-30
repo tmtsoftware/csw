@@ -1,6 +1,6 @@
 package csw.services.integtration.apps
 
-import csw.services.integtration.tests.{LocationServiceIntegrationTest, TrackLocationAppIntegrationTest}
+import csw.services.integtration.tests.LocationServiceIntegrationTest
 import csw.services.location.scaladsl.LocationServiceFactory
 
 object TestApp {
