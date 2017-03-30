@@ -1,5 +1,6 @@
 package csw.services.location.javadsl
 
+import java.util.Optional
 import java.util.concurrent.CompletionStage
 
 import akka.Done
@@ -19,7 +20,7 @@ trait ILocationService {
 
   def unregisterAll(): CompletionStage[Done]
 
-  def resolve(connection: Connection): CompletionStage[Option[Location]]
+  def resolve(connection: Connection): CompletionStage[Optional[Location]]
 
   def list: CompletionStage[ju.List[Location]]
 

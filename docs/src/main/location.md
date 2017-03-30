@@ -41,6 +41,9 @@ Gradle
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #create-location-service }
 
+java
+:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #create-location-service }
+
 
 ## Register a component
 
@@ -54,6 +57,10 @@ An Application, Sequencer, Assembly, HCD, or Service component may need to be us
 
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #Components-Connections-Registrations }
+
+java
+:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #Components-Connections-Registrations }
+
 
 ## Basic operations
 
@@ -69,6 +76,10 @@ This example demonstrates:
 
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #register-list-resolve-unregister }
+
+java
+:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #register-list-resolve-unregister }
+
 
 @@@ note { title="Short note on scala async" }
 
@@ -93,6 +104,9 @@ This example:
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #tracking }
 
+java
+:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #tracking }
+
 ## Filtering
 
 This example :
@@ -106,6 +120,10 @@ This example :
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #filtering }
 
+java
+:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #filtering }
+
+
 ## Shutdown
 
 This example demonstrates how to shutdown a location service. 
@@ -113,3 +131,5 @@ This example demonstrates how to shutdown a location service.
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #shutdown }
 
+java
+:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #shutdown }

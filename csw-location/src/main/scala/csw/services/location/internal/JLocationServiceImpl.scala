@@ -1,6 +1,7 @@
 package csw.services.location.internal
 
 import java.util
+import java.util.Optional
 import java.util.concurrent.CompletionStage
 
 import akka.Done
@@ -12,6 +13,7 @@ import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
+import scala.compat.java8.OptionConverters._
 
 private[location] class JLocationServiceImpl(locationService: LocationService, actorRuntime: ActorRuntime) extends ILocationService {
 
@@ -26,8 +28,8 @@ private[location] class JLocationServiceImpl(locationService: LocationService, a
   override def unregisterAll(): CompletionStage[Done] =
     locationService.unregisterAll().toJava
 
-  override def resolve(connection: Connection): CompletionStage[Option[Location]] =
-    locationService.resolve(connection).toJava
+  override def resolve(connection: Connection): CompletionStage[Optional[Location]] =
+    locationService.resolve(connection).map(_.asJava).toJava
 
   override def list: CompletionStage[util.List[Location]] =
     locationService.list.map(_.asJava).toJava
