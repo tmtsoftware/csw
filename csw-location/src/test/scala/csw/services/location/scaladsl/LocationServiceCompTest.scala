@@ -1,12 +1,9 @@
 package csw.services.location.scaladsl
 
-import akka.actor.{Actor, ActorPath, ActorSystem, PoisonPill, Props}
-import akka.actor.{Actor, ActorPath, PoisonPill, Props}
-import akka.serialization.Serialization
+import akka.actor.{Actor, ActorSystem, PoisonPill, Props}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
-import com.typesafe.config.ConfigFactory
 import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
@@ -33,7 +30,7 @@ class LocationServiceCompTest
     locationService.shutdown().await
   }
 
-  test("tcp location") {
+  test("should able to register, resolve, list and unregister tcp location") {
     val componentId: ComponentId = ComponentId("exampleTCPService", ComponentType.Service)
     val connection: TcpConnection = TcpConnection(componentId)
     val Port: Int = 1234
@@ -52,7 +49,7 @@ class LocationServiceCompTest
     locationService.list.await shouldBe List.empty
   }
 
-  test("http location") {
+  test("should able to register, list and unregister http location") {
     val componentId: ComponentId = ComponentId("exampleHTTPService", ComponentType.Service)
     val httpConnection: HttpConnection = HttpConnection(componentId)
     val Port: Int = 8080
@@ -68,7 +65,7 @@ class LocationServiceCompTest
     locationService.list.await shouldBe List.empty
   }
 
-  test("akka location") {
+  test("should able to register, list and unregister akka location") {
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
     val Prefix = "prefix"
@@ -96,7 +93,6 @@ class LocationServiceCompTest
   test("akka location death watch actor should unregister services whose actorRef is terminated") {
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
-    val Prefix = "prefix"
 
     val actorRef = actorSystem.actorOf(
       Props(new Actor {
@@ -104,7 +100,6 @@ class LocationServiceCompTest
       }),
       "my-actor-to-die"
     )
-    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
 
     locationService.register(AkkaRegistration(connection, actorRef)).await.location.connection shouldBe connection
 
@@ -119,7 +114,7 @@ class LocationServiceCompTest
     locationService.list.await shouldBe List.empty
   }
 
-  test("tracking") {
+  test("should able to track tcp connection and get location updated(on registration) and remove(on unregistration) messages") {
     val Port = 1234
     val redis1Connection = TcpConnection(ComponentId("redis1", ComponentType.Service))
     val redis1Registration = TcpRegistration(redis1Connection,  Port)
@@ -187,14 +182,14 @@ class LocationServiceCompTest
     result.unregister().await
   }
 
-  test ("Resolve tcp connection") {
+  test ("should able to resolve tcp connection") {
     val connection = TcpConnection(ComponentId("redis5", ComponentType.Service))
     locationService.register(TcpRegistration(connection,  1234)).await
 
     locationService.resolve(connection).await.get.connection shouldBe connection
   }
 
-  test("Should filter components with component type") {
+  test("should filter components with component type") {
     val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
     val actorRef = actorSystem.actorOf(
       Props(new Actor {
@@ -260,7 +255,7 @@ class LocationServiceCompTest
     locationService.list("Invalid_hostname").await shouldBe List.empty
   }
 
-  test("Unregister all components") {
+  test("should able to unregister all components") {
     val Port = 1234
     val redis1Connection = TcpConnection(ComponentId("redis1", ComponentType.Service))
     val redis1Registration = TcpRegistration(redis1Connection,  Port)
