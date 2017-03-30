@@ -1,7 +1,5 @@
 package csw.services.location
 
-import java.net.URI
-
 import akka.actor.{Actor, Props}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
@@ -9,7 +7,6 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSMultiNodeConfig, LSMultiNodeSpec}
-import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
@@ -52,9 +49,11 @@ class LocationServiceTest(ignore: Int)
 
       Thread.sleep(1000)
       val resolvedHttpLocation = locationService.resolve(httpConnection).await.get
-      resolvedHttpLocation shouldBe HttpLocation(httpConnection, new URI(s"http://${new Networks().hostname()}:$httpPort/$httpPath"))
+      resolvedHttpLocation.connection shouldBe httpConnection
 
-      locationService.list.await.toSet shouldBe Set(tcpRegistration.location(new Networks().hostname()), httpRegistration.location(new Networks().hostname()))
+      val locations = locationService.list.await
+      val connections = locations.map(_.connection)
+      connections.toSet shouldBe Set(tcpConnection, httpConnection)
     }
 
     runOn(node2) {
@@ -63,9 +62,11 @@ class LocationServiceTest(ignore: Int)
 
       Thread.sleep(1000)
       val resolvedTcpLocation = locationService.resolve(tcpConnection).await.get
-      resolvedTcpLocation shouldBe TcpLocation(tcpConnection, new URI(s"tcp://${new Networks().hostname()}:$tcpPort"))
+      resolvedTcpLocation.connection shouldBe tcpConnection
 
-      locationService.list.await.toSet shouldBe Set(tcpRegistration.location(new Networks().hostname()), httpRegistration.location(new Networks().hostname))
+      val locations = locationService.list.await
+      val connections = locations.map(_.connection)
+      connections.toSet shouldBe Set(tcpConnection, httpConnection)
     }
 
     enterBarrier("after-2")
