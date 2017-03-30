@@ -22,6 +22,8 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
 
   private val actorRuntime = new ActorRuntime(Settings())
   val trackLocationApp = new TrackLocationApp(actorRuntime)
+  val WaitTimeForResolve = 3000
+
   import actorRuntime._
 
   override protected def afterAll(): Unit = {
@@ -44,14 +46,14 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
       )
     }
 
-    Thread.sleep(2000)
+    Thread.sleep(WaitTimeForResolve)
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val tcpLocation = locationService.resolve(connection).await.get
     tcpLocation shouldBe TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
-    Thread.sleep(6000)
+    Thread.sleep(WaitTimeForResolve)
 
     val locations: Seq[Location] = locationService.list.await
     locations.contains(tcpLocation) shouldBe false
@@ -82,14 +84,14 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
       )
     }
 
-    Thread.sleep(2000)
+    Thread.sleep(WaitTimeForResolve)
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val tcpLocation = locationService.resolve(connection).await.get
     tcpLocation shouldBe TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
-    Thread.sleep(6000)
+    Thread.sleep(WaitTimeForResolve)
 
     val locations: Seq[Location] = locationService.list.await
     locations.contains(tcpLocation) shouldBe false

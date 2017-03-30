@@ -17,7 +17,7 @@ HOST_DIR_MAPPING=$1
 #fi
 
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
-docker run -d --name=HCD $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/trombone-h-c-d'
+docker run -d --name=HCD $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/trombone-h-c-d -DisSeed=true'
 
 clusterSeed=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD)
 printf "${PURPLE}----------- Akka Seed Node is : ${clusterSeed}-----------${NC}\n"

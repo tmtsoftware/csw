@@ -8,8 +8,8 @@ object TestApp {
 
   def main(args: Array[String]): Unit = {
     val locationService = LocationServiceFactory.make()
+    Thread.sleep(2000)
     scalatest.run(new LocationServiceIntegrationTest(locationService))
-    scalatest.run(new TrackLocationAppIntegrationTest(locationService))
     locationService.shutdown()
   }
 }
