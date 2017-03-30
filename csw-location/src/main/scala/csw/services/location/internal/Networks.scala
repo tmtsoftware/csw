@@ -41,6 +41,13 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
     */
   def hostname(): String = getIpv4Address().getHostAddress
 
+  /**
+    * Picks an ipV4 address that is not a loopback address. If the network interface name is provided then the address is
+    * picked from that interface name, else for all network interfaces, all ipV4 addresses which are not loopback are taken
+    * and the first one is picked.
+    *
+    * @return An ipv4 address
+    */
   def getIpv4Address(): InetAddress = all()
     .sortBy(_._1)
     .find(pair => isIpv4(pair._2))
@@ -68,11 +75,27 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
 
 }
 
+/**
+  * A `NetworkInterfaceProvider` that manages and provides `InetAddresses`
+  */
 class NetworkInterfaceProvider() {
+
+  /**
+    * Uses `NetworkInterface` to fetch all `InetAddress` for all network interfaces
+    *
+    * @return A `Sequence` of tuples in the format of (Network interface index, `List` of `InetAddresses`)
+    */
   def getAllInterfaces(): Seq[(Int, List[InetAddress])] = {
     NetworkInterface.getNetworkInterfaces.asScala.toList.map(iface => (iface.getIndex, iface.getInetAddresses().asScala.toList))
   }
 
+  /**
+    * Uses `NetworkInterface` to fetch all `InetAddress` for a given `interfaceName`
+    *
+    * @param interfaceName The name of the network interface where akka cluster is formed. If the `interfaceName` is not
+    *                      found then [[csw.services.location.internal.NetworkInterfaceNotFound]] will be thrown.
+    * @return A `Sequence` of tuples in the format of (Network interface index, `List` of `InetAddresses`)
+    */
   def getInterface(interfaceName: String): Seq[(Int, List[InetAddress])] = {
     Option(NetworkInterface.getByName(interfaceName)) match {
       case None                          => throw new NetworkInterfaceNotFound(s"Network interface=${interfaceName} not found.")
