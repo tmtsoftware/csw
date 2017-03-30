@@ -3,11 +3,11 @@ package csw.services.location.models
 /**
   * Represents a unique component based on `Name` and `ComponentType`.
   *
-  * @param name          Name for the `Component`. ''Note :'' Name should not contain
-  *            {{{
-  *            - leading or trailing spaces
-  *            - and hyphen (-)
-  *            }}}
+  * ''Note : '' Name should not contain
+  *  - leading or trailing spaces
+  *  - and hyphen (-)
+  *
+  * @param name          Name for the `Component`.
   * @param componentType Type for the `Component`
   */
 case class ComponentId(name: String, componentType: ComponentType) extends TmtSerializable {
