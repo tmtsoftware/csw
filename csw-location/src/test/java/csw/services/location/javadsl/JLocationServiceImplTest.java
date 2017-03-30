@@ -1,6 +1,5 @@
 package csw.services.location.javadsl;
 
-import akka.Done;
 import akka.actor.*;
 import akka.japi.Pair;
 import akka.japi.pf.ReceiveBuilder;
@@ -23,8 +22,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
 public class JLocationServiceImplTest {
