@@ -13,11 +13,10 @@ object UnidocSite extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     siteSubdirName in ScalaUnidoc := "api/scala",
-//    filterNotSources(sources in (ScalaUnidoc, unidoc), Set("impl", "javadsl")),
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
 
     siteSubdirName in JavaUnidoc := "api/java",
-    filterNotSources(sources in (JavaUnidoc, unidoc), Set("impl", "scaladsl")),
+    filterNotSources(sources in (JavaUnidoc, unidoc), Set("internal", "scaladsl")),
     addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
 
     autoAPIMappings := true
