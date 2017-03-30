@@ -19,7 +19,7 @@ case class Settings(values: Map[String, Any] = Map.empty) {
 
   def asSeed: Settings = withEntry(IsSeedKey, "true")
 
-  private lazy val allValues = sys.env ++ sys.props ++ values
+  private lazy val allValues = values ++ sys.env ++ sys.props
 
   def hostname: String = {
     val interfaceName: String = allValues.getOrElse(InterfaceNameKey, "").toString

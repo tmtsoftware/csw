@@ -28,18 +28,7 @@ class LocationServiceTest(ignore: Int)
   private val locationService = LocationServiceFactory.make(actorRuntime)
   import actorRuntime.{cluster, mat}
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
-      println(s"**** cluster=${cluster.selfAddress} **** from:${node(from)} **** to:${node(to)}")
-      cluster.join(node(to).address)
-    }
-    enterBarrier(from.name + "-joined")
-  }
-
   test("ensure that the cluster is up") {
-    join(node1, node1)
-    join(node2, node1)
-
     awaitAssert {
       DistributedData(system).replicator ! GetReplicaCount
       expectMsg(ReplicaCount(roles.size))
