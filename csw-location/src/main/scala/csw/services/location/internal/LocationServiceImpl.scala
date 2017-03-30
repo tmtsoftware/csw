@@ -199,7 +199,7 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
   /**
     * Terminate `ActorSystem` that was part of akka cluster.
     *
-    * ''Note : ''It is recommended not to perform any operation on `LocationService` after shutdown
+    * @note It is recommended not to perform any operation on `LocationService` after shutdown
     */
   def shutdown(): Future[Done] = actorRuntime.terminate()
 

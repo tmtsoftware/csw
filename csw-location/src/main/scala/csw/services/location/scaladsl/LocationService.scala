@@ -87,8 +87,8 @@ trait LocationService {
 
   /**
     * Shutdown the `LocationService` interface
-    * ''Note : ''It is recommended not to perform any operation on `LocationService` after shutdown
     *
+    * @note It is recommended not to perform any operation on `LocationService` after shutdown
     * @return A `Future` which completes when the location service shuts down
     */
   def shutdown(): Future[Done]

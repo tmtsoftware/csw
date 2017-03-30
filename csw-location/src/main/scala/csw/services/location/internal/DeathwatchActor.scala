@@ -18,6 +18,9 @@ class DeathwatchActor(locationService: LocationService) extends Actor {
 
   var watchedLocations: Set[AkkaLocation] = Set.empty
 
+  /**
+    * Subscribes for changes in `LWWMap` data before starting this `Actor`
+    */
   override def preStart(): Unit = {
     DistributedData(context.system).replicator ! Subscribe(AllServices.Key, self)
   }
