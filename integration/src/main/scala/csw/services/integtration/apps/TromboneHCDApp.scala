@@ -1,13 +1,9 @@
 package csw.services.integtration.apps
 
-import java.net.URI
-
-import akka.actor.{Actor, ActorPath, Props}
-import akka.pattern.pipe
-import akka.serialization.Serialization
+import akka.actor.{Actor, Props}
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaLocation, AkkaRegistration, ComponentId, ComponentType}
+import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object TromboneHCD {
@@ -17,24 +13,25 @@ object TromboneHCD {
   val componentId = ComponentId("trombonehcd", ComponentType.HCD)
   val connection = AkkaConnection(componentId)
 
-  val actorPath = ActorPath.fromString(Serialization.serializedActorPath(tromboneHcdActorRef))
   val registration = AkkaRegistration(connection, tromboneHcdActorRef)
-  val registrationResult = LocationServiceFactory.make(actorRuntime).register(registration).await
+  private val locationService = LocationServiceFactory.make(actorRuntime)
+  val registrationResult = locationService.register(registration).await
 
   println("Trombone HCD registered")
 
   def main(args: Array[String]): Unit = {
 
   }
+  case class Unregister()
 }
 
 class TromboneHCD extends Actor {
-  import context.dispatcher
+  import TromboneHCD._
+  import actorRuntime._
+
   override def receive: Receive = {
-    case "Unregister" => {
-      println("Unregistered the connection.")
-      TromboneHCD.registrationResult.unregister() pipeTo sender()
+    case Unregister => {
+      registrationResult.unregister().onComplete(_ => locationService.shutdown())
     }
-    case "Test" => println("Received test message.")
   }
 }

@@ -58,7 +58,8 @@ lazy val integration = project
   .dependsOn(`track-location-agent`)
   .settings(
     libraryDependencies ++= Seq(
-      Libs.`scalatest`
+      Libs.`scalatest`,
+      Akka.`akka-stream-testkit`
     ),
     sources in Test := (sources in Compile).value
   )
