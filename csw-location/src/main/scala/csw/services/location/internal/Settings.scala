@@ -21,7 +21,7 @@ import scala.collection.JavaConverters._
   * The config values of the `ActorSystem` will be evaluated based on the above three settings as follows :
   *  - `akka.remote.netty.tcp.hostname` will be ipV4 address based on `interfaceName` from [[csw.services.location.internal.Networks]]
   *  - `akka.remote.netty.tcp.port` will be a random port or if `isSeed` is true then 3552 (Since cluster seeds will always
-  *    run on 3552)
+  * run on 3552)
   *  - `akka.cluster.seed-nodes` will be self if `isSeed` is true otherwise `clusterSeed` value will be used
   *
   * If none of the Settings are provided then defaults will be picked as follows :
@@ -40,7 +40,12 @@ import scala.collection.JavaConverters._
   *  - then from Environment variable
   *  - and then from `Settings` api
   *
-  * @param values
+  * @note Although `Settings` can be added through multiple ways, it is recommended that
+  *       - `clusterSeed` is provided via environment variable,
+  *       - `isSeed` is provided via system properties,
+  *       - `interfaceName` is provide via environment variable and
+  *       - the `Settings` api of providing values should be used for testing purpose only.
+  *
   */
 case class Settings(values: Map[String, Any] = Map.empty) {
 

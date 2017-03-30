@@ -51,8 +51,9 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   def makeMat(): Materializer = ActorMaterializer()
 
   /**
-    * Terminates the `ActorSystem` and disconnect from the cluster
+    * Terminates the `ActorSystem` and disconnects from the cluster.
     *
+    * @see [[csw.services.location.internal.Terminator]]
     * @return A `Future` that completes on `ActorSystem` shutdown
     */
   def terminate(): Future[Done] = Terminator.terminate(actorSystem)

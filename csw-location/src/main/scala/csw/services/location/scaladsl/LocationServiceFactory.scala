@@ -14,7 +14,7 @@ object LocationServiceFactory {
     * Creates a [[csw.services.location.scaladsl.LocationService]] instance and joins itself in the akka cluster. The data
     * of the akka cluster will now be replicated on this newly created node.
     *
-    * @note It is highly recommended to create
+    * @note It is recommended to create
     *       a single instance of `LocationService` and use it throughout.
     * @return A `LocationService` instance
     */
