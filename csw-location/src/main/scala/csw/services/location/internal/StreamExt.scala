@@ -11,8 +11,9 @@ object StreamExt {
 
   /**
     * A [[akka.stream.scaladsl.Source]] with materialization of `ActorRef` is created and split to get the [[scala.concurrent.Future]]
-    * of materialization. A tuple of newly created `Source` that can be consumed and `Future` of materialization (i.e. `ActorRef`)
-    * is returned
+    * of materialization.The `Future` will complete when the `Source` will be materialized but we get the handle to that
+    * materialization right away to perform any operation on it. Returns a tuple of newly created `Source` that can be
+    * consumed and `Future` of materialization (i.e. `ActorRef`)
     */
   def actorCoupling[T]: (Source[T, NotUsed], Future[ActorRef]) = {
     Source.actorRef[T](256, OverflowStrategy.dropHead).splitMat
