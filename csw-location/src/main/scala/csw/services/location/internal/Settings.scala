@@ -4,6 +4,44 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.JavaConverters._
 
+/**
+  * Settings manages [[com.typesafe.config.Config]] values required by an [[akka.actor.ActorSystem]] to boot. It configures mainly
+  * four parameters of an `ActorSystem`, namely :
+  *
+  *  - name (Name is defaulted to a constant value so that ActorSystem joins the cluster while booting)
+  *  - akka.remote.netty.tcp.hostname (The hostname to boot an ActorSystem on)
+  *  - akka.remote.netty.tcp.port     (The port to boot an ActorSystem on)
+  *  - akka.cluster.seed-nodes        (Seed Nodes of the cluster)
+  *
+  * Settings require three values namely :
+  *  - interfaceName (The network interface where cluster is formed.)
+  *  - clusterSeed (The host address of the seedNode of the cluster)
+  *  - isSeed (Claim self to be the seed of the cluster)
+  *
+  * The config values of the `ActorSystem` will be evaluated based on the above three settings as follows :
+  *  - `akka.remote.netty.tcp.hostname` will be ipV4 address based on `interfaceName` from [[csw.services.location.internal.Networks]]
+  *  - `akka.remote.netty.tcp.port` will be a random port or if `isSeed` is true then 3552 (Since cluster seeds will always
+  *    run on 3552)
+  *  - `akka.cluster.seed-nodes` will be self if `isSeed` is true otherwise `clusterSeed` value will be used
+  *
+  * If none of the Settings are provided then defaults will be picked as follows :
+  *  - `akka.remote.netty.tcp.hostname` will be ipV4 address from [[csw.services.location.internal.Networks]]
+  *  - `akka.remote.netty.tcp.port` will be a random port
+  *  - `akka.cluster.seed-nodes` will be empty
+  * and an `ActorSystem` will be created and a cluster will be formed with no Seed Nodes. It will also self join the cluster.
+  *
+  * `Settings` can be given in three ways :
+  *  - by using the api
+  *  - by providing system properties
+  *  - or by providing environment variables
+  *
+  * If a `Settings` value e.g. isSeed is provided by more than one ways, then the precedence of consumption will be first from
+  *  - System Properties
+  *  - then from Environment variable
+  *  - and then from `Settings` api
+  *
+  * @param values
+  */
 case class Settings(values: Map[String, Any] = Map.empty) {
   def name: String = Constants.ClusterName
 
