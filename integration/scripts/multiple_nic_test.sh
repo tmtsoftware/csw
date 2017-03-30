@@ -25,7 +25,7 @@ docker network connect bridge Assembly
 docker network connect bridge Test-App
 
 printf "${YELLOW} Starting Assembly in network : tmt_net_1 ${NC}\n"
-docker exec -itd Assembly bash -c 'ifconfig && cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/assembly-app'
+docker exec -itd Assembly bash -c 'ifconfig && cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/assembly-app -DisSeed=true'
 
 printf "${PURPLE}------ Waiting for 10 seconds to let Assembly gets started ------${NC}\n"
 sleep 10
