@@ -8,7 +8,8 @@ NC='\033[0m' # No Color
 
 #Map local project directories and .ivy directory from host to docker container
 #e.g.  ./integration/scripts/execute_docker.sh '-v /home/unmesh/work/csw-prod:/source -v /home/unmesh/.ivy2:/root/.ivy2'
-HOST_DIR_MAPPING=$1
+HOST_DIR_MAPPING="-v $(pwd):/source/csw"
+echo $HOST_DIR_MAPPING
 
 #if [ "$#" -eq  "0" ]
 #   then

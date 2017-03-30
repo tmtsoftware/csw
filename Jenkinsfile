@@ -50,13 +50,13 @@ node {
             node('JenkinsNode1') {
                 stage('Multi-Container Docker') {
                     unstash "repo"
-                    sh "./integration/scripts/runner.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
+                    sh "./integration/scripts/runner.sh
                 }
             }
 
             node('JenkinsNode1') {
                 stage('Multi-NICs Docker') {
-                    sh "./integration/scripts/multiple_nic_test.sh '-v /home/ubuntu/workspace/tw-csw-prod/:/source/csw'"
+                    sh "./integration/scripts/multiple_nic_test.sh
                 }
             }
 

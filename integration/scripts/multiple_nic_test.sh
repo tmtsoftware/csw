@@ -6,7 +6,9 @@ ORANGE='\033[0;33m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
-HOST_DIR_MAPPING=$1
+HOST_DIR_MAPPING="-v $(pwd):/source/csw"
+echo $HOST_DIR_MAPPING
+
 printf "${YELLOW} Executing multiple nic's test... ${NC}\n"
 printf "${PURPLE} Creating docker subnet : tmt_net_1 ${NC}\n"
 docker network create --subnet=192.168.10.0/24 tmt_net_1
