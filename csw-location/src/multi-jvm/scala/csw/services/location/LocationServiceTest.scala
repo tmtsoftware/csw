@@ -5,9 +5,9 @@ import java.net.URI
 import akka.actor.{Actor, Props}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
-import akka.remote.testconductor.RoleName
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
+import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSMultiNodeConfig, LSMultiNodeSpec}
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -26,7 +26,7 @@ class LocationServiceTest(ignore: Int)
 
   private val actorRuntime = new ActorRuntime(system)
   private val locationService = LocationServiceFactory.make(actorRuntime)
-  import actorRuntime.{cluster, mat}
+  import actorRuntime.mat
 
   test("ensure that the cluster is up") {
     awaitAssert {
@@ -47,10 +47,10 @@ class LocationServiceTest(ignore: Int)
     val httpRegistration = HttpRegistration(httpConnection, httpPort, httpPath)
 
     runOn(node1) {
-      locationService.register(tcpRegistration)
-      Thread.sleep(1000)
+      locationService.register(tcpRegistration).await
       enterBarrier("Registration")
 
+      Thread.sleep(1000)
       val resolvedHttpLocation = locationService.resolve(httpConnection).await.get
       resolvedHttpLocation shouldBe HttpLocation(httpConnection, new URI(s"http://${new Networks().hostname()}:$httpPort/$httpPath"))
 
@@ -58,9 +58,10 @@ class LocationServiceTest(ignore: Int)
     }
 
     runOn(node2) {
-      locationService.register(httpRegistration)
+      locationService.register(httpRegistration).await
       enterBarrier("Registration")
 
+      Thread.sleep(1000)
       val resolvedTcpLocation = locationService.resolve(tcpConnection).await.get
       resolvedTcpLocation shouldBe TcpLocation(tcpConnection, new URI(s"tcp://${new Networks().hostname()}:$tcpPort"))
 
@@ -92,15 +93,11 @@ class LocationServiceTest(ignore: Int)
       val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
       probe.request(1)
-      probe.expectNextPF({
-        case LocationUpdated(_) => ()
-      })
+      probe.requestNext() shouldBe a[LocationUpdated]
       enterBarrier("Registration")
-      
+
       probe.request(1)
-      probe.expectNextPF({
-        case LocationRemoved(_) => ()
-      })
+      probe.requestNext() shouldBe a[LocationRemoved]
       enterBarrier("Unregister")
 
       switch.shutdown()
