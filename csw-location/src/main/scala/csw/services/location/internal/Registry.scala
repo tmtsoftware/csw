@@ -26,7 +26,7 @@ class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) 
   def update(f: V ⇒ V): Update[V] = Update(Key, EmptyValue, WriteMajority(5.seconds))(f)
 
   /**
-    * Creates [[akka.cluster.ddata.Replicator.Get]] with `Key` which will read from majority nodes in cluster
+    * Creates [[akka.cluster.ddata.Replicator.Get]] with `Key` which will read from local copy of cluster data
     */
   def get: Get[V] = Get(Key, ReadLocal)
 }
