@@ -9,10 +9,20 @@ import csw.services.location.internal.{Settings, Terminator}
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+  * `ActorRuntime` manages [[scala.concurrent.ExecutionContext]], [[akka.stream.Materializer]], `akka.cluster.Cluster`
+  * and `Hostname` of an [[akka.actor.ActorSystem]]
+  *
+  * @note It is highly recommended that `ActorRuntime` is created for advanced usages or testing purposes only
+  */
 class ActorRuntime(_actorSystem: ActorSystem) {
   def this(settings: Settings) = this(ActorSystem(settings.name, settings.config))
+
   def this() = this(Settings())
 
+  /**
+    * Identifies the hostname where `ActorSystem` is running
+    */
   val hostname: String = _actorSystem.settings.config.getString("akka.remote.netty.tcp.hostname")
 
   implicit val actorSystem: ActorSystem = _actorSystem
@@ -20,17 +30,31 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val mat: Materializer = makeMat()
   implicit val cluster = Cluster(actorSystem)
 
+  /**
+    * Replicator of current `ActorSystem`
+    */
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
+  /**
+    * If no seed node is provided then the cluster is initialized for `ActorSystem`  by self joining
+    */
   def initialize(): Unit = {
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
-    if(emptySeeds) {
+    if (emptySeeds) {
       cluster.join(cluster.selfAddress)
     }
   }
 
+  /**
+    * Creates an `ActorMaterializer` for current `ActorSystem`
+    */
   def makeMat(): Materializer = ActorMaterializer()
 
+  /**
+    * Terminates the `ActorSystem` and disconnect from the cluster
+    *
+    * @return A `Future` that completes on `ActorSystem` shutdown
+    */
   def terminate(): Future[Done] = Terminator.terminate(actorSystem)
 
   initialize()

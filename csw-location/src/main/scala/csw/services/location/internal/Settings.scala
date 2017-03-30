@@ -43,6 +43,10 @@ import scala.collection.JavaConverters._
   * @param values
   */
 case class Settings(values: Map[String, Any] = Map.empty) {
+
+  /**
+    * Name of the `ActorSystem` to join the cluster.
+    */
   def name: String = Constants.ClusterName
 
   val InterfaceNameKey = "interfaceName"
@@ -53,6 +57,9 @@ case class Settings(values: Map[String, Any] = Map.empty) {
 
   def withInterface(name: String): Settings = withEntry(InterfaceNameKey, name)
 
+  /**
+    * Joins the cluster with seed running on localhost
+    */
   def joinLocalSeed: Settings = withEntry(ClusterSeedKey, hostname)
 
   def asSeed: Settings = withEntry(IsSeedKey, "true")
