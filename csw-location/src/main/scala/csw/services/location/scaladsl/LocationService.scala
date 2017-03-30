@@ -38,7 +38,7 @@ trait LocationService {
   def unregisterAll(): Future[Done]
 
   /**
-    * Asynchronously resolve the location based on connection
+    * Asynchronously resolves the location based on connection
     *
     * @param connection A connection to resolve to with its registered location
     * @return A `Future` of `Option` which completes with the resolved location if found or `None` otherwise.
@@ -46,14 +46,14 @@ trait LocationService {
   def resolve(connection: Connection): Future[Option[Location]]
 
   /**
-    * Asynchronously list all locations registered with `LocationService`
+    * Asynchronously lists all locations registered with `LocationService`
     *
     * @return A `Future` of `List` which completes with all locations currently registered
     */
   def list: Future[List[Location]]
 
   /**
-    * Asynchronously filter all locations registered with `LocationService` based on a component type
+    * Asynchronously filters all locations registered with `LocationService` based on a component type
     *
     * @param componentType A component type against which all locations will be listed
     * @return A `Future` of `List` which completes with filtered locations
@@ -61,7 +61,7 @@ trait LocationService {
   def list(componentType: ComponentType): Future[List[Location]]
 
   /**
-    * Asynchronously filter all locations registered with `LocationService` based on a hostname
+    * Asynchronously filters all locations registered with `LocationService` based on a hostname
     *
     * @param hostname A hostname against which all locations will be listed
     * @return A `Future` of `List` which completes with filtered locations
@@ -69,7 +69,7 @@ trait LocationService {
   def list(hostname: String): Future[List[Location]]
 
   /**
-    * Asynchronously filter all locations registered with `LocationService` based on a connection type
+    * Asynchronously filters all locations registered with `LocationService` based on a connection type
     *
     * @param connectionType
     * @return A `Future` of `List` which completes with filtered locations
@@ -77,7 +77,7 @@ trait LocationService {
   def list(connectionType: ConnectionType): Future[List[Location]]
 
   /**
-    * Track the location of a connection
+    * Tracks the location of a connection
     *
     * @param connection A connection for which it's location will be tracked
     * @return A `Source` which continuously gives events for the connection. Use `KillSwitch` to stop tracking
@@ -86,7 +86,7 @@ trait LocationService {
   def track(connection: Connection): Source[TrackingEvent, KillSwitch]
 
   /**
-    * Shutdown the `LocationService` interface
+    * Shuts down the `LocationService` interface
     *
     * @note It is recommended not to perform any operation on `LocationService` after shutdown
     * @return A `Future` which completes when the location service shuts down

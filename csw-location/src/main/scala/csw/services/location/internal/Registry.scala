@@ -21,7 +21,7 @@ class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) 
     * Creates [[akka.cluster.ddata.Replicator.Update]] with the `Key`, `EmptyValue` and function `f` which will update
     * majority nodes in cluster
     *
-    * @param f A callback function which is passed to Update
+    * @param f A callback function which is passed to Replicator.Update
     */
   def update(f: V ⇒ V): Update[V] = Update(Key, EmptyValue, WriteMajority(5.seconds))(f)
 

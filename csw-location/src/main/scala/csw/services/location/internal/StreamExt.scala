@@ -44,8 +44,8 @@ object StreamExt {
     }
 
     /**
-      * A new `Source` is created which will be materialized to [[akka.stream.KillSwitch]]. This stream of `Source` can
-      * be terminated any time using the `KillSwitch`
+      * A new `Source` is created out of the given `Source` which will be materialized to [[akka.stream.KillSwitch]].
+      * This stream of `Source` can be terminated any time using the `KillSwitch`
       */
     def cancellable: Source[Out, KillSwitch] = source.viaMat(KillSwitches.single)(Keep.right)
   }

@@ -5,9 +5,9 @@ import java.net.{Inet6Address, InetAddress, NetworkInterface}
 import scala.collection.JavaConverters._
 
 /**
-  * An `Exception` that handles NetworkInterface not being present
+  * An `Exception` that is thrown if the provided interface name does not exist
   *
-  * @param message `Message` for exception
+  * @param message Message that identifies the cause of exception
   */
 case class NetworkInterfaceNotFound(message: String) extends Exception(message)
 
@@ -76,14 +76,14 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
 }
 
 /**
-  * A `NetworkInterfaceProvider` that manages and provides `InetAddresses`
+  * A `NetworkInterfaceProvider` that manages `InetAddresses` on a system
   */
 class NetworkInterfaceProvider() {
 
   /**
-    * Uses `NetworkInterface` to fetch all `InetAddress` for all network interfaces
+    * Uses `NetworkInterface` to fetch all `InetAddress` of all network interfaces present on the system
     *
-    * @return A `Sequence` of tuples in the format of (Network interface index, `List` of `InetAddresses`)
+    * @return A `Sequence` of tuples in the format of (Network interface index, `List` of `InetAddresses` for that interface)
     */
   def getAllInterfaces(): Seq[(Int, List[InetAddress])] = {
     NetworkInterface.getNetworkInterfaces.asScala.toList.map(iface => (iface.getIndex, iface.getInetAddresses().asScala.toList))

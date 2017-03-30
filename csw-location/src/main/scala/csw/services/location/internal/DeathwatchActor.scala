@@ -12,7 +12,7 @@ import csw.services.location.scaladsl.{ActorRuntime, LocationService}
   * An `Actor` that death watches all registered `ActorRefs` in csw akka cluster and subscribes for changes in `LWWMap` data.
   * As soon as there are changes detected in `LWWMap`, it looks for previously unwatched `ActorRefs` and starts death watching it.
   *
-  * @param locationService The `LocationService` is used for un-registering `ActorRef` for which `Terminate` message is received
+  * @param locationService The `LocationService` is used for un-registering `ActorRef` for which `Terminated` message is received
   */
 class DeathwatchActor(locationService: LocationService) extends Actor {
 
