@@ -8,6 +8,12 @@ import csw.services.location.internal.Registry.AllServices
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorRuntime, LocationService}
 
+/**
+  * An `Actor` that death watches all registered `ActorRefs` in csw akka cluster and subscribes for changes in `LWWMap` data.
+  * As soon as there are changes detected in `LWWMap`, it looks for previously unwatched `ActorRefs` and starts death watching it.
+  *
+  * @param locationService The `LocationService` is used for un-registering `ActorRef` for which `Terminate` message is received
+  */
 class DeathwatchActor(locationService: LocationService) extends Actor {
 
   var watchedLocations: Set[AkkaLocation] = Set.empty
@@ -36,6 +42,12 @@ class DeathwatchActor(locationService: LocationService) extends Actor {
 
 object DeathwatchActor {
 
+  /**
+    * Starts a [[csw.services.location.internal.DeathwatchActor]] as Cluster singleton
+    *
+    * @param actorRuntime    The `ActorSystem` from `ActorRuntime` is used to create `DeathwatchActor`
+    * @param locationService `LocationService` instance needed for `DeathwatchActor` creation
+    */
   def startSingleton(actorRuntime: ActorRuntime, locationService: LocationService): ActorRef = {
     import actorRuntime._
     actorSystem.actorOf(
