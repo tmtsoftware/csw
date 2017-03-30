@@ -11,10 +11,10 @@ class LSMultiNodeConfig extends MultiNodeConfig {
   val node1: RoleName = role("node-1")
   val node2: RoleName = role("node-2")
 
-  private val settings = Settings().withSeeds(List.empty)
+  private val settings = Settings()
 
-  nodeConfig(node1)(settings.withPort(2552).config)
-  nodeConfig(node2)(settings.withPort(2553).config)
+  nodeConfig(node1)(settings.asSeed.config)
+  nodeConfig(node2)(settings.joinLocalSeed.config)
 
   def makeSystem(config: Config): ActorSystem = ActorSystem(settings.name, config)
 }

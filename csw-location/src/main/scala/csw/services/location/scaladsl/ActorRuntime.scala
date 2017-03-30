@@ -22,8 +22,16 @@ class ActorRuntime(_actorSystem: ActorSystem) {
 
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
+  def initialize(): Unit = {
+    val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
+    if(emptySeeds) {
+      cluster.join(cluster.selfAddress)
+    }
+  }
+
   def makeMat(): Materializer = ActorMaterializer()
 
   def terminate(): Future[Done] = Terminator.terminate(actorSystem)
-}
 
+  initialize()
+}

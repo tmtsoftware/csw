@@ -20,7 +20,7 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val actorRuntime = new ActorRuntime(Settings().withPort(2556))
+  private val actorRuntime = new ActorRuntime(Settings())
   val trackLocationApp = new TrackLocationApp(actorRuntime)
   import actorRuntime._
 

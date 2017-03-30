@@ -11,8 +11,8 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
   val connection: TcpConnection = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
   val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
 
-  val actorRuntime = new ActorRuntime(Settings().withPort(2552))
-  val actorRuntime2 = new ActorRuntime(Settings().withPort(2553))
+  val actorRuntime = new ActorRuntime(Settings().asSeed)
+  val actorRuntime2 = new ActorRuntime(Settings().joinLocalSeed)
 
   val locationService = LocationServiceFactory.make(actorRuntime)
   val locationService2 = LocationServiceFactory.make(actorRuntime2)
