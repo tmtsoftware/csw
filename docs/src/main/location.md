@@ -64,15 +64,11 @@ java
 
 ## Basic operations
 
-This example demonstrates:
-
-* `register` a tcp connection with LocationService instance
-* then confirms, the returned result contains tcp connection
-* then confirms, the `list` API has tcp location
-* then uses `resolve` API, to resolve this tcp connection
-* prints to tcp uri for demonstration purpose
-* then it shows, one of the ways to `unregister` a service by calling unregister on registrationResult
-* remaining code ensures, `list` and `resolve` behave as expected after service unregistration
+* `register` API takes a `Registration` parameter and returns a `Future` of `RegistrationResult`. 
+* The success of `register` API can be validated by checking the `Location` instance it contains.
+* The `list` API returns a list of alive connections.  
+* A connection of interest, can be checked if available using the `resolve` API. If the connection is alive, `resolve` returns Future of `RegistrationResult` containing the `Location`, else failure.
+* One of the ways to `unregister` a service is by calling unregister on registrationResult received from `register` API.
 
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #register-list-resolve-unregister }
@@ -93,13 +89,11 @@ For more info, please refer: https://github.com/scala/async
 
 ## Tracking
 
-This example:
-
-* begins by `track`ing a TcpConnection. For that purpose, LocationService provides a stream of notification events. Each received event is processed by printing on console. We also acquire a  killSwitch to turn the stream off.
-* in next two lines, a tcp and a http connection is `register`ed
-* after registration is successful, a tcp registration event is printed on the console.
-* connections are unregistered
-* stream is shutdown using killSwitch
+* The lifecycle of a connection of interest can be followed using `track` API which takes a `Connection` instance as a parameter. This Connection being tracked need not already be registered with LocationService. It's alright to track connections that will be registered in future. In return, caller gets two values: 
+     1. A **source** that will emit stream of `TrackingEvents` for the connection
+     2. A **Killswitch** to turn off the stream when no longer needed.
+* Akka stream API provides many building blocks to process this stream such as Flow and Sink. In example, Sink is used to print each incoming `TrackingEvent`.
+* Consumer can shut down the stream using Killswitch.
 
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #tracking }
@@ -109,13 +103,11 @@ java
 
 ## Filtering
 
-This example :
-
-* begins by `register`ing three connections - tcp, http, akka
-* then it validates that the `list` api returns all three connections
-* then it validates that the `list` api with connection type akka returns correct connection
-* then it validates that the `list` api with service type returns only tcp and http connections
-* then the `list` api with hostname filter, returns tcp and http connections. Note, the akka connection is not listed here because the actorref is created using ActorSystem from a test class which doesn't have a hostname. 
+* The `List` API and it's variants offer means to inquire about available connections with LocationService.
+* The parameterless list returns all available connections
+* The `list` api with connection type returns connections matching the `ConnectionType`. In example it is demonstrated using 'ConnectionType.AkkaType'.
+* Similarly, filtering using 'ComponentType.Service' and hostname is also supported by `list` API.
+* Note, in the example the akka connection is not listed when filtered using hostname. This is because the actorref is created using local ActorSystem in a test class which doesn't have a hostname. 
 
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #filtering }
