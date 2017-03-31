@@ -16,10 +16,10 @@ class RegistrationTest extends TestKit(ActorSystem("testkit")) with ImplicitSend
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(testActor))
     val akkaUri = new URI(actorPath.toString)
 
-    val akkaConnection = new AkkaConnection(new ComponentId("assembly", ComponentType.Container))
-    val akkaRegistration = new AkkaRegistration(akkaConnection, testActor)
+    val akkaConnection = AkkaConnection(new ComponentId("assembly", ComponentType.Container))
+    val akkaRegistration = AkkaRegistration(akkaConnection, testActor)
 
-    val expectedAkkaLocation = new AkkaLocation(akkaConnection, akkaUri, testActor)
+    val expectedAkkaLocation = AkkaLocation(akkaConnection, akkaUri, testActor)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
   }
@@ -29,10 +29,10 @@ class RegistrationTest extends TestKit(ActorSystem("testkit")) with ImplicitSend
     val port = 9595
     val prefix = "/trombone/hcd"
 
-    val httpConnection = new HttpConnection(new ComponentId("trombone", ComponentType.HCD))
-    val httpRegistration = new HttpRegistration(httpConnection, port, prefix)
+    val httpConnection = HttpConnection(ComponentId("trombone", ComponentType.HCD))
+    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 
-    val expectedhttpLocation = new HttpLocation(httpConnection, new URI(s"http://$hostname:$port/$prefix"))
+    val expectedhttpLocation = HttpLocation(httpConnection, new URI(s"http://$hostname:$port/$prefix"))
 
     httpRegistration.location(hostname) shouldBe expectedhttpLocation
   }
@@ -41,10 +41,10 @@ class RegistrationTest extends TestKit(ActorSystem("testkit")) with ImplicitSend
     val hostname = new Networks().hostname()
     val port = 9596
 
-    val tcpConnection = new TcpConnection(new ComponentId("lgsTrombone", ComponentType.HCD))
-    val tcpRegistration = new TcpRegistration(tcpConnection, port)
+    val tcpConnection = TcpConnection(ComponentId("lgsTrombone", ComponentType.HCD))
+    val tcpRegistration = TcpRegistration(tcpConnection, port)
 
-    val expectedTcpLocation = new TcpLocation(tcpConnection, new URI(s"tcp://$hostname:$port"))
+    val expectedTcpLocation = TcpLocation(tcpConnection, new URI(s"tcp://$hostname:$port"))
 
     tcpRegistration.location(hostname) shouldBe expectedTcpLocation
   }
