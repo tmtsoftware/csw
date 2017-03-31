@@ -42,8 +42,7 @@ scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #create-location-service }
 
 java
-:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #create-location-service }
-
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #create-location-service }
 
 ## Register a component
 
@@ -59,7 +58,7 @@ scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #Components-Connections-Registrations }
 
 java
-:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #Components-Connections-Registrations }
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #Components-Connections-Registrations }
 
 
 ## Basic operations
@@ -73,18 +72,22 @@ java
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #register-list-resolve-unregister }
 
-java
-:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #register-list-resolve-unregister }
+java-NonBLockingEx
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
 
+java-BlockingEx
+:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #register-list-resolve-unregister }
 
-@@@ note { title="Short note on scala async" }
+@@@ note { title="async handling in scala and java examples." }
 
-Below code snippets use scala's async library to demonstrate LocationService API. The use of this library is optional and the API will work just fine with higher order functions provided by scala. 
+ * **scala:** The code snippets use scala's async library to demonstrate LocationService API. The use of this library is optional and the API will work just fine with higher order functions provided by scala. 
+      However, this library makes it easy to work with asynchronous code portions. The `async` marks a block of asynchronous code. It contains one or more await calls, which marks a point at which the computation will be suspended until the awaited Future is complete.
+      For more info, please refer: https://github.com/scala/async
+ 
+ * **java non-blocking example:** The code snippets use CompletionStage and thenAsync, thenApply methods to compose the futures. 
 
-However, this library makes it easy to work with asynchronous code portions. The `async` marks a block of asynchronous code. It contains one or more await calls, which marks a point at which the computation will be suspended until the awaited Future is complete.
-
-For more info, please refer: https://github.com/scala/async
-
+ * **java blocking example:** The code snippets use CompletionStage, CompletableFuture and get blocking call for the future to return.
+    
 @@@
 
 ## Tracking
@@ -98,8 +101,11 @@ For more info, please refer: https://github.com/scala/async
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #tracking }
 
-java
-:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #tracking }
+java-NonBlockingEx
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #tracking }
+
+java-BlockingEx
+:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #tracking }
 
 ## Filtering
 
@@ -112,9 +118,11 @@ java
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #filtering }
 
-java
-:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #filtering }
+java-NonBlockingEx
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #filtering }
 
+java-BlockingEx
+:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #filtering }
 
 ## Shutdown
 
@@ -123,5 +131,8 @@ This example demonstrates how to shutdown a location service.
 scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #shutdown }
 
-java
-:   @@snip [JLocationServiceDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceDemoExample.java) { #shutdown }
+java-NonBlockingEx
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #shutdown }
+
+java-BlockingEx
+:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #shutdown }

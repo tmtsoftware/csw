@@ -13,7 +13,10 @@ import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import csw.services.location.internal.Networks;
-import csw.services.location.javadsl.*;
+import csw.services.location.javadsl.ILocationService;
+import csw.services.location.javadsl.JComponentType;
+import csw.services.location.javadsl.JConnectionType;
+import csw.services.location.javadsl.JLocationServiceFactory;
 import csw.services.location.models.*;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
@@ -28,7 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
-public class JLocationServiceDemoExample {
+public class JLocationServiceNonBlockingDemoExample {
 
     private ActorSystem actorSystem = ActorSystem.create("demo");
     private Materializer mat = ActorMaterializer.create(actorSystem);
@@ -38,17 +41,21 @@ public class JLocationServiceDemoExample {
                     return ReceiveBuilder.create().build();
                 }
             }),
-            "my-actor-to-die"
+            "my-actor-1"
     );
 
     //#create-location-service
+    //static instance is used in testing for reuse and to avoid creating/terminating it for each test.
     private static ILocationService locationService = JLocationServiceFactory.make();
     //#create-location-service
 
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
         //#shutdown
-        locationService.shutdown().toCompletableFuture().get();
+        locationService.shutdown().thenCompose(result -> {
+            //can perform additional clean-up here
+            return null;
+        });
         //#shutdown
     }
 

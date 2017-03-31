@@ -93,7 +93,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
     Await.result(doneF, 5.seconds)
     //#tracking
   }
-
+  
   test("filtering") {
     //#filtering
     val assertionF: Future[Assertion] = async {
