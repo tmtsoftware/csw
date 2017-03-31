@@ -6,18 +6,16 @@ import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.common.TestFutureExtension.RichFuture
-import csw.services.location.helpers.{LSTwoNodeConfig, LSTwoNodeSpec}
+import csw.services.location.helpers.LSNodeConfig.TwoNodes
+import csw.services.location.helpers.LSNodeSpec
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
-import org.scalatest.Matchers
 
 class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0)
 class LocationServiceTestMultiJvmNode2 extends LocationServiceTest(0)
 
-class LocationServiceTest(ignore: Int)
-  extends LSTwoNodeSpec(new LSTwoNodeConfig)
-    with Matchers {
+class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoNodes) {
 
   import config._
 

@@ -5,17 +5,17 @@ import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
-import csw.services.location.helpers.{LSThreeNodeConfig, LSThreeNodeSpec}
+import csw.services.location.helpers.LSNodeConfig.ThreeNodes
+import csw.services.location.helpers.LSNodeSpec
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
-import org.scalatest.Matchers
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode3 extends TrackLocationTest(0)
 
-class TrackLocationTest(ignore: Int) extends LSThreeNodeSpec(new LSThreeNodeConfig) with Matchers {
+class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new ThreeNodes) {
 
   import config._
 
