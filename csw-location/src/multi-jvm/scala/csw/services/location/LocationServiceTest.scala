@@ -6,7 +6,7 @@ import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.common.TestFutureExtension.RichFuture
-import csw.services.location.helpers.{LSMultiNodeConfig, LSMultiNodeSpec}
+import csw.services.location.helpers.{LSTwoNodeConfig, LSTwoNodeSpec}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
@@ -16,7 +16,7 @@ class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0)
 class LocationServiceTestMultiJvmNode2 extends LocationServiceTest(0)
 
 class LocationServiceTest(ignore: Int)
-  extends LSMultiNodeSpec(new LSMultiNodeConfig)
+  extends LSTwoNodeSpec(new LSTwoNodeConfig)
     with Matchers {
 
   import config._
@@ -72,6 +72,8 @@ class LocationServiceTest(ignore: Int)
     enterBarrier("after-2")
   }
 
+//  This test is doing the same thing what TrackLocationTest is doing
+//  but the plan is to run this test on two amazon instance's with Jenkins configuration (multi-node-test).
   test("ensure that a component registered on one node is tracked on all the nodes") {
     val componentId = ComponentId("tromboneHcd", ComponentType.HCD)
     val akkaConnection = AkkaConnection(componentId)

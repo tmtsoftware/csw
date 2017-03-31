@@ -4,7 +4,7 @@ import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
-abstract class LSMultiNodeSpec(val config: LSMultiNodeConfig) extends MultiNodeSpec(config, config.makeSystem)
+abstract class LSTwoNodeSpec(val config: LSTwoNodeConfig) extends MultiNodeSpec(config, config.makeSystem)
   with ImplicitSender
   with MultiNodeSpecCallbacks
   with FunSuiteLike

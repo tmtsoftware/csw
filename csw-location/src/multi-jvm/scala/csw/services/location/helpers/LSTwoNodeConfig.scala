@@ -6,7 +6,7 @@ import akka.remote.testkit.MultiNodeConfig
 import com.typesafe.config.Config
 import csw.services.location.internal.Settings
 
-class LSMultiNodeConfig extends MultiNodeConfig {
+class LSTwoNodeConfig extends MultiNodeConfig {
 
   val node1: RoleName = role("node-1")
   val node2: RoleName = role("node-2")
