@@ -5,7 +5,7 @@ object AutoMultiJvm extends AutoPlugin {
   import com.typesafe.sbt.SbtMultiJvm
   import SbtMultiJvm.MultiJvmKeys._
 
-  override def projectSettings: Seq[Def.Setting[_]] = SbtMultiJvm.multiJvmSettings ++ Seq(
+  override def projectSettings: Seq[Setting[_]] = SbtMultiJvm.multiJvmSettings ++ Seq(
     test := {
       (test in Test).value
       (test in MultiJvm).value

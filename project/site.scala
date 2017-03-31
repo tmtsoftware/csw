@@ -20,6 +20,7 @@ object UnidocSite extends AutoPlugin {
     addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
 
     autoAPIMappings := true
+    //      apiURL := Some(url(s"http://tmtsoftware.github.io/csw-prod/api/${version.value}"))
   )
 
   def filterNotSources(filesKey: TaskKey[Seq[File]], subPaths: Set[String]): Setting[Task[Seq[File]]] = {
@@ -32,7 +33,7 @@ object ParadoxSite extends AutoPlugin {
   import ParadoxSitePlugin.autoImport._
   import com.lightbend.paradox.sbt.ParadoxPlugin.autoImport._
 
-  override def requires = ParadoxSitePlugin
+  override def requires: Plugins = ParadoxSitePlugin
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     sourceDirectory in Paradox := baseDirectory.value / "src" / "main",
