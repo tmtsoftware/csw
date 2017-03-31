@@ -29,7 +29,7 @@ class TrackLocationTest
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val actorRuntime = new ActorRuntime(Settings().asSeed)
+  private val actorRuntime = ActorRuntime.withSettings(Settings().asSeed)
   private val locationService = LocationServiceFactory.make(actorRuntime)
   import actorRuntime._
   override protected def afterAll(): Unit = {
@@ -37,7 +37,7 @@ class TrackLocationTest
   }
 
   test("Test with command line args") {
-    val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings().joinLocalSeed))
+    val trackLocationApp = new TrackLocationApp(ActorRuntime.withSettings(Settings().joinLocalSeed))
     val name = "test1"
     val port = 9999
 
@@ -67,7 +67,7 @@ class TrackLocationTest
   }
 
   test("Test with config file") {
-    val trackLocationApp = new TrackLocationApp(new ActorRuntime(Settings().joinLocalSeed))
+    val trackLocationApp = new TrackLocationApp(ActorRuntime.withSettings(Settings().joinLocalSeed))
     val name = "test2"
     val url = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile.getAbsolutePath

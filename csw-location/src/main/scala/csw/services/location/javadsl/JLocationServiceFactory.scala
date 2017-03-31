@@ -17,7 +17,7 @@ object JLocationServiceFactory {
     *
     * ''Note : '' It is recommended to create a single instance of `ILocationService` and use it throughout.
     */
-  def make(): ILocationService = make(new ActorRuntime())
+  def make(): ILocationService = make(ActorRuntime.default())
 
   /**
     * Creates a [[csw.services.location.javadsl.ILocationService]] instance. An `ILocationService` instance.

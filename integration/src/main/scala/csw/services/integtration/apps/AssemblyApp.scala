@@ -11,7 +11,7 @@ import csw.services.location.models.{AkkaLocation, AkkaRegistration, ComponentId
 import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
 
 object AssemblyApp {
-  private val actorRuntime = new ActorRuntime(Settings().withInterface("eth1"))
+  private val actorRuntime = ActorRuntime.withSettings(Settings().withInterface("eth1"))
 
   val assemblyActorRef = actorRuntime.actorSystem.actorOf(Props[AssemblyApp], "assembly")
   val componentId = ComponentId("assembly", ComponentType.Assembly)

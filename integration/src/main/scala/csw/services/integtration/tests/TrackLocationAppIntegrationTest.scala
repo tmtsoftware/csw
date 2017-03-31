@@ -20,7 +20,7 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val actorRuntime = new ActorRuntime(Settings())
+  private val actorRuntime = ActorRuntime.withSettings(Settings())
   val trackLocationApp = new TrackLocationApp(actorRuntime)
   val WaitTimeForResolve = 3000
 

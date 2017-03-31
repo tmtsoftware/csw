@@ -1,13 +1,15 @@
 package csw.services.location.scaladsl
 
 import akka.Done
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.{ActorRef, ActorSystem, Terminated}
 import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
 import akka.stream.{ActorMaterializer, Materializer}
-import csw.services.location.internal.{Settings, Terminator}
+import csw.services.location.internal.Settings
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
+import scala.util.control.NonFatal
 
 /**
   * `ActorRuntime` manages [[scala.concurrent.ExecutionContext]], [[akka.stream.Materializer]], `akka.cluster.Cluster`
@@ -15,10 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
   *
   * @note It is highly recommended that `ActorRuntime` is created for advanced usages or testing purposes only
   */
-class ActorRuntime(_actorSystem: ActorSystem) {
-  def this(settings: Settings) = this(ActorSystem(settings.name, settings.config))
-
-  def this() = this(Settings())
+class ActorRuntime private(_actorSystem: ActorSystem) {
 
   /**
     * Identifies the hostname where `ActorSystem` is running
@@ -44,10 +43,57 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   /**
     * Terminates the `ActorSystem` and disconnects from the cluster.
     *
-    * @see [[csw.services.location.internal.Terminator]]
+    * @see [[ActorRuntime]]
     * @return A `Future` that completes on `ActorSystem` shutdown
     */
-  def terminate(): Future[Done] = Terminator.terminate(actorSystem)
+  def terminate(): Future[Done] = ActorRuntime.terminate(actorSystem)
+}
 
-  Terminator.initialize(actorSystem)
+/**
+  * Manages termination of `ActorSystem` and gracefully disconnecting from cluster
+  */
+object ActorRuntime {
+  //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
+  import ExecutionContext.Implicits.global
+
+  def default(): ActorRuntime = withSettings(Settings())
+
+  def withSettings(settings: Settings): ActorRuntime = withSystem(ActorSystem(settings.name, settings.config))
+
+  /**
+    * If no seed node is provided then the cluster is initialized for `ActorSystem`  by self joining
+    */
+  def withSystem(actorSystem: ActorSystem): ActorRuntime = {
+    val cluster = Cluster(actorSystem)
+    val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
+    if (emptySeeds) {
+      cluster.join(cluster.selfAddress)
+    }
+    val p = Promise[Done]
+    cluster.registerOnMemberUp(p.success(Done))
+    try {
+      Await.result(p.future, 10.seconds)
+      new ActorRuntime(actorSystem)
+    } catch {
+      case NonFatal(ex) ⇒
+        Await.result(ActorRuntime.terminate(actorSystem), 10.seconds)
+        throw ex
+    }
+  }
+
+  /**
+    * Performs the termination with two steps in sequence as follows :
+    *  - The `ActorSystem` leaves the cluster gracefully and then
+    *  - It is terminated
+    *
+    * @param actorSystem The `ActorSystem` that needs to be cleaned up
+    * @return A `Future` that completes on successful shutdown of `ActorSystem`
+    */
+  def terminate(actorSystem: ActorSystem): Future[Done] = {
+    val cluster = Cluster(actorSystem)
+    val p = Promise[Terminated]
+    cluster.leave(cluster.selfAddress)
+    cluster.registerOnMemberRemoved(actorSystem.terminate().onComplete(p.complete))
+    p.future.map(_ => Done)
+  }
 }

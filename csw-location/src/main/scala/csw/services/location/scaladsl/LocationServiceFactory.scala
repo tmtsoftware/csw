@@ -18,7 +18,7 @@ object LocationServiceFactory {
     *       a single instance of `LocationService` and use it throughout.
     * @return A `LocationService` instance
     */
-  def make(): LocationService = make(new ActorRuntime())
+  def make(): LocationService = make(ActorRuntime.default())
 
   /**
     * Creates a [[csw.services.location.scaladsl.LocationService]] instance

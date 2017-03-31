@@ -21,7 +21,7 @@ class LocationServiceTest(ignore: Int)
 
   import config._
 
-  private val actorRuntime = new ActorRuntime(system)
+  private val actorRuntime = ActorRuntime.withSystem(system)
   private val locationService = LocationServiceFactory.make(actorRuntime)
   import actorRuntime.mat
 

@@ -47,5 +47,5 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
 }
 
 object TrackLocationApp extends App {
-  new TrackLocationApp(new ActorRuntime(Settings())).start(args)
+  new TrackLocationApp(ActorRuntime.withSettings(Settings())).start(args)
 }
