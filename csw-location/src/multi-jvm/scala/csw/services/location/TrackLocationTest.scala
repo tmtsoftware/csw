@@ -5,7 +5,7 @@ import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
-import csw.services.location.helpers.LSNodeConfig.ThreeNodes
+import csw.services.location.helpers.LSNodeConfig.TwoMembersAndSeed
 import csw.services.location.helpers.LSNodeSpec
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
@@ -15,7 +15,7 @@ class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode3 extends TrackLocationTest(0)
 
-class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new ThreeNodes) {
+class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._
 
@@ -41,7 +41,7 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new ThreeNodes)
     //create tcp connection
     val tcpConnection = TcpConnection(ComponentId("redis1", ComponentType.Service))
 
-    runOn(node1) {
+    runOn(seed) {
       val actorRef = cswCluster.actorSystem.actorOf(
         Props(new Actor {
           override def receive: Receive = Actor.emptyBehavior
@@ -57,7 +57,7 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new ThreeNodes)
       enterBarrier("Tcp-unregister")
     }
 
-    runOn(node2) {
+    runOn(member1) {
       val port = 5656
       val prefix = "/trombone/hcd"
 
@@ -99,7 +99,7 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new ThreeNodes)
 
     }
 
-    runOn(node3) {
+    runOn(member2) {
       val Port = 5657
       val tcpRegistration = TcpRegistration(tcpConnection,  Port)
       val tcpRegistrationResult = locationService.register(tcpRegistration).await

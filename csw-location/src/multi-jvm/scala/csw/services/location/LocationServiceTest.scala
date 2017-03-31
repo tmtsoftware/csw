@@ -6,7 +6,7 @@ import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.common.TestFutureExtension.RichFuture
-import csw.services.location.helpers.LSNodeConfig.TwoNodes
+import csw.services.location.helpers.LSNodeConfig.OneMemberAndSeed
 import csw.services.location.helpers.LSNodeSpec
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
@@ -15,7 +15,7 @@ import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
 class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0)
 class LocationServiceTestMultiJvmNode2 extends LocationServiceTest(0)
 
-class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoNodes) {
+class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) {
 
   import config._
 
@@ -41,7 +41,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoNodes)
     val httpConnection = HttpConnection(ComponentId("tromboneHcd", ComponentType.HCD))
     val httpRegistration = HttpRegistration(httpConnection, httpPort, httpPath)
 
-    runOn(node1) {
+    runOn(seed) {
       locationService.register(tcpRegistration).await
       enterBarrier("Registration")
 
@@ -54,7 +54,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoNodes)
       connections.toSet shouldBe Set(tcpConnection, httpConnection)
     }
 
-    runOn(node2) {
+    runOn(member1) {
       locationService.register(httpRegistration).await
       enterBarrier("Registration")
 
@@ -76,7 +76,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoNodes)
     val componentId = ComponentId("tromboneHcd", ComponentType.HCD)
     val akkaConnection = AkkaConnection(componentId)
 
-    runOn(node1) {
+    runOn(seed) {
       val actorRef = cswCluster.actorSystem.actorOf(
         Props(new Actor {
           override def receive: Receive = Actor.emptyBehavior
@@ -90,7 +90,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoNodes)
       enterBarrier("Unregister")
     }
 
-    runOn(node2) {
+    runOn(member1) {
       val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
       probe.request(1)
