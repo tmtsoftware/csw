@@ -24,5 +24,3 @@ object Command{
     Command(command, port, options.delay.getOrElse(defaultDelay), options.noExit)
   }
 }
-
-

@@ -77,9 +77,11 @@ public class JLocationServiceBlockingDemoExample {
             }),
             "my-actor-1"
     );
-    //#create-location-service
+
     //static instance is used in testing for reuse and to avoid creating/terminating it for each test.
-    private static ILocationService locationService = JLocationServiceFactory.make();
+    private static
+    //#create-location-service
+    ILocationService locationService = JLocationServiceFactory.make();
     //#create-location-service
 
     @AfterClass
