@@ -24,6 +24,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
   import cswCluster.mat
 
   test("ensure that the cluster is up") {
+    enterBarrier("nodes-joined")
     awaitAssert {
       DistributedData(system).replicator ! GetReplicaCount
       expectMsg(ReplicaCount(roles.size))

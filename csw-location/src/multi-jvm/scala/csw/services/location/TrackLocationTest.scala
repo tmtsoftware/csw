@@ -24,6 +24,7 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
   import cswCluster.mat
 
   test("ensure that the cluster is up") {
+    enterBarrier("nodes-joined")
     awaitAssert {
       DistributedData(system).replicator ! GetReplicaCount
       expectMsg(ReplicaCount(roles.size))
@@ -76,7 +77,6 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
       trackedTcpConnection shouldBe tcpConnection
 
       enterBarrier("Registration")
-
       enterBarrier("Akka-unregister")
 
       val akkaRemovedEvent: TrackingEvent = akkaProbe.requestNext()
@@ -111,7 +111,6 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
       trackedHttpConnection shouldBe httpConnection
 
       enterBarrier("Registration")
-
       enterBarrier("Akka-unregister")
       enterBarrier("Http-unregister")
 
