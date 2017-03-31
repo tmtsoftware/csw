@@ -9,7 +9,7 @@ import scala.concurrent.Future
   */
 trait RegistrationResult {
   /**
-    * Asynchronously unregister the previously registered `Location` and return a `Future` which completes on successful
+    * Unregisters the previously registered `Location` and returns a `Future` which completes on successful
     * un-registration
     */
   def unregister(): Future[Done]

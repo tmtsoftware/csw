@@ -3,7 +3,7 @@ package csw.services.location.javadsl;
 import csw.services.location.models.ComponentType;
 
 /**
- * Java API for location service component types.
+ * Java API for component types. It encapsulates `ComponentType` which is fundamental to LocationService library.
  */
 @SuppressWarnings("unused")
 public class JComponentType {

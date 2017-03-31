@@ -21,17 +21,17 @@ object ConnectionType extends Enum[ConnectionType] {
   override def values: IndexedSeq[ConnectionType] = findValues
 
   /**
-    * Type of a REST/HTTP based service
+    * Used to define a HTTP connection
     */
   case object HttpType extends ConnectionType("http")
 
   /**
-    * Type of a TCP based service
+    * Used to define a TCP connection
     */
   case object TcpType extends ConnectionType("tcp")
 
   /**
-    * Type of an Akka actor based service
+    * Used to define an Akka connection
     */
   case object AkkaType extends ConnectionType("akka")
 

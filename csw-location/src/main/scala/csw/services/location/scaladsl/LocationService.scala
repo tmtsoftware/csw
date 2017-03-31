@@ -14,7 +14,7 @@ import scala.concurrent.Future
 trait LocationService {
 
   /**
-    * Asynchronously registers the connection information.
+    * Registers the connection information.
     *
     * @param registration The [[csw.services.location.models.Location]] from registration will be used to register with
     *                     akka cluster
@@ -23,7 +23,7 @@ trait LocationService {
   def register(registration: Registration): Future[RegistrationResult]
 
   /**
-    * Asynchronously unregisters the connection
+    * Unregisters the connection
     *
     * @param connection An already registered connection
     * @return A `Future` which completes after un-registration happens successfully and fails otherwise
@@ -31,14 +31,14 @@ trait LocationService {
   def unregister(connection: Connection): Future[Done]
 
   /**
-    * Asynchronously unregisters all connections registered via `LocationService`
+    * Unregisters all connections registered with `LocationService`
     *
-    * @return A `Future` which completes with `Success` after all locations are unregistered successfully or fails otherwise
+    * @return A `Future` which completes after all locations are unregistered successfully or fails otherwise
     */
   def unregisterAll(): Future[Done]
 
   /**
-    * Asynchronously resolves the location based on connection
+    * Resolves the location based on connection
     *
     * @param connection A connection to resolve to with its registered location
     * @return A `Future` of `Option` which completes with the resolved location if found or `None` otherwise.
@@ -46,32 +46,32 @@ trait LocationService {
   def resolve(connection: Connection): Future[Option[Location]]
 
   /**
-    * Asynchronously lists all locations registered with `LocationService`
+    * Lists all locations registered with `LocationService`
     *
-    * @return A `Future` of `List` which completes with all locations currently registered
+    * @return A `Future` which completes with a `List` of all registered locations
     */
   def list: Future[List[Location]]
 
   /**
-    * Asynchronously filters all locations registered with `LocationService` based on a component type
+    * Filters all locations registered with `LocationService` based on a component type
     *
-    * @param componentType A component type against which all locations will be listed
-    * @return A `Future` of `List` which completes with filtered locations
+    * @param componentType This component type will be used to match Locations
+    * @return A `Future` which completes with filtered locations
     */
   def list(componentType: ComponentType): Future[List[Location]]
 
   /**
-    * Asynchronously filters all locations registered with `LocationService` based on a hostname
+    * Filters all locations registered with `LocationService` based on a hostname
     *
-    * @param hostname A hostname against which all locations will be listed
+    * @param hostname This hostname will be used to match Locations
     * @return A `Future` of `List` which completes with filtered locations
     */
   def list(hostname: String): Future[List[Location]]
 
   /**
-    * Asynchronously filters all locations registered with `LocationService` based on a connection type
+    * Filters all locations registered with `LocationService` based on a connection type
     *
-    * @param connectionType
+    * @param connectionType This connection type will be used to match Locations
     * @return A `Future` of `List` which completes with filtered locations
     */
   def list(connectionType: ConnectionType): Future[List[Location]]
@@ -80,8 +80,8 @@ trait LocationService {
     * Tracks the location of a connection
     *
     * @param connection A connection for which it's location will be tracked
-    * @return A `Source` which continuously gives events for the connection. Use `KillSwitch` to stop tracking
-    *         it anytime. This will stop giving events for earlier tracked connection
+    * @return A `Source` that emits events for the connection. Use `KillSwitch` to stop tracking
+    *         when no longer needed. This will stop giving events for earlier tracked connection
     */
   def track(connection: Connection): Source[TrackingEvent, KillSwitch]
 

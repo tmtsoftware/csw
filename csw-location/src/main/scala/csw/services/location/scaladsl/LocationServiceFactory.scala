@@ -11,7 +11,7 @@ import csw.services.location.internal._
 object LocationServiceFactory {
 
   /**
-    * Creates a [[csw.services.location.scaladsl.LocationService]] instance and joins itself in the akka cluster. The data
+    * Creates a [[csw.services.location.scaladsl.LocationService]] instance and joins itself to the akka cluster. The data
     * of the akka cluster will now be replicated on this newly created node.
     *
     * @note It is recommended to create
@@ -21,7 +21,7 @@ object LocationServiceFactory {
   def make(): LocationService = make(new ActorRuntime())
 
   /**
-    * Creates a [[csw.services.location.scaladsl.LocationService]] instance. It may not join the usual csw akka cluster.
+    * Creates a [[csw.services.location.scaladsl.LocationService]] instance
     *
     * @note It is highly recommended to use it for testing purposes only.
     * @param actorRuntime An [[csw.services.location.scaladsl.ActorRuntime]] with custom configuration
