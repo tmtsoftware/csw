@@ -7,9 +7,7 @@ import akka.cluster.ddata.DistributedData
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.location.internal.{Settings, Terminator}
 
-import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
-import scala.util.control.NonFatal
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * `ActorRuntime` manages [[scala.concurrent.ExecutionContext]], [[akka.stream.Materializer]], `akka.cluster.Cluster`
@@ -37,23 +35,6 @@ class ActorRuntime(_actorSystem: ActorSystem) {
     */
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
-  /**
-    * If no seed node is provided then the cluster is initialized for `ActorSystem`  by self joining
-    */
-  def initialize(): Unit = {
-    val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
-    if (emptySeeds) {
-      cluster.join(cluster.selfAddress)
-    }
-    val p = Promise[Done]
-    cluster.registerOnMemberUp(p.success(Done))
-    try {
-      Await.result(p.future, 10.seconds)
-    } catch {
-      case NonFatal(ex) ⇒
-        Await.result(Terminator.terminate(actorSystem), 10.seconds)
-    }
-  }
 
   /**
     * Creates an `ActorMaterializer` for current `ActorSystem`
@@ -68,5 +49,5 @@ class ActorRuntime(_actorSystem: ActorSystem) {
     */
   def terminate(): Future[Done] = Terminator.terminate(actorSystem)
 
-  initialize()
+  Terminator.initialize(actorSystem)
 }
