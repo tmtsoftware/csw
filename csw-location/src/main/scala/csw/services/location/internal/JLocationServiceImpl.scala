@@ -20,7 +20,7 @@ private[location] class JLocationServiceImpl(locationService: LocationService, a
   import actorRuntime._
 
   override def register(registration: Registration): CompletionStage[IRegistrationResult] =
-    locationService.register(registration).map(JRegistrationResultsFactory.from).toJava
+    locationService.register(registration).map(registrationResult).toJava
 
   override def unregister(connection: Connection): CompletionStage[Done] =
     locationService.unregister(connection).toJava
@@ -47,4 +47,12 @@ private[location] class JLocationServiceImpl(locationService: LocationService, a
     locationService.track(connection).asJava
 
   override def shutdown(): CompletionStage[Done] = locationService.shutdown().toJava
+
+  private def registrationResult(registrationResult: RegistrationResult): IRegistrationResult = {
+    new IRegistrationResult {
+      override def unregister: CompletionStage[Done] = registrationResult.unregister().toJava
+
+      override def location: Location = registrationResult.location
+    }
+  }
 }
