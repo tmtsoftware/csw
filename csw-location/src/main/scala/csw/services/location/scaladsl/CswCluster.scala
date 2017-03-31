@@ -58,7 +58,7 @@ object CswCluster {
 
   def default(): CswCluster = withSettings(Settings())
 
-  def withSettings(settings: Settings): CswCluster = withSystem(ActorSystem(settings.name, settings.config))
+  def withSettings(settings: Settings): CswCluster = withSystem(ActorSystem(settings.clusterName, settings.config))
 
   /**
     * If no seed node is provided then the cluster is initialized for `ActorSystem`  by self joining

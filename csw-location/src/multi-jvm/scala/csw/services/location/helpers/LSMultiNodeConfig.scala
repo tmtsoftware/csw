@@ -16,5 +16,5 @@ class LSMultiNodeConfig extends MultiNodeConfig {
   nodeConfig(node1)(settings.asSeed.config)
   nodeConfig(node2)(settings.joinLocalSeed.config)
 
-  def makeSystem(config: Config): ActorSystem = ActorSystem(settings.name, config)
+  def makeSystem(config: Config): ActorSystem = ActorSystem(settings.clusterName, config)
 }

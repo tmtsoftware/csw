@@ -47,13 +47,7 @@ import scala.collection.JavaConverters._
   *       - the `Settings` api of providing values should be used for testing purpose only.
   *
   */
-case class Settings(values: Map[String, Any] = Map.empty) {
-
-  /**
-    * Name of the `ActorSystem` to join the cluster.
-    */
-  def name: String = Constants.ClusterName
-
+case class Settings(clusterName: String = Constants.ClusterName,  values: Map[String, Any] = Map.empty) {
   val InterfaceNameKey = "interfaceName"
   val ClusterSeedKey = "clusterSeed"
   val IsSeedKey = "isSeed"
@@ -77,8 +71,8 @@ case class Settings(values: Map[String, Any] = Map.empty) {
   }
 
   def seedNodes: List[String] = (allValues.get(ClusterSeedKey), allValues.get(IsSeedKey)) match {
-    case (Some(seed), _)   ⇒ List(s"akka.tcp://$name@$seed:3552")
-    case (_, Some("true")) ⇒ List(s"akka.tcp://$name@$hostname:3552")
+    case (Some(seed), _)   ⇒ List(s"akka.tcp://$clusterName@$seed:3552")
+    case (_, Some("true")) ⇒ List(s"akka.tcp://$clusterName@$hostname:3552")
     case (_, _)            ⇒ List.empty
   }
 
@@ -96,6 +90,6 @@ case class Settings(values: Map[String, Any] = Map.empty) {
 
     ConfigFactory
       .parseMap(computedValues.asJava)
-      .withFallback(ConfigFactory.load(name))
+      .withFallback(ConfigFactory.load(clusterName))
   }
 }
