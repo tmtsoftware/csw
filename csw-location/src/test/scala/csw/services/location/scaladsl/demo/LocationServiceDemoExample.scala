@@ -30,7 +30,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
 
 
   //#create-location-service
-  lazy val locationService = LocationServiceFactory.make()
+  lazy val locationService = LocationServiceFactory.default()
   //#create-location-service
 
 

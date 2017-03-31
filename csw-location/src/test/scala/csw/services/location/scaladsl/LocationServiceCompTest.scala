@@ -17,7 +17,7 @@ class LocationServiceCompTest
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  lazy val locationService: LocationService = LocationServiceFactory.make()
+  lazy val locationService: LocationService = LocationServiceFactory.default()
 
   implicit val actorSystem = ActorSystem("test-actor-system")
   implicit val mat: Materializer = ActorMaterializer()

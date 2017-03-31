@@ -26,7 +26,7 @@ object JLocationServiceFactory {
     * @param cswCluster An [[csw.services.location.scaladsl.CswCluster]] with custom configuration
     */
   def make(cswCluster: CswCluster): ILocationService = {
-    val locationService: LocationService = LocationServiceFactory.make(cswCluster)
+    val locationService: LocationService = LocationServiceFactory.withCluster(cswCluster)
     new JLocationServiceImpl(locationService, cswCluster)
   }
 }

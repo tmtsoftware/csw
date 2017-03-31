@@ -18,7 +18,7 @@ object LocationServiceFactory {
     *       a single instance of `LocationService` and use it throughout.
     * @return A `LocationService` instance
     */
-  def make(): LocationService = make(CswCluster.default())
+  def default(): LocationService = withCluster(CswCluster.default())
 
   /**
     * Creates a [[csw.services.location.scaladsl.LocationService]] instance
@@ -27,7 +27,7 @@ object LocationServiceFactory {
     * @param cswCluster An [[csw.services.location.scaladsl.CswCluster]] with custom configuration
     * @return A `LocationService` instance
     */
-  def make(cswCluster: CswCluster): LocationService = {
+  def withCluster(cswCluster: CswCluster): LocationService = {
     val locationService: LocationService = new LocationServiceImpl(cswCluster)
     DeathwatchActor.startSingleton(cswCluster, locationService)
     locationService

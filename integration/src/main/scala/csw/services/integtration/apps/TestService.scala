@@ -14,7 +14,7 @@ object TestService {
 
   val registration = HttpRegistration(connection,  Port, Path)
   val registrationResult =
-    LocationServiceFactory.make().register(registration).await
+    LocationServiceFactory.default().register(registration).await
 
   print("Redis Service Registered")
 

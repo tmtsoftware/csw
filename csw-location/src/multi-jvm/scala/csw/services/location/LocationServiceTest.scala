@@ -22,7 +22,7 @@ class LocationServiceTest(ignore: Int)
   import config._
 
   private val cswCluster = CswCluster.withSystem(system)
-  private val locationService = LocationServiceFactory.make(cswCluster)
+  private val locationService = LocationServiceFactory.withCluster(cswCluster)
   import cswCluster.mat
 
   test("ensure that the cluster is up") {

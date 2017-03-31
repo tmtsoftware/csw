@@ -14,8 +14,8 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
   val cswCluster = CswCluster.withSettings(Settings().asSeed)
   val cswCluster2 = CswCluster.withSettings(Settings().joinLocalSeed)
 
-  val locationService = LocationServiceFactory.make(cswCluster)
-  val locationService2 = LocationServiceFactory.make(cswCluster2)
+  val locationService = LocationServiceFactory.withCluster(cswCluster)
+  val locationService2 = LocationServiceFactory.withCluster(cswCluster2)
 
   override protected def afterAll(): Unit = {
     locationService2.shutdown().await

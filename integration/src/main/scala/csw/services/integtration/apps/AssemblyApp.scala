@@ -19,7 +19,7 @@ object AssemblyApp {
 
   val actorPath = ActorPath.fromString(Serialization.serializedActorPath(assemblyActorRef))
   val registration = AkkaRegistration(connection, assemblyActorRef)
-  val registrationResult = LocationServiceFactory.make(cswCluster).register(registration).await
+  val registrationResult = LocationServiceFactory.withCluster(cswCluster).register(registration).await
 
   def main(args: Array[String]): Unit = {
 

@@ -16,7 +16,7 @@ import scala.util.control.NonFatal
   */
 class TrackLocationApp(cswCluster: CswCluster) {
   import cswCluster._
-  val locationService= LocationServiceFactory.make(cswCluster)
+  val locationService= LocationServiceFactory.withCluster(cswCluster)
   var trackLocation: TrackLocation = _
 
   def start(args: Array[String]): Any = {

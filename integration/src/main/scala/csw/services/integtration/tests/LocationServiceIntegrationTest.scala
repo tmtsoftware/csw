@@ -19,7 +19,7 @@ class LocationServiceIntegrationTest
     with BeforeAndAfter
     with BeforeAndAfterAll {
 
-  val locationService = LocationServiceFactory.make()
+  val locationService = LocationServiceFactory.default()
 
   override protected def afterAll(): Unit = {
     locationService.shutdown()

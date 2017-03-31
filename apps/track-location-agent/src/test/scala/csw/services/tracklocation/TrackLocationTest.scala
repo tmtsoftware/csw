@@ -30,7 +30,7 @@ class TrackLocationTest
     with BeforeAndAfterAll {
 
   private val cswCluster = CswCluster.withSettings(Settings().asSeed)
-  private val locationService = LocationServiceFactory.make(cswCluster)
+  private val locationService = LocationServiceFactory.withCluster(cswCluster)
   import cswCluster._
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await

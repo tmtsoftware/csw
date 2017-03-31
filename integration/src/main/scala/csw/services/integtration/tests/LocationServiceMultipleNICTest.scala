@@ -11,7 +11,7 @@ class LocationServiceMultipleNICTest(cswCluster: CswCluster) extends FunSuite
   with BeforeAndAfter
   with BeforeAndAfterAll{
 
-  private val locationService = LocationServiceFactory.make(cswCluster)
+  private val locationService = LocationServiceFactory.withCluster(cswCluster)
 
   override protected def afterAll(): Unit = {
     locationService.shutdown()

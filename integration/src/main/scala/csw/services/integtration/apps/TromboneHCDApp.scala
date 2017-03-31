@@ -14,7 +14,7 @@ object TromboneHCD {
   val connection = AkkaConnection(componentId)
 
   val registration = AkkaRegistration(connection, tromboneHcdActorRef)
-  private val locationService = LocationServiceFactory.make(cswCluster)
+  private val locationService = LocationServiceFactory.withCluster(cswCluster)
   val registrationResult = locationService.register(registration).await
 
   println("Trombone HCD registered")
