@@ -8,7 +8,7 @@ import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.helpers.{LSThreeNodeConfig, LSThreeNodeSpec}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
+import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
 import org.scalatest.Matchers
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)
@@ -19,9 +19,9 @@ class TrackLocationTest(ignore: Int) extends LSThreeNodeSpec(new LSThreeNodeConf
 
   import config._
 
-  private val actorRuntime = new ActorRuntime(system)
-  private val locationService = LocationServiceFactory.make(actorRuntime)
-  import actorRuntime.mat
+  private val cswCluster = CswCluster.withSystem(system)
+  private val locationService = LocationServiceFactory.withCluster(cswCluster)
+  import cswCluster.mat
 
   test("ensure that the cluster is up") {
     awaitAssert {
@@ -42,7 +42,7 @@ class TrackLocationTest(ignore: Int) extends LSThreeNodeSpec(new LSThreeNodeConf
     val tcpConnection = TcpConnection(ComponentId("redis1", ComponentType.Service))
 
     runOn(node1) {
-      val actorRef = actorRuntime.actorSystem.actorOf(
+      val actorRef = cswCluster.actorSystem.actorOf(
         Props(new Actor {
           override def receive: Receive = Actor.emptyBehavior
         }),

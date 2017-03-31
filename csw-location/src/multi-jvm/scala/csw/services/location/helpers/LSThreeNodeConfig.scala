@@ -18,5 +18,5 @@ class LSThreeNodeConfig extends MultiNodeConfig {
   nodeConfig(node2)(settings.joinLocalSeed.config)
   nodeConfig(node3)(settings.joinLocalSeed.config)
 
-  def makeSystem(config: Config): ActorSystem = ActorSystem(settings.name, config)
+  def makeSystem(config: Config): ActorSystem = ActorSystem(settings.clusterName, config)
 }
