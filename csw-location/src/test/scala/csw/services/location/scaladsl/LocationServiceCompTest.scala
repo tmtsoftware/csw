@@ -139,11 +139,11 @@ class LocationServiceCompTest
     probe.expectComplete()
   }
 
-  test("Can not register a different connection against already registered name"){
+  test("should not register a different Registration(connection + port/URI/actorRef) against already registered name"){
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
-    val duplicateTcpRegistration = TcpRegistration(connection,  1234)
-    val tcpRegistration = TcpRegistration(connection,  1111)
+    val duplicateTcpRegistration = TcpRegistration(connection, 1234)
+    val tcpRegistration = TcpRegistration(connection, 1111)
 
     val result = locationService.register(tcpRegistration).await
 
@@ -154,12 +154,12 @@ class LocationServiceCompTest
     result.unregister().await
   }
 
-  test("registering an already registered connection does not result in failure"){
+  test("registering an already registered Registration(connection + port/URI/actorRef) on same machine should not result in failure"){
     val componentId = ComponentId("redis4", ComponentType.Service)
     val connection = TcpConnection(componentId)
 
-    val duplicateTcpRegistration = TcpRegistration(connection,  1234)
-    val tcpRegistration = TcpRegistration(connection,  1234)
+    val duplicateTcpRegistration = TcpRegistration(connection, 1234)
+    val tcpRegistration = TcpRegistration(connection, 1234)
 
     val result = locationService.register(tcpRegistration).await
 
