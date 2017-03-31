@@ -139,6 +139,83 @@ class LocationServiceCompTest
     probe.expectComplete()
   }
 
+  test("should able to track http and akka connection registered before tracking started") {
+    val hostname = new Networks().hostname()
+    //create http registration
+    val port = 9595
+    val prefix = "/trombone/hcd"
+    val httpConnection = HttpConnection(new ComponentId("Assembly1", ComponentType.Assembly))
+    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
+
+    //create akka registration
+    val akkaComponentId = ComponentId("container1", ComponentType.Container)
+    val akkaConnection = AkkaConnection(akkaComponentId)
+    val actorRef = actorSystem.actorOf(
+      Props(new Actor {
+        override def receive: Receive = Actor.emptyBehavior
+      }),
+      "container1-actor"
+    )
+    val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
+
+    val httpRegistrationResult = locationService.register(httpRegistration).await
+    val akkaRegistrationResult = locationService.register(akkaRegistration).await
+
+    //start tracking both http and akka connections
+    val (httpSwitch, httpProbe) = locationService.track(httpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+    val (akkaSwitch, akkaProbe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+
+    httpProbe.request(1)
+    httpProbe.expectNext(LocationUpdated(httpRegistration.location(hostname)))
+
+    akkaProbe.request(1)
+    akkaProbe.expectNext(LocationUpdated(akkaRegistration.location(hostname)))
+
+    //unregister http connection
+    httpRegistrationResult.unregister().await
+    httpProbe.request(1)
+    httpProbe.expectNext(LocationRemoved(httpConnection))
+
+    //stop tracking http connection
+    httpSwitch.shutdown()
+    httpProbe.request(1)
+    httpProbe.expectComplete()
+
+    //unregister and stop tracking akka connection
+    akkaRegistrationResult.unregister().await
+    akkaSwitch.shutdown()
+
+    akkaProbe.request(1)
+    akkaProbe.expectComplete()
+
+  }
+
+  test("should able to stop tracking") {
+    val hostname = new Networks().hostname()
+    //create http registration
+    val port = 9595
+    val prefix = "/trombone/hcd"
+    val httpConnection = HttpConnection(new ComponentId("trombone1", ComponentType.HCD))
+    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
+
+    val httpRegistrationResult = locationService.register(httpRegistration).await
+
+    //start tracking http connection
+    val (httpSwitch, httpProbe) = locationService.track(httpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+
+    httpProbe.request(1)
+    httpProbe.expectNext(LocationUpdated(httpRegistration.location(hostname)))
+
+    //stop tracking http connection
+    httpSwitch.shutdown()
+    httpProbe.request(1)
+    httpProbe.expectComplete()
+
+    httpRegistrationResult.unregister().await
+
+    httpProbe.expectNoMsg()
+  }
+
   test("should not register a different Registration(connection + port/URI/actorRef) against already registered name"){
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
