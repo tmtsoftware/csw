@@ -5,8 +5,7 @@ import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
-import csw.services.location.helpers.LSNodeConfig.TwoMembersAndSeed
-import csw.services.location.helpers.LSNodeSpec
+import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
