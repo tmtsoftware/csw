@@ -3,10 +3,9 @@ package csw.services.tracklocation
 import java.util.concurrent.atomic.AtomicBoolean
 
 import akka.stream.scaladsl.{Sink, Source}
-import akka.util.Timeout
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
-import csw.services.location.scaladsl.{ActorRuntime, LocationService}
+import csw.services.location.scaladsl.{CswCluster, LocationService}
 import csw.services.tracklocation.models.Command
 
 import scala.collection.immutable.Seq
@@ -15,9 +14,9 @@ import scala.concurrent.{Await, Future}
 import scala.sys.ShutdownHookThread
 import scala.sys.process._
 
-class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRuntime, locationService: LocationService) {
+class TrackLocation(names: List[String], command: Command, cswCluster: CswCluster, locationService: LocationService) {
 
-  import actorRuntime._
+  import cswCluster._
 
   private var isRunning = new AtomicBoolean(true)
   
@@ -33,7 +32,6 @@ class TrackLocation(names: List[String], command: Command, actorRuntime: ActorRu
     val connection = TcpConnection(componentId)
     locationService.register(TcpRegistration(connection,  command.port))
   }
-
 
   private def awaitTermination(results: Seq[RegistrationResult]): Unit = {
     println(results.map(_.location.connection.componentId))

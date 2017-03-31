@@ -6,7 +6,7 @@ import akka.cluster.ddata.Replicator.{Changed, Subscribe}
 import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.models._
-import csw.services.location.scaladsl.{ActorRuntime, LocationService}
+import csw.services.location.scaladsl.{CswCluster, LocationService}
 
 /**
   * An `Actor` that death watches all registered `ActorRefs` in csw akka cluster and subscribes for changes in `LWWMap` data.
@@ -48,11 +48,11 @@ object DeathwatchActor {
   /**
     * Starts a [[csw.services.location.internal.DeathwatchActor]] as Cluster singleton
     *
-    * @param actorRuntime    The `ActorSystem` from `ActorRuntime` is used to create `DeathwatchActor`
+    * @param cswCluster    The `ActorSystem` from `CswCluster` is used to create `DeathwatchActor`
     * @param locationService `LocationService` instance needed for `DeathwatchActor` creation
     */
-  def startSingleton(actorRuntime: ActorRuntime, locationService: LocationService): ActorRef = {
-    import actorRuntime._
+  def startSingleton(cswCluster: CswCluster, locationService: LocationService): ActorRef = {
+    import cswCluster._
     actorSystem.actorOf(
       ClusterSingletonManager.props(
         singletonProps = Props(new DeathwatchActor(locationService)),

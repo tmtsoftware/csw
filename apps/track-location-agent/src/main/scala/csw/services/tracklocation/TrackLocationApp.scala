@@ -2,7 +2,7 @@ package csw.services.tracklocation
 
 import akka.Done
 import csw.services.location.internal.Settings
-import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
+import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
 import csw.services.tracklocation.models.{Command, Options}
 import csw.services.tracklocation.utils.CmdLineArgsParser
 
@@ -14,9 +14,9 @@ import scala.util.control.NonFatal
   * A utility application that starts a given external program, registers it with the location service and
   * unregisters it when the program exits.
   */
-class TrackLocationApp(actorRuntime: ActorRuntime) {
-  import actorRuntime._
-  val locationService= LocationServiceFactory.make(actorRuntime)
+class TrackLocationApp(cswCluster: CswCluster) {
+  import cswCluster._
+  val locationService= LocationServiceFactory.make(cswCluster)
   var trackLocation: TrackLocation = _
 
   def start(args: Array[String]): Any = {
@@ -25,7 +25,7 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
         try {
           val command = Command.parse(options)
           println(s"commandText: ${command.commandText}, command: $command")
-          trackLocation = new TrackLocation(options.names, command, actorRuntime, locationService)
+          trackLocation = new TrackLocation(options.names, command, cswCluster, locationService)
           trackLocation.run().recover {
             case NonFatal(ex) =>
               ex.printStackTrace()
@@ -47,5 +47,5 @@ class TrackLocationApp(actorRuntime: ActorRuntime) {
 }
 
 object TrackLocationApp extends App {
-  new TrackLocationApp(ActorRuntime.withSettings(Settings())).start(args)
+  new TrackLocationApp(CswCluster.withSettings(Settings())).start(args)
 }

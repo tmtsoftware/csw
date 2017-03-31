@@ -9,15 +9,15 @@ import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.services.location.javadsl.{ILocationService, IRegistrationResult}
 import csw.services.location.models._
-import csw.services.location.scaladsl.{ActorRuntime, LocationService}
+import csw.services.location.scaladsl.{CswCluster, LocationService}
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 
-private[location] class JLocationServiceImpl(locationService: LocationService, actorRuntime: ActorRuntime) extends ILocationService {
+private[location] class JLocationServiceImpl(locationService: LocationService, cswCluster: CswCluster) extends ILocationService {
 
-  import actorRuntime._
+  import cswCluster._
 
   override def register(registration: Registration): CompletionStage[IRegistrationResult] =
     locationService.register(registration).map(registrationResult).toJava

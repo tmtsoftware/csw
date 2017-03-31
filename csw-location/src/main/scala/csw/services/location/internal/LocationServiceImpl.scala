@@ -11,7 +11,7 @@ import csw.services.location.exceptions.{OtherLocationIsRegistered, Registration
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.models._
-import csw.services.location.scaladsl.{ActorRuntime, LocationService}
+import csw.services.location.scaladsl.{CswCluster, LocationService}
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -25,11 +25,11 @@ import scala.concurrent.duration.DurationDouble
   *
   * the other with [[akka.cluster.ddata.LWWMap]] with a constant key and a map of `Connection` to `Location` as value
   *
-  * @param actorRuntime ActorRuntime which gives handle to ActorSystem of akka cluster
+  * @param cswCluster 'CswCluster' which gives handle to ActorSystem of akka cluster
   */
-private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends LocationService { outer =>
+private[location] class LocationServiceImpl(cswCluster: CswCluster) extends LocationService { outer =>
 
-  import actorRuntime._
+  import cswCluster._
   implicit val timeout: Timeout = Timeout(5.seconds)
 
 
@@ -53,7 +53,7 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     * If update in `LWWRegister` and `LWWMap` is successful then a `Future` is returned with `RegistrationResult`
     */
   def register(registration: Registration): Future[RegistrationResult] = {
-    val location = registration.location(actorRuntime.hostname)
+    val location = registration.location(cswCluster.hostname)
 
     val service = new Registry.Service(location.connection)
 
@@ -201,7 +201,7 @@ private[location] class LocationServiceImpl(actorRuntime: ActorRuntime) extends 
     *
     * @note It is recommended not to perform any operation on `LocationService` after shutdown
     */
-  def shutdown(): Future[Done] = actorRuntime.terminate()
+  def shutdown(): Future[Done] = cswCluster.terminate()
 
   private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {
     override def location: Location = loc

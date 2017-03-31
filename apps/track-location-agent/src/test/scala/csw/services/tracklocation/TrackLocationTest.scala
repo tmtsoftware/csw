@@ -10,7 +10,7 @@ import com.typesafe.scalalogging.LazyLogging
 import csw.services.location.internal.{Networks, Settings}
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
-import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
+import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
 import csw.services.tracklocation.common.TestFutureExtension.RichFuture
 import csw.services.tracklocation.models.Command
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
@@ -29,15 +29,15 @@ class TrackLocationTest
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val actorRuntime = ActorRuntime.withSettings(Settings().asSeed)
-  private val locationService = LocationServiceFactory.make(actorRuntime)
-  import actorRuntime._
+  private val cswCluster = CswCluster.withSettings(Settings().asSeed)
+  private val locationService = LocationServiceFactory.make(cswCluster)
+  import cswCluster._
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await
   }
 
   test("Test with command line args") {
-    val trackLocationApp = new TrackLocationApp(ActorRuntime.withSettings(Settings().joinLocalSeed))
+    val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(Settings().joinLocalSeed))
     val name = "test1"
     val port = 9999
 
@@ -67,7 +67,7 @@ class TrackLocationTest
   }
 
   test("Test with config file") {
-    val trackLocationApp = new TrackLocationApp(ActorRuntime.withSettings(Settings().joinLocalSeed))
+    val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(Settings().joinLocalSeed))
     val name = "test2"
     val url = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
@@ -103,7 +103,7 @@ class TrackLocationTest
     val port = 9999
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
-      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime, locationService)
+      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), cswCluster, locationService)
       trackLocation.run().await
     }
 
@@ -115,7 +115,7 @@ class TrackLocationTest
     val port = 9999
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
-      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), actorRuntime, locationService)
+      val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), cswCluster, locationService)
       trackLocation.run().await
     }
 

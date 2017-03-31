@@ -9,7 +9,7 @@ import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSMultiNodeConfig, LSMultiNodeSpec}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
+import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
 import org.scalatest.Matchers
 
 class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0)
@@ -21,9 +21,9 @@ class LocationServiceTest(ignore: Int)
 
   import config._
 
-  private val actorRuntime = ActorRuntime.withSystem(system)
-  private val locationService = LocationServiceFactory.make(actorRuntime)
-  import actorRuntime.mat
+  private val cswCluster = CswCluster.withSystem(system)
+  private val locationService = LocationServiceFactory.make(cswCluster)
+  import cswCluster.mat
 
   test("ensure that the cluster is up") {
     awaitAssert {
@@ -77,7 +77,7 @@ class LocationServiceTest(ignore: Int)
     val akkaConnection = AkkaConnection(componentId)
 
     runOn(node1) {
-      val actorRef = actorRuntime.actorSystem.actorOf(
+      val actorRef = cswCluster.actorSystem.actorOf(
         Props(new Actor {
           override def receive: Receive = Actor.emptyBehavior
         }),

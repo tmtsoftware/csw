@@ -12,12 +12,12 @@ import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 /**
-  * `ActorRuntime` manages [[scala.concurrent.ExecutionContext]], [[akka.stream.Materializer]], `akka.cluster.Cluster`
+  * `CswCluster` manages [[scala.concurrent.ExecutionContext]], [[akka.stream.Materializer]], `akka.cluster.Cluster`
   * and `Hostname` of an [[akka.actor.ActorSystem]]
   *
-  * @note It is highly recommended that `ActorRuntime` is created for advanced usages or testing purposes only
+  * @note It is highly recommended that `CswCluster` is created for advanced usages or testing purposes only
   */
-class ActorRuntime private(_actorSystem: ActorSystem) {
+class CswCluster private(_actorSystem: ActorSystem) {
 
   /**
     * Identifies the hostname where `ActorSystem` is running
@@ -43,27 +43,27 @@ class ActorRuntime private(_actorSystem: ActorSystem) {
   /**
     * Terminates the `ActorSystem` and disconnects from the cluster.
     *
-    * @see [[ActorRuntime]]
+    * @see [[CswCluster]]
     * @return A `Future` that completes on `ActorSystem` shutdown
     */
-  def terminate(): Future[Done] = ActorRuntime.terminate(actorSystem)
+  def terminate(): Future[Done] = CswCluster.terminate(actorSystem)
 }
 
 /**
   * Manages termination of `ActorSystem` and gracefully disconnecting from cluster
   */
-object ActorRuntime {
+object CswCluster {
   //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
   import ExecutionContext.Implicits.global
 
-  def default(): ActorRuntime = withSettings(Settings())
+  def default(): CswCluster = withSettings(Settings())
 
-  def withSettings(settings: Settings): ActorRuntime = withSystem(ActorSystem(settings.name, settings.config))
+  def withSettings(settings: Settings): CswCluster = withSystem(ActorSystem(settings.name, settings.config))
 
   /**
     * If no seed node is provided then the cluster is initialized for `ActorSystem`  by self joining
     */
-  def withSystem(actorSystem: ActorSystem): ActorRuntime = {
+  def withSystem(actorSystem: ActorSystem): CswCluster = {
     val cluster = Cluster(actorSystem)
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
     if (emptySeeds) {
@@ -73,10 +73,10 @@ object ActorRuntime {
     cluster.registerOnMemberUp(p.success(Done))
     try {
       Await.result(p.future, 10.seconds)
-      new ActorRuntime(actorSystem)
+      new CswCluster(actorSystem)
     } catch {
       case NonFatal(ex) ⇒
-        Await.result(ActorRuntime.terminate(actorSystem), 10.seconds)
+        Await.result(CswCluster.terminate(actorSystem), 10.seconds)
         throw ex
     }
   }

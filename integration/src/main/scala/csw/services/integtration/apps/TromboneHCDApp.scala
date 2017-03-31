@@ -4,17 +4,17 @@ import akka.actor.{Actor, Props}
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
-import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
+import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
 
 object TromboneHCD {
-  private val actorRuntime = ActorRuntime.default()
+  private val cswCluster = CswCluster.default()
 
-  val tromboneHcdActorRef = actorRuntime.actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
+  val tromboneHcdActorRef = cswCluster.actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
   val componentId = ComponentId("trombonehcd", ComponentType.HCD)
   val connection = AkkaConnection(componentId)
 
   val registration = AkkaRegistration(connection, tromboneHcdActorRef)
-  private val locationService = LocationServiceFactory.make(actorRuntime)
+  private val locationService = LocationServiceFactory.make(cswCluster)
   val registrationResult = locationService.register(registration).await
 
   println("Trombone HCD registered")
@@ -27,7 +27,7 @@ object TromboneHCD {
 
 class TromboneHCD extends Actor {
   import TromboneHCD._
-  import actorRuntime._
+  import cswCluster._
 
   override def receive: Receive = {
     case Unregister => {

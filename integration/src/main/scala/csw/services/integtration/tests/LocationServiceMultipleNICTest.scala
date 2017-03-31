@@ -3,15 +3,15 @@ package csw.services.integtration.tests
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType, AkkaLocation}
-import csw.services.location.scaladsl.{ActorRuntime, LocationServiceFactory}
+import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuite, Matchers}
 
-class LocationServiceMultipleNICTest(actorRuntime: ActorRuntime) extends FunSuite
+class LocationServiceMultipleNICTest(cswCluster: CswCluster) extends FunSuite
   with Matchers
   with BeforeAndAfter
   with BeforeAndAfterAll{
 
-  private val locationService = LocationServiceFactory.make(actorRuntime)
+  private val locationService = LocationServiceFactory.make(cswCluster)
 
   override protected def afterAll(): Unit = {
     locationService.shutdown()

@@ -11,11 +11,11 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
   val connection: TcpConnection = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
   val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
 
-  val actorRuntime = ActorRuntime.withSettings(Settings().asSeed)
-  val actorRuntime2 = ActorRuntime.withSettings(Settings().joinLocalSeed)
+  val cswCluster = CswCluster.withSettings(Settings().asSeed)
+  val cswCluster2 = CswCluster.withSettings(Settings().joinLocalSeed)
 
-  val locationService = LocationServiceFactory.make(actorRuntime)
-  val locationService2 = LocationServiceFactory.make(actorRuntime2)
+  val locationService = LocationServiceFactory.make(cswCluster)
+  val locationService2 = LocationServiceFactory.make(cswCluster2)
 
   override protected def afterAll(): Unit = {
     locationService2.shutdown().await

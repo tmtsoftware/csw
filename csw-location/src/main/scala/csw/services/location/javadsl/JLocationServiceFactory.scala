@@ -1,7 +1,7 @@
 package csw.services.location.javadsl
 
 import csw.services.location.internal.JLocationServiceImpl
-import csw.services.location.scaladsl.{ActorRuntime, LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.{CswCluster, LocationService, LocationServiceFactory}
 
 /**
   * A `Factory` that manages creation of [[csw.services.location.javadsl.ILocationService]].
@@ -17,16 +17,16 @@ object JLocationServiceFactory {
     *
     * ''Note : '' It is recommended to create a single instance of `ILocationService` and use it throughout.
     */
-  def make(): ILocationService = make(ActorRuntime.default())
+  def make(): ILocationService = make(CswCluster.default())
 
   /**
     * Creates a [[csw.services.location.javadsl.ILocationService]] instance. An `ILocationService` instance.
     * ''Note : '' It is highly recommended to use it for testing purposes only.
     *
-    * @param actorRuntime An [[csw.services.location.scaladsl.ActorRuntime]] with custom configuration
+    * @param cswCluster An [[csw.services.location.scaladsl.CswCluster]] with custom configuration
     */
-  def make(actorRuntime: ActorRuntime): ILocationService = {
-    val locationService: LocationService = LocationServiceFactory.make(actorRuntime)
-    new JLocationServiceImpl(locationService, actorRuntime)
+  def make(cswCluster: CswCluster): ILocationService = {
+    val locationService: LocationService = LocationServiceFactory.make(cswCluster)
+    new JLocationServiceImpl(locationService, cswCluster)
   }
 }
