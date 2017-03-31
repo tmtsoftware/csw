@@ -5,8 +5,10 @@ import java.io.File
 import csw.services.tracklocation.models.Options
 import scopt.OptionParser
 
+/**
+  * Parses the command line options using `scopt` library.
+  */
 object CmdLineArgsParser {
-  // Parses the command line options
   val parser: OptionParser[Options] = new scopt.OptionParser[Options]("trackLocation") {
     head("trackLocation", System.getProperty("CSW_VERSION"))
 

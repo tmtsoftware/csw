@@ -1,10 +1,16 @@
 package csw.services.tracklocation.models
 
-import java.io.File
-
-import com.typesafe.config.{Config, ConfigFactory, ConfigResolveOptions}
+import com.typesafe.config.Config
 import csw.services.tracklocation.utils.{OptionsHandler, Utils}
 
+/**
+  * Prepares a command object, based on in input parameters.
+  *
+  * @param commandText An executable command. e.g. "redis-server /usr/local/etc/redis.conf"
+  * @param port Port number
+  * @param delay Number of milliseconds
+  * @param noExit prevents application from exiting after running the command
+  */
 case class Command(
     commandText: String,
     port: Int,

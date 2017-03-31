@@ -14,25 +14,38 @@ import scala.concurrent.{Await, Future}
 import scala.sys.ShutdownHookThread
 import scala.sys.process._
 
+/**
+  * Starts a given external program, registers it with the location service and unregisters it when the program exits.
+  */
 class TrackLocation(names: List[String], command: Command, cswCluster: CswCluster, locationService: LocationService) {
 
   import cswCluster._
 
   private var isRunning = new AtomicBoolean(true)
-  
+
   def run(): Future[Unit] = register().map(awaitTermination)
 
+  /**
+    * INTERNAL API : Registers the services from `names` collection with LocationService.
+    */
   private def register(): Future[Seq[RegistrationResult]] = Source(names)
     .initialDelay(command.delay.millis) //delay to give the app a chance to start
     .mapAsync(1)(registerName)
     .runWith(Sink.seq)
 
+  /**
+    * INTERNAL API : Registers a single service as a TCP service.
+    */
   private def registerName(name: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
     val connection = TcpConnection(componentId)
-    locationService.register(TcpRegistration(connection,  command.port))
+    locationService.register(TcpRegistration(connection, command.port))
   }
 
+  /**
+    * INTERNAL API : Registers a shutdownHook to handle service un-registration during abnormal exit. Then, executes user
+    * specified command and awaits its termination.
+    */
   private def awaitTermination(results: Seq[RegistrationResult]): Unit = {
     println(results.map(_.location.connection.componentId))
 
@@ -56,8 +69,11 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
     if (!command.noExit) System.exit(exitCode)
   }
 
+  /**
+    * INTERNAL API : Unregisters a service.
+    */
   private def unregisterServices(results: Seq[RegistrationResult]): Unit = synchronized {
-    if(isRunning.get()) {
+    if (isRunning.get()) {
       Await.result(Future.traverse(results)(_.unregister()), 10.seconds)
       isRunning.set(false)
       println(s"Services are unregistered.")

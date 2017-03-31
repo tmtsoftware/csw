@@ -11,12 +11,12 @@ import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 
 /**
-  * A utility application that starts a given external program, registers it with the location service and
-  * unregisters it when the program exits.
+  * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
   */
 class TrackLocationApp(cswCluster: CswCluster) {
   import cswCluster._
   val locationService= LocationServiceFactory.withCluster(cswCluster)
+
   var trackLocation: TrackLocation = _
 
   def start(args: Array[String]): Any = {

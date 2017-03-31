@@ -3,6 +3,9 @@ package csw.services.tracklocation.utils
 import com.typesafe.config.Config
 import csw.services.tracklocation.models.Options
 
+/**
+  * Exposes utility methods to parse string, int, port options.
+  */
 final case class OptionsHandler(val options: Options, val appConfig: Option[Config]) {
 
   def stringOpt(entry: String, arg: Option[String] = None): Option[String] = {
