@@ -90,6 +90,6 @@ case class Settings(clusterName: String = Constants.ClusterName,  values: Map[St
 
     ConfigFactory
       .parseMap(computedValues.asJava)
-      .withFallback(ConfigFactory.load(clusterName))
+      .withFallback(ConfigFactory.load().getConfig(clusterName))
   }
 }
