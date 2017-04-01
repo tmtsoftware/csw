@@ -33,7 +33,7 @@ class TrackLocationTest
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
   import cswCluster._
   override protected def afterAll(): Unit = {
-    actorSystem.terminate().await
+    locationService.shutdown().await
   }
 
   test("Test with command line args") {

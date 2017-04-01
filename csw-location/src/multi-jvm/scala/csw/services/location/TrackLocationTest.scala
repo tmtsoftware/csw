@@ -8,7 +8,7 @@ import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0)
@@ -18,7 +18,6 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
 
   import config._
 
-  private val cswCluster = CswCluster.withSystem(system)
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
   import cswCluster.mat
 

@@ -18,7 +18,7 @@ object LocationServiceFactory {
     *       a single instance of `LocationService` and use it throughout.
     * @return A `LocationService` instance
     */
-  def default(): LocationService = withCluster(CswCluster.default())
+  def make(): LocationService = withCluster(CswCluster.make())
 
   /**
     * Creates a [[csw.services.location.scaladsl.LocationService]] instance

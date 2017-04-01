@@ -9,7 +9,7 @@ import csw.services.location.common.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0)
 class LocationServiceTestMultiJvmNode2 extends LocationServiceTest(0)
@@ -18,7 +18,6 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
   import config._
 
-  private val cswCluster = CswCluster.withSystem(system)
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
   import cswCluster.mat
 

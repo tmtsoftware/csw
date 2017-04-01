@@ -56,7 +56,7 @@ object CswCluster {
   //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
   import ExecutionContext.Implicits.global
 
-  def default(): CswCluster = withSettings(Settings())
+  def make(): CswCluster = withSettings(Settings())
 
   def withSettings(settings: Settings): CswCluster = withSystem(ActorSystem(settings.clusterName, settings.config))
 

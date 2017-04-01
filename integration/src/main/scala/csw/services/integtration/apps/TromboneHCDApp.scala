@@ -7,7 +7,7 @@ import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentTyp
 import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
 
 object TromboneHCD {
-  private val cswCluster = CswCluster.default()
+  private val cswCluster = CswCluster.make()
 
   val tromboneHcdActorRef = cswCluster.actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
   val componentId = ComponentId("trombonehcd", ComponentType.HCD)
