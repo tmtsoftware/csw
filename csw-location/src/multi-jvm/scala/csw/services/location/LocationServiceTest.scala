@@ -54,7 +54,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       connections.toSet shouldBe Set(tcpConnection, httpConnection)
     }
 
-    runOn(member1) {
+    runOn(member) {
       locationService.register(httpRegistration).await
       enterBarrier("Registration")
 
@@ -90,7 +90,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       enterBarrier("Unregister")
     }
 
-    runOn(member1) {
+    runOn(member) {
       val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
       probe.request(1)
