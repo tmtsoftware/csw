@@ -47,7 +47,7 @@ import scala.collection.JavaConverters._
   *       - the `Settings` api of providing values should be used for testing purpose only.
   *
   */
-case class Settings(clusterName: String = Constants.ClusterName,  values: Map[String, Any] = Map.empty) {
+case class Settings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
   val InterfaceNameKey = "interfaceName"
   val ClusterSeedKey = "clusterSeed"
   val IsSeedKey = "isSeed"
@@ -70,22 +70,21 @@ case class Settings(clusterName: String = Constants.ClusterName,  values: Map[St
     new Networks(interfaceName).hostname()
   }
 
-  def seedNodes: List[String] = (allValues.get(ClusterSeedKey), allValues.get(IsSeedKey)) match {
-    case (Some(seed), _)   ⇒ List(s"akka.tcp://$clusterName@$seed:3552")
-    case (_, Some("true")) ⇒ List(s"akka.tcp://$clusterName@$hostname:3552")
-    case (_, _)            ⇒ List.empty
-  }
+  def isSeed: Boolean = allValues.get(IsSeedKey).contains("true")
 
-  def port: Int = allValues.get(IsSeedKey) match {
-    case Some("true") ⇒ 3552
-    case _            ⇒ 0
+  def port: Int = if (isSeed) 3552 else 0
+
+  def seedNodes: List[String] = allValues.get(ClusterSeedKey) match {
+    case Some(seed)     ⇒ List(s"akka.tcp://$clusterName@$seed:3552")
+    case None if isSeed ⇒ List(s"akka.tcp://$clusterName@$hostname:3552")
+    case None           ⇒ List.empty
   }
 
   def config: Config = {
     val computedValues: Map[String, Any] = Map(
-      "akka.remote.netty.tcp.hostname" -> hostname,
-      "akka.remote.netty.tcp.port" -> port,
-      "akka.cluster.seed-nodes" -> seedNodes.asJava
+      "akka.remote.netty.tcp.hostname" → hostname,
+      "akka.remote.netty.tcp.port" → port,
+      "akka.cluster.seed-nodes" → seedNodes.asJava
     )
 
     ConfigFactory
