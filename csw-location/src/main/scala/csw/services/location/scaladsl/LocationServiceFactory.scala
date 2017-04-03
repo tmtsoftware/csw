@@ -11,7 +11,7 @@ import csw.services.location.internal._
 object LocationServiceFactory {
 
   /**
-    * Creates a [[csw.services.location.scaladsl.LocationService]] instance and joins itself to the akka cluster. The data
+    * Creates a [[csw.services.location.scaladsl.LocationService]] instance and joins to the akka cluster. The data
     * of the akka cluster will now be replicated on this newly created node.
     *
     * @note It is recommended to create

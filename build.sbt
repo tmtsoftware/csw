@@ -7,7 +7,7 @@ lazy val `csw-prod` = project
   .aggregate(`csw-location`, `track-location-agent`)
   .settings(Settings.mergeSiteWith(docs))
   .settings(
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(`track-location-agent`)
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(`track-location-agent`, `integration`)
   )
 
 lazy val `csw-location` = project
