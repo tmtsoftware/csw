@@ -38,7 +38,7 @@ class TrackLocationTest
   }
 
   test("Test with command line args") {
-    val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(ClusterSettings().joinLocalSeed))
+    val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(ClusterSettings().joinLocal()))
     val name = "test1"
     val port = 9999
 
@@ -68,7 +68,7 @@ class TrackLocationTest
   }
 
   test("Test with config file") {
-    val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(ClusterSettings().joinLocalSeed))
+    val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(ClusterSettings().joinLocal()))
     val name = "test2"
     val url = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile.getAbsolutePath

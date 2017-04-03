@@ -25,7 +25,7 @@ class NMembersAndSeed(n: Int) extends MultiNodeConfig {
   val seed: RoleName = addRole("seed")(settings.asSeed)
 
   val members: Vector[RoleName] = (1 to n).toVector.map { x =>
-    addRole(s"member-$x")(settings.joinLocalSeed)
+    addRole(s"member-$x")(settings.joinLocal())
   }
 
   private def addRole(name: String)(settings: ClusterSettings): RoleName = {

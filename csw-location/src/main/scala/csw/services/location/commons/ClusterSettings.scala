@@ -57,10 +57,12 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
 
   def withInterface(name: String): ClusterSettings = withEntry(InterfaceNameKey, name)
 
+  def joinNode(seed: String): ClusterSettings = withEntry(ClusterSeedKey, seed)
+
   /**
     * Joins the cluster with seed running on localhost
     */
-  def joinLocalSeed: ClusterSettings = withEntry(ClusterSeedKey, hostname)
+  def joinLocal(port: Int = 3552): ClusterSettings = withEntry(ClusterSeedKey, s"$hostname:$port")
 
   def asSeed: ClusterSettings = withEntry(IsSeedKey, "true")
 
@@ -76,7 +78,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   def port: Int = if (isSeed) 3552 else 0
 
   def seedNodes: List[String] = allValues.get(ClusterSeedKey) match {
-    case Some(seed)     ⇒ List(s"akka.tcp://$clusterName@$seed:3552")
+    case Some(seed)     ⇒ List(s"akka.tcp://$clusterName@$seed")
     case None if isSeed ⇒ List(s"akka.tcp://$clusterName@$hostname:3552")
     case None           ⇒ List.empty
   }
