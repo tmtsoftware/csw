@@ -10,9 +10,6 @@ import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, 
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
-
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode3 extends TrackLocationTest(0)
@@ -130,69 +127,5 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
 
     enterBarrier("after-2")
   }
-
-  test("component running on one node should detect if other component running on another node crashes"){
-
-    val akkaConnection = AkkaConnection(ComponentId("Container1", ComponentType.Container))
-
-    runOn(seed) {
-      val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
-      enterBarrier("Registration")
-
-      probe.requestNext() shouldBe a[LocationUpdated]
-      Thread.sleep(2000)
-      
-      Await.result(testConductor.shutdown(member1, abort = true), 30.seconds)
-      enterBarrier("after-crash")
-
-      within(5.seconds) {
-        awaitAssert {
-          probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
-        }
-      }
-
-      Thread.sleep(1000)
-
-      locationService.list.await.size shouldBe 1
-    }
-
-    runOn(member1) {
-      val actorRef = cswCluster.actorSystem.actorOf(
-        Props(new Actor {
-          override def receive: Receive = Actor.emptyBehavior
-        }),
-        "trombone-hcd-1"
-      )
-      locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
-      enterBarrier("Registration")
-
-      Await.ready(system.whenTerminated, 30.seconds)
-    }
-
-    runOn(member2) {
-      val port = 9595
-      val prefix = "/trombone/hcd"
-
-      val httpConnection = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
-      val httpRegistration = HttpRegistration(httpConnection, port, prefix)
-
-      locationService.register(httpRegistration).await
-
-      enterBarrier("Registration")
-      val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
-      Thread.sleep(2000)
-      enterBarrier("after-crash")
-
-      within(5.seconds) {
-        awaitAssert {
-          probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
-        }
-      }
-
-      Thread.sleep(1000)
-
-      locationService.list.await.size shouldBe 1
-
-    }
-  }
 }
+
