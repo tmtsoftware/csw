@@ -4,11 +4,11 @@ import akka.actor.ActorSystem
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.location.internal.Settings
+import csw.services.location.internal.ClusterSettings
 
 class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 
-  private val settings = Settings()
+  private val settings = ClusterSettings()
 
   commonConfig(debugConfig(on = false)
     .withFallback(
@@ -28,7 +28,7 @@ class NMembersAndSeed(n: Int) extends MultiNodeConfig {
     addRole(s"member-$x")(settings.joinLocalSeed)
   }
 
-  private def addRole(name: String)(settings: Settings): RoleName = {
+  private def addRole(name: String)(settings: ClusterSettings): RoleName = {
     val node = role(name)
     nodeConfig(node)(settings.config)
     node

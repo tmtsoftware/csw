@@ -5,7 +5,7 @@ import akka.actor.{ActorRef, ActorSystem, Terminated}
 import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
 import akka.stream.{ActorMaterializer, Materializer}
-import csw.services.location.internal.Settings
+import csw.services.location.internal.ClusterSettings
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
@@ -60,14 +60,14 @@ object CswCluster {
     *
     * @see [[CswCluster.withSystem]]
     */
-  def make(): CswCluster = withSettings(Settings())
+  def make(): CswCluster = withSettings(ClusterSettings())
 
   /**
     * Creates CswCluster with the given settings
     *
     * @see [[CswCluster.withSystem]]
     */
-  def withSettings(settings: Settings): CswCluster = withSystem(ActorSystem(settings.clusterName, settings.config))
+  def withSettings(settings: ClusterSettings): CswCluster = withSystem(ActorSystem(settings.clusterName, settings.config))
 
   /**
     * The actorSystem joins csw cluster. If no seed node is provided then the cluster is initialized for `ActorSystem`

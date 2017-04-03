@@ -7,7 +7,7 @@ import java.nio.file.Paths
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
-import csw.services.location.internal.{Networks, Settings}
+import csw.services.location.internal.{Networks, ClusterSettings}
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
@@ -29,7 +29,7 @@ class TrackLocationTest
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val cswCluster = CswCluster.withSettings(Settings().asSeed)
+  private val cswCluster = CswCluster.withSettings(ClusterSettings().asSeed)
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
   import cswCluster._
   override protected def afterAll(): Unit = {
@@ -37,7 +37,7 @@ class TrackLocationTest
   }
 
   test("Test with command line args") {
-    val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(Settings().joinLocalSeed))
+    val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(ClusterSettings().joinLocalSeed))
     val name = "test1"
     val port = 9999
 
@@ -67,7 +67,7 @@ class TrackLocationTest
   }
 
   test("Test with config file") {
-    val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(Settings().joinLocalSeed))
+    val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(ClusterSettings().joinLocalSeed))
     val name = "test2"
     val url = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile.getAbsolutePath

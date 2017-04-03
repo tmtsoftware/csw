@@ -4,7 +4,7 @@ import java.io.{BufferedWriter, FileWriter}
 import java.net.URI
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.internal.{Networks, Settings}
+import csw.services.location.internal.{Networks, ClusterSettings}
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{CswCluster, LocationService}
@@ -20,7 +20,7 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val cswCluster = CswCluster.withSettings(Settings())
+  private val cswCluster = CswCluster.withSettings(ClusterSettings())
   val trackLocationApp = new TrackLocationApp(cswCluster)
   val WaitTimeForResolve = 3000
 

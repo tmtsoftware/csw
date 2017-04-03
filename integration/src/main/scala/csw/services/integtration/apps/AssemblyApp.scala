@@ -5,13 +5,13 @@ import java.net.URI
 import akka.actor.{Actor, ActorPath, Props}
 import akka.serialization.Serialization
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.internal.Settings
+import csw.services.location.internal.ClusterSettings
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaLocation, AkkaRegistration, ComponentId, ComponentType}
 import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
 
 object AssemblyApp {
-  private val cswCluster = CswCluster.withSettings(Settings().withInterface("eth1"))
+  private val cswCluster = CswCluster.withSettings(ClusterSettings().withInterface("eth1"))
 
   val assemblyActorRef = cswCluster.actorSystem.actorOf(Props[AssemblyApp], "assembly")
   val componentId = ComponentId("assembly", ComponentType.Assembly)

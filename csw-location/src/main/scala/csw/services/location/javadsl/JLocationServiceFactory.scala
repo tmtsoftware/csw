@@ -1,6 +1,6 @@
 package csw.services.location.javadsl
 
-import csw.services.location.internal.{JLocationServiceImpl, Settings}
+import csw.services.location.internal.{JLocationServiceImpl, ClusterSettings}
 import csw.services.location.scaladsl.{CswCluster, LocationService, LocationServiceFactory}
 
 /**

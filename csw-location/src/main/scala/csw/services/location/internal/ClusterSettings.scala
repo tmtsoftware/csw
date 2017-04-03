@@ -5,7 +5,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import scala.collection.JavaConverters._
 
 /**
-  * Settings manages [[com.typesafe.config.Config]] values required by an [[akka.actor.ActorSystem]] to boot. It configures mainly
+  * ClusterSettings manages [[com.typesafe.config.Config]] values required by an [[akka.actor.ActorSystem]] to boot. It configures mainly
   * four parameters of an `ActorSystem`, namely :
   *
   *  - name (Name is defaulted to a constant value so that ActorSystem joins the cluster while booting)
@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
   *  - akka.remote.netty.tcp.port     (The port to boot an ActorSystem on)
   *  - akka.cluster.seed-nodes        (Seed Nodes of the cluster)
   *
-  * Settings require three values namely :
+  * ClusterSettings require three values namely :
   *  - interfaceName (The network interface where cluster is formed.)
   *  - clusterSeed (The host address of the seedNode of the cluster)
   *  - isSeed (Claim self to be the seed of the cluster)
@@ -24,44 +24,44 @@ import scala.collection.JavaConverters._
   * run on 3552)
   *  - `akka.cluster.seed-nodes` will be self if `isSeed` is true otherwise `clusterSeed` value will be used
   *
-  * If none of the Settings are provided then defaults will be picked as follows :
+  * If none of the settings are provided then defaults will be picked as follows :
   *  - `akka.remote.netty.tcp.hostname` will be ipV4 address from [[csw.services.location.internal.Networks]]
   *  - `akka.remote.netty.tcp.port` will be a random port
   *  - `akka.cluster.seed-nodes` will be empty
   * and an `ActorSystem` will be created and a cluster will be formed with no Seed Nodes. It will also self join the cluster.
   *
-  * `Settings` can be given in three ways :
+  * `ClusterSettings` can be given in three ways :
   *  - by using the api
   *  - by providing system properties
   *  - or by providing environment variables
   *
-  * If a `Settings` value e.g. isSeed is provided by more than one ways, then the precedence of consumption will be first from
+  * If a `ClusterSettings` value e.g. isSeed is provided by more than one ways, then the precedence of consumption will be first from
   *  - System Properties
   *  - then from Environment variable
-  *  - and then from `Settings` api
+  *  - and then from `ClusterSettings` api
   *
-  * @note Although `Settings` can be added through multiple ways, it is recommended that
+  * @note Although `ClusterSettings` can be added through multiple ways, it is recommended that
   *       - `clusterSeed` is provided via environment variable,
   *       - `isSeed` is provided via system properties,
   *       - `interfaceName` is provide via environment variable and
-  *       - the `Settings` api of providing values should be used for testing purpose only.
+  *       - the `ClusterSettings` api of providing values should be used for testing purpose only.
   *
   */
-case class Settings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
+case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
   val InterfaceNameKey = "interfaceName"
   val ClusterSeedKey = "clusterSeed"
   val IsSeedKey = "isSeed"
 
-  def withEntry(key: String, value: Any): Settings = copy(values = values + (key → value))
+  def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
 
-  def withInterface(name: String): Settings = withEntry(InterfaceNameKey, name)
+  def withInterface(name: String): ClusterSettings = withEntry(InterfaceNameKey, name)
 
   /**
     * Joins the cluster with seed running on localhost
     */
-  def joinLocalSeed: Settings = withEntry(ClusterSeedKey, hostname)
+  def joinLocalSeed: ClusterSettings = withEntry(ClusterSeedKey, hostname)
 
-  def asSeed: Settings = withEntry(IsSeedKey, "true")
+  def asSeed: ClusterSettings = withEntry(IsSeedKey, "true")
 
   private lazy val allValues = values ++ sys.env ++ sys.props
 

@@ -1,7 +1,7 @@
 package csw.services.location.scaladsl
 
 import csw.services.location.common.TestFutureExtension.RichFuture
-import csw.services.location.internal.{Networks, Settings}
+import csw.services.location.internal.{Networks, ClusterSettings}
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, TcpRegistration}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -11,8 +11,8 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
   val connection: TcpConnection = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
   val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
 
-  private val locationService = LocationServiceFactory.withCluster(CswCluster.withSettings(Settings().asSeed) )
-  private val locationService2 = LocationServiceFactory.withCluster(CswCluster.withSettings(Settings().joinLocalSeed))
+  private val locationService = LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().asSeed) )
+  private val locationService2 = LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().joinLocalSeed))
 
   override protected def afterAll(): Unit = {
     locationService2.shutdown().await
