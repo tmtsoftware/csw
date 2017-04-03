@@ -140,7 +140,8 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
       enterBarrier("Registration")
 
       probe.requestNext() shouldBe a[LocationUpdated]
-
+      Thread.sleep(2000)
+      
       Await.result(testConductor.shutdown(member1, abort = true), 30.seconds)
       enterBarrier("after-crash")
 
@@ -179,7 +180,7 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
 
       enterBarrier("Registration")
       val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
-
+      Thread.sleep(2000)
       enterBarrier("after-crash")
 
       within(5.seconds) {
