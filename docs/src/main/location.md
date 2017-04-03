@@ -44,15 +44,28 @@ Scala
 Java
 :   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #create-location-service }
 
-## Register a component
+## Shutdown LocationService
+
+This example demonstrates how to shutdown a location service. 
+
+Scala
+:   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #shutdown }
+
+Java
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #shutdown }
+
+JavaBlocking
+:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #shutdown }
+
+## Creating components, connections and registrations
 
 An Application, Sequencer, Assembly, HCD, or Service component may need to be used by another component as part of normal operations. It must register its location information with Location service so that other components can find it.
 
-#### Components, Connections and Registrations
+**Components** are OMOA entities. They have a name identifier and type such as Container, HCD, Assembly, Service.
+   
+**Connections** are the means to reach to components and are categorized as Akka, HTTP, Tcp connection.
 
-* Components are OMOA entities. They have a name identifier and type such as HCD, Assembly, Service.   
-* Connections are the means to reach to components and are categorized as Akka, HTTP, Tcp connection.
-* Registrations are service endpoints stored in LocationService.
+**Registrations** are service endpoints stored in LocationService.
 
 Scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #Components-Connections-Registrations }
@@ -123,16 +136,3 @@ Java
 
 JavaBlocking
 :   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #filtering }
-
-## Shutdown
-
-This example demonstrates how to shutdown a location service. 
-
-Scala
-:   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #shutdown }
-
-Java
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #shutdown }
-
-JavaBlocking
-:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #shutdown }

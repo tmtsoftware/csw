@@ -28,9 +28,9 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
     "my-actor-1"
   )
 
-
+  lazy
   //#create-location-service
-  lazy val locationService = LocationServiceFactory.make()
+   val locationService = LocationServiceFactory.make()
   //#create-location-service
 
 
