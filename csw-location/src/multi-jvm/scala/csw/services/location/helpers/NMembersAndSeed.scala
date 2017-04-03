@@ -3,12 +3,22 @@ package csw.services.location.helpers
 import akka.actor.ActorSystem
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.location.internal.Settings
 
 class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 
   private val settings = Settings()
+
+  commonConfig(debugConfig(on = false)
+    .withFallback(
+    ConfigFactory.parseString("""
+      akka.loglevel = ERROR
+      akka.remote.netty.tcp.applied-adapters = []
+      akka.remote.log-remote-lifecycle-events = ERROR
+    """)))
+
+  testTransport(on = true)
 
   def makeSystem(config: Config): ActorSystem = ActorSystem(settings.clusterName, config)
 
