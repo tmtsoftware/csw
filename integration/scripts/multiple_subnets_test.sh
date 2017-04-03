@@ -16,7 +16,7 @@ docker run --name=lan10.1 --net=macvlan-10 --ip=192.168.210.10 -d $HOST_DIR_MAPP
 docker run --name=lan10.2 --net=macvlan-10 --ip=192.168.220.10 -d $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
 docker run --name=lan10.3 --net=macvlan-10 --ip=192.168.210.5 -d $HOST_DIR_MAPPING tmt/local-csw-centos tail -f /dev/null
 
-akkaSeed=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' lan10.1)
+akkaSeed="$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' lan10.1):3552"
 printf "${PURPLE}----------- Akka Seed Node is : ${akkaSeed}-----------${NC}\n"
 
 
