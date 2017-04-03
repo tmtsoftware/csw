@@ -35,7 +35,7 @@ object CmdLineArgsParser {
 
     opt[String]('c', "command") valueName "<name>"action { (x, c) =>
       c.copy(command = Some(x))
-    } text "The command that starts the target application: use %port to insert the port number (default: use $name.command from config file: Required). The command is optional. If not provided, the service names provided will be registered via Location Service."
+    } text "The parameter is optional. The command that starts the target application. Use use %port to specify the port number. If parameter is not provided value $name.command from config file will be picked up. If value in config file is not found, the service names provided will be registered with Location Service."
 
     opt[Int]('p', "port") valueName "<number>" action { (x, c) =>
       c.copy(port = Some(x))
@@ -43,7 +43,7 @@ object CmdLineArgsParser {
 
     arg[File]("<app-config>") optional () maxOccurs 1 action { (x, c) =>
       c.copy(appConfigFile = Some(x))
-    } text "optional config file in HOCON format (Options specified as: $name.command, $name.port, etc. Fetched from config service if path does not exist)"
+    } text "optional config file in HOCON format (Options specified as: $name.command, $name.port, etc.)"
 
     opt[Int]("delay") action { (x, c) =>
       c.copy(delay = Some(x))
