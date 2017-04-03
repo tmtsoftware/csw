@@ -12,7 +12,7 @@ import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 /**
-  * `CswCluster` manages [[scala.concurrent.ExecutionContext]], [[akka.stream.Materializer]], `akka.cluster.Cluster`
+  * `CswCluster` manages [[scala.concurrent.ExecutionContext]], [[akka.stream.Materializer]]
   * and `Hostname` of an [[akka.actor.ActorSystem]]
   *
   * @note It is highly recommended that `CswCluster` is created for advanced usages or testing purposes only
@@ -41,27 +41,40 @@ class CswCluster private(_actorSystem: ActorSystem) {
   def makeMat(): Materializer = ActorMaterializer()
 
   /**
-    * Terminates the `ActorSystem` and disconnects from the cluster.
+    * Terminates the `ActorSystem` and gracefully disconnects from the cluster.
     *
-    * @see [[CswCluster]]
     * @return A `Future` that completes on `ActorSystem` shutdown
     */
   def terminate(): Future[Done] = CswCluster.terminate(actorSystem)
 }
 
 /**
-  * Manages termination of `ActorSystem` and gracefully disconnecting from cluster
+  * Manages initialization and termination of `ActorSystem` and `Cluster`
   */
 object CswCluster {
   //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
   import ExecutionContext.Implicits.global
 
+  /**
+    * Creates CswCluster with the given settings
+    *
+    * @see [[CswCluster.withSystem]]
+    */
   def make(): CswCluster = withSettings(Settings())
 
+  /**
+    * Creates CswCluster with the given settings
+    *
+    * @see [[CswCluster.withSystem]]
+    */
   def withSettings(settings: Settings): CswCluster = withSystem(ActorSystem(settings.clusterName, settings.config))
 
   /**
-    * If no seed node is provided then the cluster is initialized for `ActorSystem`  by self joining
+    * The actorSystem joins csw cluster. If no seed node is provided then the cluster is initialized for `ActorSystem`
+    * by self joining.
+    *
+    * @note The call to this method will be blocked till the actorSystem joins the cluster
+    * @return A CswCluster instance that provides extension for actorSystem
     */
   def withSystem(actorSystem: ActorSystem): CswCluster = {
     val cluster = Cluster(actorSystem)
