@@ -56,23 +56,19 @@ object CswCluster {
 
   /**
     * Creates CswCluster with the given settings
-    *
-    * @see [[CswCluster.withSystem]]
     */
   def make(): CswCluster = withSettings(ClusterSettings())
 
   /**
     * Creates CswCluster with the given settings
-    *
-    * @see [[CswCluster.withSystem]]
     */
   def withSettings(settings: ClusterSettings): CswCluster = withSystem(ActorSystem(settings.clusterName, settings.config))
 
   /**
     * The actorSystem joins csw cluster. If no seed node is provided then the cluster is initialized for `ActorSystem`
     * by self joining.
+    * ''Note : '' The call to this method will be blocked till the actorSystem joins the cluster
     *
-    * @note The call to this method will be blocked till the actorSystem joins the cluster
     * @return A CswCluster instance that provides extension for actorSystem
     */
   def withSystem(actorSystem: ActorSystem): CswCluster = {

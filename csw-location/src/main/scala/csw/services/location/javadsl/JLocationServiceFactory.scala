@@ -24,7 +24,7 @@ object JLocationServiceFactory {
     * Creates a [[csw.services.location.javadsl.ILocationService]] instance. An `ILocationService` instance.
     * ''Note : '' It is highly recommended to use it for testing purposes only.
     *
-    * @param cswCluster An [[CswCluster]] with custom configuration
+    * @param cswCluster An `CswCluster` with custom configuration
     */
   def withCluster(cswCluster: CswCluster): ILocationService = {
     val locationService: LocationService = LocationServiceFactory.withCluster(cswCluster)
