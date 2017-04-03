@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.location.internal.ClusterSettings
+import csw.services.location.commons.ClusterSettings
 
 class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 

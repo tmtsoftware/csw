@@ -3,9 +3,10 @@ package csw.services.tracklocation
 import java.util.concurrent.atomic.AtomicBoolean
 
 import akka.stream.scaladsl.{Sink, Source}
+import csw.services.location.commons.CswCluster
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
-import csw.services.location.scaladsl.{CswCluster, LocationService}
+import csw.services.location.scaladsl.LocationService
 import csw.services.tracklocation.models.Command
 
 import scala.collection.immutable.Seq

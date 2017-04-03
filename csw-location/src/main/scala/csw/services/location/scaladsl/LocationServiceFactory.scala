@@ -1,5 +1,6 @@
 package csw.services.location.scaladsl
 
+import csw.services.location.commons.CswCluster
 import csw.services.location.internal._
 
 /**
@@ -24,7 +25,7 @@ object LocationServiceFactory {
     * on this newly created node.
     *
     * @note It is highly recommended to use it for testing purposes only.
-    * @param cswCluster An [[csw.services.location.scaladsl.CswCluster]] with custom configuration
+    * @param cswCluster An [[CswCluster]] with custom configuration
     * @return A `LocationService` instance
     */
   def withCluster(cswCluster: CswCluster): LocationService = {

@@ -1,8 +1,8 @@
 package csw.services.tracklocation
 
 import akka.Done
-import csw.services.location.internal.ClusterSettings
-import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
+import csw.services.location.commons.{ClusterSettings, CswCluster}
+import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.tracklocation.models.{Command, Options}
 import csw.services.tracklocation.utils.CmdLineArgsParser
 

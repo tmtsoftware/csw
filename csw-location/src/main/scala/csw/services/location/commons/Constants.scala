@@ -1,4 +1,4 @@
-package csw.services.location.internal
+package csw.services.location.commons
 
 object Constants {
   val PathKey = "path"

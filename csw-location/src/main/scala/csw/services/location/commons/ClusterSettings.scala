@@ -1,6 +1,7 @@
-package csw.services.location.internal
+package csw.services.location.commons
 
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.services.location.internal.Networks
 
 import scala.collection.JavaConverters._
 

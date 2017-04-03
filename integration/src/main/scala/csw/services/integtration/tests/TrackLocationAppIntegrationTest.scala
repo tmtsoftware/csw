@@ -4,10 +4,11 @@ import java.io.{BufferedWriter, FileWriter}
 import java.net.URI
 
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.internal.{Networks, ClusterSettings}
+import csw.services.location.commons.{ClusterSettings, CswCluster}
+import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
-import csw.services.location.scaladsl.{CswCluster, LocationService}
+import csw.services.location.scaladsl.LocationService
 import csw.services.tracklocation.TrackLocationApp
 import org.scalatest._
 

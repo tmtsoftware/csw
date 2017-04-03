@@ -1,11 +1,10 @@
-package csw.services.location.scaladsl
+package csw.services.location.commons
 
 import akka.Done
 import akka.actor.{ActorRef, ActorSystem, Terminated}
 import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
 import akka.stream.{ActorMaterializer, Materializer}
-import csw.services.location.internal.ClusterSettings
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}

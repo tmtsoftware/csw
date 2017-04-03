@@ -2,7 +2,7 @@ package csw.services.location.helpers
 
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
-import csw.services.location.scaladsl.CswCluster
+import csw.services.location.commons.CswCluster
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
 abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T) extends MultiNodeSpec(config, config.makeSystem)

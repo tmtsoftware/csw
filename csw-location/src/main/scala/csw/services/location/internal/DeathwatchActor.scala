@@ -4,9 +4,10 @@ import akka.actor.{Actor, ActorRef, PoisonPill, Props, Terminated}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{Changed, Subscribe}
 import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings}
+import csw.services.location.commons.CswCluster
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.models._
-import csw.services.location.scaladsl.{CswCluster, LocationService}
+import csw.services.location.scaladsl.LocationService
 
 /**
   * An `Actor` that death watches all registered `ActorRefs` in csw akka cluster and subscribes for changes in `LWWMap` data.

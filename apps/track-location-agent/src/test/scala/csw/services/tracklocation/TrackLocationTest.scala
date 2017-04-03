@@ -7,10 +7,11 @@ import java.nio.file.Paths
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
-import csw.services.location.internal.{Networks, ClusterSettings}
+import csw.services.location.commons.{ClusterSettings, CswCluster}
+import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
-import csw.services.location.scaladsl.{CswCluster, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.tracklocation.common.TestFutureExtension.RichFuture
 import csw.services.tracklocation.models.Command
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}

@@ -7,11 +7,12 @@ import akka.pattern.ask
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
 import akka.util.Timeout
+import csw.services.location.commons.CswCluster
 import csw.services.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed, RegistrationListingFailed, UnregistrationFailed}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.models._
-import csw.services.location.scaladsl.{CswCluster, LocationService}
+import csw.services.location.scaladsl.LocationService
 
 import scala.async.Async._
 import scala.concurrent.Future

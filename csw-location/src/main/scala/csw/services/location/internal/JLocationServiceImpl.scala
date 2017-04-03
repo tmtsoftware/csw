@@ -7,9 +7,10 @@ import java.util.concurrent.CompletionStage
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
+import csw.services.location.commons.CswCluster
 import csw.services.location.javadsl.{ILocationService, IRegistrationResult}
 import csw.services.location.models._
-import csw.services.location.scaladsl.{CswCluster, LocationService}
+import csw.services.location.scaladsl.LocationService
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
