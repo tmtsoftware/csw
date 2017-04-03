@@ -38,28 +38,32 @@ Gradle
 
 ## Create LocationService
 
+LocationServiceFactory exposes a make method to create an instance of LocationService. However, the make call will look for configuration settings managed using ClusterSettings. Verify @scaladoc[ClusterSettings](csw/services/location/commons/ClusterSettings) to ensure that LocationService behavior is as expected.
+
+
+
 Scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #create-location-service }
 
 Java
 :   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #create-location-service }
 
+
 ## Shutdown LocationService
 
-This example demonstrates how to shutdown a location service. 
+This example demonstrates how to shutdown a location service. Shutdown will terminate the ActorSystem and will leave the cluster.  
+
+**Note:** All the services registered via this instance of LocationService will continue to be available for other cluster members. 
 
 Scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #shutdown }
 
 Java
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #shutdown }
-
-JavaBlocking
 :   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #shutdown }
 
 ## Creating components, connections and registrations
 
-An Application, Sequencer, Assembly, HCD, or Service component may need to be used by another component as part of normal operations. It must register its location information with Location service so that other components can find it.
+An Application, Sequencer, Assembly, HCD, or Service component may need to be used by another component as part of normal observatory operations. It must register its location information with Location service so that other components can find it.
 
 **Components** are OMOA entities. They have a name identifier and type such as Container, HCD, Assembly, Service.
    
@@ -76,11 +80,13 @@ Java
 
 ## Basic operations
 
-* `register` API takes a `Registration` parameter and returns a `Future` of `RegistrationResult`. 
-* The success of `register` API can be validated by checking the `Location` instance it contains.
-* The `list` API returns a list of alive connections.  
-* A connection of interest, can be checked if available using the `resolve` API. If the connection is alive, `resolve` returns Future of `RegistrationResult` containing the `Location`, else failure.
-* One of the ways to `unregister` a service is by calling unregister on registrationResult received from `register` API.
+`register` API takes a `Registration` parameter and returns a handle to registration result. The success of `register` API can be validated by checking the `Location` instance pointed by registration result.
+
+The `list` API returns a list of alive connections with LocationService.
+  
+A connection of interest, can be checked if available using the `resolve` API. If the connection is alive, `resolve` returns the handle to the `Location`.
+
+One of the ways to `unregister` a service is by calling unregister on registration result received from `register` API.
 
 Scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #register-list-resolve-unregister }
@@ -93,23 +99,26 @@ JavaBlocking
 
 @@@ note { title="async handling in scala and java examples." }
 
- * **scala:** The code snippets use scala's async library to demonstrate LocationService API. The use of this library is optional and the API will work just fine with higher order functions provided by scala. 
-      However, this library makes it easy to work with asynchronous code portions. The `async` marks a block of asynchronous code. It contains one or more await calls, which marks a point at which the computation will be suspended until the awaited Future is complete.
+ * **scala:** `async` marks a block of asynchronous code and allows to `await` the computation till the Future is complete.
       For more info, please refer: https://github.com/scala/async
  
- * **java non-blocking example:** The code snippets use CompletionStage and thenAsync, thenApply methods to compose the futures. 
+ * **java non-blocking example:** The code snippets use `CompletionStage` and it's `thenAsync`, `thenApply` methods. This style allows to compose multiple Futures and not block the calling thread till Futures are complete. 
 
- * **java blocking example:** The code snippets use CompletionStage, CompletableFuture and get blocking call for the future to return.
+ * **java blocking example:** The code snippets use `CompletionStage`, `CompletableFuture` using `get` blocking call. This style blocks the calling thread till the Future is complete.
     
 @@@
 
 ## Tracking
 
-* The lifecycle of a connection of interest can be followed using `track` API which takes a `Connection` instance as a parameter. This Connection being tracked need not already be registered with LocationService. It's alright to track connections that will be registered in future. In return, caller gets two values: 
-     1. A **source** that will emit stream of `TrackingEvents` for the connection
-     2. A **Killswitch** to turn off the stream when no longer needed.
-* Akka stream API provides many building blocks to process this stream such as Flow and Sink. In example, Sink is used to print each incoming `TrackingEvent`.
-* Consumer can shut down the stream using Killswitch.
+The lifecycle of a connection of interest can be followed using `track` API which takes a `Connection` instance as a parameter. **A `Connection` need not already be registered with LocationService.** It's alright to track connections that will be registered in future. 
+
+A `track` function returns two values:     
+* A **source** that will emit stream of `TrackingEvents` for the connection.  
+* A **Killswitch** to turn off the stream when no longer needed.  
+
+Akka stream API provides many building blocks to process this stream such as Flow and Sink. In example, Sink is used to print each incoming `TrackingEvent`.
+
+Consumer can shut down the stream using Killswitch.
 
 Scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #tracking }
@@ -122,12 +131,10 @@ JavaBlocking
 
 ## Filtering
 
-* The `List` API and it's variants offer means to inquire about available connections with LocationService.
-* The parameterless list returns all available connections
-* The `list` api with connection type returns connections matching the `ConnectionType`. In example it is demonstrated using 'ConnectionType.AkkaType'.
-* Similarly, filtering using 'ComponentType.Service' and hostname is also supported by `list` API.
-* Note, in the example the akka connection is not listed when filtered using hostname. This is because the actorref is created using local ActorSystem in a test class which doesn't have a hostname. 
+The `list` API and it's variants offer means to inquire about available connections with LocationService. The **parameter-less** `list` returns all available connections
 
+Other variants are filters using `ConnectionType`, `ComponentType` and `hostname`.
+ 
 Scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #filtering }
 
