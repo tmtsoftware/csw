@@ -46,7 +46,8 @@ On machine2
 
 Once both the seed apps are running, you can start your application consuming the location service as:
 
-/your-application -DclusterPort=3552 -DclusterSeeds=192.168.1.21:3552,192.168.1.22:3552
+/your-application -DclusterSeeds=192.168.1.21:3552,192.168.1.22:3552
 
+Note that you need not provide a clusterPort for your app, as it will pick a random port. 
 As earlier, instead of providing system properties, it is also possible to set environment variable "clusterSeeds" to the 
 seed node address list.
