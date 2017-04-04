@@ -19,13 +19,28 @@ class DeathwatchActor(locationService: LocationService) extends Actor {
   var watchedLocations: Set[AkkaLocation] = Set.empty
 
   /**
-    * Subscribes for changes in `LWWMap` data before starting this `Actor`
+    * Subscribes for changes in `LWWMap` data before starting this `Actor`. Current state for `LWWMap` will given to DeathwatchActor
+    * through [[akka.cluster.ddata.Replicator.Changed]] message
     */
   override def preStart(): Unit = {
     DistributedData(context.system).replicator ! Subscribe(AllServices.Key, self)
   }
 
+  /**
+    * Manages two kinds of events, which are as follows:
+    *{{{
+    *  - Changed event for `LWWMap`:
+    *  The value of `LWWMap` is compared with currently watched akka
+    *  locations to find out newly added locations and start death
+    *  watching them.
+    *
+    *  - Terminated event for ActorRef : The `ActorRef`
+    *  is unregistered from `LocationService` gracefully and is stopped
+    *  being watched.
+    *}}}
+    */
   override def receive: Receive = {
+
     case c@Changed(AllServices.Key) ⇒
       val allLocations = c.get(AllServices.Key).entries.values.toSet
       val locations = allLocations.collect { case x: AkkaLocation ⇒ x }
