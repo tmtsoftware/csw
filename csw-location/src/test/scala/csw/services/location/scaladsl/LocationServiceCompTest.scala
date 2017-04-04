@@ -327,7 +327,16 @@ class LocationServiceCompTest
     val httpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
     val registrationResult = locationService.register(HttpRegistration(httpConnection,  1234, "path123")).await
 
-    locationService.list(new Networks().hostname()).await.map(_.connection).toSet shouldBe Set(tcpConnection, httpConnection)
+    val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+    val actorRef = actorSystem.actorOf(
+      Props(new Actor {
+        override def receive: Receive = Actor.emptyBehavior
+      }),
+      "my-actor-4"
+    )
+    locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
+
+    locationService.list(new Networks().hostname()).await.map(_.connection).toSet shouldBe Set(tcpConnection, httpConnection, akkaConnection)
 
     locationService.list("Invalid_hostname").await shouldBe List.empty
   }

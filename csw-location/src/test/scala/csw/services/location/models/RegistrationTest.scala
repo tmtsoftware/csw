@@ -2,26 +2,41 @@ package csw.services.location.models
 
 import java.net.URI
 
-import akka.actor.{ActorPath, ActorSystem}
+import akka.actor.{Actor, ActorPath, ActorSystem, Props}
 import akka.serialization.Serialization
-import akka.testkit.{ImplicitSender, TestKit}
+import com.typesafe.config.{Config, ConfigFactory}
+import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import org.scalatest.{FunSuiteLike, Matchers}
 
-class RegistrationTest extends TestKit(ActorSystem("testkit")) with ImplicitSender with FunSuiteLike with Matchers {
+import scala.concurrent.duration.DurationDouble
+import scala.concurrent.Await
+
+class RegistrationTest extends FunSuiteLike with Matchers {
 
   test("should able to create the AkkaRegistration which should internally create AkkaLocation") {
     val hostname = new Networks().hostname()
-    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(testActor))
+
+    val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+    val actorSystem = ActorSystem("test-actor-system")
+    val actorRef = actorSystem.actorOf(
+      Props(new Actor {
+        override def receive: Receive = Actor.emptyBehavior
+      }),
+      "my-actor-1"
+    )
+
+    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
     val akkaUri = new URI(actorPath.toString)
 
-    val akkaConnection = AkkaConnection(new ComponentId("assembly", ComponentType.Container))
-    val akkaRegistration = AkkaRegistration(akkaConnection, testActor)
+    val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
 
-    val expectedAkkaLocation = AkkaLocation(akkaConnection, akkaUri, testActor)
+    val expectedAkkaLocation = AkkaLocation(akkaConnection, akkaUri, actorRef)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
+
+    Await.result(actorSystem.terminate, 10.seconds)
   }
 
   test("should able to create the HttpRegistration which should internally create HttpLocation") {
@@ -49,4 +64,23 @@ class RegistrationTest extends TestKit(ActorSystem("testkit")) with ImplicitSend
     tcpRegistration.location(hostname) shouldBe expectedTcpLocation
   }
 
+  test("should not allow AkkaRegistration using local ActorRef") {
+    val config: Config = ConfigFactory.parseString(
+      """
+        akka.actor.provider = local
+      """)
+
+    val actorSystem = ActorSystem("local-actor-system", config)
+    val actorRef = actorSystem.actorOf(
+      Props(new Actor {
+        override def receive: Receive = Actor.emptyBehavior
+      }),
+      "my-actor-2"
+    )
+    val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+
+    intercept[LocalAkkaActorRegistrationNotAllowed] {
+      AkkaRegistration(akkaConnection, actorRef)
+    }
+  }
 }

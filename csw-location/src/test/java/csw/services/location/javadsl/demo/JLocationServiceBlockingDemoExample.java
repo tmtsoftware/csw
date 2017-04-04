@@ -19,6 +19,7 @@ import csw.services.location.models.*;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.models.Connection.TcpConnection;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,6 +52,11 @@ public class JLocationServiceBlockingDemoExample {
     //#create-location-service
     ILocationService locationService = JLocationServiceFactory.make();
     //#create-location-service
+
+    @After
+    public void afterEach() {
+        locationService.unregisterAll();
+    }
 
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
@@ -99,6 +105,7 @@ public class JLocationServiceBlockingDemoExample {
         ArrayList<Location> expectedLocations4 = new ArrayList<>();
         expectedLocations4.add(tcpRegistration.location(new Networks().hostname()));
         expectedLocations4.add(httpRegistration.location(new Networks().hostname()));
+        expectedLocations4.add(akkaRegistration.location(new Networks().hostname()));
         Assert.assertEquals(expectedLocations4, locationService.list(new Networks().hostname()).toCompletableFuture().get());
         //#filtering
 

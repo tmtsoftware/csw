@@ -4,6 +4,7 @@ import java.net.URI
 
 import akka.actor.{ActorPath, ActorRef}
 import akka.serialization.Serialization
+import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 /**
@@ -32,11 +33,26 @@ final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef
     */
   private val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
 
+  private val uri = new URI(actorPath.toString)
+
+  /**
+    * INTERNAL API : ActorRefRemote URI consists of a valid hostname and port
+    */
+  private def isRemoteUri = {
+    uri.getPort != -1 || uri.getHost.matches("((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.|$)){4}")
+  }
+
+  /**
+    * Allows only remote ActorRef
+    */
+  if (!isRemoteUri) throw new LocalAkkaActorRegistrationNotAllowed(actorRef)
+
+
   /**
     * A [[csw.services.location.models.AkkaLocation]] is formed with the given `Connection` and  `URI`.
     * The `URI` is derived from `ActorPath` of the given `ActorRef`.
     */
-  override def location(hostname: String): Location = AkkaLocation(connection, new URI(actorPath.toString), actorRef)
+  override def location(hostname: String): Location = AkkaLocation(connection, uri, actorRef)
 }
 
 /**

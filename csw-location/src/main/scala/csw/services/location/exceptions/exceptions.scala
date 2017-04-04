@@ -1,5 +1,6 @@
 package csw.services.location.exceptions
 
+import akka.actor.ActorRef
 import csw.services.location.models.{Connection, Location}
 
 /**
@@ -35,4 +36,11 @@ case class OtherLocationIsRegistered(location: Location, otherLocation: Location
   */
 case object RegistrationListingFailed extends RuntimeException(
   s"unable to get the list of registered locations"
+)
+
+/**
+  * An Exception representing failure in registering non remote actors
+  */
+case class LocalAkkaActorRegistrationNotAllowed(actorRef: ActorRef) extends RuntimeException(
+  s"Registration of only remote actors is allowed. Instead local actor $actorRef received."
 )

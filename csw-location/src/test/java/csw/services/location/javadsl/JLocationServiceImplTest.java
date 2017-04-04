@@ -171,12 +171,7 @@ public class JLocationServiceImplTest {
         locations.add(tcpRegistration.location(new Networks().hostname()));
         locations.add(akkaRegistration.location(new Networks().hostname()));
 
-        Assert.assertTrue(locations.size() == 2);
-
-        ArrayList<Location> locations2 = new ArrayList<>();
-        locations2.add(tcpRegistration.location(new Networks().hostname()));
-
-        Assert.assertEquals(locations2, locationService.list(new Networks().hostname()).toCompletableFuture().get());
+        Assert.assertEquals(locations, locationService.list(new Networks().hostname()).toCompletableFuture().get());
     }
 
     @Test

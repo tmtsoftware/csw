@@ -104,7 +104,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
       await(locationService.list).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location, akkaRegistrationResult.location)
       await(locationService.list(ConnectionType.AkkaType)).toSet shouldBe Set(akkaRegistrationResult.location)
       await(locationService.list(ComponentType.Service)).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location)
-      await(locationService.list(new Networks().hostname())).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location)
+      await(locationService.list(new Networks().hostname())).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location, akkaRegistrationResult.location)
     }
 
     Await.result(assertionF, 5.seconds)
