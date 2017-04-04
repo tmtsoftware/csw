@@ -55,7 +55,9 @@ object Common extends AutoPlugin {
         case Some("true") => version.value
         case _            => "0.1-SNAPSHOT"
       }
-    }
+    },
+
+    isSnapshot := sys.props.get("prod.publish") != Some("true")
   )
 
   private def extraSettings = sys.props.get("check.cycles") match {
