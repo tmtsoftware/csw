@@ -7,7 +7,7 @@ class ConnectionTest extends FunSuite with Matchers {
 
   test("should able to form a connection name with componentId name, componentId type and connection type separated by '-'") {
     val expectedAkkaConnectionName = "tromboneHcd-hcd-akka"
-    val akkaConnection = new AkkaConnection(new ComponentId("tromboneHcd", ComponentType.HCD))
+    val akkaConnection = AkkaConnection(ComponentId("tromboneHcd", ComponentType.HCD))
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
