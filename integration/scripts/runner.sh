@@ -20,17 +20,17 @@ echo $HOST_DIR_MAPPING
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
 docker run -d --name=HCD $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/trombone-h-c-d -DisSeed=true'
 
-clusterSeed="$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD):3552"
-printf "${PURPLE}----------- Akka Seed Node is : ${clusterSeed}-----------${NC}\n"
+clusterSeeds="$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD):3552"
+printf "${PURPLE}----------- Akka Seed Node is : ${clusterSeeds}-----------${NC}\n"
 sleep 5
 
 printf "${YELLOW}----------- Starting Reddis App -----------${NC}\n"
-docker run -d --name=Reddis --env clusterSeed=$clusterSeed $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-service -DclusterSeed=$clusterSeed'
+docker run -d --name=Reddis --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-service -DclusterSeeds=$clusterSeeds'
 
 sleep 5
 
 printf "${YELLOW}------ Starting Test App ------${NC}\n"
-docker run --name=Test-App --env clusterSeed=$clusterSeed $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-app -DclusterSeed=$clusterSeed'
+docker run --name=Test-App --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-app -DclusterSeeds=$clusterSeeds'
 test_exit_code=$?
 
 printf "${PURPLE}---------- Stopping and Removing all docker containers ---------- ${NC}"

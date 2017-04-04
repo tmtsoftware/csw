@@ -16,14 +16,14 @@ import scala.collection.JavaConverters._
   *
   * ClusterSettings require three values namely :
   *  - interfaceName (The network interface where cluster is formed.)
-  *  - clusterSeed (The host address of the seedNode of the cluster)
+  *  - clusterSeeds (The host address of the seedNode of the cluster)
   *  - isSeed (Claim self to be the seed of the cluster)
   *
   * The config values of the `ActorSystem` will be evaluated based on the above three settings as follows :
   *  - `akka.remote.netty.tcp.hostname` will be ipV4 address based on `interfaceName` from [[csw.services.location.internal.Networks]]
   *  - `akka.remote.netty.tcp.port` will be a random port or if `isSeed` is true then 3552 (Since cluster seeds will always
   * run on 3552)
-  *  - `akka.cluster.seed-nodes` will be self if `isSeed` is true otherwise `clusterSeed` value will be used
+  *  - `akka.cluster.seed-nodes` will be self if `isSeed` is true otherwise `clusterSeeds` value will be used
   *
   * If none of the settings are provided then defaults will be picked as follows :
   *  - `akka.remote.netty.tcp.hostname` will be ipV4 address from [[csw.services.location.internal.Networks]]
@@ -42,7 +42,7 @@ import scala.collection.JavaConverters._
   *  - and then from `ClusterSettings` api
   *
   * @note Although `ClusterSettings` can be added through multiple ways, it is recommended that
-  *       - `clusterSeed` is provided via environment variable,
+  *       - `clusterSeeds` is provided via environment variable,
   *       - `isSeed` is provided via system properties,
   *       - `interfaceName` is provide via environment variable and
   *       - the `ClusterSettings` api of providing values should be used for testing purpose only.
@@ -50,19 +50,20 @@ import scala.collection.JavaConverters._
   */
 case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
   val InterfaceNameKey = "interfaceName"
-  val ClusterSeedKey = "clusterSeed"
+  val ClusterSeedsKey = "clusterSeeds"
   val IsSeedKey = "isSeed"
 
   def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
 
   def withInterface(name: String): ClusterSettings = withEntry(InterfaceNameKey, name)
 
-  def joinNode(seed: String): ClusterSettings = withEntry(ClusterSeedKey, seed)
+  def joinSeeds(seeds: String*): ClusterSettings = withEntry(ClusterSeedsKey, seeds.mkString(","))
 
+  def joinLocals(ports: Int*): ClusterSettings = joinSeeds(ports.map(port ⇒ s"$hostname:$port"): _*)
   /**
     * Joins the cluster with seed running on localhost
     */
-  def joinLocal(port: Int = 3552): ClusterSettings = withEntry(ClusterSeedKey, s"$hostname:$port")
+  def joinLocal(): ClusterSettings = joinLocals(3552)
 
   def asSeed: ClusterSettings = withEntry(IsSeedKey, "true")
 
@@ -77,10 +78,12 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
 
   def port: Int = if (isSeed) 3552 else 0
 
-  def seedNodes: List[String] = allValues.get(ClusterSeedKey) match {
-    case Some(seed)     ⇒ List(s"akka.tcp://$clusterName@$seed")
-    case None if isSeed ⇒ List(s"akka.tcp://$clusterName@$hostname:3552")
-    case None           ⇒ List.empty
+  def seedNodes: List[String] = {
+    val seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(","))
+    seeds match {
+      case Nil if isSeed ⇒ List(s"akka.tcp://$clusterName@$hostname:3552")
+      case _             ⇒ seeds.map(seed ⇒ s"akka.tcp://$clusterName@$seed")
+    }
   }
 
   def config: Config = {
