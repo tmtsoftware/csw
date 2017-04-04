@@ -51,10 +51,13 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   val InterfaceNameKey = "interfaceName"
   val ClusterSeedsKey = "clusterSeeds"
   val ClusterPortKey = "clusterPort"
+  val ManagementPortKey = "managementPort"
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
 
   def withInterface(name: String): ClusterSettings = withEntry(InterfaceNameKey, name)
+
+  def withManagementPort(port: Int): ClusterSettings = withEntry(ManagementPortKey, port)
 
   def joinSeeds(seed: String, seeds: String*): ClusterSettings = withEntry(ClusterSeedsKey, (seed +: seeds).mkString(","))
 
@@ -70,6 +73,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   }
 
   private def port: Int = allValues.getOrElse(ClusterPortKey, 0).toString.toInt
+  def managementPort: Option[Any] = allValues.get(ManagementPortKey)
 
   private def seedNodes: List[String] = {
     val seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
@@ -80,7 +84,10 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
     val computedValues: Map[String, Any] = Map(
       "akka.remote.netty.tcp.hostname" → hostname,
       "akka.remote.netty.tcp.port" → port,
-      "akka.cluster.seed-nodes" → seedNodes.asJava
+      "akka.cluster.seed-nodes" → seedNodes.asJava,
+      "akka.cluster.http.management.hostname" → hostname,
+      "akka.cluster.http.management.port" → managementPort.getOrElse(19999),
+      "startManagement" → managementPort.isDefined
     )
 
     ConfigFactory

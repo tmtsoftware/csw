@@ -22,7 +22,9 @@ lazy val `csw-location` = project
       Libs.`scala-java8-compat`,
       Libs.`scala-async`,
       Libs.`enumeratum`,
-      Libs.`chill-akka`
+      Libs.`chill-akka`,
+      Libs.`akka-management-cluster-http`,
+      Libs.`akka-http`
     ),
     libraryDependencies ++= Seq(
       Akka.`akka-stream-testkit` % Test,

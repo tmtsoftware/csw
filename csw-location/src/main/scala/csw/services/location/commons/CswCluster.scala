@@ -4,6 +4,7 @@ import akka.Done
 import akka.actor.{ActorRef, ActorSystem, Terminated}
 import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
+import akka.cluster.http.management.ClusterHttpManagement
 import akka.stream.{ActorMaterializer, Materializer}
 
 import scala.concurrent.duration.DurationInt
@@ -73,6 +74,10 @@ object CswCluster {
     */
   def withSystem(actorSystem: ActorSystem): CswCluster = {
     val cluster = Cluster(actorSystem)
+    val startManagement = actorSystem.settings.config.getBoolean("startManagement")
+    if(startManagement) {
+      Await.result(ClusterHttpManagement(cluster).start(), 10.seconds)
+    }
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
     if (emptySeeds) {
       cluster.join(cluster.selfAddress)
@@ -84,6 +89,7 @@ object CswCluster {
       new CswCluster(actorSystem)
     } catch {
       case NonFatal(ex) ⇒
+        Await.result(ClusterHttpManagement(cluster).start(), 10.seconds)
         Await.result(CswCluster.terminate(actorSystem), 10.seconds)
         throw ex
     }

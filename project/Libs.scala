@@ -13,6 +13,8 @@ object Libs {
   val `mockito-core` = "org.mockito" % "mockito-core" % "2.7.17"
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.1.3" % Runtime
   val `chill-akka` = "com.twitter" %% "chill-akka" % "0.9.2"
+  val `akka-management-cluster-http` = "com.lightbend.akka" %% "akka-management-cluster-http" % "0.1-RC1"
+  val `akka-http` = "com.typesafe.akka" %% "akka-http" % "10.0.5"
 }
 
 object Akka {
