@@ -40,8 +40,6 @@ Gradle
 
 LocationServiceFactory exposes a make method to create an instance of LocationService. However, the make call will look for configuration settings managed using ClusterSettings. Verify @scaladoc[ClusterSettings](csw/services/location/commons/ClusterSettings) to ensure that LocationService behavior is as expected.
 
-
-
 Scala
 :   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #create-location-service }
 
@@ -143,3 +141,9 @@ Java
 
 JavaBlocking
 :   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #filtering }
+
+## Source code for examples
+
+* @github[Scala Example](/csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala)
+* @github[Java Example](/csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java)
+* @github[JavaBlocking Example](/csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java)
