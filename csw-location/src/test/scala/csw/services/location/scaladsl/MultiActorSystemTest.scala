@@ -12,8 +12,8 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
   val connection: TcpConnection = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
   val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
 
-  private val locationService = LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().asSeed) )
-  private val locationService2 = LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().joinLocal()))
+  private val locationService = LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().onPort(3552)) )
+  private val locationService2 = LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().joinLocal(3552)))
 
   override protected def afterAll(): Unit = {
     locationService2.shutdown().await

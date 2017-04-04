@@ -22,10 +22,10 @@ class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 
   def makeSystem(config: Config): ActorSystem = ActorSystem(settings.clusterName, config)
 
-  val seed: RoleName = addRole("seed")(settings.asSeed)
+  val seed: RoleName = addRole("seed")(settings.onPort(3552))
 
   val members: Vector[RoleName] = (1 to n).toVector.map { x =>
-    addRole(s"member-$x")(settings.joinLocal())
+    addRole(s"member-$x")(settings.joinLocal(3552))
   }
 
   private def addRole(name: String)(settings: ClusterSettings): RoleName = {
