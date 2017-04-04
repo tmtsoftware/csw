@@ -6,23 +6,34 @@ ORANGE='\033[0;33m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
+#1. Get the current directory (Root dir : csw-prod) which is used to map to docker container
 HOST_DIR_MAPPING="-v $(pwd):/source/csw"
 echo $HOST_DIR_MAPPING
 
+#2. Pulls docker image from docker hub (This is a custom image which has sbt, java installed)
 docker pull twtmt/centos-tmt
 
+#3. Start first container and run TromboneHcdApp which acts as a seed
+# cmd line param : -DclusterPort=3552 => This will start app on port 3552 and create a cluster with a single node
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
 docker run -d --name=HCD $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/trombone-h-c-d -DclusterPort=3552'
 
+#4. Store the ip address and port of first container (HCD App) into variable clusterSeeds
 clusterSeeds="$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD):3552"
 printf "${PURPLE}----------- Akka Seed Node is : ${clusterSeeds}-----------${NC}\n"
 sleep 5
 
+#5. Start second container and run TestService app
+# cmd line param :-DclusterSeeds=$clusterSeeds (Ip:Port combination of seed - refer #4)
+# with clusterSeeds parameters, this container will join the cluster created at step #3
 printf "${YELLOW}----------- Starting Reddis App -----------${NC}\n"
 docker run -d --name=Reddis --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-service -DclusterSeeds=$clusterSeeds'
 
 sleep 5
 
+#6. Start second container and run Test app which executes LocationServiceIntegrationTest
+# cmd line param :-DclusterSeeds=$clusterSeeds (Ip:Port combination of seed - refer #4)
+# with clusterSeeds parameters, this container will join the cluster created at step #3
 printf "${YELLOW}------ Starting Test App ------${NC}\n"
 docker run --name=Test-App --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-app -DclusterSeeds=$clusterSeeds'
 test_exit_code=$?
