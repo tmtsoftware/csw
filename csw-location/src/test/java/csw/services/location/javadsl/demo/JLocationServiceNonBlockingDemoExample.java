@@ -60,10 +60,7 @@ public class JLocationServiceNonBlockingDemoExample {
     public static void shutdown() throws ExecutionException, InterruptedException {
 
         //#shutdown
-        locationService.shutdown().thenCompose(result -> {
-            //can perform additional clean-up here
-            return null;
-        });
+        locationService.shutdown().toCompletableFuture().get();
         //#shutdown
     }
 
