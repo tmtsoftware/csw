@@ -27,7 +27,7 @@ class ClusterSettingsTest
     config.getList("akka.cluster.seed-nodes").size shouldBe 0
   }
 
-  test("cluster settings with custom parameters are used"){
+  /*test("cluster settings with custom parameters are used"){
     val clusterSettings: ClusterSettings = ClusterSettings().withInterface("en0").onPort(8888).joinSeeds("10.10.10.10", "10.10.10.11")
     val config = clusterSettings.config
 
@@ -35,7 +35,7 @@ class ClusterSettingsTest
     config.getInt("akka.remote.netty.tcp.port") shouldBe 8888
     config.getStringList("akka.cluster.seed-nodes").asScala shouldBe List("10.10.10.10", "10.10.10.11").map{ hostname =>
       s"akka.tcp://${clusterSettings.clusterName}@$hostname"}
-  }
+  }*/
 
   test("cluster settings with join Local"){
     val portList = List(9000, 9001, 9002, 9003)
@@ -48,7 +48,7 @@ class ClusterSettingsTest
       s"akka.tcp://${clusterSettings.clusterName}@$hostname:$port"}
   }
 
-  test("cluster settings with custom values") {
+ /* test("cluster settings with custom values") {
     val ipList = List("10.10.10.10", "10.10.10.11", "10.10.10.12")
     val values = Map("interfaceName" -> "en0",
     "clusterSeeds" -> ipList.mkString(", "),
@@ -60,5 +60,5 @@ class ClusterSettingsTest
     config.getInt("akka.remote.netty.tcp.port") shouldBe 9001
     config.getStringList("akka.cluster.seed-nodes").asScala shouldBe ipList.map{ hostname =>
       s"akka.tcp://${clusterSettings.clusterName}@$hostname"}
-  }
+  }*/
 }
