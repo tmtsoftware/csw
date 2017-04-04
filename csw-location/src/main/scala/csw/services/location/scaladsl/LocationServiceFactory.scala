@@ -1,6 +1,6 @@
 package csw.services.location.scaladsl
 
-import csw.services.location.commons.CswCluster
+import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.internal._
 
 /**
@@ -25,12 +25,22 @@ object LocationServiceFactory {
     * on this newly created node.
     *
     * @note It is highly recommended to use it for testing purposes only.
+    * @param clusterSettings A [[ClusterSettings]] with custom configuration
+    * @return A `LocationService` instance
+    */
+  def withSettings(clusterSettings: ClusterSettings): LocationService = withCluster(CswCluster.withSettings(clusterSettings))
+
+  /**
+    * Creates a [[csw.services.location.scaladsl.LocationService]] instance. The data of the akka cluster will now be replicated
+    * on this newly created node.
+    *
+    * @note It is highly recommended to use it for testing purposes only.
     * @param cswCluster An [[CswCluster]] with custom configuration
     * @return A `LocationService` instance
     */
   def withCluster(cswCluster: CswCluster): LocationService = {
     val locationService: LocationService = new LocationServiceImpl(cswCluster)
-    DeathwatchActor.startSingleton(cswCluster, locationService)
+    DeathwatchActor.start(cswCluster, locationService)
     locationService
   }
 }
