@@ -80,7 +80,7 @@ object CswCluster {
     val p = Promise[Done]
     cluster.registerOnMemberUp(p.success(Done))
     try {
-      Await.result(p.future, 10.seconds)
+      Await.result(p.future, 20.seconds)
       new CswCluster(actorSystem)
     } catch {
       case NonFatal(ex) ⇒
