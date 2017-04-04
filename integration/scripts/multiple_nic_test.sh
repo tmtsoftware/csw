@@ -9,6 +9,8 @@ NC='\033[0m' # No Color
 HOST_DIR_MAPPING="-v $(pwd):/source/csw"
 echo $HOST_DIR_MAPPING
 
+docker pull twtmt/centos-tmt
+
 printf "${YELLOW} Executing multiple nic's test... ${NC}\n"
 printf "${PURPLE} Creating docker subnet : tmt_net_1 ${NC}\n"
 docker network create --subnet=192.168.10.0/24 tmt_net_1
@@ -16,18 +18,15 @@ docker network create --subnet=192.168.10.0/24 tmt_net_1
 printf "${PURPLE} Creating another docker subnet : tmt_net_2 ${NC}\n"
 docker network create --subnet=192.168.20.0/24 tmt_net_2
 
-docker run -itd --name=Assembly --net=tmt_net_1 $HOST_DIR_MAPPING tmt/local-csw-centos bash
+docker run -itd --name=Assembly --net=tmt_net_1 $HOST_DIR_MAPPING twtmt/centos-tmt bash
 
-#akkaSeed=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' Assembly)
-#printf "${PURPLE}----------- Akka Seed Node is : ${akkaSeed}-----------${NC}\n"
-
-docker run -itd --name=Test-App --net=tmt_net_2 $HOST_DIR_MAPPING tmt/local-csw-centos bash
+docker run -itd --name=Test-App --net=tmt_net_2 $HOST_DIR_MAPPING twtmt/centos-tmt bash
 
 docker network connect bridge Assembly
 docker network connect bridge Test-App
 
 printf "${YELLOW} Starting Assembly in network : tmt_net_1 ${NC}\n"
-docker exec -itd Assembly bash -c 'ifconfig && cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/assembly-app -DclusterPort=true'
+docker exec -itd Assembly bash -c 'ifconfig && cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/assembly-app -DclusterPort=3552'
 
 printf "${PURPLE}------ Waiting for 10 seconds to let Assembly gets started ------${NC}\n"
 sleep 10

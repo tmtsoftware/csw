@@ -3,7 +3,7 @@ package csw.services.integtration.tests
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
 import csw.services.integtration.apps.TromboneHCD
-import csw.services.integtration.apps.TromboneHCD.Unregister
+import csw.services.integtration.apps.TromboneHCD.{Unregister, tromboneHcdActorRef}
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
@@ -23,7 +23,7 @@ class LocationServiceIntegrationTest
 
   override protected def afterAll(): Unit = {
     locationService.shutdown()
-    system.terminate()
+    TestKit.shutdownActorSystem(system)
   }
 
   test("should not allow duplicate akka registration") {

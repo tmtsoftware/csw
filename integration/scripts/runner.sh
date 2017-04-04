@@ -6,31 +6,25 @@ ORANGE='\033[0;33m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
-#Map local project directories and .ivy directory from host to docker container
-#e.g.  ./integration/scripts/execute_docker.sh '-v /home/unmesh/work/csw-prod:/source -v /home/unmesh/.ivy2:/root/.ivy2'
 HOST_DIR_MAPPING="-v $(pwd):/source/csw"
 echo $HOST_DIR_MAPPING
 
-#if [ "$#" -eq  "0" ]
-#   then
-#     printf "${RED} Please provide host directory mappings for source root and .ivy. e.g. ${NC} ./integration/scripts/execute_docker.sh '-v /home/unmesh/work/csw-prod:/source -v /home/unmesh/.ivy2:/root/.ivy2' \n"
-#     exit 1
-#fi
+docker pull twtmt/centos-tmt
 
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
-docker run -d --name=HCD $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/trombone-h-c-d -DclusterPort=3552'
+docker run -d --name=HCD $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/trombone-h-c-d -DclusterPort=3552'
 
 clusterSeeds="$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD):3552"
 printf "${PURPLE}----------- Akka Seed Node is : ${clusterSeeds}-----------${NC}\n"
 sleep 5
 
 printf "${YELLOW}----------- Starting Reddis App -----------${NC}\n"
-docker run -d --name=Reddis --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-service -DclusterSeeds=$clusterSeeds'
+docker run -d --name=Reddis --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-service -DclusterSeeds=$clusterSeeds'
 
 sleep 5
 
 printf "${YELLOW}------ Starting Test App ------${NC}\n"
-docker run --name=Test-App --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING tmt/local-csw-centos bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-app -DclusterSeeds=$clusterSeeds'
+docker run --name=Test-App --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-app -DclusterSeeds=$clusterSeeds'
 test_exit_code=$?
 
 printf "${PURPLE}---------- Stopping and Removing all docker containers ---------- ${NC}"
