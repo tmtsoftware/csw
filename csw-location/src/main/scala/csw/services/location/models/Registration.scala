@@ -2,7 +2,7 @@ package csw.services.location.models
 
 import java.net.URI
 
-import akka.actor.{ActorPath, ActorRef}
+import akka.actor.{ActorPath, ActorRef, Address}
 import akka.serialization.Serialization
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -37,9 +37,10 @@ final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef
     * INTERNAL API : Allows only remote ActorRef
     */
   private val uri = {
-    val actorUri = new URI(actorPath.toString)
-    if (actorUri.getPort == -1) throw LocalAkkaActorRegistrationNotAllowed(actorRef)
-    actorUri
+    actorPath.address match {
+      case Address(_, _, None, None) => throw LocalAkkaActorRegistrationNotAllowed(actorRef)
+      case _ => new URI(actorPath.toString)
+    }
   }
 
   /**
