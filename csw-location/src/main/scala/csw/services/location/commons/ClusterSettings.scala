@@ -72,7 +72,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   private def port: Int = allValues.getOrElse(ClusterPortKey, 0).toString.toInt
 
   private def seedNodes: List[String] = {
-    val seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(","))
+    val seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
     seeds.map(seed ⇒ s"akka.tcp://$clusterName@$seed")
   }
 
