@@ -25,7 +25,7 @@ object LocationServiceFactory {
     * on this newly created node.
     *
     * @note It is highly recommended to use it for testing purposes only.
-    * @param clusterSettings A [[ClusterSettings]] with custom configuration
+    * @param clusterSettings A [[csw.services.location.commons.ClusterSettings]] with custom configuration
     * @return A `LocationService` instance
     */
   def withSettings(clusterSettings: ClusterSettings): LocationService = withCluster(CswCluster.withSettings(clusterSettings))
