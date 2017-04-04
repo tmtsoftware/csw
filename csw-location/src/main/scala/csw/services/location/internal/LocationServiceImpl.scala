@@ -194,7 +194,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     source.collect {
       case c@Changed(service.Key) if c.get(service.Key).value.isDefined => LocationUpdated(c.get(service.Key).value.get)
       case c@Changed(service.Key)                                       => LocationRemoved(connection)
-    }.cancellable
+    }.cancellable.distinctUntilChanged
   }
 
   /**

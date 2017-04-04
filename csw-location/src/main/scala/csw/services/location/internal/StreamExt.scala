@@ -48,6 +48,10 @@ object StreamExt {
       * This stream of `Source` can be terminated any time using the `KillSwitch`
       */
     def cancellable: Source[Out, KillSwitch] = source.viaMat(KillSwitches.single)(Keep.right)
+
+    def distinctUntilChanged: Source[Out, Mat] = source.map(Option.apply).prepend(Source.single(None)).sliding(2).collect {
+      case Seq(a, b@Some(x)) if a != b ⇒ x
+    }
   }
 
 }
