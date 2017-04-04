@@ -33,20 +33,14 @@ final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef
     */
   private val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
 
-  private val uri = new URI(actorPath.toString)
-
   /**
-    * INTERNAL API : ActorRefRemote URI consists of a valid hostname and port
+    * INTERNAL API : Allows only remote ActorRef
     */
-  private def isRemoteUri = {
-    uri.getPort != -1 || uri.getHost.matches("((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.|$)){4}")
+  private val uri = {
+    val actorUri = new URI(actorPath.toString)
+    if (actorUri.getPort == -1) throw LocalAkkaActorRegistrationNotAllowed(actorRef)
+    actorUri
   }
-
-  /**
-    * Allows only remote ActorRef
-    */
-  if (!isRemoteUri) throw new LocalAkkaActorRegistrationNotAllowed(actorRef)
-
 
   /**
     * A [[csw.services.location.models.AkkaLocation]] is formed with the given `Connection` and  `URI`.

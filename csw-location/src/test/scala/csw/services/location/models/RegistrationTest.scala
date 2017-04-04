@@ -82,5 +82,6 @@ class RegistrationTest extends FunSuiteLike with Matchers {
     intercept[LocalAkkaActorRegistrationNotAllowed] {
       AkkaRegistration(akkaConnection, actorRef)
     }
+    Await.result(actorSystem.terminate, 10.seconds)
   }
 }
