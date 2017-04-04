@@ -1,6 +1,6 @@
-##Integration Test Runner Guide
+## Integration Test Runner Guide
 
-###Prerequisites
+### Prerequisites
 * Packaged and unzipped Integration project
     * To package and unzip integration project, execute `./universal_package.sh` scripts from root level 
 
