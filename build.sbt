@@ -4,13 +4,14 @@ val plugins:Seq[Plugins] = if(enableCoverage.toBoolean) Seq(Coverage) else Seq.e
 lazy val `csw-prod` = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
-  .aggregate(`csw-location`, `track-location-agent`, `csw-cluster-seed`)
+  .aggregate(`csw-location`, `track-location-agent`, `csw-cluster-seed`, `csw-cs`)
   .settings(Settings.mergeSiteWith(docs))
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(
       `csw-cluster-seed`,
       `track-location-agent`,
-      `integration`
+      `integration`,
+      `csw-cs`
     )
   )
 
@@ -79,7 +80,7 @@ lazy val integration = project
   )
 
 
-lazy val cs = project
+lazy val `csw-cs` = project
   .enablePlugins(DeployApp)
   .dependsOn(`csw-location`)
   .settings(
