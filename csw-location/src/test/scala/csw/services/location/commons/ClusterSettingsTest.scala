@@ -75,5 +75,9 @@ class ClusterSettingsTest
     clusterSettings.interfaceName shouldBe systemInterfacename
     clusterSettings.seedNodes shouldBe List("10.10.10.12", "10.10.10.13").map{ hostname =>
       s"akka.tcp://${clusterSettings.clusterName}@$hostname"}
+
+    System.clearProperty("clusterPort")
+    System.clearProperty("clusterSeeds")
+    System.clearProperty("interfaceName")
   }
 }
