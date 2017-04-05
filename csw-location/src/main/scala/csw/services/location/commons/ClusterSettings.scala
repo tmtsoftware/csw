@@ -74,6 +74,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   }
 
   private[location] def port: Int = allValues.getOrElse(ClusterPortKey, 0).toString.toInt
+
   def managementPort: Option[Any] = allValues.get(ManagementPortKey)
 
   private[location] def seedNodes: List[String] = {
