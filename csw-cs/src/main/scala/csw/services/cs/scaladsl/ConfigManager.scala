@@ -15,7 +15,7 @@ trait ConfigManager {
   /**
    * The name of this instance
    */
-  val name: String
+  def name: String
 
   /**
    * Creates a file with the given path and data and optional comment.
