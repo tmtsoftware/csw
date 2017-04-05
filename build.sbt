@@ -28,7 +28,7 @@ lazy val `csw-location` = project
       Libs.`enumeratum`,
       Libs.`chill-akka`,
       Libs.`akka-management-cluster-http`,
-      Libs.`akka-http`
+      AkkaHttp.`akka-http`
     ),
     libraryDependencies ++= Seq(
       Akka.`akka-stream-testkit` % Test,
@@ -76,4 +76,22 @@ lazy val integration = project
       Akka.`akka-stream-testkit`
     ),
     sources in Test := (sources in Compile).value
+  )
+
+
+lazy val cs = project
+  .enablePlugins(DeployApp)
+  .dependsOn(`csw-location`)
+  .settings(
+    libraryDependencies ++= Seq(
+      AkkaHttp.`akka-http`,
+      Libs.svnkit,
+      Libs.`play-json`,
+      Libs.`scopt`
+    ),
+    libraryDependencies ++= Seq(
+      Libs.`scalatest` % Test
+    ),
+    sources in (Compile, doc) := Seq.empty,
+    bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
