@@ -67,15 +67,16 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
 
   private lazy val allValues = values ++ sys.env ++ sys.props
 
+  private[location] def interfaceName: String = allValues.getOrElse(InterfaceNameKey, "").toString
+
   private def hostname: String = {
-    val interfaceName: String = allValues.getOrElse(InterfaceNameKey, "").toString
     new Networks(interfaceName).hostname()
   }
 
-  private def port: Int = allValues.getOrElse(ClusterPortKey, 0).toString.toInt
+  private[location] def port: Int = allValues.getOrElse(ClusterPortKey, 0).toString.toInt
   def managementPort: Option[Any] = allValues.get(ManagementPortKey)
 
-  private def seedNodes: List[String] = {
+  private[location] def seedNodes: List[String] = {
     val seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
     seeds.map(seed ⇒ s"akka.tcp://$clusterName@$seed")
   }
