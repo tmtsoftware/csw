@@ -15,7 +15,7 @@ class LargeFileManagerTest
   private val manager = new LargeFileManager(new Wiring().settings)
 
   private val tempFile = {
-    val tempFile = Paths.get("someLargeFile.txt").toFile
+    val tempFile = Paths.get("SomeLargeFile.txt").toFile
     val bw = new BufferedWriter(new FileWriter(tempFile))
     bw.write(s"""test {We think, this is some large text!!!!}""")
     bw.close()
@@ -26,14 +26,14 @@ class LargeFileManagerTest
     tempFile.delete()
   }
 
-  test("store large file") {
+  test("storing large file") {
     val actualSha = manager.post(tempFile).await
     val expectedSha = HashGeneratorUtils.generateSHA1(tempFile)
 
     actualSha shouldBe expectedSha
   }
 
-  test("testGet") {
+  test("getting large file") {
     val actualSha = HashGeneratorUtils.generateSHA1(tempFile)
     val outFile = java.io.File.createTempFile("out", ".txt")
     val file = manager.get(actualSha, outFile).await
