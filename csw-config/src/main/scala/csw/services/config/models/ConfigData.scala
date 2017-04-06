@@ -1,4 +1,4 @@
-package csw.services.cs.models
+package csw.services.config.models
 
 import java.io.{ByteArrayOutputStream, File, FileOutputStream, OutputStream}
 import java.nio.file.{Files, Paths, StandardCopyOption}

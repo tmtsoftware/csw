@@ -1,11 +1,11 @@
-package csw.services.cs.internal
+package csw.services.config.internal
 
 import java.io.{FileNotFoundException, IOException}
 import java.nio.file.Paths
 import java.util.Date
 
-import csw.services.cs.common.TestFutureExtension.RichFuture
-import csw.services.cs.models.{ConfigBytes, ConfigData, ConfigString}
+import csw.services.config.common.TestFutureExtension.RichFuture
+import csw.services.config.models.{ConfigBytes, ConfigData, ConfigString}
 import org.scalatest.Matchers
 
 import scala.concurrent.ExecutionContext

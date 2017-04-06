@@ -1,4 +1,4 @@
-package csw.services.cs.models
+package csw.services.config.models
 
 import java.io.File
 

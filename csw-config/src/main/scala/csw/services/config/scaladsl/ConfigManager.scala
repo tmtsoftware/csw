@@ -1,9 +1,9 @@
-package csw.services.cs.scaladsl
+package csw.services.config.scaladsl
 
 import java.io.File
 import java.util.Date
 
-import csw.services.cs.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 
 import scala.concurrent.{ExecutionContext, Future}
 

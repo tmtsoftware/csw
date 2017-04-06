@@ -1,4 +1,4 @@
-package csw.services.cs.internal
+package csw.services.config.internal
 
 import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path, Paths}

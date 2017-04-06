@@ -1,11 +1,11 @@
-package csw.services.cs.internal
+package csw.services.config.internal
 
 import java.io._
 import java.util.UUID
 
 import akka.actor.ActorSystem
-import csw.services.cs.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
-import csw.services.cs.scaladsl.ConfigManager
+import csw.services.config.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.scaladsl.ConfigManager
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
 import org.tmatesoft.svn.core.io.{SVNRepository, SVNRepositoryFactory}
