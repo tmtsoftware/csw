@@ -3,15 +3,11 @@ package csw.services.cs.internal
 import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path, Paths}
 
-import akka.http.scaladsl.model.HttpEntity.ChunkStreamPart
 import akka.http.scaladsl.model._
-import akka.stream.scaladsl.Source
 import net.codejava.security.HashGeneratorUtils
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Try
-import scala.util.control.NonFatal
 
 class LargeFileManager(settings: Settings) {
 
@@ -32,7 +28,7 @@ class LargeFileManager(settings: Settings) {
       Files.copy(inFile.toPath, out)
       out.flush()
       out.close()
-      if(FileUtils.validate(fileName, outFile)) {
+      if(validate(fileName, outFile)) {
         id
       }
       else {
@@ -62,4 +58,13 @@ class LargeFileManager(settings: Settings) {
     val (subdir, name) = file.getName.splitAt(2)
     Paths.get(dir.getPath, subdir, name)
   }
+
+  /**
+    * Verifies that the given file's content matches the SHA-1 id
+    * @param id the SHA-1 of the file
+    * @param file the file to check
+    * @return true if the file is valid
+    */
+  def validate(id: String, file: File): Boolean =
+    id == HashGeneratorUtils.generateSHA1(file)
 }
