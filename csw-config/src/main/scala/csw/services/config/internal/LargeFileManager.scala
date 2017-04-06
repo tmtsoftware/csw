@@ -12,8 +12,7 @@ import scala.concurrent.Future
 class LargeFileManager(settings: Settings) {
 
   def post(inFile: File): Future[String] = Future {
-    val id= HashGeneratorUtils.generateSHA1(inFile)
-    val fileName = inFile.getName
+    val sha = HashGeneratorUtils.generateSHA1(inFile)
     val dir = settings.`large-files-dir`.replaceFirst("~", System.getProperty("user.home"))
 
     val path = makePath(new File(dir), inFile)
@@ -21,19 +20,19 @@ class LargeFileManager(settings: Settings) {
     outFile.getParentFile.mkdirs()
 
     if (outFile.exists) {
-      id
+      sha
     }
     else {
       val out = new FileOutputStream(outFile)
       Files.copy(inFile.toPath, out)
       out.flush()
       out.close()
-      if(validate(fileName, outFile)) {
-        id
+      if(validate(sha, outFile)) {
+        sha
       }
       else {
         outFile.delete()
-        throw new RuntimeException(s" Error in creating file for $id")
+        throw new RuntimeException(s" Error in creating file for $sha")
       }
     }
   }

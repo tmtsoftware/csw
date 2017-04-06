@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import java.util.Date
 
 import csw.services.config.common.TestFutureExtension.RichFuture
-import csw.services.config.models.{ConfigBytes, ConfigString}
+import csw.services.config.models.{ConfigBytes, ConfigId, ConfigString}
 import org.scalatest.Matchers
 
 class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
@@ -218,6 +218,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     configManager.exists(file).await shouldBe true
   }
 
+<<<<<<< HEAD
   test("delete existing file") {
     svnAdmin.initSvnRepo(null)
     val configValue = "axisName = tromboneAxis"
