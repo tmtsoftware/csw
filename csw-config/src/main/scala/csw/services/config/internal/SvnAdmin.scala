@@ -9,10 +9,8 @@ class SvnAdmin(settings: Settings) {
 
   /**
     * Initializes an svn repository in the given dir.
-    *
-    * @param dir directory to contain the new repository
     */
-  def initSvnRepo(dir: File): Unit = {
+  def initSvnRepo(): Unit = {
     // Create the new main repo
     FSRepositoryFactory.setup()
     SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, true)

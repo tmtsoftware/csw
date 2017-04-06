@@ -16,7 +16,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   private val svnAdmin = wiring.svnAdmin
 
   test("create and get") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
     val configValue = "axisName = tromboneAxis"
 
     val file = Paths.get("/a.conf").toFile
@@ -25,7 +25,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("/ in the beginning of file path is ignored if provided") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
     val configValue = "axisName = tromboneAxis"
 
     val fileName = "csw.conf"
@@ -41,7 +41,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("create an existing file throws IOException") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val configValue = "axisName = tromboneAxis"
     val file = Paths.get("/a.conf").toFile
@@ -53,7 +53,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("update and get") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val configValue = "axisName = tromboneAxis"
     val file = Paths.get("/a.conf").toFile
@@ -66,7 +66,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("update throws FileNotFoundException if a file does not exists") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val file = Paths.get("/a.conf").toFile
 
@@ -76,7 +76,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("get return None if a file does not exists") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val file = Paths.get("/a.conf").toFile
 
@@ -84,7 +84,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("get specific version by config id") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
@@ -101,7 +101,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("get version by date") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
@@ -120,7 +120,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("get initial version if the date is before the creation date") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
@@ -139,7 +139,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("get history of a file") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
@@ -160,7 +160,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("list all config files") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val tromboneConfig = Paths.get("trombone.conf").toFile
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf").toFile
@@ -173,7 +173,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("exists returns false if file does not exist") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val file = Paths.get("/a.conf").toFile
 
@@ -181,7 +181,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("exists returns true if file exist") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
     val configValue = "axisName = tromboneAxis"
 
     val file = Paths.get("a/test.csw.conf").toFile
@@ -191,7 +191,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("delete existing file") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
     val configValue = "axisName = tromboneAxis"
 
     val file = Paths.get("tromboneHCD.conf").toFile
@@ -211,7 +211,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("delete removes all versions of a file") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
@@ -230,7 +230,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("default config file") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
 
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
@@ -251,7 +251,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("storing and getting large file") {
-    svnAdmin.initSvnRepo(null)
+    svnAdmin.initSvnRepo()
     val file = Paths.get("SomeLargeFile.txt").toFile
     val content = "testing large file"
 
