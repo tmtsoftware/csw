@@ -3,22 +3,21 @@ package csw.services.config.internal
 import java.io.File
 import java.nio.file.Paths
 
+import com.typesafe.config.Config
 import org.tmatesoft.svn.core.SVNURL
 
-class Settings {
+class Settings(config: Config) {
 
-  def file: File = Paths.get("/tmp/abc123").toFile
+  private val `csw-config` = config.getConfig("csw-config")
 
-  def url: SVNURL = SVNURL.fromFile(file)
+  val `repository-dir`: String = `csw-config`.getString("repository-dir")
+  val `tmp-dir`: String = `csw-config`.getString("tmp-dir")
+  val `large-files-dir`: String = `csw-config`.getString("large-files-dir")
+  val `svn-user-name`: String = `csw-config`.getString("svn-user-name")
+  val `sha1-suffix`: String = `csw-config`.getString("sha1-suffix")
+  val `default-suffix`: String = `csw-config`.getString("default-suffix")
 
-  def userName: String = "kaku"
-
-  def sha1Suffix = ".sha1"
-
-  def tmpDir = "/tmp/temp-dir-for-csw"
-
-  def defaultSuffix = ".default"
-
-  def dir = "/tmp/CsTestOversize"
+  val repositoryFile: File = Paths.get(`repository-dir`).toFile
+  val svnUrl: SVNURL = SVNURL.fromFile(repositoryFile)
 
 }

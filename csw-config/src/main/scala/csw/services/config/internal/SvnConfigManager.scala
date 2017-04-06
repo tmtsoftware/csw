@@ -155,7 +155,7 @@ class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) e
         val svnOperationFactory = new SvnOperationFactory()
         try {
           val remoteDelete = svnOperationFactory.createRemoteDelete()
-          remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.url.appendPath(path.getPath, false)))
+          remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.svnUrl.appendPath(path.getPath, false)))
           remoteDelete.setCommitMessage(comment)
           remoteDelete.run()
         } finally {
@@ -175,7 +175,7 @@ class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) e
     val svnOperationFactory = new SvnOperationFactory()
     try {
       val svnList = svnOperationFactory.createList()
-      svnList.setSingleTarget(SvnTarget.fromURL(settings.url, SVNRevision.HEAD))
+      svnList.setSingleTarget(SvnTarget.fromURL(settings.svnUrl, SVNRevision.HEAD))
       svnList.setRevision(SVNRevision.HEAD)
       svnList.setDepth(SVNDepth.INFINITY)
       svnList.setReceiver(new ISvnObjectReceiver[SVNDirEntry] {
@@ -223,7 +223,7 @@ class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) e
     } yield result
   }
 
-  private def getTempFile: File = new File(settings.tmpDir, UUID.randomUUID().toString)
+  private def getTempFile: File = new File(settings.`tmp-dir`, UUID.randomUUID().toString)
 
   private def deleteTempFile(file: File): Future[Unit] = Future(file.deleteOnExit())
 
@@ -272,8 +272,8 @@ class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) e
 
   // Gets an object for accessing the svn repository (not reusing a single instance since not thread safe)
   private def getSvn: SVNRepository = {
-    val svn = SVNRepositoryFactory.create(settings.url)
-    val authManager = BasicAuthenticationManager.newInstance(settings.userName, Array[Char]())
+    val svn = SVNRepositoryFactory.create(settings.svnUrl)
+    val authManager = BasicAuthenticationManager.newInstance(settings.`svn-user-name`, Array[Char]())
     svn.setAuthenticationManager(authManager)
     svn
   }
@@ -348,7 +348,7 @@ class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) e
   }
 
   // File used to store the SHA-1 of the actual file, if oversized.
-  private def shaFile(file: File): File = new File(s"${file.getPath}${settings.sha1Suffix}")
+  private def shaFile(file: File): File = new File(s"${file.getPath}${settings.`sha1-suffix`}")
 
   // Returns the current version of the file, if known
   private def getCurrentVersion(path: File): Option[ConfigId] = {
@@ -363,7 +363,7 @@ class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) e
     var logEntries = List[SVNLogEntry]()
     try {
       val logClient = clientManager.getLogClient
-      logClient.doLog(settings.url, Array(path.getPath), SVNRevision.HEAD, null, null, true, true, maxResults,
+      logClient.doLog(settings.svnUrl, Array(path.getPath), SVNRevision.HEAD, null, null, true, true, maxResults,
         new ISVNLogEntryHandler() {
           override def handleLogEntry(logEntry: SVNLogEntry): Unit = logEntries = logEntry :: logEntries
         })
@@ -378,6 +378,6 @@ class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) e
 
   // File used to store the id of the default version of the file.
   private def defaultFile(file: File): File =
-    new File(s"${file.getPath}${settings.defaultSuffix}")
+    new File(s"${file.getPath}${settings.`default-suffix`}")
 
 }

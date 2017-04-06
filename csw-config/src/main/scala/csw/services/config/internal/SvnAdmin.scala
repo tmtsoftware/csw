@@ -15,7 +15,7 @@ class SvnAdmin(settings: Settings) {
   def initSvnRepo(dir: File): Unit = {
     // Create the new main repo
     FSRepositoryFactory.setup()
-    SVNRepositoryFactory.createLocalRepository(settings.file, false, true)
+    SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, true)
   }
 
   /**
@@ -25,8 +25,8 @@ class SvnAdmin(settings: Settings) {
   def deleteDirectoryRecursively(dir: File): Unit = {
     // just to be safe, don't delete anything that is not in /tmp/
     val p = dir.getPath
-    if (!p.startsWith("/tmp/") && !p.startsWith(settings.tmpDir))
-      throw new RuntimeException(s"Refusing to delete $dir since not in /tmp/ or ${settings.tmpDir}")
+    if (!p.startsWith("/tmp/") && !p.startsWith(settings.`tmp-dir`))
+      throw new RuntimeException(s"Refusing to delete $dir since not in /tmp/ or ${settings.`tmp-dir`}")
 
     if (dir.isDirectory) {
       dir.list.foreach {

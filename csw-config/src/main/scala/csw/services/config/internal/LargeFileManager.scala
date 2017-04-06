@@ -14,7 +14,7 @@ class LargeFileManager(settings: Settings) {
   def post(inFile: File): Future[String] = Future {
     val id= HashGeneratorUtils.generateSHA1(inFile)
     val fileName = inFile.getName
-    val dir = settings.dir.replaceFirst("~", System.getProperty("user.home"))
+    val dir = settings.`large-files-dir`.replaceFirst("~", System.getProperty("user.home"))
 
     val path = makePath(new File(dir), inFile)
     val outFile = path.toFile
@@ -39,7 +39,7 @@ class LargeFileManager(settings: Settings) {
   }
 
   def get(id: String, outFile: File): Future[File] = Future {
-    val repoDir = settings.dir.replaceFirst("~", System.getProperty("user.home"))
+    val repoDir = settings.`large-files-dir`.replaceFirst("~", System.getProperty("user.home"))
     val repoFilePath = makePath(new File(repoDir), new File(Uri(id).path.toString()))
 
     if(repoFilePath.toFile.exists()) {

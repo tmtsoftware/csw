@@ -5,18 +5,18 @@ import java.nio.file.Paths
 import java.util.Date
 
 import csw.services.config.common.TestFutureExtension.RichFuture
-import csw.services.config.models.{ConfigBytes, ConfigData, ConfigString}
+import csw.services.config.models.{ConfigBytes, ConfigString}
 import org.scalatest.Matchers
 
 import scala.concurrent.ExecutionContext
 
 class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
-  val settings = new Settings
-  private val svnAdmin = new SvnAdmin(settings)
-  private val largeFileManager = new LargeFileManager(settings)
-  val configManager: SvnConfigManager = new SvnConfigManager(settings, largeFileManager)
+  private val wiring = new Wiring()
 
-  implicit val ec = ExecutionContext.Implicits.global
+  private val configManager = wiring.configManager
+  private val svnAdmin = wiring.svnAdmin
+
+  private implicit val ec = ExecutionContext.Implicits.global
   test("create and get") {
     svnAdmin.initSvnRepo(null)
 
