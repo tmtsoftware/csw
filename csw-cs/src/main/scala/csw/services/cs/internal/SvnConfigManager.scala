@@ -82,13 +82,6 @@ class SvnConfigManager(settings: Settings) extends ConfigManager {
     } yield configId
   }
 
-
-  override def createOrUpdate(path: File, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] =
-    for {
-      exists <- exists(path)
-      result <- if (exists) update(path, configData, comment) else create(path, configData, oversize, comment)
-    } yield result
-
   override def get(path: File, id: Option[ConfigId]): Future[Option[ConfigData]] = {
     // Get oversize files that are stored in the annex server
     def getOversize: Future[Option[ConfigData]] = {

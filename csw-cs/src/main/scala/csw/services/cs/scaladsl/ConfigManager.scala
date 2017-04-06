@@ -41,17 +41,6 @@ trait ConfigManager {
   def update(path: File, configData: ConfigData, comment: String = ""): Future[ConfigId]
 
   /**
-   * Creates the file with the given path, or updates it, if it already exists.
-   *
-   * @param path       the file path relative to the repository root
-   * @param configData used to read the contents of the file
-   * @param oversize   true if the file is large and requires special handling (external storage)
-   * @param comment    an optional comment to associate with this file
-   * @return a unique id that can be used to refer to the file
-   */
-  def createOrUpdate(path: File, configData: ConfigData, oversize: Boolean = false, comment: String = ""): Future[ConfigId]
-
-  /**
    * Gets and returns the file stored under the given path.
    *
    * @param path the file path relative to the repository root
