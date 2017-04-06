@@ -3,11 +3,10 @@ package csw.services.cs.internal
 import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path, Paths}
 
-import akka.actor.ActorSystem
 import net.codejava.security.HashGeneratorUtils
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class LargeFileManager(settings: Settings) {
 
