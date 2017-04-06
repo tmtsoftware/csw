@@ -8,15 +8,12 @@ import csw.services.config.common.TestFutureExtension.RichFuture
 import csw.services.config.models.{ConfigBytes, ConfigString}
 import org.scalatest.Matchers
 
-import scala.concurrent.ExecutionContext
-
 class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   private val wiring = new Wiring()
 
   private val configManager = wiring.configManager
   private val svnAdmin = wiring.svnAdmin
 
-  private implicit val ec = ExecutionContext.Implicits.global
   test("create and get") {
     svnAdmin.initSvnRepo(null)
 

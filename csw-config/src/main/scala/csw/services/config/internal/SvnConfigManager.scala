@@ -1,7 +1,7 @@
 package csw.services.config.internal
 
 import java.io._
-import java.util.UUID
+import java.util.{Date, UUID}
 
 import akka.actor.ActorSystem
 import csw.services.config.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
@@ -140,6 +140,37 @@ class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) e
       configData <- getImpl(present)
     } yield configData
   }
+
+  override def get(path: File, date: Date): Future[Option[ConfigData]] = {
+    val t = date.getTime
+
+    // A condition used in the for comprehension below to catch the case where the file does not exist
+    def predicate(condition: Boolean): Future[Unit] =
+      if (condition) Future(()) else Future.failed(new RuntimeException)
+
+    // Gets the ConfigFileHistory matching the date
+    def getHist: Future[Option[ConfigFileHistory]] = {
+      history(path).map { h =>
+        val found = h.find(_.time.getTime <= t)
+        if (found.nonEmpty) found
+        else if (h.isEmpty) None
+        else {
+          Some(if (t > h.head.time.getTime) h.head else h.last)
+        }
+      }
+    }
+
+    val f = for {
+      hist <- getHist
+      _ <- predicate(hist.nonEmpty)
+      result <- get(path, hist.map(_.id))
+    } yield result
+
+    f.recover {
+      case _ => None
+    }
+  }
+
 
   override def exists(path: File): Future[Boolean] = Future(pathExists(path))
 

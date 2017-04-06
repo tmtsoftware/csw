@@ -51,44 +51,16 @@ trait ConfigManager {
   def get(path: File, id: Option[ConfigId] = None): Future[Option[ConfigData]]
 
   /**
-   * Gets the file as it existed on the given date.
-   * If date is before the file was created, the initial version is returned.
-   * If date is after the last change, the most recent version is returned.
-   * If the path does not exist in the repo, Future[None] is returned.
-   *
-   * @param path the file path relative to the repository root
-   * @param date the target date
-   * @return a future object that can be used to access the file's data, if found
-   */
-  def get(path: File, date: Date)(implicit ec: ExecutionContext): Future[Option[ConfigData]] = {
-    val t = date.getTime
-
-    // A condition used in the for comprehension below to catch the case where the file does not exist
-    def predicate(condition: Boolean): Future[Unit] =
-      if (condition) Future(()) else Future.failed(new RuntimeException)
-
-    // Gets the ConfigFileHistory matching the date
-    def getHist: Future[Option[ConfigFileHistory]] = {
-      history(path).map { h =>
-        val found = h.find(_.time.getTime <= t)
-        if (found.nonEmpty) found
-        else if (h.isEmpty) None
-        else {
-          Some(if (t > h.head.time.getTime) h.head else h.last)
-        }
-      }
-    }
-
-    val f = for {
-      hist <- getHist
-      _ <- predicate(hist.nonEmpty)
-      result <- get(path, hist.map(_.id))
-    } yield result
-
-    f.recover {
-      case _ => None
-    }
-  }
+    * Gets the file as it existed on the given date.
+    * If date is before the file was created, the initial version is returned.
+    * If date is after the last change, the most recent version is returned.
+    * If the path does not exist in the repo, Future[None] is returned.
+    *
+    * @param path the file path relative to the repository root
+    * @param date the target date
+    * @return a future object that can be used to access the file's data, if found
+    */
+  def get(path: File, date: Date): Future[Option[ConfigData]]
 
   /**
    * Returns true if the given path exists and is being managed
