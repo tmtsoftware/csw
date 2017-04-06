@@ -15,7 +15,7 @@ class LargeFileManager(settings: Settings) {
     val sha = HashGeneratorUtils.generateSHA1(inFile)
     val dir = settings.`large-files-dir`.replaceFirst("~", System.getProperty("user.home"))
 
-    val path = makePath(new File(dir), inFile)
+    val path = makePath(new File(dir), new File(sha))
     val outFile = path.toFile
     outFile.getParentFile.mkdirs()
 
@@ -37,9 +37,9 @@ class LargeFileManager(settings: Settings) {
     }
   }
 
-  def get(id: String, outFile: File): Future[File] = Future {
+  def get(sha: String, outFile: File): Future[File] = Future {
     val repoDir = settings.`large-files-dir`.replaceFirst("~", System.getProperty("user.home"))
-    val repoFilePath = makePath(new File(repoDir), new File(Uri(id).path.toString()))
+    val repoFilePath = makePath(new File(repoDir), new File(Uri(sha).path.toString()))
 
     if(repoFilePath.toFile.exists()) {
       val out = new FileOutputStream(outFile)
@@ -48,7 +48,7 @@ class LargeFileManager(settings: Settings) {
       out.close()
       outFile
     } else {
-      throw new RuntimeException(s" Error in locating file for $id")
+      throw new RuntimeException(s" Error in locating file for $sha")
     }
   }
 

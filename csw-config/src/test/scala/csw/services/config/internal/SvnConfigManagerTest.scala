@@ -218,7 +218,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     configManager.exists(file).await shouldBe true
   }
 
-<<<<<<< HEAD
   test("delete existing file") {
     svnAdmin.initSvnRepo(null)
     val configValue = "axisName = tromboneAxis"
