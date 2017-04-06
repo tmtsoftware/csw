@@ -158,7 +158,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     configManager.get(file, date).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
   }
 
-  test("get history of all versions of a file") {
+  test("get history of a file") {
     svnAdmin.initSvnRepo(null)
 
     val configValue = "axisName = tromboneAxis"
@@ -176,6 +176,9 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
 
     configManager.history(file).await.size shouldBe 3
     configManager.history(file).await.map(_.id) should contain allOf(configIdCreate, configIdUpdate, configIdUpdate2)
+
+    configManager.history(file, 2).await.size shouldBe 2
+    configManager.history(file, 2).await.map(_.id) should contain allOf (configIdUpdate, configIdUpdate2)
   }
 
   test("list all config files") {
@@ -256,5 +259,28 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     configManager.delete(file).await
     configManager.history(file).await.size shouldBe 0
     configManager.get(file, Some(configId)).await shouldBe None
+  }
+
+  test("default config file") {
+    svnAdmin.initSvnRepo(null)
+
+    val configValue = "axisName = tromboneAxis"
+    val assemblyConfigValue = "assemblyHCDCount = 3"
+    val newAssemblyConfigValue = "assemblyHCDCount = 5"
+
+    val file = Paths.get("/a.conf").toFile
+    val configIdCreate = configManager.create(
+      file, ConfigString(configValue), oversize = false, "hello world"
+    ).await
+    configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe ConfigString(configValue).str
+
+    val configIdUpdate = configManager.update(file, ConfigString(assemblyConfigValue), "Updated config to assembly").await
+    val configIdUpdate2 = configManager.update(file, ConfigString(newAssemblyConfigValue), "Updated config to assembly").await
+
+    configManager.getDefault(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe newAssemblyConfigValue
+    configManager.setDefault(file, Some(configIdUpdate)).await
+    configManager.getDefault(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe assemblyConfigValue
+    configManager.resetDefault(file).await
+    configManager.getDefault(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe newAssemblyConfigValue
   }
 }
