@@ -7,7 +7,6 @@ import akka.actor.ActorSystem
 import csw.services.cs.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.cs.scaladsl.ConfigManager
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
-import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
 import org.tmatesoft.svn.core.io.{SVNRepository, SVNRepositoryFactory}
 import org.tmatesoft.svn.core.wc.{SVNClientManager, SVNRevision}
@@ -16,45 +15,6 @@ import org.tmatesoft.svn.core._
 
 import scala.concurrent.Future
 
-class SvnManager(settings: Settings) {
-
-  /**
-    * Initializes an svn repository in the given dir.
-    *
-    * @param dir directory to contain the new repository
-    */
-  def initSvnRepo(dir: File): Unit = {
-    // Create the new main repo
-    FSRepositoryFactory.setup()
-    SVNRepositoryFactory.createLocalRepository(settings.file, false, true)
-  }
-
-  /**
-    * FOR TESTING: Deletes the contents of the given directory (recursively).
-    * This is meant for use by tests that need to always start with an empty Svn repository.
-    */
-  def deleteDirectoryRecursively(dir: File): Unit = {
-    // just to be safe, don't delete anything that is not in /tmp/
-    val p = dir.getPath
-    if (!p.startsWith("/tmp/") && !p.startsWith(settings.tmpDir))
-      throw new RuntimeException(s"Refusing to delete $dir since not in /tmp/ or ${settings.tmpDir}")
-
-    if (dir.isDirectory) {
-      dir.list.foreach {
-        filePath =>
-          val file = new File(dir, filePath)
-          if (file.isDirectory) {
-            deleteDirectoryRecursively(file)
-          } else {
-            file.delete()
-          }
-      }
-      dir.delete()
-    }
-  }
-
-}
-
 class SvnConfigManager(settings: Settings) extends ConfigManager {
 
   private implicit val system = ActorSystem()
@@ -62,17 +22,13 @@ class SvnConfigManager(settings: Settings) extends ConfigManager {
 
   override def name: String = "my name is missing"
 
-  private def getTempFile: File = new File(settings.tmpDir, UUID.randomUUID().toString)
-
-  private def deleteTempFile(file: File): Future[Unit] = Future(file.deleteOnExit())
-
   override def create(path: File, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
 
     def createOversize(): Future[ConfigId] = {
       val file = getTempFile
       for {
         _ <- configData.writeToFile(file)
-        sha1 <- AnnexTemp.post(file)
+        sha1 <- Annex.post(file)
         _ <- deleteTempFile(file)
         configId <- create(shaFile(path), ConfigData(sha1), oversize = false, comment)
       } yield configId
@@ -95,6 +51,188 @@ class SvnConfigManager(settings: Settings) extends ConfigManager {
     } yield configId
 
   }
+
+
+  override def update(path: File, configData: ConfigData, comment: String): Future[ConfigId] = {
+
+    def updateOversize(): Future[ConfigId] = {
+      val file = getTempFile
+      for {
+        _ <- configData.writeToFile(file)
+        sha1 <- Annex.post(file)
+        _ <- deleteTempFile(file)
+        configId <- update(shaFile(path), ConfigData(sha1), comment)
+      } yield configId
+    }
+
+    // If the file already exists in the repo, update it
+    def updateImpl(present: Boolean): Future[ConfigId] = {
+      if (!present) {
+        Future.failed(new FileNotFoundException("File not found: " + path))
+      } else if (isOversize(path)) {
+        updateOversize()
+      } else {
+        put(path, configData, update = true, comment)
+      }
+    }
+
+    for {
+      present <- exists(path)
+      configId <- updateImpl(present)
+    } yield configId
+  }
+
+
+  override def createOrUpdate(path: File, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] =
+    for {
+      exists <- exists(path)
+      result <- if (exists) update(path, configData, comment) else create(path, configData, oversize, comment)
+    } yield result
+
+  override def get(path: File, id: Option[ConfigId]): Future[Option[ConfigData]] = {
+    // Get oversize files that are stored in the annex server
+    def getOversize: Future[Option[ConfigData]] = {
+      val file = getTempFile
+      for {
+        opt <- get(shaFile(path), id)
+        data <- getData(file, opt)
+        _ <- deleteTempFile(file)
+      } yield data
+    }
+
+    // Gets the actual file data using the SHA-1 value contained in the checked in file
+    def getData(file: File, opt: Option[ConfigData]): Future[Option[ConfigData]] = {
+      opt match {
+        case None => Future(None)
+        case Some(configData) =>
+          for {
+            sha1 <- configData.toFutureString
+            configDataOpt <- getFromAnnexServer(file, sha1)
+          } yield configDataOpt
+      }
+    }
+
+    // If the file matches the SHA-1 hash, return a future for it, otherwise get it from the annex server
+    def getFromAnnexServer(file: File, sha1: String): Future[Option[ConfigData]] = {
+      Annex.get(sha1, file).map {
+        _ => Some(ConfigData(file))
+      }
+    }
+
+    // Returns the contents of the given version of the file, if found
+    def getConfigData: Future[Option[ConfigData]] = Future {
+      val os = new ByteArrayOutputStream()
+      val svn = getSvn
+      try {
+        svn.getFile(path.getPath, svnRevision(id).getNumber, null, os)
+      } finally {
+        svn.closeSession()
+      }
+      Some(ConfigData(os.toByteArray))
+    }
+
+    // If the file exists in the repo, get its data
+    def getImpl(present: Boolean): Future[Option[ConfigData]] = {
+      if (!present) {
+        Future(None)
+      } else if (isOversize(path)) {
+        getOversize
+      } else {
+        getConfigData
+      }
+    }
+
+    for {
+      present <- exists(path)
+      configData <- getImpl(present)
+    } yield configData
+  }
+
+  override def exists(path: File): Future[Boolean] = Future(pathExists(path))
+
+  override def delete(path: File, comment: String = "deleted"): Future[Unit] = {
+    def deleteFile(path: File, comment: String = "deleted"): Unit = {
+      if (isOversize(path)) {
+        deleteFile(shaFile(path), comment)
+      } else {
+        if (!pathExists(path)) {
+          throw new FileNotFoundException("Can't delete " + path + " because it does not exist")
+        }
+
+        val svnOperationFactory = new SvnOperationFactory()
+        try {
+          val remoteDelete = svnOperationFactory.createRemoteDelete()
+          remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.url.appendPath(path.getPath, false)))
+          remoteDelete.setCommitMessage(comment)
+          remoteDelete.run()
+        } finally {
+          svnOperationFactory.dispose()
+        }
+      }
+    }
+
+    Future {
+      deleteFile(path, comment)
+    }
+  }
+
+  override def list(): Future[List[ConfigFileInfo]] = Future {
+    // XXX Should .sha1 files have the .sha1 suffix removed in the result?
+    var entries = List[SVNDirEntry]()
+    val svnOperationFactory = new SvnOperationFactory()
+    try {
+      val svnList = svnOperationFactory.createList()
+      svnList.setSingleTarget(SvnTarget.fromURL(settings.url, SVNRevision.HEAD))
+      svnList.setRevision(SVNRevision.HEAD)
+      svnList.setDepth(SVNDepth.INFINITY)
+      svnList.setReceiver(new ISvnObjectReceiver[SVNDirEntry] {
+        override def receive(target: SvnTarget, e: SVNDirEntry): Unit = {
+          entries = e :: entries
+        }
+      })
+      svnList.run()
+    } finally {
+      svnOperationFactory.dispose()
+    }
+    entries.filter(_.getKind == SVNNodeKind.FILE).sortWith(_.getRelativePath < _.getRelativePath)
+      .map(e => ConfigFileInfo(new File(e.getRelativePath), ConfigId(e.getRevision), e.getCommitMessage))
+  }
+
+  override def history(path: File, maxResults: Int = Int.MaxValue): Future[List[ConfigFileHistory]] = {
+    // XXX Should .sha1 files have the .sha1 suffix removed in the result?
+    if (isOversize(path))
+      Future(hist(shaFile(path), maxResults))
+    else
+      Future(hist(path, maxResults))
+  }
+
+  override def setDefault(path: File, id: Option[ConfigId] = None): Future[Unit] = {
+    (if (id.isDefined) id else getCurrentVersion(path)) match {
+      case Some(configId) =>
+        create(defaultFile(path), ConfigData(configId.id)).map(_ => ())
+      case None =>
+        Future.failed(new RuntimeException(s"Unknown path $path"))
+    }
+  }
+
+  override def resetDefault(path: File): Future[Unit] = {
+    delete(defaultFile(path))
+  }
+
+  override def getDefault(path: File): Future[Option[ConfigData]] = {
+    val currentId = getCurrentVersion(path)
+    if (currentId.isEmpty)
+      Future(None)
+    else for {
+      d <- get(defaultFile(path))
+      id <- if (d.isDefined) d.get.toFutureString else Future(currentId.get.id)
+      result <- get(path, Some(ConfigId(id)))
+    } yield result
+  }
+
+  private def getTempFile: File = new File(settings.tmpDir, UUID.randomUUID().toString)
+
+  private def deleteTempFile(file: File): Future[Unit] = Future(file.deleteOnExit())
 
   /**
     * Creates or updates a config file with the given path and data and optional comment.
@@ -121,7 +259,7 @@ class SvnConfigManager(settings: Settings) extends ConfigManager {
 
   // Modifies the contents of the given file in the repository.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  def modifyFile(comment: String, path: File, data: Array[Byte]): SVNCommitInfo = {
+  private def modifyFile(comment: String, path: File, data: Array[Byte]): SVNCommitInfo = {
     val svn = getSvn
     try {
       val editor = svn.getCommitEditor(comment, null)
@@ -208,102 +346,6 @@ class SvnConfigManager(settings: Settings) extends ConfigManager {
     }
   }
 
-
-  override def update(path: File, configData: ConfigData, comment: String): Future[ConfigId] = {
-
-    def updateOversize(): Future[ConfigId] = {
-      val file = getTempFile
-      for {
-        _ <- configData.writeToFile(file)
-        sha1 <- AnnexTemp.post(file)
-        _ <- deleteTempFile(file)
-        configId <- update(shaFile(path), ConfigData(sha1), comment)
-      } yield configId
-    }
-
-    // If the file already exists in the repo, update it
-    def updateImpl(present: Boolean): Future[ConfigId] = {
-      if (!present) {
-        Future.failed(new FileNotFoundException("File not found: " + path))
-      } else if (isOversize(path)) {
-        updateOversize()
-      } else {
-        put(path, configData, update = true, comment)
-      }
-    }
-
-    for {
-      present <- exists(path)
-      configId <- updateImpl(present)
-    } yield configId
-  }
-
-
-  override def createOrUpdate(path: File, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] =
-    for {
-      exists <- exists(path)
-      result <- if (exists) update(path, configData, comment) else create(path, configData, oversize, comment)
-    } yield result
-
-  override def get(path: File, id: Option[ConfigId]): Future[Option[ConfigData]] = {
-    // Get oversize files that are stored in the annex server
-    def getOversize: Future[Option[ConfigData]] = {
-      val file = getTempFile
-      for {
-        opt <- get(shaFile(path), id)
-        data <- getData(file, opt)
-        _ <- deleteTempFile(file)
-      } yield data
-    }
-
-    // Gets the actual file data using the SHA-1 value contained in the checked in file
-    def getData(file: File, opt: Option[ConfigData]): Future[Option[ConfigData]] = {
-      opt match {
-        case None => Future(None)
-        case Some(configData) =>
-          for {
-            sha1 <- configData.toFutureString
-            configDataOpt <- getFromAnnexServer(file, sha1)
-          } yield configDataOpt
-      }
-    }
-
-    // If the file matches the SHA-1 hash, return a future for it, otherwise get it from the annex server
-    def getFromAnnexServer(file: File, sha1: String): Future[Option[ConfigData]] = {
-      AnnexTemp.get(sha1, file).map {
-        _ => Some(ConfigData(file))
-      }
-    }
-
-    // Returns the contents of the given version of the file, if found
-    def getConfigData: Future[Option[ConfigData]] = Future {
-      val os = new ByteArrayOutputStream()
-      val svn = getSvn
-      try {
-        svn.getFile(path.getPath, svnRevision(id).getNumber, null, os)
-      } finally {
-        svn.closeSession()
-      }
-      Some(ConfigData(os.toByteArray))
-    }
-
-    // If the file exists in the repo, get its data
-    def getImpl(present: Boolean): Future[Option[ConfigData]] = {
-      if (!present) {
-        Future(None)
-      } else if (isOversize(path)) {
-        getOversize
-      } else {
-        getConfigData
-      }
-    }
-
-    for {
-      present <- exists(path)
-      configData <- getImpl(present)
-    } yield configData
-  }
-
   // Gets the svn revision from the given id, defaulting to HEAD
   private def svnRevision(id: Option[ConfigId] = None): SVNRevision = {
     id match {
@@ -313,10 +355,7 @@ class SvnConfigManager(settings: Settings) extends ConfigManager {
   }
 
   // File used to store the SHA-1 of the actual file, if oversized.
-  private def shaFile(file: File): File =
-    new File(s"${file.getPath}${settings.sha1Suffix}")
-
-  // --- Default version handling ---
+  private def shaFile(file: File): File = new File(s"${file.getPath}${settings.sha1Suffix}")
 
   // Returns the current version of the file, if known
   private def getCurrentVersion(path: File): Option[ConfigId] = {
@@ -348,85 +387,4 @@ class SvnConfigManager(settings: Settings) extends ConfigManager {
   private def defaultFile(file: File): File =
     new File(s"${file.getPath}${settings.defaultSuffix}")
 
-  override def exists(path: File): Future[Boolean] = Future(pathExists(path))
-
-  override def delete(path: File, comment: String = "deleted"): Future[Unit] = {
-    def deleteFile(path: File, comment: String = "deleted"): Unit = {
-      if (isOversize(path)) {
-        deleteFile(shaFile(path), comment)
-      } else {
-        if (!pathExists(path)) {
-          throw new FileNotFoundException("Can't delete " + path + " because it does not exist")
-        }
-
-        val svnOperationFactory = new SvnOperationFactory()
-        try {
-          val remoteDelete = svnOperationFactory.createRemoteDelete()
-          remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.url.appendPath(path.getPath, false)))
-          remoteDelete.setCommitMessage(comment)
-          remoteDelete.run()
-        } finally {
-          svnOperationFactory.dispose()
-        }
-      }
-    }
-
-    Future {
-      deleteFile(path, comment)
-    }
-  }
-
-  override def list(): Future[List[ConfigFileInfo]] = Future {
-    // XXX Should .sha1 files have the .sha1 suffix removed in the result?
-    var entries = List[SVNDirEntry]()
-    val svnOperationFactory = new SvnOperationFactory()
-    try {
-      val svnList = svnOperationFactory.createList()
-      svnList.setSingleTarget(SvnTarget.fromURL(settings.url, SVNRevision.HEAD))
-      svnList.setRevision(SVNRevision.HEAD)
-      svnList.setDepth(SVNDepth.INFINITY)
-      svnList.setReceiver(new ISvnObjectReceiver[SVNDirEntry] {
-        override def receive(target: SvnTarget, e: SVNDirEntry): Unit = {
-          entries = e :: entries
-        }
-      })
-      svnList.run()
-    } finally {
-      svnOperationFactory.dispose()
-    }
-    entries.filter(_.getKind == SVNNodeKind.FILE).sortWith(_.getRelativePath < _.getRelativePath)
-      .map(e => ConfigFileInfo(new File(e.getRelativePath), ConfigId(e.getRevision), e.getCommitMessage))
-  }
-
-  override def history(path: File, maxResults: Int = Int.MaxValue): Future[List[ConfigFileHistory]] = {
-    // XXX Should .sha1 files have the .sha1 suffix removed in the result?
-    if (isOversize(path))
-      Future(hist(shaFile(path), maxResults))
-    else
-      Future(hist(path, maxResults))
-  }
-
-  def setDefault(path: File, id: Option[ConfigId] = None): Future[Unit] = {
-    (if (id.isDefined) id else getCurrentVersion(path)) match {
-      case Some(configId) =>
-        create(defaultFile(path), ConfigData(configId.id)).map(_ => ())
-      case None =>
-        Future.failed(new RuntimeException(s"Unknown path $path"))
-    }
-  }
-
-  def resetDefault(path: File): Future[Unit] = {
-    delete(defaultFile(path))
-  }
-
-  def getDefault(path: File): Future[Option[ConfigData]] = {
-    val currentId = getCurrentVersion(path)
-    if (currentId.isEmpty)
-      Future(None)
-    else for {
-      d <- get(defaultFile(path))
-      id <- if (d.isDefined) d.get.toFutureString else Future(currentId.get.id)
-      result <- get(path, Some(ConfigId(id)))
-    } yield result
-  }
 }

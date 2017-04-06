@@ -4,7 +4,7 @@ import java.io.File
 
 import scala.concurrent.Future
 
-object AnnexTemp {
+object Annex {
 
   def post(file: File): Future[String] = ???
 
