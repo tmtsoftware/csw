@@ -20,10 +20,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val configValue = "axisName = tromboneAxis"
 
     val file = Paths.get("/a.conf").toFile
-    configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
-
+    configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
   }
 
@@ -34,14 +31,10 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val fileName = "csw.conf"
     val file = Paths.get(s"/$fileName").toFile
     val fileWithoutBackslash = Paths.get(fileName).toFile
-    configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
 
     intercept[IOException] {
-      configManager.create(
-        fileWithoutBackslash, ConfigString(configValue), oversize = false, "hello world"
-      ).await
+      configManager.create(fileWithoutBackslash, ConfigString(configValue), oversize = false, "hello world").await
     }
 
     configManager.get(fileWithoutBackslash).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
@@ -52,14 +45,10 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
 
     val configValue = "axisName = tromboneAxis"
     val file = Paths.get("/a.conf").toFile
-    configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
 
     intercept[IOException] {
-      configManager.create(
-        file, ConfigString(configValue), oversize = false, "hello world"
-      ).await
+      configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
     }
   }
 
@@ -68,9 +57,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
 
     val configValue = "axisName = tromboneAxis"
     val file = Paths.get("/a.conf").toFile
-    configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
 
     val assmeblyConfigValue = "assemblyHCDCount = 3"
@@ -103,9 +90,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val assemblyConfigValue = "assemblyHCDCount = 3"
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
     val file = Paths.get("/a/b/csw.conf").toFile
-    configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
 
     val configId = configManager.update(file, ConfigString(assemblyConfigValue), "Updated config to assembly").await
@@ -123,11 +108,8 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
 
     val file = Paths.get("/a.conf").toFile
-    configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
-
 
     configManager.update(file, ConfigString(assemblyConfigValue), "Updated config to assembly").await
     val date = new Date()
@@ -146,11 +128,8 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
 
     val date = new Date(0L)
     val file = Paths.get("/a.conf").toFile
-    configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
-
 
     configManager.update(file, ConfigString(assemblyConfigValue), "Updated config to assembly").await
     configManager.update(file, ConfigString(newAssemblyConfigValue), "Updated config to assembly").await
@@ -167,9 +146,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
 
     val file = Paths.get("/a.conf").toFile
-    val configIdCreate = configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    val configIdCreate = configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe ConfigString(configValue).str
 
     val configIdUpdate = configManager.update(file, ConfigString(assemblyConfigValue), "Updated config to assembly").await
@@ -188,13 +165,9 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val tromboneConfig = Paths.get("trombone.conf").toFile
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf").toFile
 
-    val tromboneConfigId = configManager.create(
-      tromboneConfig, ConfigString("axisName = tromboneAxis"), oversize = false, "hello trombone"
-    ).await
+    val tromboneConfigId = configManager.create(tromboneConfig, ConfigString("axisName = tromboneAxis"), oversize = false, "hello trombone").await
 
-    val assemblyConfigId = configManager.create(
-      assemblyConfig, ConfigString("assemblyHCDCount = 3"), oversize = false, "hello assembly"
-    ).await
+    val assemblyConfigId = configManager.create(assemblyConfig, ConfigString("assemblyHCDCount = 3"), oversize = false, "hello assembly").await
 
     configManager.list().await.map(_.id) should contain allOf(tromboneConfigId, assemblyConfigId)
   }
@@ -212,9 +185,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val configValue = "axisName = tromboneAxis"
 
     val file = Paths.get("a/test.csw.conf").toFile
-    configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
 
     configManager.exists(file).await shouldBe true
   }
@@ -224,9 +195,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val configValue = "axisName = tromboneAxis"
 
     val file = Paths.get("tromboneHCD.conf").toFile
-    configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
 
     configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
 
@@ -248,9 +217,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val assemblyConfigValue = "assemblyHCDCount = 3"
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
     val file = Paths.get("/a/b/csw.conf").toFile
-    configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
 
     val configId = configManager.update(file, ConfigString(assemblyConfigValue), "Updated config to assembly").await
@@ -270,9 +237,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
 
     val file = Paths.get("/a.conf").toFile
-    val configIdCreate = configManager.create(
-      file, ConfigString(configValue), oversize = false, "hello world"
-    ).await
+    val configIdCreate = configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe ConfigString(configValue).str
 
     val configIdUpdate = configManager.update(file, ConfigString(assemblyConfigValue), "Updated config to assembly").await
