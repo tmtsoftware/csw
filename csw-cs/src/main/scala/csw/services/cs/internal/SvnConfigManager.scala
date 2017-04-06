@@ -15,7 +15,7 @@ import org.tmatesoft.svn.core._
 
 import scala.concurrent.Future
 
-class SvnConfigManager(settings: Settings) extends ConfigManager {
+class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) extends ConfigManager {
 
   private implicit val system = ActorSystem()
   import system.dispatcher
@@ -28,7 +28,7 @@ class SvnConfigManager(settings: Settings) extends ConfigManager {
       val file = getTempFile
       for {
         _ <- configData.writeToFile(file)
-        sha1 <- Annex.post(file)
+        sha1 <- largeFileManager.post(file)
         _ <- deleteTempFile(file)
         configId <- create(shaFile(path), ConfigData(sha1), oversize = false, comment)
       } yield configId
@@ -59,7 +59,7 @@ class SvnConfigManager(settings: Settings) extends ConfigManager {
       val file = getTempFile
       for {
         _ <- configData.writeToFile(file)
-        sha1 <- Annex.post(file)
+        sha1 <- largeFileManager.post(file)
         _ <- deleteTempFile(file)
         configId <- update(shaFile(path), ConfigData(sha1), comment)
       } yield configId
@@ -107,7 +107,7 @@ class SvnConfigManager(settings: Settings) extends ConfigManager {
 
     // If the file matches the SHA-1 hash, return a future for it, otherwise get it from the annex server
     def getFromAnnexServer(file: File, sha1: String): Future[Option[ConfigData]] = {
-      Annex.get(sha1, file).map {
+      largeFileManager.get(sha1, file).map {
         _ => Some(ConfigData(file))
       }
     }

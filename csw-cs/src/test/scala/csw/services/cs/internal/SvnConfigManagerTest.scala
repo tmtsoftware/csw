@@ -10,7 +10,8 @@ import org.scalatest.Matchers
 class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   val settings = new Settings
   private val svnAdmin = new SvnAdmin(settings)
-  val configManager: SvnConfigManager = new SvnConfigManager(settings)
+  private val largeFileManager = new LargeFileManager(settings)
+  val configManager: SvnConfigManager = new SvnConfigManager(settings, largeFileManager)
 
   test("create and get") {
     svnAdmin.initSvnRepo(null)
