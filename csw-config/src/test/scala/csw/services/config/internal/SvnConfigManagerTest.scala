@@ -37,6 +37,12 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
       file, ConfigString(configValue), oversize = false, "hello world"
     ).await
 
+    intercept[IOException] {
+      configManager.create(
+        fileWithoutBackslash, ConfigString(configValue), oversize = false, "hello world"
+      ).await
+    }
+
     configManager.get(fileWithoutBackslash).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
   }
 
@@ -209,4 +215,46 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     configManager.exists(file).await shouldBe true
   }
 
+  test("delete existing file") {
+    svnAdmin.initSvnRepo(null)
+    val configValue = "axisName = tromboneAxis"
+
+    val file = Paths.get("tromboneHCD.conf").toFile
+    configManager.create(
+      file, ConfigString(configValue), oversize = false, "hello world"
+    ).await
+
+    configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
+
+    configManager.delete(file).await
+    configManager.get(file).await shouldBe None
+  }
+
+  test("delete file which does not exists returns FileNotFoundException") {
+    val file = Paths.get("tromboneHCD.conf").toFile
+    intercept[FileNotFoundException] {
+      configManager.delete(file).await
+    }
+  }
+
+  test("delete removes all versions of a file") {
+    svnAdmin.initSvnRepo(null)
+
+    val configValue = "axisName = tromboneAxis"
+    val assemblyConfigValue = "assemblyHCDCount = 3"
+    val newAssemblyConfigValue = "assemblyHCDCount = 5"
+    val file = Paths.get("/a/b/csw.conf").toFile
+    configManager.create(
+      file, ConfigString(configValue), oversize = false, "hello world"
+    ).await
+    configManager.get(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
+
+    val configId = configManager.update(file, ConfigString(assemblyConfigValue), "Updated config to assembly").await
+    configManager.update(file, ConfigString(newAssemblyConfigValue), "Updated config to assembly").await
+
+    configManager.history(file).await.size shouldBe 3
+    configManager.delete(file).await
+    configManager.history(file).await.size shouldBe 0
+    configManager.get(file, Some(configId)).await shouldBe None
+  }
 }

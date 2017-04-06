@@ -52,7 +52,6 @@ class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) e
 
   }
 
-
   override def update(path: File, configData: ConfigData, comment: String): Future[ConfigId] = {
 
     def updateOversize(): Future[ConfigId] = {
@@ -171,9 +170,9 @@ class SvnConfigManager(settings: Settings, largeFileManager: LargeFileManager) e
     }
   }
 
-
   override def exists(path: File): Future[Boolean] = Future(pathExists(path))
 
+  //TODO: This implementation deletes all versions of a file. This is different than the expecations
   override def delete(path: File, comment: String = "deleted"): Future[Unit] = {
     def deleteFile(path: File, comment: String = "deleted"): Unit = {
       if (isOversize(path)) {
