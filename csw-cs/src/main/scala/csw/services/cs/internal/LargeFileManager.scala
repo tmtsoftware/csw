@@ -9,15 +9,12 @@ import net.codejava.security.HashGeneratorUtils
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class LargeFileManager {
-
-  implicit val system = ActorSystem("ConfigServiceAnnexClient")
+class LargeFileManager(settings: Settings) {
 
   def post(inFile: File): Future[String] = Future {
     val id= HashGeneratorUtils.generateSHA1(inFile)
     val fileName = inFile.getName
-    val baseDir = system.settings.config.getString("csw.services.largeFile.dir")
-    val dir = baseDir.replaceFirst("~", System.getProperty("user.home"))
+    val dir = settings.dir.replaceFirst("~", System.getProperty("user.home"))
 
     val path = makePath(new File(dir), inFile)
     val outFile = path.toFile

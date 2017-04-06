@@ -19,4 +19,6 @@ class Settings {
 
   def defaultSuffix = ".default"
 
+  def dir = "/tmp/CsTestOversize"
+
 }
