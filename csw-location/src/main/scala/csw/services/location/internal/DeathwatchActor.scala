@@ -27,35 +27,29 @@ class DeathwatchActor(locationService: LocationService) extends Actor {
   }
 
   /**
-    * Manages two kinds of events, which are as follows:
-    *{{{
-    *  - Changed event for `LWWMap`:
-    *  The value of `LWWMap` is compared with currently watched akka
-    *  locations to find out newly added locations and start death
-    *  watching them.
-    *
-    *  - Terminated event for ActorRef : The `ActorRef`
-    *  is unregistered from `LocationService` gracefully and is stopped
-    *  being watched.
-    *}}}
+    * Manages `Changed` event for `LWWMap` and `Terminated` event for `ActorRef`
     */
   override def receive: Receive = {
-
     case c@Changed(AllServices.Key) ⇒
       val allLocations = c.get(AllServices.Key).entries.values.toSet
-      val locations = allLocations.collect { case x: AkkaLocation ⇒ x }
-      val addedLocations = locations diff watchedLocations
-      addedLocations.foreach(loc ⇒ context.watch(loc.actorRef))
-      watchedLocations = locations
+      //take only akka locations
+      val akkaLocations = allLocations.collect { case x: AkkaLocation ⇒ x }
+      //find out the ones that are not being watched and watch them
+      val unwatchedLocations = akkaLocations diff watchedLocations
+      unwatchedLocations.foreach(loc ⇒ context.watch(loc.actorRef))
+      //all akka locations are now watched
+      watchedLocations = akkaLocations
     case Terminated(deadActorRef)   =>
+      //unwatch the terminated akka location
       context.unwatch(deadActorRef)
+
+      //Unregister the terminated akka location and remove it from watched locations
       val maybeLocation = watchedLocations.find(_.actorRef == deadActorRef)
       maybeLocation.foreach { location =>
         locationService.unregister(location.connection)
         watchedLocations -= location
       }
   }
-
 }
 
 object DeathwatchActor {
@@ -73,5 +67,4 @@ object DeathwatchActor {
       name = "location-service-death-watch-actor"
     )
   }
-
 }
