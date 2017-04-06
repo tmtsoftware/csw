@@ -9,10 +9,12 @@ import org.scalatest.Matchers
 class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
 
   test("create") {
-    val configManager: SvnConfigManager = new SvnConfigManager(new Settings)
-    configManager.initSvnRepo(null)
+    val settings = new Settings
+    new SvnManager(settings).initSvnRepo(null)
 
-    configManager.create(Paths.get("/a.txt").toFile, ConfigData.apply("ha ha ha"), oversize = false, "hello world").await
+    val configManager: SvnConfigManager = new SvnConfigManager(settings)
+
+    configManager.create(Paths.get("/a.txt").toFile, ConfigData("ha ha ha"), oversize = false, "hello world").await
   }
 
 }

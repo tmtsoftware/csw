@@ -14,4 +14,9 @@ class Settings {
   def userName: String = "kaku"
 
   def sha1Suffix = ".sha1"
+
+  def tmpDir = "/tmp/temp-dir-for-csw"
+
+  def defaultSuffix = ".default"
+
 }
