@@ -14,14 +14,7 @@ node {
 
                 stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
                     try {
-                        sh "sbt csw-location/test:test"
-                    }
-                    catch (Exception e) {
-                        currentBuild.result = 'FAILED'
-                        failBuild = true
-                    }
-                    try {
-                        sh "sbt track-location-agent/test:test"
+                        sh "sbt test:test"
                     }
                     catch (Exception e) {
                         currentBuild.result = 'FAILED'
