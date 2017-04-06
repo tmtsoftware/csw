@@ -3,7 +3,7 @@
  <check level="warning" class="org.scalastyle.file.FileTabChecker" enabled="true"></check>
  <check level="error" class="org.scalastyle.file.FileLengthChecker" enabled="true">
   <parameters>
-   <parameter name="maxFileLength"><![CDATA[250]]></parameter>
+   <parameter name="maxFileLength"><![CDATA[500]]></parameter>
   </parameters>
  </check>
  <check level="warning" class="org.scalastyle.file.HeaderMatchesChecker" enabled="false">
@@ -98,7 +98,7 @@
  </check>
  <check level="error" class="org.scalastyle.scalariform.MethodLengthChecker" enabled="true">
   <parameters>
-   <parameter name="maxLength"><![CDATA[30]]></parameter>
+   <parameter name="maxLength"><![CDATA[100]]></parameter>
   </parameters>
  </check>
  <check level="warning" class="org.scalastyle.scalariform.MethodNamesChecker" enabled="true">
