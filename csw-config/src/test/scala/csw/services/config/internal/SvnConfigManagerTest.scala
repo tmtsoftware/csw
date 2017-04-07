@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import java.util.Date
 
 import csw.services.config.common.TestFutureExtension.RichFuture
-import csw.services.config.models.{ConfigBytes, ConfigString}
+import csw.services.config.models.{ConfigBytes, ConfigFileInfo, ConfigString}
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.Matchers
 
@@ -38,7 +38,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     configManager.get(fileWithoutBackslash).await.get.asInstanceOf[ConfigBytes].toString shouldBe configValue
   }
 
-  test("create an existing file throws IOException") {
+  test("creating an existing file throws IOException") {
     svnAdmin.initSvnRepo()
 
     val configValue = "axisName = tromboneAxis"
@@ -151,10 +151,10 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val configIdUpdate2 = configManager.update(file, ConfigString(newAssemblyConfigValue), "Updated config to assembly").await
 
     configManager.history(file).await.size shouldBe 3
-    configManager.history(file).await.map(_.id) should contain allOf(configIdCreate, configIdUpdate, configIdUpdate2)
+    configManager.history(file).await.map(_.id) shouldBe List(configIdUpdate2, configIdUpdate, configIdCreate)
 
     configManager.history(file, 2).await.size shouldBe 2
-    configManager.history(file, 2).await.map(_.id) should contain allOf (configIdUpdate, configIdUpdate2)
+    configManager.history(file, 2).await.map(_.id) shouldBe List(configIdUpdate2, configIdUpdate)
   }
 
   test("list all config files") {
@@ -163,11 +163,16 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val tromboneConfig = Paths.get("trombone.conf").toFile
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf").toFile
 
-    val tromboneConfigId = configManager.create(tromboneConfig, ConfigString("axisName = tromboneAxis"), oversize = false, "hello trombone").await
+    val tromboneConfigComment = "hello trombone"
+    val assemblyConfigComment = "hello assembly"
 
-    val assemblyConfigId = configManager.create(assemblyConfig, ConfigString("assemblyHCDCount = 3"), oversize = false, "hello assembly").await
+    val tromboneConfigId = configManager.create(tromboneConfig, ConfigString("axisName = tromboneAxis"), oversize = false, tromboneConfigComment).await
+    val assemblyConfigId = configManager.create(assemblyConfig, ConfigString("assemblyHCDCount = 3"), oversize = false, assemblyConfigComment).await
 
-    configManager.list().await.map(_.id) should contain allOf(tromboneConfigId, assemblyConfigId)
+    val tromboneConfigInfo: ConfigFileInfo = ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment)
+    val assemblyConfigInfo: ConfigFileInfo = ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)
+
+    configManager.list().await shouldBe List(assemblyConfigInfo, tromboneConfigInfo)
   }
 
   test("exists returns false if file does not exist") {
