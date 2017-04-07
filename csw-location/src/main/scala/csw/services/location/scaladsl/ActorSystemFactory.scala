@@ -1,26 +1,21 @@
 package csw.services.location.scaladsl
 
 import akka.actor.ActorSystem
-import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.location.commons.ClusterSettings
+import com.typesafe.config.ConfigFactory
+import csw.services.location.commons.{ClusterSettings, Constants}
 
-final case class ActorSystemFactory(name : String, config: Config) {
+class ActorSystemFactory(name : String) {
 
-  def make: ActorSystem = {
-    val fallback = ConfigFactory
+  def this() = this(Constants.RemoteActorSystemName)
+
+  def remote: ActorSystem = {
+
+    val config = ConfigFactory
       .parseString(s"akka.remote.netty.tcp.hostname = ${ClusterSettings().hostname}")
-      .withFallback(config)
+      .withFallback(ConfigFactory.load().getConfig(name))
 
-    ActorSystem(name, fallback)
+    ActorSystem(name, config)
   }
-}
-
-object ActorSystemFactory {
-  private val defaultConfig = ConfigFactory.load().getConfig("csw-actor-system")
-
-  def apply(): ActorSystemFactory = new ActorSystemFactory("csw-actor-system", defaultConfig)
-
-  def apply(name : String): ActorSystemFactory = new ActorSystemFactory(name, defaultConfig)
 }
 
 

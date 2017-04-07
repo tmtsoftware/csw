@@ -15,6 +15,7 @@ import csw.services.location.models.*;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.models.Connection.TcpConnection;
+import csw.services.location.scaladsl.ActorSystemFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -26,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 
 public class JLocationServiceImplTest {
     private static ILocationService locationService = JLocationServiceFactory.make();
-    private ActorSystem actorSystem = JActorSystemFactory.create("test-actor-system");
+    private ActorSystem actorSystem = new ActorSystemFactory().remote();
     private Materializer mat = ActorMaterializer.create(actorSystem);
 
     private ComponentId akkaHcdComponentId = new ComponentId("hcd1", JComponentType.HCD);
