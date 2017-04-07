@@ -87,7 +87,7 @@ lazy val `csw-config` = project
     libraryDependencies ++= Seq(
       AkkaHttp.`akka-http`,
       Libs.svnkit,
-      Libs.`play-json`,
+      AkkaHttp.`akka-http-spray-json`,
       Libs.`scopt`
     ),
     libraryDependencies ++= Seq(

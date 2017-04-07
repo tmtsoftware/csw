@@ -14,8 +14,7 @@ object Libs {
   val `logback-classic` = "ch.qos.logback" % "logback-classic" % "1.1.3" % Runtime //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `chill-akka` = "com.twitter" %% "chill-akka" % "0.9.2" //Apache License 2.0
   val `akka-management-cluster-http` = "com.lightbend.akka" %% "akka-management-cluster-http" % "0.1-RC1" //N/A at the moment
-  val svnkit = "org.tmatesoft.svnkit" % "svnkit" % "1.8.11" // TMate Open Source License
-  val `play-json` = "com.typesafe.play" %% "play-json" % "2.6.0-M6"
+  val svnkit = "org.tmatesoft.svnkit" % "svnkit" % "1.8.11" //TMate Open Source License
 }
 
 object Akka {
@@ -31,5 +30,6 @@ object Akka {
 
 object AkkaHttp {
   val Version = "10.0.5"
-  val `akka-http` = "com.typesafe.akka" %% "akka-http" % Version // ApacheV2
+  val `akka-http` = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
+  val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % "10.0.5" //ApacheV2
 }
