@@ -253,12 +253,12 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     configManager.getDefault(file).await.get.asInstanceOf[ConfigBytes].toString shouldBe newAssemblyConfigValue
   }
 
-  test("storing and getting large file") {
+  test("storing and retrieving oversize file") {
     svnAdmin.initSvnRepo()
-    val file = Paths.get("SomeLargeFile.txt").toFile
-    val content = "testing large file"
+    val file = Paths.get("SomeOversizeFile.txt").toFile
+    val content = "testing oversize file"
 
-    val configId = configManager.create(file, ConfigString(content), true, "committing large file").await
+    val configId = configManager.create(file, ConfigString(content), true, "committing oversize file").await
     val fileContent = configManager.get(file, Some(configId)).await.get
     fileContent.toString shouldBe content
 

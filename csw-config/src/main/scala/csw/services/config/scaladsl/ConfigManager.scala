@@ -23,7 +23,7 @@ trait ConfigManager {
    *
    * @param path       the file path relative to the repository root
    * @param configData used to read the contents of the file
-   * @param oversize   true if the file is large and requires special handling (external storage)
+   * @param oversize   true if the file is oversize and requires special handling (external storage)
    * @param comment    an optional comment to associate with this file
    * @return a unique id that can be used to refer to the file
    */

@@ -15,11 +15,11 @@ import scala.concurrent.Future
 * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
 * the SHA-1 hash value.
 **/
-class LargeFileManager(settings: Settings) {
+class OversizeFileManager(settings: Settings) {
 
   def post(inFile: File): Future[String] = Future {
     val sha = HashGeneratorUtils.generateSHA1(inFile)
-    val dir = settings.`large-files-dir`.replaceFirst("~", System.getProperty("user.home"))
+    val dir = settings.`oversize-files-dir`.replaceFirst("~", System.getProperty("user.home"))
 
     val path = makePath(new File(dir), new File(sha))
     val outFile = path.toFile
@@ -44,7 +44,7 @@ class LargeFileManager(settings: Settings) {
   }
 
   def get(shaAsFileName: String, outFile: File): Future[File] = Future {
-    val repoDir = settings.`large-files-dir`.replaceFirst("~", System.getProperty("user.home"))
+    val repoDir = settings.`oversize-files-dir`.replaceFirst("~", System.getProperty("user.home"))
     val repoFilePath = makePath(new File(repoDir), new File(shaAsFileName))
 
     if(repoFilePath.toFile.exists()) {

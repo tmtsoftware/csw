@@ -7,17 +7,17 @@ import csw.services.config.common.TestFutureExtension.RichFuture
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-class LargeFileManagerTest
+class OversizeFileManagerTest
   extends FunSuite
     with Matchers
     with BeforeAndAfterAll {
 
-  private val manager = Wiring.largeFileManager
+  private val manager = Wiring.oversizeFileManager
 
   private val tempFile = {
-    val tempFile = Paths.get("SomeLargeFile.txt").toFile
+    val tempFile = Paths.get("SomeOversizeFile.txt").toFile
     val bw = new BufferedWriter(new FileWriter(tempFile))
-    bw.write(s"""test {We think, this is some large text!!!!}""")
+    bw.write(s"""test {We think, this is some oversize text!!!!}""")
     bw.close()
     tempFile
   }
@@ -26,14 +26,14 @@ class LargeFileManagerTest
     tempFile.delete()
   }
 
-  test("storing large file") {
+  test("storing oversize file") {
     val actualSha = manager.post(tempFile).await
     val expectedSha = HashGeneratorUtils.generateSHA1(tempFile)
 
     actualSha shouldBe expectedSha
   }
 
-  test("getting large file") {
+  test("getting oversize file") {
     val actualSha = HashGeneratorUtils.generateSHA1(tempFile)
     val outFile = java.io.File.createTempFile("out", ".txt")
     manager.get(actualSha, outFile).await
