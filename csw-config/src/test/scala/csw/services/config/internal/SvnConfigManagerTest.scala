@@ -265,4 +265,24 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val svnConfigData = configManager.get(new File(s"${file.getPath}${Wiring.settings.`sha1-suffix`}"), Some(configId)).await.get
     svnConfigData.toString shouldBe HashGeneratorUtils.generateSHA1(content)
   }
+
+  test("listing oversize files"){
+    svnAdmin.initSvnRepo()
+
+    val file1 = Paths.get("OversizeFile1.txt").toFile
+    val comment1  = "committing oversize file"
+
+    val file2 = Paths.get("OversizeFile2.txt").toFile
+    val comment2 = "committing one more oversize file"
+
+    val configId1 = configManager.create(file1, ConfigString("testing oversize file"), true, comment1).await
+    val configId2 = configManager.create(file2, ConfigString("testing oversize file"), true, comment2).await
+
+    val fileInfoes: List[ConfigFileInfo] = configManager.list().await
+
+    fileInfoes.toSet shouldBe Set(
+      ConfigFileInfo(new File(s"${file1.toPath}${Wiring.settings.`sha1-suffix`}"), configId1, comment1),
+      ConfigFileInfo(new File(s"${file2.toPath}${Wiring.settings.`sha1-suffix`}"), configId2, comment2)
+    )
+  }
 }
