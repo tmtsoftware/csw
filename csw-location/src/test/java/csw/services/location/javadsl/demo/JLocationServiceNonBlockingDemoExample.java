@@ -13,14 +13,13 @@ import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import csw.services.location.internal.Networks;
-import csw.services.location.javadsl.ILocationService;
-import csw.services.location.javadsl.JComponentType;
-import csw.services.location.javadsl.JConnectionType;
-import csw.services.location.javadsl.JLocationServiceFactory;
+import csw.services.location.javadsl.*;
 import csw.services.location.models.*;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.models.Connection.TcpConnection;
+import csw.services.location.scaladsl.ActorSystemFactory;
+import csw.services.location.scaladsl.ActorSystemFactory$;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -34,7 +33,7 @@ import java.util.concurrent.ExecutionException;
 
 public class JLocationServiceNonBlockingDemoExample {
 
-    private ActorSystem actorSystem = ActorSystem.create("demo");
+    private ActorSystem actorSystem = JActorSystemFactory.create("demo");
     private Materializer mat = ActorMaterializer.create(actorSystem);
     private ActorRef actorRef = actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                 @Override

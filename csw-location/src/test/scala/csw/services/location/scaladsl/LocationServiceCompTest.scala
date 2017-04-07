@@ -1,6 +1,6 @@
 package csw.services.location.scaladsl
 
-import akka.actor.{Actor, ActorSystem, PoisonPill, Props}
+import akka.actor.{Actor, PoisonPill, Props}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
@@ -19,7 +19,7 @@ class LocationServiceCompTest
 
   lazy val locationService: LocationService = LocationServiceFactory.make()
 
-  implicit val actorSystem = ActorSystem("test-actor-system")
+  implicit val actorSystem = ActorSystemFactory("test-actor-system").make
   implicit val mat: Materializer = ActorMaterializer()
 
   override protected def afterEach(): Unit = {

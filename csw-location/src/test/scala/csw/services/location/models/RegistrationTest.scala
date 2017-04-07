@@ -8,6 +8,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.scaladsl.ActorSystemFactory
 import org.scalatest.{FunSuiteLike, Matchers}
 
 import scala.concurrent.duration.DurationDouble
@@ -19,7 +20,7 @@ class RegistrationTest extends FunSuiteLike with Matchers {
     val hostname = new Networks().hostname()
 
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorSystem = ActorSystem("test-actor-system")
+    val actorSystem = ActorSystemFactory("test-actor-system").make
     val actorRef = actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior

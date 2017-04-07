@@ -19,6 +19,7 @@ import csw.services.location.models.*;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.models.Connection.TcpConnection;
+import csw.services.location.scaladsl.ActorSystemFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -35,7 +36,7 @@ import java.util.concurrent.ExecutionException;
 
 public class JLocationServiceBlockingDemoExample {
 
-    private ActorSystem actorSystem = ActorSystem.create("demo");
+    private ActorSystem actorSystem = JActorSystemFactory.create("demo");
     private Materializer mat = ActorMaterializer.create(actorSystem);
 
     private ActorRef actorRef = actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {

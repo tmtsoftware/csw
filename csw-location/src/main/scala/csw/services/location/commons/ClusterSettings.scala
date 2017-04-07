@@ -69,7 +69,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
 
   private[location] def interfaceName: String = allValues.getOrElse(InterfaceNameKey, "").toString
 
-  private def hostname: String = {
+  def hostname: String = {
     new Networks(interfaceName).hostname()
   }
 
