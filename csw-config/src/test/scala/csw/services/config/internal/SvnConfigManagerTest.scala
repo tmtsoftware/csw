@@ -7,15 +7,26 @@ import java.util.Date
 import csw.services.config.common.TestFutureExtension.RichFuture
 import csw.services.config.models.{ConfigBytes, ConfigFileHistory, ConfigFileInfo, ConfigString}
 import net.codejava.security.HashGeneratorUtils
-import org.scalatest.Matchers
+import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 
-class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
+class SvnConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEach {
   private val wiring = new Wiring()
   private val configManager = wiring.configManager
   private val svnAdmin = wiring.svnAdmin
+  private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile
+  private val tmpDir = Paths.get(wiring.settings.`tmp-dir`).toFile
+
+  override protected def beforeEach(): Unit = {
+    svnAdmin.initSvnRepo()
+  }
+
+  override protected def afterEach(): Unit = {
+    svnAdmin.deleteDirectoryRecursively(tmpDir)
+    svnAdmin.deleteDirectoryRecursively(oversizeFileDir)
+    svnAdmin.deleteDirectoryRecursively(wiring.settings.repositoryFile)
+  }
 
   test("create and get") {
-    svnAdmin.initSvnRepo()
     val configValue = "axisName = tromboneAxis"
 
     val file = Paths.get("/a.conf").toFile
@@ -24,7 +35,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("/ in the beginning of file path is ignored if provided") {
-    svnAdmin.initSvnRepo()
     val configValue = "axisName = tromboneAxis"
 
     val fileName = "csw.conf"
@@ -40,8 +50,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("creating an existing file throws IOException") {
-    svnAdmin.initSvnRepo()
-
     val configValue = "axisName = tromboneAxis"
     val file = Paths.get("/a.conf").toFile
     configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
@@ -52,8 +60,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("update and get") {
-    svnAdmin.initSvnRepo()
-
     val configValue = "axisName = tromboneAxis"
     val file = Paths.get("/a.conf").toFile
     configManager.create(file, ConfigString(configValue), oversize = false, "hello world").await
@@ -65,8 +71,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("update throws FileNotFoundException if a file does not exists") {
-    svnAdmin.initSvnRepo()
-
     val file = Paths.get("/a.conf").toFile
 
     intercept[FileNotFoundException] {
@@ -75,16 +79,12 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("get return None if a file does not exists") {
-    svnAdmin.initSvnRepo()
-
     val file = Paths.get("/a.conf").toFile
 
     configManager.get(file).await shouldBe None
   }
 
   test("get specific version by config id") {
-    svnAdmin.initSvnRepo()
-
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
@@ -100,8 +100,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("get version by date") {
-    svnAdmin.initSvnRepo()
-
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
@@ -119,8 +117,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("get initial version if the date is before the creation date") {
-    svnAdmin.initSvnRepo()
-
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
@@ -138,8 +134,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("get history of a file") {
-    svnAdmin.initSvnRepo()
-
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
@@ -159,8 +153,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("list all config files") {
-    svnAdmin.initSvnRepo()
-
     val tromboneConfig = Paths.get("trombone.conf").toFile
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf").toFile
 
@@ -177,15 +169,12 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("exists returns false if file does not exist") {
-    svnAdmin.initSvnRepo()
-
     val file = Paths.get("/a.conf").toFile
 
     configManager.exists(file).await shouldBe false
   }
 
   test("exists returns true if file exist") {
-    svnAdmin.initSvnRepo()
     val configValue = "axisName = tromboneAxis"
 
     val file = Paths.get("a/test.csw.conf").toFile
@@ -195,7 +184,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("delete existing file") {
-    svnAdmin.initSvnRepo()
     val configValue = "axisName = tromboneAxis"
 
     val file = Paths.get("tromboneHCD.conf").toFile
@@ -215,8 +203,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("delete removes all versions of a file") {
-    svnAdmin.initSvnRepo()
-
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
@@ -234,8 +220,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("default config file") {
-    svnAdmin.initSvnRepo()
-
     val configValue = "axisName = tromboneAxis"
     val assemblyConfigValue = "assemblyHCDCount = 3"
     val newAssemblyConfigValue = "assemblyHCDCount = 5"
@@ -255,7 +239,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("storing and retrieving oversize file") {
-    svnAdmin.initSvnRepo()
     val file = Paths.get("SomeOversizeFile.txt").toFile
     val content = "testing oversize file"
 
@@ -268,8 +251,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("listing oversize files"){
-    svnAdmin.initSvnRepo()
-
     val file1 = Paths.get("OversizeFile1.txt").toFile
     val comment1  = "committing oversize file"
 
@@ -288,7 +269,6 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
   }
 
   test("Updating oversize file and retrieving history") {
-    svnAdmin.initSvnRepo()
     val file = Paths.get("SomeOversizeFile.txt").toFile
     val creationContent = "testing oversize file"
     val creationComment = "initial commit"

@@ -12,7 +12,10 @@ class OversizeFileManagerTest
     with Matchers
     with BeforeAndAfterAll {
 
-  private val manager = new Wiring().oversizeFileManager
+  private val wiring = new Wiring()
+  private val manager = wiring.oversizeFileManager
+  private val svnAdmin = wiring.svnAdmin
+  private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile
 
   private val tempFile = {
     val tempFile = Paths.get("SomeOversizeFile.txt").toFile
@@ -24,6 +27,7 @@ class OversizeFileManagerTest
 
   override protected def afterAll(): Unit = {
     tempFile.delete()
+    svnAdmin.deleteDirectoryRecursively(oversizeFileDir)
   }
 
   test("storing oversize file") {
