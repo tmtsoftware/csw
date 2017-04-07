@@ -9,6 +9,12 @@ import net.codejava.security.HashGeneratorUtils
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+/**
+* The files are stored in the configured directory using a file name and directory structure
+* based on the SHA-1 hash of the file contents (This is the same way Git stores data).
+* The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
+* the SHA-1 hash value.
+**/
 class LargeFileManager(settings: Settings) {
 
   def post(inFile: File): Future[String] = Future {
@@ -37,9 +43,9 @@ class LargeFileManager(settings: Settings) {
     }
   }
 
-  def get(sha: String, outFile: File): Future[File] = Future {
+  def get(shaAsFileName: String, outFile: File): Future[File] = Future {
     val repoDir = settings.`large-files-dir`.replaceFirst("~", System.getProperty("user.home"))
-    val repoFilePath = makePath(new File(repoDir), new File(Uri(sha).path.toString()))
+    val repoFilePath = makePath(new File(repoDir), new File(shaAsFileName))
 
     if(repoFilePath.toFile.exists()) {
       val out = new FileOutputStream(outFile)
@@ -48,11 +54,12 @@ class LargeFileManager(settings: Settings) {
       out.close()
       outFile
     } else {
-      throw new RuntimeException(s" Error in locating file for $sha")
+      throw new RuntimeException(s" Error in locating file for $shaAsFileName")
     }
   }
 
-
+  // Returns the name of the file to use in the configured directory.
+  // Like Git, distribute the files in directories based on the first 2 chars of the SHA-1 hash
   private def makePath(dir: File, file: File): Path = {
     val (subdir, name) = file.getName.splitAt(2)
     Paths.get(dir.getPath, subdir, name)
