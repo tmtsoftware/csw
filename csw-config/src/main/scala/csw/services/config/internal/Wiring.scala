@@ -3,7 +3,7 @@ package csw.services.config.internal
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.config.scaladsl.ConfigManager
 
-class Wiring {
+object Wiring {
   val config: Config = ConfigFactory.load()
   val settings = new Settings(config)
   val largeFileManager = new LargeFileManager(settings)

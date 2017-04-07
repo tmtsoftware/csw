@@ -12,7 +12,7 @@ class LargeFileManagerTest
     with Matchers
     with BeforeAndAfterAll {
 
-  private val manager = new LargeFileManager(new Wiring().settings)
+  private val manager = Wiring.largeFileManager
 
   private val tempFile = {
     val tempFile = Paths.get("SomeLargeFile.txt").toFile
@@ -36,9 +36,10 @@ class LargeFileManagerTest
   test("getting large file") {
     val actualSha = HashGeneratorUtils.generateSHA1(tempFile)
     val outFile = java.io.File.createTempFile("out", ".txt")
-    val file = manager.get(actualSha, outFile).await
+    manager.get(actualSha, outFile).await
 
     HashGeneratorUtils.generateSHA1(outFile) shouldBe actualSha
+    outFile.delete()
   }
 
 }

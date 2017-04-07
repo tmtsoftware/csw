@@ -5,15 +5,13 @@ import java.nio.file.Paths
 import java.util.Date
 
 import csw.services.config.common.TestFutureExtension.RichFuture
-import csw.services.config.models.{ConfigBytes, ConfigFile, ConfigId, ConfigString}
+import csw.services.config.models.{ConfigBytes, ConfigString}
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.Matchers
 
 class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
-  private val wiring = new Wiring()
-
-  private val configManager = wiring.configManager
-  private val svnAdmin = wiring.svnAdmin
+  private val configManager = Wiring.configManager
+  private val svnAdmin = Wiring.svnAdmin
 
   test("create and get") {
     svnAdmin.initSvnRepo()
@@ -259,7 +257,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val fileContent = configManager.get(file, Some(configId)).await.get
     fileContent.toString shouldBe content
 
-    val svnConfigData = configManager.get(new File(s"${file.getPath}${wiring.settings.`sha1-suffix`}"), Some(configId)).await.get
+    val svnConfigData = configManager.get(new File(s"${file.getPath}${Wiring.settings.`sha1-suffix`}"), Some(configId)).await.get
     svnConfigData.toString shouldBe HashGeneratorUtils.generateSHA1(content)
   }
 }
