@@ -22,7 +22,7 @@ class ConfigServiceApp(configManager: ConfigManager) extends HttpApp with JsonSu
 
   val pathParam: Directive1[File] = parameter('path).map(filePath ⇒ Paths.get(filePath).toFile)
   val idParam: Directive1[Option[ConfigId]] = parameter('id.?).map(_.map(new ConfigId(_)))
-  val maxResultsParam: Directive1[Int] = parameter('maxResults.as[Int] ? 100)
+  val maxResultsParam: Directive1[Int] = parameter('maxResults.as[Int] ? Int.MaxValue)
   val commentParam: Directive1[String] = parameter('comment ? "")
   val oversizeParam: Directive1[Boolean] = parameter('oversize.as[Boolean] ? false)
   val fileDataParam: Directive1[ConfigSource] = fileUpload("conf").map { case (fileInfo, source) ⇒ ConfigSource(source) }
@@ -42,6 +42,11 @@ class ConfigServiceApp(configManager: ConfigManager) extends HttpApp with JsonSu
           streamData(configManager.get(filePath, maybeConfigId))
         }
       } ~
+        path("getDefault") {
+          pathParam { filePath ⇒
+            streamData(configManager.getDefault(filePath))
+          }
+        } ~
         path("exists") {
           pathParam { filePath ⇒
             rejectEmptyResponse & complete {
@@ -58,34 +63,29 @@ class ConfigServiceApp(configManager: ConfigManager) extends HttpApp with JsonSu
           (pathParam & maxResultsParam) { (filePath, maxCount) ⇒
             complete(configManager.history(filePath, maxCount))
           }
-        } ~
-        path("getDefault") {
-          pathParam { filePath ⇒
-            streamData(configManager.getDefault(filePath))
-          }
         }
     } ~
       post {
-        path("setDefault") {
-          (pathParam & idParam) { (filePath, maybeConfigId) ⇒
-            complete(configManager.setDefault(filePath, maybeConfigId).map(_ ⇒ Done))
+        path("create") {
+          (pathParam & fileDataParam & oversizeParam & commentParam) { (filePath, configSource, oversize, comment) ⇒
+            val eventualId = configManager.create(filePath, configSource, oversize, comment)
+            complete(eventualId.map(_.id))
           }
         } ~
-          path("resetDefault") {
-            pathParam { filePath ⇒
-              complete(configManager.resetDefault(filePath).map(_ ⇒ Done))
-            }
-          } ~
-          path("create") {
-            (pathParam & fileDataParam & oversizeParam & commentParam) { (filePath, configSource, oversize, comment) ⇒
-              val eventualId = configManager.create(filePath, configSource, oversize, comment)
-              complete(eventualId.map(_.id))
-            }
-          } ~
           path("update") {
             (pathParam & fileDataParam & commentParam) { (filePath, configSource, comment) ⇒
               val eventualId = configManager.update(filePath, configSource, comment)
               complete(eventualId.map(_.id))
+            }
+          } ~
+          path("setDefault") {
+            (pathParam & idParam) { (filePath, maybeConfigId) ⇒
+              complete(configManager.setDefault(filePath, maybeConfigId).map(_ ⇒ Done))
+            }
+          } ~
+          path("resetDefault") {
+            pathParam { filePath ⇒
+              complete(configManager.resetDefault(filePath).map(_ ⇒ Done))
             }
           }
       }
