@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import java.util.Date
 
 import csw.services.config.common.TestFutureExtension.RichFuture
-import csw.services.config.models.{ConfigBytes, ConfigFileInfo, ConfigString}
+import csw.services.config.models.{ConfigBytes, ConfigFileHistory, ConfigFileInfo, ConfigString}
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.Matchers
 
@@ -283,6 +283,37 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     fileInfoes.toSet shouldBe Set(
       ConfigFileInfo(new File(s"${file1.toPath}${Wiring.settings.`sha1-suffix`}"), configId1, comment1),
       ConfigFileInfo(new File(s"${file2.toPath}${Wiring.settings.`sha1-suffix`}"), configId2, comment2)
+    )
+  }
+
+  test("Updating oversize file and retrieving history") {
+    svnAdmin.initSvnRepo()
+    val file = Paths.get("SomeOversizeFile.txt").toFile
+    val creationContent = "testing oversize file"
+    val creationComment = "initial commit"
+    val creationConfigId = configManager.create(file, ConfigString(creationContent), true, creationComment).await
+
+    val newContent = "testing oversize file, again"
+    val newComment = "Updating file"
+    val newConfigId = configManager.update(file, ConfigString(newContent), newComment).await
+
+    val creationFileContent = configManager.get(file, Some(creationConfigId)).await.get
+    creationFileContent.toString shouldBe creationContent
+
+    val updatedFileContent = configManager.get(file, Some(newConfigId)).await.get
+    updatedFileContent.toString shouldBe newContent
+
+    val oldSvnConfigData = configManager.get(new File(s"${file.getPath}${Wiring.settings.`sha1-suffix`}"), Some(creationConfigId)).await.get
+    oldSvnConfigData.toString shouldBe HashGeneratorUtils.generateSHA1(creationContent)
+
+    val newSvnConfigData = configManager.get(new File(s"${file.getPath}${Wiring.settings.`sha1-suffix`}"), Some(newConfigId)).await.get
+    newSvnConfigData.toString shouldBe HashGeneratorUtils.generateSHA1(newContent)
+
+    val fileHistories: List[ConfigFileHistory] = configManager.history(file).await
+
+    fileHistories.map(history => (history.id, history.comment)) shouldBe List(
+      (newConfigId, newComment),
+      (creationConfigId, creationComment)
     )
   }
 }
