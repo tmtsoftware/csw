@@ -5,14 +5,13 @@ import java.nio.file.Paths
 
 import akka.Done
 import akka.actor.ActorSystem
+import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
 import akka.http.scaladsl.model.ContentTypes
 import akka.http.scaladsl.model.HttpEntity.Chunked
-import akka.http.scaladsl.server.{Directive1, HttpApp, Route, StandardRoute}
+import akka.http.scaladsl.server.{Directive1, HttpApp, Route}
 import csw.services.config.internal.JsonSupport
 import csw.services.config.models.{ConfigData, ConfigId, ConfigSource}
 import csw.services.config.scaladsl.ConfigManager
-
-import scala.concurrent.Future
 
 class ConfigServiceApp(configManager: ConfigManager) extends HttpApp with JsonSupport {
 
@@ -25,26 +24,26 @@ class ConfigServiceApp(configManager: ConfigManager) extends HttpApp with JsonSu
   val maxResultsParam: Directive1[Int] = parameter('maxResults.as[Int] ? Int.MaxValue)
   val commentParam: Directive1[String] = parameter('comment ? "")
   val oversizeParam: Directive1[Boolean] = parameter('oversize.as[Boolean] ? false)
-  val fileDataParam: Directive1[ConfigSource] = fileUpload("conf").map { case (fileInfo, source) ⇒ ConfigSource(source) }
+  val fileDataParam: Directive1[ConfigSource] = fileUpload("conf").map { case (_, source) ⇒ ConfigSource(source) }
 
-  def streamData(configDataF: Future[Option[ConfigData]]): StandardRoute = rejectEmptyResponse & complete {
-    configDataF.map { configDataO ⇒
-      configDataO.map { configData =>
-        Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
-      }
-    }
+  implicit val configDataMarshaller: ToEntityMarshaller[ConfigData] = Marshaller.opaque { configData =>
+    Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
   }
 
   override protected def route: Route = {
     get {
       path("get") {
         (pathParam & idParam) { (filePath, maybeConfigId) ⇒
-          streamData(configManager.get(filePath, maybeConfigId))
+          rejectEmptyResponse & complete {
+            configManager.get(filePath, maybeConfigId)
+          }
         }
       } ~
         path("getDefault") {
           pathParam { filePath ⇒
-            streamData(configManager.getDefault(filePath))
+            rejectEmptyResponse & complete {
+              configManager.getDefault(filePath)
+            }
           }
         } ~
         path("exists") {
@@ -68,14 +67,12 @@ class ConfigServiceApp(configManager: ConfigManager) extends HttpApp with JsonSu
       post {
         path("create") {
           (pathParam & fileDataParam & oversizeParam & commentParam) { (filePath, configSource, oversize, comment) ⇒
-            val eventualId = configManager.create(filePath, configSource, oversize, comment)
-            complete(eventualId.map(_.id))
+            complete(configManager.create(filePath, configSource, oversize, comment))
           }
         } ~
           path("update") {
             (pathParam & fileDataParam & commentParam) { (filePath, configSource, comment) ⇒
-              val eventualId = configManager.update(filePath, configSource, comment)
-              complete(eventualId.map(_.id))
+              complete(configManager.update(filePath, configSource, comment))
             }
           } ~
           path("setDefault") {
