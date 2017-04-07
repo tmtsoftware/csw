@@ -4,7 +4,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.config.scaladsl.ConfigManager
 import csw.services.config.server.ConfigServiceApp
 
-object Wiring {
+class Wiring {
   val config: Config = ConfigFactory.load()
   val settings = new Settings(config)
   val oversizeFileManager = new OversizeFileManager(settings)

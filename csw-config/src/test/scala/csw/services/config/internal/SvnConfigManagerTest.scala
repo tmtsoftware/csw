@@ -10,8 +10,9 @@ import net.codejava.security.HashGeneratorUtils
 import org.scalatest.Matchers
 
 class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
-  private val configManager = Wiring.configManager
-  private val svnAdmin = Wiring.svnAdmin
+  private val wiring = new Wiring()
+  private val configManager = wiring.configManager
+  private val svnAdmin = wiring.svnAdmin
 
   test("create and get") {
     svnAdmin.initSvnRepo()
@@ -262,7 +263,7 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val fileContent = configManager.get(file, Some(configId)).await.get
     fileContent.toString shouldBe content
 
-    val svnConfigData = configManager.get(new File(s"${file.getPath}${Wiring.settings.`sha1-suffix`}"), Some(configId)).await.get
+    val svnConfigData = configManager.get(new File(s"${file.getPath}${wiring.settings.`sha1-suffix`}"), Some(configId)).await.get
     svnConfigData.toString shouldBe HashGeneratorUtils.generateSHA1(content)
   }
 
@@ -281,8 +282,8 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val fileInfoes: List[ConfigFileInfo] = configManager.list().await
 
     fileInfoes.toSet shouldBe Set(
-      ConfigFileInfo(new File(s"${file1.toPath}${Wiring.settings.`sha1-suffix`}"), configId1, comment1),
-      ConfigFileInfo(new File(s"${file2.toPath}${Wiring.settings.`sha1-suffix`}"), configId2, comment2)
+      ConfigFileInfo(new File(s"${file1.toPath}${wiring.settings.`sha1-suffix`}"), configId1, comment1),
+      ConfigFileInfo(new File(s"${file2.toPath}${wiring.settings.`sha1-suffix`}"), configId2, comment2)
     )
   }
 
@@ -303,10 +304,10 @@ class SvnConfigManagerTest extends org.scalatest.FunSuite with Matchers {
     val updatedFileContent = configManager.get(file, Some(newConfigId)).await.get
     updatedFileContent.toString shouldBe newContent
 
-    val oldSvnConfigData = configManager.get(new File(s"${file.getPath}${Wiring.settings.`sha1-suffix`}"), Some(creationConfigId)).await.get
+    val oldSvnConfigData = configManager.get(new File(s"${file.getPath}${wiring.settings.`sha1-suffix`}"), Some(creationConfigId)).await.get
     oldSvnConfigData.toString shouldBe HashGeneratorUtils.generateSHA1(creationContent)
 
-    val newSvnConfigData = configManager.get(new File(s"${file.getPath}${Wiring.settings.`sha1-suffix`}"), Some(newConfigId)).await.get
+    val newSvnConfigData = configManager.get(new File(s"${file.getPath}${wiring.settings.`sha1-suffix`}"), Some(newConfigId)).await.get
     newSvnConfigData.toString shouldBe HashGeneratorUtils.generateSHA1(newContent)
 
     val fileHistories: List[ConfigFileHistory] = configManager.history(file).await

@@ -12,7 +12,7 @@ class OversizeFileManagerTest
     with Matchers
     with BeforeAndAfterAll {
 
-  private val manager = Wiring.oversizeFileManager
+  private val manager = new Wiring().oversizeFileManager
 
   private val tempFile = {
     val tempFile = Paths.get("SomeOversizeFile.txt").toFile
