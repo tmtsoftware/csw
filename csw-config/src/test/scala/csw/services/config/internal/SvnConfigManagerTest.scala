@@ -11,8 +11,7 @@ import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 
 class SvnConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEach {
   private val wiring = new Wiring()
-  private val configManager = wiring.configManager
-  private val svnAdmin = wiring.svnAdmin
+  import wiring._
   private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile
   private val tmpDir = Paths.get(wiring.settings.`tmp-dir`).toFile
 

@@ -13,8 +13,7 @@ class OversizeFileManagerTest
     with BeforeAndAfterAll {
 
   private val wiring = new Wiring()
-  private val manager = wiring.oversizeFileManager
-  private val svnAdmin = wiring.svnAdmin
+  import wiring._
   private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile
 
   private val tempFile = {
@@ -31,7 +30,7 @@ class OversizeFileManagerTest
   }
 
   test("storing oversize file") {
-    val actualSha = manager.post(tempFile).await
+    val actualSha = oversizeFileManager.post(tempFile).await
     val expectedSha = HashGeneratorUtils.generateSHA1(tempFile)
 
     actualSha shouldBe expectedSha
@@ -40,7 +39,7 @@ class OversizeFileManagerTest
   test("getting oversize file") {
     val actualSha = HashGeneratorUtils.generateSHA1(tempFile)
     val outFile = java.io.File.createTempFile("out", ".txt")
-    manager.get(actualSha, outFile).await
+    oversizeFileManager.get(actualSha, outFile).await
 
     HashGeneratorUtils.generateSHA1(outFile) shouldBe actualSha
     outFile.delete()
