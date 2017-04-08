@@ -1,7 +1,8 @@
-package csw.services.config.internal
+package csw.services.config
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.services.config.repo.{OversizeFileManager, SvnAdmin, SvnConfigManager}
 import csw.services.config.scaladsl.ConfigManager
 import csw.services.config.server.ConfigServiceApp
 

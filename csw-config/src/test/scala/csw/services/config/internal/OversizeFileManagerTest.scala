@@ -3,6 +3,7 @@ package csw.services.config.internal
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Paths
 
+import csw.services.config.Wiring
 import csw.services.config.common.TestFutureExtension.RichFuture
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

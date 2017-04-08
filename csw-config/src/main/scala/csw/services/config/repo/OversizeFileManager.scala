@@ -1,9 +1,9 @@
-package csw.services.config.internal
+package csw.services.config.repo
 
 import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path, Paths}
 
-import akka.http.scaladsl.model._
+import csw.services.config.Settings
 import net.codejava.security.HashGeneratorUtils
 
 import scala.concurrent.ExecutionContext.Implicits.global

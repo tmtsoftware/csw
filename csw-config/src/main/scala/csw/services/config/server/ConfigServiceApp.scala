@@ -3,7 +3,6 @@ package csw.services.config.server
 import akka.Done
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.{HttpApp, Route}
-import csw.services.config.internal.HttpSupport
 import csw.services.config.scaladsl.ConfigManager
 
 class ConfigServiceApp(configManager: ConfigManager, actorSystem: ActorSystem) extends HttpApp with HttpSupport {

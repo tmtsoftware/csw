@@ -4,6 +4,7 @@ import java.io._
 import java.nio.file.Paths
 import java.util.Date
 
+import csw.services.config.Wiring
 import csw.services.config.common.TestFutureExtension.RichFuture
 import csw.services.config.models.{ConfigBytes, ConfigFileHistory, ConfigFileInfo, ConfigString}
 import net.codejava.security.HashGeneratorUtils

@@ -1,17 +1,18 @@
-package csw.services.config.internal
+package csw.services.config.repo
 
 import java.io._
 import java.util.{Date, UUID}
 
 import akka.actor.ActorSystem
+import csw.services.config.Settings
 import csw.services.config.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.scaladsl.ConfigManager
+import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
 import org.tmatesoft.svn.core.io.{SVNRepository, SVNRepositoryFactory}
 import org.tmatesoft.svn.core.wc.{SVNClientManager, SVNRevision}
 import org.tmatesoft.svn.core.wc2.{ISvnObjectReceiver, SvnOperationFactory, SvnTarget}
-import org.tmatesoft.svn.core._
 
 import scala.concurrent.Future
 

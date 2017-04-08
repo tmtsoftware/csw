@@ -1,4 +1,4 @@
-package csw.services.config.internal
+package csw.services.config
 
 object Main {
   private val wiring = new Wiring

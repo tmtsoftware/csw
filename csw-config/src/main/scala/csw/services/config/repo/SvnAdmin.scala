@@ -1,7 +1,8 @@
-package csw.services.config.internal
+package csw.services.config.repo
 
 import java.io.File
 
+import csw.services.config.Settings
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory
 
