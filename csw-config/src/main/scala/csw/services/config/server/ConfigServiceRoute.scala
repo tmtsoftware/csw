@@ -1,15 +1,15 @@
 package csw.services.config.server
 
 import akka.Done
-import akka.actor.ActorSystem
-import akka.http.scaladsl.server.{HttpApp, Route}
+import akka.http.scaladsl.server.Route
+import csw.services.config.ActorRuntime
 import csw.services.config.scaladsl.ConfigManager
 
-class ConfigServiceApp(configManager: ConfigManager, actorSystem: ActorSystem) extends HttpApp with HttpSupport {
+class ConfigServiceRoute(configManager: ConfigManager, actorRuntime: ActorRuntime) extends HttpSupport {
 
-  import actorSystem.dispatcher
+  import actorRuntime._
 
-  override protected def route: Route = {
+  def route: Route = {
     get {
       path("get") {
         (pathParam & idParam) { (filePath, maybeConfigId) ⇒

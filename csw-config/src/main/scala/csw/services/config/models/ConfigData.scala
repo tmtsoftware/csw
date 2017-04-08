@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths, StandardCopyOption}
 
 import akka.NotUsed
 import akka.actor.ActorRefFactory
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 
@@ -63,9 +63,8 @@ trait ConfigData {
   /**
    * Returns a future string by reading the source.
    */
-  def toFutureString(implicit context: ActorRefFactory): Future[String] = {
-    implicit val materializer = ActorMaterializer()
-    import context.dispatcher
+  def toFutureString(implicit mat: Materializer): Future[String] = {
+    import mat.executionContext
     val out = new ByteArrayOutputStream
     val sink = Sink.foreach[ByteString] { bytes =>
       out.write(bytes.toArray)

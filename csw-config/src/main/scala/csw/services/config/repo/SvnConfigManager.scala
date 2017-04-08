@@ -4,7 +4,7 @@ import java.io._
 import java.util.{Date, UUID}
 
 import akka.actor.ActorSystem
-import csw.services.config.Settings
+import csw.services.config.{ActorRuntime, Settings}
 import csw.services.config.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.scaladsl.ConfigManager
 import org.tmatesoft.svn.core._
@@ -16,10 +16,9 @@ import org.tmatesoft.svn.core.wc2.{ISvnObjectReceiver, SvnOperationFactory, SvnT
 
 import scala.concurrent.Future
 
-class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileManager) extends ConfigManager {
+class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileManager, actorRuntime: ActorRuntime) extends ConfigManager {
 
-  private implicit val system = ActorSystem()
-  import system.dispatcher
+  import actorRuntime._
 
   override def name: String = "my name is missing"
 
