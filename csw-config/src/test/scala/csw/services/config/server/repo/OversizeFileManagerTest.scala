@@ -14,7 +14,7 @@ class OversizeFileManagerTest
     with Matchers
     with BeforeAndAfterAll {
 
-  private val wiring = new ServerWiring()
+  private val wiring = new ServerWiring
   import wiring._
   private val testFileUtils = new TestFileUtils(settings)
   private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile
