@@ -340,6 +340,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
 
   test("should be able to get oversize time stamped file") {
     val initialDate = new Date
+    
     val file = Paths.get("SomeOversizeFile.txt").toFile
     val content = "testing oversize file"
     configManager.create(file, ConfigString(content), true, "committing oversize file").await
@@ -350,9 +351,8 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val newComment = "Updating file"
     configManager.update(file, ConfigString(newContent), newComment).await
 
-    //If date is before file creation, the initial version is not being returned.
-    /*val initialData = configManager.get(file, initialDate).await.get
-    initialData.toString shouldBe content*/
+    val initialData = configManager.get(file, initialDate).await.get
+    initialData.toString shouldBe content
 
     val oldTimeStampedData = configManager.get(file, date).await.get
     oldTimeStampedData.toString shouldBe content
