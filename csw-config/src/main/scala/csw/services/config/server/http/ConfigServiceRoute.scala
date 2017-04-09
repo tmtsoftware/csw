@@ -1,15 +1,18 @@
 package csw.services.config.server.http
 
 import akka.Done
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
+import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import csw.services.config.commons.ActorRuntime
 import csw.services.config.scaladsl.ConfigManager
+
+import scala.util.control.NonFatal
 
 class ConfigServiceRoute(configManager: ConfigManager, actorRuntime: ActorRuntime) extends HttpSupport {
 
   import actorRuntime._
 
-  def route: Route = {
+  def route: Route = handleExceptions(exceptionHandler) {
     get {
       path("get") {
         (pathParam & idParam) { (filePath, maybeConfigId) ⇒
@@ -65,5 +68,10 @@ class ConfigServiceRoute(configManager: ConfigManager, actorRuntime: ActorRuntim
             }
           }
       }
+  }
+
+  private val exceptionHandler = ExceptionHandler {
+    case ClientException(ex) ⇒ complete(HttpResponse(StatusCodes.BadRequest, entity = ex.getMessage))
+    case NonFatal(ex)        ⇒ complete(HttpResponse(StatusCodes.InternalServerError, entity = ex.getMessage))
   }
 }

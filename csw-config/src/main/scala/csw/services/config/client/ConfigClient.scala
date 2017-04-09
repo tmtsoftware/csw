@@ -1,6 +1,6 @@
 package csw.services.config.client
 
-import java.io.File
+import java.io.{File, IOException}
 import java.nio.file.Paths
 import java.util.Date
 
@@ -20,6 +20,7 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.DurationDouble
 
 class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends ConfigManager with JsonSupport {
+
   import actorRuntime._
 
   override def name: String = "http-based-config-client"
@@ -34,9 +35,11 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     Marshal(formData).to[RequestEntity].flatMap { entity =>
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
       Http().singleRequest(request).flatMap { response ⇒
-        if(response.status == StatusCodes.OK)
-          Unmarshal(response).to[ConfigId]
-        else response.entity.toStrict(5.seconds).map(s ⇒ throw new RuntimeException(s.data.utf8String))
+        response.status match {
+          case StatusCodes.OK         ⇒ Unmarshal(response).to[ConfigId]
+          case StatusCodes.BadRequest ⇒ Future.failed(new IOException(response.status.reason()))
+          case _                      ⇒ Future.failed(new RuntimeException(response.status.reason()))
+        }
       }
     }
   }
@@ -49,10 +52,11 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
       .withQuery(Query(Map("path" → path.getPath) ++ id.map(d ⇒ "id" → d.toString)))
     val request = HttpRequest(uri = uri)
     Http().singleRequest(request).map { response =>
-      if(response.status == StatusCodes.OK)
-        Some(ConfigSource(response.entity.dataBytes))
-      else
-        None
+      response.status match {
+        case StatusCodes.OK       ⇒ Some(ConfigSource(response.entity.dataBytes))
+        case StatusCodes.NotFound ⇒ None
+        case _                    ⇒ throw new RuntimeException(response.status.reason())
+      }
     }
   }
 

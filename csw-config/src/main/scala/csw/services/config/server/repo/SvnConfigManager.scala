@@ -235,7 +235,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       case Some(configId) =>
         create(defaultFile(path), ConfigData(configId.id)).map(_ => ())
       case None =>
-        Future.failed(new RuntimeException(s"Unknown path $path"))
+        Future.failed(new FileNotFoundException(s"Unknown path $path"))
     }
   }
 
