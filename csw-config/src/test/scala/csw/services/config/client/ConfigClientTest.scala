@@ -4,14 +4,18 @@ import java.nio.file.Paths
 
 import csw.services.config.commons.TestFileUtils
 import csw.services.config.commons.TestFutureExtension.RichFuture
-import csw.services.config.models.{ConfigBytes, ConfigString}
-import csw.services.config.server.Wiring
+import csw.services.config.models.ConfigString
+import csw.services.config.server.ServerWiring
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ConfigClientTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  private val wiring = new Wiring()
-  import wiring._
+  private val serverWiring = new ServerWiring()
+  import serverWiring.{httpService, settings, svnAdmin}
+
+  private val clientWiring = new ClientWiring()
+  import clientWiring._
+
   private val testFileUtils = new TestFileUtils(settings)
 
   private val oversizeFileDir = Paths.get(settings.`oversize-files-dir`).toFile
@@ -40,9 +44,9 @@ class ConfigClientTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     val configValue = "axisName = tromboneAxis"
 
     val file = Paths.get("test.conf").toFile
-    configClient.create(file, ConfigString(configValue), oversize = false, "commit test file").await
+    configManager.create(file, ConfigString(configValue), oversize = false, "commit test file").await
     Thread.sleep(1000)
-    configClient.get(file).await.get.toFutureString.await shouldBe configValue
+    configManager.get(file).await.get.toFutureString.await shouldBe configValue
   }
 
 }

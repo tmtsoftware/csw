@@ -5,7 +5,7 @@ import java.nio.file.Paths
 
 import csw.services.config.commons.TestFileUtils
 import csw.services.config.commons.TestFutureExtension.RichFuture
-import csw.services.config.server.Wiring
+import csw.services.config.server.ServerWiring
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -14,7 +14,7 @@ class OversizeFileManagerTest
     with Matchers
     with BeforeAndAfterAll {
 
-  private val wiring = new Wiring()
+  private val wiring = new ServerWiring()
   import wiring._
   private val testFileUtils = new TestFileUtils(settings)
   private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile

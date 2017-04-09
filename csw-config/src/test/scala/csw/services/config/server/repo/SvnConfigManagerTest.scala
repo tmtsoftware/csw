@@ -7,12 +7,12 @@ import java.util.Date
 import csw.services.config.commons.TestFileUtils
 import csw.services.config.commons.TestFutureExtension.RichFuture
 import csw.services.config.models.{ConfigFileHistory, ConfigFileInfo, ConfigString}
-import csw.services.config.server.Wiring
+import csw.services.config.server.ServerWiring
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 
 class SvnConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEach {
-  private val wiring = new Wiring()
+  private val wiring = new ServerWiring()
   import wiring._
   private val testFileUtils = new TestFileUtils(settings)
 

@@ -4,7 +4,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
 object Main {
-  private val wiring = new Wiring
+  private val wiring = new ServerWiring
   import wiring._
   def main(args: Array[String]): Unit = {
     svnAdmin.initSvnRepo()
