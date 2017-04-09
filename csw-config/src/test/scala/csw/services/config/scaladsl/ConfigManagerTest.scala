@@ -6,7 +6,7 @@ import java.util.Date
 
 import csw.services.config.commons.TestFileUtils
 import csw.services.config.commons.TestFutureExtension.RichFuture
-import csw.services.config.models.{ConfigFileHistory, ConfigFileInfo, ConfigString}
+import csw.services.config.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigString}
 import csw.services.config.server.ServerWiring
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
@@ -246,7 +246,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     configManager.getDefault(file).await.get.toFutureString.await shouldBe newAssemblyConfigValue
   }
 
-  test("should able to store and retrieve oversize file") {
+  test("should be able to store and retrieve oversize file") {
     val file = Paths.get("SomeOversizeFile.txt").toFile
     val content = "testing oversize file"
 
@@ -276,7 +276,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     )
   }
 
-  test("should able to update oversize file and retrieve the history") {
+  test("should be able to update oversize file and retrieve the history") {
     val file = Paths.get("SomeOversizeFile.txt").toFile
     val creationContent = "testing oversize file"
     val creationComment = "initial commit"
@@ -304,5 +304,68 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
       (newConfigId, newComment),
       (creationConfigId, creationComment)
     )
+  }
+
+  test("should be able to get oversize default file") {
+    val file = Paths.get("SomeOversizeFile.txt").toFile
+    val content = "testing oversize file"
+    configManager.create(file, ConfigString(content), true, "committing oversize file").await
+
+    configManager.setDefault(file).await
+
+    val newContent = "testing oversize file, again"
+    val newComment = "Updating file"
+    configManager.update(file, ConfigString(newContent), newComment).await
+
+    val defaultData: ConfigData = configManager.getDefault(file).await.get
+    defaultData.toString shouldBe content
+
+    configManager.resetDefault(file).await
+
+    val resetDefaultData: ConfigData = configManager.getDefault(file).await.get
+    resetDefaultData.toString shouldBe newContent
+
+    configManager.delete(file, "deleting file").await
+
+    val fileExists = configManager.exists(file).await
+    fileExists shouldBe false
+
+    val defaultAfterDelete = configManager.getDefault(file).await
+    defaultAfterDelete shouldBe None
+
+    intercept[java.io.FileNotFoundException] {
+    val resetDefaultAfterDelete = configManager.resetDefault(file).await
+    }
+  }
+
+  test("should be able to get oversize time stamped file") {
+    val initialDate = new Date
+    val file = Paths.get("SomeOversizeFile.txt").toFile
+    val content = "testing oversize file"
+    configManager.create(file, ConfigString(content), true, "committing oversize file").await
+
+    val date = new Date
+
+    val newContent = "testing oversize file, again"
+    val newComment = "Updating file"
+    configManager.update(file, ConfigString(newContent), newComment).await
+
+    //If date is before file creation, the initial version is not being returned.
+    /*val initialData = configManager.get(file, initialDate).await.get
+    initialData.toString shouldBe content*/
+
+    val oldTimeStampedData = configManager.get(file, date).await.get
+    oldTimeStampedData.toString shouldBe content
+
+    val latestData = configManager.get(file, new Date).await.get
+    latestData.toString shouldBe newContent
+
+    configManager.delete(file, "deleting file").await
+
+    val fileExists = configManager.exists(file).await
+    fileExists shouldBe false
+
+    val fileTimeStampedAfterDelete = configManager.get(file, new Date()).await
+    fileTimeStampedAfterDelete shouldBe None
   }
 }
