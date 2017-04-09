@@ -1,4 +1,4 @@
-package csw.services.config
+package csw.services.config.commons
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}

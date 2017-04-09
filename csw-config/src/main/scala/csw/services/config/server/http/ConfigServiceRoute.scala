@@ -1,8 +1,8 @@
-package csw.services.config.server
+package csw.services.config.server.http
 
 import akka.Done
 import akka.http.scaladsl.server.Route
-import csw.services.config.ActorRuntime
+import csw.services.config.commons.ActorRuntime
 import csw.services.config.scaladsl.ConfigManager
 
 class ConfigServiceRoute(configManager: ConfigManager, actorRuntime: ActorRuntime) extends HttpSupport {

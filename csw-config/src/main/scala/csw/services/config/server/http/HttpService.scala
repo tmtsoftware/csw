@@ -1,8 +1,9 @@
-package csw.services.config.server
+package csw.services.config.server.http
 
 import akka.Done
 import akka.http.scaladsl.Http
-import csw.services.config.{ActorRuntime, Settings}
+import csw.services.config.commons.ActorRuntime
+import csw.services.config.server.Settings
 
 import scala.async.Async._
 import scala.concurrent.Future

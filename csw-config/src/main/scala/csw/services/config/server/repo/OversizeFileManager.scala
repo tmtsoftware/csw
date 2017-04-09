@@ -1,9 +1,9 @@
-package csw.services.config.repo
+package csw.services.config.server.repo
 
 import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path, Paths}
 
-import csw.services.config.Settings
+import csw.services.config.server.Settings
 import net.codejava.security.HashGeneratorUtils
 
 import scala.concurrent.ExecutionContext.Implicits.global

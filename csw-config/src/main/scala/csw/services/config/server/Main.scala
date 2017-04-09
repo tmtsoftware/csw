@@ -1,4 +1,4 @@
-package csw.services.config
+package csw.services.config.server
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
@@ -8,6 +8,6 @@ object Main {
   import wiring._
   def main(args: Array[String]): Unit = {
     svnAdmin.initSvnRepo()
-    Await.result(wiring.httpService.lazyBinding, 5.seconds)
+    Await.result(httpService.lazyBinding, 5.seconds)
   }
 }

@@ -10,10 +10,10 @@ import akka.http.scaladsl.model.Multipart.FormData
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import csw.services.config.ActorRuntime
+import csw.services.config.commons.ActorRuntime
 import csw.services.config.models._
 import csw.services.config.scaladsl.ConfigManager
-import csw.services.config.server.JsonSupport
+import csw.services.config.server.http.JsonSupport
 import csw.services.location.models.Location
 
 import scala.concurrent.{Await, Future}

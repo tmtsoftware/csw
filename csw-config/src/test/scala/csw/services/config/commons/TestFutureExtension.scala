@@ -1,4 +1,4 @@
-package csw.services.config.common
+package csw.services.config.commons
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}

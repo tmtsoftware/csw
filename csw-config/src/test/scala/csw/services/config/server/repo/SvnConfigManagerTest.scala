@@ -1,18 +1,21 @@
-package csw.services.config.internal
+package csw.services.config.server.repo
 
 import java.io._
 import java.nio.file.Paths
 import java.util.Date
 
-import csw.services.config.Wiring
-import csw.services.config.common.TestFutureExtension.RichFuture
-import csw.services.config.models.{ConfigBytes, ConfigFileHistory, ConfigFileInfo, ConfigString}
+import csw.services.config.commons.TestFileUtils
+import csw.services.config.commons.TestFutureExtension.RichFuture
+import csw.services.config.models.{ConfigFileHistory, ConfigFileInfo, ConfigString}
+import csw.services.config.server.Wiring
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 
 class SvnConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEach {
   private val wiring = new Wiring()
   import wiring._
+  private val testFileUtils = new TestFileUtils(settings)
+
   private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile
   private val tmpDir = Paths.get(wiring.settings.`tmp-dir`).toFile
   import actorRuntime._
@@ -22,9 +25,9 @@ class SvnConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEac
   }
 
   override protected def afterEach(): Unit = {
-    svnAdmin.deleteDirectoryRecursively(tmpDir)
-    svnAdmin.deleteDirectoryRecursively(oversizeFileDir)
-    svnAdmin.deleteDirectoryRecursively(wiring.settings.repositoryFile)
+    testFileUtils.deleteDirectoryRecursively(tmpDir)
+    testFileUtils.deleteDirectoryRecursively(oversizeFileDir)
+    testFileUtils.deleteDirectoryRecursively(wiring.settings.repositoryFile)
   }
 
   test("should able to create a file and retrieve the same") {

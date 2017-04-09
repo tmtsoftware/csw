@@ -1,10 +1,11 @@
-package csw.services.config.internal
+package csw.services.config.server.repo
 
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Paths
 
-import csw.services.config.Wiring
-import csw.services.config.common.TestFutureExtension.RichFuture
+import csw.services.config.commons.TestFileUtils
+import csw.services.config.commons.TestFutureExtension.RichFuture
+import csw.services.config.server.Wiring
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -15,6 +16,7 @@ class OversizeFileManagerTest
 
   private val wiring = new Wiring()
   import wiring._
+  private val testFileUtils = new TestFileUtils(settings)
   private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile
 
   private val tempFile = {
@@ -27,7 +29,7 @@ class OversizeFileManagerTest
 
   override protected def afterAll(): Unit = {
     tempFile.delete()
-    svnAdmin.deleteDirectoryRecursively(oversizeFileDir)
+    testFileUtils.deleteDirectoryRecursively(oversizeFileDir)
   }
 
   test("storing oversize file") {

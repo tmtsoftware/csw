@@ -2,15 +2,18 @@ package csw.services.config.client
 
 import java.nio.file.Paths
 
-import csw.services.config.Wiring
-import csw.services.config.common.TestFutureExtension.RichFuture
+import csw.services.config.commons.TestFileUtils
+import csw.services.config.commons.TestFutureExtension.RichFuture
 import csw.services.config.models.{ConfigBytes, ConfigString}
+import csw.services.config.server.Wiring
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ConfigClientTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
   private val wiring = new Wiring()
   import wiring._
+  private val testFileUtils = new TestFileUtils(settings)
+
   private val oversizeFileDir = Paths.get(settings.`oversize-files-dir`).toFile
   private val tmpDir = Paths.get(settings.`tmp-dir`).toFile
   import actorRuntime._
@@ -28,9 +31,9 @@ class ConfigClientTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   }
 
   override protected def afterEach(): Unit = {
-    svnAdmin.deleteDirectoryRecursively(tmpDir)
-    svnAdmin.deleteDirectoryRecursively(oversizeFileDir)
-    svnAdmin.deleteDirectoryRecursively(settings.repositoryFile)
+    testFileUtils.deleteDirectoryRecursively(tmpDir)
+    testFileUtils.deleteDirectoryRecursively(oversizeFileDir)
+    testFileUtils.deleteDirectoryRecursively(settings.repositoryFile)
   }
 
   test("should able to create a file and retrieve the same") {
