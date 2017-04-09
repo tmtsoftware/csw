@@ -20,7 +20,7 @@ class RegistrationTest extends FunSuiteLike with Matchers {
     val hostname = new Networks().hostname()
 
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorSystem = new ActorSystemFactory().remote
+    val actorSystem = ActorSystemFactory.remote
     val actorRef = actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior

@@ -36,7 +36,7 @@ import java.util.concurrent.ExecutionException;
 
 public class JLocationServiceBlockingDemoExample {
 
-    private ActorSystem actorSystem = new ActorSystemFactory().remote();
+    private ActorSystem actorSystem = ActorSystemFactory.remote();
     private Materializer mat = ActorMaterializer.create(actorSystem);
 
     private ActorRef actorRef = actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {

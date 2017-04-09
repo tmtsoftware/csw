@@ -19,7 +19,7 @@ class LocationServiceCompTest
 
   lazy val locationService: LocationService = LocationServiceFactory.make()
 
-  implicit val actorSystem = new ActorSystemFactory().remote
+  implicit val actorSystem = ActorSystemFactory.remote("test")
   implicit val mat: Materializer = ActorMaterializer()
 
   override protected def afterEach(): Unit = {

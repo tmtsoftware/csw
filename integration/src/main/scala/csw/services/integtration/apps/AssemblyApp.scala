@@ -11,7 +11,7 @@ import csw.services.location.scaladsl.{ActorSystemFactory, LocationServiceFactor
 object AssemblyApp {
   private val cswCluster = CswCluster.withSettings(ClusterSettings().withInterface("eth1"))
 
-  val assemblyActorRef = new ActorSystemFactory().remote.actorOf(Props[AssemblyApp], "assembly")
+  val assemblyActorRef = ActorSystemFactory.remote.actorOf(Props[AssemblyApp], "assembly")
   val componentId = ComponentId("assembly", ComponentType.Assembly)
   val connection = AkkaConnection(componentId)
 
