@@ -18,8 +18,6 @@ class ConfigClientTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   private val testFileUtils = new TestFileUtils(settings)
 
-  private val oversizeFileDir = Paths.get(settings.`oversize-files-dir`).toFile
-  private val tmpDir = Paths.get(settings.`tmp-dir`).toFile
   import actorRuntime._
 
   override protected def beforeAll(): Unit = {
@@ -35,9 +33,7 @@ class ConfigClientTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   }
 
   override protected def afterEach(): Unit = {
-    testFileUtils.deleteDirectoryRecursively(tmpDir)
-    testFileUtils.deleteDirectoryRecursively(oversizeFileDir)
-    testFileUtils.deleteDirectoryRecursively(settings.repositoryFile)
+    testFileUtils.deleteServerFiles()
   }
 
   test("should able to create a file and retrieve the same") {

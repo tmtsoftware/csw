@@ -16,8 +16,6 @@ class SvnConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEac
   import wiring._
   private val testFileUtils = new TestFileUtils(settings)
 
-  private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile
-  private val tmpDir = Paths.get(wiring.settings.`tmp-dir`).toFile
   import actorRuntime._
 
   override protected def beforeEach(): Unit = {
@@ -25,9 +23,7 @@ class SvnConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEac
   }
 
   override protected def afterEach(): Unit = {
-    testFileUtils.deleteDirectoryRecursively(tmpDir)
-    testFileUtils.deleteDirectoryRecursively(oversizeFileDir)
-    testFileUtils.deleteDirectoryRecursively(wiring.settings.repositoryFile)
+    testFileUtils.deleteServerFiles()
   }
 
   test("should able to create a file and retrieve the same") {

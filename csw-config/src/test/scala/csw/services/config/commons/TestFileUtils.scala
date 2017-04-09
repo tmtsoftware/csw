@@ -1,12 +1,19 @@
 package csw.services.config.commons
 
 import java.io.File
+import java.nio.file.Paths
 
 import csw.services.config.server.Settings
-import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory
-import org.tmatesoft.svn.core.io.SVNRepositoryFactory
 
 class TestFileUtils(settings: Settings) {
+
+  def deleteServerFiles(): Unit = {
+    val oversizeFileDir = Paths.get(settings.`oversize-files-dir`).toFile
+    val tmpDir = Paths.get(settings.`tmp-dir`).toFile
+    deleteDirectoryRecursively(tmpDir)
+    deleteDirectoryRecursively(oversizeFileDir)
+    deleteDirectoryRecursively(settings.repositoryFile)
+  }
 
   /**
     * FOR TESTING: Deletes the contents of the given directory (recursively).
