@@ -15,12 +15,19 @@ class ConfigServiceRoute(configManager: ConfigManager, actorRuntime: ActorRuntim
   def route: Route = handleExceptions(exceptionHandler) {
     get {
       path("get") {
-        (pathParam & idParam) { (filePath, maybeConfigId) ⇒
+        (pathParam & dateParam) { (filePath, date) ⇒
           rejectEmptyResponse & complete {
-            configManager.get(filePath, maybeConfigId)
+            configManager.get(filePath, date)
           }
         }
       } ~
+        path("get") {
+          (pathParam & idParam) { (filePath, maybeConfigId) ⇒
+            rejectEmptyResponse & complete {
+              configManager.get(filePath, maybeConfigId)
+            }
+          }
+        } ~
         path("getDefault") {
           pathParam { filePath ⇒
             rejectEmptyResponse & complete {
@@ -32,7 +39,7 @@ class ConfigServiceRoute(configManager: ConfigManager, actorRuntime: ActorRuntim
           pathParam { filePath ⇒
             rejectEmptyResponse & complete {
               configManager.exists(filePath).map { found ⇒
-                if (found) Some(Done) else None
+                if (found) Some("convert me into a head request") else None
               }
             }
           }
@@ -66,12 +73,21 @@ class ConfigServiceRoute(configManager: ConfigManager, actorRuntime: ActorRuntim
             pathParam { filePath ⇒
               complete(configManager.resetDefault(filePath).map(_ ⇒ Done))
             }
+          } ~
+          path("delete") {
+            (pathParam & commentParam) { (filePath, comment) ⇒
+              complete(configManager.delete(filePath, comment).map(_ ⇒ Done))
+            }
           }
       }
   }
 
   private val exceptionHandler = ExceptionHandler {
-    case ClientException(ex) ⇒ complete(HttpResponse(StatusCodes.BadRequest, entity = ex.getMessage))
-    case NonFatal(ex)        ⇒ complete(HttpResponse(StatusCodes.InternalServerError, entity = ex.getMessage))
+    case ClientException(ex) ⇒
+      ex.printStackTrace()
+      complete(HttpResponse(StatusCodes.BadRequest, entity = ex.getMessage))
+    case NonFatal(ex)        ⇒
+      ex.printStackTrace()
+      complete(HttpResponse(StatusCodes.InternalServerError, entity = ex.getMessage))
   }
 }

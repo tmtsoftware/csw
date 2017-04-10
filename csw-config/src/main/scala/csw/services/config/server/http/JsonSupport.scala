@@ -11,10 +11,10 @@ import spray.json.{DefaultJsonProtocol, JsString, JsValue, JsonFormat, RootJsonF
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
-  private val simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+  protected val simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
   implicit val fileFormat: JsonFormat[File] = new JsonFormat[File] {
-    override def write(obj: File): JsValue = JsString(obj.getAbsolutePath)
+    override def write(obj: File): JsValue = JsString(obj.getPath)
 
     override def read(json: JsValue): File = json match {
       case JsString(value) ⇒ Paths.get(value).toFile

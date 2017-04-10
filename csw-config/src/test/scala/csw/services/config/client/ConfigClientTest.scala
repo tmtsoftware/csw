@@ -5,7 +5,7 @@ import csw.services.config.api.scaladsl.{ConfigManager, ConfigManagerTest}
 import csw.services.config.server.ServerWiring
 import org.scalatest.BeforeAndAfterAll
 
-class ConfigClientTest(removeMe: Int) extends ConfigManagerTest with BeforeAndAfterAll {
+class ConfigClientTest extends ConfigManagerTest with BeforeAndAfterAll {
 
   private val serverWiring = new ServerWiring
   private val clientWiring = new ClientWiring

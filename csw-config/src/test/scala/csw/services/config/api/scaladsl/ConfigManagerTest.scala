@@ -237,7 +237,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     configManager.get(file).await.get.toFutureString.await shouldBe ConfigString(configValue).str
 
     val configIdUpdate1 = configManager.update(file, ConfigString(assemblyConfigValue), "Updated config to assembly").await
-    val configIdUpdate2 = configManager.update(file, ConfigString(newAssemblyConfigValue), "Updated config to assembly").await
+    configManager.update(file, ConfigString(newAssemblyConfigValue), "Updated config to assembly").await
 
     configManager.getDefault(file).await.get.toFutureString.await shouldBe newAssemblyConfigValue
     configManager.setDefault(file, Some(configIdUpdate1)).await
@@ -252,10 +252,10 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
 
     val configId = configManager.create(file, ConfigString(content), true, "committing oversize file").await
     val fileContent = configManager.get(file, Some(configId)).await.get
-    fileContent.toString shouldBe content
+    fileContent.toFutureString.await shouldBe content
 
     val svnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(configId)).await.get
-    svnConfigData.toString shouldBe HashGeneratorUtils.generateSHA1(content)
+    svnConfigData.toFutureString.await shouldBe HashGeneratorUtils.generateSHA1(content)
   }
 
   test("should list oversize files") {
@@ -287,16 +287,16 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val newConfigId = configManager.update(file, ConfigString(newContent), newComment).await
 
     val creationFileContent = configManager.get(file, Some(creationConfigId)).await.get
-    creationFileContent.toString shouldBe creationContent
+    creationFileContent.toFutureString.await shouldBe creationContent
 
     val updatedFileContent = configManager.get(file, Some(newConfigId)).await.get
-    updatedFileContent.toString shouldBe newContent
+    updatedFileContent.toFutureString.await shouldBe newContent
 
     val oldSvnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(creationConfigId)).await.get
-    oldSvnConfigData.toString shouldBe HashGeneratorUtils.generateSHA1(creationContent)
+    oldSvnConfigData.toFutureString.await shouldBe HashGeneratorUtils.generateSHA1(creationContent)
 
     val newSvnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(newConfigId)).await.get
-    newSvnConfigData.toString shouldBe HashGeneratorUtils.generateSHA1(newContent)
+    newSvnConfigData.toFutureString.await shouldBe HashGeneratorUtils.generateSHA1(newContent)
 
     val fileHistories: List[ConfigFileHistory] = configManager.history(file).await
 
@@ -318,12 +318,12 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     configManager.update(file, ConfigString(newContent), newComment).await
 
     val defaultData: ConfigData = configManager.getDefault(file).await.get
-    defaultData.toString shouldBe content
+    defaultData.toFutureString.await shouldBe content
 
     configManager.resetDefault(file).await
 
     val resetDefaultData: ConfigData = configManager.getDefault(file).await.get
-    resetDefaultData.toString shouldBe newContent
+    resetDefaultData.toFutureString.await shouldBe newContent
 
     configManager.delete(file, "deleting file").await
 
@@ -334,7 +334,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     defaultAfterDelete shouldBe None
 
     intercept[java.io.FileNotFoundException] {
-    val resetDefaultAfterDelete = configManager.resetDefault(file).await
+      val resetDefaultAfterDelete = configManager.resetDefault(file).await
     }
   }
 
@@ -352,13 +352,13 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     configManager.update(file, ConfigString(newContent), newComment).await
 
     val initialData = configManager.get(file, initialDate).await.get
-    initialData.toString shouldBe content
+    initialData.toFutureString.await shouldBe content
 
     val oldTimeStampedData = configManager.get(file, date).await.get
-    oldTimeStampedData.toString shouldBe content
+    oldTimeStampedData.toFutureString.await shouldBe content
 
     val latestData = configManager.get(file, new Date).await.get
-    latestData.toString shouldBe newContent
+    latestData.toFutureString.await shouldBe newContent
 
     configManager.delete(file, "deleting file").await
 

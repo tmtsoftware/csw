@@ -222,7 +222,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       .map(e => ConfigFileInfo(new File(e.getRelativePath), ConfigId(e.getRevision), e.getCommitMessage))
   }
 
-  override def history(path: File, maxResults: Int = Int.MaxValue): Future[List[ConfigFileHistory]] = {
+  override def history(path: File, maxResults: Int): Future[List[ConfigFileHistory]] = {
     // XXX Should .sha1 files have the .sha1 suffix removed in the result?
     if (isOversize(path))
       Future(hist(shaFile(path), maxResults))
