@@ -1,9 +1,10 @@
 package csw.services.config.api.javadsl;
 
+import akka.stream.Materializer;
 import csw.services.config.api.commons.TestFileUtils;
+import csw.services.config.api.models.ConfigData;
 import csw.services.config.server.ServerWiring;
 import csw.services.config.server.internal.JConfigManager;
-import csw.services.config.api.models.*;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,12 +15,13 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-
 public class JConfigMangerTest {
     private static ServerWiring serverWiring = new ServerWiring();
     private static TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
     private IConfigManager configManager = new JConfigManager(serverWiring.configManager(), serverWiring.actorRuntime());
+    private Materializer mat = serverWiring.actorRuntime().mat();
+
 
     @Before
     public void initSvnRepo() {
@@ -36,9 +38,9 @@ public class JConfigMangerTest {
         String configValue = "axisName = tromboneAxis";
 
         File file = Paths.get("test.conf").toFile();
-        configManager.create(file, new ConfigString(configValue), false, "commit test file").toCompletableFuture().get();
+        configManager.create(file, ConfigData.apply(configValue), false, "commit test file").toCompletableFuture().get();
         Optional<ConfigData> configData = configManager.get(file).toCompletableFuture().get();
-        Assert.assertEquals(configData.get().toString(), configValue);
+        Assert.assertEquals(configData.get().jStringF(mat).toCompletableFuture().get(), configValue);
     }
 
 }
