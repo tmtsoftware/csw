@@ -3,8 +3,7 @@ package csw.services.config.server.repo
 import csw.services.config.server.Settings
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory
-
-import scala.util.control.NonFatal
+import org.tmatesoft.svn.core.{SVNErrorCode, SVNException}
 
 class SvnAdmin(settings: Settings) {
   /**
@@ -15,6 +14,7 @@ class SvnAdmin(settings: Settings) {
     FSRepositoryFactory.setup()
     SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, false)
   } catch {
-    case NonFatal(ex) ⇒ ex.printStackTrace()
+    //If the repo already exists, print stracktrace and continue to boot
+    case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.IO_ERROR ⇒ ex.printStackTrace()
   }
 }
