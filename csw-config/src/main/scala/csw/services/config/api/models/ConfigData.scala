@@ -1,19 +1,16 @@
 package csw.services.config.api.models
 
-import java.io.{ByteArrayOutputStream, File, FileOutputStream, OutputStream}
-import java.nio.file.{Files, Paths, StandardCopyOption}
-import java.util.concurrent.CompletionStage
+import java.io.{File, OutputStream}
+import java.nio.file.Files
+import java.util.concurrent.{CompletableFuture, CompletionStage}
 
-import akka.NotUsed
-import akka.actor.ActorRefFactory
-import akka.stream.{ActorMaterializer, Materializer}
-import akka.stream.scaladsl.{FileIO, Sink, Source, StreamConverters}
+import akka.stream.Materializer
+import akka.stream.scaladsl.{FileIO, Source, StreamConverters}
 import akka.util.ByteString
 
+import scala.compat.java8.FutureConverters._
 import scala.concurrent.Future
 import scala.util.Try
-
-import scala.compat.java8.FutureConverters._
 
 /**
  * This class represents the contents of the files being managed.
@@ -48,8 +45,8 @@ class ConfigData(val source: Source[ByteString, Any]) {
     source.runFold("")((str, bs) ⇒ str + bs.utf8String)
   }
 
-  def jStringF(implicit mat: Materializer): CompletionStage[String] = {
-    toStringF.toJava
+  def toJStringF(implicit mat: Materializer): CompletableFuture[String] = {
+    toStringF.toJava.toCompletableFuture
   }
 }
 
