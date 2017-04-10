@@ -14,20 +14,39 @@ import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 
-class JConfigManager(configManager: ConfigManager,actorRuntime: ActorRuntime) extends IConfigManager {
+class JConfigManager(configManager: ConfigManager, actorRuntime: ActorRuntime) extends IConfigManager {
 
   import actorRuntime._
+
   override def name: String =
     configManager.name
 
-  override def create(path: File, configData: ConfigData, oversize: Boolean, comment: String): CompletionStage[ConfigId] =
+  override def create(path: File,
+                      configData: ConfigData,
+                      oversize: Boolean,
+                      comment: String): CompletionStage[ConfigId] =
     configManager.create(path, configData, oversize, comment).toJava
+
+  override def create(path: File, configData: ConfigData, comment: String): CompletionStage[ConfigId] =
+    create(path, configData, oversize = false, comment)
+
+  override def create(path: File, configData: ConfigData, oversize: Boolean): CompletionStage[ConfigId] =
+    create(path, configData, oversize, "")
+
+  override def create(path: File, configData: ConfigData): CompletionStage[ConfigId] =
+    create(path, configData, oversize = false, comment = "")
 
   override def update(path: File, configData: ConfigData, comment: String): CompletionStage[ConfigId] =
     configManager.update(path, configData, comment).toJava
 
+  override def update(path: File, configData: ConfigData): CompletionStage[ConfigId] =
+    update(path, configData, comment = "")
+
   override def get(path: File, id: Optional[ConfigId]): CompletionStage[Optional[ConfigData]] =
     configManager.get(path, id.asScala).map(_.asJava).toJava
+
+  override def get(path: File): CompletionStage[Optional[ConfigData]] =
+    configManager.get(path).map(_.asJava).toJava
 
   override def get(path: File, date: Date): CompletionStage[Optional[ConfigData]] =
     configManager.get(path, date).map(_.asJava).toJava
@@ -38,11 +57,17 @@ class JConfigManager(configManager: ConfigManager,actorRuntime: ActorRuntime) ex
   override def delete(path: File, comment: String): CompletionStage[Unit] =
     configManager.delete(path, comment).toJava
 
+  override def delete(path: File): CompletionStage[Unit] =
+    delete(path, comment = "deleted")
+
   override def list(): CompletionStage[util.List[ConfigFileInfo]] =
     configManager.list().map(_.asJava).toJava
 
   override def history(path: File, maxResults: Int): CompletionStage[util.List[ConfigFileHistory]] =
     configManager.history(path, maxResults).map(_.asJava).toJava
+
+  override def history(path: File): CompletionStage[util.List[ConfigFileHistory]] =
+    history(path, maxResults = Int.MaxValue)
 
   override def setDefault(path: File, id: Optional[ConfigId]): CompletionStage[Unit] =
     configManager.setDefault(path, id.asScala).toJava

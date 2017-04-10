@@ -29,7 +29,10 @@ trait IConfigManager {
     * @param comment    an optional comment to associate with this file
     * @return a unique id that can be used to refer to the file
     */
-  def create(path: File, configData: ConfigData, oversize: Boolean = false, comment: String = ""): CompletionStage[ConfigId]
+  def create(path: File, configData: ConfigData, oversize: Boolean, comment: String): CompletionStage[ConfigId]
+  def create(path: File, configData: ConfigData, comment: String): CompletionStage[ConfigId]
+  def create(path: File, configData: ConfigData, oversize: Boolean): CompletionStage[ConfigId]
+  def create(path: File, configData: ConfigData): CompletionStage[ConfigId]
 
   /**
     * Updates the config file with the given path and data and optional comment.
@@ -40,7 +43,8 @@ trait IConfigManager {
     * @param comment    an optional comment to associate with this file
     * @return a unique id that can be used to refer to the file
     */
-  def update(path: File, configData: ConfigData, comment: String = ""): CompletionStage[ConfigId]
+  def update(path: File, configData: ConfigData, comment: String): CompletionStage[ConfigId]
+  def update(path: File, configData: ConfigData): CompletionStage[ConfigId]
 
   /**
     * Gets and returns the file stored under the given path.
@@ -51,6 +55,7 @@ trait IConfigManager {
     * @return a future object that can be used to access the file's data, if found
     */
   def get(path: File, id: Optional[ConfigId]): CompletionStage[Optional[ConfigData]]
+  def get(path: File): CompletionStage[Optional[ConfigData]]
 
   /**
     * Gets the file as it existed on the given date.
@@ -77,7 +82,8 @@ trait IConfigManager {
     *
     * @param path the file path relative to the repository root
     */
-  def delete(path: File, comment: String = "deleted"): CompletionStage[Unit]
+  def delete(path: File, comment: String): CompletionStage[Unit]
+  def delete(path: File): CompletionStage[Unit]
 
   /**
     * Returns a list containing all of the known config files
@@ -93,7 +99,8 @@ trait IConfigManager {
     * @param maxResults the maximum number of history results to return (default: unlimited)
     * @return a list containing one ConfigFileHistory object for each version of path
     */
-  def history(path: File, maxResults: Int = Int.MaxValue): CompletionStage[ju.List[ConfigFileHistory]]
+  def history(path: File, maxResults: Int): CompletionStage[ju.List[ConfigFileHistory]]
+  def history(path: File): CompletionStage[ju.List[ConfigFileHistory]]
 
   /**
     * Sets the "default version" of the file with the given path.
