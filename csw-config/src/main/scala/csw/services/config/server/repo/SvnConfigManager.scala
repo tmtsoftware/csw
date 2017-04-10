@@ -99,7 +99,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
         case None => Future(None)
         case Some(configData) =>
           for {
-            sha1 <- configData.toFutureString
+            sha1 <- configData.stringF
             configDataOpt <- getFromAnnexServer(file, sha1)
           } yield configDataOpt
       }
@@ -249,7 +249,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       Future(None)
     else for {
       d <- get(defaultFile(path))
-      id <- if (d.isDefined) d.get.toFutureString else Future(currentId.get.id)
+      id <- if (d.isDefined) d.get.stringF else Future(currentId.get.id)
       result <- get(path, Some(ConfigId(id)))
     } yield result
   }

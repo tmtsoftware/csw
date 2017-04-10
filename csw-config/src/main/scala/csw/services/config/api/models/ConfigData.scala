@@ -58,14 +58,8 @@ class ConfigData(val source: Source[ByteString, Any]) {
   /**
    * Returns a future string by reading the source.
    */
-  def toFutureString(implicit mat: Materializer): Future[String] = {
-    import mat.executionContext
-    val out = new ByteArrayOutputStream
-    val sink = Sink.foreach[ByteString] { bytes =>
-      out.write(bytes.toArray)
-    }
-    val materialized = source.runWith(sink)
-    for (_ <- materialized) yield out.toString
+  def stringF(implicit mat: Materializer): Future[String] = {
+    source.runFold("")((str, bs) ⇒ str + bs.utf8String)
   }
 }
 
