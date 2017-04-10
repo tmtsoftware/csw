@@ -5,6 +5,7 @@ import java.util
 import java.util.{Date, Optional}
 import java.util.concurrent.CompletionStage
 
+import csw.services.config.api.commons.ActorRuntime
 import csw.services.config.api.javadsl.IConfigManager
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigManager
@@ -13,9 +14,9 @@ import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 
-class JConfigManager(configManager: ConfigManager) extends IConfigManager {
+class JConfigManager(configManager: ConfigManager,actorRuntime: ActorRuntime) extends IConfigManager {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
+  import actorRuntime._
   override def name: String =
     configManager.name
 
