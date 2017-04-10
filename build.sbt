@@ -92,7 +92,8 @@ lazy val `csw-config` = project
     ),
     libraryDependencies ++= Seq(
       Libs.`scalatest` % Test,
-      AkkaHttp.`akka-http-testkit` % Test
+      AkkaHttp.`akka-http-testkit` % Test,
+      Libs.`junit` % Test
     ),
     sources in (Compile, doc) := Seq.empty,
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
