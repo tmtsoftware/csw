@@ -1,12 +1,12 @@
-package csw.services.config.scaladsl
+package csw.services.config.api.scaladsl
 
 import java.io._
 import java.nio.file.Paths
 import java.util.Date
 
-import csw.services.config.commons.TestFileUtils
-import csw.services.config.commons.TestFutureExtension.RichFuture
-import csw.services.config.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigString}
+import csw.services.config.api.commons.TestFileUtils
+import csw.services.config.api.commons.TestFutureExtension.RichFuture
+import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigString}
 import csw.services.config.server.ServerWiring
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}

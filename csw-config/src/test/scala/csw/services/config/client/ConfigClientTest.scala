@@ -1,7 +1,7 @@
 package csw.services.config.client
 
-import csw.services.config.commons.TestFutureExtension.RichFuture
-import csw.services.config.scaladsl.{ConfigManager, ConfigManagerTest}
+import csw.services.config.api.commons.TestFutureExtension.RichFuture
+import csw.services.config.api.scaladsl.{ConfigManager, ConfigManagerTest}
 import csw.services.config.server.ServerWiring
 import org.scalatest.BeforeAndAfterAll
 

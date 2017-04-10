@@ -3,8 +3,8 @@ package csw.services.config.server.repo
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Paths
 
-import csw.services.config.commons.TestFileUtils
-import csw.services.config.commons.TestFutureExtension.RichFuture
+import csw.services.config.api.commons.TestFileUtils
+import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.ServerWiring
 import net.codejava.security.HashGeneratorUtils
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

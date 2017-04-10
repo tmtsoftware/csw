@@ -2,8 +2,8 @@ package csw.services.config.server.http
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import csw.services.config.commons.TestFileUtils
-import csw.services.config.models.{ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.commons.TestFileUtils
+import csw.services.config.api.models.{ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.server.ServerWiring
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 

@@ -3,8 +3,8 @@ package csw.services.config.server.http
 import akka.Done
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
-import csw.services.config.commons.ActorRuntime
-import csw.services.config.scaladsl.ConfigManager
+import csw.services.config.api.commons.ActorRuntime
+import csw.services.config.api.scaladsl.ConfigManager
 
 import scala.util.control.NonFatal
 

@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import csw.services.config.models.{ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.models.{ConfigFileHistory, ConfigFileInfo, ConfigId}
 import spray.json.{DefaultJsonProtocol, JsString, JsValue, JsonFormat, RootJsonFormat}
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {

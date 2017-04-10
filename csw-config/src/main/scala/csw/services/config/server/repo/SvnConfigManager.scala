@@ -4,9 +4,9 @@ import java.io._
 import java.util.{Date, UUID}
 
 import akka.actor.ActorSystem
-import csw.services.config.commons.ActorRuntime
-import csw.services.config.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
-import csw.services.config.scaladsl.ConfigManager
+import csw.services.config.api.commons.ActorRuntime
+import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.scaladsl.ConfigManager
 import csw.services.config.server.Settings
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager

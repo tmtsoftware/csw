@@ -2,8 +2,8 @@ package csw.services.config.server
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.config.commons.ActorRuntime
-import csw.services.config.scaladsl.ConfigManager
+import csw.services.config.api.commons.ActorRuntime
+import csw.services.config.api.scaladsl.ConfigManager
 import csw.services.config.server.http.{ConfigServiceRoute, HttpService}
 import csw.services.config.server.repo.{OversizeFileManager, SvnAdmin, SvnConfigManager}
 

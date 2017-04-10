@@ -7,7 +7,7 @@ import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
 import akka.http.scaladsl.model.ContentTypes
 import akka.http.scaladsl.model.HttpEntity.Chunked
 import akka.http.scaladsl.server.{Directive1, Directives}
-import csw.services.config.models.{ConfigData, ConfigId, ConfigSource}
+import csw.services.config.api.models.{ConfigData, ConfigId, ConfigSource}
 
 trait HttpSupport extends Directives with JsonSupport {
   val pathParam: Directive1[File] = parameter('path).map(filePath ⇒ Paths.get(filePath).toFile)
