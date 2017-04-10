@@ -16,7 +16,11 @@ import scala.concurrent.{Await, Future}
 
 class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  private implicit val actorSystem = ActorSystemFactory.remote
+  private implicit
+  //#create-actor-system
+  val actorSystem = ActorSystemFactory.remote()
+  //#create-actor-system
+
   import actorSystem.dispatcher
   implicit val mat = ActorMaterializer()
   private val actorRef = actorSystem.actorOf(

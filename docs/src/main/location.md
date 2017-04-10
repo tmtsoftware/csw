@@ -75,6 +75,22 @@ Scala
 Java
 :   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #Components-Connections-Registrations }
 
+## Creating ActorRef for registration
+
+While creating `akkaRegistration` in above example, make sure the ActorSystem used for creating `actorRef`,
+ is created using `ActorSystemFactory` as follows :
+ 
+
+Scala
+:  @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #create-actor-system }
+
+Java
+:  @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #create-actor-system }
+
+This is required to start a remote ActorSystem on the interface where csw-cluster is running. All the ActorRefs created using this
+ActorSystem will now be available for communication from other components that are part of csw-cluster.
+
+
 
 ## Basic operations
 

@@ -32,7 +32,11 @@ import java.util.concurrent.ExecutionException;
 
 public class JLocationServiceNonBlockingDemoExample {
 
-    private ActorSystem actorSystem = ActorSystemFactory.remote();
+    private
+    //#create-actor-system
+    ActorSystem actorSystem = ActorSystemFactory.remote();
+    //#create-actor-system
+
     private Materializer mat = ActorMaterializer.create(actorSystem);
     private ActorRef actorRef = actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                 @Override
