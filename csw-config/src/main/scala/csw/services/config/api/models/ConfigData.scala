@@ -49,7 +49,7 @@ class ConfigData(val source: Source[ByteString, Any]) {
   }
 
   def jStringF(implicit mat: Materializer): CompletionStage[String] = {
-    stringF.toJava
+    toStringF.toJava
   }
 }
 
