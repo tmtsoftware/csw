@@ -1,6 +1,7 @@
 package csw.services.config.server.repo
 
 import java.io._
+import java.nio.file.Files
 import java.util.{Date, UUID}
 
 import akka.actor.ActorSystem
@@ -26,9 +27,8 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   override def create(path: File, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
 
     def createOversize(): Future[ConfigId] = {
-      val file = getTempFile
       for {
-        _ <- configData.writeToFile(file)
+        file <- configData.toFileF
         sha1 <- oversizeFileManager.post(file)
         _ <- deleteTempFile(file)
         configId <- create(shaFile(path), ConfigData(sha1), oversize = false, comment)
@@ -56,9 +56,8 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   override def update(path: File, configData: ConfigData, comment: String): Future[ConfigId] = {
 
     def updateOversize(): Future[ConfigId] = {
-      val file = getTempFile
       for {
-        _ <- configData.writeToFile(file)
+        file <- configData.toFileF
         sha1 <- oversizeFileManager.post(file)
         _ <- deleteTempFile(file)
         configId <- update(shaFile(path), ConfigData(sha1), comment)
@@ -99,7 +98,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
         case None => Future(None)
         case Some(configData) =>
           for {
-            sha1 <- configData.stringF
+            sha1 <- configData.toStringF
             configDataOpt <- getFromAnnexServer(file, sha1)
           } yield configDataOpt
       }
@@ -249,12 +248,12 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       Future(None)
     else for {
       d <- get(defaultFile(path))
-      id <- if (d.isDefined) d.get.stringF else Future(currentId.get.id)
+      id <- if (d.isDefined) d.get.toStringF else Future(currentId.get.id)
       result <- get(path, Some(ConfigId(id)))
     } yield result
   }
 
-  private def getTempFile: File = new File(settings.`tmp-dir`, UUID.randomUUID().toString)
+  private def getTempFile: File = Files.createTempFile("config", "crud").toFile
 
   private def deleteTempFile(file: File): Future[Unit] = Future(file.deleteOnExit())
 

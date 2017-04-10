@@ -6,7 +6,7 @@ import java.nio.file.{Files, Paths, StandardCopyOption}
 import akka.NotUsed
 import akka.actor.ActorRefFactory
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.stream.scaladsl.{FileIO, Sink, Source}
+import akka.stream.scaladsl.{FileIO, Sink, Source, StreamConverters}
 import akka.util.ByteString
 
 import scala.concurrent.Future
@@ -20,45 +20,28 @@ class ConfigData(val source: Source[ByteString, Any]) {
   /**
    * Writes the contents of the source to the given output stream.
    */
-  def writeToOutputStream(out: OutputStream)(implicit context: ActorRefFactory): Future[Unit] = {
-    import context.dispatcher
-    implicit val materializer = ActorMaterializer()
-    val sink = Sink.foreach[ByteString] { bytes =>
-      out.write(bytes.toArray)
-    }
-    val materialized = source.runWith(sink)
-    // ensure the output file is closed when done
-    for {
-      _ <- materialized
-    } yield {
-      Try(out.close())
-    }
+  def writeToOutputStream(out: OutputStream)(implicit mat: Materializer): Future[Unit] = {
+    import mat.executionContext
+    source
+      .runWith(StreamConverters.fromOutputStream(() ⇒ out))
+      .map(_ ⇒ Try(out.close()))
   }
 
   /**
-   * Writes the contents of the source to the given file.
+   * Writes the contents of the source to a temp file and returns it.
    */
-  def writeToFile(file: File)(implicit context: ActorRefFactory): Future[Unit] = {
-    import context.dispatcher
-    val path = file.toPath
-    val dir = Option(path.getParent).getOrElse(new File(".").toPath)
-    if (!Files.isDirectory(dir))
-      Files.createDirectories(dir)
-
-    // Write to a tmp file and then rename
-    val tmpFile = File.createTempFile(file.getName, null, dir.toFile)
-    val out = new FileOutputStream(tmpFile)
-    for {
-      _ <- writeToOutputStream(out)
-    } yield {
-      Files.move(tmpFile.toPath, path, StandardCopyOption.ATOMIC_MOVE)
-    }
+  def toFileF(implicit mat: Materializer): Future[File] = {
+    import mat.executionContext
+    val path = Files.createTempFile("config-service-", null)
+    source
+      .runWith(FileIO.toPath(path))
+      .map(_ ⇒ path.toFile)
   }
 
   /**
    * Returns a future string by reading the source.
    */
-  def stringF(implicit mat: Materializer): Future[String] = {
+  def toStringF(implicit mat: Materializer): Future[String] = {
     source.runFold("")((str, bs) ⇒ str + bs.utf8String)
   }
 }
