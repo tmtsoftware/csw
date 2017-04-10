@@ -6,22 +6,17 @@ import java.nio.file.{Files, Paths, StandardCopyOption}
 import akka.NotUsed
 import akka.actor.ActorRefFactory
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{FileIO, Sink, Source}
 import akka.util.ByteString
 
 import scala.concurrent.Future
 import scala.util.Try
 
 /**
- * This trait represents the contents of the files being managed.
- * It is based on Akka streams.
+ * This class represents the contents of the files being managed.
+ * It is wraps an Akka streams of ByteString
  */
-trait ConfigData {
-  /**
-   * Returns a stream which can be used to read the data
-   */
-  def source: Source[ByteString, Any]
-
+class ConfigData(val source: Source[ByteString, Any]) {
   /**
    * Writes the contents of the source to the given output stream.
    */
@@ -81,12 +76,12 @@ object ConfigData {
   /**
    * The data is contained in the string
    */
-  def apply(str: String): ConfigData = ConfigString(str)
+  def apply(str: String): ConfigData = ConfigData(str.getBytes)
 
   /**
    * Takes the data from the byte array
    */
-  def apply(bytes: Array[Byte]): ConfigData = ConfigBytes(bytes)
+  def apply(bytes: Array[Byte]): ConfigData = ConfigData(Source.single(ByteString(bytes)))
 
   /**
    * Initialize with the contents of the given file.
@@ -94,40 +89,10 @@ object ConfigData {
    * @param file      the data source
    * @param chunkSize the block or chunk size to use when streaming the data
    */
-  def apply(file: File, chunkSize: Int = 4096): ConfigData = ConfigFile(file, chunkSize)
+  def apply(file: File, chunkSize: Int = 4096): ConfigData = ConfigData(FileIO.fromPath(file.toPath, chunkSize))
 
   /**
    * The data source can be any byte string
    */
-  def apply(source: Source[ByteString, Any]): ConfigData = ConfigSource(source)
+  def apply(source: Source[ByteString, Any]): ConfigData = new ConfigData(source)
 }
-
-case class ConfigString(str: String) extends ConfigData {
-  override def source: Source[ByteString, NotUsed] = Source(List(ByteString(str.getBytes)))
-
-  override def toString: String = str
-}
-
-case class ConfigBytes(bytes: Array[Byte]) extends ConfigData {
-  override def source: Source[ByteString, NotUsed] = Source(List(ByteString(bytes)))
-
-  override def toString: String = new String(bytes)
-}
-
-case class ConfigFile(file: File, chunkSize: Int = 4096) extends ConfigData {
-
-  // XXX Seems that Source is not serializable...
-  //  override def source: Source[ByteString, NotUsed] = {
-  //    val mappedByteBuffer = FileUtils.mmap(file.toPath)
-  //    val iterator = new FileUtils.ByteBufferIterator(mappedByteBuffer, chunkSize)
-  //    Source.fromIterator(() => iterator)
-  //  }
-
-  private val bytes = Files.readAllBytes(Paths.get(file.getPath))
-
-  override def source: Source[ByteString, NotUsed] = Source(List(ByteString(bytes)))
-
-  override def toString: String = new String(bytes)
-}
-
-case class ConfigSource(override val source: Source[ByteString, Any]) extends ConfigData
