@@ -88,7 +88,8 @@ lazy val `csw-config` = project
       AkkaHttp.`akka-http`,
       Libs.svnkit,
       AkkaHttp.`akka-http-spray-json`,
-      Libs.`scopt`
+      Libs.`scopt`,
+      Libs.`commons-codec`
     ),
     libraryDependencies ++= Seq(
       Libs.`scalatest` % Test,

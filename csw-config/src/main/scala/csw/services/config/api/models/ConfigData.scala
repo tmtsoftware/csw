@@ -1,8 +1,8 @@
 package csw.services.config.api.models
 
-import java.io.{File, OutputStream}
+import java.io.{File, InputStream}
 import java.nio.file.Files
-import java.util.concurrent.{CompletableFuture, CompletionStage}
+import java.util.concurrent.CompletableFuture
 
 import akka.stream.Materializer
 import akka.stream.scaladsl.{FileIO, Source, StreamConverters}
@@ -10,23 +10,12 @@ import akka.util.ByteString
 
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.Future
-import scala.util.Try
 
 /**
  * This class represents the contents of the files being managed.
  * It is wraps an Akka streams of ByteString
  */
 class ConfigData(val source: Source[ByteString, Any]) {
-  /**
-   * Writes the contents of the source to the given output stream.
-   */
-  def writeToOutputStream(out: OutputStream)(implicit mat: Materializer): Future[Unit] = {
-    import mat.executionContext
-    source
-      .runWith(StreamConverters.fromOutputStream(() ⇒ out))
-      .map(_ ⇒ Try(out.close()))
-  }
-
   /**
    * Writes the contents of the source to a temp file and returns it.
    */
@@ -47,6 +36,12 @@ class ConfigData(val source: Source[ByteString, Any]) {
 
   def toJStringF(implicit mat: Materializer): CompletableFuture[String] = {
     toStringF.toJava.toCompletableFuture
+  }
+  /**
+    * Returns an inputStream which emits the bytes read from source
+    */
+  def toInputStream(implicit mat: Materializer): InputStream = {
+    source.runWith(StreamConverters.asInputStream())
   }
 }
 

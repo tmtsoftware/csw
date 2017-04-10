@@ -1,6 +1,7 @@
 package csw.services.config.api.commons
 
 import akka.actor.ActorSystem
+import akka.dispatch.MessageDispatcher
 import akka.stream.{ActorMaterializer, Materializer}
 
 import scala.concurrent.ExecutionContextExecutor

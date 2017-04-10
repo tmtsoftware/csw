@@ -265,24 +265,19 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     * @param comment    an optional comment to associate with this file
     * @return a future unique id that can be used to refer to the file
     */
-  private def put(path: File, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = {
-    val os = new ByteArrayOutputStream()
-    for {
-      _ <- configData.writeToOutputStream(os)
-    } yield {
-      val data = os.toByteArray
-      val commitInfo = if (update) {
-        modifyFile(comment, path, data)
-      } else {
-        addFile(comment, path, data)
-      }
-      ConfigId(commitInfo.getNewRevision)
+  private def put(path: File, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = Future {
+    val inputStream = configData.toInputStream
+    val commitInfo = if (update) {
+      modifyFile(comment, path, inputStream)
+    } else {
+      addFile(comment, path, inputStream)
     }
+    ConfigId(commitInfo.getNewRevision)
   }
 
   // Modifies the contents of the given file in the repository.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  private def modifyFile(comment: String, path: File, data: Array[Byte]): SVNCommitInfo = {
+  private def modifyFile(comment: String, path: File, data: InputStream): SVNCommitInfo = {
     val svn = getSvn
     try {
       val editor = svn.getCommitEditor(comment, null)
@@ -291,7 +286,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       editor.openFile(filePath, SVNRepository.INVALID_REVISION)
       editor.applyTextDelta(filePath, null)
       val deltaGenerator = new SVNDeltaGenerator
-      val checksum = deltaGenerator.sendDelta(filePath, new ByteArrayInputStream(data), editor, true)
+      val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
       editor.closeFile(filePath, checksum)
       editor.closeDir()
       editor.closeEdit
@@ -310,7 +305,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   // Adds the given file (and dir if needed) to svn.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  private def addFile(comment: String, path: File, data: Array[Byte]): SVNCommitInfo = {
+  private def addFile(comment: String, path: File, data: InputStream): SVNCommitInfo = {
     val svn = getSvn
     try {
       val editor = svn.getCommitEditor(comment, null)
@@ -330,7 +325,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       editor.addFile(filePath, null, SVNRepository.INVALID_REVISION)
       editor.applyTextDelta(filePath, null)
       val deltaGenerator = new SVNDeltaGenerator
-      val checksum = deltaGenerator.sendDelta(filePath, new ByteArrayInputStream(data), editor, true)
+      val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
       editor.closeFile(filePath, checksum)
       editor.closeDir() // XXX TODO I think all added parent dirs need to be closed also
       editor.closeEdit()
