@@ -3,6 +3,8 @@ package csw.services.config.api.javadsl;
 import akka.stream.Materializer;
 import csw.services.config.api.commons.TestFileUtils;
 import csw.services.config.api.models.ConfigData;
+import csw.services.config.api.models.ConfigFileHistory;
+import csw.services.config.api.models.ConfigId;
 import csw.services.config.server.ServerWiring;
 import csw.services.config.server.internal.JConfigManager;
 import org.junit.After;
@@ -12,8 +14,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class JConfigMangerTest {
     private ServerWiring serverWiring = new ServerWiring();
@@ -65,4 +71,60 @@ public class JConfigMangerTest {
         Assert.assertEquals(configDataUpdated.get().toJStringF(mat).get(), updatedAssemblyConfigValue);
     }
 
+    @Test
+    public void testSpecificVersionRetrieval() throws ExecutionException, InterruptedException {
+        String configValue = "axisName = tromboneAxis";
+        String assemblyConfigValue = "assemblyHCDCount = 3";
+        String newAssemblyConfigValue = "assemblyHCDCount = 5";
+        File file = Paths.get("/a/b/csw.conf").toFile();
+        configManager.create(file, ConfigData.apply(configValue), false, "commit csw conf file").get();
+        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+
+        ConfigId configId = configManager.update(file, ConfigData.apply(assemblyConfigValue), "commit updated conf file").get();
+
+        configManager.update(file, ConfigData.apply(newAssemblyConfigValue), "updated config to assembly").get();
+        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), newAssemblyConfigValue);
+
+        Assert.assertEquals(configManager.get(file, Optional.of(configId)).get().get().toJStringF(mat).get(), assemblyConfigValue);
+    }
+
+    @Test
+    public void testCorrectVersionBasedOnDate() throws ExecutionException, InterruptedException {
+        String configValue = "axisName = tromboneAxis";
+        String assemblyConfigValue = "assemblyHCDCount = 3";
+        String newAssemblyConfigValue = "assemblyHCDCount = 5";
+
+        File file = Paths.get("/test.conf").toFile();
+        configManager.create(file, ConfigData.apply(configValue), false, "commit initial configuration").get();
+        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+
+        configManager.update(file, ConfigData.apply(assemblyConfigValue), "updated config to assembly").get();
+        Date date = new Date();
+        configManager.update(file, ConfigData.apply(newAssemblyConfigValue), "updated config to assembly").get();
+
+        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), newAssemblyConfigValue);
+        Assert.assertEquals(configManager.get(file, date).get().get().toJStringF(mat).get(), assemblyConfigValue);
+    }
+
+    @Test
+    public void testHistoryOfAFile() throws ExecutionException, InterruptedException {
+        String configValue = "axisName = tromboneAxis";
+        String assemblyConfigValue = "assemblyHCDCount = 3";
+        String newAssemblyConfigValue = "assemblyHCDCount = 5";
+
+        File file = Paths.get("/test.conf").toFile();
+        ConfigId configIdCreate = configManager.create(file, ConfigData.apply(configValue), false, "commit initial configuration").get();
+        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+
+        ConfigId configIdUpdate1 = configManager.update(file, ConfigData.apply(assemblyConfigValue), "updated config to assembly").get();
+        ConfigId configIdUpdate2 = configManager.update(file, ConfigData.apply(newAssemblyConfigValue), "updated config to assembly").get();
+
+        Assert.assertEquals(configManager.history(file).get().size(), 3);
+        Assert.assertEquals(configManager.history(file).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1, configIdCreate)));
+
+        Assert.assertEquals(configManager.history(file, 2).get().size(), 2);
+        Assert.assertEquals(configManager.history(file, 2).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+    }
 }
