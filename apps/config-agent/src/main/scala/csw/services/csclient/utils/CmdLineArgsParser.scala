@@ -1,0 +1,68 @@
+package csw.services.csclient.utils
+
+import java.io.File
+
+import csw.services.csclient.models.Options
+import scopt.OptionParser
+
+/**
+  * Parses the command line options using `scopt` library.
+  */
+
+object CmdLineArgsParser {
+
+  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("csClient") {
+    head("csClient", System.getProperty("CSW_VERSION"))
+
+    cmd("create") action { (_, c) =>
+      c.copy(op = "create")
+    } text "copies the input file in the repository at a specified path" children (
+
+      arg[File]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(x))
+      } text "path in the repository",
+
+      opt[File]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
+        c.copy(inputFilePath = Some(x))
+      } text "input file path",
+
+      opt[Unit]("oversize") action { (_, c) =>
+        c.copy(oversize = true)
+      } text "optional add this option for large/binary files",
+
+      opt[String]('c', "comment") action { (x, c) =>
+        c.copy(comment = x)
+      } text "optional create comment"
+    )
+
+    //get operation
+    cmd("get") action { (_, c) =>
+      c.copy(op = "get")
+    } text "retrieves file with a given path from config service, and writes it to the output file" children (
+      arg[File]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(x))
+      } text "path of the file in the repository",
+
+      opt[File]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
+        c.copy(outputFilePath = Some(x))
+      } text "output file path",
+
+      opt[String]("id") action { (x, c) =>
+        c.copy(id = Some(x))
+      } text "optional version id of the repository file to get"
+    )
+
+    help("help")
+
+    version("version")
+
+    checkConfig { c =>
+      if (c.op.isEmpty)
+        failure("Please specify at least one command {get | create | update | exists | list | history | setDefault | getDefault | resetDefault}")
+      else
+        success
+    }
+
+    override def errorOnUnknownArgument: Boolean = false
+  }
+}
