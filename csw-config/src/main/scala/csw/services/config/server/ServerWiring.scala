@@ -6,18 +6,21 @@ import csw.services.config.api.commons.ActorRuntime
 import csw.services.config.api.scaladsl.ConfigManager
 import csw.services.config.server.http.{ConfigServiceRoute, HttpService}
 import csw.services.config.server.repo.{OversizeFileManager, SvnAdmin, SvnConfigManager}
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 class ServerWiring {
-  val config: Config = ConfigFactory.load()
-  val settings = new Settings(config)
+  lazy val config: Config = ConfigFactory.load()
+  lazy val settings = new Settings(config)
 
-  val actorSystem = ActorSystem("config-service", config)
-  val actorRuntime = new ActorRuntime(actorSystem)
+  lazy val actorSystem = ActorSystem("config-service", config)
+  lazy val actorRuntime = new ActorRuntime(actorSystem)
 
-  val oversizeFileManager = new OversizeFileManager(settings)
-  val svnAdmin = new SvnAdmin(settings)
-  val configManager: ConfigManager = new SvnConfigManager(settings, oversizeFileManager, actorRuntime)
+  lazy val oversizeFileManager = new OversizeFileManager(settings)
+  lazy val svnAdmin = new SvnAdmin(settings)
+  lazy val configManager: ConfigManager = new SvnConfigManager(settings, oversizeFileManager, actorRuntime)
 
-  val configServiceRoute = new ConfigServiceRoute(configManager, actorRuntime)
-  val httpService = new HttpService(configServiceRoute, settings, actorRuntime)
+  lazy val locationService: LocationService = LocationServiceFactory.make()
+
+  lazy val configServiceRoute = new ConfigServiceRoute(configManager, actorRuntime)
+  lazy val httpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }

@@ -4,15 +4,15 @@ import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.config.api.commons.ActorRuntime
 import csw.services.config.api.scaladsl.ConfigManager
-import csw.services.location.models.Connection.HttpConnection
-import csw.services.location.models._
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 class ClientWiring {
-  val config: Config = ConfigFactory.load()
-  val actorSystem = ActorSystem("config-client", config)
-  val actorRuntime = new ActorRuntime(actorSystem)
+  lazy val config: Config = ConfigFactory.load()
+  lazy val actorSystem = ActorSystem("config-client", config)
+  lazy val actorRuntime = new ActorRuntime(actorSystem)
 
-  val registration = HttpRegistration(HttpConnection(ComponentId("configClient", ComponentType.Service)), 4000, "")
-  val location: Location = registration.location("localhost")
-  val configManager: ConfigManager = new ConfigClient(location, actorRuntime)
+  lazy val locationService: LocationService = LocationServiceFactory.make()
+  lazy val locationResolver = new LocationResolver(locationService)
+
+  lazy val configManager: ConfigManager = new ConfigClient(locationResolver.configServiceLocation, actorRuntime)
 }

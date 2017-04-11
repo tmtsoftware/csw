@@ -8,11 +8,11 @@ import csw.services.config.api.commons.{ShaUtils, TestFileUtils}
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo}
 import csw.services.config.server.ServerWiring
-import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEach {
+abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  private val serverWiring = new ServerWiring
+  lazy val serverWiring = new ServerWiring
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
 
@@ -26,6 +26,10 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
 
   override protected def afterEach(): Unit = {
     testFileUtils.deleteServerFiles()
+  }
+
+  override protected def afterAll(): Unit = {
+    serverWiring.httpService.shutdown().await
   }
 
   val configValue: String =
