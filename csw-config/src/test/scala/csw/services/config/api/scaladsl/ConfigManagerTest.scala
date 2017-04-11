@@ -29,17 +29,35 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     testFileUtils.deleteServerFiles()
   }
 
-  test("should able to create a file and retrieve the same") {
-    val configValue = "axisName = tromboneAxis"
+  val configValue: String =
+    """
+      |axisName1 = tromboneAxis1
+      |axisName2 = tromboneAxis2
+      |axisName3 = tromboneAxis3
+      |""".stripMargin
 
+  val configValue2: String =
+    """
+      |axisName11 = tromboneAxis11
+      |axisName22 = tromboneAxis22
+      |axisName33 = tromboneAxis33
+      |""".stripMargin
+
+  val configValue3: String =
+    """
+      |axisName111 = tromboneAxis111
+      |axisName222 = tromboneAxis222
+      |axisName333 = tromboneAxis333
+      |""".stripMargin
+
+
+  test("should able to create a file and retrieve the same") {
     val file = Paths.get("test.conf").toFile
     configManager.create(file, ConfigData(configValue), oversize = false, "commit test file").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
   }
 
   test("should ignore '/' at the beginning of file path and create a file") {
-    val configValue = "axisName = tromboneAxis"
-
     val fileName = "csw.conf"
     val file = Paths.get(s"/$fileName").toFile
     val fileWithoutBackslash = Paths.get(fileName).toFile
@@ -53,7 +71,6 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should throw IOException while creating a file if it already exists in repository") {
-    val configValue = "axisName = tromboneAxis"
     val file = Paths.get("/test.conf").toFile
     configManager.create(file, ConfigData(configValue), oversize = false, "commit test conf for first time").await
 
@@ -63,21 +80,19 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should able to update existing file and get the file with updated content") {
-    val assemblyConfigValue = "axisName = tromboneAxis"
     val file = Paths.get("/assembly.conf").toFile
-    configManager.create(file, ConfigData(assemblyConfigValue), oversize = false, "commit assembly conf").await
-    configManager.get(file).await.get.toStringF.await shouldBe assemblyConfigValue
+    configManager.create(file, ConfigData(configValue), oversize = false, "commit assembly conf").await
+    configManager.get(file).await.get.toStringF.await shouldBe configValue
 
-    val updatedAssemblyConfigValue = "assemblyHCDCount = 3"
-    configManager.update(file, ConfigData(updatedAssemblyConfigValue), "commit updated assembly conf").await
-    configManager.get(file).await.get.toStringF.await shouldBe updatedAssemblyConfigValue
+    configManager.update(file, ConfigData(configValue2), "commit updated assembly conf").await
+    configManager.get(file).await.get.toStringF.await shouldBe configValue2
   }
 
   test("update should throw FileNotFoundException if a file does not exists in repository") {
     val file = Paths.get("/assembly.conf").toFile
 
     intercept[FileNotFoundException] {
-      configManager.update(file, ConfigData("assemblyHCDCount = 3"), "commit updated assembly conf").await
+      configManager.update(file, ConfigData(configValue), "commit updated assembly conf").await
     }
   }
 
@@ -88,67 +103,52 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should able to retrieve the specific version of file by config ID") {
-    val configValue = "axisName = tromboneAxis"
-    val assemblyConfigValue = "assemblyHCDCount = 3"
-    val newAssemblyConfigValue = "assemblyHCDCount = 5"
     val file = Paths.get("/a/b/csw.conf").toFile
     configManager.create(file, ConfigData(configValue), oversize = false, "commit csw conf file").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
-    val configId = configManager.update(file, ConfigData(assemblyConfigValue), "commit updated conf file").await
+    val configId = configManager.update(file, ConfigData(configValue), "commit updated conf file").await
 
-    configManager.update(file, ConfigData(newAssemblyConfigValue), "updated config to assembly").await
-    configManager.get(file).await.get.toStringF.await shouldBe newAssemblyConfigValue
+    configManager.update(file, ConfigData(configValue2), "updated config to assembly").await
+    configManager.get(file).await.get.toStringF.await shouldBe configValue2
 
-    configManager.get(file, Some(configId)).await.get.toStringF.await shouldBe assemblyConfigValue
+    configManager.get(file, Some(configId)).await.get.toStringF.await shouldBe configValue
   }
 
   test("should get the correct version of file based on date") {
-    val configValue = "axisName = tromboneAxis"
-    val assemblyConfigValue = "assemblyHCDCount = 3"
-    val newAssemblyConfigValue = "assemblyHCDCount = 5"
-
     val file = Paths.get("/test.conf").toFile
     configManager.create(file, ConfigData(configValue), oversize = false, "commit initial configuration").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
-    configManager.update(file, ConfigData(assemblyConfigValue), "updated config to assembly").await
+    configManager.update(file, ConfigData(configValue2), "updated config to assembly").await
     val date = new Date()
-    configManager.update(file, ConfigData(newAssemblyConfigValue), "updated config to assembly").await
+    configManager.update(file, ConfigData(configValue3), "updated config to assembly").await
 
-    configManager.get(file).await.get.toStringF.await shouldBe newAssemblyConfigValue
-    configManager.get(file, date).await.get.toStringF.await shouldBe assemblyConfigValue
+    configManager.get(file).await.get.toStringF.await shouldBe configValue3
+    configManager.get(file, date).await.get.toStringF.await shouldBe configValue2
   }
 
   test("should get the initial version of file if date provided is before the creation date") {
-    val initialConfigValue = "axisName = tromboneAxis"
-    val assemblyConfigValue = "assemblyHCDCount = 3"
-    val newAssemblyConfigValue = "assemblyHCDCount = 5"
-
     val date = new Date(0L)
     val file = Paths.get("/test.conf").toFile
-    configManager.create(file, ConfigData(initialConfigValue), oversize = false, "commit initial configuration").await
-    configManager.get(file).await.get.toStringF.await shouldBe initialConfigValue
+    configManager.create(file, ConfigData(configValue), oversize = false, "commit initial configuration").await
+    configManager.get(file).await.get.toStringF.await shouldBe configValue
 
-    configManager.update(file, ConfigData(assemblyConfigValue), "updated config to assembly").await
+    configManager.update(file, ConfigData(configValue2), "updated config to assembly").await
 
-    configManager.update(file, ConfigData(newAssemblyConfigValue), "updated config to assembly").await
-    configManager.get(file).await.get.toStringF.await shouldBe newAssemblyConfigValue
+    configManager.update(file, ConfigData(configValue3), "updated config to assembly").await
+    configManager.get(file).await.get.toStringF.await shouldBe configValue3
 
-    configManager.get(file, date).await.get.toStringF.await shouldBe initialConfigValue
+    configManager.get(file, date).await.get.toStringF.await shouldBe configValue
   }
 
   test("should get the history of a file") {
-    val configValue = "axisName = tromboneAxis"
-    val assemblyConfigValue = "assemblyHCDCount = 3"
-    val newAssemblyConfigValue = "assemblyHCDCount = 5"
-
     val file = Paths.get("/test.conf").toFile
     val configIdCreate = configManager.create(file, ConfigData(configValue), oversize = false, "commit initial configuration").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
-    val configIdUpdate1 = configManager.update(file, ConfigData(assemblyConfigValue), "updated config to assembly").await
-    val configIdUpdate2 = configManager.update(file, ConfigData(newAssemblyConfigValue), "updated config to assembly").await
+    val configIdUpdate1 = configManager.update(file, ConfigData(configValue2), "updated config to assembly").await
+    val configIdUpdate2 = configManager.update(file, ConfigData(configValue3), "updated config to assembly").await
 
     configManager.history(file).await.size shouldBe 3
     configManager.history(file).await.map(_.id) shouldBe List(configIdUpdate2, configIdUpdate1, configIdCreate)
@@ -180,8 +180,6 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("exists should return true if file exist") {
-    val configValue = "axisName = tromboneAxis"
-
     val file = Paths.get("a/test.csw.conf").toFile
     configManager.create(file, ConfigData(configValue), oversize = false, "commit config file").await
 
@@ -189,8 +187,6 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should able to delete existing file") {
-    val configValue = "axisName = tromboneAxis"
-
     val file = Paths.get("tromboneHCD.conf").toFile
     configManager.create(file, ConfigData(configValue), oversize = false, "commit trombone config file").await
 
@@ -210,16 +206,13 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   //  TODO Implementation of delete() needs to be fixed
   //  This is not a valid test. Delete should just remove latest version and keep older ones.
   test("delete removes all versions of a file") {
-    val configValue = "axisName = tromboneAxis"
-    val assemblyConfigValue = "assemblyHCDCount = 3"
-    val newAssemblyConfigValue = "assemblyHCDCount = 5"
     val file = Paths.get("/a/b/csw.conf").toFile
 
     configManager.create(file, ConfigData(configValue), oversize = false, "commit config file").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
-    val configId = configManager.update(file, ConfigData(assemblyConfigValue), "updated config to assembly").await
-    configManager.update(file, ConfigData(newAssemblyConfigValue), "updated config to assembly").await
+    val configId = configManager.update(file, ConfigData(configValue2), "updated config to assembly").await
+    configManager.update(file, ConfigData(configValue3), "updated config to assembly").await
 
     configManager.history(file).await.size shouldBe 3
     configManager.delete(file).await
@@ -228,22 +221,18 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should able to get and set the default config file") {
-    val configValue = "axisName = tromboneAxis"
-    val assemblyConfigValue = "assemblyHCDCount = 3"
-    val newAssemblyConfigValue = "assemblyHCDCount = 5"
-
     val file = Paths.get("/test.conf").toFile
     val configIdCreate = configManager.create(file, ConfigData(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
-    val configIdUpdate1 = configManager.update(file, ConfigData(assemblyConfigValue), "Updated config to assembly").await
-    configManager.update(file, ConfigData(newAssemblyConfigValue), "Updated config to assembly").await
+    val configIdUpdate1 = configManager.update(file, ConfigData(configValue2), "Updated config to assembly").await
+    configManager.update(file, ConfigData(configValue3), "Updated config to assembly").await
 
-    configManager.getDefault(file).await.get.toStringF.await shouldBe newAssemblyConfigValue
+    configManager.getDefault(file).await.get.toStringF.await shouldBe configValue3
     configManager.setDefault(file, Some(configIdUpdate1)).await
-    configManager.getDefault(file).await.get.toStringF.await shouldBe assemblyConfigValue
+    configManager.getDefault(file).await.get.toStringF.await shouldBe configValue2
     configManager.resetDefault(file).await
-    configManager.getDefault(file).await.get.toStringF.await shouldBe newAssemblyConfigValue
+    configManager.getDefault(file).await.get.toStringF.await shouldBe configValue3
   }
 
   test("should be able to store and retrieve oversize file") {
