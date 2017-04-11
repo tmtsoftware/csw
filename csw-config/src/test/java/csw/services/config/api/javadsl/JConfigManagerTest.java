@@ -4,6 +4,7 @@ import akka.stream.Materializer;
 import csw.services.config.api.commons.TestFileUtils;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.api.models.ConfigFileHistory;
+import csw.services.config.api.models.ConfigFileInfo;
 import csw.services.config.api.models.ConfigId;
 import csw.services.config.server.ServerWiring;
 import csw.services.config.server.internal.JConfigManager;
@@ -21,7 +22,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class JConfigMangerTest {
+public class JConfigManagerTest {
     private ServerWiring serverWiring = new ServerWiring();
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
@@ -126,5 +127,22 @@ public class JConfigMangerTest {
         Assert.assertEquals(configManager.history(file, 2).get().size(), 2);
         Assert.assertEquals(configManager.history(file, 2).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+    }
+
+    @Test
+    public void testListAllFiles() throws ExecutionException, InterruptedException {
+        File tromboneConfig = Paths.get("trombone.conf").toFile();
+        File assemblyConfig = Paths.get("a/b/assembly/assembly.conf").toFile();
+
+        String tromboneConfigComment = "hello trombone";
+        String assemblyConfigComment = "hello assembly";
+
+        ConfigId tromboneConfigId = configManager.create(tromboneConfig, ConfigData.apply("axisName = tromboneAxis"), false, tromboneConfigComment).get();
+        ConfigId assemblyConfigId = configManager.create(assemblyConfig, ConfigData.apply("assemblyHCDCount = 3"), false, assemblyConfigComment).get();
+
+        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment);
+        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment);
+
+        Assert.assertEquals(configManager.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
     }
 }
