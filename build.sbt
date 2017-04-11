@@ -56,6 +56,21 @@ lazy val `track-location-agent` = project
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
 
+lazy val `config-agent` = project
+  .in(file("apps/config-agent"))
+  .enablePlugins(DeployApp)
+  .dependsOn(`csw-location`)
+  .settings(
+    libraryDependencies ++= Seq(
+      Akka.`akka-actor`,
+      Libs.`scopt`,
+      Libs.`scalatest` % Test,
+      Libs.`scala-logging` % Test
+    ),
+    sources in (Compile, doc) := Seq.empty,
+    bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
+  )
+
 lazy val `csw-cluster-seed` = project
   .in(file("apps/csw-cluster-seed"))
   .enablePlugins(DeployApp)
