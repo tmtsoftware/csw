@@ -27,7 +27,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     def createOversize(): Future[ConfigId] = {
       for {
         sha1 <- oversizeFileManager.post(configData)
-        configId <- create(shaFile(path), ConfigData(sha1), oversize = false, comment)
+        configId <- create(shaFile(path), ConfigData.fromString(sha1), oversize = false, comment)
       } yield configId
     }
 
@@ -54,7 +54,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     def updateOversize(): Future[ConfigId] = {
       for {
         sha1 <- oversizeFileManager.post(configData)
-        configId <- update(shaFile(path), ConfigData(sha1), comment)
+        configId <- update(shaFile(path), ConfigData.fromString(sha1), comment)
       } yield configId
     }
 
@@ -104,7 +104,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       } finally {
         svn.closeSession()
       }
-      Some(ConfigData(os.toByteArray))
+      Some(ConfigData.fromBytes(os.toByteArray))
     }
 
     // If the file exists in the repo, get its data
@@ -216,7 +216,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   override def setDefault(path: File, id: Option[ConfigId] = None): Future[Unit] = {
     (if (id.isDefined) id else getCurrentVersion(path)) match {
       case Some(configId) =>
-        create(defaultFile(path), ConfigData(configId.id)).map(_ => ())
+        create(defaultFile(path), ConfigData.fromString(configId.id)).map(_ => ())
       case None =>
         Future.failed(new FileNotFoundException(s"Unknown path $path"))
     }

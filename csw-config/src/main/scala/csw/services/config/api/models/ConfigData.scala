@@ -4,7 +4,7 @@ import java.io.{File, InputStream}
 import java.nio.file.Files
 import java.util.concurrent.CompletableFuture
 
-import akka.stream.Materializer
+import akka.stream.{Materializer, javadsl}
 import akka.stream.scaladsl.{FileIO, Source, StreamConverters}
 import akka.util.ByteString
 
@@ -16,6 +16,7 @@ import scala.concurrent.Future
  * It is wraps an Akka streams of ByteString
  */
 class ConfigData(val source: Source[ByteString, Any]) {
+
   /**
    * Returns a future string by reading the source.
    */
@@ -23,6 +24,11 @@ class ConfigData(val source: Source[ByteString, Any]) {
     source.runFold("")((str, bs) ⇒ str + bs.utf8String)
   }
 
+  /**
+    * * Java API
+    *
+    * Returns a future string by reading the source.
+    */
   def toJStringF(implicit mat: Materializer): CompletableFuture[String] = {
     toStringF.toJava.toCompletableFuture
   }
@@ -41,12 +47,12 @@ object ConfigData {
   /**
    * The data is contained in the string
    */
-  def apply(str: String): ConfigData = ConfigData(str.getBytes)
+  def fromString(str: String): ConfigData = new ConfigData(Source.single(ByteString(str.getBytes)))
 
   /**
    * Takes the data from the byte array
    */
-  def apply(bytes: Array[Byte]): ConfigData = ConfigData(Source.single(ByteString(bytes)))
+  def fromBytes(bytes: Array[Byte]): ConfigData = new ConfigData(Source.single(ByteString(bytes)))
 
   /**
    * Initialize with the contents of the given file.
@@ -54,10 +60,17 @@ object ConfigData {
    * @param file      the data source
    * @param chunkSize the block or chunk size to use when streaming the data
    */
-  def apply(file: File, chunkSize: Int = 4096): ConfigData = ConfigData(FileIO.fromPath(file.toPath, chunkSize))
+  def fromFile(file: File, chunkSize: Int = 4096): ConfigData = new ConfigData(FileIO.fromPath(file.toPath, chunkSize))
 
   /**
    * The data source can be any byte string
    */
-  def apply(source: Source[ByteString, Any]): ConfigData = new ConfigData(source)
+  def fromSource(source: Source[ByteString, Any]): ConfigData = new ConfigData(source)
+
+  /**
+    * Java API
+    *
+    * The data source can be any byte string
+    */
+  def fromJavaSource(source: javadsl.Source[ByteString, Any]): ConfigData = new ConfigData(source.asScala)
 }

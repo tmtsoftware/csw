@@ -44,7 +44,7 @@ public class JConfigManagerTest {
         String configValue = "axisName = tromboneAxis";
 
         File file = Paths.get("test.conf").toFile();
-        configManager.create(file, ConfigData.apply(configValue), false, "commit test file").get();
+        configManager.create(file, ConfigData.fromString(configValue), false, "commit test file").get();
         Optional<ConfigData> configData = configManager.get(file).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue);
     }
@@ -53,7 +53,7 @@ public class JConfigManagerTest {
     public void testCreateOversizeFile() throws ExecutionException, InterruptedException {
         File tempFile = Paths.get("SomeOversizeFile.txt").toFile();
         String configValue = "test {We think, this is some oversize text!!!!}";
-        configManager.create(tempFile, ConfigData.apply(configValue), true).get();
+        configManager.create(tempFile, ConfigData.fromString(configValue), true).get();
         Optional<ConfigData> configData = configManager.get(tempFile).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue);
     }
@@ -62,12 +62,12 @@ public class JConfigManagerTest {
     public void testUpdateExistingFile() throws ExecutionException, InterruptedException {
         String assemblyConfigValue = "axisName = tromboneAxis";
         File file = Paths.get("/assembly.conf").toFile();
-        configManager.create(file, ConfigData.apply(assemblyConfigValue), false, "commit assembly conf").get();
+        configManager.create(file, ConfigData.fromString(assemblyConfigValue), false, "commit assembly conf").get();
         Optional<ConfigData> configData = configManager.get(file).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), assemblyConfigValue);
 
         String updatedAssemblyConfigValue = "assemblyHCDCount = 3";
-        configManager.update(file, ConfigData.apply(updatedAssemblyConfigValue), "commit updated assembly conf").get();
+        configManager.update(file, ConfigData.fromString(updatedAssemblyConfigValue), "commit updated assembly conf").get();
         Optional<ConfigData> configDataUpdated = configManager.get(file).get();
         Assert.assertEquals(configDataUpdated.get().toJStringF(mat).get(), updatedAssemblyConfigValue);
     }
@@ -78,12 +78,12 @@ public class JConfigManagerTest {
         String assemblyConfigValue = "assemblyHCDCount = 3";
         String newAssemblyConfigValue = "assemblyHCDCount = 5";
         File file = Paths.get("/a/b/csw.conf").toFile();
-        configManager.create(file, ConfigData.apply(configValue), false, "commit csw conf file").get();
+        configManager.create(file, ConfigData.fromString(configValue), false, "commit csw conf file").get();
         Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
 
-        ConfigId configId = configManager.update(file, ConfigData.apply(assemblyConfigValue), "commit updated conf file").get();
+        ConfigId configId = configManager.update(file, ConfigData.fromString(assemblyConfigValue), "commit updated conf file").get();
 
-        configManager.update(file, ConfigData.apply(newAssemblyConfigValue), "updated config to assembly").get();
+        configManager.update(file, ConfigData.fromString(newAssemblyConfigValue), "updated config to assembly").get();
         Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), newAssemblyConfigValue);
 
         Assert.assertEquals(configManager.get(file, Optional.of(configId)).get().get().toJStringF(mat).get(), assemblyConfigValue);
@@ -96,12 +96,12 @@ public class JConfigManagerTest {
         String newAssemblyConfigValue = "assemblyHCDCount = 5";
 
         File file = Paths.get("/test.conf").toFile();
-        configManager.create(file, ConfigData.apply(configValue), false, "commit initial configuration").get();
+        configManager.create(file, ConfigData.fromString(configValue), false, "commit initial configuration").get();
         Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
 
-        configManager.update(file, ConfigData.apply(assemblyConfigValue), "updated config to assembly").get();
+        configManager.update(file, ConfigData.fromString(assemblyConfigValue), "updated config to assembly").get();
         Date date = new Date();
-        configManager.update(file, ConfigData.apply(newAssemblyConfigValue), "updated config to assembly").get();
+        configManager.update(file, ConfigData.fromString(newAssemblyConfigValue), "updated config to assembly").get();
 
         Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), newAssemblyConfigValue);
         Assert.assertEquals(configManager.get(file, date).get().get().toJStringF(mat).get(), assemblyConfigValue);
@@ -114,11 +114,11 @@ public class JConfigManagerTest {
         String newAssemblyConfigValue = "assemblyHCDCount = 5";
 
         File file = Paths.get("/test.conf").toFile();
-        ConfigId configIdCreate = configManager.create(file, ConfigData.apply(configValue), false, "commit initial configuration").get();
+        ConfigId configIdCreate = configManager.create(file, ConfigData.fromString(configValue), false, "commit initial configuration").get();
         Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
 
-        ConfigId configIdUpdate1 = configManager.update(file, ConfigData.apply(assemblyConfigValue), "updated config to assembly").get();
-        ConfigId configIdUpdate2 = configManager.update(file, ConfigData.apply(newAssemblyConfigValue), "updated config to assembly").get();
+        ConfigId configIdUpdate1 = configManager.update(file, ConfigData.fromString(assemblyConfigValue), "updated config to assembly").get();
+        ConfigId configIdUpdate2 = configManager.update(file, ConfigData.fromString(newAssemblyConfigValue), "updated config to assembly").get();
 
         Assert.assertEquals(configManager.history(file).get().size(), 3);
         Assert.assertEquals(configManager.history(file).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
@@ -137,8 +137,8 @@ public class JConfigManagerTest {
         String tromboneConfigComment = "hello trombone";
         String assemblyConfigComment = "hello assembly";
 
-        ConfigId tromboneConfigId = configManager.create(tromboneConfig, ConfigData.apply("axisName = tromboneAxis"), false, tromboneConfigComment).get();
-        ConfigId assemblyConfigId = configManager.create(assemblyConfig, ConfigData.apply("assemblyHCDCount = 3"), false, assemblyConfigComment).get();
+        ConfigId tromboneConfigId = configManager.create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis"), false, tromboneConfigComment).get();
+        ConfigId assemblyConfigId = configManager.create(assemblyConfig, ConfigData.fromString("assemblyHCDCount = 3"), false, assemblyConfigComment).get();
 
         ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment);
         ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment);

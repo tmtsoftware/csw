@@ -49,7 +49,7 @@ class OversizeFileManager(settings: Settings) {
     val repoFilePath = makePath(settings.`oversize-files-dir`, shaAsFileName)
 
     if (repoFilePath.toFile.exists()) {
-      Some(ConfigData(FileIO.fromPath(repoFilePath)))
+      Some(ConfigData.fromSource(FileIO.fromPath(repoFilePath)))
     } else {
       None
     }
