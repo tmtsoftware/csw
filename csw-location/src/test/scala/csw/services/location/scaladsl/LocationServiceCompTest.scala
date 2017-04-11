@@ -1,6 +1,6 @@
 package csw.services.location.scaladsl
 
-import akka.actor.{Actor, PoisonPill, Props}
+import akka.actor.{Actor, ActorSystem, PoisonPill, Props}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
@@ -19,7 +19,7 @@ class LocationServiceCompTest
 
   lazy val locationService: LocationService = LocationServiceFactory.make()
 
-  implicit val actorSystem = ActorSystemFactory.remote("test")
+  implicit val actorSystem: ActorSystem = ActorSystemFactory.remote("test")
   implicit val mat: Materializer = ActorMaterializer()
 
   override protected def afterEach(): Unit = {
@@ -49,7 +49,7 @@ class LocationServiceCompTest
     locationService.list.await shouldBe List.empty
   }
 
-  test("should able to register, list and unregister http location") {
+  test("should able to register, resolve, list and unregister http location") {
     val componentId: ComponentId = ComponentId("exampleHTTPService", ComponentType.Service)
     val httpConnection: HttpConnection = HttpConnection(componentId)
     val Port: Int = 8080
@@ -59,13 +59,15 @@ class LocationServiceCompTest
 
     locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
 
+    locationService.resolve(httpConnection).await.get shouldBe httpRegistration.location(new Networks().hostname())
+
     locationService.list.await shouldBe List(httpRegistration.location(new Networks().hostname()))
 
     locationService.unregister(httpConnection).await
     locationService.list.await shouldBe List.empty
   }
 
-  test("should able to register, list and unregister akka location") {
+  test("should able to register, resolve, list and unregister akka location") {
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
     val Prefix = "prefix"
@@ -82,6 +84,8 @@ class LocationServiceCompTest
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
 
     Thread.sleep(10)
+
+    locationService.resolve(connection).await.get shouldBe akkaRegistration.location(new Networks().hostname())
 
     locationService.list.await shouldBe List(akkaRegistration.location(new Networks().hostname()))
 
@@ -195,7 +199,7 @@ class LocationServiceCompTest
     //create http registration
     val port = 9595
     val prefix = "/trombone/hcd"
-    val httpConnection = HttpConnection(new ComponentId("trombone1", ComponentType.HCD))
+    val httpConnection = HttpConnection(ComponentId("trombone1", ComponentType.HCD))
     val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
