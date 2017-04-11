@@ -28,9 +28,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
     def createOversize(): Future[ConfigId] = {
       for {
-        file <- configData.toFileF
-        sha1 <- oversizeFileManager.post(file)
-        _ <- deleteTempFile(file)
+        sha1 <- oversizeFileManager.post(configData)
         configId <- create(shaFile(path), ConfigData(sha1), oversize = false, comment)
       } yield configId
     }
@@ -57,9 +55,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
     def updateOversize(): Future[ConfigId] = {
       for {
-        file <- configData.toFileF
-        sha1 <- oversizeFileManager.post(file)
-        _ <- deleteTempFile(file)
+        sha1 <- oversizeFileManager.post(configData)
         configId <- update(shaFile(path), ConfigData(sha1), comment)
       } yield configId
     }

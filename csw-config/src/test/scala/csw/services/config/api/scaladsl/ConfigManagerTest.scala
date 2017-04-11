@@ -4,11 +4,10 @@ import java.io._
 import java.nio.file.Paths
 import java.util.Date
 
-import csw.services.config.api.commons.TestFileUtils
+import csw.services.config.api.commons.{ShaUtils, TestFileUtils}
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo}
 import csw.services.config.server.ServerWiring
-import net.codejava.security.HashGeneratorUtils
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 
 abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEach {
@@ -244,7 +243,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     fileContent.toStringF.await shouldBe content
 
     val svnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(configId)).await.get
-    svnConfigData.toStringF.await shouldBe HashGeneratorUtils.generateSHA1(content)
+    svnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(content).await
   }
 
   test("should list oversize files") {
@@ -282,10 +281,10 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     updatedFileContent.toStringF.await shouldBe newContent
 
     val oldSvnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(creationConfigId)).await.get
-    oldSvnConfigData.toStringF.await shouldBe HashGeneratorUtils.generateSHA1(creationContent)
+    oldSvnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(creationContent).await
 
     val newSvnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(newConfigId)).await.get
-    newSvnConfigData.toStringF.await shouldBe HashGeneratorUtils.generateSHA1(newContent)
+    newSvnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(newContent).await
 
     val fileHistories: List[ConfigFileHistory] = configManager.history(file).await
 
