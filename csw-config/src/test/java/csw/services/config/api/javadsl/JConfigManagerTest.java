@@ -29,6 +29,10 @@ public class JConfigManagerTest {
     private IConfigManager configManager = new JConfigManager(serverWiring.configManager(), serverWiring.actorRuntime());
     private Materializer mat = serverWiring.actorRuntime().mat();
 
+    String configValue = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";
+    String configValue2 = "axisName11 = tromboneAxis\naxisName22 = tromboneAxis2\naxisName3 = tromboneAxis33";
+    String configValue3 = "axisName111 = tromboneAxis\naxisName222 = tromboneAxis2\naxisName3 = tromboneAxis333";
+
     @Before
     public void initSvnRepo() {
         serverWiring.svnAdmin().initSvnRepo();
@@ -144,5 +148,17 @@ public class JConfigManagerTest {
         ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment);
 
         Assert.assertEquals(configManager.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
+    }
+
+    @Test
+    public void testExists() throws ExecutionException, InterruptedException {
+        File file = Paths.get("/test.conf").toFile();
+        Object ifExist = configManager.exists(file).get();
+        Assert.assertEquals(ifExist, false);
+
+        File newFile = Paths.get("a/test.csw.conf").toFile();
+        configManager.create(newFile, ConfigData.fromString(configValue), false, "commit config file").get();
+
+        Assert.assertEquals(configManager.exists(newFile).get(), true);
     }
 }
