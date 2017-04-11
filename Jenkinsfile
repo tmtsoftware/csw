@@ -1,79 +1,81 @@
 #!groovy
-node {
-    def failBuild = false
-    try {
-        ansiColor('xterm') {
-            node('master') {
-                stage('Checkout') {
-                    git 'https://github.com/tmtsoftware/csw-prod.git'
-                }
+try{
+    ansiColor('xterm') {
+        node('master') {
+            def failBuild = false
 
-                stage('Build') {
-                    sh "sbt -Dcheck.cycles=true clean scalastyle compile"
-                }
-
-                stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
-                    try {
-                        sh "sbt test:test"
-                    }
-                    catch (Exception e) {
-                        currentBuild.result = 'FAILED'
-                        failBuild = true
-                    }
-                    try {
-                        sh "sbt coverageReport"
-                    }
-                    catch (Exception ex) {
-                        failBuild = true
-                    }
-                    sh "sbt coverageAggregate"
-                    if (failBuild == true)
-                        sh "exit 1"
-                }
-
-                stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine.
-                    sh "sbt csw-location/multi-jvm:test"
-                }
-
-                stage('Multi-Node Test') { // These tests cover the scenario of multiple components in multiple containers on different machines.
-                    sh "sbt -DenableCoverage=false \"csw-location/multi-node-test-only csw.services.location.LocationServiceTest\""
-                }
-
-                stage('Package') {
-                    sh "./universal_package.sh"
-                    stash name: "repo"
-                }
+            stage('Checkout') {
+                git 'https://github.com/tmtsoftware/csw-prod.git'
             }
 
-            node('JenkinsNode1') {
-                stage('Multi-Container Docker') {
-                    unstash "repo"
-                    sh "./integration/scripts/runner.sh"
-                }
+            stage('Build') {
+                sh "sbt -Dcheck.cycles=true clean scalastyle compile"
             }
 
-            node('JenkinsNode1') {
-                stage('Multi-NICs Docker') {
-                    sh "./integration/scripts/multiple_nic_test.sh"
+            stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
+                try {
+                    sh "sbt test:test"
                 }
+                catch (Exception e) {
+                    currentBuild.result = 'FAILED'
+                    failBuild = true
+                }
+                try {
+                    sh "sbt coverageReport"
+                }
+                catch (Exception ex) {
+                    failBuild = true
+                }
+                sh "sbt coverageAggregate"
+                if (failBuild == true)
+                    sh "exit 1"
             }
 
-            node('master') {
-                stage('Deploy') {
-                    sh "./publish.sh"
-                }
+            stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine.
+                sh "sbt csw-location/multi-jvm:test"
+            }
+
+            stage('Multi-Node Test') { // These tests cover the scenario of multiple components in multiple containers on different machines.
+                sh "sbt -DenableCoverage=false \"csw-location/multi-node-test-only csw.services.location.LocationServiceTest\""
+            }
+
+            stage('Package') {
+                sh "./universal_package.sh"
+                stash name: "repo"
+            }
+        }
+
+        node('JenkinsNode1') {
+            stage('Multi-Container Docker') {
+                unstash "repo"
+                sh "./integration/scripts/runner.sh"
+            }
+
+            stage('Multi-NICs Docker') {
+                sh "./integration/scripts/multiple_nic_test.sh"
+            }
+        }
+
+        node('master') {
+            stage('Deploy') {
+                sh "./publish.sh"
             }
         }
     }
-    catch (Exception e) {
-        currentBuild.result = "FAILED"
-        throw e
-    } finally {
-        node('master') {
-            stage("Report") {
-                sendNotification(currentBuild.result)
+}
+catch (Exception e) {
+    currentBuild.result = "FAILED"
+    throw e
+}
+finally {
+    node('master') {
+        stage("Report") {
+            try{
                 publishJunitReport()
                 publishScoverageReport()
+            }
+            finally {
+                sendNotification(currentBuild.result)
             }
         }
     }
@@ -98,15 +100,15 @@ def sendNotification(String buildStatus = 'STARTED') {
     } else {
         color = 'RED'
         colorCode = '#FF0000'
+        emailext(
+                    subject: subject,
+                    body: details,
+                    to: "tmt-csw@thoughtworks.com"
+            )
     }
 
     slackSend(color: colorCode, message: summary)
 
-    emailext(
-            subject: subject,
-            body: details,
-            to: "tmt-csw@thoughtworks.com"
-    )
 }
 
 def publishJunitReport() {
