@@ -43,10 +43,10 @@ class OversizeFileManager(settings: Settings) {
     }
   }
 
-  def get(shaAsFileName: String): Option[ConfigData] = {
-    val repoFilePath = makePath(settings.`oversize-files-dir`, shaAsFileName)
+  def get(sha: String): Option[ConfigData] = {
+    val repoFilePath = makePath(settings.`oversize-files-dir`, sha)
 
-    if (repoFilePath.toFile.exists()) {
+    if (Files.exists(repoFilePath)) {
       Some(ConfigData.fromSource(FileIO.fromPath(repoFilePath)))
     } else {
       None
