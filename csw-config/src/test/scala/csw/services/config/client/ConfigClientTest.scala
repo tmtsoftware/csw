@@ -29,4 +29,7 @@ class ConfigClientTest extends ConfigManagerTest {
 
   override val configManager: ConfigManager = clientWiring.configManager
 
+  override protected def afterAll(): Unit = {
+    serverWiring.httpService.shutdown().await
+  }
 }

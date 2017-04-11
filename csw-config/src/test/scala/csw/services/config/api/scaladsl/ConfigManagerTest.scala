@@ -28,10 +28,6 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     testFileUtils.deleteServerFiles()
   }
 
-  override protected def afterAll(): Unit = {
-    serverWiring.httpService.shutdown().await
-  }
-
   val configValue: String =
     """
       |axisName1 = tromboneAxis1
