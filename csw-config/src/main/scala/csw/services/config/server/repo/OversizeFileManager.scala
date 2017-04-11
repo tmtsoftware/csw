@@ -45,18 +45,13 @@ class OversizeFileManager(settings: Settings) {
     }
   }
 
-  def get(shaAsFileName: String, outFile: File): Future[File] = Future {
-    val repoDir = settings.`oversize-files-dir`.replaceFirst("~", System.getProperty("user.home"))
-    val repoFilePath = makePath(repoDir, shaAsFileName)
+  def get(shaAsFileName: String): Option[ConfigData] = {
+    val repoFilePath = makePath(settings.`oversize-files-dir`, shaAsFileName)
 
     if (repoFilePath.toFile.exists()) {
-      val out = new FileOutputStream(outFile)
-      Files.copy(repoFilePath, out)
-      out.flush()
-      out.close()
-      outFile
+      Some(ConfigData(FileIO.fromPath(repoFilePath)))
     } else {
-      throw new RuntimeException(s" Error in locating file for $shaAsFileName")
+      None
     }
   }
 

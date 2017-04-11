@@ -11,12 +11,16 @@ import scala.concurrent.Future
 
 object ShaUtils {
 
+  def generateSHA1(source: Source[ByteString, Any])(implicit mat: Materializer): Future[String] = {
+    source.runWith(sha1Sink)
+  }
+
   def generateSHA1(file: File)(implicit mat: Materializer): Future[String] = {
-    FileIO.fromPath(file.toPath).runWith(sha1Sink)
+    generateSHA1(FileIO.fromPath(file.toPath))
   }
 
   def generateSHA1(string: String)(implicit mat: Materializer): Future[String] = {
-    Source.single(ByteString(string.getBytes)).runWith(sha1Sink)
+    generateSHA1(Source.single(ByteString(string.getBytes)))
   }
 
   //Keep this a def so that the digester is created anew each time.

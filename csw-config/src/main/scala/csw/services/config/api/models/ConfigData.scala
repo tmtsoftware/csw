@@ -17,17 +17,6 @@ import scala.concurrent.Future
  */
 class ConfigData(val source: Source[ByteString, Any]) {
   /**
-   * Writes the contents of the source to a temp file and returns it.
-   */
-  def toFileF(implicit mat: Materializer): Future[File] = {
-    import mat.executionContext
-    val path = Files.createTempFile("config-service-", null)
-    source
-      .runWith(FileIO.toPath(path))
-      .map(_ ⇒ path.toFile)
-  }
-
-  /**
    * Returns a future string by reading the source.
    */
   def toStringF(implicit mat: Materializer): Future[String] = {

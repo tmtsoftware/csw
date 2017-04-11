@@ -1,10 +1,8 @@
 package csw.services.config.server.repo
 
 import java.io._
-import java.nio.file.Files
-import java.util.{Date, UUID}
+import java.util.Date
 
-import akka.actor.ActorSystem
 import csw.services.config.api.commons.ActorRuntime
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigManager
@@ -80,30 +78,20 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   override def get(path: File, id: Option[ConfigId]): Future[Option[ConfigData]] = {
     // Get oversize files that are stored in the annex server
     def getOversize: Future[Option[ConfigData]] = {
-      val file = getTempFile
       for {
         opt <- get(shaFile(path), id)
-        data <- getData(file, opt)
-        _ <- deleteTempFile(file)
+        data <- getData(opt)
       } yield data
     }
 
     // Gets the actual file data using the SHA-1 value contained in the checked in file
-    def getData(file: File, opt: Option[ConfigData]): Future[Option[ConfigData]] = {
+    def getData(opt: Option[ConfigData]): Future[Option[ConfigData]] = {
       opt match {
         case None => Future(None)
         case Some(configData) =>
           for {
             sha1 <- configData.toStringF
-            configDataOpt <- getFromAnnexServer(file, sha1)
-          } yield configDataOpt
-      }
-    }
-
-    // If the file matches the SHA-1 hash, return a future for it, otherwise get it from the annex server
-    def getFromAnnexServer(file: File, sha1: String): Future[Option[ConfigData]] = {
-      oversizeFileManager.get(sha1, file).map {
-        _ => Some(ConfigData(file))
+          } yield oversizeFileManager.get(sha1)
       }
     }
 
@@ -248,10 +236,6 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       result <- get(path, Some(ConfigId(id)))
     } yield result
   }
-
-  private def getTempFile: File = Files.createTempFile("config", "crud").toFile
-
-  private def deleteTempFile(file: File): Future[Unit] = Future(file.deleteOnExit())
 
   /**
     * Creates or updates a config file with the given path and data and optional comment.
