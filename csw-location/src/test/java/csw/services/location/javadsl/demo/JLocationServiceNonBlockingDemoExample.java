@@ -13,7 +13,10 @@ import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import csw.services.location.internal.Networks;
-import csw.services.location.javadsl.*;
+import csw.services.location.javadsl.ILocationService;
+import csw.services.location.javadsl.JComponentType;
+import csw.services.location.javadsl.JConnectionType;
+import csw.services.location.javadsl.JLocationServiceFactory;
 import csw.services.location.models.*;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
@@ -27,6 +30,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
@@ -62,7 +66,7 @@ public class JLocationServiceNonBlockingDemoExample {
     public static void shutdown() throws ExecutionException, InterruptedException {
 
         //#shutdown
-        locationService.shutdown().toCompletableFuture().get();
+        locationService.shutdown().get();
         //#shutdown
     }
 
@@ -84,7 +88,7 @@ public class JLocationServiceNonBlockingDemoExample {
         expectedLocations.add(tcpRegistration.location(new Networks().hostname()));
 
         //#register-list-resolve-unregister
-        CompletionStage<Void> completionStage = locationService.register(tcpRegistration).thenCompose(tcpRegistrationResult -> {
+        CompletableFuture<Void> completableFuture = locationService.register(tcpRegistration).thenCompose(tcpRegistrationResult -> {
             Assert.assertEquals(tcpRegistration.connection(), tcpRegistrationResult.location().connection());
             return locationService.list().thenCompose(locations -> {
                 Assert.assertEquals(expectedLocations, locations);
@@ -104,7 +108,7 @@ public class JLocationServiceNonBlockingDemoExample {
             });
         });
 
-        completionStage.toCompletableFuture().get();
+        completableFuture.get();
         //#register-list-resolve-unregister
     }
 
@@ -115,21 +119,21 @@ public class JLocationServiceNonBlockingDemoExample {
 
         Thread.sleep(200);
 
-        CompletionStage<Void> registrationStage = locationService.register(tcpRegistration).thenCompose(tcpRegistrationResult -> {
+        CompletableFuture<Void> registrationFuture = locationService.register(tcpRegistration).thenCompose(tcpRegistrationResult -> {
             return locationService.register(httpRegistration).thenApply(httpRegistrationResult -> {
                 return null;
             });
         });
-        registrationStage.toCompletableFuture().get();
+        registrationFuture.get();
 
         Thread.sleep(200);
 
-        CompletionStage<Object> unRegistrationStage = locationService.unregister(tcpConnection).thenCompose(uResult1 -> {
+        CompletableFuture<Object> unRegistrationFuture = locationService.unregister(tcpConnection).thenCompose(uResult1 -> {
             return locationService.unregister(httpConnection).thenApply(uResult -> {
                 return null;
             });
         });
-        unRegistrationStage.toCompletableFuture().get();
+        unRegistrationFuture.toCompletableFuture().get();
 
         Thread.sleep(400);
         stream.first().shutdown();
@@ -161,7 +165,7 @@ public class JLocationServiceNonBlockingDemoExample {
         expectedLocations4.add(httpRegistration.location(new Networks().hostname()));
         expectedLocations4.add(akkaRegistration.location(new Networks().hostname()));
 
-        CompletionStage<Void> completionStage = locationService.register(tcpRegistration).thenCompose(tcpRegistrationResult -> {
+        CompletableFuture<Void> completableFuture = locationService.register(tcpRegistration).thenCompose(tcpRegistrationResult -> {
             return locationService.register(httpRegistration).thenCompose(httpRegistrationResult -> {
                 return locationService.register(akkaRegistration).thenCompose(akkaRegistrationResult -> {
                     return locationService.list().thenCompose(locations1 -> {
@@ -181,7 +185,7 @@ public class JLocationServiceNonBlockingDemoExample {
             });
         });
 
-        completionStage.toCompletableFuture().get();
+        completableFuture.get();
         //#filtering
         locationService.unregisterAll();
     }

@@ -116,9 +116,9 @@ JavaBlocking
  * **scala:** `async` marks a block of asynchronous code and allows to `await` the computation till the Future is complete.
       For more info, please refer: https://github.com/scala/async
  
- * **java non-blocking example:** The code snippets use `CompletionStage` and it's `thenAsync`, `thenApply` methods. This style allows to compose multiple Futures and not block the calling thread till Futures are complete. 
+ * **java non-blocking example:** The code snippets use `CompletiableFuture` and it's `thenAsync`, `thenApply` methods. This style allows to compose multiple Futures and not block the calling thread till Futures are complete. 
 
- * **java blocking example:** The code snippets use `CompletionStage`, `CompletableFuture` using `get` blocking call. This style blocks the calling thread till the Future is complete.
+ * **java blocking example:** The code snippets use `CompletableFuture` using `get` blocking call. This style blocks the calling thread till the Future is complete.
     
 @@@
 

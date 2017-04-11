@@ -2,7 +2,7 @@ package csw.services.location.internal
 
 import java.util
 import java.util.Optional
-import java.util.concurrent.CompletionStage
+import java.util.concurrent.CompletableFuture
 
 import akka.Done
 import akka.stream.KillSwitch
@@ -20,38 +20,38 @@ private[location] class JLocationServiceImpl(locationService: LocationService, c
 
   import cswCluster._
 
-  override def register(registration: Registration): CompletionStage[IRegistrationResult] =
-    locationService.register(registration).map(registrationResult).toJava
+  override def register(registration: Registration): CompletableFuture[IRegistrationResult] =
+    locationService.register(registration).map(registrationResult).toJava.toCompletableFuture
 
-  override def unregister(connection: Connection): CompletionStage[Done] =
-    locationService.unregister(connection).toJava
+  override def unregister(connection: Connection): CompletableFuture[Done] =
+    locationService.unregister(connection).toJava.toCompletableFuture
 
-  override def unregisterAll(): CompletionStage[Done] =
-    locationService.unregisterAll().toJava
+  override def unregisterAll(): CompletableFuture[Done] =
+    locationService.unregisterAll().toJava.toCompletableFuture
 
-  override def resolve(connection: Connection): CompletionStage[Optional[Location]] =
-    locationService.resolve(connection).map(_.asJava).toJava
+  override def resolve(connection: Connection): CompletableFuture[Optional[Location]] =
+    locationService.resolve(connection).map(_.asJava).toJava.toCompletableFuture
 
-  override def list: CompletionStage[util.List[Location]] =
-    locationService.list.map(_.asJava).toJava
+  override def list: CompletableFuture[util.List[Location]] =
+    locationService.list.map(_.asJava).toJava.toCompletableFuture
 
-  override def list(componentType: ComponentType): CompletionStage[util.List[Location]] =
-    locationService.list(componentType).map(_.asJava).toJava
+  override def list(componentType: ComponentType): CompletableFuture[util.List[Location]] =
+    locationService.list(componentType).map(_.asJava).toJava.toCompletableFuture
 
-  override def list(hostname: String): CompletionStage[util.List[Location]] =
-    locationService.list(hostname).map(_.asJava).toJava
+  override def list(hostname: String): CompletableFuture[util.List[Location]] =
+    locationService.list(hostname).map(_.asJava).toJava.toCompletableFuture
 
-  override def list(connectionType: ConnectionType): CompletionStage[util.List[Location]] =
-    locationService.list(connectionType).map(_.asJava).toJava
+  override def list(connectionType: ConnectionType): CompletableFuture[util.List[Location]] =
+    locationService.list(connectionType).map(_.asJava).toJava.toCompletableFuture
 
   override def track(connection: Connection): Source[TrackingEvent, KillSwitch] =
     locationService.track(connection).asJava
 
-  override def shutdown(): CompletionStage[Done] = locationService.shutdown().toJava
+  override def shutdown(): CompletableFuture[Done] = locationService.shutdown().toJava.toCompletableFuture
 
   private def registrationResult(registrationResult: RegistrationResult): IRegistrationResult = {
     new IRegistrationResult {
-      override def unregister: CompletionStage[Done] = registrationResult.unregister().toJava
+      override def unregister: CompletableFuture[Done] = registrationResult.unregister().toJava.toCompletableFuture
 
       override def location: Location = registrationResult.location
     }

@@ -62,7 +62,7 @@ public class JLocationServiceBlockingDemoExample {
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
         //#shutdown
-        locationService.shutdown().toCompletableFuture().get();
+        locationService.shutdown().get();
         //#shutdown
     }
 
@@ -80,45 +80,45 @@ public class JLocationServiceBlockingDemoExample {
     @Test
     public void filtering() throws ExecutionException, InterruptedException {
         //#filtering
-        IRegistrationResult tcpRegistrationResult = locationService.register(tcpRegistration).toCompletableFuture().get();
-        IRegistrationResult httpRegistrationResult = locationService.register(httpRegistration).toCompletableFuture().get();
-        IRegistrationResult akkaRegistrationResult = locationService.register(akkaRegistration).toCompletableFuture().get();
+        IRegistrationResult tcpRegistrationResult = locationService.register(tcpRegistration).get();
+        IRegistrationResult httpRegistrationResult = locationService.register(httpRegistration).get();
+        IRegistrationResult akkaRegistrationResult = locationService.register(akkaRegistration).get();
 
         //expected list of locations
         ArrayList<Location> expectedLocations1 = new ArrayList<>();
         expectedLocations1.add(tcpRegistration.location(new Networks().hostname()));
         expectedLocations1.add(httpRegistration.location(new Networks().hostname()));
         expectedLocations1.add(akkaRegistration.location(new Networks().hostname()));
-        Assert.assertEquals(expectedLocations1, locationService.list().toCompletableFuture().get());
+        Assert.assertEquals(expectedLocations1, locationService.list().get());
 
         //Filter by type
         ArrayList<Location> expectedLocations2 = new ArrayList<>();
         expectedLocations2.add(akkaRegistration.location(new Networks().hostname()));
-        Assert.assertEquals(expectedLocations2, locationService.list(JConnectionType.AkkaType).toCompletableFuture().get());
+        Assert.assertEquals(expectedLocations2, locationService.list(JConnectionType.AkkaType).get());
 
         //Filter by service
         ArrayList<Location> expectedLocations3 = new ArrayList<>();
         expectedLocations3.add(tcpRegistration.location(new Networks().hostname()));
         expectedLocations3.add(httpRegistration.location(new Networks().hostname()));
-        Assert.assertEquals(expectedLocations3, locationService.list(JComponentType.Service).toCompletableFuture().get());
+        Assert.assertEquals(expectedLocations3, locationService.list(JComponentType.Service).get());
 
         //Filter by hostname
         ArrayList<Location> expectedLocations4 = new ArrayList<>();
         expectedLocations4.add(tcpRegistration.location(new Networks().hostname()));
         expectedLocations4.add(httpRegistration.location(new Networks().hostname()));
         expectedLocations4.add(akkaRegistration.location(new Networks().hostname()));
-        Assert.assertEquals(expectedLocations4, locationService.list(new Networks().hostname()).toCompletableFuture().get());
+        Assert.assertEquals(expectedLocations4, locationService.list(new Networks().hostname()).get());
         //#filtering
 
-        tcpRegistrationResult.unregister().toCompletableFuture().get();
-        httpRegistrationResult.unregister().toCompletableFuture().get();
-        akkaRegistrationResult.unregister().toCompletableFuture().get();
+        tcpRegistrationResult.unregister().get();
+        httpRegistrationResult.unregister().get();
+        akkaRegistrationResult.unregister().get();
     }
 
     @Test
     public void demo() throws ExecutionException, InterruptedException {
         //#register-list-resolve-unregister
-        IRegistrationResult tcpRegistrationResult = locationService.register(tcpRegistration).toCompletableFuture().get();
+        IRegistrationResult tcpRegistrationResult = locationService.register(tcpRegistration).get();
 
         Assert.assertEquals(tcpRegistration.connection(), tcpRegistrationResult.location().connection());
 
@@ -126,15 +126,15 @@ public class JLocationServiceBlockingDemoExample {
         ArrayList<Location> expectedLocations = new ArrayList<>();
         expectedLocations.add(tcpRegistration.location(new Networks().hostname()));
 
-        Assert.assertEquals(expectedLocations, locationService.list().toCompletableFuture().get());
-        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpConnection).toCompletableFuture().get().get());
+        Assert.assertEquals(expectedLocations, locationService.list().get());
+        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpConnection).get().get());
 
         System.out.println(tcpRegistrationResult.location().uri());
 
-        tcpRegistrationResult.unregister().toCompletableFuture().get();
+        tcpRegistrationResult.unregister().get();
 
-        Assert.assertEquals(Collections.EMPTY_LIST, locationService.list().toCompletableFuture().get());
-        Assert.assertEquals(Optional.empty(), locationService.resolve(tcpConnection).toCompletableFuture().get());
+        Assert.assertEquals(Collections.EMPTY_LIST, locationService.list().get());
+        Assert.assertEquals(Optional.empty(), locationService.resolve(tcpConnection).get());
         //#register-list-resolve-unregister
     }
 
@@ -145,17 +145,16 @@ public class JLocationServiceBlockingDemoExample {
 
         Thread.sleep(200);
 
-        IRegistrationResult tcpRegistrationResult = locationService.register(tcpRegistration).toCompletableFuture().get();
-        IRegistrationResult httpRegistrationResult = locationService.register(httpRegistration).toCompletableFuture().get();
+        IRegistrationResult tcpRegistrationResult = locationService.register(tcpRegistration).get();
+        IRegistrationResult httpRegistrationResult = locationService.register(httpRegistration).get();
 
         Thread.sleep(200);
 
-        tcpRegistrationResult.unregister().toCompletableFuture().get();
-        locationService.unregister(httpConnection).toCompletableFuture().get();
+        tcpRegistrationResult.unregister().get();
+        locationService.unregister(httpConnection).get();
 
         Thread.sleep(200);
         stream.first().shutdown();
         //#tracking
     }
 }
-
