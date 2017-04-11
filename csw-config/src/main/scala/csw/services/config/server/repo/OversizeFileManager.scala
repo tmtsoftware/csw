@@ -1,6 +1,5 @@
 package csw.services.config.server.repo
 
-import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path, Paths}
 
 import akka.stream.Materializer

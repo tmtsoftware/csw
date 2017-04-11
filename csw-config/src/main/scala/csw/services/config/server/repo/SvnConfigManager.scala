@@ -15,6 +15,7 @@ import org.tmatesoft.svn.core.wc.{SVNClientManager, SVNRevision}
 import org.tmatesoft.svn.core.wc2.{ISvnObjectReceiver, SvnOperationFactory, SvnTarget}
 
 import scala.concurrent.Future
+import async.Async._
 
 class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileManager, actorRuntime: ActorRuntime) extends ConfigManager {
 
@@ -24,11 +25,9 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   override def create(path: File, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
 
-    def createOversize(): Future[ConfigId] = {
-      for {
-        sha1 <- oversizeFileManager.post(configData)
-        configId <- create(shaFile(path), ConfigData.fromString(sha1), oversize = false, comment)
-      } yield configId
+    def createOversize(): Future[ConfigId] = async {
+      val sha1 = await(oversizeFileManager.post(configData))
+      await(create(shaFile(path), ConfigData.fromString(sha1), oversize = false, comment))
     }
 
     // If the file does not already exists in the repo, create it
@@ -42,20 +41,17 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       }
     }
 
-    for {
-      present <- exists(path)
-      configId <- createImpl(present)
-    } yield configId
-
+    async {
+      val present = await(exists(path))
+      await(createImpl(present))
+    }
   }
 
   override def update(path: File, configData: ConfigData, comment: String): Future[ConfigId] = {
 
-    def updateOversize(): Future[ConfigId] = {
-      for {
-        sha1 <- oversizeFileManager.post(configData)
-        configId <- update(shaFile(path), ConfigData.fromString(sha1), comment)
-      } yield configId
+    def updateOversize(): Future[ConfigId] = async {
+      val sha1 = await(oversizeFileManager.post(configData))
+      await(update(shaFile(path), ConfigData.fromString(sha1), comment))
     }
 
     // If the file already exists in the repo, update it
@@ -69,34 +65,32 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       }
     }
 
-    for {
-      present <- exists(path)
-      configId <- updateImpl(present)
-    } yield configId
+    async {
+      val present = await(exists(path))
+      await(updateImpl(present))
+    }
   }
 
   override def get(path: File, id: Option[ConfigId]): Future[Option[ConfigData]] = {
     // Get oversize files that are stored in the annex server
-    def getOversize: Future[Option[ConfigData]] = {
-      for {
-        opt <- get(shaFile(path), id)
-        data <- getData(opt)
-      } yield data
+    def getOversize: Future[Option[ConfigData]] = async {
+      val opt = await(get(shaFile(path), id))
+      await(getData(opt))
     }
 
     // Gets the actual file data using the SHA-1 value contained in the checked in file
-    def getData(opt: Option[ConfigData]): Future[Option[ConfigData]] = {
+    def getData(opt: Option[ConfigData]): Future[Option[ConfigData]] = async {
       opt match {
-        case None => Future(None)
+        case None             =>
+          None
         case Some(configData) =>
-          for {
-            sha1 <- configData.toStringF
-          } yield oversizeFileManager.get(sha1)
+          val sha1 = await(configData.toStringF)
+          oversizeFileManager.get(sha1)
       }
     }
 
     // Returns the contents of the given version of the file, if found
-    def getConfigData: Future[Option[ConfigData]] = Future {
+    def getConfigData: Future[Option[ConfigData]] = async {
       val os = new ByteArrayOutputStream()
       val svn = getSvn
       try {
@@ -118,39 +112,27 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       }
     }
 
-    for {
-      present <- exists(path)
-      configData <- getImpl(present)
-    } yield configData
+    async {
+      val present = await(exists(path))
+      await(getImpl(present))
+    }
   }
 
   override def get(path: File, date: Date): Future[Option[ConfigData]] = {
     val t = date.getTime
 
-    // A condition used in the for comprehension below to catch the case where the file does not exist
-    def predicate(condition: Boolean): Future[Unit] =
-      if (condition) Future(()) else Future.failed(new RuntimeException)
-
     // Gets the ConfigFileHistory matching the date
-    def getHist: Future[Option[ConfigFileHistory]] = {
-      history(path).map { h =>
-        val found = h.find(_.time.getTime <= t)
-        if (found.nonEmpty) found
-        else if (h.isEmpty) None
-        else {
-          Some(if (t > h.head.time.getTime) h.head else h.last)
-        }
-      }
+    def getHist: Future[Option[ConfigFileHistory]] = async {
+      val h = await(history(path))
+      val found = h.find(_.time.getTime <= t)
+      if (found.nonEmpty) found
+      else if (h.isEmpty) None
+      else Some(if (t > h.head.time.getTime) h.head else h.last)
     }
 
-    val f = for {
-      hist <- getHist
-      _ <- predicate(hist.nonEmpty)
-      result <- get(path, hist.map(_.id))
-    } yield result
-
-    f.recover {
-      case _ => None
+    async {
+      val hist = await(getHist)
+      if (hist.isEmpty) None else await(get(path, hist.map(_.id)))
     }
   }
 
@@ -192,11 +174,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       svnList.setSingleTarget(SvnTarget.fromURL(settings.svnUrl, SVNRevision.HEAD))
       svnList.setRevision(SVNRevision.HEAD)
       svnList.setDepth(SVNDepth.INFINITY)
-      svnList.setReceiver(new ISvnObjectReceiver[SVNDirEntry] {
-        override def receive(target: SvnTarget, e: SVNDirEntry): Unit = {
-          entries = e :: entries
-        }
-      })
+      svnList.setReceiver((_, e: SVNDirEntry) => entries = e :: entries)
       svnList.run()
     } finally {
       svnOperationFactory.dispose()
@@ -205,19 +183,19 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       .map(e => ConfigFileInfo(new File(e.getRelativePath), ConfigId(e.getRevision), e.getCommitMessage))
   }
 
-  override def history(path: File, maxResults: Int): Future[List[ConfigFileHistory]] = {
+  override def history(path: File, maxResults: Int): Future[List[ConfigFileHistory]] = async {
     // XXX Should .sha1 files have the .sha1 suffix removed in the result?
     if (isOversize(path))
-      Future(hist(shaFile(path), maxResults))
+      hist(shaFile(path), maxResults)
     else
-      Future(hist(path, maxResults))
+      hist(path, maxResults)
   }
 
   override def setDefault(path: File, id: Option[ConfigId] = None): Future[Unit] = {
     (if (id.isDefined) id else getCurrentVersion(path)) match {
       case Some(configId) =>
         create(defaultFile(path), ConfigData.fromString(configId.id)).map(_ => ())
-      case None =>
+      case None           =>
         Future.failed(new FileNotFoundException(s"Unknown path $path"))
     }
   }
@@ -226,15 +204,15 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     delete(defaultFile(path))
   }
 
-  override def getDefault(path: File): Future[Option[ConfigData]] = {
-    val currentId = getCurrentVersion(path)
-    if (currentId.isEmpty)
-      Future(None)
-    else for {
-      d <- get(defaultFile(path))
-      id <- if (d.isDefined) d.get.toStringF else Future(currentId.get.id)
-      result <- get(path, Some(ConfigId(id)))
-    } yield result
+  override def getDefault(path: File): Future[Option[ConfigData]] = async {
+    getCurrentVersion(path) match {
+      case None ⇒
+        None
+      case Some(configId) ⇒
+        val d = await(get(defaultFile(path)))
+        val id = if (d.isDefined) await(d.get.toStringF) else configId.id
+        await(get(path, Some(ConfigId(id))))
+    }
   }
 
   /**
@@ -291,6 +269,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       val editor = svn.getCommitEditor(comment, null)
       editor.openRoot(SVNRepository.INVALID_REVISION)
       val dirPath = path.getParentFile
+
       // Recursively add any missing directories leading to the file
       def addDir(dir: File): Unit = {
         if (dir != null) {
@@ -300,6 +279,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
           }
         }
       }
+
       addDir(dirPath)
       val filePath = path.getPath
       editor.addFile(filePath, null, SVNRepository.INVALID_REVISION)

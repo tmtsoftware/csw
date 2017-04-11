@@ -1,11 +1,10 @@
 package csw.services.config.api.models
 
-import java.io.{File, InputStream}
-import java.nio.file.Files
+import java.io.InputStream
 import java.util.concurrent.CompletableFuture
 
+import akka.stream.scaladsl.{Source, StreamConverters}
 import akka.stream.{Materializer, javadsl}
-import akka.stream.scaladsl.{FileIO, Source, StreamConverters}
 import akka.util.ByteString
 
 import scala.compat.java8.FutureConverters._
@@ -53,14 +52,6 @@ object ConfigData {
    * Takes the data from the byte array
    */
   def fromBytes(bytes: Array[Byte]): ConfigData = new ConfigData(Source.single(ByteString(bytes)))
-
-  /**
-   * Initialize with the contents of the given file.
-   *
-   * @param file      the data source
-   * @param chunkSize the block or chunk size to use when streaming the data
-   */
-  def fromFile(file: File, chunkSize: Int = 4096): ConfigData = new ConfigData(FileIO.fromPath(file.toPath, chunkSize))
 
   /**
    * The data source can be any byte string
