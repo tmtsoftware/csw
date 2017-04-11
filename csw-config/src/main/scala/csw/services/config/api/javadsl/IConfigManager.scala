@@ -4,6 +4,7 @@ import java.io.File
 import java.util.{Date, Optional}
 import java.util.concurrent.CompletableFuture
 import java.{util => ju}
+import java.{lang => jl}
 
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 
@@ -75,7 +76,7 @@ trait IConfigManager {
     * @param path the file path relative to the repository root
     * @return true the file exists
     */
-  def exists(path: File): CompletableFuture[Boolean]
+  def exists(path: File): CompletableFuture[jl.Boolean]
 
   /**
     * Deletes the given config file (older versions will still be available)

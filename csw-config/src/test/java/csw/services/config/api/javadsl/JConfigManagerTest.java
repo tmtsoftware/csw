@@ -153,12 +153,22 @@ public class JConfigManagerTest {
     @Test
     public void testExists() throws ExecutionException, InterruptedException {
         File file = Paths.get("/test.conf").toFile();
-        Object ifExist = configManager.exists(file).get();
-        Assert.assertEquals(ifExist, false);
+        Assert.assertFalse(configManager.exists(file).get());
 
         File newFile = Paths.get("a/test.csw.conf").toFile();
         configManager.create(newFile, ConfigData.fromString(configValue), false, "commit config file").get();
 
-        Assert.assertEquals(configManager.exists(newFile).get(), true);
+        Assert.assertTrue(configManager.exists(newFile).get());
+    }
+
+    @Test
+    public void testDelete() throws ExecutionException, InterruptedException {
+        File file = Paths.get("tromboneHCD.conf").toFile();
+        configManager.create(file, ConfigData.fromString(configValue), false, "commit trombone config file").get();
+
+        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+
+        configManager.delete(file).get();
+        Assert.assertEquals(configManager.get(file).get(), Optional.empty());
     }
 }
