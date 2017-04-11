@@ -4,10 +4,12 @@ import java.io._
 import java.nio.file.{Path, Paths}
 import java.util.Date
 
+import akka.stream.scaladsl.StreamConverters
 import csw.services.config.api.commons.ActorRuntime
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigManager
 import csw.services.config.server.Settings
+import csw.services.location.internal.StreamExt.RichSource
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
@@ -17,6 +19,7 @@ import org.tmatesoft.svn.core.wc2.{SvnOperationFactory, SvnTarget}
 
 import scala.async.Async._
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileManager, actorRuntime: ActorRuntime) extends ConfigManager {
 
@@ -91,15 +94,23 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
 
     // Returns the contents of the given version of the file, if found
-    def getConfigData: Future[Option[ConfigData]] = async {
-      val os = new ByteArrayOutputStream()
+    def getConfigData: Future[Option[ConfigData]] = {
       val svn = getSvn
-      try {
-        svn.getFile(path.toString, svnRevision(id).getNumber, null, os)
-      } finally {
-        svn.closeSession()
+      val outputStream = StreamConverters.asOutputStream().cancellableMat
+      val source = outputStream.mapMaterializedValue { case (out, switch) ⇒
+        Future {
+          try {
+            svn.getFile(path.toString, svnRevision(id).getNumber, null, out)
+          } catch {
+            case NonFatal(ex) ⇒ switch.abort(ex)
+          } finally {
+            out.flush()
+            out.close()
+            svn.closeSession()
+          }
+        }
       }
-      Some(ConfigData.fromBytes(os.toByteArray))
+      Future(Some(ConfigData.fromSource(source)))
     }
 
     // If the file exists in the repo, get its data
@@ -209,7 +220,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   override def getDefault(path: Path): Future[Option[ConfigData]] = async {
     getCurrentVersion(path) match {
-      case None ⇒
+      case None           ⇒
         None
       case Some(configId) ⇒
         val d = await(get(defaultFile(path)))

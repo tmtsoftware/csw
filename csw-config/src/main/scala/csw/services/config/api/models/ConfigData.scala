@@ -46,12 +46,7 @@ object ConfigData {
   /**
    * The data is contained in the string
    */
-  def fromString(str: String): ConfigData = fromBytes(str.getBytes)
-
-  /**
-   * Takes the data from the byte array
-   */
-  def fromBytes(bytes: Array[Byte]): ConfigData = new ConfigData(Source.single(ByteString(bytes)))
+  def fromString(str: String): ConfigData = new ConfigData(Source.single(ByteString(str.getBytes())))
 
   /**
    * The data source can be any byte string
