@@ -81,7 +81,7 @@ lazy val integration = project
 
 
 lazy val `csw-config` = project
-  .enablePlugins(DeployApp)
+  .enablePlugins(DeployApp, AutoMultiJvm)
   .dependsOn(`csw-location`)
   .settings(
     libraryDependencies ++= Seq(
@@ -94,7 +94,9 @@ lazy val `csw-config` = project
     libraryDependencies ++= Seq(
       Libs.`scalatest` % Test,
       AkkaHttp.`akka-http-testkit` % Test,
-      Libs.`junit` % Test
+      Libs.`junit` % Test,
+      Akka.`akka-multi-node-testkit` % Test,
+      Akka.`akka-stream-testkit` % Test
     ),
     sources in (Compile, doc) := Seq.empty,
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")

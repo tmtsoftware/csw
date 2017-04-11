@@ -7,16 +7,15 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
 import akka.stream.testkit.TestSubscriber.Probe
 import akka.stream.testkit.scaladsl.TestSink
+import akka.stream.{ActorMaterializer, Materializer}
+import akka.testkit.TestKit
 import akka.util.ByteString
-import csw.services.config.api.commons.ActorRuntime
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{FunSuiteLike, Matchers}
 
-class ConfigDataTest extends FunSuite with Matchers {
+class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike with Matchers {
 
-  implicit val actorSystem = ActorSystem("config-service")
-  private val actorRuntime = new ActorRuntime(actorSystem)
-  import actorRuntime._
+  implicit val mat: Materializer = ActorMaterializer()
 
   val expectedStringConfigData =
     """
@@ -42,13 +41,6 @@ class ConfigDataTest extends FunSuite with Matchers {
     val probe: Probe[ByteString] = fromString.source.runWith(TestSink.probe)
 
     probe.requestNext().utf8String shouldEqual expectedStringConfigData
-  }
-
-  test("should create source of ByteString from bytes data") {
-    val fromBytes: ConfigData = ConfigData.fromBytes(expectedStringConfigData.getBytes)
-    val probe: Probe[ByteString] = fromBytes.source.runWith(TestSink.probe)
-
-    probe.requestNext().utf8String.getBytes shouldEqual expectedStringConfigData.getBytes
   }
 
   test("should create Config data of source of ByteString from ByteString source") {
