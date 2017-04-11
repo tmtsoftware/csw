@@ -1,26 +1,28 @@
 package csw.services.config.api.commons
 
 import java.io.File
+import java.nio.file.Path
 import java.security.MessageDigest
 
 import akka.stream.Materializer
 import akka.stream.scaladsl.{FileIO, Flow, Keep, Sink, Source}
 import akka.util.ByteString
+import csw.services.config.api.models.ConfigData
 
 import scala.concurrent.Future
 
 object ShaUtils {
 
-  def generateSHA1(source: Source[ByteString, Any])(implicit mat: Materializer): Future[String] = {
+  private def generateSHA1(source: Source[ByteString, Any])(implicit mat: Materializer): Future[String] = {
     source.runWith(sha1Sink)
   }
 
-  def generateSHA1(file: File)(implicit mat: Materializer): Future[String] = {
-    generateSHA1(FileIO.fromPath(file.toPath))
+  def generateSHA1(configData: ConfigData)(implicit mat: Materializer): Future[String] = {
+    generateSHA1(configData.source)
   }
 
-  def generateSHA1(string: String)(implicit mat: Materializer): Future[String] = {
-    generateSHA1(Source.single(ByteString(string.getBytes)))
+  def generateSHA1(path: Path)(implicit mat: Materializer): Future[String] = {
+    generateSHA1(FileIO.fromPath(path))
   }
 
   //Keep this a def so that the digester is created anew each time.

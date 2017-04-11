@@ -240,12 +240,13 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val file = Paths.get("SomeOversizeFile.txt").toFile
     val content = "testing oversize file"
 
-    val configId = configManager.create(file, ConfigData.fromString(content), true, "committing oversize file").await
+    val configData = ConfigData.fromString(content)
+    val configId = configManager.create(file, configData, true, "committing oversize file").await
     val fileContent = configManager.get(file, Some(configId)).await.get
     fileContent.toStringF.await shouldBe content
 
     val svnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(configId)).await.get
-    svnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(content).await
+    svnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(configData).await
   }
 
   test("should list oversize files") {
@@ -270,11 +271,14 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val file = Paths.get("SomeOversizeFile.txt").toFile
     val creationContent = "testing oversize file"
     val creationComment = "initial commit"
-    val creationConfigId = configManager.create(file, ConfigData.fromString(creationContent), true, creationComment).await
+
+    val configData = ConfigData.fromString(creationContent)
+    val creationConfigId = configManager.create(file, configData, true, creationComment).await
 
     val newContent = "testing oversize file, again"
     val newComment = "Updating file"
-    val newConfigId = configManager.update(file, ConfigData.fromString(newContent), newComment).await
+    val configData2 = ConfigData.fromString(newContent)
+    val newConfigId = configManager.update(file, configData2, newComment).await
 
     val creationFileContent = configManager.get(file, Some(creationConfigId)).await.get
     creationFileContent.toStringF.await shouldBe creationContent
@@ -283,10 +287,10 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     updatedFileContent.toStringF.await shouldBe newContent
 
     val oldSvnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(creationConfigId)).await.get
-    oldSvnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(creationContent).await
+    oldSvnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(configData).await
 
     val newSvnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(newConfigId)).await.get
-    newSvnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(newContent).await
+    newSvnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(configData2).await
 
     val fileHistories: List[ConfigFileHistory] = configManager.history(file).await
 

@@ -22,24 +22,23 @@ import scala.concurrent.Future
 class OversizeFileManager(settings: Settings) {
 
   def post(configData: ConfigData)(implicit mat: Materializer): Future[String] = async {
-    val (tempFile, sha) = await(saveAndSha(configData))
+    val (tempFilePath, sha) = await(saveAndSha(configData))
 
     val outPath = makePath(settings.`oversize-files-dir`, sha)
-    val outFile = outPath.toFile
-    outFile.getParentFile.mkdirs()
 
-    if (outFile.exists) {
-      Files.delete(tempFile.toPath)
+    if (Files.exists(outPath)) {
+      Files.delete(tempFilePath)
       sha
     }
     else {
-      Files.move(tempFile.toPath, outFile.toPath)
-      if (await(validate(sha, outFile))) {
+      Files.createDirectories(outPath.getParent)
+      Files.move(tempFilePath, outPath)
+      if (await(validate(sha, outPath))) {
         sha
       }
       else {
-        outFile.delete()
-        Files.delete(tempFile.toPath)
+        Files.delete(outPath)
+        Files.delete(tempFilePath)
         throw new RuntimeException(s" Error in creating file for $sha")
       }
     }
@@ -66,22 +65,22 @@ class OversizeFileManager(settings: Settings) {
     * Verifies that the given file's content matches the SHA-1 id
     *
     * @param id   the SHA-1 of the file
-    * @param file the file to check
+    * @param path the file to check
     * @return true if the file is valid
     */
-  def validate(id: String, file: File)(implicit mat: Materializer): Future[Boolean] = async {
-    id == await(ShaUtils.generateSHA1(file))
+  def validate(id: String, path: Path)(implicit mat: Materializer): Future[Boolean] = async {
+    id == await(ShaUtils.generateSHA1(path))
   }
 
 
-  def saveAndSha(configData: ConfigData)(implicit mat: Materializer): Future[(File, String)] = async {
+  def saveAndSha(configData: ConfigData)(implicit mat: Materializer): Future[(Path, String)] = async {
     val path = Files.createTempFile("config-service-overize-", ".tmp")
     val (resultF, shaF) = configData.source
       .alsoToMat(FileIO.toPath(path))(Keep.right)
       .toMat(ShaUtils.sha1Sink)(Keep.both)
       .run()
     await(resultF).status.get
-    (path.toFile, await(shaF))
+    (path, await(shaF))
   }
 
 }
