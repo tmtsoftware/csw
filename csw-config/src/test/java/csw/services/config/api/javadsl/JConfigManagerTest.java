@@ -13,7 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
-import static org.tmatesoft.svn.core.wc2.SvnChecksum.Kind.sha1;
 
 public class JConfigManagerTest {
     private ServerWiring serverWiring = new ServerWiring();
@@ -49,32 +47,32 @@ public class JConfigManagerTest {
     public void testCreateAndRetrieveFile() throws ExecutionException, InterruptedException {
         String configValue = "axisName = tromboneAxis";
 
-        File file = Paths.get("test.conf").toFile();
-        configManager.create(file, ConfigData.fromString(configValue), false, "commit test file").get();
-        Optional<ConfigData> configData = configManager.get(file).get();
+        Path path = Paths.get("test.conf");
+        configManager.create(path, ConfigData.fromString(configValue), false, "commit test file").get();
+        Optional<ConfigData> configData = configManager.get(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue);
     }
 
     @Test
     public void testCreateOversizeFile() throws ExecutionException, InterruptedException {
-        File tempFile = Paths.get("SomeOversizeFile.txt").toFile();
+        Path path = Paths.get("SomeOversizeFile.txt");
         String configValue = "test {We think, this is some oversize text!!!!}";
-        configManager.create(tempFile, ConfigData.fromString(configValue), true).get();
-        Optional<ConfigData> configData = configManager.get(tempFile).get();
+        configManager.create(path, ConfigData.fromString(configValue), true).get();
+        Optional<ConfigData> configData = configManager.get(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue);
     }
 
     @Test
     public void testUpdateExistingFile() throws ExecutionException, InterruptedException {
         String assemblyConfigValue = "axisName = tromboneAxis";
-        File file = Paths.get("/assembly.conf").toFile();
-        configManager.create(file, ConfigData.fromString(assemblyConfigValue), false, "commit assembly conf").get();
-        Optional<ConfigData> configData = configManager.get(file).get();
+        Path path = Paths.get("/assembly.conf");
+        configManager.create(path, ConfigData.fromString(assemblyConfigValue), false, "commit assembly conf").get();
+        Optional<ConfigData> configData = configManager.get(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), assemblyConfigValue);
 
         String updatedAssemblyConfigValue = "assemblyHCDCount = 3";
-        configManager.update(file, ConfigData.fromString(updatedAssemblyConfigValue), "commit updated assembly conf").get();
-        Optional<ConfigData> configDataUpdated = configManager.get(file).get();
+        configManager.update(path, ConfigData.fromString(updatedAssemblyConfigValue), "commit updated assembly conf").get();
+        Optional<ConfigData> configDataUpdated = configManager.get(path).get();
         Assert.assertEquals(configDataUpdated.get().toJStringF(mat).get(), updatedAssemblyConfigValue);
     }
 
@@ -83,16 +81,16 @@ public class JConfigManagerTest {
         String configValue = "axisName = tromboneAxis";
         String assemblyConfigValue = "assemblyHCDCount = 3";
         String newAssemblyConfigValue = "assemblyHCDCount = 5";
-        File file = Paths.get("/a/b/csw.conf").toFile();
-        configManager.create(file, ConfigData.fromString(configValue), false, "commit csw conf file").get();
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+        Path path = Paths.get("/a/b/csw.conf");
+        configManager.create(path, ConfigData.fromString(configValue), false, "commit csw conf path").get();
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), configValue);
 
-        ConfigId configId = configManager.update(file, ConfigData.fromString(assemblyConfigValue), "commit updated conf file").get();
+        ConfigId configId = configManager.update(path, ConfigData.fromString(assemblyConfigValue), "commit updated conf path").get();
 
-        configManager.update(file, ConfigData.fromString(newAssemblyConfigValue), "updated config to assembly").get();
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), newAssemblyConfigValue);
+        configManager.update(path, ConfigData.fromString(newAssemblyConfigValue), "updated config to assembly").get();
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), newAssemblyConfigValue);
 
-        Assert.assertEquals(configManager.get(file, Optional.of(configId)).get().get().toJStringF(mat).get(), assemblyConfigValue);
+        Assert.assertEquals(configManager.get(path, Optional.of(configId)).get().get().toJStringF(mat).get(), assemblyConfigValue);
     }
 
     @Test
@@ -101,16 +99,16 @@ public class JConfigManagerTest {
         String assemblyConfigValue = "assemblyHCDCount = 3";
         String newAssemblyConfigValue = "assemblyHCDCount = 5";
 
-        File file = Paths.get("/test.conf").toFile();
-        configManager.create(file, ConfigData.fromString(configValue), false, "commit initial configuration").get();
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+        Path path = Paths.get("/test.conf");
+        configManager.create(path, ConfigData.fromString(configValue), false, "commit initial configuration").get();
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), configValue);
 
-        configManager.update(file, ConfigData.fromString(assemblyConfigValue), "updated config to assembly").get();
+        configManager.update(path, ConfigData.fromString(assemblyConfigValue), "updated config to assembly").get();
         Date date = new Date();
-        configManager.update(file, ConfigData.fromString(newAssemblyConfigValue), "updated config to assembly").get();
+        configManager.update(path, ConfigData.fromString(newAssemblyConfigValue), "updated config to assembly").get();
 
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), newAssemblyConfigValue);
-        Assert.assertEquals(configManager.get(file, date).get().get().toJStringF(mat).get(), assemblyConfigValue);
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), newAssemblyConfigValue);
+        Assert.assertEquals(configManager.get(path, date).get().get().toJStringF(mat).get(), assemblyConfigValue);
     }
 
     @Test
@@ -119,26 +117,26 @@ public class JConfigManagerTest {
         String assemblyConfigValue = "assemblyHCDCount = 3";
         String newAssemblyConfigValue = "assemblyHCDCount = 5";
 
-        File file = Paths.get("/test.conf").toFile();
-        ConfigId configIdCreate = configManager.create(file, ConfigData.fromString(configValue), false, "commit initial configuration").get();
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+        Path path = Paths.get("/test.conf");
+        ConfigId configIdCreate = configManager.create(path, ConfigData.fromString(configValue), false, "commit initial configuration").get();
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), configValue);
 
-        ConfigId configIdUpdate1 = configManager.update(file, ConfigData.fromString(assemblyConfigValue), "updated config to assembly").get();
-        ConfigId configIdUpdate2 = configManager.update(file, ConfigData.fromString(newAssemblyConfigValue), "updated config to assembly").get();
+        ConfigId configIdUpdate1 = configManager.update(path, ConfigData.fromString(assemblyConfigValue), "updated config to assembly").get();
+        ConfigId configIdUpdate2 = configManager.update(path, ConfigData.fromString(newAssemblyConfigValue), "updated config to assembly").get();
 
-        Assert.assertEquals(configManager.history(file).get().size(), 3);
-        Assert.assertEquals(configManager.history(file).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
+        Assert.assertEquals(configManager.history(path).get().size(), 3);
+        Assert.assertEquals(configManager.history(path).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1, configIdCreate)));
 
-        Assert.assertEquals(configManager.history(file, 2).get().size(), 2);
-        Assert.assertEquals(configManager.history(file, 2).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
+        Assert.assertEquals(configManager.history(path, 2).get().size(), 2);
+        Assert.assertEquals(configManager.history(path, 2).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
     }
 
     @Test
     public void testListAllFiles() throws ExecutionException, InterruptedException {
-        File tromboneConfig = Paths.get("trombone.conf").toFile();
-        File assemblyConfig = Paths.get("a/b/assembly/assembly.conf").toFile();
+        Path tromboneConfig = Paths.get("trombone.conf");
+        Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
         String tromboneConfigComment = "hello trombone";
         String assemblyConfigComment = "hello assembly";
@@ -154,46 +152,46 @@ public class JConfigManagerTest {
 
     @Test
     public void testExists() throws ExecutionException, InterruptedException {
-        File file = Paths.get("/test.conf").toFile();
-        Assert.assertFalse(configManager.exists(file).get());
+        Path path = Paths.get("/test.conf");
+        Assert.assertFalse(configManager.exists(path).get());
 
-        File newFile = Paths.get("a/test.csw.conf").toFile();
-        configManager.create(newFile, ConfigData.fromString(configValue), false, "commit config file").get();
+        Path path1 = Paths.get("a/test.csw.conf");
+        configManager.create(path1, ConfigData.fromString(configValue), false, "commit config file").get();
 
-        Assert.assertTrue(configManager.exists(newFile).get());
+        Assert.assertTrue(configManager.exists(path1).get());
     }
 
     @Test
     public void testDelete() throws ExecutionException, InterruptedException {
-        File file = Paths.get("tromboneHCD.conf").toFile();
-        configManager.create(file, ConfigData.fromString(configValue), false, "commit trombone config file").get();
+        Path path = Paths.get("tromboneHCD.conf");
+        configManager.create(path, ConfigData.fromString(configValue), false, "commit trombone config file").get();
 
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), configValue);
 
-        configManager.delete(file).get();
-        Assert.assertEquals(configManager.get(file).get(), Optional.empty());
+        configManager.delete(path).get();
+        Assert.assertEquals(configManager.get(path).get(), Optional.empty());
     }
 
     @Test
     public void testGetAndSetDefaultConfigFile() throws ExecutionException, InterruptedException {
-        File file = Paths.get("/test.conf").toFile();
-        ConfigId configIdCreate = configManager.create(file, ConfigData.fromString(configValue), false, "hello world").get();
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+        Path path = Paths.get("/test.conf");
+        ConfigId configIdCreate = configManager.create(path, ConfigData.fromString(configValue), false, "hello world").get();
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), configValue);
 
-        ConfigId configIdUpdate1 = configManager.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").get();
-        configManager.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").get();
+        ConfigId configIdUpdate1 = configManager.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
+        configManager.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
 
-        Assert.assertEquals(configManager.getDefault(file).get().get().toJStringF(mat).get(), configValue3);
-        configManager.setDefault(file, Optional.of(configIdUpdate1)).get();
-        Assert.assertEquals(configManager.getDefault(file).get().get().toJStringF(mat).get(), configValue2);
-        configManager.resetDefault(file).get();
-        Assert.assertEquals(configManager.getDefault(file).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configManager.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        configManager.setDefault(path, Optional.of(configIdUpdate1)).get();
+        Assert.assertEquals(configManager.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
+        configManager.resetDefault(path).get();
+        Assert.assertEquals(configManager.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
     @Test
     public void testListOversizeFiles() throws ExecutionException, InterruptedException {
-        File tromboneConfig = Paths.get("trombone.conf").toFile();
-        File assemblyConfig = Paths.get("a/b/assembly/assembly.conf").toFile();
+        Path tromboneConfig = Paths.get("trombone.conf");
+        Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
         String tromboneConfigComment = "test{Oversize file no1}";
         String assemblyConfigComment = "test{Oversize file no2}";
@@ -206,10 +204,10 @@ public class JConfigManagerTest {
                                                          assemblyConfigComment).get();
 
         ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(
-                new File(tromboneConfig.getPath() + serverWiring.settings().sha1$minussuffix()),
+                Paths.get(tromboneConfig.toString() + serverWiring.settings().sha1$minussuffix()),
                           tromboneConfigId, tromboneConfigComment);
         ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(
-                new File(assemblyConfig.getPath() + serverWiring.settings().sha1$minussuffix()),
+                Paths.get(assemblyConfig.toString() + serverWiring.settings().sha1$minussuffix()),
                           assemblyConfigId, assemblyConfigComment);
 
         Assert.assertEquals(configManager.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
@@ -217,61 +215,61 @@ public class JConfigManagerTest {
 
     @Test
     public void testOversizeFileExists() throws ExecutionException, InterruptedException {
-        File file = Paths.get("/test.conf").toFile();
-        Assert.assertFalse(configManager.exists(file).get());
+        Path path = Paths.get("/test.conf");
+        Assert.assertFalse(configManager.exists(path).get());
 
-        File newFile = Paths.get("a/test.csw.conf").toFile();
-        configManager.create(newFile, ConfigData.fromString(configValue3), true, "create oversize file").get();
+        Path newPath = Paths.get("a/test.csw.conf");
+        configManager.create(newPath, ConfigData.fromString(configValue3), true, "create oversize file").get();
 
-        Assert.assertTrue(configManager.exists(newFile).get());
+        Assert.assertTrue(configManager.exists(newPath).get());
     }
 
     @Test
     public void testUpdateAndHistoryOfOversizedFiles() throws ExecutionException, InterruptedException {
-        File file = Paths.get("/test.conf").toFile();
-        ConfigId configIdCreate = configManager.create(file, ConfigData.fromString(configValue), true, "commit initial configuration").get();
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+        Path path = Paths.get("/test.conf");
+        ConfigId configIdCreate = configManager.create(path, ConfigData.fromString(configValue), true, "commit initial configuration").get();
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), configValue);
 
-        ConfigId configIdUpdate1 = configManager.update(file, ConfigData.fromString(configValue2), "updated config to assembly").get();
-        ConfigId configIdUpdate2 = configManager.update(file, ConfigData.fromString(configValue3), "updated config to assembly").get();
+        ConfigId configIdUpdate1 = configManager.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
+        ConfigId configIdUpdate2 = configManager.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
 
-        Assert.assertEquals(configManager.history(file).get().size(), 3);
-        Assert.assertEquals(configManager.history(file).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
+        Assert.assertEquals(configManager.history(path).get().size(), 3);
+        Assert.assertEquals(configManager.history(path).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1, configIdCreate)));
 
-        Assert.assertEquals(configManager.history(file, 2).get().size(), 2);
-        Assert.assertEquals(configManager.history(file, 2).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
+        Assert.assertEquals(configManager.history(path, 2).get().size(), 2);
+        Assert.assertEquals(configManager.history(path, 2).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
     }
 
     @Test
     public void testGetAndSetDefaultOversizeConfigFile() throws ExecutionException, InterruptedException {
-        File file = Paths.get("/test.conf").toFile();
-        ConfigId configIdCreate = configManager.create(file, ConfigData.fromString(configValue), true, "some comment").get();
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+        Path path = Paths.get("/test.conf");
+        ConfigId configIdCreate = configManager.create(path, ConfigData.fromString(configValue), true, "some comment").get();
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), configValue);
 
-        ConfigId configIdUpdate1 = configManager.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").get();
-        configManager.update(file, ConfigData.fromString(configValue3), "Updated config").get();
+        ConfigId configIdUpdate1 = configManager.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
+        configManager.update(path, ConfigData.fromString(configValue3), "Updated config").get();
 
-        Assert.assertEquals(configManager.getDefault(file).get().get().toJStringF(mat).get(), configValue3);
-        configManager.setDefault(file, Optional.of(configIdUpdate1)).get();
-        Assert.assertEquals(configManager.getDefault(file).get().get().toJStringF(mat).get(), configValue2);
-        configManager.resetDefault(file).get();
-        Assert.assertEquals(configManager.getDefault(file).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configManager.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        configManager.setDefault(path, Optional.of(configIdUpdate1)).get();
+        Assert.assertEquals(configManager.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
+        configManager.resetDefault(path).get();
+        Assert.assertEquals(configManager.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
     @Test
     public void testRetrieveVersionBasedOnDateForOverSizedFile() throws ExecutionException, InterruptedException {
-        File file = Paths.get("/test.conf").toFile();
-        configManager.create(file, ConfigData.fromString(configValue), true, "commit initial oversize configuration").get();
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue);
+        Path path = Paths.get("/test.conf");
+        configManager.create(path, ConfigData.fromString(configValue), true, "commit initial oversize configuration").get();
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), configValue);
 
-        configManager.update(file, ConfigData.fromString(configValue2), "updated config to assembly").get();
+        configManager.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
         Date date = new Date();
-        configManager.update(file, ConfigData.fromString(configValue3), "updated config to assembly").get();
+        configManager.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
 
-        Assert.assertEquals(configManager.get(file).get().get().toJStringF(mat).get(), configValue3);
-        Assert.assertEquals(configManager.get(file, date).get().get().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configManager.get(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configManager.get(path, date).get().get().toJStringF(mat).get(), configValue2);
     }
 
 }

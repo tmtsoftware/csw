@@ -55,15 +55,15 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
 
 
   test("should able to create a file and retrieve the same") {
-    val file = Paths.get("test.conf").toFile
+    val file = Paths.get("test.conf")
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit test file").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
   }
 
   test("should ignore '/' at the beginning of file path and create a file") {
     val fileName = "csw.conf"
-    val file = Paths.get(s"/$fileName").toFile
-    val fileWithoutBackslash = Paths.get(fileName).toFile
+    val file = Paths.get(s"/$fileName")
+    val fileWithoutBackslash = Paths.get(fileName)
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit csw file").await
 
     intercept[IOException] {
@@ -74,7 +74,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should throw IOException while creating a file if it already exists in repository") {
-    val file = Paths.get("/test.conf").toFile
+    val file = Paths.get("/test.conf")
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit test conf for first time").await
 
     intercept[IOException] {
@@ -83,7 +83,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should able to update existing file and get the file with updated content") {
-    val file = Paths.get("/assembly.conf").toFile
+    val file = Paths.get("/assembly.conf")
 
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit assembly conf").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
@@ -93,7 +93,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("update should throw FileNotFoundException if a file does not exists in repository") {
-    val file = Paths.get("/assembly.conf").toFile
+    val file = Paths.get("/assembly.conf")
 
     intercept[FileNotFoundException] {
       configManager.update(file, ConfigData.fromString(configValue), "commit updated assembly conf").await
@@ -101,13 +101,13 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("get call should return `None` if a file does not exists in repository") {
-    val file = Paths.get("/test.conf").toFile
+    val file = Paths.get("/test.conf")
 
     configManager.get(file).await shouldBe None
   }
 
   test("should able to retrieve the specific version of file by config ID") {
-    val file = Paths.get("/a/b/csw.conf").toFile
+    val file = Paths.get("/a/b/csw.conf")
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit csw conf file").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
@@ -120,7 +120,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should get the correct version of file based on date") {
-    val file = Paths.get("/test.conf").toFile
+    val file = Paths.get("/test.conf")
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit initial configuration").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
@@ -134,7 +134,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
 
   test("should get the initial version of file if date provided is before the creation date") {
     val date = new Date(0L)
-    val file = Paths.get("/test.conf").toFile
+    val file = Paths.get("/test.conf")
 
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit initial configuration").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
@@ -148,7 +148,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should get the history of a file") {
-    val file = Paths.get("/test.conf").toFile
+    val file = Paths.get("/test.conf")
     val configIdCreate = configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit initial configuration").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
@@ -163,8 +163,8 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should list all the available config files") {
-    val tromboneConfig = Paths.get("trombone.conf").toFile
-    val assemblyConfig = Paths.get("a/b/assembly/assembly.conf").toFile
+    val tromboneConfig = Paths.get("trombone.conf")
+    val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
 
     val tromboneConfigComment = "hello trombone"
     val assemblyConfigComment = "hello assembly"
@@ -179,20 +179,20 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("exists should return false if file does not exist") {
-    val file = Paths.get("/test.conf").toFile
+    val file = Paths.get("/test.conf")
 
     configManager.exists(file).await shouldBe false
   }
 
   test("exists should return true if file exist") {
-    val file = Paths.get("a/test.csw.conf").toFile
+    val file = Paths.get("a/test.csw.conf")
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit config file").await
 
     configManager.exists(file).await shouldBe true
   }
 
   test("should able to delete existing file") {
-    val file = Paths.get("tromboneHCD.conf").toFile
+    val file = Paths.get("tromboneHCD.conf")
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit trombone config file").await
 
     configManager.get(file).await.get.toStringF.await shouldBe configValue
@@ -202,7 +202,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("deleting non existing file should throw FileNotFoundException") {
-    val file = Paths.get("tromboneHCD.conf").toFile
+    val file = Paths.get("tromboneHCD.conf")
     intercept[FileNotFoundException] {
       configManager.delete(file).await
     }
@@ -211,7 +211,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   //  TODO Implementation of delete() needs to be fixed
   //  This is not a valid test. Delete should just remove latest version and keep older ones.
   test("delete removes all versions of a file") {
-    val file = Paths.get("/a/b/csw.conf").toFile
+    val file = Paths.get("/a/b/csw.conf")
 
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit config file").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
@@ -226,7 +226,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should able to get and set the default config file") {
-    val file = Paths.get("/test.conf").toFile
+    val file = Paths.get("/test.conf")
     val configIdCreate = configManager.create(file, ConfigData.fromString(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
@@ -241,7 +241,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should be able to store and retrieve oversize file") {
-    val file = Paths.get("SomeOversizeFile.txt").toFile
+    val file = Paths.get("SomeOversizeFile.txt")
     val content = "testing oversize file"
 
     val configData = ConfigData.fromString(content)
@@ -249,15 +249,15 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val fileContent = configManager.get(file, Some(configId)).await.get
     fileContent.toStringF.await shouldBe content
 
-    val svnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(configId)).await.get
+    val svnConfigData = configManager.get(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), Some(configId)).await.get
     svnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(configData).await
   }
 
   test("should list oversize files") {
-    val file1 = Paths.get("OversizeFile1.txt").toFile
+    val file1 = Paths.get("OversizeFile1.txt")
     val comment1  = "committing oversize file"
 
-    val file2 = Paths.get("OversizeFile2.txt").toFile
+    val file2 = Paths.get("OversizeFile2.txt")
     val comment2 = "committing one more oversize file"
 
     val configId1 = configManager.create(file1, ConfigData.fromString("testing oversize file"), true, comment1).await
@@ -266,13 +266,13 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val listOfFileInfo: List[ConfigFileInfo] = configManager.list().await
 
     listOfFileInfo.toSet shouldBe Set(
-      ConfigFileInfo(new File(s"${file1.toPath}${serverWiring.settings.`sha1-suffix`}"), configId1, comment1),
-      ConfigFileInfo(new File(s"${file2.toPath}${serverWiring.settings.`sha1-suffix`}"), configId2, comment2)
+      ConfigFileInfo(Paths.get(s"${file1.toString}${serverWiring.settings.`sha1-suffix`}"), configId1, comment1),
+      ConfigFileInfo(Paths.get(s"${file2.toString}${serverWiring.settings.`sha1-suffix`}"), configId2, comment2)
     )
   }
 
   test("should be able to update oversize file and retrieve the history") {
-    val file = Paths.get("SomeOversizeFile.txt").toFile
+    val file = Paths.get("SomeOversizeFile.txt")
     val creationContent = "testing oversize file"
     val creationComment = "initial commit"
 
@@ -290,10 +290,10 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val updatedFileContent = configManager.get(file, Some(newConfigId)).await.get
     updatedFileContent.toStringF.await shouldBe newContent
 
-    val oldSvnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(creationConfigId)).await.get
+    val oldSvnConfigData = configManager.get(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), Some(creationConfigId)).await.get
     oldSvnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(configData).await
 
-    val newSvnConfigData = configManager.get(new File(s"${file.getPath}${serverWiring.settings.`sha1-suffix`}"), Some(newConfigId)).await.get
+    val newSvnConfigData = configManager.get(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), Some(newConfigId)).await.get
     newSvnConfigData.toStringF.await shouldBe ShaUtils.generateSHA1(configData2).await
 
     val fileHistories: List[ConfigFileHistory] = configManager.history(file).await
@@ -305,7 +305,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should be able to get oversize default file") {
-    val file = Paths.get("SomeOversizeFile.txt").toFile
+    val file = Paths.get("SomeOversizeFile.txt")
     val content = "testing oversize file"
     configManager.create(file, ConfigData.fromString(content), true, "committing oversize file").await
 
@@ -339,7 +339,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   test("should be able to get oversize time stamped file") {
     val initialDate = new Date
     
-    val file = Paths.get("SomeOversizeFile.txt").toFile
+    val file = Paths.get("SomeOversizeFile.txt")
     val content = "testing oversize file"
     configManager.create(file, ConfigData.fromString(content), true, "committing oversize file").await
 

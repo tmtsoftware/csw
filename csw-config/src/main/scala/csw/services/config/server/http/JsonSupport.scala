@@ -1,7 +1,6 @@
 package csw.services.config.server.http
 
-import java.io.File
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -13,11 +12,11 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
   protected val simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
-  implicit val fileFormat: JsonFormat[File] = new JsonFormat[File] {
-    override def write(obj: File): JsValue = JsString(obj.getPath)
+  implicit val fileFormat: JsonFormat[Path] = new JsonFormat[Path] {
+    override def write(obj: Path): JsValue = JsString(obj.toString)
 
-    override def read(json: JsValue): File = json match {
-      case JsString(value) ⇒ Paths.get(value).toFile
+    override def read(json: JsValue): Path = json match {
+      case JsString(value) ⇒ Paths.get(value)
       case _               ⇒ throw new RuntimeException("can not parse")
     }
   }

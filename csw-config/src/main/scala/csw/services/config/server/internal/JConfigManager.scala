@@ -1,6 +1,6 @@
 package csw.services.config.server.internal
 
-import java.io.File
+import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 import java.util.{Date, Optional}
 import java.{util, lang => jl}
@@ -21,60 +21,60 @@ class JConfigManager(configManager: ConfigManager, actorRuntime: ActorRuntime) e
   override def name: String =
     configManager.name
 
-  override def create(path: File,
+  override def create(path: Path,
                       configData: ConfigData,
                       oversize: Boolean,
                       comment: String): CompletableFuture[ConfigId] =
     configManager.create(path, configData, oversize, comment).toJava.toCompletableFuture
 
-  override def create(path: File, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
+  override def create(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
     create(path, configData, oversize = false, comment)
 
-  override def create(path: File, configData: ConfigData, oversize: Boolean): CompletableFuture[ConfigId] =
+  override def create(path: Path, configData: ConfigData, oversize: Boolean): CompletableFuture[ConfigId] =
     create(path, configData, oversize, comment = "")
 
-  override def create(path: File, configData: ConfigData): CompletableFuture[ConfigId] =
+  override def create(path: Path, configData: ConfigData): CompletableFuture[ConfigId] =
     create(path, configData, oversize = false, comment = "")
 
-  override def update(path: File, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
+  override def update(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
     configManager.update(path, configData, comment).toJava.toCompletableFuture
 
-  override def update(path: File, configData: ConfigData): CompletableFuture[ConfigId] =
+  override def update(path: Path, configData: ConfigData): CompletableFuture[ConfigId] =
     update(path, configData, comment = "")
 
-  override def get(path: File, id: Optional[ConfigId]): CompletableFuture[Optional[ConfigData]] =
+  override def get(path: Path, id: Optional[ConfigId]): CompletableFuture[Optional[ConfigData]] =
     configManager.get(path, id.asScala).map(_.asJava).toJava.toCompletableFuture
 
-  override def get(path: File): CompletableFuture[Optional[ConfigData]] =
+  override def get(path: Path): CompletableFuture[Optional[ConfigData]] =
     configManager.get(path).map(_.asJava).toJava.toCompletableFuture
 
-  override def get(path: File, date: Date): CompletableFuture[Optional[ConfigData]] =
+  override def get(path: Path, date: Date): CompletableFuture[Optional[ConfigData]] =
     configManager.get(path, date).map(_.asJava).toJava.toCompletableFuture
 
-  override def exists(path: File): CompletableFuture[jl.Boolean] =
+  override def exists(path: Path): CompletableFuture[jl.Boolean] =
     configManager.exists(path).toJava.toCompletableFuture.asInstanceOf[CompletableFuture[jl.Boolean]]
 
-  override def delete(path: File, comment: String): CompletableFuture[Unit] =
+  override def delete(path: Path, comment: String): CompletableFuture[Unit] =
     configManager.delete(path, comment).toJava.toCompletableFuture
 
-  override def delete(path: File): CompletableFuture[Unit] =
+  override def delete(path: Path): CompletableFuture[Unit] =
     delete(path, comment = "deleted")
 
   override def list(): CompletableFuture[util.List[ConfigFileInfo]] =
     configManager.list().map(_.asJava).toJava.toCompletableFuture
 
-  override def history(path: File, maxResults: Int): CompletableFuture[util.List[ConfigFileHistory]] =
+  override def history(path: Path, maxResults: Int): CompletableFuture[util.List[ConfigFileHistory]] =
     configManager.history(path, maxResults).map(_.asJava).toJava.toCompletableFuture
 
-  override def history(path: File): CompletableFuture[util.List[ConfigFileHistory]] =
+  override def history(path: Path): CompletableFuture[util.List[ConfigFileHistory]] =
     history(path, maxResults = Int.MaxValue)
 
-  override def setDefault(path: File, id: Optional[ConfigId]): CompletableFuture[Unit] =
+  override def setDefault(path: Path, id: Optional[ConfigId]): CompletableFuture[Unit] =
     configManager.setDefault(path, id.asScala).toJava.toCompletableFuture
 
-  override def resetDefault(path: File): CompletableFuture[Unit] =
+  override def resetDefault(path: Path): CompletableFuture[Unit] =
     configManager.resetDefault(path).toJava.toCompletableFuture
 
-  override def getDefault(path: File): CompletableFuture[Optional[ConfigData]] =
+  override def getDefault(path: Path): CompletableFuture[Optional[ConfigData]] =
     configManager.getDefault(path).map(_.asJava).toJava.toCompletableFuture
 }

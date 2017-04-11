@@ -1,14 +1,11 @@
 package csw.services.config.api.javadsl
 
-import java.io.File
-import java.util.{Date, Optional}
+import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
-import java.{util => ju}
-import java.{lang => jl}
+import java.util.{Date, Optional}
+import java.{lang => jl, util => ju}
 
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
-
-import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Defines an interface for storing and retrieving configuration information
@@ -30,10 +27,10 @@ trait IConfigManager {
     * @param comment    an optional comment to associate with this file
     * @return a unique id that can be used to refer to the file
     */
-  def create(path: File, configData: ConfigData, oversize: Boolean, comment: String): CompletableFuture[ConfigId]
-  def create(path: File, configData: ConfigData, comment: String): CompletableFuture[ConfigId]
-  def create(path: File, configData: ConfigData, oversize: Boolean): CompletableFuture[ConfigId]
-  def create(path: File, configData: ConfigData): CompletableFuture[ConfigId]
+  def create(path: Path, configData: ConfigData, oversize: Boolean, comment: String): CompletableFuture[ConfigId]
+  def create(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId]
+  def create(path: Path, configData: ConfigData, oversize: Boolean): CompletableFuture[ConfigId]
+  def create(path: Path, configData: ConfigData): CompletableFuture[ConfigId]
 
   /**
     * Updates the config file with the given path and data and optional comment.
@@ -44,8 +41,8 @@ trait IConfigManager {
     * @param comment    an optional comment to associate with this file
     * @return a unique id that can be used to refer to the file
     */
-  def update(path: File, configData: ConfigData, comment: String): CompletableFuture[ConfigId]
-  def update(path: File, configData: ConfigData): CompletableFuture[ConfigId]
+  def update(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId]
+  def update(path: Path, configData: ConfigData): CompletableFuture[ConfigId]
 
   /**
     * Gets and returns the file stored under the given path.
@@ -55,8 +52,8 @@ trait IConfigManager {
     *             (by default the latest version is returned)
     * @return a future object that can be used to access the file's data, if found
     */
-  def get(path: File, id: Optional[ConfigId]): CompletableFuture[Optional[ConfigData]]
-  def get(path: File): CompletableFuture[Optional[ConfigData]]
+  def get(path: Path, id: Optional[ConfigId]): CompletableFuture[Optional[ConfigData]]
+  def get(path: Path): CompletableFuture[Optional[ConfigData]]
 
   /**
     * Gets the file as it existed on the given date.
@@ -68,7 +65,7 @@ trait IConfigManager {
     * @param date the target date
     * @return a future object that can be used to access the file's data, if found
     */
-  def get(path: File, date: Date): CompletableFuture[Optional[ConfigData]]
+  def get(path: Path, date: Date): CompletableFuture[Optional[ConfigData]]
 
   /**
     * Returns true if the given path exists and is being managed
@@ -76,15 +73,15 @@ trait IConfigManager {
     * @param path the file path relative to the repository root
     * @return true the file exists
     */
-  def exists(path: File): CompletableFuture[jl.Boolean]
+  def exists(path: Path): CompletableFuture[jl.Boolean]
 
   /**
     * Deletes the given config file (older versions will still be available)
     *
     * @param path the file path relative to the repository root
     */
-  def delete(path: File, comment: String): CompletableFuture[Unit]
-  def delete(path: File): CompletableFuture[Unit]
+  def delete(path: Path, comment: String): CompletableFuture[Unit]
+  def delete(path: Path): CompletableFuture[Unit]
 
   /**
     * Returns a list containing all of the known config files
@@ -100,8 +97,8 @@ trait IConfigManager {
     * @param maxResults the maximum number of history results to return (default: unlimited)
     * @return a list containing one ConfigFileHistory object for each version of path
     */
-  def history(path: File, maxResults: Int): CompletableFuture[ju.List[ConfigFileHistory]]
-  def history(path: File): CompletableFuture[ju.List[ConfigFileHistory]]
+  def history(path: Path, maxResults: Int): CompletableFuture[ju.List[ConfigFileHistory]]
+  def history(path: Path): CompletableFuture[ju.List[ConfigFileHistory]]
 
   /**
     * Sets the "default version" of the file with the given path.
@@ -113,7 +110,7 @@ trait IConfigManager {
     *             (by default the id of the latest version is used)
     * @return a future result
     */
-  def setDefault(path: File, id: Optional[ConfigId]): CompletableFuture[Unit]
+  def setDefault(path: Path, id: Optional[ConfigId]): CompletableFuture[Unit]
 
   /**
     * Resets the "default version" of the file with the given path to be always the latest version.
@@ -121,7 +118,7 @@ trait IConfigManager {
     * @param path the file path relative to the repository root
     * @return a future result
     */
-  def resetDefault(path: File): CompletableFuture[Unit]
+  def resetDefault(path: Path): CompletableFuture[Unit]
 
   /**
     * Gets and returns the default version of the file stored under the given path.
@@ -130,7 +127,7 @@ trait IConfigManager {
     * @param path the file path relative to the repository root
     * @return a future object that can be used to access the file's data, if found
     */
-  def getDefault(path: File): CompletableFuture[Optional[ConfigData]]
+  def getDefault(path: Path): CompletableFuture[Optional[ConfigData]]
 }
 
 

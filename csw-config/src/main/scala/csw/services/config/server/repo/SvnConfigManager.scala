@@ -1,6 +1,7 @@
 package csw.services.config.server.repo
 
 import java.io._
+import java.nio.file.{Path, Paths}
 import java.util.Date
 
 import csw.services.config.api.commons.ActorRuntime
@@ -12,10 +13,10 @@ import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
 import org.tmatesoft.svn.core.io.{SVNRepository, SVNRepositoryFactory}
 import org.tmatesoft.svn.core.wc.{SVNClientManager, SVNRevision}
-import org.tmatesoft.svn.core.wc2.{ISvnObjectReceiver, SvnOperationFactory, SvnTarget}
+import org.tmatesoft.svn.core.wc2.{SvnOperationFactory, SvnTarget}
 
+import scala.async.Async._
 import scala.concurrent.Future
-import async.Async._
 
 class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileManager, actorRuntime: ActorRuntime) extends ConfigManager {
 
@@ -23,7 +24,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   override def name: String = "my name is missing"
 
-  override def create(path: File, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
+  override def create(path: Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
 
     def createOversize(): Future[ConfigId] = async {
       val sha1 = await(oversizeFileManager.post(configData))
@@ -47,7 +48,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  override def update(path: File, configData: ConfigData, comment: String): Future[ConfigId] = {
+  override def update(path: Path, configData: ConfigData, comment: String): Future[ConfigId] = {
 
     def updateOversize(): Future[ConfigId] = async {
       val sha1 = await(oversizeFileManager.post(configData))
@@ -71,7 +72,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  override def get(path: File, id: Option[ConfigId]): Future[Option[ConfigData]] = {
+  override def get(path: Path, id: Option[ConfigId]): Future[Option[ConfigData]] = {
     // Get oversize files that are stored in the annex server
     def getOversize: Future[Option[ConfigData]] = async {
       val opt = await(get(shaFile(path), id))
@@ -94,7 +95,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       val os = new ByteArrayOutputStream()
       val svn = getSvn
       try {
-        svn.getFile(path.getPath, svnRevision(id).getNumber, null, os)
+        svn.getFile(path.toString, svnRevision(id).getNumber, null, os)
       } finally {
         svn.closeSession()
       }
@@ -118,7 +119,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  override def get(path: File, date: Date): Future[Option[ConfigData]] = {
+  override def get(path: Path, date: Date): Future[Option[ConfigData]] = {
     val t = date.getTime
 
     // Gets the ConfigFileHistory matching the date
@@ -136,11 +137,11 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  override def exists(path: File): Future[Boolean] = Future(pathExists(path))
+  override def exists(path: Path): Future[Boolean] = Future(pathExists(path))
 
   //TODO: This implementation deletes all versions of a file. This is different than the expecations
-  override def delete(path: File, comment: String = "deleted"): Future[Unit] = {
-    def deleteFile(path: File, comment: String = "deleted"): Unit = {
+  override def delete(path: Path, comment: String = "deleted"): Future[Unit] = {
+    def deleteFile(path: Path, comment: String = "deleted"): Unit = {
       if (isOversize(path)) {
         deleteFile(shaFile(path), comment)
       } else {
@@ -151,7 +152,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
         val svnOperationFactory = new SvnOperationFactory()
         try {
           val remoteDelete = svnOperationFactory.createRemoteDelete()
-          remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.svnUrl.appendPath(path.getPath, false)))
+          remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.svnUrl.appendPath(path.toString, false)))
           remoteDelete.setCommitMessage(comment)
           remoteDelete.run()
         } finally {
@@ -180,18 +181,20 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       svnOperationFactory.dispose()
     }
     entries.filter(_.getKind == SVNNodeKind.FILE).sortWith(_.getRelativePath < _.getRelativePath)
-      .map(e => ConfigFileInfo(new File(e.getRelativePath), ConfigId(e.getRevision), e.getCommitMessage))
+      .map(e => ConfigFileInfo(Paths.get(e.getRelativePath), ConfigId(e.getRevision), e.getCommitMessage))
   }
 
-  override def history(path: File, maxResults: Int): Future[List[ConfigFileHistory]] = async {
+  override def history(path: Path, maxResults: Int): Future[List[ConfigFileHistory]] = async {
     // XXX Should .sha1 files have the .sha1 suffix removed in the result?
-    if (isOversize(path))
+    if (isOversize(path)) {
       hist(shaFile(path), maxResults)
-    else
+    }
+    else {
       hist(path, maxResults)
+    }
   }
 
-  override def setDefault(path: File, id: Option[ConfigId] = None): Future[Unit] = {
+  override def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit] = {
     (if (id.isDefined) id else getCurrentVersion(path)) match {
       case Some(configId) =>
         create(defaultFile(path), ConfigData.fromString(configId.id)).map(_ => ())
@@ -200,11 +203,11 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  override def resetDefault(path: File): Future[Unit] = {
+  override def resetDefault(path: Path): Future[Unit] = {
     delete(defaultFile(path))
   }
 
-  override def getDefault(path: File): Future[Option[ConfigData]] = async {
+  override def getDefault(path: Path): Future[Option[ConfigData]] = async {
     getCurrentVersion(path) match {
       case None ⇒
         None
@@ -223,7 +226,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     * @param comment    an optional comment to associate with this file
     * @return a future unique id that can be used to refer to the file
     */
-  private def put(path: File, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = Future {
+  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = Future {
     val inputStream = configData.toInputStream
     val commitInfo = if (update) {
       modifyFile(comment, path, inputStream)
@@ -235,12 +238,12 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   // Modifies the contents of the given file in the repository.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  private def modifyFile(comment: String, path: File, data: InputStream): SVNCommitInfo = {
+  private def modifyFile(comment: String, path: Path, data: InputStream): SVNCommitInfo = {
     val svn = getSvn
     try {
       val editor = svn.getCommitEditor(comment, null)
       editor.openRoot(SVNRepository.INVALID_REVISION)
-      val filePath = path.getPath
+      val filePath = path.toString
       editor.openFile(filePath, SVNRepository.INVALID_REVISION)
       editor.applyTextDelta(filePath, null)
       val deltaGenerator = new SVNDeltaGenerator
@@ -263,25 +266,25 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   // Adds the given file (and dir if needed) to svn.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  private def addFile(comment: String, path: File, data: InputStream): SVNCommitInfo = {
+  private def addFile(comment: String, path: Path, data: InputStream): SVNCommitInfo = {
     val svn = getSvn
     try {
       val editor = svn.getCommitEditor(comment, null)
       editor.openRoot(SVNRepository.INVALID_REVISION)
-      val dirPath = path.getParentFile
+      val dirPath = path.getParent
 
       // Recursively add any missing directories leading to the file
-      def addDir(dir: File): Unit = {
+      def addDir(dir: Path): Unit = {
         if (dir != null) {
-          addDir(dir.getParentFile)
+          addDir(dir.getParent)
           if (!dirExists(dir)) {
-            editor.addDir(dir.getPath, null, SVNRepository.INVALID_REVISION)
+            editor.addDir(dir.toString, null, SVNRepository.INVALID_REVISION)
           }
         }
       }
 
       addDir(dirPath)
-      val filePath = path.getPath
+      val filePath = path.toString
       editor.addFile(filePath, null, SVNRepository.INVALID_REVISION)
       editor.applyTextDelta(filePath, null)
       val deltaGenerator = new SVNDeltaGenerator
@@ -295,30 +298,30 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   }
 
   // True if the directory path exists in the repository
-  private def dirExists(path: File): Boolean = {
+  private def dirExists(path: Path): Boolean = {
     val svn = getSvn
     try {
-      svn.checkPath(path.getPath, SVNRepository.INVALID_REVISION) == SVNNodeKind.DIR
+      svn.checkPath(path.toString, SVNRepository.INVALID_REVISION) == SVNNodeKind.DIR
     } finally {
       svn.closeSession()
     }
   }
 
   // True if the path exists in the repository
-  private def pathExists(path: File): Boolean = {
+  private def pathExists(path: Path): Boolean = {
     val svn = getSvn
     try {
-      svn.checkPath(path.getPath, SVNRepository.INVALID_REVISION) == SVNNodeKind.FILE || isOversize(path)
+      svn.checkPath(path.toString, SVNRepository.INVALID_REVISION) == SVNNodeKind.FILE || isOversize(path)
     } finally {
       svn.closeSession()
     }
   }
 
   // True if the .sha1 file exists, meaning the file needs special oversize handling.
-  private def isOversize(path: File): Boolean = {
+  private def isOversize(path: Path): Boolean = {
     val svn = getSvn
     try {
-      svn.checkPath(shaFile(path).getPath, SVNRepository.INVALID_REVISION) == SVNNodeKind.FILE
+      svn.checkPath(shaFile(path).toString, SVNRepository.INVALID_REVISION) == SVNNodeKind.FILE
     } finally {
       svn.closeSession()
     }
@@ -333,22 +336,24 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   }
 
   // File used to store the SHA-1 of the actual file, if oversized.
-  private def shaFile(file: File): File = new File(s"${file.getPath}${settings.`sha1-suffix`}")
+  private def shaFile(path: Path): Path = Paths.get(s"${path.toString}${settings.`sha1-suffix`}")
 
   // Returns the current version of the file, if known
-  private def getCurrentVersion(path: File): Option[ConfigId] = {
-    if (isOversize(path))
+  private def getCurrentVersion(path: Path): Option[ConfigId] = {
+    if (isOversize(path)) {
       hist(shaFile(path), 1).headOption.map(_.id)
-    else
+    }
+    else {
       hist(path, 1).headOption.map(_.id)
+    }
   }
 
-  private def hist(path: File, maxResults: Int = Int.MaxValue): List[ConfigFileHistory] = {
+  private def hist(path: Path, maxResults: Int = Int.MaxValue): List[ConfigFileHistory] = {
     val clientManager = SVNClientManager.newInstance()
     var logEntries = List[SVNLogEntry]()
     try {
       val logClient = clientManager.getLogClient
-      logClient.doLog(settings.svnUrl, Array(path.getPath), SVNRevision.HEAD, null, null, true, true, maxResults,
+      logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
         new ISVNLogEntryHandler() {
           override def handleLogEntry(logEntry: SVNLogEntry): Unit = logEntries = logEntry :: logEntries
         })
@@ -362,7 +367,6 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   }
 
   // File used to store the id of the default version of the file.
-  private def defaultFile(file: File): File =
-    new File(s"${file.getPath}${settings.`default-suffix`}")
-
+  private def defaultFile(path: Path): Path =
+    Paths.get(s"${path.toString}${settings.`default-suffix`}")
 }

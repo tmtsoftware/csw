@@ -1,11 +1,11 @@
 package csw.services.config.api.scaladsl
 
-import java.io.File
+import java.nio.file.Path
 import java.util.Date
 
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 /**
  * Defines an interface for storing and retrieving configuration information
@@ -27,7 +27,7 @@ trait ConfigManager {
    * @param comment    an optional comment to associate with this file
    * @return a unique id that can be used to refer to the file
    */
-  def create(path: File, configData: ConfigData, oversize: Boolean = false, comment: String = ""): Future[ConfigId]
+  def create(path: Path, configData: ConfigData, oversize: Boolean = false, comment: String = ""): Future[ConfigId]
 
   /**
    * Updates the config file with the given path and data and optional comment.
@@ -38,7 +38,7 @@ trait ConfigManager {
    * @param comment    an optional comment to associate with this file
    * @return a unique id that can be used to refer to the file
    */
-  def update(path: File, configData: ConfigData, comment: String = ""): Future[ConfigId]
+  def update(path: Path, configData: ConfigData, comment: String = ""): Future[ConfigId]
 
   /**
    * Gets and returns the file stored under the given path.
@@ -48,7 +48,7 @@ trait ConfigManager {
    *             (by default the latest version is returned)
    * @return a future object that can be used to access the file's data, if found
    */
-  def get(path: File, id: Option[ConfigId] = None): Future[Option[ConfigData]]
+  def get(path: Path, id: Option[ConfigId] = None): Future[Option[ConfigData]]
 
   /**
     * Gets the file as it existed on the given date.
@@ -60,7 +60,7 @@ trait ConfigManager {
     * @param date the target date
     * @return a future object that can be used to access the file's data, if found
     */
-  def get(path: File, date: Date): Future[Option[ConfigData]]
+  def get(path: Path, date: Date): Future[Option[ConfigData]]
 
   /**
    * Returns true if the given path exists and is being managed
@@ -68,14 +68,14 @@ trait ConfigManager {
    * @param path the file path relative to the repository root
    * @return true the file exists
    */
-  def exists(path: File): Future[Boolean]
+  def exists(path: Path): Future[Boolean]
 
   /**
    * Deletes the given config file (older versions will still be available)
    *
    * @param path the file path relative to the repository root
    */
-  def delete(path: File, comment: String = "deleted"): Future[Unit]
+  def delete(path: Path, comment: String = "deleted"): Future[Unit]
 
   /**
    * Returns a list containing all of the known config files
@@ -91,7 +91,7 @@ trait ConfigManager {
    * @param maxResults the maximum number of history results to return (default: unlimited)
    * @return a list containing one ConfigFileHistory object for each version of path
    */
-  def history(path: File, maxResults: Int = Int.MaxValue): Future[List[ConfigFileHistory]]
+  def history(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileHistory]]
 
   /**
    * Sets the "default version" of the file with the given path.
@@ -103,7 +103,7 @@ trait ConfigManager {
    *             (by default the id of the latest version is used)
    * @return a future result
    */
-  def setDefault(path: File, id: Option[ConfigId] = None): Future[Unit]
+  def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit]
 
   /**
    * Resets the "default version" of the file with the given path to be always the latest version.
@@ -111,7 +111,7 @@ trait ConfigManager {
    * @param path the file path relative to the repository root
    * @return a future result
    */
-  def resetDefault(path: File): Future[Unit]
+  def resetDefault(path: Path): Future[Unit]
 
   /**
    * Gets and returns the default version of the file stored under the given path.
@@ -120,7 +120,7 @@ trait ConfigManager {
    * @param path the file path relative to the repository root
    * @return a future object that can be used to access the file's data, if found
    */
-  def getDefault(path: File): Future[Option[ConfigData]]
+  def getDefault(path: Path): Future[Option[ConfigData]]
 }
 
 

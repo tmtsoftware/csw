@@ -1,7 +1,7 @@
 package csw.services.config.client
 
-import java.io.{File, FileNotFoundException, IOException}
-import java.nio.file.Paths
+import java.io.{FileNotFoundException, IOException}
+import java.nio.{file => jnio}
 import java.util.Date
 
 import akka.http.scaladsl.Http
@@ -16,7 +16,7 @@ import csw.services.config.api.scaladsl.ConfigManager
 import csw.services.config.server.http.JsonSupport
 import csw.services.location.models.Location
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends ConfigManager with JsonSupport {
 
@@ -24,12 +24,12 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
 
   override def name: String = "http-based-config-client"
 
-  override def create(path: File, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
+  override def create(path: jnio.Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
     val entity = HttpEntity.IndefiniteLength(ContentTypes.`application/octet-stream`, configData.source)
     val formData: Multipart.FormData = FormData(FormData.BodyPart("conf", entity, Map("filename" → "")))
     val uri = Uri(location.uri.toString)
       .withPath(Path / "create")
-      .withQuery(Query("path" → path.getPath, "oversize" → oversize.toString, "comment" → comment))
+      .withQuery(Query("path" → path.toString, "oversize" → oversize.toString, "comment" → comment))
 
     Marshal(formData).to[RequestEntity].flatMap { entity =>
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
@@ -44,12 +44,12 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     }
   }
 
-  override def update(path: File, configData: ConfigData, comment: String): Future[ConfigId] = {
+  override def update(path: jnio.Path, configData: ConfigData, comment: String): Future[ConfigId] = {
     val entity = HttpEntity.IndefiniteLength(ContentTypes.`application/octet-stream`, configData.source)
     val formData: Multipart.FormData = FormData(FormData.BodyPart("conf", entity, Map("filename" → "")))
     val uri = Uri(location.uri.toString)
       .withPath(Path / "update")
-      .withQuery(Query("path" → path.getPath, "comment" → comment))
+      .withQuery(Query("path" → path.toString, "comment" → comment))
 
     Marshal(formData).to[RequestEntity].flatMap { entity =>
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
@@ -64,10 +64,10 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     }
   }
 
-  override def get(path: File, id: Option[ConfigId]): Future[Option[ConfigData]] = {
+  override def get(path: jnio.Path, id: Option[ConfigId]): Future[Option[ConfigData]] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "get")
-      .withQuery(Query(Map("path" → path.getPath) ++ id.map(configId ⇒ "id" → configId.id.toString)))
+      .withQuery(Query(Map("path" → path.toString) ++ id.map(configId ⇒ "id" → configId.id.toString)))
     val request = HttpRequest(uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
@@ -79,10 +79,10 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     }
   }
 
-  override def get(path: File, date: Date): Future[Option[ConfigData]] = {
+  override def get(path: jnio.Path, date: Date): Future[Option[ConfigData]] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "get")
-      .withQuery(Query(Map("path" → path.getPath, "date" → simpleDateFormat.format(date))))
+      .withQuery(Query(Map("path" → path.toString, "date" → simpleDateFormat.format(date))))
     val request = HttpRequest(uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
@@ -94,10 +94,10 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     }
   }
 
-  override def exists(path: File): Future[Boolean] = {
+  override def exists(path: jnio.Path): Future[Boolean] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "exists")
-      .withQuery(Query(Map("path" → path.getPath)))
+      .withQuery(Query(Map("path" → path.toString)))
     val request = HttpRequest(uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
@@ -109,10 +109,10 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     }
   }
 
-  override def delete(path: File, comment: String): Future[Unit] = {
+  override def delete(path: jnio.Path, comment: String): Future[Unit] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "delete")
-      .withQuery(Query(Map("path" → path.getPath, "comment" → comment)))
+      .withQuery(Query(Map("path" → path.toString, "comment" → comment)))
     val request = HttpRequest(HttpMethods.POST, uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
@@ -136,10 +136,10 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     }
   }
 
-  override def history(path: File, maxResults: Int): Future[List[ConfigFileHistory]] = {
+  override def history(path: jnio.Path, maxResults: Int): Future[List[ConfigFileHistory]] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "history")
-      .withQuery(Query(Map("path" → path.getPath, "maxResults" → maxResults.toString)))
+      .withQuery(Query(Map("path" → path.toString, "maxResults" → maxResults.toString)))
     val request = HttpRequest(uri = uri)
     println(request)
     Http().singleRequest(request).flatMap { response =>
@@ -150,10 +150,10 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     }
   }
 
-  override def setDefault(path: File, id: Option[ConfigId]): Future[Unit] = {
+  override def setDefault(path: jnio.Path, id: Option[ConfigId]): Future[Unit] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "setDefault")
-      .withQuery(Query(Map("path" → path.getPath) ++ id.map(configId ⇒ "id" → configId.id.toString)))
+      .withQuery(Query(Map("path" → path.toString) ++ id.map(configId ⇒ "id" → configId.id.toString)))
     val request = HttpRequest(HttpMethods.POST, uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
@@ -165,10 +165,10 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     }
   }
 
-  override def resetDefault(path: File): Future[Unit] = {
+  override def resetDefault(path: jnio.Path): Future[Unit] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "resetDefault")
-      .withQuery(Query(Map("path" → path.getPath)))
+      .withQuery(Query(Map("path" → path.toString)))
     val request = HttpRequest(HttpMethods.POST, uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
@@ -180,10 +180,10 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     }
   }
 
-  override def getDefault(path: File): Future[Option[ConfigData]] = {
+  override def getDefault(path: jnio.Path): Future[Option[ConfigData]] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "getDefault")
-      .withQuery(Query(Map("path" → path.getPath)))
+      .withQuery(Query(Map("path" → path.toString)))
     val request = HttpRequest(uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
