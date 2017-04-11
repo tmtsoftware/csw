@@ -1,4 +1,4 @@
-package csw.services.csClient
+package csw.services.csclient
 
 import akka.Done
 import csw.services.location.commons.{ClusterSettings, CswCluster}
