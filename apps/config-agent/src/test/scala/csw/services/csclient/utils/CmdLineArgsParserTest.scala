@@ -98,4 +98,22 @@ class CmdLineArgsParserTest
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
     x should contain (new Options("delete", Some(repositoryFilepath), None, None, None, false, ""))
   }
+
+  test("test list") {
+    val argv = Array("list")
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x should contain (new Options("list", None, None, None, None, false, ""))
+  }
+
+  test("test history with no sub-options") {
+    val argv = Array("history")
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x shouldEqual None
+  }
+
+  test("test history with sub-options") {
+    val argv = Array("history", repositoryFilepath.toString)
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x should contain (new Options("history", Some(repositoryFilepath), None, None, None, false, ""))
+  }
 }

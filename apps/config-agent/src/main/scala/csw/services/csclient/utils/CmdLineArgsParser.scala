@@ -93,8 +93,19 @@ object CmdLineArgsParser {
       )
 
     //list operation
+    cmd("list") action { (_, c) =>
+      c.copy(op = "list")
+    } text "lists the files in the repository" children ()
 
     //history operation
+    cmd("history") action { (_, c) =>
+      c.copy(op = "history")
+    } text "shows versioning history of the file in the repository" children (
+
+      arg[File]("<path>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(x))
+      } text "path name in the repository"
+      )
 
     //setDefault operation
 
