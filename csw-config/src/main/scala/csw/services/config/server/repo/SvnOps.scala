@@ -31,7 +31,7 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
 
   // Adds the given file (and dir if needed) to svn.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  def addFile(path: Path, comment: String, data: InputStream) = Future {
+  def addFile(path: Path, comment: String, data: InputStream): Future[SVNCommitInfo] = Future {
     val svn = svnHandle()
     try {
       val editor = svn.getCommitEditor(comment, null)
@@ -119,10 +119,8 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
     var logEntries = List[SVNLogEntry]()
     try {
       val logClient = clientManager.getLogClient
-      logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
-        new ISVNLogEntryHandler() {
-          override def handleLogEntry(logEntry: SVNLogEntry): Unit = logEntries = logEntry :: logEntries
-        })
+      val handler: ISVNLogEntryHandler = logEntry => logEntries = logEntry :: logEntries
+      logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults, handler)
       logEntries.sortWith(_.getRevision > _.getRevision)
     } finally {
       clientManager.dispose()
@@ -139,11 +137,12 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
     }
   }
 
+  def pathExists(path: Path): Future[Boolean] = Future {
+    checkPath(path, SVNNodeKind.FILE)
+  }
 
   // True if the directory path exists in the repository
   private def dirExists(path: Path): Boolean = checkPath(path, SVNNodeKind.DIR)
-
-  def pathExists(path: Path): Boolean = checkPath(path, SVNNodeKind.FILE)
 
   private def checkPath(path: Path, kind: SVNNodeKind): Boolean = {
     val svn = svnHandle()
@@ -153,7 +152,6 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
       svn.closeSession()
     }
   }
-
 
   // Gets an object for accessing the svn repository (not reusing a single instance since not thread safe)
   private def svnHandle(): SVNRepository = {

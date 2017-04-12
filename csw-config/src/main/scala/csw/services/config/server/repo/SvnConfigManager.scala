@@ -28,13 +28,13 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
 
     // If the file does not already exists in the repo, create it
-    def createImpl(present: Boolean): Future[ConfigId] = {
+    def createImpl(present: Boolean): Future[ConfigId] = async {
       if (present) {
-        Future.failed(new IOException("File already exists in repository: " + path))
+        throw new IOException("File already exists in repository: " + path)
       } else if (oversize) {
-        createOversize()
+        await(createOversize())
       } else {
-        put(path, configData, update = false, comment)
+        await(put(path, configData, update = false, comment))
       }
     }
 
@@ -52,13 +52,13 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
 
     // If the file already exists in the repo, update it
-    def updateImpl(present: Boolean): Future[ConfigId] = {
+    def updateImpl(present: Boolean): Future[ConfigId] = async {
       if (!present) {
-        Future.failed(new FileNotFoundException("File not found: " + path))
-      } else if (isOversize(path)) {
-        updateOversize()
+        throw new FileNotFoundException("File not found: " + path)
+      } else if (await(isOversize(path))) {
+        await(updateOversize())
       } else {
-        put(path, configData, update = true, comment)
+        await(put(path, configData, update = true, comment))
       }
     }
 
@@ -99,13 +99,13 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
 
     // If the file exists in the repo, get its data
-    def getImpl(present: Boolean): Future[Option[ConfigData]] = {
+    def getImpl(present: Boolean): Future[Option[ConfigData]] = async {
       if (!present) {
-        Future(None)
-      } else if (isOversize(path)) {
-        getOversize
+        None
+      } else if (await(isOversize(path))) {
+        await(getOversize)
       } else {
-        getConfigData
+        await(getConfigData)
       }
     }
 
@@ -132,12 +132,15 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  override def exists(path: Path): Future[Boolean] = Future(isNormalSize(path) || isOversize(path))
+  override def exists(path: Path): Future[Boolean] = async {
+    val normalSize = await(isNormalSize(path))
+    if(normalSize) normalSize else await(isOversize(path))
+  }
 
   //TODO: This implementation deletes all versions of a file. This is different than the expecations
   override def delete(path: Path, comment: String = "deleted"): Future[Unit] = async {
-    if (isOversize(path)) await(svnOps.delete(shaPath(path), comment))
-    else if (isNormalSize(path)) await(svnOps.delete(path, comment))
+    if (await(isOversize(path))) await(svnOps.delete(shaPath(path), comment))
+    else if (await(isNormalSize(path))) await(svnOps.delete(path, comment))
     else throw new FileNotFoundException("Can't delete " + path + " because it does not exist")
   }
 
@@ -148,7 +151,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   override def history(path: Path, maxResults: Int): Future[List[ConfigFileHistory]] = async {
     // XXX Should .sha1 files have the .sha1 suffix removed in the result?
-    if (isOversize(path)) {
+    if (await(isOversize(path))) {
       await(hist(shaPath(path), maxResults))
     }
     else {
@@ -196,12 +199,12 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   }
 
   // True if the file exists
-  private def isNormalSize(path: Path): Boolean = {
+  private def isNormalSize(path: Path): Future[Boolean] = {
     svnOps.pathExists(path)
   }
 
   // True if the .sha1 file exists, meaning the file needs special oversize handling.
-  private def isOversize(path: Path): Boolean = {
+  private def isOversize(path: Path): Future[Boolean] = {
     svnOps.pathExists(shaPath(path))
   }
 
@@ -210,7 +213,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   // Returns the current version of the file, if known
   private def getCurrentVersion(path: Path): Future[Option[ConfigId]] = async {
-    if (isOversize(path)) {
+    if (await(isOversize(path))) {
       await(hist(shaPath(path), 1)).headOption.map(_.id)
     }
     else {
@@ -224,6 +227,5 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   }
 
   // File used to store the id of the default version of the file.
-  private def defaultFile(path: Path): Path =
-    Paths.get(s"${path.toString}${settings.`default-suffix`}")
+  private def defaultFile(path: Path): Path = Paths.get(s"${path.toString}${settings.`default-suffix`}")
 }
