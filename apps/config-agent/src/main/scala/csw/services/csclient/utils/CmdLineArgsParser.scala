@@ -75,12 +75,32 @@ object CmdLineArgsParser {
     //exists operation
     cmd("exists") action { (_, c) =>
       c.copy(op = "exists")
-    } text "checks if the path exists in the repository" children (
+    } text "checks if the file exists at specified path in the repository" children (
 
-      arg[File]("<path>") action { (x, c) =>
+      arg[File]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(x))
+      } text "file path in the repository"
+      )
+
+    //delete operation
+    cmd("delete") action { (_, c) =>
+      c.copy(op = "delete")
+    } text "deletes the file at specified path in the repository" children (
+
+      arg[File]("<repositoryFilePath>") action { (x, c) =>
         c.copy(repositoryFilePath = Some(x))
       } text "path name in the repository"
       )
+
+    //list operation
+
+    //history operation
+
+    //setDefault operation
+
+    //resetDefault operation
+
+    //getDefault operation
 
     help("help")
 
