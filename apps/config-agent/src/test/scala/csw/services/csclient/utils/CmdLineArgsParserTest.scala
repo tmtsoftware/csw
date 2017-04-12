@@ -116,4 +116,22 @@ class CmdLineArgsParserTest
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
     x should contain (new Options("history", Some(repositoryFilepath), None, None, None, false, ""))
   }
+
+  test("test setDefault with no sub-options") {
+    val argv = Array("setDefault")
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x shouldEqual None
+  }
+
+  test("test setDefault with all sub-options") {
+    val argv = Array("setDefault", repositoryFilepath.toString, "--id", id)
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x should contain (new Options("setDefault", Some(repositoryFilepath), None, None, Some(id), false, ""))
+  }
+
+  test("test setDefault with bare minimum sub-options") {
+    val argv = Array("setDefault", repositoryFilepath.toString)
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x should contain (new Options("setDefault", Some(repositoryFilepath), None, None, None, false, ""))
+  }
 }

@@ -89,7 +89,7 @@ object CmdLineArgsParser {
 
       arg[File]("<repositoryFilePath>") action { (x, c) =>
         c.copy(repositoryFilePath = Some(x))
-      } text "path name in the repository"
+      } text "file path in the repository"
       )
 
     //list operation
@@ -104,10 +104,22 @@ object CmdLineArgsParser {
 
       arg[File]("<path>") action { (x, c) =>
         c.copy(repositoryFilePath = Some(x))
-      } text "path name in the repository"
+      } text "file path in the repository"
       )
 
     //setDefault operation
+    cmd("setDefault") action { (_, c) =>
+      c.copy(op = "setDefault")
+    } text "sets the default version of the file" children (
+
+      arg[File]("<path>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(x))
+      } text "file path in the repository",
+
+      opt[String]("id") action { (x, c) =>
+        c.copy(id = Some(x))
+      } text "optional version id to set as default for file"
+    )
 
     //resetDefault operation
 
