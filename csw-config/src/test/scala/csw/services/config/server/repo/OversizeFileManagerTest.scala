@@ -3,7 +3,7 @@ package csw.services.config.server.repo
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Paths
 
-import csw.services.config.api.commons.{ShaUtils, TestFileUtils}
+import csw.services.config.api.commons.TestFileUtils
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.models.ConfigData
 import csw.services.config.server.ServerWiring

@@ -4,10 +4,11 @@ import java.io._
 import java.nio.file.Paths
 import java.util.Date
 
-import csw.services.config.api.commons.{ShaUtils, TestFileUtils}
+import csw.services.config.api.commons.TestFileUtils
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo}
 import csw.services.config.server.ServerWiring
+import csw.services.config.server.repo.ShaUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {

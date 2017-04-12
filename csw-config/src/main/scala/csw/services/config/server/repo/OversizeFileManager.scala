@@ -4,7 +4,7 @@ import java.nio.file.{Files, Path, Paths}
 
 import akka.stream.Materializer
 import akka.stream.scaladsl.{FileIO, Keep}
-import csw.services.config.api.commons.ShaUtils
+import ShaUtils
 import csw.services.config.api.models.ConfigData
 import csw.services.config.server.Settings
 

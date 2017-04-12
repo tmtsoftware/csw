@@ -1,6 +1,5 @@
-package csw.services.config.api.commons
+package csw.services.config.server.repo
 
-import java.io.File
 import java.nio.file.Path
 import java.security.MessageDigest
 
