@@ -20,7 +20,7 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileManager, actorRuntime: ActorRuntime) extends ConfigManager {
+class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileManager, actorRuntime: ActorRuntime, svnOps: SvnOps) extends ConfigManager {
 
   import actorRuntime._
 
@@ -97,17 +97,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       val svn = getSvn
       val outputStream = StreamConverters.asOutputStream().cancellableMat
       val source = outputStream.mapMaterializedValue { case (out, switch) ⇒
-        Future {
-          try {
-            svn.getFile(path.toString, svnRevision(id).getNumber, null, out)
-          } catch {
-            case NonFatal(ex) ⇒ switch.abort(ex)
-          } finally {
-            out.flush()
-            out.close()
-            svn.closeSession()
-          }
-        }
+        svnOps.getFile(path, svnRevision(id).getNumber, out, ex ⇒ switch.abort(ex))
       }
       Future(Some(ConfigData.fromSource(source)))
     }

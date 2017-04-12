@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.config.api.scaladsl.ConfigManager
 import csw.services.config.server.http.{ConfigServiceRoute, HttpService}
-import csw.services.config.server.repo.{FileOps, OversizeFileManager, SvnAdmin, SvnConfigManager}
+import csw.services.config.server.repo._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 class ServerWiring {
@@ -14,10 +14,11 @@ class ServerWiring {
   lazy val actorSystem = ActorSystem("config-service", config)
   lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
   lazy val fileOps = new FileOps(actorRuntime.blockingIoDispatcher)
+  lazy val svnOps = new SvnOps(settings, actorRuntime.blockingIoDispatcher)
 
   lazy val oversizeFileManager = new OversizeFileManager(settings, fileOps)
   lazy val svnAdmin = new SvnAdmin(settings)
-  lazy val configManager: ConfigManager = new SvnConfigManager(settings, oversizeFileManager, actorRuntime)
+  lazy val configManager: ConfigManager = new SvnConfigManager(settings, oversizeFileManager, actorRuntime, svnOps)
 
   lazy val locationService: LocationService = LocationServiceFactory.make()
 
