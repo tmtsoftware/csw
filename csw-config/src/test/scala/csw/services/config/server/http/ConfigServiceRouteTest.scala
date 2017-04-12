@@ -1,5 +1,7 @@
 package csw.services.config.server.http
 
+import java.time.Instant
+
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
@@ -96,7 +98,7 @@ class ConfigServiceRouteTest extends FunSuite
     }
 
     // try to create file which already exists
-    Post("/create?" + createRequestParameterList, configFile1) ~> route ~> check {
+    Post("/create?" + createRequestParameterList, configFile1) ~> Route.seal(route) ~> check {
       // expected
       // status shouldEqual StatusCodes.Conflict
       // status shouldEqual StatusCodes.UnprocessableEntity
@@ -194,6 +196,34 @@ class ConfigServiceRouteTest extends FunSuite
       status shouldBe StatusCodes.InternalServerError
     }
 
+  }
+
+  test("get by date - success status code") {
+    val timeWhenRepoWasEmpty = Instant.now()
+    Post("/create?" + createRequestParameterList, configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+    val timeWhenFileWasCreated = Instant.now()
+
+    Post("/update?path=test.conf&comment=updated", updatedConfigFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    Get(s"/get?path=test.conf&date=$timeWhenFileWasCreated") ~> Route.seal(route) ~> check {
+      status shouldBe StatusCodes.OK
+    }
+
+    Get(s"/get?path=test.conf&date=$timeWhenRepoWasEmpty") ~> Route.seal(route) ~> check {
+      status shouldBe StatusCodes.OK
+    }
+  }
+
+  test("get by date - failure status codes") {
+    val timeWhenRepoWasEmpty = Instant.now()
+
+    Get(s"/get?path=test.conf&date=$timeWhenRepoWasEmpty") ~> Route.seal(route) ~> check {
+      status shouldBe StatusCodes.NotFound
+    }
   }
 
   test("list - success status code") {
