@@ -225,12 +225,12 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     * @param comment    an optional comment to associate with this file
     * @return a future unique id that can be used to refer to the file
     */
-  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = Future {
+  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = async {
     val inputStream = configData.toInputStream
     val commitInfo = if (update) {
       modifyFile(comment, path, inputStream)
     } else {
-      addFile(comment, path, inputStream)
+      await(svnOps.addFile(comment, path, inputStream))
     }
     ConfigId(commitInfo.getNewRevision)
   }
@@ -261,49 +261,6 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     val authManager = BasicAuthenticationManager.newInstance(settings.`svn-user-name`, Array[Char]())
     svn.setAuthenticationManager(authManager)
     svn
-  }
-
-  // Adds the given file (and dir if needed) to svn.
-  // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  private def addFile(comment: String, path: Path, data: InputStream): SVNCommitInfo = {
-    val svn = getSvn
-    try {
-      val editor = svn.getCommitEditor(comment, null)
-      editor.openRoot(SVNRepository.INVALID_REVISION)
-      val dirPath = path.getParent
-
-      // Recursively add any missing directories leading to the file
-      def addDir(dir: Path): Unit = {
-        if (dir != null) {
-          addDir(dir.getParent)
-          if (!dirExists(dir)) {
-            editor.addDir(dir.toString, null, SVNRepository.INVALID_REVISION)
-          }
-        }
-      }
-
-      addDir(dirPath)
-      val filePath = path.toString
-      editor.addFile(filePath, null, SVNRepository.INVALID_REVISION)
-      editor.applyTextDelta(filePath, null)
-      val deltaGenerator = new SVNDeltaGenerator
-      val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
-      editor.closeFile(filePath, checksum)
-      editor.closeDir() // XXX TODO I think all added parent dirs need to be closed also
-      editor.closeEdit()
-    } finally {
-      svn.closeSession()
-    }
-  }
-
-  // True if the directory path exists in the repository
-  private def dirExists(path: Path): Boolean = {
-    val svn = getSvn
-    try {
-      svn.checkPath(path.toString, SVNRepository.INVALID_REVISION) == SVNNodeKind.DIR
-    } finally {
-      svn.closeSession()
-    }
   }
 
   // True if the path exists in the repository
