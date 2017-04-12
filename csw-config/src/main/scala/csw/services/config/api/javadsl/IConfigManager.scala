@@ -2,7 +2,8 @@ package csw.services.config.api.javadsl
 
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
-import java.util.{Date, Optional}
+import java.time.Instant
+import java.util.Optional
 import java.{lang => jl, util => ju}
 
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
@@ -62,10 +63,10 @@ trait IConfigManager {
     * If the path does not exist in the repo, Future[None] is returned.
     *
     * @param path the file path relative to the repository root
-    * @param date the target date
+    * @param time the target date
     * @return a future object that can be used to access the file's data, if found
     */
-  def get(path: Path, date: Date): CompletableFuture[Optional[ConfigData]]
+  def get(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]]
 
   /**
     * Returns true if the given path exists and is being managed

@@ -1,9 +1,10 @@
 package csw.services.config.server.internal
 
 import java.nio.file.Path
+import java.time.Instant
+import java.util.Optional
 import java.util.concurrent.CompletableFuture
-import java.util.{Date, Optional}
-import java.{util, lang ⇒ jl}
+import java.{util, lang => jl}
 
 import csw.services.config.api.javadsl.IConfigManager
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
@@ -48,8 +49,8 @@ class JConfigManager(configManager: ConfigManager, actorRuntime: ActorRuntime) e
   override def get(path: Path): CompletableFuture[Optional[ConfigData]] =
     configManager.get(path).map(_.asJava).toJava.toCompletableFuture
 
-  override def get(path: Path, date: Date): CompletableFuture[Optional[ConfigData]] =
-    configManager.get(path, date).map(_.asJava).toJava.toCompletableFuture
+  override def get(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]] =
+    configManager.get(path, time).map(_.asJava).toJava.toCompletableFuture
 
   override def exists(path: Path): CompletableFuture[jl.Boolean] =
     configManager.exists(path).toJava.toCompletableFuture.asInstanceOf[CompletableFuture[jl.Boolean]]

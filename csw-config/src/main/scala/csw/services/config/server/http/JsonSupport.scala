@@ -1,8 +1,7 @@
 package csw.services.config.server.http
 
 import java.nio.file.{Path, Paths}
-import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.Instant
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import csw.services.config.api.models.{ConfigFileHistory, ConfigFileInfo, ConfigId}
@@ -10,23 +9,21 @@ import spray.json.{DefaultJsonProtocol, JsString, JsValue, JsonFormat, RootJsonF
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
-  protected val simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-
   implicit val fileFormat: JsonFormat[Path] = new JsonFormat[Path] {
     override def write(obj: Path): JsValue = JsString(obj.toString)
 
     override def read(json: JsValue): Path = json match {
       case JsString(value) ⇒ Paths.get(value)
-      case _               ⇒ throw new RuntimeException("can not parse")
+      case _ ⇒ throw new RuntimeException("can not parse")
     }
   }
 
-  implicit val dateFormat: JsonFormat[Date] = new JsonFormat[Date] {
-    override def write(obj: Date): JsValue = JsString(simpleDateFormat.format(obj))
+  implicit val dateFormat: JsonFormat[Instant] = new JsonFormat[Instant] {
+    override def write(obj: Instant): JsValue = JsString(obj.toString)
 
-    override def read(json: JsValue): Date = json match {
-      case JsString(value) ⇒ simpleDateFormat.parse(value)
-      case _               ⇒ throw new RuntimeException("can not parse")
+    override def read(json: JsValue): Instant = json match {
+      case JsString(value) ⇒ Instant.parse(value)
+      case _ ⇒ throw new RuntimeException("can not parse")
     }
   }
 

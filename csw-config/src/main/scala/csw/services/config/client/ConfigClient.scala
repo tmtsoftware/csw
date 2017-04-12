@@ -1,8 +1,8 @@
 package csw.services.config.client
 
 import java.io.{FileNotFoundException, IOException}
-import java.nio.{file ⇒ jnio}
-import java.util.Date
+import java.nio.{file => jnio}
+import java.time.Instant
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.Marshal
@@ -78,10 +78,10 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
     }
   }
 
-  override def get(path: jnio.Path, date: Date): Future[Option[ConfigData]] = {
+  override def get(path: jnio.Path, time: Instant): Future[Option[ConfigData]] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "get")
-      .withQuery(Query("path" → path.toString, "date" → simpleDateFormat.format(date)))
+      .withQuery(Query("path" → path.toString, "date" → time.toString))
     val request = HttpRequest(uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>

@@ -2,7 +2,7 @@ package csw.services.config.server.repo
 
 import java.io._
 import java.nio.file.{Path, Paths}
-import java.util.Date
+import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
@@ -129,16 +129,15 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  override def get(path: Path, date: Date): Future[Option[ConfigData]] = {
-    val t = date.getTime
+  override def get(path: Path, time: Instant): Future[Option[ConfigData]] = {
 
     // Gets the ConfigFileHistory matching the date
     def getHist: Future[Option[ConfigFileHistory]] = async {
       val h = await(history(path))
-      val found = h.find(_.time.getTime <= t)
+      val found = h.find(t => t.time.isBefore(time) || t.time.equals(time))
       if (found.nonEmpty) found
       else if (h.isEmpty) None
-      else Some(if (t > h.head.time.getTime) h.head else h.last)
+      else Some(if (time.isAfter(h.head.time)) h.head else h.last)
     }
 
     async {
@@ -368,7 +367,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
           override def handleLogEntry(logEntry: SVNLogEntry): Unit = logEntries = logEntry :: logEntries
         })
       logEntries.sortWith(_.getRevision > _.getRevision)
-        .map(e => ConfigFileHistory(ConfigId(e.getRevision), e.getMessage, e.getDate))
+        .map(e => ConfigFileHistory(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
     } catch {
       case ex: SVNException => Nil
     } finally {

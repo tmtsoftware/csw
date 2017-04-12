@@ -2,10 +2,10 @@ package csw.services.config.api.scaladsl
 
 import java.io._
 import java.nio.file.Paths
-import java.util.Date
+import java.time.Instant
 
-import csw.services.config.api.commons.TestFileUtils
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
+import csw.services.config.api.commons.TestFileUtils
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo}
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.repo.ShaUtils
@@ -122,15 +122,15 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
     configManager.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
-    val date = new Date()
+    val time = Instant.now()
     configManager.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
 
     configManager.get(file).await.get.toStringF.await shouldBe configValue3
-    configManager.get(file, date).await.get.toStringF.await shouldBe configValue2
+    configManager.get(file, time).await.get.toStringF.await shouldBe configValue2
   }
 
   test("should get the initial version of file if date provided is before the creation date") {
-    val date = new Date(0L)
+    val time = Instant.MIN
     val file = Paths.get("/test.conf")
 
     configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit initial configuration").await
@@ -141,7 +141,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     configManager.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue3
 
-    configManager.get(file, date).await.get.toStringF.await shouldBe configValue
+    configManager.get(file, time).await.get.toStringF.await shouldBe configValue
   }
 
   test("should get the history of a file") {
@@ -224,7 +224,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
 
   test("should able to get and set the default config file") {
     val file = Paths.get("/test.conf")
-    val configIdCreate = configManager.create(file, ConfigData.fromString(configValue), oversize = false, "hello world").await
+    configManager.create(file, ConfigData.fromString(configValue), oversize = false, "hello world").await
     configManager.get(file).await.get.toStringF.await shouldBe configValue
 
     val configIdUpdate1 = configManager.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").await
@@ -242,7 +242,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val content = "testing oversize file"
 
     val configData = ConfigData.fromString(content)
-    val configId = configManager.create(file, configData, true, "committing oversize file").await
+    val configId = configManager.create(file, configData, oversize = true, "committing oversize file").await
     val fileContent = configManager.get(file, Some(configId)).await.get
     fileContent.toStringF.await shouldBe content
 
@@ -257,8 +257,8 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val file2 = Paths.get("OversizeFile2.txt")
     val comment2 = "committing one more oversize file"
 
-    val configId1 = configManager.create(file1, ConfigData.fromString("testing oversize file"), true, comment1).await
-    val configId2 = configManager.create(file2, ConfigData.fromString("testing oversize file"), true, comment2).await
+    val configId1 = configManager.create(file1, ConfigData.fromString("testing oversize file"), oversize = true, comment1).await
+    val configId2 = configManager.create(file2, ConfigData.fromString("testing oversize file"), oversize = true, comment2).await
 
     val listOfFileInfo: List[ConfigFileInfo] = configManager.list().await
 
@@ -274,7 +274,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val creationComment = "initial commit"
 
     val configData = ConfigData.fromString(creationContent)
-    val creationConfigId = configManager.create(file, configData, true, creationComment).await
+    val creationConfigId = configManager.create(file, configData, oversize = true, creationComment).await
 
     val newContent = "testing oversize file, again"
     val newComment = "Updating file"
@@ -304,7 +304,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
   test("should be able to get oversize default file") {
     val file = Paths.get("SomeOversizeFile.txt")
     val content = "testing oversize file"
-    configManager.create(file, ConfigData.fromString(content), true, "committing oversize file").await
+    configManager.create(file, ConfigData.fromString(content), oversize = true, "committing oversize file").await
 
     configManager.setDefault(file).await
 
@@ -329,30 +329,30 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     defaultAfterDelete shouldBe None
 
     intercept[java.io.FileNotFoundException] {
-      val resetDefaultAfterDelete = configManager.resetDefault(file).await
+      configManager.resetDefault(file).await
     }
   }
 
   test("should be able to get oversize time stamped file") {
-    val initialDate = new Date
+    val initialTime = Instant.MIN
     
     val file = Paths.get("SomeOversizeFile.txt")
     val content = "testing oversize file"
-    configManager.create(file, ConfigData.fromString(content), true, "committing oversize file").await
+    configManager.create(file, ConfigData.fromString(content), oversize = true, "committing oversize file").await
 
-    val date = new Date
+    val time = Instant.now()
 
     val newContent = "testing oversize file, again"
     val newComment = "Updating file"
     configManager.update(file, ConfigData.fromString(newContent), newComment).await
 
-    val initialData = configManager.get(file, initialDate).await.get
+    val initialData = configManager.get(file, initialTime).await.get
     initialData.toStringF.await shouldBe content
 
-    val oldTimeStampedData = configManager.get(file, date).await.get
+    val oldTimeStampedData = configManager.get(file, time).await.get
     oldTimeStampedData.toStringF.await shouldBe content
 
-    val latestData = configManager.get(file, new Date).await.get
+    val latestData = configManager.get(file, Instant.now()).await.get
     latestData.toStringF.await shouldBe newContent
 
     configManager.delete(file, "deleting file").await
@@ -360,7 +360,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     val fileExists = configManager.exists(file).await
     fileExists shouldBe false
 
-    val fileTimeStampedAfterDelete = configManager.get(file, new Date()).await
+    val fileTimeStampedAfterDelete = configManager.get(file, Instant.now()).await
     fileTimeStampedAfterDelete shouldBe None
   }
 }
