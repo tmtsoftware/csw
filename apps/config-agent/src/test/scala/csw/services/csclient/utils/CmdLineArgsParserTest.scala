@@ -74,4 +74,16 @@ class CmdLineArgsParserTest
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
     x should contain (new Options("get", Some(repositoryFilepath), None, Some(outputFile), None, false, ""))
   }
+
+  test("test exists with no sub-options") {
+    val argv = Array("exists")
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x shouldEqual None
+  }
+
+  test("test exists with sub-options") {
+    val argv = Array("exists", repositoryFilepath.toString)
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x should contain (new Options("exists", Some(repositoryFilepath), None, None, None, false, ""))
+  }
 }

@@ -72,6 +72,16 @@ object CmdLineArgsParser {
       } text "optional version id of the repository file to get"
     )
 
+    //exists operation
+    cmd("exists") action { (_, c) =>
+      c.copy(op = "exists")
+    } text "checks if the path exists in the repository" children (
+
+      arg[File]("<path>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(x))
+      } text "path name in the repository"
+      )
+
     help("help")
 
     version("version")
