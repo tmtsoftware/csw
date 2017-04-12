@@ -61,6 +61,7 @@ lazy val `config-cli-client` = project
   .in(file("apps/config-cli-client"))
   .enablePlugins(DeployApp)
   .dependsOn(`csw-location`)
+  .dependsOn(`csw-config`)
   .settings(
     libraryDependencies ++= Seq(
       Akka.`akka-actor`,

@@ -1,6 +1,7 @@
 package csw.services.csclient.utils
 
 import java.io.File
+import java.nio.file.{Path, Paths}
 
 import csw.services.csclient.models.Options
 import scopt.OptionParser
@@ -19,12 +20,12 @@ object CmdLineArgsParser {
       c.copy(op = "create")
     } text "copies the input file in the repository at a specified path" children (
 
-      arg[File]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(x))
+      arg[String]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(Paths.get(x)))
       } text "path in the repository",
 
-      opt[File]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
-        c.copy(inputFilePath = Some(x))
+      opt[String]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
+        c.copy(inputFilePath = Some(Paths.get(x)))
       } text "input file path",
 
       opt[Unit]("oversize") action { (_, c) =>
@@ -41,12 +42,12 @@ object CmdLineArgsParser {
       c.copy(op = "update")
     } text "overwrites the file specified in the repository by the input file" children (
 
-      arg[File]("<path>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(x))
+      arg[String]("<path>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(Paths.get(x)))
       } text "path in the repository",
 
-      opt[File]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
-        c.copy(inputFilePath = Some(x))
+      opt[String]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
+        c.copy(inputFilePath = Some(Paths.get(x)))
       } text "input file path",
 
       opt[String]('c', "comment") action { (x, c) =>
@@ -59,12 +60,12 @@ object CmdLineArgsParser {
       c.copy(op = "get")
     } text "retrieves file with a given path from config service, and writes it to the output file" children (
 
-      arg[File]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(x))
+      arg[String]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(Paths.get(x)))
       } text "path of the file in the repository",
 
-      opt[File]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
-        c.copy(outputFilePath = Some(x))
+      opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
+        c.copy(outputFilePath = Some(Paths.get(x)))
       } text "output file path",
 
       opt[String]("id") action { (x, c) =>
@@ -77,8 +78,8 @@ object CmdLineArgsParser {
       c.copy(op = "exists")
     } text "checks if the file exists at specified path in the repository" children (
 
-      arg[File]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(x))
+      arg[String]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(Paths.get(x)))
       } text "file path in the repository"
       )
 
@@ -87,8 +88,8 @@ object CmdLineArgsParser {
       c.copy(op = "delete")
     } text "deletes the file at specified path in the repository" children (
 
-      arg[File]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(x))
+      arg[String]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(Paths.get(x)))
       } text "file path in the repository"
       )
 
@@ -102,8 +103,8 @@ object CmdLineArgsParser {
       c.copy(op = "history")
     } text "shows versioning history of the file in the repository" children (
 
-      arg[File]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(x))
+      arg[String]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(Paths.get(x)))
       } text "file path in the repository"
       )
 
@@ -112,8 +113,8 @@ object CmdLineArgsParser {
       c.copy(op = "setDefault")
     } text "sets default version of the file in the repository" children (
 
-      arg[File]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(x))
+      arg[String]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(Paths.get(x)))
       } text "file path in the repository",
 
       opt[String]("id") action { (x, c) =>
@@ -126,8 +127,8 @@ object CmdLineArgsParser {
       c.copy(op = "resetDefault")
     } text "resets the default to the latest version of the file in the repository" children (
 
-      arg[File]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(x))
+      arg[String]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(Paths.get(x)))
       } text "file path in the repository"
       )
 
@@ -136,12 +137,12 @@ object CmdLineArgsParser {
       c.copy(op = "getDefault")
     } text "gets the default version of the file in the repository" children (
 
-      arg[File]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(x))
+      arg[String]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(Paths.get(x)))
       } text "file path in the repository",
 
-      opt[File]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
-        c.copy(outputFilePath = Some(x))
+      opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
+        c.copy(outputFilePath = Some(Paths.get(x)))
       } text "output file"
     )
 

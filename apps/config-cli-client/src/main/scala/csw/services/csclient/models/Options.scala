@@ -1,6 +1,7 @@
 package csw.services.csclient.models
 
 import java.io.File
+import java.nio.file.Path
 
 /**
   * @param op Gets file with given path from the config service and writes it to the o  utput file.
@@ -14,9 +15,9 @@ import java.io.File
   */
 case class Options(
                     op:String = "",
-                    repositoryFilePath: Option[File] = None,
-                    inputFilePath: Option[File] = None,
-                    outputFilePath: Option[File] = None,
+                    repositoryFilePath: Option[Path] = None,
+                    inputFilePath: Option[Path] = None,
+                    outputFilePath: Option[Path] = None,
                     id: Option[String] = None,
                     oversize: Boolean = false,
                     comment: String = ""

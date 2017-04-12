@@ -1,6 +1,6 @@
 package csw.services.csclient.utils
 
-import java.io.File
+import java.nio.file.Paths
 
 import csw.services.csclient.models.Options
 import org.scalatest.{FunSuite, Matchers}
@@ -9,14 +9,14 @@ class CmdLineArgsParserTest
   extends FunSuite
     with Matchers{
 
-  val repositoryFilepath = new File("path/in/repository")
-  val inputFile = new File("/tmp/some/input/file")
-  val outputFile = new File("/tmp/some/output/file")
+  val repositoryFilePath = "path/in/repository"
+  val inputFilePath = "/tmp/some/input/file"
+  val outputFilePath = "/tmp/some/output/file"
   val id = "1234"
   val comment = "test commit comment!!!"
 
   test("test arguments without specifying operation") {
-    val argv = Array("", repositoryFilepath.toString, "-o", outputFile.toString)
+    val argv = Array("", repositoryFilePath, "-o", outputFilePath)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
     x shouldEqual None
   }
@@ -28,15 +28,15 @@ class CmdLineArgsParserTest
   }
 
   test("test create with all applicable sub-options") {
-    val argv = Array("create", repositoryFilepath.toString, "-i", inputFile.toString, "--oversize", "-c", comment)
+    val argv = Array("create", repositoryFilePath, "-i", inputFilePath, "--oversize", "-c", comment)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("create", Some(repositoryFilepath), Some(inputFile), None, None, true, comment))
+    x should contain (new Options("create", Some(Paths.get(repositoryFilePath)), Some(Paths.get(inputFilePath)), None, None, true, comment))
   }
 
   test("test create with bare minimum sub-options") {
-    val argv = Array("create", repositoryFilepath.toString, "-i", inputFile.toString)
+    val argv = Array("create", repositoryFilePath, "-i", inputFilePath)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("create", Some(repositoryFilepath), Some(inputFile), None, None, false, ""))
+    x should contain (new Options("create", Some(Paths.get(repositoryFilePath)), Some(Paths.get(inputFilePath)), None, None, false, ""))
   }
 
   test("test update with no sub-options") {
@@ -46,15 +46,15 @@ class CmdLineArgsParserTest
   }
 
   test("test update with all applicable sub-options") {
-    val argv = Array("update", repositoryFilepath.toString, "-i", inputFile.toString, "-c", comment)
+    val argv = Array("update", repositoryFilePath, "-i", inputFilePath, "-c", comment)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("update", Some(repositoryFilepath), Some(inputFile), None, None, false, comment))
+    x should contain (new Options("update", Some(Paths.get(repositoryFilePath)), Some(Paths.get(inputFilePath)), None, None, false, comment))
   }
 
   test("test update with bare minimum sub-options") {
-    val argv = Array("update", repositoryFilepath.toString, "-i", inputFile.toString)
+    val argv = Array("update", repositoryFilePath, "-i", inputFilePath)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("update", Some(repositoryFilepath), Some(inputFile), None, None, false, ""))
+    x should contain (new Options("update", Some(Paths.get(repositoryFilePath)), Some(Paths.get(inputFilePath)), None, None, false, ""))
   }
 
   test("test get with no sub-options") {
@@ -64,15 +64,15 @@ class CmdLineArgsParserTest
   }
 
   test("test get with all applicable sub-options") {
-    val argv = Array("get", repositoryFilepath.toString, "-o", outputFile.toString, "--id", id)
+    val argv = Array("get", repositoryFilePath, "-o", outputFilePath, "--id", id)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("get", Some(repositoryFilepath), None, Some(outputFile), Some(id), false, ""))
+    x should contain (new Options("get", Some(Paths.get(repositoryFilePath)), None, Some(Paths.get(outputFilePath)), Some(id), false, ""))
   }
 
   test("test get with bare minimum sub-options") {
-    val argv = Array("get", repositoryFilepath.toString, "-o", outputFile.toString)
+    val argv = Array("get", repositoryFilePath, "-o", outputFilePath)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("get", Some(repositoryFilepath), None, Some(outputFile), None, false, ""))
+    x should contain (new Options("get", Some(Paths.get(repositoryFilePath)), None, Some(Paths.get(outputFilePath)), None, false, ""))
   }
 
   test("test exists with no sub-options") {
@@ -82,9 +82,9 @@ class CmdLineArgsParserTest
   }
 
   test("test exists with sub-options") {
-    val argv = Array("exists", repositoryFilepath.toString)
+    val argv = Array("exists", repositoryFilePath)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("exists", Some(repositoryFilepath), None, None, None, false, ""))
+    x should contain (new Options("exists", Some(Paths.get(repositoryFilePath)), None, None, None, false, ""))
   }
 
   test("test delete with no sub-options") {
@@ -94,9 +94,9 @@ class CmdLineArgsParserTest
   }
 
   test("test delete with sub-options") {
-    val argv = Array("delete", repositoryFilepath.toString)
+    val argv = Array("delete", repositoryFilePath)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("delete", Some(repositoryFilepath), None, None, None, false, ""))
+    x should contain (new Options("delete", Some(Paths.get(repositoryFilePath)), None, None, None, false, ""))
   }
 
   test("test list") {
@@ -112,9 +112,9 @@ class CmdLineArgsParserTest
   }
 
   test("test history with sub-options") {
-    val argv = Array("history", repositoryFilepath.toString)
+    val argv = Array("history", repositoryFilePath)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("history", Some(repositoryFilepath), None, None, None, false, ""))
+    x should contain (new Options("history", Some(Paths.get(repositoryFilePath)), None, None, None, false, ""))
   }
 
   test("test setDefault with no sub-options") {
@@ -124,15 +124,15 @@ class CmdLineArgsParserTest
   }
 
   test("test setDefault with all sub-options") {
-    val argv = Array("setDefault", repositoryFilepath.toString, "--id", id)
+    val argv = Array("setDefault", repositoryFilePath, "--id", id)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("setDefault", Some(repositoryFilepath), None, None, Some(id), false, ""))
+    x should contain (new Options("setDefault", Some(Paths.get(repositoryFilePath)), None, None, Some(id), false, ""))
   }
 
   test("test setDefault with bare minimum sub-options") {
-    val argv = Array("setDefault", repositoryFilepath.toString)
+    val argv = Array("setDefault", repositoryFilePath)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("setDefault", Some(repositoryFilepath), None, None, None, false, ""))
+    x should contain (new Options("setDefault", Some(Paths.get(repositoryFilePath)), None, None, None, false, ""))
   }
 
   test("test resetDefault with no sub-options") {
@@ -142,9 +142,9 @@ class CmdLineArgsParserTest
   }
 
   test("test resetDefault with sub-options") {
-    val argv = Array("resetDefault", repositoryFilepath.toString)
+    val argv = Array("resetDefault", repositoryFilePath)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("resetDefault", Some(repositoryFilepath), None, None, None, false, ""))
+    x should contain (new Options("resetDefault", Some(Paths.get(repositoryFilePath)), None, None, None, false, ""))
   }
 
   test("test getDefault with no sub-options") {
@@ -154,8 +154,8 @@ class CmdLineArgsParserTest
   }
 
   test("test getDefault with sub-options") {
-    val argv = Array("getDefault", repositoryFilepath.toString, "-o", outputFile.toString)
+    val argv = Array("getDefault", repositoryFilePath, "-o", outputFilePath)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x should contain (new Options("getDefault", Some(repositoryFilepath), None, Some(outputFile), None, false, ""))
+    x should contain (new Options("getDefault", Some(Paths.get(repositoryFilePath)), None, Some(Paths.get(outputFilePath)), None, false, ""))
   }
 }
