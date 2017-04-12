@@ -1,7 +1,7 @@
 package csw.services.config.server.repo
 
-import java.io.{InputStream, OutputStream}
-import java.nio.file.Path
+import java.io.{FileNotFoundException, InputStream, OutputStream}
+import java.nio.file.{Path, Paths}
 
 import akka.Done
 import akka.dispatch.MessageDispatcher
@@ -10,6 +10,7 @@ import org.tmatesoft.svn.core.{SVNCommitInfo, SVNNodeKind}
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
 import org.tmatesoft.svn.core.io.{SVNRepository, SVNRepositoryFactory}
+import org.tmatesoft.svn.core.wc2.{SvnOperationFactory, SvnTarget}
 
 import scala.concurrent.Future
 import scala.util.control.NonFatal
@@ -66,10 +67,23 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
     }
   }
 
+  def deletePath(path: Path, comment: String): Future[SVNCommitInfo] = Future {
+    val svnOperationFactory = new SvnOperationFactory()
+    try {
+      val remoteDelete = svnOperationFactory.createRemoteDelete()
+      remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.svnUrl.appendPath(path.toString, false)))
+      remoteDelete.setCommitMessage(comment)
+      remoteDelete.run()
+    } finally {
+      svnOperationFactory.dispose()
+    }
+  }
+
+
   // True if the directory path exists in the repository
   private def dirExists(path: Path): Boolean = checkPath(path, SVNNodeKind.DIR)
-  
-  private def checkFilePath(path: Path): Boolean = checkPath(path, SVNNodeKind.FILE)
+
+  def pathExists(path: Path): Boolean = checkPath(path, SVNNodeKind.FILE)
 
   private def checkPath(path: Path, kind: SVNNodeKind): Boolean = {
     val svn = svnHandle()
