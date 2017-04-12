@@ -6,9 +6,14 @@ import csw.services.config.api.models.ConfigData;
 import csw.services.config.api.models.ConfigFileHistory;
 import csw.services.config.api.models.ConfigFileInfo;
 import csw.services.config.api.models.ConfigId;
+import csw.services.config.client.ClientWiring;
+import csw.services.config.client.CustomClientWiring;
+import csw.services.config.client.CustomServerWiring;
 import csw.services.config.server.ServerWiring;
 import csw.services.config.server.internal.JConfigManager;
 import org.junit.*;
+import scala.concurrent.Await;
+import scala.concurrent.duration.Duration;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,15 +25,21 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class JConfigManagerTest {
-    private static ServerWiring serverWiring = new ServerWiring();
+    private static ServerWiring serverWiring = new CustomServerWiring();
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
-    private IConfigManager configManager = new JConfigManager(serverWiring.configManager(), serverWiring.actorRuntime());
-    private Materializer mat = serverWiring.actorRuntime().mat();
+    private static ClientWiring clientWiring = new CustomClientWiring();
+    private IConfigManager configManager = new JConfigManager(clientWiring.configManager(), clientWiring.actorRuntime());
+    private Materializer mat = clientWiring.actorRuntime().mat();
 
     private String configValue = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";
     private String configValue2 = "axisName11 = tromboneAxis\naxisName22 = tromboneAxis2\naxisName3 = tromboneAxis33";
     private String configValue3 = "axisName111 = tromboneAxis\naxisName222 = tromboneAxis2\naxisName3 = tromboneAxis333";
+
+    @BeforeClass
+    public static void beforeAll() throws Exception {
+        Await.result(serverWiring.httpService().lazyBinding(), Duration.create(20, "seconds"));
+    }
 
     @Before
     public void initSvnRepo() {
@@ -41,8 +52,9 @@ public class JConfigManagerTest {
     }
 
     @AfterClass
-    public static void afterAll() throws ExecutionException, InterruptedException {
-        serverWiring.actorRuntime().jShutdown().get();
+    public static void afterAll() throws Exception {
+        Await.result(serverWiring.httpService().shutdown(), Duration.create(20, "seconds"));
+        Await.result(clientWiring.actorSystem().terminate(), Duration.create(20, "seconds"));
     }
 
     @Test

@@ -31,5 +31,6 @@ class ConfigClientTest extends ConfigManagerTest {
 
   override protected def afterAll(): Unit = {
     serverWiring.httpService.shutdown().await
+    clientWiring.actorSystem.terminate().await
   }
 }
