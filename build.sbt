@@ -56,8 +56,8 @@ lazy val `track-location-agent` = project
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
 
-lazy val `config-agent` = project
-  .in(file("apps/config-agent"))
+lazy val `config-console-client` = project
+  .in(file("apps/config-console-client"))
   .enablePlugins(DeployApp)
   .dependsOn(`csw-location`)
   .settings(

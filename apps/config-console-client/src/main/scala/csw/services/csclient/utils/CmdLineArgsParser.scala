@@ -156,6 +156,6 @@ object CmdLineArgsParser {
         success
     }
 
-    override def errorOnUnknownArgument: Boolean = false
+    override def errorOnUnknownArgument = false
   }
 }
