@@ -47,25 +47,6 @@ class ConfigServiceRouteTest extends FunSuite
   override protected def afterEach(): Unit =
     testFileUtils.deleteServerFiles()
 
-//  TODO: FixMe
-  /*
-  test("exists") {
-
-    Post("/create?" + createRequestParameterList, configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
-    }
-
-    Get("/exists?path=test.conf") ~> Route.seal(route) ~> check {
-      status shouldEqual StatusCodes.OK
-    }
-
-    Get("/exists?path=test_not_exists.conf") ~> Route.seal(route) ~> check {
-      status shouldEqual StatusCodes.NotFound
-    }
-
-  }
-   */
-
   /**
     * test HTTP response codes
     */
@@ -428,6 +409,25 @@ class ConfigServiceRouteTest extends FunSuite
       //  status shouldEqual StatusCodes.NotFound
     }
 
+  }
+
+  test("exists - success status code") {
+
+    Post("/create?" + createRequestParameterList, configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    Get("/exists?path=test.conf") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+  }
+
+  test("exists - failure status code") {
+
+    Get("/exists?path=test_not_exists.conf") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.NotFound
+    }
 
   }
 
