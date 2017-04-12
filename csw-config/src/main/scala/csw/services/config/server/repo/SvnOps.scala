@@ -67,6 +67,27 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
     }
   }
 
+  // Modifies the contents of the given file in the repository.
+  // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
+  def modifyFile(comment: String, path: Path, data: InputStream): Future[SVNCommitInfo] = Future {
+    val svn = svnHandle()
+    try {
+      val editor = svn.getCommitEditor(comment, null)
+      editor.openRoot(SVNRepository.INVALID_REVISION)
+      val filePath = path.toString
+      editor.openFile(filePath, SVNRepository.INVALID_REVISION)
+      editor.applyTextDelta(filePath, null)
+      val deltaGenerator = new SVNDeltaGenerator
+      val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
+      editor.closeFile(filePath, checksum)
+      editor.closeDir()
+      editor.closeEdit
+    } finally {
+      svn.closeSession()
+    }
+  }
+
+
   def deletePath(path: Path, comment: String): Future[SVNCommitInfo] = Future {
     val svnOperationFactory = new SvnOperationFactory()
     try {

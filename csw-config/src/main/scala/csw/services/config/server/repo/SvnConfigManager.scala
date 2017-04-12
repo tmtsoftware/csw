@@ -208,31 +208,11 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = async {
     val inputStream = configData.toInputStream
     val commitInfo = if (update) {
-      modifyFile(comment, path, inputStream)
+      await(svnOps.modifyFile(comment, path, inputStream))
     } else {
       await(svnOps.addFile(comment, path, inputStream))
     }
     ConfigId(commitInfo.getNewRevision)
-  }
-
-  // Modifies the contents of the given file in the repository.
-  // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  private def modifyFile(comment: String, path: Path, data: InputStream): SVNCommitInfo = {
-    val svn = getSvn
-    try {
-      val editor = svn.getCommitEditor(comment, null)
-      editor.openRoot(SVNRepository.INVALID_REVISION)
-      val filePath = path.toString
-      editor.openFile(filePath, SVNRepository.INVALID_REVISION)
-      editor.applyTextDelta(filePath, null)
-      val deltaGenerator = new SVNDeltaGenerator
-      val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
-      editor.closeFile(filePath, checksum)
-      editor.closeDir()
-      editor.closeEdit
-    } finally {
-      svn.closeSession()
-    }
   }
 
   // Gets an object for accessing the svn repository (not reusing a single instance since not thread safe)
