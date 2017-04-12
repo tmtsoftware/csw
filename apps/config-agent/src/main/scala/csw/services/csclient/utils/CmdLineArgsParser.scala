@@ -132,6 +132,18 @@ object CmdLineArgsParser {
       )
 
     //getDefault operation
+    cmd("getDefault") action { (_, c) =>
+      c.copy(op = "getDefault")
+    } text "gets the default version of the file in the repository" children (
+
+      arg[File]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(x))
+      } text "file path in the repository",
+
+      opt[File]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
+        c.copy(outputFilePath = Some(x))
+      } text "output file"
+    )
 
     help("help")
 
