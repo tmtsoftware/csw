@@ -2,8 +2,7 @@ package csw.services.config.server.http
 
 import akka.Done
 import akka.http.scaladsl.Http
-import csw.services.config.api.commons.ActorRuntime
-import csw.services.config.server.Settings
+import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.HttpConnection
 import csw.services.location.models._

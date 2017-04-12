@@ -3,12 +3,12 @@ package csw.services.config.server.internal
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 import java.util.{Date, Optional}
-import java.{util, lang => jl}
+import java.{util, lang ⇒ jl}
 
-import csw.services.config.api.commons.ActorRuntime
 import csw.services.config.api.javadsl.IConfigManager
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigManager
+import csw.services.config.server.ActorRuntime
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._

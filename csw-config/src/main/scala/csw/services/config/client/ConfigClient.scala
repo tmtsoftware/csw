@@ -1,7 +1,7 @@
 package csw.services.config.client
 
 import java.io.{FileNotFoundException, IOException}
-import java.nio.{file => jnio}
+import java.nio.{file ⇒ jnio}
 import java.util.Date
 
 import akka.http.scaladsl.Http
@@ -10,7 +10,6 @@ import akka.http.scaladsl.model.Multipart.FormData
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import csw.services.config.api.commons.ActorRuntime
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigManager
 import csw.services.config.server.http.JsonSupport

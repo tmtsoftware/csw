@@ -42,7 +42,7 @@ class OversizeFileManagerTest extends FunSuite with Matchers with BeforeAndAfter
 
   test("getting oversize file") {
     val actualSha = ShaUtils.generateSHA1(configData).await
-    ShaUtils.generateSHA1(oversizeFileManager.get(actualSha).get).await shouldBe actualSha
+    ShaUtils.generateSHA1(oversizeFileManager.get(actualSha).await.get).await shouldBe actualSha
   }
 
 }

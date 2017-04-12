@@ -2,7 +2,6 @@ package csw.services.config.client
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.config.api.commons.ActorRuntime
 import csw.services.config.api.scaladsl.ConfigManager
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 

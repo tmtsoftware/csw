@@ -5,10 +5,9 @@ import java.nio.file.{Path, Paths}
 import java.util.Date
 
 import akka.stream.scaladsl.StreamConverters
-import csw.services.config.api.commons.ActorRuntime
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigManager
-import csw.services.config.server.Settings
+import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
@@ -89,7 +88,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
           None
         case Some(configData) =>
           val sha1 = await(configData.toStringF)
-          oversizeFileManager.get(sha1)
+          await(oversizeFileManager.get(sha1))
       }
     }
 
