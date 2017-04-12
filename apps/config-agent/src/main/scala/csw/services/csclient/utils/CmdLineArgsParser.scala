@@ -102,7 +102,7 @@ object CmdLineArgsParser {
       c.copy(op = "history")
     } text "shows versioning history of the file in the repository" children (
 
-      arg[File]("<path>") action { (x, c) =>
+      arg[File]("<repositoryFilePath>") action { (x, c) =>
         c.copy(repositoryFilePath = Some(x))
       } text "file path in the repository"
       )
@@ -110,18 +110,26 @@ object CmdLineArgsParser {
     //setDefault operation
     cmd("setDefault") action { (_, c) =>
       c.copy(op = "setDefault")
-    } text "sets the default version of the file" children (
+    } text "sets default version of the file in the repository" children (
 
-      arg[File]("<path>") action { (x, c) =>
+      arg[File]("<repositoryFilePath>") action { (x, c) =>
         c.copy(repositoryFilePath = Some(x))
       } text "file path in the repository",
 
       opt[String]("id") action { (x, c) =>
         c.copy(id = Some(x))
-      } text "optional version id to set as default for file"
+      } text "optional version id of file to be set as default"
     )
 
     //resetDefault operation
+    cmd("resetDefault") action { (_, c) =>
+      c.copy(op = "resetDefault")
+    } text "resets the default to the latest version of the file in the repository" children (
+
+      arg[File]("<repositoryFilePath>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(x))
+      } text "file path in the repository"
+      )
 
     //getDefault operation
 
