@@ -33,10 +33,12 @@ try{
 
             stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine.
                 sh "sbt csw-location/multi-jvm:test"
+                sh "sbt csw-config/multi-jvm:test"
             }
 
             stage('Multi-Node Test') { // These tests cover the scenario of multiple components in multiple containers on different machines.
-                sh "sbt -DenableCoverage=false \"csw-location/multi-node-test-only csw.services.location.LocationServiceTest\""
+                sh "sbt -DenableCoverage=false csw-location/multi-node-test"
+                sh "sbt -DenableCoverage=false csw-config/multi-node-test"
             }
 
             stage('Package') {

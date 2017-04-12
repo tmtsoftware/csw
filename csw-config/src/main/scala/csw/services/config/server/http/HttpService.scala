@@ -3,7 +3,7 @@ package csw.services.config.server.http
 import akka.Done
 import akka.http.scaladsl.Http
 import csw.services.config.server.{ActorRuntime, Settings}
-import csw.services.location.internal.Networks
+import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.Connection.HttpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
@@ -19,7 +19,7 @@ class HttpService(locationService: LocationService, configServiceRoute: ConfigSe
     val binding = await(
       Http().bindAndHandle(
       handler = configServiceRoute.route,
-      interface = new Networks("").hostname(),
+      interface = ClusterAwareSettings.hostname,
       port = settings.`service-port`
     )
     )

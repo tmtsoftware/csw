@@ -97,3 +97,5 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
       .withFallback(ConfigFactory.load().getConfig(clusterName))
   }
 }
+
+object ClusterAwareSettings extends ClusterSettings
