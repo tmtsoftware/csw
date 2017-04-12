@@ -5,11 +5,13 @@ import java.nio.file.{Path, Paths}
 
 import akka.Done
 import akka.dispatch.MessageDispatcher
+import csw.services.config.api.models.{ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.server.Settings
-import org.tmatesoft.svn.core.{SVNCommitInfo, SVNNodeKind}
+import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
 import org.tmatesoft.svn.core.io.{SVNRepository, SVNRepositoryFactory}
+import org.tmatesoft.svn.core.wc.{SVNClientManager, SVNRevision}
 import org.tmatesoft.svn.core.wc2.{SvnOperationFactory, SvnTarget}
 
 import scala.concurrent.Future
@@ -36,7 +38,7 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
 
   // Adds the given file (and dir if needed) to svn.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  def addFile(comment: String, path: Path, data: InputStream): Future[SVNCommitInfo] = Future {
+  def addFile(path: Path, comment: String, data: InputStream) = Future {
     val svn = svnHandle()
     try {
       val editor = svn.getCommitEditor(comment, null)
@@ -69,7 +71,7 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
 
   // Modifies the contents of the given file in the repository.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  def modifyFile(comment: String, path: Path, data: InputStream): Future[SVNCommitInfo] = Future {
+  def modifyFile(path: Path, comment: String, data: InputStream) = Future {
     val svn = svnHandle()
     try {
       val editor = svn.getCommitEditor(comment, null)
@@ -88,7 +90,7 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
   }
 
 
-  def deletePath(path: Path, comment: String): Future[SVNCommitInfo] = Future {
+  def delete(path: Path, comment: String): Future[SVNCommitInfo] = Future {
     val svnOperationFactory = new SvnOperationFactory()
     try {
       val remoteDelete = svnOperationFactory.createRemoteDelete()
@@ -97,6 +99,50 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
       remoteDelete.run()
     } finally {
       svnOperationFactory.dispose()
+    }
+  }
+
+  def list(): Future[List[SVNDirEntry]] = Future {
+    // XXX Should .sha1 files have the .sha1 suffix removed in the result?
+    var entries = List[SVNDirEntry]()
+    val svnOperationFactory = new SvnOperationFactory()
+    try {
+      val svnList = svnOperationFactory.createList()
+      svnList.setSingleTarget(SvnTarget.fromURL(settings.svnUrl, SVNRevision.HEAD))
+      svnList.setRevision(SVNRevision.HEAD)
+      svnList.setDepth(SVNDepth.INFINITY)
+      svnList.setReceiver((_, e: SVNDirEntry) => entries = e :: entries)
+      svnList.run()
+    } finally {
+      svnOperationFactory.dispose()
+    }
+    entries
+      .filter(_.getKind == SVNNodeKind.FILE)
+      .sortWith(_.getRelativePath < _.getRelativePath)
+  }
+
+  def hist(path: Path, maxResults: Int): Future[List[SVNLogEntry]] = Future {
+    val clientManager = SVNClientManager.newInstance()
+    var logEntries = List[SVNLogEntry]()
+    try {
+      val logClient = clientManager.getLogClient
+      logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
+        new ISVNLogEntryHandler() {
+          override def handleLogEntry(logEntry: SVNLogEntry): Unit = logEntries = logEntry :: logEntries
+        })
+      logEntries.sortWith(_.getRevision > _.getRevision)
+    } finally {
+      clientManager.dispose()
+    }
+  } recover {
+    case ex: SVNException => Nil
+  }
+
+  // Gets the svn revision from the given id, defaulting to HEAD
+  def svnRevision(id: Option[Long] = None): Future[SVNRevision] = Future {
+    id match {
+      case Some(value) => SVNRevision.create(value)
+      case None        => SVNRevision.HEAD
     }
   }
 

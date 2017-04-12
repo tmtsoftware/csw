@@ -9,16 +9,9 @@ import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFile
 import csw.services.config.api.scaladsl.ConfigManager
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
-import org.tmatesoft.svn.core._
-import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
-import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
-import org.tmatesoft.svn.core.io.{SVNRepository, SVNRepositoryFactory}
-import org.tmatesoft.svn.core.wc.{SVNClientManager, SVNRevision}
-import org.tmatesoft.svn.core.wc2.{SvnOperationFactory, SvnTarget}
 
 import scala.async.Async._
 import scala.concurrent.Future
-import scala.util.control.NonFatal
 
 class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileManager, actorRuntime: ActorRuntime, svnOps: SvnOps) extends ConfigManager {
 
@@ -93,13 +86,13 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
 
     // Returns the contents of the given version of the file, if found
-    def getConfigData: Future[Option[ConfigData]] = {
-      val svn = getSvn
+    def getConfigData: Future[Option[ConfigData]] = async {
       val outputStream = StreamConverters.asOutputStream().cancellableMat
+      val revision = await(svnOps.svnRevision(id.map(_.id.toLong)))
       val source = outputStream.mapMaterializedValue { case (out, switch) ⇒
-        svnOps.getFile(path, svnRevision(id).getNumber, out, ex ⇒ switch.abort(ex))
+        svnOps.getFile(path, revision.getNumber, out, ex ⇒ switch.abort(ex))
       }
-      Future(Some(ConfigData.fromSource(source)))
+      Some(ConfigData.fromSource(source))
     }
 
     // If the file exists in the repo, get its data
@@ -140,54 +133,38 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   //TODO: This implementation deletes all versions of a file. This is different than the expecations
   override def delete(path: Path, comment: String = "deleted"): Future[Unit] = async {
-    if (svnOps.pathExists(shaPath(path))) await(svnOps.deletePath(shaPath(path), comment))
-    else if (svnOps.pathExists(path)) await(svnOps.deletePath(path, comment))
+    if (svnOps.pathExists(shaPath(path))) await(svnOps.delete(shaPath(path), comment))
+    else if (svnOps.pathExists(path)) await(svnOps.delete(path, comment))
     else throw new FileNotFoundException("Can't delete " + path + " because it does not exist")
   }
 
-  override def list(): Future[List[ConfigFileInfo]] = Future {
-    // XXX Should .sha1 files have the .sha1 suffix removed in the result?
-    var entries = List[SVNDirEntry]()
-    val svnOperationFactory = new SvnOperationFactory()
-    try {
-      val svnList = svnOperationFactory.createList()
-      svnList.setSingleTarget(SvnTarget.fromURL(settings.svnUrl, SVNRevision.HEAD))
-      svnList.setRevision(SVNRevision.HEAD)
-      svnList.setDepth(SVNDepth.INFINITY)
-      svnList.setReceiver((_, e: SVNDirEntry) => entries = e :: entries)
-      svnList.run()
-    } finally {
-      svnOperationFactory.dispose()
-    }
-    entries.filter(_.getKind == SVNNodeKind.FILE).sortWith(_.getRelativePath < _.getRelativePath)
+  override def list(): Future[List[ConfigFileInfo]] = async {
+    await(svnOps.list())
       .map(e => ConfigFileInfo(Paths.get(e.getRelativePath), ConfigId(e.getRevision), e.getCommitMessage))
   }
 
   override def history(path: Path, maxResults: Int): Future[List[ConfigFileHistory]] = async {
     // XXX Should .sha1 files have the .sha1 suffix removed in the result?
     if (isOversize(path)) {
-      hist(shaPath(path), maxResults)
+      await(hist(shaPath(path), maxResults))
     }
     else {
-      hist(path, maxResults)
+      await(hist(path, maxResults))
     }
   }
 
-  override def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit] = {
-    (if (id.isDefined) id else getCurrentVersion(path)) match {
-      case Some(configId) =>
-        create(defaultFile(path), ConfigData.fromString(configId.id)).map(_ => ())
-      case None           =>
-        Future.failed(new FileNotFoundException(s"Unknown path $path"))
+  override def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit] = async {
+    val maybeConfigId = if (id.isDefined) id else await(getCurrentVersion(path))
+    maybeConfigId match {
+      case Some(configId) => await(create(defaultFile(path), ConfigData.fromString(configId.id)))
+      case None           => throw new FileNotFoundException(s"Unknown path $path")
     }
   }
 
-  override def resetDefault(path: Path): Future[Unit] = {
-    delete(defaultFile(path))
-  }
+  override def resetDefault(path: Path): Future[Unit] = delete(defaultFile(path))
 
   override def getDefault(path: Path): Future[Option[ConfigData]] = async {
-    getCurrentVersion(path) match {
+    await(getCurrentVersion(path)) match {
       case None           ⇒
         None
       case Some(configId) ⇒
@@ -208,19 +185,11 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = async {
     val inputStream = configData.toInputStream
     val commitInfo = if (update) {
-      await(svnOps.modifyFile(comment, path, inputStream))
+      await(svnOps.modifyFile(path, comment, inputStream))
     } else {
-      await(svnOps.addFile(comment, path, inputStream))
+      await(svnOps.addFile(path, comment, inputStream))
     }
     ConfigId(commitInfo.getNewRevision)
-  }
-
-  // Gets an object for accessing the svn repository (not reusing a single instance since not thread safe)
-  private def getSvn: SVNRepository = {
-    val svn = SVNRepositoryFactory.create(settings.svnUrl)
-    val authManager = BasicAuthenticationManager.newInstance(settings.`svn-user-name`, Array[Char]())
-    svn.setAuthenticationManager(authManager)
-    svn
   }
 
   // True if the .sha1 file exists, meaning the file needs special oversize handling.
@@ -228,43 +197,22 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     svnOps.pathExists(shaPath(path))
   }
 
-  // Gets the svn revision from the given id, defaulting to HEAD
-  private def svnRevision(id: Option[ConfigId] = None): SVNRevision = {
-    id match {
-      case Some(configId) => SVNRevision.create(configId.id.toLong)
-      case None           => SVNRevision.HEAD
-    }
-  }
-
   // File used to store the SHA-1 of the actual file, if oversized.
   private def shaPath(path: Path): Path = Paths.get(s"${path.toString}${settings.`sha1-suffix`}")
 
   // Returns the current version of the file, if known
-  private def getCurrentVersion(path: Path): Option[ConfigId] = {
+  private def getCurrentVersion(path: Path): Future[Option[ConfigId]] = async {
     if (isOversize(path)) {
-      hist(shaPath(path), 1).headOption.map(_.id)
+      await(hist(shaPath(path), 1)).headOption.map(_.id)
     }
     else {
-      hist(path, 1).headOption.map(_.id)
+      await(hist(path, 1)).headOption.map(_.id)
     }
   }
 
-  private def hist(path: Path, maxResults: Int = Int.MaxValue): List[ConfigFileHistory] = {
-    val clientManager = SVNClientManager.newInstance()
-    var logEntries = List[SVNLogEntry]()
-    try {
-      val logClient = clientManager.getLogClient
-      logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
-        new ISVNLogEntryHandler() {
-          override def handleLogEntry(logEntry: SVNLogEntry): Unit = logEntries = logEntry :: logEntries
-        })
-      logEntries.sortWith(_.getRevision > _.getRevision)
-        .map(e => ConfigFileHistory(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
-    } catch {
-      case ex: SVNException => Nil
-    } finally {
-      clientManager.dispose()
-    }
+  private def hist(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileHistory]] = async {
+    await(svnOps.hist(path, maxResults))
+      .map(e => ConfigFileHistory(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
   }
 
   // File used to store the id of the default version of the file.
