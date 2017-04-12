@@ -4,13 +4,13 @@ val plugins:Seq[Plugins] = if(enableCoverage.toBoolean) Seq(Coverage) else Seq.e
 lazy val `csw-prod` = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
-  .aggregate(`csw-location`, `track-location-agent`, `csw-cluster-seed`, `csw-config`, `config-console-client`)
+  .aggregate(`csw-location`, `track-location-agent`, `csw-cluster-seed`, `csw-config`, `config-cli-client`)
   .settings(Settings.mergeSiteWith(docs))
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(
       `csw-cluster-seed`,
       `track-location-agent`,
-      `config-console-client`,
+      `config-cli-client`,
       `integration`,
       `csw-config`
     )
@@ -57,8 +57,8 @@ lazy val `track-location-agent` = project
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
 
-lazy val `config-console-client` = project
-  .in(file("apps/config-console-client"))
+lazy val `config-cli-client` = project
+  .in(file("apps/config-cli-client"))
   .enablePlugins(DeployApp)
   .dependsOn(`csw-location`)
   .settings(
