@@ -82,7 +82,7 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
   override def get(path: jnio.Path, date: Date): Future[Option[ConfigData]] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "get")
-      .withQuery(Query(Map("path" → path.toString, "date" → simpleDateFormat.format(date))))
+      .withQuery(Query("path" → path.toString, "date" → simpleDateFormat.format(date)))
     val request = HttpRequest(uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
@@ -97,7 +97,7 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
   override def exists(path: jnio.Path): Future[Boolean] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "exists")
-      .withQuery(Query(Map("path" → path.toString)))
+      .withQuery(Query("path" → path.toString))
     val request = HttpRequest(uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
@@ -112,7 +112,7 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
   override def delete(path: jnio.Path, comment: String): Future[Unit] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "delete")
-      .withQuery(Query(Map("path" → path.toString, "comment" → comment)))
+      .withQuery(Query("path" → path.toString, "comment" → comment))
     val request = HttpRequest(HttpMethods.POST, uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
@@ -139,7 +139,7 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
   override def history(path: jnio.Path, maxResults: Int): Future[List[ConfigFileHistory]] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "history")
-      .withQuery(Query(Map("path" → path.toString, "maxResults" → maxResults.toString)))
+      .withQuery(Query("path" → path.toString, "maxResults" → maxResults.toString))
     val request = HttpRequest(uri = uri)
     println(request)
     Http().singleRequest(request).flatMap { response =>
@@ -168,7 +168,7 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
   override def resetDefault(path: jnio.Path): Future[Unit] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "resetDefault")
-      .withQuery(Query(Map("path" → path.toString)))
+      .withQuery(Query("path" → path.toString))
     val request = HttpRequest(HttpMethods.POST, uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
@@ -183,7 +183,7 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
   override def getDefault(path: jnio.Path): Future[Option[ConfigData]] = {
     val uri = Uri(location.uri.toString)
       .withPath(Path / "getDefault")
-      .withQuery(Query(Map("path" → path.toString)))
+      .withQuery(Query("path" → path.toString))
     val request = HttpRequest(uri = uri)
     println(request)
     Http().singleRequest(request).map { response =>
