@@ -14,9 +14,9 @@ import org.tmatesoft.svn.core.wc2.{SvnOperationFactory, SvnTarget}
 
 import scala.concurrent.Future
 
-class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
+class SvnOps(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
-  private implicit val blockingIoDispatcher = dispatcher
+  private implicit val _blockingIoDispatcher = blockingIoDispatcher
 
   def getFile(path: Path, revision: Long, outputStream: OutputStream): Future[Unit] = Future {
     val svn = svnHandle()

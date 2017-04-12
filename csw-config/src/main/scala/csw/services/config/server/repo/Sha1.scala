@@ -10,22 +10,22 @@ import csw.services.config.api.models.ConfigData
 
 import scala.concurrent.Future
 
-object ShaUtils {
+object Sha1 {
 
-  private def generateSHA1(source: Source[ByteString, Any])(implicit mat: Materializer): Future[String] = {
-    source.runWith(sha1Sink)
+  private def fromSource(source: Source[ByteString, Any])(implicit mat: Materializer): Future[String] = {
+    source.runWith(sink)
   }
 
-  def generateSHA1(configData: ConfigData)(implicit mat: Materializer): Future[String] = {
-    generateSHA1(configData.source)
+  def fromConfigData(configData: ConfigData)(implicit mat: Materializer): Future[String] = {
+    fromSource(configData.source)
   }
 
-  def generateSHA1(path: Path)(implicit mat: Materializer): Future[String] = {
-    generateSHA1(FileIO.fromPath(path))
+  def fromPath(path: Path)(implicit mat: Materializer): Future[String] = {
+    fromSource(FileIO.fromPath(path))
   }
 
   //Keep this a def so that the digester is created anew each time.
-  def sha1Sink: Sink[ByteString, Future[String]] = {
+  def sink: Sink[ByteString, Future[String]] = {
     val sha1Digester = MessageDigest.getInstance("SHA-1")
     Flow[ByteString]
       .fold(sha1Digester) { (digester, bs) =>

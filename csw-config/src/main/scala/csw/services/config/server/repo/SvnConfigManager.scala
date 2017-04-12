@@ -59,17 +59,6 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   }
 
   override def get(path: Path, id: Option[ConfigId]): Future[Option[ConfigData]] = {
-    // Get oversize files that are stored in the annex server
-    def getOversize: Future[Option[ConfigData]] = async {
-      await(get(shaFilePath(path), id)) match {
-        case None             =>
-          None
-        case Some(configData) =>
-          val sha1 = await(configData.toStringF)
-          await(oversizeFileManager.get(sha1))
-      }
-    }
-
     // Returns the contents of the given version of the file, if found
     def getNormalSize: Future[Option[ConfigData]] = async {
       val outputStream = StreamConverters.asOutputStream().cancellableMat
@@ -80,6 +69,17 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
         }
       }
       Some(ConfigData.fromSource(source))
+    }
+
+    // Get oversize files that are stored in the annex server
+    def getOversize: Future[Option[ConfigData]] = async {
+      await(get(shaFilePath(path), id)) match {
+        case None             =>
+          None
+        case Some(configData) =>
+          val sha1 = await(configData.toStringF)
+          await(oversizeFileManager.get(sha1))
+      }
     }
 
     // If the file exists in the repo, get its data
@@ -110,10 +110,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   }
 
   override def exists(path: Path): Future[Boolean] = async {
-    await(pathStatus(path)) match {
-      case x: PathStatus.Present ⇒ true
-      case _                     ⇒ false
-    }
+    await(pathStatus(path)).isInstanceOf[PathStatus.Present]
   }
 
   //TODO: This implementation deletes all versions of a file. This is different than the expecations

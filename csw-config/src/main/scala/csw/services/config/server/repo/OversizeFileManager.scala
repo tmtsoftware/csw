@@ -67,7 +67,7 @@ class OversizeFileManager(settings: Settings, fileOps: FileOps) {
     * @return true if the file is valid
     */
   def validate(id: String, path: Path)(implicit mat: Materializer): Future[Boolean] = async {
-    id == await(ShaUtils.generateSHA1(path))
+    id == await(Sha1.fromPath(path))
   }
 
 
@@ -75,7 +75,7 @@ class OversizeFileManager(settings: Settings, fileOps: FileOps) {
     val path = await(fileOps.createTempFile("config-service-overize-", ".tmp"))
     val (resultF, shaF) = configData.source
       .alsoToMat(FileIO.toPath(path))(Keep.right)
-      .toMat(ShaUtils.sha1Sink)(Keep.both)
+      .toMat(Sha1.sink)(Keep.both)
       .run()
     await(resultF).status.get
     (path, await(shaF))
