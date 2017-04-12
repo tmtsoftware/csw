@@ -29,6 +29,10 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
     testFileUtils.deleteServerFiles()
   }
 
+  override protected def afterAll(): Unit = {
+    actorSystem.terminate().await
+  }
+
   val configValue: String =
     """
       |axisName1 = tromboneAxis1

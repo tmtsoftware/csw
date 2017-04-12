@@ -8,10 +8,7 @@ import csw.services.config.api.models.ConfigFileInfo;
 import csw.services.config.api.models.ConfigId;
 import csw.services.config.server.ServerWiring;
 import csw.services.config.server.internal.JConfigManager;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class JConfigManagerTest {
-    private ServerWiring serverWiring = new ServerWiring();
+    private static ServerWiring serverWiring = new ServerWiring();
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
     private IConfigManager configManager = new JConfigManager(serverWiring.configManager(), serverWiring.actorRuntime());
@@ -41,6 +38,11 @@ public class JConfigManagerTest {
     @After
     public void deleteServerFiles() {
         testFileUtils.deleteServerFiles();
+    }
+
+    @AfterClass
+    public static void afterAll() throws ExecutionException, InterruptedException {
+        serverWiring.actorRuntime().jShutdown().get();
     }
 
     @Test
