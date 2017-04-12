@@ -12,6 +12,7 @@ import csw.services.location.internal.StreamExt.RichSource
 
 import scala.async.Async._
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileManager, actorRuntime: ActorRuntime, svnOps: SvnOps) extends ConfigManager {
 
@@ -90,7 +91,9 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       val outputStream = StreamConverters.asOutputStream().cancellableMat
       val revision = await(svnOps.svnRevision(id.map(_.id.toLong)))
       val source = outputStream.mapMaterializedValue { case (out, switch) ⇒
-        svnOps.getFile(path, revision.getNumber, out, ex ⇒ switch.abort(ex))
+        svnOps.getFile(path, revision.getNumber, out).recover {
+          case NonFatal(ex) ⇒ switch.abort(ex)
+        }
       }
       Some(ConfigData.fromSource(source))
     }
@@ -129,12 +132,12 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  override def exists(path: Path): Future[Boolean] = Future(svnOps.pathExists(path) || isOversize(path))
+  override def exists(path: Path): Future[Boolean] = Future(isNormalSize(path) || isOversize(path))
 
   //TODO: This implementation deletes all versions of a file. This is different than the expecations
   override def delete(path: Path, comment: String = "deleted"): Future[Unit] = async {
-    if (svnOps.pathExists(shaPath(path))) await(svnOps.delete(shaPath(path), comment))
-    else if (svnOps.pathExists(path)) await(svnOps.delete(path, comment))
+    if (isOversize(path)) await(svnOps.delete(shaPath(path), comment))
+    else if (isNormalSize(path)) await(svnOps.delete(path, comment))
     else throw new FileNotFoundException("Can't delete " + path + " because it does not exist")
   }
 
@@ -190,6 +193,11 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       await(svnOps.addFile(path, comment, inputStream))
     }
     ConfigId(commitInfo.getNewRevision)
+  }
+
+  // True if the file exists
+  private def isNormalSize(path: Path): Boolean = {
+    svnOps.pathExists(path)
   }
 
   // True if the .sha1 file exists, meaning the file needs special oversize handling.

@@ -1,11 +1,9 @@
 package csw.services.config.server.repo
 
-import java.io.{FileNotFoundException, InputStream, OutputStream}
-import java.nio.file.{Path, Paths}
+import java.io.{InputStream, OutputStream}
+import java.nio.file.Path
 
-import akka.Done
 import akka.dispatch.MessageDispatcher
-import csw.services.config.api.models.{ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.server.Settings
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
@@ -15,24 +13,19 @@ import org.tmatesoft.svn.core.wc.{SVNClientManager, SVNRevision}
 import org.tmatesoft.svn.core.wc2.{SvnOperationFactory, SvnTarget}
 
 import scala.concurrent.Future
-import scala.util.control.NonFatal
 
 class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
 
   private implicit val blockingIoDispatcher = dispatcher
 
-  def getFile(path: Path, revision: Long, outputStream: OutputStream, onError: Throwable ⇒ Unit): Future[Done] = {
+  def getFile(path: Path, revision: Long, outputStream: OutputStream): Future[Unit] = Future {
     val svn = svnHandle()
-
-    Future {
+    try {
       svn.getFile(path.toString, revision, null, outputStream)
       outputStream.flush()
       outputStream.close()
-    } recover {
-      case NonFatal(ex) ⇒ onError(ex)
-    } map { _ ⇒
+    } finally {
       svn.closeSession()
-      Done
     }
   }
 
