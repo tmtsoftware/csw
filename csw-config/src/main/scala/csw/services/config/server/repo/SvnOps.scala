@@ -6,6 +6,7 @@ import java.nio.file.Path
 import akka.Done
 import akka.dispatch.MessageDispatcher
 import csw.services.config.server.Settings
+import org.tmatesoft.svn.core.SVNNodeKind
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.io.{SVNRepository, SVNRepositoryFactory}
 
@@ -28,6 +29,18 @@ class SvnOps(settings: Settings, dispatcher: MessageDispatcher) {
     } map { _ ⇒
       svn.closeSession()
       Done
+    }
+  }
+
+  def checkFilePath(path: Path): Future[Boolean] = checkPath(path, SVNNodeKind.FILE)
+  def checkDirPath(path: Path): Future[Boolean] = checkPath(path, SVNNodeKind.DIR)
+
+  private def checkPath(path: Path, kind: SVNNodeKind): Future[Boolean] = Future {
+    val svn = svnHandle()
+    try {
+      svn.checkPath(path.toString, SVNRepository.INVALID_REVISION) == kind
+    } finally {
+      svn.closeSession()
     }
   }
 

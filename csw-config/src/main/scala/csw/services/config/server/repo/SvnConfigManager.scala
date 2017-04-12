@@ -58,13 +58,13 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
 
     // If the file already exists in the repo, update it
-    def updateImpl(present: Boolean): Future[ConfigId] = {
+    def updateImpl(present: Boolean): Future[ConfigId] = async {
       if (!present) {
-        Future.failed(new FileNotFoundException("File not found: " + path))
-      } else if (isOversize(path)) {
-        updateOversize()
+        throw new FileNotFoundException("File not found: " + path)
+      } else if (await(isOversize(path))) {
+        await(updateOversize())
       } else {
-        put(path, configData, update = true, comment)
+        await(put(path, configData, update = true, comment))
       }
     }
 
@@ -103,13 +103,13 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
 
     // If the file exists in the repo, get its data
-    def getImpl(present: Boolean): Future[Option[ConfigData]] = {
+    def getImpl(present: Boolean): Future[Option[ConfigData]] = async {
       if (!present) {
-        Future(None)
-      } else if (isOversize(path)) {
-        getOversize
+        None
+      } else if (await(isOversize(path))) {
+        await(getOversize)
       } else {
-        getConfigData
+        await(getConfigData)
       }
     }
 
@@ -136,32 +136,26 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  override def exists(path: Path): Future[Boolean] = Future(pathExists(path))
+  override def exists(path: Path): Future[Boolean] = pathExists(path)
 
   //TODO: This implementation deletes all versions of a file. This is different than the expecations
-  override def delete(path: Path, comment: String = "deleted"): Future[Unit] = {
-    def deleteFile(path: Path, comment: String = "deleted"): Unit = {
-      if (isOversize(path)) {
-        deleteFile(shaFile(path), comment)
-      } else {
-        if (!pathExists(path)) {
-          throw new FileNotFoundException("Can't delete " + path + " because it does not exist")
-        }
-
-        val svnOperationFactory = new SvnOperationFactory()
-        try {
-          val remoteDelete = svnOperationFactory.createRemoteDelete()
-          remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.svnUrl.appendPath(path.toString, false)))
-          remoteDelete.setCommitMessage(comment)
-          remoteDelete.run()
-        } finally {
-          svnOperationFactory.dispose()
-        }
+  override def delete(path: Path, comment: String = "deleted"): Future[Unit] = async {
+    if (await(isOversize(path))) {
+      await(delete(shaFile(path), comment))
+    } else {
+      if (!await(pathExists(path))) {
+        throw new FileNotFoundException("Can't delete " + path + " because it does not exist")
       }
-    }
 
-    Future {
-      deleteFile(path, comment)
+      val svnOperationFactory = new SvnOperationFactory()
+      try {
+        val remoteDelete = svnOperationFactory.createRemoteDelete()
+        remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.svnUrl.appendPath(path.toString, false)))
+        remoteDelete.setCommitMessage(comment)
+        remoteDelete.run()
+      } finally {
+        svnOperationFactory.dispose()
+      }
     }
   }
 
@@ -185,7 +179,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   override def history(path: Path, maxResults: Int): Future[List[ConfigFileHistory]] = async {
     // XXX Should .sha1 files have the .sha1 suffix removed in the result?
-    if (isOversize(path)) {
+    if (await(isOversize(path))) {
       hist(shaFile(path), maxResults)
     }
     else {
@@ -193,21 +187,19 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  override def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit] = {
-    (if (id.isDefined) id else getCurrentVersion(path)) match {
-      case Some(configId) =>
-        create(defaultFile(path), ConfigData.fromString(configId.id)).map(_ => ())
-      case None           =>
-        Future.failed(new FileNotFoundException(s"Unknown path $path"))
+  override def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit] = async {
+    val maybeConfigId1 = if (id.isDefined) id else await(getCurrentVersion(path))
+
+    maybeConfigId1 match {
+      case Some(configId) => await(create(defaultFile(path), ConfigData.fromString(configId.id)))
+      case None           => throw new FileNotFoundException(s"Unknown path $path")
     }
   }
 
-  override def resetDefault(path: Path): Future[Unit] = {
-    delete(defaultFile(path))
-  }
+  override def resetDefault(path: Path): Future[Unit] = delete(defaultFile(path))
 
   override def getDefault(path: Path): Future[Option[ConfigData]] = async {
-    getCurrentVersion(path) match {
+    await(getCurrentVersion(path)) match {
       case None           ⇒
         None
       case Some(configId) ⇒
@@ -225,12 +217,12 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     * @param comment    an optional comment to associate with this file
     * @return a future unique id that can be used to refer to the file
     */
-  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = Future {
+  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = async {
     val inputStream = configData.toInputStream
     val commitInfo = if (update) {
       modifyFile(comment, path, inputStream)
     } else {
-      addFile(comment, path, inputStream)
+      await(addFile(comment, path, inputStream))
     }
     ConfigId(commitInfo.getNewRevision)
   }
@@ -265,24 +257,23 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   // Adds the given file (and dir if needed) to svn.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  private def addFile(comment: String, path: Path, data: InputStream): SVNCommitInfo = {
+  private def addFile(comment: String, path: Path, data: InputStream): Future[SVNCommitInfo] = {
     val svn = getSvn
-    try {
-      val editor = svn.getCommitEditor(comment, null)
-      editor.openRoot(SVNRepository.INVALID_REVISION)
-      val dirPath = path.getParent
-
-      // Recursively add any missing directories leading to the file
-      def addDir(dir: Path): Unit = {
-        if (dir != null) {
-          addDir(dir.getParent)
-          if (!dirExists(dir)) {
-            editor.addDir(dir.toString, null, SVNRepository.INVALID_REVISION)
-          }
+    val editor = svn.getCommitEditor(comment, null)
+    editor.openRoot(SVNRepository.INVALID_REVISION)
+    val dirPath = path.getParent
+    // Recursively add any missing directories leading to the file
+    def addDir(dir: Path): Future[Unit] = async {
+      if (dir != null) {
+        await(addDir(dir.getParent))
+        if (!await(dirExists(dir))) {
+          editor.addDir(dir.toString, null, SVNRepository.INVALID_REVISION)
         }
       }
+    }
 
-      addDir(dirPath)
+    async {
+      await(addDir(dirPath))
       val filePath = path.toString
       editor.addFile(filePath, null, SVNRepository.INVALID_REVISION)
       editor.applyTextDelta(filePath, null)
@@ -290,40 +281,30 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
       val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
       editor.closeFile(filePath, checksum)
       editor.closeDir() // XXX TODO I think all added parent dirs need to be closed also
-      editor.closeEdit()
-    } finally {
+      val commitInfo = editor.closeEdit()
       svn.closeSession()
+      commitInfo
+    } recover {
+      case NonFatal(ex) ⇒
+        svn.closeSession()
+        throw ex
     }
   }
 
   // True if the directory path exists in the repository
-  private def dirExists(path: Path): Boolean = {
-    val svn = getSvn
-    try {
-      svn.checkPath(path.toString, SVNRepository.INVALID_REVISION) == SVNNodeKind.DIR
-    } finally {
-      svn.closeSession()
-    }
+  private def dirExists(path: Path): Future[Boolean] = {
+    svnOps.checkDirPath(path)
   }
 
   // True if the path exists in the repository
-  private def pathExists(path: Path): Boolean = {
-    val svn = getSvn
-    try {
-      svn.checkPath(path.toString, SVNRepository.INVALID_REVISION) == SVNNodeKind.FILE || isOversize(path)
-    } finally {
-      svn.closeSession()
-    }
+  private def pathExists(path: Path): Future[Boolean] = async {
+    val dd = await(svnOps.checkFilePath(path))
+    if(!dd) await(isOversize(path)) else dd
   }
 
   // True if the .sha1 file exists, meaning the file needs special oversize handling.
-  private def isOversize(path: Path): Boolean = {
-    val svn = getSvn
-    try {
-      svn.checkPath(shaFile(path).toString, SVNRepository.INVALID_REVISION) == SVNNodeKind.FILE
-    } finally {
-      svn.closeSession()
-    }
+  private def isOversize(path: Path): Future[Boolean] = {
+    svnOps.checkFilePath(shaFile(path))
   }
 
   // Gets the svn revision from the given id, defaulting to HEAD
@@ -338,8 +319,8 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   private def shaFile(path: Path): Path = Paths.get(s"${path.toString}${settings.`sha1-suffix`}")
 
   // Returns the current version of the file, if known
-  private def getCurrentVersion(path: Path): Option[ConfigId] = {
-    if (isOversize(path)) {
+  private def getCurrentVersion(path: Path): Future[Option[ConfigId]] = async {
+    if (await(isOversize(path))) {
       hist(shaFile(path), 1).headOption.map(_.id)
     }
     else {
