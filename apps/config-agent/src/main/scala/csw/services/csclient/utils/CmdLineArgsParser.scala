@@ -14,6 +14,7 @@ object CmdLineArgsParser {
   val parser: OptionParser[Options] = new scopt.OptionParser[Options]("csClient") {
     head("csClient", System.getProperty("CSW_VERSION"))
 
+    //create operation
     cmd("create") action { (_, c) =>
       c.copy(op = "create")
     } text "copies the input file in the repository at a specified path" children (
@@ -35,10 +36,29 @@ object CmdLineArgsParser {
       } text "optional create comment"
     )
 
+    //update operation
+    cmd("update") action { (_, c) =>
+      c.copy(op = "update")
+    } text "overwrites the file specified in the repository by the input file" children (
+
+      arg[File]("<path>") action { (x, c) =>
+        c.copy(repositoryFilePath = Some(x))
+      } text "path in the repository",
+
+      opt[File]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
+        c.copy(inputFilePath = Some(x))
+      } text "input file path",
+
+      opt[String]('c', "comment") action { (x, c) =>
+        c.copy(comment = x)
+      } text "optional create comment"
+    )
+
     //get operation
     cmd("get") action { (_, c) =>
       c.copy(op = "get")
     } text "retrieves file with a given path from config service, and writes it to the output file" children (
+
       arg[File]("<repositoryFilePath>") action { (x, c) =>
         c.copy(repositoryFilePath = Some(x))
       } text "path of the file in the repository",

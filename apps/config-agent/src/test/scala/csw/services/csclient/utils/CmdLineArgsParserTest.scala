@@ -39,6 +39,30 @@ class CmdLineArgsParserTest
     x should contain (new Options("create", Some(repositoryFilepath), Some(inputFile), None, None, false, ""))
   }
 
+  test("test update with no sub-options") {
+    val argv = Array("update")
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x shouldEqual None
+  }
+
+  test("test update with all applicable sub-options") {
+    val argv = Array("update", repositoryFilepath.toString, "-i", inputFile.toString, "-c", comment)
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x should contain (new Options("update", Some(repositoryFilepath), Some(inputFile), None, None, false, comment))
+  }
+
+  test("test update with bare minimum sub-options") {
+    val argv = Array("update", repositoryFilepath.toString, "-i", inputFile.toString)
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x should contain (new Options("update", Some(repositoryFilepath), Some(inputFile), None, None, false, ""))
+  }
+
+  test("test get with no sub-options") {
+    val argv = Array("get")
+    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
+    x shouldEqual None
+  }
+
   test("test get with all applicable sub-options") {
     val argv = Array("get", repositoryFilepath.toString, "-o", outputFile.toString, "--id", id)
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
@@ -50,5 +74,4 @@ class CmdLineArgsParserTest
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
     x should contain (new Options("get", Some(repositoryFilepath), None, Some(outputFile), None, false, ""))
   }
-
 }
