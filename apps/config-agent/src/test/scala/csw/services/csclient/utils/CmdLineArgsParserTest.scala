@@ -158,10 +158,4 @@ class CmdLineArgsParserTest
     val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
     x should contain (new Options("getDefault", Some(repositoryFilepath), None, Some(outputFile), None, false, ""))
   }
-
-  test("test helo") {
-    val argv = Array("--help")
-    val x: Option[Options] = CmdLineArgsParser.parser.parse(argv, Options())
-    x shouldEqual None
-  }
 }
