@@ -158,5 +158,15 @@ object CmdLineArgsParser {
     }
 
     override def errorOnUnknownArgument = false
+
   }
+
+  /**
+    * Parses the command line arguments and returns a value if they are valid.
+    *
+    * @param args the command line arguments
+    * @return an object containing the parsed values of the command line arguments
+    */
+  def parse(args: Seq[String]): Option[Options] = parser.parse(args, Options())
+
 }
