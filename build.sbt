@@ -21,7 +21,7 @@ lazy val `csw-location` = project
 
 lazy val `track-location-agent` = project
   .in(file("apps/track-location-agent"))
-  .enablePlugins(DeployApp)
+  .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-location`)
   .settings(
     libraryDependencies ++= Dependencies.TrackLocationAgent,
@@ -37,7 +37,7 @@ lazy val `csw-cluster-seed` = project
 //Config service related projects
 lazy val `config-cli-client` = project
   .in(file("apps/config-cli-client"))
-  .enablePlugins(DeployApp)
+  .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-location`)
   .dependsOn(`csw-config`)
   .settings(
