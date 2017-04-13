@@ -17,3 +17,11 @@ class ClientWiring {
   lazy val configService: ConfigService = new ConfigClient(locationResolver.configServiceLocation, actorRuntime)
   lazy val javaConfigService: IConfigService = new JConfigService(configService, actorRuntime)
 }
+
+object ClientWiring {
+  def make(): ClientWiring = new ClientWiring
+
+  def make(_actorSystem: ActorSystem): ClientWiring = new ClientWiring {
+    override lazy val actorSystem: ActorSystem = _actorSystem
+  }
+}
