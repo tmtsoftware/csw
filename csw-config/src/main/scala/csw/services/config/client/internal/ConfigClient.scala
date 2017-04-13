@@ -1,7 +1,7 @@
-package csw.services.config.client
+package csw.services.config.client.internal
 
 import java.io.{FileNotFoundException, IOException}
-import java.nio.{file => jnio}
+import java.nio.{file ⇒ jnio}
 import java.time.Instant
 
 import akka.http.scaladsl.Http

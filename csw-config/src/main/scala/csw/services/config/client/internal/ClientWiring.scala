@@ -1,7 +1,8 @@
-package csw.services.config.client
+package csw.services.config.client.internal
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.services.config.api.javadsl.IConfigService
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
@@ -14,4 +15,5 @@ class ClientWiring {
   lazy val locationResolver = new LocationResolver(locationService)
 
   lazy val configService: ConfigService = new ConfigClient(locationResolver.configServiceLocation, actorRuntime)
+  lazy val javaConfigService: IConfigService = new JConfigService(configService, actorRuntime)
 }

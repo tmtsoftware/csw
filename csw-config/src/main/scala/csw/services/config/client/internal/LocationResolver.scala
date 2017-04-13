@@ -1,4 +1,4 @@
-package csw.services.config.client
+package csw.services.config.client.internal
 
 import csw.services.location.models.Connection.HttpConnection
 import csw.services.location.models.{ComponentId, ComponentType, Location}

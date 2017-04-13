@@ -2,6 +2,7 @@ package csw.services.config.client
 
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.scaladsl.{ConfigService, ConfigServiceTest}
+import csw.services.config.client.internal.ClientWiring
 import csw.services.config.server.ServerWiring
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}

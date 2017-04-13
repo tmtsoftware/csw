@@ -6,11 +6,11 @@ import csw.services.config.api.models.ConfigData;
 import csw.services.config.api.models.ConfigFileHistory;
 import csw.services.config.api.models.ConfigFileInfo;
 import csw.services.config.api.models.ConfigId;
-import csw.services.config.client.ClientWiring;
+import csw.services.config.client.internal.ClientWiring;
 import csw.services.config.client.CustomClientWiring;
 import csw.services.config.client.CustomServerWiring;
 import csw.services.config.server.ServerWiring;
-import csw.services.config.server.internal.JConfigManager;
+import csw.services.config.client.internal.JConfigService;
 import org.junit.*;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
@@ -29,7 +29,7 @@ public class JConfigServiceTest {
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
     private static ClientWiring clientWiring = new CustomClientWiring();
-    private IConfigManager configManager = new JConfigManager(clientWiring.configService(), clientWiring.actorRuntime());
+    private IConfigService configManager = clientWiring.javaConfigService();
     private Materializer mat = clientWiring.actorRuntime().mat();
 
     private String configValue = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";

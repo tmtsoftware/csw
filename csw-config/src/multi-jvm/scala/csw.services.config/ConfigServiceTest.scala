@@ -3,7 +3,7 @@ import java.nio.file.Paths
 import com.typesafe.config.ConfigFactory
 import csw.services.config.api.commons.TestFileUtils
 import csw.services.config.api.models.ConfigData
-import csw.services.config.client.ClientWiring
+import csw.services.config.client.internal.ClientWiring
 import csw.services.config.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.config.server.{Main, ServerWiring, Settings}
 import csw.services.location.commons.ClusterSettings

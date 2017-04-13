@@ -11,7 +11,7 @@ import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFile
 /**
   * Defines an interface for storing and retrieving configuration information
   */
-trait IConfigManager {
+trait IConfigService {
 
   /**
     * The name of this instance
