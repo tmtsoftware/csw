@@ -19,6 +19,7 @@ case class Options(
                     inputFilePath: Option[Path] = None,
                     outputFilePath: Option[Path] = None,
                     id: Option[String] = None,
+                    maxFileVersions: Int = Int.MaxValue,
                     oversize: Boolean = false,
                     comment: String = ""
                   )

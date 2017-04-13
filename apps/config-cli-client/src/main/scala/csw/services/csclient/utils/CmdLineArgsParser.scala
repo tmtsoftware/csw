@@ -105,8 +105,12 @@ object CmdLineArgsParser {
 
       arg[String]("<repositoryFilePath>") action { (x, c) =>
         c.copy(repositoryFilePath = Some(Paths.get(x)))
-      } text "file path in the repository"
-      )
+      } text "file path in the repository",
+
+      opt[Int]("max") action { (x, c) =>
+        c.copy(maxFileVersions = x)
+      } text "optional maximum entries of file versions"
+    )
 
     //setDefault operation
     cmd("setDefault") action { (_, c) =>
