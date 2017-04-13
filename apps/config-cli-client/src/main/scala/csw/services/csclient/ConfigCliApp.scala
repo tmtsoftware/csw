@@ -3,7 +3,7 @@ package csw.services.csclient
 import java.io.File
 
 import csw.services.config.api.models.{ConfigData, ConfigId}
-import csw.services.config.client.ClientWiring
+import csw.services.config.client.internal.ClientWiring
 import csw.services.csclient.models.Options
 import csw.services.csclient.utils.CmdLineArgsParser
 
@@ -34,7 +34,7 @@ class ConfigCliApp {
       val idOpt: Option[ConfigId] = options.id.map(ConfigId(_))
 
       for {
-        configDataOpt: Option[ConfigData] <- configManager.get(options.repositoryFilePath.get, idOpt)
+        configDataOpt: Option[ConfigData] <- configService.get(options.repositoryFilePath.get, idOpt)
         if configDataOpt.isDefined
         outputFile: File <- configDataOpt.get.toFileF(options.outputFilePath.get)
       } yield {
@@ -46,7 +46,7 @@ class ConfigCliApp {
     def create(): Future[Unit] = {
       val configData: ConfigData = ConfigData.fromPath(options.inputFilePath.get)
       for {
-        configId <- configManager.create(options.repositoryFilePath.get, configData, oversize = options.oversize,
+        configId <- configService.create(options.repositoryFilePath.get, configData, oversize = options.oversize,
           options.comment)
       } yield {
         println(s"File : ${options.repositoryFilePath.get} is created with id : ${configId.id}")
