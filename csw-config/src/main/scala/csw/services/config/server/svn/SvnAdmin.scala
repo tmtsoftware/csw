@@ -1,4 +1,4 @@
-package csw.services.config.server.repo
+package csw.services.config.server.svn
 
 import csw.services.config.server.Settings
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory

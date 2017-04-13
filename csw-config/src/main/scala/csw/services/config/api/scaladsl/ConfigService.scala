@@ -10,7 +10,7 @@ import scala.concurrent.Future
 /**
  * Defines an interface for storing and retrieving configuration information
  */
-trait ConfigManager {
+trait ConfigService {
 
   /**
    * The name of this instance

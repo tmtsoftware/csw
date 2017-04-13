@@ -8,14 +8,14 @@ import java.{util, lang => jl}
 
 import csw.services.config.api.javadsl.IConfigManager
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
-import csw.services.config.api.scaladsl.ConfigManager
+import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.ActorRuntime
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 
-class JConfigManager(configManager: ConfigManager, actorRuntime: ActorRuntime) extends IConfigManager {
+class JConfigManager(configManager: ConfigService, actorRuntime: ActorRuntime) extends IConfigManager {
 
   import actorRuntime._
 

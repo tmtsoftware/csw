@@ -3,12 +3,12 @@ package csw.services.config.server.http
 import akka.Done
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
-import csw.services.config.api.scaladsl.ConfigManager
+import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.ActorRuntime
 
 import scala.util.control.NonFatal
 
-class ConfigServiceRoute(configManager: ConfigManager, actorRuntime: ActorRuntime) extends HttpSupport {
+class ConfigServiceRoute(configManager: ConfigService, actorRuntime: ActorRuntime) extends HttpSupport {
 
   import actorRuntime._
 

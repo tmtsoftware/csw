@@ -1,7 +1,7 @@
 package csw.services.config.client
 
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
-import csw.services.config.api.scaladsl.{ConfigManager, ConfigManagerTest}
+import csw.services.config.api.scaladsl.{ConfigService, ConfigServiceTest}
 import csw.services.config.server.ServerWiring
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
@@ -20,14 +20,14 @@ class CustomClientWiring extends ClientWiring {
     }
 }
 
-class ConfigClientTest extends ConfigManagerTest {
+class ConfigClientTest extends ConfigServiceTest {
 
   override lazy val serverWiring = new CustomServerWiring
   serverWiring.httpService.lazyBinding.await
 
   lazy val clientWiring = new CustomClientWiring
 
-  override val configManager: ConfigManager = clientWiring.configManager
+  override val configManager: ConfigService = clientWiring.configService
 
   override protected def afterAll(): Unit = {
     serverWiring.httpService.shutdown().await

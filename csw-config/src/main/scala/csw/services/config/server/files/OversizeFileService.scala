@@ -1,4 +1,4 @@
-package csw.services.config.server.repo
+package csw.services.config.server.files
 
 import java.nio.file.{Path, Paths}
 
@@ -17,26 +17,26 @@ import scala.concurrent.Future
   * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
   * the SHA-1 hash value.
   **/
-class OversizeFileManager(settings: Settings, fileOps: FileOps) {
+class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo) {
 
   def post(configData: ConfigData)(implicit mat: Materializer): Future[String] = async {
     val (tempFilePath, sha) = await(saveAndSha(configData))
 
     val outPath = makePath(settings.`oversize-files-dir`, sha)
 
-    if (await(fileOps.exists(outPath))) {
-      await(fileOps.delete(tempFilePath))
+    if (await(fileRepo.exists(outPath))) {
+      await(fileRepo.delete(tempFilePath))
       sha
     }
     else {
-      await(fileOps.createDirectories(outPath.getParent))
-      await(fileOps.move(tempFilePath, outPath))
+      await(fileRepo.createDirectories(outPath.getParent))
+      await(fileRepo.move(tempFilePath, outPath))
       if (await(validate(sha, outPath))) {
         sha
       }
       else {
-        await(fileOps.delete(outPath))
-        await(fileOps.delete(tempFilePath))
+        await(fileRepo.delete(outPath))
+        await(fileRepo.delete(tempFilePath))
         throw new RuntimeException(s" Error in creating file for $sha")
       }
     }
@@ -45,7 +45,7 @@ class OversizeFileManager(settings: Settings, fileOps: FileOps) {
   def get(sha: String): Future[Option[ConfigData]] = async {
     val repoFilePath = makePath(settings.`oversize-files-dir`, sha)
 
-    if (await(fileOps.exists(repoFilePath))) {
+    if (await(fileRepo.exists(repoFilePath))) {
       Some(ConfigData.fromSource(FileIO.fromPath(repoFilePath)))
     } else {
       None
@@ -72,7 +72,7 @@ class OversizeFileManager(settings: Settings, fileOps: FileOps) {
 
 
   def saveAndSha(configData: ConfigData)(implicit mat: Materializer): Future[(Path, String)] = async {
-    val path = await(fileOps.createTempFile("config-service-overize-", ".tmp"))
+    val path = await(fileRepo.createTempFile("config-service-overize-", ".tmp"))
     val (resultF, shaF) = configData.source
       .alsoToMat(FileIO.toPath(path))(Keep.right)
       .toMat(Sha1.sink)(Keep.both)

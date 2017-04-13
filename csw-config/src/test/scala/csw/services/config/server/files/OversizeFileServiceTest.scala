@@ -1,4 +1,4 @@
-package csw.services.config.server.repo
+package csw.services.config.server.files
 
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Paths
@@ -9,7 +9,7 @@ import csw.services.config.api.models.ConfigData
 import csw.services.config.server.ServerWiring
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-class OversizeFileManagerTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class OversizeFileServiceTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   private val wiring = new ServerWiring
 
@@ -34,7 +34,7 @@ class OversizeFileManagerTest extends FunSuite with Matchers with BeforeAndAfter
   }
 
   test("storing oversize file") {
-    val actualSha = oversizeFileManager.post(configData).await
+    val actualSha = oversizeFileService.post(configData).await
     val expectedSha = Sha1.fromConfigData(configData).await
 
     actualSha shouldBe expectedSha
@@ -42,7 +42,7 @@ class OversizeFileManagerTest extends FunSuite with Matchers with BeforeAndAfter
 
   test("getting oversize file") {
     val actualSha = Sha1.fromConfigData(configData).await
-    Sha1.fromConfigData(oversizeFileManager.get(actualSha).await.get).await shouldBe actualSha
+    Sha1.fromConfigData(oversizeFileService.get(actualSha).await.get).await shouldBe actualSha
   }
 
 }

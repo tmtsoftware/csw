@@ -1,4 +1,4 @@
-package csw.services.config.server.repo
+package csw.services.config.server.files
 
 import java.nio.file.{CopyOption, Files, Path, StandardCopyOption}
 
@@ -6,7 +6,7 @@ import akka.dispatch.MessageDispatcher
 
 import scala.concurrent.Future
 
-class FileOps(blockingIoDispatcher: MessageDispatcher) {
+class OversizeFileRepo(blockingIoDispatcher: MessageDispatcher) {
 
   private implicit val _blockingIoDispatcher = blockingIoDispatcher
 

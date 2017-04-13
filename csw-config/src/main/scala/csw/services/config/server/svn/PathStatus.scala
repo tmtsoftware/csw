@@ -1,4 +1,4 @@
-package csw.services.config.server.repo
+package csw.services.config.server.svn
 
 sealed abstract class PathStatus
 

@@ -1,10 +1,9 @@
-package csw.services.config.server.repo
+package csw.services.config.server.svn
 
 import java.io.{InputStream, OutputStream}
 import java.nio.file.Path
 
 import akka.dispatch.MessageDispatcher
-import csw.services.config.api.models.ConfigId
 import csw.services.config.server.Settings
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
@@ -15,7 +14,7 @@ import org.tmatesoft.svn.core.wc2.{SvnOperationFactory, SvnTarget}
 
 import scala.concurrent.Future
 
-class SvnOps(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
+class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   private implicit val _blockingIoDispatcher = blockingIoDispatcher
 

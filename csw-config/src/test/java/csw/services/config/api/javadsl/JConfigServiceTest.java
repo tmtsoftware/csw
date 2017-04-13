@@ -24,12 +24,12 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class JConfigManagerTest {
+public class JConfigServiceTest {
     private static ServerWiring serverWiring = new CustomServerWiring();
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
     private static ClientWiring clientWiring = new CustomClientWiring();
-    private IConfigManager configManager = new JConfigManager(clientWiring.configManager(), clientWiring.actorRuntime());
+    private IConfigManager configManager = new JConfigManager(clientWiring.configService(), clientWiring.actorRuntime());
     private Materializer mat = clientWiring.actorRuntime().mat();
 
     private String configValue = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";

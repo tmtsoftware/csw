@@ -1,4 +1,4 @@
-package csw.services.config.server.repo
+package csw.services.config.server.files
 
 import java.nio.file.Path
 import java.security.MessageDigest

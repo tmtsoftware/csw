@@ -8,10 +8,10 @@ import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.commons.TestFileUtils
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo}
 import csw.services.config.server.ServerWiring
-import csw.services.config.server.repo.Sha1
+import csw.services.config.server.files.Sha1
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
+abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
   lazy val serverWiring = new ServerWiring
 
@@ -19,7 +19,7 @@ abstract class ConfigManagerTest extends FunSuite with Matchers with BeforeAndAf
 
   import serverWiring.actorRuntime._
 
-  def configManager: ConfigManager
+  def configManager: ConfigService
 
   override protected def beforeEach(): Unit = {
     serverWiring.svnAdmin.initSvnRepo()

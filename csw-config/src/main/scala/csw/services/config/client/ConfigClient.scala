@@ -11,13 +11,13 @@ import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import csw.services.config.api.models._
-import csw.services.config.api.scaladsl.ConfigManager
+import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.http.JsonSupport
 import csw.services.location.models.Location
 
 import scala.concurrent.Future
 
-class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends ConfigManager with JsonSupport {
+class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends ConfigService with JsonSupport {
 
   import actorRuntime._
 

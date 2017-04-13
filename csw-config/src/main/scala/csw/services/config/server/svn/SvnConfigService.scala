@@ -1,4 +1,4 @@
-package csw.services.config.server.repo
+package csw.services.config.server.svn
 
 import java.io._
 import java.nio.file.{Path, Paths}
@@ -6,7 +6,8 @@ import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
-import csw.services.config.api.scaladsl.ConfigManager
+import csw.services.config.api.scaladsl.ConfigService
+import csw.services.config.server.files.OversizeFileService
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
 
@@ -14,7 +15,7 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileManager, actorRuntime: ActorRuntime, svnOps: SvnOps) extends ConfigManager {
+class SvnConfigService(settings: Settings, fileService: OversizeFileService, actorRuntime: ActorRuntime, svnRepo: SvnRepo) extends ConfigService {
 
   import actorRuntime._
 
@@ -23,7 +24,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   override def create(path: Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
 
     def createOversize(): Future[ConfigId] = async {
-      val sha1 = await(oversizeFileManager.post(configData))
+      val sha1 = await(fileService.post(configData))
       await(create(shaFilePath(path), ConfigData.fromString(sha1), oversize = false, comment))
     }
 
@@ -44,7 +45,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   override def update(path: Path, configData: ConfigData, comment: String): Future[ConfigId] = {
 
     def updateOversize(): Future[ConfigId] = async {
-      val sha1 = await(oversizeFileManager.post(configData))
+      val sha1 = await(fileService.post(configData))
       await(update(shaFilePath(path), ConfigData.fromString(sha1), comment))
     }
 
@@ -62,9 +63,9 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     // Returns the contents of the given version of the file, if found
     def getNormalSize: Future[Option[ConfigData]] = async {
       val outputStream = StreamConverters.asOutputStream().cancellableMat
-      val revision = await(svnOps.svnRevision(id.map(_.id.toLong)))
+      val revision = await(svnRepo.svnRevision(id.map(_.id.toLong)))
       val source = outputStream.mapMaterializedValue { case (out, switch) ⇒
-        svnOps.getFile(path, revision.getNumber, out).recover {
+        svnRepo.getFile(path, revision.getNumber, out).recover {
           case NonFatal(ex) ⇒ switch.abort(ex)
         }
       }
@@ -78,7 +79,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
           None
         case Some(configData) =>
           val sha1 = await(configData.toStringF)
-          await(oversizeFileManager.get(sha1))
+          await(fileService.get(sha1))
       }
     }
 
@@ -116,14 +117,14 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   //TODO: This implementation deletes all versions of a file. This is different than the expecations
   override def delete(path: Path, comment: String = "deleted"): Future[Unit] = async {
     await(pathStatus(path)) match {
-      case PathStatus.NormalSize ⇒ await(svnOps.delete(path, comment))
-      case PathStatus.Oversize   ⇒ await(svnOps.delete(shaFilePath(path), comment))
+      case PathStatus.NormalSize ⇒ await(svnRepo.delete(path, comment))
+      case PathStatus.Oversize   ⇒ await(svnRepo.delete(shaFilePath(path), comment))
       case PathStatus.Missing    ⇒ throw new FileNotFoundException("Can't delete " + path + " because it does not exist")
     }
   }
 
   override def list(): Future[List[ConfigFileInfo]] = async {
-    await(svnOps.list()).map { entry =>
+    await(svnRepo.list()).map { entry =>
       ConfigFileInfo(Paths.get(entry.getRelativePath), ConfigId(entry.getRevision), entry.getCommitMessage)
     }
   }
@@ -166,9 +167,9 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
     val revision = id.map(_.id.toLong)
-    if (await(svnOps.pathExists(path, revision))) {
+    if (await(svnRepo.pathExists(path, revision))) {
       PathStatus.NormalSize
-    } else if (await(svnOps.pathExists(shaFilePath(path), revision))) {
+    } else if (await(svnRepo.pathExists(shaFilePath(path), revision))) {
       PathStatus.Oversize
     } else {
       PathStatus.Missing
@@ -187,9 +188,9 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     val inputStream = configData.toInputStream
 
     val commitInfo = if (update) {
-      await(svnOps.modifyFile(path, comment, inputStream))
+      await(svnRepo.modifyFile(path, comment, inputStream))
     } else {
-      await(svnOps.addFile(path, comment, inputStream))
+      await(svnRepo.addFile(path, comment, inputStream))
     }
     ConfigId(commitInfo.getNewRevision)
   }
@@ -204,7 +205,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
   }
 
   private def hist(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileHistory]] = async {
-    await(svnOps.hist(path, maxResults))
+    await(svnRepo.hist(path, maxResults))
       .map(e => ConfigFileHistory(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
   }
 

@@ -74,8 +74,8 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAn
           |""".stripMargin
 
       val file = Paths.get("test.conf")
-      configManager.create(file, ConfigData.fromString(configValue), oversize = false, "commit test file").await
-      val actualConfigValue = configManager.get(file).await.get.toStringF.await
+      configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit test file").await
+      val actualConfigValue = configService.get(file).await.get.toStringF.await
       actualConfigValue shouldBe configValue
 
       enterBarrier("end")
