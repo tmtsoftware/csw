@@ -5,7 +5,8 @@ import java.nio.{file ⇒ jnio}
 import java.time.Instant
 
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.marshalling.Marshal
+import akka.http.scaladsl.marshalling.{Marshal, Marshaller, ToEntityMarshaller}
+import akka.http.scaladsl.model.HttpEntity.Chunked
 import akka.http.scaladsl.model.Multipart.FormData
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
@@ -24,41 +25,35 @@ class ConfigClient(location: Location, actorRuntime: ActorRuntime) extends Confi
   override def name: String = "http-based-config-client"
 
   override def create(path: jnio.Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
-    val entity = HttpEntity.IndefiniteLength(ContentTypes.`application/octet-stream`, configData.source)
-    val formData: Multipart.FormData = FormData(FormData.BodyPart("conf", entity, Map("filename" → "")))
+    val entity = Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
     val uri = Uri(location.uri.toString)
       .withPath(Path / "create")
       .withQuery(Query("path" → path.toString, "oversize" → oversize.toString, "comment" → comment))
 
-    Marshal(formData).to[RequestEntity].flatMap { entity =>
-      val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
-      println(request)
-      Http().singleRequest(request).flatMap { response ⇒
-        response.status match {
-          case StatusCodes.OK         ⇒ Unmarshal(response).to[ConfigId]
-          case StatusCodes.BadRequest ⇒ throw new IOException(response.status.reason())
-          case _                      ⇒ throw new RuntimeException(response.status.reason())
-        }
+    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
+    println(request)
+    Http().singleRequest(request).flatMap { response ⇒
+      response.status match {
+        case StatusCodes.OK         ⇒ Unmarshal(response).to[ConfigId]
+        case StatusCodes.BadRequest ⇒ throw new IOException(response.status.reason())
+        case _                      ⇒ throw new RuntimeException(response.status.reason())
       }
     }
   }
 
   override def update(path: jnio.Path, configData: ConfigData, comment: String): Future[ConfigId] = {
-    val entity = HttpEntity.IndefiniteLength(ContentTypes.`application/octet-stream`, configData.source)
-    val formData: Multipart.FormData = FormData(FormData.BodyPart("conf", entity, Map("filename" → "")))
+    val entity = Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
     val uri = Uri(location.uri.toString)
       .withPath(Path / "update")
       .withQuery(Query("path" → path.toString, "comment" → comment))
 
-    Marshal(formData).to[RequestEntity].flatMap { entity =>
-      val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
-      println(request)
-      Http().singleRequest(request).flatMap { response ⇒
-        response.status match {
-          case StatusCodes.OK         ⇒ Unmarshal(response).to[ConfigId]
-          case StatusCodes.BadRequest ⇒ throw new FileNotFoundException(response.status.reason())
-          case _                      ⇒ throw new RuntimeException(response.status.reason())
-        }
+    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
+    println(request)
+    Http().singleRequest(request).flatMap { response ⇒
+      response.status match {
+        case StatusCodes.OK         ⇒ Unmarshal(response).to[ConfigId]
+        case StatusCodes.BadRequest ⇒ throw new FileNotFoundException(response.status.reason())
+        case _                      ⇒ throw new RuntimeException(response.status.reason())
       }
     }
   }

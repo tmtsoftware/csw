@@ -16,8 +16,9 @@ trait HttpSupport extends Directives with JsonSupport {
   val maxResultsParam: Directive1[Int] = parameter('maxResults.as[Int] ? Int.MaxValue)
   val commentParam: Directive1[String] = parameter('comment ? "")
   val oversizeParam: Directive1[Boolean] = parameter('oversize.as[Boolean] ? false)
-  val fileDataParam: Directive1[ConfigData] = fileUpload("conf").map { case (_, source) ⇒ ConfigData.fromSource(source) }
+  val configDataEntity: Directive1[ConfigData] = extractDataBytes.map(ConfigData.fromSource)
 
+  //This marshaller is used to create a response chunked stream for get/getDefault requests
   implicit val configDataMarshaller: ToEntityMarshaller[ConfigData] = Marshaller.opaque { configData =>
     Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
   }

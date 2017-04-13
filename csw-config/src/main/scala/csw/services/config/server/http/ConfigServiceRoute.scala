@@ -8,7 +8,7 @@ import csw.services.config.server.ActorRuntime
 
 import scala.util.control.NonFatal
 
-class ConfigServiceRoute(configManager: ConfigService, actorRuntime: ActorRuntime) extends HttpSupport {
+class ConfigServiceRoute(configService: ConfigService, actorRuntime: ActorRuntime) extends HttpSupport {
 
   import actorRuntime._
 
@@ -17,66 +17,66 @@ class ConfigServiceRoute(configManager: ConfigService, actorRuntime: ActorRuntim
       path("get") {
         (pathParam & dateParam) { (filePath, date) ⇒
           rejectEmptyResponse & complete {
-            configManager.get(filePath, date)
+            configService.get(filePath, date)
           }
         }
       } ~
         path("get") {
           (pathParam & idParam) { (filePath, maybeConfigId) ⇒
             rejectEmptyResponse & complete {
-              configManager.get(filePath, maybeConfigId)
+              configService.get(filePath, maybeConfigId)
             }
           }
         } ~
         path("getDefault") {
           pathParam { filePath ⇒
             rejectEmptyResponse & complete {
-              configManager.getDefault(filePath)
+              configService.getDefault(filePath)
             }
           }
         } ~
         path("exists") {
           pathParam { filePath ⇒
             rejectEmptyResponse & complete {
-              configManager.exists(filePath).map { found ⇒
+              configService.exists(filePath).map { found ⇒
                 if (found) Some("convert me into a head request") else None
               }
             }
           }
         } ~
         path("list") {
-          complete(configManager.list())
+          complete(configService.list())
         } ~
         path("history") {
           (pathParam & maxResultsParam) { (filePath, maxCount) ⇒
-            complete(configManager.history(filePath, maxCount))
+            complete(configService.history(filePath, maxCount))
           }
         }
     } ~
       post {
         path("create") {
-          (pathParam & fileDataParam & oversizeParam & commentParam) { (filePath, configSource, oversize, comment) ⇒
-            complete(configManager.create(filePath, configSource, oversize, comment))
+          (pathParam & configDataEntity & oversizeParam & commentParam) { (filePath, configData, oversize, comment) ⇒
+            complete(configService.create(filePath, configData, oversize, comment))
           }
         } ~
           path("update") {
-            (pathParam & fileDataParam & commentParam) { (filePath, configSource, comment) ⇒
-              complete(configManager.update(filePath, configSource, comment))
+            (pathParam & configDataEntity & commentParam) { (filePath, configData, comment) ⇒
+              complete(configService.update(filePath, configData, comment))
             }
           } ~
           path("setDefault") {
             (pathParam & idParam) { (filePath, maybeConfigId) ⇒
-              complete(configManager.setDefault(filePath, maybeConfigId).map(_ ⇒ Done))
+              complete(configService.setDefault(filePath, maybeConfigId).map(_ ⇒ Done))
             }
           } ~
           path("resetDefault") {
             pathParam { filePath ⇒
-              complete(configManager.resetDefault(filePath).map(_ ⇒ Done))
+              complete(configService.resetDefault(filePath).map(_ ⇒ Done))
             }
           } ~
           path("delete") {
             (pathParam & commentParam) { (filePath, comment) ⇒
-              complete(configManager.delete(filePath, comment).map(_ ⇒ Done))
+              complete(configService.delete(filePath, comment).map(_ ⇒ Done))
             }
           }
       }

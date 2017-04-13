@@ -6,7 +6,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.services.config.api.commons.TestFileUtils
-import csw.services.config.api.models.{ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.server.ServerWiring
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -15,7 +15,7 @@ class ConfigServiceRouteTest extends FunSuite
     with BeforeAndAfterAll
     with BeforeAndAfterEach
     with Matchers
-    with JsonSupport {
+    with HttpSupport {
 
   val serverWiring = new ServerWiring
   import serverWiring._
@@ -24,19 +24,13 @@ class ConfigServiceRouteTest extends FunSuite
   private val testFileUtils = new TestFileUtils(settings)
 
   private val configValue1 = "axisName = tromboneAxis"
-  val configFile1 =
-    Multipart.FormData(Multipart.FormData.BodyPart.Strict("conf",
-        HttpEntity(ContentTypes.`text/plain(UTF-8)`, configValue1), Map("fileName" → "test.conf")))
+  private val configFile1 = ConfigData.fromString(configValue1)
 
   private val updatedConfigValue1 = "assemblyHCDCount = 3"
-  val updatedConfigFile1 =
-    Multipart.FormData(Multipart.FormData.BodyPart.Strict("conf",
-      HttpEntity(ContentTypes.`text/plain(UTF-8)`, updatedConfigValue1), Map("fileName" → "test.conf")))
+  private val updatedConfigFile1 = ConfigData.fromString(updatedConfigValue1)
 
   private val configValue2 = "name = NFIRAOS Trombone Assembly"
-  val configFile2 =
-    Multipart.FormData(Multipart.FormData.BodyPart.Strict("conf",
-      HttpEntity(ContentTypes.`text/plain(UTF-8)`, configValue2), Map("fileName" → "test1.conf")))
+  private val configFile2 = ConfigData.fromString(configValue2)
 
   val createRequestParameterList = "path=test.conf&oversize=true&comment=commit1"
 
@@ -81,11 +75,6 @@ class ConfigServiceRouteTest extends FunSuite
       status shouldEqual StatusCodes.OK
       // expected
       // status shouldEqual StatusCodes.Created
-    }
-
-    // invalid query parameter's
-    Post("/create?path=test1.conf&oversize=true&comment=commit") ~> Route.seal(route) ~> check {
-      status shouldEqual StatusCodes.UnsupportedMediaType
     }
 
     Post("/create?oversize=true&comment=commit1", configFile1) ~> Route.seal(route) ~> check {
