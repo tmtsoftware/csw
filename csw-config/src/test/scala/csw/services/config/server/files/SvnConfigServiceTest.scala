@@ -5,5 +5,5 @@ import csw.services.config.server.ServerWiring
 
 class SvnConfigServiceTest extends ConfigServiceTest {
   override lazy val serverWiring = new ServerWiring
-  override val configManager: ConfigService = serverWiring.configService
+  override val configService: ConfigService = serverWiring.configService
 }

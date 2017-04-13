@@ -28,7 +28,7 @@ class ConfigClientTest extends ConfigServiceTest {
 
   lazy val clientWiring = new CustomClientWiring
 
-  override val configManager: ConfigService = clientWiring.configService
+  override val configService: ConfigService = clientWiring.configService
 
   override protected def afterAll(): Unit = {
     serverWiring.httpService.shutdown().await
