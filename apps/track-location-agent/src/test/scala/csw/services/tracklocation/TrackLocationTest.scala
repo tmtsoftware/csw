@@ -93,7 +93,7 @@ class TrackLocationTest
     val tcpLocation = new TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
 
-    //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
+    //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propagate test's locationService
     Thread.sleep(6000)
     locationService.list.await shouldBe List.empty
   }

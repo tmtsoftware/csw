@@ -24,7 +24,7 @@ class HttpService(locationService: LocationService, configServiceRoute: ConfigSe
     )
     )
     println(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
-    println("=========== Registering Config Service Server with Location Service ===============")
+    println("==== Registering Config Service HTTP Server with Location Service ====")
     await(registerWithLocationService())
     binding
   }
