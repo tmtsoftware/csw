@@ -1,4 +1,4 @@
-package csw.services.config.server.files
+package csw.services.config.server.svn
 
 import csw.services.config.api.scaladsl.{ConfigService, ConfigServiceTest}
 import csw.services.config.server.ServerWiring

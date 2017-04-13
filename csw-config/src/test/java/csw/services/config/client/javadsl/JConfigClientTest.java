@@ -1,7 +1,8 @@
-package csw.services.config.api.javadsl;
+package csw.services.config.client.javadsl;
 
 import akka.stream.Materializer;
 import csw.services.config.api.commons.TestFileUtils;
+import csw.services.config.api.javadsl.IConfigService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.api.models.ConfigFileHistory;
 import csw.services.config.api.models.ConfigFileInfo;
@@ -24,7 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class JConfigServiceTest {
+public class JConfigClientTest {
     private static ServerWiring serverWiring = new CustomServerWiring();
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
