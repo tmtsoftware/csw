@@ -1,5 +1,5 @@
-val enableCoverage = System.getProperty("enableCoverage", "true")
-val plugins:Seq[Plugins] = if(enableCoverage.toBoolean) Seq(Coverage) else Seq.empty
+val enableCoverage =  sys.props.get("enableCoverage") == Some("true")
+val MaybeCoverage: Plugins = if(enableCoverage) Coverage else Plugins.empty
 
 lazy val `csw-prod` = project
   .in(file("."))
@@ -17,29 +17,9 @@ lazy val `csw-prod` = project
   )
 
 lazy val `csw-location` = project
-  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm)
-  .enablePlugins(plugins:_*)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
-    libraryDependencies ++= Seq(
-      Akka.`akka-stream`,
-      Akka.`akka-distributed-data`,
-      Akka.`akka-remote`,
-      Akka.`akka-cluster-tools`,
-      Libs.`scala-java8-compat`,
-      Libs.`scala-async`,
-      Libs.`enumeratum`,
-      Libs.`chill-akka`,
-      Libs.`akka-management-cluster-http`,
-      AkkaHttp.`akka-http`
-    ),
-    libraryDependencies ++= Seq(
-      Akka.`akka-stream-testkit` % Test,
-      Libs.`scalatest` % Test,
-      Libs.`junit` % Test,
-      Libs.`junit-interface` % Test,
-      Libs.`mockito-core` % Test,
-      Akka.`akka-multi-node-testkit` % Test
-    )
+    libraryDependencies ++= Dependencies.Location
   )
 
 lazy val `track-location-agent` = project
@@ -47,12 +27,7 @@ lazy val `track-location-agent` = project
   .enablePlugins(DeployApp)
   .dependsOn(`csw-location`)
   .settings(
-    libraryDependencies ++= Seq(
-      Akka.`akka-actor`,
-      Libs.`scopt`,
-      Libs.`scalatest` % Test,
-      Libs.`scala-logging` % Test
-    ),
+    libraryDependencies ++= Dependencies.TrackLocationAgent,
     sources in (Compile, doc) := Seq.empty,
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
@@ -63,12 +38,7 @@ lazy val `config-cli-client` = project
   .dependsOn(`csw-location`)
   .dependsOn(`csw-config`)
   .settings(
-    libraryDependencies ++= Seq(
-      Akka.`akka-actor`,
-      Libs.`scopt`,
-      Libs.`scalatest` % Test,
-      Libs.`scala-logging` % Test
-    ),
+    libraryDependencies ++= Dependencies.ConfigCliClient,
     sources in (Compile, doc) := Seq.empty,
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
@@ -81,18 +51,13 @@ lazy val `csw-cluster-seed` = project
     sources in (Compile, doc) := Seq.empty
   )
 
-lazy val docs = project
-  .enablePlugins(ParadoxSite, NoPublish)
+lazy val docs = project.enablePlugins(ParadoxSite, NoPublish)
 
 lazy val integration = project
   .enablePlugins(DeployApp)
-  .dependsOn(`csw-location`)
-  .dependsOn(`track-location-agent`)
+  .dependsOn(`csw-location`, `track-location-agent`)
   .settings(
-    libraryDependencies ++= Seq(
-      Libs.`scalatest`,
-      Akka.`akka-stream-testkit`
-    ),
+    libraryDependencies ++= Dependencies.Integration,
     sources in Test := (sources in Compile).value
   )
 
@@ -101,20 +66,7 @@ lazy val `csw-config` = project
   .enablePlugins(DeployApp, AutoMultiJvm)
   .dependsOn(`csw-location`)
   .settings(
-    libraryDependencies ++= Seq(
-      AkkaHttp.`akka-http`,
-      Libs.svnkit,
-      AkkaHttp.`akka-http-spray-json`,
-      Libs.`scopt`,
-      Libs.`commons-codec`
-    ),
-    libraryDependencies ++= Seq(
-      Libs.`scalatest` % Test,
-      AkkaHttp.`akka-http-testkit` % Test,
-      Libs.`junit` % Test,
-      Akka.`akka-multi-node-testkit` % Test,
-      Akka.`akka-stream-testkit` % Test
-    ),
+    libraryDependencies ++= Dependencies.Config,
     sources in (Compile, doc) := Seq.empty,
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
