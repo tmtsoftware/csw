@@ -4,7 +4,7 @@ import akka.Done
 import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata._
 import akka.pattern.ask
-import akka.stream.KillSwitch
+import akka.stream.{KillSwitch, OverflowStrategy}
 import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import csw.services.location.commons.CswCluster
@@ -188,13 +188,15 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     *
     */
   def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
-    val (source, actorRefF) = StreamExt.actorCoupling[Any]
     val service = new Registry.Service(connection)
-    actorRefF.foreach(actorRef ⇒ replicator ! Subscribe(service.Key, actorRef))
-    source.collect {
+    val source = Source.actorRef[Any](256, OverflowStrategy.dropHead).mapMaterializedValue {
+      actorRef ⇒ replicator ! Subscribe(service.Key, actorRef)
+    }
+    val trackingEvents = source.collect {
       case c@Changed(service.Key) if c.get(service.Key).value.isDefined => LocationUpdated(c.get(service.Key).value.get)
       case c@Changed(service.Key)                                       => LocationRemoved(connection)
-    }.cancellable.distinctUntilChanged
+    }
+    trackingEvents.cancellable.distinctUntilChanged
   }
 
   /**

@@ -13,11 +13,11 @@ object Dependencies {
     Libs.`akka-management-cluster-http`,
     AkkaHttp.`akka-http`,
 
-    Akka.`akka-stream-testkit` % Test,
     Libs.`scalatest` % Test,
     Libs.`junit` % Test,
     Libs.`junit-interface` % Test,
     Libs.`mockito-core` % Test,
+    Akka.`akka-stream-testkit` % Test,
     Akka.`akka-multi-node-testkit` % Test
   )
 
