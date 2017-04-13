@@ -46,7 +46,7 @@ lazy val `config-cli-client` = project
   )
 
 lazy val `csw-config` = project
-  .enablePlugins(DeployApp, AutoMultiJvm)
+  .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
   .dependsOn(`csw-location`)
   .settings(
     libraryDependencies ++= Dependencies.Config,

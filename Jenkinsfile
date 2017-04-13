@@ -14,7 +14,7 @@ try{
 
             stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
                 try {
-                    sh "sbt test:test"
+                    sh "sbt -DenableCoverage=true test:test"
                 }
                 catch (Exception e) {
                     currentBuild.result = 'FAILED'
