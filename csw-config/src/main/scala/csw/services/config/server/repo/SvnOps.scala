@@ -4,6 +4,7 @@ import java.io.{InputStream, OutputStream}
 import java.nio.file.Path
 
 import akka.dispatch.MessageDispatcher
+import csw.services.config.api.models.ConfigId
 import csw.services.config.server.Settings
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
@@ -137,17 +138,19 @@ class SvnOps(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
-  def pathExists(path: Path): Future[Boolean] = Future {
-    checkPath(path, SVNNodeKind.FILE)
+  def pathExists(path: Path, id: Option[Long]): Future[Boolean] = Future {
+    checkPath(path, SVNNodeKind.FILE, SVNRepository.INVALID_REVISION)
   }
 
   // True if the directory path exists in the repository
-  private def dirExists(path: Path): Boolean = checkPath(path, SVNNodeKind.DIR)
+  private def dirExists(path: Path): Boolean = {
+    checkPath(path, SVNNodeKind.DIR, SVNRepository.INVALID_REVISION)
+  }
 
-  private def checkPath(path: Path, kind: SVNNodeKind): Boolean = {
+  private def checkPath(path: Path, kind: SVNNodeKind, revision: Long): Boolean = {
     val svn = svnHandle()
     try {
-      svn.checkPath(path.toString, SVNRepository.INVALID_REVISION) == kind
+      svn.checkPath(path.toString, revision) == kind
     } finally {
       svn.closeSession()
     }

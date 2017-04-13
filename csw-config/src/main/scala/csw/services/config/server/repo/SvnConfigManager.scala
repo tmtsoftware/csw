@@ -84,7 +84,7 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
 
     // If the file exists in the repo, get its data
     async {
-      await(pathStatus(path)) match {
+      await(pathStatus(path, id)) match {
         case PathStatus.NormalSize ⇒ await(getNormalSize)
         case PathStatus.Oversize   ⇒ await(getOversize)
         case PathStatus.Missing    ⇒ None
@@ -164,10 +164,11 @@ class SvnConfigManager(settings: Settings, oversizeFileManager: OversizeFileMana
     }
   }
 
-  private def pathStatus(path: Path): Future[PathStatus] = async {
-    if (await(svnOps.pathExists(path))) {
+  private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
+    val revision = id.map(_.id.toLong)
+    if (await(svnOps.pathExists(path, revision))) {
       PathStatus.NormalSize
-    } else if (await(svnOps.pathExists(shaFilePath(path)))) {
+    } else if (await(svnOps.pathExists(shaFilePath(path), revision))) {
       PathStatus.Oversize
     } else {
       PathStatus.Missing
