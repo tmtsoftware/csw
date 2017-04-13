@@ -29,13 +29,12 @@ object ConfigCliApp extends App {
     case None => System.exit(1)
   }
 
-  def shutdown(): Future[Done] ={
+  def shutdown(): Future[Done] = {
     clientWiring.actorSystem.terminate()
     locationService.shutdown()
   }
 
   def commandLineRunner(options: Options): Future[Unit] = {
-
     def create(): Future[Unit] = {
       val configData: ConfigData = PathUtils.fromPath(options.inputFilePath.get)
       for {
@@ -48,7 +47,6 @@ object ConfigCliApp extends App {
 
     def update() = {
       val configData: ConfigData = PathUtils.fromPath(options.inputFilePath.get)
-
       for {
         configId <- configService.update(options.repositoryFilePath.get, configData, options.comment)
       } yield {
@@ -58,7 +56,6 @@ object ConfigCliApp extends App {
 
     def get(): Future[Unit] = {
       val idOpt: Option[ConfigId] = options.id.map(ConfigId(_))
-
       for {
         configDataOpt: Option[ConfigData] <- configService.get(options.repositoryFilePath.get, idOpt)
         if configDataOpt.isDefined
@@ -68,17 +65,15 @@ object ConfigCliApp extends App {
       }
     }
 
-    def exists(): Future[Unit] = {
+    def exists(): Future[Unit] =
       configService.exists(options.repositoryFilePath.get).map { bExists =>
         println(s"File ${options.repositoryFilePath.get} exists in the repo? : $bExists")
       }
-    }
 
-    def delete(): Future[Unit] = {
+    def delete(): Future[Unit] =
       configService.delete(options.repositoryFilePath.get).map { _ =>
         println(s"File ${options.repositoryFilePath.get} deletion is completed.")
       }
-    }
 
     def list(): Future[Unit] = {
       for {
@@ -124,20 +119,17 @@ object ConfigCliApp extends App {
     }
 
     options.op match {
-      case "create" => create()
-      case "update" => update()
-      case "get" => get()
-      case "exists" => exists()
-      case "delete" => delete()
-      case "list" => list()
+      case "create"         => create()
+      case "update"         => update()
+      case "get"            => get()
+      case "exists"         => exists()
+      case "delete"         => delete()
+      case "list"           => list()
       case "history"        => history()
       case "setDefault"     => setDefault()
       case "getDefault"     => getDefault
       case "resetDefault"   => resetDefault()
-      case x =>
-        throw new RuntimeException(s"Unknown operation: $x")
+      case x                => throw new RuntimeException(s"Unknown operation: $x")
     }
-
   }
-
 }
