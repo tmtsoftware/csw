@@ -138,7 +138,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
   }
 
   def pathExists(path: Path, id: Option[Long]): Future[Boolean] = Future {
-    checkPath(path, SVNNodeKind.FILE, SVNRepository.INVALID_REVISION)
+    checkPath(path, SVNNodeKind.FILE, id.getOrElse(SVNRepository.INVALID_REVISION))
   }
 
   // True if the directory path exists in the repository

@@ -6,7 +6,7 @@ import java.time.Instant
 
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.commons.TestFileUtils
-import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo}
+import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.files.Sha1
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -223,7 +223,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configManager.history(file).await.size shouldBe 3
     configManager.delete(file).await
     configManager.history(file).await.size shouldBe 0
-    configManager.get(file, Some(configId)).await shouldBe None
+    configManager.get(file, Some(configId)).await.get.toStringF.await shouldBe configValue2
+    configManager.get(file, Some(ConfigId(3))).await.get.toStringF.await shouldBe configValue3
+    configManager.get(file).await shouldBe None
   }
 
   test("should able to get and set the default config file") {
