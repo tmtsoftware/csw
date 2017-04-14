@@ -52,6 +52,7 @@ object Dependencies {
     Libs.`scalatest` % Test,
     AkkaHttp.`akka-http-testkit` % Test,
     Libs.`junit` % Test,
+    Libs.`junit-interface` % Test,
     Akka.`akka-multi-node-testkit` % Test,
     Akka.`akka-stream-testkit` % Test
   )

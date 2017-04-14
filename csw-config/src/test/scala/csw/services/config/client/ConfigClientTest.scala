@@ -2,36 +2,33 @@ package csw.services.config.client
 
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.scaladsl.{ConfigService, ConfigServiceTest}
-import csw.services.config.client.internal.ClientWiring
+import csw.services.config.client.internal.ActorRuntime
+import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.ServerWiring
 import csw.services.location.commons.ClusterSettings
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
-
-class CustomServerWiring extends ServerWiring {
-  override lazy val locationService: LocationService = {
-    LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
-  }
-}
-
-class CustomClientWiring extends ClientWiring {
-    override lazy val locationService: LocationService = {
-      val clientLocationService = LocationServiceFactory.withSettings(ClusterSettings().joinLocal(3552))
-      Thread.sleep(2000)
-      clientLocationService
-    }
-}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 class ConfigClientTest extends ConfigServiceTest {
 
-  override lazy val serverWiring = new CustomServerWiring
-  serverWiring.httpService.lazyBinding.await
+  private val locationService = LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
+  private val clientLocationService = LocationServiceFactory.withSettings(ClusterSettings().joinLocal(3552))
 
-  lazy val clientWiring = new CustomClientWiring
+  private val httpService = ServerWiring.make(locationService).httpService
 
-  override val configService: ConfigService = clientWiring.configService
+  private val actorRuntime = new ActorRuntime()
+  import actorRuntime._
+
+  override val configService: ConfigService = ConfigClientFactory.make(actorSystem, clientLocationService)
+
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+    httpService.lazyBinding.await
+  }
 
   override protected def afterAll(): Unit = {
-    serverWiring.httpService.shutdown().await
-    clientWiring.actorSystem.terminate().await
+    clientLocationService.shutdown().await
+    actorSystem.terminate().await
+    httpService.shutdown().await
+    super.afterAll()
   }
 }

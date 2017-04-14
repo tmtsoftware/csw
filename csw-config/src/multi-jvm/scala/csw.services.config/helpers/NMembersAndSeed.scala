@@ -1,27 +1,31 @@
 package csw.services.config.helpers
 
+import akka.actor.ActorSystem
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
+import com.typesafe.config.Config
+import csw.services.location.commons.ClusterSettings
 
 class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 
-  val server: RoleName = addRole("server")
+  private val settings = ClusterSettings()
 
-  val clients: Vector[RoleName] = (1 to n).toVector.map { x =>
-    addRole(s"client-$x")
+  def makeSystem(config: Config): ActorSystem = ActorSystem(settings.clusterName, config)
+
+  val seed: RoleName = addRole("seed")(settings.onPort(3552))
+
+  val members: Vector[RoleName] = (1 to n).toVector.map { x =>
+    addRole(s"member-$x")(settings.joinLocal(3552))
   }
 
-  private def addRole(name: String): RoleName = {
+  private def addRole(name: String)(settings: ClusterSettings): RoleName = {
     val node = role(name)
-    nodeConfig _
+    nodeConfig(node)(settings.config)
     node
   }
 }
 
-class OneMemberAndSeed extends NMembersAndSeed(1) {
-  val Vector(client) = clients
-}
-
-class TwoMembersAndSeed extends NMembersAndSeed(2) {
-  val Vector(client1, client2) = clients
+class OneClientAndServer extends NMembersAndSeed(1) {
+  val server: RoleName = seed
+  val Vector(client) = members
 }

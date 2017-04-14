@@ -1,5 +1,6 @@
 package csw.services.config.client.javadsl;
 
+import akka.actor.ActorSystem;
 import akka.stream.Materializer;
 import csw.services.config.api.commons.TestFileUtils;
 import csw.services.config.api.javadsl.IConfigService;
@@ -7,11 +8,12 @@ import csw.services.config.api.models.ConfigData;
 import csw.services.config.api.models.ConfigFileHistory;
 import csw.services.config.api.models.ConfigFileInfo;
 import csw.services.config.api.models.ConfigId;
-import csw.services.config.client.internal.ClientWiring;
-import csw.services.config.client.CustomClientWiring;
-import csw.services.config.client.CustomServerWiring;
+import csw.services.config.client.internal.ActorRuntime;
 import csw.services.config.server.ServerWiring;
-import csw.services.config.client.internal.JConfigService;
+import csw.services.config.server.http.HttpService;
+import csw.services.location.commons.ClusterAwareSettings;
+import csw.services.location.javadsl.ILocationService;
+import csw.services.location.javadsl.JLocationServiceFactory;
 import org.junit.*;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
@@ -26,12 +28,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class JConfigClientTest {
-    private static ServerWiring serverWiring = new CustomServerWiring();
+    private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
+    private static ILocationService clientLocationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
+    private static IConfigService configService = JConfigClientFactory.make(actorRuntime.actorSystem(), clientLocationService);
+
+    private static ILocationService locationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.joinLocal(3552, new scala.collection.mutable.ArrayBuffer()));
+    private static ServerWiring serverWiring = ServerWiring.make(locationService.asScala());
+    private static HttpService httpService = serverWiring.httpService();
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
-    private static ClientWiring clientWiring = new CustomClientWiring();
-    private IConfigService configService = clientWiring.configService().asJava();
-    private Materializer mat = clientWiring.actorRuntime().mat();
+    private Materializer mat = actorRuntime.mat();
 
     private String configValue = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";
     private String configValue2 = "axisName11 = tromboneAxis\naxisName22 = tromboneAxis2\naxisName3 = tromboneAxis33";
@@ -39,7 +45,7 @@ public class JConfigClientTest {
 
     @BeforeClass
     public static void beforeAll() throws Exception {
-        Await.result(serverWiring.httpService().lazyBinding(), Duration.create(20, "seconds"));
+        Await.result(httpService.lazyBinding(), Duration.create(20, "seconds"));
     }
 
     @Before
@@ -54,8 +60,9 @@ public class JConfigClientTest {
 
     @AfterClass
     public static void afterAll() throws Exception {
-        Await.result(serverWiring.httpService().shutdown(), Duration.create(20, "seconds"));
-        Await.result(clientWiring.actorSystem().terminate(), Duration.create(20, "seconds"));
+        Await.result(httpService.shutdown(), Duration.create(20, "seconds"));
+        clientLocationService.shutdown().get();
+        Await.result(actorRuntime.actorSystem().terminate(), Duration.create(20, "seconds"));
     }
 
     @Test

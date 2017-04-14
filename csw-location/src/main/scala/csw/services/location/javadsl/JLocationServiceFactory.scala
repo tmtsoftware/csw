@@ -1,6 +1,6 @@
 package csw.services.location.javadsl
 
-import csw.services.location.commons.CswCluster
+import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.scaladsl.LocationServiceFactory
 
 /**
@@ -18,6 +18,8 @@ object JLocationServiceFactory {
     * ''Note : '' It is recommended to create a single instance of `ILocationService` and use it throughout.
     */
   def make(): ILocationService = withCluster(CswCluster.make())
+
+  def withSettings(clusterSettings: ClusterSettings): ILocationService = withCluster(CswCluster.withSettings(clusterSettings))
 
   /**
     * Creates a [[csw.services.location.javadsl.ILocationService]] instance. An `ILocationService` instance.

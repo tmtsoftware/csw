@@ -1,70 +1,58 @@
+package csw.services.config
+
 import java.nio.file.Paths
 
+import akka.actor.ActorSystem
+import akka.cluster.ddata.DistributedData
+import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import com.typesafe.config.ConfigFactory
 import csw.services.config.api.commons.TestFileUtils
 import csw.services.config.api.models.ConfigData
-import csw.services.config.client.internal.ClientWiring
-import csw.services.config.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.services.config.server.{Main, ServerWiring, Settings}
-import csw.services.location.commons.ClusterSettings
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
-import org.scalatest.BeforeAndAfterEach
-
-class CustomServerWiring extends ServerWiring {
-  override lazy val locationService: LocationService = LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
-}
-
-class CustomClientWiring extends ClientWiring {
-  override lazy val locationService: LocationService = {
-    val locationService1 = LocationServiceFactory.withSettings(ClusterSettings().joinLocal(3552))
-    Thread.sleep(2000)
-    locationService1
-  }
-
-}
+import csw.services.config.client.internal.ActorRuntime
+import csw.services.config.client.scaladsl.ConfigClientFactory
+import csw.services.config.helpers.{LSNodeSpec, OneClientAndServer}
+import csw.services.config.server.{ServerWiring, Settings}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 class ConfigServiceTestMultiJvmNode1 extends ConfigServiceTest(0)
 class ConfigServiceTestMultiJvmNode2 extends ConfigServiceTest(0)
 
-class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) with BeforeAndAfterEach{
+class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAndServer) {
 
   import config._
 
+  private val locationService = LocationServiceFactory.withCluster(cswCluster)
+
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
-
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    testFileUtils.deleteServerFiles()
-  }
-
-  override protected def afterEach(): Unit = {
-    testFileUtils.deleteServerFiles()
-  }
 
   override def afterAll(): Unit = {
     super.afterAll()
     testFileUtils.deleteServerFiles()
   }
 
+  test("ensure that the cluster is up") {
+    enterBarrier("nodes-joined")
+    awaitAssert {
+      DistributedData(system).replicator ! GetReplicaCount
+      expectMsg(ReplicaCount(roles.size))
+    }
+    enterBarrier("cluster-formed")
+  }
+
   test("should start config service server on one node and client should able to create and get files from other node") {
 
     runOn(server) {
-
-      System.setProperty("clusterPort", "3552")
-      Main.main(Array[String]())
+      val serverWiring = ServerWiring.make(locationService)
+      serverWiring.svnAdmin.initSvnRepo()
+      serverWiring.httpService.lazyBinding.await
       enterBarrier("server-started")
-
-      enterBarrier("end")
-
-      Main.shutdown()
-      enterBarrier("shutdown")
     }
 
     runOn(client) {
       enterBarrier("server-started")
-      val customClientWiring = new CustomClientWiring
-      import customClientWiring._
+      val actorRuntime = new ActorRuntime(ActorSystem())
       import actorRuntime._
+      val configService = ConfigClientFactory.make(actorSystem, locationService)
 
       val configValue: String =
         """
@@ -77,16 +65,6 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAn
       configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit test file").await
       val actualConfigValue = configService.get(file).await.get.toStringF.await
       actualConfigValue shouldBe configValue
-
-      enterBarrier("end")
-
-      locationService.shutdown()
-      enterBarrier("shutdown")
-
     }
-
-    enterBarrier("after-2")
-
   }
-
 }

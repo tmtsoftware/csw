@@ -3,35 +3,45 @@ package csw.services.csclient
 import java.io.File
 
 import akka.Done
+import akka.actor.ActorSystem
 import csw.services.config.api.models.{ConfigData, ConfigId}
-import csw.services.config.client.internal.ClientWiring
+import csw.services.config.api.scaladsl.ConfigService
+import csw.services.config.client.internal.ActorRuntime
+import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.csclient.models.Options
 import csw.services.csclient.utils.{CmdLineArgsParser, PathUtils}
+import csw.services.location.commons.ClusterSettings
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+import async.Async._
 
-object ConfigCliApp extends App {
+class ConfigCliApp(clusterSettings: ClusterSettings) {
 
-  private lazy val clientWiring = new ClientWiring
-  import clientWiring._
+  val actorRuntime = new ActorRuntime(ActorSystem())
   import actorRuntime._
 
-  CmdLineArgsParser.parse(args) match {
-    case Some(options) =>
-      commandLineRunner(options).onComplete {
-        case Success(_) => shutdown.onComplete(_ => System.exit(0))
-        case Failure(ex) =>
-          System.err.println(s"Error: ${ex.getMessage}")
-          ex.printStackTrace(System.err)
-          shutdown.onComplete(_ => System.exit(1))
-      }
-    case None => System.exit(1)
+  private val locationService = LocationServiceFactory.withSettings(clusterSettings)
+  val configService: ConfigService = ConfigClientFactory.make(actorSystem, locationService)
+
+  def start(args: Array[String]): Unit = {
+    CmdLineArgsParser.parse(args) match {
+      case Some(options) =>
+        commandLineRunner(options).onComplete {
+          case Success(_) => shutdown().onComplete(_ => System.exit(0))
+          case Failure(ex) =>
+            System.err.println(s"Error: ${ex.getMessage}")
+            ex.printStackTrace(System.err)
+            shutdown().onComplete(_ => System.exit(1))
+        }
+      case None => System.exit(1)
+    }
   }
 
-  def shutdown(): Future[Done] = {
-    clientWiring.actorSystem.terminate()
-    locationService.shutdown()
+  def shutdown(): Future[Done] = async {
+    await(actorSystem.terminate())
+    await(locationService.shutdown())
   }
 
   def commandLineRunner(options: Options): Future[Unit] = {
@@ -132,4 +142,12 @@ object ConfigCliApp extends App {
       case x                => throw new RuntimeException(s"Unknown operation: $x")
     }
   }
+}
+
+object ConfigCliApp {
+
+  def main(args: Array[String]): Unit = {
+    new ConfigCliApp(ClusterSettings()).start(args)
+  }
+
 }

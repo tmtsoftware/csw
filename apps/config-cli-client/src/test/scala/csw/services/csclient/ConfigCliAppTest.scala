@@ -12,23 +12,19 @@ import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class CustomServerWiring extends ServerWiring {
-  override lazy val locationService: LocationService = {
-    LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
-  }
-}
-
 class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  lazy val serverWiring = new CustomServerWiring
+  private val locationService = LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
+  private val serverWiring = ServerWiring.make(locationService)
+  private val httpService = serverWiring.httpService
+  httpService.lazyBinding.await
+
+  val ConfigCliApp = new ConfigCliApp(ClusterSettings().joinLocal(3552))
+  Thread.sleep(1000)
+
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
 
   import csw.services.csclient.commons.CmdLineArgsUtil._
-
-  override protected def beforeAll(): Unit = {
-    //  start http server
-    serverWiring.httpService.lazyBinding.await
-  }
 
   override protected def beforeEach(): Unit = {
     serverWiring.svnAdmin.initSvnRepo()
@@ -40,8 +36,8 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   }
 
   override protected def afterAll(): Unit = {
-    serverWiring.httpService.shutdown().await
-    ConfigCliApp.shutdown()
+    httpService.shutdown().await
+    ConfigCliApp.shutdown().await
     new File(inputFilePath).delete()
     new File(updatedInputFilePath).delete()
   }

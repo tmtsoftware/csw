@@ -27,3 +27,8 @@ class ServerWiring {
   lazy val httpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }
 
+object ServerWiring {
+  def make(_locationService: LocationService): ServerWiring = new ServerWiring {
+    override lazy val locationService: LocationService = _locationService
+  }
+}

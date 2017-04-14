@@ -18,10 +18,10 @@ class HttpService(locationService: LocationService, configServiceRoute: ConfigSe
   lazy val lazyBinding: Future[Http.ServerBinding] = async {
     val binding = await(
       Http().bindAndHandle(
-      handler = configServiceRoute.route,
-      interface = ClusterAwareSettings.hostname,
-      port = settings.`service-port`
-    )
+        handler = configServiceRoute.route,
+        interface = ClusterAwareSettings.hostname,
+        port = settings.`service-port`
+      )
     )
     println(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     println("==== Registering Config Service HTTP Server with Location Service ====")
@@ -36,7 +36,7 @@ class HttpService(locationService: LocationService, configServiceRoute: ConfigSe
 
   def shutdown(): Future[Done] = async {
     await(await(lazyBinding).unbind())
-    await(actorRuntime.actorSystem.terminate())
+    await(actorSystem.terminate())
     await(locationService.shutdown())
     Done
   }
