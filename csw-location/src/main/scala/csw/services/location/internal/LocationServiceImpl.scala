@@ -19,81 +19,54 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
-/**
-  * A `LocationService` implementation which manages registration data on akka cluster.
-  *
-  * The data is kept in two formats. One with [[akka.cluster.ddata.LWWRegister]] with `Connection.name`
-  * as key and `Option[Location]` as value and
-  *
-  * the other with [[akka.cluster.ddata.LWWMap]] with a constant key and a map of `Connection` to `Location` as value
-  *
-  * @param cswCluster 'CswCluster' which gives handle to ActorSystem of akka cluster
-  */
+
 private[location] class LocationServiceImpl(cswCluster: CswCluster) extends LocationService { outer =>
 
   import cswCluster._
   implicit val timeout: Timeout = Timeout(5.seconds)
 
-
   /**
-    * Registers a `Location` against connection name in `LWWRegister` and then `Connection` to `Location` in `LWWMap`.
-    * A `Future` is returned with `Failure` :
-    * {{{
-    * - If the connection name is already present in LWWRegister with
-    *   some other Location different than current Location
-    *
-    * - If update in LWWRegister fails, which will skip subsequent
-    *   update in LWWMap as well
-    *
-    * - If update in LWWRegister is successful but LWWMap fails
-    *   (This makes data inconsistent between LWWRegister and LWWMap. The
-    *   user is expected to register again with same Registration so that
-    *   LWWRegister will be updated again with same Option of Location and
-    *   LWWMap will be updated with new entry of Connection to Location)
-    * }}}
-    *
-    * If update in `LWWRegister` and `LWWMap` is successful then a `Future` is returned with `RegistrationResult`
-    */
+  * Register a 'connection -> location' entry in CRDT
+  *
+  * @param registration holds connection and location
+  **/
   def register(registration: Registration): Future[RegistrationResult] = {
+
+    //Get the location from this registration
     val location = registration.location(cswCluster.hostname)
 
-    val service = new Registry.Service(location.connection)
+    //Create a CRDT key from this connection
+    val service = new Registry.Service(registration.connection)
 
+    //Create an update message for replicator to update the connection key. if the current value for the key is None or
+    //same as this location then update it with this location. if it is some other location then throw an exception.
     val updateValue = service.update {
       case r@LWWRegister(Some(`location`) | None) => r.withValue(Some(location))
       case LWWRegister(Some(otherLocation))       => throw OtherLocationIsRegistered(location, otherLocation)
     }
 
-    val updateRegistry = AllServices.update(_ + (location.connection → location))
+    //Create a message for replicator to update connection -> location map in CRDT
+    val updateRegistry = AllServices.update(_ + (registration.connection → location))
 
+    //Send the update message for connection key to replicator. On success, send another message to update connection -> location
+    //map. If that is successful then return a registrationResult for this Location. In case of any failure throw an exception.
     (replicator ? updateValue).flatMap {
       case _: UpdateSuccess[_]                     => (replicator ? updateRegistry).map {
         case _: UpdateSuccess[_] => registrationResult(location)
-        case _                   => throw RegistrationFailed(location.connection)
+        case _                   => throw RegistrationFailed(registration.connection)
       }
       case ModifyFailure(service.Key, _, cause, _) => throw cause
-      case _                                       => throw RegistrationFailed(location.connection)
+      case _                                       => throw RegistrationFailed(registration.connection)
     }
   }
 
-  /**
-    * Unregisters `Location` for `Connection` from `LWWRegister` and then from `LWWMap`.
-    * A `Future` is returned with `Failure` :
-    * {{{
-    * - If update in LWWRegister fails, which will skip subsequent update in LWWMap
-    *
-    * - If update in LWWRegister is successful but in LWWMap fails
-    *   (This makes data inconsistent between LWWRegister and LWWMap.
-    *   The user is expected to unregister again with the same Connection
-    *   so that LWWRegister will be updated again with None and
-    *   LWWMap will be updated to remove entry of Connection to Location)
-    * }}}
-    *
-    * If update in `LWWRegister` and `LWWMap` is successful then a `Future` is returned with `Success`
-    */
+  // Unregister the connection from CRDT
   def unregister(connection: Connection): Future[Done] = {
+    //Create a CRDT key from this connection
     val service = new Registry.Service(connection)
 
+    //Send an update message to replicator to update the connection key with None. On success send another message to remove the
+    //corresponding connection -> location entry from map. In case of any failure throw an exception otherwise return Done.
     (replicator ? service.update(_.withValue(None))).flatMap {
       case x: UpdateSuccess[_] => (replicator ? AllServices.update(_ - connection)).map {
         case _: UpdateSuccess[_] => Done
@@ -103,111 +76,70 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     }
   }
 
-  /**
-    * List all locations from `LWWMap` and unregister them one after another.
-    *
-    * A `Future` is returned with `Success` if all locations are unregistered successfully
-    *
-    * or with `Failure` if list from `LWWMap` fails or un-registration of any of the location fails
-    */
+  // Unregister all connections from CRDT
   def unregisterAll(): Future[Done] = async {
+    //Get all locations registered with CRDT
     val locations = await(list)
+
+    //for each location unregister it's corresponding connection
     await(Future.traverse(locations)(loc ⇒ unregister(loc.connection)))
     Done
   }
 
-  /**
-    * List all entries from `LWWMap` and find a `Location` for the given `Connection`.
-    *
-    * A `Future` is returned with `None` if no location is found
-    *
-    * or with `Failure` if list from `LWWMap` fails
-    */
   def find(connection: Connection): Future[Option[Location]] = async {
     await(list).find(_.connection == connection)
   }
 
-
+  //Resolve a location for the given connection
   override def resolve(connection: Connection, within: FiniteDuration): Future[Option[Location]] = async {
     val foundInLocalCache = await(find(connection))
     if(foundInLocalCache.isDefined) foundInLocalCache else await(resolveWithin(connection, within))
   }
 
-  /**
-    * List all entries from `LWWMap` and complete the `Future` with `Location` values.
-    *
-    * A `Future` is returned with empty list if no constant key is found for `LWWMap`.
-    *
-    * The returned `Future` will fail if list from `LWWMap` fails
-    */
+  //List all locations registered with CRDT
   def list: Future[List[Location]] = (replicator ? AllServices.get).map {
     case x@GetSuccess(AllServices.Key, _) => x.get(AllServices.Key).entries.values.toList
     case NotFound(AllServices.Key, _)     ⇒ List.empty
     case _                                => throw RegistrationListingFailed
   }
 
-  /**
-    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `ComponentType`.
-    *
-    * A `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
-    * against the given `ComponentType`.
-    *
-    * The returned `Future` will fail if list from `LWWMap` fails
-    */
+  //List all locations registered for the given componentType
   def list(componentType: ComponentType): Future[List[Location]] = async {
     await(list).filter(_.connection.componentId.componentType == componentType)
   }
 
-  /**
-    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `Hostname`.
-    *
-    * A `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
-    * against the given `Hostname`.
-    *
-    * The returned `Future` will fail if list from `LWWMap` fails
-    */
+  //List all locations registered with the given hostname
   def list(hostname: String): Future[List[Location]] = async {
     await(list).filter(_.uri.getHost == hostname)
   }
 
-  /**
-    * List all locations from `LWWMap` and complete the `Future` with `Location` values filtered on `ConnectionType`.
-    *
-    * A `Future` is returned with empty list if no constant key is found for `LWWMap` or no locations are registered
-    * against the given `ComponentType`.
-    *
-    * The returned `Future` will fail if list from `LWWMap` fails
-    */
+  //List all locations registered with the given connection type
   def list(connectionType: ConnectionType): Future[List[Location]] = async {
     await(list).filter(_.connection.connectionType == connectionType)
   }
 
-  /**
-    * Creates an `ActorRef` that subscribes for `Changed` messages for a given `Connection` from `LWWRegister` and pass
-    * it to [[akka.stream.scaladsl.Source]].
-    *
-    * The `Source` will then map the `Changed` event to [[csw.services.location.models.LocationUpdated]]
-    * if the `LWWRegister` contains the `Location` against `Connection`
-    *
-    * or to [[csw.services.location.models.LocationRemoved]] if there is no value against `Connection`.
-    *
-    * Un-track a given connection using [[akka.stream.KillSwitch]]
-    *
-    */
+  //Track the status of given connection
   def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
+    //Create a CRDT key from this connection
     val service = new Registry.Service(connection)
+    //Get a source from an actor so that messages send to the actor is put in the stream
     val source = Source.actorRef[Any](256, OverflowStrategy.dropHead).mapMaterializedValue {
+      //When the stream starts flowing, the actor is subscribed to the replicator to get all events for the connection key
       actorRef ⇒ replicator ! Subscribe(service.Key, actorRef)
     }
+
+    //Collect only the Changed events for this connection and transform it to location events. If the changed event has the value
+    //(Location) then send location updated event. If not, location must have been removed, send appropriate event.
     val trackingEvents = source.collect {
       case c@Changed(service.Key) if c.get(service.Key).value.isDefined => LocationUpdated(c.get(service.Key).value.get)
       case c@Changed(service.Key)                                       => LocationRemoved(connection)
     }
+    //Allow stream to be cancellable
     trackingEvents.cancellable.distinctUntilChanged
   }
 
   /**
-    * Terminate `ActorSystem` that was part of akka cluster.
+    * Terminate the `ActorSystem` and gracefully leave the akka cluster
     *
     * @note It is recommended not to perform any operation on `LocationService` after shutdown
     */

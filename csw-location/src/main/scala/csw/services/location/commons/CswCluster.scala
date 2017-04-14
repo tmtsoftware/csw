@@ -15,7 +15,7 @@ import scala.util.control.NonFatal
   * `CswCluster` manages [[scala.concurrent.ExecutionContext]], [[akka.stream.Materializer]]
   * and `Hostname` of an [[akka.actor.ActorSystem]]
   *
-  * @note It is highly recommended that explicit creation of `CswCluster` should be for advanced usages or testing purposes only
+  * ''Note: '' It is highly recommended that explicit creation of `CswCluster` should be for advanced usages or testing purposes only
   */
 class CswCluster private(_actorSystem: ActorSystem) {
 
