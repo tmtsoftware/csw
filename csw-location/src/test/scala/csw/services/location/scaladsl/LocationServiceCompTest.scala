@@ -187,11 +187,12 @@ class LocationServiceCompTest
 
     //unregister and stop tracking akka connection
     akkaRegistrationResult.unregister().await
-    akkaSwitch.shutdown()
+    akkaProbe.request(1)
+    akkaProbe.expectNext(LocationRemoved(akkaConnection))
 
+    akkaSwitch.shutdown()
     akkaProbe.request(1)
     akkaProbe.expectComplete()
-
   }
 
   test("should able to stop tracking") {

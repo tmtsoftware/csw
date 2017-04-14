@@ -12,9 +12,9 @@ class ClientWiring {
   lazy val actorRuntime = new ActorRuntime(actorSystem)
 
   lazy val locationService: LocationService = LocationServiceFactory.make()
-  lazy val locationResolver = new LocationResolver(locationService)
+  lazy val configServiceResolver = new ConfigServiceResolver(locationService, actorRuntime)
 
-  lazy val configService: ConfigService = new ConfigClient(locationResolver.configServiceLocation, actorRuntime)
+  lazy val configService: ConfigService = new ConfigClient(configServiceResolver, actorRuntime)
   lazy val javaConfigService: IConfigService = new JConfigService(configService, actorRuntime)
 }
 
