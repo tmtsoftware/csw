@@ -16,8 +16,6 @@ class TestFileUtils(settings: Settings) {
 
   def deleteServerFiles(): Unit = {
     val oversizeFileDir = Paths.get(settings.`oversize-files-dir`).toFile
-    val tmpDir = Paths.get(settings.`tmp-dir`).toFile
-    deleteDirectoryRecursively(tmpDir)
     deleteDirectoryRecursively(oversizeFileDir)
     deleteDirectoryRecursively(settings.repositoryFile)
   }
@@ -29,8 +27,8 @@ class TestFileUtils(settings: Settings) {
   def deleteDirectoryRecursively(dir: File): Unit = {
     // just to be safe, don't delete anything that is not in /tmp/
     val p = dir.getPath
-    if (!p.startsWith("/tmp/") && !p.startsWith(settings.`tmp-dir`))
-      throw new RuntimeException(s"Refusing to delete $dir since not in /tmp/ or ${settings.`tmp-dir`}")
+    if (!p.startsWith("/tmp/"))
+      throw new RuntimeException(s"Refusing to delete $dir since not in /tmp/")
 
     if (dir.isDirectory) {
       dir.list.foreach {
