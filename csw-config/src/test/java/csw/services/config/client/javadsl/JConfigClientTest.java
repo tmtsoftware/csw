@@ -30,7 +30,7 @@ public class JConfigClientTest {
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
     private static ClientWiring clientWiring = new CustomClientWiring();
-    private IConfigService configService = clientWiring.javaConfigService();
+    private IConfigService configService = clientWiring.configService().asJava();
     private Materializer mat = clientWiring.actorRuntime().mat();
 
     private String configValue = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";

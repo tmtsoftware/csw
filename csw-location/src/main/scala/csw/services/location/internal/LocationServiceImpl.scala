@@ -11,6 +11,7 @@ import csw.services.location.commons.CswCluster
 import csw.services.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed, RegistrationListingFailed, UnregistrationFailed}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.internal.StreamExt.RichSource
+import csw.services.location.javadsl.ILocationService
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
 
@@ -205,6 +206,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     * @note It is recommended not to perform any operation on `LocationService` after shutdown
     */
   def shutdown(): Future[Done] = cswCluster.terminate()
+
+
+  override def asJava: ILocationService = new JLocationServiceImpl(this, cswCluster)
 
   private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {
     override def location: Location = loc

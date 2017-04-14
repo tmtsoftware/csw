@@ -5,8 +5,10 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
+import csw.services.config.api.javadsl.IConfigService
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
+import csw.services.config.client.internal.JConfigService
 import csw.services.config.server.files.OversizeFileService
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
@@ -164,6 +166,9 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
       }
     }
   }
+
+
+  override def asJava: IConfigService = new JConfigService(this, actorRuntime.ec)
 
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
     val revision = id.map(_.id.toLong)

@@ -26,3 +26,4 @@ class ServerWiring {
   lazy val configServiceRoute = new ConfigServiceRoute(configService, actorRuntime)
   lazy val httpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }
+

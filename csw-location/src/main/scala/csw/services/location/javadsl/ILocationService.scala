@@ -2,12 +2,13 @@ package csw.services.location.javadsl
 
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
-import java.{util => ju}
+import java.{util ⇒ ju}
 
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.services.location.models._
+import csw.services.location.scaladsl.LocationService
 
 /**
   * A `LocationService` interface which allows you to manage connections and their registrations.
@@ -95,4 +96,9 @@ trait ILocationService {
     * @return A `CompletableFuture` which completes when the location service shuts down
     */
   def shutdown(): CompletableFuture[Done]
+
+  /**
+    * Returns the Scala API for this instance of location service
+    */
+  def asScala: LocationService
 }

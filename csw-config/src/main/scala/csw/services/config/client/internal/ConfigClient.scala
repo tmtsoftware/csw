@@ -9,6 +9,7 @@ import akka.http.scaladsl.model.HttpEntity.Chunked
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import csw.services.config.api.javadsl.IConfigService
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.http.JsonSupport
@@ -195,4 +196,6 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
+
+  override def asJava: IConfigService = new JConfigService(this, actorRuntime.ec)
 }

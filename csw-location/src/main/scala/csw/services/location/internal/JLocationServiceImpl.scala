@@ -49,6 +49,8 @@ private[location] class JLocationServiceImpl(locationService: LocationService, c
 
   override def shutdown(): CompletableFuture[Done] = locationService.shutdown().toJava.toCompletableFuture
 
+  override def asScala: LocationService = locationService
+
   private def registrationResult(registrationResult: RegistrationResult): IRegistrationResult = {
     new IRegistrationResult {
       override def unregister: CompletableFuture[Done] = registrationResult.unregister().toJava.toCompletableFuture

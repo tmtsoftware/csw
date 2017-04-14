@@ -3,6 +3,7 @@ package csw.services.config.api.scaladsl
 import java.nio.file.Path
 import java.time.Instant
 
+import csw.services.config.api.javadsl.IConfigService
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 
 import scala.concurrent.Future
@@ -121,8 +122,9 @@ trait ConfigService {
    * @return a future object that can be used to access the file's data, if found
    */
   def getDefault(path: Path): Future[Option[ConfigData]]
+
+  /**
+    * Returns the Java API for this instance of config service
+    */
+  def asJava: IConfigService
 }
-
-
-
-

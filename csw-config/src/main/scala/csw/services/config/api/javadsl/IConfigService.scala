@@ -4,9 +4,10 @@ import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 import java.time.Instant
 import java.util.Optional
-import java.{lang => jl, util => ju}
+import java.{lang ⇒ jl, util ⇒ ju}
 
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.scaladsl.ConfigService
 
 /**
   * Defines an interface for storing and retrieving configuration information
@@ -129,8 +130,9 @@ trait IConfigService {
     * @return a future object that can be used to access the file's data, if found
     */
   def getDefault(path: Path): CompletableFuture[Optional[ConfigData]]
+
+  /**
+    * Returns the Scala API for this instance of config service
+    */
+  def asScala: ConfigService
 }
-
-
-
-

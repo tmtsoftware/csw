@@ -13,10 +13,11 @@ import csw.services.config.api.scaladsl.ConfigService
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
+import scala.concurrent.ExecutionContext
 
-class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) extends IConfigService {
+class JConfigService(configService: ConfigService, _ec: ExecutionContext) extends IConfigService {
 
-  import actorRuntime._
+  private implicit val ec = _ec
 
   override def name: String =
     configService.name
@@ -77,4 +78,6 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
 
   override def getDefault(path: Path): CompletableFuture[Optional[ConfigData]] =
     configService.getDefault(path).map(_.asJava).toJava.toCompletableFuture
+
+  override def asScala: ConfigService = configService
 }
