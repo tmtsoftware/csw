@@ -13,11 +13,10 @@ import csw.services.config.api.scaladsl.ConfigService
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
-import scala.concurrent.ExecutionContext
 
-class JConfigService(configService: ConfigService, _ec: ExecutionContext) extends IConfigService {
+class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) extends IConfigService {
 
-  private implicit val ec = _ec
+  import actorRuntime._
 
   override def name: String =
     configService.name

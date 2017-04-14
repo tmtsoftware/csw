@@ -167,9 +167,6 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
     }
   }
 
-
-  override def asJava: IConfigService = new JConfigService(this, actorRuntime.ec)
-
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
     val revision = id.map(_.id.toLong)
     if (await(svnRepo.pathExists(path, revision))) {

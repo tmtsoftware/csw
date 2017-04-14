@@ -1,6 +1,7 @@
 package csw.services.location.javadsl
 
 import csw.services.location.commons.{ClusterSettings, CswCluster}
+import csw.services.location.internal.JLocationServiceImpl
 import csw.services.location.scaladsl.LocationServiceFactory
 
 /**
@@ -27,5 +28,8 @@ object JLocationServiceFactory {
     *
     * @param cswCluster An `CswCluster` with custom configuration
     */
-  def withCluster(cswCluster: CswCluster): ILocationService = LocationServiceFactory.withCluster(cswCluster).asJava
+  def withCluster(cswCluster: CswCluster): ILocationService = {
+    val locationService = LocationServiceFactory.withCluster(cswCluster)
+    new JLocationServiceImpl(locationService, cswCluster)
+  }
 }

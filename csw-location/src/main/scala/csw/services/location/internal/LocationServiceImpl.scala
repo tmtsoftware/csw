@@ -207,9 +207,6 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     */
   def shutdown(): Future[Done] = cswCluster.terminate()
 
-
-  override def asJava: ILocationService = new JLocationServiceImpl(this, cswCluster)
-
   private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {
     override def location: Location = loc
 

@@ -196,6 +196,4 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
-
-  override def asJava: IConfigService = new JConfigService(this, actorRuntime.ec)
 }
