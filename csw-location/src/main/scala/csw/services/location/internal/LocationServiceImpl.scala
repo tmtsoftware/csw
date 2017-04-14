@@ -35,11 +35,11 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     //Get the location from this registration
     val location = registration.location(cswCluster.hostname)
 
-    //Create a CRDT key from this connection
+    //Create a CRDT key of connection
     val service = new Registry.Service(registration.connection)
 
-    //Create an update message for replicator to update the connection key. if the current value for the key is None or
-    //same as this location then update it with this location. if it is some other location then throw an exception.
+    //Create an update message for replicator to update the value for the connection key. if the current value is None or same as
+    //this location then update it with this location. if it is some other location then throw an exception.
     val updateValue = service.update {
       case r@LWWRegister(Some(`location`) | None) => r.withValue(Some(location))
       case LWWRegister(Some(otherLocation))       => throw OtherLocationIsRegistered(location, otherLocation)
