@@ -8,7 +8,7 @@ import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 /**
-  * Registration holds information about a Connection its live location. This model is used to register a connection with LocationService.
+  * Registration holds information about a connection and its live location. This model is used to register a connection with LocationService.
   */
 sealed abstract class Registration {
   def connection: Connection

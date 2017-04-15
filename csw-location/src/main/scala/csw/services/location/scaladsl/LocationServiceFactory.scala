@@ -17,21 +17,20 @@ object LocationServiceFactory {
   def make(): LocationService = withCluster(CswCluster.make())
 
   /**
-    * Create a LocationService to manage registrations
+    * Create a LocationService instance to manage registrations
     *
     * @note It is highly recommended to use this method for testing purpose only.
-    * @param clusterSettings Provide customized settings for csw-cluster
     */
   def withSettings(clusterSettings: ClusterSettings): LocationService = withCluster(CswCluster.withSettings(clusterSettings))
 
   /**
-    * Creates a LocationService instance to manage registrations
+    * Create a LocationService instance to manage registrations
     *
     * @note It is highly recommended to use it for testing purpose only.
-    * @param cswCluster Provide a cluster with customized configuration
     */
   def withCluster(cswCluster: CswCluster): LocationService = {
     val locationService: LocationService = new LocationServiceImpl(cswCluster)
+    // starts a DeathwatchActor each time a LocationService is created
     DeathwatchActor.start(cswCluster, locationService)
     locationService
   }

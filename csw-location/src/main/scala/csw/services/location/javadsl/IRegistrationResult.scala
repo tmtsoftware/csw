@@ -6,7 +6,7 @@ import akka.Done
 import csw.services.location.models.Location
 
 /**
-  * RegistrationResult represents successful registration of a location.
+  * IRegistrationResult represents successful registration of a location.
   */
 trait IRegistrationResult {
 

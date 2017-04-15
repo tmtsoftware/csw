@@ -12,7 +12,7 @@ import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 /**
-  * CswCluster provide cluster properties to manage data in CRDT
+  * CswCluster provides cluster properties to manage data in CRDT
   *
   * ''Note: '' It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
   */
@@ -29,7 +29,7 @@ class CswCluster private(_actorSystem: ActorSystem) {
   implicit val cluster = Cluster(actorSystem)
 
   /**
-    * Gives the replicator for current ActorSystem
+    * Gives the replicator for the current ActorSystem
     *
     * @see [[akka.cluster.ddata.Replicator]]
     */
@@ -50,7 +50,9 @@ class CswCluster private(_actorSystem: ActorSystem) {
 }
 
 /**
-  * Manages initialization and termination of ActorSystem and the Cluster
+  * Manages initialization and termination of ActorSystem and the Cluster.
+  *
+  * ''Note: '' The creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
   */
 object CswCluster {
   //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
@@ -71,8 +73,6 @@ object CswCluster {
 
   /**
     * Creates CswCluster with the given ActorSystem
-    *
-    * ''Note: '' The call to this method will be blocked till the actorSystem joins csw-cluster successfully
     */
   def withSystem(actorSystem: ActorSystem): CswCluster = {
     // Get the cluster information of this ActorSystem
@@ -97,7 +97,7 @@ object CswCluster {
     cluster.registerOnMemberUp(p.success(Done))
 
     try {
-      //Block until the ActorSystem joins csw-cluster successfully
+      // Block until the ActorSystem joins csw-cluster successfully
       Await.result(p.future, 20.seconds)
       // return the CswCluster instance with this ActorSystem
       new CswCluster(actorSystem)
@@ -123,7 +123,7 @@ object CswCluster {
     val p = Promise[Terminated]
     // request to leave the self node from the cluster
     cluster.leave(cluster.selfAddress)
-    // Once the self node has gracefully left the cluster, request to terminate the ActorSystem
+    // once the self node has gracefully left the cluster, request to terminate the ActorSystem
     cluster.registerOnMemberRemoved(actorSystem.terminate().onComplete(p.complete))
     // The promise will be completed once the ActorSystem has successfully shutdown
     p.future.map(_ => Done)

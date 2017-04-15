@@ -47,7 +47,7 @@ object Registry {
 
   /**
     * Service manages CRDT with connection as key and location as value. It is used to track a connection by subscribing events
-    * on it.
+    * for it.
     */
   class Service(connection: Connection)(implicit cluster: Cluster) extends Registry[LWWRegisterKey[Option[Location]], LWWRegister[Option[Location]]](
     Key = LWWRegisterKey(connection.name),

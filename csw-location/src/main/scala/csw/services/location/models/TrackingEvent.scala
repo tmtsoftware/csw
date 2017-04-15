@@ -1,7 +1,7 @@
 package csw.services.location.models
 
 /**
-  * TrackingEvent is used to represent events for tracking a connection
+  * TrackingEvent is used to represent location events while tracking the connection
   */
 sealed abstract class TrackingEvent {
   def connection: Connection

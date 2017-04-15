@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 case class NetworkInterfaceNotFound(message: String) extends Exception(message)
 
 /**
-  * Picks an appropriate ipv4 address to register using the NetworkInterfaceProvider
+  * Picks an appropriate ipv4 address to register with CRDT using the NetworkInterfaceProvider
   *
   * @param interfaceName Provide the name of network interface where csw cluster is running
   */
