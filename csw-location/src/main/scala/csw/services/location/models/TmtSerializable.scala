@@ -1,6 +1,6 @@
 package csw.services.location.models
 
 /**
-  * A Serializable for Kryo hierarchy to work
+  * All models that will be residing in CRDT needs to extend TmtSerializable
   */
 trait TmtSerializable extends Serializable

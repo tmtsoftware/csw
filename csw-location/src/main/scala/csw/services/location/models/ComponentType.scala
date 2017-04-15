@@ -6,40 +6,38 @@ import enumeratum.{Enum, EnumEntry}
 import scala.collection.immutable.IndexedSeq
 
 /**
-  * Represents different types of Component. `ComponentType` is serializable as it will be replicated on cluster
+  * Represents a type of Component. It should be serializable since data present in CRDT has to be communicable over the network.
+  * The type will always be represented in lower case
   */
 sealed abstract class ComponentType extends EnumEntry with Lowercase with TmtSerializable {
 
   /**
-    * Lowercase name of the `ComponentType` e.g. for HCD type of components, the name will be `hcd`
+    * The name of ComponentType e.g. for HCD components, the name will be represented as `hcd`.
     */
   def name: String = entryName
 }
 
 object ComponentType extends Enum[ComponentType] {
 
-  /**
-    * Return all `ComponentType` values
-    */
   def values: IndexedSeq[ComponentType] = findValues
 
   /**
-    * A container for components (assemblies and HCDs)
+    * Represents a container for components e.g assemblies and HCDs
     */
   case object Container extends ComponentType
 
   /**
-    * A component that controls a hardware device
+    * Represents a component that controls a hardware device
     */
   case object HCD extends ComponentType
 
   /**
-    * A component that controls one or more HCDs or assemblies
+    * Represents a component that controls one or more HCDs or assemblies
     */
   case object Assembly extends ComponentType
 
   /**
-    * A general purpose service component e.g. actor and/or web service application
+    * Represents a general purpose service component e.g. actor and/or web service application
     */
   case object Service extends ComponentType
 
