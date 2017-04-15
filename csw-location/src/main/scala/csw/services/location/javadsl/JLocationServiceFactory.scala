@@ -5,28 +5,25 @@ import csw.services.location.internal.JLocationServiceImpl
 import csw.services.location.scaladsl.LocationServiceFactory
 
 /**
-  * A `Factory` that manages creation of [[csw.services.location.javadsl.ILocationService]].
+  * The factory is used to create LocationService instance. With each creation, a new ActorSystem will be created and will
+  * become part of csw-cluster.
   *
-  * ''Note : '' Each time the `Factory` creates `ILocationService`, a new `ActorSystem` and a Cluster singleton Actor
-  *       ([[csw.services.location.internal.DeathwatchActor]]) will be created
+  * ''Note : '' Hence, it is recommended to create a single instance of LocationService and use it throughout the application
   */
 object JLocationServiceFactory {
 
   /**
-    * Creates a [[csw.services.location.javadsl.ILocationService]] instance and joins itself to the akka cluster. The data
-    * of the akka cluster will now be replicated on this newly created node. An `ILocationService` instance is returned.
-    *
-    * ''Note : '' It is recommended to create a single instance of `ILocationService` and use it throughout.
+    * Create a LocationService instance to manage registrations
     */
   def make(): ILocationService = withCluster(CswCluster.make())
 
   def withSettings(clusterSettings: ClusterSettings): ILocationService = withCluster(CswCluster.withSettings(clusterSettings))
 
   /**
-    * Creates a [[csw.services.location.javadsl.ILocationService]] instance. An `ILocationService` instance.
-    * ''Note : '' It is highly recommended to use it for testing purposes only.
+    * Creates a LocationService instance to manage registrations
     *
-    * @param cswCluster An `CswCluster` with custom configuration
+    * ''Note : '' It is highly recommended to use it for testing purpose only.
+    * @param cswCluster Provide a cluster with customized configuration
     */
   def withCluster(cswCluster: CswCluster): ILocationService = {
     val locationService = LocationServiceFactory.withCluster(cswCluster)
