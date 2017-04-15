@@ -38,14 +38,14 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     //Create a CRDT key of connection
     val service = new Registry.Service(registration.connection)
 
-    //Create an update message for replicator to update the value for the connection key. if the current value is None or same as
+    //Create an update message to update the value of connection key. if the current value is None or same as
     //this location then update it with this location. if it is some other location then throw an exception.
     val updateValue = service.update {
       case r@LWWRegister(Some(`location`) | None) => r.withValue(Some(location))
       case LWWRegister(Some(otherLocation))       => throw OtherLocationIsRegistered(location, otherLocation)
     }
 
-    //Create a message for replicator to update connection -> location map in CRDT
+    //Create a message to update connection -> location map in CRDT
     val updateRegistry = AllServices.update(_ + (registration.connection → location))
 
     //Send the update message for connection key to replicator. On success, send another message to update connection -> location
@@ -139,9 +139,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   }
 
   /**
-    * Terminate the `ActorSystem` and gracefully leave the akka cluster
+    * Terminate the ActorSystem and gracefully leave the akka cluster
     *
-    * @note It is recommended not to perform any operation on `LocationService` after shutdown
+    * @note It is recommended not to perform any operation on LocationService after shutdown
     */
   def shutdown(): Future[Done] = cswCluster.terminate()
 

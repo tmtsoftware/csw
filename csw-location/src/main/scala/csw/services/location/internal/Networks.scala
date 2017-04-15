@@ -4,49 +4,34 @@ import java.net.{Inet6Address, InetAddress, NetworkInterface}
 
 import scala.collection.JavaConverters._
 
-/**
-  * An `Exception` that is thrown if the provided interface name does not exist
-  *
-  * @param message Message that identifies the cause of exception
-  */
 case class NetworkInterfaceNotFound(message: String) extends Exception(message)
 
 /**
-  * Picks an appropriate ipV4 address to register
+  * Picks an appropriate ipv4 address to register using the NetworkInterfaceProvider
   *
-  * @param interfaceName   The name of network interface where akka cluster will be formed and an ipV4 address from that
-  *                        network interface will be picked.
-  * @param networkProvider A custom `NetworkInterfaceProvider` which manages network interfaces and their ip addresses
+  * @param interfaceName Provide the name of network interface where csw cluster is running
   */
 class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider) {
 
   /**
-    * Picks an appropriate ipV4 address to register. Default `NetworkInterfaceProvider` will be created to manage network
-    * interfaces and their ip addresses
-    *
-    * @param interfaceName The name of network interface where akka cluster will be formed and an ip address from that network
-    *                      interface will be picked
+    * Picks an appropriate ipv4 address from the network interface provided
     */
   def this(interfaceName: String) = this(interfaceName, new NetworkInterfaceProvider())
 
   /**
-    * Picks an appropriate ipV4 address to register. Default `NetworkInterfaceProvider` will be created to manage network
-    * interfaces and their ip addresses. Since no `interfaceName` is given all network interfaces will be picked to find
-    * appropriate ipV4 address
+    * Picks an appropriate ipv4 address. Since no specific network interface is provided, the first available interface will be
+    * taken to pick address
     */
   def this() = this("")
 
   /**
-    * Returns ipv4 host address
-    */
+    * Gives the ipv4 host address
+     */
   def hostname(): String = getIpv4Address().getHostAddress
 
   /**
-    * Picks an ipV4 address that is not a loopback address. If the network interface name is provided then the address is
-    * picked from that interface name, else for all network interfaces, all ipV4 addresses which are not loopback are taken
-    * and the first one is picked.
-    *
-    * @return An ipv4 address
+    * Gives the non-loopback, ipv4 address for the given network interface. If no interface name is provided then the address mapped
+    * to the first available interface is chosen.
     */
   def getIpv4Address(): InetAddress = all()
     .sortBy(_._1)
@@ -54,11 +39,13 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
     .getOrElse((0, InetAddress.getLocalHost))
     ._2
 
+  // Check if the given InetAddress is not a loopback address and is a ipv4 address
   private def isIpv4(addr: InetAddress): Boolean = {
     // Don't use ipv6 addresses yet, since it seems to not be working with the current akka version
     !addr.isLoopbackAddress && !addr.isInstanceOf[Inet6Address]
   }
 
+  // Prepare a tuple of interface index to InetAddress
   private def all(): Seq[(Int, InetAddress)] = {
     for {
       tuple <- getNetworkInterfaceList()
@@ -66,6 +53,7 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
     } yield (tuple._1, a)
   }
 
+  // If the network interface is defined then get all InetAddresses mapped for that else get it for all interfaces
   private def getNetworkInterfaceList(): Seq[(Int, List[InetAddress])] = {
     if (interfaceName.isEmpty)
       networkProvider.getAllInterfaces()
@@ -76,25 +64,21 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
 }
 
 /**
-  * A `NetworkInterfaceProvider` that manages `InetAddresses` on a system
-  */
+  *  Provides InetAddresses for network interface
+   */
 class NetworkInterfaceProvider() {
 
   /**
-    * Uses `NetworkInterface` to fetch all `InetAddress` of all network interfaces present on the system
-    *
-    * @return A `Sequence` of tuples in the format of (Network interface index, `List` of `InetAddresses` for that interface)
+    * Prepare a Sequence of tuple where each tuple represents a network interface and the list of all InetAddresses mapped for that
+    * interface
     */
   def getAllInterfaces(): Seq[(Int, List[InetAddress])] = {
     NetworkInterface.getNetworkInterfaces.asScala.toList.map(iface => (iface.getIndex, iface.getInetAddresses().asScala.toList))
   }
 
   /**
-    * Uses `NetworkInterface` to fetch all `InetAddress` for a given `interfaceName`
-    *
-    * @param interfaceName The name of the network interface where akka cluster is formed. If the `interfaceName` is not
-    *                      found then [[csw.services.location.internal.NetworkInterfaceNotFound]] will be thrown.
-    * @return A `Sequence` of tuples in the format of (Network interface index, `List` of `InetAddresses`)
+    * Prepare a tuple representing the given interface and the list of all InetAddresses mapped for that interface. If the given
+    * interface is not found then an exception is thrown
     */
   def getInterface(interfaceName: String): Seq[(Int, List[InetAddress])] = {
     Option(NetworkInterface.getByName(interfaceName)) match {
