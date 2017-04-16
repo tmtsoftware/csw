@@ -89,7 +89,7 @@ object CswCluster {
       new CswCluster(actorSystem)
     } catch {
       case NonFatal(ex) ⇒
-        Await.result(ClusterHttpManagement(cluster).start(), 10.seconds)
+        Await.result(ClusterHttpManagement(cluster).stop(), 10.seconds)
         Await.result(CswCluster.terminate(actorSystem), 10.seconds)
         throw ex
     }

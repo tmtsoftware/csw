@@ -14,8 +14,9 @@ import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 
 import scala.async.Async._
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, Future}
+import scala.util.control.NonFatal
 
 class ConfigCliApp(clusterSettings: ClusterSettings) {
 
@@ -25,18 +26,23 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
   private val locationService = LocationServiceFactory.withSettings(clusterSettings)
   val configService: ConfigService = ConfigClientFactory.make(actorSystem, locationService)
 
-  def start(args: Array[String]): Unit = {
+  def start(args: Array[String]): Future[Unit] = async {
     CmdLineArgsParser.parse(args) match {
       case Some(options) =>
-        commandLineRunner(options).onComplete {
-          case Success(_) => shutdown().onComplete(_ => System.exit(0))
-          case Failure(ex) =>
-            System.err.println(s"Error: ${ex.getMessage}")
-            ex.printStackTrace(System.err)
-            shutdown().onComplete(_ => System.exit(1))
-        }
-      case None => System.exit(1)
+        await(commandLineRunner(options))
+        await(shutdown())
+        System.exit(0)
+      case None =>
+        System.exit(1)
     }
+  } recoverWith  {
+    case NonFatal(ex) ⇒
+      System.err.println(s"Error: ${ex.getMessage}")
+      ex.printStackTrace(System.err)
+      async {
+        await(shutdown())
+        System.exit(1)
+      }
   }
 
   def shutdown(): Future[Done] = async {
@@ -150,7 +156,7 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
 object ConfigCliApp {
 
   def main(args: Array[String]): Unit = {
-    new ConfigCliApp(ClusterSettings()).start(args)
+    Await.result(new ConfigCliApp(ClusterSettings()).start(args), 5.seconds)
   }
 
 }

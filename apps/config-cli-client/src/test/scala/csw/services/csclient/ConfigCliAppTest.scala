@@ -98,7 +98,6 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     //  is there any way to assert here?
     val parsedExistsArgs: Option[Options] = CmdLineArgsParser.parse(existsArgs)
     ConfigCliApp.commandLineRunner(parsedExistsArgs.get).await
-
   }
 
   test("should able to set, reset and get the default version of file.") {
