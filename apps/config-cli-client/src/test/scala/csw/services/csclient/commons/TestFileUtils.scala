@@ -7,13 +7,6 @@ import csw.services.config.server.Settings
 
 class TestFileUtils(settings: Settings) {
 
-  val repositoryFilePath = "/path/hcd/trombone.conf"
-  val inputFilePath = "/tmp/ConfigCliClient/input.txt"
-  val outputFilePath = "/tmp/ConfigCliClient/output.txt"
-  val id = "1234"
-  val comment = "test commit comment!!!"
-
-
   def deleteServerFiles(): Unit = {
     val oversizeFileDir = Paths.get(settings.`oversize-files-dir`).toFile
     deleteDirectoryRecursively(oversizeFileDir)
