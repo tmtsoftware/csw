@@ -20,7 +20,7 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   httpService.lazyBinding.await
 
   val ConfigCliApp = new ConfigCliApp(ClusterSettings().joinLocal(3552))
-  Thread.sleep(1000)
+  Thread.sleep(2000)
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
 
