@@ -112,8 +112,10 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
     }
   }
 
-  override def exists(path: Path): Future[Boolean] = async {
-    await(pathStatus(path)).isInstanceOf[PathStatus.Present]
+  override def exists(path: Path): Future[Boolean] = exists(path, None)
+
+  private def exists(path: Path, id: Option[ConfigId]): Future[Boolean] = async {
+    await(pathStatus(path, id)).isInstanceOf[PathStatus.Present]
   }
 
   //TODO: This implementation deletes all versions of a file. This is different than the expecations
@@ -141,11 +143,18 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
   }
 
   override def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit] = async {
-    val maybeConfigId = if (id.isDefined) id else await(getCurrentVersion(path))
+    if(!await(exists(path, id))) {
+      throw new FileNotFoundException(s"file does not exist at path=$path")
+    }
+    val defaultPath = defaultFilePath(path)
 
-    maybeConfigId match {
-      case Some(configId) => await(create(defaultFilePath(path), ConfigData.fromString(configId.id)))
-      case None           => throw new FileNotFoundException(s"Unknown path $path")
+    val present = await(exists(defaultPath))
+
+    id match {
+      case Some(configId) if present ⇒ await(update(defaultPath, ConfigData.fromString(configId.id)))
+      case Some(configId)            ⇒ await(create(defaultPath, ConfigData.fromString(configId.id)))
+      case None if present           ⇒ await(delete(defaultPath))
+      case None                      ⇒ ()
     }
   }
 

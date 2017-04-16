@@ -150,6 +150,8 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     val svn = svnHandle()
     try {
       svn.checkPath(path.toString, revision) == kind
+    } catch {
+      case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.FS_NO_SUCH_REVISION ⇒ false
     } finally {
       svn.closeSession()
     }

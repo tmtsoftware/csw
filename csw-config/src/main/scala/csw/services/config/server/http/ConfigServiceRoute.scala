@@ -13,72 +13,49 @@ class ConfigServiceRoute(configService: ConfigService, actorRuntime: ActorRuntim
   import actorRuntime._
 
   def route: Route = handleExceptions(exceptionHandler) {
-    get {
-      path("get") {
-        (pathParam & dateParam) { (filePath, date) ⇒
-          rejectEmptyResponse & complete {
-            configService.get(filePath, date)
-          }
+    path("config" / FilePath) { filePath ⇒
+      (get & rejectEmptyResponse) {
+        (dateOParam & defaultParam & idParam) {
+          case (Some(date), _, _) ⇒ complete(configService.get(filePath, date))
+          case (_, true, _)       ⇒ complete(configService.getDefault(filePath))
+          case (_, _, maybeId)    ⇒ complete(configService.get(filePath, maybeId))
         }
       } ~
-        path("get") {
-          (pathParam & idParam) { (filePath, maybeConfigId) ⇒
-            rejectEmptyResponse & complete {
-              configService.get(filePath, maybeConfigId)
+        head {
+          complete {
+            configService.exists(filePath).map { found ⇒
+              if (found) StatusCodes.OK else StatusCodes.NotFound
             }
           }
         } ~
-        path("getDefault") {
-          pathParam { filePath ⇒
-            rejectEmptyResponse & complete {
-              configService.getDefault(filePath)
-            }
-          }
-        } ~
-        path("exists") {
-          pathParam { filePath ⇒
-            rejectEmptyResponse & complete {
-              configService.exists(filePath).map { found ⇒
-                if (found) Some("convert me into a head request") else None
-              }
-            }
-          }
-        } ~
-        path("list") {
-          complete(configService.list())
-        } ~
-        path("history") {
-          (pathParam & maxResultsParam) { (filePath, maxCount) ⇒
-            complete(configService.history(filePath, maxCount))
-          }
-        }
-    } ~
-      post {
-        path("create") {
-          (pathParam & configDataEntity & oversizeParam & commentParam) { (filePath, configData, oversize, comment) ⇒
+        post {
+          (configDataEntity & oversizeParam & commentParam) { (configData, oversize, comment) ⇒
             complete(configService.create(filePath, configData, oversize, comment))
           }
         } ~
-          path("update") {
-            (pathParam & configDataEntity & commentParam) { (filePath, configData, comment) ⇒
-              complete(configService.update(filePath, configData, comment))
-            }
-          } ~
-          path("setDefault") {
-            (pathParam & idParam) { (filePath, maybeConfigId) ⇒
-              complete(configService.setDefault(filePath, maybeConfigId).map(_ ⇒ Done))
-            }
-          } ~
-          path("resetDefault") {
-            pathParam { filePath ⇒
-              complete(configService.resetDefault(filePath).map(_ ⇒ Done))
-            }
-          } ~
-          path("delete") {
-            (pathParam & commentParam) { (filePath, comment) ⇒
-              complete(configService.delete(filePath, comment).map(_ ⇒ Done))
-            }
+        put {
+          (configDataEntity & commentParam) { (configData, comment) ⇒
+            complete(configService.update(filePath, configData, comment))
           }
+        } ~
+        delete {
+          commentParam { comment ⇒
+            complete(configService.delete(filePath, comment).map(_ ⇒ Done))
+          }
+        }
+    } ~
+      (path("default" / FilePath) & put) { filePath ⇒
+        idParam { maybeId ⇒
+          complete(configService.setDefault(filePath, maybeId).map(_ ⇒ Done))
+        }
+      } ~
+      (path("history" / FilePath) & get) { filePath ⇒
+        maxResultsParam { maxCount ⇒
+          complete(configService.history(filePath, maxCount))
+        }
+      } ~
+      (path("list") & get) {
+        complete(configService.list())
       }
   }
 

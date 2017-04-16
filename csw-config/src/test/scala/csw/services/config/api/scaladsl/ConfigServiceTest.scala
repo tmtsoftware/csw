@@ -62,7 +62,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should ignore '/' at the beginning of file path and create a file") {
-    val fileName = "csw.conf"
+    val fileName = "csw.conf/1/2/3"
     val file = Paths.get(s"/$fileName")
     val fileWithoutBackslash = Paths.get(fileName)
     configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit csw file").await
@@ -239,7 +239,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
     configService.setDefault(file, Some(configIdUpdate1)).await
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue2
-    configService.resetDefault(file).await
+    configService.setDefault(file).await
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
   }
 
@@ -310,9 +310,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("should be able to get oversize default file") {
     val file = Paths.get("SomeOversizeFile.txt")
     val content = "testing oversize file"
-    configService.create(file, ConfigData.fromString(content), oversize = true, "committing oversize file").await
+    val configId = configService.create(file, ConfigData.fromString(content), oversize = true, "committing oversize file").await
 
-    configService.setDefault(file).await
+    configService.setDefault(file, Some(configId)).await
 
     val newContent = "testing oversize file, again"
     val newComment = "Updating file"
@@ -321,7 +321,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val defaultData: ConfigData = configService.getDefault(file).await.get
     defaultData.toStringF.await shouldBe content
 
-    configService.resetDefault(file).await
+    configService.setDefault(file).await
 
     val resetDefaultData: ConfigData = configService.getDefault(file).await.get
     resetDefaultData.toStringF.await shouldBe newContent
@@ -335,7 +335,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     defaultAfterDelete shouldBe None
 
     intercept[java.io.FileNotFoundException] {
-      configService.resetDefault(file).await
+      configService.setDefault(file).await
     }
   }
 
