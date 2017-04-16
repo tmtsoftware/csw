@@ -2,6 +2,7 @@ package csw.services.csclient.models
 
 import java.io.File
 import java.nio.file.Path
+import java.time.Instant
 
 /**
   * @param op Gets file with given path from the config service and writes it to the o  utput file.
@@ -19,6 +20,7 @@ case class Options(
                     inputFilePath: Option[Path] = None,
                     outputFilePath: Option[Path] = None,
                     id: Option[String] = None,
+                    date: Option[Instant] = None,
                     maxFileVersions: Int = Int.MaxValue,
                     oversize: Boolean = false,
                     comment: String = ""

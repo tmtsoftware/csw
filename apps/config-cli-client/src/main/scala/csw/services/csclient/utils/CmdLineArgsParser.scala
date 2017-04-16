@@ -1,7 +1,7 @@
 package csw.services.csclient.utils
 
-import java.io.File
-import java.nio.file.{Path, Paths}
+import java.nio.file.Paths
+import java.time.Instant
 
 import csw.services.csclient.models.Options
 import scopt.OptionParser
@@ -70,7 +70,11 @@ object CmdLineArgsParser {
 
       opt[String]("id") action { (x, c) =>
         c.copy(id = Some(x))
-      } text "optional version id of the repository file to get"
+      } text "optional version id of the repository file to get",
+
+      opt[String]("date") action { (x, c) =>
+        c.copy(date = Some(Instant.parse(x)))
+      } text "optional date parameter ex. 2017-04-16T16:15:23.503Z"
     )
 
     //exists operation

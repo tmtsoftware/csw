@@ -11,11 +11,11 @@ import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.csclient.models.Options
 import csw.services.csclient.utils.{CmdLineArgsParser, PathUtils}
 import csw.services.location.commons.ClusterSettings
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 
+import scala.async.Async._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-import async.Async._
 
 class ConfigCliApp(clusterSettings: ClusterSettings) {
 
@@ -67,7 +67,10 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
     def get(): Future[Unit] = {
       val idOpt: Option[ConfigId] = options.id.map(ConfigId(_))
       for {
-        configDataOpt: Option[ConfigData] <- configService.get(options.repositoryFilePath.get, idOpt)
+        configDataOpt: Option[ConfigData] <- {
+          if (options.date.isDefined) configService.get(options.repositoryFilePath.get, options.date.get)
+          else configService.get(options.repositoryFilePath.get, idOpt)
+        }
         if configDataOpt.isDefined
           outputFile: File <- PathUtils.writeToPath(configDataOpt.get, options.outputFilePath.get)
       } yield {

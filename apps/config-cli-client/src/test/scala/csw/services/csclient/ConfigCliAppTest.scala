@@ -3,13 +3,13 @@ package csw.services.csclient
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import csw.services.csclient.commons.TestFileUtils
 import csw.services.config.server.ServerWiring
+import csw.services.csclient.commons.TestFileUtils
 import csw.services.csclient.commons.TestFutureExtension.RichFuture
 import csw.services.csclient.models.Options
 import csw.services.csclient.utils.CmdLineArgsParser
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
