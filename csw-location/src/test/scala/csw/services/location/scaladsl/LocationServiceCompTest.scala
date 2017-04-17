@@ -11,6 +11,8 @@ import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, 
 import csw.services.location.models._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
+import scala.concurrent.duration.DurationInt
+
 class LocationServiceCompTest
   extends FunSuite
     with Matchers
@@ -39,13 +41,13 @@ class LocationServiceCompTest
 
     locationService.register(tcpRegistration).await
 
-    locationService.resolve(connection).await.get shouldBe tcpRegistration.location(new Networks().hostname())
+    locationService.find(connection).await.get shouldBe tcpRegistration.location(new Networks().hostname())
 
     locationService.list.await shouldBe List(tcpRegistration.location(new Networks().hostname()))
 
     locationService.register(tcpRegistration).await.unregister().await
 
-    locationService.resolve(connection).await shouldBe None
+    locationService.find(connection).await shouldBe None
     locationService.list.await shouldBe List.empty
   }
 
@@ -59,7 +61,7 @@ class LocationServiceCompTest
 
     locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
 
-    locationService.resolve(httpConnection).await.get shouldBe httpRegistration.location(new Networks().hostname())
+    locationService.find(httpConnection).await.get shouldBe httpRegistration.location(new Networks().hostname())
 
     locationService.list.await shouldBe List(httpRegistration.location(new Networks().hostname()))
 
@@ -83,9 +85,7 @@ class LocationServiceCompTest
 
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
 
-    Thread.sleep(10)
-
-    locationService.resolve(connection).await.get shouldBe akkaRegistration.location(new Networks().hostname())
+    locationService.resolve(connection, 5.seconds).await.get shouldBe akkaRegistration.location(new Networks().hostname())
 
     locationService.list.await shouldBe List(akkaRegistration.location(new Networks().hostname()))
 
@@ -273,7 +273,7 @@ class LocationServiceCompTest
     val connection = TcpConnection(ComponentId("redis5", ComponentType.Service))
     locationService.register(TcpRegistration(connection,  1234)).await
 
-    locationService.resolve(connection).await.get.connection shouldBe connection
+    locationService.find(connection).await.get.connection shouldBe connection
   }
 
   test("should filter components with component type") {

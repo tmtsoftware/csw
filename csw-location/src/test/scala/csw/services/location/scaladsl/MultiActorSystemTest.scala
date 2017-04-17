@@ -7,6 +7,8 @@ import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, TcpRegistration}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
+import scala.concurrent.duration.DurationInt
+
 class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   val connection: TcpConnection = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
@@ -21,10 +23,9 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
 
   test("ensure that location service works across two actorSystems within the same JVM") {
     locationService.register(tcpRegistration).await
-    Thread.sleep(2000)
-    locationService2.resolve(connection).await.get shouldBe tcpRegistration.location(new Networks().hostname())
+    locationService2.resolve(connection, 5.seconds).await.get shouldBe tcpRegistration.location(new Networks().hostname())
 
     locationService.shutdown().await
-    locationService2.resolve(connection).await.get shouldBe tcpRegistration.location(new Networks().hostname())
+    locationService2.resolve(connection, 5.seconds).await.get shouldBe tcpRegistration.location(new Networks().hostname())
   }
 }

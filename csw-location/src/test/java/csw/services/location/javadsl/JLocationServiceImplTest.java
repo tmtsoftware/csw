@@ -78,9 +78,9 @@ public class JLocationServiceImplTest {
         locationService.register(tcpRegistration).get();
 
         Assert.assertEquals(3, locationService.list().get().size());
-        Assert.assertEquals(akkaRegistration.location(new Networks().hostname()), locationService.resolve(akkaHcdConnection).get().get());
-        Assert.assertEquals(httpRegistration.location(new Networks().hostname()), locationService.resolve(httpServiceConnection).get().get());
-        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpServiceConnection).get().get());
+        Assert.assertEquals(akkaRegistration.location(new Networks().hostname()), locationService.find(akkaHcdConnection).get().get());
+        Assert.assertEquals(httpRegistration.location(new Networks().hostname()), locationService.find(httpServiceConnection).get().get());
+        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.find(tcpServiceConnection).get().get());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class JLocationServiceImplTest {
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
         locationService.register(tcpRegistration).get();
-        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpServiceConnection).get().get());
+        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.find(tcpServiceConnection).get().get());
     }
 
     @Test
@@ -97,7 +97,7 @@ public class JLocationServiceImplTest {
 
         AkkaRegistration registration = new AkkaRegistration(akkaHcdConnection, actorRef);
         locationService.register(registration).get();
-        Assert.assertEquals(registration.location(new Networks().hostname()), locationService.resolve(akkaHcdConnection).get().get());
+        Assert.assertEquals(registration.location(new Networks().hostname()), locationService.find(akkaHcdConnection).get().get());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class JLocationServiceImplTest {
 
         locationService.register(tcpRegistration).get();
         Assert.assertEquals(1, locationService.list().get().size());
-        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpServiceConnection).get().get());
+        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.find(tcpServiceConnection).get().get());
 
         locationService.unregister(tcpServiceConnection).get();
     }
@@ -132,7 +132,7 @@ public class JLocationServiceImplTest {
         AkkaRegistration registration = new AkkaRegistration(akkaHcdConnection, actorRef);
 
         locationService.register(registration).get();
-        Assert.assertEquals(registration.location(new Networks().hostname()), locationService.resolve(akkaHcdConnection).get().get());
+        Assert.assertEquals(registration.location(new Networks().hostname()), locationService.find(akkaHcdConnection).get().get());
 
         locationService.unregister(akkaHcdConnection).get();
     }

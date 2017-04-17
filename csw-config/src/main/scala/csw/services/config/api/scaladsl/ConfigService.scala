@@ -66,9 +66,10 @@ trait ConfigService {
    * Returns true if the given path exists and is being managed
    *
    * @param path the file path relative to the repository root
+   * @param id revision of the file
    * @return true the file exists
    */
-  def exists(path: Path): Future[Boolean]
+  def exists(path: Path, id: Option[ConfigId] = None): Future[Boolean]
 
   /**
    * Deletes the given config file (older versions will still be available)
@@ -104,14 +105,6 @@ trait ConfigService {
    * @return a future result
    */
   def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit]
-
-  /**
-   * Resets the "default version" of the file with the given path to be always the latest version.
-   *
-   * @param path the file path relative to the repository root
-   * @return a future result
-   */
-  def resetDefault(path: Path): Future[Unit]
 
   /**
    * Gets and returns the default version of the file stored under the given path.

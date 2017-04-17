@@ -5,24 +5,23 @@ import com.typesafe.config.ConfigFactory
 import csw.services.location.commons.{ClusterSettings, Constants}
 
 /**
-  * Creates a remote `ActorSystem` on the network interface where csw-cluster is running. The `ActorSystem` starts on
+  * ActorSystemFactory creates a remote ActorSystem on the interface where csw-cluster is running. The ActorSystem starts on a
   * random port.
   *
-  * @note It is highly recommended that if the `ActorRef` needs to be registered with `LocationService` then the `ActorSystem`
-  *       in which it is created, should be created using `ActorSystemFactory` only
+  * @note It is highly recommended to create actors via this factory if it has to be registered with LocationService
   */
 object ActorSystemFactory {
 
   /**
-    * Creates an `ActorSystem` with default name
+    * Create an ActorSystem with default name and remote properties
     */
   def remote(): ActorSystem = remote(Constants.RemoteActorSystemName)
 
   /**
-    * Creates an `ActorSystem` with the given name
+    * Create an ActorSystem with the given name and remote properties
     *
-    * @note Even if the custom configuration is provided for the given `name`, it will be simply
-    *       ignored, instead default remote configuration will be used while creating `ActorSystem`.
+    * @note Even if the custom configuration is provided for the given name of ActorSystem, it will be simply
+    *       ignored, instead default remote configuration will be used while creating ActorSystem
     */
   def remote(name: String): ActorSystem = {
 

@@ -78,6 +78,15 @@ trait IConfigService {
   def exists(path: Path): CompletableFuture[jl.Boolean]
 
   /**
+    * Returns true if the given path exists and is being managed
+    *
+    * @param path the file path relative to the repository root
+    * @param id revision of the file
+    * @return true the file exists
+    */
+  def exists(path: Path, id: Optional[ConfigId]): CompletableFuture[jl.Boolean]
+
+  /**
     * Deletes the given config file (older versions will still be available)
     *
     * @param path the file path relative to the repository root
@@ -113,14 +122,6 @@ trait IConfigService {
     * @return a future result
     */
   def setDefault(path: Path, id: Optional[ConfigId]): CompletableFuture[Unit]
-
-  /**
-    * Resets the "default version" of the file with the given path to be always the latest version.
-    *
-    * @param path the file path relative to the repository root
-    * @return a future result
-    */
-  def resetDefault(path: Path): CompletableFuture[Unit]
 
   /**
     * Gets and returns the default version of the file stored under the given path.

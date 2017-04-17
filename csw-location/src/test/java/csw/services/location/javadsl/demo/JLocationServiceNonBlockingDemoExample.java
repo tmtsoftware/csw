@@ -92,13 +92,13 @@ public class JLocationServiceNonBlockingDemoExample {
             Assert.assertEquals(tcpRegistration.connection(), tcpRegistrationResult.location().connection());
             return locationService.list().thenCompose(locations -> {
                 Assert.assertEquals(expectedLocations, locations);
-                return locationService.resolve(tcpConnection).thenCompose(locationOption -> {
+                return locationService.find(tcpConnection).thenCompose(locationOption -> {
                     Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationOption.get());
                     System.out.println(tcpRegistrationResult.location().uri());
                     return tcpRegistrationResult.unregister().thenCompose(done -> {
                         return locationService.list().thenCompose(locations1 -> {
                             Assert.assertEquals(Collections.EMPTY_LIST, locations1);
-                            return locationService.resolve(tcpConnection).thenApply(location -> {
+                            return locationService.find(tcpConnection).thenApply(location -> {
                                 Assert.assertEquals(Optional.empty(), location);
                                 return null;
                             });

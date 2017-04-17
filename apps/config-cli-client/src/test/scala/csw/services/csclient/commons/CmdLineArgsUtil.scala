@@ -36,7 +36,6 @@ object CmdLineArgsUtil {
   val historyArgs = Array("history", repositoryFilePath, "--max", maxFileVersions.toString)
   val setDefaultAllArgs = Array("setDefault", repositoryFilePath, "--id", id)
   val setDefaultMinimalArgs = Array("setDefault", repositoryFilePath)
-  val resetDefaultArgs = Array("resetDefault", repositoryFilePath)
   val getDefaultArgs = Array("getDefault", repositoryFilePath, "-o", outputFilePath)
 
   private def createTempFile(fileName: String, fileContent: String): File = {

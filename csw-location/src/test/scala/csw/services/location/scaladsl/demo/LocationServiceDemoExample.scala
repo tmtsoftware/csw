@@ -62,14 +62,14 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
       tcpRegistrationResult.location.connection shouldBe tcpConnection
 
       await(locationService.list) shouldBe List(tcpRegistrationResult.location)
-      await(locationService.resolve(tcpConnection)) shouldBe Some(tcpRegistrationResult.location)
+      await(locationService.find(tcpConnection)) shouldBe Some(tcpRegistrationResult.location)
 
       println(tcpRegistrationResult.location.uri)
 
       await(tcpRegistrationResult.unregister())
 
       await(locationService.list) shouldBe List.empty
-      await(locationService.resolve(tcpConnection)) shouldBe None
+      await(locationService.find(tcpConnection)) shouldBe None
     }
     Await.result(assertionF, 5.seconds)
     //#register-list-resolve-unregister

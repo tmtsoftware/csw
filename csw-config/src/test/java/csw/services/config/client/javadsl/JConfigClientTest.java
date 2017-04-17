@@ -190,7 +190,7 @@ public class JConfigClientTest {
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
         configService.setDefault(path, Optional.of(configIdUpdate1)).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
-        configService.resetDefault(path).get();
+        configService.setDefault(path, Optional.empty()).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
@@ -260,7 +260,7 @@ public class JConfigClientTest {
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
         configService.setDefault(path, Optional.of(configIdUpdate1)).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
-        configService.resetDefault(path).get();
+        configService.setDefault(path, Optional.empty()).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
     }
 

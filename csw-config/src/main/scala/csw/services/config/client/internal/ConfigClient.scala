@@ -1,6 +1,5 @@
 package csw.services.config.client.internal
 
-import java.io.{FileNotFoundException, IOException}
 import java.nio.{file ⇒ jnio}
 import java.time.Instant
 
@@ -9,7 +8,7 @@ import akka.http.scaladsl.model.HttpEntity.Chunked
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import csw.services.config.api.javadsl.IConfigService
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.http.JsonSupport
@@ -23,49 +22,53 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   override def name: String = "http-based-config-client"
 
+  private def configUri(path: jnio.Path) = baseUri(Path / "config" ++ Path / Path(path.toString))
+  private def defaultUri(path: jnio.Path) = baseUri(Path / "default" ++ Path / Path(path.toString))
+  private def historyUri(path: jnio.Path) = baseUri(Path / "history" ++ Path / Path(path.toString))
+
+  private def listUri = baseUri(Path / "list")
+
+  private def baseUri(path: Path) = async {
+    await(configServiceResolver.uri).withPath(path)
+  }
+
   override def create(path: jnio.Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = async {
     val entity = Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
-    val uri = await(configServiceResolver.uri)
-      .withPath(Path / "create")
-      .withQuery(Query("path" → path.toString, "oversize" → oversize.toString, "comment" → comment))
+    val uri = await(configUri(path)).withQuery(Query("oversize" → oversize.toString, "comment" → comment))
 
     val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
     println(request)
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK         ⇒ await(Unmarshal(response).to[ConfigId])
-      case StatusCodes.BadRequest ⇒ throw new IOException(response.status.reason())
-      case _                      ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.Created  ⇒ await(Unmarshal(response).to[ConfigId])
+      case StatusCodes.Conflict ⇒ throw FileAlreadyExists(path)
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 
   override def update(path: jnio.Path, configData: ConfigData, comment: String): Future[ConfigId] = async {
     val entity = Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
-    val uri = await(configServiceResolver.uri)
-      .withPath(Path / "update")
-      .withQuery(Query("path" → path.toString, "comment" → comment))
+    val uri = await(configUri(path)).withQuery(Query("comment" → comment))
 
-    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
+    val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity)
     println(request)
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK         ⇒ await(Unmarshal(response).to[ConfigId])
-      case StatusCodes.BadRequest ⇒ throw new FileNotFoundException(response.status.reason())
-      case _                      ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.OK       ⇒ await(Unmarshal(response).to[ConfigId])
+      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 
   override def get(path: jnio.Path, id: Option[ConfigId]): Future[Option[ConfigData]] = async {
-    val uri = await(configServiceResolver.uri)
-      .withPath(Path / "get")
-      .withQuery(Query(Map("path" → path.toString) ++ id.map(configId ⇒ "id" → configId.id.toString)))
+    val uri = await(configUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
 
     val request = HttpRequest(uri = uri)
     println(request)
-
     val response = await(Http().singleRequest(request))
+
     response.status match {
       case StatusCodes.OK       ⇒ Some(ConfigData.fromSource(response.entity.dataBytes))
       case StatusCodes.NotFound ⇒ None
@@ -74,9 +77,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   }
 
   override def get(path: jnio.Path, time: Instant): Future[Option[ConfigData]] = async {
-    val uri = await(configServiceResolver.uri)
-      .withPath(Path / "get")
-      .withQuery(Query("path" → path.toString, "date" → time.toString))
+    val uri = await(configUri(path)).withQuery(Query("date" → time.toString))
 
     val request = HttpRequest(uri = uri)
     println(request)
@@ -89,12 +90,10 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def exists(path: jnio.Path): Future[Boolean] = async {
-    val uri = await(configServiceResolver.uri)
-      .withPath(Path / "exists")
-      .withQuery(Query("path" → path.toString))
+  override def exists(path: jnio.Path, id: Option[ConfigId]): Future[Boolean] = async {
+    val uri = await(configUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
 
-    val request = HttpRequest(uri = uri)
+    val request = HttpRequest(HttpMethods.HEAD, uri = uri)
     println(request)
     val response = await(Http().singleRequest(request))
 
@@ -106,23 +105,21 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   }
 
   override def delete(path: jnio.Path, comment: String): Future[Unit] = async {
-    val uri = await(configServiceResolver.uri)
-      .withPath(Path / "delete")
-      .withQuery(Query("path" → path.toString, "comment" → comment))
+    val uri = await(configUri(path)).withQuery(Query("comment" → comment))
 
-    val request = HttpRequest(HttpMethods.POST, uri = uri)
+    val request = HttpRequest(HttpMethods.DELETE, uri = uri)
     println(request)
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK         ⇒ ()
-      case StatusCodes.BadRequest ⇒ throw new FileNotFoundException(response.status.reason())
-      case _                      ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.OK       ⇒ ()
+      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 
   override def list(): Future[List[ConfigFileInfo]] = async {
-    val uri = await(configServiceResolver.uri).withPath(Path / "list")
+    val uri = await(listUri)
 
     val request = HttpRequest(uri = uri)
     println(request)
@@ -135,56 +132,35 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   }
 
   override def history(path: jnio.Path, maxResults: Int): Future[List[ConfigFileHistory]] = async {
-    val uri = await(configServiceResolver.uri)
-      .withPath(Path / "history")
-      .withQuery(Query("path" → path.toString, "maxResults" → maxResults.toString))
+    val uri = await(historyUri(path)).withQuery(Query("maxResults" → maxResults.toString))
 
     val request = HttpRequest(uri = uri)
     println(request)
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK ⇒ await(Unmarshal(response.entity).to[List[ConfigFileHistory]])
-      case _              ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.OK       ⇒ await(Unmarshal(response.entity).to[List[ConfigFileHistory]])
+      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 
   override def setDefault(path: jnio.Path, id: Option[ConfigId]): Future[Unit] = async {
-    val uri = await(configServiceResolver.uri)
-      .withPath(Path / "setDefault")
-      .withQuery(Query(Map("path" → path.toString) ++ id.map(configId ⇒ "id" → configId.id.toString)))
+    val uri = await(defaultUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
 
-    val request = HttpRequest(HttpMethods.POST, uri = uri)
+    val request = HttpRequest(HttpMethods.PUT, uri = uri)
     println(request)
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK         ⇒ ()
-      case StatusCodes.BadRequest ⇒ throw new FileNotFoundException(response.status.reason())
-      case _                      ⇒ throw new RuntimeException(response.status.reason())
-    }
-  }
-
-  override def resetDefault(path: jnio.Path): Future[Unit] = async {
-    val uri = await(configServiceResolver.uri)
-      .withPath(Path / "resetDefault")
-      .withQuery(Query("path" → path.toString))
-
-    val request = HttpRequest(HttpMethods.POST, uri = uri)
-    println(request)
-    val response = await(Http().singleRequest(request))
-
-    response.status match {
-      case StatusCodes.OK         ⇒ ()
-      case StatusCodes.BadRequest ⇒ throw new FileNotFoundException(response.status.reason())
-      case _                      ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.OK       ⇒ ()
+      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 
   override def getDefault(path: jnio.Path): Future[Option[ConfigData]] = async {
-    val uri = await(configServiceResolver.uri)
-      .withPath(Path / "getDefault")
-      .withQuery(Query("path" → path.toString))
+    val uri = await(configUri(path)).withQuery(Query("default" → "true"))
 
     val request = HttpRequest(uri = uri)
     println(request)
