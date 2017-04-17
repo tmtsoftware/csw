@@ -24,12 +24,11 @@ object PathUtils {
     * Writes config data to a provided file and returns output file.
     */
   def writeToPath(configData: ConfigData, path: Path)(implicit mat: Materializer): Future[File] = {
-    val file = new File(path.toString)
     import mat.executionContext
     configData
       .source
-      .runWith(FileIO.toPath(file.toPath))
-      .map(_ ⇒ file)
+      .runWith(FileIO.toPath(path))
+      .map(_ ⇒ path.toFile)
   }
 
 }
