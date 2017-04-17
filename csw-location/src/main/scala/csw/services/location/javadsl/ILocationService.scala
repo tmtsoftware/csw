@@ -34,9 +34,9 @@ trait ILocationService {
 
   /**
     * Unregisters all connections registered
+    * ''Note: '' It is highly recommended to use this method for testing purpose only
     *
     * @return A CompletableFuture which completes after all connections are unregistered successfully or fails otherwise
-    * ''Note: '' It is highly recommended to use this method for testing purpose only
     */
   def unregisterAll(): CompletableFuture[Done]
 
