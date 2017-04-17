@@ -1,6 +1,6 @@
 package csw.services.location.models
 
 /**
-  * All models that resides in CRDT has to be serializable using TmtSerializable. It is required since they have to be communicable over the network.
+  * Models required to be transmitted over the network need to be extended from TmtSerializable
   */
 trait TmtSerializable extends Serializable

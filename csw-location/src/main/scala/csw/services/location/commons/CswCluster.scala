@@ -88,7 +88,7 @@ object CswCluster {
     // Check if seed nodes are provided to join csw-cluster
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
     if (emptySeeds) {
-      // Join the cluster on self node. It will be mostly used for testing.
+      // If no seeds are provided (which happens only during testing), then create a single node cluster by joining to self
       cluster.join(cluster.selfAddress)
     }
 
@@ -110,7 +110,7 @@ object CswCluster {
   }
 
   /**
-    * Performs the termination as follows :
+    * Termination happens as follows :
     *  - The given ActorSystem is requested to leave the cluster gracefully
     *  - and once it has left the cluster, it is terminated
     *

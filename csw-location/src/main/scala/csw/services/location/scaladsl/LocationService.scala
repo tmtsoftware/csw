@@ -20,7 +20,7 @@ trait LocationService {
   def register(registration: Registration): Future[RegistrationResult]
 
   /**
-    * Unregisters the connection from CRDT
+    * Unregisters the connection
     *
     * @param connection An already registered connection
     * @return A Future which completes after un-registration happens successfully and fails otherwise

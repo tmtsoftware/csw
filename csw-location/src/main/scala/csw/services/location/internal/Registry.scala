@@ -18,7 +18,7 @@ import scala.concurrent.duration.DurationDouble
   */
 class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) {
   /**
-    * Creates an update message for replicator with WriteConsistency as majority
+    * Creates an update message for replicator and it ensures that the response goes out only after majority nodes are written to
     *
     * @see [[akka.cluster.ddata.Replicator.Update]]
     * @param f A callback function which is passed to Replicator.Update
@@ -26,7 +26,7 @@ class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) 
   def update(f: V ⇒ V): Update[V] = Update(Key, EmptyValue, WriteMajority(5.seconds))(f)
 
   /**
-    * Creates a get message for replicator with ReadConsistency as Local
+    * Creates a get message for replicator. Unlike for update, it will read from the local cache of the node
     *
     * @see [[akka.cluster.ddata.Replicator.Get]]
     */

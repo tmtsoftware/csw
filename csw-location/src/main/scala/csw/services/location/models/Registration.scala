@@ -12,6 +12,12 @@ import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, 
   */
 sealed abstract class Registration {
   def connection: Connection
+
+  /**
+    * A location represents a live connection available for consumption
+    *
+    * @param hostname Provide a hostname where the connection endpoint is available
+    */
   def location(hostname: String): Location
 }
 

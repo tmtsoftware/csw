@@ -35,11 +35,12 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     //Get the location from this registration
     val location = registration.location(cswCluster.hostname)
 
-    //Create a CRDT key of connection
+    //Create a message handler for this connection
     val service = new Registry.Service(registration.connection)
 
     //Create an update message to update the value of connection key. if the current value is None or same as
-    //this location then update it with this location. if it is some other location then throw an exception.
+    //this location then update it with this location. if it is some other location then an exception will be thrown and
+    //it will be handled below by ModifyFailure.
     val updateValue = service.update {
       case r@LWWRegister(Some(`location`) | None) => r.withValue(Some(location))
       case LWWRegister(Some(otherLocation))       => throw OtherLocationIsRegistered(location, otherLocation)
@@ -62,7 +63,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
 
   // Unregister the connection from CRDT
   def unregister(connection: Connection): Future[Done] = {
-    //Create a CRDT key from this connection
+    //Create a message handler for this connection
     val service = new Registry.Service(connection)
 
     //Send an update message to replicator to update the connection key with None. On success send another message to remove the
@@ -77,6 +78,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   }
 
   // Unregister all connections from CRDT
+  // Note : This method shold be used for testing purpose only
   def unregisterAll(): Future[Done] = async {
     //Get all locations registered with CRDT
     val locations = await(list)
@@ -120,9 +122,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
 
   //Track the status of given connection
   def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
-    //Create a CRDT key from this connection
+    //Create a message handler for this connection
     val service = new Registry.Service(connection)
-    //Get a source from an actor so that messages send to the actor is put in the stream
+    //Get a source from an actor so that messages send to the actor are put in the stream
     val source = Source.actorRef[Any](256, OverflowStrategy.dropHead).mapMaterializedValue {
       //When the stream starts flowing, the actor is subscribed to the replicator to get all events for the connection key
       actorRef ⇒ replicator ! Subscribe(service.Key, actorRef)
@@ -134,15 +136,12 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
       case c@Changed(service.Key) if c.get(service.Key).value.isDefined => LocationUpdated(c.get(service.Key).value.get)
       case c@Changed(service.Key)                                       => LocationRemoved(connection)
     }
-    //Allow stream to be cancellable
+    //Allow stream to be cancellable. This will give the handle of KillSwitch.
     trackingEvents.cancellable.distinctUntilChanged
   }
 
-  /**
-    * Terminate the ActorSystem and gracefully leave the akka cluster
-    *
-    * @note It is recommended not to perform any operation on LocationService after shutdown
-    */
+  //Terminate the ActorSystem and gracefully leave the akka cluster
+  // Note: It is recommended not to perform any operation on LocationService after shutdown
   def shutdown(): Future[Done] = cswCluster.terminate()
 
   private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {

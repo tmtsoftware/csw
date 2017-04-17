@@ -36,6 +36,7 @@ trait ILocationService {
     * Unregisters all connections registered
     *
     * @return A CompletableFuture which completes after all connections are unregistered successfully or fails otherwise
+    * ''Note: '' It is highly recommended to use this method for testing purpose only
     */
   def unregisterAll(): CompletableFuture[Done]
 
@@ -43,7 +44,7 @@ trait ILocationService {
     * Resolve the location for a connection from the local cache
     *
     * @param connection A connection to resolve to with its registered location
-    * @return A `CompletableFuture` of `Optional` which completes with the resolved location if found or `Empty` otherwise.
+    * @return A CompletableFuture which completes with the resolved location if found or Empty otherwise.
     */
   def find(connection: Connection): CompletableFuture[Optional[Location]]
 

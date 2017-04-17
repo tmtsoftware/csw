@@ -9,7 +9,7 @@ import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
 
 /**
-  * DeathWatchActor tracks the health of all Actors registered with LocationService
+  * DeathWatchActor tracks the health of all Actors registered with LocationService.
   *
   * @param locationService is used to unregister Actors that are no more alive
   */
@@ -30,9 +30,13 @@ class DeathwatchActor(locationService: LocationService) extends Actor {
   }
 
   /**
-    * DeathWatchActor handles
-    *  - Changed event for any location registered with CRDT and
-    *  - Terminated event for an actor that it was tracking
+    * Receive function processes two events:
+    *
+    *  - Changed event will be sent by replicator for newly registered Locations.
+    *  - Terminated event will be received upon termination of an actor that was being watched
+    *
+    * @note DeathwatchActor is primarily interested in Terminated events, but to be able to get those events, it has to track new actor registrations.
+    *       So that they can be watched for termination.
     *
     * @see [[akka.cluster.ddata.Replicator.Changed]]
     * @see [[akka.actor.Terminated]]

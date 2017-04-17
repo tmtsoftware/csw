@@ -45,12 +45,13 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
     !addr.isLoopbackAddress && !addr.isInstanceOf[Inet6Address]
   }
 
-  // Prepare a tuple of interface index to InetAddress
+  //Uses a helper method to acquire seq of tuples containing "Index and List of InetAddresses". Then, flattens it.
+  //e.g. Seq((1, List(A, B), (2, List(C, D)) => Seq((1,A), (1, B), (2, C), (2, D))
   private def all(): Seq[(Int, InetAddress)] = {
     for {
-      tuple <- getNetworkInterfaceList()
-      a <- tuple._2
-    } yield (tuple._1, a)
+      (index, inetAddresses) <- getNetworkInterfaceList()
+      inetAddress <- inetAddresses
+    } yield (index, inetAddress)
   }
 
   // If the network interface is defined then get all InetAddresses mapped for that else get it for all interfaces
