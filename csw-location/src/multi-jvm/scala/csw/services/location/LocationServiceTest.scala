@@ -13,7 +13,7 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.{DurationDouble, _}
 
 class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0)
 class LocationServiceTestMultiJvmNode2 extends LocationServiceTest(0)
@@ -59,8 +59,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       locationService.register(tcpRegistration).await
       enterBarrier("Registration")
 
-      Thread.sleep(1000)
-      val resolvedHttpLocation = locationService.find(httpConnection).await.get
+      val resolvedHttpLocation = locationService.resolve(httpConnection, 5.seconds).await.get
       resolvedHttpLocation.connection shouldBe httpConnection
 
       val locations = locationService.list.await
@@ -72,8 +71,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       locationService.register(httpRegistration).await
       enterBarrier("Registration")
 
-      Thread.sleep(1000)
-      val resolvedTcpLocation = locationService.find(tcpConnection).await.get
+      val resolvedTcpLocation = locationService.resolve(tcpConnection, 5.seconds).await.get
       resolvedTcpLocation.connection shouldBe tcpConnection
 
       val locations = locationService.list.await
@@ -136,9 +134,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       locationService.register(tcpRegistration).await
       enterBarrier("Registration")
 
-      Thread.sleep(2000)
-
-      val resolvedLocation: Location = Await.result(locationService.find(akkaConnection), 10.seconds).get
+      val resolvedLocation: Location = Await.result(locationService.resolve(akkaConnection, 5.seconds), 5.seconds).get
 
       val assemblyActorRef = resolvedLocation.asInstanceOf[AkkaLocation].actorRef
 

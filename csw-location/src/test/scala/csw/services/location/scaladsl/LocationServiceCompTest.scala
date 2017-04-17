@@ -11,6 +11,8 @@ import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, 
 import csw.services.location.models._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
+import scala.concurrent.duration.DurationInt
+
 class LocationServiceCompTest
   extends FunSuite
     with Matchers
@@ -83,9 +85,7 @@ class LocationServiceCompTest
 
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
 
-    Thread.sleep(10)
-
-    locationService.find(connection).await.get shouldBe akkaRegistration.location(new Networks().hostname())
+    locationService.resolve(connection, 5.seconds).await.get shouldBe akkaRegistration.location(new Networks().hostname())
 
     locationService.list.await shouldBe List(akkaRegistration.location(new Networks().hostname()))
 

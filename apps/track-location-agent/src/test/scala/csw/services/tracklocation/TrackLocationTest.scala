@@ -17,7 +17,7 @@ import csw.services.tracklocation.models.Command
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
+import scala.concurrent.duration.{DurationLong, _}
 
 /**
   * Test the trackLocation app in-line
@@ -54,10 +54,9 @@ class TrackLocationTest
       )
     }
 
-    Thread.sleep(2000)
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
 
-    val resolvedLocation = locationService.find(connection).await.get
+    val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
     val tcpLocation = new TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
 
@@ -86,10 +85,8 @@ class TrackLocationTest
       )
     }
 
-    Thread.sleep(2000)
-
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
-    val resolvedLocation = locationService.find(connection).await.get
+    val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
     val tcpLocation = new TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
 
