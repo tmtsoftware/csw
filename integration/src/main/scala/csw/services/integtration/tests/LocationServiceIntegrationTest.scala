@@ -41,7 +41,7 @@ class LocationServiceIntegrationTest
   test("should able to resolve and communicate with remote HCD started on another container") {
     val componentId = ComponentId("trombonehcd", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
-    val hcdLocation = locationService.resolve(connection).await.get
+    val hcdLocation = locationService.find(connection).await.get
 
     hcdLocation shouldBe a[AkkaLocation]
     hcdLocation.connection shouldBe connection
@@ -66,7 +66,7 @@ class LocationServiceIntegrationTest
     val componentId = ComponentId("redisservice", ComponentType.Service)
     val connection = HttpConnection(componentId)
 
-    val hcdLocation = locationService.resolve(connection).await.get
+    val hcdLocation = locationService.find(connection).await.get
 
     hcdLocation shouldBe a[HttpLocation]
     hcdLocation.connection shouldBe connection

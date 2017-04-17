@@ -57,7 +57,7 @@ class TrackLocationTest
     Thread.sleep(2000)
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
 
-    val resolvedLocation = locationService.resolve(connection).await.get
+    val resolvedLocation = locationService.find(connection).await.get
     val tcpLocation = new TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
 
@@ -89,7 +89,7 @@ class TrackLocationTest
     Thread.sleep(2000)
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
-    val resolvedLocation = locationService.resolve(connection).await.get
+    val resolvedLocation = locationService.find(connection).await.get
     val tcpLocation = new TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
 

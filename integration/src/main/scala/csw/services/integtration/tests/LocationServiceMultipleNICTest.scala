@@ -28,7 +28,7 @@ class LocationServiceMultipleNICTest(cswCluster: CswCluster) extends FunSuite
 
     listOfLocations should have size 1
 
-    val assemblyLocation = locationService.resolve(connection).await.get
+    val assemblyLocation = locationService.find(connection).await.get
 
     assemblyLocation shouldBe a[AkkaLocation]
 

@@ -41,12 +41,12 @@ trait ILocationService {
   def unregisterAll(): CompletableFuture[Done]
 
   /**
-    * Resolves the location based on connection
+    * Resolve the location for a connection from the local cache
     *
     * @param connection A connection to resolve to with its registered location
     * @return A `CompletableFuture` of `Optional` which completes with the resolved location if found or `Empty` otherwise.
     */
-  def resolve(connection: Connection): CompletableFuture[Optional[Location]]
+  def find(connection: Connection): CompletableFuture[Optional[Location]]
 
   /**
     * Lists all locations registered with `LocationService`

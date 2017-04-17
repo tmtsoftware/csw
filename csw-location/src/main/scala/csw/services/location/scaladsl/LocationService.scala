@@ -38,12 +38,12 @@ trait LocationService {
   def unregisterAll(): Future[Done]
 
   /**
-    * Resolves the location based on connection
+    * Finds the location for a connection from the local cache
     *
     * @param connection A connection to resolve to with its registered location
     * @return A `Future` of `Option` which completes with the resolved location if found or `None` otherwise.
     */
-  def resolve(connection: Connection): Future[Option[Location]]
+  def find(connection: Connection): Future[Option[Location]]
 
   /**
     * Lists all locations registered with `LocationService`

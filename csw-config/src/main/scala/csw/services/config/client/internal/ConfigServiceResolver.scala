@@ -15,7 +15,7 @@ class ConfigServiceResolver(locationService: LocationService, actorRuntime: Acto
   private val configConnection = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
 
   def uri: Future[Uri] = async {
-    val location = await(locationService.resolve(configConnection)).getOrElse(
+    val location = await(locationService.find(configConnection)).getOrElse(
       //TODO: Make a domain specific exception
       throw new RuntimeException(s"config service connection=${configConnection.name} can not be resolved")
     )

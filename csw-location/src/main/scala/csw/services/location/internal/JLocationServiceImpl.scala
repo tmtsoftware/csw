@@ -29,8 +29,8 @@ private[location] class JLocationServiceImpl(locationService: LocationService, c
   override def unregisterAll(): CompletableFuture[Done] =
     locationService.unregisterAll().toJava.toCompletableFuture
 
-  override def resolve(connection: Connection): CompletableFuture[Optional[Location]] =
-    locationService.resolve(connection).map(_.asJava).toJava.toCompletableFuture
+  override def find(connection: Connection): CompletableFuture[Optional[Location]] =
+    locationService.find(connection).map(_.asJava).toJava.toCompletableFuture
 
   override def list: CompletableFuture[util.List[Location]] =
     locationService.list.map(_.asJava).toJava.toCompletableFuture

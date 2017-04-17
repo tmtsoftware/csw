@@ -12,7 +12,6 @@ import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
-import csw.services.location.commons.CswCluster;
 import csw.services.location.internal.Networks;
 import csw.services.location.javadsl.*;
 import csw.services.location.models.*;
@@ -24,13 +23,10 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
-import scala.sys.SystemProperties;
-import scala.sys.SystemProperties$;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
@@ -127,14 +123,14 @@ public class JLocationServiceBlockingDemoExample {
         expectedLocations.add(tcpRegistration.location(new Networks().hostname()));
 
         Assert.assertEquals(expectedLocations, locationService.list().get());
-        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpConnection).get().get());
+        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.find(tcpConnection).get().get());
 
         System.out.println(tcpRegistrationResult.location().uri());
 
         tcpRegistrationResult.unregister().get();
 
         Assert.assertEquals(Collections.EMPTY_LIST, locationService.list().get());
-        Assert.assertEquals(Optional.empty(), locationService.resolve(tcpConnection).get());
+        Assert.assertEquals(Optional.empty(), locationService.find(tcpConnection).get());
         //#register-list-resolve-unregister
     }
 

@@ -60,7 +60,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       enterBarrier("Registration")
 
       Thread.sleep(1000)
-      val resolvedHttpLocation = locationService.resolve(httpConnection).await.get
+      val resolvedHttpLocation = locationService.find(httpConnection).await.get
       resolvedHttpLocation.connection shouldBe httpConnection
 
       val locations = locationService.list.await
@@ -73,7 +73,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       enterBarrier("Registration")
 
       Thread.sleep(1000)
-      val resolvedTcpLocation = locationService.resolve(tcpConnection).await.get
+      val resolvedTcpLocation = locationService.find(tcpConnection).await.get
       resolvedTcpLocation.connection shouldBe tcpConnection
 
       val locations = locationService.list.await
@@ -138,7 +138,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
       Thread.sleep(2000)
 
-      val resolvedLocation: Location = Await.result(locationService.resolve(akkaConnection), 10.seconds).get
+      val resolvedLocation: Location = Await.result(locationService.find(akkaConnection), 10.seconds).get
 
       val assemblyActorRef = resolvedLocation.asInstanceOf[AkkaLocation].actorRef
 

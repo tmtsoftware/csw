@@ -123,7 +123,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     *
     * or with `Failure` if list from `LWWMap` fails
     */
-  def resolve(connection: Connection): Future[Option[Location]] = async {
+  def find(connection: Connection): Future[Option[Location]] = async {
     await(list).find(_.connection == connection)
   }
 
