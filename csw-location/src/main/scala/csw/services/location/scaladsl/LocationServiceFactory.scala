@@ -4,42 +4,33 @@ import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.internal._
 
 /**
-  * A `Factory` that manages creation of [[csw.services.location.scaladsl.LocationService]].
+  * The factory is used to create LocationService instance. With each creation, a new ActorSystem will be created and will
+  * become part of csw-cluster.
   *
-  * @note Each time the `Factory` creates `LocationService`, a new `ActorSystem` and a Cluster singleton Actor
-  *       ([[csw.services.location.internal.DeathwatchActor]]) will be created
+  * @note Hence, it is recommended to create a single instance of LocationService and use it throughout the application
   */
 object LocationServiceFactory {
 
   /**
-    * Creates a [[csw.services.location.scaladsl.LocationService]] instance and joins to the akka cluster. The data
-    * of the akka cluster will now be replicated on this newly created node.
-    *
-    * @note It is recommended to create a single instance of `LocationService` and use it throughout.
-    * @return A `LocationService` instance
+    * Create a LocationService instance to manage registrations
     */
   def make(): LocationService = withCluster(CswCluster.make())
 
   /**
-    * Creates a [[csw.services.location.scaladsl.LocationService]] instance. The data of the akka cluster will now be replicated
-    * on this newly created node.
+    * Create a LocationService instance to manage registrations
     *
-    * @note It is highly recommended to use it for testing purposes only.
-    * @param clusterSettings A [[csw.services.location.commons.ClusterSettings]] with custom configuration
-    * @return A `LocationService` instance
+    * @note It is highly recommended to use this method for testing purpose only.
     */
   def withSettings(clusterSettings: ClusterSettings): LocationService = withCluster(CswCluster.withSettings(clusterSettings))
 
   /**
-    * Creates a [[csw.services.location.scaladsl.LocationService]] instance. The data of the akka cluster will now be replicated
-    * on this newly created node.
+    * Create a LocationService instance to manage registrations
     *
-    * @note It is highly recommended to use it for testing purposes only.
-    * @param cswCluster An CswCluster with custom configuration
-    * @return A `LocationService` instance
+    * @note It is highly recommended to use it for testing purpose only.
     */
   def withCluster(cswCluster: CswCluster): LocationService = {
     val locationService: LocationService = new LocationServiceImpl(cswCluster)
+    // starts a DeathwatchActor each time a LocationService is created
     DeathwatchActor.start(cswCluster, locationService)
     locationService
   }

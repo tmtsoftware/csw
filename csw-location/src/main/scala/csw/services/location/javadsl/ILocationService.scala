@@ -13,17 +13,14 @@ import csw.services.location.scaladsl.LocationService
 import scala.concurrent.duration.FiniteDuration
 
 /**
-  * A `LocationService` interface which allows you to manage connections and their registrations.
-  * All operations are async, hence yield a `CompletableFuture`
+  * A LocationService interface to manage connections and their registrations. All operations are non-blocking.
   */
 trait ILocationService {
 
   /**
-    * Registers the connection information and returns a `CompletableFuture` which completes with Registration result which
-    * can be used to unregister the location
+    * Registers a connection to location
     *
-    * @param registration The [[csw.services.location.models.Location]] from registration will be used to register with
-    *                     akka cluster
+    * @return A CompletableFuture which completes with Registration result
     */
   def register(registration: Registration): CompletableFuture[IRegistrationResult]
 
@@ -31,14 +28,15 @@ trait ILocationService {
     * Unregisters the connection
     *
     * @param connection An already registered connection
-    * @return A `CompletableFuture` which completes after un-registration happens successfully and fails otherwise
+    * @return A CompletableFuture which completes after un-registration happens successfully and fails otherwise
     */
   def unregister(connection: Connection): CompletableFuture[Done]
 
   /**
-    * Unregisters all connections registered with `LocationService`
+    * Unregisters all connections registered
+    * ''Note: '' It is highly recommended to use this method for testing purpose only
     *
-    * @return A `CompletableFuture` which completes after all locations are unregistered successfully or fails otherwise
+    * @return A CompletableFuture which completes after all connections are unregistered successfully or fails otherwise
     */
   def unregisterAll(): CompletableFuture[Done]
 
@@ -46,66 +44,60 @@ trait ILocationService {
     * Resolve the location for a connection from the local cache
     *
     * @param connection A connection to resolve to with its registered location
-    * @return A `CompletableFuture` of `Optional` which completes with the resolved location if found or `Empty` otherwise.
+    * @return A CompletableFuture which completes with the resolved location if found or Empty otherwise.
     */
   def find(connection: Connection): CompletableFuture[Optional[Location]]
 
   /**
-    * Resolves the location for a connection from the local cache, if not found waits for the event to arrive
-    * within specified time limit. Returns None if both fail.
-    *
-    * @param connection A connection to resolve to with its registered location
-    * @param within Max wait time for event to arrive
-    * @return A `CompletableFuture` of `Optional` which completes with the resolved location if found or `Empty` otherwise.
-    */
+  * Resolves the location based on the given connection
+  *
+  * @return A CompletableFuture which completes with the resolved location if found or None otherwise.
+  */
   def resolve(connection: Connection, within: FiniteDuration): CompletableFuture[Optional[Location]]
 
   /**
-    * Lists all locations registered with `LocationService`
+    * Lists all locations registered
     *
-    * @return A `CompletableFuture` which completes with a `List` of all registered locations
+    * @return A CompletableFuture which completes with a List of all registered locations
     */
   def list: CompletableFuture[ju.List[Location]]
 
   /**
-    * Filters all locations registered with `LocationService` based on a component type
+    * Filters all locations registered based on a component type
     *
-    * @param componentType This component type will be used to match Locations
-    * @return A `CompletableFuture` which completes with filtered locations
+    * @return A CompletableFuture which completes with filtered locations
     */
   def list(componentType: ComponentType): CompletableFuture[ju.List[Location]]
 
   /**
-    * Filters all locations registered with `LocationService` based on a hostname
+    * Filters all locations registered based on a hostname
     *
-    * @param hostname This hostname will be used to match Locations
-    * @return A `CompletableFuture` which completes with filtered locations
+    * @return A CompletableFuture which completes with filtered locations
     */
   def list(hostname: String): CompletableFuture[ju.List[Location]]
 
   /**
-    * Filters all locations registered with `LocationService` based on a connection type
+    * Filters all locations registered based on a connection type
     *
-    * @param connectionType This connection type will be used to match Locations
-    * @return A `CompletableFuture` which completes with filtered locations
+    * @return A CompletableFuture which completes with filtered locations
     */
   def list(connectionType: ConnectionType): CompletableFuture[ju.List[Location]]
 
   /**
-    * Tracks the location of a connection
+    * Tracks the connection and send events for modification or removal of its location
     *
-    * @param connection A connection to track
-    * @return A `Source` that emits events for the connection. Use `KillSwitch` to stop tracking
-    *         when no longer needed. This will stop giving events for earlier tracked connection
+    * @return A stream that emits events related to the connection. It can be cancelled using KillSwitch. This will stop giving
+    *         events for earlier tracked connection
     */
   def track(connection: Connection): Source[TrackingEvent, KillSwitch]
 
   /**
-    * Shuts down the `LocationService` interface
+    * Shuts down the LocationService
     *
-    * ''Note : '' It is recommended not to perform any operation on `LocationService` after shutdown
+    * ''Note : '' It is recommended not to perform any operation on LocationService after calling this method
     *
-    * @return A `CompletableFuture` which completes when the location service shuts down
+    *''See Also: '' terminate method in [[csw.services.location.commons.CswCluster]]
+    * @return A CompletableFuture which completes when the location service has shutdown successfully
     */
   def shutdown(): CompletableFuture[Done]
 

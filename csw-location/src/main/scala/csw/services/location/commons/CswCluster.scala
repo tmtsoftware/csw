@@ -12,15 +12,14 @@ import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 /**
-  * `CswCluster` manages [[scala.concurrent.ExecutionContext]], [[akka.stream.Materializer]]
-  * and `Hostname` of an [[akka.actor.ActorSystem]]
+  * CswCluster provides cluster properties to manage data in CRDT
   *
-  * @note It is highly recommended that explicit creation of `CswCluster` should be for advanced usages or testing purposes only
+  * ''Note: '' It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
   */
 class CswCluster private(_actorSystem: ActorSystem) {
 
   /**
-    * Identifies the hostname where `ActorSystem` is running
+    * Identifies the hostname where ActorSystem is running
     */
   val hostname: String = _actorSystem.settings.config.getString("akka.remote.netty.tcp.hostname")
 
@@ -30,62 +29,77 @@ class CswCluster private(_actorSystem: ActorSystem) {
   implicit val cluster = Cluster(actorSystem)
 
   /**
-    * Replicator of current `ActorSystem`
+    * Gives the replicator for the current ActorSystem
+    *
+    * @see [[akka.cluster.ddata.Replicator]]
     */
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
 
   /**
-    * Creates an `ActorMaterializer` for current `ActorSystem`
+    * Creates an ActorMaterializer for current ActorSystem
     */
   def makeMat(): Materializer = ActorMaterializer()
 
   /**
-    * Terminates the `ActorSystem` and gracefully disconnects from the cluster.
+    * Terminates the ActorSystem and gracefully leaves the cluster
     *
-    * @return A `Future` that completes on `ActorSystem` shutdown
+    * @return A Future that completes on successful shutdown of ActorSystem
     */
   def terminate(): Future[Done] = CswCluster.terminate(actorSystem)
 }
 
 /**
-  * Manages initialization and termination of `ActorSystem` and `Cluster`
+  * Manages initialization and termination of ActorSystem and the Cluster.
+  *
+  * ''Note: '' The creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
   */
 object CswCluster {
   //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
   import ExecutionContext.Implicits.global
 
   /**
-    * Creates CswCluster with the given settings
+    * Creates CswCluster with the default cluster settings
+    *
+    * @see [[csw.services.location.commons.ClusterSettings]]
     */
   def make(): CswCluster = withSettings(ClusterSettings())
 
   /**
-    * Creates CswCluster with the given settings
+    * Creates CswCluster with the given customized settings
     */
   def withSettings(settings: ClusterSettings): CswCluster = withSystem(ActorSystem(settings.clusterName, settings.config))
 
+
   /**
-    * The actorSystem joins csw cluster. If no seed node is provided then the cluster is initialized for `ActorSystem`
-    * by self joining.
-    * ''Note : '' The call to this method will be blocked till the actorSystem joins the cluster
-    *
-    * @return A CswCluster instance that provides extension for actorSystem
+    * Creates CswCluster with the given ActorSystem
     */
   def withSystem(actorSystem: ActorSystem): CswCluster = {
-    val cluster = Cluster(actorSystem)
+    // Get the cluster information of this ActorSystem
+    val cluster: Cluster = Cluster(actorSystem)
+
+    // Get the startManagement flag for the ActorSystem
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if(startManagement) {
+      //Block until the cluster is initialized
       Await.result(ClusterHttpManagement(cluster).start(), 10.seconds)
     }
+
+    // Check if seed nodes are provided to join csw-cluster
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
     if (emptySeeds) {
+      // If no seeds are provided (which happens only during testing), then create a single node cluster by joining to self
       cluster.join(cluster.selfAddress)
     }
+
     val p = Promise[Done]
+    // Once the current ActorSystem has joined csw-cluster, the promise will be completed
     cluster.registerOnMemberUp(p.success(Done))
+
     try {
+      // Block until the ActorSystem joins csw-cluster successfully
       Await.result(p.future, 20.seconds)
+      // return the CswCluster instance with this ActorSystem
       new CswCluster(actorSystem)
     } catch {
       case NonFatal(ex) ⇒
@@ -96,18 +110,22 @@ object CswCluster {
   }
 
   /**
-    * Performs the termination with two steps in sequence as follows :
-    *  - The `ActorSystem` leaves the cluster gracefully and then
-    *  - It is terminated
+    * Termination happens as follows :
+    *  - The given ActorSystem is requested to leave the cluster gracefully
+    *  - and once it has left the cluster, it is terminated
     *
-    * @param actorSystem The `ActorSystem` that needs to be cleaned up
-    * @return A `Future` that completes on successful shutdown of `ActorSystem`
+    * @param actorSystem The ActorSystem that needs to be cleaned up
+    * @return A Future that completes on successful shutdown of ActorSystem
     */
   def terminate(actorSystem: ActorSystem): Future[Done] = {
+    // get the cluster information of this ActorSystem
     val cluster = Cluster(actorSystem)
     val p = Promise[Terminated]
+    // request to leave the self node from the cluster
     cluster.leave(cluster.selfAddress)
+    // once the self node has gracefully left the cluster, request to terminate the ActorSystem
     cluster.registerOnMemberRemoved(actorSystem.terminate().onComplete(p.complete))
+    // The promise will be completed once the ActorSystem has successfully shutdown
     p.future.map(_ => Done)
   }
 }

@@ -1,24 +1,20 @@
 package csw.services.location.models
 
 /**
-  * Represents `Tracking events` for a given `Connection`
+  * TrackingEvent is used to represent location events while tracking the connection
   */
 sealed abstract class TrackingEvent {
   def connection: Connection
 }
 
 /**
-  * Represents `Update` event for a `Connection`
-  *
-  * @param location A `Location` that got updated
+  * This event represents modification in location details
   */
 case class LocationUpdated(location: Location) extends TrackingEvent {
   override def connection: Connection = location.connection
 }
 
 /**
-  * Represents `Removed` event for a `Connection`
-  *
-  * @param connection A `Connection` for which `Location` was removed
+  * This event represents unavailability of a location
   */
 case class LocationRemoved(connection: Connection) extends TrackingEvent

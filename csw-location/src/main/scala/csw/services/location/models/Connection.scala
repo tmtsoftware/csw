@@ -3,18 +3,17 @@ package csw.services.location.models
 import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
 
 /**
-  * Manages a unique connection based on `ConnectionType` and [[csw.services.location.models.ComponentId]]
-  *
-  * @param connectionType A type of connection offered by component e.g. akka, http or tcp
+  * Represents a connection based on a componentId and the type of connection offered by the component
   */
 sealed abstract class Connection(val connectionType: ConnectionType) extends TmtSerializable {
+
   /**
-    * A unique component id based on `Component name` and [[csw.services.location.models.ComponentType]]
+    * The component that is providing this connection
     */
   def componentId: ComponentId
 
   /**
-    * Creates a unique name for `Connection` composed of `Component name`, `ComponentType` and `ConnectionType`
+    * Creates a unique name for Connection based on Component name, ComponentType and ConnectionType
     */
   def name: String = s"${componentId.name}-${componentId.componentType.name}-${connectionType.name}"
 }
@@ -22,23 +21,17 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends Tmt
 object Connection {
 
   /**
-    * A connection to a remote akka based component
-    *
-    * @param componentId A component providing akka services
+    * Represents a connection offered by remote Actors
     */
   final case class AkkaConnection(componentId: ComponentId) extends Connection(AkkaType)
 
   /**
-    * A connection to a remote http based component
-    *
-    * @param componentId A component providing http services
+    * Represents a http connection provided by the component
     */
   final case class HttpConnection(componentId: ComponentId) extends Connection(HttpType)
 
   /**
-    * A connection to a remote tcp based component
-    *
-    * @param componentId A component providing tcp services
+    * represents a tcp connection provided by the component
     */
   final case class TcpConnection(componentId: ComponentId) extends Connection(TcpType)
 

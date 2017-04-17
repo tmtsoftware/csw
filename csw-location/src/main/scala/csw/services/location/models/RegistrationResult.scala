@@ -5,17 +5,14 @@ import akka.Done
 import scala.concurrent.Future
 
 /**
-  * Returned as a result of successful registration.
+  * RegistrationResult represents successful registration of a location.
   */
 trait RegistrationResult {
+
   /**
-    * Unregisters the previously registered `Location` and returns a `Future` which completes on successful
-    * un-registration
+    * The successful registration of location can be unregistered using this method
     */
   def unregister(): Future[Done]
 
-  /**
-    * A `Location` registered successfully with `LocationService`
-    */
   def location: Location
 }
