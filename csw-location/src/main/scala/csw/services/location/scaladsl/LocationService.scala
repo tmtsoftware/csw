@@ -6,6 +6,7 @@ import akka.stream.scaladsl.Source
 import csw.services.location.models._
 
 import scala.concurrent.Future
+import scala.concurrent.duration.FiniteDuration
 
 /**
   * A LocationService interface to manage registrations. All operations are non-blocking.
@@ -36,11 +37,22 @@ trait LocationService {
   def unregisterAll(): Future[Done]
 
   /**
-    * Resolves the location based on the given connection
+    * Resolves the location for a connection from the local cache
     *
+    * @param connection A connection to resolve to with its registered location
     * @return A Future which completes with the resolved location if found or None otherwise.
     */
-  def resolve(connection: Connection): Future[Option[Location]]
+  def find(connection: Connection): Future[Option[Location]]
+
+  /**
+    * Resolves the location for a connection from the local cache, if not found waits for the event to arrive
+    * within specified time limit. Returns None if both fail.
+    *
+    * @param connection A connection to resolve to with its registered location
+    * @param within Max wait time for event to arrive
+    * @return A Future which completes with the resolved location if found or None otherwise.
+    */
+  def resolve(connection: Connection, within: FiniteDuration): Future[Option[Location]]
 
   /**
     * Lists all locations registered
