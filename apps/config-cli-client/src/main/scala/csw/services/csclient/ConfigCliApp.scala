@@ -95,7 +95,7 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
 
     def history(): Future[Unit] = async {
       val histList = await(configService.history(options.repositoryFilePath.get, options.maxFileVersions))
-      histList.foreach(h => println(s"$h.id.id\t$h.time\t$h.comment"))
+      histList.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
     }
 
     def setDefault(): Future[Unit] = async {
@@ -109,7 +109,7 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
 
       configDataOpt match {
         case Some(configData) ⇒
-          val outputFile = await(PathUtils.writeToPath(configDataOpt.get, options.outputFilePath.get))
+          val outputFile = await(PathUtils.writeToPath(configData, options.outputFilePath.get))
           println(s"Default version of repository file: ${options.repositoryFilePath.get} is saved at location: ${outputFile.getAbsolutePath}")
         case None             ⇒
       }
