@@ -48,19 +48,13 @@ class ConfigServiceRouteTest extends FunSuite
   test("create - success status code") {
     // try to create by providing optional comment parameter
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      // actual
-      status shouldEqual StatusCodes.OK
-      // expected
-      // status shouldEqual StatusCodes.Created
+      status shouldEqual StatusCodes.Created
       responseAs[ConfigId] shouldBe ConfigId(1)
     }
 
     // try to create by not providing optional comment parameter
     Post("/config/test1.conf?oversize=true", configFile2) ~> route ~> check {
-      // actual
-      status shouldEqual StatusCodes.OK
-      // expected
-      // status shouldEqual StatusCodes.Created
+      status shouldEqual StatusCodes.Created
       responseAs[ConfigId] shouldBe ConfigId(2)
     }
 
@@ -69,10 +63,7 @@ class ConfigServiceRouteTest extends FunSuite
   test("create - failure status codes") {
 
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      // actual
-      status shouldEqual StatusCodes.OK
-      // expected
-      // status shouldEqual StatusCodes.Created
+      status shouldEqual StatusCodes.Created
     }
 
     Post("/config?oversize=true&comment=commit1", configFile1) ~> Route.seal(route) ~> check {
@@ -81,12 +72,7 @@ class ConfigServiceRouteTest extends FunSuite
 
     // try to create file which already exists
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> Route.seal(route) ~> check {
-      // expected
-      // status shouldEqual StatusCodes.Conflict
-      // status shouldEqual StatusCodes.UnprocessableEntity
-
-      // actual
-      status shouldEqual StatusCodes.BadRequest
+       status shouldEqual StatusCodes.Conflict
     }
 
   }
@@ -94,7 +80,7 @@ class ConfigServiceRouteTest extends FunSuite
   test("update - success status code") {
 
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
 
     // try to update by providing optional comment parameter
@@ -114,34 +100,26 @@ class ConfigServiceRouteTest extends FunSuite
   }
 
   test("update - failure status codes") {
-    // query parameter missing
+    // path missing
     Post("/update") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
     // try to update file which does not exist
     Put("/config/test.conf?comment=updated", configFile1) ~> route ~> check {
-      // expected
-      // status shouldEqual StatusCodes.NotFound
-
-      //  actual
-      status shouldEqual StatusCodes.BadRequest
+      status shouldEqual StatusCodes.NotFound
     }
 
     // try to update a file which does not exist by not providing optional comment parameter
     Put("/config/test.conf", configFile1) ~> route ~> check {
-      // expected
-      // status shouldEqual StatusCodes.NotFound
-
-      //  actual
-      status shouldEqual StatusCodes.BadRequest
+      status shouldEqual StatusCodes.NotFound
     }
 
   }
 
   test("get - success status code") {
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
 
     Get("/config/test.conf") ~> Route.seal(route) ~> check {
@@ -159,7 +137,7 @@ class ConfigServiceRouteTest extends FunSuite
   test("get - failure status codes") {
 
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
 
     // try to fetch file which does not exists
@@ -177,7 +155,7 @@ class ConfigServiceRouteTest extends FunSuite
   test("get by date - success status code") {
     val timeWhenRepoWasEmpty = Instant.now()
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
     val timeWhenFileWasCreated = Instant.now()
 
@@ -210,8 +188,9 @@ class ConfigServiceRouteTest extends FunSuite
     }
 
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
+
     // when list is not empty
     Get("/list") ~> route ~> check {
       status shouldEqual StatusCodes.OK
@@ -223,7 +202,7 @@ class ConfigServiceRouteTest extends FunSuite
   test("history - success  status code") {
 
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
 
     Put("/config/test.conf?comment=commit2", updatedConfigFile1) ~> route ~> check {
@@ -250,6 +229,7 @@ class ConfigServiceRouteTest extends FunSuite
   }
 
   test("history - failure  status codes") {
+
     // query parameter missing
     Get("/history") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
@@ -257,19 +237,11 @@ class ConfigServiceRouteTest extends FunSuite
 
     // try to fetch history of a file which does not exists
     Get("/history/test5.conf") ~> Route.seal(route) ~> check {
-      // expected
-      // status shouldEqual StatusCodes.NotFound
-
-      //  actual
-      status shouldEqual StatusCodes.OK
+     status shouldEqual StatusCodes.NotFound
     }
 
     Get("/history/test5.conf&maxResults=5") ~> Route.seal(route) ~> check {
-      // expected
-      // status shouldEqual StatusCodes.NotFound
-
-      //  actual
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.NotFound
     }
 
   }
@@ -277,7 +249,7 @@ class ConfigServiceRouteTest extends FunSuite
   test("getDefault - success status code") {
 
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
 
     Get("/config/test.conf?default=true") ~> route ~> check {
@@ -300,7 +272,7 @@ class ConfigServiceRouteTest extends FunSuite
   test("setDefault - success status code") {
 
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
 
     Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
@@ -323,24 +295,16 @@ class ConfigServiceRouteTest extends FunSuite
 
     // try to set default version of file which does not exist
     Put("/default/test.conf?id=1") ~> Route.seal(route) ~> check {
-      //  actual
-      status shouldEqual StatusCodes.BadRequest
-
-      //  expected
-      //  status shouldEqual StatusCodes.NotFound
+      status shouldEqual StatusCodes.NotFound
     }
 
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
 
     // try to set default version of file which exist bu corresponding id does not exist
     Put("/default/test.conf?id=2") ~> Route.seal(route) ~> check {
-      //  actual
-      status shouldEqual StatusCodes.BadRequest
-
-      //  expected
-      //  status shouldEqual StatusCodes.NotFound
+      status shouldEqual StatusCodes.NotFound
     }
 
   }
@@ -348,7 +312,7 @@ class ConfigServiceRouteTest extends FunSuite
   test("resetDefault - success status code") {
 
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
 
     Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
@@ -356,7 +320,6 @@ class ConfigServiceRouteTest extends FunSuite
     }
 
     Put("/default/test.conf") ~> Route.seal(route) ~> check {
-      //  actual
       status shouldEqual StatusCodes.OK
     }
 
@@ -373,11 +336,7 @@ class ConfigServiceRouteTest extends FunSuite
 
     //  try to reset default version of file which does not exists
     Put("/default/test.conf") ~> Route.seal(route) ~> check {
-      //  actual
-      status shouldEqual StatusCodes.BadRequest
-
-      //  expected
-      //  status shouldEqual StatusCodes.NotFound
+      status shouldEqual StatusCodes.NotFound
     }
 
   }
@@ -385,17 +344,19 @@ class ConfigServiceRouteTest extends FunSuite
   test("exists - success status code") {
 
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
 
     Head("/config/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
-
   }
 
   test("exists - failure status code") {
 
+    Head("/config/test.conf?id=3") ~> route ~> check {
+      status shouldEqual StatusCodes.NotFound
+    }
     Head("/config/test_not_exists.conf") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }

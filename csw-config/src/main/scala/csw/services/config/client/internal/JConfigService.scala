@@ -54,6 +54,9 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def exists(path: Path): CompletableFuture[jl.Boolean] =
     configService.exists(path).toJava.toCompletableFuture.asInstanceOf[CompletableFuture[jl.Boolean]]
 
+  override def exists(path: Path, id: Optional[ConfigId]): CompletableFuture[jl.Boolean] =
+    configService.exists(path, id.asScala).toJava.toCompletableFuture.asInstanceOf[CompletableFuture[jl.Boolean]]
+
   override def delete(path: Path, comment: String): CompletableFuture[Unit] =
     configService.delete(path, comment).toJava.toCompletableFuture
 
@@ -71,9 +74,6 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
 
   override def setDefault(path: Path, id: Optional[ConfigId]): CompletableFuture[Unit] =
     configService.setDefault(path, id.asScala).toJava.toCompletableFuture
-
-  override def resetDefault(path: Path): CompletableFuture[Unit] =
-    configService.resetDefault(path).toJava.toCompletableFuture
 
   override def getDefault(path: Path): CompletableFuture[Optional[ConfigData]] =
     configService.getDefault(path).map(_.asJava).toJava.toCompletableFuture

@@ -115,11 +115,6 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
       }
     }
 
-    def resetDefault(): Future[Unit] = async {
-      await(configService.resetDefault(options.repositoryFilePath.get))
-      println(s"Default version of file ${options.repositoryFilePath.get} is set to latest.")
-    }
-
     options.op match {
       case "create"       => create()
       case "update"       => update()
@@ -130,7 +125,6 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
       case "history"      => history()
       case "setDefault"   => setDefault()
       case "getDefault"   => getDefault
-      case "resetDefault" => resetDefault()
       case x              => throw new RuntimeException(s"Unknown operation: $x")
     }
   }

@@ -1,14 +1,12 @@
 package csw.services.config.server.svn
 
-import java.io._
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
-import csw.services.config.api.javadsl.IConfigService
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
-import csw.services.config.client.internal.JConfigService
 import csw.services.config.server.files.OversizeFileService
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
@@ -35,7 +33,7 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
       val present = await(exists(path))
 
       if (present) {
-        throw new IOException("File already exists in repository: " + path)
+        throw FileAlreadyExists(path)
       } else if (oversize) {
         await(createOversize())
       } else {
@@ -56,7 +54,7 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
       await(pathStatus(path)) match {
         case PathStatus.NormalSize ⇒ await(put(path, configData, update = true, comment))
         case PathStatus.Oversize   ⇒ await(updateOversize())
-        case PathStatus.Missing    ⇒ throw new FileNotFoundException("File not found: " + path)
+        case PathStatus.Missing    ⇒ throw FileNotFound(path)
       }
     }
   }
@@ -112,18 +110,15 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
     }
   }
 
-  override def exists(path: Path): Future[Boolean] = exists(path, None)
-
-  private def exists(path: Path, id: Option[ConfigId]): Future[Boolean] = async {
+  override def exists(path: Path, id: Option[ConfigId]): Future[Boolean] = async {
     await(pathStatus(path, id)).isInstanceOf[PathStatus.Present]
   }
 
-  //TODO: This implementation deletes all versions of a file. This is different than the expecations
   override def delete(path: Path, comment: String = "deleted"): Future[Unit] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒ await(svnRepo.delete(path, comment))
       case PathStatus.Oversize   ⇒ await(svnRepo.delete(shaFilePath(path), comment))
-      case PathStatus.Missing    ⇒ throw new FileNotFoundException("Can't delete " + path + " because it does not exist")
+      case PathStatus.Missing    ⇒ throw FileNotFound(path)
     }
   }
 
@@ -138,13 +133,13 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒ await(hist(path, maxResults))
       case PathStatus.Oversize   ⇒ await(hist(shaFilePath(path), maxResults))
-      case PathStatus.Missing    ⇒ List.empty
+      case PathStatus.Missing    ⇒ throw FileNotFound(path)
     }
   }
 
   override def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit] = async {
     if(!await(exists(path, id))) {
-      throw new FileNotFoundException(s"file does not exist at path=$path")
+      throw FileNotFound(path)
     }
     val defaultPath = defaultFilePath(path)
 
@@ -157,8 +152,6 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
       case None                      ⇒ ()
     }
   }
-
-  override def resetDefault(path: Path): Future[Unit] = delete(defaultFilePath(path))
 
   override def getDefault(path: Path): Future[Option[ConfigData]] = {
 

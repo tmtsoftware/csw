@@ -1,11 +1,11 @@
 package csw.services.config.api.scaladsl
 
-import java.io._
 import java.nio.file.Paths
 import java.time.Instant
 
-import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.commons.TestFileUtils
+import csw.services.config.api.commons.TestFutureExtension.RichFuture
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.files.Sha1
@@ -67,7 +67,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val fileWithoutBackslash = Paths.get(fileName)
     configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit csw file").await
 
-    intercept[IOException] {
+    intercept[FileAlreadyExists] {
       configService.create(fileWithoutBackslash, ConfigData.fromString(configValue), oversize = false, "commit without '/'").await
     }
 
@@ -78,7 +78,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val file = Paths.get("/test.conf")
     configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit test conf for first time").await
 
-    intercept[IOException] {
+    intercept[FileAlreadyExists] {
       configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit test conf again").await
     }
   }
@@ -96,7 +96,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("update should throw FileNotFoundException if a file does not exists in repository") {
     val file = Paths.get("/assembly.conf")
 
-    intercept[FileNotFoundException] {
+    intercept[FileNotFound] {
       configService.update(file, ConfigData.fromString(configValue), "commit updated assembly conf").await
     }
   }
@@ -204,13 +204,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   test("deleting non existing file should throw FileNotFoundException") {
     val file = Paths.get("tromboneHCD.conf")
-    intercept[FileNotFoundException] {
+    intercept[FileNotFound] {
       configService.delete(file).await
     }
   }
 
-  //  TODO Implementation of delete() needs to be fixed
-  //  This is not a valid test. Delete should just remove latest version and keep older ones.
   test("delete removes all versions of a file") {
     val file = Paths.get("/a/b/csw.conf")
 
@@ -222,7 +220,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     configService.history(file).await.size shouldBe 3
     configService.delete(file).await
-    configService.history(file).await.size shouldBe 0
+    intercept[FileNotFound] {
+      configService.history(file).await.size shouldBe 0
+    }
     configService.get(file, Some(configId)).await.get.toStringF.await shouldBe configValue2
     configService.get(file, Some(ConfigId(3))).await.get.toStringF.await shouldBe configValue3
     configService.get(file).await shouldBe None
@@ -334,7 +334,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val defaultAfterDelete = configService.getDefault(file).await
     defaultAfterDelete shouldBe None
 
-    intercept[java.io.FileNotFoundException] {
+    intercept[FileNotFound] {
       configService.setDefault(file).await
     }
   }
@@ -366,7 +366,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val fileExists = configService.exists(file).await
     fileExists shouldBe false
 
-    val fileTimeStampedAfterDelete = configService.get(file, Instant.now()).await
+    val fileTimeStampedAfterDelete = configService.get(file).await
     fileTimeStampedAfterDelete shouldBe None
   }
 }

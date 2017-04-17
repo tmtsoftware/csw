@@ -127,7 +127,7 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     }
 
     //  reset default version of file and store it at location: /tmp/output.txt
-    val parsedResetDefaultArgs: Option[Options] = CmdLineArgsParser.parse(resetDefaultArgs)
+    val parsedResetDefaultArgs: Option[Options] = CmdLineArgsParser.parse(setDefaultMinimalArgs)
     ConfigCliApp.commandLineRunner(parsedResetDefaultArgs.get).await
 
     //  get default version of file and store it at location: /tmp/output.txt

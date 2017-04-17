@@ -1,7 +1,5 @@
 package csw.services.config.client.internal
 
-import java.io.{FileNotFoundException, IOException}
-import java.nio.charset.Charset
 import java.nio.{file ⇒ jnio}
 import java.time.Instant
 
@@ -10,6 +8,7 @@ import akka.http.scaladsl.model.HttpEntity.Chunked
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.http.JsonSupport
@@ -26,6 +25,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   private def configUri(path: jnio.Path) = baseUri(Path / "config" ++ Path / Path(path.toString))
   private def defaultUri(path: jnio.Path) = baseUri(Path / "default" ++ Path / Path(path.toString))
   private def historyUri(path: jnio.Path) = baseUri(Path / "history" ++ Path / Path(path.toString))
+
   private def listUri = baseUri(Path / "list")
 
   private def baseUri(path: Path) = async {
@@ -41,9 +41,9 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK         ⇒ await(Unmarshal(response).to[ConfigId])
-      case StatusCodes.BadRequest ⇒ throw new IOException(response.status.reason())
-      case _                      ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.Created  ⇒ await(Unmarshal(response).to[ConfigId])
+      case StatusCodes.Conflict ⇒ throw FileAlreadyExists(path)
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 
@@ -56,9 +56,9 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK         ⇒ await(Unmarshal(response).to[ConfigId])
-      case StatusCodes.BadRequest ⇒ throw new FileNotFoundException(response.status.reason())
-      case _                      ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.OK       ⇒ await(Unmarshal(response).to[ConfigId])
+      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 
@@ -90,8 +90,8 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def exists(path: jnio.Path): Future[Boolean] = async {
-    val uri = await(configUri(path))
+  override def exists(path: jnio.Path, id: Option[ConfigId]): Future[Boolean] = async {
+    val uri = await(configUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
 
     val request = HttpRequest(HttpMethods.HEAD, uri = uri)
     println(request)
@@ -112,9 +112,9 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK         ⇒ ()
-      case StatusCodes.BadRequest ⇒ throw new FileNotFoundException(response.status.reason())
-      case _                      ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.OK       ⇒ ()
+      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 
@@ -139,8 +139,9 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK ⇒ await(Unmarshal(response.entity).to[List[ConfigFileHistory]])
-      case _              ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.OK       ⇒ await(Unmarshal(response.entity).to[List[ConfigFileHistory]])
+      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 
@@ -152,23 +153,9 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK         ⇒ ()
-      case StatusCodes.BadRequest ⇒ throw new FileNotFoundException(response.status.reason())
-      case _                      ⇒ throw new RuntimeException(response.status.reason())
-    }
-  }
-
-  override def resetDefault(path: jnio.Path): Future[Unit] = async {
-    val uri = await(defaultUri(path))
-
-    val request = HttpRequest(HttpMethods.PUT, uri = uri)
-    println(request)
-    val response = await(Http().singleRequest(request))
-
-    response.status match {
-      case StatusCodes.OK         ⇒ ()
-      case StatusCodes.BadRequest ⇒ throw new FileNotFoundException(response.status.reason())
-      case _                      ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.OK       ⇒ ()
+      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 
