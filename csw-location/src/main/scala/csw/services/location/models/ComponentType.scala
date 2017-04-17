@@ -6,7 +6,7 @@ import enumeratum.{Enum, EnumEntry}
 import scala.collection.immutable.IndexedSeq
 
 /**
-  * Represents a type of the Component. It should be serializable since the data present in CRDT has to be communicable over the network.
+  * Represents a type of the Component. It should be serializable since it has to be transmittable over the network.
   * The type will always be represented in lower case.
   */
 sealed abstract class ComponentType extends EnumEntry with Lowercase with TmtSerializable {

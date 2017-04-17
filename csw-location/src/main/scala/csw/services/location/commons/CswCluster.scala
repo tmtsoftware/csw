@@ -12,7 +12,7 @@ import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 /**
-  * CswCluster provides cluster properties to manage data in CRDT
+  * CswCluster provides cluster properties to manage distributed data
   *
   * ''Note: '' It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
   */

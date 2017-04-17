@@ -8,7 +8,7 @@ import csw.services.location.commons.{ClusterSettings, Constants}
   * ActorSystemFactory creates a remote ActorSystem on the interface where csw-cluster is running. The ActorSystem starts on a
   * random port.
   *
-  * @note It is highly recommended to create actors via this factory if it has to be registered in CRDT
+  * @note It is highly recommended to create actors via this factory if it has to be registered with LocationService
   */
 object ActorSystemFactory {
 

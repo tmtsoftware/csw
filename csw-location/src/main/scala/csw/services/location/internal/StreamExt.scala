@@ -24,6 +24,9 @@ object StreamExt {
       */
     def cancellableMat: Source[Out, (Mat, KillSwitch)] = source.viaMat(KillSwitches.single)(Keep.both)
 
+    /**
+      * Deduplicate identical elements that consecutively appear in a stream
+      */
     def distinctUntilChanged: Source[Out, Mat] = source
       .map(Option.apply)
       .prepend(Source.single(None))

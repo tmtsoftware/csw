@@ -26,10 +26,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   implicit val timeout: Timeout = Timeout(5.seconds)
 
   /**
-  * Register a 'connection -> location' entry in CRDT
-  *
-  * @param registration holds connection and location
-  **/
+    * Register a 'connection -> location' entry in CRDT
+    **/
   def register(registration: Registration): Future[RegistrationResult] = {
 
     //Get the location from this registration
@@ -61,7 +59,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     }
   }
 
-  // Unregister the connection from CRDT
+  /**
+    * Unregister the connection from CRDT
+    */
   def unregister(connection: Connection): Future[Done] = {
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
@@ -77,8 +77,10 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     }
   }
 
-  // Unregister all connections from CRDT
-  // Note : This method shold be used for testing purpose only
+  /**
+    * Unregister all connections from CRDT
+    * Note : This method shold be used for testing purpose only
+    */
   def unregisterAll(): Future[Done] = async {
     //Get all locations registered with CRDT
     val locations = await(list)
@@ -88,60 +90,79 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     Done
   }
 
+  /**
+    * Resolves the location for a connection from the local cache
+    */
   def find(connection: Connection): Future[Option[Location]] = async {
     await(list).find(_.connection == connection)
   }
 
-  //Resolve a location for the given connection
+  /**
+    * Resolve a location for the given connection
+    */
   override def resolve(connection: Connection, within: FiniteDuration): Future[Option[Location]] = async {
     val foundInLocalCache = await(find(connection))
     if(foundInLocalCache.isDefined) foundInLocalCache else await(resolveWithin(connection, within))
   }
 
-  //List all locations registered with CRDT
+  /**
+    * List all locations registered with CRDT
+    */
   def list: Future[List[Location]] = (replicator ? AllServices.get).map {
     case x@GetSuccess(AllServices.Key, _) => x.get(AllServices.Key).entries.values.toList
     case NotFound(AllServices.Key, _)     ⇒ List.empty
     case _                                => throw RegistrationListingFailed
   }
 
-  //List all locations registered for the given componentType
+  /**
+    * List all locations registered for the given componentType
+    */
   def list(componentType: ComponentType): Future[List[Location]] = async {
     await(list).filter(_.connection.componentId.componentType == componentType)
   }
 
-  //List all locations registered with the given hostname
+  /**
+    * List all locations registered with the given hostname
+    */
   def list(hostname: String): Future[List[Location]] = async {
     await(list).filter(_.uri.getHost == hostname)
   }
 
-  //List all locations registered with the given connection type
+  /**
+    * List all locations registered with the given connection type
+    */
   def list(connectionType: ConnectionType): Future[List[Location]] = async {
     await(list).filter(_.connection.connectionType == connectionType)
   }
 
-  //Track the status of given connection
+  /**
+    * Track the status of given connection
+    */
   def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
-    //Get a source from an actor so that messages send to the actor are put in the stream
+    //Get a stream that emits messages sent to the actor generated after materialization
     val source = Source.actorRef[Any](256, OverflowStrategy.dropHead).mapMaterializedValue {
-      //When the stream starts flowing, the actor is subscribed to the replicator to get all events for the connection key
+      //Subscribe materialized actorRef to the changes in connection so that above stream starts emitting messages
       actorRef ⇒ replicator ! Subscribe(service.Key, actorRef)
     }
 
-    //Collect only the Changed events for this connection and transform it to location events. If the changed event has the value
-    //(Location) then send location updated event. If not, location must have been removed, send appropriate event.
+    //Collect only the Changed events for this connection and transform it to location events.
+    // If the changed event contains a Location, send LocationUpdated event.
+    // If not, location must have been removed, send LocationRemoved event.
     val trackingEvents = source.collect {
       case c@Changed(service.Key) if c.get(service.Key).value.isDefined => LocationUpdated(c.get(service.Key).value.get)
       case c@Changed(service.Key)                                       => LocationRemoved(connection)
     }
-    //Allow stream to be cancellable. This will give the handle of KillSwitch.
+    //Allow stream to be cancellable by giving it a KillSwitch in mat value.
+    // Also, deduplicate identical messages in case multiple DeathWatch actors unregisters the same location.
     trackingEvents.cancellable.distinctUntilChanged
   }
 
-  //Terminate the ActorSystem and gracefully leave the akka cluster
-  // Note: It is recommended not to perform any operation on LocationService after shutdown
+  /**
+    * Terminate the ActorSystem and gracefully leave the akka cluster
+    * Note: It is recommended not to perform any operation on LocationService after shutdown
+    */
   def shutdown(): Future[Done] = cswCluster.terminate()
 
   private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {

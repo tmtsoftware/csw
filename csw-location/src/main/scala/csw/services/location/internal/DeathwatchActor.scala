@@ -21,7 +21,7 @@ class DeathwatchActor(locationService: LocationService) extends Actor {
   var watchedLocations: Set[AkkaLocation] = Set.empty
 
   /**
-    * Before starting DeathWatchActor, it is subscribed to replicator to get events for locations registered with CRDT
+    * Before starting DeathWatchActor, it is subscribed to replicator to get events for locations registered with LocationService
     *
     * @see [[csw.services.location.internal.Registry.AllServices]]
     */

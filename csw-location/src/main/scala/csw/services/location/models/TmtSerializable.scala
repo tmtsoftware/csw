@@ -1,6 +1,7 @@
 package csw.services.location.models
 
 /**
-  * Models required to be transmitted over the network need to be extended from TmtSerializable
+  * Marker trait for serializing domain models over the wire.
+  * This marker is configured to be serialized using Kryo.
   */
 trait TmtSerializable extends Serializable

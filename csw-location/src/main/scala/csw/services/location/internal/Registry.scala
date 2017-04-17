@@ -9,11 +9,11 @@ import csw.services.location.models.{Connection, Location}
 import scala.concurrent.duration.DurationDouble
 
 /**
-  * Registry is used to create CRDTs and manage its update and get messages for replicator
+  * Registry is used to create distributed data and manage its update and get messages for replicator
   *
-  * @param Key        The CRDT key
-  * @param EmptyValue The default value of CRDT key
-  * @tparam K The type of CRDT key
+  * @param Key        The distributed data key
+  * @param EmptyValue The default value of distributed data key
+  * @tparam K The type of distributed data key
   * @tparam V The type of ReplicatedData
   */
 class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) {
@@ -36,9 +36,8 @@ class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) 
 object Registry {
 
   /**
-    * AllServices manages CRDT with Constants.RegistryKey as key and a map of connection to location as value. It is used to get
-    * list of all registered locations. Since there is no other way to get that data from CRDT, Constants.RegistryKey is created
-    * which will hold all locations registered with CRDT.
+    * AllServices is a distributed map from connection to location.
+    * It is used to get list of all registered locations at any point in time
     */
   object AllServices extends Registry[LWWMapKey[Connection, Location], LWWMap[Connection, Location]](
     Key = LWWMapKey(Constants.RegistryKey),
@@ -46,8 +45,9 @@ object Registry {
   )
 
   /**
-    * Service manages CRDT with connection as key and location as value. It is used to track a connection by subscribing events
-    * for it.
+    * Service is a distributed registry which holds a location value against a connection-name.
+    * At times, a location may not be available for a given connection-name, hence the location is an optional value.
+    * It is used to track a single connection by subscribing events generated when associated location changes.
     */
   class Service(connection: Connection)(implicit cluster: Cluster) extends Registry[LWWRegisterKey[Option[Location]], LWWRegister[Option[Location]]](
     Key = LWWRegisterKey(connection.name),

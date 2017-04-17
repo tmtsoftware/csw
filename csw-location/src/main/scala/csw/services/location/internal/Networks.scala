@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 case class NetworkInterfaceNotFound(message: String) extends Exception(message)
 
 /**
-  * Picks an appropriate ipv4 address to register with CRDT using the NetworkInterfaceProvider
+  * Picks an appropriate ipv4 address to register using the NetworkInterfaceProvider
   *
   * @param interfaceName Provide the name of network interface where csw cluster is running
   */
@@ -16,7 +16,7 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
   /**
     * Picks an appropriate ipv4 address from the network interface provided
     */
-  def this(interfaceName: String) = this(interfaceName, new NetworkInterfaceProvider())
+  def this(interfaceName: String) = this(interfaceName, new NetworkInterfaceProvider)
 
   /**
     * Picks an appropriate ipv4 address. Since no specific network interface is provided, the first available interface will be
@@ -27,13 +27,13 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
   /**
     * Gives the ipv4 host address
      */
-  def hostname(): String = getIpv4Address().getHostAddress
+  def hostname(): String = ipv4Address.getHostAddress
 
   /**
     * Gives the non-loopback, ipv4 address for the given network interface. If no interface name is provided then the address mapped
     * to the first available interface is chosen.
     */
-  def getIpv4Address(): InetAddress = all()
+  def ipv4Address: InetAddress = mappings
     .sortBy(_._1)
     .find(pair => isIpv4(pair._2))
     .getOrElse((0, InetAddress.getLocalHost))
@@ -45,19 +45,17 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
     !addr.isLoopbackAddress && !addr.isInstanceOf[Inet6Address]
   }
 
-  //Uses a helper method to acquire seq of tuples containing "Index and List of InetAddresses". Then, flattens it.
-  //e.g. Seq((1, List(A, B), (2, List(C, D)) => Seq((1,A), (1, B), (2, C), (2, D))
-  private def all(): Seq[(Int, InetAddress)] = {
+  //Get a flattened seq of Index -> InetAddresses pairs
+  private def mappings: Seq[(Int, InetAddress)] = {
     for {
-      (index, inetAddresses) <- getNetworkInterfaceList()
+      (index, inetAddresses) <- interfaces
       inetAddress <- inetAddresses
     } yield (index, inetAddress)
   }
 
-  // If the network interface is defined then get all InetAddresses mapped for that else get it for all interfaces
-  private def getNetworkInterfaceList(): Seq[(Int, List[InetAddress])] = {
+  private def interfaces: Seq[(Int, List[InetAddress])] = {
     if (interfaceName.isEmpty)
-      networkProvider.getAllInterfaces()
+      networkProvider.allInterfaces
     else
       networkProvider.getInterface(interfaceName)
   }
@@ -67,24 +65,22 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
 /**
   *  Provides InetAddresses for network interface
    */
-class NetworkInterfaceProvider() {
+class NetworkInterfaceProvider {
 
   /**
-    * Prepare a Sequence of tuple where each tuple represents a network interface and the list of all InetAddresses mapped for that
-    * interface
+    * Get Seq of (Index -> List of InetAddress) mapping for each interface
     */
-  def getAllInterfaces(): Seq[(Int, List[InetAddress])] = {
-    NetworkInterface.getNetworkInterfaces.asScala.toList.map(iface => (iface.getIndex, iface.getInetAddresses().asScala.toList))
+  def allInterfaces: Seq[(Int, List[InetAddress])] = {
+    NetworkInterface.getNetworkInterfaces.asScala.toList.map(iface => (iface.getIndex, iface.getInetAddresses.asScala.toList))
   }
 
   /**
-    * Prepare a tuple representing the given interface and the list of all InetAddresses mapped for that interface. If the given
-    * interface is not found then an exception is thrown
+    * Get Seq of (Index -> List of InetAddress) mapping for a given interface
     */
   def getInterface(interfaceName: String): Seq[(Int, List[InetAddress])] = {
     Option(NetworkInterface.getByName(interfaceName)) match {
-      case None                          => throw new NetworkInterfaceNotFound(s"Network interface=${interfaceName} not found.")
-      case s@Some(nic: NetworkInterface) => s.map(iface => (iface.getIndex, iface.getInetAddresses().asScala.toList)).get :: Nil
+      case Some(nic) => List((nic.getIndex, nic.getInetAddresses.asScala.toList))
+      case None      => throw NetworkInterfaceNotFound(s"Network interface=$interfaceName not found.")
     }
   }
 }
