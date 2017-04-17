@@ -4,14 +4,13 @@ import akka.Done
 import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata._
 import akka.pattern.ask
-import akka.stream.{KillSwitch, OverflowStrategy}
 import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.{KillSwitch, OverflowStrategy}
 import akka.util.Timeout
 import csw.services.location.commons.CswCluster
 import csw.services.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed, RegistrationListingFailed, UnregistrationFailed}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.internal.StreamExt.RichSource
-import csw.services.location.javadsl.ILocationService
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
 
