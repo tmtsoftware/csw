@@ -247,9 +247,14 @@ class LocationServiceCompTest
 
     val result2 = locationService.register(duplicateTcpRegistration).await
 
+    result.location.connection shouldBe connection
     result2.location.connection shouldBe connection
 
     result.unregister().await
+    // Location service should be empty because second register above did nothing -- you can only register once
+    locationService.list.await shouldBe List.empty
+
+    // Second unregister does nothing and does not produce an error
     result2.unregister().await
   }
 
