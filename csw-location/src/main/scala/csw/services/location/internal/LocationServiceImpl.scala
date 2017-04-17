@@ -5,7 +5,7 @@ import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata._
 import akka.pattern.ask
 import akka.stream.{KillSwitch, OverflowStrategy}
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{Sink, Source}
 import akka.util.Timeout
 import csw.services.location.commons.CswCluster
 import csw.services.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed, RegistrationListingFailed, UnregistrationFailed}
@@ -17,7 +17,7 @@ import csw.services.location.scaladsl.LocationService
 
 import scala.async.Async._
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationDouble
+import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 /**
   * A `LocationService` implementation which manages registration data on akka cluster.
@@ -127,6 +127,12 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     await(list).find(_.connection == connection)
   }
 
+
+  override def resolve(connection: Connection, within: FiniteDuration): Future[Option[Location]] = async {
+    val foundInLocalCache = await(find(connection))
+    if(foundInLocalCache.isDefined) foundInLocalCache else await(resolveWithin(connection, within))
+  }
+
   /**
     * List all entries from `LWWMap` and complete the `Future` with `Location` values.
     *
@@ -211,5 +217,11 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     override def location: Location = loc
 
     override def unregister(): Future[Done] = outer.unregister(location.connection)
+  }
+
+  private def resolveWithin(connection: Connection, waitTime: FiniteDuration): Future[Option[Location]] = {
+    track(connection).collect {
+      case LocationUpdated(location) ⇒ location
+    }.takeWithin(waitTime).runWith(Sink.headOption)
   }
 }

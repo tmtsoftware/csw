@@ -10,6 +10,8 @@ import akka.stream.javadsl.Source
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
 
+import scala.concurrent.duration.FiniteDuration
+
 /**
   * A `LocationService` interface which allows you to manage connections and their registrations.
   * All operations are async, hence yield a `CompletableFuture`
@@ -47,6 +49,16 @@ trait ILocationService {
     * @return A `CompletableFuture` of `Optional` which completes with the resolved location if found or `Empty` otherwise.
     */
   def find(connection: Connection): CompletableFuture[Optional[Location]]
+
+  /**
+    * Resolves the location for a connection from the local cache, if not found waits for the event to arrive
+    * within specified time limit. Returns None if both fail.
+    *
+    * @param connection A connection to resolve to with its registered location
+    * @param within Max wait time for event to arrive
+    * @return A `CompletableFuture` of `Optional` which completes with the resolved location if found or `Empty` otherwise.
+    */
+  def resolve(connection: Connection, within: FiniteDuration): CompletableFuture[Optional[Location]]
 
   /**
     * Lists all locations registered with `LocationService`
