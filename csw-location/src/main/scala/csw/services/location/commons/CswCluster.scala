@@ -87,6 +87,10 @@ object CswCluster {
     if(startManagement) {
       //Block until the cluster is initialized
       Await.result(ClusterHttpManagement(cluster).start(), 10.seconds)
+      //Add shutdown hook if cluster management is started successfully.
+      CoordinatedShutdown(actorSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "shudownClusterManagement") { () =>
+        ClusterHttpManagement(cluster).stop()
+      }
     }
 
     // Check if seed nodes are provided to join csw-cluster
