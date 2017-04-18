@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+# This script exercises below steps :
+#    1.  Create a docker subnet=192.168.10.0/24 with name `tmt_net_1`
+#    2.  Create another subnet=192.168.20.0/24 with name tmt_net_2
+#    3.  Create a container name `Assembly` and attach it to first network (tmt_net_1)
+#    4.  Create a container name `Test-App` and attach it to second network (tmt_net_2)
+#    5.  At this stage, both the container will have single NIC allocated  by custom docker network and both residing under two different subnets
+#    6.  Now attach both the containers to bridge network (This is a default Docker bridge network)
+#    7.  At this stage, both containers will have TWO NIC's (one from custom network and one from docker bridge network)
+#    8.  Run AssemblyApp.scala with Interface eth1 (docker bridge Interface) on `Assembly` container with clusterPort=3552 (This will act as a seed to form cluster and register assembly with LocationService)
+#    9.  Run TestMultipleNicApp.scala with Interface eth1 (docker bridge Interface) on `Test-App` container. (This will resolve/find a assembly connection which is registers on `Assembly` container)
+
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 ORANGE='\033[0;33m'

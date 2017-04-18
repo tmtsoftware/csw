@@ -8,7 +8,7 @@ import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.location.scaladsl.{ActorSystemFactory, LocationServiceFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -17,6 +17,17 @@ class DetectComponentCrashTestMultiJvmNode1 extends DetectComponentCrashTest(0)
 class DetectComponentCrashTestMultiJvmNode2 extends DetectComponentCrashTest(0)
 class DetectComponentCrashTestMultiJvmNode3 extends DetectComponentCrashTest(0)
 
+/**
+  * This test is running as a part of jenkins master-slave setup forming three nodes cluster. (seed: running on jenkins master, member1: running on jenkins slave, member2: running on jenkins slave)
+  * This test exercises below steps :
+  * 1. Registering akka connection on member1 node
+  * 2. seed(master) and member2 is tracking a akka connection which is registered on slave (member1)
+  * 3. Exiting member1 using testConductor.exit(member1, 1) (tell the remote node to shut itself down using System.exit with the given
+  * exitValue 1. The node will also be removed from cluster)
+  * 4. Once remote member1 is exited, we are asserting that master (seed) and member2 should receive LocationRemoved event within 5 seconds
+  * => probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
+  *
+**/
 class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._
@@ -33,7 +44,7 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
     enterBarrier("after-1")
   }
 
-  test("component running on one node should detect if other component running on another node crashes"){
+  test("component running on one node should detect if other component running on another node crashes") {
 
     val akkaConnection = AkkaConnection(ComponentId("Container1", ComponentType.Container))
 
@@ -44,7 +55,7 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
       probe.requestNext() shouldBe a[LocationUpdated]
       Thread.sleep(2000)
 
-      Await.result(testConductor.shutdown(member1, abort = true), 30.seconds)
+      Await.result(testConductor.exit(member1, 0), 5.seconds)
       enterBarrier("after-crash")
 
       within(5.seconds) {
@@ -59,7 +70,7 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
     }
 
     runOn(member1) {
-      val actorRef = cswCluster.actorSystem.actorOf(
+      val actorRef = ActorSystemFactory.remote().actorOf(
         Props(new Actor {
           override def receive: Receive = Actor.emptyBehavior
         }),
@@ -68,7 +79,7 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
       locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
-      Await.ready(system.whenTerminated, 30.seconds)
+      Await.ready(system.whenTerminated, 5.seconds)
     }
 
     runOn(member2) {
