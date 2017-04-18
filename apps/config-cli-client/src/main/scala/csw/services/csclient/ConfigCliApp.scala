@@ -1,7 +1,6 @@
 package csw.services.csclient
 
 import akka.Done
-import akka.actor.ActorSystem
 import csw.services.config.api.models.ConfigId
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
@@ -18,34 +17,31 @@ import scala.util.control.NonFatal
 
 class ConfigCliApp(clusterSettings: ClusterSettings) {
 
-  val actorRuntime = new ActorRuntime(ActorSystem())
+  val actorRuntime = new ActorRuntime()
 
   import actorRuntime._
 
   private val locationService = LocationServiceFactory.withSettings(clusterSettings)
   private val configService: ConfigService = ConfigClientFactory.make(actorSystem, locationService)
 
-  def start(args: Array[String]): Future[Unit] = async {
+  def start(args: Array[String]): Future[Done] = async {
     CmdLineArgsParser.parse(args) match {
       case Some(options) =>
         await(commandLineRunner(options))
-        await(shutdown())
-        System.exit(0)
+        await(shutdown(0))
       case None          =>
-        System.exit(1)
+        await(shutdown(1))
     }
   } recoverWith {
     case NonFatal(ex) ⇒
-      ex.printStackTrace(System.err)
-      async {
-        await(shutdown())
-        System.exit(1)
-      }
+      ex.printStackTrace()
+      shutdown(1)
   }
 
-  def shutdown(): Future[Done] = async {
+  def shutdown(code: Int): Future[Done] = async {
     await(actorSystem.terminate())
     await(locationService.shutdown())
+    sys.exit(code)
   }
 
   def commandLineRunner(options: Options): Future[Unit] = {

@@ -36,7 +36,7 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
   override protected def afterAll(): Unit = {
     httpService.shutdown().await
-    ConfigCliApp.shutdown().await
+    ConfigCliApp.shutdown(0).await
     new File(inputFilePath).delete()
     new File(updatedInputFilePath).delete()
   }
