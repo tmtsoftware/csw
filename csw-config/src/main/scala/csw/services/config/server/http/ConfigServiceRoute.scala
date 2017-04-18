@@ -1,21 +1,20 @@
 package csw.services.config.server.http
 
-import java.io.{FileNotFoundException, IOException}
-
 import akka.Done
-import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
-import akka.http.scaladsl.server.{ExceptionHandler, Route}
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Route
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.ActorRuntime
-import csw.services.config.api.exceptions.{FileNotFound, FileAlreadyExists}
 
-import scala.util.control.NonFatal
-
-class ConfigServiceRoute(configService: ConfigService, actorRuntime: ActorRuntime) extends HttpSupport {
+class ConfigServiceRoute(
+  configService: ConfigService,
+  actorRuntime: ActorRuntime,
+  configExceptionHandler: ConfigExceptionHandler
+) extends HttpSupport {
 
   import actorRuntime._
 
-  def route: Route = handleExceptions(exceptionHandler) {
+  def route: Route = handleExceptions(configExceptionHandler.exceptionHandler) {
     path("config" / FilePath) { filePath ⇒
       (get & rejectEmptyResponse) {
         (dateParam & defaultParam & idParam) {
@@ -60,17 +59,5 @@ class ConfigServiceRoute(configService: ConfigService, actorRuntime: ActorRuntim
       (path("list") & get) {
         complete(configService.list())
       }
-  }
-
-  private val exceptionHandler = ExceptionHandler {
-    case ex: FileAlreadyExists ⇒
-      ex.printStackTrace()
-      complete(HttpResponse(StatusCodes.Conflict, entity = ex.getMessage))
-    case ex: FileNotFound      ⇒
-      ex.printStackTrace()
-      complete(HttpResponse(StatusCodes.NotFound, entity = ex.getMessage))
-    case NonFatal(ex)          ⇒
-      ex.printStackTrace()
-      complete(HttpResponse(StatusCodes.InternalServerError, entity = ex.getMessage))
   }
 }
