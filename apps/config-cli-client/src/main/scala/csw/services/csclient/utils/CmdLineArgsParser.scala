@@ -12,16 +12,16 @@ import scopt.OptionParser
 
 object CmdLineArgsParser {
 
-  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("csClient") {
-    head("csClient", System.getProperty("CSW_VERSION"))
+  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("config-cli-client") {
+    head("config-cli-client", System.getProperty("CSW_VERSION"))
 
     //create operation
     cmd("create") action { (_, c) =>
       c.copy(op = "create")
-    } text "copies the input file in the repository at a specified path" children (
+    } text "creates the input file in the repository at a specified path" children (
 
-      arg[String]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(Paths.get(x)))
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path in the repository",
 
       opt[String]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
@@ -43,7 +43,7 @@ object CmdLineArgsParser {
     } text "overwrites the file specified in the repository by the input file" children (
 
       arg[String]("<path>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(Paths.get(x)))
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path in the repository",
 
       opt[String]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
@@ -60,8 +60,8 @@ object CmdLineArgsParser {
       c.copy(op = "get")
     } text "retrieves file with a given path from config service, and writes it to the output file" children (
 
-      arg[String]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(Paths.get(x)))
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path of the file in the repository",
 
       opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
@@ -82,8 +82,8 @@ object CmdLineArgsParser {
       c.copy(op = "exists")
     } text "checks if the file exists at specified path in the repository" children (
 
-      arg[String]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(Paths.get(x)))
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository"
       )
 
@@ -92,8 +92,8 @@ object CmdLineArgsParser {
       c.copy(op = "delete")
     } text "deletes the file at specified path in the repository" children (
 
-      arg[String]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(Paths.get(x)))
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository"
       )
 
@@ -107,8 +107,8 @@ object CmdLineArgsParser {
       c.copy(op = "history")
     } text "shows versioning history of the file in the repository" children (
 
-      arg[String]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(Paths.get(x)))
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
 
       opt[Int]("max") action { (x, c) =>
@@ -121,8 +121,8 @@ object CmdLineArgsParser {
       c.copy(op = "setDefault")
     } text "sets default version of the file in the repository" children (
 
-      arg[String]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(Paths.get(x)))
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
 
       opt[String]("id") action { (x, c) =>
@@ -135,8 +135,8 @@ object CmdLineArgsParser {
       c.copy(op = "resetDefault")
     } text "resets the default to the latest version of the file in the repository" children (
 
-      arg[String]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(Paths.get(x)))
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository"
       )
 
@@ -145,8 +145,8 @@ object CmdLineArgsParser {
       c.copy(op = "getDefault")
     } text "gets the default version of the file in the repository" children (
 
-      arg[String]("<repositoryFilePath>") action { (x, c) =>
-        c.copy(repositoryFilePath = Some(Paths.get(x)))
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
 
       opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
