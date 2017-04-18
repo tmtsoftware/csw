@@ -36,19 +36,22 @@ class LocationServiceCompTest
     val componentId: ComponentId = ComponentId("exampleTCPService", ComponentType.Service)
     val connection: TcpConnection = TcpConnection(componentId)
     val Port: Int = 1234
-
     val tcpRegistration: TcpRegistration = TcpRegistration(connection,  Port)
 
+    // register, resolve & list tcp connection for the first time
     locationService.register(tcpRegistration).await
-
-    locationService.find(connection).await.get shouldBe tcpRegistration.location(new Networks().hostname())
-
+    locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration.location(new Networks().hostname())
     locationService.list.await shouldBe List(tcpRegistration.location(new Networks().hostname()))
 
-    locationService.register(tcpRegistration).await.unregister().await
-
-    locationService.find(connection).await shouldBe None
+    // unregister, resolve & list tcp connection
+    locationService.unregister(connection).await
+    locationService.resolve(connection, 2.seconds).await shouldBe None
     locationService.list.await shouldBe List.empty
+
+    // re-register, resolve & list tcp connection for the first time
+    locationService.register(tcpRegistration).await
+    locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration.location(new Networks().hostname())
+    locationService.list.await shouldBe List(tcpRegistration.location(new Networks().hostname()))
   }
 
   test("should able to register, resolve, list and unregister http location") {
@@ -56,42 +59,49 @@ class LocationServiceCompTest
     val httpConnection: HttpConnection = HttpConnection(componentId)
     val Port: Int = 8080
     val Path: String = "path/to/resource"
-
     val httpRegistration: HttpRegistration = HttpRegistration(httpConnection,  Port, Path)
 
+    // register, resolve & list http connection for the first time
     locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
-
-    locationService.find(httpConnection).await.get shouldBe httpRegistration.location(new Networks().hostname())
-
+    locationService.resolve(httpConnection, 2.seconds).await.get shouldBe httpRegistration.location(new Networks().hostname())
     locationService.list.await shouldBe List(httpRegistration.location(new Networks().hostname()))
 
+    // unregister, resolve & list http connection
     locationService.unregister(httpConnection).await
+    locationService.resolve(httpConnection, 2.seconds).await shouldBe None
     locationService.list.await shouldBe List.empty
+
+    // re-register, resolve & list http connection for the first time
+    locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
+    locationService.resolve(httpConnection, 2.seconds).await.get shouldBe httpRegistration.location(new Networks().hostname())
+    locationService.list.await shouldBe List(httpRegistration.location(new Networks().hostname()))
   }
 
   test("should able to register, resolve, list and unregister akka location") {
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection = AkkaConnection(componentId)
-    val Prefix = "prefix"
-
     val actorRef = actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior
       }),
       "my-actor-1"
     )
-
     val akkaRegistration = AkkaRegistration(connection, actorRef)
 
+    // register, resolve & list akka connection for the first time
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
-
-    locationService.resolve(connection, 5.seconds).await.get shouldBe akkaRegistration.location(new Networks().hostname())
-
+    locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration.location(new Networks().hostname())
     locationService.list.await shouldBe List(akkaRegistration.location(new Networks().hostname()))
 
-    locationService.register(akkaRegistration).await.unregister().await
-
+    // unregister, resolve & list akka connection
+    locationService.unregister(connection).await
+    locationService.resolve(connection, 2.seconds).await shouldBe None
     locationService.list.await shouldBe List.empty
+
+    // re-register, resolve & list akka connection for the first time
+    locationService.register(akkaRegistration).await.location.connection shouldBe connection
+    locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration.location(new Networks().hostname())
+    locationService.list.await shouldBe List(akkaRegistration.location(new Networks().hostname()))
   }
 
   test("akka location death watch actor should unregister services whose actorRef is terminated") {
