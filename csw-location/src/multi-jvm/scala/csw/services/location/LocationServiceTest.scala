@@ -100,6 +100,9 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
       locationService.unregister(akkaConnection).await
       enterBarrier("Unregister")
+
+      locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
+      enterBarrier("Re-registration")
     }
 
     runOn(member) {
@@ -112,6 +115,10 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       probe.request(1)
       probe.requestNext() shouldBe a[LocationRemoved]
       enterBarrier("Unregister")
+
+      probe.request(1)
+      probe.requestNext() shouldBe a[LocationUpdated]
+      enterBarrier("Re-registration")
 
       switch.shutdown()
       probe.request(1)
