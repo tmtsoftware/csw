@@ -1,7 +1,7 @@
 package csw.services.location.commons
 
 import akka.Done
-import akka.actor.{ActorRef, ActorSystem, Terminated}
+import akka.actor.{ActorRef, ActorSystem, CoordinatedShutdown, Terminated}
 import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
 import akka.cluster.http.management.ClusterHttpManagement
@@ -35,6 +35,10 @@ class CswCluster private(_actorSystem: ActorSystem) {
     */
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
+  /**
+    * Gives handle to CoordinatedShutdown so that shutdown hooks can be added from outside
+    */
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   /**
     * Creates an ActorMaterializer for current ActorSystem
@@ -46,7 +50,7 @@ class CswCluster private(_actorSystem: ActorSystem) {
     *
     * @return A Future that completes on successful shutdown of ActorSystem
     */
-  def terminate(): Future[Done] = CswCluster.terminate(actorSystem)
+  def terminate(): Future[Done] = coordinatedShutdown.run()
 }
 
 /**
@@ -104,28 +108,8 @@ object CswCluster {
     } catch {
       case NonFatal(ex) ⇒
         Await.result(ClusterHttpManagement(cluster).stop(), 10.seconds)
-        Await.result(CswCluster.terminate(actorSystem), 10.seconds)
+        Await.result(CoordinatedShutdown(actorSystem).run(), 10.seconds)
         throw ex
     }
-  }
-
-  /**
-    * Termination happens as follows :
-    *  - The given ActorSystem is requested to leave the cluster gracefully
-    *  - and once it has left the cluster, it is terminated
-    *
-    * @param actorSystem The ActorSystem that needs to be cleaned up
-    * @return A Future that completes on successful shutdown of ActorSystem
-    */
-  def terminate(actorSystem: ActorSystem): Future[Done] = {
-    // get the cluster information of this ActorSystem
-    val cluster = Cluster(actorSystem)
-    val p = Promise[Terminated]
-    // request to leave the self node from the cluster
-    cluster.leave(cluster.selfAddress)
-    // once the self node has gracefully left the cluster, request to terminate the ActorSystem
-    cluster.registerOnMemberRemoved(actorSystem.terminate().onComplete(p.complete))
-    // The promise will be completed once the ActorSystem has successfully shutdown
-    p.future.map(_ => Done)
   }
 }

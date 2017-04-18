@@ -15,7 +15,7 @@ import scala.util.control.NonFatal
   */
 class TrackLocationApp(cswCluster: CswCluster) {
   import cswCluster._
-  val locationService= LocationServiceFactory.withCluster(cswCluster)
+  private val locationService = LocationServiceFactory.withCluster(cswCluster)
 
   var trackLocation: TrackLocation = _
 

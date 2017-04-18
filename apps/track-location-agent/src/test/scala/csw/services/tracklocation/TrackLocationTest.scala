@@ -64,6 +64,7 @@ class TrackLocationTest
     Thread.sleep(6000)
 
     locationService.list.await shouldBe List.empty
+    trackLocationApp.shutdown().await
   }
 
   test("Test with config file") {
@@ -93,6 +94,7 @@ class TrackLocationTest
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propagate test's locationService
     Thread.sleep(6000)
     locationService.list.await shouldBe List.empty
+    trackLocationApp.shutdown().await
   }
 
   test("should not contain leading or trailing spaces in service names") {

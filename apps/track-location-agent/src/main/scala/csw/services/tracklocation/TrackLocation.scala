@@ -12,7 +12,6 @@ import csw.services.tracklocation.models.Command
 import scala.collection.immutable.Seq
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
-import scala.sys.ShutdownHookThread
 import scala.sys.process._
 
 /**
@@ -50,7 +49,7 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
   private def awaitTermination(results: Seq[RegistrationResult]): Unit = {
     println(results.map(_.location.connection.componentId))
 
-    val sysShutDownHook: ShutdownHookThread = sys.addShutdownHook {
+    cswCluster.coordinatedShutdown.addJvmShutdownHook {
       println("Shutdown hook reached, unregistering services.")
       unregisterServices(results)
       println(s"Exited the application.")
@@ -62,8 +61,6 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
     println(s"$command exited with exit code $exitCode")
 
     unregisterServices(results)
-    sysShutDownHook.remove()
-    println("Shutdown hook is removed.")
 
     Await.ready(locationService.shutdown(), 10.seconds)
 
