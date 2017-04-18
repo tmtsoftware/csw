@@ -48,7 +48,7 @@ class LocationServiceCompTest
     locationService.resolve(connection, 2.seconds).await shouldBe None
     locationService.list.await shouldBe List.empty
 
-    // re-register, resolve & list tcp connection for the first time
+    // re-register, resolve & list tcp connection
     locationService.register(tcpRegistration).await
     locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration.location(new Networks().hostname())
     locationService.list.await shouldBe List(tcpRegistration.location(new Networks().hostname()))
@@ -71,7 +71,7 @@ class LocationServiceCompTest
     locationService.resolve(httpConnection, 2.seconds).await shouldBe None
     locationService.list.await shouldBe List.empty
 
-    // re-register, resolve & list http connection for the first time
+    // re-register, resolve & list http connection
     locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
     locationService.resolve(httpConnection, 2.seconds).await.get shouldBe httpRegistration.location(new Networks().hostname())
     locationService.list.await shouldBe List(httpRegistration.location(new Networks().hostname()))
@@ -98,7 +98,7 @@ class LocationServiceCompTest
     locationService.resolve(connection, 2.seconds).await shouldBe None
     locationService.list.await shouldBe List.empty
 
-    // re-register, resolve & list akka connection for the first time
+    // re-register, resolve & list akka connection
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
     locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration.location(new Networks().hostname())
     locationService.list.await shouldBe List(akkaRegistration.location(new Networks().hostname()))
