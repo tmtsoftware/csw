@@ -43,7 +43,7 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAn
 
     runOn(server) {
       val serverWiring = ServerWiring.make(locationService)
-      serverWiring.svnAdmin.initSvnRepo()
+      serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.lazyBinding.await
       enterBarrier("server-started")
     }

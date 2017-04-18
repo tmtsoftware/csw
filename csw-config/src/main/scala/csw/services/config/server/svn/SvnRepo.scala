@@ -7,6 +7,7 @@ import akka.dispatch.MessageDispatcher
 import csw.services.config.server.Settings
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
+import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
 import org.tmatesoft.svn.core.io.{SVNRepository, SVNRepositoryFactory}
 import org.tmatesoft.svn.core.wc.{SVNClientManager, SVNRevision}
@@ -17,6 +18,19 @@ import scala.concurrent.Future
 class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   private implicit val _blockingIoDispatcher = blockingIoDispatcher
+
+  def initSvnRepo(): Unit = {
+    try {
+      // Create the new main repo
+      FSRepositoryFactory.setup()
+      SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, false)
+      println(s"New Repository created at ${settings.svnUrl}")
+    } catch {
+      //If the repo already exists, print stracktrace and continue to boot
+      case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.IO_ERROR ⇒
+        println(s"Repository already exists at ${settings.svnUrl}")
+    }
+  }
 
   def getFile(path: Path, revision: Long, outputStream: OutputStream): Future[Unit] = Future {
     val svn = svnHandle()

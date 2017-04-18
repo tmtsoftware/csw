@@ -36,7 +36,7 @@ class ConfigServiceRouteTest extends FunSuite
     testFileUtils.deleteServerFiles()
 
   override protected def beforeEach(): Unit =
-    svnAdmin.initSvnRepo()
+    svnRepo.initSvnRepo()
 
   override protected def afterEach(): Unit =
     testFileUtils.deleteServerFiles()

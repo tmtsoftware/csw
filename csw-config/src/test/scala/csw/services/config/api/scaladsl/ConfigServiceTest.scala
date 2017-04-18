@@ -22,7 +22,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   def configService: ConfigService
 
   override protected def beforeEach(): Unit = {
-    serverWiring.svnAdmin.initSvnRepo()
+    serverWiring.svnRepo.initSvnRepo()
   }
 
   override protected def afterEach(): Unit = {

@@ -26,7 +26,7 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   import csw.services.csclient.commons.CmdLineArgsUtil._
 
   override protected def beforeEach(): Unit = {
-    serverWiring.svnAdmin.initSvnRepo()
+    serverWiring.svnRepo.initSvnRepo()
   }
 
   override protected def afterEach(): Unit = {

@@ -50,7 +50,7 @@ public class JConfigClientTest {
 
     @Before
     public void initSvnRepo() {
-        serverWiring.svnAdmin().initSvnRepo();
+        serverWiring.svnRepo().initSvnRepo();
     }
 
     @After
