@@ -48,6 +48,9 @@ object Registry {
     * Service is a distributed registry which holds a location value against a connection-name.
     * At times, a location may not be available for a given connection-name, hence the location is an optional value.
     * It is used to track a single connection by subscribing events generated when associated location changes.
+    *
+    * @note Service has key as LWWRegisterKey[Option[Location]] as it represents the type of value that LWWRegister will hold.
+    * But the value of LWWRegisterKey will still be connection-name.
     */
   class Service(connection: Connection)(implicit cluster: Cluster) extends Registry[LWWRegisterKey[Option[Location]], LWWRegister[Option[Location]]](
     Key = LWWRegisterKey(connection.name),
