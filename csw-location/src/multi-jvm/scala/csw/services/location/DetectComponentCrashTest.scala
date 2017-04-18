@@ -58,6 +58,9 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
       Await.result(testConductor.exit(member1, 0), 5.seconds)
       enterBarrier("after-crash")
 
+      // Story CSW-15 requires crash detection within 10 seconds with a goal of 5 seconds.
+      // This 5.seconds demonstrates that if the test passes, the performance goal is met. Could be relaxed to 10 seconds
+      // if needed.
       within(5.seconds) {
         awaitAssert {
           probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
