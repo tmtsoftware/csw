@@ -2,7 +2,7 @@ package csw.services.tracklocation
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-import akka.stream.scaladsl.{Sink, Source}
+import akka.Done
 import csw.services.location.commons.CswCluster
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
@@ -23,15 +23,13 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
 
   private var isRunning = new AtomicBoolean(true)
 
-  def run(): Future[Unit] = register().map(awaitTermination)
-
-  /**
-    * INTERNAL API : Registers the services from `names` collection with LocationService.
-    */
-  private def register(): Future[Seq[RegistrationResult]] = Source(names)
-    .initialDelay(command.delay.millis) //delay to give the app a chance to start
-    .mapAsync(1)(registerName)
-    .runWith(Sink.seq)
+  def run(): Done = {
+    Thread.sleep(command.delay)
+    //Register all connections
+    val results = Await.result(Future.traverse(names)(registerName), 10.seconds)
+    unregisterOnTermination(results)
+    Done
+  }
 
   /**
     * INTERNAL API : Registers a single service as a TCP service.
@@ -46,7 +44,7 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
     * INTERNAL API : Registers a shutdownHook to handle service un-registration during abnormal exit. Then, executes user
     * specified command and awaits its termination.
     */
-  private def awaitTermination(results: Seq[RegistrationResult]): Unit = {
+  private def unregisterOnTermination(results: Seq[RegistrationResult]): Unit = {
     println(results.map(_.location.connection.componentId))
 
     cswCluster.coordinatedShutdown.addJvmShutdownHook {

@@ -4,7 +4,6 @@ import java.io.File
 import java.net.URI
 import java.nio.file.Paths
 
-import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import csw.services.location.commons.{ClusterSettings, CswCluster}
@@ -16,8 +15,7 @@ import csw.services.tracklocation.common.TestFutureExtension.RichFuture
 import csw.services.tracklocation.models.Command
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
 
-import scala.concurrent.Future
-import scala.concurrent.duration.{DurationLong, _}
+import scala.concurrent.duration._
 
 /**
   * Test the trackLocation app in-line
@@ -32,7 +30,7 @@ class TrackLocationTest
 
   private val cswCluster = CswCluster.withSettings(ClusterSettings().onPort(3552))
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
-  import cswCluster._
+
   override protected def afterAll(): Unit = {
     locationService.shutdown().await
   }
@@ -84,7 +82,7 @@ class TrackLocationTest
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
-    val tcpLocation = new TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
+    val tcpLocation = TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propagate test's locationService
@@ -100,7 +98,7 @@ class TrackLocationTest
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
       val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), cswCluster, locationService)
-      trackLocation.run().await
+      trackLocation.run()
     }
 
     illegalArgumentException.getMessage shouldBe "requirement failed: component name has leading and trailing whitespaces"
@@ -112,7 +110,7 @@ class TrackLocationTest
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
       val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), cswCluster, locationService)
-      trackLocation.run().await
+      trackLocation.run()
     }
 
     illegalArgumentException.getMessage shouldBe "requirement failed: component name has '-'"

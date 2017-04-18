@@ -6,10 +6,10 @@ import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.tracklocation.models.Command
 import csw.services.tracklocation.utils.CmdLineArgsParser
 
-import scala.async.Async._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
+import async.Async._
 
 /**
   * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
@@ -18,28 +18,24 @@ class TrackLocationApp(cswCluster: CswCluster) {
   import cswCluster._
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
 
-  def start(args: Array[String]): Future[Done] = {
+  def start(args: Array[String]): Future[Done] = async {
 
-    val resultF = async {
+    try {
       CmdLineArgsParser.parse(args) match {
         case Some(options) =>
           val command = Command.parse(options)
           println(s"commandText: ${command.commandText}, command: $command")
           val trackLocation = new TrackLocation(options.names, command, cswCluster, locationService)
-          await(trackLocation.run())
+          trackLocation.run()
         case None          => Done
       }
-    } recover {
+    } catch {
       case NonFatal(ex) =>
         ex.printStackTrace()
         Done
     }
 
-    async {
-      await(resultF)
-      await(shutdown())
-    }
-
+    await(shutdown())
   }
 
   def shutdown(): Future[Done] = locationService.shutdown()
