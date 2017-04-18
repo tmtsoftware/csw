@@ -28,20 +28,19 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
     CmdLineArgsParser.parse(args) match {
       case Some(options) =>
         await(commandLineRunner(options))
-        await(shutdown(0))
+        await(shutdown())
       case None          =>
-        await(shutdown(1))
+        await(shutdown())
     }
   } recoverWith {
     case NonFatal(ex) ⇒
       ex.printStackTrace()
-      shutdown(1)
+      shutdown()
   }
 
-  def shutdown(code: Int): Future[Done] = async {
+  def shutdown(): Future[Done] = async {
     await(actorSystem.terminate())
     await(locationService.shutdown())
-    sys.exit(code)
   }
 
   def commandLineRunner(options: Options): Future[Unit] = {

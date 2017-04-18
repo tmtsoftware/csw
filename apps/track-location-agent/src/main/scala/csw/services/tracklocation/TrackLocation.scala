@@ -61,10 +61,6 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
     println(s"$command exited with exit code $exitCode")
 
     unregisterServices(results)
-
-    Await.ready(locationService.shutdown(), 10.seconds)
-
-    if (!command.noExit) System.exit(exitCode)
   }
 
   /**

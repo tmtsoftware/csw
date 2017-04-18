@@ -42,17 +42,15 @@ class TrackLocationTest
     val name = "test1"
     val port = 9999
 
-    Future {
-      trackLocationApp.start(
+    val completionF = trackLocationApp.start(
       Array(
-      "--name", name,
-      "--command",
-      "sleep 5",
-      "--port", port.toString,
-      "--no-exit"
+        "--name", name,
+        "--command",
+        "sleep 5",
+        "--port", port.toString,
+        "--no-exit"
       )
-      )
-    }
+    )
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
 
@@ -64,7 +62,7 @@ class TrackLocationTest
     Thread.sleep(6000)
 
     locationService.list.await shouldBe List.empty
-    trackLocationApp.shutdown().await
+    completionF.await
   }
 
   test("Test with config file") {
@@ -76,15 +74,13 @@ class TrackLocationTest
     val config = ConfigFactory.parseFile(new File(configFile))
     val port = config.getString("test2.port")
 
-    Future {
-      trackLocationApp.start(
-        Array(
-          "--name",
-          name,
-          "--no-exit",
-          configFile)
-      )
-    }
+    val completionF = trackLocationApp.start(
+      Array(
+        "--name",
+        name,
+        "--no-exit",
+        configFile)
+    )
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
@@ -94,7 +90,7 @@ class TrackLocationTest
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propagate test's locationService
     Thread.sleep(6000)
     locationService.list.await shouldBe List.empty
-    trackLocationApp.shutdown().await
+    completionF.await
   }
 
   test("should not contain leading or trailing spaces in service names") {

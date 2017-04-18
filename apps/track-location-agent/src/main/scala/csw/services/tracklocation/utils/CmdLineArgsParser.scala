@@ -9,6 +9,7 @@ import scopt.OptionParser
   * Parses the command line options using `scopt` library.
   */
 object CmdLineArgsParser {
+
   val parser: OptionParser[Options] = new scopt.OptionParser[Options]("trackLocation") {
     head("trackLocation", System.getProperty("CSW_VERSION"))
 
@@ -55,8 +56,14 @@ object CmdLineArgsParser {
 
     help("help")
     version("version")
-
-    //override def terminate(exitState: Either[String, Unit]): Unit = ()
   }
-}
 
+  /**
+    * Parses the command line arguments and returns a value if they are valid.
+    *
+    * @param args the command line arguments
+    * @return an object containing the parsed values of the command line arguments
+    */
+  def parse(args: Seq[String]): Option[Options] = parser.parse(args, Options())
+
+}
