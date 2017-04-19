@@ -6,8 +6,8 @@ import csw.services.tracklocation.models.Options
 import scopt.OptionParser
 
 /**
-  * Parses the command line options using `scopt` library.
-  */
+ * Parses the command line options using `scopt` library.
+ */
 object CmdLineArgsParser {
 
   val parser: OptionParser[Options] = new scopt.OptionParser[Options]("trackLocation") {
@@ -17,10 +17,9 @@ object CmdLineArgsParser {
       val allValid = services.forall { service =>
         !service.contains("-") && service.trim == service
       }
-      if(allValid){
+      if (allValid) {
         success
-      }
-      else{
+      } else {
         failure("Service name cannot have '-' or leading/trailing spaces")
       }
     }
@@ -28,13 +27,12 @@ object CmdLineArgsParser {
     opt[Seq[String]]("name")
       .required()
       .valueName("<name1>[,<name2>,...]")
-      .action ( (x, c) =>
-        c.copy(names = x.toList)
-      )
+      .action((x, c) => c.copy(names = x.toList))
       .validate(xs => acceptableServiceNames(xs))
-      .text("Required: The name (or names, separated by comma) used to register the application (also root name in config file).")
+      .text(
+          "Required: The name (or names, separated by comma) used to register the application (also root name in config file).")
 
-    opt[String]('c', "command") valueName "<name>"action { (x, c) =>
+    opt[String]('c', "command") valueName "<name>" action { (x, c) =>
       c.copy(command = Some(x))
     } text "The parameter is optional. The command that starts the target application. Use use %port to specify the port number. If parameter is not provided value $name.command from config file will be picked up. If value in config file is not found, the service names provided will be registered with Location Service."
 
@@ -59,11 +57,11 @@ object CmdLineArgsParser {
   }
 
   /**
-    * Parses the command line arguments and returns a value if they are valid.
-    *
-    * @param args the command line arguments
-    * @return an object containing the parsed values of the command line arguments
-    */
+   * Parses the command line arguments and returns a value if they are valid.
+   *
+   * @param args the command line arguments
+   * @return an object containing the parsed values of the command line arguments
+   */
   def parse(args: Seq[String]): Option[Options] = parser.parse(args, Options())
 
 }

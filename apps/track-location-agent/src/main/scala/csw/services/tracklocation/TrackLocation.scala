@@ -15,8 +15,8 @@ import scala.concurrent.{Await, Future}
 import scala.sys.process._
 
 /**
-  * Starts a given external program, registers it with the location service and unregisters it when the program exits.
-  */
+ * Starts a given external program, registers it with the location service and unregisters it when the program exits.
+ */
 class TrackLocation(names: List[String], command: Command, cswCluster: CswCluster, locationService: LocationService) {
 
   import cswCluster._
@@ -32,18 +32,18 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
   }
 
   /**
-    * INTERNAL API : Registers a single service as a TCP service.
-    */
+   * INTERNAL API : Registers a single service as a TCP service.
+   */
   private def registerName(name: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
-    val connection = TcpConnection(componentId)
+    val connection  = TcpConnection(componentId)
     locationService.register(TcpRegistration(connection, command.port))
   }
 
   /**
-    * INTERNAL API : Registers a shutdownHook to handle service un-registration during abnormal exit. Then, executes user
-    * specified command and awaits its termination.
-    */
+   * INTERNAL API : Registers a shutdownHook to handle service un-registration during abnormal exit. Then, executes user
+   * specified command and awaits its termination.
+   */
   private def unregisterOnTermination(results: Seq[RegistrationResult]): Unit = {
     println(results.map(_.location.connection.componentId))
 
@@ -62,8 +62,8 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
   }
 
   /**
-    * INTERNAL API : Unregisters a service.
-    */
+   * INTERNAL API : Unregisters a service.
+   */
   private def unregisterServices(results: Seq[RegistrationResult]): Unit = synchronized {
     if (isRunning.get()) {
       Await.result(Future.traverse(results)(_.unregister()), 10.seconds)

@@ -15,7 +15,11 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-class SvnConfigService(settings: Settings, fileService: OversizeFileService, actorRuntime: ActorRuntime, svnRepo: SvnRepo) extends ConfigService {
+class SvnConfigService(settings: Settings,
+                       fileService: OversizeFileService,
+                       actorRuntime: ActorRuntime,
+                       svnRepo: SvnRepo)
+    extends ConfigService {
 
   import actorRuntime._
 
@@ -63,11 +67,12 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
     // Returns the contents of the given version of the file, if found
     def getNormalSize: Future[Option[ConfigData]] = async {
       val outputStream = StreamConverters.asOutputStream().cancellableMat
-      val revision = await(svnRepo.svnRevision(id.map(_.id.toLong)))
-      val source = outputStream.mapMaterializedValue { case (out, switch) ⇒
-        svnRepo.getFile(path, revision.getNumber, out).recover {
-          case NonFatal(ex) ⇒ switch.abort(ex)
-        }
+      val revision     = await(svnRepo.svnRevision(id.map(_.id.toLong)))
+      val source = outputStream.mapMaterializedValue {
+        case (out, switch) ⇒
+          svnRepo.getFile(path, revision.getNumber, out).recover {
+            case NonFatal(ex) ⇒ switch.abort(ex)
+          }
       }
       Some(ConfigData.fromSource(source))
     }
@@ -75,7 +80,7 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
     // Get oversize files that are stored in the annex server
     def getOversize: Future[Option[ConfigData]] = async {
       await(get(shaFilePath(path), id)) match {
-        case None             =>
+        case None =>
           None
         case Some(configData) =>
           val sha1 = await(configData.toStringF)
@@ -97,7 +102,7 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
 
     // Gets the ConfigFileHistory matching the date
     def getHist: Future[Option[ConfigFileHistory]] = async {
-      val h = await(history(path))
+      val h     = await(history(path))
       val found = h.find(t => t.time.isBefore(time) || t.time.equals(time))
       if (found.nonEmpty) found
       else if (h.isEmpty) None
@@ -138,7 +143,7 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
   }
 
   override def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit] = async {
-    if(!await(exists(path, id))) {
+    if (!await(exists(path, id))) {
       throw FileNotFound(path)
     }
     val defaultPath = defaultFilePath(path)
@@ -156,7 +161,7 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
   override def getDefault(path: Path): Future[Option[ConfigData]] = {
 
     def getDefaultById(configId: ConfigId): Future[Option[ConfigData]] = async {
-      val d = await(get(defaultFilePath(path)))
+      val d  = await(get(defaultFilePath(path)))
       val id = if (d.isDefined) await(d.get.toStringF) else configId.id
       await(get(path, Some(ConfigId(id))))
     }
@@ -181,23 +186,24 @@ class SvnConfigService(settings: Settings, fileService: OversizeFileService, act
   }
 
   /**
-    * Creates or updates a config file with the given path and data and optional comment.
-    *
-    * @param path       the config file path
-    * @param configData the contents of the file
-    * @param comment    an optional comment to associate with this file
-    * @return a future unique id that can be used to refer to the file
-    */
-  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] = async {
-    val inputStream = configData.toInputStream
+   * Creates or updates a config file with the given path and data and optional comment.
+   *
+   * @param path       the config file path
+   * @param configData the contents of the file
+   * @param comment    an optional comment to associate with this file
+   * @return a future unique id that can be used to refer to the file
+   */
+  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] =
+    async {
+      val inputStream = configData.toInputStream
 
-    val commitInfo = if (update) {
-      await(svnRepo.modifyFile(path, comment, inputStream))
-    } else {
-      await(svnRepo.addFile(path, comment, inputStream))
+      val commitInfo = if (update) {
+        await(svnRepo.modifyFile(path, comment, inputStream))
+      } else {
+        await(svnRepo.addFile(path, comment, inputStream))
+      }
+      ConfigId(commitInfo.getNewRevision)
     }
-    ConfigId(commitInfo.getNewRevision)
-  }
 
   // Returns the current version of the file, if known
   private def getCurrentVersion(path: Path): Future[Option[ConfigId]] = async {

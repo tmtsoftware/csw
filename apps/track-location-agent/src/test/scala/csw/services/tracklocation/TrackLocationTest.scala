@@ -18,34 +18,34 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Match
 import scala.concurrent.duration._
 
 /**
-  * Test the trackLocation app in-line
-  */
-
+ * Test the trackLocation app in-line
+ */
 class TrackLocationTest
-  extends FunSuiteLike
+    extends FunSuiteLike
     with Matchers
     with LazyLogging
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
-  private val cswCluster = CswCluster.withSettings(ClusterSettings().onPort(3552))
+  private val cswCluster      = CswCluster.withSettings(ClusterSettings().onPort(3552))
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     locationService.shutdown().await
-  }
 
   test("Test with command line args") {
     val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(ClusterSettings().joinLocal(3552)))
-    val name = "test1"
-    val port = 9999
+    val name             = "test1"
+    val port             = 9999
 
     val completionF = trackLocationApp.start(
       Array(
-        "--name", name,
+        "--name",
+        name,
         "--command",
         "sleep 5",
-        "--port", port.toString,
+        "--port",
+        port.toString,
         "--no-exit"
       )
     )
@@ -53,7 +53,7 @@ class TrackLocationTest
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
 
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
-    val tcpLocation = new TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
+    val tcpLocation      = new TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propogate test's locationService
@@ -65,24 +65,20 @@ class TrackLocationTest
 
   test("Test with config file") {
     val trackLocationApp = new TrackLocationApp(CswCluster.withSettings(ClusterSettings().joinLocal(3552)))
-    val name = "test2"
-    val url = getClass.getResource("/test2.conf")
-    val configFile = Paths.get(url.toURI).toFile.getAbsolutePath
+    val name             = "test2"
+    val url              = getClass.getResource("/test2.conf")
+    val configFile       = Paths.get(url.toURI).toFile.getAbsolutePath
 
     val config = ConfigFactory.parseFile(new File(configFile))
-    val port = config.getString("test2.port")
+    val port   = config.getString("test2.port")
 
     val completionF = trackLocationApp.start(
-      Array(
-        "--name",
-        name,
-        "--no-exit",
-        configFile)
+      Array("--name", name, "--no-exit", configFile)
     )
 
-    val connection = TcpConnection(ComponentId(name, ComponentType.Service))
+    val connection       = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
-    val tcpLocation = TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
+    val tcpLocation      = TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
 
     //Below sleep should allow TrackLocation->LocationService->UnregisterAll to propagate test's locationService
@@ -94,7 +90,7 @@ class TrackLocationTest
   test("should not contain leading or trailing spaces in service names") {
 
     val services = List(" test1 ")
-    val port = 9999
+    val port     = 9999
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
       val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), cswCluster, locationService)
@@ -106,7 +102,7 @@ class TrackLocationTest
 
   test("should not contain '-' in service names") {
     val services = List("test-1")
-    val port = 9999
+    val port     = 9999
 
     val illegalArgumentException = intercept[IllegalArgumentException] {
       val trackLocation = new TrackLocation(services, Command("sleep 5", port, 0, true), cswCluster, locationService)

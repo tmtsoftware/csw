@@ -5,12 +5,10 @@ import java.nio.file.Paths
 
 import org.scalatest.{FunSuite, Matchers}
 
-class CommandTest
-  extends FunSuite
-  with Matchers {
+class CommandTest extends FunSuite with Matchers {
 
   test("testParse with no options should return command with default values") {
-    val opt = Options()
+    val opt        = Options()
     val c: Command = Command.parse(opt)
 
     c.commandText shouldBe "false"
@@ -20,7 +18,7 @@ class CommandTest
   }
 
   test("testParse with options should return executable command") {
-    val opt = Options(List("Alarm, Event, Telemetry"), Some("ls"), Some(8080), None, Some(9999), true)
+    val opt        = Options(List("Alarm, Event, Telemetry"), Some("ls"), Some(8080), None, Some(9999), true)
     val c: Command = Command.parse(opt)
 
     c.commandText shouldBe "ls"
@@ -30,11 +28,11 @@ class CommandTest
   }
 
   test("testParse with config file should honour config options") {
-    val url = getClass.getResource("/redisTest.conf")
+    val url            = getClass.getResource("/redisTest.conf")
     val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
-    val configFile = new File(configFilePath)
-    val opt = Options(List("redisTest"), None, None, Option(configFile))
-    val c: Command = Command.parse(opt)
+    val configFile     = new File(configFilePath)
+    val opt            = Options(List("redisTest"), None, None, Option(configFile))
+    val c: Command     = Command.parse(opt)
 
     c.commandText shouldBe "redis-server --port 7777"
     c.port shouldBe 7777
@@ -43,11 +41,11 @@ class CommandTest
   }
 
   test("testParse with config file port, command parameters are overrideable from command line") {
-    val url = getClass.getResource("/redisTest.conf")
+    val url            = getClass.getResource("/redisTest.conf")
     val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
-    val configFile = new File(configFilePath)
-    val opt = Options(List("redisTest"), Some("sleep"), Some(8888), Option(configFile))
-    val c: Command = Command.parse(opt)
+    val configFile     = new File(configFilePath)
+    val opt            = Options(List("redisTest"), Some("sleep"), Some(8888), Option(configFile))
+    val c: Command     = Command.parse(opt)
 
     c.commandText shouldBe "sleep"
     c.port shouldBe 8888
@@ -56,7 +54,7 @@ class CommandTest
   }
 
   test("testParse when empty command is specified, should execute a 'false' command") {
-    val opt = Options(List("redisTest"), None, Some(4444), None)
+    val opt        = Options(List("redisTest"), None, Some(4444), None)
     val c: Command = Command.parse(opt)
 
     c.commandText shouldBe "false"

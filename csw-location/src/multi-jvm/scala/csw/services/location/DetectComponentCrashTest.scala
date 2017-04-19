@@ -18,15 +18,15 @@ class DetectComponentCrashTestMultiJvmNode2 extends DetectComponentCrashTest(0)
 class DetectComponentCrashTestMultiJvmNode3 extends DetectComponentCrashTest(0)
 
 /**
-  * This test is running as a part of jenkins master-slave setup forming three nodes cluster. (seed: running on jenkins master, member1: running on jenkins slave, member2: running on jenkins slave)
-  * This test exercises below steps :
-  * 1. Registering akka connection on member1 node
-  * 2. seed(master) and member2 is tracking a akka connection which is registered on slave (member1)
-  * 3. Exiting member1 using testConductor.exit(member1, 1) (tell the remote node to shut itself down using System.exit with the given
-  * exitValue 1. The node will also be removed from cluster)
-  * 4. Once remote member1 is exited, we are asserting that master (seed) and member2 should receive LocationRemoved event within 5 seconds
-  * => probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
-  *
+ * This test is running as a part of jenkins master-slave setup forming three nodes cluster. (seed: running on jenkins master, member1: running on jenkins slave, member2: running on jenkins slave)
+ * This test exercises below steps :
+ * 1. Registering akka connection on member1 node
+ * 2. seed(master) and member2 is tracking a akka connection which is registered on slave (member1)
+ * 3. Exiting member1 using testConductor.exit(member1, 1) (tell the remote node to shut itself down using System.exit with the given
+ * exitValue 1. The node will also be removed from cluster)
+ * 4. Once remote member1 is exited, we are asserting that master (seed) and member2 should receive LocationRemoved event within 5 seconds
+ * => probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
+ *
 **/
 class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
@@ -73,12 +73,14 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
     }
 
     runOn(member1) {
-      val actorRef = ActorSystemFactory.remote().actorOf(
-        Props(new Actor {
-          override def receive: Receive = Actor.emptyBehavior
-        }),
-        "trombone-hcd-1"
-      )
+      val actorRef = ActorSystemFactory
+        .remote()
+        .actorOf(
+          Props(new Actor {
+            override def receive: Receive = Actor.emptyBehavior
+          }),
+          "trombone-hcd-1"
+        )
       locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
@@ -86,10 +88,10 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
     }
 
     runOn(member2) {
-      val port = 9595
+      val port   = 9595
       val prefix = "/trombone/hcd"
 
-      val httpConnection = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
+      val httpConnection   = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
       val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 
       locationService.register(httpRegistration).await

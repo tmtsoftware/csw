@@ -27,5 +27,5 @@ class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 
 class OneClientAndServer extends NMembersAndSeed(1) {
   val server: RoleName = seed
-  val Vector(client) = members
+  val Vector(client)   = members
 }

@@ -4,8 +4,7 @@ import csw.services.location.commons.CswCluster
 
 object ClusterSeed {
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     CswCluster.make()
-  }
 
 }

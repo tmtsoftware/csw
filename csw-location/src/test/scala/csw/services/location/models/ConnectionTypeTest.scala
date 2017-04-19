@@ -8,7 +8,8 @@ class ConnectionTypeTest extends FunSuite with Matchers {
 
     val expectedConnectionTypeValues = Set("http", "tcp", "akka")
 
-    val actualConnectionTypeValues: Set[String] = ConnectionType.values.map(connectionType => connectionType.entryName).toSet
+    val actualConnectionTypeValues: Set[String] =
+      ConnectionType.values.map(connectionType => connectionType.entryName).toSet
 
     actualConnectionTypeValues shouldEqual expectedConnectionTypeValues
   }

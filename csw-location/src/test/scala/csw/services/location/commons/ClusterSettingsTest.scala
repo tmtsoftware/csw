@@ -4,9 +4,7 @@ import com.typesafe.config.ConfigException
 import csw.services.location.internal.Networks
 import org.scalatest.{FunSuite, Matchers}
 
-class ClusterSettingsTest
-  extends FunSuite
-    with Matchers {
+class ClusterSettingsTest extends FunSuite with Matchers {
 
   test("exception is thrown when settings are not found for a given cluster name") {
     val settings: ClusterSettings = ClusterSettings("undefined-settings-in-conf")
@@ -17,7 +15,7 @@ class ClusterSettingsTest
 
   test("default cluster settings are used when no custom parameters are supplied") {
     val clusterSettings = ClusterSettings()
-    val config = clusterSettings.config
+    val config          = clusterSettings.config
 
     clusterSettings.clusterName shouldBe Constants.ClusterName
     config.getString("akka.remote.netty.tcp.hostname") shouldBe new Networks().hostname()
@@ -25,56 +23,60 @@ class ClusterSettingsTest
     config.getList("akka.cluster.seed-nodes").size shouldBe 0
   }
 
-  test("cluster settings with custom parameters are used"){
+  test("cluster settings with custom parameters are used") {
     val port = 8888
-    val clusterSettings: ClusterSettings = ClusterSettings().withInterface("en0").onPort(port).joinSeeds("10.10.10.10", "10.10.10.11")
+    val clusterSettings: ClusterSettings =
+      ClusterSettings().withInterface("en0").onPort(port).joinSeeds("10.10.10.10", "10.10.10.11")
 
     clusterSettings.interfaceName shouldBe "en0"
     clusterSettings.port shouldBe port
-    clusterSettings.seedNodes shouldBe List("10.10.10.10", "10.10.10.11").map{ hostname =>
-      s"akka.tcp://${clusterSettings.clusterName}@$hostname"}
+    clusterSettings.seedNodes shouldBe List("10.10.10.10", "10.10.10.11").map { hostname =>
+      s"akka.tcp://${clusterSettings.clusterName}@$hostname"
+    }
   }
 
-  test("cluster settings with join Local"){
-    val port = 9010
+  test("cluster settings with join Local") {
+    val port     = 9010
     val portList = List(9000, 9001, 9002, 9003)
     val hostname = new Networks().hostname
-    val clusterSettings: ClusterSettings = ClusterSettings().onPort(port).joinLocal(portList(0), portList(1), portList(2), portList(3))
+    val clusterSettings: ClusterSettings =
+      ClusterSettings().onPort(port).joinLocal(portList(0), portList(1), portList(2), portList(3))
 
     clusterSettings.port shouldBe port
-    clusterSettings.seedNodes shouldBe portList.map{ port =>
-      s"akka.tcp://${clusterSettings.clusterName}@$hostname:$port"}
+    clusterSettings.seedNodes shouldBe portList.map { port =>
+      s"akka.tcp://${clusterSettings.clusterName}@$hostname:$port"
+    }
   }
 
   test("cluster settings with custom values") {
-    val port = 9001
-    val ipList = List("10.10.10.10", "10.10.10.11", "10.10.10.12")
-    val values = Map("interfaceName" -> "en0",
-    "clusterSeeds" -> ipList.mkString(", "),
-    "clusterPort" -> "9000")
+    val port                             = 9001
+    val ipList                           = List("10.10.10.10", "10.10.10.11", "10.10.10.12")
+    val values                           = Map("interfaceName" -> "en0", "clusterSeeds" -> ipList.mkString(", "), "clusterPort" -> "9000")
     val clusterSettings: ClusterSettings = ClusterSettings(values = values).onPort(port)
 
     clusterSettings.interfaceName shouldBe "en0"
     clusterSettings.port shouldBe port
-    clusterSettings.seedNodes shouldBe ipList.map{ hostname =>
-      s"akka.tcp://${clusterSettings.clusterName}@$hostname"}
+    clusterSettings.seedNodes shouldBe ipList.map { hostname =>
+      s"akka.tcp://${clusterSettings.clusterName}@$hostname"
+    }
   }
 
   test("cluster settings with system properties") {
-    val systemPort = 9002
-    val systemSeeds = "10.10.10.12, 10.10.10.13"
+    val systemPort          = 9002
+    val systemSeeds         = "10.10.10.12, 10.10.10.13"
     val systemInterfacename = "eth0"
 
     System.setProperty("clusterPort", systemPort.toString)
     System.setProperty("clusterSeeds", systemSeeds.toString)
     System.setProperty("interfaceName", systemInterfacename)
-    
+
     val clusterSettings = ClusterSettings().onPort(9001).joinSeeds("10.10.10.10", "10.10.10.11").withInterface("en0")
 
     clusterSettings.port shouldBe systemPort
     clusterSettings.interfaceName shouldBe systemInterfacename
-    clusterSettings.seedNodes shouldBe List("10.10.10.12", "10.10.10.13").map{ hostname =>
-      s"akka.tcp://${clusterSettings.clusterName}@$hostname"}
+    clusterSettings.seedNodes shouldBe List("10.10.10.12", "10.10.10.13").map { hostname =>
+      s"akka.tcp://${clusterSettings.clusterName}@$hostname"
+    }
 
     System.clearProperty("clusterPort")
     System.clearProperty("clusterSeeds")

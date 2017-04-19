@@ -21,22 +21,23 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
 
   import actorRuntime._
 
-  private val locationService = LocationServiceFactory.withSettings(clusterSettings)
+  private val locationService              = LocationServiceFactory.withSettings(clusterSettings)
   private val configService: ConfigService = ConfigClientFactory.make(actorSystem, locationService)
 
-  def start(args: Array[String]): Future[Done] = async {
-    CmdLineArgsParser.parse(args) match {
-      case Some(options) =>
-        await(commandLineRunner(options))
-        await(shutdown())
-      case None          =>
-        await(shutdown())
+  def start(args: Array[String]): Future[Done] =
+    async {
+      CmdLineArgsParser.parse(args) match {
+        case Some(options) =>
+          await(commandLineRunner(options))
+          await(shutdown())
+        case None =>
+          await(shutdown())
+      }
+    } recoverWith {
+      case NonFatal(ex) ⇒
+        ex.printStackTrace()
+        shutdown()
     }
-  } recoverWith {
-    case NonFatal(ex) ⇒
-      ex.printStackTrace()
-      shutdown()
-  }
 
   def shutdown(): Future[Done] = async {
     await(actorSystem.terminate())
@@ -47,13 +48,14 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
 
     def create(): Future[Unit] = async {
       val configData = PathUtils.fromPath(options.inputFilePath.get)
-      val configId = await(configService.create(options.relativeRepoPath.get, configData, oversize = options.oversize, options.comment))
+      val configId = await(configService.create(options.relativeRepoPath.get, configData, oversize = options.oversize,
+          options.comment))
       println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
     }
 
     def update() = async {
       val configData = PathUtils.fromPath(options.inputFilePath.get)
-      val configId = await(configService.update(options.relativeRepoPath.get, configData, options.comment))
+      val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment))
       println(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
     }
 
@@ -69,7 +71,7 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
         case Some(configData) ⇒
           val outputFile = await(PathUtils.writeToPath(configData, options.outputFilePath.get))
           println(s"Output file is created at location : ${outputFile.getAbsolutePath}")
-        case None             ⇒
+        case None ⇒
       }
     }
 
@@ -105,30 +107,30 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
       configDataOpt match {
         case Some(configData) ⇒
           val outputFile = await(PathUtils.writeToPath(configData, options.outputFilePath.get))
-          println(s"Default version of repository file: ${options.relativeRepoPath.get} is saved at location: ${outputFile.getAbsolutePath}")
-        case None             ⇒
+          println(
+              s"Default version of repository file: ${options.relativeRepoPath.get} is saved at location: ${outputFile.getAbsolutePath}")
+        case None ⇒
       }
     }
 
     options.op match {
-      case "create"       => create()
-      case "update"       => update()
-      case "get"          => get()
-      case "exists"       => exists()
-      case "delete"       => delete()
-      case "list"         => list()
-      case "history"      => history()
-      case "setDefault"   => setDefault()
-      case "getDefault"   => getDefault
-      case x              => throw new RuntimeException(s"Unknown operation: $x")
+      case "create"     => create()
+      case "update"     => update()
+      case "get"        => get()
+      case "exists"     => exists()
+      case "delete"     => delete()
+      case "list"       => list()
+      case "history"    => history()
+      case "setDefault" => setDefault()
+      case "getDefault" => getDefault
+      case x            => throw new RuntimeException(s"Unknown operation: $x")
     }
   }
 }
 
 object ConfigCliApp {
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     Await.result(new ConfigCliApp(ClusterSettings()).start(args), 5.seconds)
-  }
 
 }

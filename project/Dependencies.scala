@@ -12,28 +12,25 @@ object Dependencies {
     Libs.`chill-akka`,
     Libs.`akka-management-cluster-http`,
     AkkaHttp.`akka-http`,
-
-    Libs.`scalatest` % Test,
-    Libs.`junit` % Test,
-    Libs.`junit-interface` % Test,
-    Libs.`mockito-core` % Test,
-    Akka.`akka-stream-testkit` % Test,
+    Libs.`scalatest`               % Test,
+    Libs.`junit`                   % Test,
+    Libs.`junit-interface`         % Test,
+    Libs.`mockito-core`            % Test,
+    Akka.`akka-stream-testkit`     % Test,
     Akka.`akka-multi-node-testkit` % Test
   )
 
   val TrackLocationAgent = Seq(
     Akka.`akka-actor`,
     Libs.`scopt`,
-
-    Libs.`scalatest` % Test,
+    Libs.`scalatest`     % Test,
     Libs.`scala-logging` % Test
   )
 
   val ConfigCliClient = Seq(
     Akka.`akka-actor`,
     Libs.`scopt`,
-
-    Libs.`scalatest` % Test,
+    Libs.`scalatest`     % Test,
     Libs.`scala-logging` % Test
   )
 
@@ -48,12 +45,11 @@ object Dependencies {
     Libs.svnkit,
     Libs.`scopt`,
     Libs.`commons-codec`,
-
-    Libs.`scalatest` % Test,
-    AkkaHttp.`akka-http-testkit` % Test,
-    Libs.`junit` % Test,
-    Libs.`junit-interface` % Test,
+    Libs.`scalatest`               % Test,
+    AkkaHttp.`akka-http-testkit`   % Test,
+    Libs.`junit`                   % Test,
+    Libs.`junit-interface`         % Test,
     Akka.`akka-multi-node-testkit` % Test,
-    Akka.`akka-stream-testkit` % Test
+    Akka.`akka-stream-testkit`     % Test
   )
 }

@@ -15,21 +15,20 @@ import org.scalatest._
 import scala.concurrent.Future
 
 class TrackLocationAppIntegrationTest(locationService: LocationService)
-  extends FunSuite
+    extends FunSuite
     with Matchers
     with BeforeAndAfter
     with BeforeAndAfterEach
     with BeforeAndAfterAll {
 
   private val cswCluster = CswCluster.withSettings(ClusterSettings())
-  val trackLocationApp = new TrackLocationApp(cswCluster)
+  val trackLocationApp   = new TrackLocationApp(cswCluster)
   val WaitTimeForResolve = 3000
 
   import cswCluster._
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     trackLocationApp.shutdown().await
-  }
 
   test("launch the trackLocationApp") {
     val name = "test1"
@@ -38,10 +37,12 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
     Future {
       trackLocationApp.start(
         Array(
-          "--name", name,
+          "--name",
+          name,
           "--command",
           "sleep 5",
-          "--port", port.toString,
+          "--port",
+          port.toString,
           "--no-exit"
         )
       )
@@ -49,7 +50,7 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
 
     Thread.sleep(WaitTimeForResolve)
 
-    val connection = TcpConnection(ComponentId(name, ComponentType.Service))
+    val connection  = TcpConnection(ComponentId(name, ComponentType.Service))
     val tcpLocation = locationService.find(connection).await.get
     tcpLocation shouldBe TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
 
@@ -65,7 +66,7 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
     val port = 8888
 
     val tempFile = java.io.File.createTempFile("trackLocationApp-test2", ".conf")
-    val bw = new BufferedWriter(new FileWriter(tempFile))
+    val bw       = new BufferedWriter(new FileWriter(tempFile))
     bw.write(s"""test2 {
       port = 8888
       command = sleep 5
@@ -77,17 +78,13 @@ class TrackLocationAppIntegrationTest(locationService: LocationService)
 
     Future {
       trackLocationApp.start(
-        Array(
-          "--name",
-          name,
-          "--no-exit",
-          configFile)
+        Array("--name", name, "--no-exit", configFile)
       )
     }
 
     Thread.sleep(WaitTimeForResolve)
 
-    val connection = TcpConnection(ComponentId(name, ComponentType.Service))
+    val connection  = TcpConnection(ComponentId(name, ComponentType.Service))
     val tcpLocation = locationService.find(connection).await.get
     tcpLocation shouldBe TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
 

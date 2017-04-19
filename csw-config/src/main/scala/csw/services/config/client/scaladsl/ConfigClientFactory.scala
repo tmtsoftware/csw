@@ -7,7 +7,7 @@ import csw.services.location.scaladsl.LocationService
 
 object ConfigClientFactory {
   def make(actorSystem: ActorSystem, locationService: LocationService): ConfigService = {
-    val actorRuntime = new ActorRuntime(actorSystem)
+    val actorRuntime          = new ActorRuntime(actorSystem)
     val configServiceResolver = new ConfigServiceResolver(locationService, actorRuntime)
     new ConfigClient(configServiceResolver, actorRuntime)
   }

@@ -13,18 +13,16 @@ object TromboneHCD {
   val hcdActorSystem = ActorSystem("trombone-hcd-system")
 
   val tromboneHcdActorRef = hcdActorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
-  val componentId = ComponentId("trombonehcd", ComponentType.HCD)
-  val connection = AkkaConnection(componentId)
+  val componentId         = ComponentId("trombonehcd", ComponentType.HCD)
+  val connection          = AkkaConnection(componentId)
 
-  val registration = AkkaRegistration(connection, tromboneHcdActorRef)
+  val registration            = AkkaRegistration(connection, tromboneHcdActorRef)
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
-  val registrationResult = locationService.register(registration).await
+  val registrationResult      = locationService.register(registration).await
 
   println("Trombone HCD registered")
 
-  def main(args: Array[String]): Unit = {
-
-  }
+  def main(args: Array[String]): Unit = {}
   case class Unregister()
 }
 

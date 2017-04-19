@@ -12,83 +12,84 @@ import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 /**
-  * CswCluster provides cluster properties to manage distributed data
-  *
-  * ''Note: '' It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
-  */
-class CswCluster private(_actorSystem: ActorSystem) {
+ * CswCluster provides cluster properties to manage distributed data
+ *
+ * ''Note: '' It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
+ */
+class CswCluster private (_actorSystem: ActorSystem) {
 
   /**
-    * Identifies the hostname where ActorSystem is running
-    */
+   * Identifies the hostname where ActorSystem is running
+   */
   val hostname: String = _actorSystem.settings.config.getString("akka.remote.netty.tcp.hostname")
 
   implicit val actorSystem: ActorSystem = _actorSystem
-  implicit val ec: ExecutionContext = actorSystem.dispatcher
-  implicit val mat: Materializer = makeMat()
-  implicit val cluster = Cluster(actorSystem)
+  implicit val ec: ExecutionContext     = actorSystem.dispatcher
+  implicit val mat: Materializer        = makeMat()
+  implicit val cluster                  = Cluster(actorSystem)
 
   /**
-    * Gives the replicator for the current ActorSystem
-    *
-    * @see [[akka.cluster.ddata.Replicator]]
-    */
+   * Gives the replicator for the current ActorSystem
+   *
+   * @see [[akka.cluster.ddata.Replicator]]
+   */
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
   /**
-    * Gives handle to CoordinatedShutdown so that shutdown hooks can be added from outside
-    */
+   * Gives handle to CoordinatedShutdown so that shutdown hooks can be added from outside
+   */
   val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   /**
-    * Creates an ActorMaterializer for current ActorSystem
-    */
+   * Creates an ActorMaterializer for current ActorSystem
+   */
   def makeMat(): Materializer = ActorMaterializer()
 
   /**
-    * Terminates the ActorSystem and gracefully leaves the cluster
-    *
-    * @return A Future that completes on successful shutdown of ActorSystem
-    */
+   * Terminates the ActorSystem and gracefully leaves the cluster
+   *
+   * @return A Future that completes on successful shutdown of ActorSystem
+   */
   def terminate(): Future[Done] = coordinatedShutdown.run()
 }
 
 /**
-  * Manages initialization and termination of ActorSystem and the Cluster.
-  *
-  * ''Note: '' The creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
-  */
+ * Manages initialization and termination of ActorSystem and the Cluster.
+ *
+ * ''Note: '' The creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
+ */
 object CswCluster {
   //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
   import ExecutionContext.Implicits.global
 
   /**
-    * Creates CswCluster with the default cluster settings
-    *
-    * @see [[csw.services.location.commons.ClusterSettings]]
-    */
+   * Creates CswCluster with the default cluster settings
+   *
+   * @see [[csw.services.location.commons.ClusterSettings]]
+   */
   def make(): CswCluster = withSettings(ClusterSettings())
 
   /**
-    * Creates CswCluster with the given customized settings
-    */
-  def withSettings(settings: ClusterSettings): CswCluster = withSystem(ActorSystem(settings.clusterName, settings.config))
-
+   * Creates CswCluster with the given customized settings
+   */
+  def withSettings(settings: ClusterSettings): CswCluster =
+    withSystem(ActorSystem(settings.clusterName, settings.config))
 
   /**
-    * Creates CswCluster with the given ActorSystem
-    */
+   * Creates CswCluster with the given ActorSystem
+   */
   def withSystem(actorSystem: ActorSystem): CswCluster = {
     // Get the cluster information of this ActorSystem
     val cluster: Cluster = Cluster(actorSystem)
 
     // Get the startManagement flag for the ActorSystem
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
-    if(startManagement) {
+    if (startManagement) {
       //Block until the cluster is initialized
       Await.result(ClusterHttpManagement(cluster).start(), 10.seconds)
       //Add shutdown hook if cluster management is started successfully.
-      CoordinatedShutdown(actorSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "shudownClusterManagement") { () =>
+      CoordinatedShutdown(actorSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind,
+        "shudownClusterManagement") { () =>
         ClusterHttpManagement(cluster).stop()
       }
     }

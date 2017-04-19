@@ -18,7 +18,7 @@ import scala.concurrent.duration.{DurationDouble, _}
 class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0)
 class LocationServiceTestMultiJvmNode2 extends LocationServiceTest(0)
 
-class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) with BeforeAndAfterEach{
+class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) with BeforeAndAfterEach {
 
   import config._
 
@@ -27,9 +27,8 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
   val assemblyActorSystem = ActorSystem("assembly-actor-system")
 
-  override protected def afterEach(): Unit = {
+  override protected def afterEach(): Unit =
     Await.result(locationService.unregisterAll(), 10.seconds)
-  }
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -46,13 +45,13 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
   }
 
   test("ensure that a component registered by one node is resolved and listed on all the nodes") {
-    val tcpPort = 446
-    val tcpConnection = TcpConnection(ComponentId("reddis", ComponentType.Service))
+    val tcpPort         = 446
+    val tcpConnection   = TcpConnection(ComponentId("reddis", ComponentType.Service))
     val tcpRegistration = TcpRegistration(tcpConnection, tcpPort)
 
-    val httpPort = 81
-    val httpPath = "/test/hcd"
-    val httpConnection = HttpConnection(ComponentId("tromboneHcd", ComponentType.HCD))
+    val httpPort         = 81
+    val httpPath         = "/test/hcd"
+    val httpConnection   = HttpConnection(ComponentId("tromboneHcd", ComponentType.HCD))
     val httpRegistration = HttpRegistration(httpConnection, httpPort, httpPath)
 
     runOn(seed) {
@@ -62,7 +61,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       val resolvedHttpLocation = locationService.resolve(httpConnection, 5.seconds).await.get
       resolvedHttpLocation.connection shouldBe httpConnection
 
-      val locations = locationService.list.await
+      val locations   = locationService.list.await
       val connections = locations.map(_.connection)
       connections.toSet shouldBe Set(tcpConnection, httpConnection)
     }
@@ -74,7 +73,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       val resolvedTcpLocation = locationService.resolve(tcpConnection, 5.seconds).await.get
       resolvedTcpLocation.connection shouldBe tcpConnection
 
-      val locations = locationService.list.await
+      val locations   = locationService.list.await
       val connections = locations.map(_.connection)
       connections.toSet shouldBe Set(tcpConnection, httpConnection)
     }
@@ -85,7 +84,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 //  This test is doing the same thing what TrackLocationTest is doing
 //  but the plan is to run this test on two amazon instance's with Jenkins configuration (multi-node-test).
   test("ensure that a component registered on one node is tracked on all the nodes") {
-    val componentId = ComponentId("tromboneHcd", ComponentType.HCD)
+    val componentId    = ComponentId("tromboneHcd", ComponentType.HCD)
     val akkaConnection = AkkaConnection(componentId)
 
     runOn(seed) {
@@ -127,15 +126,15 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     enterBarrier("after-3")
   }
 
-  test("ensure that component is able to resolve and send message to remote actor created through separate actor system than LocationService actor system") {
+  test(
+      "ensure that component is able to resolve and send message to remote actor created through separate actor system than LocationService actor system") {
 
     val tcpConnection = TcpConnection(ComponentId("redis1", ComponentType.Service))
 
     val akkaConnection = AkkaConnection(ComponentId("Assembly1", ComponentType.Assembly))
 
-
     runOn(seed) {
-      val tcpPort = 470
+      val tcpPort         = 470
       val tcpRegistration = TcpRegistration(tcpConnection, tcpPort)
 
       locationService.register(tcpRegistration).await
@@ -149,7 +148,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       Thread.sleep(2000)
       enterBarrier("Unregistration")
 
-      val locations = locationService.list.await
+      val locations                    = locationService.list.await
       val connections: Set[Connection] = locations.map(_.connection).toSet
 
       locations.size shouldBe 1
@@ -157,7 +156,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     }
 
     runOn(member) {
-      val actorRef = assemblyActorSystem.actorOf(AssemblyActor.props(locationService) , "assembly-actor")
+      val actorRef = assemblyActorSystem.actorOf(AssemblyActor.props(locationService), "assembly-actor")
 
       locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
 

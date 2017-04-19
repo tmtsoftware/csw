@@ -57,28 +57,30 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
     }
 
     runOn(member1) {
-      val port = 5656
+      val port   = 5656
       val prefix = "/trombone/hcd"
 
-      val httpRegistration = HttpRegistration(httpConnection, port, prefix)
+      val httpRegistration       = HttpRegistration(httpConnection, port, prefix)
       val httpRegistrationResult = locationService.register(httpRegistration).await
 
-      val (akkaSwitch, akkaProbe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
-      val (tcpSwitch, tcpProbe) = locationService.track(tcpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+      val (akkaSwitch, akkaProbe) =
+        locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+      val (tcpSwitch, tcpProbe) =
+        locationService.track(tcpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
       val akkaEvent: TrackingEvent = akkaProbe.requestNext()
-      val trackedAkkaConnection = akkaEvent.asInstanceOf[LocationUpdated].connection
+      val trackedAkkaConnection    = akkaEvent.asInstanceOf[LocationUpdated].connection
       trackedAkkaConnection shouldBe akkaConnection
 
       val tcpEvent: TrackingEvent = tcpProbe.requestNext()
-      val trackedTcpConnection = tcpEvent.asInstanceOf[LocationUpdated].connection
+      val trackedTcpConnection    = tcpEvent.asInstanceOf[LocationUpdated].connection
       trackedTcpConnection shouldBe tcpConnection
 
       enterBarrier("Registration")
       enterBarrier("Akka-unregister")
 
       val akkaRemovedEvent: TrackingEvent = akkaProbe.requestNext()
-      val unregisteredAkkaConnection = akkaRemovedEvent.asInstanceOf[LocationRemoved].connection
+      val unregisteredAkkaConnection      = akkaRemovedEvent.asInstanceOf[LocationRemoved].connection
       unregisteredAkkaConnection shouldBe akkaConnection
 
       akkaSwitch.shutdown()
@@ -98,14 +100,15 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
     }
 
     runOn(member2) {
-      val Port = 5657
-      val tcpRegistration = TcpRegistration(tcpConnection,  Port)
+      val Port                  = 5657
+      val tcpRegistration       = TcpRegistration(tcpConnection, Port)
       val tcpRegistrationResult = locationService.register(tcpRegistration).await
 
-      val (httpSwitch, httpProbe) = locationService.track(httpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+      val (httpSwitch, httpProbe) =
+        locationService.track(httpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
       val httpEvent: TrackingEvent = httpProbe.requestNext()
-      val trackedHttpConnection = httpEvent.asInstanceOf[LocationUpdated].connection
+      val trackedHttpConnection    = httpEvent.asInstanceOf[LocationUpdated].connection
       trackedHttpConnection shouldBe httpConnection
 
       enterBarrier("Registration")
@@ -113,7 +116,7 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
       enterBarrier("Http-unregister")
 
       val httpRemovedEvent: TrackingEvent = httpProbe.requestNext()
-      val unregisteredHttpConnection = httpRemovedEvent.asInstanceOf[LocationRemoved].connection
+      val unregisteredHttpConnection      = httpRemovedEvent.asInstanceOf[LocationRemoved].connection
       unregisteredHttpConnection shouldBe httpConnection
 
       httpSwitch.shutdown()
@@ -128,4 +131,3 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
     enterBarrier("after-2")
   }
 }
-

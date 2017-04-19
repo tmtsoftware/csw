@@ -20,7 +20,7 @@ class RegistrationTest extends FunSuiteLike with Matchers {
     val hostname = new Networks().hostname()
 
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorSystem = ActorSystemFactory.remote
+    val actorSystem    = ActorSystemFactory.remote
     val actorRef = actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = Actor.emptyBehavior
@@ -29,7 +29,7 @@ class RegistrationTest extends FunSuiteLike with Matchers {
     )
 
     val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
-    val akkaUri = new URI(actorPath.toString)
+    val akkaUri   = new URI(actorPath.toString)
 
     val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
 
@@ -42,10 +42,10 @@ class RegistrationTest extends FunSuiteLike with Matchers {
 
   test("should able to create the HttpRegistration which should internally create HttpLocation") {
     val hostname = new Networks().hostname()
-    val port = 9595
-    val prefix = "/trombone/hcd"
+    val port     = 9595
+    val prefix   = "/trombone/hcd"
 
-    val httpConnection = HttpConnection(ComponentId("trombone", ComponentType.HCD))
+    val httpConnection   = HttpConnection(ComponentId("trombone", ComponentType.HCD))
     val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 
     val expectedhttpLocation = HttpLocation(httpConnection, new URI(s"http://$hostname:$port/$prefix"))
@@ -55,9 +55,9 @@ class RegistrationTest extends FunSuiteLike with Matchers {
 
   test("should able to create the TcpRegistration which should internally create TcpLocation") {
     val hostname = new Networks().hostname()
-    val port = 9596
+    val port     = 9596
 
-    val tcpConnection = TcpConnection(ComponentId("lgsTrombone", ComponentType.HCD))
+    val tcpConnection   = TcpConnection(ComponentId("lgsTrombone", ComponentType.HCD))
     val tcpRegistration = TcpRegistration(tcpConnection, port)
 
     val expectedTcpLocation = TcpLocation(tcpConnection, new URI(s"tcp://$hostname:$port"))
@@ -66,8 +66,7 @@ class RegistrationTest extends FunSuiteLike with Matchers {
   }
 
   test("should not allow AkkaRegistration using local ActorRef") {
-    val config: Config = ConfigFactory.parseString(
-      """
+    val config: Config = ConfigFactory.parseString("""
         akka.actor.provider = local
       """)
 

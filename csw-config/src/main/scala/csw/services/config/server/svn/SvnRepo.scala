@@ -19,7 +19,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   private implicit val _blockingIoDispatcher = blockingIoDispatcher
 
-  def initSvnRepo(): Unit = {
+  def initSvnRepo(): Unit =
     try {
       // Create the new main repo
       FSRepositoryFactory.setup()
@@ -30,7 +30,6 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.IO_ERROR ⇒
         println(s"Repository already exists at ${settings.svnUrl}")
     }
-  }
 
   def getFile(path: Path, revision: Long, outputStream: OutputStream): Future[Unit] = Future {
     val svn = svnHandle()
@@ -53,21 +52,20 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       val dirPath = path.getParent
 
       // Recursively add any missing directories leading to the file
-      def addDir(dir: Path): Unit = {
+      def addDir(dir: Path): Unit =
         if (dir != null) {
           addDir(dir.getParent)
           if (!dirExists(dir)) {
             editor.addDir(dir.toString, null, SVNRepository.INVALID_REVISION)
           }
         }
-      }
 
       addDir(dirPath)
       val filePath = path.toString
       editor.addFile(filePath, null, SVNRepository.INVALID_REVISION)
       editor.applyTextDelta(filePath, null)
       val deltaGenerator = new SVNDeltaGenerator
-      val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
+      val checksum       = deltaGenerator.sendDelta(filePath, data, editor, true)
       editor.closeFile(filePath, checksum)
       editor.closeDir() // XXX TODO I think all added parent dirs need to be closed also
       editor.closeEdit()
@@ -87,7 +85,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       editor.openFile(filePath, SVNRepository.INVALID_REVISION)
       editor.applyTextDelta(filePath, null)
       val deltaGenerator = new SVNDeltaGenerator
-      val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
+      val checksum       = deltaGenerator.sendDelta(filePath, data, editor, true)
       editor.closeFile(filePath, checksum)
       editor.closeDir()
       editor.closeEdit
@@ -95,7 +93,6 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       svn.closeSession()
     }
   }
-
 
   def delete(path: Path, comment: String): Future[SVNCommitInfo] = Future {
     val svnOperationFactory = new SvnOperationFactory()
@@ -111,7 +108,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   def list(): Future[List[SVNDirEntry]] = Future {
     // XXX Should .sha1 files have the .sha1 suffix removed in the result?
-    var entries = List[SVNDirEntry]()
+    var entries             = List[SVNDirEntry]()
     val svnOperationFactory = new SvnOperationFactory()
     try {
       val svnList = svnOperationFactory.createList()
@@ -128,20 +125,22 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       .sortWith(_.getRelativePath < _.getRelativePath)
   }
 
-  def hist(path: Path, maxResults: Int): Future[List[SVNLogEntry]] = Future {
-    val clientManager = SVNClientManager.newInstance()
-    var logEntries = List[SVNLogEntry]()
-    try {
-      val logClient = clientManager.getLogClient
-      val handler: ISVNLogEntryHandler = logEntry => logEntries = logEntry :: logEntries
-      logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults, handler)
-      logEntries.sortWith(_.getRevision > _.getRevision)
-    } finally {
-      clientManager.dispose()
+  def hist(path: Path, maxResults: Int): Future[List[SVNLogEntry]] =
+    Future {
+      val clientManager = SVNClientManager.newInstance()
+      var logEntries    = List[SVNLogEntry]()
+      try {
+        val logClient                    = clientManager.getLogClient
+        val handler: ISVNLogEntryHandler = logEntry => logEntries = logEntry :: logEntries
+        logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
+          handler)
+        logEntries.sortWith(_.getRevision > _.getRevision)
+      } finally {
+        clientManager.dispose()
+      }
+    } recover {
+      case ex: SVNException => Nil
     }
-  } recover {
-    case ex: SVNException => Nil
-  }
 
   // Gets the svn revision from the given id, defaulting to HEAD
   def svnRevision(id: Option[Long] = None): Future[SVNRevision] = Future {
@@ -156,9 +155,8 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
   }
 
   // True if the directory path exists in the repository
-  private def dirExists(path: Path): Boolean = {
+  private def dirExists(path: Path): Boolean =
     checkPath(path, SVNNodeKind.DIR, SVNRepository.INVALID_REVISION)
-  }
 
   private def checkPath(path: Path, kind: SVNNodeKind, revision: Long): Boolean = {
     val svn = svnHandle()
@@ -173,7 +171,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   // Gets an object for accessing the svn repository (not reusing a single instance since not thread safe)
   private def svnHandle(): SVNRepository = {
-    val svn = SVNRepositoryFactory.create(settings.svnUrl)
+    val svn         = SVNRepositoryFactory.create(settings.svnUrl)
     val authManager = BasicAuthenticationManager.newInstance(settings.`svn-user-name`, Array[Char]())
     svn.setAuthenticationManager(authManager)
     svn

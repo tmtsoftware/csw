@@ -11,9 +11,9 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class ActorRuntime(_actorSystem: ActorSystem, settings: Settings) {
-  implicit val actorSystem: ActorSystem = _actorSystem
+  implicit val actorSystem: ActorSystem     = _actorSystem
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
-  implicit val mat: Materializer = ActorMaterializer()
+  implicit val mat: Materializer            = ActorMaterializer()
 
   val blockingIoDispatcher: MessageDispatcher = actorSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
 

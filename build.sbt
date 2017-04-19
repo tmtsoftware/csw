@@ -1,12 +1,17 @@
-val enableCoverage =  sys.props.get("enableCoverage") == Some("true")
-val MaybeCoverage: Plugins = if(enableCoverage) Coverage else Plugins.empty
+val enableCoverage         = sys.props.get("enableCoverage") == Some("true")
+val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
 val unidocExclusions: Seq[ProjectReference] = Seq(
-  `csw-cluster-seed`, `track-location-agent`, `config-cli-client`, `integration`, `csw-config`
+  `csw-cluster-seed`,
+  `track-location-agent`,
+  `config-cli-client`,
+  `integration`,
+  `csw-config`
 )
 
 //Root project
-lazy val `csw-prod` = project.in(file("."))
+lazy val `csw-prod` = project
+  .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
   .aggregate(`csw-location`, `track-location-agent`, `csw-cluster-seed`, `csw-config`, `config-cli-client`)
   .settings(Settings.mergeSiteWith(docs))
@@ -33,7 +38,6 @@ lazy val `csw-cluster-seed` = project
   .enablePlugins(DeployApp)
   .dependsOn(`csw-location`)
 
-
 //Config service related projects
 lazy val `config-cli-client` = project
   .in(file("apps/config-cli-client"))
@@ -53,7 +57,6 @@ lazy val `csw-config` = project
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
 
-
 //Integration test project
 lazy val integration = project
   .enablePlugins(DeployApp)
@@ -61,7 +64,6 @@ lazy val integration = project
   .settings(
     libraryDependencies ++= Dependencies.Integration
   )
-
 
 //Docs project
 lazy val docs = project.enablePlugins(ParadoxSite, NoPublish)

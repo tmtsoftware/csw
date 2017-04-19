@@ -46,5 +46,5 @@ object DeployApp extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] =
     SettingsHelper.makeDeploymentSettings(Universal, packageBin in Universal, "zip") ++
-      SettingsHelper.makeDeploymentSettings(UniversalDocs, packageBin in UniversalDocs, "zip")
+    SettingsHelper.makeDeploymentSettings(UniversalDocs, packageBin in UniversalDocs, "zip")
 }

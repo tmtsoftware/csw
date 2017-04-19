@@ -3,7 +3,7 @@ package csw.services.integtration.tests
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
 import csw.services.integtration.apps.TromboneHCD
-import csw.services.integtration.apps.TromboneHCD.{Unregister, tromboneHcdActorRef}
+import csw.services.integtration.apps.TromboneHCD.{tromboneHcdActorRef, Unregister}
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
@@ -28,19 +28,19 @@ class LocationServiceIntegrationTest
 
   test("should not allow duplicate akka registration") {
     val tromboneHcdActorRef = system.actorOf(Props[TromboneHCD], "trombone-hcd")
-    val componentId = ComponentId("trombonehcd", ComponentType.HCD)
-    val connection = AkkaConnection(componentId)
+    val componentId         = ComponentId("trombonehcd", ComponentType.HCD)
+    val connection          = AkkaConnection(componentId)
 
     val registration = AkkaRegistration(connection, tromboneHcdActorRef)
     Thread.sleep(4000)
-    intercept[OtherLocationIsRegistered]{
+    intercept[OtherLocationIsRegistered] {
       locationService.register(registration).await
     }
   }
 
   test("should able to resolve and communicate with remote HCD started on another container") {
     val componentId = ComponentId("trombonehcd", ComponentType.HCD)
-    val connection = AkkaConnection(componentId)
+    val connection  = AkkaConnection(componentId)
     val hcdLocation = locationService.find(connection).await.get
 
     hcdLocation shouldBe a[AkkaLocation]
@@ -55,7 +55,7 @@ class LocationServiceIntegrationTest
     locationService.list.await should have size 1
   }
 
-  test("list all components"){
+  test("list all components") {
     val listOfLocations = locationService.list.await
 
     listOfLocations should have size 1
@@ -64,7 +64,7 @@ class LocationServiceIntegrationTest
   test("should able to resolve remote Service started on another container") {
 
     val componentId = ComponentId("redisservice", ComponentType.Service)
-    val connection = HttpConnection(componentId)
+    val connection  = HttpConnection(componentId)
 
     val hcdLocation = locationService.find(connection).await.get
 

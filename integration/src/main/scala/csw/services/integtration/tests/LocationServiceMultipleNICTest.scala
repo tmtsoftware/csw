@@ -7,21 +7,21 @@ import csw.services.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuite, Matchers}
 
-class LocationServiceMultipleNICTest(cswCluster: CswCluster) extends FunSuite
-  with Matchers
-  with BeforeAndAfter
-  with BeforeAndAfterAll{
+class LocationServiceMultipleNICTest(cswCluster: CswCluster)
+    extends FunSuite
+    with Matchers
+    with BeforeAndAfter
+    with BeforeAndAfterAll {
 
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     locationService.shutdown()
-  }
 
-  test("should list and resolve component having multiple-nic's"){
+  test("should list and resolve component having multiple-nic's") {
 
     val componentId = ComponentId("assembly", ComponentType.Assembly)
-    val connection = AkkaConnection(componentId)
+    val connection  = AkkaConnection(componentId)
 
     Thread.sleep(4000)
     val listOfLocations = locationService.list.await

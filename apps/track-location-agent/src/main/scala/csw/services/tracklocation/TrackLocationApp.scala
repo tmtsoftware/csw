@@ -12,8 +12,8 @@ import scala.util.control.NonFatal
 import async.Async._
 
 /**
-  * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
-  */
+ * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
+ */
 class TrackLocationApp(cswCluster: CswCluster) {
   import cswCluster._
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
@@ -27,7 +27,7 @@ class TrackLocationApp(cswCluster: CswCluster) {
           println(s"commandText: ${command.commandText}, command: $command")
           val trackLocation = new TrackLocation(options.names, command, cswCluster, locationService)
           trackLocation.run()
-        case None          => Done
+        case None => Done
       }
     } catch {
       case NonFatal(ex) =>

@@ -10,7 +10,7 @@ object JConfigClientFactory {
 
   def make(actorSystem: ActorSystem, locationService: ILocationService): IConfigService = {
     val configService = ConfigClientFactory.make(actorSystem, locationService.asScala)
-    val actorRuntime = new ActorRuntime(actorSystem)
+    val actorRuntime  = new ActorRuntime(actorSystem)
     new JConfigService(configService, actorRuntime)
   }
 

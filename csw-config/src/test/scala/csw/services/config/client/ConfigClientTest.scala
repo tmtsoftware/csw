@@ -10,7 +10,7 @@ import csw.services.location.scaladsl.LocationServiceFactory
 
 class ConfigClientTest extends ConfigServiceTest {
 
-  private val locationService = LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
+  private val locationService       = LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
   private val clientLocationService = LocationServiceFactory.withSettings(ClusterSettings().joinLocal(3552))
 
   private val httpService = ServerWiring.make(locationService).httpService

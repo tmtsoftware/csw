@@ -11,7 +11,10 @@ import csw.services.location.scaladsl.LocationService
 import scala.async.Async._
 import scala.concurrent.Future
 
-class HttpService(locationService: LocationService, configServiceRoute: ConfigServiceRoute, settings: Settings, actorRuntime: ActorRuntime) {
+class HttpService(locationService: LocationService,
+                  configServiceRoute: ConfigServiceRoute,
+                  settings: Settings,
+                  actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 
@@ -30,7 +33,8 @@ class HttpService(locationService: LocationService, configServiceRoute: ConfigSe
   }
 
   private def registerWithLocationService(): Future[RegistrationResult] = {
-    val registration = HttpRegistration(HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service)), settings.`service-port`, "")
+    val registration = HttpRegistration(HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service)),
+      settings.`service-port`, "")
     locationService.register(registration)
   }
 

@@ -12,21 +12,19 @@ import scala.concurrent.Future
 object PathUtils {
 
   /**
-    * Initialize with the contents of the file from given path.
-    *
-    * @param path      the data source
-    * @param chunkSize the block or chunk size to use when streaming the data
-    */
+   * Initialize with the contents of the file from given path.
+   *
+   * @param path      the data source
+   * @param chunkSize the block or chunk size to use when streaming the data
+   */
   def fromPath(path: Path, chunkSize: Int = 4096): ConfigData = ConfigData.fromSource(FileIO.fromPath(path, chunkSize))
 
-
   /**
-    * Writes config data to a provided file and returns output file.
-    */
+   * Writes config data to a provided file and returns output file.
+   */
   def writeToPath(configData: ConfigData, path: Path)(implicit mat: Materializer): Future[File] = {
     import mat.executionContext
-    configData
-      .source
+    configData.source
       .runWith(FileIO.toPath(path))
       .map(_ ⇒ path.toFile)
   }

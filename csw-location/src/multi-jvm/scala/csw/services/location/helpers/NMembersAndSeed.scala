@@ -10,9 +10,9 @@ class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 
   private val settings = ClusterSettings()
 
-  commonConfig(debugConfig(on = false)
-    .withFallback(
-    ConfigFactory.parseString("""
+  commonConfig(
+      debugConfig(on = false)
+        .withFallback(ConfigFactory.parseString("""
       akka.loglevel = ERROR
       akka.remote.netty.tcp.applied-adapters = []
       akka.remote.log-remote-lifecycle-events = ERROR

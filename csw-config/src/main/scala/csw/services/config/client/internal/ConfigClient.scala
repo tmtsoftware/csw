@@ -16,13 +16,15 @@ import csw.services.config.server.http.JsonSupport
 import scala.async.Async._
 import scala.concurrent.Future
 
-class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime) extends ConfigService with JsonSupport {
+class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
+    extends ConfigService
+    with JsonSupport {
 
   import actorRuntime._
 
   override def name: String = "http-based-config-client"
 
-  private def configUri(path: jnio.Path) = baseUri(Path / "config" ++ Path / Path(path.toString))
+  private def configUri(path: jnio.Path)  = baseUri(Path / "config" ++ Path / Path(path.toString))
   private def defaultUri(path: jnio.Path) = baseUri(Path / "default" ++ Path / Path(path.toString))
   private def historyUri(path: jnio.Path) = baseUri(Path / "history" ++ Path / Path(path.toString))
 
@@ -32,24 +34,25 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     await(configServiceResolver.uri).withPath(path)
   }
 
-  override def create(path: jnio.Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = async {
-    val entity = Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
-    val uri = await(configUri(path)).withQuery(Query("oversize" → oversize.toString, "comment" → comment))
+  override def create(path: jnio.Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] =
+    async {
+      val entity = Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
+      val uri    = await(configUri(path)).withQuery(Query("oversize" → oversize.toString, "comment" → comment))
 
-    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
-    println(request)
-    val response = await(Http().singleRequest(request))
+      val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
+      println(request)
+      val response = await(Http().singleRequest(request))
 
-    response.status match {
-      case StatusCodes.Created  ⇒ await(Unmarshal(response).to[ConfigId])
-      case StatusCodes.Conflict ⇒ throw FileAlreadyExists(path)
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
+      response.status match {
+        case StatusCodes.Created  ⇒ await(Unmarshal(response).to[ConfigId])
+        case StatusCodes.Conflict ⇒ throw FileAlreadyExists(path)
+        case _                    ⇒ throw new RuntimeException(response.status.reason())
+      }
     }
-  }
 
   override def update(path: jnio.Path, configData: ConfigData, comment: String): Future[ConfigId] = async {
     val entity = Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
-    val uri = await(configUri(path)).withQuery(Query("comment" → comment))
+    val uri    = await(configUri(path)).withQuery(Query("comment" → comment))
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity)
     println(request)

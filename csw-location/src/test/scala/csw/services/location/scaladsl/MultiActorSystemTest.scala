@@ -11,21 +11,24 @@ import scala.concurrent.duration.DurationInt
 
 class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  val connection: TcpConnection = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
+  val connection: TcpConnection        = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
   val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
 
-  private val locationService = LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().onPort(3552)) )
-  private val locationService2 = LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().joinLocal(3552)))
+  private val locationService =
+    LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().onPort(3552)))
+  private val locationService2 =
+    LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().joinLocal(3552)))
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     locationService2.shutdown().await
-  }
 
   test("ensure that location service works across two actorSystems within the same JVM") {
     locationService.register(tcpRegistration).await
-    locationService2.resolve(connection, 5.seconds).await.get shouldBe tcpRegistration.location(new Networks().hostname())
+    locationService2.resolve(connection, 5.seconds).await.get shouldBe tcpRegistration.location(
+        new Networks().hostname())
 
     locationService.shutdown().await
-    locationService2.resolve(connection, 5.seconds).await.get shouldBe tcpRegistration.location(new Networks().hostname())
+    locationService2.resolve(connection, 5.seconds).await.get shouldBe tcpRegistration.location(
+        new Networks().hostname())
   }
 }

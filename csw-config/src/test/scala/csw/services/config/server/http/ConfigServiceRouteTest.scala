@@ -10,7 +10,8 @@ import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFile
 import csw.services.config.server.ServerWiring
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class ConfigServiceRouteTest extends FunSuite
+class ConfigServiceRouteTest
+    extends FunSuite
     with ScalatestRouteTest
     with BeforeAndAfterAll
     with BeforeAndAfterEach
@@ -24,13 +25,13 @@ class ConfigServiceRouteTest extends FunSuite
   private val testFileUtils = new TestFileUtils(settings)
 
   private val configValue1 = "axisName = tromboneAxis"
-  private val configFile1 = ConfigData.fromString(configValue1)
+  private val configFile1  = ConfigData.fromString(configValue1)
 
   private val updatedConfigValue1 = "assemblyHCDCount = 3"
-  private val updatedConfigFile1 = ConfigData.fromString(updatedConfigValue1)
+  private val updatedConfigFile1  = ConfigData.fromString(updatedConfigValue1)
 
   private val configValue2 = "name = NFIRAOS Trombone Assembly"
-  private val configFile2 = ConfigData.fromString(configValue2)
+  private val configFile2  = ConfigData.fromString(configValue2)
 
   override protected def beforeAll(): Unit =
     testFileUtils.deleteServerFiles()
@@ -42,9 +43,8 @@ class ConfigServiceRouteTest extends FunSuite
     testFileUtils.deleteServerFiles()
 
   /**
-    * test HTTP response codes
-    */
-
+   * test HTTP response codes
+   */
   test("create - success status code") {
     // try to create by providing optional comment parameter
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
@@ -72,7 +72,7 @@ class ConfigServiceRouteTest extends FunSuite
 
     // try to create file which already exists
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> Route.seal(route) ~> check {
-       status shouldEqual StatusCodes.Conflict
+      status shouldEqual StatusCodes.Conflict
     }
 
   }
@@ -237,7 +237,7 @@ class ConfigServiceRouteTest extends FunSuite
 
     // try to fetch history of a file which does not exists
     Get("/history/test5.conf") ~> Route.seal(route) ~> check {
-     status shouldEqual StatusCodes.NotFound
+      status shouldEqual StatusCodes.NotFound
     }
 
     Get("/history/test5.conf&maxResults=5") ~> Route.seal(route) ~> check {

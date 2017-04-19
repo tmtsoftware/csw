@@ -51,15 +51,15 @@ trait ConfigService {
   def get(path: Path, id: Option[ConfigId] = None): Future[Option[ConfigData]]
 
   /**
-    * Gets the file as it existed on the given date.
-    * If date is before the file was created, the initial version is returned.
-    * If date is after the last change, the most recent version is returned.
-    * If the path does not exist in the repo, Future[None] is returned.
-    *
-    * @param path the file path relative to the repository root
-    * @param time the target date
-    * @return a future object that can be used to access the file's data, if found
-    */
+   * Gets the file as it existed on the given date.
+   * If date is before the file was created, the initial version is returned.
+   * If date is after the last change, the most recent version is returned.
+   * If the path does not exist in the repo, Future[None] is returned.
+   *
+   * @param path the file path relative to the repository root
+   * @param time the target date
+   * @return a future object that can be used to access the file's data, if found
+   */
   def get(path: Path, time: Instant): Future[Option[ConfigData]]
 
   /**

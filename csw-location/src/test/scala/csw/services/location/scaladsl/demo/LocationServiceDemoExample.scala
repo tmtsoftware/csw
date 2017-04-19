@@ -34,22 +34,20 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
 
   lazy
   //#create-location-service
-   val locationService = LocationServiceFactory.make()
+  val locationService = LocationServiceFactory.make()
   //#create-location-service
 
-
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     locationService.shutdown().await
-  }
 
   //#Components-Connections-Registrations
-  val tcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
+  val tcpConnection   = TcpConnection(ComponentId("redis", ComponentType.Service))
   val tcpRegistration = TcpRegistration(tcpConnection, 6380)
 
-  val httpConnection = HttpConnection(ComponentId("configuration", ComponentType.Service))
+  val httpConnection   = HttpConnection(ComponentId("configuration", ComponentType.Service))
   val httpRegistration = HttpRegistration(httpConnection, 8080, "path123")
 
-  val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+  val akkaConnection   = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
   val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
   //#Components-Connections-Registrations
 
@@ -57,20 +55,20 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
     val assertionF: Future[Assertion] =
       //#register-list-resolve-unregister
       async {
-      val tcpRegistrationResult = await(locationService.register(tcpRegistration))
+        val tcpRegistrationResult = await(locationService.register(tcpRegistration))
 
-      tcpRegistrationResult.location.connection shouldBe tcpConnection
+        tcpRegistrationResult.location.connection shouldBe tcpConnection
 
-      await(locationService.list) shouldBe List(tcpRegistrationResult.location)
-      await(locationService.find(tcpConnection)) shouldBe Some(tcpRegistrationResult.location)
+        await(locationService.list) shouldBe List(tcpRegistrationResult.location)
+        await(locationService.find(tcpConnection)) shouldBe Some(tcpRegistrationResult.location)
 
-      println(tcpRegistrationResult.location.uri)
+        println(tcpRegistrationResult.location.uri)
 
-      await(tcpRegistrationResult.unregister())
+        await(tcpRegistrationResult.unregister())
 
-      await(locationService.list) shouldBe List.empty
-      await(locationService.find(tcpConnection)) shouldBe None
-    }
+        await(locationService.list) shouldBe List.empty
+        await(locationService.find(tcpConnection)) shouldBe None
+      }
     Await.result(assertionF, 5.seconds)
     //#register-list-resolve-unregister
   }
@@ -82,7 +80,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
     Thread.sleep(200)
 
     async {
-      val tcpRegistrationResult = await(locationService.register(tcpRegistration))
+      val tcpRegistrationResult  = await(locationService.register(tcpRegistration))
       val httpRegistrationResult = await(locationService.register(httpRegistration))
 
       Thread.sleep(200)
@@ -97,18 +95,21 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
     Await.result(doneF, 5.seconds)
     //#tracking
   }
-  
+
   test("filtering") {
     //#filtering
     val assertionF: Future[Assertion] = async {
-      val tcpRegistrationResult = await(locationService.register(tcpRegistration))
+      val tcpRegistrationResult  = await(locationService.register(tcpRegistration))
       val httpRegistrationResult = await(locationService.register(httpRegistration))
       val akkaRegistrationResult = await(locationService.register(akkaRegistration))
 
-      await(locationService.list).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location, akkaRegistrationResult.location)
+      await(locationService.list).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location,
+        akkaRegistrationResult.location)
       await(locationService.list(ConnectionType.AkkaType)).toSet shouldBe Set(akkaRegistrationResult.location)
-      await(locationService.list(ComponentType.Service)).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location)
-      await(locationService.list(new Networks().hostname())).toSet shouldBe Set(tcpRegistrationResult.location, httpRegistrationResult.location, akkaRegistrationResult.location)
+      await(locationService.list(ComponentType.Service)).toSet shouldBe Set(tcpRegistrationResult.location,
+        httpRegistrationResult.location)
+      await(locationService.list(new Networks().hostname())).toSet shouldBe Set(tcpRegistrationResult.location,
+        httpRegistrationResult.location, akkaRegistrationResult.location)
     }
 
     Await.result(assertionF, 5.seconds)

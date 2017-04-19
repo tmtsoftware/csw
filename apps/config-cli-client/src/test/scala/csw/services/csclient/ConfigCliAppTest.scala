@@ -15,8 +15,8 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   private val locationService = LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
-  private val serverWiring = ServerWiring.make(locationService)
-  private val httpService = serverWiring.httpService
+  private val serverWiring    = ServerWiring.make(locationService)
+  private val httpService     = serverWiring.httpService
   httpService.lazyBinding.await
 
   val ConfigCliApp = new ConfigCliApp(ClusterSettings().joinLocal(3552))
@@ -25,9 +25,8 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
   import csw.services.csclient.commons.CmdLineArgsUtil._
 
-  override protected def beforeEach(): Unit = {
+  override protected def beforeEach(): Unit =
     serverWiring.svnRepo.initSvnRepo()
-  }
 
   override protected def afterEach(): Unit = {
     testFileUtils.deleteServerFiles()

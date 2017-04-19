@@ -12,17 +12,14 @@ import scala.concurrent.Future
 
 object Sha1 {
 
-  private def fromSource(source: Source[ByteString, Any])(implicit mat: Materializer): Future[String] = {
+  private def fromSource(source: Source[ByteString, Any])(implicit mat: Materializer): Future[String] =
     source.runWith(sink)
-  }
 
-  def fromConfigData(configData: ConfigData)(implicit mat: Materializer): Future[String] = {
+  def fromConfigData(configData: ConfigData)(implicit mat: Materializer): Future[String] =
     fromSource(configData.source)
-  }
 
-  def fromPath(path: Path)(implicit mat: Materializer): Future[String] = {
+  def fromPath(path: Path)(implicit mat: Materializer): Future[String] =
     fromSource(FileIO.fromPath(path))
-  }
 
   //Keep this a def so that the digester is created anew each time.
   def sink: Sink[ByteString, Future[String]] = {

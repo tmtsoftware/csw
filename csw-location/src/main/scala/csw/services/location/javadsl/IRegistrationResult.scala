@@ -6,13 +6,13 @@ import akka.Done
 import csw.services.location.models.Location
 
 /**
-  * IRegistrationResult represents successful registration of a location.
-  */
+ * IRegistrationResult represents successful registration of a location.
+ */
 trait IRegistrationResult {
 
   /**
-    * The successful registration of location can be unregistered using this method
-    */
+   * The successful registration of location can be unregistered using this method
+   */
   def unregister: CompletableFuture[Done]
 
   def location: Location

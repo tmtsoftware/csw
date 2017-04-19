@@ -12,10 +12,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
-  * The files are stored in the configured directory using a file name and directory structure
-  * based on the SHA-1 hash of the file contents (This is the same way Git stores data).
-  * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
-  * the SHA-1 hash value.
+ * The files are stored in the configured directory using a file name and directory structure
+ * based on the SHA-1 hash of the file contents (This is the same way Git stores data).
+ * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
+ * the SHA-1 hash value.
   **/
 class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo) {
 
@@ -27,14 +27,12 @@ class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo) {
     if (await(fileRepo.exists(outPath))) {
       await(fileRepo.delete(tempFilePath))
       sha
-    }
-    else {
+    } else {
       await(fileRepo.createDirectories(outPath.getParent))
       await(fileRepo.move(tempFilePath, outPath))
       if (await(validate(sha, outPath))) {
         sha
-      }
-      else {
+      } else {
         await(fileRepo.delete(outPath))
         await(fileRepo.delete(tempFilePath))
         throw new RuntimeException(s" Error in creating file for $sha")
@@ -60,16 +58,15 @@ class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo) {
   }
 
   /**
-    * Verifies that the given file's content matches the SHA-1 id
-    *
-    * @param id   the SHA-1 of the file
-    * @param path the file to check
-    * @return true if the file is valid
-    */
+   * Verifies that the given file's content matches the SHA-1 id
+   *
+   * @param id   the SHA-1 of the file
+   * @param path the file to check
+   * @return true if the file is valid
+   */
   def validate(id: String, path: Path)(implicit mat: Materializer): Future[Boolean] = async {
     id == await(Sha1.fromPath(path))
   }
-
 
   def saveAndSha(configData: ConfigData)(implicit mat: Materializer): Future[(Path, String)] = async {
     val path = await(fileRepo.createTempFile("config-service-overize-", ".tmp"))

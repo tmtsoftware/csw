@@ -38,6 +38,4 @@ package csw.services
  * Here you specify port and hostname for the local host is automatically determined.
  *
  */
-package object location {
-
-}
+package object location {}

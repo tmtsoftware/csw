@@ -15,7 +15,7 @@ class OversizeFileServiceTest extends FunSuite with Matchers with BeforeAndAfter
 
   import wiring._
 
-  private val testFileUtils = new TestFileUtils(settings)
+  private val testFileUtils   = new TestFileUtils(settings)
   private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile
 
   import actorRuntime._
@@ -29,12 +29,11 @@ class OversizeFileServiceTest extends FunSuite with Matchers with BeforeAndAfter
 
   private val configData = ConfigData.fromString(contents)
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     testFileUtils.deleteDirectoryRecursively(oversizeFileDir)
-  }
 
   test("storing oversize file") {
-    val actualSha = oversizeFileService.post(configData).await
+    val actualSha   = oversizeFileService.post(configData).await
     val expectedSha = Sha1.fromConfigData(configData).await
 
     actualSha shouldBe expectedSha

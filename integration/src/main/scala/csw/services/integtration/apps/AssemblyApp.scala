@@ -12,16 +12,14 @@ object AssemblyApp {
   private val cswCluster = CswCluster.withSettings(ClusterSettings().withInterface("eth1"))
 
   val assemblyActorRef = ActorSystemFactory.remote.actorOf(Props[AssemblyApp], "assembly")
-  val componentId = ComponentId("assembly", ComponentType.Assembly)
-  val connection = AkkaConnection(componentId)
+  val componentId      = ComponentId("assembly", ComponentType.Assembly)
+  val connection       = AkkaConnection(componentId)
 
-  val actorPath = ActorPath.fromString(Serialization.serializedActorPath(assemblyActorRef))
-  val registration = AkkaRegistration(connection, assemblyActorRef)
+  val actorPath          = ActorPath.fromString(Serialization.serializedActorPath(assemblyActorRef))
+  val registration       = AkkaRegistration(connection, assemblyActorRef)
   val registrationResult = LocationServiceFactory.withCluster(cswCluster).register(registration).await
 
-  def main(args: Array[String]): Unit = {
-
-  }
+  def main(args: Array[String]): Unit = {}
 
 }
 

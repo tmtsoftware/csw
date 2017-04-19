@@ -10,21 +10,21 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
-  lazy val settings = new Settings(config)
+  lazy val settings       = new Settings(config)
 
-  lazy val actorSystem = ActorSystem("config-service", config)
-  lazy val actorRuntime = new ActorRuntime(actorSystem, settings)
+  lazy val actorSystem      = ActorSystem("config-service", config)
+  lazy val actorRuntime     = new ActorRuntime(actorSystem, settings)
   lazy val oversizeFileRepo = new OversizeFileRepo(actorRuntime.blockingIoDispatcher)
-  lazy val svnRepo = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
+  lazy val svnRepo          = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
 
-  lazy val oversizeFileService = new OversizeFileService(settings, oversizeFileRepo)
+  lazy val oversizeFileService          = new OversizeFileService(settings, oversizeFileRepo)
   lazy val configService: ConfigService = new SvnConfigService(settings, oversizeFileService, actorRuntime, svnRepo)
 
   lazy val locationService: LocationService = LocationServiceFactory.make()
 
   lazy val configExceptionHandler = new ConfigExceptionHandler
-  lazy val configServiceRoute = new ConfigServiceRoute(configService, actorRuntime, configExceptionHandler)
-  lazy val httpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
+  lazy val configServiceRoute     = new ConfigServiceRoute(configService, actorRuntime, configExceptionHandler)
+  lazy val httpService            = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }
 
 object ServerWiring {

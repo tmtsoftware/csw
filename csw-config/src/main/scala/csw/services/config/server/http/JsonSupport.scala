@@ -14,7 +14,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
     override def read(json: JsValue): Path = json match {
       case JsString(value) ⇒ Paths.get(value)
-      case _ ⇒ throw new RuntimeException("can not parse")
+      case _               ⇒ throw new RuntimeException("can not parse")
     }
   }
 
@@ -23,11 +23,11 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
     override def read(json: JsValue): Instant = json match {
       case JsString(value) ⇒ Instant.parse(value)
-      case _ ⇒ throw new RuntimeException("can not parse")
+      case _               ⇒ throw new RuntimeException("can not parse")
     }
   }
 
-  implicit val configIdFormat: RootJsonFormat[ConfigId] = jsonFormat1(new ConfigId(_))
-  implicit val configFileInfoFormat: RootJsonFormat[ConfigFileInfo] = jsonFormat3(ConfigFileInfo.apply)
+  implicit val configIdFormat: RootJsonFormat[ConfigId]                   = jsonFormat1(new ConfigId(_))
+  implicit val configFileInfoFormat: RootJsonFormat[ConfigFileInfo]       = jsonFormat3(ConfigFileInfo.apply)
   implicit val configFileHistoryFormat: RootJsonFormat[ConfigFileHistory] = jsonFormat3(ConfigFileHistory.apply)
 }

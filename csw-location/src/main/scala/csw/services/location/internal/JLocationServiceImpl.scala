@@ -18,7 +18,8 @@ import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.duration.FiniteDuration
 
-private[location] class JLocationServiceImpl(locationService: LocationService, cswCluster: CswCluster) extends ILocationService {
+private[location] class JLocationServiceImpl(locationService: LocationService, cswCluster: CswCluster)
+    extends ILocationService {
 
   import cswCluster._
 
@@ -34,9 +35,8 @@ private[location] class JLocationServiceImpl(locationService: LocationService, c
   override def find(connection: Connection): CompletableFuture[Optional[Location]] =
     locationService.find(connection).map(_.asJava).toJava.toCompletableFuture
 
-  override def resolve(connection: Connection, within: FiniteDuration): CompletableFuture[Optional[Location]] = {
+  override def resolve(connection: Connection, within: FiniteDuration): CompletableFuture[Optional[Location]] =
     locationService.resolve(connection, within).map(_.asJava).toJava.toCompletableFuture
-  }
 
   override def list: CompletableFuture[util.List[Location]] =
     locationService.list.map(_.asJava).toJava.toCompletableFuture
@@ -60,11 +60,10 @@ private[location] class JLocationServiceImpl(locationService: LocationService, c
 
   override def asScala: LocationService = locationService
 
-  private def registrationResult(registrationResult: RegistrationResult): IRegistrationResult = {
+  private def registrationResult(registrationResult: RegistrationResult): IRegistrationResult =
     new IRegistrationResult {
       override def unregister: CompletableFuture[Done] = registrationResult.unregister().toJava.toCompletableFuture
 
       override def location: Location = registrationResult.location
     }
-  }
 }
