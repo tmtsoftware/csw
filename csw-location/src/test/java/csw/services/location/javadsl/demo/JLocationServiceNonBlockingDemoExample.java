@@ -12,6 +12,7 @@ import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
+import akka.testkit.TestProbe;
 import csw.services.location.internal.Networks;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JComponentType;
@@ -33,6 +34,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class JLocationServiceNonBlockingDemoExample {
 
@@ -187,6 +189,30 @@ public class JLocationServiceNonBlockingDemoExample {
 
         completableFuture.get();
         //#filtering
+        locationService.unregisterAll();
+    }
+
+    @Test
+    public void subscribing(){
+        //subscribing
+        TestProbe probe = new TestProbe(actorSystem);
+
+        KillSwitch killSwitch = locationService.subscribe(tcpRegistration.connection(), new Consumer<TrackingEvent>() {
+            @Override
+            public void accept(TrackingEvent trackingEvent) {
+                probe.ref().tell(trackingEvent, ActorRef.noSender());
+            }
+        });
+
+        locationService.register(tcpRegistration);
+        probe.expectMsg(new LocationUpdated(tcpRegistration.location(new Networks().hostname())));
+
+        locationService.unregister(tcpConnection);
+        probe.expectMsg(new LocationRemoved(tcpRegistration.connection()));
+
+        killSwitch.shutdown();
+        probe.expectNoMsg();
+        //subscribing
         locationService.unregisterAll();
     }
 }

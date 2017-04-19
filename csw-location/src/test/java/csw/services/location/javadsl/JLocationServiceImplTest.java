@@ -292,11 +292,12 @@ public class JLocationServiceImplTest {
     }
 
     @Test
-    public void testSubscribeConnection(){
+    public void testSubscribeConnection() {
         int Port = 1234;
         TcpConnection redis1Connection = new TcpConnection(new ComponentId("redis1", JComponentType.Service));
         TcpRegistration redis1Registration = new TcpRegistration(redis1Connection, Port);
 
+        //Test probe actor to receive the TrackingEvent notifications
         TestProbe probe = new TestProbe(actorSystem);
 
         KillSwitch killSwitch = locationService.subscribe(redis1Connection, new Consumer<TrackingEvent>() {
@@ -312,6 +313,7 @@ public class JLocationServiceImplTest {
         locationService.unregister(redis1Connection);
         probe.expectMsg(new LocationRemoved(redis1Registration.connection()));
 
+        //shutdown the notification stream, should no longer receive any notifications
         killSwitch.shutdown();
         probe.expectNoMsg();
     }
