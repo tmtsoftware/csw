@@ -4,20 +4,21 @@ import akka.actor.{Actor, ActorSystem, PoisonPill, Props}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
+import akka.testkit.TestProbe
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest._
 
 import scala.concurrent.duration.DurationInt
 
 class LocationServiceCompTest
-  extends FunSuite
-    with Matchers
-    with BeforeAndAfterEach
-    with BeforeAndAfterAll {
+  extends FunSuiteLike
+  with Matchers
+  with BeforeAndAfterEach
+  with BeforeAndAfterAll {
 
   lazy val locationService: LocationService = LocationServiceFactory.make()
 
@@ -151,6 +152,27 @@ class LocationServiceCompTest
     switch.shutdown()
     probe.request(1)
     probe.expectComplete()
+  }
+
+  test("should be able to subscribe a tcp connection and receive notifications via callback") {
+    val hostname = new Networks().hostname()
+    val Port = 1234
+    val redis1Connection = TcpConnection(ComponentId("redis1", ComponentType.Service))
+    val redis1Registration = TcpRegistration(redis1Connection,  Port)
+
+    val probe = TestProbe()
+
+    val switch = locationService.subscribe(redis1Connection, te => probe.ref ! te)
+
+    locationService.register(redis1Registration).await
+    probe.expectMsg(LocationUpdated(redis1Registration.location(hostname)))
+
+    locationService.unregister(redis1Connection).await
+    probe.expectMsg(LocationRemoved(redis1Registration.connection))
+
+    switch.shutdown()
+    locationService.register(redis1Registration).await
+    probe.expectNoMsg()
   }
 
   test("should able to track http and akka connection registered before tracking started") {
