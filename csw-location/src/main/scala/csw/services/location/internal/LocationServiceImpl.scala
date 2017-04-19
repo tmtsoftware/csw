@@ -159,6 +159,13 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   }
 
   /**
+    * Subscribe to events of a connection by providing a callback.
+    */
+  override def subscribe(connection: Connection, callback: TrackingEvent ⇒ Unit): KillSwitch = {
+    track(connection).to(Sink.foreach(callback)).run()
+  }
+
+  /**
     * Terminate the ActorSystem and gracefully leave the akka cluster
     * Note: It is recommended not to perform any operation on LocationService after shutdown
     */

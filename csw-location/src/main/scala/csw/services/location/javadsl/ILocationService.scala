@@ -1,7 +1,8 @@
 package csw.services.location.javadsl
 
 import java.util.Optional
-import java.util.concurrent.CompletableFuture
+import java.util.concurrent.{Callable, CompletableFuture}
+import java.util.function.Consumer
 import java.{util ⇒ ju}
 
 import akka.Done
@@ -90,6 +91,14 @@ trait ILocationService {
     *         events for earlier tracked connection
     */
   def track(connection: Connection): Source[TrackingEvent, KillSwitch]
+
+  /**
+    * Subscribe to tracking events for a connection by providing a consumer
+    * For each event accept method of consumer interface is invoked.
+    * Returns a killswitch which can be shutdown to unsubscribe the consumer.
+    * Use this method if you do not want to handle materialization and happy with a side-effecting callback instead
+    */
+  def subscribe(connection: Connection, consumer: Consumer[TrackingEvent]): KillSwitch
 
   /**
     * Shuts down the LocationService

@@ -91,6 +91,14 @@ trait LocationService {
   def track(connection: Connection): Source[TrackingEvent, KillSwitch]
 
   /**
+    * Subscribe to tracking events for a connection by providing a callback
+    * For each event the callback is invoked.
+    * Returns a killswitch which can be shutdown to unsubscribe the callback.
+    * Use this method if you do not want to handle materialization and happy with a side-effecting callback instead
+    */
+  def subscribe(connection: Connection, callback: TrackingEvent ⇒ Unit): KillSwitch
+
+  /**
     * Shuts down the LocationService
     *
     * @see terminate method in [[csw.services.location.commons.CswCluster]]
