@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class JLocationServiceImplTest {
     private static ILocationService locationService = JLocationServiceFactory.make();
@@ -288,6 +289,31 @@ public class JLocationServiceImplTest {
 
         source.first().shutdown();
         source.second().expectComplete();
+    }
+
+    @Test
+    public void testSubscribeConnection(){
+        int Port = 1234;
+        TcpConnection redis1Connection = new TcpConnection(new ComponentId("redis1", JComponentType.Service));
+        TcpRegistration redis1Registration = new TcpRegistration(redis1Connection, Port);
+
+        TestProbe probe = new TestProbe(actorSystem);
+
+        KillSwitch killSwitch = locationService.subscribe(redis1Connection, new Consumer<TrackingEvent>() {
+            @Override
+            public void accept(TrackingEvent trackingEvent) {
+                probe.ref().tell(trackingEvent, ActorRef.noSender());
+            }
+        });
+
+        locationService.register(redis1Registration);
+        probe.expectMsg(new LocationUpdated(redis1Registration.location(new Networks().hostname())));
+
+        locationService.unregister(redis1Connection);
+        probe.expectMsg(new LocationRemoved(redis1Registration.connection()));
+
+        killSwitch.shutdown();
+        probe.expectNoMsg();
     }
 
     @Test
