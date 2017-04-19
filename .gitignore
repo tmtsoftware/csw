@@ -1,7 +1,7 @@
 ignore
 .vagrant
 logs
-project/project
+project/project/target
 project/target
 target
 tmp
