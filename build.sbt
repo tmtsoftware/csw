@@ -25,7 +25,6 @@ lazy val `csw-location` = project
   )
 
 lazy val `track-location-agent` = project
-  .in(file("apps/track-location-agent"))
   .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-location`)
   .settings(
