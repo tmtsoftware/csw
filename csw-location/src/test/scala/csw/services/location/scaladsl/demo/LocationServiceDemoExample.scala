@@ -3,6 +3,7 @@ package csw.services.location.scaladsl.demo
 import akka.actor.{Actor, Props}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink}
+import akka.testkit.TestProbe
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -114,6 +115,33 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
 
     Await.result(assertionF, 5.seconds)
     //#filtering
+  }
+
+  test("subscribing") {
+    //#subscribing
+    val hostname = new Networks().hostname()
+
+    //Test probe actor to receive the TrackingEvent notifications
+    val probeActorRef = TestProbe()
+
+    val switch = locationService.subscribe(tcpConnection, trackingEvent => probeActorRef.ref ! trackingEvent)
+
+    val assertionF = async {
+      await(locationService.register(tcpRegistration))
+      probeActorRef.expectMsg(LocationUpdated(tcpRegistration.location(hostname)))
+
+      await(locationService.unregister(tcpConnection))
+      probeActorRef.expectMsg(LocationRemoved(tcpRegistration.connection))
+
+      //shutdown the notification stream, should no longer receive any notifications
+      switch.shutdown()
+
+      await(locationService.register(tcpRegistration))
+      probeActorRef.expectNoMsg()
+    }
+
+    Await.result(assertionF, 10.seconds)
+    //#subscribing
   }
 
   test("shutdown") {
