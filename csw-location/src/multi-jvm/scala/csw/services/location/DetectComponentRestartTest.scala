@@ -6,7 +6,7 @@ import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.commons.ClusterSettings
-import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
@@ -16,8 +16,9 @@ import scala.concurrent.duration._
 
 class DetectComponentRestartTestMultiJvmNode1 extends DetectComponentRestartTest(0)
 class DetectComponentRestartTestMultiJvmNode2 extends DetectComponentRestartTest(0)
+class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest(0)
 
-class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) {
+class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._
 
@@ -43,7 +44,7 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new On
       probe.requestNext() shouldBe a[LocationUpdated]
 
       Thread.sleep(2000)
-      Await.result(testConductor.shutdown(member), 10.seconds)
+      Await.result(testConductor.shutdown(member2), 10.seconds)
 
       probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
 
@@ -52,7 +53,21 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new On
       probe.requestNext(5.seconds) shouldBe a[LocationUpdated]
     }
 
-    runOn(member) {
+    runOn(member1) {
+      val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+      enterBarrier("Registration")
+
+      probe.requestNext() shouldBe a[LocationUpdated]
+
+      Thread.sleep(2000)
+      probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
+
+      enterBarrier("member-restarted")
+
+      probe.requestNext(5.seconds) shouldBe a[LocationUpdated]
+    }
+
+    runOn(member2) {
       val actorRef = cswCluster.actorSystem
         .actorOf(
           Props(new Actor {
