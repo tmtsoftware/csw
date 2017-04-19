@@ -64,7 +64,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
       def closeDir(checksum: String, depth: Int): SVNCommitInfo = {
         editor.closeFile(path.toString, checksum)
-        for(i <- 1 to openDirDepth) 
+        for (i <- 1 to openDirDepth)
           editor.closeDir()
         editor.closeEdit
       }
