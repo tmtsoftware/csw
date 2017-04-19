@@ -9,7 +9,7 @@ try{
             }
 
             stage('Build') {
-                sh "sbt scalafmt --test"
+                sh "sbt 'scalafmt --test'"
                 sh "sbt -Dcheck.cycles=true clean scalastyle compile"
             }
 
