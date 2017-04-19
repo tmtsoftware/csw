@@ -51,24 +51,32 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       editor.openRoot(SVNRepository.INVALID_REVISION)
       val dirPath = path.getParent
 
+      var openDirDepth = 1
       // Recursively add any missing directories leading to the file
       def addDir(dir: Path): Unit =
         if (dir != null) {
           addDir(dir.getParent)
           if (!dirExists(dir)) {
             editor.addDir(dir.toString, null, SVNRepository.INVALID_REVISION)
+            openDirDepth += 1
           }
         }
+
+      def closeDir(checksum: String, depth: Int): SVNCommitInfo = {
+        editor.closeFile(path.toString, checksum)
+        for(i <- 1 to openDirDepth) 
+          editor.closeDir()
+        editor.closeEdit
+      }
 
       addDir(dirPath)
       val filePath = path.toString
       editor.addFile(filePath, null, SVNRepository.INVALID_REVISION)
       editor.applyTextDelta(filePath, null)
       val deltaGenerator = new SVNDeltaGenerator
-      val checksum       = deltaGenerator.sendDelta(filePath, data, editor, true)
-      editor.closeFile(filePath, checksum)
-      editor.closeDir() // XXX TODO I think all added parent dirs need to be closed also
-      editor.closeEdit()
+
+      val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
+      closeDir(checksum, openDirDepth) // XXX TODO I think all added parent dirs need to be closed also
     } finally {
       svn.closeSession()
     }
