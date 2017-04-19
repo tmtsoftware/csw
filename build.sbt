@@ -34,7 +34,6 @@ lazy val `track-location-agent` = project
   )
 
 lazy val `csw-cluster-seed` = project
-  .in(file("apps/csw-cluster-seed"))
   .enablePlugins(DeployApp)
   .dependsOn(`csw-location`)
 
