@@ -194,7 +194,8 @@ public class JLocationServiceNonBlockingDemoExample {
 
     @Test
     public void subscribing(){
-        //subscribing
+        //#subscribing
+        //Test probe actor to receive the TrackingEvent notifications
         TestProbe probe = new TestProbe(actorSystem);
 
         KillSwitch killSwitch = locationService.subscribe(tcpRegistration.connection(), new Consumer<TrackingEvent>() {
@@ -210,9 +211,10 @@ public class JLocationServiceNonBlockingDemoExample {
         locationService.unregister(tcpConnection);
         probe.expectMsg(new LocationRemoved(tcpRegistration.connection()));
 
+        //shutdown the notification stream, should no longer receive any notifications
         killSwitch.shutdown();
         probe.expectNoMsg();
-        //subscribing
+        //#subscribing
         locationService.unregisterAll();
     }
 }

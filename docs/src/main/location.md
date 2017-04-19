@@ -126,7 +126,7 @@ JavaBlocking
 
 The lifecycle of a connection of interest can be followed using `track` API which takes a `Connection` instance as a parameter. **A `Connection` need not already be registered with LocationService.** It's alright to track connections that will be registered in future. 
 
-A `track` function returns two values:     
+A `track` API returns two values:     
 * A **source** that will emit stream of `TrackingEvents` for the connection.  
 * A **Killswitch** to turn off the stream when no longer needed.  
 
@@ -142,6 +142,23 @@ Java
 
 JavaBlocking
 :   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #tracking }
+
+## Subscribing
+
+The `subscribe` API allows the caller to track a connetion and receive the TrackingEvent notifications via a callback. 
+
+The API expects following parameters :    
+* An existing connection or a connection to be registered in future.  
+* A callback that implements `Consumer`, receives TrackEvent as parameter.  
+ 
+In return it gives a Killswitch that can be used to turn off the event notifications and release the supplied callback, if required.
+ 
+Scala
+:   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #subscribing }
+
+Java
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #subscribing }
+
 
 ## Filtering
 
