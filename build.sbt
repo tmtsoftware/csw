@@ -49,8 +49,14 @@ lazy val `csw-config-client-cli` = project
 lazy val `csw-config-api` = project
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
-    libraryDependencies ++= Dependencies.ConfigApi,
-    bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
+    libraryDependencies ++= Dependencies.ConfigApi
+  )
+
+lazy val `csw-config-server` = project
+  .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
+  .dependsOn(`csw-location`, `csw-config-api`)
+  .settings(
+    libraryDependencies ++= Dependencies.ConfigServer
   )
 
 lazy val `csw-config` = project
