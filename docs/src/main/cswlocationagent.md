@@ -1,4 +1,4 @@
-# track-location-agent
+# csw-location-agent
 
 A utility application that starts a given external program, registers comma separated list of services the location service and unregisters them when the program exits.
 
@@ -15,17 +15,17 @@ A utility application that starts a given external program, registers comma sepa
 
 ## Examples
 
-**Example:** track-location-agent --name "redis" --command "redis-server /usr/local/etc/redis.conf" --port 6379  
+**Example:** csw-location-agent --name "redis" --command "redis-server /usr/local/etc/redis.conf" --port 6379  
 **Explanation:** Application will start redis server on port 6379(default redis port) and will register a TcpConnection for the same with LocationService 
 
-**Example:** track-location-agent --name "foo" --command "sleep 30"  
+**Example:** csw-location-agent --name "foo" --command "sleep 30"  
 **Explanation:** **Explanation:** Application will sleep for 30 seconds. Then, will register a service named foo on a random port with LocationService. Once sleep is over after 30 seconds, will unregister foo service.
 
-**Example:** track-location-agent --name "myHttpService" --command "python -m SimpleHTTPServer 8080" --port 8080  
+**Example:** csw-location-agent --name "myHttpService" --command "python -m SimpleHTTPServer 8080" --port 8080  
 **Explanation:** Application will start a simple HTTP service on port 8080. Then, will register myHttpService as a TCP service with LocationService.
 
-**Example:** track-location-agent --help  
+**Example:** csw-location-agent --help  
 **Explanation:** Prints help message
 
-**Example:** track-location-agent --version  
+**Example:** csw-location-agent --version  
 **Explanation:** Prints application version
