@@ -321,8 +321,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.get(file).await shouldBe None
   }
 
-  test("should able to get and set the default config file") {
-    val file = Paths.get("/test.conf")
+  test("should able to get, set and reset the default version of config file") {
+    val file = Paths.get("/tmt/test/setdefault/getdefault/resetdefault/default.conf")
     configService.create(file, ConfigData.fromString(configValue), oversize = false, "hello world").await
     configService.get(file).await.get.toStringF.await shouldBe configValue
 
@@ -330,6 +330,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       configService.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").await
     configService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").await
 
+    configService.get(file).await.get.toStringF.await shouldBe configValue3
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
     configService.setDefault(file, Some(configIdUpdate1)).await
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue2
