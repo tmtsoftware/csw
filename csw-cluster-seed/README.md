@@ -13,8 +13,8 @@ You run
 
 sbt csw-cluster-seed/universal:publishLocal
 
-This will create a "csw-cluster-seed.zip" and print the path where it is located. Unzip the file and enter the
-zip and follow the instructions below.
+This will create a "csw-cluster-seed.zip" and print the path where it is located. Unzip the file and switch current
+working directory to the extracted folder and follow the instructions below.
 
 
 **Deploying a single seed application**
