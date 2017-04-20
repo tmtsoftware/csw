@@ -11,8 +11,8 @@ import scopt.OptionParser
  */
 object CmdLineArgsParser {
 
-  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("config-cli-client") {
-    head("config-cli-client", System.getProperty("CSW_VERSION"))
+  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("csw-config-client-cli") {
+    head("csw-config-client-cli", System.getProperty("CSW_VERSION"))
 
     //create operation
     cmd("create") action { (_, c) =>

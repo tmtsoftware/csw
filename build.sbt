@@ -4,7 +4,7 @@ val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-cluster-seed`,
   `csw-location-agent`,
-  `config-cli-client`,
+  `csw-config-client-cli`,
   `integration`,
   `csw-config`
 )
@@ -13,7 +13,7 @@ val unidocExclusions: Seq[ProjectReference] = Seq(
 lazy val `csw-prod` = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
-  .aggregate(`csw-location`, `csw-location-agent`, `csw-cluster-seed`, `csw-config`, `config-cli-client`)
+  .aggregate(`csw-location`, `csw-location-agent`, `csw-cluster-seed`, `csw-config`, `csw-config-client-cli`)
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
 
@@ -37,7 +37,7 @@ lazy val `csw-cluster-seed` = project
   .dependsOn(`csw-location`)
 
 //Config service related projects
-lazy val `config-cli-client` = project
+lazy val `csw-config-client-cli` = project
   .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-location`)
   .dependsOn(`csw-config`)
