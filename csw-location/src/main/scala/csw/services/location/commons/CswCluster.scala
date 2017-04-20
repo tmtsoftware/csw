@@ -2,7 +2,7 @@ package csw.services.location.commons
 
 import akka.Done
 import akka.actor.{ActorRef, ActorSystem, CoordinatedShutdown}
-import akka.cluster.Cluster
+import akka.cluster.{Cluster, MemberStatus}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.cluster.http.management.ClusterHttpManagement
@@ -76,9 +76,8 @@ class CswCluster private (_actorSystem: ActorSystem) {
   def ensureReplication(): Unit = {
     implicit val timeout = Timeout(5.seconds)
     import akka.pattern.ask
-    def count =
-      Await.result(DistributedData(actorSystem).replicator ? GetReplicaCount, 5.seconds).asInstanceOf[ReplicaCount]
-    BlockingClusterUtils.awaitAssert(count.n == cluster.state.members.size)
+    def replicaCount = Await.result(replicator ? GetReplicaCount, 5.seconds).asInstanceOf[ReplicaCount]
+    BlockingClusterUtils.awaitAssert(replicaCount.n == cluster.state.members.count(_.status == MemberStatus.Up))
   }
 
   /**
