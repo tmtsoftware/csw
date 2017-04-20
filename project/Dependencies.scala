@@ -27,7 +27,7 @@ object Dependencies {
     Libs.`scala-logging` % Test
   )
 
-  val ConfigCliClient = Seq(
+  val CswConfigClientCli = Seq(
     Akka.`akka-actor`,
     Libs.`scopt`,
     Libs.`scalatest`     % Test,
@@ -37,6 +37,11 @@ object Dependencies {
   val Integration = Seq(
     Libs.`scalatest`,
     Akka.`akka-stream-testkit`
+  )
+
+  val ConfigApi = Seq(
+    Libs.`scalatest`           % Test,
+    Akka.`akka-stream-testkit` % Test
   )
 
   val Config = Seq(
