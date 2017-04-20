@@ -2,7 +2,7 @@ package csw.services.location.internal
 
 import java.util
 import java.util.Optional
-import java.util.concurrent.{Callable, CompletableFuture}
+import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
 import akka.Done

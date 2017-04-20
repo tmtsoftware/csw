@@ -26,9 +26,9 @@ class ConfigClientTest extends ConfigServiceTest {
   }
 
   override protected def afterAll(): Unit = {
-    clientLocationService.shutdown().await
     actorSystem.terminate().await
     httpService.shutdown().await
+    clientLocationService.shutdown().await
     super.afterAll()
   }
 }

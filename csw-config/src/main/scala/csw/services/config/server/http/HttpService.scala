@@ -18,7 +18,7 @@ class HttpService(locationService: LocationService,
 
   import actorRuntime._
 
-  lazy val lazyBinding: Future[Http.ServerBinding] = async {
+  lazy val lazyBinding: Future[ConfigServiceBinding] = async {
     val binding = await(
       Http().bindAndHandle(
         handler = configServiceRoute.route,
@@ -28,21 +28,25 @@ class HttpService(locationService: LocationService,
     )
     println(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     println("==== Registering Config Service HTTP Server with Location Service ====")
-    await(registerWithLocationService())
-    binding
-  }
-
-  private def registerWithLocationService(): Future[RegistrationResult] = {
-    val registration = HttpRegistration(HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service)),
-      settings.`service-port`, "")
-    locationService.register(registration)
+    ConfigServiceBinding(binding, await(register()))
   }
 
   def shutdown(): Future[Done] = async {
-    await(await(lazyBinding).unbind())
+    val configServiceBinding = await(lazyBinding)
+    await(configServiceBinding.registrationResult.unregister())
+    await(configServiceBinding.serverBinding.unbind())
     await(actorSystem.terminate())
     await(locationService.shutdown())
     Done
+  }
+
+  private def register(): Future[RegistrationResult] = {
+    val registration = HttpRegistration(
+      connection = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service)),
+      port = settings.`service-port`,
+      path = ""
+    )
+    locationService.register(registration)
   }
 
 }
