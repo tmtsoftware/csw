@@ -59,6 +59,12 @@ lazy val `csw-config-server` = project
     libraryDependencies ++= Dependencies.ConfigServer
   )
 
+lazy val `csw-config-api-testkit` = project
+  .dependsOn(`csw-config-api`, `csw-config-server`)
+  .settings(
+    libraryDependencies ++= Dependencies.ConfigApiTestkit
+  )
+
 lazy val `csw-config` = project
   .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
   .dependsOn(`csw-location`)

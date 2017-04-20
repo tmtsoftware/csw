@@ -59,6 +59,12 @@ object Dependencies {
     Akka.`akka-stream-testkit`     % Test
   )
 
+  val ConfigApiTestkit = Seq(
+    Akka.`akka-stream`,
+    Libs.`scalatest`,
+    Akka.`akka-stream-testkit`
+  )
+
   val Config = Seq(
     AkkaHttp.`akka-http`,
     AkkaHttp.`akka-http-spray-json`,
