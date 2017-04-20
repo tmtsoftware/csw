@@ -15,7 +15,7 @@ sbt
     ```
     @@@
 
-Maven
+maven
 :   @@@vars
     ```xml
     <dependency>
@@ -27,7 +27,7 @@ Maven
     ```
     @@@
 
-Gradle
+gradle
 :   @@@vars
     ```gradle
     dependencies {
@@ -113,12 +113,12 @@ JavaBlocking
 
 @@@ note { title="async handling in scala and java examples." }
 
- * **scala:** `async` marks a block of asynchronous code and allows to `await` the computation till the Future is complete.
+ * **Scala:** `async` marks a block of asynchronous code and allows to `await` the computation till the Future is complete.
       For more info, please refer: https://github.com/scala/async
  
- * **java non-blocking example:** The code snippets use `CompletiableFuture` and it's `thenAsync`, `thenApply` methods. This style allows to compose multiple Futures and not block the calling thread till Futures are complete. 
+ * **Java non-blocking example:** The code snippets use `CompletiableFuture` and it's `thenAsync`, `thenApply` methods. This style allows to compose multiple Futures and not block the calling thread till Futures are complete. 
 
- * **java blocking example:** The code snippets use `CompletableFuture` using `get` blocking call. This style blocks the calling thread till the Future is complete.
+ * **Java blocking example:** The code snippets use `CompletableFuture` using `get` blocking call. This style blocks the calling thread till the Future is complete.
     
 @@@
 
