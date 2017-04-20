@@ -1,8 +1,12 @@
 package csw.services.config.api.scaladsl
 
-import java.nio.file.Paths
+import java.io.{ByteArrayInputStream, InputStream}
+import java.nio.file.{Path, Paths}
 import java.time.Instant
 
+import akka.stream.IOResult
+import akka.stream.scaladsl.{Source, StreamConverters}
+import akka.util.ByteString
 import csw.services.config.api.commons.TestFileUtils
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
@@ -10,6 +14,8 @@ import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFile
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.files.Sha1
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+
+import scala.concurrent.Future
 
 abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
@@ -50,6 +56,52 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       |axisName222 = tromboneAxis222
       |axisName333 = tromboneAxis333
       |""".stripMargin
+
+  def createConfigs(configFileNames: Set[String]): Set[ConfigId] =
+    configFileNames.map(fileName ⇒ {
+      val fileContent            = scala.io.Source.fromResource(fileName).mkString
+      val configData: ConfigData = ConfigData.fromString(fileContent)
+      configService.create(Paths.get(fileName), configData, oversize = false, s"committing file: ${fileName}").await
+    })
+
+  test("should able to upload and get component configurations from config service") {
+    val configFileNames            = Set("tromboneAssembly.conf", "tromboneContainer.conf", "tromboneHCD.conf")
+    val configIds                  = createConfigs(configFileNames)
+    val configFilePaths: Set[Path] = configFileNames.map(name ⇒ Paths.get(name))
+    val tuples                     = configIds zip configFilePaths
+
+    for {
+      (configId, path) ← tuples
+    } yield {
+      val configData = configService.get(path, Some(configId)).await
+      val source     = scala.io.Source.fromResource(path.toString)
+      try source.mkString shouldEqual configData.get.toStringF.await
+      finally {
+        source.close()
+      }
+    }
+  }
+
+  implicit class RichInputStream(is: InputStream) {
+    def toByteArray() = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
+  }
+
+  test("should able to upload and get binary configurations from config service") {
+    val binaryFileName = "binaryConf.bin"
+    val binaryConfPath = Paths.get(binaryFileName)
+
+    val binarySourceData: InputStream = getClass().getClassLoader().getResourceAsStream(binaryFileName)
+    val expectedBinaryContent         = binarySourceData.toByteArray()
+
+    val stream: Source[ByteString, Future[IOResult]] =
+      StreamConverters.fromInputStream(() ⇒ new ByteArrayInputStream(expectedBinaryContent))
+
+    val configData = ConfigData.fromSource(stream)
+
+    configService.create(binaryConfPath, configData, oversize = true, "commit test file").await
+
+    configService.get(binaryConfPath).await.get.toInputStream.toByteArray() shouldBe expectedBinaryContent
+  }
 
   test("should able to create a file and retrieve the same") {
     val file = Paths.get("test.conf")
