@@ -18,7 +18,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Match
 import scala.concurrent.duration._
 
 /**
- * Test the trackLocation app in-line
+ * Test the csw-location-agent app in-line
  */
 class TrackLocationTest
     extends FunSuiteLike

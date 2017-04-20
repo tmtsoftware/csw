@@ -1,11 +1,11 @@
-Track location agent
+Csw location agent
 =========================
 
-Track location agent helps track services in csw.
+Csw location agent helps track services.
 
 The paradox document can be found [here](https://tmtsoftware.github.io/csw-prod/).
 
-If you want to get started with agent, refer the [examples](https://tmtsoftware.github.io/csw-prod/tracklocation.html).
+If you want to get started with agent, refer the [examples](https://tmtsoftware.github.io/csw-prod/cswlocationagent.html).
 
 You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/index.html).
 

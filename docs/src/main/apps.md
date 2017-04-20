@@ -1,7 +1,6 @@
 # Applications
 
 @@@ index
-
-* [track-location-agent](locationagent.md)
+* [csw-location-agent](cswlocationagent.md)
 
 @@@

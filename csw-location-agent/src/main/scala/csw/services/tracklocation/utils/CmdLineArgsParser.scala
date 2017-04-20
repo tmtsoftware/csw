@@ -10,8 +10,8 @@ import scopt.OptionParser
  */
 object CmdLineArgsParser {
 
-  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("trackLocation") {
-    head("trackLocation", System.getProperty("CSW_VERSION"))
+  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("csw-location-agent") {
+    head("csw-location-agent", System.getProperty("CSW_VERSION"))
 
     def acceptableServiceNames(services: Seq[String]): Either[String, Unit] = {
       val allValid = services.forall { service =>

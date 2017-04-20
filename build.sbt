@@ -3,7 +3,7 @@ val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
 val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-cluster-seed`,
-  `track-location-agent`,
+  `csw-location-agent`,
   `config-cli-client`,
   `integration`,
   `csw-config`
@@ -13,7 +13,7 @@ val unidocExclusions: Seq[ProjectReference] = Seq(
 lazy val `csw-prod` = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
-  .aggregate(`csw-location`, `track-location-agent`, `csw-cluster-seed`, `csw-config`, `config-cli-client`)
+  .aggregate(`csw-location`, `csw-location-agent`, `csw-cluster-seed`, `csw-config`, `config-cli-client`)
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
 
@@ -24,11 +24,11 @@ lazy val `csw-location` = project
     libraryDependencies ++= Dependencies.Location
   )
 
-lazy val `track-location-agent` = project
+lazy val `csw-location-agent` = project
   .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-location`)
   .settings(
-    libraryDependencies ++= Dependencies.TrackLocationAgent,
+    libraryDependencies ++= Dependencies.CswLocationAgent,
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
 
@@ -58,7 +58,7 @@ lazy val `csw-config` = project
 //Integration test project
 lazy val integration = project
   .enablePlugins(DeployApp)
-  .dependsOn(`csw-location`, `track-location-agent`)
+  .dependsOn(`csw-location`, `csw-location-agent`)
   .settings(
     libraryDependencies ++= Dependencies.Integration
   )

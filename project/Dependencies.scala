@@ -20,7 +20,7 @@ object Dependencies {
     Akka.`akka-multi-node-testkit` % Test
   )
 
-  val TrackLocationAgent = Seq(
+  val CswLocationAgent = Seq(
     Akka.`akka-actor`,
     Libs.`scopt`,
     Libs.`scalatest`     % Test,

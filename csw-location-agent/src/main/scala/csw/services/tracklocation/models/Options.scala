@@ -3,7 +3,7 @@ package csw.services.tracklocation.models
 import java.io.File
 
 /**
- * Command line options ("trackLocation --help" prints a usage message with descriptions of all the options)
+ * Command line options ("csw-location-agent --help" prints a usage message with descriptions of all the options)
  *
  * @param names         names is a comma separated list of services (without whitespace or hyphen) to be registered with
  *                      LocationService. e.g. "Alarm,Telemetry,Configuration"

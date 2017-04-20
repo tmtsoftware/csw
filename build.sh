@@ -27,7 +27,7 @@ docker exec build-container bash -c 'cd /source && sbt -Dcheck.cycles=true clean
 exit_code_cmd_1=$?
 docker exec build-container bash -c 'cd /source && sbt csw-location/test'
 exit_code_cmd_2=$?
-docker exec build-container bash -c 'cd /source && sbt trackLocation/test'
+docker exec build-container bash -c 'cd /source && sbt csw-location-agent/test'
 exit_code_cmd_3=$?
 docker exec build-container bash -c 'cd /source && sbt coverageReport'
 exit_code_cmd_4=$?
