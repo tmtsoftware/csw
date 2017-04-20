@@ -125,14 +125,20 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should throw FileAlreadyExists while creating a file if it already exists in repository") {
-    val file = Paths.get("/test.conf")
+    val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
-      .create(file, ConfigData.fromString(configValue), oversize = false, "commit test conf for first time")
+      .create(file, ConfigData.fromString(configValue), oversize = false, "commit redis conf for first time")
       .await
 
     intercept[FileAlreadyExists] {
-      configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit test conf again").await
+      configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit redis conf again").await
     }
+
+    val newFile = Paths.get("/tmt/tcp/redis/text/redis_updated.conf")
+    val configId = configService
+      .create(newFile, ConfigData.fromString(configValue3), oversize = false, "commit redis conf with unique name")
+      .await
+    configId shouldBe ConfigId(2)
   }
 
   test("should able to update existing file and get the file with updated content") {
