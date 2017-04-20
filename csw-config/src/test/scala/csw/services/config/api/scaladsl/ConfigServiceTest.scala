@@ -64,6 +64,10 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       configService.create(Paths.get(fileName), configData, oversize = false, s"committing file: ${fileName}").await
     })
 
+  implicit class RichInputStream(is: InputStream) {
+    def toByteArray() = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
+  }
+
   test("should able to upload and get component configurations from config service") {
     val configFileNames            = Set("tromboneAssembly.conf", "tromboneContainer.conf", "tromboneHCD.conf")
     val configIds                  = createConfigs(configFileNames)
@@ -80,10 +84,6 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
         source.close()
       }
     }
-  }
-
-  implicit class RichInputStream(is: InputStream) {
-    def toByteArray() = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
   }
 
   test("should able to upload and get binary configurations from config service") {
@@ -124,7 +124,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.get(fileWithoutBackslash).await.get.toStringF.await shouldBe configValue
   }
 
-  test("should throw IOException while creating a file if it already exists in repository") {
+  test("should throw FileAlreadyExists while creating a file if it already exists in repository") {
     val file = Paths.get("/test.conf")
     configService
       .create(file, ConfigData.fromString(configValue), oversize = false, "commit test conf for first time")
@@ -151,6 +151,26 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     intercept[FileNotFound] {
       configService.update(file, ConfigData.fromString(configValue), "commit updated assembly conf").await
     }
+  }
+
+  test("each revision of file should have unique identifier") {
+    val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
+    val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
+    val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
+    val binaryConfPath        = Paths.get("trombone/test/binary/binaryConf.bin")
+    val expectedConfigIds     = List(ConfigId(1), ConfigId(2), ConfigId(3), ConfigId(4), ConfigId(5), ConfigId(6))
+
+    val configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue)).await
+    val configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
+    val configId3 = configService.create(binaryConfPath, ConfigData.fromString(configValue3), oversize = true).await
+    val configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue3)).await
+    val configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue3)).await
+    val configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
+
+    val actualConfigIds =
+      List(configId1, configId2, configId3, configId4, configId5, configId6).sortBy(configId ⇒ configId.id)
+
+    actualConfigIds shouldBe expectedConfigIds
   }
 
   test("get call should return `None` if a file does not exists in repository") {
