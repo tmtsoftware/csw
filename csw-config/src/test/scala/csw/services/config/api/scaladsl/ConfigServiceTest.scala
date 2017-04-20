@@ -88,7 +88,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   test("should able to upload and get binary configurations from config service") {
     val binaryFileName = "binaryConf.bin"
-    val binaryConfPath = Paths.get(binaryFileName)
+    val binaryConfPath = Paths.get("/tmt/trombone/test/conf/large/" + binaryFileName)
 
     val binarySourceData: InputStream = getClass().getClassLoader().getResourceAsStream(binaryFileName)
     val expectedBinaryContent         = binarySourceData.toByteArray()
@@ -104,7 +104,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should able to create a file and retrieve the same") {
-    val file = Paths.get("test.conf")
+    val file = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf")
     configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit test file").await
     configService.get(file).await.get.toStringF.await shouldBe configValue
   }
