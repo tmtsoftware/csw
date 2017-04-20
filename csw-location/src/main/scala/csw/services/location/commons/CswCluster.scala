@@ -1,11 +1,13 @@
 package csw.services.location.commons
 
 import akka.Done
-import akka.actor.{ActorRef, ActorSystem, CoordinatedShutdown, Terminated}
+import akka.actor.{ActorRef, ActorSystem, CoordinatedShutdown}
 import akka.cluster.Cluster
 import akka.cluster.ddata.DistributedData
+import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.cluster.http.management.ClusterHttpManagement
 import akka.stream.{ActorMaterializer, Materializer}
+import akka.util.Timeout
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
@@ -30,8 +32,6 @@ class CswCluster private (_actorSystem: ActorSystem) {
 
   /**
    * Gives the replicator for the current ActorSystem
-   *
-   * @see [[akka.cluster.ddata.Replicator]]
    */
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
@@ -46,9 +46,43 @@ class CswCluster private (_actorSystem: ActorSystem) {
   def makeMat(): Materializer = ActorMaterializer()
 
   /**
+   * aaa
+   */
+  def startClusterManagement(): Unit = {
+    val startManagement = actorSystem.settings.config.getBoolean("startManagement")
+    if (startManagement) {
+      val clusterHttpManagement = ClusterHttpManagement(cluster)
+      //Add shutdown hook if cluster management is started successfully.
+      coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind,
+        "shutdownClusterManagement")(() => clusterHttpManagement.stop())
+      Await.result(clusterHttpManagement.start(), 10.seconds)
+    }
+  }
+
+  def joinCluster(): Done = {
+    // Check if seed nodes are provided to join csw-cluster
+    val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
+    if (emptySeeds) {
+      // If no seeds are provided (which happens only during testing), then create a single node cluster by joining to self
+      cluster.join(cluster.selfAddress)
+    }
+
+    val p = Promise[Done]
+    // Once the current ActorSystem has joined csw-cluster, the promise will be completed
+    cluster.registerOnMemberUp(p.success(Done))
+    Await.result(p.future, 20.seconds)
+  }
+
+  def ensureReplication(): Unit = {
+    implicit val timeout = Timeout(5.seconds)
+    import akka.pattern.ask
+    def count =
+      Await.result(DistributedData(actorSystem).replicator ? GetReplicaCount, 5.seconds).asInstanceOf[ReplicaCount]
+    BlockingClusterUtils.awaitAssert(count.n == cluster.state.members.size)
+  }
+
+  /**
    * Terminates the ActorSystem and gracefully leaves the cluster
-   *
-   * @return A Future that completes on successful shutdown of ActorSystem
    */
   def terminate(): Future[Done] = coordinatedShutdown.run()
 }
@@ -60,7 +94,6 @@ class CswCluster private (_actorSystem: ActorSystem) {
  */
 object CswCluster {
   //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
-  import ExecutionContext.Implicits.global
 
   /**
    * Creates CswCluster with the default cluster settings
@@ -79,40 +112,14 @@ object CswCluster {
    * Creates CswCluster with the given ActorSystem
    */
   def withSystem(actorSystem: ActorSystem): CswCluster = {
-    // Get the cluster information of this ActorSystem
-    val cluster: Cluster = Cluster(actorSystem)
-
-    // Get the startManagement flag for the ActorSystem
-    val startManagement = actorSystem.settings.config.getBoolean("startManagement")
-    if (startManagement) {
-      //Block until the cluster is initialized
-      Await.result(ClusterHttpManagement(cluster).start(), 10.seconds)
-      //Add shutdown hook if cluster management is started successfully.
-      CoordinatedShutdown(actorSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind,
-        "shudownClusterManagement") { () =>
-        ClusterHttpManagement(cluster).stop()
-      }
-    }
-
-    // Check if seed nodes are provided to join csw-cluster
-    val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
-    if (emptySeeds) {
-      // If no seeds are provided (which happens only during testing), then create a single node cluster by joining to self
-      cluster.join(cluster.selfAddress)
-    }
-
-    val p = Promise[Done]
-    // Once the current ActorSystem has joined csw-cluster, the promise will be completed
-    cluster.registerOnMemberUp(p.success(Done))
-
+    val cswCluster = new CswCluster(actorSystem)
     try {
-      // Block until the ActorSystem joins csw-cluster successfully
-      Await.result(p.future, 20.seconds)
-      // return the CswCluster instance with this ActorSystem
-      new CswCluster(actorSystem)
+      cswCluster.startClusterManagement()
+      cswCluster.joinCluster()
+      cswCluster.ensureReplication()
+      cswCluster
     } catch {
       case NonFatal(ex) ⇒
-        Await.result(ClusterHttpManagement(cluster).stop(), 10.seconds)
         Await.result(CoordinatedShutdown(actorSystem).run(), 10.seconds)
         throw ex
     }
