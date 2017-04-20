@@ -40,6 +40,7 @@ object Dependencies {
   )
 
   val ConfigApi = Seq(
+    Akka.`akka-stream`,
     Libs.`scalatest`           % Test,
     Akka.`akka-stream-testkit` % Test
   )
