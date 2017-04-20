@@ -38,7 +38,6 @@ lazy val `csw-cluster-seed` = project
 
 //Config service related projects
 lazy val `config-cli-client` = project
-  .in(file("apps/config-cli-client"))
   .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-location`)
   .dependsOn(`csw-config`)
