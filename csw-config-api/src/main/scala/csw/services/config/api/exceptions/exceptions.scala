@@ -1,4 +1,4 @@
-package csw.services.config.exceptions
+package csw.services.config.api.exceptions
 
 import java.nio.file.Path
 

@@ -5,6 +5,7 @@ import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestKit
 import akka.util.ByteString
+import csw.services.config.api.models.ConfigData
 import csw.services.config.commons.TestFutureExtension.RichFuture
 import org.scalatest.{FunSuiteLike, Matchers}
 

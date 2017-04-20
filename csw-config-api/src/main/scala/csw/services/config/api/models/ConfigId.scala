@@ -1,4 +1,4 @@
-package csw.services.config.models
+package csw.services.config.api.models
 
 /**
  * Type of an id returned from ConfigManager create or update methods
