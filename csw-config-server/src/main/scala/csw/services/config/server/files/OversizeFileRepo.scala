@@ -1,6 +1,6 @@
 package csw.services.config.server.files
 
-import java.nio.file.{Files, Path, StandardCopyOption}
+import java.nio.file.{CopyOption, Files, Path, StandardCopyOption}
 
 import akka.dispatch.MessageDispatcher
 

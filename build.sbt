@@ -1,21 +1,37 @@
 val enableCoverage         = sys.props.get("enableCoverage") == Some("true")
 val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
-val unidocExclusions: Seq[ProjectReference] = Seq(
+lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
+  `csw-cluster-seed`,
+  `csw-config-api`,
+  `csw-config-client`,
+  `csw-config-client-cli`,
+  `csw-config-server`,
+  `csw-location`,
+  `csw-location-agent`
+)
+
+lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-cluster-seed`,
   `csw-location-agent`,
+  `csw-config-api`,
+  `csw-config-server`,
   `csw-config-client-cli`,
-  `integration`,
-  `csw-config`
+  `integration`
 )
 
 //Root project
 lazy val `csw-prod` = project
   .in(file("."))
   .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt)
-  .aggregate(`csw-location`, `csw-location-agent`, `csw-cluster-seed`, `csw-config`, `csw-config-client-cli`)
+  .aggregate(aggregatedProjects: _*)
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
+
+//Cluster seed
+lazy val `csw-cluster-seed` = project
+  .enablePlugins(DeployApp)
+  .dependsOn(`csw-location`)
 
 //Location service related projects
 lazy val `csw-location` = project
@@ -32,44 +48,33 @@ lazy val `csw-location-agent` = project
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
 
-lazy val `csw-cluster-seed` = project
-  .enablePlugins(DeployApp)
-  .dependsOn(`csw-location`)
-
 //Config service related projects
-lazy val `csw-config-client-cli` = project
-  .enablePlugins(DeployApp, MaybeCoverage)
-  .dependsOn(`csw-location`)
-  .dependsOn(`csw-config`)
-  .settings(
-    libraryDependencies ++= Dependencies.CswConfigClientCli,
-    bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
-  )
-
 lazy val `csw-config-api` = project
-  .enablePlugins(DeployApp, MaybeCoverage)
+  .enablePlugins(MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigApi
   )
 
 lazy val `csw-config-server` = project
-  .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
+  .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-location`, `csw-config-api`)
   .settings(
-    libraryDependencies ++= Dependencies.ConfigServer
+    libraryDependencies ++= Dependencies.ConfigServer,
+    bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
 
-lazy val `csw-config-api-testkit` = project
-  .dependsOn(`csw-config-api`, `csw-config-server`)
+lazy val `csw-config-client` = project
+  .enablePlugins(AutoMultiJvm, MaybeCoverage)
+  .dependsOn(`csw-location`, `csw-config-api`, `csw-config-server` % "test->test")
   .settings(
-    libraryDependencies ++= Dependencies.ConfigApiTestkit
+    libraryDependencies ++= Dependencies.ConfigClient
   )
 
-lazy val `csw-config` = project
-  .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
-  .dependsOn(`csw-location`)
+lazy val `csw-config-client-cli` = project
+  .enablePlugins(DeployApp, MaybeCoverage)
+  .dependsOn(`csw-config-client`, `csw-config-server` % "test->test")
   .settings(
-    libraryDependencies ++= Dependencies.Config,
+    libraryDependencies ++= Dependencies.CswConfigClientCli,
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
   )
 

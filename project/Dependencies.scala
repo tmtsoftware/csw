@@ -41,38 +41,23 @@ object Dependencies {
 
   val ConfigApi = Seq(
     Akka.`akka-stream`,
+    AkkaHttp.`akka-http-spray-json`,
     Libs.`scalatest`           % Test,
     Akka.`akka-stream-testkit` % Test
   )
 
   val ConfigServer = Seq(
     AkkaHttp.`akka-http`,
-    AkkaHttp.`akka-http-spray-json`,
     Libs.svnkit,
     Libs.`scopt`,
-    Libs.`commons-codec`,
-    Libs.`scalatest`               % Test,
-    AkkaHttp.`akka-http-testkit`   % Test,
-    Libs.`junit`                   % Test,
-    Libs.`junit-interface`         % Test,
-    Akka.`akka-multi-node-testkit` % Test,
-    Akka.`akka-stream-testkit`     % Test
+    Libs.`scalatest`             % Test,
+    AkkaHttp.`akka-http-testkit` % Test,
+    Akka.`akka-stream-testkit`   % Test
   )
 
-  val ConfigApiTestkit = Seq(
-    Akka.`akka-stream`,
-    Libs.`scalatest`,
-    Akka.`akka-stream-testkit`
-  )
-
-  val Config = Seq(
+  val ConfigClient = Seq(
     AkkaHttp.`akka-http`,
-    AkkaHttp.`akka-http-spray-json`,
-    Libs.svnkit,
-    Libs.`scopt`,
-    Libs.`commons-codec`,
     Libs.`scalatest`               % Test,
-    AkkaHttp.`akka-http-testkit`   % Test,
     Libs.`junit`                   % Test,
     Libs.`junit-interface`         % Test,
     Akka.`akka-multi-node-testkit` % Test,
