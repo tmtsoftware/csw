@@ -8,7 +8,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-config-client-cli`,
   `csw-config-server`,
   `csw-location`,
-  `csw-location-agent`
+  `csw-location-agent`,
+  `integration`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
@@ -66,7 +67,8 @@ lazy val `csw-config-server` = project
 
 lazy val `csw-config-client` = project
   .enablePlugins(AutoMultiJvm, MaybeCoverage)
-  .dependsOn(`csw-location`, `csw-config-api`, `csw-config-server` % "test->test")
+  .dependsOn(`csw-location` % "compile->compile;multi-jvm->multi-jvm", `csw-config-api`,
+    `csw-config-server`     % "test->test")
   .settings(
     libraryDependencies ++= Dependencies.ConfigClient
   )

@@ -9,15 +9,15 @@ import com.typesafe.config.ConfigFactory
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.config.helpers.{LSNodeSpec, OneClientAndServer}
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.{ServerWiring, Settings}
+import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.location.scaladsl.LocationServiceFactory
 
 class ConfigServiceTestMultiJvmNode1 extends ConfigServiceTest(0)
 class ConfigServiceTestMultiJvmNode2 extends ConfigServiceTest(0)
 
-class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAndServer) {
+class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) {
 
   import config._
 
@@ -41,14 +41,14 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAn
 
   test("should start config service server on one node and client should able to create and get files from other node") {
 
-    runOn(server) {
+    runOn(seed) {
       val serverWiring = ServerWiring.make(locationService)
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.lazyBinding.await
       enterBarrier("server-started")
     }
 
-    runOn(client) {
+    runOn(member) {
       enterBarrier("server-started")
       val actorRuntime = new ActorRuntime(ActorSystem())
       import actorRuntime._
