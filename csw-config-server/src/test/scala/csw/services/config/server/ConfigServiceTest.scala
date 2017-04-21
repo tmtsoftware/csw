@@ -36,7 +36,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   override protected def afterAll(): Unit =
     actorSystem.terminate().await
 
-  val configValue: String =
+  val configValue1: String =
     """
       |axisName1 = tromboneAxis1
       |axisName2 = tromboneAxis2
@@ -55,6 +55,20 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       |axisName111 = tromboneAxis111
       |axisName222 = tromboneAxis222
       |axisName333 = tromboneAxis333
+      |""".stripMargin
+
+  val configValue4: String =
+    """
+      |axisName1111 = tromboneAxis1111
+      |axisName2222 = tromboneAxis2222
+      |axisName3333 = tromboneAxis3333
+      |""".stripMargin
+
+  val configValue5: String =
+    """
+      |axisName11111 = tromboneAxis11111
+      |axisName22222 = tromboneAxis22222
+      |axisName33333 = tromboneAxis33333
       |""".stripMargin
 
   def createConfigs(configFileNames: Set[String]): Set[ConfigId] =
@@ -105,33 +119,35 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   test("should able to create a file and retrieve the same") {
     val file = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf")
-    configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit test file").await
-    configService.get(file).await.get.toStringF.await shouldBe configValue
+    configService.create(file, ConfigData.fromString(configValue1), oversize = false, "commit test file").await
+    configService.get(file).await.get.toStringF.await shouldBe configValue1
   }
 
   test("should ignore '/' at the beginning of file path and create a file") {
     val fileName             = "csw.conf/1/2/3"
     val file                 = Paths.get(s"/$fileName")
     val fileWithoutBackslash = Paths.get(fileName)
-    configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit csw file").await
+    configService.create(file, ConfigData.fromString(configValue1), oversize = false, "commit csw file").await
 
     intercept[FileAlreadyExists] {
       configService
-        .create(fileWithoutBackslash, ConfigData.fromString(configValue), oversize = false, "commit without '/'")
+        .create(fileWithoutBackslash, ConfigData.fromString(configValue1), oversize = false, "commit without '/'")
         .await
     }
 
-    configService.get(fileWithoutBackslash).await.get.toStringF.await shouldBe configValue
+    configService.get(fileWithoutBackslash).await.get.toStringF.await shouldBe configValue1
   }
 
   test("should throw FileAlreadyExists while creating a file if it already exists in repository") {
     val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
-      .create(file, ConfigData.fromString(configValue), oversize = false, "commit redis conf for first time")
+      .create(file, ConfigData.fromString(configValue1), oversize = false, "commit redis conf for first time")
       .await
 
     intercept[FileAlreadyExists] {
-      configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit redis conf again").await
+      configService
+        .create(file, ConfigData.fromString(configValue1), oversize = false, "commit redis conf again")
+        .await
     }
 
     val newFile = Paths.get("/tmt/tcp/redis/text/redis_updated.conf")
@@ -144,8 +160,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("should able to update existing file and get the file with updated content") {
     val file = Paths.get("/assembly.conf")
 
-    configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit assembly conf").await
-    configService.get(file).await.get.toStringF.await shouldBe configValue
+    configService.create(file, ConfigData.fromString(configValue1), oversize = false, "commit assembly conf").await
+    configService.get(file).await.get.toStringF.await shouldBe configValue1
 
     configService.update(file, ConfigData.fromString(configValue2), "commit updated assembly conf").await
     configService.get(file).await.get.toStringF.await shouldBe configValue2
@@ -155,7 +171,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val file = Paths.get("/assembly.conf")
 
     intercept[FileNotFound] {
-      configService.update(file, ConfigData.fromString(configValue), "commit updated assembly conf").await
+      configService.update(file, ConfigData.fromString(configValue1), "commit updated assembly conf").await
     }
   }
 
@@ -166,11 +182,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val binaryConfPath        = Paths.get("trombone/test/binary/binaryConf.bin")
     val expectedConfigIds     = List(ConfigId(1), ConfigId(2), ConfigId(3), ConfigId(4), ConfigId(5), ConfigId(6))
 
-    val configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue)).await
+    val configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1)).await
     val configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
     val configId3 = configService.create(binaryConfPath, ConfigData.fromString(configValue3), oversize = true).await
-    val configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue3)).await
-    val configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue3)).await
+    val configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4)).await
+    val configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5)).await
     val configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
 
     val actualConfigIds =
@@ -186,24 +202,39 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should able to retrieve the specific version of file by config ID") {
-    val file = Paths.get("/a/b/csw.conf")
-    configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit csw conf file").await
-    configService.get(file).await.get.toStringF.await shouldBe configValue
+    val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
+    val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
+    val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
+    val redisConf             = Paths.get("redis/test/text/redis.conf")
 
-    val configId = configService.update(file, ConfigData.fromString(configValue), "commit updated conf file").await
+    val configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1)).await
+    val configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
+    val configId3 = configService.create(redisConf, ConfigData.fromString(configValue3)).await
+    val configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4)).await
+    val configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5)).await
+    val configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
 
-    configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
-    configService.get(file).await.get.toStringF.await shouldBe configValue2
+    val configData1 = configService.get(tromboneHcdConf, Some(configId1)).await.get
+    val configData2 = configService.get(tromboneAssemblyConf, Some(configId2)).await.get
+    val configData3 = configService.get(redisConf, Some(configId3)).await.get
+    val configData4 = configService.get(tromboneContainerConf, Some(configId4)).await.get
+    val configData5 = configService.get(tromboneHcdConf, Some(configId5)).await.get
+    val configData6 = configService.get(tromboneAssemblyConf, Some(configId6)).await.get
 
-    configService.get(file, Some(configId)).await.get.toStringF.await shouldBe configValue
+    configData1.toStringF.await shouldBe configValue1
+    configData2.toStringF.await shouldBe configValue2
+    configData3.toStringF.await shouldBe configValue3
+    configData4.toStringF.await shouldBe configValue4
+    configData5.toStringF.await shouldBe configValue5
+    configData6.toStringF.await shouldBe configValue2
   }
 
   test("should get the correct version of file based on date") {
     val file = Paths.get("/test.conf")
     configService
-      .create(file, ConfigData.fromString(configValue), oversize = false, "commit initial configuration")
+      .create(file, ConfigData.fromString(configValue1), oversize = false, "commit initial configuration")
       .await
-    configService.get(file).await.get.toStringF.await shouldBe configValue
+    configService.get(file).await.get.toStringF.await shouldBe configValue1
 
     configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
     val time = Instant.now()
@@ -218,24 +249,24 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val file = Paths.get("/test.conf")
 
     configService
-      .create(file, ConfigData.fromString(configValue), oversize = false, "commit initial configuration")
+      .create(file, ConfigData.fromString(configValue1), oversize = false, "commit initial configuration")
       .await
-    configService.get(file).await.get.toStringF.await shouldBe configValue
+    configService.get(file).await.get.toStringF.await shouldBe configValue1
 
     configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
 
     configService.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
     configService.get(file).await.get.toStringF.await shouldBe configValue3
 
-    configService.get(file, time).await.get.toStringF.await shouldBe configValue
+    configService.get(file, time).await.get.toStringF.await shouldBe configValue1
   }
 
   test("should get the history of a file") {
     val file = Paths.get("/test.conf")
     val configIdCreate = configService
-      .create(file, ConfigData.fromString(configValue), oversize = false, "commit initial configuration")
+      .create(file, ConfigData.fromString(configValue1), oversize = false, "commit initial configuration")
       .await
-    configService.get(file).await.get.toStringF.await shouldBe configValue
+    configService.get(file).await.get.toStringF.await shouldBe configValue1
 
     val configIdUpdate1 =
       configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
@@ -279,12 +310,12 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("exists should return true if file exist") {
     val textFile = Paths.get("a/test.csw.conf")
 
-    configService.create(textFile, ConfigData.fromString(configValue), oversize = false, "commit config file").await
+    configService.create(textFile, ConfigData.fromString(configValue1), oversize = false, "commit config file").await
     configService.exists(textFile).await shouldBe true
 
     val binaryFile = Paths.get("/tmt/binary/hcd/ref.bin")
 
-    configService.create(binaryFile, ConfigData.fromString(configValue), oversize = true, "commit config file").await
+    configService.create(binaryFile, ConfigData.fromString(configValue1), oversize = true, "commit config file").await
     configService.exists(binaryFile).await shouldBe true
 
   }
@@ -292,10 +323,10 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("should able to delete existing file") {
     val file = Paths.get("tromboneHCD.conf")
     configService
-      .create(file, ConfigData.fromString(configValue), oversize = false, "commit trombone config file")
+      .create(file, ConfigData.fromString(configValue1), oversize = false, "commit trombone config file")
       .await
 
-    configService.get(file).await.get.toStringF.await shouldBe configValue
+    configService.get(file).await.get.toStringF.await shouldBe configValue1
 
     configService.delete(file).await
     configService.get(file).await shouldBe None
@@ -311,8 +342,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("delete removes all versions of a file") {
     val file = Paths.get("/a/b/csw.conf")
 
-    configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit config file").await
-    configService.get(file).await.get.toStringF.await shouldBe configValue
+    configService.create(file, ConfigData.fromString(configValue1), oversize = false, "commit config file").await
+    configService.get(file).await.get.toStringF.await shouldBe configValue1
 
     val configId = configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
     configService.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
@@ -329,8 +360,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   test("should able to get, set and reset the default version of config file") {
     val file = Paths.get("/tmt/test/setdefault/getdefault/resetdefault/default.conf")
-    configService.create(file, ConfigData.fromString(configValue), oversize = false, "hello world").await
-    configService.get(file).await.get.toStringF.await shouldBe configValue
+    configService.create(file, ConfigData.fromString(configValue1), oversize = false, "hello world").await
+    configService.get(file).await.get.toStringF.await shouldBe configValue1
 
     val configIdUpdate1 =
       configService.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").await
