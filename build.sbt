@@ -9,8 +9,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-config-server`,
   `csw-location`,
   `csw-location-agent`,
-  `csw-test-utils`,
-  `integration`
+  `csw-test-utils`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
@@ -42,14 +41,13 @@ lazy val `csw-cluster-seed` = project
 //Location service related projects
 lazy val `csw-location` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
-  .dependsOn(`csw-test-utils` % Test)
   .settings(
     libraryDependencies ++= Dependencies.Location
   )
 
 lazy val `csw-location-agent` = project
   .enablePlugins(DeployApp, MaybeCoverage)
-  .dependsOn(`csw-location`, `csw-test-utils` % Test)
+  .dependsOn(`csw-location`)
   .settings(
     libraryDependencies ++= Dependencies.CswLocationAgent,
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
@@ -65,7 +63,7 @@ lazy val `csw-config-api` = project
 
 lazy val `csw-config-server` = project
   .enablePlugins(DeployApp, MaybeCoverage)
-  .dependsOn(`csw-location`, `csw-config-api`, `csw-test-utils` % Test)
+  .dependsOn(`csw-location`, `csw-config-api`)
   .settings(
     libraryDependencies ++= Dependencies.ConfigServer,
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
@@ -73,14 +71,14 @@ lazy val `csw-config-server` = project
 
 lazy val `csw-config-client` = project
   .enablePlugins(AutoMultiJvm, MaybeCoverage)
-  .dependsOn(`csw-location`, `csw-config-api`, `csw-config-server` % "test->test", `csw-test-utils` % Test)
+  .dependsOn(`csw-location`, `csw-config-api`, `csw-config-server` % "test->test")
   .settings(
     libraryDependencies ++= Dependencies.ConfigClient
   )
 
 lazy val `csw-config-client-cli` = project
   .enablePlugins(DeployApp, MaybeCoverage)
-  .dependsOn(`csw-config-client`, `csw-config-server` % "test->test", `csw-test-utils` % Test)
+  .dependsOn(`csw-config-client`, `csw-config-server` % "test->test")
   .settings(
     libraryDependencies ++= Dependencies.CswConfigClientCli,
     bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
@@ -96,7 +94,7 @@ lazy val `csw-test-utils` = project
 //Integration test project
 lazy val integration = project
   .enablePlugins(DeployApp)
-  .dependsOn(`csw-location`, `csw-location-agent`, `csw-test-utils`)
+  .dependsOn(`csw-location`, `csw-location-agent`)
   .settings(
     libraryDependencies ++= Dependencies.Integration
   )

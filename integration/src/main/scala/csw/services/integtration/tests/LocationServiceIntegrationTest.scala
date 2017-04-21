@@ -3,12 +3,12 @@ package csw.services.integtration.tests
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
 import csw.services.integtration.apps.TromboneHCD
-import csw.services.integtration.apps.TromboneHCD.Unregister
+import csw.services.integtration.apps.TromboneHCD.{tromboneHcdActorRef, Unregister}
+import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.test.utils.TestFutureExtension.RichFuture
 import org.scalatest._
 
 class LocationServiceIntegrationTest

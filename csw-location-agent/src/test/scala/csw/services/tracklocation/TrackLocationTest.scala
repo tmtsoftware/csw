@@ -11,7 +11,7 @@ import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.test.utils.TestFutureExtension.RichFuture
+import csw.services.tracklocation.common.TestFutureExtension.RichFuture
 import csw.services.tracklocation.models.Command
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
 

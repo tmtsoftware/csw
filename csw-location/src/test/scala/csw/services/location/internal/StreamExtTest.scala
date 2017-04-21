@@ -3,8 +3,8 @@ package csw.services.location.internal
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
+import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.internal.StreamExt.RichSource
-import csw.services.test.utils.TestFutureExtension.RichFuture
 import org.scalatest.{FunSuite, Matchers}
 
 class StreamExtTest extends FunSuite with Matchers {

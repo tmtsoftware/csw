@@ -4,11 +4,11 @@ import akka.actor.{Actor, Props}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit.TestProbe
+import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationServiceFactory}
-import csw.services.test.utils.TestFutureExtension.RichFuture
 import org.scalatest._
 
 import scala.async.Async._

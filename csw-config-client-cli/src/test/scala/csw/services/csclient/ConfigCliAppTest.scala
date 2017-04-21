@@ -5,11 +5,11 @@ import java.nio.file.{Files, Paths}
 
 import csw.services.config.server.ServerWiring
 import csw.services.csclient.commons.TestFileUtils
+import csw.services.csclient.commons.TestFutureExtension.RichFuture
 import csw.services.csclient.models.Options
 import csw.services.csclient.utils.CmdLineArgsParser
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.test.utils.TestFutureExtension.RichFuture
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {

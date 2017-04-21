@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import csw.services.config.api.models.ConfigData
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFileUtils
-import csw.services.test.utils.TestFutureExtension.RichFuture
+import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 class OversizeFileServiceTest extends FunSuite with Matchers with BeforeAndAfterAll {
