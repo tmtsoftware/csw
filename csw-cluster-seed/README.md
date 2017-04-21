@@ -1,5 +1,5 @@
-CSW Cluster Seed
-----------------
+CSW Cluster Seed CLI App
+------------------------
 
 This is a mini application which will start a csw cluster seed required for all clustered services like
 location-service. It is required that you start one or more seed applications before consuming location-service.
@@ -22,7 +22,7 @@ working directory to the extracted folder and follow the instructions below.
 Assume that 192.168.1.21 is the IP of the machine on which the seed app is being started and you wish to deploy it 
 on port 3552.
 
-./bin/csw-cluster-seed -DclusterPort=3552 -DclusterSeeds=192.168.1.21:3552
+./bin/csw-cluster-seed --clusterPort=3552 --clusterSeeds=192.168.1.21:3552
 
 Once the seed app is running, you can start your application consuming the location service as:
 
@@ -38,11 +38,11 @@ the seed app is being started. Also assume that you want to deploy them on port 
 
 On machine1
 
-./bin/csw-cluster-seed -DclusterPort=3552 -DclusterSeeds=192.168.1.21:3552,192.168.1.22:3552
+./bin/csw-cluster-seed --clusterPort=3552 --clusterSeeds=192.168.1.21:3552,192.168.1.22:3552
 
 On machine2
 
-./bin/csw-cluster-seed -DclusterPort=3552 -DclusterSeeds=192.168.1.21:3552,192.168.1.22:3552
+./bin/csw-cluster-seed --clusterPort=3552 --DclusterSeeds=192.168.1.21:3552,192.168.1.22:3552
 
 Once both the seed apps are running, you can start your application consuming the location service as:
 
@@ -51,3 +51,8 @@ Once both the seed apps are running, you can start your application consuming th
 Note that you need not provide a clusterPort for your app, as it will pick a random port. 
 As earlier, instead of providing system properties, it is also possible to set environment variable "clusterSeeds" to the 
 seed node address list.
+
+**Help**
+Use the following command to get help on the options available with this app
+  
+./bin/csw-cluster-seed --help

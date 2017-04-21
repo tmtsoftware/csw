@@ -32,6 +32,9 @@ lazy val `csw-prod` = project
 lazy val `csw-cluster-seed` = project
   .enablePlugins(DeployApp)
   .dependsOn(`csw-location`)
+  .settings(
+    libraryDependencies ++= Dependencies.CswClusterSeed
+  )
 
 //Location service related projects
 lazy val `csw-location` = project
