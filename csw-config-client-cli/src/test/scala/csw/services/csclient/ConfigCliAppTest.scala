@@ -40,7 +40,7 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     new File(updatedInputFilePath).delete()
   }
 
-  test("should able to create a file a in svn repo and read it from svn to local disk") {
+  test("should able to create a file in repo and read it from repo to local disk") {
 
     //  create file
     val parsedCreateArgs: Option[Options] = CmdLineArgsParser.parse(createMinimalArgs)
@@ -60,7 +60,7 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     }
   }
 
-  test("should able to update, delete and check for existence of a file from svn repo") {
+  test("should able to update, delete and check for existence of a file from repo") {
 
     //  create file
     val parsedCreateArgs: Option[Options] = CmdLineArgsParser.parse(createMinimalArgs)
