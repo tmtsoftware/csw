@@ -7,17 +7,18 @@ import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import com.typesafe.config.ConfigFactory
 import csw.services.config.api.models.ConfigData
+import csw.services.config.client.helpers.OneClientAndServer
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.{ServerWiring, Settings}
-import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import csw.services.location.helpers.LSNodeSpec
 import csw.services.location.scaladsl.LocationServiceFactory
 
 class ConfigServiceTestMultiJvmNode1 extends ConfigServiceTest(0)
 class ConfigServiceTestMultiJvmNode2 extends ConfigServiceTest(0)
 
-class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) {
+class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAndServer) {
 
   import config._
 
@@ -41,14 +42,14 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAn
 
   test("should start config service server on one node and client should able to create and get files from other node") {
 
-    runOn(seed) {
+    runOn(server) {
       val serverWiring = ServerWiring.make(locationService)
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.registeredLazyBinding.await
       enterBarrier("server-started")
     }
 
-    runOn(member) {
+    runOn(client) {
       enterBarrier("server-started")
       val actorRuntime = new ActorRuntime(ActorSystem())
       import actorRuntime._
