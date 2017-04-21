@@ -3,7 +3,6 @@ package csw.services.config.client.javadsl;
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
 import csw.services.config.api.exceptions.FileAlreadyExists;
-import csw.services.config.api.exceptions.FileNotFound;
 import csw.services.config.api.javadsl.IConfigService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.api.models.ConfigFileHistory;
@@ -21,7 +20,6 @@ import org.junit.rules.ExpectedException;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -31,9 +29,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.isA;
-import static org.junit.Assert.assertThat;
 
 public class JConfigClientTest {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
@@ -199,18 +195,25 @@ public class JConfigClientTest {
 
     @Test
     public void testGetAndSetDefaultConfigFile() throws ExecutionException, InterruptedException {
-        Path path = Paths.get("/test.conf");
-        ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue), false, "hello world").get();
+        Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
+        configService.create(path, ConfigData.fromString(configValue), false, "hello world").get();
         Assert.assertEquals(configService.get(path).get().get().toJStringF(mat).get(), configValue);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
         configService.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
-
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+
         configService.setDefault(path, Optional.of(configIdUpdate1)).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
+
         configService.setDefault(path, Optional.empty()).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+    }
+
+    @Test
+    public void testGetDefaultReturnsNoneIfFileNotExist() throws ExecutionException, InterruptedException {
+        Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
+        Assert.assertEquals(configService.getDefault(path).get(), Optional.empty());
     }
 
     @Test
@@ -251,7 +254,7 @@ public class JConfigClientTest {
 
     @Test
     public void testUpdateAndHistoryOfOversizedFiles() throws ExecutionException, InterruptedException {
-        Path path = Paths.get("/test.conf");
+        Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue), true, "commit initial configuration").get();
         Assert.assertEquals(configService.get(path).get().get().toJStringF(mat).get(), configValue);
 
@@ -269,16 +272,17 @@ public class JConfigClientTest {
 
     @Test
     public void testGetAndSetDefaultOversizeConfigFile() throws ExecutionException, InterruptedException {
-        Path path = Paths.get("/test.conf");
-        ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue), true, "some comment").get();
+        Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
+        configService.create(path, ConfigData.fromString(configValue), true, "some comment").get();
         Assert.assertEquals(configService.get(path).get().get().toJStringF(mat).get(), configValue);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
         configService.update(path, ConfigData.fromString(configValue3), "Updated config").get();
-
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+
         configService.setDefault(path, Optional.of(configIdUpdate1)).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
+
         configService.setDefault(path, Optional.empty()).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
     }

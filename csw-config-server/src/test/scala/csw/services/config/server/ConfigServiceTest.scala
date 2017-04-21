@@ -338,6 +338,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
   }
 
+  test("getDefault should return None if file does not exists") {
+    val file = Paths.get("/tmt/test/get/default/app.conf")
+    configService.getDefault(file).await shouldBe None
+  }
+
   test("should be able to store and retrieve oversize file") {
     val file    = Paths.get("SomeOversizeFile.txt")
     val content = "testing oversize file"
