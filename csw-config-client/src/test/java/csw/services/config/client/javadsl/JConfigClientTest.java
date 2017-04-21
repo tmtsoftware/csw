@@ -109,6 +109,12 @@ public class JConfigClientTest {
     }
 
     @Test
+    public void testGetReturnsNoneIfFileNotExists() throws ExecutionException, InterruptedException {
+        Path path = Paths.get("/tmt/text/file/not/exist/app.conf");
+        Assert.assertEquals(configService.get(path).get(), Optional.empty());
+    }
+
+    @Test
     public void testSpecificVersionRetrieval() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/a/b/csw.conf");
         configService.create(path, ConfigData.fromString(configValue), false, "commit csw conf path").get();
