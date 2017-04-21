@@ -3,6 +3,7 @@ package csw.services.config.client.javadsl;
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
 import csw.services.config.api.exceptions.FileAlreadyExists;
+import csw.services.config.api.exceptions.FileNotFound;
 import csw.services.config.api.javadsl.IConfigService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.api.models.ConfigFileHistory;
@@ -106,6 +107,13 @@ public class JConfigClientTest {
         configService.update(path, ConfigData.fromString(configValue2), "commit updated assembly conf").get();
         Optional<ConfigData> configDataUpdated = configService.get(path).get();
         Assert.assertEquals(configDataUpdated.get().toJStringF(mat).get(), configValue2);
+    }
+
+    @Test
+    public void testUpdateReturnsFileNotFoundExceptionOnAbsenceOfFile() throws ExecutionException, InterruptedException {
+        Path path = Paths.get("/tmt/trombone/assembly.conf");
+        exception.expectCause(isA(FileNotFound.class));
+        configService.update(path, ConfigData.fromString(configValue), "commit assembly conf").get();
     }
 
     @Test
