@@ -2,6 +2,8 @@ package csw.services.config.client.javadsl;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
+import csw.services.config.api.exceptions.FileAlreadyExists;
+import csw.services.config.api.exceptions.FileNotFound;
 import csw.services.config.api.javadsl.IConfigService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.api.models.ConfigFileHistory;
@@ -15,9 +17,11 @@ import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JLocationServiceFactory;
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -26,6 +30,10 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.isA;
+import static org.junit.Assert.assertThat;
 
 public class JConfigClientTest {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
@@ -42,6 +50,9 @@ public class JConfigClientTest {
     private String configValue = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";
     private String configValue2 = "axisName11 = tromboneAxis\naxisName22 = tromboneAxis2\naxisName3 = tromboneAxis33";
     private String configValue3 = "axisName111 = tromboneAxis\naxisName222 = tromboneAxis2\naxisName3 = tromboneAxis333";
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
     public static void beforeAll() throws Exception {
@@ -67,10 +78,18 @@ public class JConfigClientTest {
 
     @Test
     public void testCreateAndRetrieveFile() throws ExecutionException, InterruptedException {
-        Path path = Paths.get("test.conf");
+        Path path = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf");
         configService.create(path, ConfigData.fromString(configValue), false, "commit test file").get();
         Optional<ConfigData> configData = configService.get(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue);
+    }
+
+    @Test
+    public void testFileAlreadyExistsExceptionOnCreate() throws ExecutionException, InterruptedException {
+        Path path = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf");
+        configService.create(path, ConfigData.fromString(configValue), false, "commit test file").get();
+        exception.expectCause(isA(FileAlreadyExists.class));
+        configService.create(path, ConfigData.fromString(configValue), false, "commit test file").get();
     }
 
     @Test
