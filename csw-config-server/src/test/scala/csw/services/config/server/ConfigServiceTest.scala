@@ -11,8 +11,8 @@ import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.TestFileUtils
-import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.files.Sha1
+import csw.services.test.utils.TestFutureExtension.RichFuture
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Future

@@ -1,10 +1,10 @@
 package csw.services.integtration.tests
 
-import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.CswCluster
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.test.utils.TestFutureExtension.RichFuture
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuite, Matchers}
 
 class LocationServiceMultipleNICTest(cswCluster: CswCluster)

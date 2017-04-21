@@ -1,11 +1,11 @@
 package csw.services.integtration.apps
 
 import akka.actor.{Actor, ActorSystem, Props}
-import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.CswCluster
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.test.utils.TestFutureExtension.RichFuture
 
 object TromboneHCD {
   private val cswCluster = CswCluster.make()

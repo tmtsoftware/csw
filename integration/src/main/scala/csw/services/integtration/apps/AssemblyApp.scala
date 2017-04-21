@@ -2,11 +2,11 @@ package csw.services.integtration.apps
 
 import akka.actor.{Actor, ActorPath, Props}
 import akka.serialization.Serialization
-import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationServiceFactory}
+import csw.services.test.utils.TestFutureExtension.RichFuture
 
 object AssemblyApp {
   private val cswCluster = CswCluster.withSettings(ClusterSettings().withInterface("eth1"))
