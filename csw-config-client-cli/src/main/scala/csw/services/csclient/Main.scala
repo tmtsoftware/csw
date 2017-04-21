@@ -1,12 +1,12 @@
 package csw.services.csclient
 
 import akka.Done
-import csw.services.config.api.models.ConfigId
+import csw.services.config.api.models.{ConfigData, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.csclient.models.Options
-import csw.services.csclient.utils.{ArgsParser, PathUtils}
+import csw.services.csclient.utils.ArgsParser
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 
@@ -47,14 +47,14 @@ class Main(clusterSettings: ClusterSettings) {
   def commandLineRunner(options: Options): Future[Unit] = {
 
     def create(): Future[Unit] = async {
-      val configData = PathUtils.fromPath(options.inputFilePath.get)
+      val configData = ConfigData.fromPath(options.inputFilePath.get)
       val configId = await(configService.create(options.relativeRepoPath.get, configData, oversize = options.oversize,
           options.comment))
       println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
     }
 
     def update() = async {
-      val configData = PathUtils.fromPath(options.inputFilePath.get)
+      val configData = ConfigData.fromPath(options.inputFilePath.get)
       val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment))
       println(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
     }
@@ -69,7 +69,7 @@ class Main(clusterSettings: ClusterSettings) {
 
       configDataOpt match {
         case Some(configData) ⇒
-          val outputFile = await(PathUtils.writeToPath(configData, options.outputFilePath.get))
+          val outputFile = await(configData.toPath(options.outputFilePath.get))
           println(s"Output file is created at location : ${outputFile.getAbsolutePath}")
         case None ⇒
       }
@@ -106,7 +106,7 @@ class Main(clusterSettings: ClusterSettings) {
 
       configDataOpt match {
         case Some(configData) ⇒
-          val outputFile = await(PathUtils.writeToPath(configData, options.outputFilePath.get))
+          val outputFile = await(configData.toPath(options.outputFilePath.get))
           println(
               s"Default version of repository file: ${options.relativeRepoPath.get} is saved at location: ${outputFile.getAbsolutePath}")
         case None ⇒

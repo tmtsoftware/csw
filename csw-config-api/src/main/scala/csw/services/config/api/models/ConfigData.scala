@@ -36,6 +36,16 @@ class ConfigData(val source: Source[ByteString, Any]) {
    */
   def toInputStream(implicit mat: Materializer): InputStream =
     source.runWith(StreamConverters.asInputStream())
+
+  /**
+   * Writes config data to a provided file path and returns future file.
+   */
+  def toPath(path: Path)(implicit mat: Materializer): Future[File] = {
+    import mat.executionContext
+    source
+      .runWith(FileIO.toPath(path))
+      .map(_ ⇒ path.toFile)
+  }
 }
 
 /**
@@ -59,4 +69,12 @@ object ConfigData {
    * The data source can be any byte string
    */
   def fromJavaSource(source: javadsl.Source[ByteString, Any]): ConfigData = new ConfigData(source.asScala)
+
+  /**
+   * Initialize with the contents of the file from given path.
+   *
+   * @param path      the data source
+   * @param chunkSize the block or chunk size to use when streaming the data
+   */
+  def fromPath(path: Path, chunkSize: Int = 4096): ConfigData = ConfigData.fromSource(FileIO.fromPath(path, chunkSize))
 }
