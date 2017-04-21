@@ -277,10 +277,16 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("exists should return true if file exist") {
-    val file = Paths.get("a/test.csw.conf")
-    configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit config file").await
+    val textFile = Paths.get("a/test.csw.conf")
 
-    configService.exists(file).await shouldBe true
+    configService.create(textFile, ConfigData.fromString(configValue), oversize = false, "commit config file").await
+    configService.exists(textFile).await shouldBe true
+
+    val binaryFile = Paths.get("/tmt/binary/hcd/ref.bin")
+
+    configService.create(binaryFile, ConfigData.fromString(configValue), oversize = true, "commit config file").await
+    configService.exists(binaryFile).await shouldBe true
+
   }
 
   test("should able to delete existing file") {
