@@ -43,7 +43,7 @@ try{
             }
 
             stage('Package') {
-                sh "./universal_package.sh"
+                sh "./integration/scripts/package_integration.sh"
                 stash name: "repo"
             }
         }
