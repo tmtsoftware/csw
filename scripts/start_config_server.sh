@@ -2,7 +2,7 @@
 
 stop_app() {
     pid=$(lsof -i:$1 -t);
-    (kill -TERM $pid || kill -KILL $pid) 2> /dev/null
+    (kill -SIGINT $pid) 2> /dev/null
 }
 
 start_cluster_seed() {
