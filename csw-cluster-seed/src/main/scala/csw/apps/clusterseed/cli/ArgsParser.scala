@@ -1,8 +1,10 @@
 package csw.apps.clusterseed.cli
 
+import csw.services.BuildInfo
+
 class ArgsParser {
   val parser = new scopt.OptionParser[Options]("scopt") {
-    head("csw-cluster-seed", System.getProperty("CSW_VERSION"))
+    head(BuildInfo.name, BuildInfo.version)
 
     opt[Int]("clusterPort").required() action { (x, c) =>
       c.copy(clusterPort = x)

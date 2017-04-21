@@ -3,6 +3,7 @@ package csw.services.csclient.utils
 import java.nio.file.Paths
 import java.time.Instant
 
+import csw.services.BuildInfo
 import csw.services.csclient.models.Options
 import scopt.OptionParser
 
@@ -12,7 +13,7 @@ import scopt.OptionParser
 object ArgsParser {
 
   val parser: OptionParser[Options] = new scopt.OptionParser[Options]("csw-config-client-cli") {
-    head("csw-config-client-cli", System.getProperty("CSW_VERSION"))
+    head(BuildInfo.name, BuildInfo.version)
 
     //create operation
     cmd("create") action { (_, c) =>

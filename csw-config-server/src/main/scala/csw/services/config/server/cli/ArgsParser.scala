@@ -1,8 +1,10 @@
 package csw.services.config.server.cli
 
+import csw.services.BuildInfo
+
 class ArgsParser {
   val parser = new scopt.OptionParser[Options]("scopt") {
-    head("config-sever", System.getProperty("CSW_VERSION"))
+    head(BuildInfo.name, BuildInfo.version)
 
     opt[Unit]("init") action { (x, c) =>
       c.copy(init = true)

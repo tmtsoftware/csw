@@ -2,6 +2,7 @@ package csw.services.tracklocation.utils
 
 import java.io.File
 
+import csw.services.BuildInfo
 import csw.services.tracklocation.models.Options
 import scopt.OptionParser
 
@@ -11,7 +12,7 @@ import scopt.OptionParser
 object ArgsParser {
 
   val parser: OptionParser[Options] = new scopt.OptionParser[Options]("csw-location-agent") {
-    head("csw-location-agent", System.getProperty("CSW_VERSION"))
+    head(BuildInfo.name, BuildInfo.version)
 
     def acceptableServiceNames(services: Seq[String]): Either[String, Unit] = {
       val allValid = services.forall { service =>

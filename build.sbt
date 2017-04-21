@@ -47,8 +47,7 @@ lazy val `csw-location-agent` = project
   .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-location`)
   .settings(
-    libraryDependencies ++= Dependencies.CswLocationAgent,
-    bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
+    libraryDependencies ++= Dependencies.CswLocationAgent
   )
 
 //Config service related projects
@@ -62,8 +61,7 @@ lazy val `csw-config-server` = project
   .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-location`, `csw-config-api`)
   .settings(
-    libraryDependencies ++= Dependencies.ConfigServer,
-    bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
+    libraryDependencies ++= Dependencies.ConfigServer
   )
 
 lazy val `csw-config-client` = project
@@ -77,8 +75,7 @@ lazy val `csw-config-client-cli` = project
   .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-config-client`, `csw-config-server` % "test->test")
   .settings(
-    libraryDependencies ++= Dependencies.CswConfigClientCli,
-    bashScriptExtraDefines ++= Seq(s"addJava -DCSW_VERSION=${version.value}")
+    libraryDependencies ++= Dependencies.CswConfigClientCli
   )
 
 //Integration test project

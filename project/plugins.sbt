@@ -16,6 +16,7 @@ addSbtPlugin("com.typesafe.sbt"                  % "sbt-multi-jvm"           % "
 addSbtPlugin("io.spray"                          % "sbt-revolver"            % "0.8.0")
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"       % "0.2.0")
 addSbtPlugin("net.virtual-void"                  % "sbt-dependency-graph"    % "0.8.2")
+addSbtPlugin("com.eed3si9n"                      % "sbt-buildinfo"           % "0.7.0")
 
 resolvers += Resolver.url("2m-sbt-plugin-releases",
   url("https://dl.bintray.com/2m/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
