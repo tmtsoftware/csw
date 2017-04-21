@@ -21,7 +21,7 @@ class ConfigClientTest extends ConfigServiceTest {
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    httpService.lazyBinding.await
+    httpService.registeredLazyBinding.await
   }
 
   override protected def afterAll(): Unit = {

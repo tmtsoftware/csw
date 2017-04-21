@@ -27,7 +27,7 @@ class Main {
           Await.result(shutdown(), 10.seconds)
         }
 
-        Await.result(httpService.lazyBinding, 5.seconds)
+        Await.result(httpService.registeredLazyBinding, 5.seconds)
     }
 
   def shutdown(): Future[Done] = httpService.shutdown()

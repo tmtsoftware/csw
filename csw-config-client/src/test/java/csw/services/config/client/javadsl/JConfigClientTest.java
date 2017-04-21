@@ -45,7 +45,7 @@ public class JConfigClientTest {
 
     @BeforeClass
     public static void beforeAll() throws Exception {
-        Await.result(httpService.lazyBinding(), Duration.create(20, "seconds"));
+        Await.result(httpService.registeredLazyBinding(), Duration.create(20, "seconds"));
     }
 
     @Before

@@ -17,7 +17,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
   private val locationService = LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
   private val serverWiring    = ServerWiring.make(locationService)
   private val httpService     = serverWiring.httpService
-  httpService.lazyBinding.await
+  httpService.registeredLazyBinding.await
 
   val ConfigCliApp = new Main(ClusterSettings().joinLocal(3552))
 
