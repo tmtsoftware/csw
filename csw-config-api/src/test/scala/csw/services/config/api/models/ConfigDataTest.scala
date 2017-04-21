@@ -5,7 +5,7 @@ import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestKit
 import akka.util.ByteString
-import csw.services.config.api.commons.TestFutureExtension.RichFuture
+import csw.services.test.utils.TestFutureExtension.RichFuture
 import org.scalatest.{FunSuiteLike, Matchers}
 
 class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike with Matchers {

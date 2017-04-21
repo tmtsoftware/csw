@@ -64,6 +64,11 @@ object Dependencies {
     Akka.`akka-stream-testkit`     % Test
   )
 
+  val TestUtils = Seq(
+    Libs.`scalatest`,
+    Akka.`akka-multi-node-testkit`
+  )
+
   val CswClusterSeed = Seq(
     Libs.`scopt`
   )
