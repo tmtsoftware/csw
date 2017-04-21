@@ -2,7 +2,7 @@ package csw.services.csclient.commons
 
 import java.io.{BufferedWriter, File, FileWriter}
 
-object CmdLineArgsUtil {
+object ArgsUtil {
 
   val relativeRepoPath          = "/path/hcd/trombone.conf"
   val inputFileContents: String = """

@@ -6,7 +6,7 @@ import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.csclient.models.Options
-import csw.services.csclient.utils.{CmdLineArgsParser, PathUtils}
+import csw.services.csclient.utils.{ArgsParser, PathUtils}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 
@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 
-class ConfigCliApp(clusterSettings: ClusterSettings) {
+class Main(clusterSettings: ClusterSettings) {
 
   val actorRuntime = new ActorRuntime()
 
@@ -26,7 +26,7 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
 
   def start(args: Array[String]): Future[Done] =
     async {
-      CmdLineArgsParser.parse(args) match {
+      ArgsParser.parse(args) match {
         case Some(options) =>
           await(commandLineRunner(options))
           await(shutdown())
@@ -128,9 +128,9 @@ class ConfigCliApp(clusterSettings: ClusterSettings) {
   }
 }
 
-object ConfigCliApp {
+object Main {
 
   def main(args: Array[String]): Unit =
-    Await.result(new ConfigCliApp(ClusterSettings()).start(args), 5.seconds)
+    Await.result(new Main(ClusterSettings()).start(args), 5.seconds)
 
 }

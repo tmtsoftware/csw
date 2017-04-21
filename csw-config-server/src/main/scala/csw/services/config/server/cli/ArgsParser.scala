@@ -1,7 +1,7 @@
 package csw.services.config.server.cli
 
-class ConfigServerCliParser {
-  val parser = new scopt.OptionParser[ConfiServiceCliOptions]("scopt") {
+class ArgsParser {
+  val parser = new scopt.OptionParser[Options]("scopt") {
     head("config-sever", System.getProperty("CSW_VERSION"))
 
     opt[Unit]("init") action { (x, c) =>
@@ -21,5 +21,5 @@ class ConfigServerCliParser {
     version("version")
   }
 
-  def parse(args: Seq[String]): Option[ConfiServiceCliOptions] = parser.parse(args, ConfiServiceCliOptions())
+  def parse(args: Seq[String]): Option[Options] = parser.parse(args, Options())
 }

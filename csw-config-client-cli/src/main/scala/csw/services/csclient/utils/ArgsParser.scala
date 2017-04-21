@@ -9,7 +9,7 @@ import scopt.OptionParser
 /**
  * Parses the command line options using `scopt` library.
  */
-object CmdLineArgsParser {
+object ArgsParser {
 
   val parser: OptionParser[Options] = new scopt.OptionParser[Options]("csw-config-client-cli") {
     head("csw-config-client-cli", System.getProperty("CSW_VERSION"))

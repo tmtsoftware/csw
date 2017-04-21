@@ -7,23 +7,23 @@ import csw.services.config.server.ServerWiring
 import csw.services.csclient.commons.TestFileUtils
 import csw.services.csclient.commons.TestFutureExtension.RichFuture
 import csw.services.csclient.models.Options
-import csw.services.csclient.utils.CmdLineArgsParser
+import csw.services.csclient.utils.ArgsParser
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   private val locationService = LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
   private val serverWiring    = ServerWiring.make(locationService)
   private val httpService     = serverWiring.httpService
   httpService.lazyBinding.await
 
-  val ConfigCliApp = new ConfigCliApp(ClusterSettings().joinLocal(3552))
+  val ConfigCliApp = new Main(ClusterSettings().joinLocal(3552))
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
 
-  import csw.services.csclient.commons.CmdLineArgsUtil._
+  import csw.services.csclient.commons.ArgsUtil._
 
   override protected def beforeEach(): Unit =
     serverWiring.svnRepo.initSvnRepo()
@@ -43,11 +43,11 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   test("should able to create a file in repo and read it from repo to local disk") {
 
     //  create file
-    val parsedCreateArgs: Option[Options] = CmdLineArgsParser.parse(createMinimalArgs)
+    val parsedCreateArgs: Option[Options] = ArgsParser.parse(createMinimalArgs)
     ConfigCliApp.commandLineRunner(parsedCreateArgs.get).await
 
     //  get file and store it at location: /tmp/output.txt
-    val parsedGetArgs: Option[Options] = CmdLineArgsParser.parse(getMinimalArgs)
+    val parsedGetArgs: Option[Options] = ArgsParser.parse(getMinimalArgs)
     ConfigCliApp.commandLineRunner(parsedGetArgs.get).await
 
     // read locally saved output file (/tmp/output.conf) from disk and
@@ -63,15 +63,15 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   test("should able to update, delete and check for existence of a file from repo") {
 
     //  create file
-    val parsedCreateArgs: Option[Options] = CmdLineArgsParser.parse(createMinimalArgs)
+    val parsedCreateArgs: Option[Options] = ArgsParser.parse(createMinimalArgs)
     ConfigCliApp.commandLineRunner(parsedCreateArgs.get).await
 
     //  update file content
-    val parsedUpdateArgs: Option[Options] = CmdLineArgsParser.parse(updateAllArgs)
+    val parsedUpdateArgs: Option[Options] = ArgsParser.parse(updateAllArgs)
     ConfigCliApp.commandLineRunner(parsedUpdateArgs.get).await
 
     //  get file and store it at location: /tmp/output.txt
-    val parsedGetArgs: Option[Options] = CmdLineArgsParser.parse(getMinimalArgs)
+    val parsedGetArgs: Option[Options] = ArgsParser.parse(getMinimalArgs)
     ConfigCliApp.commandLineRunner(parsedGetArgs.get).await
 
     //  read locally saved output file (/tmp/output.conf) from disk and
@@ -85,35 +85,35 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
     //  file should exist
     //  is there any way to assert here?
-    val parsedExistsArgs1: Option[Options] = CmdLineArgsParser.parse(existsArgs)
+    val parsedExistsArgs1: Option[Options] = ArgsParser.parse(existsArgs)
     ConfigCliApp.commandLineRunner(parsedExistsArgs1.get).await
 
     //  delete file
-    val parsedDeleteArgs: Option[Options] = CmdLineArgsParser.parse(deleteArgs)
+    val parsedDeleteArgs: Option[Options] = ArgsParser.parse(deleteArgs)
     ConfigCliApp.commandLineRunner(parsedDeleteArgs.get).await
 
     //  deleted file should not exist
     //  is there any way to assert here?
-    val parsedExistsArgs: Option[Options] = CmdLineArgsParser.parse(existsArgs)
+    val parsedExistsArgs: Option[Options] = ArgsParser.parse(existsArgs)
     ConfigCliApp.commandLineRunner(parsedExistsArgs.get).await
   }
 
   test("should able to set, reset and get the default version of file.") {
 
     //  create file
-    val parsedCreateArgs: Option[Options] = CmdLineArgsParser.parse(createMinimalArgs)
+    val parsedCreateArgs: Option[Options] = ArgsParser.parse(createMinimalArgs)
     ConfigCliApp.commandLineRunner(parsedCreateArgs.get).await
 
     //  update file content
-    val parsedUpdateArgs: Option[Options] = CmdLineArgsParser.parse(updateAllArgs)
+    val parsedUpdateArgs: Option[Options] = ArgsParser.parse(updateAllArgs)
     ConfigCliApp.commandLineRunner(parsedUpdateArgs.get).await
 
     //  set default version of file to id=1 and store it at location: /tmp/output.txt
-    val parsedSetDefaultArgs: Option[Options] = CmdLineArgsParser.parse(setDefaultAllArgs)
+    val parsedSetDefaultArgs: Option[Options] = ArgsParser.parse(setDefaultAllArgs)
     ConfigCliApp.commandLineRunner(parsedSetDefaultArgs.get).await
 
     //  get default version of file and store it at location: /tmp/output.txt
-    val parsedGetDefaultArgs: Option[Options] = CmdLineArgsParser.parse(getDefaultArgs)
+    val parsedGetDefaultArgs: Option[Options] = ArgsParser.parse(getDefaultArgs)
     ConfigCliApp.commandLineRunner(parsedGetDefaultArgs.get).await
 
     //  read locally saved output file (/tmp/output.conf) from disk and
@@ -126,7 +126,7 @@ class ConfigCliAppTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     }
 
     //  reset default version of file and store it at location: /tmp/output.txt
-    val parsedResetDefaultArgs: Option[Options] = CmdLineArgsParser.parse(setDefaultMinimalArgs)
+    val parsedResetDefaultArgs: Option[Options] = ArgsParser.parse(setDefaultMinimalArgs)
     ConfigCliApp.commandLineRunner(parsedResetDefaultArgs.get).await
 
     //  get default version of file and store it at location: /tmp/output.txt

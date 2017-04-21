@@ -4,7 +4,7 @@ import akka.Done
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.tracklocation.models.Command
-import csw.services.tracklocation.utils.CmdLineArgsParser
+import csw.services.tracklocation.utils.ArgsParser
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -14,14 +14,14 @@ import async.Async._
 /**
  * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
  */
-class TrackLocationApp(cswCluster: CswCluster) {
+class Main(cswCluster: CswCluster) {
   import cswCluster._
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
 
   def start(args: Array[String]): Future[Done] = async {
 
     try {
-      CmdLineArgsParser.parse(args) match {
+      ArgsParser.parse(args) match {
         case Some(options) =>
           val command = Command.parse(options)
           println(s"commandText: ${command.commandText}, command: $command")
@@ -41,6 +41,6 @@ class TrackLocationApp(cswCluster: CswCluster) {
   def shutdown(): Future[Done] = locationService.shutdown()
 }
 
-object TrackLocationApp extends App {
-  Await.result(new TrackLocationApp(CswCluster.withSettings(ClusterSettings())).start(args), Duration.Inf)
+object Main extends App {
+  Await.result(new Main(CswCluster.withSettings(ClusterSettings())).start(args), Duration.Inf)
 }

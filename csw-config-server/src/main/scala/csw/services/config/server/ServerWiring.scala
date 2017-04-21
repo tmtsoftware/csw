@@ -3,7 +3,7 @@ package csw.services.config.server
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.config.api.scaladsl.ConfigService
-import csw.services.config.server.cli.ConfigServerCliParser
+import csw.services.config.server.cli.ArgsParser
 import csw.services.config.server.files._
 import csw.services.config.server.http.{ConfigExceptionHandler, ConfigServiceRoute, HttpService}
 import csw.services.config.server.svn.{SvnConfigService, SvnRepo}
@@ -28,7 +28,7 @@ class ServerWiring {
   lazy val configExceptionHandler = new ConfigExceptionHandler
   lazy val configServiceRoute     = new ConfigServiceRoute(configService, actorRuntime, configExceptionHandler)
   lazy val httpService            = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
-  lazy val configServerCliParser  = new ConfigServerCliParser
+  lazy val configServerCliParser  = new ArgsParser
 }
 
 object ServerWiring {

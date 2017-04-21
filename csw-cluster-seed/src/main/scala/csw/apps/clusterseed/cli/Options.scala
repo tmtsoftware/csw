@@ -1,6 +1,6 @@
 package csw.apps.clusterseed.cli
 
-case class ClusterSeedCliOptions(
+case class Options(
     clusterPort: Int = 0,
     clusterSeeds: String = ""
 )

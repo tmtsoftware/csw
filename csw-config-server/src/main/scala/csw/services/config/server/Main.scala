@@ -1,19 +1,19 @@
 package csw.services.config.server
 
 import akka.Done
-import csw.services.config.server.cli.ConfiServiceCliOptions
+import csw.services.config.server.cli.Options
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 
-class ConfigServerCliApp {
+class Main {
 
   private val wiring = new ServerWiring
   import wiring._
 
   def start(args: Array[String]): Unit =
     configServerCliParser.parse(args).foreach {
-      case ConfiServiceCliOptions(init, maybePort, clusterSeeds) =>
+      case Options(init, maybePort, clusterSeeds) =>
         sys.props("clusterSeeds") = clusterSeeds
         maybePort.foreach { port =>
           sys.props("httpPort") = port.toString
@@ -33,6 +33,6 @@ class ConfigServerCliApp {
   def shutdown(): Future[Done] = httpService.shutdown()
 }
 
-object ConfigServerCliApp extends App {
-  new ConfigServerCliApp().start(args)
+object Main extends App {
+  new Main().start(args)
 }

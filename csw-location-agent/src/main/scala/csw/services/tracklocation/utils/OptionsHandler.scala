@@ -6,7 +6,7 @@ import csw.services.tracklocation.models.Options
 /**
  * Exposes utility methods to parse string, int, port options.
  */
-final case class OptionsHandler(val options: Options, val appConfig: Option[Config]) {
+final case class OptionsHandler(options: Options, appConfig: Option[Config]) {
 
   def stringOpt(entry: String, arg: Option[String] = None): Option[String] = {
     val value = if (arg.isDefined) { arg } else {
