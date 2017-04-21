@@ -36,30 +36,33 @@ class CswCluster private (_actorSystem: ActorSystem) {
   val replicator: ActorRef = DistributedData(actorSystem).replicator
 
   /**
-   * Gives handle to CoordinatedShutdown so that shutdown hooks can be added from outside
+   * Gives handle to CoordinatedShutdown extension
    */
-  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
+  private val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   /**
    * Creates an ActorMaterializer for current ActorSystem
    */
   def makeMat(): Materializer = ActorMaterializer()
 
+  def addJvmShutdownHook[T](hook: ⇒ T): Unit = coordinatedShutdown.addJvmShutdownHook(hook)
+
   /**
    * aaa
    */
-  def startClusterManagement(): Unit = {
+  private def startClusterManagement(): Unit = {
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
       val clusterHttpManagement = ClusterHttpManagement(cluster)
       //Add shutdown hook if cluster management is started successfully.
-      coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind,
-        "shutdownClusterManagement")(() => clusterHttpManagement.stop())
+      coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "shutdownClusterManagement") { () =>
+        clusterHttpManagement.stop()
+      }
       Await.result(clusterHttpManagement.start(), 10.seconds)
     }
   }
 
-  def joinCluster(): Done = {
+  private def joinCluster(): Done = {
     // Check if seed nodes are provided to join csw-cluster
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
     if (emptySeeds) {
@@ -73,17 +76,19 @@ class CswCluster private (_actorSystem: ActorSystem) {
     Await.result(p.future, 20.seconds)
   }
 
-  def ensureReplication(): Unit = {
+  private def ensureReplication(): Unit = {
     implicit val timeout = Timeout(5.seconds)
     import akka.pattern.ask
-    def replicaCount = Await.result(replicator ? GetReplicaCount, 5.seconds).asInstanceOf[ReplicaCount]
-    BlockingClusterUtils.awaitAssert(replicaCount.n == cluster.state.members.count(_.status == MemberStatus.Up))
+    def replicaCountF = (replicator ? GetReplicaCount).mapTo[ReplicaCount]
+    def replicaCount  = Await.result(replicaCountF, 5.seconds).n
+    def upMembers     = cluster.state.members.count(_.status == MemberStatus.Up)
+    BlockingUtils.awaitAssert(replicaCount == upMembers)
   }
 
   /**
    * Terminates the ActorSystem and gracefully leaves the cluster
    */
-  def terminate(): Future[Done] = coordinatedShutdown.run()
+  def shutdown(): Future[Done] = coordinatedShutdown.run()
 }
 
 /**
@@ -119,7 +124,7 @@ object CswCluster {
       cswCluster
     } catch {
       case NonFatal(ex) ⇒
-        Await.result(CoordinatedShutdown(actorSystem).run(), 10.seconds)
+        Await.result(cswCluster.shutdown(), 10.seconds)
         throw ex
     }
   }

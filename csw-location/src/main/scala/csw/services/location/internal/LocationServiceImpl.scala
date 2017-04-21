@@ -176,7 +176,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
    * Terminate the ActorSystem and gracefully leave the akka cluster
    * Note: It is recommended not to perform any operation on LocationService after shutdown
    */
-  def shutdown(): Future[Done] = cswCluster.terminate()
+  def shutdown(): Future[Done] = cswCluster.shutdown()
 
   private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {
     override def location: Location = loc

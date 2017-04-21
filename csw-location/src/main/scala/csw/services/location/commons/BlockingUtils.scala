@@ -3,16 +3,16 @@ package csw.services.location.commons
 import scala.annotation.tailrec
 import scala.concurrent.duration.{Duration, DurationDouble, DurationInt}
 
-object BlockingClusterUtils {
+private[commons] object BlockingUtils {
 
-  def awaitAssert(a: ⇒ Boolean, max: Duration = 5.seconds): Unit = {
-    val interval = 100.millis
+  def awaitAssert(predicate: ⇒ Boolean, max: Duration = 5.seconds): Unit = {
     def now      = System.nanoTime.nanos
     val stop     = now + max
+    val interval = 100.millis
 
     @tailrec
     def poll(t: Duration): Unit =
-      if (!a) {
+      if (!predicate) {
         Thread.sleep(t.toMillis)
         poll((stop - now) min interval)
       }

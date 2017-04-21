@@ -23,7 +23,7 @@ class ConfigServerCliApp {
           wiring.svnRepo.initSvnRepo()
         }
 
-        cswCluster.coordinatedShutdown.addJvmShutdownHook {
+        cswCluster.addJvmShutdownHook {
           Await.result(shutdown(), 10.seconds)
         }
 

@@ -47,7 +47,7 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
   private def unregisterOnTermination(results: Seq[RegistrationResult]): Unit = {
     println(results.map(_.location.connection.componentId))
 
-    cswCluster.coordinatedShutdown.addJvmShutdownHook {
+    cswCluster.addJvmShutdownHook {
       println("Shutdown hook reached, unregistering services.")
       unregisterServices(results)
       println(s"Exited the application.")
