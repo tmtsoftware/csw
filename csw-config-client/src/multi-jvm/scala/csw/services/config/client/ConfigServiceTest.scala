@@ -1,4 +1,4 @@
-package csw.services.config
+package csw.services.config.client
 
 import java.nio.file.Paths
 
