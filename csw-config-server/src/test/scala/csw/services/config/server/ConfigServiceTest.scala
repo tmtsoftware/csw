@@ -287,17 +287,24 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val tromboneConfigComment = "hello trombone"
     val assemblyConfigComment = "hello assembly"
 
+    //  Check that files to be added does not already exists in the repo and then add
+    configService.list.await.foreach { fileInfo ⇒
+      fileInfo.path should not be tromboneConfig
+      fileInfo.path should not be assemblyConfig
+    }
+
+    //  Add files to repo
     val tromboneConfigId = configService
-      .create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis"), oversize = false,
-        tromboneConfigComment)
+      .create(tromboneConfig, ConfigData.fromString(configValue1), oversize = false, tromboneConfigComment)
       .await
     val assemblyConfigId = configService
-      .create(assemblyConfig, ConfigData.fromString("assemblyHCDCount = 3"), oversize = false, assemblyConfigComment)
+      .create(assemblyConfig, ConfigData.fromString(configValue2), oversize = false, assemblyConfigComment)
       .await
 
     val tromboneConfigInfo: ConfigFileInfo = ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment)
     val assemblyConfigInfo: ConfigFileInfo = ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)
 
+    // list files from repo and assert that it contains added files
     configService.list().await shouldBe List(assemblyConfigInfo, tromboneConfigInfo)
   }
 
