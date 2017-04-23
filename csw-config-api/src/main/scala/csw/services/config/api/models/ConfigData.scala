@@ -40,11 +40,11 @@ class ConfigData(val source: Source[ByteString, Any]) {
   /**
    * Writes config data to a provided file path and returns future file.
    */
-  def toPath(path: Path)(implicit mat: Materializer): Future[File] = {
+  def toPath(path: Path)(implicit mat: Materializer): Future[Path] = {
     import mat.executionContext
     source
       .runWith(FileIO.toPath(path))
-      .map(_ ⇒ path.toFile)
+      .map(_ ⇒ path)
   }
 }
 

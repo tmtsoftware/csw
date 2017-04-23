@@ -70,7 +70,7 @@ class Main(clusterSettings: ClusterSettings) {
       configDataOpt match {
         case Some(configData) ⇒
           val outputFile = await(configData.toPath(options.outputFilePath.get))
-          println(s"Output file is created at location : ${outputFile.getAbsolutePath}")
+          println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
         case None ⇒
       }
     }
@@ -108,7 +108,7 @@ class Main(clusterSettings: ClusterSettings) {
         case Some(configData) ⇒
           val outputFile = await(configData.toPath(options.outputFilePath.get))
           println(
-              s"Default version of repository file: ${options.relativeRepoPath.get} is saved at location: ${outputFile.getAbsolutePath}")
+              s"Default version of repository file: ${options.relativeRepoPath.get} is saved at location: ${outputFile.toAbsolutePath}")
         case None ⇒
       }
     }
