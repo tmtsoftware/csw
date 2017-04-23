@@ -1,8 +1,8 @@
 package csw.services.csclient.commons
 
-import java.io.{BufferedWriter, File, FileWriter}
+import java.nio.file.{Files, Path, Paths}
 
-object ArgsUtil {
+class ArgsUtil {
 
   val relativeRepoPath          = "/path/hcd/trombone.conf"
   val inputFileContents: String = """
@@ -17,8 +17,8 @@ object ArgsUtil {
                             |axisName33 = tromboneAxis33
                             |""".stripMargin
 
-  val inputFilePath: String        = createTempFile("input", inputFileContents).toPath.toString
-  val updatedInputFilePath: String = createTempFile("updated_input", updatedInputFileContents).toPath.toString
+  val inputFilePath: String        = createTempFile("input", inputFileContents).toString
+  val updatedInputFilePath: String = createTempFile("updated_input", updatedInputFileContents).toString
   val outputFilePath               = "/tmp/output.conf"
   val id                           = "1"
   val comment                      = "test commit comment!!!"
@@ -38,12 +38,9 @@ object ArgsUtil {
   val setDefaultMinimalArgs = Array("setDefault", relativeRepoPath)
   val getDefaultArgs        = Array("getDefault", relativeRepoPath, "-o", outputFilePath)
 
-  private def createTempFile(fileName: String, fileContent: String): File = {
-    val tempFile = java.io.File.createTempFile(fileName, ".conf")
-    val bw       = new BufferedWriter(new FileWriter(tempFile))
-    bw.write(fileContent)
-    bw.close()
-    tempFile
-  }
+  private def createTempFile(fileName: String, fileContent: String): Path =
+    Files.write(Files.createTempFile(fileName, ".conf"), fileContent.getBytes)
 
+  def readFile(filePath: String): String =
+    new String(Files.readAllBytes(Paths.get(filePath)))
 }

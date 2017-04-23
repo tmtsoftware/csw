@@ -1,10 +1,9 @@
 package csw.services.csclient
 
-import java.io.File
 import java.nio.file.{Files, Paths}
 
 import csw.services.config.server.ServerWiring
-import csw.services.csclient.commons.TestFileUtils
+import csw.services.csclient.commons.{ArgsUtil, TestFileUtils}
 import csw.services.csclient.commons.TestFutureExtension.RichFuture
 import csw.services.csclient.models.Options
 import csw.services.csclient.utils.ArgsParser
@@ -23,21 +22,22 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
 
-  import csw.services.csclient.commons.ArgsUtil._
+  val ArgsUtil = new ArgsUtil
+  import ArgsUtil._
 
   override protected def beforeEach(): Unit =
     serverWiring.svnRepo.initSvnRepo()
 
   override protected def afterEach(): Unit = {
     testFileUtils.deleteServerFiles()
-    new File(outputFilePath).delete()
+    Files.delete(Paths.get(outputFilePath))
   }
 
   override protected def afterAll(): Unit = {
     httpService.shutdown().await
     ConfigCliApp.shutdown().await
-    new File(inputFilePath).delete()
-    new File(updatedInputFilePath).delete()
+    Files.delete(Paths.get(inputFilePath))
+    Files.delete(Paths.get(updatedInputFilePath))
   }
 
   test("should able to create a file in repo and read it from repo to local disk") {
@@ -52,12 +52,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
 
     // read locally saved output file (/tmp/output.conf) from disk and
     // match the contents with input file content
-    Files.exists(Paths.get(outputFilePath)) shouldEqual true
-    val source = scala.io.Source.fromFile(outputFilePath)
-    try source.mkString shouldEqual inputFileContents
-    finally {
-      source.close()
-    }
+    readFile(outputFilePath) shouldEqual inputFileContents
   }
 
   test("should able to update, delete and check for existence of a file from repo") {
@@ -76,12 +71,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
 
     //  read locally saved output file (/tmp/output.conf) from disk and
     //  match the contents with input file content
-    Files.exists(Paths.get(outputFilePath)) shouldEqual true
-    val source = scala.io.Source.fromFile(outputFilePath)
-    try source.mkString shouldEqual updatedInputFileContents
-    finally {
-      source.close()
-    }
+    readFile(outputFilePath) shouldEqual updatedInputFileContents
 
     //  file should exist
     //  is there any way to assert here?
@@ -118,12 +108,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
 
     //  read locally saved output file (/tmp/output.conf) from disk and
     //  match the contents with input file content
-    Files.exists(Paths.get(outputFilePath)) shouldEqual true
-    val source1 = scala.io.Source.fromFile(outputFilePath)
-    try source1.mkString shouldEqual inputFileContents
-    finally {
-      source1.close()
-    }
+    readFile(outputFilePath) shouldEqual inputFileContents
 
     //  reset default version of file and store it at location: /tmp/output.txt
     val parsedResetDefaultArgs: Option[Options] = ArgsParser.parse(setDefaultMinimalArgs)
@@ -134,11 +119,6 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
 
     //  read locally saved output file (/tmp/output.conf) from disk and
     //  match the contents with input file content
-    Files.exists(Paths.get(outputFilePath)) shouldEqual true
-    val source2 = scala.io.Source.fromFile(outputFilePath)
-    try source2.mkString shouldEqual updatedInputFileContents
-    finally {
-      source2.close()
-    }
+    readFile(outputFilePath) shouldEqual updatedInputFileContents
   }
 }
