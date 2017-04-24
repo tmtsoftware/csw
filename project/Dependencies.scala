@@ -60,6 +60,7 @@ object Dependencies {
     Libs.`scalatest`               % Test,
     Libs.`junit`                   % Test,
     Libs.`junit-interface`         % Test,
+    Libs.`mockito-core`            % Test,
     Akka.`akka-multi-node-testkit` % Test,
     Akka.`akka-stream-testkit`     % Test
   )

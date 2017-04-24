@@ -17,7 +17,6 @@ class ConfigServiceResolver(locationService: LocationService, actorRuntime: Acto
 
   def uri: Future[Uri] = async {
     val location = await(locationService.resolve(configConnection, 5.seconds)).getOrElse(
-      //TODO: Make a domain specific exception
       throw new RuntimeException(s"config service connection=${configConnection.name} can not be resolved")
     )
     Uri(location.uri.toString)
