@@ -1,19 +1,17 @@
 package csw.services.location
 
 import akka.actor.{Actor, ActorSystem, Props}
-import akka.cluster.ddata.DistributedData
-import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationService
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{DurationDouble, _}
+import scala.concurrent.duration._
 
 class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0)
 class LocationServiceTestMultiJvmNode2 extends LocationServiceTest(0)
@@ -21,7 +19,6 @@ class LocationServiceTestMultiJvmNode2 extends LocationServiceTest(0)
 class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) with BeforeAndAfterEach {
 
   import config._
-
   import cswCluster.mat
 
   val assemblyActorSystem = ActorSystem("assembly-actor-system")
@@ -32,15 +29,6 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
   override def afterAll(): Unit = {
     super.afterAll()
     assemblyActorSystem.terminate()
-  }
-
-  test("ensure that the cluster is up") {
-    enterBarrier("nodes-joined")
-    awaitAssert {
-      DistributedData(system).replicator ! GetReplicaCount
-      expectMsg(ReplicaCount(roles.size))
-    }
-    enterBarrier("after-1")
   }
 
   test("ensure that a component registered by one node is resolved and listed on all the nodes") {

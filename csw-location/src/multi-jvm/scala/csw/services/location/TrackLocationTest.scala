@@ -1,14 +1,11 @@
 package csw.services.location
 
 import akka.actor.{Actor, Props}
-import akka.cluster.ddata.DistributedData
-import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import csw.services.location.scaladsl.LocationServiceFactory
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0)
@@ -17,17 +14,7 @@ class TrackLocationTestMultiJvmNode3 extends TrackLocationTest(0)
 class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._
-
   import cswCluster.mat
-
-  test("ensure that the cluster is up") {
-    enterBarrier("nodes-joined")
-    awaitAssert {
-      DistributedData(system).replicator ! GetReplicaCount
-      expectMsg(ReplicaCount(roles.size))
-    }
-    enterBarrier("after-1")
-  }
 
   test("two components should able to track same connection and single component should able to track two components") {
     //create akka connection

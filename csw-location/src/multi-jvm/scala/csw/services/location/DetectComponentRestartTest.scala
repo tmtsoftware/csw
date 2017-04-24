@@ -1,8 +1,6 @@
 package csw.services.location
 
 import akka.actor.{Actor, ActorSystem, Props}
-import akka.cluster.ddata.DistributedData
-import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.commons.ClusterSettings
@@ -21,17 +19,7 @@ class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest
 class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._
-
   import cswCluster.mat
-
-  test("ensure that the cluster is up") {
-    enterBarrier("nodes-joined")
-    awaitAssert {
-      DistributedData(system).replicator ! GetReplicaCount
-      expectMsg(ReplicaCount(roles.size))
-    }
-    enterBarrier("after-1")
-  }
 
   test("should detect re-registering of new location for a connection that has crashed/gone away") {
     val akkaConnection = AkkaConnection(ComponentId("TromboneHcd", ComponentType.HCD))
