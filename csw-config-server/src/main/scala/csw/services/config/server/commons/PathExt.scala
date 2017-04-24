@@ -15,15 +15,14 @@ object PathExt {
 
   implicit class RichPath(val path: Path) extends AnyVal {
 
-    def validate =
+    def validate(): Unit =
       if (isInvalidPath(path)) {
-
         val invalidCharsMessage = invalidChars
           .replace("\\s", " ")
           .map(char ⇒ s"{$char}")
           .mkString(",")
 
-        throw new InvalidFilePath(path, s"${invalidCharsMessage}")
+        throw new InvalidFilePath(path, invalidCharsMessage)
       }
   }
 }
