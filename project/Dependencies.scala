@@ -66,6 +66,7 @@ object Dependencies {
   )
 
   val CswClusterSeed = Seq(
-    Libs.`scopt`
+    Libs.`scopt`,
+    Libs.`scalatest` % Test
   )
 }

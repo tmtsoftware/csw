@@ -1,7 +1,7 @@
 package csw.apps.clusterseed
 
 import csw.apps.clusterseed.cli.{ArgsParser, Options}
-import csw.services.location.commons.CswCluster
+import csw.services.location.commons.{ClusterAwareSettings, CswCluster}
 
 class Main {
 
@@ -10,11 +10,17 @@ class Main {
     val clusterSeedCliParser = new ArgsParser
 
     clusterSeedCliParser.parse(args).foreach {
-      case Options(port, clusterSeeds) =>
-        sys.props("clusterSeeds") = clusterSeeds
-        sys.props("clusterPort") = port.toString
+      case Options(port) =>
+        val clusterSettings = ClusterAwareSettings.onPort(port)
+        if (clusterSettings.seedNodes.isEmpty) {
+          println(
+            s"[error] clusterSeeds setting is not configured. Please do so by either setting the env variable or system property."
+          )
+        } else {
+          clusterSettings.debug()
+          CswCluster.withSettings(clusterSettings)
+        }
 
-        CswCluster.make()
     }
   }
 }

@@ -2,9 +2,15 @@ package csw.services.location.commons
 
 import com.typesafe.config.ConfigException
 import csw.services.location.internal.Networks
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-class ClusterSettingsTest extends FunSuite with Matchers {
+class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll {
+
+  override protected def afterAll(): Unit = {
+    System.clearProperty("clusterPort")
+    System.clearProperty("clusterSeeds")
+    System.clearProperty("interfaceName")
+  }
 
   test("exception is thrown when settings are not found for a given cluster name") {
     val settings: ClusterSettings = ClusterSettings("undefined-settings-in-conf")
@@ -26,7 +32,7 @@ class ClusterSettingsTest extends FunSuite with Matchers {
   test("cluster settings with custom parameters are used") {
     val port = 8888
     val clusterSettings: ClusterSettings =
-      ClusterSettings().withInterface("en0").onPort(port).joinSeeds("10.10.10.10", "10.10.10.11")
+      ClusterSettings().withInterface("en0").onPort(port).joinSeeds("10.10.10.10, 10.10.10.11")
 
     clusterSettings.interfaceName shouldBe "en0"
     clusterSettings.port shouldBe port
@@ -70,16 +76,12 @@ class ClusterSettingsTest extends FunSuite with Matchers {
     System.setProperty("clusterSeeds", systemSeeds.toString)
     System.setProperty("interfaceName", systemInterfacename)
 
-    val clusterSettings = ClusterSettings().onPort(9001).joinSeeds("10.10.10.10", "10.10.10.11").withInterface("en0")
+    val clusterSettings = ClusterSettings()
 
     clusterSettings.port shouldBe systemPort
     clusterSettings.interfaceName shouldBe systemInterfacename
     clusterSettings.seedNodes shouldBe List("10.10.10.12", "10.10.10.13").map { hostname =>
       s"akka.tcp://${clusterSettings.clusterName}@$hostname"
     }
-
-    System.clearProperty("clusterPort")
-    System.clearProperty("clusterSeeds")
-    System.clearProperty("interfaceName")
   }
 }

@@ -53,6 +53,13 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   val ClusterPortKey    = "clusterPort"
   val ManagementPortKey = "managementPort"
 
+  def debug(): Unit =
+    println(s"""
+         |[debug] Using following cluster configurations:
+         |[debug] ClusterSeedsKey: ${seedNodes.mkString(",")}
+         |[debug] InterfaceNameKey: $interfaceName
+      """.stripMargin)
+
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
 
   //InterfaceName should be ideally provided via env variables.
@@ -65,19 +72,20 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   //This method should be used for testing only.
   def withManagementPort(port: Int): ClusterSettings = withEntry(ManagementPortKey, port)
 
-  private[location] def joinSeeds(seed: String, seeds: String*): ClusterSettings =
-    withEntry(ClusterSeedsKey, (seed +: seeds).mkString(","))
+  def joinSeeds(seeds: String): ClusterSettings = withEntry(ClusterSeedsKey, seeds)
 
   //If no seeds are provided (which happens only during testing), then create a single node cluster by joining to self.
-  def joinLocal(port: Int, ports: Int*): ClusterSettings =
-    joinSeeds(s"$hostname:$port", ports.map(port ⇒ s"$hostname:$port"): _*)
+  def joinLocal(port: Int, ports: Int*): ClusterSettings = {
+    val seeds = s"$hostname:$port" +: ports.map(port ⇒ s"$hostname:$port")
+    joinSeeds(seeds.mkString(","))
+  }
 
-  //clusterPort should be ideally provided via env variables. This method should be used for testing only.
+  //clusterPort should be ideally provided via env variables.
   def onPort(port: Int): ClusterSettings = withEntry(ClusterPortKey, port)
 
   //Config values for ActorSystem should be first picked from system variable then from environment properties and
   //then use the programmatically set variables.
-  private lazy val allValues = values ++ sys.env ++ sys.props
+  private lazy val allValues = sys.env ++ sys.props ++ values
 
   //If no interfaceName is provided then use empty value for it.
   private[location] def interfaceName: String = allValues.getOrElse(InterfaceNameKey, "").toString
@@ -94,7 +102,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   def managementPort: Option[Any] = allValues.get(ManagementPortKey)
 
   //Prepare a list of seedNodes provided via clusterSeeds
-  private[location] def seedNodes: List[String] = {
+  def seedNodes: List[String] = {
     val seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
     seeds.map(seed ⇒ s"akka.tcp://$clusterName@$seed")
   }
