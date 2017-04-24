@@ -22,7 +22,6 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
   import config._
 
-  private val locationService = LocationServiceFactory.withCluster(cswCluster)
   import cswCluster.mat
 
   val assemblyActorSystem = ActorSystem("assembly-actor-system")

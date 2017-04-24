@@ -22,8 +22,6 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAn
 
   import config._
 
-  private val locationService = LocationServiceFactory.withCluster(cswCluster)
-
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
   override def afterAll(): Unit = {

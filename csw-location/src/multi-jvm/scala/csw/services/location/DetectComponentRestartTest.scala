@@ -22,7 +22,6 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
 
   import config._
 
-  private val locationService = LocationServiceFactory.withCluster(cswCluster)
   import cswCluster.mat
 
   test("ensure that the cluster is up") {
