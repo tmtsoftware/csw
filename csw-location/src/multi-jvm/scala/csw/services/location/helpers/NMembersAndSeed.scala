@@ -3,12 +3,12 @@ package csw.services.location.helpers
 import akka.actor.ActorSystem
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
 import csw.services.location.commons.ClusterSettings
 
 class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 
-  private val settings = ClusterSettings()
+  private val settings = new MultiNodeClusterSettings()
 
   def makeSystem(config: Config): ActorSystem = ActorSystem(settings.clusterName, config)
 
