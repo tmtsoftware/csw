@@ -45,7 +45,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       response.status match {
         case StatusCodes.Created    ⇒ await(Unmarshal(response).to[ConfigId])
         case StatusCodes.Conflict   ⇒ throw FileAlreadyExists(path)
-        case StatusCodes.BadRequest ⇒ throw InvalidFilePath(response.entity.toString)
+        case StatusCodes.BadRequest ⇒ throw InvalidFilePath(await(Unmarshal(response).to[String]))
         case _                      ⇒ throw new RuntimeException(response.status.reason())
       }
     }
