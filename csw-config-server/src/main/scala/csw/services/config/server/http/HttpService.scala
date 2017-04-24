@@ -15,7 +15,7 @@ import scala.util.control.NonFatal
 
 class HttpService(locationService: LocationService,
                   configServiceRoute: ConfigServiceRoute,
-                  settings: Settings,
+                  port: Int,
                   actorRuntime: ActorRuntime) {
 
   import actorRuntime._
@@ -40,7 +40,7 @@ class HttpService(locationService: LocationService,
     Http().bindAndHandle(
       handler = configServiceRoute.route,
       interface = ClusterAwareSettings.hostname,
-      port = settings.`service-port`
+      port = port
     ) recoverWith {
       case NonFatal(ex) ⇒
         async {

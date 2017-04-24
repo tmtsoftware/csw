@@ -14,10 +14,6 @@ class ArgsParser {
       c.copy(port = Some(x))
     } text "http port at which service will be run, if not specified value from config file will be used"
 
-    opt[String]("clusterSeeds").required() action { (x, c) =>
-      c.copy(clusterSeeds = x)
-    } text "comma separated list of cluster-seed node addresses"
-
     help("help")
 
     version("version")
