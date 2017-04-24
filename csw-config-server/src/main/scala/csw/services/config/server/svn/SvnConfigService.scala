@@ -4,17 +4,17 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.files.OversizeFileService
+import csw.services.config.server.files.PathExt.RichPath
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
 
 import scala.async.Async._
 import scala.concurrent.Future
 import scala.util.control.NonFatal
-import scala.util.matching.Regex
 
 class SvnConfigService(settings: Settings,
                        fileService: OversizeFileService,
@@ -28,27 +28,17 @@ class SvnConfigService(settings: Settings,
 
   override def create(path: Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
 
-    val invalidChars = "!#$%&'@^`~+,;="
-
-    def isInvalidPath(path: Path): Future[Boolean] = Future {
-      val invalidCharsPattern = s".*[$invalidChars\\s]+.*"
-      path.toString.matches(invalidCharsPattern)
-    }
-
     def createOversize(): Future[ConfigId] = async {
       val sha1 = await(fileService.post(configData))
       await(create(shaFilePath(path), ConfigData.fromString(sha1), oversize = false, comment))
     }
 
     async {
-      if (await(isInvalidPath(path)))
-        throw new InvalidFilePath(path, s"${invalidChars.mkString(" ")} 'whitespaces'")
-
+      path.validate
       // If the file does not already exists in the repo, create it
       if (await(exists(path))) {
         throw FileAlreadyExists(path)
       }
-
       if (oversize) {
         await(createOversize())
       } else {

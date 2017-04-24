@@ -525,28 +525,13 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   test("should allow to create files with valid path and throw error for invalid path") {
-    val paths = List(
-      Paths.get("/invalidpath!/sample.txt"),
-      Paths.get("/invalidpath#/sample.txt"),
-      Paths.get("/invalidpath$/sample.txt"),
-//      Paths.get("/invalidpath/%sample.txt"),
-      Paths.get("/invalidpath/&sample.txt"),
-      Paths.get("/invalidpath/sa'mple.txt"),
-      Paths.get("/invalidpath/samp@le.txt"),
-      Paths.get("/invalidpath/samp`le.txt"),
-      Paths.get("/invalid+path/sample.txt"),
-      Paths.get("/invalid,path/sample.txt"),
-      Paths.get("/invalidpath;/sample.txt"),
-      Paths.get("/invalidpath/sam=ple.txt"),
-      Paths.get("/invalid path/sample.txt")
-    )
-    paths.foreach { path ⇒
-      intercept[InvalidFilePath] {
-        configService
-          .create(path, ConfigData.fromString("testing invalid file path"), oversize = false,
-            "testing invalid file path")
-          .await
-      }
+    val filePath = Paths.get("/invalid path!/sample@.txt")
+
+    intercept[InvalidFilePath] {
+      configService
+        .create(filePath, ConfigData.fromString("testing invalid file path"), oversize = false,
+          "testing invalid file path")
+        .await
     }
   }
 }
