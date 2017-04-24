@@ -30,8 +30,9 @@ object Dependencies {
   val CswConfigClientCli = Seq(
     Akka.`akka-actor`,
     Libs.`scopt`,
-    Libs.`scalatest`     % Test,
-    Libs.`scala-logging` % Test
+    Libs.`scalatest`               % Test,
+    Libs.`scala-logging`           % Test,
+    Akka.`akka-multi-node-testkit` % Test
   )
 
   val Integration = Seq(

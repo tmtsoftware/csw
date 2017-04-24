@@ -74,8 +74,8 @@ lazy val `csw-config-client` = project
   )
 
 lazy val `csw-config-client-cli` = project
-  .enablePlugins(DeployApp, MaybeCoverage)
-  .dependsOn(`csw-config-client`, `csw-config-server` % "test->test")
+  .enablePlugins(AutoMultiJvm, DeployApp, MaybeCoverage)
+  .dependsOn(`csw-config-client`, `csw-config-server` % "test->test", `csw-location` % "multi-jvm->multi-jvm")
   .settings(
     libraryDependencies ++= Dependencies.CswConfigClientCli
   )
