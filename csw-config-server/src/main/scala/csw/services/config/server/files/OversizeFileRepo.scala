@@ -1,6 +1,6 @@
 package csw.services.config.server.files
 
-import java.nio.file.{CopyOption, Files, Path, StandardCopyOption}
+import java.nio.file._
 
 import akka.dispatch.MessageDispatcher
 
@@ -16,4 +16,5 @@ class OversizeFileRepo(blockingIoDispatcher: MessageDispatcher) {
   def move(source: Path, target: Path): Future[Unit] =
     Future(Files.move(source, target, StandardCopyOption.ATOMIC_MOVE))
   def createTempFile(prefix: String, suffix: String): Future[Path] = Future(Files.createTempFile(prefix, suffix))
+
 }

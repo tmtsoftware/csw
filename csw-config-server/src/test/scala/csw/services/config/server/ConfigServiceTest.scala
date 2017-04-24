@@ -7,7 +7,7 @@ import java.time.Instant
 import akka.stream.IOResult
 import akka.stream.scaladsl.{Source, StreamConverters}
 import akka.util.ByteString
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.TestFileUtils
@@ -522,5 +522,31 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     val fileTimeStampedAfterDelete = configService.get(file).await
     fileTimeStampedAfterDelete shouldBe None
+  }
+
+  test("should allow to create files with valid path and throw error for invalid path") {
+    val paths = List(
+      Paths.get("/invalidpath!/sample.txt"),
+      Paths.get("/invalidpath#/sample.txt"),
+      Paths.get("/invalidpath$/sample.txt"),
+//      Paths.get("/invalidpath/%sample.txt"),
+      Paths.get("/invalidpath/&sample.txt"),
+      Paths.get("/invalidpath/sa'mple.txt"),
+      Paths.get("/invalidpath/samp@le.txt"),
+      Paths.get("/invalidpath/samp`le.txt"),
+      Paths.get("/invalid+path/sample.txt"),
+      Paths.get("/invalid,path/sample.txt"),
+      Paths.get("/invalidpath;/sample.txt"),
+      Paths.get("/invalidpath/sam=ple.txt"),
+      Paths.get("/invalid path/sample.txt")
+    )
+    paths.foreach { path ⇒
+      intercept[InvalidFilePath] {
+        configService
+          .create(path, ConfigData.fromString("testing invalid file path"), oversize = false,
+            "testing invalid file path")
+          .await
+      }
+    }
   }
 }

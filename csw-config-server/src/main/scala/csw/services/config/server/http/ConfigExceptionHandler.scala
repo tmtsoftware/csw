@@ -2,7 +2,7 @@ package csw.services.config.server.http
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, ExceptionHandler}
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 
 import scala.util.control.NonFatal
 
@@ -15,6 +15,9 @@ class ConfigExceptionHandler extends Directives {
     case ex: FileNotFound ⇒
       ex.printStackTrace()
       complete(StatusCodes.NotFound → ex.getMessage)
+    case ex: InvalidFilePath ⇒
+      ex.printStackTrace()
+      complete(StatusCodes.BadRequest → ex.getMessage)
     case NonFatal(ex) ⇒
       ex.printStackTrace()
       complete(StatusCodes.InternalServerError → ex.getMessage)

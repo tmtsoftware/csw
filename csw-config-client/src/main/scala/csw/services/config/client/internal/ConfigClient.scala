@@ -8,7 +8,7 @@ import akka.http.scaladsl.model.HttpEntity.Chunked
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{JsonSupport, _}
 import csw.services.config.api.scaladsl.ConfigService
 
@@ -43,9 +43,10 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       val response = await(Http().singleRequest(request))
 
       response.status match {
-        case StatusCodes.Created  ⇒ await(Unmarshal(response).to[ConfigId])
-        case StatusCodes.Conflict ⇒ throw FileAlreadyExists(path)
-        case _                    ⇒ throw new RuntimeException(response.status.reason())
+        case StatusCodes.Created    ⇒ await(Unmarshal(response).to[ConfigId])
+        case StatusCodes.Conflict   ⇒ throw FileAlreadyExists(path)
+        case StatusCodes.BadRequest ⇒ throw InvalidFilePath(response.status.reason())
+        case _                      ⇒ throw new RuntimeException(response.status.reason())
       }
     }
 
