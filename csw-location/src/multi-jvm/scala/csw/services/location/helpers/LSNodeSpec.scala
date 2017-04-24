@@ -19,7 +19,11 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T)
 
   override def initialParticipants: Int = roles.size
 
-  override def beforeAll(): Unit = multiNodeSpecBeforeAll()
+  override def beforeAll(): Unit = {
+    //dummy call ensure that location service is successfully started before running any test
+    locationService.list.await
+    multiNodeSpecBeforeAll()
+  }
 
   override def afterAll(): Unit = multiNodeSpecAfterAll()
 }
