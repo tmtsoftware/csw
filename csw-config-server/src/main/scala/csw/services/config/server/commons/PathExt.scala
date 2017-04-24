@@ -1,4 +1,4 @@
-package csw.services.config.server.files
+package csw.services.config.server.commons
 
 import java.nio.file.Path
 

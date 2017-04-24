@@ -3,7 +3,7 @@ package csw.services.config.server.files
 import java.nio.file.Paths
 
 import csw.services.config.api.exceptions.InvalidFilePath
-import csw.services.config.server.files.PathExt.RichPath
+import csw.services.config.server.commons.PathExt.RichPath
 import org.scalatest.FunSuite
 
 class PathExtTest extends FunSuite {

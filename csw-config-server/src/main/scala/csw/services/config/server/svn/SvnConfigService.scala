@@ -8,7 +8,7 @@ import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.files.OversizeFileService
-import csw.services.config.server.files.PathExt.RichPath
+import csw.services.config.server.commons.PathExt.RichPath
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
 
