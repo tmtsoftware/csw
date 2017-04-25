@@ -57,7 +57,6 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
     println(s"""
          |[debug] Using following cluster configurations:
          |[debug] ClusterSeedsKey: ${seedNodes.mkString(",")}
-         |[debug] InterfaceNameKey: $interfaceName
       """.stripMargin)
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
