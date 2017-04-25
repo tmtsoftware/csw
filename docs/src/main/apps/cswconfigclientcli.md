@@ -4,7 +4,7 @@ A command line application that facilitates interaction with config service. It 
 
 ## Commands
 
-Note: Exactly one command must be specified from the list - {create | update | get | exists | delete | list | history | setDefault | getDefault}
+Note: Exactly one command must be specified from the list - `{create | update | get | exists | delete | list | history | setDefault | resetDefault | getDefault}`
 
 ### create
 creates the input file in the repository at a specified path

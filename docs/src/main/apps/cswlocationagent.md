@@ -4,14 +4,14 @@ A utility application that starts a given external program, registers comma sepa
 
 ## Command line parameter options
 
-* **--names** It's a required parameter. It needs to be a list of comma separated service names without a space after comma.
-* **--command** The parameter is optional. The command that starts the target application. Use use %port to specify the port number. If parameter is not provided value $name.command from config file will be picked up. If value in config file is not found, the service names provided will be registered with Location Service.
-* **--port** Optional port number the application listens on (default: use value of $name.port from config file, or use a random, free port.)
+* **`--names`** It's a required parameter. It needs to be a list of comma separated service names without a space after comma.
+* **`--command`** The parameter is optional. The command that starts the target application. Use use %port to specify the port number. If parameter is not provided value $name.command from config file will be picked up. If value in config file is not found, the service names provided will be registered with Location Service.
+* **`--port`** Optional port number the application listens on (default: use value of $name.port from config file, or use a random, free port.)
 * **<app-config>** Optional config file in HOCON format. Will be automatically picked based on --names parameter (Options specified as: $name.command, $name.port, etc.)
-* **--delay** Number of milliseconds to wait for the app to start before registering it with the location service (default: 1000)
-* **--no-exit** For testing: prevents application from exiting after running command
-* **--help** Prints the help message.
-* **--version** Prints the version of the application.
+* **`--delay`** Number of milliseconds to wait for the app to start before registering it with the location service (default: 1000)
+* **`--no-exit`** For testing: prevents application from exiting after running command
+* **`--help`** Prints the help message.
+* **`--version`** Prints the version of the application.
 
 ## Examples
 

@@ -9,10 +9,10 @@ Kindly refer to this [cluster-seed setup](https://tmtsoftware.github.io/csw-prod
 
 ## Command line parameter options
 
-* **--initRepo** It's an optional parameter. When supplied, server will try to initialize a repository if it does not exist.
-* **--port** It's an optional parameter. When specified the HTTP server will start on this port. Default will be 4000.
-* **--help** Prints the help message.
-* **--version** Prints the version of the application.
+* **`--initRepo`** It's an optional parameter. When supplied, server will try to initialize a repository if it does not exist.
+* **`--port`** It's an optional parameter. When specified the HTTP server will start on this port. Default will be 4000.
+* **`--help`** Prints the help message.
+* **`--version`** Prints the version of the application.
 
 ## Examples
 
