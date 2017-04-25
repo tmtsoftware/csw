@@ -1,0 +1,404 @@
+{
+	"id": "941c9aa1-7747-f495-acf8-cccecb888586",
+	"name": "csw-prod",
+	"description": "",
+	"order": [],
+	"folders": [
+		{
+			"id": "81aeb8ec-88b4-d483-b3f1-87dc038fa53b",
+			"name": "config service",
+			"description": "",
+			"order": [
+				"35f06e73-c001-2cb1-3f64-cf41989ba6bb",
+				"c090e90e-2a9c-a268-9dce-adc44bf01ef7",
+				"1d5a83bb-0f89-df7a-e4d8-8e3073a7297c",
+				"3598078a-963c-671f-bb8b-54054df9105e",
+				"98e19ee2-3fb7-3022-767b-ff12f6139bcd",
+				"f121add7-b28b-e554-a54b-90e67d0dc5cc",
+				"1d7adef3-4cf0-397d-6aba-3f5d19e9e844",
+				"e5ca4000-e4e1-7633-2a10-58517a9c09ba",
+				"652801e5-7cda-88cb-d07b-6196b01bccab",
+				"40be4ff7-c791-5cc4-63cb-0743012216e0"
+			],
+			"owner": 0,
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586"
+		}
+	],
+	"timestamp": 1491661596048,
+	"owner": 0,
+	"public": false,
+	"requests": [
+		{
+			"id": "1d5a83bb-0f89-df7a-e4d8-8e3073a7297c",
+			"headers": "",
+			"url": "http://{{hostname}}:{{port}}/config/{{path}}?id={{id}}",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [
+				{
+					"key": "code",
+					"value": "xWnkliVQJURqB2x1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "grant_type",
+					"value": "authorization_code",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "redirect_uri",
+					"value": "https://www.getpostman.com/oauth2/callback",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "abc123",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "ssh-secret",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"tests": "tests[\"response code is 200\"] = responseCode.code === 200;",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1492889175247,
+			"name": "3. get by ID",
+			"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests.",
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586"
+		},
+		{
+			"id": "1d7adef3-4cf0-397d-6aba-3f5d19e9e844",
+			"headers": "",
+			"url": "http://{{hostname}}:{{port}}/config/{{path}}",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "HEAD",
+			"data": [
+				{
+					"key": "code",
+					"value": "xWnkliVQJURqB2x1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "grant_type",
+					"value": "authorization_code",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "redirect_uri",
+					"value": "https://www.getpostman.com/oauth2/callback",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "abc123",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "ssh-secret",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"tests": "tests[\"response code is 200\"] = responseCode.code === 200;",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1492889158255,
+			"name": "7. exists",
+			"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests.",
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586"
+		},
+		{
+			"id": "3598078a-963c-671f-bb8b-54054df9105e",
+			"headers": "",
+			"url": "http://{{hostname}}:{{port}}/config/{{path}}?comment=\"updating config file\"",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "PUT",
+			"data": [],
+			"dataMode": "raw",
+			"tests": "tests[\"response code is 200\"] = responseCode.code === 200;\n\ntests[\"Body matches string\"] = responseBody.has(\"id\");",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1492889171527,
+			"name": "4. update",
+			"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests.",
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586",
+			"rawModeData": "\ncsw-config-server {\n\n  repository-dir = /tmp/csw-config-svn\n  tmp-dir = /tmp/csw-config-temp\n  oversize-files-dir = /tmp/csw-config-oversize-files\n\n  svn-user-name = some-user-name\n\n  sha1-suffix = .sha1\n  default-suffix = .default\n\n  service-port = 4000\n  service-port = ${?httpPort}\n\n  blocking-io-dispatcher = \"csw-config-server.default-blocking-io-dispatcher\"\n\n  default-blocking-io-dispatcher {\n    type = \"Dispatcher\"\n    executor = \"thread-pool-executor\"\n    throughput = 1\n\n    thread-pool-executor {\n      fixed-pool-size = 64\n    }\n  }\n\n}\n"
+		},
+		{
+			"id": "35f06e73-c001-2cb1-3f64-cf41989ba6bb",
+			"headers": "",
+			"url": "http://{{hostname}}:{{port}}/config/{{path}}?oversize=false&comment=\"uploading configuration file\"",
+			"preRequestScript": "\npostman.clearGlobalVariable(\"path\");\npostman.clearGlobalVariable(\"id\");\n\n\nvar random = Math.floor(Math.random() * 1000)\nvar path = \"trombone/hcd/application_\" + random\npostman.setGlobalVariable(\"path\", path);\n",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [],
+			"dataMode": "raw",
+			"tests": "tests[\"response code is 201\"] = responseCode.code === 201;\n\ntests[\"Body matches string\"] = responseBody.has(\"id\");\n\nvar jsonData = JSON.parse(responseBody);\npostman.setGlobalVariable(\"id\", jsonData.id);\n\n",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1492956019442,
+			"name": "1. create",
+			"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests.",
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586",
+			"rawModeData": "// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}\n\n// Additional, application specific configuration for the HCD\ncsw.examples.trombone.hcd {\n  axis-config {\n    axisName = \"tromboneAxis\"\n    lowLimit = 100\n    lowUser = 200\n    highUser = 1200\n    highLimit = 1300\n    home = 300\n    startPosition = 350\n    stepDelayMS = 100  // This value can be shorter, but 150 shows well in tests\n  }\n}\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}"
+		},
+		{
+			"id": "40be4ff7-c791-5cc4-63cb-0743012216e0",
+			"headers": "",
+			"url": "http://{{hostname}}:{{port}}/config/{{path}}?default=true",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [
+				{
+					"key": "code",
+					"value": "xWnkliVQJURqB2x1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "grant_type",
+					"value": "authorization_code",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "redirect_uri",
+					"value": "https://www.getpostman.com/oauth2/callback",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "abc123",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "ssh-secret",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"tests": "tests[\"response code is 200\"] = responseCode.code === 200;",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1492889146244,
+			"name": "11. get default",
+			"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests.",
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586"
+		},
+		{
+			"id": "652801e5-7cda-88cb-d07b-6196b01bccab",
+			"headers": "",
+			"url": "http://{{hostname}}:{{port}}/default/{{path}}?id={{id}}",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "PUT",
+			"data": [
+				{
+					"key": "conf",
+					"value": "",
+					"type": "file",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"tests": "tests[\"response code is 200\"] = responseCode.code === 200;",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1492889149959,
+			"name": "10. set default with ID",
+			"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests.",
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586"
+		},
+		{
+			"id": "98e19ee2-3fb7-3022-767b-ff12f6139bcd",
+			"headers": "",
+			"url": "http://{{hostname}}:{{port}}/list",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [
+				{
+					"key": "code",
+					"value": "xWnkliVQJURqB2x1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "grant_type",
+					"value": "authorization_code",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "redirect_uri",
+					"value": "https://www.getpostman.com/oauth2/callback",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "abc123",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "ssh-secret",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"tests": "tests[\"response code is 200\"] = responseCode.code === 200;",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1492889165663,
+			"name": "5. list",
+			"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests.",
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586"
+		},
+		{
+			"id": "c090e90e-2a9c-a268-9dce-adc44bf01ef7",
+			"headers": "",
+			"url": "http://{{hostname}}:{{port}}/config/{{path}}?id={{id}}",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [
+				{
+					"key": "code",
+					"value": "xWnkliVQJURqB2x1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "grant_type",
+					"value": "authorization_code",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "redirect_uri",
+					"value": "https://www.getpostman.com/oauth2/callback",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "abc123",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "ssh-secret",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"tests": "tests[\"response code is 200\"] = responseCode.code === 200;",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1492889178735,
+			"name": "2. get",
+			"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests.",
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586"
+		},
+		{
+			"id": "e5ca4000-e4e1-7633-2a10-58517a9c09ba",
+			"headers": "",
+			"url": "http://{{hostname}}:{{port}}/default/{{path}}",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "PUT",
+			"data": [
+				{
+					"key": "conf",
+					"value": "",
+					"type": "file",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"tests": "tests[\"response code is 200\"] = responseCode.code === 200;",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1492889153143,
+			"name": "8. reset default",
+			"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests.",
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586"
+		},
+		{
+			"id": "f121add7-b28b-e554-a54b-90e67d0dc5cc",
+			"headers": "",
+			"url": "http://{{hostname}}:{{port}}/history/{{path}}?maxResults={{$randomInt}}",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [
+				{
+					"key": "code",
+					"value": "xWnkliVQJURqB2x1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "grant_type",
+					"value": "authorization_code",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "redirect_uri",
+					"value": "https://www.getpostman.com/oauth2/callback",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "abc123",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "ssh-secret",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"tests": "tests[\"response code is 200\"] = responseCode.code === 200;",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1492889162055,
+			"name": "6. history",
+			"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests.",
+			"collectionId": "941c9aa1-7747-f495-acf8-cccecb888586"
+		}
+	]
+}
