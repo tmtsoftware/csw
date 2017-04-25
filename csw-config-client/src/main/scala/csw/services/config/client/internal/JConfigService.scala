@@ -75,6 +75,9 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def setDefault(path: Path, id: Optional[ConfigId]): CompletableFuture[Unit] =
     configService.setDefault(path, id.asScala).toJava.toCompletableFuture
 
+  override def resetDefault(path: Path): CompletableFuture[Unit] =
+    configService.resetDefault(path).toJava.toCompletableFuture
+
   override def getDefault(path: Path): CompletableFuture[Optional[ConfigData]] =
     configService.getDefault(path).map(_.asJava).toJava.toCompletableFuture
 

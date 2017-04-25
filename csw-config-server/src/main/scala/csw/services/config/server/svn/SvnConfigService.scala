@@ -159,6 +159,8 @@ class SvnConfigService(settings: Settings,
     }
   }
 
+  override def resetDefault(path: Path): Future[Unit] = setDefault(path, None)
+
   override def getDefault(path: Path): Future[Option[ConfigData]] = {
 
     def getDefaultById(configId: ConfigId): Future[Option[ConfigData]] = async {

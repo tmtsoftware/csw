@@ -162,6 +162,8 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
+  override def resetDefault(path: jnio.Path): Future[Unit] = setDefault(path, None)
+
   override def getDefault(path: jnio.Path): Future[Option[ConfigData]] = async {
     val uri = await(configUri(path)).withQuery(Query("default" → "true"))
 

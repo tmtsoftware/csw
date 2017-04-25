@@ -124,6 +124,14 @@ trait IConfigService {
   def setDefault(path: Path, id: Optional[ConfigId]): CompletableFuture[Unit]
 
   /**
+   * Resets the "default version" of the file with the given path to the latest version.
+   *
+   * @param path the file path relative to the repository root
+   * @return a future result
+   */
+  def resetDefault(path: Path): CompletableFuture[Unit]
+
+  /**
    * Gets and returns the default version of the file stored under the given path.
    * If no default was set, this returns the latest version.
    *
