@@ -49,7 +49,7 @@ find_my_ip() {
 usage() {
     echo "usage: $programname [--seedPort port] [--httpPort port] [--init]"
     echo "  --seedPort <number>     optional: start seed on provided port, default: 5552"
-    echo "  --seedPort <number>     optional: start http config server on provided port, default: 5000"
+    echo "  --httpPort <number>     optional: start http config server on provided port, default: 5000"
     echo "  --init                  optional: create new repo, default: false"
     exit 1
 }

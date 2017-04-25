@@ -82,6 +82,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     def toByteArray() = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
   }
 
+  // DEOPSCSW-42: Storing text based component configuration (uploading files with various sizes)
+  // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   test("should able to upload and get component configurations from config service") {
     val configFileNames            = Set("tromboneAssembly.conf", "tromboneContainer.conf", "tromboneHCD.conf")
     val configIds                  = createConfigs(configFileNames)
@@ -100,6 +102,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     }
   }
 
+  // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   test("should able to upload and get binary configurations from config service") {
     val binaryFileName = "binaryConf.bin"
     val binaryConfPath = Paths.get("/tmt/trombone/test/conf/large/" + binaryFileName)
@@ -117,12 +120,14 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.get(binaryConfPath).await.get.toInputStream.toByteArray() shouldBe expectedBinaryContent
   }
 
+  //  DEOPSCSW-42: Storing text based component configuration (exercise deep path)
   test("should able to create a file and retrieve the same") {
     val file = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf")
     configService.create(file, ConfigData.fromString(configValue1), oversize = false, "commit test file").await
     configService.get(file).await.get.toStringF.await shouldBe configValue1
   }
 
+  //  DEOPSCSW-42: Storing text based component configuration
   test("should ignore '/' at the beginning of file path and create a file") {
     val fileName             = "csw.conf/1/2/3"
     val file                 = Paths.get(s"/$fileName")
@@ -138,6 +143,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.get(fileWithoutBackslash).await.get.toStringF.await shouldBe configValue1
   }
 
+  //  DEOPSCSW-42: Storing text based component configuration
   test("should throw FileAlreadyExists while creating a file if it already exists in repository") {
     val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
@@ -157,8 +163,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configId shouldBe ConfigId(2)
   }
 
+  // DEOPSCSW-49: Update an Existing File with a New Version
   test("should able to update existing file and get the file with updated content") {
-    val file = Paths.get("/assembly.conf")
+    val file = Paths.get("/tmt/text/trombone/test/assembly.conf")
 
     configService.create(file, ConfigData.fromString(configValue1), oversize = false, "commit assembly conf").await
     configService.get(file).await.get.toStringF.await shouldBe configValue1
@@ -167,6 +174,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.get(file).await.get.toStringF.await shouldBe configValue2
   }
 
+  // DEOPSCSW-49: Update an Existing File with a New Version
   test("update should throw FileNotFoundException if a file does not exists in repository") {
     val file = Paths.get("/assembly.conf")
 
@@ -175,6 +183,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     }
   }
 
+  //  DEOPSCSW-46: Unique identifier for configuration file version
   test("each revision of file should have unique identifier") {
     val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
     val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
@@ -195,12 +204,16 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     actualConfigIds shouldBe expectedConfigIds
   }
 
+  // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
+  // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   test("get call should return `None` if a file does not exists in repository") {
     val file = Paths.get("/test.conf")
 
     configService.get(file).await shouldBe None
   }
 
+  // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
+  // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   test("should able to retrieve the specific version of file by config ID") {
     val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
     val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
@@ -308,12 +321,14 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.list().await shouldBe List(assemblyConfigInfo, tromboneConfigInfo)
   }
 
+  // DEOPSCSW-74: Check config file existence by unique name
   test("exists should return false if file does not exist") {
     val file = Paths.get("/test.conf")
 
     configService.exists(file).await shouldBe false
   }
 
+  // DEOPSCSW-74: Check config file existence by unique name
   test("exists should return true if file exist") {
     val textFile = Paths.get("a/test.csw.conf")
 
@@ -365,28 +380,40 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.get(file).await shouldBe None
   }
 
+  // DEOPSCSW-77: Set default version of configuration file in config service
+  // DEOPSCSW-78: Get the default version of a configuration file
+  // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
   test("should able to get, set and reset the default version of config file") {
+    // create file
     val file = Paths.get("/tmt/test/setdefault/getdefault/resetdefault/default.conf")
     configService.create(file, ConfigData.fromString(configValue1), oversize = false, "hello world").await
     configService.get(file).await.get.toStringF.await shouldBe configValue1
 
-    val configIdUpdate1 =
-      configService.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").await
+    // update file twice
+    val configId = configService.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").await
     configService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").await
 
+    // check that get file without ID should return latest file
     configService.get(file).await.get.toStringF.await shouldBe configValue3
+    // check that getDefault file without ID should return latest file
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
-    configService.setDefault(file, Some(configIdUpdate1)).await
+    // set default version of file to id=2
+    configService.setDefault(file, Some(configId)).await
+    // check that getDefault file without ID returns file with id=2
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue2
+    // check that setDefault without id,resets default version of file
     configService.setDefault(file).await
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
   }
 
+  // DEOPSCSW-77: Set default version of configuration file in config service
+  // DEOPSCSW-78: Get the default version of a configuration file
   test("getDefault should return None if file does not exists") {
     val file = Paths.get("/tmt/test/get/default/app.conf")
     configService.getDefault(file).await shouldBe None
   }
 
+  // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
   test("should be able to store and retrieve oversize file") {
     val file    = Paths.get("SomeOversizeFile.txt")
     val content = "testing oversize file"
@@ -421,6 +448,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     )
   }
 
+  // DEOPSCSW-49: Update an Existing File with a New Version
   test("should be able to update oversize file and retrieve the history") {
     val file            = Paths.get("SomeOversizeFile.txt")
     val creationContent = "testing oversize file"
@@ -460,6 +488,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     )
   }
 
+  // DEOPSCSW-77: Set default version of configuration file in config service
+  // DEOPSCSW-78: Get the default version of a configuration file
+  // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
   test("should be able to get oversize default file") {
     val file    = Paths.get("SomeOversizeFile.txt")
     val content = "testing oversize file"
