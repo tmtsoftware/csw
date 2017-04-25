@@ -3,9 +3,7 @@ Configuration Service
 
 Configuration Service helps storing and fetching config files of components.
 
-The paradox document can be found [here](https://tmtsoftware.github.io/csw-prod/).
-
-The examples of getting started is under development. 
+If you want to get started with configuration service, refer the [examples](https://tmtsoftware.github.io/csw-prod/services/config.html). 
 
 You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/index.html).
 
