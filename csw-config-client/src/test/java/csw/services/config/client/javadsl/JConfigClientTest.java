@@ -100,6 +100,7 @@ public class JConfigClientTest {
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
     }
 
+    // DEOPSCSW-49: Update an Existing File with a New Version
     @Test
     public void testUpdateExistingFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/assembly.conf");
@@ -112,6 +113,7 @@ public class JConfigClientTest {
         Assert.assertEquals(configDataUpdated.get().toJStringF(mat).get(), configValue2);
     }
 
+    // DEOPSCSW-49: Update an Existing File with a New Version
     @Test
     public void testUpdateReturnsFileNotFoundExceptionOnAbsenceOfFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/trombone/assembly.conf");
@@ -119,6 +121,8 @@ public class JConfigClientTest {
         configService.update(path, ConfigData.fromString(configValue1), "commit assembly conf").get();
     }
 
+    // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
+    // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
     @Test
     public void testGetReturnsNoneIfFileNotExists() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text/file/not/exist/app.conf");
@@ -159,6 +163,8 @@ public class JConfigClientTest {
         Assert.assertEquals(configData6.toJStringF(mat).get(), configValue2);
     }
 
+    // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
+    // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
     @Test
     public void testSpecificVersionRetrieval() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/a/b/csw.conf");
@@ -222,6 +228,7 @@ public class JConfigClientTest {
         Assert.assertEquals(configService.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
     }
 
+    // DEOPSCSW-74: Check config file existence by unique name
     @Test
     public void testExists() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
@@ -244,6 +251,9 @@ public class JConfigClientTest {
         Assert.assertEquals(configService.get(path).get(), Optional.empty());
     }
 
+    // DEOPSCSW-77: Set default version of configuration file in config. service
+    // DEOPSCSW-78: Get the default version of a configuration file
+    // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
     public void testGetAndSetDefaultConfigFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
@@ -261,6 +271,8 @@ public class JConfigClientTest {
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
+    // DEOPSCSW-78: Get the default version of a configuration file
+    // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
     public void testGetDefaultReturnsNoneIfFileNotExist() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
@@ -292,6 +304,7 @@ public class JConfigClientTest {
         Assert.assertEquals(configService.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
     }
 
+    // DEOPSCSW-74: Check config file existence by unique name
     @Test
     public void testOversizeFileExists() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
@@ -303,6 +316,7 @@ public class JConfigClientTest {
         Assert.assertTrue(configService.exists(newPath).get());
     }
 
+    // DEOPSCSW-49: Update an Existing File with a New Version
     @Test
     public void testUpdateAndHistoryOfOversizedFiles() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
@@ -321,6 +335,9 @@ public class JConfigClientTest {
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
     }
 
+    // DEOPSCSW-77: Set default version of configuration file in config. service
+    // DEOPSCSW-78: Get the default version of a configuration file
+    // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
     public void testGetAndSetDefaultOversizeConfigFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
