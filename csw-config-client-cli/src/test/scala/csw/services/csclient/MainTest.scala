@@ -3,19 +3,17 @@ package csw.services.csclient
 import java.nio.file.{Files, Paths}
 
 import csw.services.config.server.ServerWiring
-import csw.services.csclient.commons.{ArgsUtil, TestFileUtils}
 import csw.services.csclient.commons.TestFutureExtension.RichFuture
+import csw.services.csclient.commons.{ArgsUtil, TestFileUtils}
 import csw.services.csclient.models.Options
 import csw.services.csclient.utils.ArgsParser
-import csw.services.location.commons.ClusterSettings
-import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  private val locationService = LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
-  private val serverWiring    = ServerWiring.make(locationService)
-  private val httpService     = serverWiring.httpService
+  private val serverWiring = ServerWiring.make(ClusterAwareSettings.onPort(3552))
+  private val httpService  = serverWiring.httpService
   httpService.registeredLazyBinding.await
 
   val ConfigCliApp = new Main(ClusterSettings().joinLocal(3552))

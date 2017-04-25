@@ -4,15 +4,14 @@ import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.{ConfigServiceTest, ServerWiring}
-import csw.services.location.commons.ClusterSettings
+import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.LocationServiceFactory
 
 class ConfigClientTest extends ConfigServiceTest {
 
-  private val locationService       = LocationServiceFactory.withSettings(ClusterSettings().onPort(3552))
-  private val clientLocationService = LocationServiceFactory.withSettings(ClusterSettings().joinLocal(3552))
+  private val clientLocationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552))
 
-  private val httpService = ServerWiring.make(locationService).httpService
+  private val httpService = ServerWiring.make(ClusterAwareSettings.joinLocal(3552)).httpService
 
   private val actorRuntime = new ActorRuntime()
   import actorRuntime._

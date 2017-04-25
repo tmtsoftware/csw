@@ -32,9 +32,15 @@ class ServerWiring {
 }
 
 object ServerWiring {
+
   def make(_locationService: LocationService): ServerWiring = new ServerWiring {
     override lazy val locationService: LocationService = _locationService
   }
+
+  def make(_clusterSettings: ClusterSettings): ServerWiring = new ServerWiring {
+    override lazy val clusterSettings: ClusterSettings = _clusterSettings
+  }
+
   def make(_clusterSettings: ClusterSettings, maybePort: Option[Int]): ServerWiring = new ServerWiring {
     override lazy val clusterSettings: ClusterSettings = _clusterSettings
 

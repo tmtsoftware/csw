@@ -37,8 +37,7 @@ public class JConfigClientTest {
     private static ILocationService clientLocationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
     private static IConfigService configService = JConfigClientFactory.make(actorRuntime.actorSystem(), clientLocationService);
 
-    private static ILocationService locationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.joinLocal(3552, new scala.collection.mutable.ArrayBuffer()));
-    private static ServerWiring serverWiring = ServerWiring.make(locationService.asScala());
+    private static ServerWiring serverWiring = ServerWiring.make(ClusterAwareSettings.joinLocal(3552, new scala.collection.mutable.ArrayBuffer()));
     private static HttpService httpService = serverWiring.httpService();
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
