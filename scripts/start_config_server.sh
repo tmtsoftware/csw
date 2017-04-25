@@ -33,19 +33,6 @@ start_config_server() {
     ./csw-config-server/target/universal/csw-config-server-0.1-SNAPSHOT/bin/csw-config-server --port $1 -DclusterSeeds=$2 $3
 }
 
-find_my_ip() {
-    my_ip=""
-    unamestr=`uname`
-    if [[ "$unamestr" == 'Linux' ]]; then
-       my_ip=$(hostname -i)
-    elif [[ "$unamestr" == 'Darwin' ]]; then
-        my_ip=$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}')
-    else
-        echo "Currently supports 'Linux' & 'Darwin' platform only."
-        exit 1
-    fi
-}
-
 usage() {
     echo "usage: $programname [--seedPort port] [--httpPort port] [--init]"
     echo "  --seedPort <number>     optional: start seed on provided port, default: 5552"
@@ -85,7 +72,6 @@ parse_cmd_args() {
 
 }
 
-
 programname=$0
 # Parse command line arguments
 parse_cmd_args "$@"
@@ -95,7 +81,7 @@ stop_app $http_port
 stop_app $seed_port
 
 # Get the ip address of local machine and store it in variable: my_ip
-find_my_ip
+my_ip=$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}')
 
 seeds="${my_ip}:${seed_port}"
 
