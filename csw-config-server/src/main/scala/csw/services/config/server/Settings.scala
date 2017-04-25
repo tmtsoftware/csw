@@ -15,7 +15,7 @@ class Settings(config: Config) {
   val `svn-user-name`: String          = `csw-config-server`.getString("svn-user-name")
   val `sha1-suffix`: String            = `csw-config-server`.getString("sha1-suffix")
   val `default-suffix`: String         = `csw-config-server`.getString("default-suffix")
-  val `service-port`: Int              = `csw-config-server`.getInt("service-port")
+  def `service-port`: Int              = `csw-config-server`.getInt("service-port")
   val `blocking-io-dispatcher`: String = `csw-config-server`.getString("blocking-io-dispatcher")
 
   val repositoryFile: File = Paths.get(`repository-dir`).toFile

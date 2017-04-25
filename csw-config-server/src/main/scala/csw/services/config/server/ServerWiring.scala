@@ -28,9 +28,7 @@ class ServerWiring {
   lazy val configExceptionHandler = new ConfigExceptionHandler
   lazy val configServiceRoute     = new ConfigServiceRoute(configService, actorRuntime, configExceptionHandler)
 
-  def makeHttpService(port: Int): HttpService =
-    new HttpService(locationService, configServiceRoute, port, actorRuntime)
-  lazy val httpService: HttpService = makeHttpService(settings.`service-port`)
+  lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }
 
 object ServerWiring {
@@ -39,6 +37,9 @@ object ServerWiring {
   }
   def make(_clusterSettings: ClusterSettings, maybePort: Option[Int]): ServerWiring = new ServerWiring {
     override lazy val clusterSettings: ClusterSettings = _clusterSettings
-    override lazy val httpService: HttpService         = makeHttpService(maybePort.getOrElse(settings.`service-port`))
+
+    override lazy val settings: Settings = new Settings(config) {
+      override val `service-port`: Int = maybePort.getOrElse(super.`service-port`)
+    }
   }
 }
