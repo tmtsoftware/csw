@@ -2,7 +2,7 @@
 
 @@@ index
 
-* [Location service](location.md)
-* [Configuration service](config.md)
+* [Location service](services/location.md)
+* [Configuration service](services/config.md)
 
 @@@

@@ -41,10 +41,10 @@ gradle
 LocationServiceFactory exposes a make method to create an instance of LocationService. However, the make call will look for configuration settings managed using ClusterSettings. Verify @scaladoc[ClusterSettings](csw/services/location/commons/ClusterSettings) to ensure that LocationService behavior is as expected.
 
 Scala
-:   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #create-location-service }
+:   @@snip [LocationServiceDemoExample.scala](../../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #create-location-service }
 
 Java
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #create-location-service }
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #create-location-service }
 
 
 ## Shutdown LocationService
@@ -54,10 +54,10 @@ This example demonstrates how to shutdown a location service. Shutdown will term
 **Note:** All the services registered via this instance of LocationService will continue to be available for other cluster members. 
 
 Scala
-:   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #shutdown }
+:   @@snip [LocationServiceDemoExample.scala](../../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #shutdown }
 
 Java
-:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #shutdown }
+:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #shutdown }
 
 ## Creating components, connections and registrations
 
@@ -70,10 +70,10 @@ An Application, Sequencer, Assembly, HCD, or Service component may need to be us
 **Registrations** are service endpoints stored in LocationService.
 
 Scala
-:   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #Components-Connections-Registrations }
+:   @@snip [LocationServiceDemoExample.scala](../../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #Components-Connections-Registrations }
 
 Java
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #Components-Connections-Registrations }
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #Components-Connections-Registrations }
 
 ## Creating ActorRef for registration
 
@@ -82,10 +82,10 @@ While creating `akkaRegistration` in above example, make sure the ActorSystem us
  
 
 Scala
-:  @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #create-actor-system }
+:  @@snip [LocationServiceDemoExample.scala](../../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #create-actor-system }
 
 Java
-:  @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #create-actor-system }
+:  @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #create-actor-system }
 
 This is required to start a remote ActorSystem on the interface where csw-cluster is running. All the ActorRefs created using this
 ActorSystem will now be available for communication from other components that are part of csw-cluster.
@@ -103,13 +103,13 @@ A connection of interest, can be checked if available using the `resolve` API. I
 One of the ways to `unregister` a service is by calling unregister on registration result received from `register` API.
 
 Scala
-:   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #register-list-resolve-unregister }
+:   @@snip [LocationServiceDemoExample.scala](../../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #register-list-resolve-unregister }
 
 Java
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
 
 JavaBlocking
-:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #register-list-resolve-unregister }
+:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #register-list-resolve-unregister }
 
 @@@ note { title="async handling in scala and java examples." }
 
@@ -135,13 +135,13 @@ Akka stream API provides many building blocks to process this stream such as Flo
 Consumer can shut down the stream using Killswitch.
 
 Scala
-:   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #tracking }
+:   @@snip [LocationServiceDemoExample.scala](../../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #tracking }
 
 Java
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #tracking }
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #tracking }
 
 JavaBlocking
-:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #tracking }
+:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #tracking }
 
 ## Subscribing
 
@@ -154,10 +154,10 @@ The API expects following parameters :
 In return it gives a Killswitch that can be used to turn off the event notifications and release the supplied callback, if required.
  
 Scala
-:   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #subscribing }
+:   @@snip [LocationServiceDemoExample.scala](../../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #subscribing }
 
 Java
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #subscribing }
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #subscribing }
 
 
 ## Filtering
@@ -167,13 +167,13 @@ The `list` API and it's variants offer means to inquire about available connecti
 Other variants are filters using `ConnectionType`, `ComponentType` and `hostname`.
  
 Scala
-:   @@snip [LocationServiceDemoExample.scala](../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #filtering }
+:   @@snip [LocationServiceDemoExample.scala](../../../../csw-location/src/test/scala/csw/services/location/scaladsl/demo/LocationServiceDemoExample.scala) { #filtering }
 
 Java
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #filtering }
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #filtering }
 
 JavaBlocking
-:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #filtering }
+:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #filtering }
 
 ## Source code for examples
 

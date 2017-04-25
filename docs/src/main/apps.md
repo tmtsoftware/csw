@@ -1,7 +1,7 @@
 # Applications
 
 @@@ index
-* [csw-cluster-seed](cswclusterseed.md)
-* [csw-location-agent](cswlocationagent.md)
+* [csw-cluster-seed](apps/cswclusterseed.md)
+* [csw-location-agent](apps/cswlocationagent.md)
 
 @@@
