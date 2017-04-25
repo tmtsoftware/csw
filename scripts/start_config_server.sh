@@ -12,7 +12,7 @@ init=""
 
 stop_app() {
     pid=$(lsof -i:$1 -t);
-    (kill -SIGINT $pid || kill -9 $pid) 2> /dev/null
+    (kill -SIGTERM $pid || kill -9 $pid) 2> /dev/null
 }
 
 start_cluster_seed() {
@@ -21,7 +21,7 @@ start_cluster_seed() {
     echo "All" | unzip csw-cluster-seed/target/universal/csw-cluster-seed-0.1-SNAPSHOT.zip -d csw-cluster-seed/target/universal/
 
     printf "${YELLOW}------ Starting Seed node on port $seed_port ------${NC}\n"
-     ./csw-cluster-seed/target/universal/csw-cluster-seed-0.1-SNAPSHOT/bin/csw-cluster-seed --clusterPort $1 --clusterSeeds $2 &
+     ./csw-cluster-seed/target/universal/csw-cluster-seed-0.1-SNAPSHOT/bin/csw-cluster-seed --clusterPort $1 -DclusterSeeds=$2 &
 }
 
 start_config_server() {
@@ -30,7 +30,7 @@ start_config_server() {
     echo "All" | unzip csw-config-server/target/universal/csw-config-server-0.1-SNAPSHOT.zip -d csw-config-server/target/universal/
 
     printf "${YELLOW}------ Starting config http server on port: $http_port ------${NC}\n"
-    ./csw-config-server/target/universal/csw-config-server-0.1-SNAPSHOT/bin/csw-config-server --port $1 --clusterSeeds $2 $3
+    ./csw-config-server/target/universal/csw-config-server-0.1-SNAPSHOT/bin/csw-config-server --port $1 -DclusterSeeds=$2 $3
 }
 
 find_my_ip() {
@@ -44,6 +44,14 @@ find_my_ip() {
         echo "Currently supports 'Linux' & 'Darwin' platform only."
         exit 1
     fi
+}
+
+usage() {
+    echo "usage: $programname [--seedPort port] [--httpPort port] [--init]"
+    echo "  --seedPort <number>     optional: start seed on provided port, default: 5552"
+    echo "  --seedPort <number>     optional: start http config server on provided port, default: 5000"
+    echo "  --init                  optional: create new repo, default: false"
+    exit 1
 }
 
 parse_cmd_args() {
@@ -64,8 +72,12 @@ parse_cmd_args() {
         --init)
         init="--init"
         ;;
+         --help)
+        usage
+        ;;
         *)
-        echo "Ignoring unknown option provided : ${key}."
+        echo "Unknown argument provided. Find usage below :"
+        usage
         ;;
     esac
     shift
@@ -73,12 +85,14 @@ parse_cmd_args() {
 
 }
 
+
+programname=$0
 # Parse command line arguments
 parse_cmd_args "$@"
 
 printf "${PURPLE}------ Stopping any process started on port: $seed_port & $http_port ------${NC}\n"
-stop_app $seed_port
 stop_app $http_port
+stop_app $seed_port
 
 # Get the ip address of local machine and store it in variable: my_ip
 find_my_ip
