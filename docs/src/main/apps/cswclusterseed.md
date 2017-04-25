@@ -7,14 +7,14 @@ Even though a single seed app is good enough to make use of location-service it 
 in production you deploy more than one instance on different machines to get the fault tolerance in case one of 
 the machines hosting the seed crashes.
 
-## Using SBT to create the zip containing binary for the cluster seed app
+## Prerequisite
 
 The command `sbt csw-cluster-seed/universal:publishLocal` will publish necessary artifacts to run csw-cluster-seed application. 
 
 The target of above command is a zip file titled "csw-cluster-seed.zip" and it's path will be printed on console. Unzip this file and switch current
 working directory to the extracted folder. Choose appropriate instructions from below based on requirement ie single seed or multiple seeds.
 
-## If deploying a single seed application
+## If deploying single seed application
 Steps below describe set-up to run cluster seed on a single machine. This can be a requirement for testing or demo purpose.
 
 Preparation:
@@ -40,9 +40,9 @@ Switch to application directory and run this command on **machine1 and machine2*
 ## Help
 Use the following command to get help on the options available with this app
   
-./bin/csw-cluster-seed --help
+`./bin/csw-cluster-seed --help`
 
 ## Version
 Use the following command to get version information for this app
   
-./bin/csw-cluster-seed --version
+`./bin/csw-cluster-seed --version`
