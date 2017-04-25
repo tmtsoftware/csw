@@ -15,7 +15,7 @@ object PathExt {
 
   implicit class RichPath(val path: Path) extends AnyVal {
 
-    def validate(): Unit =
+    def validateName(): Unit =
       if (isInvalidPath(path)) {
         val invalidCharsMessage = invalidChars
           .replace("\\s", " ")

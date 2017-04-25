@@ -34,7 +34,7 @@ class SvnConfigService(settings: Settings,
     }
 
     async {
-      path.validate
+      path.validateName
       // If the file does not already exists in the repo, create it
       if (await(exists(path))) {
         throw FileAlreadyExists(path)

@@ -27,7 +27,7 @@ class PathExtTest extends FunSuite {
     )
 
     paths.foreach { path ⇒
-      intercept[InvalidFilePath](path.validate)
+      intercept[InvalidFilePath](path.validateName)
     }
   }
 }
