@@ -61,6 +61,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
       """.stripMargin)
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
+  def withEntries(entries: Map[String, Any]): ClusterSettings     = copy(values = values ++ entries)
 
   //InterfaceName should be ideally provided via env variables.
   //It should contain the value where csw-cluster has to be started.

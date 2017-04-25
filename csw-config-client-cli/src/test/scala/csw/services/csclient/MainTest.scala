@@ -7,7 +7,7 @@ import csw.services.csclient.commons.TestFutureExtension.RichFuture
 import csw.services.csclient.commons.{ArgsUtil, TestFileUtils}
 import csw.services.csclient.models.Options
 import csw.services.csclient.utils.ArgsParser
-import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.services.location.commons.ClusterAwareSettings
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
@@ -16,7 +16,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
   private val httpService  = serverWiring.httpService
   httpService.registeredLazyBinding.await
 
-  val ConfigCliApp = new Main(ClusterSettings().joinLocal(3552))
+  val ConfigCliApp = new Main(ClusterAwareSettings.joinLocal(3552))
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
 
