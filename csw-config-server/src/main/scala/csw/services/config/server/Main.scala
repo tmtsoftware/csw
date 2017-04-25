@@ -1,12 +1,14 @@
 package csw.services.config.server
 
+import akka.Done
 import csw.services.config.server.cli.{ArgsParser, Options}
+import csw.services.config.server.http.HttpService
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-class Main(clusterSettings: ClusterSettings) {
+class Main(clusterSettings: ClusterSettings, args: Array[String]) {
 
   if (clusterSettings.seedNodes.isEmpty) {
     println(
@@ -17,8 +19,8 @@ class Main(clusterSettings: ClusterSettings) {
 
   lazy val configServerCliParser = new ArgsParser
 
-  def start(args: Array[String]): Unit =
-    configServerCliParser.parse(args).foreach {
+  lazy val maybeHttpService: Option[HttpService] =
+    configServerCliParser.parse(args).map {
       case Options(init, maybePort) =>
         clusterSettings.debug()
         val wiring = ServerWiring.make(clusterSettings, maybePort)
@@ -33,9 +35,10 @@ class Main(clusterSettings: ClusterSettings) {
         }
 
         Await.result(httpService.registeredLazyBinding, 5.seconds)
+        httpService
     }
 }
 
 object Main extends App {
-  new Main(ClusterAwareSettings).start(args)
+  new Main(ClusterAwareSettings, args).maybeHttpService
 }
