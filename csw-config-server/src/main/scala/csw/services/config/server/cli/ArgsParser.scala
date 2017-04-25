@@ -6,9 +6,9 @@ class ArgsParser {
   val parser = new scopt.OptionParser[Options]("scopt") {
     head(BuildInfo.name, BuildInfo.version)
 
-    opt[Unit]("init") action { (x, c) =>
-      c.copy(init = true)
-    } text "the repository is initialized, if it does not yet exist"
+    opt[Unit]("initRepo") action { (x, c) =>
+      c.copy(initRepo = true)
+    } text "optional, if specified the repository will be initialized, if it does not exist"
 
     opt[Int]("port") action { (x, c) =>
       c.copy(port = Some(x))
