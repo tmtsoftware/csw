@@ -283,23 +283,31 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   // DEOPSCSW-45: Saving version information for config. file
+  // DEOPSCSW-76: Access a list of all the versions of a stored configuration file
   test("should get the history of a file") {
-    val file = Paths.get("/test.conf")
-    val configIdCreate = configService
-      .create(file, ConfigData.fromString(configValue1), oversize = false, "commit initial configuration")
-      .await
-    configService.get(file).await.get.toStringF.await shouldBe configValue1
+    val file = Paths.get("/tmt/lgs/trombone/hcd.conf")
 
-    val configIdUpdate1 =
-      configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
-    val configIdUpdate2 =
-      configService.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
+    intercept[FileNotFound] {
+      configService.history(file).await
+    }
 
-    configService.history(file).await.size shouldBe 3
-    configService.history(file).await.map(_.id) shouldBe List(configIdUpdate2, configIdUpdate1, configIdCreate)
+    val commitMsg1 = "commit version: 1"
+    val commitMsg2 = "commit version: 2"
+    val commitMsg3 = "commit version: 3"
 
-    configService.history(file, 2).await.size shouldBe 2
-    configService.history(file, 2).await.map(_.id) shouldBe List(configIdUpdate2, configIdUpdate1)
+    val configId1 = configService.create(file, ConfigData.fromString(configValue1), oversize = false, commitMsg1).await
+    val configId2 = configService.update(file, ConfigData.fromString(configValue2), commitMsg2).await
+    val configId3 = configService.update(file, ConfigData.fromString(configValue3), commitMsg3).await
+
+    val configFileHistories = configService.history(file).await
+    configFileHistories.size shouldBe 3
+    configFileHistories.map(_.id) shouldBe List(configId3, configId2, configId1)
+    configFileHistories.map(_.comment) shouldBe List(commitMsg3, commitMsg2, commitMsg1)
+
+    val configFileHistories1 = configService.history(file, 2).await
+    configFileHistories1.size shouldBe 2
+    configFileHistories1.map(_.id) shouldBe List(configId3, configId2)
+    configFileHistories1.map(_.comment) shouldBe List(commitMsg3, commitMsg2)
   }
 
   // DEOPSCSW-48: Store new configuration file in Config. service

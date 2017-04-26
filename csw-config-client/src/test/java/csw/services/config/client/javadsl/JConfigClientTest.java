@@ -194,22 +194,35 @@ public class JConfigClientTest {
     }
 
     // DEOPSCSW-45: Saving version information for config. file
+    // DEOPSCSW-76: Access a list of all the versions of a stored configuration file
     @Test
     public void testHistoryOfAFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
-        ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue1), false, "commit initial configuration").get();
-        Assert.assertEquals(configService.get(path).get().get().toJStringF(mat).get(), configValue1);
 
-        ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
-        ConfigId configIdUpdate2 = configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
+        exception.expectCause(isA(FileNotFound.class));
+        configService.history(path).get();
+
+        String comment1 = "commit version 1";
+        String comment2 = "commit version 2";
+        String comment3 = "commit version 3";
+
+        ConfigId configId1 = configService.create(path, ConfigData.fromString(configValue1), false, comment1).get();
+        ConfigId configId2 = configService.update(path, ConfigData.fromString(configValue2), comment2).get();
+        ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3), comment3).get();
 
         Assert.assertEquals(configService.history(path).get().size(), 3);
+
         Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1, configIdCreate)));
+                new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
+
+        Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileHistory::comment).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(comment3, comment2, comment1)));
 
         Assert.assertEquals(configService.history(path, 2).get().size(), 2);
         Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+                new ArrayList<>(Arrays.asList(configId3, configId2)));
+        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileHistory::comment).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(comment3, comment2)));
     }
 
     // DEOPSCSW-48: Store new configuration file in Config. service
