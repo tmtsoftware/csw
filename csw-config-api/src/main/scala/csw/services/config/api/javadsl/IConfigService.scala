@@ -54,8 +54,8 @@ trait IConfigService {
    *             (by default the latest version is returned)
    * @return a future object that can be used to access the file's data, if found
    */
-  def get(path: Path, id: Optional[ConfigId]): CompletableFuture[Optional[ConfigData]]
-  def get(path: Path): CompletableFuture[Optional[ConfigData]]
+  def getById(path: Path, id: ConfigId): CompletableFuture[Optional[ConfigData]]
+  def getLatest(path: Path): CompletableFuture[Optional[ConfigData]]
 
   /**
    * Gets the file as it existed on the given date.
@@ -67,7 +67,7 @@ trait IConfigService {
    * @param time the target date
    * @return a future object that can be used to access the file's data, if found
    */
-  def get(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]]
+  def getByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]]
 
   /**
    * Returns true if the given path exists and is being managed

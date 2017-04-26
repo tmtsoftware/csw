@@ -86,11 +86,11 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
       val configService = ConfigClientFactory.make(actorSystem, locationService)
 
       enterBarrier("member1-create")
-      val actualConfigValue = configService.get(Paths.get(repoPath1)).await.get.toStringF.await
+      val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
       actualConfigValue shouldBe inputFileContents
 
       enterBarrier("member1-update")
-      val actualUpdatedConfigValue = configService.get(Paths.get(repoPath1)).await.get.toStringF.await
+      val actualUpdatedConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
       actualUpdatedConfigValue shouldBe updatedInputFileContents
 
       enterBarrier("member1-setDefault")

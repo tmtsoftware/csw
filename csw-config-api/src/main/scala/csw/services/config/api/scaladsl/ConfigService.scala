@@ -44,11 +44,18 @@ trait ConfigService {
    * Gets and returns the file stored under the given path.
    *
    * @param path the file path relative to the repository root
-   * @param id   an optional id used to specify a specific version to fetch
-   *             (by default the latest version is returned)
+   * @param id   id used to specify a specific version to fetch
    * @return a future object that can be used to access the file's data, if found
    */
-  def get(path: Path, id: Option[ConfigId] = None): Future[Option[ConfigData]]
+  def getById(path: Path, id: ConfigId): Future[Option[ConfigData]]
+
+  /**
+   * Gets and returns the file stored under the given path.
+   *
+   * @param path the file path relative to the repository root
+   * @return a future object that can be used to access the file's data, if found
+   */
+  def getLatest(path: Path): Future[Option[ConfigData]]
 
   /**
    * Gets the file as it existed on the given date.
@@ -60,7 +67,7 @@ trait ConfigService {
    * @param time the target date
    * @return a future object that can be used to access the file's data, if found
    */
-  def get(path: Path, time: Instant): Future[Option[ConfigData]]
+  def getByTime(path: Path, time: Instant): Future[Option[ConfigData]]
 
   /**
    * Returns true if the given path exists and is being managed

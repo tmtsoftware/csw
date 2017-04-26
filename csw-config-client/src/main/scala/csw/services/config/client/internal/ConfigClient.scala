@@ -65,8 +65,8 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def get(path: jnio.Path, id: Option[ConfigId]): Future[Option[ConfigData]] = async {
-    val uri = await(configUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
+  override def getLatest(path: jnio.Path): Future[Option[ConfigData]] = async {
+    val uri = await(configUri(path)).withQuery(Query("latest" → "true"))
 
     val request = HttpRequest(uri = uri)
     println(request)
@@ -79,7 +79,21 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def get(path: jnio.Path, time: Instant): Future[Option[ConfigData]] = async {
+  override def getById(path: jnio.Path, configId: ConfigId): Future[Option[ConfigData]] = async {
+    val uri = await(configUri(path)).withQuery(Query("id" → configId.id))
+
+    val request = HttpRequest(uri = uri)
+    println(request)
+    val response = await(Http().singleRequest(request))
+
+    response.status match {
+      case StatusCodes.OK       ⇒ Some(ConfigData.fromSource(response.entity.dataBytes))
+      case StatusCodes.NotFound ⇒ None
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
+    }
+  }
+
+  override def getByTime(path: jnio.Path, time: Instant): Future[Option[ConfigData]] = async {
     val uri = await(configUri(path)).withQuery(Query("date" → time.toString))
 
     val request = HttpRequest(uri = uri)

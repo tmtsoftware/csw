@@ -42,14 +42,14 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def update(path: Path, configData: ConfigData): CompletableFuture[ConfigId] =
     update(path, configData, comment = "")
 
-  override def get(path: Path, id: Optional[ConfigId]): CompletableFuture[Optional[ConfigData]] =
-    configService.get(path, id.asScala).map(_.asJava).toJava.toCompletableFuture
+  override def getById(path: Path, id: ConfigId): CompletableFuture[Optional[ConfigData]] =
+    configService.getById(path, id).map(_.asJava).toJava.toCompletableFuture
 
-  override def get(path: Path): CompletableFuture[Optional[ConfigData]] =
-    configService.get(path).map(_.asJava).toJava.toCompletableFuture
+  override def getLatest(path: Path): CompletableFuture[Optional[ConfigData]] =
+    configService.getLatest(path).map(_.asJava).toJava.toCompletableFuture
 
-  override def get(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]] =
-    configService.get(path, time).map(_.asJava).toJava.toCompletableFuture
+  override def getByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]] =
+    configService.getByTime(path, time).map(_.asJava).toJava.toCompletableFuture
 
   override def exists(path: Path): CompletableFuture[jl.Boolean] =
     configService.exists(path).toJava.toCompletableFuture.asInstanceOf[CompletableFuture[jl.Boolean]]

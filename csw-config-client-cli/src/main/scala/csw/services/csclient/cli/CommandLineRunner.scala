@@ -27,9 +27,10 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     def get(): Unit = {
       val idOpt = options.id.map(ConfigId(_))
 
-      val configDataOpt = options.date match {
-        case Some(date) ⇒ await(configService.get(options.relativeRepoPath.get, date))
-        case None       ⇒ await(configService.get(options.relativeRepoPath.get, idOpt))
+      val configDataOpt = (options.date, options.id) match {
+        case (Some(date), _) ⇒ await(configService.getByTime(options.relativeRepoPath.get, date))
+        case (_, Some(id))   ⇒ await(configService.getById(options.relativeRepoPath.get, ConfigId(id)))
+        case (_, _)          ⇒ await(configService.getLatest(options.relativeRepoPath.get))
       }
 
       configDataOpt match {

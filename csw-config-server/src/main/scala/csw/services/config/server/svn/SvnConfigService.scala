@@ -11,6 +11,7 @@ import csw.services.config.server.files.OversizeFileService
 import csw.services.config.server.commons.PathExt.RichPath
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
+import org.tmatesoft.svn.core.wc.SVNRevision
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -64,42 +65,46 @@ class SvnConfigService(settings: Settings,
     }
   }
 
-  override def get(path: Path, id: Option[ConfigId]): Future[Option[ConfigData]] = {
-    // Returns the contents of the given version of the file, if found
-    def getNormalSize: Future[Option[ConfigData]] = async {
-      val outputStream = StreamConverters.asOutputStream().cancellableMat
-      val revision     = await(svnRepo.svnRevision(id.map(_.id.toLong)))
-      val source = outputStream.mapMaterializedValue {
-        case (out, switch) ⇒
-          svnRepo.getFile(path, revision.getNumber, out).recover {
-            case NonFatal(ex) ⇒ switch.abort(ex)
-          }
-      }
-      Some(ConfigData.fromSource(source))
+  // Returns the contents of the given version of the file, if found
+  private def getNormalSize(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
+    val outputStream = StreamConverters.asOutputStream().cancellableMat
+    val source = outputStream.mapMaterializedValue {
+      case (out, switch) ⇒
+        svnRepo.getFile(path, revision.getNumber, out).recover {
+          case NonFatal(ex) ⇒ switch.abort(ex)
+        }
     }
+    Some(ConfigData.fromSource(source))
+  }
 
-    // Get oversize files that are stored in the annex server
-    def getOversize: Future[Option[ConfigData]] = async {
-      await(get(shaFilePath(path), id)) match {
-        case None =>
-          None
-        case Some(configData) =>
-          val sha1 = await(configData.toStringF)
-          await(fileService.get(sha1))
-      }
-    }
-
-    // If the file exists in the repo, get its data
-    async {
-      await(pathStatus(path, id)) match {
-        case PathStatus.NormalSize ⇒ await(getNormalSize)
-        case PathStatus.Oversize   ⇒ await(getOversize)
-        case PathStatus.Missing    ⇒ None
-      }
+  // Get oversize files that are stored in the annex server
+  private def getOversize(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
+    await(getNormalSize(shaFilePath(path), revision)) match {
+      case None =>
+        None
+      case Some(configData) =>
+        val sha1 = await(configData.toStringF)
+        await(fileService.get(sha1))
     }
   }
 
-  override def get(path: Path, time: Instant): Future[Option[ConfigData]] = {
+  private def get(path: Path, configId: Option[ConfigId] = None) =
+    async {
+      val svnRevision = await(svnRepo.svnRevision(configId.map(_.id.toLong)))
+
+      await(pathStatus(path, configId)) match {
+        case PathStatus.NormalSize ⇒ await(getNormalSize(path, svnRevision))
+        case PathStatus.Oversize   ⇒ await(getOversize(path, svnRevision))
+        case PathStatus.Missing    ⇒ None
+      }
+    }
+  // If the file exists in the repo, get data of its latest revision
+  override def getLatest(path: Path): Future[Option[ConfigData]] = get(path)
+
+  // If the version specified by configId for the file exists in the repo, get its data
+  override def getById(path: Path, configId: ConfigId): Future[Option[ConfigData]] = get(path, Some(configId))
+
+  override def getByTime(path: Path, time: Instant): Future[Option[ConfigData]] = {
 
     // Gets the ConfigFileHistory matching the date
     def getHist: Future[Option[ConfigFileRevision]] = async {
@@ -112,7 +117,7 @@ class SvnConfigService(settings: Settings,
 
     async {
       val hist = await(getHist)
-      if (hist.isEmpty) None else await(get(path, hist.map(_.id)))
+      if (hist.isEmpty) None else await(getById(path, hist.map(_.id).get))
     }
   }
 
@@ -165,9 +170,9 @@ class SvnConfigService(settings: Settings,
   override def getDefault(path: Path): Future[Option[ConfigData]] = {
 
     def getDefaultById(configId: ConfigId): Future[Option[ConfigData]] = async {
-      val d  = await(get(defaultFilePath(path)))
+      val d  = await(getLatest(defaultFilePath(path)))
       val id = if (d.isDefined) await(d.get.toStringF) else configId.id
-      await(get(path, Some(ConfigId(id))))
+      await(getById(path, ConfigId(id)))
     }
 
     async {
