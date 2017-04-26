@@ -17,10 +17,11 @@ class ConfigServiceRoute(
   def route: Route = handleExceptions(configExceptionHandler.exceptionHandler) {
     path("config" / FilePath) { filePath ⇒
       (get & rejectEmptyResponse) {
-        (dateParam & defaultParam & idParam) {
-          case (Some(date), _, _) ⇒ complete(configService.get(filePath, date))
-          case (_, true, _)       ⇒ complete(configService.getDefault(filePath))
-          case (_, _, maybeId)    ⇒ complete(configService.get(filePath, maybeId))
+        (dateParam & idParam & latestParam) {
+          case (Some(date), _, _)   ⇒ complete(configService.get(filePath, date))
+          case (_, id @ Some(_), _) ⇒ complete(configService.get(filePath, id))
+          case (_, _, true)         ⇒ complete(configService.get(filePath))
+          case (_, _, _)            ⇒ complete(configService.getDefault(filePath))
         }
       } ~
       (head & idParam) { id ⇒

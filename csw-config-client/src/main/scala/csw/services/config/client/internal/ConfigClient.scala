@@ -165,7 +165,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   override def resetDefault(path: jnio.Path, comment: String): Future[Unit] = setDefault(path, None, comment)
 
   override def getDefault(path: jnio.Path): Future[Option[ConfigData]] = async {
-    val uri = await(defaultUri(path))
+    val uri = await(configUri(path))
 
     val request = HttpRequest(uri = uri)
     println(request)

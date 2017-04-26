@@ -180,6 +180,37 @@ class ConfigServiceRouteTest
     }
   }
 
+  test("get latest - success status code") {
+    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
+
+    Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    Put("/default/test.conf?id=1") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    Get("/config/test.conf?latest=true") ~> Route.seal(route) ~> check {
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldEqual updatedConfigValue1
+    }
+
+    Get("/config/test.conf") ~> Route.seal(route) ~> check {
+      status shouldBe StatusCodes.OK
+      responseAs[String] shouldEqual configValue1
+    }
+  }
+
+  test("get latest - failure status code") {
+    // try to fetch file which does not exists
+    Get("/get?path=test1.conf?latest=true") ~> Route.seal(route) ~> check {
+      status shouldBe StatusCodes.NotFound
+    }
+  }
+
   test("list - success status code") {
     // when list is empty
     Get("/list") ~> route ~> check {
@@ -252,7 +283,7 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.Created
     }
 
-    Get("/config/test.conf?default=true") ~> route ~> check {
+    Get("/config/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[String] shouldEqual configValue1
@@ -283,7 +314,7 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
     }
 
-    Get("/config/test.conf?default=true") ~> route ~> check {
+    Get("/config/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[String] shouldEqual configValue1
