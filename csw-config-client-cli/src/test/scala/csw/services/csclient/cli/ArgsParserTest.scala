@@ -1,9 +1,9 @@
-package csw.services.csclient.utils
+package csw.services.csclient.cli
 
 import java.nio.file.Paths
 import java.time.Instant
 
-import csw.services.csclient.models.Options
+import csw.services.csclient.cli.{ArgsParser, Options}
 import org.scalatest.{FunSuite, Matchers}
 
 class ArgsParserTest extends FunSuite with Matchers {

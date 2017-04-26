@@ -54,19 +54,19 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
       // create file using cli app from client1 and verify client2 able to access it
       val cliMain    = new Main(ClusterSettings().joinLocal(3552))
       val createArgs = Array("create", repoPath1, "-i", inputFilePath)
-      cliMain.start(createArgs).await
+      cliMain.start(createArgs)
       enterBarrier("member1-create")
 
       // update file using cli app from client1 and verify client2 able to access it
       val cliMain1   = new Main(ClusterSettings().joinLocal(3552))
       val updateArgs = Array("update", repoPath1, "-i", updatedInputFilePath)
-      cliMain1.start(updateArgs).await
+      cliMain1.start(updateArgs)
       enterBarrier("member1-update")
 
       // set default version of file using cli app from client1 and verify client2 able to access it
       val cliMain2       = new Main(ClusterSettings().joinLocal(3552))
       val setDefaultArgs = Array("setDefault", repoPath1, "--id", "1")
-      cliMain2.start(setDefaultArgs).await
+      cliMain2.start(setDefaultArgs)
       enterBarrier("member1-setDefault")
 
       // Verify that client1 (cli app) is able to access file created by client2
@@ -74,7 +74,7 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
       val cliMain3       = new Main(ClusterSettings().joinLocal(3552))
       val tempOutputFile = Files.createTempFile("output", ".conf").toString
       val getMinimalArgs = Array("get", repoPath2, "-o", tempOutputFile)
-      cliMain3.start(getMinimalArgs).await
+      cliMain3.start(getMinimalArgs)
       new String(Files.readAllBytes(Paths.get(tempOutputFile))) shouldEqual inputFileContents
 
     }

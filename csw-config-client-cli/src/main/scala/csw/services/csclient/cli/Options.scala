@@ -1,6 +1,5 @@
-package csw.services.csclient.models
+package csw.services.csclient.cli
 
-import java.io.File
 import java.nio.file.Path
 import java.time.Instant
 

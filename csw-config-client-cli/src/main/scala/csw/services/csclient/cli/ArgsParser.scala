@@ -1,10 +1,9 @@
-package csw.services.csclient.utils
+package csw.services.csclient.cli
 
 import java.nio.file.Paths
 import java.time.Instant
 
 import csw.services.BuildInfo
-import csw.services.csclient.models.Options
 import scopt.OptionParser
 
 /**

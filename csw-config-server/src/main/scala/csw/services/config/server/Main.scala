@@ -1,6 +1,5 @@
 package csw.services.config.server
 
-import akka.Done
 import csw.services.config.server.cli.{ArgsParser, Options}
 import csw.services.config.server.http.HttpService
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
