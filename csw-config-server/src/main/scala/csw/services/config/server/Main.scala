@@ -7,19 +7,9 @@ import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-class Main(clusterSettings: ClusterSettings, args: Array[String]) {
-
-  if (clusterSettings.seedNodes.isEmpty) {
-    println(
-      s"[error] clusterSeeds setting is not configured. Please do so by either setting the env variable or system property."
-    )
-    System.exit(1)
-  }
-
-  lazy val configServerCliParser = new ArgsParser
-
-  lazy val maybeHttpService: Option[HttpService] =
-    configServerCliParser.parse(args).map {
+class Main(clusterSettings: ClusterSettings) {
+  def start(args: Array[String]): Option[HttpService] =
+    new ArgsParser().parse(args).map {
       case Options(init, maybePort) =>
         clusterSettings.debug()
         val wiring = ServerWiring.make(clusterSettings, maybePort)
@@ -39,5 +29,11 @@ class Main(clusterSettings: ClusterSettings, args: Array[String]) {
 }
 
 object Main extends App {
-  new Main(ClusterAwareSettings, args).maybeHttpService
+  if (ClusterAwareSettings.seedNodes.isEmpty) {
+    println(
+      s"[error] clusterSeeds setting is not configured. Please do so by either setting the env variable or system property."
+    )
+  } else {
+    new Main(ClusterAwareSettings).start(args)
+  }
 }

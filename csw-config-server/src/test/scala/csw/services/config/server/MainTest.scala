@@ -36,7 +36,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
   }
 
   test("should be able to register with location service on start up") {
-    val httpService: HttpService = new Main(clusterSettings, Array()).maybeHttpService.get
+    val httpService: HttpService = new Main(clusterSettings).start(Array.empty).get
     val configConnection         = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
     locationService.find(configConnection).await.get.connection shouldBe configConnection
     httpService.shutdown().await
@@ -44,7 +44,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
   }
 
   test("should init svn repo if --initRepo option is provided") {
-    val httpService = new Main(clusterSettings, Array("--initRepo")).maybeHttpService.get
+    val httpService = new Main(clusterSettings).start(Array("--initRepo")).get
 
     val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
     val configServiceLocation = locationService.find(configConnection).await.get
@@ -60,7 +60,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
   }
 
   test("should not initialize svn repo if --initRepo option is not provided") {
-    val httpService = new Main(clusterSettings, Array[String]()).maybeHttpService.get
+    val httpService = new Main(clusterSettings).start(Array.empty).get
 
     val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
     val configServiceLocation = locationService.find(configConnection).await.get
