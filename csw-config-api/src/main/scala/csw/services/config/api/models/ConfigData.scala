@@ -1,10 +1,10 @@
 package csw.services.config.api.models
 
-import java.io.{File, InputStream}
+import java.io.InputStream
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 
-import akka.stream.scaladsl.{FileIO, Source, StreamConverters}
+import akka.stream.scaladsl.{FileIO, Keep, Source, StreamConverters}
 import akka.stream.{javadsl, Materializer}
 import akka.util.ByteString
 
@@ -43,8 +43,14 @@ class ConfigData(val source: Source[ByteString, Any]) {
   def toPath(path: Path)(implicit mat: Materializer): Future[Path] = {
     import mat.executionContext
     source
-      .runWith(FileIO.toPath(path))
-      .map(_ ⇒ path)
+      .toMat(FileIO.toPath(path))(Keep.right)
+      .mapMaterializedValue { resultF =>
+        resultF.map { ioResult ⇒
+          ioResult.status.get
+          path
+        }
+      }
+      .run()
   }
 }
 
