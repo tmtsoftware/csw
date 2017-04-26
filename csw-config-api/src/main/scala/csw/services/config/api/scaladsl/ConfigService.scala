@@ -104,7 +104,7 @@ trait ConfigService {
    *             (by default the id of the latest version is used)
    * @return a future result
    */
-  def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit]
+  def setDefault(path: Path, id: Option[ConfigId] = None, comment: String = ""): Future[Unit]
 
   /**
    * Resets the "default version" of the file with the given path to the latest version.
@@ -112,7 +112,7 @@ trait ConfigService {
    * @param path the file path relative to the repository root
    * @return a future result
    */
-  def resetDefault(path: Path): Future[Unit]
+  def resetDefault(path: Path, comment: String = ""): Future[Unit]
 
   /**
    * Gets and returns the default version of the file stored under the given path.

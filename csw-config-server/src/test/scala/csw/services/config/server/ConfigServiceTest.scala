@@ -408,12 +408,17 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     // check that getDefault file without ID should return latest file
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
     // set default version of file to id=2
-    configService.setDefault(file, Some(configId)).await
+    configService.setDefault(file, Some(configId), "Setting default first time").await
     // check that getDefault file without ID returns file with id=2
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue2
-    // check that setDefault without id,resets default version of file
-    configService.setDefault(file).await
+
+    configService.resetDefault(file, "resetting default").await
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
+
+    // check that setDefault without id,resets default version of file
+    configService.setDefault(file, comment = "setting default again").await
+    configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
+
   }
 
   // DEOPSCSW-77: Set default version of configuration file in config service
@@ -582,6 +587,12 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     val tromboneConfigComment = "hello trombone"
     val assemblyConfigComment = "hello assembly"
+
+    // Check that files to be added does not already exists in the repo and then add
+    configService.list.await.foreach { fileInfo ⇒
+      fileInfo.path should not be tromboneConfig
+      fileInfo.path should not be assemblyConfig
+    }
 
     // Add files to repo
     val tromboneConfigId = configService

@@ -121,6 +121,7 @@ trait IConfigService {
    *             (by default the id of the latest version is used)
    * @return a future result
    */
+  def setDefault(path: Path, id: Optional[ConfigId], comment: String): CompletableFuture[Unit]
   def setDefault(path: Path, id: Optional[ConfigId]): CompletableFuture[Unit]
 
   /**
@@ -129,6 +130,7 @@ trait IConfigService {
    * @param path the file path relative to the repository root
    * @return a future result
    */
+  def resetDefault(path: Path, comment: String): CompletableFuture[Unit]
   def resetDefault(path: Path): CompletableFuture[Unit]
 
   /**

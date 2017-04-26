@@ -255,9 +255,10 @@ public class JConfigClientTest {
 
     // DEOPSCSW-77: Set default version of configuration file in config. service
     // DEOPSCSW-78: Get the default version of a configuration file
+    // DEOPSCSW-79:     Reset the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
-    public void testGetAndSetDefaultConfigFile() throws ExecutionException, InterruptedException {
+    public void testGetSetAndResetDefaultConfigFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "hello world").get();
         Assert.assertEquals(configService.get(path).get().get().toJStringF(mat).get(), configValue1);
@@ -269,7 +270,13 @@ public class JConfigClientTest {
         configService.setDefault(path, Optional.of(configIdUpdate1)).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.setDefault(path, Optional.empty()).get();
+        configService.resetDefault(path, "reseting default file").get();
+        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+
+        configService.resetDefault(path).get();
+        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+
+        configService.setDefault(path, Optional.empty(), "setting default again").get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
     }
 

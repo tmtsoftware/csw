@@ -144,7 +144,7 @@ class SvnConfigService(settings: Settings,
     }
   }
 
-  override def setDefault(path: Path, id: Option[ConfigId] = None): Future[Unit] = async {
+  override def setDefault(path: Path, id: Option[ConfigId] = None, comment: String): Future[Unit] = async {
     if (!await(exists(path, id))) {
       throw FileNotFound(path)
     }
@@ -153,14 +153,14 @@ class SvnConfigService(settings: Settings,
     val present = await(exists(defaultPath))
 
     id match {
-      case Some(configId) if present ⇒ await(update(defaultPath, ConfigData.fromString(configId.id)))
-      case Some(configId)            ⇒ await(create(defaultPath, ConfigData.fromString(configId.id)))
+      case Some(configId) if present ⇒ await(update(defaultPath, ConfigData.fromString(configId.id), comment))
+      case Some(configId)            ⇒ await(create(defaultPath, ConfigData.fromString(configId.id), comment = comment))
       case None if present           ⇒ await(delete(defaultPath))
       case None                      ⇒ ()
     }
   }
 
-  override def resetDefault(path: Path): Future[Unit] = setDefault(path, None)
+  override def resetDefault(path: Path, comment: String): Future[Unit] = setDefault(path, None, comment)
 
   override def getDefault(path: Path): Future[Option[ConfigData]] = {
 
