@@ -1,46 +1,37 @@
 package csw.services.tracklocation
 
 import akka.Done
-import csw.services.location.commons.{ClusterSettings, CswCluster}
-import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings, CswCluster}
 import csw.services.tracklocation.models.Command
 import csw.services.tracklocation.utils.ArgsParser
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
-import scala.util.control.NonFatal
-import async.Async._
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 /**
  * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
  */
-class Main(cswCluster: CswCluster) {
-  import cswCluster._
-  private val locationService = LocationServiceFactory.withCluster(cswCluster)
-
-  def start(args: Array[String]): Future[Done] = async {
-
-    try {
-      ArgsParser.parse(args) match {
-        case Some(options) =>
-          val command = Command.parse(options)
-          println(s"commandText: ${command.commandText}, command: $command")
-          val trackLocation = new TrackLocation(options.names, command, cswCluster, locationService)
-          trackLocation.run()
-        case None => Done
+class Main(clusterSettings: ClusterSettings) {
+  def start(args: Array[String]): Option[Done] =
+    ArgsParser.parse(args).map { options =>
+      val cswCluster = CswCluster.withSettings(clusterSettings)
+      try {
+        val command = Command.parse(options)
+        println(s"commandText: ${command.commandText}, command: $command")
+        val trackLocation = new TrackLocation(options.names, command, cswCluster)
+        trackLocation.run()
+      } finally {
+        Await.result(cswCluster.shutdown(), 10.seconds)
       }
-    } catch {
-      case NonFatal(ex) =>
-        ex.printStackTrace()
-        Done
     }
-
-    await(shutdown())
-  }
-
-  def shutdown(): Future[Done] = locationService.shutdown()
 }
 
 object Main extends App {
-  Await.result(new Main(CswCluster.withSettings(ClusterSettings())).start(args), Duration.Inf)
+  if (ClusterAwareSettings.seedNodes.isEmpty) {
+    println(
+      s"[error] clusterSeeds setting is not configured. Please do so by either setting the env variable or system property."
+    )
+  } else {
+    new Main(ClusterAwareSettings).start(args)
+  }
 }

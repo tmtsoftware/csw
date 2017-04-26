@@ -6,7 +6,7 @@ import akka.Done
 import csw.services.location.commons.CswCluster
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.tracklocation.models.Command
 
 import scala.collection.immutable.Seq
@@ -17,9 +17,10 @@ import scala.sys.process._
 /**
  * Starts a given external program, registers it with the location service and unregisters it when the program exits.
  */
-class TrackLocation(names: List[String], command: Command, cswCluster: CswCluster, locationService: LocationService) {
+class TrackLocation(names: List[String], command: Command, cswCluster: CswCluster) {
 
   import cswCluster._
+  private val locationService = LocationServiceFactory.withCluster(cswCluster)
 
   private var isRunning = new AtomicBoolean(true)
 
