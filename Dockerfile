@@ -5,7 +5,7 @@ ENV	LC_ALL en_US.UTF-8
 
 RUN yum install yum upgrade -y; yum update -y;  yum clean all
 
-RUN yum install -y strace procps tree vim git curl wget gnuplot
+RUN yum install -y strace procps tree vim git curl wget gnuplot unzip net-tools
 RUN yum groupinstall -y 'Development Tools'
 RUN yum install -y openssl-devel
 

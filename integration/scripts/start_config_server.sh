@@ -56,8 +56,8 @@ parse_cmd_args() {
         http_port="$2"
         shift
         ;;
-        --init)
-        init="--init"
+        --initRepo)
+        init="--initRepo"
         ;;
          --help)
         usage

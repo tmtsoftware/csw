@@ -195,6 +195,7 @@ public class JConfigClientTest {
 
     // DEOPSCSW-45: Saving version information for config. file
     // DEOPSCSW-76: Access a list of all the versions of a stored configuration file
+    // DEOPSCSW-63: Add comment while creating or updating a configuration file
     @Test
     public void testHistoryOfAFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");

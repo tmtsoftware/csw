@@ -284,6 +284,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   // DEOPSCSW-45: Saving version information for config. file
   // DEOPSCSW-76: Access a list of all the versions of a stored configuration file
+  // DEOPSCSW-63: Add comment while creating or updating a configuration file
   test("should get the history of a file") {
     val file = Paths.get("/tmt/lgs/trombone/hcd.conf")
 
