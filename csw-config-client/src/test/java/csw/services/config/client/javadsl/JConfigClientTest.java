@@ -73,6 +73,7 @@ public class JConfigClientTest {
     }
 
     // DEOPSCSW-42: Storing text based component configuration
+    // DEOPSCSW-48: Store new configuration file in Config. service
     @Test
     public void testCreateAndRetrieveFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf");
@@ -82,6 +83,7 @@ public class JConfigClientTest {
     }
 
     // DEOPSCSW-42: Storing text based component configuration
+    // DEOPSCSW-48: Store new configuration file in Config. service
     @Test
     public void testFileAlreadyExistsExceptionOnCreate() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf");
@@ -191,6 +193,7 @@ public class JConfigClientTest {
         Assert.assertEquals(configService.get(path, instant).get().get().toJStringF(mat).get(), configValue2);
     }
 
+    // DEOPSCSW-45: Saving version information for config. file
     @Test
     public void testHistoryOfAFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
@@ -209,6 +212,7 @@ public class JConfigClientTest {
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
     }
 
+    // DEOPSCSW-48: Store new configuration file in Config. service
     @Test
     public void testListAllFiles() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");

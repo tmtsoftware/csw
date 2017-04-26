@@ -84,6 +84,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   // DEOPSCSW-42: Storing text based component configuration (uploading files with various sizes)
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
+  // DEOPSCSW-48: Store new configuration file in Config. service
   test("should able to upload and get component configurations from config service") {
     val configFileNames            = Set("tromboneAssembly.conf", "tromboneContainer.conf", "tromboneHCD.conf")
     val configIds                  = createConfigs(configFileNames)
@@ -103,6 +104,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
+  // DEOPSCSW-48: Store new configuration file in Config. service
   test("should able to upload and get binary configurations from config service") {
     val binaryFileName = "binaryConf.bin"
     val binaryConfPath = Paths.get("/tmt/trombone/test/conf/large/" + binaryFileName)
@@ -143,7 +145,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.get(fileWithoutBackslash).await.get.toStringF.await shouldBe configValue1
   }
 
-  //  DEOPSCSW-42: Storing text based component configuration
+  // DEOPSCSW-42: Storing text based component configuration
+  // DEOPSCSW-48: Store new configuration file in Config. service
   test("should throw FileAlreadyExists while creating a file if it already exists in repository") {
     val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
@@ -214,6 +217,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
+  // DEOPSCSW-45: Saving version information for config. file
   test("should able to retrieve the specific version of file by config ID") {
     val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
     val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
@@ -278,6 +282,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.get(file, time).await.get.toStringF.await shouldBe configValue1
   }
 
+  // DEOPSCSW-45: Saving version information for config. file
   test("should get the history of a file") {
     val file = Paths.get("/test.conf")
     val configIdCreate = configService
@@ -297,6 +302,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.history(file, 2).await.map(_.id) shouldBe List(configIdUpdate2, configIdUpdate1)
   }
 
+  // DEOPSCSW-48: Store new configuration file in Config. service
   test("should list all the available config files") {
     val tromboneConfig = Paths.get("trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
