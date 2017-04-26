@@ -50,7 +50,7 @@ class MainTest extends FunSuiteLike with Matchers with LazyLogging with BeforeAn
 
     val connection = TcpConnection(ComponentId(name, ComponentType.Service))
 
-    val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
+    val resolvedLocation = locationService.resolve(connection, 10.seconds).await.get
     val tcpLocation      = TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
 
@@ -77,7 +77,7 @@ class MainTest extends FunSuiteLike with Matchers with LazyLogging with BeforeAn
     }
 
     val connection       = TcpConnection(ComponentId(name, ComponentType.Service))
-    val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
+    val resolvedLocation = locationService.resolve(connection, 10.seconds).await.get
     val tcpLocation      = TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
     resolvedLocation shouldBe tcpLocation
 
