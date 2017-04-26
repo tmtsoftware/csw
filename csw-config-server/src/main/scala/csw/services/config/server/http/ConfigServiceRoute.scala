@@ -46,9 +46,13 @@ class ConfigServiceRoute(
         }
       }
     } ~
-    (path("default" / FilePath) & put) { filePath ⇒
-      idParam { maybeId ⇒
+    (path("default" / FilePath)) { filePath ⇒
+      (put & idParam) { maybeId ⇒
         complete(configService.setDefault(filePath, maybeId).map(_ ⇒ Done))
+      } ~
+      (get & rejectEmptyResponse) {
+        println(s"------------------------getting default version of ${filePath} -----------------------")
+        complete(configService.getDefault(filePath))
       }
     } ~
     (path("history" / FilePath) & get) { filePath ⇒
