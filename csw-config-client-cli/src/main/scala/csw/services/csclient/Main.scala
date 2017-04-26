@@ -18,7 +18,7 @@ class Main(clusterSettings: ClusterSettings) {
 object Main extends App {
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     println(
-      s"[error] clusterSeeds setting is not configured. Please do so by either setting the env variable or system property."
+      s"[error] clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
     )
   } else {
     new Main(ClusterAwareSettings).start(args)
