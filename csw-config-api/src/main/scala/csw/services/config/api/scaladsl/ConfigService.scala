@@ -3,7 +3,7 @@ package csw.services.config.api.scaladsl
 import java.nio.file.Path
 import java.time.Instant
 
-import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.models._
 
 import scala.concurrent.Future
 
@@ -90,9 +90,9 @@ trait ConfigService {
    *
    * @param path       the file path relative to the repository root
    * @param maxResults the maximum number of history results to return (default: unlimited)
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a list containing one ConfigFileRevision object for each version of path
    */
-  def history(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileHistory]]
+  def history(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]]
 
   /**
    * Sets the "default version" of the file with the given path.

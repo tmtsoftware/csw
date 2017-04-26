@@ -5,7 +5,7 @@ import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
-import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.files.OversizeFileService
 import csw.services.config.server.commons.PathExt.RichPath
@@ -102,7 +102,7 @@ class SvnConfigService(settings: Settings,
   override def get(path: Path, time: Instant): Future[Option[ConfigData]] = {
 
     // Gets the ConfigFileHistory matching the date
-    def getHist: Future[Option[ConfigFileHistory]] = async {
+    def getHist: Future[Option[ConfigFileRevision]] = async {
       val h     = await(history(path))
       val found = h.find(t => t.time.isBefore(time) || t.time.equals(time))
       if (found.nonEmpty) found
@@ -136,7 +136,7 @@ class SvnConfigService(settings: Settings,
   }
 
   // XXX Should .sha1 files have the .sha1 suffix removed in the result?
-  override def history(path: Path, maxResults: Int): Future[List[ConfigFileHistory]] = async {
+  override def history(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒ await(hist(path, maxResults))
       case PathStatus.Oversize   ⇒ await(hist(shaFilePath(path), maxResults))
@@ -218,9 +218,9 @@ class SvnConfigService(settings: Settings,
     }
   }
 
-  private def hist(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileHistory]] = async {
+  private def hist(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]] = async {
     await(svnRepo.hist(path, maxResults))
-      .map(e => ConfigFileHistory(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
+      .map(e => ConfigFileRevision(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
   }
 
   // File used to store the SHA-1 of the actual file, if oversized.

@@ -8,7 +8,7 @@ import akka.stream.IOResult
 import akka.stream.scaladsl.{Source, StreamConverters}
 import akka.util.ByteString
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
-import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
@@ -503,7 +503,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       .get
     newSvnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData2).await
 
-    val fileHistories: List[ConfigFileHistory] = configService.history(file).await
+    val fileHistories: List[ConfigFileRevision] = configService.history(file).await
 
     fileHistories.map(history => (history.id, history.comment)) shouldBe List(
       (newConfigId, newComment),

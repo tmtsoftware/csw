@@ -6,7 +6,7 @@ import csw.services.config.api.exceptions.FileAlreadyExists;
 import csw.services.config.api.exceptions.FileNotFound;
 import csw.services.config.api.javadsl.IConfigService;
 import csw.services.config.api.models.ConfigData;
-import csw.services.config.api.models.ConfigFileHistory;
+import csw.services.config.api.models.ConfigFileRevision;
 import csw.services.config.api.models.ConfigFileInfo;
 import csw.services.config.api.models.ConfigId;
 import csw.services.config.client.internal.ActorRuntime;
@@ -211,17 +211,16 @@ public class JConfigClientTest {
         ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3), comment3).get();
 
         Assert.assertEquals(configService.history(path).get().size(), 3);
-
-        Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
+       Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
 
-        Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileHistory::comment).collect(Collectors.toList()),
+        Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(comment3, comment2, comment1)));
 
         Assert.assertEquals(configService.history(path, 2).get().size(), 2);
-        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
+        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configId3, configId2)));
-        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileHistory::comment).collect(Collectors.toList()),
+        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(comment3, comment2)));
     }
 
@@ -345,11 +344,11 @@ public class JConfigClientTest {
         ConfigId configIdUpdate2 = configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
 
         Assert.assertEquals(configService.history(path).get().size(), 3);
-        Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
+        Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1, configIdCreate)));
 
         Assert.assertEquals(configService.history(path, 2).get().size(), 2);
-        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileHistory::id).collect(Collectors.toList()),
+        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
     }
 

@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture
 import java.{util, lang ⇒ jl}
 
 import csw.services.config.api.javadsl.IConfigService
-import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 
 import scala.collection.JavaConverters._
@@ -66,10 +66,10 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def list(): CompletableFuture[util.List[ConfigFileInfo]] =
     configService.list().map(_.asJava).toJava.toCompletableFuture
 
-  override def history(path: Path, maxResults: Int): CompletableFuture[util.List[ConfigFileHistory]] =
+  override def history(path: Path, maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
     configService.history(path, maxResults).map(_.asJava).toJava.toCompletableFuture
 
-  override def history(path: Path): CompletableFuture[util.List[ConfigFileHistory]] =
+  override def history(path: Path): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, maxResults = Int.MaxValue)
 
   override def setDefault(path: Path, id: Optional[ConfigId], comment: String): CompletableFuture[Unit] =

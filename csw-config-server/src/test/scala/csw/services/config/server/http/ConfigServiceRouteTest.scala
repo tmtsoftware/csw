@@ -5,7 +5,7 @@ import java.time.Instant
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -245,7 +245,7 @@ class ConfigServiceRouteTest
     Get("/history/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
-      responseAs[List[ConfigFileHistory]]
+      responseAs[List[ConfigFileRevision]]
         .map(history => (history.id, history.comment))
         .toSet shouldEqual configFileHistoryIdCommentTuples
     }
@@ -253,7 +253,7 @@ class ConfigServiceRouteTest
     Get("/history/test.conf?maxResults=1") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
-      responseAs[List[ConfigFileHistory]]
+      responseAs[List[ConfigFileRevision]]
         .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(2), "commit2"))
     }
 

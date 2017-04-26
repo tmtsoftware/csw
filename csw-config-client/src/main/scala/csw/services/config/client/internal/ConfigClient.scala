@@ -134,7 +134,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def history(path: jnio.Path, maxResults: Int): Future[List[ConfigFileHistory]] = async {
+  override def history(path: jnio.Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     val uri = await(historyUri(path)).withQuery(Query("maxResults" → maxResults.toString))
 
     val request = HttpRequest(uri = uri)
@@ -142,7 +142,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK       ⇒ await(Unmarshal(response.entity).to[List[ConfigFileHistory]])
+      case StatusCodes.OK       ⇒ await(Unmarshal(response.entity).to[List[ConfigFileRevision]])
       case StatusCodes.NotFound ⇒ throw FileNotFound(path)
       case _                    ⇒ throw new RuntimeException(response.status.reason())
     }

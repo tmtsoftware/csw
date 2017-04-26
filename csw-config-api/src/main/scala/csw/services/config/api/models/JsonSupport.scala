@@ -26,7 +26,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
     }
   }
 
-  implicit val configIdFormat: RootJsonFormat[ConfigId]                   = jsonFormat1(new ConfigId(_))
-  implicit val configFileInfoFormat: RootJsonFormat[ConfigFileInfo]       = jsonFormat3(ConfigFileInfo.apply)
-  implicit val configFileHistoryFormat: RootJsonFormat[ConfigFileHistory] = jsonFormat3(ConfigFileHistory.apply)
+  implicit val configIdFormat: RootJsonFormat[ConfigId]                    = jsonFormat1(new ConfigId(_))
+  implicit val configFileInfoFormat: RootJsonFormat[ConfigFileInfo]        = jsonFormat3(ConfigFileInfo.apply)
+  implicit val configFileHistoryFormat: RootJsonFormat[ConfigFileRevision] = jsonFormat3(ConfigFileRevision.apply)
 }

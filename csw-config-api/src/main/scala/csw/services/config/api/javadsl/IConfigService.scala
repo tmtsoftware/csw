@@ -6,7 +6,7 @@ import java.time.Instant
 import java.util.Optional
 import java.{lang ⇒ jl, util ⇒ ju}
 
-import csw.services.config.api.models.{ConfigData, ConfigFileHistory, ConfigFileInfo, ConfigId}
+import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 
 /**
@@ -108,8 +108,8 @@ trait IConfigService {
    * @param maxResults the maximum number of history results to return (default: unlimited)
    * @return a list containing one ConfigFileHistory object for each version of path
    */
-  def history(path: Path, maxResults: Int): CompletableFuture[ju.List[ConfigFileHistory]]
-  def history(path: Path): CompletableFuture[ju.List[ConfigFileHistory]]
+  def history(path: Path, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
+  def history(path: Path): CompletableFuture[ju.List[ConfigFileRevision]]
 
   /**
    * Sets the "default version" of the file with the given path.
