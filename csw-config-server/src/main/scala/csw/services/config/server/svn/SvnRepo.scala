@@ -129,7 +129,10 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       svnOperationFactory.dispose()
     }
     entries
-      .filter(_.getKind == SVNNodeKind.FILE)
+      .filter(
+          svnDir ⇒
+            svnDir.getKind == SVNNodeKind.FILE &&
+            !svnDir.getName.endsWith(settings.`default-suffix`))
       .sortWith(_.getRelativePath < _.getRelativePath)
   }
 

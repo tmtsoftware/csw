@@ -130,7 +130,8 @@ class SvnConfigService(settings: Settings,
 
   override def list(): Future[List[ConfigFileInfo]] = async {
     await(svnRepo.list()).map { entry =>
-      ConfigFileInfo(Paths.get(entry.getRelativePath), ConfigId(entry.getRevision), entry.getCommitMessage)
+      ConfigFileInfo(Paths.get(entry.getRelativePath.stripSuffix(settings.`sha1-suffix`)), ConfigId(entry.getRevision),
+        entry.getCommitMessage)
     }
   }
 

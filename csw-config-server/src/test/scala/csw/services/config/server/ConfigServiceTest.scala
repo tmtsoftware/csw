@@ -228,17 +228,21 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
 
     val configData1 = configService.get(tromboneHcdConf, Some(configId1)).await.get
-    val configData2 = configService.get(tromboneAssemblyConf, Some(configId2)).await.get
-    val configData3 = configService.get(redisConf, Some(configId3)).await.get
-    val configData4 = configService.get(tromboneContainerConf, Some(configId4)).await.get
-    val configData5 = configService.get(tromboneHcdConf, Some(configId5)).await.get
-    val configData6 = configService.get(tromboneAssemblyConf, Some(configId6)).await.get
-
     configData1.toStringF.await shouldBe configValue1
+
+    val configData2 = configService.get(tromboneAssemblyConf, Some(configId2)).await.get
     configData2.toStringF.await shouldBe configValue2
+
+    val configData3 = configService.get(redisConf, Some(configId3)).await.get
     configData3.toStringF.await shouldBe configValue3
+
+    val configData4 = configService.get(tromboneContainerConf, Some(configId4)).await.get
     configData4.toStringF.await shouldBe configValue4
+
+    val configData5 = configService.get(tromboneHcdConf, Some(configId5)).await.get
     configData5.toStringF.await shouldBe configValue5
+
+    val configData6 = configService.get(tromboneAssemblyConf, Some(configId6)).await.get
     configData6.toStringF.await shouldBe configValue2
   }
 
@@ -428,7 +432,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
   }
 
-  test("should list oversize files") {
+  test("should list oversize files without .sha1 suffix") {
     val file1    = Paths.get("OversizeFile1.txt")
     val comment1 = "committing oversize file"
 
@@ -443,8 +447,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val listOfFileInfo: List[ConfigFileInfo] = configService.list().await
 
     listOfFileInfo.toSet shouldBe Set(
-      ConfigFileInfo(Paths.get(s"${file1.toString}${serverWiring.settings.`sha1-suffix`}"), configId1, comment1),
-      ConfigFileInfo(Paths.get(s"${file2.toString}${serverWiring.settings.`sha1-suffix`}"), configId2, comment2)
+      ConfigFileInfo(file1, configId1, comment1),
+      ConfigFileInfo(file2, configId2, comment2)
     )
   }
 
@@ -564,5 +568,32 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
           "testing invalid file path")
         .await
     }
+  }
+
+  test("should exclude .default files from list") {
+    val tromboneConfig = Paths.get("trombone.conf")
+    val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
+
+    val tromboneConfigComment = "hello trombone"
+    val assemblyConfigComment = "hello assembly"
+
+    // Add files to repo
+    val tromboneConfigId = configService
+      .create(tromboneConfig, ConfigData.fromString(configValue1), oversize = false, tromboneConfigComment)
+      .await
+    val assemblyConfigId = configService
+      .create(assemblyConfig, ConfigData.fromString(configValue2), oversize = true, assemblyConfigComment)
+      .await
+
+    configService.setDefault(tromboneConfig, Some(tromboneConfigId)).await
+    configService.setDefault(assemblyConfig, Some(assemblyConfigId)).await
+
+    // list files from repo and assert that it contains added files
+    val configFiles = configService.list().await
+
+    configFiles.toSet shouldBe Set(
+      ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment),
+      ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)
+    )
   }
 }

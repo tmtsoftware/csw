@@ -24,9 +24,7 @@ import scala.concurrent.duration.Duration;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -280,7 +278,7 @@ public class JConfigClientTest {
     }
 
     @Test
-    public void testListOversizeFiles() throws ExecutionException, InterruptedException {
+    public void testListOversizeFilesWithoutShaSuffix() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
@@ -294,12 +292,8 @@ public class JConfigClientTest {
                                                         true,
                                                          assemblyConfigComment).get();
 
-        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(
-                Paths.get(tromboneConfig.toString() + serverWiring.settings().sha1$minussuffix()),
-                          tromboneConfigId, tromboneConfigComment);
-        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(
-                Paths.get(assemblyConfig.toString() + serverWiring.settings().sha1$minussuffix()),
-                          assemblyConfigId, assemblyConfigComment);
+        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment);
+        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment);
 
         Assert.assertEquals(configService.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
     }
@@ -367,6 +361,35 @@ public class JConfigClientTest {
 
         Assert.assertEquals(configService.get(path).get().get().toJStringF(mat).get(), configValue3);
         Assert.assertEquals(configService.get(path, instant).get().get().toJStringF(mat).get(), configValue2);
+    }
+
+    @Test
+    public void testDefaultFilesAreExcludedInList() throws ExecutionException, InterruptedException {
+        Path tromboneConfig = Paths.get("trombone.conf");
+        Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
+
+        String tromboneConfigComment = "hello trombone";
+        String assemblyConfigComment = "hello assembly";
+
+        // Add files to repo
+        ConfigId tromboneConfigId = configService
+                .create(tromboneConfig, ConfigData.fromString(configValue1),false, tromboneConfigComment)
+                .get();
+        ConfigId assemblyConfigId = configService
+                .create(assemblyConfig, ConfigData.fromString(configValue2),true, assemblyConfigComment)
+                .get();
+
+        configService.setDefault(tromboneConfig, Optional.of(tromboneConfigId)).get();
+        configService.setDefault(assemblyConfig, Optional.of(assemblyConfigId)).get();
+
+        // list files from repo and assert that it contains added files
+
+        Set<ConfigFileInfo> actual = new HashSet<ConfigFileInfo>(configService.list().get());
+
+        Set<ConfigFileInfo> expected = new HashSet<>(Arrays.asList(new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment),
+                new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)));
+
+        Assert.assertEquals(expected, actual);
     }
 
 }
