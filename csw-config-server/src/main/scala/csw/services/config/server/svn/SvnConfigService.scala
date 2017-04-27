@@ -74,7 +74,7 @@ class SvnConfigService(settings: Settings,
           case NonFatal(ex) ⇒ switch.abort(ex)
         }
     }
-    Some(ConfigData.fromSource(source))
+    Some(ConfigData(source))
   }
 
   // Get oversize files that are stored in the annex server

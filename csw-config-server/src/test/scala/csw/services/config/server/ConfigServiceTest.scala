@@ -115,7 +115,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val stream: Source[ByteString, Future[IOResult]] =
       StreamConverters.fromInputStream(() ⇒ new ByteArrayInputStream(expectedBinaryContent))
 
-    val configData = ConfigData.fromSource(stream)
+    val configData = ConfigData(stream)
 
     configService.create(binaryConfPath, configData, oversize = true, "commit test file").await
 

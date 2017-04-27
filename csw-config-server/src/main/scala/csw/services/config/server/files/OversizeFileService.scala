@@ -44,7 +44,7 @@ class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo) {
     val repoFilePath = makePath(settings.`oversize-files-dir`, sha)
 
     if (await(fileRepo.exists(repoFilePath))) {
-      Some(ConfigData.fromSource(FileIO.fromPath(repoFilePath)))
+      Some(ConfigData.fromPath(repoFilePath))
     } else {
       None
     }

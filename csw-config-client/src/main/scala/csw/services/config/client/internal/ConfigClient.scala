@@ -73,7 +73,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK       ⇒ Some(ConfigData.fromSource(response.entity.dataBytes))
+      case StatusCodes.OK       ⇒ Some(ConfigData(response.entity.dataBytes))
       case StatusCodes.NotFound ⇒ None
       case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
@@ -87,7 +87,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK       ⇒ Some(ConfigData.fromSource(response.entity.dataBytes))
+      case StatusCodes.OK       ⇒ Some(ConfigData(response.entity.dataBytes))
       case StatusCodes.NotFound ⇒ None
       case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
@@ -101,7 +101,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK       ⇒ Some(ConfigData.fromSource(response.entity.dataBytes))
+      case StatusCodes.OK       ⇒ Some(ConfigData(response.entity.dataBytes))
       case StatusCodes.NotFound ⇒ None
       case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
@@ -190,7 +190,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val response = await(Http().singleRequest(request))
 
     response.status match {
-      case StatusCodes.OK       ⇒ Some(ConfigData.fromSource(response.entity.dataBytes))
+      case StatusCodes.OK       ⇒ Some(ConfigData(response.entity.dataBytes))
       case StatusCodes.NotFound ⇒ None
       case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
