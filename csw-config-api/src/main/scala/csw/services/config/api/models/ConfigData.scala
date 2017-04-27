@@ -15,7 +15,7 @@ import scala.concurrent.Future
  * This class represents the contents of the files being managed.
  * It is wraps an Akka streams of ByteString
  */
-case class ConfigData(source: Source[ByteString, Any]) {
+case class ConfigData(source: Source[ByteString, Any], length: Long) {
 
   /**
    * Returns a future string by reading the source.
@@ -62,12 +62,16 @@ object ConfigData {
   /**
    * The data is contained in the string
    */
-  def fromString(str: String): ConfigData = ConfigData(Source.single(ByteString(str.getBytes())))
+  def fromString(str: String): ConfigData = {
+    val byteString = ByteString(str.getBytes())
+    ConfigData(Source.single(byteString), byteString.length)
+  }
 
   /**
    * Initialize with the contents of the file from given path.
    *
    * @param path      the data source
    */
-  def fromPath(path: Path): ConfigData = ConfigData(FileIO.fromPath(path))
+  def fromPath(path: Path): ConfigData =
+    ConfigData(FileIO.fromPath(path), path.toFile.length())
 }

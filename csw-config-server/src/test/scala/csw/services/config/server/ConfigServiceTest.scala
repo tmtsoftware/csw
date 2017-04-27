@@ -75,11 +75,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configFileNames.map(fileName ⇒ {
       val fileContent            = scala.io.Source.fromResource(fileName).mkString
       val configData: ConfigData = ConfigData.fromString(fileContent)
-      configService.create(Paths.get(fileName), configData, oversize = false, s"committing file: ${fileName}").await
+      configService.create(Paths.get(fileName), configData, oversize = false, s"committing file: $fileName").await
     })
 
   implicit class RichInputStream(is: InputStream) {
-    def toByteArray() = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
+    def toByteArray: Array[Byte] = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
   }
 
   // DEOPSCSW-42: Storing text based component configuration (uploading files with various sizes)
@@ -109,17 +109,16 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val binaryFileName = "binaryConf.bin"
     val binaryConfPath = Paths.get("/tmt/trombone/test/conf/large/" + binaryFileName)
 
-    val binarySourceData: InputStream = getClass().getClassLoader().getResourceAsStream(binaryFileName)
-    val expectedBinaryContent         = binarySourceData.toByteArray()
+    def binarySourceData = getClass.getClassLoader.getResourceAsStream(binaryFileName)
+    val binaryContent    = binarySourceData.toByteArray
 
-    val stream: Source[ByteString, Future[IOResult]] =
-      StreamConverters.fromInputStream(() ⇒ new ByteArrayInputStream(expectedBinaryContent))
-
-    val configData = ConfigData(stream)
+    val configData = ConfigData(StreamConverters.fromInputStream(() ⇒ binarySourceData), binaryContent.length)
 
     configService.create(binaryConfPath, configData, oversize = true, "commit test file").await
 
-    configService.getLatest(binaryConfPath).await.get.toInputStream.toByteArray() shouldBe expectedBinaryContent
+    val actualBytes = configService.getLatest(binaryConfPath).await.get.toInputStream.toByteArray
+
+    actualBytes shouldBe binaryContent
   }
 
   //  DEOPSCSW-42: Storing text based component configuration (exercise deep path)

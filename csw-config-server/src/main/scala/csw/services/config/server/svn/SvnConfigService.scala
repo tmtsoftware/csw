@@ -35,7 +35,7 @@ class SvnConfigService(settings: Settings,
     }
 
     async {
-      path.validateName
+      path.validateName()
       // If the file does not already exists in the repo, create it
       if (await(exists(path))) {
         throw FileAlreadyExists(path)
@@ -74,7 +74,7 @@ class SvnConfigService(settings: Settings,
           case NonFatal(ex) ⇒ switch.abort(ex)
         }
     }
-    Some(ConfigData(source))
+    Some(ConfigData(source, await(svnRepo.getFileSize(path, revision.getNumber))))
   }
 
   // Get oversize files that are stored in the annex server

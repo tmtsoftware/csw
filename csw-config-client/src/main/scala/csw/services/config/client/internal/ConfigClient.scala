@@ -4,7 +4,6 @@ import java.nio.{file ⇒ jnio}
 import java.time.Instant
 
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.HttpEntity.Chunked
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -35,7 +34,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   override def create(path: jnio.Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] =
     async {
-      val entity = Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
+      val entity = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
       val uri    = await(configUri(path)).withQuery(Query("oversize" → oversize.toString, "comment" → comment))
 
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
@@ -51,7 +50,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
 
   override def update(path: jnio.Path, configData: ConfigData, comment: String): Future[ConfigId] = async {
-    val entity = Chunked.fromData(ContentTypes.`application/octet-stream`, configData.source)
+    val entity = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
     val uri    = await(configUri(path)).withQuery(Query("comment" → comment))
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity)
@@ -65,47 +64,15 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def getLatest(path: jnio.Path): Future[Option[ConfigData]] = async {
-    val uri = await(configUri(path)).withQuery(Query("latest" → "true"))
+  override def getDefault(path: jnio.Path): Future[Option[ConfigData]] = get(path, Query.Empty)
 
-    val request = HttpRequest(uri = uri)
-    println(request)
-    val response = await(Http().singleRequest(request))
+  override def getLatest(path: jnio.Path): Future[Option[ConfigData]] = get(path, Query("latest" → "true"))
 
-    response.status match {
-      case StatusCodes.OK       ⇒ Some(ConfigData(response.entity.dataBytes))
-      case StatusCodes.NotFound ⇒ None
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
-    }
-  }
+  override def getById(path: jnio.Path, configId: ConfigId): Future[Option[ConfigData]] =
+    get(path, Query("id" → configId.id))
 
-  override def getById(path: jnio.Path, configId: ConfigId): Future[Option[ConfigData]] = async {
-    val uri = await(configUri(path)).withQuery(Query("id" → configId.id))
-
-    val request = HttpRequest(uri = uri)
-    println(request)
-    val response = await(Http().singleRequest(request))
-
-    response.status match {
-      case StatusCodes.OK       ⇒ Some(ConfigData(response.entity.dataBytes))
-      case StatusCodes.NotFound ⇒ None
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
-    }
-  }
-
-  override def getByTime(path: jnio.Path, time: Instant): Future[Option[ConfigData]] = async {
-    val uri = await(configUri(path)).withQuery(Query("date" → time.toString))
-
-    val request = HttpRequest(uri = uri)
-    println(request)
-    val response = await(Http().singleRequest(request))
-
-    response.status match {
-      case StatusCodes.OK       ⇒ Some(ConfigData(response.entity.dataBytes))
-      case StatusCodes.NotFound ⇒ None
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
-    }
-  }
+  override def getByTime(path: jnio.Path, time: Instant): Future[Option[ConfigData]] =
+    get(path, Query("date" → time.toString))
 
   override def exists(path: jnio.Path, id: Option[ConfigId]): Future[Boolean] = async {
     val uri = await(configUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
@@ -182,17 +149,20 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def getDefault(path: jnio.Path): Future[Option[ConfigData]] = async {
-    val uri = await(configUri(path))
+  private def get(path: jnio.Path, query: Query): Future[Option[ConfigData]] = async {
+    val uri = await(configUri(path)).withQuery(query)
 
     val request = HttpRequest(uri = uri)
     println(request)
     val response = await(Http().singleRequest(request))
 
+    val lengthOption = response.entity.contentLengthOption
+
     response.status match {
-      case StatusCodes.OK       ⇒ Some(ConfigData(response.entity.dataBytes))
-      case StatusCodes.NotFound ⇒ None
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.OK if lengthOption.isDefined ⇒ Some(ConfigData(response.entity.dataBytes, lengthOption.get))
+      case StatusCodes.OK                           ⇒ throw new RuntimeException("response must have content-length")
+      case StatusCodes.NotFound                     ⇒ None
+      case _                                        ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 }

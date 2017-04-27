@@ -1,10 +1,8 @@
 package csw.services.config.api.models
 
 import akka.actor.ActorSystem
-import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestKit
-import akka.util.ByteString
 import csw.services.config.api.commons.TestFutureExtension.RichFuture
 import org.scalatest.{FunSuiteLike, Matchers}
 
@@ -19,14 +17,12 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLi
       |Then create a source from ByteString
       |""".stripMargin
 
-  private val sourceOfByteString = Source.single(ByteString(expectedStringConfigData))
-
   test("should able to retrieve string from Config Data source") {
-    new ConfigData(sourceOfByteString).toStringF.await shouldEqual expectedStringConfigData
+    ConfigData.fromString(expectedStringConfigData).toStringF.await shouldEqual expectedStringConfigData
   }
 
   test("should able to generate InputStream from Config Data source") {
-    val inputStream = new ConfigData(sourceOfByteString).toInputStream
+    val inputStream = ConfigData.fromString(expectedStringConfigData).toInputStream
     scala.io.Source.fromInputStream(inputStream).mkString shouldEqual expectedStringConfigData
   }
 

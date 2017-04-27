@@ -42,6 +42,15 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
+  def getFileSize(path: Path, revision: Long): Future[Long] = Future {
+    val svn = svnHandle()
+    try {
+      svn.info(path.toString, revision).getSize
+    } finally {
+      svn.closeSession()
+    }
+  }
+
   // Adds the given file (and dir if needed) to svn.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
   def addFile(path: Path, comment: String, data: InputStream): Future[SVNCommitInfo] = Future {
