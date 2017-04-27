@@ -2,8 +2,8 @@ package csw.services.config.server.http
 
 import akka.Done
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
-import csw.services.config.api.models.ConfigId
+import akka.http.scaladsl.server.{Directive1, Route}
+import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.ActorRuntime
 
@@ -14,6 +14,9 @@ class ConfigServiceRoute(
 ) extends HttpSupport {
 
   import actorRuntime._
+
+  val configDataEntity: Directive1[ConfigData] = rejectMissingContentLength & extractRequestEntity
+    .map(entity => ConfigData.from(entity.dataBytes, entity.contentLengthOption.get))
 
   def route: Route = handleExceptions(configExceptionHandler.exceptionHandler) {
     path("config" / FilePath) { filePath ⇒

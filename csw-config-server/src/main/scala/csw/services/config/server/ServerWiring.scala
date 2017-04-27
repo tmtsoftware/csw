@@ -18,7 +18,7 @@ class ServerWiring {
   lazy val oversizeFileRepo = new OversizeFileRepo(actorRuntime.blockingIoDispatcher)
   lazy val svnRepo          = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
 
-  lazy val oversizeFileService          = new OversizeFileService(settings, oversizeFileRepo)
+  lazy val oversizeFileService          = new OversizeFileService(settings, oversizeFileRepo, actorRuntime)
   lazy val configService: ConfigService = new SvnConfigService(settings, oversizeFileService, actorRuntime, svnRepo)
 
   lazy val clusterSettings                  = ClusterSettings()

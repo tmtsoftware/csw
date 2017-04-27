@@ -77,7 +77,7 @@ public class JConfigClientTest {
     @Test
     public void testCreateAndRetrieveFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf");
-        configService.create(path, ConfigData.fromString(configValue1), false, "commit test file").get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), false, "commit test file").get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
     }
@@ -87,15 +87,15 @@ public class JConfigClientTest {
     @Test
     public void testFileAlreadyExistsExceptionOnCreate() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/trombone/assembly/conf/normalfiles/test/test.conf");
-        configService.create(path, ConfigData.fromString(configValue1), false, "commit test file").get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), false, "commit test file").get();
         exception.expectCause(isA(FileAlreadyExists.class));
-        configService.create(path, ConfigData.fromString(configValue1), false, "commit test file").get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), false, "commit test file").get();
     }
 
     @Test
     public void testCreateOversizeFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("SomeOversizeFile.txt");
-        configService.create(path, ConfigData.fromString(configValue1), true).get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), true).get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
     }
@@ -104,11 +104,11 @@ public class JConfigClientTest {
     @Test
     public void testUpdateExistingFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/assembly.conf");
-        configService.create(path, ConfigData.fromString(configValue1), false, "commit assembly conf").get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), false, "commit assembly conf").get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
 
-        configService.update(path, ConfigData.fromString(configValue2), "commit updated assembly conf").get();
+        configService.update(path, ConfigData.fromString(configValue2, mat), "commit updated assembly conf").get();
         Optional<ConfigData> configDataUpdated = configService.getLatest(path).get();
         Assert.assertEquals(configDataUpdated.get().toJStringF(mat).get(), configValue2);
     }
@@ -118,7 +118,7 @@ public class JConfigClientTest {
     public void testUpdateReturnsFileNotFoundExceptionOnAbsenceOfFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/trombone/assembly.conf");
         exception.expectCause(isA(FileNotFound.class));
-        configService.update(path, ConfigData.fromString(configValue1), "commit assembly conf").get();
+        configService.update(path, ConfigData.fromString(configValue1, mat), "commit assembly conf").get();
     }
 
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
@@ -137,12 +137,12 @@ public class JConfigClientTest {
         Path tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf");
         Path redisConf             = Paths.get("redis/test/text/redis.conf");
 
-        ConfigId configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1)).get();
-        ConfigId configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2)).get();
-        ConfigId configId3 = configService.create(redisConf, ConfigData.fromString(configValue3)).get();
-        ConfigId configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4)).get();
-        ConfigId configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5)).get();
-        ConfigId configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).get();
+        ConfigId configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1, mat)).get();
+        ConfigId configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2, mat)).get();
+        ConfigId configId3 = configService.create(redisConf, ConfigData.fromString(configValue3, mat)).get();
+        ConfigId configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4, mat)).get();
+        ConfigId configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5, mat)).get();
+        ConfigId configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2, mat)).get();
 
         ConfigData configData1 = configService.getById(tromboneHcdConf, configId1).get().get();
         Assert.assertEquals(configData1.toJStringF(mat).get(), configValue1);
@@ -168,12 +168,12 @@ public class JConfigClientTest {
     @Test
     public void testSpecificVersionRetrieval() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/a/b/csw.conf");
-        configService.create(path, ConfigData.fromString(configValue1), false, "commit csw conf path").get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), false, "commit csw conf path").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
-        ConfigId configId = configService.update(path, ConfigData.fromString(configValue2), "commit updated conf path").get();
+        ConfigId configId = configService.update(path, ConfigData.fromString(configValue2, mat), "commit updated conf path").get();
 
-        configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
+        configService.update(path, ConfigData.fromString(configValue3, mat), "updated config to assembly").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue3);
 
         Assert.assertEquals(configService.getById(path, configId).get().get().toJStringF(mat).get(), configValue2);
@@ -182,12 +182,12 @@ public class JConfigClientTest {
     @Test
     public void testRetrieveVersionBasedOnDate() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
-        configService.create(path, ConfigData.fromString(configValue1), false, "commit initial configuration").get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), false, "commit initial configuration").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
-        configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
+        configService.update(path, ConfigData.fromString(configValue2, mat), "updated config to assembly").get();
         Instant instant = Instant.now();
-        configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
+        configService.update(path, ConfigData.fromString(configValue3, mat), "updated config to assembly").get();
 
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue3);
         Assert.assertEquals(configService.getByTime(path, instant).get().get().toJStringF(mat).get(), configValue2);
@@ -207,9 +207,9 @@ public class JConfigClientTest {
         String comment2 = "commit version 2";
         String comment3 = "commit version 3";
 
-        ConfigId configId1 = configService.create(path, ConfigData.fromString(configValue1), false, comment1).get();
-        ConfigId configId2 = configService.update(path, ConfigData.fromString(configValue2), comment2).get();
-        ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3), comment3).get();
+        ConfigId configId1 = configService.create(path, ConfigData.fromString(configValue1, mat), false, comment1).get();
+        ConfigId configId2 = configService.update(path, ConfigData.fromString(configValue2, mat), comment2).get();
+        ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3, mat), comment3).get();
 
         Assert.assertEquals(configService.history(path).get().size(), 3);
        Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
@@ -234,8 +234,8 @@ public class JConfigClientTest {
         String tromboneConfigComment = "hello trombone";
         String assemblyConfigComment = "hello assembly";
 
-        ConfigId tromboneConfigId = configService.create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis"), false, tromboneConfigComment).get();
-        ConfigId assemblyConfigId = configService.create(assemblyConfig, ConfigData.fromString("assemblyHCDCount = 3"), false, assemblyConfigComment).get();
+        ConfigId tromboneConfigId = configService.create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis", mat), false, tromboneConfigComment).get();
+        ConfigId assemblyConfigId = configService.create(assemblyConfig, ConfigData.fromString("assemblyHCDCount = 3", mat), false, assemblyConfigComment).get();
 
         ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment);
         ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment);
@@ -250,7 +250,7 @@ public class JConfigClientTest {
         Assert.assertFalse(configService.exists(path).get());
 
         Path path1 = Paths.get("a/test.csw.conf");
-        configService.create(path1, ConfigData.fromString(configValue1), false, "commit config file").get();
+        configService.create(path1, ConfigData.fromString(configValue1, mat), false, "commit config file").get();
 
         Assert.assertTrue(configService.exists(path1).get());
     }
@@ -258,7 +258,7 @@ public class JConfigClientTest {
     @Test
     public void testDelete() throws ExecutionException, InterruptedException {
         Path path = Paths.get("tromboneHCD.conf");
-        configService.create(path, ConfigData.fromString(configValue1), false, "commit trombone config file").get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), false, "commit trombone config file").get();
 
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
@@ -273,11 +273,11 @@ public class JConfigClientTest {
     @Test
     public void testGetSetAndResetDefaultConfigFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
-        configService.create(path, ConfigData.fromString(configValue1), false, "hello world").get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), false, "hello world").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
-        ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
-        configService.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
+        ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2, mat), "Updated config to assembly").get();
+        configService.update(path, ConfigData.fromString(configValue3, mat), "Updated config to assembly").get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
 
         configService.setDefault(path, configIdUpdate1).get();
@@ -309,10 +309,10 @@ public class JConfigClientTest {
         String tromboneConfigComment = "test{Oversize file no1}";
         String assemblyConfigComment = "test{Oversize file no2}";
 
-        ConfigId tromboneConfigId = configService.create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis"),
+        ConfigId tromboneConfigId = configService.create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis", mat),
                                                         true,
                                                          tromboneConfigComment).get();
-        ConfigId assemblyConfigId = configService.create(assemblyConfig, ConfigData.fromString("assemblyHCDCount = 3"),
+        ConfigId assemblyConfigId = configService.create(assemblyConfig, ConfigData.fromString("assemblyHCDCount = 3", mat),
                                                         true,
                                                          assemblyConfigComment).get();
 
@@ -329,7 +329,7 @@ public class JConfigClientTest {
         Assert.assertFalse(configService.exists(path).get());
 
         Path newPath = Paths.get("a/test.csw.conf");
-        configService.create(newPath, ConfigData.fromString(configValue3), true, "create oversize file").get();
+        configService.create(newPath, ConfigData.fromString(configValue3, mat), true, "create oversize file").get();
 
         Assert.assertTrue(configService.exists(newPath).get());
     }
@@ -338,11 +338,11 @@ public class JConfigClientTest {
     @Test
     public void testUpdateAndHistoryOfOversizedFiles() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
-        ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration").get();
+        ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue1, mat), true, "commit initial configuration").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
-        ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
-        ConfigId configIdUpdate2 = configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
+        ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2, mat), "updated config to assembly").get();
+        ConfigId configIdUpdate2 = configService.update(path, ConfigData.fromString(configValue3, mat), "updated config to assembly").get();
 
         Assert.assertEquals(configService.history(path).get().size(), 3);
         Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
@@ -359,11 +359,11 @@ public class JConfigClientTest {
     @Test
     public void testGetAndSetDefaultOversizeConfigFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
-        configService.create(path, ConfigData.fromString(configValue1), true, "some comment").get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), true, "some comment").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
-        ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
-        configService.update(path, ConfigData.fromString(configValue3), "Updated config").get();
+        ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2, mat), "Updated config to assembly").get();
+        configService.update(path, ConfigData.fromString(configValue3, mat), "Updated config").get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
 
         configService.setDefault(path, configIdUpdate1).get();
@@ -376,12 +376,12 @@ public class JConfigClientTest {
     @Test
     public void testRetrieveVersionBasedOnDateForOverSizedFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
-        configService.create(path, ConfigData.fromString(configValue1), true, "commit initial oversize configuration").get();
+        configService.create(path, ConfigData.fromString(configValue1, mat), true, "commit initial oversize configuration").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
-        configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
+        configService.update(path, ConfigData.fromString(configValue2, mat), "updated config to assembly").get();
         Instant instant = Instant.now();
-        configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
+        configService.update(path, ConfigData.fromString(configValue3, mat), "updated config to assembly").get();
 
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue3);
         Assert.assertEquals(configService.getByTime(path, instant).get().get().toJStringF(mat).get(), configValue2);
@@ -397,10 +397,10 @@ public class JConfigClientTest {
 
         // Add files to repo
         ConfigId tromboneConfigId = configService
-                .create(tromboneConfig, ConfigData.fromString(configValue1),false, tromboneConfigComment)
+                .create(tromboneConfig, ConfigData.fromString(configValue1, mat),false, tromboneConfigComment)
                 .get();
         ConfigId assemblyConfigId = configService
-                .create(assemblyConfig, ConfigData.fromString(configValue2),true, assemblyConfigComment)
+                .create(assemblyConfig, ConfigData.fromString(configValue2, mat),true, assemblyConfigComment)
                 .get();
 
         configService.setDefault(tromboneConfig, tromboneConfigId).get();

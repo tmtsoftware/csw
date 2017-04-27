@@ -74,7 +74,7 @@ class SvnConfigService(settings: Settings,
           case NonFatal(ex) ⇒ switch.abort(ex)
         }
     }
-    Some(ConfigData(source, await(svnRepo.getFileSize(path, revision.getNumber))))
+    Some(ConfigData.from(source, await(svnRepo.getFileSize(path, revision.getNumber))))
   }
 
   // Get oversize files that are stored in the annex server

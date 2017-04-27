@@ -1,7 +1,7 @@
 package csw.services.config.server
 
 import java.io.{ByteArrayInputStream, InputStream}
-import java.nio.file.{Path, Paths}
+import java.nio.file.{Files, Path, Paths}
 import java.time.Instant
 
 import akka.stream.IOResult
@@ -112,7 +112,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     def binarySourceData = getClass.getClassLoader.getResourceAsStream(binaryFileName)
     val binaryContent    = binarySourceData.toByteArray
 
-    val configData = ConfigData(StreamConverters.fromInputStream(() ⇒ binarySourceData), binaryContent.length)
+    val configData = ConfigData.from(StreamConverters.fromInputStream(() ⇒ binarySourceData), binaryContent.length)
 
     configService.create(binaryConfPath, configData, oversize = true, "commit test file").await
 

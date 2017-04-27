@@ -159,10 +159,11 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val lengthOption = response.entity.contentLengthOption
 
     response.status match {
-      case StatusCodes.OK if lengthOption.isDefined ⇒ Some(ConfigData(response.entity.dataBytes, lengthOption.get))
-      case StatusCodes.OK                           ⇒ throw new RuntimeException("response must have content-length")
-      case StatusCodes.NotFound                     ⇒ None
-      case _                                        ⇒ throw new RuntimeException(response.status.reason())
+      case StatusCodes.OK if lengthOption.isDefined ⇒
+        Some(ConfigData.from(response.entity.dataBytes, lengthOption.get))
+      case StatusCodes.OK       ⇒ throw new RuntimeException("response must have content-length")
+      case StatusCodes.NotFound ⇒ None
+      case _                    ⇒ throw new RuntimeException(response.status.reason())
     }
   }
 }

@@ -2,13 +2,11 @@ package csw.services.config.server.files
 
 import java.nio.file.{Path, Paths}
 
-import akka.stream.Materializer
 import akka.stream.scaladsl.{FileIO, Keep}
 import csw.services.config.api.models.ConfigData
-import csw.services.config.server.Settings
+import csw.services.config.server.{ActorRuntime, Settings}
 
 import scala.async.Async._
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
@@ -17,9 +15,11 @@ import scala.concurrent.Future
  * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
  * the SHA-1 hash value.
   **/
-class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo) {
+class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo, actorRuntime: ActorRuntime) {
 
-  def post(configData: ConfigData)(implicit mat: Materializer): Future[String] = async {
+  import actorRuntime._
+
+  def post(configData: ConfigData): Future[String] = async {
     val (tempFilePath, sha) = await(saveAndSha(configData))
 
     val outPath = makePath(settings.`oversize-files-dir`, sha)
@@ -64,11 +64,11 @@ class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo) {
    * @param path the file to check
    * @return true if the file is valid
    */
-  def validate(id: String, path: Path)(implicit mat: Materializer): Future[Boolean] = async {
+  def validate(id: String, path: Path): Future[Boolean] = async {
     id == await(Sha1.fromPath(path))
   }
 
-  def saveAndSha(configData: ConfigData)(implicit mat: Materializer): Future[(Path, String)] = async {
+  def saveAndSha(configData: ConfigData): Future[(Path, String)] = async {
     val path = await(fileRepo.createTempFile("config-service-overize-", ".tmp"))
     val (resultF, shaF) = configData.source
       .alsoToMat(FileIO.toPath(path))(Keep.right)
