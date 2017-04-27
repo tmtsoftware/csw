@@ -108,7 +108,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     readFile(outputFilePath) shouldEqual inputFileContents
 
     //  reset default version of file and store it at location: /tmp/output.txt
-    val parsedResetDefaultArgs: Option[Options] = ArgsParser.parse(setDefaultMinimalArgs)
+    val parsedResetDefaultArgs: Option[Options] = ArgsParser.parse(resetDefaultAllArgs)
     commandLineRunner.run(parsedResetDefaultArgs.get)
 
     //  get default version of file and store it at location: /tmp/output.txt

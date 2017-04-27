@@ -67,15 +67,16 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     }
 
     options.op match {
-      case "create"     => create()
-      case "update"     => update()
-      case "get"        ⇒ get()
-      case "exists"     => exists()
-      case "delete"     => delete()
-      case "list"       => list()
-      case "history"    => history()
-      case "setDefault" => setDefault()
-      case x            => throw new RuntimeException(s"Unknown operation: $x")
+      case "create"       => create()
+      case "update"       => update()
+      case "get"          ⇒ get()
+      case "exists"       => exists()
+      case "delete"       => delete()
+      case "list"         => list()
+      case "history"      => history()
+      case "setDefault"   => setDefault()
+      case "resetDefault" ⇒ setDefault()
+      case x              => throw new RuntimeException(s"Unknown operation: $x")
     }
   }
 }
