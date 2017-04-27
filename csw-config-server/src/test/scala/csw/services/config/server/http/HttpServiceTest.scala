@@ -22,7 +22,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     val configConnection              = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
     locationService.find(configConnection).await.get.connection shouldBe configConnection
 
-    binding.localAddress.getHostName shouldBe new Networks().hostname()
+    binding.localAddress.getAddress.getHostName shouldBe new Networks().hostname()
     registrationResult.location.connection shouldBe configConnection
     serverWiring.httpService.shutdown().await
   }
