@@ -2,13 +2,12 @@ package csw.services.config.server.commons
 
 import java.nio.file.Paths
 
-import csw.services.config.api.exceptions.InvalidFilePath
-import csw.services.config.server.commons.PathExt.RichPath
-import org.scalatest.FunSuite
+import csw.services.config.server.commons.PathValidator.RichPath
+import org.scalatest.{FunSuite, Matchers}
 
-class PathExtTest extends FunSuite {
+class PathValidatorTest extends FunSuite with Matchers {
 
-  test("should throw InvalidFilePath exception for invalid path") {
+  test("should return false for invalid path") {
 
     val paths = List(
       Paths.get("/invalidpath!/sample.txt"),
@@ -23,11 +22,17 @@ class PathExtTest extends FunSuite {
       Paths.get("/invalid,path/sample.txt"),
       Paths.get("/invalidpath;/sample.txt"),
       Paths.get("/invalidpath/sam=ple.txt"),
-      Paths.get("/invalid path/sample.txt")
+      Paths.get("/invalid path/sample.txt"),
+      Paths.get("/invalidpath/<sample.txt"),
+      Paths.get("/invalidpath/sample>.txt")
     )
 
     paths.foreach { path ⇒
-      intercept[InvalidFilePath](path.validateName)
+      path.isValid() shouldBe false
     }
+  }
+
+  test("should return true for valid file path") {
+    Paths.get("/validpath/sample.txt").isValid() shouldBe true
   }
 }

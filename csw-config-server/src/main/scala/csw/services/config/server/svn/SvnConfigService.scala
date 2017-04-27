@@ -4,11 +4,12 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
+import csw.services.config.server.commons.PathValidator
 import csw.services.config.server.files.OversizeFileService
-import csw.services.config.server.commons.PathExt.RichPath
+import csw.services.config.server.commons.PathValidator.RichPath
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
 import org.tmatesoft.svn.core.wc.SVNRevision
@@ -35,7 +36,9 @@ class SvnConfigService(settings: Settings,
     }
 
     async {
-      path.validateName()
+      if (!path.isValid())
+        throw new InvalidFilePath(path, PathValidator.invalidCharsMessage)
+
       // If the file does not already exists in the repo, create it
       if (await(exists(path))) {
         throw FileAlreadyExists(path)
