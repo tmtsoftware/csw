@@ -3,6 +3,7 @@ package csw.services.config.server.http
 import akka.Done
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
+import csw.services.config.api.models.ConfigId
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.ActorRuntime
 
@@ -48,8 +49,9 @@ class ConfigServiceRoute(
       }
     } ~
     path("default" / FilePath) { filePath ⇒
-      (put & idParam & commentParam) { (maybeId, comment) ⇒
-        complete(configService.setDefault(filePath, maybeId, comment).map(_ ⇒ Done))
+      (put & idParam & commentParam) {
+        case (Some(configId), comment) ⇒ complete(configService.setDefault(filePath, configId, comment).map(_ ⇒ Done))
+        case (_, comment)              ⇒ complete(configService.resetDefault(filePath, comment).map(_ ⇒ Done))
       } ~
       (get & rejectEmptyResponse) {
         println(s"------------------------getting default version of $filePath -----------------------")

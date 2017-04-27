@@ -417,7 +417,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     // check that getDefault file without ID should return latest file
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
     // set default version of file to id=2
-    configService.setDefault(file, Some(configId), "Setting default first time").await
+    configService.setDefault(file, configId, "Setting default first time").await
     // check that getDefault file without ID returns file with id=2
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue2
 
@@ -425,7 +425,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
 
     // check that setDefault without id,resets default version of file
-    configService.setDefault(file, comment = "setting default again").await
+    configService.resetDefault(file, comment = "setting default again").await
     configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
 
   }
@@ -521,7 +521,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId =
       configService.create(file, ConfigData.fromString(content), oversize = true, "committing oversize file").await
 
-    configService.setDefault(file, Some(configId)).await
+    configService.setDefault(file, configId).await
 
     val newContent = "testing oversize file, again"
     val newComment = "Updating file"
@@ -530,7 +530,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val defaultData: ConfigData = configService.getDefault(file).await.get
     defaultData.toStringF.await shouldBe content
 
-    configService.setDefault(file).await
+    configService.resetDefault(file).await
 
     val resetDefaultData: ConfigData = configService.getDefault(file).await.get
     resetDefaultData.toStringF.await shouldBe newContent
@@ -544,7 +544,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     defaultAfterDelete shouldBe None
 
     intercept[FileNotFound] {
-      configService.setDefault(file).await
+      configService.resetDefault(file).await
     }
   }
 
@@ -611,8 +611,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       .create(assemblyConfig, ConfigData.fromString(configValue2), oversize = true, assemblyConfigComment)
       .await
 
-    configService.setDefault(tromboneConfig, Some(tromboneConfigId)).await
-    configService.setDefault(assemblyConfig, Some(assemblyConfigId)).await
+    configService.setDefault(tromboneConfig, tromboneConfigId).await
+    configService.setDefault(assemblyConfig, assemblyConfigId).await
 
     // list files from repo and assert that it contains added files
     val configFiles = configService.list().await

@@ -149,23 +149,23 @@ class SvnConfigService(settings: Settings,
     }
   }
 
-  override def setDefault(path: Path, id: Option[ConfigId] = None, comment: String): Future[Unit] = async {
-    if (!await(exists(path, id))) {
+  override def setDefault(path: Path, configId: ConfigId, comment: String): Future[Unit] = async {
+    if (!await(exists(path, Some(configId)))) {
       throw FileNotFound(path)
     }
     val defaultPath = defaultFilePath(path)
 
-    val present = await(exists(defaultPath))
-
-    id match {
-      case Some(configId) if present ⇒ await(update(defaultPath, ConfigData.fromString(configId.id), comment))
-      case Some(configId)            ⇒ await(create(defaultPath, ConfigData.fromString(configId.id), comment = comment))
-      case None if present           ⇒ await(delete(defaultPath))
-      case None                      ⇒ ()
+    if (await(exists(defaultPath))) {
+      await(update(defaultPath, ConfigData.fromString(configId.id), comment))
+    } else {
+      await(create(defaultPath, ConfigData.fromString(configId.id), comment = comment))
     }
   }
 
-  override def resetDefault(path: Path, comment: String): Future[Unit] = setDefault(path, None, comment)
+  override def resetDefault(path: Path, comment: String): Future[Unit] = async {
+    val revision = await(svnRepo.svnRevision()).getNumber
+    await(setDefault(path, ConfigId(revision), comment))
+  }
 
   override def getDefault(path: Path): Future[Option[ConfigData]] = {
 

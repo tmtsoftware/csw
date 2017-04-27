@@ -121,8 +121,8 @@ trait IConfigService {
    *             (by default the id of the latest version is used)
    * @return a future result
    */
-  def setDefault(path: Path, id: Optional[ConfigId], comment: String): CompletableFuture[Unit]
-  def setDefault(path: Path, id: Optional[ConfigId]): CompletableFuture[Unit]
+  def setDefault(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit]
+  def setDefault(path: Path, id: ConfigId): CompletableFuture[Unit]
 
   /**
    * Resets the "default version" of the file with the given path to the latest version.

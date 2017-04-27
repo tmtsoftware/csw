@@ -61,22 +61,27 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     }
 
     def setDefault(): Unit = {
-      val idOpt: Option[ConfigId] = options.id.map(ConfigId(_))
-      await(configService.setDefault(options.relativeRepoPath.get, idOpt))
-      println(s"${options.relativeRepoPath.get} file with id:${idOpt.getOrElse("latest")} is set as default")
+      val maybeConfigId = options.id.map(id ⇒ ConfigId(id))
+      await(configService.setDefault(options.relativeRepoPath.get, maybeConfigId.get, options.comment))
+      println(s"${options.relativeRepoPath.get} file with id:${maybeConfigId.get.id} is set as default")
+    }
+
+    def resetDefault(): Unit = {
+      await(configService.resetDefault(options.relativeRepoPath.get, options.comment))
+      println(s"${options.relativeRepoPath.get} file is reset to default")
     }
 
     options.op match {
-      case "create"       => create()
-      case "update"       => update()
+      case "create"       ⇒ create()
+      case "update"       ⇒ update()
       case "get"          ⇒ get()
-      case "exists"       => exists()
-      case "delete"       => delete()
-      case "list"         => list()
-      case "history"      => history()
-      case "setDefault"   => setDefault()
-      case "resetDefault" ⇒ setDefault()
-      case x              => throw new RuntimeException(s"Unknown operation: $x")
+      case "exists"       ⇒ exists()
+      case "delete"       ⇒ delete()
+      case "list"         ⇒ list()
+      case "history"      ⇒ history()
+      case "setDefault"   ⇒ setDefault()
+      case "resetDefault" ⇒ resetDefault()
+      case x              ⇒ throw new RuntimeException(s"Unknown operation: $x")
     }
   }
 }

@@ -38,7 +38,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     val argv               = Array("create", relativeRepoPath, "-i", inputFilePath)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("create", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None, Int.MaxValue, oversize = false, ""))
+        None, Int.MaxValue, oversize = false))
   }
 
   test("test update with no sub-options") {
@@ -78,7 +78,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     val argv               = Array("get", relativeRepoPath, "-o", outputFilePath, "--date", date)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("get", Some(Paths.get(relativeRepoPath)), None, Some(Paths.get(outputFilePath)), None,
-        Some(Instant.parse(date)), Int.MaxValue, oversize = false, ""))
+        Some(Instant.parse(date)), Int.MaxValue, oversize = false))
   }
 
   test("test get with latest sub-option") {
@@ -148,14 +148,14 @@ class ArgsParserTest extends FunSuite with Matchers {
     val argv               = Array("setDefault", relativeRepoPath, "--id", id)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("setDefault", Some(Paths.get(relativeRepoPath)), None, None, Some(id), None, Int.MaxValue,
-        oversize = false, ""))
+        oversize = false))
   }
 
   test("test setDefault with bare minimum sub-options") {
     val argv               = Array("setDefault", relativeRepoPath)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("setDefault", Some(Paths.get(relativeRepoPath)), None, None, None, None, Int.MaxValue,
-        oversize = false, ""))
+        oversize = false))
   }
 
   test("test resetDefault with no sub-options") {
@@ -168,6 +168,6 @@ class ArgsParserTest extends FunSuite with Matchers {
     val argv               = Array("resetDefault", relativeRepoPath)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("resetDefault", Some(Paths.get(relativeRepoPath)), None, None, None, None, Int.MaxValue,
-        oversize = false, ""))
+        oversize = false))
   }
 }

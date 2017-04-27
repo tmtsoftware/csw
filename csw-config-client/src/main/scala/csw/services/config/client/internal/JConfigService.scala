@@ -72,10 +72,10 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def history(path: Path): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, maxResults = Int.MaxValue)
 
-  override def setDefault(path: Path, id: Optional[ConfigId], comment: String): CompletableFuture[Unit] =
-    configService.setDefault(path, id.asScala, comment).toJava.toCompletableFuture
+  override def setDefault(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit] =
+    configService.setDefault(path, id, comment).toJava.toCompletableFuture
 
-  override def setDefault(path: Path, id: Optional[ConfigId]): CompletableFuture[Unit] =
+  override def setDefault(path: Path, id: ConfigId): CompletableFuture[Unit] =
     setDefault(path, id, "")
 
   override def resetDefault(path: Path, comment: String): CompletableFuture[Unit] =

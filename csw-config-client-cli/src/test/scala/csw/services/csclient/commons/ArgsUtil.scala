@@ -35,7 +35,7 @@ class ArgsUtil {
   val listArgs            = Array("list")
   val historyArgs         = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
   val setDefaultAllArgs   = Array("setDefault", relativeRepoPath, "--id", id)
-  val resetDefaultAllArgs = Array("resetDefault", relativeRepoPath)
+  val resetDefaultAllArgs = Array("resetDefault", relativeRepoPath, "-c", comment)
 
   private def createTempFile(fileName: String, fileContent: String): Path =
     Files.write(Files.createTempFile(fileName, ".conf"), fileContent.getBytes)

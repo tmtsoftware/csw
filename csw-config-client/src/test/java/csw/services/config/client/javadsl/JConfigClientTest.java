@@ -268,7 +268,7 @@ public class JConfigClientTest {
 
     // DEOPSCSW-77: Set default version of configuration file in config. service
     // DEOPSCSW-78: Get the default version of a configuration file
-    // DEOPSCSW-79:     Reset the default version of a configuration file
+    // DEOPSCSW-79: Reset the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
     public void testGetSetAndResetDefaultConfigFile() throws ExecutionException, InterruptedException {
@@ -280,7 +280,7 @@ public class JConfigClientTest {
         configService.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.setDefault(path, Optional.of(configIdUpdate1)).get();
+        configService.setDefault(path, configIdUpdate1).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
 
         configService.resetDefault(path, "reseting default file").get();
@@ -289,7 +289,7 @@ public class JConfigClientTest {
         configService.resetDefault(path).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.setDefault(path, Optional.empty(), "setting default again").get();
+        configService.resetDefault(path, "setting default again").get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
@@ -366,10 +366,10 @@ public class JConfigClientTest {
         configService.update(path, ConfigData.fromString(configValue3), "Updated config").get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.setDefault(path, Optional.of(configIdUpdate1)).get();
+        configService.setDefault(path, configIdUpdate1).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.setDefault(path, Optional.empty()).get();
+        configService.resetDefault(path).get();
         Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
@@ -403,8 +403,8 @@ public class JConfigClientTest {
                 .create(assemblyConfig, ConfigData.fromString(configValue2),true, assemblyConfigComment)
                 .get();
 
-        configService.setDefault(tromboneConfig, Optional.of(tromboneConfigId)).get();
-        configService.setDefault(assemblyConfig, Optional.of(assemblyConfigId)).get();
+        configService.setDefault(tromboneConfig, tromboneConfigId).get();
+        configService.setDefault(assemblyConfig, assemblyConfigId).get();
 
         // list files from repo and assert that it contains added files
 
