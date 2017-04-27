@@ -12,6 +12,7 @@ import java.time.Instant
  * @param id Optional: version id of the file to get.
  * @param oversize Optional: if the file is an Oversized(large binary file)
  * @param comment Optional: Version history comment to add while creating the file.
+ * @param latest Optional: Get the latest file.
  */
 case class Options(
     op: String = "",
@@ -22,5 +23,6 @@ case class Options(
     date: Option[Instant] = None,
     maxFileVersions: Int = Int.MaxValue,
     oversize: Boolean = false,
-    comment: String = ""
+    comment: String = "",
+    latest: Boolean = false
 )

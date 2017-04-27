@@ -62,7 +62,10 @@ object ArgsParser {
       } text "optional version id of the repository file to get",
       opt[String]("date") action { (x, c) =>
         c.copy(date = Some(Instant.parse(x)))
-      } text "optional date parameter ex. 2017-04-16T16:15:23.503Z"
+      } text "optional date parameter ex. 2017-04-16T16:15:23.503Z",
+      opt[Unit]("latest") action { (_, c) =>
+        c.copy(latest = true)
+      } text "optional use this option to get the latest file"
     )
 
     //exists operation
@@ -119,18 +122,6 @@ object ArgsParser {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository"
-    )
-
-    //getDefault operation
-    cmd("getDefault") action { (_, c) =>
-      c.copy(op = "getDefault")
-    } text "gets the default version of the file in the repository" children (
-      arg[String]("<relativeRepoPath>") action { (x, c) =>
-        c.copy(relativeRepoPath = Some(Paths.get(x)))
-      } text "file path in the repository",
-      opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
-        c.copy(outputFilePath = Some(Paths.get(x)))
-      } text "output file"
     )
 
     help("help")

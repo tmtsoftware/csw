@@ -25,12 +25,11 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     }
 
     def get(): Unit = {
-      val idOpt = options.id.map(ConfigId(_))
-
-      val configDataOpt = (options.date, options.id) match {
-        case (Some(date), _) ⇒ await(configService.getByTime(options.relativeRepoPath.get, date))
-        case (_, Some(id))   ⇒ await(configService.getById(options.relativeRepoPath.get, ConfigId(id)))
-        case (_, _)          ⇒ await(configService.getLatest(options.relativeRepoPath.get))
+      val configDataOpt = (options.date, options.id, options.latest) match {
+        case (Some(date), _, _) ⇒ await(configService.getByTime(options.relativeRepoPath.get, date))
+        case (_, Some(id), _)   ⇒ await(configService.getById(options.relativeRepoPath.get, ConfigId(id)))
+        case (_, _, true)       ⇒ await(configService.getLatest(options.relativeRepoPath.get))
+        case (_, _, _)          ⇒ await(configService.getDefault(options.relativeRepoPath.get))
       }
 
       configDataOpt match {
@@ -67,28 +66,15 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
       println(s"${options.relativeRepoPath.get} file with id:${idOpt.getOrElse("latest")} is set as default")
     }
 
-    def getDefault(): Unit = {
-      val configDataOpt = await(configService.getDefault(options.relativeRepoPath.get))
-
-      configDataOpt match {
-        case Some(configData) ⇒
-          val outputFile = await(configData.toPath(options.outputFilePath.get))
-          println(
-              s"Default version of repository file: ${options.relativeRepoPath.get} is saved at location: ${outputFile.toAbsolutePath}")
-        case None ⇒
-      }
-    }
-
     options.op match {
       case "create"     => create()
       case "update"     => update()
-      case "get"        => get()
+      case "get"        ⇒ get()
       case "exists"     => exists()
       case "delete"     => delete()
       case "list"       => list()
       case "history"    => history()
       case "setDefault" => setDefault()
-      case "getDefault" => getDefault()
       case x            => throw new RuntimeException(s"Unknown operation: $x")
     }
   }

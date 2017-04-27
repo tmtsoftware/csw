@@ -28,6 +28,7 @@ retrieves a file for a given path, stored in config service, and writes it to th
  * `-o`, `--out` is output file path
  * `--id` optional parameter. version id of the repository file to get.
  * `--date` optional parameter. ex. 2017-04-16T16:15:23.503Z
+ * `--latest` optional parameter. Use this option to get the latest file.
 
 ### exists
 checks if the file exists at specified path in the repository
@@ -58,12 +59,6 @@ sets default version of the file in the repository
 resets the default to the latest version of the file in the repository
 
  * 'relativeRepoPath' is path in the repository
-
-### getDefault
-gets the default version of the file in the repository
-
- * 'relativeRepoPath' is path in the repository
- * `-o`, `--out` is output file path
 
 ### --help 
 Prints the help message.

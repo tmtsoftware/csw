@@ -28,7 +28,7 @@ class ArgsUtil {
   val createMinimalArgs     = Array("create", relativeRepoPath, "-i", inputFilePath)
   val updateAllArgs         = Array("update", relativeRepoPath, "-i", updatedInputFilePath, "-c", comment)
   val updateMinimalArgs     = Array("update", relativeRepoPath, "-i", updatedInputFileContents)
-  val getAllArgs            = Array("get", relativeRepoPath, "-o", outputFilePath, "--id", id)
+  val getLatestArgs         = Array("get", relativeRepoPath, "-o", outputFilePath, "--latest")
   val getMinimalArgs        = Array("get", relativeRepoPath, "-o", outputFilePath)
   val existsArgs            = Array("exists", relativeRepoPath)
   val deleteArgs            = Array("delete", relativeRepoPath)
@@ -36,7 +36,6 @@ class ArgsUtil {
   val historyArgs           = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
   val setDefaultAllArgs     = Array("setDefault", relativeRepoPath, "--id", id)
   val setDefaultMinimalArgs = Array("setDefault", relativeRepoPath)
-  val getDefaultArgs        = Array("getDefault", relativeRepoPath, "-o", outputFilePath)
 
   private def createTempFile(fileName: String, fileContent: String): Path =
     Files.write(Files.createTempFile(fileName, ".conf"), fileContent.getBytes)

@@ -44,7 +44,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     commandLineRunner.run(parsedCreateArgs.get)
 
     //  get file and store it at location: /tmp/output.txt
-    val parsedGetArgs: Option[Options] = ArgsParser.parse(getMinimalArgs)
+    val parsedGetArgs: Option[Options] = ArgsParser.parse(getLatestArgs)
     commandLineRunner.run(parsedGetArgs.get)
 
     // read locally saved output file (/tmp/output.conf) from disk and
@@ -63,7 +63,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     commandLineRunner.run(parsedUpdateArgs.get)
 
     //  get file and store it at location: /tmp/output.txt
-    val parsedGetArgs: Option[Options] = ArgsParser.parse(getMinimalArgs)
+    val parsedGetArgs: Option[Options] = ArgsParser.parse(getLatestArgs)
     commandLineRunner.run(parsedGetArgs.get)
 
     //  read locally saved output file (/tmp/output.conf) from disk and
@@ -100,7 +100,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     commandLineRunner.run(parsedSetDefaultArgs.get)
 
     //  get default version of file and store it at location: /tmp/output.txt
-    val parsedGetDefaultArgs: Option[Options] = ArgsParser.parse(getDefaultArgs)
+    val parsedGetDefaultArgs: Option[Options] = ArgsParser.parse(getMinimalArgs)
     commandLineRunner.run(parsedGetDefaultArgs.get)
 
     //  read locally saved output file (/tmp/output.conf) from disk and
