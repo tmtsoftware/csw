@@ -1,6 +1,6 @@
 package csw.services.config.client.internal
 
-import java.nio.{file, file ⇒ jnio}
+import java.nio.{file ⇒ jnio}
 import java.time.Instant
 
 import akka.http.scaladsl.Http
@@ -162,17 +162,15 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def setDefault(path: jnio.Path, configId: ConfigId, comment: String): Future[Unit] = async {
-    val uri = await(defaultUri(path)).withQuery(Query("id" → configId.id.toString))
-    default(path, uri)
-  }
+  override def setDefault(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
+    handleDefault(path, Query("id" → id.id.toString, "comment" → comment))
 
-  override def resetDefault(path: jnio.Path, comment: String): Future[Unit] = async {
-    val uri = await(defaultUri(path))
-    default(path, uri)
-  }
+  override def resetDefault(path: jnio.Path, comment: String): Future[Unit] =
+    handleDefault(path, Query("comment" → comment))
 
-  private def default(path: file.Path, uri: Uri) = {
+  private def handleDefault(path: jnio.Path, query: Query): Future[Unit] = async {
+    val uri = await(defaultUri(path)).withQuery(query)
+
     val request = HttpRequest(HttpMethods.PUT, uri = uri)
     println(request)
     val response = await(Http().singleRequest(request))

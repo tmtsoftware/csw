@@ -115,7 +115,6 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
   }
 
   def list(): Future[List[SVNDirEntry]] = Future {
-    // XXX Should .sha1 files have the .sha1 suffix removed in the result?
     var entries             = List[SVNDirEntry]()
     val svnOperationFactory = new SvnOperationFactory()
     try {
