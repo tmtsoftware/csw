@@ -2,7 +2,6 @@ package csw.services.config.server.commons
 
 import java.nio.file.Paths
 
-import csw.services.config.server.commons.PathValidator.RichPath
 import org.scalatest.{FunSuite, Matchers}
 
 class PathValidatorTest extends FunSuite with Matchers {
@@ -28,11 +27,11 @@ class PathValidatorTest extends FunSuite with Matchers {
     )
 
     paths.foreach { path ⇒
-      path.isValid() shouldBe false
+      PathValidator.isValid(path) shouldBe false
     }
   }
 
   test("should return true for valid file path") {
-    Paths.get("/validpath/sample.txt").isValid() shouldBe true
+    PathValidator.isValid(Paths.get("/validpath/sample.txt")) shouldBe true
   }
 }

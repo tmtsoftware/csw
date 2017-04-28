@@ -9,7 +9,6 @@ import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRev
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.PathValidator
 import csw.services.config.server.files.OversizeFileService
-import csw.services.config.server.commons.PathValidator.RichPath
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
 import org.tmatesoft.svn.core.wc.SVNRevision
@@ -34,7 +33,7 @@ class SvnConfigService(settings: Settings,
     }
 
     async {
-      if (!path.isValid())
+      if (!PathValidator.isValid(path))
         throw new InvalidFilePath(path, PathValidator.invalidCharsMessage)
 
       // If the file does not already exists in the repo, create it
