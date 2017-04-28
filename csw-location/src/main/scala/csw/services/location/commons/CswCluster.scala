@@ -52,10 +52,6 @@ class CswCluster private (_actorSystem: ActorSystem) {
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
       val clusterHttpManagement = ClusterHttpManagement(cluster)
-      //Add shutdown hook if cluster management is started successfully.
-      coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "shutdownClusterManagement") { () =>
-        clusterHttpManagement.stop()
-      }
       Await.result(clusterHttpManagement.start(), 10.seconds)
     }
   }

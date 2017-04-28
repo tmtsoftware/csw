@@ -27,22 +27,18 @@ class HttpService(locationService: LocationService,
 
     coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
-      s"unregistering ${registrationResult.location}"
+      s"unregistering-${registrationResult.location}"
     )(() => registrationResult.unregister())
 
     coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseServiceUnbind,
-      s"unregistering ${registrationResult.location}"
+      "location-service-shutdown"
     )(() ⇒ locationService.shutdown())
 
     println(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     (binding, registrationResult)
   } recoverWith {
-    case NonFatal(ex) ⇒
-      async {
-        await(shutdown())
-        throw ex
-      }
+    case NonFatal(ex) ⇒ shutdown().map(_ ⇒ throw ex)
   }
 
   def shutdown(): Future[Done] = actorRuntime.shutdown()
