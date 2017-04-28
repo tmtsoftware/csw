@@ -82,7 +82,10 @@ class CswCluster private (_actorSystem: ActorSystem) {
     def replicaCountF = (replicator ? GetReplicaCount).mapTo[ReplicaCount]
     def replicaCount  = Await.result(replicaCountF, 5.seconds).n
     def upMembers     = cluster.state.members.count(_.status == MemberStatus.Up)
-    BlockingUtils.awaitAssert(replicaCount == upMembers)
+    val success       = BlockingUtils.poll(replicaCount == upMembers)
+    if (!success) {
+      throw new RuntimeException("could not ensure that the data is replicated in location service cluster")
+    }
   }
 
   /**

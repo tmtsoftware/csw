@@ -5,19 +5,20 @@ import scala.concurrent.duration.{Duration, DurationDouble, DurationInt}
 
 private[commons] object BlockingUtils {
 
-  def awaitAssert(predicate: ⇒ Boolean, max: Duration = 5.seconds): Unit = {
-    def now      = System.nanoTime.nanos
-    val stop     = now + max
-    val interval = 100.millis
+  def poll(predicate: ⇒ Boolean, max: Duration = 5.seconds): Boolean = {
+    def now  = System.nanoTime.nanos
+    val stop = now + max
 
     @tailrec
-    def poll(t: Duration): Unit =
-      if (!predicate) {
-        Thread.sleep(t.toMillis)
-        poll((stop - now) min interval)
+    def loop(): Boolean =
+      if (predicate || now > stop) {
+        predicate
+      } else {
+        Thread.sleep(100)
+        loop()
       }
 
-    poll(max min interval)
+    loop()
   }
 
 }
