@@ -1,6 +1,7 @@
 package csw.services.config.server.http
 
 import akka.Done
+import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.services.config.server.{ActorRuntime, Settings}
@@ -23,32 +24,34 @@ class HttpService(locationService: LocationService,
   lazy val registeredLazyBinding: Future[(ServerBinding, RegistrationResult)] = async {
     val binding            = await(bind())
     val registrationResult = await(register(binding))
+
+    coordinatedShutdown.addTask(
+      CoordinatedShutdown.PhaseBeforeServiceUnbind,
+      s"unregistering ${registrationResult.location}"
+    )(() => registrationResult.unregister())
+
+    coordinatedShutdown.addTask(
+      CoordinatedShutdown.PhaseServiceUnbind,
+      s"unregistering ${registrationResult.location}"
+    )(() ⇒ locationService.shutdown())
+
     println(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     (binding, registrationResult)
+  } recoverWith {
+    case NonFatal(ex) ⇒
+      async {
+        await(shutdown())
+        throw ex
+      }
   }
 
-  def shutdown(): Future[Done] = async {
-    val (binding, registrationResult) = await(registeredLazyBinding)
-    await(registrationResult.unregister())
-    await(binding.unbind())
-    await(locationService.shutdown())
-    await(actorSystem.terminate())
-    Done
-  }
+  def shutdown(): Future[Done] = actorRuntime.shutdown()
 
-  private def bind() =
-    Http().bindAndHandle(
-      handler = configServiceRoute.route,
-      interface = ClusterAwareSettings.hostname,
-      port = settings.`service-port`
-    ) recoverWith {
-      case NonFatal(ex) ⇒
-        async {
-          await(locationService.shutdown())
-          await(actorSystem.terminate())
-          throw ex
-        }
-    }
+  private def bind() = Http().bindAndHandle(
+    handler = configServiceRoute.route,
+    interface = ClusterAwareSettings.hostname,
+    port = settings.`service-port`
+  )
 
   private def register(binding: ServerBinding): Future[RegistrationResult] = {
     val registration = HttpRegistration(
@@ -58,13 +61,5 @@ class HttpService(locationService: LocationService,
     )
     println("==== Registering Config Service HTTP Server with Location Service ====")
     locationService.register(registration)
-  } recoverWith {
-    case NonFatal(ex) ⇒
-      async {
-        await(binding.unbind())
-        await(locationService.shutdown())
-        await(actorSystem.terminate())
-        throw ex
-      }
   }
 }

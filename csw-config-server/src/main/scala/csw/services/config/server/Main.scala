@@ -19,10 +19,6 @@ class Main(clusterSettings: ClusterSettings) {
           svnRepo.initSvnRepo()
         }
 
-        cswCluster.addJvmShutdownHook {
-          Await.result(httpService.shutdown(), 10.seconds)
-        }
-
         Await.result(httpService.registeredLazyBinding, 5.seconds)
         httpService
     }

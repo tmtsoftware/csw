@@ -3,7 +3,7 @@ package csw.services.config.server
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.dispatch.MessageDispatcher
 import akka.stream.{ActorMaterializer, Materializer}
 
@@ -17,7 +17,9 @@ class ActorRuntime(_actorSystem: ActorSystem, settings: Settings) {
 
   val blockingIoDispatcher: MessageDispatcher = actorSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
 
-  def shutdown(): Future[Done] = actorSystem.terminate().map(_ ⇒ Done)
+  val coordinatedShutdown = CoordinatedShutdown(actorSystem)
+
+  def shutdown(): Future[Done] = coordinatedShutdown.run()
 
   def jShutdown(): CompletableFuture[Done] = shutdown().toJava.toCompletableFuture
 }
