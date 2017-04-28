@@ -20,8 +20,6 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   import actorRuntime._
 
-  override def name: String = "http-based-config-client"
-
   private def configUri(path: jnio.Path)  = baseUri(Path / "config" ++ Path / Path(path.toString))
   private def defaultUri(path: jnio.Path) = baseUri(Path / "default" ++ Path / Path(path.toString))
   private def historyUri(path: jnio.Path) = baseUri(Path / "history" ++ Path / Path(path.toString))

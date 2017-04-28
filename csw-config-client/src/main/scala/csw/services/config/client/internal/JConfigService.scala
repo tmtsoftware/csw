@@ -18,9 +18,6 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
 
   import actorRuntime._
 
-  override def name: String =
-    configService.name
-
   override def create(path: Path,
                       configData: ConfigData,
                       oversize: Boolean,

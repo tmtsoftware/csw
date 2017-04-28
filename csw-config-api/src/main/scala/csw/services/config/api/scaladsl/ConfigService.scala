@@ -13,11 +13,6 @@ import scala.concurrent.Future
 trait ConfigService {
 
   /**
-   * The name of this instance
-   */
-  def name: String
-
-  /**
    * Creates a file with the given path and data and optional comment.
    * An IOException is thrown if the file already exists.
    *

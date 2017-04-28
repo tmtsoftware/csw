@@ -15,11 +15,6 @@ import csw.services.config.api.scaladsl.ConfigService
 trait IConfigService {
 
   /**
-   * The name of this instance
-   */
-  def name: String
-
-  /**
    * Creates a file with the given path and data and optional comment.
    * An IOException is thrown if the file already exists.
    *

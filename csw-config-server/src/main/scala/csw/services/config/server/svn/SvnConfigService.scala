@@ -26,8 +26,6 @@ class SvnConfigService(settings: Settings,
 
   import actorRuntime._
 
-  override def name: String = "my name is missing"
-
   override def create(path: Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
 
     def createOversize(): Future[ConfigId] = async {
