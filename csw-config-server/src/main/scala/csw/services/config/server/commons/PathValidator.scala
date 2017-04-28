@@ -6,7 +6,8 @@ import scala.util.matching.Regex
 
 object PathValidator {
 
-  private val invalidChars = "!#<>$%&'@^`~+,;=\\s"
+  private val invalidChars               = "!#<>$%&'@^`~+,;=\\s"
+  private val invalidCharsPattern: Regex = s".*[$invalidChars]+.*".r
 
   val invalidCharsMessage: String = invalidChars
     .replace("\\s", " ")
@@ -14,11 +15,7 @@ object PathValidator {
     .mkString(",")
 
   def isValid(path: Path): Boolean = {
-    val invalidCharsPattern: Regex = s".*[$invalidChars]+.*".r
-
-    path.toString match {
-      case invalidCharsPattern(_ *) ⇒ false
-      case _                        ⇒ true
-    }
+    val predicate = invalidCharsPattern.pattern.asPredicate()
+    !predicate.test(path.toString)
   }
 }

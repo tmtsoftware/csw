@@ -10,14 +10,15 @@ import akka.http.scaladsl.server._
 import csw.services.config.api.models.{ConfigData, ConfigId, JsonSupport}
 
 trait HttpSupport extends Directives with JsonSupport {
-  val pathParam: Directive1[Path]            = parameter('path).map(filePath ⇒ Paths.get(filePath))
-  val latestParam: Directive1[Boolean]       = parameter('latest.as[Boolean] ? false)
-  val idParam: Directive1[Option[ConfigId]]  = parameter('id.?).map(_.map(new ConfigId(_)))
-  val dateParam: Directive1[Option[Instant]] = parameter('date.?).map(_.map(Instant.parse))
-  val maxResultsParam: Directive1[Int]       = parameter('maxResults.as[Int] ? Int.MaxValue)
-  val commentParam: Directive1[String]       = parameter('comment ? "")
-  val oversizeParam: Directive1[Boolean]     = parameter('oversize.as[Boolean] ? false)
-  val FilePath: PathMatcher1[Path]           = Remaining.map(path => Paths.get(path))
+  val pathParam: Directive1[Path]              = parameter('path).map(filePath ⇒ Paths.get(filePath))
+  val latestParam: Directive1[Boolean]         = parameter('latest.as[Boolean] ? false)
+  val idParam: Directive1[Option[ConfigId]]    = parameter('id.?).map(_.map(new ConfigId(_)))
+  val dateParam: Directive1[Option[Instant]]   = parameter('date.?).map(_.map(Instant.parse))
+  val maxResultsParam: Directive1[Int]         = parameter('maxResults.as[Int] ? Int.MaxValue)
+  val patternParam: Directive1[Option[String]] = parameter('pattern.?)
+  val commentParam: Directive1[String]         = parameter('comment ? "")
+  val oversizeParam: Directive1[Boolean]       = parameter('oversize.as[Boolean] ? false)
+  val FilePath: PathMatcher1[Path]             = Remaining.map(path => Paths.get(path))
 
   val rejectMissingContentLength: Directive0 = extractRequestEntity.flatMap {
     case entity if entity.contentLengthOption.isDefined ⇒ pass

@@ -136,14 +136,13 @@ class SvnConfigService(settings: Settings,
     }
   }
 
-  override def list(): Future[List[ConfigFileInfo]] = async {
-    await(svnRepo.list()).map { entry =>
+  override def list(pattern: Option[String] = None): Future[List[ConfigFileInfo]] = async {
+    await(svnRepo.list(pattern)).map { entry =>
       ConfigFileInfo(Paths.get(entry.getRelativePath.stripSuffix(settings.`sha1-suffix`)), ConfigId(entry.getRevision),
         entry.getCommitMessage)
     }
   }
 
-  // XXX Should .sha1 files have the .sha1 suffix removed in the result?
   override def history(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒ await(hist(path, maxResults))

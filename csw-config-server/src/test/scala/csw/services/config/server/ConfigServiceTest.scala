@@ -316,7 +316,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val assemblyConfigComment = "hello assembly"
 
     //  Check that files to be added does not already exists in the repo and then add
-    configService.list.await.foreach { fileInfo ⇒
+    configService.list().await.foreach { fileInfo ⇒
       fileInfo.path should not be tromboneConfig
       fileInfo.path should not be assemblyConfig
     }
@@ -595,7 +595,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val assemblyConfigComment = "hello assembly"
 
     // Check that files to be added does not already exists in the repo and then add
-    configService.list.await.foreach { fileInfo ⇒
+    configService.list().await.foreach { fileInfo ⇒
       fileInfo.path should not be tromboneConfig
       fileInfo.path should not be assemblyConfig
     }
@@ -618,5 +618,30 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment),
       ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)
     )
+  }
+
+  test("should filter list based on the pattern") {
+    val tromboneConfig = Paths.get("a/c/trombone.conf")
+    val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
+    val hcdConfig      = Paths.get("a/b/c/hcd/hcd.conf")
+
+    configService.create(tromboneConfig, ConfigData.fromString(configValue1), oversize = false, "hello trombone").await
+    configService.create(assemblyConfig, ConfigData.fromString(configValue2), oversize = true, "hello assembly").await
+    configService.create(hcdConfig, ConfigData.fromString(configValue3), oversize = false, "hello hcd").await
+
+    val fileInfoes1 = configService.list(Some("a/b")).await
+    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyConfig, hcdConfig)
+
+    val fileInfoes2 = configService.list(Some(".conf")).await
+    fileInfoes2.map(_.path).toSet shouldBe Set(tromboneConfig, assemblyConfig, hcdConfig)
+
+    val fileInfoes3 = configService.list(Some("a/b/c/d")).await
+    fileInfoes3.isEmpty shouldBe true
+
+    val fileInfoes4 = configService.list(Some("a/b/c")).await
+    fileInfoes4.map(_.path).toSet shouldBe Set(hcdConfig)
+
+    val fileInfoes5 = configService.list().await
+    fileInfoes5.map(_.path).toSet shouldBe Set(tromboneConfig, assemblyConfig, hcdConfig)
   }
 }

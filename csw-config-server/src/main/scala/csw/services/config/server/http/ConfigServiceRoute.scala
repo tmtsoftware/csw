@@ -2,8 +2,7 @@ package csw.services.config.server.http
 
 import akka.Done
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.{Directive1, Route}
-import csw.services.config.api.models.ConfigData
+import akka.http.scaladsl.server.Route
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.ActorRuntime
 
@@ -25,10 +24,12 @@ class ConfigServiceRoute(
           case (_, _, _)          ⇒ complete(configService.getDefault(filePath))
         }
       } ~
-      (head & idParam) { id ⇒
-        complete {
-          configService.exists(filePath, id).map { found ⇒
-            if (found) StatusCodes.OK else StatusCodes.NotFound
+      head {
+        idParam { id ⇒
+          complete {
+            configService.exists(filePath, id).map { found ⇒
+              if (found) StatusCodes.OK else StatusCodes.NotFound
+            }
           }
         }
       } ~
@@ -49,9 +50,12 @@ class ConfigServiceRoute(
       }
     } ~
     path("default" / FilePath) { filePath ⇒
-      (put & idParam & commentParam) {
-        case (Some(configId), comment) ⇒ complete(configService.setDefault(filePath, configId, comment).map(_ ⇒ Done))
-        case (_, comment)              ⇒ complete(configService.resetDefault(filePath, comment).map(_ ⇒ Done))
+      put {
+        (idParam & commentParam) {
+          case (Some(configId), comment) ⇒
+            complete(configService.setDefault(filePath, configId, comment).map(_ ⇒ Done))
+          case (_, comment) ⇒ complete(configService.resetDefault(filePath, comment).map(_ ⇒ Done))
+        }
       } ~
       (get & rejectEmptyResponse) {
         println(s"------------------------getting default version of $filePath -----------------------")
@@ -64,7 +68,9 @@ class ConfigServiceRoute(
       }
     } ~
     (path("list") & get) {
-      complete(configService.list())
+      patternParam { pattern ⇒
+        complete(configService.list(pattern))
+      }
     }
   }
 }

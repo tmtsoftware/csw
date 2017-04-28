@@ -2,16 +2,18 @@ package csw.services.config.server.svn
 
 import java.io.{InputStream, OutputStream}
 import java.nio.file.Path
+import java.util.regex.Pattern
 
 import akka.dispatch.MessageDispatcher
 import csw.services.config.server.Settings
+import csw.services.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator
 import org.tmatesoft.svn.core.io.{SVNRepository, SVNRepositoryFactory}
 import org.tmatesoft.svn.core.wc.{SVNClientManager, SVNRevision}
-import org.tmatesoft.svn.core.wc2.{SvnOperationFactory, SvnTarget}
+import org.tmatesoft.svn.core.wc2.{ISvnObjectReceiver, SvnOperationFactory, SvnTarget}
 
 import scala.concurrent.Future
 
@@ -123,25 +125,26 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
-  def list(): Future[List[SVNDirEntry]] = Future {
-    var entries             = List[SVNDirEntry]()
+  def list(pattern: Option[String] = None): Future[List[SVNDirEntry]] = Future {
+    var entries             = List.empty[SVNDirEntry]
     val svnOperationFactory = new SvnOperationFactory()
+    val compiledPattern     = pattern.map(Pattern.compile)
     try {
       val svnList = svnOperationFactory.createList()
       svnList.setSingleTarget(SvnTarget.fromURL(settings.svnUrl, SVNRevision.HEAD))
       svnList.setRevision(SVNRevision.HEAD)
       svnList.setDepth(SVNDepth.INFINITY)
-      svnList.setReceiver((_, e: SVNDirEntry) => entries = e :: entries)
+      val receiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
+        if (entry.isFile && entry.isNotDefault(settings.`default-suffix`) && entry.matches(compiledPattern)) {
+          entries = entry :: entries
+        }
+      }
+      svnList.setReceiver(receiver)
       svnList.run()
     } finally {
       svnOperationFactory.dispose()
     }
-    entries
-      .filter(
-          svnDir ⇒
-            svnDir.getKind == SVNNodeKind.FILE &&
-            !svnDir.getName.endsWith(settings.`default-suffix`))
-      .sortWith(_.getRelativePath < _.getRelativePath)
+    entries.sortWith(_.getRelativePath < _.getRelativePath)
   }
 
   def hist(path: Path, maxResults: Int): Future[List[SVNLogEntry]] =

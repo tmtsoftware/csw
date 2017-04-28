@@ -60,8 +60,10 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def delete(path: Path): CompletableFuture[Unit] =
     delete(path, comment = "deleted")
 
-  override def list(): CompletableFuture[util.List[ConfigFileInfo]] =
-    configService.list().map(_.asJava).toJava.toCompletableFuture
+  override def list(): CompletableFuture[util.List[ConfigFileInfo]] = list(Optional.empty())
+
+  override def list(pattern: Optional[String]): CompletableFuture[util.List[ConfigFileInfo]] =
+    configService.list(pattern.asScala).map(_.asJava).toJava.toCompletableFuture
 
   override def history(path: Path, maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
     configService.history(path, maxResults).map(_.asJava).toJava.toCompletableFuture

@@ -104,8 +104,8 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def list(): Future[List[ConfigFileInfo]] = async {
-    val uri = await(listUri)
+  override def list(pattern: Option[String]): Future[List[ConfigFileInfo]] = async {
+    val uri = await(listUri).withQuery(Query(pattern.map("pattern" → _).toMap))
 
     val request = HttpRequest(uri = uri)
     println(request)

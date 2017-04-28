@@ -95,6 +95,7 @@ trait IConfigService {
    * @return a list containing one ConfigFileInfo object for each known config file
    */
   def list(): CompletableFuture[ju.List[ConfigFileInfo]]
+  def list(pattern: Optional[String]): CompletableFuture[ju.List[ConfigFileInfo]]
 
   /**
    * Returns a list of all known versions of a given path
