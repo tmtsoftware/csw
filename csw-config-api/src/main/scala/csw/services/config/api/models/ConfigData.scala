@@ -20,7 +20,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
   /**
    * Returns a future string by reading the source.
    */
-  private[config] def toStringF(implicit mat: Materializer): Future[String] =
+  def toStringF(implicit mat: Materializer): Future[String] =
     source.runFold("")((str, bs) ⇒ str + bs.utf8String)
 
   /**
