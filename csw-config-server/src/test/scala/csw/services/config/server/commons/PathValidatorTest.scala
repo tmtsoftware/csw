@@ -6,6 +6,7 @@ import org.scalatest.{FunSuite, Matchers}
 
 class PathValidatorTest extends FunSuite with Matchers {
 
+  // DEOPSCSW-47: Unique name for configuration file
   test("should return false for invalid path") {
 
     val paths = List(

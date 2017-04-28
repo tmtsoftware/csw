@@ -142,6 +142,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   // DEOPSCSW-42: Storing text based component configuration
   // DEOPSCSW-48: Store new configuration file in Config. service
+  // DEOPSCSW-47: Unique name for configuration file
   test("should throw FileAlreadyExists while creating a file if it already exists in repository") {
     val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
@@ -181,7 +182,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     }
   }
 
-  //  DEOPSCSW-46: Unique identifier for configuration file version
+  // DEOPSCSW-46: Unique identifier for configuration file version
   test("each revision of file should have unique identifier") {
     val tromboneHcdConf       = Paths.get("trombone/test/hcd/akka/hcd.conf")
     val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
@@ -574,6 +575,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     fileTimeStampedAfterDelete shouldBe None
   }
 
+  // DEOPSCSW-47: Unique name for configuration file
   test("should allow to create files with valid path and throw error for invalid path") {
     val filePath = Paths.get("/invalid path!/sample@.txt")
 
