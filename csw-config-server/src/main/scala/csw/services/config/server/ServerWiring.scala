@@ -48,4 +48,8 @@ object ServerWiring {
       override val `service-port`: Int = maybePort.getOrElse(super.`service-port`)
     }
   }
+
+  def make(_config: Config): ServerWiring = new ServerWiring {
+    override lazy val config: Config = _config.withFallback(ConfigFactory.load())
+  }
 }

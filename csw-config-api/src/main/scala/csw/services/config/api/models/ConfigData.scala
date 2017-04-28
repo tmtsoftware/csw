@@ -20,7 +20,7 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
   /**
    * Returns a future string by reading the source.
    */
-  def toStringF(implicit mat: Materializer): Future[String] =
+  private[config] def toStringF(implicit mat: Materializer): Future[String] =
     source.runFold("")((str, bs) ⇒ str + bs.utf8String)
 
   /**
@@ -28,13 +28,13 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    *
    * Returns a future string by reading the source.
    */
-  def toJStringF(implicit mat: Materializer): CompletableFuture[String] =
+  private[config] def toJStringF(implicit mat: Materializer): CompletableFuture[String] =
     toStringF.toJava.toCompletableFuture
 
   /**
    * Returns an inputStream which emits the bytes read from source
    */
-  def toInputStream(implicit mat: Materializer): InputStream =
+  private[config] def toInputStream(implicit mat: Materializer): InputStream =
     source.runWith(StreamConverters.asInputStream())
 
   /**
@@ -74,5 +74,6 @@ object ConfigData {
    */
   def fromPath(path: Path): ConfigData = ConfigData.from(FileIO.fromPath(path), path.toFile.length())
 
-  def from(dataBytes: Source[ByteString, Any], length: Long): ConfigData = new ConfigData(dataBytes, length)
+  private[config] def from(dataBytes: Source[ByteString, Any], length: Long): ConfigData =
+    new ConfigData(dataBytes, length)
 }
