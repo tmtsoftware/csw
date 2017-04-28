@@ -1,6 +1,7 @@
 package csw.services.config.server
 
 import java.io.File
+import java.lang
 import java.nio.file.Paths
 
 import com.typesafe.config.Config
@@ -17,6 +18,7 @@ class Settings(config: Config) {
   val `default-suffix`: String         = `csw-config-server`.getString("default-suffix")
   def `service-port`: Int              = `csw-config-server`.getInt("service-port")
   val `blocking-io-dispatcher`: String = `csw-config-server`.getString("blocking-io-dispatcher")
+  val `annex-min-file-size`: Long      = `csw-config-server`.getBytes("annex-min-file-size")
 
   val repositoryFile: File = Paths.get(`repository-dir`).toFile
   val svnUrl: SVNURL       = SVNURL.fromFile(repositoryFile)

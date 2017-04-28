@@ -4,6 +4,7 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
+import csw.services.config.api.commons.BinaryUtils
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
@@ -40,7 +41,9 @@ class SvnConfigService(settings: Settings,
       if (await(exists(path))) {
         throw FileAlreadyExists(path)
       }
-      if (oversize) {
+
+      if (oversize || configData.length > settings.`annex-min-file-size`) {
+        //println(s"Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
         await(createOversize())
       } else {
         await(put(path, configData, update = false, comment))
