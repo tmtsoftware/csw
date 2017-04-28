@@ -1,8 +1,7 @@
 package csw.services.tracklocation
 
-import java.util.concurrent.atomic.AtomicBoolean
-
 import akka.Done
+import akka.actor.CoordinatedShutdown
 import csw.services.location.commons.CswCluster
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
@@ -21,8 +20,6 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
 
   import cswCluster._
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
-
-  private var isRunning = new AtomicBoolean(true)
 
   def run(): Done = {
     Thread.sleep(command.delay)
@@ -48,28 +45,24 @@ class TrackLocation(names: List[String], command: Command, cswCluster: CswCluste
   private def unregisterOnTermination(results: Seq[RegistrationResult]): Unit = {
     println(results.map(_.location.connection.componentId))
 
-    cswCluster.addJvmShutdownHook {
-      println("Shutdown hook reached, unregistering services.")
-      unregisterServices(results)
-      println(s"Exited the application.")
-    }
+    coordinatedShutdown.addTask(
+      CoordinatedShutdown.PhaseBeforeServiceUnbind,
+      "unregistering"
+    )(() => unregisterServices(results))
 
-    isRunning.set(true)
     println(s"Executing specified command: ${command.commandText}")
     val exitCode = command.commandText.!
     println(s"$command exited with exit code $exitCode")
-
-    unregisterServices(results)
   }
 
   /**
    * INTERNAL API : Unregisters a service.
    */
-  private def unregisterServices(results: Seq[RegistrationResult]): Unit = synchronized {
-    if (isRunning.get()) {
-      Await.result(Future.traverse(results)(_.unregister()), 10.seconds)
-      isRunning.set(false)
+  private def unregisterServices(results: Seq[RegistrationResult]): Future[Done] = {
+    println("Shutdown hook reached, unregistering services.")
+    Future.traverse(results)(_.unregister()).map { _ =>
       println(s"Services are unregistered.")
+      Done
     }
   }
 }

@@ -38,14 +38,12 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * Gives handle to CoordinatedShutdown extension
    */
-  private val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   /**
    * Creates an ActorMaterializer for current ActorSystem
    */
   def makeMat(): Materializer = ActorMaterializer()
-
-  def addJvmShutdownHook[T](hook: ⇒ T): Unit = coordinatedShutdown.addJvmShutdownHook(hook)
 
   /**
    * aaa
