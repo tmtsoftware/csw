@@ -29,4 +29,7 @@ trait HttpSupport extends Directives with JsonSupport {
   implicit val configDataMarshaller: ToEntityMarshaller[ConfigData] = Marshaller.opaque { configData =>
     HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
   }
+
+  val configDataEntity: Directive1[ConfigData] = rejectMissingContentLength & extractRequestEntity
+    .map(entity => ConfigData.from(entity.dataBytes, entity.contentLengthOption.get))
 }

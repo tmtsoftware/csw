@@ -5,17 +5,17 @@ import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 
 import akka.stream.Materializer
-import akka.stream.scaladsl.{FileIO, Keep, Sink, Source, StreamConverters}
+import akka.stream.scaladsl.{FileIO, Keep, Source, StreamConverters}
 import akka.util.ByteString
 
 import scala.compat.java8.FutureConverters._
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
 
 /**
  * This class represents the contents of the files being managed.
  * It is wraps an Akka streams of ByteString
  */
-case class ConfigData(source: Source[ByteString, Any], length: Long, isBinary: Future[Boolean]) {
+class ConfigData private (val source: Source[ByteString, Any], val length: Long) {
 
   /**
    * Returns a future string by reading the source.
@@ -62,7 +62,7 @@ object ConfigData {
   /**
    * The data is contained in the string
    */
-  def fromString(str: String)(implicit mat: Materializer): ConfigData = {
+  def fromString(str: String): ConfigData = {
     val byteString = ByteString(str.getBytes())
     ConfigData.from(Source.single(byteString), byteString.length)
   }
@@ -72,17 +72,7 @@ object ConfigData {
    *
    * @param path      the data source
    */
-  def fromPath(path: Path)(implicit mat: Materializer): ConfigData =
-    ConfigData.from(FileIO.fromPath(path), path.toFile.length())
+  def fromPath(path: Path): ConfigData = ConfigData.from(FileIO.fromPath(path), path.toFile.length())
 
-  def from(dataBytes: Source[ByteString, Any], length: Long)(implicit mat: Materializer): ConfigData = {
-    import mat.executionContext
-    val p = Promise[Boolean]
-    val future = dataBytes.prefixAndTail(1).runWith(Sink.head).map {
-      case (bytes, source) ⇒
-        p.success(false)
-        source.prepend(Source(bytes))
-    }
-    ConfigData(Source.fromFutureSource(future), length, p.future)
-  }
+  def from(dataBytes: Source[ByteString, Any], length: Long): ConfigData = new ConfigData(dataBytes, length)
 }

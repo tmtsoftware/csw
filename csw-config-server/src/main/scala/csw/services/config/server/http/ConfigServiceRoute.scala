@@ -15,9 +15,6 @@ class ConfigServiceRoute(
 
   import actorRuntime._
 
-  val configDataEntity: Directive1[ConfigData] = rejectMissingContentLength & extractRequestEntity
-    .map(entity => ConfigData.from(entity.dataBytes, entity.contentLengthOption.get))
-
   def route: Route = handleExceptions(configExceptionHandler.exceptionHandler) {
     path("config" / FilePath) { filePath ⇒
       (get & rejectEmptyResponse) {

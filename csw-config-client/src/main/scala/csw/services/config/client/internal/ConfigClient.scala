@@ -7,6 +7,8 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import csw.services.config.api.commons.BinaryUtils
+import csw.services.config.api.commons.ConfigStreamExts.RichSource
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{JsonSupport, _}
 import csw.services.config.api.scaladsl.ConfigService
@@ -32,8 +34,10 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   override def create(path: jnio.Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] =
     async {
-      val entity = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
-      val uri    = await(configUri(path)).withQuery(Query("oversize" → oversize.toString, "comment" → comment))
+      val (prefix, stitchedSource) = configData.source.prefixAndStitch(1)
+      val annex                    = if (oversize) oversize else BinaryUtils.isBinary(await(prefix))
+      val uri                      = await(configUri(path)).withQuery(Query("oversize" → annex.toString, "comment" → comment))
+      val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
       println(request)

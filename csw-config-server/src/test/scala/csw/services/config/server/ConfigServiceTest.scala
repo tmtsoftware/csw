@@ -1,12 +1,10 @@
 package csw.services.config.server
 
-import java.io.{ByteArrayInputStream, InputStream}
-import java.nio.file.{Files, Path, Paths}
+import java.io.InputStream
+import java.nio.file.{Path, Paths}
 import java.time.Instant
 
-import akka.stream.IOResult
-import akka.stream.scaladsl.{Source, StreamConverters}
-import akka.util.ByteString
+import akka.stream.scaladsl.StreamConverters
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
@@ -14,8 +12,6 @@ import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.files.Sha1
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
-
-import scala.concurrent.Future
 
 abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
