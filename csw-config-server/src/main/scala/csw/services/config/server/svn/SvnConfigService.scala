@@ -34,9 +34,9 @@ class SvnConfigService(settings: Settings,
     }
 
     async {
-      if (!PathValidator.isValid(path))
+      if (!PathValidator.isValid(path)) {
         throw new InvalidFilePath(path, PathValidator.invalidCharsMessage)
-
+      }
       // If the file does not already exists in the repo, create it
       if (await(exists(path))) {
         throw FileAlreadyExists(path)

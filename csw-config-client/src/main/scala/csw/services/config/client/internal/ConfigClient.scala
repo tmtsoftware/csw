@@ -47,7 +47,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
         case StatusCodes.Created    ⇒ await(Unmarshal(response).to[ConfigId])
         case StatusCodes.Conflict   ⇒ throw FileAlreadyExists(path)
         case StatusCodes.BadRequest ⇒ throw InvalidFilePath(await(Unmarshal(response).to[String]))
-        case _                      ⇒ throw new RuntimeException(response.status.reason())
+        case _                      ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
       }
     }
 
@@ -62,7 +62,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     response.status match {
       case StatusCodes.OK       ⇒ await(Unmarshal(response).to[ConfigId])
       case StatusCodes.NotFound ⇒ throw FileNotFound(path)
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
+      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
     }
   }
 
@@ -86,7 +86,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     response.status match {
       case StatusCodes.OK       ⇒ true
       case StatusCodes.NotFound ⇒ false
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
+      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
     }
   }
 
@@ -100,7 +100,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     response.status match {
       case StatusCodes.OK       ⇒ ()
       case StatusCodes.NotFound ⇒ throw FileNotFound(path)
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
+      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
     }
   }
 
@@ -113,7 +113,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
     response.status match {
       case StatusCodes.OK ⇒ await(Unmarshal(response.entity).to[List[ConfigFileInfo]])
-      case _              ⇒ throw new RuntimeException(response.status.reason())
+      case _              ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
     }
   }
 
@@ -127,7 +127,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     response.status match {
       case StatusCodes.OK       ⇒ await(Unmarshal(response.entity).to[List[ConfigFileRevision]])
       case StatusCodes.NotFound ⇒ throw FileNotFound(path)
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
+      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
     }
   }
 
@@ -147,7 +147,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     response.status match {
       case StatusCodes.OK       ⇒ ()
       case StatusCodes.NotFound ⇒ throw FileNotFound(path)
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
+      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
     }
   }
 
@@ -163,9 +163,12 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     response.status match {
       case StatusCodes.OK if lengthOption.isDefined ⇒
         Some(ConfigData.from(response.entity.dataBytes, lengthOption.get))
-      case StatusCodes.OK       ⇒ throw new RuntimeException("response must have content-length")
+      case StatusCodes.OK ⇒
+        //Not consuming the file content will block the connection.
+        response.entity.discardBytes()
+        throw new RuntimeException("response must have content-length")
       case StatusCodes.NotFound ⇒ None
-      case _                    ⇒ throw new RuntimeException(response.status.reason())
+      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
     }
   }
 }
