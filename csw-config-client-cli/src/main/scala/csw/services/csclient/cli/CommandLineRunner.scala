@@ -4,9 +4,11 @@ import csw.services.config.api.models.{ConfigData, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.Duration
+
 class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime) {
 
-  import Block.await
   import actorRuntime._
 
   def run(options: Options): Unit = {
@@ -84,4 +86,8 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
       case x              ⇒ throw new RuntimeException(s"Unknown operation: $x")
     }
   }
+
+  //command line app is by nature blocking.
+  //Do not use such method in library/server side code
+  private def await[T](future: Future[T]): T = Await.result(future, Duration.Inf)
 }

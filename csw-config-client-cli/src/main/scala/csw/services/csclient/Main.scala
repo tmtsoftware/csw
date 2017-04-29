@@ -1,16 +1,20 @@
 package csw.services.csclient
 
-import csw.services.csclient.cli.{ArgsParser, Wiring}
+import csw.services.csclient.cli.{ArgsParser, ClientCliWiring}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationLong
 
 class Main(clusterSettings: ClusterSettings) {
   def start(args: Array[String]): Unit =
     ArgsParser.parse(args).foreach { options ⇒
-      val wiring = new Wiring(clusterSettings)
+      val wiring = new ClientCliWiring(clusterSettings)
+      import wiring._
       try {
-        wiring.commandLineRunner.run(options)
+        commandLineRunner.run(options)
       } finally {
-        wiring.shutdown()
+        Await.result(actorRuntime.shutdown(), 5.seconds)
       }
     }
 }

@@ -14,7 +14,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
   private val httpService  = serverWiring.httpService
   httpService.registeredLazyBinding.await
 
-  private val wiring = new Wiring(ClusterAwareSettings.joinLocal(3552))
+  private val wiring = new ClientCliWiring(ClusterAwareSettings.joinLocal(3552))
   import wiring.commandLineRunner
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
@@ -32,7 +32,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
 
   override protected def afterAll(): Unit = {
     httpService.shutdown().await
-    wiring.shutdown()
+    wiring.actorRuntime.shutdown().await
     Files.delete(Paths.get(inputFilePath))
     Files.delete(Paths.get(updatedInputFilePath))
   }
