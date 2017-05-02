@@ -38,39 +38,46 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
   test("should be able to register with location service on start up") {
     val httpService: HttpService = new Main(clusterSettings).start(Array.empty).get
     val configConnection         = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-    locationService.find(configConnection).await.get.connection shouldBe configConnection
-    httpService.shutdown().await
+    try {
+      locationService.find(configConnection).await.get.connection shouldBe configConnection
+    } finally {
+      httpService.shutdown().await
+    }
     locationService.find(configConnection).await shouldBe None
   }
 
   test("should init svn repo if --initRepo option is provided") {
     val httpService = new Main(clusterSettings).start(Array("--initRepo")).get
 
-    val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-    val configServiceLocation = locationService.find(configConnection).await.get
+    try {
+      val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
+      val configServiceLocation = locationService.find(configConnection).await.get
 
-    val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
+      val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
-    val request  = HttpRequest(uri = uri)
-    val response = Http().singleRequest(request).await
-    response.status shouldBe StatusCodes.OK
-    response.discardEntityBytes()
-
-    httpService.shutdown().await
+      val request  = HttpRequest(uri = uri)
+      val response = Http().singleRequest(request).await
+      response.status shouldBe StatusCodes.OK
+      response.discardEntityBytes()
+    } finally {
+      httpService.shutdown().await
+    }
   }
 
   test("should not initialize svn repo if --initRepo option is not provided") {
     val httpService = new Main(clusterSettings).start(Array.empty).get
 
-    val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-    val configServiceLocation = locationService.find(configConnection).await.get
+    try {
+      val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
+      val configServiceLocation = locationService.find(configConnection).await.get
 
-    val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
+      val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
-    val request  = HttpRequest(uri = uri)
-    val response = Http().singleRequest(request).await
-    response.status shouldBe StatusCodes.InternalServerError
-
-    httpService.shutdown().await
+      val request  = HttpRequest(uri = uri)
+      val response = Http().singleRequest(request).await
+      response.status shouldBe StatusCodes.InternalServerError
+    } finally {
+      httpService.shutdown().await
+    }
   }
 }
