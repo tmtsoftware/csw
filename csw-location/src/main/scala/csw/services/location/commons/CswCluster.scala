@@ -1,13 +1,15 @@
 package csw.services.location.commons
 
 import akka.Done
-import akka.actor.{ActorRef, ActorSystem, CoordinatedShutdown}
+import akka.actor.{ActorRef, ActorSystem, CoordinatedShutdown, PoisonPill}
 import akka.cluster.{Cluster, MemberStatus}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.cluster.http.management.ClusterHttpManagement
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
+import csw.services.location.ClusterConfirmationActor
+import csw.services.location.ClusterConfirmationActor.HasJoinedCluster
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
@@ -64,10 +66,17 @@ class CswCluster private (_actorSystem: ActorSystem) {
       cluster.join(cluster.selfAddress)
     }
 
-    val p = Promise[Done]
-    // Once the current ActorSystem has joined csw-cluster, the promise will be completed
-    cluster.registerOnMemberUp(p.success(Done))
-    Await.result(p.future, 20.seconds)
+    val confirmationActor = actorSystem.actorOf(ClusterConfirmationActor.props())
+    implicit val timeout  = Timeout(5.seconds)
+    import akka.pattern.ask
+    def statusF = (confirmationActor ? HasJoinedCluster).mapTo[Option[Done]]
+    def status  = Await.result(statusF, 5.seconds)
+    val success = BlockingUtils.poll(status.isDefined, 20.seconds)
+    if (!success) {
+      throw new RuntimeException("could not join cluster")
+    }
+    confirmationActor ! PoisonPill
+    Done
   }
 
   private def ensureReplication(): Unit = {
@@ -76,7 +85,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
     def replicaCountF = (replicator ? GetReplicaCount).mapTo[ReplicaCount]
     def replicaCount  = Await.result(replicaCountF, 5.seconds).n
     def upMembers     = cluster.state.members.count(_.status == MemberStatus.Up)
-    val success       = BlockingUtils.poll(replicaCount == upMembers)
+    val success       = BlockingUtils.poll(replicaCount >= upMembers, 10.seconds)
     if (!success) {
       throw new RuntimeException("could not ensure that the data is replicated in location service cluster")
     }
