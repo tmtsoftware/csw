@@ -24,29 +24,15 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
   test("should detect re-registering of new location for a connection that has crashed/gone away") {
     val akkaConnection = AkkaConnection(ComponentId("TromboneHcd", ComponentType.HCD))
 
-    runOn(seed) {
+    runOn(seed, member1) {
       val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
-      enterBarrier("Registration")
-
-      probe.requestNext() shouldBe a[LocationUpdated]
-
-      Thread.sleep(2000)
-      Await.result(testConductor.shutdown(member2), 10.seconds)
-
-      probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
-
-      enterBarrier("member-restarted")
-
       probe.requestNext(5.seconds) shouldBe a[LocationUpdated]
-    }
-
-    runOn(member1) {
-      val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
       enterBarrier("Registration")
 
-      probe.requestNext() shouldBe a[LocationUpdated]
+      runOn(seed) {
+        Await.result(testConductor.shutdown(member2), 10.seconds)
+      }
 
-      Thread.sleep(2000)
       probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
 
       enterBarrier("member-restarted")
@@ -77,7 +63,7 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
         )
 
       val freshLocationService = LocationServiceFactory.withSettings(ClusterSettings().joinLocal(3552))
-      Thread.sleep(1000)
+      Thread.sleep(2000)
       freshLocationService.register(AkkaRegistration(akkaConnection, freshActorRef))
 
       enterBarrier("member-restarted")

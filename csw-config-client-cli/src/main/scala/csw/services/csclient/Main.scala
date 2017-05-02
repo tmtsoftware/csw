@@ -14,7 +14,7 @@ class Main(clusterSettings: ClusterSettings) {
       try {
         commandLineRunner.run(options)
       } finally {
-        Await.result(actorRuntime.shutdown(), 5.seconds)
+        Await.result(actorRuntime.shutdown(), 10.seconds)
       }
     }
 }

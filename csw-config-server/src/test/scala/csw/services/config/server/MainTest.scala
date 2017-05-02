@@ -14,6 +14,7 @@ import csw.services.location.models.Connection.HttpConnection
 import csw.services.location.models.{ComponentId, ComponentType}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import scala.concurrent.duration._
 
 class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   implicit val actorSystem: ActorSystem = ActorSystem("config-server")
@@ -38,8 +39,9 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
   test("should be able to register with location service on start up") {
     val httpService: HttpService = new Main(clusterSettings).start(Array.empty).get
     val configConnection         = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
+
     try {
-      locationService.find(configConnection).await.get.connection shouldBe configConnection
+      locationService.resolve(configConnection, 5.seconds).await.get.connection shouldBe configConnection
     } finally {
       httpService.shutdown().await
     }
@@ -51,7 +53,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
 
     try {
       val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-      val configServiceLocation = locationService.find(configConnection).await.get
+      val configServiceLocation = locationService.resolve(configConnection, 5.seconds).await.get
 
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
@@ -69,7 +71,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
 
     try {
       val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-      val configServiceLocation = locationService.find(configConnection).await.get
+      val configServiceLocation = locationService.resolve(configConnection, 5.seconds).await.get
 
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
