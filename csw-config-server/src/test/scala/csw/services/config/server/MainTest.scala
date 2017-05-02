@@ -16,6 +16,7 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import scala.concurrent.duration._
 
+// DEOPSCSW-130: Command line App for HTTP server
 class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   implicit val actorSystem: ActorSystem = ActorSystem("config-server")
   implicit val mat: Materializer        = ActorMaterializer()
