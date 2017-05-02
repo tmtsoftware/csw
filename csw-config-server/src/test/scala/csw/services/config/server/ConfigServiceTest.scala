@@ -644,6 +644,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     val fileInfoes5 = configService.list().await
     fileInfoes5.map(_.path).toSet shouldBe Set(tromboneConfig, assemblyConfig, hcdConfig)
+
+    val fileInfoes6 = configService.list(Some("hcd")).await
+    fileInfoes6.map(_.path).toSet shouldBe Set(hcdConfig)
   }
 
   test("should be able to store and retrieve text file with size greater than configured size as oversize") {

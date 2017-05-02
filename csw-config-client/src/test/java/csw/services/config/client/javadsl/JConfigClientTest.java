@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.isA;
 
@@ -422,35 +423,29 @@ public class JConfigClientTest {
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
         Path hcdConfig = Paths.get("a/b/c/hcd/hcd.conf");
 
-        String tromboneConfigComment = "hello trombone";
-        String assemblyConfigComment = "hello assembly";
-        String hcdConfigComment = "hello hcd";
+        configService.create(tromboneConfig, ConfigData.fromString(configValue1), false, "hello trombone").get();
+        configService.create(assemblyConfig, ConfigData.fromString(configValue2), false, "hello assembly").get();
+        configService.create(hcdConfig, ConfigData.fromString(configValue3), false, "hello hcd").get();
 
-        ConfigId tromboneConfigId = configService.create(tromboneConfig, ConfigData.fromString(configValue1), false, tromboneConfigComment).get();
-        ConfigId assemblyConfigId = configService.create(assemblyConfig, ConfigData.fromString(configValue2), false, assemblyConfigComment).get();
-        ConfigId hcdConfigId = configService.create(hcdConfig, ConfigData.fromString(configValue3), false, hcdConfigComment).get();
+        Set<Path> expected = new HashSet<>(Arrays.asList(hcdConfig, assemblyConfig));
+        Stream<Path> actualStream = configService.list(Optional.of("a/b/")).get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected, actualStream.collect(Collectors.toSet()));
 
-        Set<ConfigFileInfo> expected = new HashSet<>(Arrays.asList(new ConfigFileInfo(hcdConfig, hcdConfigId, hcdConfigComment),
-                new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)));
-        Set<ConfigFileInfo> actual = new HashSet<>(configService.list(Optional.of("a/b/")).get());
-        Assert.assertEquals(expected, actual);
+        Set<Path> expected1 = Collections.singleton(hcdConfig);
+        Stream<Path> actualStream1 = configService.list(Optional.of("a/b/c")).get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected1, actualStream1.collect(Collectors.toSet()));
 
-        Set<ConfigFileInfo> expected1 = new HashSet<>(Collections.singletonList(new ConfigFileInfo(hcdConfig, hcdConfigId, hcdConfigComment)));
-        Set<ConfigFileInfo> actual1 = new HashSet<>(configService.list(Optional.of("a/b/c")).get());
-        Assert.assertEquals(expected1, actual1);
-
-        Set<ConfigFileInfo> allFiles = new HashSet<>(Arrays.asList(new ConfigFileInfo(hcdConfig, hcdConfigId, hcdConfigComment),
-                new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment),
-                new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment)));
-        Set<ConfigFileInfo> actual2 = new HashSet<>(configService.list(Optional.of(".conf")).get());
-        Assert.assertEquals(allFiles, actual2);
+        Set<Path> all = new HashSet<>(Arrays.asList(hcdConfig, assemblyConfig, tromboneConfig));
+        Stream<Path> actualStream2 = configService.list(Optional.of(".conf")).get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(all, actualStream2.collect(Collectors.toSet()));
 
         List<ConfigFileInfo> fileInfos = configService.list(Optional.of("a/b/c/d")).get();
         Assert.assertTrue(fileInfos.isEmpty());
 
-        Set<ConfigFileInfo> actual3 = new HashSet<>(configService.list().get());
-        Assert.assertEquals(allFiles, actual3);
+        Stream<Path> actualStream3 = configService.list().get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(all, actualStream3.collect(Collectors.toSet()));
 
+        Stream<Path> actualStream4 = configService.list(Optional.of("hcd")).get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected1, actualStream4.collect(Collectors.toSet()));
     }
-
 }
