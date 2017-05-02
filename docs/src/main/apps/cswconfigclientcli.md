@@ -43,6 +43,8 @@ deletes the file at specified path in the repository
 ### list
 lists the files in the repository
 
+ * `--pattern` optional parameter. List all files whose path matches the given pattern. 
+
 ### history
 shows versioning history of the file in the repository
 

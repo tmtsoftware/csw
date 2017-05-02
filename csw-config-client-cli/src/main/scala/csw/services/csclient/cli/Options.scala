@@ -13,6 +13,7 @@ import java.time.Instant
  * @param oversize Optional: if the file is an Oversized(large binary file)
  * @param comment Optional: Version history comment to add while creating the file.
  * @param latest Optional: Get the latest file.
+ * @param pattern Optional: List all files whose path matches the given pattern.
  */
 case class Options(
     op: String = "",
@@ -24,5 +25,6 @@ case class Options(
     maxFileVersions: Int = Int.MaxValue,
     oversize: Boolean = false,
     comment: String = "",
-    latest: Boolean = false
+    latest: Boolean = false,
+    pattern: Option[String] = None
 )

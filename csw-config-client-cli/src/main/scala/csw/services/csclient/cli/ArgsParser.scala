@@ -89,7 +89,11 @@ object ArgsParser {
     //list operation
     cmd("list") action { (_, c) =>
       c.copy(op = "list")
-    } text "lists the files in the repository" children ()
+    } text "lists the files in the repository" children (
+      opt[String]("pattern") action { (x, c) =>
+        c.copy(pattern = Some(x))
+      } text "optional list all files whose path matches the given pattern"
+    )
 
     //history operation
     cmd("history") action { (_, c) =>
