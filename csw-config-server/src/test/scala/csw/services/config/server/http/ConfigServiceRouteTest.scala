@@ -218,6 +218,11 @@ class ConfigServiceRouteTest
       responseAs[List[ConfigFileInfo]].size shouldBe 0
     }
 
+    Get("/list?pattern=a/b") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 0
+    }
+
     Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -228,6 +233,10 @@ class ConfigServiceRouteTest
       responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
 
+    Get("/list?pattern=.conf") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 1
+    }
   }
 
   test("history - success  status code") {
@@ -310,7 +319,7 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/default/test.conf?id=1") ~> Route.seal(route) ~> check {
+    Put("/default/test.conf?id=1&comment=commit1") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
@@ -325,7 +334,7 @@ class ConfigServiceRouteTest
   test("setDefault - failure status codes") {
 
     // try to set default version of file which does not exist
-    Put("/default/test.conf?id=1") ~> Route.seal(route) ~> check {
+    Put("/default/test.conf?id=1&comment=commit1") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
@@ -334,7 +343,7 @@ class ConfigServiceRouteTest
     }
 
     // try to set default version of file which exist bu corresponding id does not exist
-    Put("/default/test.conf?id=2") ~> Route.seal(route) ~> check {
+    Put("/default/test.conf?id=2&comment=commit1") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
