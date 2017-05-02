@@ -4,7 +4,7 @@ import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.{ConfigServiceTest, ServerWiring}
-import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 
 class ConfigClientTest extends ConfigServiceTest {

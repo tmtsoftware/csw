@@ -5,6 +5,7 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
@@ -643,5 +644,31 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     val fileInfoes5 = configService.list().await
     fileInfoes5.map(_.path).toSet shouldBe Set(tromboneConfig, assemblyConfig, hcdConfig)
+  }
+
+  test("should be able to store and retrieve text file with size greater than configured size as oversize") {
+    val fileName              = "tromboneContainer.conf"
+    val path                  = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
+    val configData            = ConfigData.fromPath(path)
+    val config: Config        = ConfigFactory.parseString("csw-config-server.annex-min-file-size=1 KiB")
+    val serverWiringAnnexTest = ServerWiring.make(config)
+
+    val configId =
+      serverWiringAnnexTest.configService
+        .create(Paths.get(fileName), configData, oversize = false, s"committing file: $fileName")
+        .await
+
+    val expectedContent =
+      serverWiringAnnexTest.configService.getById(Paths.get(fileName), configId).await.get.toInputStream.toByteArray
+    val diskFile = getClass.getClassLoader.getResourceAsStream(fileName)
+    expectedContent shouldBe diskFile.toByteArray
+
+    val svnConfigData =
+      serverWiringAnnexTest.configService
+        .getById(Paths.get(s"$fileName${serverWiring.settings.`sha1-suffix`}"), configId)
+        .await
+        .get
+    svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
+    serverWiringAnnexTest.actorRuntime.shutdown().await
   }
 }

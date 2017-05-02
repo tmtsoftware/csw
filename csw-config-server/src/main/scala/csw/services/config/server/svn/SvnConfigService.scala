@@ -42,7 +42,7 @@ class SvnConfigService(settings: Settings,
       }
 
       if (oversize || configData.length > settings.`annex-min-file-size`) {
-//        println(s"Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
+//        println(s"Either oversize=${oversize} is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
         await(createOversize())
       } else {
         await(put(path, configData, update = false, comment))
