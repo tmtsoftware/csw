@@ -16,6 +16,7 @@ trait HttpSupport extends Directives with JsonSupport {
   val dateParam: Directive1[Option[Instant]]   = parameter('date.?).map(_.map(Instant.parse))
   val maxResultsParam: Directive1[Int]         = parameter('maxResults.as[Int] ? Int.MaxValue)
   val patternParam: Directive1[Option[String]] = parameter('pattern.?)
+  val typeParam: Directive1[Option[String]]    = parameter('type.?)
   val commentParam: Directive1[String]         = parameter('comment ? "")
   val annexParam: Directive1[Boolean]          = parameter('annex.as[Boolean] ? false)
   val FilePath: PathMatcher1[Path]             = Remaining.map(path => Paths.get(path))

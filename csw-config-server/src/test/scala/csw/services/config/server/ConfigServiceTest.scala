@@ -621,6 +621,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     )
   }
 
+  //DEOPSCSW-75 List the names of configuration files that match a path
   test("should filter list based on the pattern") {
     val tromboneConfig = Paths.get("a/c/trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
@@ -630,22 +631,22 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.create(assemblyConfig, ConfigData.fromString(configValue2), annex = true, "hello assembly").await
     configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
 
-    val fileInfoes1 = configService.list(Some("a/b")).await
+    val fileInfoes1 = configService.list(pattern = Some("a/b.*")).await
     fileInfoes1.map(_.path).toSet shouldBe Set(assemblyConfig, hcdConfig)
 
-    val fileInfoes2 = configService.list(Some(".conf")).await
+    val fileInfoes2 = configService.list(pattern = Some(".*.conf")).await
     fileInfoes2.map(_.path).toSet shouldBe Set(tromboneConfig, assemblyConfig, hcdConfig)
 
-    val fileInfoes3 = configService.list(Some("a/b/c/d")).await
+    val fileInfoes3 = configService.list(pattern = Some("a/b/c/d.*")).await
     fileInfoes3.isEmpty shouldBe true
 
-    val fileInfoes4 = configService.list(Some("a/b/c")).await
+    val fileInfoes4 = configService.list(pattern = Some("a/b/c.*")).await
     fileInfoes4.map(_.path).toSet shouldBe Set(hcdConfig)
 
     val fileInfoes5 = configService.list().await
     fileInfoes5.map(_.path).toSet shouldBe Set(tromboneConfig, assemblyConfig, hcdConfig)
 
-    val fileInfoes6 = configService.list(Some("hcd")).await
+    val fileInfoes6 = configService.list(pattern = Some(".*hcd.*")).await
     fileInfoes6.map(_.path).toSet shouldBe Set(hcdConfig)
   }
 
@@ -673,5 +674,43 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
         .get
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
     serverWiringAnnexTest.actorRuntime.shutdown().await
+  }
+
+  //DEOPSCSW-132 List oversize and normal sized files
+  //DEOPSCSW-75 List the names of configuration files that match a path
+  test("should filter list based on the type and pattern") {
+    val tromboneConfig  = Paths.get("a/c/trombone.conf")
+    val hcdConfig       = Paths.get("a/b/c/hcd/hcd.conf")
+    val assemblyConfig1 = Paths.get("a/b/assembly/assembly1.conf")
+    val assemblyConfig2 = Paths.get("a/b/c/assembly/assembly2.conf")
+
+    configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
+    configService.create(assemblyConfig1, ConfigData.fromString(configValue2), annex = true, "hello assembly1").await
+    configService.create(assemblyConfig2, ConfigData.fromString(configValue2), annex = true, "hello assembly2").await
+    configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
+
+    val fileInfoes3 = configService.list(Some("annex")).await
+    fileInfoes3.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
+
+    val fileInfoes2 = configService.list(Some("normal")).await
+    fileInfoes2.map(_.path).toSet shouldBe Set(tromboneConfig, hcdConfig)
+
+    val fileInfoes1 = configService.list(Some("annex"), Some("a/b/c.*")).await
+    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyConfig2)
+
+    val fileInfoes7 = configService.list(Some("annex"), Some(".*.conf")).await
+    fileInfoes7.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
+
+    val fileInfoes8 = configService.list(Some("annex"), Some(".*assembly.*")).await
+    fileInfoes8.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
+
+    val fileInfoes4 = configService.list(Some("normal"), Some("a/b/c.*")).await
+    fileInfoes4.map(_.path).toSet shouldBe Set(hcdConfig)
+
+    val fileInfoes5 = configService.list(Some("normal"), Some(".*.conf")).await
+    fileInfoes5.map(_.path).toSet shouldBe Set(tromboneConfig, hcdConfig)
+
+    val fileInfoes6 = configService.list(Some("normal"), Some(".*hcd.*")).await
+    fileInfoes6.map(_.path).toSet shouldBe Set(hcdConfig)
   }
 }

@@ -68,8 +68,8 @@ class ConfigServiceRoute(
       }
     } ~
     (path("list") & get) {
-      patternParam { pattern ⇒
-        complete(configService.list(pattern))
+      (typeParam & patternParam) { (fileType, pattern) ⇒
+        complete(configService.list(fileType, pattern))
       }
     }
   }

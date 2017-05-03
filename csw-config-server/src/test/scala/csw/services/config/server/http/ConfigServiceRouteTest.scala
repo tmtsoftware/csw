@@ -233,7 +233,7 @@ class ConfigServiceRouteTest
       responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
 
-    Get("/list?pattern=.conf") ~> route ~> check {
+    Get("/list?pattern=.*.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 1
     }

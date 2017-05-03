@@ -417,6 +417,7 @@ public class JConfigClientTest {
         Assert.assertEquals(expected, actual);
     }
 
+    //DEOPSCSW-75 List the names of configuration files that match a path
     @Test
     public void testListIsFilteredBasedOnPattern() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
@@ -428,24 +429,24 @@ public class JConfigClientTest {
         configService.create(hcdConfig, ConfigData.fromString(configValue3), false, "hello hcd").get();
 
         Set<Path> expected = new HashSet<>(Arrays.asList(hcdConfig, assemblyConfig));
-        Stream<Path> actualStream = configService.list(Optional.of("a/b/")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream = configService.list(Optional.of("a/b/.*")).get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected, actualStream.collect(Collectors.toSet()));
 
         Set<Path> expected1 = Collections.singleton(hcdConfig);
-        Stream<Path> actualStream1 = configService.list(Optional.of("a/b/c")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream1 = configService.list(Optional.of("a/b/c.*")).get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected1, actualStream1.collect(Collectors.toSet()));
 
         Set<Path> all = new HashSet<>(Arrays.asList(hcdConfig, assemblyConfig, tromboneConfig));
-        Stream<Path> actualStream2 = configService.list(Optional.of(".conf")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream2 = configService.list(Optional.of(".*.conf")).get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(all, actualStream2.collect(Collectors.toSet()));
 
-        List<ConfigFileInfo> fileInfos = configService.list(Optional.of("a/b/c/d")).get();
+        List<ConfigFileInfo> fileInfos = configService.list(Optional.of("a/b/c/d.*")).get();
         Assert.assertTrue(fileInfos.isEmpty());
 
         Stream<Path> actualStream3 = configService.list().get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(all, actualStream3.collect(Collectors.toSet()));
 
-        Stream<Path> actualStream4 = configService.list(Optional.of("hcd")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream4 = configService.list(Optional.of(".*hcd.*")).get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected1, actualStream4.collect(Collectors.toSet()));
     }
 }

@@ -85,7 +85,7 @@ trait ConfigService {
    *
    * @return a list containing one ConfigFileInfo object for each known config file
    */
-  def list(pattern: Option[String] = None): Future[List[ConfigFileInfo]]
+  def list(fileType: Option[String] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]]
 
   /**
    * Returns a list of all known versions of a given path

@@ -132,12 +132,12 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  override def list(pattern: Option[String] = None): Future[List[ConfigFileInfo]] = async {
-    await(svnRepo.list(pattern)).map { entry =>
-      ConfigFileInfo(Paths.get(entry.getRelativePath.stripSuffix(settings.`sha1-suffix`)), ConfigId(entry.getRevision),
-        entry.getCommitMessage)
+  override def list(fileType: Option[String] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] =
+    async {
+      await(svnRepo.list(fileType, pattern)).map { entry =>
+        ConfigFileInfo(Paths.get(entry.getRelativePath), ConfigId(entry.getRevision), entry.getCommitMessage)
+      }
     }
-  }
 
   override def history(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     await(pathStatus(path)) match {

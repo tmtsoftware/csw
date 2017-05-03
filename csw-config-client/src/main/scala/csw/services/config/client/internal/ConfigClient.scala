@@ -104,18 +104,19 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def list(pattern: Option[String] = None): Future[List[ConfigFileInfo]] = async {
-    val uri = await(listUri).withQuery(Query(pattern.map("pattern" → _).toMap))
+  override def list(fileType: Option[String] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] =
+    async {
+      val uri = await(listUri).withQuery(Query(fileType.map("type" → _).toMap ++ pattern.map("pattern" → _).toMap))
 
-    val request = HttpRequest(uri = uri)
-    println(request)
-    val response = await(Http().singleRequest(request))
+      val request = HttpRequest(uri = uri)
+      println(request)
+      val response = await(Http().singleRequest(request))
 
-    response.status match {
-      case StatusCodes.OK ⇒ await(Unmarshal(response.entity).to[List[ConfigFileInfo]])
-      case _              ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
+      response.status match {
+        case StatusCodes.OK ⇒ await(Unmarshal(response.entity).to[List[ConfigFileInfo]])
+        case _              ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
+      }
     }
-  }
 
   override def history(path: jnio.Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     val uri = await(historyUri(path)).withQuery(Query("maxResults" → maxResults.toString))
