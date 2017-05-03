@@ -198,8 +198,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5)).await
     val configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
 
-    val actualConfigIds =
-      List(configId1, configId2, configId3, configId4, configId5, configId6).sortBy(configId ⇒ configId.id)
+    val actualConfigIds = List(configId1, configId2, configId3, configId4, configId5, configId6).sortBy(_.id)
 
     actualConfigIds shouldBe expectedConfigIds
   }

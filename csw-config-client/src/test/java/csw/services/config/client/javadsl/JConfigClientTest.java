@@ -201,29 +201,31 @@ public class JConfigClientTest {
     public void testHistoryOfAFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
 
-        exception.expectCause(isA(FileNotFound.class));
-        configService.history(path).get();
+        try{
+            exception.expectCause(isA(FileNotFound.class));
+            configService.history(path).get();
+        }finally {
+            String comment1 = "commit version 1";
+            String comment2 = "commit version 2";
+            String comment3 = "commit version 3";
 
-        String comment1 = "commit version 1";
-        String comment2 = "commit version 2";
-        String comment3 = "commit version 3";
+            ConfigId configId1 = configService.create(path, ConfigData.fromString(configValue1), false, comment1).get();
+            ConfigId configId2 = configService.update(path, ConfigData.fromString(configValue2), comment2).get();
+            ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3), comment3).get();
 
-        ConfigId configId1 = configService.create(path, ConfigData.fromString(configValue1), false, comment1).get();
-        ConfigId configId2 = configService.update(path, ConfigData.fromString(configValue2), comment2).get();
-        ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3), comment3).get();
+            Assert.assertEquals(configService.history(path).get().size(), 3);
+            Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
 
-        Assert.assertEquals(configService.history(path).get().size(), 3);
-       Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
+            Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(comment3, comment2, comment1)));
 
-        Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(comment3, comment2, comment1)));
-
-        Assert.assertEquals(configService.history(path, 2).get().size(), 2);
-        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configId3, configId2)));
-        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(comment3, comment2)));
+            Assert.assertEquals(configService.history(path, 2).get().size(), 2);
+            Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2)));
+            Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(comment3, comment2)));
+        }
     }
 
     // DEOPSCSW-48: Store new configuration file in Config. service
