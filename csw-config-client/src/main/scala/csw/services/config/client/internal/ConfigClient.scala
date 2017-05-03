@@ -32,11 +32,11 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     await(configServiceResolver.uri).withPath(path)
   }
 
-  override def create(path: jnio.Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] =
+  override def create(path: jnio.Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] =
     async {
       val (prefix, stitchedSource) = configData.source.prefixAndStitch(1)
-      val annex                    = if (oversize) oversize else BinaryUtils.isBinary(await(prefix))
-      val uri                      = await(configUri(path)).withQuery(Query("oversize" → annex.toString, "comment" → comment))
+      val isAnnex                  = if (annex) annex else BinaryUtils.isBinary(await(prefix))
+      val uri                      = await(configUri(path)).withQuery(Query("annex" → isAnnex.toString, "comment" → comment))
       val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)

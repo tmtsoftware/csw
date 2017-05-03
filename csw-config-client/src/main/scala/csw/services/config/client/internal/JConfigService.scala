@@ -20,18 +20,18 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
 
   override def create(path: Path,
                       configData: ConfigData,
-                      oversize: Boolean,
+                      annex: Boolean,
                       comment: String): CompletableFuture[ConfigId] =
-    configService.create(path, configData, oversize, comment).toJava.toCompletableFuture
+    configService.create(path, configData, annex, comment).toJava.toCompletableFuture
 
   override def create(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
-    create(path, configData, oversize = false, comment)
+    create(path, configData, annex = false, comment)
 
-  override def create(path: Path, configData: ConfigData, oversize: Boolean): CompletableFuture[ConfigId] =
-    create(path, configData, oversize, comment = "")
+  override def create(path: Path, configData: ConfigData, annex: Boolean): CompletableFuture[ConfigId] =
+    create(path, configData, annex, comment = "")
 
   override def create(path: Path, configData: ConfigData): CompletableFuture[ConfigId] =
-    create(path, configData, oversize = false, comment = "")
+    create(path, configData, annex = false, comment = "")
 
   override def update(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
     configService.update(path, configData, comment).toJava.toCompletableFuture

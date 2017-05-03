@@ -24,8 +24,8 @@ object ArgsParser {
       opt[String]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
         c.copy(inputFilePath = Some(Paths.get(x)))
       } text "input file path",
-      opt[Unit]("oversize") action { (_, c) =>
-        c.copy(oversize = true)
+      opt[Unit]("annex") action { (_, c) =>
+        c.copy(annex = true)
       } text "optional add this option for large/binary files",
       opt[String]('c', "comment") action { (x, c) =>
         c.copy(comment = x)

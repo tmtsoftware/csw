@@ -330,7 +330,7 @@ public class JConfigClientTest {
         Assert.assertFalse(configService.exists(path).get());
 
         Path newPath = Paths.get("a/test.csw.conf");
-        configService.create(newPath, ConfigData.fromString(configValue3), true, "create oversize file").get();
+        configService.create(newPath, ConfigData.fromString(configValue3), true, "create annex file").get();
 
         Assert.assertTrue(configService.exists(newPath).get());
     }
@@ -377,7 +377,7 @@ public class JConfigClientTest {
     @Test
     public void testRetrieveVersionBasedOnDateForOverSizedFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
-        configService.create(path, ConfigData.fromString(configValue1), true, "commit initial oversize configuration").get();
+        configService.create(path, ConfigData.fromString(configValue1), true, "commit initial annex configuration").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
         configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();

@@ -49,7 +49,7 @@
 						}
 					],
 					"request": {
-						"url": "http://{{hostname}}:{{port}}/config/{{path}}?oversize=false&comment=\"uploading configuration file\"",
+						"url": "http://{{hostname}}:{{port}}/config/{{path}}?annex=false&comment=\"uploading configuration file\"",
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -193,7 +193,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "\ncsw-config-server {\n\n  repository-dir = /tmp/csw-config-svn\n  tmp-dir = /tmp/csw-config-temp\n  oversize-files-dir = /tmp/csw-config-oversize-files\n\n  svn-user-name = some-user-name\n\n  sha1-suffix = .sha1\n  default-suffix = .default\n\n  service-port = 4000\n  service-port = ${?httpPort}\n\n  blocking-io-dispatcher = \"csw-config-server.default-blocking-io-dispatcher\"\n\n  default-blocking-io-dispatcher {\n    type = \"Dispatcher\"\n    executor = \"thread-pool-executor\"\n    throughput = 1\n\n    thread-pool-executor {\n      fixed-pool-size = 64\n    }\n  }\n\n}\n"
+							"raw": "\ncsw-config-server {\n\n  repository-dir = /tmp/csw-config-svn\n  tmp-dir = /tmp/csw-config-temp\n  annex-files-dir = /tmp/csw-config-annex-files\n\n  svn-user-name = some-user-name\n\n  sha1-suffix = .sha1\n  default-suffix = .default\n\n  service-port = 4000\n  service-port = ${?httpPort}\n\n  blocking-io-dispatcher = \"csw-config-server.default-blocking-io-dispatcher\"\n\n  default-blocking-io-dispatcher {\n    type = \"Dispatcher\"\n    executor = \"thread-pool-executor\"\n    throughput = 1\n\n    thread-pool-executor {\n      fixed-pool-size = 64\n    }\n  }\n\n}\n"
 						},
 						"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests."
 					},

@@ -15,8 +15,8 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
 
     def create(): Unit = {
       val configData = ConfigData.fromPath(options.inputFilePath.get)
-      val configId = await(configService.create(options.relativeRepoPath.get, configData, oversize = options.oversize,
-          options.comment))
+      val configId =
+        await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex, options.comment))
       println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
     }
 

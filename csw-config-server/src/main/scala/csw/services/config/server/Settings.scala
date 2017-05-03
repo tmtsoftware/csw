@@ -11,7 +11,7 @@ class Settings(config: Config) {
   private val `csw-config-server` = config.getConfig("csw-config-server")
 
   val `repository-dir`: String         = `csw-config-server`.getString("repository-dir")
-  val `oversize-files-dir`: String     = `csw-config-server`.getString("oversize-files-dir")
+  val `annex-files-dir`: String        = `csw-config-server`.getString("annex-files-dir")
   val `svn-user-name`: String          = `csw-config-server`.getString("svn-user-name")
   val `sha1-suffix`: String            = `csw-config-server`.getString("sha1-suffix")
   val `default-suffix`: String         = `csw-config-server`.getString("default-suffix")

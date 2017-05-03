@@ -24,7 +24,7 @@ class ArgsUtil {
   val comment                      = "test commit comment!!!"
   val maxFileVersions              = 32
 
-  val createAllArgs       = Array("create", relativeRepoPath, "-i", inputFilePath, "--oversize", "-c", comment)
+  val createAllArgs       = Array("create", relativeRepoPath, "-i", inputFilePath, "--annex", "-c", comment)
   val createMinimalArgs   = Array("create", relativeRepoPath, "-i", inputFilePath)
   val updateAllArgs       = Array("update", relativeRepoPath, "-i", updatedInputFilePath, "-c", comment)
   val updateMinimalArgs   = Array("update", relativeRepoPath, "-i", updatedInputFileContents)

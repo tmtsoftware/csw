@@ -18,11 +18,11 @@ trait ConfigService {
    *
    * @param path       the file path relative to the repository root
    * @param configData used to read the contents of the file
-   * @param oversize   true if the file is oversize and requires special handling (external storage)
+   * @param annex   true if the file is annex and requires special handling (external storage)
    * @param comment    an optional comment to associate with this file
    * @return a unique id that can be used to refer to the file
    */
-  def create(path: Path, configData: ConfigData, oversize: Boolean = false, comment: String = ""): Future[ConfigId]
+  def create(path: Path, configData: ConfigData, annex: Boolean = false, comment: String = ""): Future[ConfigId]
 
   /**
    * Updates the config file with the given path and data and optional comment.

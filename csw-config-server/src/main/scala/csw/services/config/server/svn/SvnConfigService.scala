@@ -25,11 +25,11 @@ class SvnConfigService(settings: Settings,
 
   import actorRuntime._
 
-  override def create(path: Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
+  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = {
 
     def createOversize(): Future[ConfigId] = async {
       val sha1 = await(fileService.post(configData))
-      await(create(shaFilePath(path), ConfigData.fromString(sha1), oversize = false, comment))
+      await(create(shaFilePath(path), ConfigData.fromString(sha1), annex = false, comment))
     }
 
     async {
@@ -41,8 +41,8 @@ class SvnConfigService(settings: Settings,
         throw FileAlreadyExists(path)
       }
 
-      if (oversize || configData.length > settings.`annex-min-file-size`) {
-//        println(s"Either oversize=${oversize} is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
+      if (annex || configData.length > settings.`annex-min-file-size`) {
+//        println(s"Either annex=${annex} is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
         await(createOversize())
       } else {
         await(put(path, configData, update = false, comment))
@@ -79,7 +79,7 @@ class SvnConfigService(settings: Settings,
     Some(ConfigData.from(source, await(svnRepo.getFileSize(path, revision.getNumber))))
   }
 
-  // Get oversize files that are stored in the annex server
+  // Get annex files that are stored in the annex server
   private def getOversize(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
     await(getNormalSize(shaFilePath(path), revision)) match {
       case None =>

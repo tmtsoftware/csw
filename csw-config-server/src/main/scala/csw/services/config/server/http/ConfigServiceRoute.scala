@@ -34,8 +34,8 @@ class ConfigServiceRoute(
         }
       } ~
       post {
-        (configDataEntity & oversizeParam & commentParam) { (configData, oversize, comment) ⇒
-          complete(StatusCodes.Created -> configService.create(filePath, configData, oversize, comment))
+        (configDataEntity & oversizeParam & commentParam) { (configData, annex, comment) ⇒
+          complete(StatusCodes.Created -> configService.create(filePath, configData, annex, comment))
         }
       } ~
       put {
