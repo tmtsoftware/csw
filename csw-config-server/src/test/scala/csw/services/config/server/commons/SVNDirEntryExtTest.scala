@@ -48,8 +48,8 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
     val normalDirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt", SVNNodeKind.FILE, 100,
       false, 1, new Date(), "author", "comment")
 
-    val annexDirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt.sha1", SVNNodeKind.FILE, 100,
-      false, 1, new Date(), "author", "comment")
+    val annexDirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt.$sha1", SVNNodeKind.FILE,
+      100, false, 1, new Date(), "author", "comment")
 
     normalDirEntry.isNormal(settings.`sha1-suffix`) shouldBe true
     annexDirEntry.isAnnex(settings.`sha1-suffix`) shouldBe true

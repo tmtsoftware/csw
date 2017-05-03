@@ -448,7 +448,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
   }
 
-  test("should list files from annex store without .sha1 suffix") {
+  test("should list files from annex store without .$sha1 suffix") {
     val file1    = Paths.get("AnnexFile1.txt")
     val comment1 = "committing annex file"
 
