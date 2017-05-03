@@ -399,9 +399,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-77: Set default version of configuration file in config service
   // DEOPSCSW-78: Get the default version of a configuration file
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
-  test("should able to get, set and reset the default version of config file") {
+  test("should able to get, set and reset the active version of config file") {
     // create file
-    val file = Paths.get("/tmt/test/setdefault/getdefault/resetdefault/default.conf")
+    val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "hello world").await
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue1
 
@@ -411,27 +411,27 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // check that get file without ID should return latest file
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue3
-    // check that getDefault file without ID should return latest file
-    configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
-    // set default version of file to id=2
-    configService.setDefault(file, configId, "Setting default first time").await
-    // check that getDefault file without ID returns file with id=2
-    configService.getDefault(file).await.get.toStringF.await shouldBe configValue2
+    // check that getActive file without ID should return latest file
+    configService.getActive(file).await.get.toStringF.await shouldBe configValue3
+    // set active version of file to id=2
+    configService.setActive(file, configId, "Setting active version for the first time").await
+    // check that getActive file without ID returns file with id=2
+    configService.getActive(file).await.get.toStringF.await shouldBe configValue2
 
-    configService.resetDefault(file, "resetting default").await
-    configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
+    configService.resetActive(file, "resetting active version").await
+    configService.getActive(file).await.get.toStringF.await shouldBe configValue3
 
-    // check that setDefault without id,resets default version of file
-    configService.resetDefault(file, comment = "setting default again").await
-    configService.getDefault(file).await.get.toStringF.await shouldBe configValue3
+    // check that setActive without id,resets active version of file
+    configService.resetActive(file, comment = "setting active  versionagain").await
+    configService.getActive(file).await.get.toStringF.await shouldBe configValue3
 
   }
 
   // DEOPSCSW-77: Set default version of configuration file in config service
   // DEOPSCSW-78: Get the default version of a configuration file
-  test("getDefault should return None if file does not exists") {
+  test("getActive should return None if file does not exists") {
     val file = Paths.get("/tmt/test/ahgvfyfgpp.conf")
-    configService.getDefault(file).await shouldBe None
+    configService.getActive(file).await shouldBe None
   }
 
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
@@ -513,36 +513,36 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-77: Set default version of configuration file in config service
   // DEOPSCSW-78: Get the default version of a configuration file
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
-  test("should be able to get default file from annex store") {
+  test("should be able to get active file from annex store") {
     val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
     val configId =
       configService.create(file, ConfigData.fromString(content), annex = true, "committing annex file").await
 
-    configService.setDefault(file, configId).await
+    configService.setActive(file, configId).await
 
     val newContent = "testing annex file, again"
     val newComment = "Updating file"
     configService.update(file, ConfigData.fromString(newContent), newComment).await
 
-    val defaultData: ConfigData = configService.getDefault(file).await.get
-    defaultData.toStringF.await shouldBe content
+    val activeConfigData: ConfigData = configService.getActive(file).await.get
+    activeConfigData.toStringF.await shouldBe content
 
-    configService.resetDefault(file).await
+    configService.resetActive(file).await
 
-    val resetDefaultData: ConfigData = configService.getDefault(file).await.get
-    resetDefaultData.toStringF.await shouldBe newContent
+    val resetActiveConfigData: ConfigData = configService.getActive(file).await.get
+    resetActiveConfigData.toStringF.await shouldBe newContent
 
     configService.delete(file, "deleting file").await
 
     val fileExists = configService.exists(file).await
     fileExists shouldBe false
 
-    val defaultAfterDelete = configService.getDefault(file).await
-    defaultAfterDelete shouldBe None
+    val activeAfterDelete = configService.getActive(file).await
+    activeAfterDelete shouldBe None
 
     intercept[FileNotFound] {
-      configService.resetDefault(file).await
+      configService.resetActive(file).await
     }
   }
 
@@ -610,8 +610,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       .create(assemblyConfig, ConfigData.fromString(configValue2), annex = true, assemblyConfigComment)
       .await
 
-    configService.setDefault(tromboneConfig, tromboneConfigId).await
-    configService.setDefault(assemblyConfig, assemblyConfigId).await
+    configService.setActive(tromboneConfig, tromboneConfigId).await
+    configService.setActive(assemblyConfig, assemblyConfigId).await
 
     // list files from repo and assert that it contains added files
     val configFiles = configService.list().await

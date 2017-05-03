@@ -22,9 +22,9 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   import actorRuntime._
 
-  private def configUri(path: jnio.Path)  = baseUri(Path / "config" ++ Path / Path(path.toString))
-  private def defaultUri(path: jnio.Path) = baseUri(Path / "default" ++ Path / Path(path.toString))
-  private def historyUri(path: jnio.Path) = baseUri(Path / "history" ++ Path / Path(path.toString))
+  private def configUri(path: jnio.Path)    = baseUri(Path / "config" ++ Path / Path(path.toString))
+  private def activeConfig(path: jnio.Path) = baseUri(Path / "default" ++ Path / Path(path.toString))
+  private def historyUri(path: jnio.Path)   = baseUri(Path / "history" ++ Path / Path(path.toString))
 
   private def listUri = baseUri(Path / "list")
 
@@ -66,7 +66,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def getDefault(path: jnio.Path): Future[Option[ConfigData]] = get(path, Query.Empty)
+  override def getActive(path: jnio.Path): Future[Option[ConfigData]] = get(path, Query.Empty)
 
   override def getLatest(path: jnio.Path): Future[Option[ConfigData]] = get(path, Query("latest" → "true"))
 
@@ -133,14 +133,14 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def setDefault(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
-    handleDefault(path, Query("id" → id.id.toString, "comment" → comment))
+  override def setActive(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
+    handleActiveConfig(path, Query("id" → id.id.toString, "comment" → comment))
 
-  override def resetDefault(path: jnio.Path, comment: String): Future[Unit] =
-    handleDefault(path, Query("comment" → comment))
+  override def resetActive(path: jnio.Path, comment: String): Future[Unit] =
+    handleActiveConfig(path, Query("comment" → comment))
 
-  private def handleDefault(path: jnio.Path, query: Query): Future[Unit] = async {
-    val uri = await(defaultUri(path)).withQuery(query)
+  private def handleActiveConfig(path: jnio.Path, query: Query): Future[Unit] = async {
+    val uri = await(activeConfig(path)).withQuery(query)
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri)
     println(request)

@@ -111,35 +111,35 @@ trait IConfigService {
   def history(path: Path): CompletableFuture[ju.List[ConfigFileRevision]]
 
   /**
-   * Sets the "default version" of the file with the given path.
-   * If this method is not called, the default version will always be the latest version.
-   * After calling this method, the version with the given Id will be the default.
+   * Sets the "active version" to be the version provided for the file with the given path.
+   * If this method is not called, the active version will always be the version with which the file was created i.e. 1
+   * After calling this method, the version with the given Id will be the active.
    *
    * @param path the file path relative to the repository root
    * @param id   an optional id used to specify a specific version
-   *             (by default the id of the latest version is used)
+   *             (by default the id of the version with which the file was created i.e. 1)
    * @return     a future result
    */
-  def setDefault(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit]
-  def setDefault(path: Path, id: ConfigId): CompletableFuture[Unit]
+  def setActive(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit]
+  def setActive(path: Path, id: ConfigId): CompletableFuture[Unit]
 
   /**
-   * Resets the "default version" of the file with the given path to the latest version.
+   * Resets the "active version" of the file with the given path to the latest version.
    *
    * @param path the file path relative to the repository root
    * @return     a future result
    */
-  def resetDefault(path: Path, comment: String): CompletableFuture[Unit]
-  def resetDefault(path: Path): CompletableFuture[Unit]
+  def resetActive(path: Path, comment: String): CompletableFuture[Unit]
+  def resetActive(path: Path): CompletableFuture[Unit]
 
   /**
-   * Gets and returns the default version of the file stored under the given path.
-   * If no default was set, this returns the latest version.
+   * Gets and returns the active version of the file stored under the given path.
+   * If no active was set, this returns the version with which the file was created i.e. 1.
    *
    * @param path the file path relative to the repository root
    * @return     a future object that can be used to access the file's data, if found
    */
-  def getDefault(path: Path): CompletableFuture[Optional[ConfigData]]
+  def getActive(path: Path): CompletableFuture[Optional[ConfigData]]
 
   /**
    * Returns the Scala API for this instance of config service

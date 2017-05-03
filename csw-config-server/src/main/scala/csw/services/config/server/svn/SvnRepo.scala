@@ -87,7 +87,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       val deltaGenerator = new SVNDeltaGenerator
 
       val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
-      closeDir(checksum, openDirDepth) // XXX TODO I think all added parent dirs need to be closed also
+      closeDir(checksum, openDirDepth)
     } finally {
       svn.closeSession()
     }

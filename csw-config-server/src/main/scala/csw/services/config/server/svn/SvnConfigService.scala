@@ -157,39 +157,39 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  override def setDefault(path: Path, id: ConfigId, comment: String): Future[Unit] = async {
+  override def setActive(path: Path, id: ConfigId, comment: String): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
       throw FileNotFound(path)
     }
 
-    val defaultPath = defaultFilePath(path)
-    val present     = await(exists(defaultPath))
+    val activePath = activeFilePath(path)
+    val present    = await(exists(activePath))
 
     if (present) {
-      await(update(defaultPath, ConfigData.fromString(id.id), comment))
+      await(update(activePath, ConfigData.fromString(id.id), comment))
     } else {
-      await(createFile(defaultPath, ConfigData.fromString(id.id), comment = comment))
+      await(createFile(activePath, ConfigData.fromString(id.id), comment = comment))
     }
   }
 
-  override def resetDefault(path: Path, comment: String): Future[Unit] = async {
+  override def resetActive(path: Path, comment: String): Future[Unit] = async {
     if (!await(exists(path))) {
       throw FileNotFound(path)
     }
 
-    val defaultPath = defaultFilePath(path)
+    val activePath = activeFilePath(path)
 
-    val present = await(exists(defaultPath))
+    val present = await(exists(activePath))
 
     if (present) {
-      await(delete(defaultPath))
+      await(delete(activePath))
     }
   }
 
-  override def getDefault(path: Path): Future[Option[ConfigData]] = {
+  override def getActive(path: Path): Future[Option[ConfigData]] = {
 
-    def getDefaultById(configId: ConfigId): Future[Option[ConfigData]] = async {
-      val d  = await(getLatest(defaultFilePath(path)))
+    def getActiveById(configId: ConfigId): Future[Option[ConfigData]] = async {
+      val d  = await(getLatest(activeFilePath(path)))
       val id = if (d.isDefined) await(d.get.toStringF) else configId.id
       await(getById(path, ConfigId(id)))
     }
@@ -197,7 +197,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     async {
       await(getCurrentVersion(path)) match {
         case None           ⇒ None
-        case Some(configId) ⇒ await(getDefaultById(configId))
+        case Some(configId) ⇒ await(getActiveById(configId))
       }
     }
   }
@@ -250,6 +250,6 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   // File used to store the SHA-1 of the actual file, if annexd.
   private def shaFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`sha1-suffix`}")
 
-  // File used to store the id of the default version of the file.
-  private def defaultFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`active-suffix`}")
+  // File used to store the id of the active version of the file.
+  private def activeFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`active-config-suffix`}")
 }

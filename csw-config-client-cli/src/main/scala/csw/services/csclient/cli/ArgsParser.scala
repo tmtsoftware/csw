@@ -108,9 +108,9 @@ object ArgsParser {
     )
 
     //setDefault operation
-    cmd("setDefault") action { (_, c) =>
-      c.copy(op = "setDefault")
-    } text "sets default version of the file in the repository" children (
+    cmd("setActive") action { (_, c) =>
+      c.copy(op = "setActive")
+    } text "sets active version of the file in the repository" children (
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
@@ -120,9 +120,9 @@ object ArgsParser {
     )
 
     //resetDefault operation
-    cmd("resetDefault") action { (_, c) =>
-      c.copy(op = "resetDefault")
-    } text "resets the default to the latest version of the file in the repository" children (
+    cmd("resetActive") action { (_, c) =>
+      c.copy(op = "resetActive")
+    } text "resets the active to the latest version of the file in the repository" children (
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository"

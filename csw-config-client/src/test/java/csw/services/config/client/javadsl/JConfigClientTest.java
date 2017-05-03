@@ -277,34 +277,34 @@ public class JConfigClientTest {
     // DEOPSCSW-79: Reset the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
-    public void testGetSetAndResetDefaultConfigFile() throws ExecutionException, InterruptedException {
+    public void testGetSetAndResetActiveConfigFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "hello world").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
         configService.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.setDefault(path, configIdUpdate1).get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
+        configService.setActive(path, configIdUpdate1).get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.resetDefault(path, "reseting default file").get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        configService.resetActive(path, "resetting active version of file").get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.resetDefault(path).get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        configService.resetActive(path).get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.resetDefault(path, "setting default again").get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        configService.resetActive(path, "setting active version again").get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
     // DEOPSCSW-78: Get the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
-    public void testGetDefaultReturnsNoneIfFileNotExist() throws ExecutionException, InterruptedException {
+    public void testGetActiveReturnsNoneIfFileNotExist() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
-        Assert.assertEquals(configService.getDefault(path).get(), Optional.empty());
+        Assert.assertEquals(configService.getActive(path).get(), Optional.empty());
     }
 
     @Test
@@ -363,20 +363,20 @@ public class JConfigClientTest {
     // DEOPSCSW-78: Get the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
-    public void testGetAndSetDefaultConfigFileFromAnnexStore() throws ExecutionException, InterruptedException {
+    public void testGetAndSetActiveConfigFileFromAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         configService.create(path, ConfigData.fromString(configValue1), true, "some comment").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
         configService.update(path, ConfigData.fromString(configValue3), "Updated config").get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.setDefault(path, configIdUpdate1).get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
+        configService.setActive(path, configIdUpdate1).get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.resetDefault(path).get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        configService.resetActive(path).get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
     @Test
@@ -394,7 +394,7 @@ public class JConfigClientTest {
     }
 
     @Test
-    public void testDefaultFilesAreExcludedInList() throws ExecutionException, InterruptedException {
+    public void testActiveFilesAreExcludedInList() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
@@ -409,8 +409,8 @@ public class JConfigClientTest {
                 .create(assemblyConfig, ConfigData.fromString(configValue2),true, assemblyConfigComment)
                 .get();
 
-        configService.setDefault(tromboneConfig, tromboneConfigId).get();
-        configService.setDefault(assemblyConfig, assemblyConfigId).get();
+        configService.setActive(tromboneConfig, tromboneConfigId).get();
+        configService.setActive(assemblyConfig, assemblyConfigId).get();
 
         // list files from repo and assert that it contains added files
 

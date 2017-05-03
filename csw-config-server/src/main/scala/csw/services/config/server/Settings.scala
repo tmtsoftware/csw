@@ -14,12 +14,11 @@ class Settings(config: Config) {
   val `annex-files-dir`: String        = `csw-config-server`.getString("annex-dir")
   val `svn-user-name`: String          = `csw-config-server`.getString("svn-user-name")
   val `sha1-suffix`: String            = `csw-config-server`.getString("sha1-suffix")
-  val `active-suffix`: String          = `csw-config-server`.getString("active-suffix")
+  val `active-config-suffix`: String   = `csw-config-server`.getString("active-config-suffix")
   def `service-port`: Int              = `csw-config-server`.getInt("service-port")
   val `blocking-io-dispatcher`: String = `csw-config-server`.getString("blocking-io-dispatcher")
   val `annex-min-file-size`: Long      = `csw-config-server`.getBytes("annex-min-file-size")
 
   val repositoryFile: File = Paths.get(`repository-dir`).toFile
   val svnUrl: SVNURL       = SVNURL.fromFile(repositoryFile)
-
 }

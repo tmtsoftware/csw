@@ -85,7 +85,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     commandLineRunner.run(parsedExistsArgs.get)
   }
 
-  test("should able to set, reset and get the default version of file.") {
+  test("should able to set, reset and get the active version of file.") {
 
     //  create file
     val parsedCreateArgs: Option[Options] = ArgsParser.parse(createMinimalArgs)
@@ -95,24 +95,24 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     val parsedUpdateArgs: Option[Options] = ArgsParser.parse(updateAllArgs)
     commandLineRunner.run(parsedUpdateArgs.get)
 
-    //  set default version of file to id=1 and store it at location: /tmp/output.txt
-    val parsedSetDefaultArgs: Option[Options] = ArgsParser.parse(setDefaultAllArgs)
-    commandLineRunner.run(parsedSetDefaultArgs.get)
+    //  set active version of file to id=1 and store it at location: /tmp/output.txt
+    val parsedSetActiveArgs: Option[Options] = ArgsParser.parse(setActiveAllArgs)
+    commandLineRunner.run(parsedSetActiveArgs.get)
 
-    //  get default version of file and store it at location: /tmp/output.txt
-    val parsedGetDefaultArgs: Option[Options] = ArgsParser.parse(getMinimalArgs)
-    commandLineRunner.run(parsedGetDefaultArgs.get)
+    //  get active version of file and store it at location: /tmp/output.txt
+    val parsedGetActiveArgs: Option[Options] = ArgsParser.parse(getMinimalArgs)
+    commandLineRunner.run(parsedGetActiveArgs.get)
 
     //  read locally saved output file (/tmp/output.conf) from disk and
     //  match the contents with input file content
     readFile(outputFilePath) shouldEqual inputFileContents
 
-    //  reset default version of file and store it at location: /tmp/output.txt
-    val parsedResetDefaultArgs: Option[Options] = ArgsParser.parse(resetDefaultAllArgs)
-    commandLineRunner.run(parsedResetDefaultArgs.get)
+    //  reset active version of file and store it at location: /tmp/output.txt
+    val parsedResetActiveArgs: Option[Options] = ArgsParser.parse(resetActiveAllArgs)
+    commandLineRunner.run(parsedResetActiveArgs.get)
 
-    //  get default version of file and store it at location: /tmp/output.txt
-    commandLineRunner.run(parsedGetDefaultArgs.get)
+    //  get active version of file and store it at location: /tmp/output.txt
+    commandLineRunner.run(parsedGetActiveArgs.get)
 
     //  read locally saved output file (/tmp/output.conf) from disk and
     //  match the contents with input file content

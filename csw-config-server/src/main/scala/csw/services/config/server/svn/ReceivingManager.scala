@@ -12,8 +12,8 @@ class ReceivingManager(settings: Settings, fileType: Option[FileType], compiledP
 
   private var entries: List[SVNDirEntry] = List.empty
 
-  private def defaultReceiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
-    if (entry.isFile && entry.isNotDefault(settings.`active-suffix`)) {
+  private def activeFileReceiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
+    if (entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`)) {
       entry.stripAnnexSuffix(settings.`sha1-suffix`)
       if (entry.matches(compiledPattern)) {
         entries = entry :: entries
@@ -22,14 +22,15 @@ class ReceivingManager(settings: Settings, fileType: Option[FileType], compiledP
   }
 
   private def normalFileReceiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
-    if (entry.isFile && entry.isNotDefault(settings.`active-suffix`) && entry
+    if (entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`) && entry
           .isNormal(settings.`sha1-suffix`) && entry.matches(compiledPattern)) {
       entries = entry :: entries
     }
   }
 
   private def annexFileReceiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
-    if (entry.isFile && entry.isNotDefault(settings.`active-suffix`) && entry.isAnnex(settings.`sha1-suffix`)) {
+    if (entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`) && entry
+          .isAnnex(settings.`sha1-suffix`)) {
       entry.stripAnnexSuffix(settings.`sha1-suffix`)
       if (entry.matches(compiledPattern)) {
         entries = entry :: entries
@@ -41,7 +42,7 @@ class ReceivingManager(settings: Settings, fileType: Option[FileType], compiledP
     fileType match {
       case Some(FileType.Annex)  ⇒ annexFileReceiver
       case Some(FileType.Normal) ⇒ normalFileReceiver
-      case _                     ⇒ defaultReceiver
+      case _                     ⇒ activeFileReceiver
     }
 
   def getReceivedEntries: List[SVNDirEntry] = entries

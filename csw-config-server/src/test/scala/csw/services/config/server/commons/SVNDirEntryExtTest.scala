@@ -27,7 +27,7 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
     )
 
     dirEntry.isFile shouldBe true
-    dirEntry.isNotDefault(settings.`active-suffix`) shouldBe true
+    dirEntry.isNotActiveFile(settings.`active-config-suffix`) shouldBe true
 
     patterns.foreach(pattern ⇒ dirEntry.matches(Some(pattern)) shouldBe true)
   }
@@ -44,7 +44,6 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
     patterns.foreach(pattern ⇒ dirEntry.matches(Some(pattern)) shouldBe false)
   }
 
-  // DEOPSCSW-135: Validation of suffix for active and sha files
   test("should detect annex and normal file based on type") {
     val normalDirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt", SVNNodeKind.FILE, 100,
       false, 1, new Date(), "author", "comment")
