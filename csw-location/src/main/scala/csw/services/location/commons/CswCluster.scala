@@ -79,6 +79,9 @@ class CswCluster private (_actorSystem: ActorSystem) {
     Done
   }
 
+  /**
+   * Ensures that data replication is started in Location service cluster by matching replica count with Up members.
+   */
   private def ensureReplication(): Unit = {
     implicit val timeout = Timeout(5.seconds)
     import akka.pattern.ask

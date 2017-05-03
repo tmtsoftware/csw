@@ -7,7 +7,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import csw.services.config.api.commons.BinaryUtils
+import csw.services.config.api.commons.{BinaryUtils, FileType}
 import csw.services.config.api.commons.ConfigStreamExts.RichSource
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{JsonSupport, _}
@@ -22,9 +22,9 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   import actorRuntime._
 
-  private def configUri(path: jnio.Path)  = baseUri(Path / "config" ++ Path / Path(path.toString))
-  private def defaultUri(path: jnio.Path) = baseUri(Path / "default" ++ Path / Path(path.toString))
-  private def historyUri(path: jnio.Path) = baseUri(Path / "history" ++ Path / Path(path.toString))
+  private def configUri(path: jnio.Path)    = baseUri(Path / "config" ++ Path / Path(path.toString))
+  private def activeConfig(path: jnio.Path) = baseUri(Path / "default" ++ Path / Path(path.toString))
+  private def historyUri(path: jnio.Path)   = baseUri(Path / "history" ++ Path / Path(path.toString))
 
   private def listUri = baseUri(Path / "list")
 
@@ -32,11 +32,11 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     await(configServiceResolver.uri).withPath(path)
   }
 
-  override def create(path: jnio.Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] =
+  override def create(path: jnio.Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] =
     async {
       val (prefix, stitchedSource) = configData.source.prefixAndStitch(1)
-      val annex                    = if (oversize) oversize else BinaryUtils.isBinary(await(prefix))
-      val uri                      = await(configUri(path)).withQuery(Query("oversize" → annex.toString, "comment" → comment))
+      val isAnnex                  = if (annex) annex else BinaryUtils.isBinary(await(prefix))
+      val uri                      = await(configUri(path)).withQuery(Query("annex" → isAnnex.toString, "comment" → comment))
       val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
@@ -66,7 +66,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def getDefault(path: jnio.Path): Future[Option[ConfigData]] = get(path, Query.Empty)
+  override def getActive(path: jnio.Path): Future[Option[ConfigData]] = get(path, Query.Empty)
 
   override def getLatest(path: jnio.Path): Future[Option[ConfigData]] = get(path, Query("latest" → "true"))
 
@@ -104,18 +104,20 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def list(pattern: Option[String] = None): Future[List[ConfigFileInfo]] = async {
-    val uri = await(listUri).withQuery(Query(pattern.map("pattern" → _).toMap))
+  override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] =
+    async {
+      val uri =
+        await(listUri).withQuery(Query(fileType.map("type" → _.entryName).toMap ++ pattern.map("pattern" → _).toMap))
 
-    val request = HttpRequest(uri = uri)
-    println(request)
-    val response = await(Http().singleRequest(request))
+      val request = HttpRequest(uri = uri)
+      println(request)
+      val response = await(Http().singleRequest(request))
 
-    response.status match {
-      case StatusCodes.OK ⇒ await(Unmarshal(response.entity).to[List[ConfigFileInfo]])
-      case _              ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
+      response.status match {
+        case StatusCodes.OK ⇒ await(Unmarshal(response.entity).to[List[ConfigFileInfo]])
+        case _              ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
+      }
     }
-  }
 
   override def history(path: jnio.Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     val uri = await(historyUri(path)).withQuery(Query("maxResults" → maxResults.toString))
@@ -131,14 +133,14 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def setDefault(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
-    handleDefault(path, Query("id" → id.id.toString, "comment" → comment))
+  override def setActive(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
+    handleActiveConfig(path, Query("id" → id.id.toString, "comment" → comment))
 
-  override def resetDefault(path: jnio.Path, comment: String): Future[Unit] =
-    handleDefault(path, Query("comment" → comment))
+  override def resetActive(path: jnio.Path, comment: String): Future[Unit] =
+    handleActiveConfig(path, Query("comment" → comment))
 
-  private def handleDefault(path: jnio.Path, query: Query): Future[Unit] = async {
-    val uri = await(defaultUri(path)).withQuery(query)
+  private def handleActiveConfig(path: jnio.Path, query: Query): Future[Unit] = async {
+    val uri = await(activeConfig(path)).withQuery(query)
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri)
     println(request)

@@ -6,6 +6,7 @@ import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.{util, lang ⇒ jl}
 
+import csw.services.config.api.commons.FileType
 import csw.services.config.api.javadsl.IConfigService
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
@@ -20,18 +21,18 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
 
   override def create(path: Path,
                       configData: ConfigData,
-                      oversize: Boolean,
+                      annex: Boolean,
                       comment: String): CompletableFuture[ConfigId] =
-    configService.create(path, configData, oversize, comment).toJava.toCompletableFuture
+    configService.create(path, configData, annex, comment).toJava.toCompletableFuture
 
   override def create(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
-    create(path, configData, oversize = false, comment)
+    create(path, configData, annex = false, comment)
 
-  override def create(path: Path, configData: ConfigData, oversize: Boolean): CompletableFuture[ConfigId] =
-    create(path, configData, oversize, comment = "")
+  override def create(path: Path, configData: ConfigData, annex: Boolean): CompletableFuture[ConfigId] =
+    create(path, configData, annex, comment = "")
 
   override def create(path: Path, configData: ConfigData): CompletableFuture[ConfigId] =
-    create(path, configData, oversize = false, comment = "")
+    create(path, configData, annex = false, comment = "")
 
   override def update(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
     configService.update(path, configData, comment).toJava.toCompletableFuture
@@ -60,10 +61,17 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def delete(path: Path): CompletableFuture[Unit] =
     delete(path, comment = "deleted")
 
-  override def list(): CompletableFuture[util.List[ConfigFileInfo]] = list(Optional.empty())
+  override def list(fileType: FileType, pattern: String): CompletableFuture[util.List[ConfigFileInfo]] =
+    configService.list(Some(fileType), Some(pattern)).map(_.asJava).toJava.toCompletableFuture
 
-  override def list(pattern: Optional[String]): CompletableFuture[util.List[ConfigFileInfo]] =
-    configService.list(pattern.asScala).map(_.asJava).toJava.toCompletableFuture
+  override def list(fileType: FileType): CompletableFuture[util.List[ConfigFileInfo]] =
+    configService.list(Some(fileType)).map(_.asJava).toJava.toCompletableFuture
+
+  override def list(pattern: String): CompletableFuture[util.List[ConfigFileInfo]] =
+    configService.list(pattern = Some(pattern)).map(_.asJava).toJava.toCompletableFuture
+
+  override def list(): CompletableFuture[util.List[ConfigFileInfo]] =
+    configService.list().map(_.asJava).toJava.toCompletableFuture
 
   override def history(path: Path, maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
     configService.history(path, maxResults).map(_.asJava).toJava.toCompletableFuture
@@ -71,20 +79,20 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def history(path: Path): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, maxResults = Int.MaxValue)
 
-  override def setDefault(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit] =
-    configService.setDefault(path, id, comment).toJava.toCompletableFuture
+  override def setActive(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit] =
+    configService.setActive(path, id, comment).toJava.toCompletableFuture
 
-  override def setDefault(path: Path, id: ConfigId): CompletableFuture[Unit] =
-    setDefault(path, id, "")
+  override def setActive(path: Path, id: ConfigId): CompletableFuture[Unit] =
+    setActive(path, id, "")
 
-  override def resetDefault(path: Path, comment: String): CompletableFuture[Unit] =
-    configService.resetDefault(path, comment).toJava.toCompletableFuture
+  override def resetActive(path: Path, comment: String): CompletableFuture[Unit] =
+    configService.resetActive(path, comment).toJava.toCompletableFuture
 
-  override def resetDefault(path: Path): CompletableFuture[Unit] =
-    resetDefault(path, "")
+  override def resetActive(path: Path): CompletableFuture[Unit] =
+    resetActive(path, "")
 
-  override def getDefault(path: Path): CompletableFuture[Optional[ConfigData]] =
-    configService.getDefault(path).map(_.asJava).toJava.toCompletableFuture
+  override def getActive(path: Path): CompletableFuture[Optional[ConfigData]] =
+    configService.getActive(path).map(_.asJava).toJava.toCompletableFuture
 
   override def asScala: ConfigService = configService
 }

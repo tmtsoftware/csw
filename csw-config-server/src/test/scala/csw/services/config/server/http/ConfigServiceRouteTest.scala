@@ -47,13 +47,13 @@ class ConfigServiceRouteTest
    */
   test("create - success status code") {
     // try to create by providing optional comment parameter
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
       responseAs[ConfigId] shouldBe ConfigId(1)
     }
 
     // try to create by not providing optional comment parameter
-    Post("/config/test1.conf?oversize=true", configFile2) ~> route ~> check {
+    Post("/config/test1.conf?annex=true", configFile2) ~> route ~> check {
       status shouldEqual StatusCodes.Created
       responseAs[ConfigId] shouldBe ConfigId(2)
     }
@@ -62,16 +62,16 @@ class ConfigServiceRouteTest
 
   test("create - failure status codes") {
 
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
-    Post("/config?oversize=true&comment=commit1", configFile1) ~> Route.seal(route) ~> check {
+    Post("/config?annex=true&comment=commit1", configFile1) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
     // try to create file which already exists
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> Route.seal(route) ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.Conflict
     }
 
@@ -79,7 +79,7 @@ class ConfigServiceRouteTest
 
   test("update - success status code") {
 
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -118,7 +118,7 @@ class ConfigServiceRouteTest
   }
 
   test("get - success status code") {
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -136,7 +136,7 @@ class ConfigServiceRouteTest
 
   test("get - failure status codes") {
 
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -154,7 +154,7 @@ class ConfigServiceRouteTest
 
   test("get by date - success status code") {
     val timeWhenRepoWasEmpty = Instant.now()
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
     val timeWhenFileWasCreated = Instant.now()
@@ -181,7 +181,7 @@ class ConfigServiceRouteTest
   }
 
   test("get latest - success status code") {
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -223,7 +223,7 @@ class ConfigServiceRouteTest
       responseAs[List[ConfigFileInfo]].size shouldBe 0
     }
 
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -233,7 +233,7 @@ class ConfigServiceRouteTest
       responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
 
-    Get("/list?pattern=.conf") ~> route ~> check {
+    Get("/list?pattern=.*.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
@@ -241,7 +241,7 @@ class ConfigServiceRouteTest
 
   test("history - success  status code") {
 
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -288,7 +288,7 @@ class ConfigServiceRouteTest
 
   test("getDefault - success status code") {
 
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -311,7 +311,7 @@ class ConfigServiceRouteTest
 
   test("setDefault - success status code") {
 
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -338,7 +338,7 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.NotFound
     }
 
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -351,7 +351,7 @@ class ConfigServiceRouteTest
 
   test("resetDefault - success status code") {
 
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -383,7 +383,7 @@ class ConfigServiceRouteTest
 
   test("exists - success status code") {
 
-    Post("/config/test.conf?oversize=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 

@@ -13,13 +13,13 @@ class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
 
-  lazy val actorSystem      = ActorSystem("config-service", config)
-  lazy val actorRuntime     = new ActorRuntime(actorSystem, settings)
-  lazy val oversizeFileRepo = new OversizeFileRepo(actorRuntime.blockingIoDispatcher)
-  lazy val svnRepo          = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
+  lazy val actorSystem   = ActorSystem("config-service", config)
+  lazy val actorRuntime  = new ActorRuntime(actorSystem, settings)
+  lazy val annexFileRepo = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
+  lazy val svnRepo       = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
 
-  lazy val oversizeFileService          = new OversizeFileService(settings, oversizeFileRepo, actorRuntime)
-  lazy val configService: ConfigService = new SvnConfigService(settings, oversizeFileService, actorRuntime, svnRepo)
+  lazy val annexFileService             = new AnnexFileService(settings, annexFileRepo, actorRuntime)
+  lazy val configService: ConfigService = new SvnConfigService(settings, annexFileService, actorRuntime, svnRepo)
 
   lazy val clusterSettings                  = ClusterSettings()
   lazy val cswCluster: CswCluster           = CswCluster.withSettings(clusterSettings)

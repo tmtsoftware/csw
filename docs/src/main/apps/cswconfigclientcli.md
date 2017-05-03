@@ -11,7 +11,7 @@ creates the input file in the repository at a specified path
 
  * 'relativeRepoPath' is path in the repository
  * `-i`, `--in` is input file path
- * `--oversize` is optional parameter. Add this option to specify if the input file is large/binary files
+ * `--annex` is optional parameter. Add this option to specify if the input file is large/binary files
  * `-c, --comment` optional create comment
  
 ### update

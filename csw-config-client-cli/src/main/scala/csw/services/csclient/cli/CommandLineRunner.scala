@@ -15,8 +15,8 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
 
     def create(): Unit = {
       val configData = ConfigData.fromPath(options.inputFilePath.get)
-      val configId = await(configService.create(options.relativeRepoPath.get, configData, oversize = options.oversize,
-          options.comment))
+      val configId =
+        await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex, options.comment))
       println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
     }
 
@@ -31,7 +31,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
         case (Some(date), _, _) ⇒ await(configService.getByTime(options.relativeRepoPath.get, date))
         case (_, Some(id), _)   ⇒ await(configService.getById(options.relativeRepoPath.get, ConfigId(id)))
         case (_, _, true)       ⇒ await(configService.getLatest(options.relativeRepoPath.get))
-        case (_, _, _)          ⇒ await(configService.getDefault(options.relativeRepoPath.get))
+        case (_, _, _)          ⇒ await(configService.getActive(options.relativeRepoPath.get))
       }
 
       configDataOpt match {
@@ -53,7 +53,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     }
 
     def list(): Unit = {
-      val fileInfoes = await(configService.list(options.pattern))
+      val fileInfoes = await(configService.list(pattern = options.pattern))
       fileInfoes.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
     }
 
@@ -62,28 +62,28 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
       histList.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
     }
 
-    def setDefault(): Unit = {
+    def setActive(): Unit = {
       val maybeConfigId = options.id.map(id ⇒ ConfigId(id))
-      await(configService.setDefault(options.relativeRepoPath.get, maybeConfigId.get, options.comment))
+      await(configService.setActive(options.relativeRepoPath.get, maybeConfigId.get, options.comment))
       println(s"${options.relativeRepoPath.get} file with id:${maybeConfigId.get.id} is set as default")
     }
 
-    def resetDefault(): Unit = {
-      await(configService.resetDefault(options.relativeRepoPath.get, options.comment))
+    def resetActive(): Unit = {
+      await(configService.resetActive(options.relativeRepoPath.get, options.comment))
       println(s"${options.relativeRepoPath.get} file is reset to default")
     }
 
     options.op match {
-      case "create"       ⇒ create()
-      case "update"       ⇒ update()
-      case "get"          ⇒ get()
-      case "exists"       ⇒ exists()
-      case "delete"       ⇒ delete()
-      case "list"         ⇒ list()
-      case "history"      ⇒ history()
-      case "setDefault"   ⇒ setDefault()
-      case "resetDefault" ⇒ resetDefault()
-      case x              ⇒ throw new RuntimeException(s"Unknown operation: $x")
+      case "create"      ⇒ create()
+      case "update"      ⇒ update()
+      case "get"         ⇒ get()
+      case "exists"      ⇒ exists()
+      case "delete"      ⇒ delete()
+      case "list"        ⇒ list()
+      case "history"     ⇒ history()
+      case "setActive"   ⇒ setActive()
+      case "resetActive" ⇒ resetActive()
+      case x             ⇒ throw new RuntimeException(s"Unknown operation: $x")
     }
   }
 

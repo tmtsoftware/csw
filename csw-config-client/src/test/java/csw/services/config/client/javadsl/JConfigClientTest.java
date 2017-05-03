@@ -2,6 +2,9 @@ package csw.services.config.client.javadsl;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
+import csw.services.config.api.commons.FileType;
+import csw.services.config.api.commons.FileType$;
+import csw.services.config.api.commons.JFileType;
 import csw.services.config.api.exceptions.FileAlreadyExists;
 import csw.services.config.api.exceptions.FileNotFound;
 import csw.services.config.api.javadsl.IConfigService;
@@ -94,8 +97,8 @@ public class JConfigClientTest {
     }
 
     @Test
-    public void testCreateOversizeFile() throws ExecutionException, InterruptedException {
-        Path path = Paths.get("SomeOversizeFile.txt");
+    public void testCreateFileInAnnexStore() throws ExecutionException, InterruptedException {
+        Path path = Paths.get("SomeAnnexFile.txt");
         configService.create(path, ConfigData.fromString(configValue1), true).get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
@@ -201,29 +204,31 @@ public class JConfigClientTest {
     public void testHistoryOfAFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
 
-        exception.expectCause(isA(FileNotFound.class));
-        configService.history(path).get();
+        try{
+            exception.expectCause(isA(FileNotFound.class));
+            configService.history(path).get();
+        }finally {
+            String comment1 = "commit version 1";
+            String comment2 = "commit version 2";
+            String comment3 = "commit version 3";
 
-        String comment1 = "commit version 1";
-        String comment2 = "commit version 2";
-        String comment3 = "commit version 3";
+            ConfigId configId1 = configService.create(path, ConfigData.fromString(configValue1), false, comment1).get();
+            ConfigId configId2 = configService.update(path, ConfigData.fromString(configValue2), comment2).get();
+            ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3), comment3).get();
 
-        ConfigId configId1 = configService.create(path, ConfigData.fromString(configValue1), false, comment1).get();
-        ConfigId configId2 = configService.update(path, ConfigData.fromString(configValue2), comment2).get();
-        ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3), comment3).get();
+            Assert.assertEquals(configService.history(path).get().size(), 3);
+            Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
 
-        Assert.assertEquals(configService.history(path).get().size(), 3);
-       Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
+            Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(comment3, comment2, comment1)));
 
-        Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(comment3, comment2, comment1)));
-
-        Assert.assertEquals(configService.history(path, 2).get().size(), 2);
-        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(configId3, configId2)));
-        Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
-                new ArrayList<>(Arrays.asList(comment3, comment2)));
+            Assert.assertEquals(configService.history(path, 2).get().size(), 2);
+            Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2)));
+            Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(comment3, comment2)));
+        }
     }
 
     // DEOPSCSW-48: Store new configuration file in Config. service
@@ -272,43 +277,43 @@ public class JConfigClientTest {
     // DEOPSCSW-79: Reset the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
-    public void testGetSetAndResetDefaultConfigFile() throws ExecutionException, InterruptedException {
+    public void testGetSetAndResetActiveConfigFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
         configService.create(path, ConfigData.fromString(configValue1), false, "hello world").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
         configService.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.setDefault(path, configIdUpdate1).get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
+        configService.setActive(path, configIdUpdate1).get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.resetDefault(path, "reseting default file").get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        configService.resetActive(path, "resetting active version of file").get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.resetDefault(path).get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        configService.resetActive(path).get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.resetDefault(path, "setting default again").get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        configService.resetActive(path, "setting active version again").get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
     // DEOPSCSW-78: Get the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
-    public void testGetDefaultReturnsNoneIfFileNotExist() throws ExecutionException, InterruptedException {
+    public void testGetActiveReturnsNoneIfFileNotExist() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
-        Assert.assertEquals(configService.getDefault(path).get(), Optional.empty());
+        Assert.assertEquals(configService.getActive(path).get(), Optional.empty());
     }
 
     @Test
-    public void testListOversizeFilesWithoutShaSuffix() throws ExecutionException, InterruptedException {
+    public void testListFilesFromAnnexStoreWithoutShaSuffix() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
-        String tromboneConfigComment = "test{Oversize file no1}";
-        String assemblyConfigComment = "test{Oversize file no2}";
+        String tromboneConfigComment = "test{Annex file no1}";
+        String assemblyConfigComment = "test{Annex file no2}";
 
         ConfigId tromboneConfigId = configService.create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis"),
                                                         true,
@@ -325,19 +330,19 @@ public class JConfigClientTest {
 
     // DEOPSCSW-74: Check config file existence by unique name
     @Test
-    public void testOversizeFileExists() throws ExecutionException, InterruptedException {
+    public void testFileExistsInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
         Assert.assertFalse(configService.exists(path).get());
 
         Path newPath = Paths.get("a/test.csw.conf");
-        configService.create(newPath, ConfigData.fromString(configValue3), true, "create oversize file").get();
+        configService.create(newPath, ConfigData.fromString(configValue3), true, "create annex file").get();
 
         Assert.assertTrue(configService.exists(newPath).get());
     }
 
     // DEOPSCSW-49: Update an Existing File with a New Version
     @Test
-    public void testUpdateAndHistoryOfOversizedFiles() throws ExecutionException, InterruptedException {
+    public void testUpdateAndHistoryOfFilesInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
@@ -358,26 +363,26 @@ public class JConfigClientTest {
     // DEOPSCSW-78: Get the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
-    public void testGetAndSetDefaultOversizeConfigFile() throws ExecutionException, InterruptedException {
+    public void testGetAndSetActiveConfigFileFromAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         configService.create(path, ConfigData.fromString(configValue1), true, "some comment").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
         configService.update(path, ConfigData.fromString(configValue3), "Updated config").get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.setDefault(path, configIdUpdate1).get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue2);
+        configService.setActive(path, configIdUpdate1).get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.resetDefault(path).get();
-        Assert.assertEquals(configService.getDefault(path).get().get().toJStringF(mat).get(), configValue3);
+        configService.resetActive(path).get();
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
     @Test
-    public void testRetrieveVersionBasedOnDateForOverSizedFile() throws ExecutionException, InterruptedException {
+    public void testRetrieveVersionBasedOnDateForFileInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
-        configService.create(path, ConfigData.fromString(configValue1), true, "commit initial oversize configuration").get();
+        configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration to annex store").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
         configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
@@ -389,7 +394,7 @@ public class JConfigClientTest {
     }
 
     @Test
-    public void testDefaultFilesAreExcludedInList() throws ExecutionException, InterruptedException {
+    public void testActiveFilesAreExcludedInList() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
@@ -404,8 +409,8 @@ public class JConfigClientTest {
                 .create(assemblyConfig, ConfigData.fromString(configValue2),true, assemblyConfigComment)
                 .get();
 
-        configService.setDefault(tromboneConfig, tromboneConfigId).get();
-        configService.setDefault(assemblyConfig, assemblyConfigId).get();
+        configService.setActive(tromboneConfig, tromboneConfigId).get();
+        configService.setActive(assemblyConfig, assemblyConfigId).get();
 
         // list files from repo and assert that it contains added files
 
@@ -417,6 +422,7 @@ public class JConfigClientTest {
         Assert.assertEquals(expected, actual);
     }
 
+    //DEOPSCSW-75 List the names of configuration files that match a path
     @Test
     public void testListIsFilteredBasedOnPattern() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
@@ -424,28 +430,72 @@ public class JConfigClientTest {
         Path hcdConfig = Paths.get("a/b/c/hcd/hcd.conf");
 
         configService.create(tromboneConfig, ConfigData.fromString(configValue1), false, "hello trombone").get();
-        configService.create(assemblyConfig, ConfigData.fromString(configValue2), false, "hello assembly").get();
+        configService.create(assemblyConfig, ConfigData.fromString(configValue2), true, "hello assembly").get();
         configService.create(hcdConfig, ConfigData.fromString(configValue3), false, "hello hcd").get();
 
         Set<Path> expected = new HashSet<>(Arrays.asList(hcdConfig, assemblyConfig));
-        Stream<Path> actualStream = configService.list(Optional.of("a/b/")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream = configService.list("a/b/.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected, actualStream.collect(Collectors.toSet()));
 
         Set<Path> expected1 = Collections.singleton(hcdConfig);
-        Stream<Path> actualStream1 = configService.list(Optional.of("a/b/c")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream1 = configService.list("a/b/c.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected1, actualStream1.collect(Collectors.toSet()));
 
         Set<Path> all = new HashSet<>(Arrays.asList(hcdConfig, assemblyConfig, tromboneConfig));
-        Stream<Path> actualStream2 = configService.list(Optional.of(".conf")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream2 = configService.list(".*.conf").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(all, actualStream2.collect(Collectors.toSet()));
 
-        List<ConfigFileInfo> fileInfos = configService.list(Optional.of("a/b/c/d")).get();
+        List<ConfigFileInfo> fileInfos = configService.list("a/b/c/d.*").get();
         Assert.assertTrue(fileInfos.isEmpty());
 
         Stream<Path> actualStream3 = configService.list().get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(all, actualStream3.collect(Collectors.toSet()));
 
-        Stream<Path> actualStream4 = configService.list(Optional.of("hcd")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream4 = configService.list(".*hcd.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected1, actualStream4.collect(Collectors.toSet()));
+    }
+
+    //DEOPSCSW-132 List oversize and normal sized files
+    //DEOPSCSW-75 List the names of configuration files that match a path
+    @Test
+    public void testListIsFilteredBasedOnTypeAndPattern() throws ExecutionException, InterruptedException {
+        Path tromboneConfig = Paths.get("trombone.conf");
+        Path hcdConfig = Paths.get("a/b/c/hcd/hcd.conf");
+        Path assemblyConfig1 = Paths.get("a/b/assembly/assembly1.conf");
+        Path assemblyConfig2 = Paths.get("a/b/c/assembly/assembly2.conf");
+
+        configService.create(tromboneConfig, ConfigData.fromString(configValue1), false, "hello trombone").get();
+        configService.create(assemblyConfig1, ConfigData.fromString(configValue2), true, "hello assembly1").get();
+        configService.create(assemblyConfig2, ConfigData.fromString(configValue2), true, "hello assembly2").get();
+        configService.create(hcdConfig, ConfigData.fromString(configValue3), false, "hello hcd").get();
+
+        Set<Path> expected1 = new HashSet<>(Arrays.asList(assemblyConfig1, assemblyConfig2));
+        Stream<Path> actualStream1 = configService.list(JFileType.Annex).get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected1, actualStream1.collect(Collectors.toSet()));
+
+        Set<Path> expected2 = new HashSet<>(Arrays.asList(tromboneConfig, hcdConfig));
+        Stream<Path> actualStream2 = configService.list(JFileType.Normal).get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected2, actualStream2.collect(Collectors.toSet()));
+
+        Set<Path> expected3 = new HashSet<>(Collections.singleton(assemblyConfig2));
+        Stream<Path> actualStream3 = configService.list(JFileType.Annex, "a/b/c.*").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected3, actualStream3.collect(Collectors.toSet()));
+
+        Stream<Path> actualStream4 = configService.list(JFileType.Annex, ".*.conf").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected1, actualStream4.collect(Collectors.toSet()));
+
+        Stream<Path> actualStream5 = configService.list(JFileType.Annex, ".*assembly.*").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected1, actualStream5.collect(Collectors.toSet()));
+
+        Set<Path> expected6 = new HashSet<>(Collections.singleton(hcdConfig));
+        Stream<Path> actualStream6 = configService.list(JFileType.Normal, "a/b/c.*").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected6, actualStream6.collect(Collectors.toSet()));
+
+        Stream<Path> actualStream7 = configService.list(JFileType.Normal, ".*.conf").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected2, actualStream7.collect(Collectors.toSet()));
+
+        Set<Path> expected8 = new HashSet<>(Collections.singleton(tromboneConfig));
+        Stream<Path> actualStream8 = configService.list(JFileType.Normal, ".*trombone.*").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected8, actualStream8.collect(Collectors.toSet()));
     }
 }

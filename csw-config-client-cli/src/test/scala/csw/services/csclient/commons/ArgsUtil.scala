@@ -24,18 +24,18 @@ class ArgsUtil {
   val comment                      = "test commit comment!!!"
   val maxFileVersions              = 32
 
-  val createAllArgs       = Array("create", relativeRepoPath, "-i", inputFilePath, "--oversize", "-c", comment)
-  val createMinimalArgs   = Array("create", relativeRepoPath, "-i", inputFilePath)
-  val updateAllArgs       = Array("update", relativeRepoPath, "-i", updatedInputFilePath, "-c", comment)
-  val updateMinimalArgs   = Array("update", relativeRepoPath, "-i", updatedInputFileContents)
-  val getLatestArgs       = Array("get", relativeRepoPath, "-o", outputFilePath, "--latest")
-  val getMinimalArgs      = Array("get", relativeRepoPath, "-o", outputFilePath)
-  val existsArgs          = Array("exists", relativeRepoPath)
-  val deleteArgs          = Array("delete", relativeRepoPath)
-  val listArgs            = Array("list")
-  val historyArgs         = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
-  val setDefaultAllArgs   = Array("setDefault", relativeRepoPath, "--id", id)
-  val resetDefaultAllArgs = Array("resetDefault", relativeRepoPath, "-c", comment)
+  val createAllArgs      = Array("create", relativeRepoPath, "-i", inputFilePath, "--annex", "-c", comment)
+  val createMinimalArgs  = Array("create", relativeRepoPath, "-i", inputFilePath)
+  val updateAllArgs      = Array("update", relativeRepoPath, "-i", updatedInputFilePath, "-c", comment)
+  val updateMinimalArgs  = Array("update", relativeRepoPath, "-i", updatedInputFileContents)
+  val getLatestArgs      = Array("get", relativeRepoPath, "-o", outputFilePath, "--latest")
+  val getMinimalArgs     = Array("get", relativeRepoPath, "-o", outputFilePath)
+  val existsArgs         = Array("exists", relativeRepoPath)
+  val deleteArgs         = Array("delete", relativeRepoPath)
+  val listArgs           = Array("list")
+  val historyArgs        = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
+  val setActiveAllArgs   = Array("setActive", relativeRepoPath, "--id", id)
+  val resetActiveAllArgs = Array("resetActive", relativeRepoPath, "-c", comment)
 
   private def createTempFile(fileName: String, fileContent: String): Path =
     Files.write(Files.createTempFile(fileName, ".conf"), fileContent.getBytes)

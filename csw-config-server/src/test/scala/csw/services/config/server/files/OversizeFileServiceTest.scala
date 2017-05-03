@@ -8,39 +8,39 @@ import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-class OversizeFileServiceTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class AnnexFileServiceTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   private val wiring = new ServerWiring
 
   import wiring._
 
-  private val testFileUtils   = new TestFileUtils(settings)
-  private val oversizeFileDir = Paths.get(wiring.settings.`oversize-files-dir`).toFile
+  private val testFileUtils = new TestFileUtils(settings)
+  private val annexFileDir  = Paths.get(wiring.settings.`annex-files-dir`).toFile
 
   import actorRuntime._
 
   val contents =
     """
-      |test {We think, this is some oversize text!!!!}
-      |test2 {We think, this is some oversize text!!!!}
-      |test3 {We think, this is some oversize text!!!!}
+      |test {We think, this is some annex text!!!!}
+      |test2 {We think, this is some annex text!!!!}
+      |test3 {We think, this is some annex text!!!!}
       |""".stripMargin
 
   private val configData = ConfigData.fromString(contents)
 
   override protected def afterAll(): Unit =
-    testFileUtils.deleteDirectoryRecursively(oversizeFileDir)
+    testFileUtils.deleteDirectoryRecursively(annexFileDir)
 
-  test("storing oversize file") {
-    val actualSha   = oversizeFileService.post(configData).await
+  test("storing annex file") {
+    val actualSha   = annexFileService.post(configData).await
     val expectedSha = Sha1.fromConfigData(configData).await
 
     actualSha shouldBe expectedSha
   }
 
-  test("getting oversize file") {
+  test("getting annex file") {
     val actualSha = Sha1.fromConfigData(configData).await
-    Sha1.fromConfigData(oversizeFileService.get(actualSha).await.get).await shouldBe actualSha
+    Sha1.fromConfigData(annexFileService.get(actualSha).await.get).await shouldBe actualSha
   }
 
 }

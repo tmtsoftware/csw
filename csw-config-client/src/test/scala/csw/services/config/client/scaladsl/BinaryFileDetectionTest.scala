@@ -50,12 +50,12 @@ class BinaryFileDetectionTest extends FunSuite with Matchers with BeforeAndAfter
     def toByteArray: Array[Byte] = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
   }
 
-  test("should be able to store and retrieve binary file as oversize") {
+  test("should be able to store and retrieve binary file in annex dir") {
     val fileName   = "smallBinary.bin"
     val path       = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
     val configData = ConfigData.fromPath(path)
     val configId =
-      configService.create(Paths.get(fileName), configData, oversize = false, s"committing file: $fileName").await
+      configService.create(Paths.get(fileName), configData, annex = false, s"committing file: $fileName").await
 
     val expectedContent = configService.getById(Paths.get(fileName), configId).await.get.toInputStream.toByteArray
     val diskFile        = getClass.getClassLoader.getResourceAsStream(fileName)

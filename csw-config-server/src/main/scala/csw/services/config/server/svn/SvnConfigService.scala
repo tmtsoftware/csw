@@ -4,11 +4,12 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
+import csw.services.config.api.commons.FileType
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.PathValidator
-import csw.services.config.server.files.OversizeFileService
+import csw.services.config.server.files.AnnexFileService
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
 import org.tmatesoft.svn.core.wc.SVNRevision
@@ -17,33 +18,39 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-class SvnConfigService(settings: Settings,
-                       fileService: OversizeFileService,
-                       actorRuntime: ActorRuntime,
-                       svnRepo: SvnRepo)
+class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorRuntime: ActorRuntime, svnRepo: SvnRepo)
     extends ConfigService {
 
   import actorRuntime._
 
-  override def create(path: Path, configData: ConfigData, oversize: Boolean, comment: String): Future[ConfigId] = {
+  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
+    if (!PathValidator.isValid(path)) {
+      throw new InvalidFilePath(path, PathValidator.invalidCharsMessage)
+    }
 
-    def createOversize(): Future[ConfigId] = async {
+    // If the file already exists in the repo, throw exception
+    if (await(exists(path))) {
+      throw FileAlreadyExists(path)
+    }
+
+    await(createFile(path, configData, annex, comment))
+  }
+
+  private def createFile(path: Path,
+                         configData: ConfigData,
+                         annex: Boolean = false,
+                         comment: String = ""): Future[ConfigId] = {
+
+    def createAnnex(): Future[ConfigId] = async {
       val sha1 = await(fileService.post(configData))
-      await(create(shaFilePath(path), ConfigData.fromString(sha1), oversize = false, comment))
+      await(createFile(shaFilePath(path), ConfigData.fromString(sha1), annex = false, comment))
     }
 
     async {
-      if (!PathValidator.isValid(path)) {
-        throw new InvalidFilePath(path, PathValidator.invalidCharsMessage)
-      }
       // If the file does not already exists in the repo, create it
-      if (await(exists(path))) {
-        throw FileAlreadyExists(path)
-      }
-
-      if (oversize || configData.length > settings.`annex-min-file-size`) {
-//        println(s"Either oversize=${oversize} is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
-        await(createOversize())
+      if (annex || configData.length > settings.`annex-min-file-size`) {
+        //        println(s"Either annex=${annex} is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
+        await(createAnnex())
       } else {
         await(put(path, configData, update = false, comment))
       }
@@ -52,7 +59,7 @@ class SvnConfigService(settings: Settings,
 
   override def update(path: Path, configData: ConfigData, comment: String): Future[ConfigId] = {
 
-    def updateOversize(): Future[ConfigId] = async {
+    def updateAnnex(): Future[ConfigId] = async {
       val sha1 = await(fileService.post(configData))
       await(update(shaFilePath(path), ConfigData.fromString(sha1), comment))
     }
@@ -61,7 +68,7 @@ class SvnConfigService(settings: Settings,
     async {
       await(pathStatus(path)) match {
         case PathStatus.NormalSize ⇒ await(put(path, configData, update = true, comment))
-        case PathStatus.Oversize   ⇒ await(updateOversize())
+        case PathStatus.Annex      ⇒ await(updateAnnex())
         case PathStatus.Missing    ⇒ throw FileNotFound(path)
       }
     }
@@ -79,8 +86,8 @@ class SvnConfigService(settings: Settings,
     Some(ConfigData.from(source, await(svnRepo.getFileSize(path, revision.getNumber))))
   }
 
-  // Get oversize files that are stored in the annex server
-  private def getOversize(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
+  // Get annex files that are stored in the annex server
+  private def getAnnex(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
     await(getNormalSize(shaFilePath(path), revision)) match {
       case None =>
         None
@@ -96,7 +103,7 @@ class SvnConfigService(settings: Settings,
 
       await(pathStatus(path, configId)) match {
         case PathStatus.NormalSize ⇒ await(getNormalSize(path, svnRevision))
-        case PathStatus.Oversize   ⇒ await(getOversize(path, svnRevision))
+        case PathStatus.Annex      ⇒ await(getAnnex(path, svnRevision))
         case PathStatus.Missing    ⇒ None
       }
     }
@@ -130,59 +137,59 @@ class SvnConfigService(settings: Settings,
   override def delete(path: Path, comment: String = "deleted"): Future[Unit] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒ await(svnRepo.delete(path, comment))
-      case PathStatus.Oversize   ⇒ await(svnRepo.delete(shaFilePath(path), comment))
+      case PathStatus.Annex      ⇒ await(svnRepo.delete(shaFilePath(path), comment))
       case PathStatus.Missing    ⇒ throw FileNotFound(path)
     }
   }
 
-  override def list(pattern: Option[String] = None): Future[List[ConfigFileInfo]] = async {
-    await(svnRepo.list(pattern)).map { entry =>
-      ConfigFileInfo(Paths.get(entry.getRelativePath.stripSuffix(settings.`sha1-suffix`)), ConfigId(entry.getRevision),
-        entry.getCommitMessage)
+  override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] =
+    async {
+      await(svnRepo.list(fileType, pattern)).map { entry =>
+        ConfigFileInfo(Paths.get(entry.getRelativePath), ConfigId(entry.getRevision), entry.getCommitMessage)
+      }
     }
-  }
 
   override def history(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒ await(hist(path, maxResults))
-      case PathStatus.Oversize   ⇒ await(hist(shaFilePath(path), maxResults))
+      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), maxResults))
       case PathStatus.Missing    ⇒ throw FileNotFound(path)
     }
   }
 
-  override def setDefault(path: Path, id: ConfigId, comment: String): Future[Unit] = async {
+  override def setActive(path: Path, id: ConfigId, comment: String): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
       throw FileNotFound(path)
     }
 
-    val defaultPath = defaultFilePath(path)
-    val present     = await(exists(defaultPath))
+    val activePath = activeFilePath(path)
+    val present    = await(exists(activePath))
 
     if (present) {
-      await(update(defaultPath, ConfigData.fromString(id.id), comment))
+      await(update(activePath, ConfigData.fromString(id.id), comment))
     } else {
-      await(create(defaultPath, ConfigData.fromString(id.id), comment = comment))
+      await(createFile(activePath, ConfigData.fromString(id.id), comment = comment))
     }
   }
 
-  override def resetDefault(path: Path, comment: String): Future[Unit] = async {
+  override def resetActive(path: Path, comment: String): Future[Unit] = async {
     if (!await(exists(path))) {
       throw FileNotFound(path)
     }
 
-    val defaultPath = defaultFilePath(path)
+    val activePath = activeFilePath(path)
 
-    val present = await(exists(defaultPath))
+    val present = await(exists(activePath))
 
     if (present) {
-      await(delete(defaultPath))
+      await(delete(activePath))
     }
   }
 
-  override def getDefault(path: Path): Future[Option[ConfigData]] = {
+  override def getActive(path: Path): Future[Option[ConfigData]] = {
 
-    def getDefaultById(configId: ConfigId): Future[Option[ConfigData]] = async {
-      val d  = await(getLatest(defaultFilePath(path)))
+    def getActiveById(configId: ConfigId): Future[Option[ConfigData]] = async {
+      val d  = await(getLatest(activeFilePath(path)))
       val id = if (d.isDefined) await(d.get.toStringF) else configId.id
       await(getById(path, ConfigId(id)))
     }
@@ -190,7 +197,7 @@ class SvnConfigService(settings: Settings,
     async {
       await(getCurrentVersion(path)) match {
         case None           ⇒ None
-        case Some(configId) ⇒ await(getDefaultById(configId))
+        case Some(configId) ⇒ await(getActiveById(configId))
       }
     }
   }
@@ -200,7 +207,7 @@ class SvnConfigService(settings: Settings,
     if (await(svnRepo.pathExists(path, revision))) {
       PathStatus.NormalSize
     } else if (await(svnRepo.pathExists(shaFilePath(path), revision))) {
-      PathStatus.Oversize
+      PathStatus.Annex
     } else {
       PathStatus.Missing
     }
@@ -230,7 +237,7 @@ class SvnConfigService(settings: Settings,
   private def getCurrentVersion(path: Path): Future[Option[ConfigId]] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒ await(hist(path, 1)).headOption.map(_.id)
-      case PathStatus.Oversize   ⇒ await(hist(shaFilePath(path), 1)).headOption.map(_.id)
+      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), 1)).headOption.map(_.id)
       case PathStatus.Missing    ⇒ None
     }
   }
@@ -240,9 +247,9 @@ class SvnConfigService(settings: Settings,
       .map(e => ConfigFileRevision(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
   }
 
-  // File used to store the SHA-1 of the actual file, if oversized.
+  // File used to store the SHA-1 of the actual file, if annexd.
   private def shaFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`sha1-suffix`}")
 
-  // File used to store the id of the default version of the file.
-  private def defaultFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`default-suffix`}")
+  // File used to store the id of the active version of the file.
+  private def activeFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`active-config-suffix`}")
 }

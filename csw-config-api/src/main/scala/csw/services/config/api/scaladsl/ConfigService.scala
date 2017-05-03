@@ -3,6 +3,7 @@ package csw.services.config.api.scaladsl
 import java.nio.file.Path
 import java.time.Instant
 
+import csw.services.config.api.commons.FileType
 import csw.services.config.api.models._
 
 import scala.concurrent.Future
@@ -18,11 +19,11 @@ trait ConfigService {
    *
    * @param path       the file path relative to the repository root
    * @param configData used to read the contents of the file
-   * @param oversize   true if the file is oversize and requires special handling (external storage)
+   * @param annex   true if the file is annex and requires special handling (external storage)
    * @param comment    an optional comment to associate with this file
    * @return a unique id that can be used to refer to the file
    */
-  def create(path: Path, configData: ConfigData, oversize: Boolean = false, comment: String = ""): Future[ConfigId]
+  def create(path: Path, configData: ConfigData, annex: Boolean = false, comment: String = ""): Future[ConfigId]
 
   /**
    * Updates the config file with the given path and data and optional comment.
@@ -85,7 +86,7 @@ trait ConfigService {
    *
    * @return a list containing one ConfigFileInfo object for each known config file
    */
-  def list(pattern: Option[String] = None): Future[List[ConfigFileInfo]]
+  def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]]
 
   /**
    * Returns a list of all known versions of a given path
@@ -97,31 +98,31 @@ trait ConfigService {
   def history(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]]
 
   /**
-   * Sets the "default version" of the file with the given path.
-   * If this method is not called, the default version will always be the latest version.
-   * After calling this method, the version with the given Id will be the default.
+   * Sets the "active version" to be the version provided for the file with the given path.
+   * If this method is not called, the active version will always be the version with which the file was created i.e. 1
+   * After calling this method, the version with the given Id will be the active.
    *
    * @param path the file path relative to the repository root
    * @param id   an optional id used to specify a specific version
-   *             (by default the id of the latest version is used)
-   * @return a future result
+   *             (by default the id of the version with which the file was created i.e. 1)
+   * @return     a future result
    */
-  def setDefault(path: Path, id: ConfigId, comment: String = ""): Future[Unit]
+  def setActive(path: Path, id: ConfigId, comment: String = ""): Future[Unit]
 
   /**
-   * Resets the "default version" of the file with the given path to the latest version.
+   * Resets the "active version" of the file with the given path to the latest version.
    *
    * @param path the file path relative to the repository root
-   * @return a future result
+   * @return     a future result
    */
-  def resetDefault(path: Path, comment: String = ""): Future[Unit]
+  def resetActive(path: Path, comment: String = ""): Future[Unit]
 
   /**
-   * Gets and returns the default version of the file stored under the given path.
-   * If no default was set, this returns the latest version.
+   * Gets and returns the active version of the file stored under the given path.
+   * If no active was set, this returns the version with which the file was created i.e. 1.
    *
    * @param path the file path relative to the repository root
-   * @return a future object that can be used to access the file's data, if found
+   * @return     a future object that can be used to access the file's data, if found
    */
-  def getDefault(path: Path): Future[Option[ConfigData]]
+  def getActive(path: Path): Future[Option[ConfigData]]
 }

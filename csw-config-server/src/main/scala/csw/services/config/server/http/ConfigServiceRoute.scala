@@ -21,7 +21,7 @@ class ConfigServiceRoute(
           case (Some(date), _, _) ⇒ complete(configService.getByTime(filePath, date))
           case (_, Some(id), _)   ⇒ complete(configService.getById(filePath, id))
           case (_, _, true)       ⇒ complete(configService.getLatest(filePath))
-          case (_, _, _)          ⇒ complete(configService.getDefault(filePath))
+          case (_, _, _)          ⇒ complete(configService.getActive(filePath))
         }
       } ~
       head {
@@ -34,8 +34,8 @@ class ConfigServiceRoute(
         }
       } ~
       post {
-        (configDataEntity & oversizeParam & commentParam) { (configData, oversize, comment) ⇒
-          complete(StatusCodes.Created -> configService.create(filePath, configData, oversize, comment))
+        (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
+          complete(StatusCodes.Created -> configService.create(filePath, configData, annex, comment))
         }
       } ~
       put {
@@ -53,13 +53,13 @@ class ConfigServiceRoute(
       put {
         (idParam & commentParam) {
           case (Some(configId), comment) ⇒
-            complete(configService.setDefault(filePath, configId, comment).map(_ ⇒ Done))
-          case (_, comment) ⇒ complete(configService.resetDefault(filePath, comment).map(_ ⇒ Done))
+            complete(configService.setActive(filePath, configId, comment).map(_ ⇒ Done))
+          case (_, comment) ⇒ complete(configService.resetActive(filePath, comment).map(_ ⇒ Done))
         }
       } ~
       (get & rejectEmptyResponse) {
         println(s"------------------------getting default version of $filePath -----------------------")
-        complete(configService.getDefault(filePath))
+        complete(configService.getActive(filePath))
       }
     } ~
     (path("history" / FilePath) & get) { filePath ⇒
@@ -68,8 +68,8 @@ class ConfigServiceRoute(
       }
     } ~
     (path("list") & get) {
-      patternParam { pattern ⇒
-        complete(configService.list(pattern))
+      (typeParam & patternParam) { (fileType, pattern) ⇒
+        complete(configService.list(fileType, pattern))
       }
     }
   }

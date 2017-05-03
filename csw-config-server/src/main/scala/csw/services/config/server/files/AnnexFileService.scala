@@ -15,14 +15,14 @@ import scala.concurrent.Future
  * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
  * the SHA-1 hash value.
   **/
-class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo, actorRuntime: ActorRuntime) {
+class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 
   def post(configData: ConfigData): Future[String] = async {
     val (tempFilePath, sha) = await(saveAndSha(configData))
 
-    val outPath = makePath(settings.`oversize-files-dir`, sha)
+    val outPath = makePath(settings.`annex-files-dir`, sha)
 
     if (await(fileRepo.exists(outPath))) {
       await(fileRepo.delete(tempFilePath))
@@ -41,7 +41,7 @@ class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo, actorR
   }
 
   def get(sha: String): Future[Option[ConfigData]] = async {
-    val repoFilePath = makePath(settings.`oversize-files-dir`, sha)
+    val repoFilePath = makePath(settings.`annex-files-dir`, sha)
 
     if (await(fileRepo.exists(repoFilePath))) {
       Some(ConfigData.fromPath(repoFilePath))

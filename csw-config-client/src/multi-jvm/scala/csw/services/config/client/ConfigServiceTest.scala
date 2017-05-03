@@ -49,7 +49,7 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAn
           |""".stripMargin
 
       val file = Paths.get("test.conf")
-      configService.create(file, ConfigData.fromString(configValue), oversize = false, "commit test file").await
+      configService.create(file, ConfigData.fromString(configValue), annex = false, "commit test file").await
       val actualConfigValue = configService.getLatest(file).await.get.toStringF.await
       actualConfigValue shouldBe configValue
     }

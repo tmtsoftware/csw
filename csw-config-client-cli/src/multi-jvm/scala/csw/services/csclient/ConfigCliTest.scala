@@ -36,7 +36,7 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
   val repoPath1                = "/client1/hcd/text/tromboneHCD.conf"
   val repoPath2                = "/client2/hcd/text/app.conf"
 
-  test("should upload, update, get and set default version of configuration files") {
+  test("should upload, update, get and set active version of configuration files") {
     runOn(server) {
       // Start server on first node
       val serverWiring = ServerWiring.make(locationService)
@@ -45,7 +45,7 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
       enterBarrier("server-started")
       enterBarrier("member1-create")
       enterBarrier("member1-update")
-      enterBarrier("member1-setDefault")
+      enterBarrier("member1-setActive")
       enterBarrier("member2-create")
     }
     runOn(client1) {
@@ -63,11 +63,11 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
       cliMain1.start(updateArgs)
       enterBarrier("member1-update")
 
-      // set default version of file using cli app from client1 and verify client2 able to access it
-      val cliMain2       = new Main(ClusterSettings().joinLocal(3552))
-      val setDefaultArgs = Array("setDefault", repoPath1, "--id", "1")
-      cliMain2.start(setDefaultArgs)
-      enterBarrier("member1-setDefault")
+      // set active version of file using cli app from client1 and verify client2 able to access it
+      val cliMain2      = new Main(ClusterSettings().joinLocal(3552))
+      val setActiveArgs = Array("setActive", repoPath1, "--id", "1")
+      cliMain2.start(setActiveArgs)
+      enterBarrier("member1-setActive")
 
       // Verify that client1 (cli app) is able to access file created by client2
       enterBarrier("member2-create")
@@ -93,9 +93,9 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
       val actualUpdatedConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
       actualUpdatedConfigValue shouldBe updatedInputFileContents
 
-      enterBarrier("member1-setDefault")
-      val actualDefaultConfigValue = configService.getDefault(Paths.get(repoPath1)).await.get.toStringF.await
-      actualDefaultConfigValue shouldBe inputFileContents
+      enterBarrier("member1-setActive")
+      val actualActiveConfigValue = configService.getActive(Paths.get(repoPath1)).await.get.toStringF.await
+      actualActiveConfigValue shouldBe inputFileContents
 
       configService.create(Paths.get(repoPath2), ConfigData.fromString(inputFileContents)).await
       enterBarrier("member2-create")

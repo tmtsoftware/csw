@@ -16,18 +16,18 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
       new Date(), "author", "comment")
 
     val patterns = List(
-      Pattern.compile("a/"),
-      Pattern.compile("a/b"),
-      Pattern.compile("a/b/sample"),
-      Pattern.compile("/b/sample"),
-      Pattern.compile("sample"),
-      Pattern.compile(".txt"),
-      Pattern.compile("sample.txt"),
-      Pattern.compile("")
+      Pattern.compile("a/.*"),
+      Pattern.compile("a/b.*"),
+      Pattern.compile("a/b/sample.*"),
+      Pattern.compile(".*/b/sample.*"),
+      Pattern.compile(".*sample.*"),
+      Pattern.compile(".*.txt"),
+      Pattern.compile(".*txt"),
+      Pattern.compile(".*sample.txt.*")
     )
 
     dirEntry.isFile shouldBe true
-    dirEntry.isNotDefault(settings.`default-suffix`) shouldBe true
+    dirEntry.isNotActiveFile(settings.`active-config-suffix`) shouldBe true
 
     patterns.foreach(pattern ⇒ dirEntry.matches(Some(pattern)) shouldBe true)
   }
@@ -36,7 +36,22 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
     val dirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt", SVNNodeKind.FILE, 100, false, 1,
       new Date(), "author", "comment")
 
-    val pattern = Pattern.compile("invalidstring")
-    dirEntry.matches(Some(pattern)) shouldBe false
+    val patterns = List(
+      Pattern.compile(""),
+      Pattern.compile("invalidstring")
+    )
+
+    patterns.foreach(pattern ⇒ dirEntry.matches(Some(pattern)) shouldBe false)
+  }
+
+  test("should detect annex and normal file based on type") {
+    val normalDirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt", SVNNodeKind.FILE, 100,
+      false, 1, new Date(), "author", "comment")
+
+    val annexDirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt.$sha1", SVNNodeKind.FILE,
+      100, false, 1, new Date(), "author", "comment")
+
+    normalDirEntry.isNormal(settings.`sha1-suffix`) shouldBe true
+    annexDirEntry.isAnnex(settings.`sha1-suffix`) shouldBe true
   }
 }

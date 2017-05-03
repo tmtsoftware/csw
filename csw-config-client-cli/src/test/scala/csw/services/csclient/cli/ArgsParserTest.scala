@@ -28,17 +28,17 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("test create with all applicable sub-options") {
-    val argv               = Array("create", relativeRepoPath, "-i", inputFilePath, "--oversize", "-c", comment)
+    val argv               = Array("create", relativeRepoPath, "-i", inputFilePath, "--annex", "-c", comment)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("create", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None, Int.MaxValue, oversize = true, comment))
+        None, Int.MaxValue, annex = true, comment))
   }
 
   test("test create with bare minimum sub-options") {
     val argv               = Array("create", relativeRepoPath, "-i", inputFilePath)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("create", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None, Int.MaxValue, oversize = false))
+        None, Int.MaxValue, annex = false))
   }
 
   test("test update with no sub-options") {
@@ -51,14 +51,14 @@ class ArgsParserTest extends FunSuite with Matchers {
     val argv               = Array("update", relativeRepoPath, "-i", inputFilePath, "-c", comment)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("update", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None, Int.MaxValue, oversize = false, comment))
+        None, Int.MaxValue, annex = false, comment))
   }
 
   test("test update with bare minimum sub-options") {
     val argv               = Array("update", relativeRepoPath, "-i", inputFilePath)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("update", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None, Int.MaxValue, oversize = false))
+        None, Int.MaxValue, annex = false))
   }
 
   test("test get with no sub-options") {
@@ -78,7 +78,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     val argv               = Array("get", relativeRepoPath, "-o", outputFilePath, "--date", date)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("get", Some(Paths.get(relativeRepoPath)), None, Some(Paths.get(outputFilePath)), None,
-        Some(Instant.parse(date)), Int.MaxValue, oversize = false))
+        Some(Instant.parse(date)), Int.MaxValue, annex = false))
   }
 
   test("test get with latest sub-option") {
@@ -128,7 +128,7 @@ class ArgsParserTest extends FunSuite with Matchers {
   test("test list with pattern") {
     val argv               = Array("list", "--pattern", "a/b")
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
-    x should contain(Options("list", None, None, None, None, None, Int.MaxValue, oversize = false, "", latest = false,
+    x should contain(Options("list", None, None, None, None, None, Int.MaxValue, annex = false, "", latest = false,
         Some("a/b")))
   }
 
@@ -142,39 +142,39 @@ class ArgsParserTest extends FunSuite with Matchers {
     val argv               = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("history", Some(Paths.get(relativeRepoPath)), None, None, None, None, maxFileVersions,
-        oversize = false))
+        annex = false))
   }
 
-  test("test setDefault with no sub-options") {
-    val argv               = Array("setDefault")
+  test("test setActive with no sub-options") {
+    val argv               = Array("setActive")
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x shouldEqual None
   }
 
-  test("test setDefault with all sub-options") {
-    val argv               = Array("setDefault", relativeRepoPath, "--id", id)
+  test("test setActive with all sub-options") {
+    val argv               = Array("setActive", relativeRepoPath, "--id", id)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
-    x should contain(Options("setDefault", Some(Paths.get(relativeRepoPath)), None, None, Some(id), None, Int.MaxValue,
-        oversize = false))
+    x should contain(Options("setActive", Some(Paths.get(relativeRepoPath)), None, None, Some(id), None, Int.MaxValue,
+        annex = false))
   }
 
-  test("test setDefault with bare minimum sub-options") {
-    val argv               = Array("setDefault", relativeRepoPath)
+  test("test setActive with bare minimum sub-options") {
+    val argv               = Array("setActive", relativeRepoPath)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
-    x should contain(Options("setDefault", Some(Paths.get(relativeRepoPath)), None, None, None, None, Int.MaxValue,
-        oversize = false))
+    x should contain(Options("setActive", Some(Paths.get(relativeRepoPath)), None, None, None, None, Int.MaxValue,
+        annex = false))
   }
 
-  test("test resetDefault with no sub-options") {
-    val argv               = Array("resetDefault")
+  test("test resetActive with no sub-options") {
+    val argv               = Array("resetActive")
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x shouldEqual None
   }
 
-  test("test resetDefault with sub-options") {
-    val argv               = Array("resetDefault", relativeRepoPath)
+  test("test resetActive with sub-options") {
+    val argv               = Array("resetActive", relativeRepoPath)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
-    x should contain(Options("resetDefault", Some(Paths.get(relativeRepoPath)), None, None, None, None, Int.MaxValue,
-        oversize = false))
+    x should contain(Options("resetActive", Some(Paths.get(relativeRepoPath)), None, None, None, None, Int.MaxValue,
+        annex = false))
   }
 }
