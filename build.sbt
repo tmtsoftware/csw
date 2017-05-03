@@ -90,3 +90,11 @@ lazy val integration = project
 
 //Docs project
 lazy val docs = project.enablePlugins(ParadoxSite, NoPublish)
+
+//Example code
+lazy val examples = project
+  .enablePlugins(DeployApp)
+  .dependsOn(`csw-location`)
+  .settings(libraryDependencies ++= Dependencies.CswProdExamples
+  )
+

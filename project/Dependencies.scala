@@ -70,4 +70,8 @@ object Dependencies {
     Libs.`scopt`,
     Libs.`scalatest` % Test
   )
+
+  val CswProdExamples = Seq(
+    Libs.`scalatest` % Test
+  )
 }
