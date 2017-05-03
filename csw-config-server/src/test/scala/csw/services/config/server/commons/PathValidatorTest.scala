@@ -4,9 +4,10 @@ import java.nio.file.Paths
 
 import org.scalatest.{FunSuite, Matchers}
 
+// DEOPSCSW-47: Unique name for configuration file
+// DEOPSCSW-135: Validation of suffix for active and sha files
 class PathValidatorTest extends FunSuite with Matchers {
 
-  // DEOPSCSW-47: Unique name for configuration file
   test("should return false for invalid path") {
 
     val paths = List(
