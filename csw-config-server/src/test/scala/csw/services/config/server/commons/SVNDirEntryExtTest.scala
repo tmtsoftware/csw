@@ -27,7 +27,7 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
     )
 
     dirEntry.isFile shouldBe true
-    dirEntry.isNotDefault(settings.`default-suffix`) shouldBe true
+    dirEntry.isNotDefault(settings.`active-suffix`) shouldBe true
 
     patterns.foreach(pattern ⇒ dirEntry.matches(Some(pattern)) shouldBe true)
   }

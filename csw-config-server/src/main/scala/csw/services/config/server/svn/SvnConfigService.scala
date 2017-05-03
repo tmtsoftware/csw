@@ -22,24 +22,33 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   import actorRuntime._
 
-  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = {
+  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
+    if (!PathValidator.isValid(path)) {
+      throw new InvalidFilePath(path, PathValidator.invalidCharsMessage)
+    }
+
+    // If the file already exists in the repo, throw exception
+    if (await(exists(path))) {
+      throw FileAlreadyExists(path)
+    }
+
+    await(createFile(path, configData, annex, comment))
+  }
+
+  private def createFile(path: Path,
+                         configData: ConfigData,
+                         annex: Boolean = false,
+                         comment: String = ""): Future[ConfigId] = {
 
     def createAnnex(): Future[ConfigId] = async {
       val sha1 = await(fileService.post(configData))
-      await(create(shaFilePath(path), ConfigData.fromString(sha1), annex = false, comment))
+      await(createFile(shaFilePath(path), ConfigData.fromString(sha1), annex = false, comment))
     }
 
     async {
-      if (!PathValidator.isValid(path)) {
-        throw new InvalidFilePath(path, PathValidator.invalidCharsMessage)
-      }
       // If the file does not already exists in the repo, create it
-      if (await(exists(path))) {
-        throw FileAlreadyExists(path)
-      }
-
       if (annex || configData.length > settings.`annex-min-file-size`) {
-//        println(s"Either annex=${annex} is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
+        //        println(s"Either annex=${annex} is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
         await(createAnnex())
       } else {
         await(put(path, configData, update = false, comment))
@@ -158,7 +167,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     if (present) {
       await(update(defaultPath, ConfigData.fromString(id.id), comment))
     } else {
-      await(create(defaultPath, ConfigData.fromString(id.id), comment = comment))
+      await(createFile(defaultPath, ConfigData.fromString(id.id), comment = comment))
     }
   }
 
@@ -241,5 +250,5 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   private def shaFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`sha1-suffix`}")
 
   // File used to store the id of the default version of the file.
-  private def defaultFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`default-suffix`}")
+  private def defaultFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`active-suffix`}")
 }
