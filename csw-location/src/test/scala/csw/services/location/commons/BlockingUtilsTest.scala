@@ -1,6 +1,5 @@
 package csw.services.location.commons
 
-import csw.services.location.commons.TestFutureExtension.RichFuture
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.Future
@@ -27,9 +26,7 @@ class BlockingUtilsTest extends FunSuite with Matchers {
 
     def predicate = replicaCount == upMembers
 
-    val result = Future {
-      BlockingUtils.poll(predicate, 10.seconds)
-    }.await
+    val result = BlockingUtils.poll(predicate, 10.seconds)
 
     result shouldBe true
   }
