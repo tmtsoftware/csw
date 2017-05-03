@@ -8,7 +8,7 @@ import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, Inva
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.PathValidator
-import csw.services.config.server.files.OversizeFileService
+import csw.services.config.server.files.AnnexFileService
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
 import org.tmatesoft.svn.core.wc.SVNRevision
@@ -17,17 +17,14 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-class SvnConfigService(settings: Settings,
-                       fileService: OversizeFileService,
-                       actorRuntime: ActorRuntime,
-                       svnRepo: SvnRepo)
+class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorRuntime: ActorRuntime, svnRepo: SvnRepo)
     extends ConfigService {
 
   import actorRuntime._
 
   override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = {
 
-    def createOversize(): Future[ConfigId] = async {
+    def createAnnex(): Future[ConfigId] = async {
       val sha1 = await(fileService.post(configData))
       await(create(shaFilePath(path), ConfigData.fromString(sha1), annex = false, comment))
     }
@@ -43,7 +40,7 @@ class SvnConfigService(settings: Settings,
 
       if (annex || configData.length > settings.`annex-min-file-size`) {
 //        println(s"Either annex=${annex} is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
-        await(createOversize())
+        await(createAnnex())
       } else {
         await(put(path, configData, update = false, comment))
       }
@@ -52,7 +49,7 @@ class SvnConfigService(settings: Settings,
 
   override def update(path: Path, configData: ConfigData, comment: String): Future[ConfigId] = {
 
-    def updateOversize(): Future[ConfigId] = async {
+    def updateAnnex(): Future[ConfigId] = async {
       val sha1 = await(fileService.post(configData))
       await(update(shaFilePath(path), ConfigData.fromString(sha1), comment))
     }
@@ -61,7 +58,7 @@ class SvnConfigService(settings: Settings,
     async {
       await(pathStatus(path)) match {
         case PathStatus.NormalSize ⇒ await(put(path, configData, update = true, comment))
-        case PathStatus.Oversize   ⇒ await(updateOversize())
+        case PathStatus.Annex      ⇒ await(updateAnnex())
         case PathStatus.Missing    ⇒ throw FileNotFound(path)
       }
     }
@@ -80,7 +77,7 @@ class SvnConfigService(settings: Settings,
   }
 
   // Get annex files that are stored in the annex server
-  private def getOversize(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
+  private def getAnnex(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
     await(getNormalSize(shaFilePath(path), revision)) match {
       case None =>
         None
@@ -96,7 +93,7 @@ class SvnConfigService(settings: Settings,
 
       await(pathStatus(path, configId)) match {
         case PathStatus.NormalSize ⇒ await(getNormalSize(path, svnRevision))
-        case PathStatus.Oversize   ⇒ await(getOversize(path, svnRevision))
+        case PathStatus.Annex      ⇒ await(getAnnex(path, svnRevision))
         case PathStatus.Missing    ⇒ None
       }
     }
@@ -130,7 +127,7 @@ class SvnConfigService(settings: Settings,
   override def delete(path: Path, comment: String = "deleted"): Future[Unit] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒ await(svnRepo.delete(path, comment))
-      case PathStatus.Oversize   ⇒ await(svnRepo.delete(shaFilePath(path), comment))
+      case PathStatus.Annex      ⇒ await(svnRepo.delete(shaFilePath(path), comment))
       case PathStatus.Missing    ⇒ throw FileNotFound(path)
     }
   }
@@ -145,7 +142,7 @@ class SvnConfigService(settings: Settings,
   override def history(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒ await(hist(path, maxResults))
-      case PathStatus.Oversize   ⇒ await(hist(shaFilePath(path), maxResults))
+      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), maxResults))
       case PathStatus.Missing    ⇒ throw FileNotFound(path)
     }
   }
@@ -200,7 +197,7 @@ class SvnConfigService(settings: Settings,
     if (await(svnRepo.pathExists(path, revision))) {
       PathStatus.NormalSize
     } else if (await(svnRepo.pathExists(shaFilePath(path), revision))) {
-      PathStatus.Oversize
+      PathStatus.Annex
     } else {
       PathStatus.Missing
     }
@@ -230,7 +227,7 @@ class SvnConfigService(settings: Settings,
   private def getCurrentVersion(path: Path): Future[Option[ConfigId]] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒ await(hist(path, 1)).headOption.map(_.id)
-      case PathStatus.Oversize   ⇒ await(hist(shaFilePath(path), 1)).headOption.map(_.id)
+      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), 1)).headOption.map(_.id)
       case PathStatus.Missing    ⇒ None
     }
   }
@@ -240,7 +237,7 @@ class SvnConfigService(settings: Settings,
       .map(e => ConfigFileRevision(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
   }
 
-  // File used to store the SHA-1 of the actual file, if oversized.
+  // File used to store the SHA-1 of the actual file, if annexd.
   private def shaFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`sha1-suffix`}")
 
   // File used to store the id of the default version of the file.

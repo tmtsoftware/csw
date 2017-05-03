@@ -6,7 +6,7 @@ import akka.dispatch.MessageDispatcher
 
 import scala.concurrent.Future
 
-class OversizeFileRepo(blockingIoDispatcher: MessageDispatcher) {
+class AnnexFileRepo(blockingIoDispatcher: MessageDispatcher) {
 
   private implicit val _blockingIoDispatcher = blockingIoDispatcher
 

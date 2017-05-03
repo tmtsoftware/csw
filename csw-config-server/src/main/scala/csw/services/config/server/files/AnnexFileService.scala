@@ -15,7 +15,7 @@ import scala.concurrent.Future
  * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
  * the SHA-1 hash value.
   **/
-class OversizeFileService(settings: Settings, fileRepo: OversizeFileRepo, actorRuntime: ActorRuntime) {
+class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 

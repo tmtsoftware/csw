@@ -435,8 +435,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
-  test("should be able to store and retrieve annex file") {
-    val file    = Paths.get("SomeOversizeFile.txt")
+  test("should be able to store and retrieve file from annex store") {
+    val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
 
     val configData  = ConfigData.fromString(content)
@@ -449,11 +449,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
   }
 
-  test("should list annex files without .sha1 suffix") {
-    val file1    = Paths.get("OversizeFile1.txt")
+  test("should list files from annex store without .sha1 suffix") {
+    val file1    = Paths.get("AnnexFile1.txt")
     val comment1 = "committing annex file"
 
-    val file2    = Paths.get("OversizeFile2.txt")
+    val file2    = Paths.get("AnnexFile2.txt")
     val comment2 = "committing one more annex file"
 
     val configId1 =
@@ -470,8 +470,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   // DEOPSCSW-49: Update an Existing File with a New Version
-  test("should be able to update annex file and retrieve the history") {
-    val file            = Paths.get("SomeOversizeFile.txt")
+  test("should be able to update and retrieve the history of a file in annex store") {
+    val file            = Paths.get("SomeAnnexFile.txt")
     val creationContent = "testing annex file"
     val creationComment = "initial commit"
 
@@ -512,8 +512,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-77: Set default version of configuration file in config service
   // DEOPSCSW-78: Get the default version of a configuration file
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
-  test("should be able to get annex default file") {
-    val file    = Paths.get("SomeOversizeFile.txt")
+  test("should be able to get default file from annex store") {
+    val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
     val configId =
       configService.create(file, ConfigData.fromString(content), annex = true, "committing annex file").await
@@ -545,12 +545,12 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     }
   }
 
-  test("should be able to get annex time stamped file") {
+  test("should be able to get time stamped file from annex store") {
     val initialTime = Instant.MIN
 
-    val file    = Paths.get("SomeOversizeFile.txt")
+    val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
-    configService.create(file, ConfigData.fromString(content), annex = true, "committing annex file").await
+    configService.create(file, ConfigData.fromString(content), annex = true, "committing file to annex store").await
 
     val time = Instant.now()
 
@@ -649,7 +649,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     fileInfoes6.map(_.path).toSet shouldBe Set(hcdConfig)
   }
 
-  test("should be able to store and retrieve text file with size greater than configured size as annex") {
+  test("should be able to store and retrieve text file from annex store when size is greater than configured size") {
     val fileName              = "tromboneContainer.conf"
     val path                  = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
     val configData            = ConfigData.fromPath(path)

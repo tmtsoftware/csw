@@ -8,8 +8,8 @@ import csw.services.config.server.Settings
 class TestFileUtils(settings: Settings) {
 
   def deleteServerFiles(): Unit = {
-    val oversizeFileDir = Paths.get(settings.`annex-files-dir`).toFile
-    deleteDirectoryRecursively(oversizeFileDir)
+    val annexFileDir = Paths.get(settings.`annex-files-dir`).toFile
+    deleteDirectoryRecursively(annexFileDir)
     deleteDirectoryRecursively(settings.repositoryFile)
   }
 

@@ -94,8 +94,8 @@ public class JConfigClientTest {
     }
 
     @Test
-    public void testCreateOversizeFile() throws ExecutionException, InterruptedException {
-        Path path = Paths.get("SomeOversizeFile.txt");
+    public void testCreateFileInAnnexStore() throws ExecutionException, InterruptedException {
+        Path path = Paths.get("SomeAnnexFile.txt");
         configService.create(path, ConfigData.fromString(configValue1), true).get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
@@ -303,12 +303,12 @@ public class JConfigClientTest {
     }
 
     @Test
-    public void testListOversizeFilesWithoutShaSuffix() throws ExecutionException, InterruptedException {
+    public void testListFilesFromAnnexStoreWithoutShaSuffix() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
-        String tromboneConfigComment = "test{Oversize file no1}";
-        String assemblyConfigComment = "test{Oversize file no2}";
+        String tromboneConfigComment = "test{Annex file no1}";
+        String assemblyConfigComment = "test{Annex file no2}";
 
         ConfigId tromboneConfigId = configService.create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis"),
                                                         true,
@@ -325,7 +325,7 @@ public class JConfigClientTest {
 
     // DEOPSCSW-74: Check config file existence by unique name
     @Test
-    public void testOversizeFileExists() throws ExecutionException, InterruptedException {
+    public void testFileExistsInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
         Assert.assertFalse(configService.exists(path).get());
 
@@ -337,7 +337,7 @@ public class JConfigClientTest {
 
     // DEOPSCSW-49: Update an Existing File with a New Version
     @Test
-    public void testUpdateAndHistoryOfOversizedFiles() throws ExecutionException, InterruptedException {
+    public void testUpdateAndHistoryOfFilesInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
@@ -358,7 +358,7 @@ public class JConfigClientTest {
     // DEOPSCSW-78: Get the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
     @Test
-    public void testGetAndSetDefaultOversizeConfigFile() throws ExecutionException, InterruptedException {
+    public void testGetAndSetDefaultConfigFileFromAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         configService.create(path, ConfigData.fromString(configValue1), true, "some comment").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
@@ -375,9 +375,9 @@ public class JConfigClientTest {
     }
 
     @Test
-    public void testRetrieveVersionBasedOnDateForOverSizedFile() throws ExecutionException, InterruptedException {
+    public void testRetrieveVersionBasedOnDateForFileInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
-        configService.create(path, ConfigData.fromString(configValue1), true, "commit initial annex configuration").get();
+        configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration to annex store").get();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
         configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
