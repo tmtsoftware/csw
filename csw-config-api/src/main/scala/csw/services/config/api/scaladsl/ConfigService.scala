@@ -3,6 +3,7 @@ package csw.services.config.api.scaladsl
 import java.nio.file.Path
 import java.time.Instant
 
+import csw.services.config.api.commons.FileType
 import csw.services.config.api.models._
 
 import scala.concurrent.Future
@@ -85,7 +86,7 @@ trait ConfigService {
    *
    * @return a list containing one ConfigFileInfo object for each known config file
    */
-  def list(fileType: Option[String] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]]
+  def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]]
 
   /**
    * Returns a list of all known versions of a given path

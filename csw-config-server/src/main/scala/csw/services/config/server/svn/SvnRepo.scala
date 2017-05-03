@@ -5,6 +5,7 @@ import java.nio.file.Path
 import java.util.regex.Pattern
 
 import akka.dispatch.MessageDispatcher
+import csw.services.config.api.commons.FileType
 import csw.services.config.server.Settings
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
@@ -124,12 +125,12 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
-  def list(fileType: Option[String] = None, pattern: Option[String] = None): Future[List[SVNDirEntry]] = Future {
+  def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[SVNDirEntry]] = Future {
     val svnOperationFactory = new SvnOperationFactory()
     // svn always stores file in the repo without '/' prefix.
     // Hence if input pattern is provided like '/root/', then prefix '/' need to be striped to get the list of files from root folder.
     val compiledPattern  = pattern.map(pat ⇒ Pattern.compile(pat.stripPrefix("/")))
-    val receivingManager = new ReceivingManager(settings, compiledPattern, fileType)
+    val receivingManager = new ReceivingManager(settings, fileType, compiledPattern)
     try {
       val svnList = svnOperationFactory.createList()
       svnList.setSingleTarget(SvnTarget.fromURL(settings.svnUrl, SVNRevision.HEAD))

@@ -2,6 +2,9 @@ package csw.services.config.client.javadsl;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
+import csw.services.config.api.commons.FileType;
+import csw.services.config.api.commons.FileType$;
+import csw.services.config.api.commons.JFileType;
 import csw.services.config.api.exceptions.FileAlreadyExists;
 import csw.services.config.api.exceptions.FileNotFound;
 import csw.services.config.api.javadsl.IConfigService;
@@ -427,28 +430,72 @@ public class JConfigClientTest {
         Path hcdConfig = Paths.get("a/b/c/hcd/hcd.conf");
 
         configService.create(tromboneConfig, ConfigData.fromString(configValue1), false, "hello trombone").get();
-        configService.create(assemblyConfig, ConfigData.fromString(configValue2), false, "hello assembly").get();
+        configService.create(assemblyConfig, ConfigData.fromString(configValue2), true, "hello assembly").get();
         configService.create(hcdConfig, ConfigData.fromString(configValue3), false, "hello hcd").get();
 
         Set<Path> expected = new HashSet<>(Arrays.asList(hcdConfig, assemblyConfig));
-        Stream<Path> actualStream = configService.list(Optional.of("a/b/.*")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream = configService.list("a/b/.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected, actualStream.collect(Collectors.toSet()));
 
         Set<Path> expected1 = Collections.singleton(hcdConfig);
-        Stream<Path> actualStream1 = configService.list(Optional.of("a/b/c.*")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream1 = configService.list("a/b/c.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected1, actualStream1.collect(Collectors.toSet()));
 
         Set<Path> all = new HashSet<>(Arrays.asList(hcdConfig, assemblyConfig, tromboneConfig));
-        Stream<Path> actualStream2 = configService.list(Optional.of(".*.conf")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream2 = configService.list(".*.conf").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(all, actualStream2.collect(Collectors.toSet()));
 
-        List<ConfigFileInfo> fileInfos = configService.list(Optional.of("a/b/c/d.*")).get();
+        List<ConfigFileInfo> fileInfos = configService.list("a/b/c/d.*").get();
         Assert.assertTrue(fileInfos.isEmpty());
 
         Stream<Path> actualStream3 = configService.list().get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(all, actualStream3.collect(Collectors.toSet()));
 
-        Stream<Path> actualStream4 = configService.list(Optional.of(".*hcd.*")).get().stream().map(ConfigFileInfo::path);
+        Stream<Path> actualStream4 = configService.list(".*hcd.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected1, actualStream4.collect(Collectors.toSet()));
+    }
+
+    //DEOPSCSW-132 List oversize and normal sized files
+    //DEOPSCSW-75 List the names of configuration files that match a path
+    @Test
+    public void testListIsFilteredBasedOnTypeAndPattern() throws ExecutionException, InterruptedException {
+        Path tromboneConfig = Paths.get("trombone.conf");
+        Path hcdConfig = Paths.get("a/b/c/hcd/hcd.conf");
+        Path assemblyConfig1 = Paths.get("a/b/assembly/assembly1.conf");
+        Path assemblyConfig2 = Paths.get("a/b/c/assembly/assembly2.conf");
+
+        configService.create(tromboneConfig, ConfigData.fromString(configValue1), false, "hello trombone").get();
+        configService.create(assemblyConfig1, ConfigData.fromString(configValue2), true, "hello assembly1").get();
+        configService.create(assemblyConfig2, ConfigData.fromString(configValue2), true, "hello assembly2").get();
+        configService.create(hcdConfig, ConfigData.fromString(configValue3), false, "hello hcd").get();
+
+        Set<Path> expected1 = new HashSet<>(Arrays.asList(assemblyConfig1, assemblyConfig2));
+        Stream<Path> actualStream1 = configService.list(JFileType.Annex).get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected1, actualStream1.collect(Collectors.toSet()));
+
+        Set<Path> expected2 = new HashSet<>(Arrays.asList(tromboneConfig, hcdConfig));
+        Stream<Path> actualStream2 = configService.list(JFileType.Normal).get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected2, actualStream2.collect(Collectors.toSet()));
+
+        Set<Path> expected3 = new HashSet<>(Collections.singleton(assemblyConfig2));
+        Stream<Path> actualStream3 = configService.list(JFileType.Annex, "a/b/c.*").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected3, actualStream3.collect(Collectors.toSet()));
+
+        Stream<Path> actualStream4 = configService.list(JFileType.Annex, ".*.conf").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected1, actualStream4.collect(Collectors.toSet()));
+
+        Stream<Path> actualStream5 = configService.list(JFileType.Annex, ".*assembly.*").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected1, actualStream5.collect(Collectors.toSet()));
+
+        Set<Path> expected6 = new HashSet<>(Collections.singleton(hcdConfig));
+        Stream<Path> actualStream6 = configService.list(JFileType.Normal, "a/b/c.*").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected6, actualStream6.collect(Collectors.toSet()));
+
+        Stream<Path> actualStream7 = configService.list(JFileType.Normal, ".*.conf").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected2, actualStream7.collect(Collectors.toSet()));
+
+        Set<Path> expected8 = new HashSet<>(Collections.singleton(tromboneConfig));
+        Stream<Path> actualStream8 = configService.list(JFileType.Normal, ".*trombone.*").get().stream().map(ConfigFileInfo::path);
+        Assert.assertEquals(expected8, actualStream8.collect(Collectors.toSet()));
     }
 }

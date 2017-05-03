@@ -41,6 +41,7 @@ object Dependencies {
   )
 
   val ConfigApi = Seq(
+    Libs.`enumeratum`,
     Akka.`akka-stream`,
     AkkaHttp.`akka-http-spray-json`,
     Libs.`scalatest`           % Test,

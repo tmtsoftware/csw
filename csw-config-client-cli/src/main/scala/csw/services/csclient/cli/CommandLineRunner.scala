@@ -53,7 +53,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     }
 
     def list(): Unit = {
-      val fileInfoes = await(configService.list(options.pattern))
+      val fileInfoes = await(configService.list(pattern = options.pattern))
       fileInfoes.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
     }
 

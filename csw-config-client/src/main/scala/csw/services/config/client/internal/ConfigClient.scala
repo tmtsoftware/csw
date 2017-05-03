@@ -7,7 +7,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import csw.services.config.api.commons.BinaryUtils
+import csw.services.config.api.commons.{BinaryUtils, FileType}
 import csw.services.config.api.commons.ConfigStreamExts.RichSource
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{JsonSupport, _}
@@ -104,9 +104,10 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def list(fileType: Option[String] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] =
+  override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] =
     async {
-      val uri = await(listUri).withQuery(Query(fileType.map("type" → _).toMap ++ pattern.map("pattern" → _).toMap))
+      val uri =
+        await(listUri).withQuery(Query(fileType.map("type" → _.entryName).toMap ++ pattern.map("pattern" → _).toMap))
 
       val request = HttpRequest(uri = uri)
       println(request)

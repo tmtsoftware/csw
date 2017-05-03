@@ -2,12 +2,13 @@ package csw.services.config.server.svn
 
 import java.util.regex.Pattern
 
+import csw.services.config.api.commons.FileType
 import csw.services.config.server.Settings
 import csw.services.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
 import org.tmatesoft.svn.core.SVNDirEntry
 import org.tmatesoft.svn.core.wc2.ISvnObjectReceiver
 
-class ReceivingManager(settings: Settings, compiledPattern: Option[Pattern], fileType: Option[String]) {
+class ReceivingManager(settings: Settings, fileType: Option[FileType], compiledPattern: Option[Pattern]) {
 
   private var entries: List[SVNDirEntry] = List.empty
 
@@ -38,9 +39,9 @@ class ReceivingManager(settings: Settings, compiledPattern: Option[Pattern], fil
 
   def getReceiver: ISvnObjectReceiver[SVNDirEntry] =
     fileType match {
-      case Some("annex")  ⇒ annexFileReceiver
-      case Some("normal") ⇒ normalFileReceiver
-      case _              ⇒ defaultReceiver
+      case Some(FileType.Annex)  ⇒ annexFileReceiver
+      case Some(FileType.Normal) ⇒ normalFileReceiver
+      case _                     ⇒ defaultReceiver
     }
 
   def getReceivedEntries: List[SVNDirEntry] = entries

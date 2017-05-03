@@ -6,6 +6,7 @@ import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.services.config.api.commons.FileType
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
@@ -689,28 +690,28 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.create(assemblyConfig2, ConfigData.fromString(configValue2), annex = true, "hello assembly2").await
     configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
 
-    val fileInfoes3 = configService.list(Some("annex")).await
-    fileInfoes3.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
+    val fileInfoes1 = configService.list(Some(FileType.Annex)).await
+    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
 
-    val fileInfoes2 = configService.list(Some("normal")).await
+    val fileInfoes2 = configService.list(Some(FileType.Normal)).await
     fileInfoes2.map(_.path).toSet shouldBe Set(tromboneConfig, hcdConfig)
 
-    val fileInfoes1 = configService.list(Some("annex"), Some("a/b/c.*")).await
-    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyConfig2)
+    val fileInfoes3 = configService.list(Some(FileType.Annex), Some("a/b/c.*")).await
+    fileInfoes3.map(_.path).toSet shouldBe Set(assemblyConfig2)
 
-    val fileInfoes7 = configService.list(Some("annex"), Some(".*.conf")).await
-    fileInfoes7.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
+    val fileInfoes4 = configService.list(Some(FileType.Annex), Some(".*.conf")).await
+    fileInfoes4.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
 
-    val fileInfoes8 = configService.list(Some("annex"), Some(".*assembly.*")).await
-    fileInfoes8.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
+    val fileInfoes5 = configService.list(Some(FileType.Annex), Some(".*assembly.*")).await
+    fileInfoes5.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
 
-    val fileInfoes4 = configService.list(Some("normal"), Some("a/b/c.*")).await
-    fileInfoes4.map(_.path).toSet shouldBe Set(hcdConfig)
-
-    val fileInfoes5 = configService.list(Some("normal"), Some(".*.conf")).await
-    fileInfoes5.map(_.path).toSet shouldBe Set(tromboneConfig, hcdConfig)
-
-    val fileInfoes6 = configService.list(Some("normal"), Some(".*hcd.*")).await
+    val fileInfoes6 = configService.list(Some(FileType.Normal), Some("a/b/c.*")).await
     fileInfoes6.map(_.path).toSet shouldBe Set(hcdConfig)
+
+    val fileInfoes7 = configService.list(Some(FileType.Normal), Some(".*.conf")).await
+    fileInfoes7.map(_.path).toSet shouldBe Set(tromboneConfig, hcdConfig)
+
+    val fileInfoes8 = configService.list(Some(FileType.Normal), Some(".*hcd.*")).await
+    fileInfoes8.map(_.path).toSet shouldBe Set(hcdConfig)
   }
 }
