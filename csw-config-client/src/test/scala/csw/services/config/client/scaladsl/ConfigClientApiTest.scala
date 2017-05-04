@@ -11,6 +11,7 @@ import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
+//DEOPSCSW-138:Split Config API into Admin API and Client API
 class ConfigClientApiTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
   private val clientLocationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552))
