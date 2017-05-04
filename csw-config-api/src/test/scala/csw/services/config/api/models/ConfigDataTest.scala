@@ -19,6 +19,7 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLi
       |Then create a source from ByteString
       |""".stripMargin
 
+  //DEOPSCSW-73: Retrieve a configuration file to memory
   test("should able to retrieve string from Config Data source") {
     ConfigData.fromString(expectedStringConfigData).toStringF.await shouldEqual expectedStringConfigData
   }
