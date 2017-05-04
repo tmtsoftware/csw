@@ -7,7 +7,7 @@ import csw.services.config.server.{ConfigServiceTest, ServerWiring}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 
-class ConfigClientTest extends ConfigServiceTest {
+class ConfigAdminApiTest extends ConfigServiceTest {
 
   private val clientLocationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552))
 
