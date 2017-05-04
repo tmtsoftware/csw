@@ -43,6 +43,8 @@ deletes the file at specified path in the repository
 ### list
 lists the files in the repository
 
+ * `--annex` optional parameter. List all files that are of annex type. 
+ * `--normal` optional parameter. List all files that are of normal type. 
  * `--pattern` optional parameter. List all files whose path matches the given pattern. 
 
 ### history

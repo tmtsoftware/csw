@@ -4,12 +4,13 @@ import java.nio.{file ⇒ jnio}
 import java.time.Instant
 
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.StatusCodes.CustomStatusCode
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import csw.services.config.api.commons.{BinaryUtils, FileType}
 import csw.services.config.api.commons.ConfigStreamExts.RichSource
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
 import csw.services.config.api.models.{JsonSupport, _}
 import csw.services.config.api.scaladsl.ConfigService
 
@@ -46,7 +47,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       response.status match {
         case StatusCodes.Created    ⇒ await(Unmarshal(response).to[ConfigId])
         case StatusCodes.Conflict   ⇒ throw FileAlreadyExists(path)
-        case StatusCodes.BadRequest ⇒ throw InvalidFilePath(await(Unmarshal(response).to[String]))
+        case StatusCodes.BadRequest ⇒ throw InvalidInput(await(Unmarshal(response).to[String]))
         case _                      ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
       }
     }
@@ -114,8 +115,9 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       val response = await(Http().singleRequest(request))
 
       response.status match {
-        case StatusCodes.OK ⇒ await(Unmarshal(response.entity).to[List[ConfigFileInfo]])
-        case _              ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
+        case StatusCodes.OK         ⇒ await(Unmarshal(response.entity).to[List[ConfigFileInfo]])
+        case StatusCodes.BadRequest ⇒ throw InvalidInput(await(Unmarshal(response).to[String]))
+        case _                      ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
       }
     }
 

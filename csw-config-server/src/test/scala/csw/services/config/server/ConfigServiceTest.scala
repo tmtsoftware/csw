@@ -7,7 +7,7 @@ import java.time.Instant
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.config.api.commons.FileType
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.TestFileUtils
@@ -103,9 +103,12 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   // DEOPSCSW-48: Store new configuration file in Config. service
+  // DEOPSCSW-27: Storing binary component configurations
+  // DEOPSCSW-81: Storing large files in the configuration service
+  // DEOPSCSW-131: Detect and handle oversize files
   test("should able to upload and get binary configurations from config service") {
     val binaryFileName = "binaryConf.bin"
-    val binaryConfPath = Paths.get("/tmt/trombone/test/conf/large/" + binaryFileName)
+    val binaryConfPath = Paths.get("tmt/trombone/test/conf/large/" + binaryFileName)
 
     def binarySourceData = getClass.getClassLoader.getResourceAsStream(binaryFileName)
     val binaryContent    = binarySourceData.toByteArray
@@ -117,6 +120,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val actualBytes = configService.getLatest(binaryConfPath).await.get.toInputStream.toByteArray
 
     actualBytes shouldBe binaryContent
+
+    configService.list(Some(FileType.Annex)).await.map(_.path) shouldEqual List(binaryConfPath)
   }
 
   //  DEOPSCSW-42: Storing text based component configuration (exercise deep path)
@@ -161,7 +166,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId = configService
       .create(newFile, ConfigData.fromString(configValue3), annex = false, "commit redis conf with unique name")
       .await
-    configId shouldBe ConfigId(2)
+    configId shouldBe ConfigId(3)
   }
 
   // DEOPSCSW-49: Update an Existing File with a New Version
@@ -190,16 +195,21 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
     val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
     val binaryConfPath        = Paths.get("trombone/test/binary/binaryConf.bin")
-    val expectedConfigIds     = List(ConfigId(1), ConfigId(2), ConfigId(3), ConfigId(4), ConfigId(5), ConfigId(6))
+    val expectedConfigIds     = List(ConfigId(1), ConfigId(3), ConfigId(5), ConfigId(7), ConfigId(9), ConfigId(10))
 
+    //consumes 2 revisions, one for actual file one for active file
     val configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1)).await
+    //consumes 2 revisions, one for actual file one for active file
     val configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
+    //consumes 2 revisions, one for actual file one for active file
     val configId3 = configService.create(binaryConfPath, ConfigData.fromString(configValue3), annex = true).await
+    //consumes 2 revisions, one for actual file one for active file
     val configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4)).await
+
     val configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5)).await
     val configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
 
-    val actualConfigIds = List(configId1, configId2, configId3, configId4, configId5, configId6).sortBy(_.id)
+    val actualConfigIds = List(configId1, configId2, configId3, configId4, configId5, configId6)
 
     actualConfigIds shouldBe expectedConfigIds
   }
@@ -383,16 +393,16 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "commit config file").await
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue1
 
-    val configId = configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
-    configService.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
+    val configId2 = configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
+    val configId3 = configService.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
 
     configService.history(file).await.size shouldBe 3
     configService.delete(file).await
     intercept[FileNotFound] {
       configService.history(file).await.size shouldBe 0
     }
-    configService.getById(file, configId).await.get.toStringF.await shouldBe configValue2
-    configService.getById(file, ConfigId(3)).await.get.toStringF.await shouldBe configValue3
+    configService.getById(file, configId2).await.get.toStringF.await shouldBe configValue2
+    configService.getById(file, configId3).await.get.toStringF.await shouldBe configValue3
     configService.getLatest(file).await shouldBe None
   }
 
@@ -411,8 +421,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // check that get file without ID should return latest file
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue3
-    // check that getActive file without ID should return latest file
-    configService.getActive(file).await.get.toStringF.await shouldBe configValue3
+    // check that getActive call before any setActive call should return the file with id with which it was created
+    configService.getActive(file).await.get.toStringF.await shouldBe configValue1
     // set active version of file to id=2
     configService.setActive(file, configId, "Setting active version for the first time").await
     // check that getActive file without ID returns file with id=2
@@ -581,7 +591,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("should allow to create files with valid path and throw error for invalid path") {
     val filePath = Paths.get("/invalid path!/sample@.txt")
 
-    intercept[InvalidFilePath] {
+    intercept[InvalidInput] {
       configService
         .create(filePath, ConfigData.fromString("testing invalid file path"), annex = false,
           "testing invalid file path")
@@ -622,35 +632,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     )
   }
 
-  //DEOPSCSW-75 List the names of configuration files that match a path
-  test("should filter list based on the pattern") {
-    val tromboneConfig = Paths.get("a/c/trombone.conf")
-    val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
-    val hcdConfig      = Paths.get("a/b/c/hcd/hcd.conf")
-
-    configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
-    configService.create(assemblyConfig, ConfigData.fromString(configValue2), annex = true, "hello assembly").await
-    configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
-
-    val fileInfoes1 = configService.list(pattern = Some("a/b.*")).await
-    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyConfig, hcdConfig)
-
-    val fileInfoes2 = configService.list(pattern = Some(".*.conf")).await
-    fileInfoes2.map(_.path).toSet shouldBe Set(tromboneConfig, assemblyConfig, hcdConfig)
-
-    val fileInfoes3 = configService.list(pattern = Some("a/b/c/d.*")).await
-    fileInfoes3.isEmpty shouldBe true
-
-    val fileInfoes4 = configService.list(pattern = Some("a/b/c.*")).await
-    fileInfoes4.map(_.path).toSet shouldBe Set(hcdConfig)
-
-    val fileInfoes5 = configService.list().await
-    fileInfoes5.map(_.path).toSet shouldBe Set(tromboneConfig, assemblyConfig, hcdConfig)
-
-    val fileInfoes6 = configService.list(pattern = Some(".*hcd.*")).await
-    fileInfoes6.map(_.path).toSet shouldBe Set(hcdConfig)
-  }
-
+  // DEOPSCSW-27: Storing binary component configurations
+  // DEOPSCSW-81: Storing large files in the configuration service
+  // DEOPSCSW-131: Detect and handle oversize files
   test("should be able to store and retrieve text file from annex store when size is greater than configured size") {
     val fileName              = "tromboneContainer.conf"
     val path                  = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
@@ -677,33 +661,118 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     serverWiringAnnexTest.actorRuntime.shutdown().await
   }
 
-  //DEOPSCSW-132 List oversize and normal sized files
   //DEOPSCSW-75 List the names of configuration files that match a path
-  test("should filter list based on the type and pattern") {
-    val tromboneConfig  = Paths.get("a/c/trombone.conf")
-    val hcdConfig       = Paths.get("a/b/c/hcd/hcd.conf")
-    val assemblyConfig1 = Paths.get("a/b/assembly/assembly1.conf")
-    val assemblyConfig2 = Paths.get("a/b/c/assembly/assembly2.conf")
+  test("should list all files in a repository") {
+    val tromboneConfig        = Paths.get("a/c/trombone.conf")
+    val hcdConfig             = Paths.get("a/b/c/hcd/hcd.conf")
+    val assemblyBinaryConfig1 = Paths.get("a/b/assembly/assembly1.fits")
+    val assemblyBinaryConfig2 = Paths.get("a/b/c/assembly/assembly2.fits")
 
     configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
-    configService.create(assemblyConfig1, ConfigData.fromString(configValue2), annex = true, "hello assembly1").await
-    configService.create(assemblyConfig2, ConfigData.fromString(configValue2), annex = true, "hello assembly2").await
+    configService
+      .create(assemblyBinaryConfig1, ConfigData.fromString(configValue2), annex = true, "hello assembly1")
+      .await
+    configService
+      .create(assemblyBinaryConfig2, ConfigData.fromString(configValue2), annex = true, "hello assembly2")
+      .await
+    configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
+
+    val list = configService.list().await
+    list.map(_.path).toSet shouldBe Set(tromboneConfig, assemblyBinaryConfig1, assemblyBinaryConfig2, hcdConfig)
+
+  }
+
+  //DEOPSCSW-132 List oversize and normal sized files
+  test("should list files based on file type") {
+    val tromboneConfig        = Paths.get("a/c/trombone.conf")
+    val hcdConfig             = Paths.get("a/b/c/hcd/hcd.conf")
+    val assemblyBinaryConfig1 = Paths.get("a/b/assembly/assembly1.fits")
+    val assemblyBinaryConfig2 = Paths.get("a/b/c/assembly/assembly2.fits")
+
+    configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
+    configService
+      .create(assemblyBinaryConfig1, ConfigData.fromString(configValue2), annex = true, "hello assembly1")
+      .await
+    configService
+      .create(assemblyBinaryConfig2, ConfigData.fromString(configValue2), annex = true, "hello assembly2")
+      .await
     configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
 
     val fileInfoes1 = configService.list(Some(FileType.Annex)).await
-    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
+    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyBinaryConfig1, assemblyBinaryConfig2)
+
+    val fileInfoes2 = configService.list(Some(FileType.Normal)).await
+    fileInfoes2.map(_.path).toSet shouldBe Set(tromboneConfig, hcdConfig)
+  }
+
+  //DEOPSCSW-75 List the names of configuration files that match a path
+  test("should give empty list if pattern does not match any file") {
+    val tromboneConfig = Paths.get("a/c/trombone.conf")
+    val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
+    val hcdConfig      = Paths.get("a/b/c/hcd/hcd.conf")
+
+    configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
+    configService.create(assemblyConfig, ConfigData.fromString(configValue2), annex = true, "hello assembly").await
+    configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
+
+    val fileInfoes3 = configService.list(pattern = Some("a/b/c/d.*")).await
+    fileInfoes3.isEmpty shouldBe true
+  }
+
+  //DEOPSCSW-75 List the names of configuration files that match a path
+  test("should filter list based on the pattern") {
+    val tromboneConfig = Paths.get("a/c/trombone.conf")
+    val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
+    val hcdConfig      = Paths.get("a/b/c/hcd/hcd.conf")
+
+    configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
+    configService.create(assemblyConfig, ConfigData.fromString(configValue2), annex = true, "hello assembly").await
+    configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
+
+    val fileInfoes1 = configService.list(pattern = Some("a/b.*")).await
+    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyConfig, hcdConfig)
+
+    val fileInfoes2 = configService.list(pattern = Some(".*.conf")).await
+    fileInfoes2.map(_.path).toSet shouldBe Set(tromboneConfig, assemblyConfig, hcdConfig)
+
+    val fileInfoes4 = configService.list(pattern = Some("a/b/c.*")).await
+    fileInfoes4.map(_.path).toSet shouldBe Set(hcdConfig)
+
+    val fileInfoes6 = configService.list(pattern = Some(".*hcd.*")).await
+    fileInfoes6.map(_.path).toSet shouldBe Set(hcdConfig)
+  }
+
+  //DEOPSCSW-132 List oversize and normal sized files
+  //DEOPSCSW-75 List the names of configuration files that match a path
+  test("should filter list based on the type and pattern") {
+    val tromboneConfig        = Paths.get("a/c/trombone.conf")
+    val hcdConfig             = Paths.get("a/b/c/hcd/hcd.conf")
+    val assemblyBinaryConfig1 = Paths.get("a/b/assembly/assembly1.fits")
+    val assemblyBinaryConfig2 = Paths.get("a/b/c/assembly/assembly2.fits")
+
+    configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
+    configService
+      .create(assemblyBinaryConfig1, ConfigData.fromString(configValue2), annex = true, "hello assembly1")
+      .await
+    configService
+      .create(assemblyBinaryConfig2, ConfigData.fromString(configValue2), annex = true, "hello assembly2")
+      .await
+    configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
+
+    val fileInfoes1 = configService.list(Some(FileType.Annex)).await
+    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyBinaryConfig1, assemblyBinaryConfig2)
 
     val fileInfoes2 = configService.list(Some(FileType.Normal)).await
     fileInfoes2.map(_.path).toSet shouldBe Set(tromboneConfig, hcdConfig)
 
     val fileInfoes3 = configService.list(Some(FileType.Annex), Some("a/b/c.*")).await
-    fileInfoes3.map(_.path).toSet shouldBe Set(assemblyConfig2)
+    fileInfoes3.map(_.path).toSet shouldBe Set(assemblyBinaryConfig2)
 
-    val fileInfoes4 = configService.list(Some(FileType.Annex), Some(".*.conf")).await
-    fileInfoes4.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
+    val fileInfoes4 = configService.list(Some(FileType.Annex), Some(".*.fits")).await
+    fileInfoes4.map(_.path).toSet shouldBe Set(assemblyBinaryConfig1, assemblyBinaryConfig2)
 
     val fileInfoes5 = configService.list(Some(FileType.Annex), Some(".*assembly.*")).await
-    fileInfoes5.map(_.path).toSet shouldBe Set(assemblyConfig1, assemblyConfig2)
+    fileInfoes5.map(_.path).toSet shouldBe Set(assemblyBinaryConfig1, assemblyBinaryConfig2)
 
     val fileInfoes6 = configService.list(Some(FileType.Normal), Some("a/b/c.*")).await
     fileInfoes6.map(_.path).toSet shouldBe Set(hcdConfig)
@@ -713,5 +782,12 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     val fileInfoes8 = configService.list(Some(FileType.Normal), Some(".*hcd.*")).await
     fileInfoes8.map(_.path).toSet shouldBe Set(hcdConfig)
+  }
+
+  //DEOPSCSW-75 List the names of configuration files that match a path
+  test("should throw invalid input exception if pattern is invalid") {
+    intercept[InvalidInput] {
+      configService.list(pattern = Some("?i)")).await
+    }
   }
 }

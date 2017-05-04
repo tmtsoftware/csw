@@ -13,7 +13,7 @@ import csw.services.config.api.scaladsl.ConfigService
 /**
  * Defines an interface for storing and retrieving configuration information
  */
-trait IConfigService {
+trait IConfigService extends IConfigClientService {
 
   /**
    * Creates a file with the given path and data and optional comment.
@@ -66,23 +66,6 @@ trait IConfigService {
   def getByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]]
 
   /**
-   * Returns true if the given path exists and is being managed
-   *
-   * @param path the file path relative to the repository root
-   * @return     true the file exists
-   */
-  def exists(path: Path): CompletableFuture[jl.Boolean]
-
-  /**
-   * Returns true if the given path exists and is being managed
-   *
-   * @param path the file path relative to the repository root
-   * @param id   revision of the file
-   * @return     true the file exists
-   */
-  def exists(path: Path, id: Optional[ConfigId]): CompletableFuture[jl.Boolean]
-
-  /**
    * Deletes the given config file (older versions will still be available)
    *
    * @param path the file path relative to the repository root
@@ -131,15 +114,6 @@ trait IConfigService {
    */
   def resetActive(path: Path, comment: String): CompletableFuture[Unit]
   def resetActive(path: Path): CompletableFuture[Unit]
-
-  /**
-   * Gets and returns the active version of the file stored under the given path.
-   * If no active was set, this returns the version with which the file was created i.e. 1.
-   *
-   * @param path the file path relative to the repository root
-   * @return     a future object that can be used to access the file's data, if found
-   */
-  def getActive(path: Path): CompletableFuture[Optional[ConfigData]]
 
   /**
    * Returns the Scala API for this instance of config service

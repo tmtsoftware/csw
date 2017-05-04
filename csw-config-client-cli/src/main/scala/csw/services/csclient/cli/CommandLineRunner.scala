@@ -1,5 +1,6 @@
 package csw.services.csclient.cli
 
+import csw.services.config.api.commons.FileType
 import csw.services.config.api.models.{ConfigData, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
@@ -53,8 +54,20 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     }
 
     def list(): Unit = {
-      val fileInfoes = await(configService.list(pattern = options.pattern))
-      fileInfoes.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+      val normal = options.normal
+      val annex  = options.annex
+      (annex, normal) match {
+        case (true, true) ⇒ println("Please provide either normal or annex. See --help to know more.")
+        case (true, _) ⇒
+          val fileInfoes = await(configService.list(Some(FileType.Annex), options.pattern))
+          fileInfoes.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+        case (_, true) ⇒
+          val fileInfoes = await(configService.list(Some(FileType.Normal), options.pattern))
+          fileInfoes.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+        case (_, _) ⇒
+          val fileInfoes = await(configService.list(pattern = options.pattern))
+          fileInfoes.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+      }
     }
 
     def history(): Unit = {

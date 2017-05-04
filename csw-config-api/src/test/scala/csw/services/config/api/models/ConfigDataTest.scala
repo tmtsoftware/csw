@@ -1,5 +1,7 @@
 package csw.services.config.api.models
 
+import java.nio.file.{Files, Paths}
+
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestKit
@@ -29,5 +31,14 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLi
   test("should create source of ByteString from string") {
     val configData = ConfigData.fromString(expectedStringConfigData)
     configData.source.runFold("")(_ + _.utf8String).await shouldEqual expectedStringConfigData
+  }
+
+  //DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk
+  test("should be able to save ConfigData to local disc") {
+    val configData     = ConfigData.fromString(expectedStringConfigData)
+    val tempOutputFile = Files.createTempFile("temp-config", ".conf")
+    configData.toPath(tempOutputFile).await
+    new String(Files.readAllBytes(tempOutputFile)) shouldBe expectedStringConfigData
+    Files.delete(tempOutputFile)
   }
 }

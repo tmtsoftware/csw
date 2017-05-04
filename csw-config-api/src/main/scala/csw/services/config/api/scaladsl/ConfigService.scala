@@ -11,7 +11,7 @@ import scala.concurrent.Future
 /**
  * Defines an interface for storing and retrieving configuration information
  */
-trait ConfigService {
+trait ConfigService extends ConfigClientService {
 
   /**
    * Creates a file with the given path and data and optional comment.
@@ -66,15 +66,6 @@ trait ConfigService {
   def getByTime(path: Path, time: Instant): Future[Option[ConfigData]]
 
   /**
-   * Returns true if the given path exists and is being managed
-   *
-   * @param path the file path relative to the repository root
-   * @param id revision of the file
-   * @return true the file exists
-   */
-  def exists(path: Path, id: Option[ConfigId] = None): Future[Boolean]
-
-  /**
    * Deletes the given config file (older versions will still be available)
    *
    * @param path the file path relative to the repository root
@@ -116,13 +107,4 @@ trait ConfigService {
    * @return     a future result
    */
   def resetActive(path: Path, comment: String = ""): Future[Unit]
-
-  /**
-   * Gets and returns the active version of the file stored under the given path.
-   * If no active was set, this returns the version with which the file was created i.e. 1.
-   *
-   * @param path the file path relative to the repository root
-   * @return     a future object that can be used to access the file's data, if found
-   */
-  def getActive(path: Path): Future[Option[ConfigData]]
 }

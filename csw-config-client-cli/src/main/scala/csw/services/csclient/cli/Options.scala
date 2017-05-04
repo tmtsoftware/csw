@@ -14,6 +14,7 @@ import java.time.Instant
  * @param comment Optional: Version history comment to add while creating the file.
  * @param latest Optional: Get the latest file.
  * @param pattern Optional: List all files whose path matches the given pattern.
+ * @param normal Optional: If the file is normal.
  */
 case class Options(
     op: String = "",
@@ -26,5 +27,6 @@ case class Options(
     annex: Boolean = false,
     comment: String = "",
     latest: Boolean = false,
-    pattern: Option[String] = None
+    pattern: Option[String] = None,
+    normal: Boolean = false
 )

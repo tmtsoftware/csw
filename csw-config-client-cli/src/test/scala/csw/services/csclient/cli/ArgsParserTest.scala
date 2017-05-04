@@ -132,6 +132,20 @@ class ArgsParserTest extends FunSuite with Matchers {
         Some("a/b")))
   }
 
+  test("test list with type") {
+    val argv               = Array("list", "--annex")
+    val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
+    x should contain(Options("list", None, None, None, None, None, Int.MaxValue, annex = true, "", latest = false,
+        None, normal = false))
+  }
+
+  test("test list with type and pattern") {
+    val argv               = Array("list", "--normal", "--annex", "--pattern", "a/b")
+    val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
+    x should contain(Options("list", None, None, None, None, None, Int.MaxValue, annex = true, "", latest = false,
+        Some("a/b"), normal = true))
+  }
+
   test("test history with no sub-options") {
     val argv               = Array("history")
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())

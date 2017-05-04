@@ -37,6 +37,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     Files.delete(Paths.get(updatedInputFilePath))
   }
 
+  //DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk
   test("should able to create a file in repo and read it from repo to local disk") {
 
     //  create file

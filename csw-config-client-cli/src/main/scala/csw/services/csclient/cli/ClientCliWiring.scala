@@ -10,7 +10,7 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 class ClientCliWiring(clusterSettings: ClusterSettings) {
   lazy val actorRuntime                     = new ActorRuntime()
   lazy val locationService: LocationService = LocationServiceFactory.withSettings(clusterSettings)
-  lazy val configService: ConfigService     = ConfigClientFactory.make(actorRuntime.actorSystem, locationService)
+  lazy val configService: ConfigService     = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService)
   lazy val commandLineRunner                = new CommandLineRunner(configService, actorRuntime)
 
   actorRuntime.coordinatedShutdown.addTask(

@@ -7,7 +7,8 @@ import csw.services.config.server.{ConfigServiceTest, ServerWiring}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 
-class ConfigClientTest extends ConfigServiceTest {
+//DEOPSCSW-138:Split Config API into Admin API and Client API
+class ConfigAdminApiTest extends ConfigServiceTest {
 
   private val clientLocationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552))
 
@@ -16,7 +17,7 @@ class ConfigClientTest extends ConfigServiceTest {
   private val actorRuntime = new ActorRuntime()
   import actorRuntime._
 
-  override val configService: ConfigService = ConfigClientFactory.make(actorSystem, clientLocationService)
+  override val configService: ConfigService = ConfigClientFactory.adminApi(actorSystem, clientLocationService)
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()

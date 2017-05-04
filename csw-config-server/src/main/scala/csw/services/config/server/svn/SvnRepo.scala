@@ -2,10 +2,11 @@ package csw.services.config.server.svn
 
 import java.io.{InputStream, OutputStream}
 import java.nio.file.Path
-import java.util.regex.Pattern
+import java.util.regex.{Pattern, PatternSyntaxException}
 
 import akka.dispatch.MessageDispatcher
 import csw.services.config.api.commons.FileType
+import csw.services.config.api.exceptions.InvalidInput
 import csw.services.config.server.Settings
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
@@ -129,19 +130,21 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     val svnOperationFactory = new SvnOperationFactory()
     // svn always stores file in the repo without '/' prefix.
     // Hence if input pattern is provided like '/root/', then prefix '/' need to be striped to get the list of files from root folder.
-    val compiledPattern  = pattern.map(pat ⇒ Pattern.compile(pat.stripPrefix("/")))
-    val receivingManager = new ReceivingManager(settings, fileType, compiledPattern)
     try {
-      val svnList = svnOperationFactory.createList()
+      val compiledPattern  = pattern.map(pat ⇒ Pattern.compile(pat.stripPrefix("/")))
+      val receivingManager = new ReceivingManager(settings, fileType, compiledPattern)
+      val svnList          = svnOperationFactory.createList()
       svnList.setSingleTarget(SvnTarget.fromURL(settings.svnUrl, SVNRevision.HEAD))
       svnList.setRevision(SVNRevision.HEAD)
       svnList.setDepth(SVNDepth.INFINITY)
       svnList.setReceiver(receivingManager.getReceiver)
       svnList.run()
+      receivingManager.getReceivedEntries.sortWith(_.getRelativePath < _.getRelativePath)
+    } catch {
+      case p: PatternSyntaxException ⇒ throw InvalidInput(p.getMessage)
     } finally {
       svnOperationFactory.dispose()
     }
-    receivingManager.getReceivedEntries.sortWith(_.getRelativePath < _.getRelativePath)
   }
 
   def hist(path: Path, maxResults: Int): Future[List[SVNLogEntry]] =

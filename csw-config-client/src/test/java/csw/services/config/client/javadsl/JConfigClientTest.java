@@ -2,8 +2,6 @@ package csw.services.config.client.javadsl;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
-import csw.services.config.api.commons.FileType;
-import csw.services.config.api.commons.FileType$;
 import csw.services.config.api.commons.JFileType;
 import csw.services.config.api.exceptions.FileAlreadyExists;
 import csw.services.config.api.exceptions.FileNotFound;
@@ -37,7 +35,7 @@ import static org.hamcrest.CoreMatchers.isA;
 public class JConfigClientTest {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
     private static ILocationService clientLocationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
-    private static IConfigService configService = JConfigClientFactory.make(actorRuntime.actorSystem(), clientLocationService);
+    private static IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService);
 
     private static ServerWiring serverWiring = ServerWiring.make(ClusterAwareSettings.joinLocal(3552, new scala.collection.mutable.ArrayBuffer()));
     private static HttpService httpService = serverWiring.httpService();
@@ -284,7 +282,7 @@ public class JConfigClientTest {
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
         configService.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue1);
 
         configService.setActive(path, configIdUpdate1).get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
@@ -370,7 +368,9 @@ public class JConfigClientTest {
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "Updated config to assembly").get();
         configService.update(path, ConfigData.fromString(configValue3), "Updated config").get();
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
+
+        // check that getActive call before any setActive call should return the file with id with which it was created
+        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue1);
 
         configService.setActive(path, configIdUpdate1).get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);

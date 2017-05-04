@@ -26,11 +26,7 @@ object BinaryUtils {
    * @return Boolean value indicating if the bytes represents text content
    */
   def isNotText(bytes: Array[Byte]): Boolean = {
-    var binaryCount = 0
-    bytes.foreach { b =>
-      if (b < 0x07 || (b > 0x0d && b < 0x20) || b > 0x7F) binaryCount += 1
-    }
-
+    val binaryCount = bytes.count(b ⇒ b < 0x08 || (b > 0x0d && b < 0x20) || b > 0x7F)
     bytes.length > 0 && binaryCount * 1000 / bytes.length > 150
   }
 }

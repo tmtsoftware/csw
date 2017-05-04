@@ -83,7 +83,7 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
       enterBarrier("server-started")
       val actorRuntime = new ActorRuntime(ActorSystem())
       import actorRuntime._
-      val configService = ConfigClientFactory.make(actorSystem, locationService)
+      val configService = ConfigClientFactory.adminApi(actorSystem, locationService)
 
       enterBarrier("member1-create")
       val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
