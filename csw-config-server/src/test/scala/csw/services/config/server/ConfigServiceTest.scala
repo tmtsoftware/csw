@@ -103,9 +103,12 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   // DEOPSCSW-71: Retrieve any version of a configuration file using its unique id
   // DEOPSCSW-48: Store new configuration file in Config. service
+  // DEOPSCSW-27: Storing binary component configurations
+  // DEOPSCSW-81: Storing large files in the configuration service
+  // DEOPSCSW-131: Detect and handle oversize files
   test("should able to upload and get binary configurations from config service") {
     val binaryFileName = "binaryConf.bin"
-    val binaryConfPath = Paths.get("/tmt/trombone/test/conf/large/" + binaryFileName)
+    val binaryConfPath = Paths.get("tmt/trombone/test/conf/large/" + binaryFileName)
 
     def binarySourceData = getClass.getClassLoader.getResourceAsStream(binaryFileName)
     val binaryContent    = binarySourceData.toByteArray
@@ -117,6 +120,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val actualBytes = configService.getLatest(binaryConfPath).await.get.toInputStream.toByteArray
 
     actualBytes shouldBe binaryContent
+
+    configService.list(Some(FileType.Annex)).await.map(_.path) shouldEqual List(binaryConfPath)
   }
 
   //  DEOPSCSW-42: Storing text based component configuration (exercise deep path)
@@ -622,6 +627,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     )
   }
 
+  // DEOPSCSW-27: Storing binary component configurations
+  // DEOPSCSW-81: Storing large files in the configuration service
+  // DEOPSCSW-131: Detect and handle oversize files
   test("should be able to store and retrieve text file from annex store when size is greater than configured size") {
     val fileName              = "tromboneContainer.conf"
     val path                  = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
