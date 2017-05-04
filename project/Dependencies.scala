@@ -73,6 +73,8 @@ object Dependencies {
   )
 
   val CswProdExamples = Seq(
-    Libs.`scalatest` % Test
+    Akka.`akka-actor`,
+    Akka.`akka-stream`,
+    Libs.`scala-logging`
   )
 }
