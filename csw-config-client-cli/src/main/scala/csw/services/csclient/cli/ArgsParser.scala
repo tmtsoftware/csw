@@ -90,6 +90,12 @@ object ArgsParser {
     cmd("list") action { (_, c) =>
       c.copy(op = "list")
     } text "lists the files in the repository" children (
+      opt[Unit]("annex") action { (_, c) =>
+        c.copy(annex = true)
+      } text "optional add this option to list only large/binary files",
+      opt[Unit]("normal") action { (_, c) =>
+        c.copy(normal = true)
+      } text "optional add this option to list only non-binary/large files",
       opt[String]("pattern") action { (x, c) =>
         c.copy(pattern = Some(x))
       } text "optional list all files whose path matches the given pattern"

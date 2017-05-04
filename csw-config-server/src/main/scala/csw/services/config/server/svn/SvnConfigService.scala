@@ -5,7 +5,7 @@ import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
 import csw.services.config.api.commons.FileType
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidFilePath}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.PathValidator
@@ -25,7 +25,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
     if (!PathValidator.isValid(path)) {
-      throw new InvalidFilePath(path, PathValidator.invalidCharsMessage)
+      throw new InvalidInput(path, PathValidator.invalidCharsMessage)
     }
 
     // If the file already exists in the repo, throw exception

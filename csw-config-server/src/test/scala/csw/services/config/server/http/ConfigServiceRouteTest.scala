@@ -237,6 +237,21 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
+
+    Get("/list?type=Annex&pattern=.*.conf") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 1
+    }
+
+    Get("/list?type=Annex") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 1
+    }
+
+    Get("/list?type=Normal") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 0
+    }
   }
 
   test("history - success  status code") {

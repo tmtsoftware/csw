@@ -12,7 +12,7 @@ class ReceivingManager(settings: Settings, fileType: Option[FileType], compiledP
 
   private var entries: List[SVNDirEntry] = List.empty
 
-  private def activeFileReceiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
+  private def receiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
     if (entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`)) {
       entry.stripAnnexSuffix(settings.`sha1-suffix`)
       if (entry.matches(compiledPattern)) {
@@ -42,7 +42,7 @@ class ReceivingManager(settings: Settings, fileType: Option[FileType], compiledP
     fileType match {
       case Some(FileType.Annex)  ⇒ annexFileReceiver
       case Some(FileType.Normal) ⇒ normalFileReceiver
-      case _                     ⇒ activeFileReceiver
+      case _                     ⇒ receiver
     }
 
   def getReceivedEntries: List[SVNDirEntry] = entries
