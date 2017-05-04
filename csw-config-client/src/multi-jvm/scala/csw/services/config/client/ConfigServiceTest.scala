@@ -39,7 +39,7 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAn
       enterBarrier("server-started")
       val actorRuntime = new ActorRuntime(ActorSystem())
       import actorRuntime._
-      val configService = ConfigClientFactory.make(actorSystem, locationService)
+      val configService = ConfigClientFactory.adminApi(actorSystem, locationService)
 
       val configValue: String =
         """

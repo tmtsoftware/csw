@@ -2,8 +2,6 @@ package csw.services.config.client.javadsl;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
-import csw.services.config.api.commons.FileType;
-import csw.services.config.api.commons.FileType$;
 import csw.services.config.api.commons.JFileType;
 import csw.services.config.api.exceptions.FileAlreadyExists;
 import csw.services.config.api.exceptions.FileNotFound;
@@ -37,7 +35,7 @@ import static org.hamcrest.CoreMatchers.isA;
 public class JConfigClientTest {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
     private static ILocationService clientLocationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
-    private static IConfigService configService = JConfigClientFactory.make(actorRuntime.actorSystem(), clientLocationService);
+    private static IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService);
 
     private static ServerWiring serverWiring = ServerWiring.make(ClusterAwareSettings.joinLocal(3552, new scala.collection.mutable.ArrayBuffer()));
     private static HttpService httpService = serverWiring.httpService();

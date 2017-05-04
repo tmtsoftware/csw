@@ -16,7 +16,7 @@ class ConfigClientTest extends ConfigServiceTest {
   private val actorRuntime = new ActorRuntime()
   import actorRuntime._
 
-  override val configService: ConfigService = ConfigClientFactory.make(actorSystem, clientLocationService)
+  override val configService: ConfigService = ConfigClientFactory.adminApi(actorSystem, clientLocationService)
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()

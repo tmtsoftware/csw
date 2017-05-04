@@ -26,7 +26,7 @@ class BinaryFileDetectionTest extends FunSuite with Matchers with BeforeAndAfter
   private val actorRuntime = new ActorRuntime()
   import actorRuntime._
 
-  val configService: ConfigService = ConfigClientFactory.make(actorSystem, clientLocationService)
+  val configService: ConfigService = ConfigClientFactory.adminApi(actorSystem, clientLocationService)
 
   override protected def beforeEach(): Unit =
     serverWiring.svnRepo.initSvnRepo()
