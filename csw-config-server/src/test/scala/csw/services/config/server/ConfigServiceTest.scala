@@ -427,12 +427,14 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.setActive(file, configId, "Setting active version for the first time").await
     // check that getActive file without ID returns file with id=2
     configService.getActive(file).await.get.toStringF.await shouldBe configValue2
+    configService.getActiveVersion(file).await shouldBe configId
 
     configService.resetActive(file, "resetting active version").await
     configService.getActive(file).await.get.toStringF.await shouldBe configValue3
+    configService.getActiveVersion(file).await shouldBe ConfigId(4)
 
     // check that setActive without id,resets active version of file
-    configService.resetActive(file, comment = "setting active  versionagain").await
+    configService.resetActive(file, comment = "setting active version again").await
     configService.getActive(file).await.get.toStringF.await shouldBe configValue3
 
   }

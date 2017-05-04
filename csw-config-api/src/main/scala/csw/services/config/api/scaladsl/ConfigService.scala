@@ -107,4 +107,12 @@ trait ConfigService extends ConfigClientService {
    * @return     a future result
    */
   def resetActive(path: Path, comment: String = ""): Future[Unit]
+
+  /**
+   * Returns the version which represents the "active version" of the file with the given path
+   *
+   * @param path the file path relative to the repository root
+   * @return     id which represents the current active version
+   */
+  def getActiveVersion(path: Path): Future[ConfigId]
 }

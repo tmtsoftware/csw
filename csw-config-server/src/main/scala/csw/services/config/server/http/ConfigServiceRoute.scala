@@ -17,11 +17,10 @@ class ConfigServiceRoute(
   def route: Route = handleExceptions(configExceptionHandler.exceptionHandler) {
     path("config" / FilePath) { filePath ⇒
       (get & rejectEmptyResponse) {
-        (dateParam & idParam & latestParam) {
-          case (Some(date), _, _) ⇒ complete(configService.getByTime(filePath, date))
-          case (_, Some(id), _)   ⇒ complete(configService.getById(filePath, id))
-          case (_, _, true)       ⇒ complete(configService.getLatest(filePath))
-          case (_, _, _)          ⇒ complete(configService.getActive(filePath))
+        (dateParam & idParam) {
+          case (Some(date), _) ⇒ complete(configService.getByTime(filePath, date))
+          case (_, Some(id))   ⇒ complete(configService.getById(filePath, id))
+          case (_, _)          ⇒ complete(configService.getLatest(filePath))
         }
       } ~
       head {
@@ -49,7 +48,14 @@ class ConfigServiceRoute(
         }
       }
     } ~
-    path("default" / FilePath) { filePath ⇒
+    (path("active-config" / FilePath) & get & rejectEmptyResponse) { filePath ⇒
+      println(s"------------------------getting file for active version of $filePath -----------------------")
+      dateParam {
+        case Some(date) ⇒ complete(configService.getActive(filePath))
+        case _          ⇒ complete(configService.getActive(filePath))
+      }
+    } ~
+    path("active-version" / FilePath) { filePath ⇒
       put {
         (idParam & commentParam) {
           case (Some(configId), comment) ⇒
@@ -58,8 +64,8 @@ class ConfigServiceRoute(
         }
       } ~
       (get & rejectEmptyResponse) {
-        println(s"------------------------getting default version of $filePath -----------------------")
-        complete(configService.getActive(filePath))
+        println(s"------------------------getting active version of $filePath -----------------------")
+        complete(configService.getActiveVersion(filePath))
       }
     } ~
     (path("history" / FilePath) & get) { filePath ⇒

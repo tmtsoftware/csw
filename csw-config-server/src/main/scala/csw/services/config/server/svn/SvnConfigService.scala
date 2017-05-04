@@ -199,6 +199,11 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
+  override def getActiveVersion(path: Path): Future[ConfigId] = async {
+    val configData = await(getLatest(activeFilePath(path)))
+    ConfigId(await(configData.get.toStringF))
+  }
+
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
     val revision = id.map(_.id.toLong)
     if (await(svnRepo.pathExists(path, revision))) {
