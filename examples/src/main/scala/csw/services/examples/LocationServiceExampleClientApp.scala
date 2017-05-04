@@ -18,7 +18,7 @@ import scala.concurrent.Await
   */
 object LocationServiceExampleClientApp extends App {
   private val locationService = LocationServiceFactory.make()
-  implicit val system = ActorSystemFactory.remote
+  implicit val system = ActorSystemFactory.remote()
   implicit val mat = ActorMaterializer()
 
   system.actorOf(LocationServiceExampleClient.props(locationService))

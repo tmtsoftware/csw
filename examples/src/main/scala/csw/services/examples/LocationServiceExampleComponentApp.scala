@@ -16,7 +16,7 @@ import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, Loca
   */
 object LocationServiceExampleComponentApp extends App {
   private val locationService = LocationServiceFactory.make()
-  implicit val system = ActorSystemFactory.remote
+  implicit val system = ActorSystemFactory.remote()
   implicit val mat = ActorMaterializer()
 
   system.actorOf(LocationServiceExampleComponent.props(locationService))
