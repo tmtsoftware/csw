@@ -33,7 +33,9 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       throw FileAlreadyExists(path)
     }
 
-    await(createFile(path, configData, annex, comment))
+    val id = await(createFile(path, configData, annex, comment))
+    await(setActive(path, id))
+    id
   }
 
   private def createFile(path: Path,
@@ -177,13 +179,8 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       throw FileNotFound(path)
     }
 
-    val activePath = activeFilePath(path)
-
-    val present = await(exists(activePath))
-
-    if (present) {
-      await(delete(activePath))
-    }
+    val currentVersion = await(getCurrentVersion(path))
+    await(setActive(path, currentVersion.get))
   }
 
   override def getActive(path: Path): Future[Option[ConfigData]] = {

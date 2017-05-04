@@ -47,6 +47,7 @@ class ConfigServiceRouteTest
    */
   test("create - success status code") {
     // try to create by providing optional comment parameter
+    //consumes 2 revisions, one for actual file one for active file
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
       responseAs[ConfigId] shouldBe ConfigId(1)
@@ -55,7 +56,7 @@ class ConfigServiceRouteTest
     // try to create by not providing optional comment parameter
     Post("/config/test1.conf?annex=true", configFile2) ~> route ~> check {
       status shouldEqual StatusCodes.Created
-      responseAs[ConfigId] shouldBe ConfigId(2)
+      responseAs[ConfigId] shouldBe ConfigId(3)
     }
 
   }
@@ -94,7 +95,7 @@ class ConfigServiceRouteTest
     }
 
     Get("/config/test.conf") ~> route ~> check {
-      responseAs[String] shouldEqual updatedConfigValue1
+      responseAs[String] shouldEqual configValue1
     }
 
   }
@@ -136,6 +137,7 @@ class ConfigServiceRouteTest
 
   test("get - failure status codes") {
 
+    //consumes 2 revisions, one for actual file one for active file
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -146,7 +148,7 @@ class ConfigServiceRouteTest
     }
 
     // try to fetch version of file which does not exists
-    Get("/config/test.conf?id=2") ~> Route.seal(route) ~> check {
+    Get("/config/test.conf?id=3") ~> Route.seal(route) ~> check {
       status shouldBe StatusCodes.NotFound
     }
 
@@ -256,6 +258,7 @@ class ConfigServiceRouteTest
 
   test("history - success  status code") {
 
+    //consumes 2 revisions, one for actual file one for active file
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -264,7 +267,7 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
     }
 
-    val configFileHistoryIdCommentTuples = Set((ConfigId(1), "commit1"), (ConfigId(2), "commit2"))
+    val configFileHistoryIdCommentTuples = Set((ConfigId(1), "commit1"), (ConfigId(3), "commit2"))
 
     Get("/history/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
@@ -278,7 +281,7 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(2), "commit2"))
+        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit2"))
     }
 
   }
@@ -353,12 +356,13 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.NotFound
     }
 
+    //consumes 2 revisions, one for actual file one for active file
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
-    // try to set default version of file which exist bu corresponding id does not exist
-    Put("/default/test.conf?id=2&comment=commit1") ~> Route.seal(route) ~> check {
+    // try to set default version of file which exist but corresponding id does not exist
+    Put("/default/test.conf?id=3&comment=commit1") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 

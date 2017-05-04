@@ -166,7 +166,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId = configService
       .create(newFile, ConfigData.fromString(configValue3), annex = false, "commit redis conf with unique name")
       .await
-    configId shouldBe ConfigId(2)
+    configId shouldBe ConfigId(3)
   }
 
   // DEOPSCSW-49: Update an Existing File with a New Version
@@ -195,16 +195,21 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val tromboneAssemblyConf  = Paths.get("trombone/test/assembly/akka/assembly.conf")
     val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
     val binaryConfPath        = Paths.get("trombone/test/binary/binaryConf.bin")
-    val expectedConfigIds     = List(ConfigId(1), ConfigId(2), ConfigId(3), ConfigId(4), ConfigId(5), ConfigId(6))
+    val expectedConfigIds     = List(ConfigId(1), ConfigId(3), ConfigId(5), ConfigId(7), ConfigId(9), ConfigId(10))
 
+    //consumes 2 revisions, one for actual file one for active file
     val configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1)).await
+    //consumes 2 revisions, one for actual file one for active file
     val configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
+    //consumes 2 revisions, one for actual file one for active file
     val configId3 = configService.create(binaryConfPath, ConfigData.fromString(configValue3), annex = true).await
+    //consumes 2 revisions, one for actual file one for active file
     val configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4)).await
+
     val configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5)).await
     val configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
 
-    val actualConfigIds = List(configId1, configId2, configId3, configId4, configId5, configId6).sortBy(_.id)
+    val actualConfigIds = List(configId1, configId2, configId3, configId4, configId5, configId6)
 
     actualConfigIds shouldBe expectedConfigIds
   }
@@ -388,16 +393,16 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "commit config file").await
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue1
 
-    val configId = configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
-    configService.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
+    val configId2 = configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
+    val configId3 = configService.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
 
     configService.history(file).await.size shouldBe 3
     configService.delete(file).await
     intercept[FileNotFound] {
       configService.history(file).await.size shouldBe 0
     }
-    configService.getById(file, configId).await.get.toStringF.await shouldBe configValue2
-    configService.getById(file, ConfigId(3)).await.get.toStringF.await shouldBe configValue3
+    configService.getById(file, configId2).await.get.toStringF.await shouldBe configValue2
+    configService.getById(file, configId3).await.get.toStringF.await shouldBe configValue3
     configService.getLatest(file).await shouldBe None
   }
 
@@ -416,8 +421,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // check that get file without ID should return latest file
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue3
-    // check that getActive file without ID should return latest file
-    configService.getActive(file).await.get.toStringF.await shouldBe configValue3
+    // check that getActive call before any setActive call should return the file with id with which it was created
+    configService.getActive(file).await.get.toStringF.await shouldBe configValue1
     // set active version of file to id=2
     configService.setActive(file, configId, "Setting active version for the first time").await
     // check that getActive file without ID returns file with id=2
