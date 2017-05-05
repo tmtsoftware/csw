@@ -1,7 +1,5 @@
 package csw.services.config.server.commons
 
-import java.nio.file.Paths
-
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-47: Unique name for configuration file
@@ -11,21 +9,21 @@ class PathValidatorTest extends FunSuite with Matchers {
   test("should return false for invalid path") {
 
     val paths = List(
-      Paths.get("/invalidpath!/sample.txt"),
-      Paths.get("/invalidpath#/sample.txt"),
-      Paths.get("/invalidpath$/sample.txt"),
-      Paths.get("/invalidpath/%sample.txt"),
-      Paths.get("/invalidpath/&sample.txt"),
-      Paths.get("/invalidpath/sa'mple.txt"),
-      Paths.get("/invalidpath/samp@le.txt"),
-      Paths.get("/invalidpath/samp`le.txt"),
-      Paths.get("/invalid+path/sample.txt"),
-      Paths.get("/invalid,path/sample.txt"),
-      Paths.get("/invalidpath;/sample.txt"),
-      Paths.get("/invalidpath/sam=ple.txt"),
-      Paths.get("/invalid path/sample.txt"),
-      Paths.get("/invalidpath/<sample.txt"),
-      Paths.get("/invalidpath/sample>.txt")
+      "/invalidpath!/sample.txt",
+      "/invalidpath#/sample.txt",
+      "/invalidpath$/sample.txt",
+      "/invalidpath/%sample.txt",
+      "/invalidpath/&sample.txt",
+      "/invalidpath/sa'mple.txt",
+      "/invalidpath/samp@le.txt",
+      "/invalidpath/samp`le.txt",
+      "/invalid+path/sample.txt",
+      "/invalid,path/sample.txt",
+      "/invalidpath;/sample.txt",
+      "/invalidpath/sam=ple.txt",
+      "/invalid path/sample.txt",
+      "/invalidpath/<sample.txt",
+      "/invalidpath/sample>.txt"
     )
 
     paths.foreach { path ⇒
@@ -34,6 +32,6 @@ class PathValidatorTest extends FunSuite with Matchers {
   }
 
   test("should return true for valid file path") {
-    PathValidator.isValid(Paths.get("/validpath/sample.txt")) shouldBe true
+    PathValidator.isValid("/validpath/sample.txt") shouldBe true
   }
 }
