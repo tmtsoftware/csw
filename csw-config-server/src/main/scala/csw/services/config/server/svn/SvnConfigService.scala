@@ -199,6 +199,12 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
+  override def getActiveByTime(path: Path, time: Instant): Future[Option[ConfigData]] = async {
+    val activeVersion = await(getByTime(activeFilePath(path), time))
+    val activeId      = await(activeVersion.get.toStringF)
+    await(getById(path, ConfigId(activeId)))
+  }
+
   override def getActiveVersion(path: Path): Future[ConfigId] = async {
     val configData = await(getLatest(activeFilePath(path)))
     ConfigId(await(configData.get.toStringF))

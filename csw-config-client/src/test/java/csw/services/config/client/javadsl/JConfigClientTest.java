@@ -498,4 +498,28 @@ public class JConfigClientTest {
         Stream<Path> actualStream8 = configService.list(JFileType.Normal, ".*trombone.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected8, actualStream8.collect(Collectors.toSet()));
     }
+
+    //DEOPSCSW-140 Provide new routes to get active file as of date
+    @Test
+    public void testActiveVersionBasedOnTime() throws ExecutionException, InterruptedException {
+
+        // create file
+        Path file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf");
+        configService.create(file, ConfigData.fromString(configValue1), false, "hello world").get();
+
+        // update file twice
+        ConfigId configId = configService.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").get();
+        configService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").get();
+
+        Instant tHeadRevision = Instant.now();
+        configService.setActive(file, configId, "Setting active version for the first time").get();
+
+        Instant tActiveRevision1 = Instant.now();
+
+        configService.resetActive(file, "resetting active version").get();
+
+        Assert.assertEquals(configService.getActiveByTime(file, tHeadRevision).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getActiveByTime(file, tActiveRevision1).get().get().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configService.getActiveByTime(file, Instant.now()).get().get().toJStringF(mat).get(), configValue3);
+    }
 }

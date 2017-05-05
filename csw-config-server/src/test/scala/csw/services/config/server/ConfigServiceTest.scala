@@ -257,7 +257,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configData6.toStringF.await shouldBe configValue2
   }
 
-  test("should get the correct version of file based on date") {
+  test("should get the correct version of file based on time") {
     val file = Paths.get("/test.conf")
     configService
       .create(file, ConfigData.fromString(configValue1), annex = false, "commit initial configuration")
@@ -791,5 +791,28 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     intercept[InvalidInput] {
       configService.list(pattern = Some("?i)")).await
     }
+  }
+
+  //DEOPSCSW-140 Provide new routes to get active file as of date
+  test("should get the correct active version of the file based on time") {
+
+    // create file
+    val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
+    configService.create(file, ConfigData.fromString(configValue1), annex = false, "hello world").await
+
+    // update file twice
+    val configId = configService.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").await
+    configService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").await
+
+    val tHeadRevision = Instant.now()
+    configService.setActive(file, configId, "Setting active version for the first time").await
+
+    val tActiveRevision1 = Instant.now()
+
+    configService.resetActive(file, "resetting active version").await
+
+    configService.getActiveByTime(file, tHeadRevision).await.get.toStringF.await shouldBe configValue1
+    configService.getActiveByTime(file, tActiveRevision1).await.get.toStringF.await shouldBe configValue2
+    configService.getActiveByTime(file, Instant.now()).await.get.toStringF.await shouldBe configValue3
   }
 }

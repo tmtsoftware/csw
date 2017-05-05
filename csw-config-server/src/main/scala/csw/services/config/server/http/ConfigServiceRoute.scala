@@ -51,7 +51,7 @@ class ConfigServiceRoute(
     (path("active-config" / FilePath) & get & rejectEmptyResponse) { filePath ⇒
       println(s"------------------------getting file for active version of $filePath -----------------------")
       dateParam {
-        case Some(date) ⇒ complete(configService.getActive(filePath))
+        case Some(date) ⇒ complete(configService.getActiveByTime(filePath, date))
         case _          ⇒ complete(configService.getActive(filePath))
       }
     } ~

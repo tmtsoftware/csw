@@ -115,4 +115,14 @@ trait ConfigService extends ConfigClientService {
    * @return     id which represents the current active version
    */
   def getActiveVersion(path: Path): Future[ConfigId]
+
+  /**
+   * Gets and returns the active version of the file stored under the given path.
+   * If no active was set, this returns the version with which the file was created.
+   *
+   * @param path the file path relative to the repository root
+   * @return     a future object that can be used to access the file's data, if found
+   */
+  def getActiveByTime(path: Path, time: Instant): Future[Option[ConfigData]]
+
 }

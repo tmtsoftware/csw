@@ -10,6 +10,8 @@ import csw.services.config.api.commons.FileType
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.api.scaladsl.ConfigService
 
+import scala.concurrent.Future
+
 /**
  * Defines an interface for storing and retrieving configuration information
  */
@@ -114,6 +116,23 @@ trait IConfigService extends IConfigClientService {
    */
   def resetActive(path: Path, comment: String): CompletableFuture[Unit]
   def resetActive(path: Path): CompletableFuture[Unit]
+
+  /**
+   * Returns the version which represents the "active version" of the file with the given path
+   *
+   * @param path the file path relative to the repository root
+   * @return     id which represents the current active version
+   */
+  def getActiveVersion(path: Path): CompletableFuture[ConfigId]
+
+  /**
+   * Gets and returns the active version of the file stored under the given path.
+   * If no active was set, this returns the version with which the file was created.
+   *
+   * @param path the file path relative to the repository root
+   * @return     a future object that can be used to access the file's data, if found
+   */
+  def getActiveByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]]
 
   /**
    * Returns the Scala API for this instance of config service

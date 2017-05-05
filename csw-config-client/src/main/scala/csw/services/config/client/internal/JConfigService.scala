@@ -95,4 +95,10 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
     configService.getActive(path).map(_.asJava).toJava.toCompletableFuture
 
   override def asScala: ConfigService = configService
+
+  override def getActiveVersion(path: Path): CompletableFuture[ConfigId] =
+    configService.getActiveVersion(path).toJava.toCompletableFuture
+
+  override def getActiveByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]] =
+    configService.getActiveByTime(path, time).map(_.asJava).toJava.toCompletableFuture
 }

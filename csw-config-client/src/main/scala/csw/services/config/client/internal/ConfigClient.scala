@@ -147,6 +147,10 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   override def resetActive(path: jnio.Path, comment: String): Future[Unit] =
     handleActiveConfig(path, Query.Empty)
 
+  override def getActiveByTime(path: jnio.Path, time: Instant): Future[Option[ConfigData]] = async {
+    await(get(await(activeConfig(path)).withQuery(Query("date" → time.toString))))
+  }
+
   override def getActiveVersion(path: jnio.Path): Future[ConfigId] = async {
     val uri = await(activeConfigVersion(path))
 
