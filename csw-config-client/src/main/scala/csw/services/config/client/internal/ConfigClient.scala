@@ -45,12 +45,12 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       println(request)
       val response = await(Http().singleRequest(request))
 
-      response.status match {
-        case StatusCodes.Created    ⇒ await(Unmarshal(response).to[ConfigId])
-        case StatusCodes.Conflict   ⇒ throw FileAlreadyExists(path)
-        case StatusCodes.BadRequest ⇒ throw InvalidInput(await(Unmarshal(response).to[String]))
-        case _                      ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
-      }
+      await(
+        handleResponse(response) {
+          case StatusCodes.Created  ⇒ Unmarshal(response).to[ConfigId]
+          case StatusCodes.Conflict ⇒ throw FileAlreadyExists(path)
+        }
+      )
     }
 
   override def update(path: jnio.Path, configData: ConfigData, comment: String): Future[ConfigId] = async {
@@ -61,11 +61,11 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     println(request)
     val response = await(Http().singleRequest(request))
 
-    response.status match {
-      case StatusCodes.OK       ⇒ await(Unmarshal(response).to[ConfigId])
-      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
-      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
-    }
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigId]
+      }
+    )
   }
 
   override def getActive(path: jnio.Path): Future[Option[ConfigData]] = async {
@@ -91,11 +91,12 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     println(request)
     val response = await(Http().singleRequest(request))
 
-    response.status match {
-      case StatusCodes.OK       ⇒ true
-      case StatusCodes.NotFound ⇒ false
-      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
-    }
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK       ⇒ Future.successful(true)
+        case StatusCodes.NotFound ⇒ Future.successful(false)
+      }
+    )
   }
 
   override def delete(path: jnio.Path, comment: String): Future[Unit] = async {
@@ -105,11 +106,11 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     println(request)
     val response = await(Http().singleRequest(request))
 
-    response.status match {
-      case StatusCodes.OK       ⇒ ()
-      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
-      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
-    }
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Future.unit
+      }
+    )
   }
 
   override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] =
@@ -121,11 +122,12 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       println(request)
       val response = await(Http().singleRequest(request))
 
-      response.status match {
-        case StatusCodes.OK         ⇒ await(Unmarshal(response.entity).to[List[ConfigFileInfo]])
-        case StatusCodes.BadRequest ⇒ throw InvalidInput(await(Unmarshal(response).to[String]))
-        case _                      ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
-      }
+      await(
+        handleResponse(response) {
+          case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileInfo]]
+        }
+      )
+
     }
 
   override def history(path: jnio.Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
@@ -135,11 +137,11 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     println(request)
     val response = await(Http().singleRequest(request))
 
-    response.status match {
-      case StatusCodes.OK       ⇒ await(Unmarshal(response.entity).to[List[ConfigFileRevision]])
-      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
-      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
-    }
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileRevision]]
+      }
+    )
   }
 
   override def setActiveVersion(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
@@ -161,11 +163,11 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
     val lengthOption = response.entity.contentLengthOption
 
-    response.status match {
-      case StatusCodes.OK       ⇒ await(Unmarshal(response).to[ConfigId])
-      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
-      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
-    }
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigId]
+      }
+    )
   }
 
   private def handleActiveConfig(path: jnio.Path, query: Query): Future[Unit] = async {
@@ -175,11 +177,11 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     println(request)
     val response = await(Http().singleRequest(request))
 
-    response.status match {
-      case StatusCodes.OK       ⇒ ()
-      case StatusCodes.NotFound ⇒ throw FileNotFound(path)
-      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
-    }
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Future.unit
+      }
+    )
   }
 
   private def get(uri: Uri): Future[Option[ConfigData]] = async {
@@ -189,16 +191,30 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
     val lengthOption = response.entity.contentLengthOption
 
-    response.status match {
-      case StatusCodes.OK if lengthOption.isDefined ⇒
-        Some(ConfigData.from(response.entity.dataBytes, lengthOption.get))
-      case StatusCodes.OK ⇒
-        //Not consuming the file content will block the connection.
-        response.entity.discardBytes()
-        throw new RuntimeException("response must have content-length")
-      case StatusCodes.NotFound ⇒ None
-      case _                    ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK if lengthOption.isDefined ⇒
+          Future.successful(Some(ConfigData.from(response.entity.dataBytes, lengthOption.get)))
+        case StatusCodes.OK ⇒
+          //Not consuming the file content will block the connection.
+          response.entity.discardBytes()
+          throw new RuntimeException("response must have content-length")
+        case StatusCodes.NotFound ⇒ Future.successful(None)
+      }
+    )
+  }
+
+  def handleResponse[T](response: HttpResponse)(pf: PartialFunction[StatusCode, Future[T]]): Future[T] = {
+    def contentF = Unmarshal(response).to[String]
+
+    val defaultHandler: PartialFunction[StatusCode, Future[T]] = {
+      case StatusCodes.BadRequest ⇒ contentF.map(message ⇒ throw InvalidInput(message))
+      case StatusCodes.NotFound   ⇒ contentF.map(message ⇒ throw FileNotFound(message))
+      case _                      ⇒ contentF.map(message ⇒ throw new RuntimeException(message))
     }
+
+    val handler = pf.orElse(defaultHandler)
+    handler(response.status)
   }
 
   override def getMetadata: Future[ConfigMetadata] = async {
