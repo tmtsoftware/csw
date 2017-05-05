@@ -15,7 +15,7 @@ class ConfigServiceRoute(
   import actorRuntime._
 
   def route: Route = handleExceptions(configExceptionHandler.exceptionHandler) {
-    path("config" / FilePath) { filePath ⇒
+    prefix("config") { filePath ⇒
       (get & rejectEmptyResponse) {
         (dateParam & idParam) {
           case (Some(date), _) ⇒ complete(configService.getByTime(filePath, date))
@@ -48,14 +48,13 @@ class ConfigServiceRoute(
         }
       }
     } ~
-    (path("active-config" / FilePath) & get & rejectEmptyResponse) { filePath ⇒
-      println(s"------------------------getting file for active version of $filePath -----------------------")
+    (prefix("active-config") & get & rejectEmptyResponse) { filePath ⇒
       dateParam {
         case Some(date) ⇒ complete(configService.getActiveByTime(filePath, date))
         case _          ⇒ complete(configService.getActive(filePath))
       }
     } ~
-    path("active-version" / FilePath) { filePath ⇒
+    prefix("active-version") { filePath ⇒
       put {
         (idParam & commentParam) {
           case (Some(configId), comment) ⇒
@@ -64,11 +63,10 @@ class ConfigServiceRoute(
         }
       } ~
       (get & rejectEmptyResponse) {
-        println(s"------------------------getting active version of $filePath -----------------------")
         complete(configService.getActiveVersion(filePath))
       }
     } ~
-    (path("history" / FilePath) & get) { filePath ⇒
+    (prefix("history") & get) { filePath ⇒
       maxResultsParam { maxCount ⇒
         complete(configService.history(filePath, maxCount))
       }

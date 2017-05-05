@@ -456,8 +456,13 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val fileContent = configService.getById(file, configId).await.get
     fileContent.toStringF.await shouldBe content
 
+    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
+    //This call is invalid from client side
     val svnConfigData =
-      configService.getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), configId).await.get
+      serverWiring.configService
+        .getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), configId)
+        .await
+        .get
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
   }
 
@@ -502,13 +507,17 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val updatedFileContent = configService.getById(file, newConfigId).await.get
     updatedFileContent.toStringF.await shouldBe newContent
 
-    val oldSvnConfigData = configService
+    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
+    //This call is invalid from client side
+    val oldSvnConfigData = serverWiring.configService
       .getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), creationConfigId)
       .await
       .get
     oldSvnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
 
-    val newSvnConfigData = configService
+    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
+    //This call is invalid from client side
+    val newSvnConfigData = serverWiring.configService
       .getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), newConfigId)
       .await
       .get
@@ -587,18 +596,6 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     val fileTimeStampedAfterDelete = configService.getLatest(file).await
     fileTimeStampedAfterDelete shouldBe None
-  }
-
-  // DEOPSCSW-47: Unique name for configuration file
-  test("should allow to create files with valid path and throw error for invalid path") {
-    val filePath = Paths.get("/invalid path!/sample@.txt")
-
-    intercept[InvalidInput] {
-      configService
-        .create(filePath, ConfigData.fromString("testing invalid file path"), annex = false,
-          "testing invalid file path")
-        .await
-    }
   }
 
   test("should exclude .default files from list") {

@@ -1,8 +1,14 @@
 package csw.services.config.client.scaladsl
 
+import java.nio.file.Paths
+
+import csw.services.config.api.commons.FileType
+import csw.services.config.api.exceptions.InvalidInput
+import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
+import csw.services.config.server.files.Sha1
 import csw.services.config.server.{ConfigServiceTest, ServerWiring}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
@@ -12,7 +18,8 @@ class ConfigAdminApiTest extends ConfigServiceTest {
 
   private val clientLocationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552))
 
-  private val httpService = ServerWiring.make(ClusterAwareSettings.joinLocal(3552)).httpService
+  private val serverWiring = ServerWiring.make(ClusterAwareSettings.joinLocal(3552))
+  private val httpService  = serverWiring.httpService
 
   private val actorRuntime = new ActorRuntime()
   import actorRuntime._
@@ -30,4 +37,45 @@ class ConfigAdminApiTest extends ConfigServiceTest {
     clientLocationService.shutdown().await
     super.afterAll()
   }
+
+  // DEOPSCSW-47: Unique name for configuration file
+  test("should allow to create files with valid path and throw error for invalid path") {
+    val filePath = Paths.get("/invalid path!/sample@.txt")
+
+    intercept[InvalidInput] {
+      configService
+        .create(filePath, ConfigData.fromString("testing invalid file path"), annex = false,
+          "testing invalid file path")
+        .await
+    }
+  }
+
+  // DEOPSCSW-27: Storing binary component configurations
+  // DEOPSCSW-81: Storing large files in the configuration service
+  // DEOPSCSW-131: Detect and handle oversize files
+  test("should be able to store and retrieve binary file in annex dir") {
+    val fileName   = "smallBinary.bin"
+    val path       = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
+    val configData = ConfigData.fromPath(path)
+    val repoPath   = Paths.get(fileName)
+    val configId =
+      configService.create(repoPath, configData, annex = false, s"committing file: $fileName").await
+
+    val expectedContent = configService.getById(repoPath, configId).await.get.toInputStream.toByteArray
+    val diskFile        = getClass.getClassLoader.getResourceAsStream(fileName)
+    expectedContent shouldBe diskFile.toByteArray
+
+    val list = configService.list(Some(FileType.Annex)).await
+    list.map(_.path) shouldBe List(repoPath)
+
+    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
+    //This call is invalid from client side
+    val svnConfigData =
+      serverWiring.configService
+        .getById(Paths.get(s"$fileName${serverWiring.settings.`sha1-suffix`}"), configId)
+        .await
+        .get
+    svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
+  }
+
 }

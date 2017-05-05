@@ -293,8 +293,8 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.NotFound
     }
 
-    Get("/history/test5.conf&maxResults=5") ~> Route.seal(route) ~> check {
-      status shouldEqual StatusCodes.NotFound
+    Get("/history/invalid=/chars/in/path.conf") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.BadRequest
     }
 
   }

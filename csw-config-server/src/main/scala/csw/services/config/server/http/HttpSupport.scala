@@ -9,6 +9,7 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server._
 import csw.services.config.api.commons.FileType
 import csw.services.config.api.models.{ConfigData, ConfigId, JsonSupport}
+import csw.services.config.server.commons.PathValidator
 
 trait HttpSupport extends Directives with JsonSupport {
   val pathParam: Directive1[Path]              = parameter('path).map(filePath ⇒ Paths.get(filePath))
@@ -21,6 +22,12 @@ trait HttpSupport extends Directives with JsonSupport {
   val commentParam: Directive1[String]         = parameter('comment ? "")
   val annexParam: Directive1[Boolean]          = parameter('annex.as[Boolean] ? false)
   val FilePath: PathMatcher1[Path]             = Remaining.map(path => Paths.get(path))
+
+  def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>
+    validate(PathValidator.isValid(path), PathValidator.message(path)).tmap[Path] { _ =>
+      Paths.get(path)
+    }
+  }
 
   val configDataEntity: Directive1[ConfigData] = extractRequestEntity.flatMap {
     case entity if entity.contentLengthOption.isDefined ⇒

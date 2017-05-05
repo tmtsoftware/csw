@@ -24,10 +24,6 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   import actorRuntime._
 
   override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
-    if (!PathValidator.isValid(path.toString)) {
-      throw new InvalidInput(path, PathValidator.invalidCharsMessage)
-    }
-
     // If the file already exists in the repo, throw exception
     if (await(exists(path))) {
       throw FileAlreadyExists(path)
