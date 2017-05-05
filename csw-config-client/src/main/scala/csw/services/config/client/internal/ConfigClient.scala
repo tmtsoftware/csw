@@ -204,7 +204,20 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     )
   }
 
-  def handleResponse[T](response: HttpResponse)(pf: PartialFunction[StatusCode, Future[T]]): Future[T] = {
+  override def getMetadata: Future[ConfigMetadata] = async {
+    val request = HttpRequest(uri = await(metadataUri))
+    println(request)
+    val response = await(Http().singleRequest(request))
+
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigMetadata]
+      }
+    )
+
+  }
+
+  private def handleResponse[T](response: HttpResponse)(pf: PartialFunction[StatusCode, Future[T]]): Future[T] = {
     def contentF = Unmarshal(response).to[String]
 
     val defaultHandler: PartialFunction[StatusCode, Future[T]] = {
@@ -215,17 +228,5 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
     val handler = pf.orElse(defaultHandler)
     handler(response.status)
-  }
-
-  override def getMetadata: Future[ConfigMetadata] = async {
-    val request = HttpRequest(uri = await(metadataUri))
-    println(request)
-    val response = await(Http().singleRequest(request))
-
-    response.status match {
-      case StatusCodes.OK         ⇒ await(Unmarshal(response.entity).to[ConfigMetadata])
-      case StatusCodes.BadRequest ⇒ throw InvalidInput(await(Unmarshal(response).to[String]))
-      case _                      ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
-    }
   }
 }
