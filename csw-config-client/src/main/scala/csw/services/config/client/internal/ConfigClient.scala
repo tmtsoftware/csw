@@ -26,6 +26,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   private def activeConfig(path: jnio.Path)           = baseUri(Path / "active-config" ++ Path / Path(path.toString))
   private def activeConfigVersion(path: jnio.Path)    = baseUri(Path / "active-version" ++ Path / Path(path.toString))
   private def historyUri(path: jnio.Path)             = baseUri(Path / "history" ++ Path / Path(path.toString))
+  private def metadataUri                             = baseUri(Path / "metadata")
 
   private def listUri = baseUri(Path / "list")
 
@@ -200,4 +201,15 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
+  override def getMetadata: Future[ConfigMetadata] = async {
+    val request = HttpRequest(uri = await(metadataUri))
+    println(request)
+    val response = await(Http().singleRequest(request))
+
+    response.status match {
+      case StatusCodes.OK         ⇒ await(Unmarshal(response.entity).to[ConfigMetadata])
+      case StatusCodes.BadRequest ⇒ throw InvalidInput(await(Unmarshal(response).to[String]))
+      case _                      ⇒ throw new RuntimeException(await(Unmarshal(response).to[String]))
+    }
+  }
 }

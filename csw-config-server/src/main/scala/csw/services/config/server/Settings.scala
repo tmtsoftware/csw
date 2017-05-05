@@ -18,7 +18,9 @@ class Settings(config: Config) {
   def `service-port`: Int              = `csw-config-server`.getInt("service-port")
   val `blocking-io-dispatcher`: String = `csw-config-server`.getString("blocking-io-dispatcher")
   val `annex-min-file-size`: Long      = `csw-config-server`.getBytes("annex-min-file-size")
+  val `max-content-length`: String     = `csw-config-server`.getString("akka.http.server.parsing.max-content-length")
 
-  val repositoryFile: File = Paths.get(`repository-dir`).toFile
-  val svnUrl: SVNURL       = SVNURL.fromFile(repositoryFile)
+  val repositoryFile: File               = Paths.get(`repository-dir`).toFile
+  val svnUrl: SVNURL                     = SVNURL.fromFile(repositoryFile)
+  val annexMinFileSizeAsMetaInfo: String = `csw-config-server`.getString("annex-min-file-size")
 }

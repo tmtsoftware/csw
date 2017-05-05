@@ -6,7 +6,7 @@ import java.time.Instant
 import akka.stream.scaladsl.StreamConverters
 import csw.services.config.api.commons.FileType
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.PathValidator
 import csw.services.config.server.files.AnnexFileService
@@ -256,4 +256,9 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   // File used to store the id of the active version of the file.
   private def activeFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`active-config-suffix`}")
+
+  override def getMetadata: Future[ConfigMetadata] = Future {
+    ConfigMetadata(settings.`repository-dir`, settings.`annex-files-dir`, settings.annexMinFileSizeAsMetaInfo,
+      settings.`max-content-length`)
+  }
 }

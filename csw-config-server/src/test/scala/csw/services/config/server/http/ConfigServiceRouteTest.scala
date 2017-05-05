@@ -392,7 +392,6 @@ class ConfigServiceRouteTest
 
       responseAs[String] shouldEqual configValue1
     }
-
   }
 
   test("setActive - failure status codes") {

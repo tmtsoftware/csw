@@ -125,4 +125,11 @@ trait ConfigService extends ConfigClientService {
    */
   def getActiveByTime(path: Path, time: Instant): Future[Option[ConfigData]]
 
+  /**
+   * Query the metadata of config server
+   *
+   * @return     future of object containing config server's metadata
+   */
+  def getMetadata: Future[ConfigMetadata]
+
 }
