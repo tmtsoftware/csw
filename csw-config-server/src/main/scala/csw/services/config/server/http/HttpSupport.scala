@@ -18,7 +18,6 @@ trait HttpSupport extends Directives with JsonSupport {
   val dateParam: Directive1[Option[Instant]]   = parameter('date.?).map(_.map(Instant.parse))
   val maxResultsParam: Directive1[Int]         = parameter('maxResults.as[Int] ? Int.MaxValue)
   val patternParam: Directive1[Option[String]] = parameter('pattern.?)
-  val typeParam: Directive1[Option[FileType]]  = parameter('type.?).map(_.map(FileType.withName))
   val commentParam: Directive1[String]         = parameter('comment ? "")
   val annexParam: Directive1[Boolean]          = parameter('annex.as[Boolean] ? false)
   val FilePath: PathMatcher1[Path]             = Remaining.map(path => Paths.get(path))
@@ -27,6 +26,17 @@ trait HttpSupport extends Directives with JsonSupport {
     validate(PathValidator.isValid(path), PathValidator.message(path)).tmap[Path] { _ =>
       Paths.get(path)
     }
+  }
+
+  val typeParam: Directive1[Option[FileType]] = parameter('type.?).flatMap {
+    case Some(fileType) ⇒
+      FileType.withNameInsensitiveOption(fileType) match {
+        case Some(ft) ⇒ provide(Some(ft))
+        case None ⇒
+          reject(MalformedQueryParamRejection("type",
+              s"only these values are supported: ${FileType.values.mkString(",")}"))
+      }
+    case None ⇒ provide(None)
   }
 
   val configDataEntity: Directive1[ConfigData] = extractRequestEntity.flatMap {

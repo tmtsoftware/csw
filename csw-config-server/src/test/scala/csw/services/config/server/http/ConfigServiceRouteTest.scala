@@ -3,9 +3,11 @@ package csw.services.config.server.http
 import java.time.Instant
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{MalformedQueryParamRejection, Route}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.services.config.api.models._
+import csw.services.config.api.commons.FileType
+import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -248,6 +250,11 @@ class ConfigServiceRouteTest
     Get("/list?type=Normal") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 0
+    }
+
+    Get("/list?type=invalidtype") ~> route ~> check {
+      rejection shouldBe MalformedQueryParamRejection("type",
+        s"only these values are supported: ${FileType.values.mkString(",")}")
     }
   }
 
