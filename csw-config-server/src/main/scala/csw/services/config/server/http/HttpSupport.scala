@@ -2,25 +2,17 @@ package csw.services.config.server.http
 
 import java.nio.file.{Path, Paths}
 import java.time.Instant
+import java.util.regex.{Pattern, PatternSyntaxException}
 
 import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
 import akka.http.scaladsl.model.headers.HttpEncoding
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server._
-import csw.services.config.api.commons.FileType
-import csw.services.config.api.models.{ConfigData, ConfigId, JsonSupport}
+import csw.services.config.api.commons.JsonSupport
+import csw.services.config.api.models.{ConfigData, ConfigId, FileType}
 import csw.services.config.server.commons.PathValidator
 
 trait HttpSupport extends Directives with JsonSupport {
-  val pathParam: Directive1[Path]              = parameter('path).map(filePath ⇒ Paths.get(filePath))
-  val latestParam: Directive1[Boolean]         = parameter('latest.as[Boolean] ? false)
-  val idParam: Directive1[Option[ConfigId]]    = parameter('id.?).map(_.map(new ConfigId(_)))
-  val dateParam: Directive1[Option[Instant]]   = parameter('date.?).map(_.map(Instant.parse))
-  val maxResultsParam: Directive1[Int]         = parameter('maxResults.as[Int] ? Int.MaxValue)
-  val patternParam: Directive1[Option[String]] = parameter('pattern.?)
-  val commentParam: Directive1[String]         = parameter('comment ? "")
-  val annexParam: Directive1[Boolean]          = parameter('annex.as[Boolean] ? false)
-  val FilePath: PathMatcher1[Path]             = Remaining.map(path => Paths.get(path))
 
   def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>
     validate(PathValidator.isValid(path), PathValidator.message(path)).tmap[Path] { _ =>
@@ -28,13 +20,30 @@ trait HttpSupport extends Directives with JsonSupport {
     }
   }
 
+  val pathParam: Directive1[Path]            = parameter('path).map(filePath ⇒ Paths.get(filePath))
+  val latestParam: Directive1[Boolean]       = parameter('latest.as[Boolean] ? false)
+  val idParam: Directive1[Option[ConfigId]]  = parameter('id.?).map(_.map(new ConfigId(_)))
+  val dateParam: Directive1[Option[Instant]] = parameter('date.?).map(_.map(Instant.parse))
+  val maxResultsParam: Directive1[Int]       = parameter('maxResults.as[Int] ? Int.MaxValue)
+  val commentParam: Directive1[String]       = parameter('comment ? "")
+  val annexParam: Directive1[Boolean]        = parameter('annex.as[Boolean] ? false)
+
+  val patternParam: Directive1[Option[String]] = parameter('pattern.?).flatMap {
+    case p @ Some(pattern) ⇒
+      try {
+        Pattern.compile(pattern)
+        provide(p)
+      } catch {
+        case ex: PatternSyntaxException ⇒ reject(MalformedQueryParamRejection("pattern", ex.getMessage))
+      }
+    case None ⇒ provide(None)
+  }
+
   val typeParam: Directive1[Option[FileType]] = parameter('type.?).flatMap {
     case Some(fileType) ⇒
       FileType.withNameInsensitiveOption(fileType) match {
-        case Some(ft) ⇒ provide(Some(ft))
-        case None ⇒
-          reject(MalformedQueryParamRejection("type",
-              s"only these values are supported: ${FileType.values.mkString(",")}"))
+        case ft @ Some(_) ⇒ provide(ft)
+        case None         ⇒ reject(MalformedQueryParamRejection("type", s"Supported types: ${FileType.stringify}"))
       }
     case None ⇒ provide(None)
   }

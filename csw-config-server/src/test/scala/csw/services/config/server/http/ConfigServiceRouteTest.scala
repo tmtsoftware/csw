@@ -5,9 +5,7 @@ import java.time.Instant
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.{MalformedQueryParamRejection, Route}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import csw.services.config.api.models._
-import csw.services.config.api.commons.FileType
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId, FileType, _}
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -217,11 +215,6 @@ class ConfigServiceRouteTest
       responseAs[List[ConfigFileInfo]].size shouldBe 0
     }
 
-    Get("/list?pattern=a/b") ~> route ~> check {
-      status shouldEqual StatusCodes.OK
-      responseAs[List[ConfigFileInfo]].size shouldBe 0
-    }
-
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -231,15 +224,33 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
+  }
+
+  test("list by pattern - success code") {
+    Get("/list?pattern=a/b") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 0
+    }
+
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
 
     Get("/list?pattern=.*.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
+  }
 
-    Get("/list?type=Annex&pattern=.*.conf") ~> route ~> check {
-      status shouldEqual StatusCodes.OK
-      responseAs[List[ConfigFileInfo]].size shouldBe 1
+  test("list by pattern - rejection") {
+    Get("/list?pattern=?i)") ~> route ~> check {
+      rejection shouldBe MalformedQueryParamRejection("pattern", "Dangling meta character '?' near index 0\n?i)\n^")
+    }
+  }
+
+  test("list by file type - success code") {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
     }
 
     Get("/list?type=Annex") ~> route ~> check {
@@ -251,10 +262,22 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 0
     }
+  }
 
+  test("list by file type - rejection") {
     Get("/list?type=invalidtype") ~> route ~> check {
-      rejection shouldBe MalformedQueryParamRejection("type",
-        s"only these values are supported: ${FileType.values.mkString(",")}")
+      rejection shouldBe MalformedQueryParamRejection("type", s"Supported types: ${FileType.stringify}")
+    }
+  }
+
+  test("list by file type and pattern - success code") {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
+
+    Get("/list?type=Annex&pattern=.*.conf") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
   }
 

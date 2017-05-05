@@ -6,7 +6,6 @@ import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.{util, lang ⇒ jl}
 
-import csw.services.config.api.commons.FileType
 import csw.services.config.api.javadsl.IConfigService
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService

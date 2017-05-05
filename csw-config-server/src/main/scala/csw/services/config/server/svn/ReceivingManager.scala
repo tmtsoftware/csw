@@ -2,7 +2,7 @@ package csw.services.config.server.svn
 
 import java.util.regex.Pattern
 
-import csw.services.config.api.commons.FileType
+import csw.services.config.api.models.FileType
 import csw.services.config.server.Settings
 import csw.services.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
 import org.tmatesoft.svn.core.SVNDirEntry

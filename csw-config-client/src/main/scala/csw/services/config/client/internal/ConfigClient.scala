@@ -8,9 +8,9 @@ import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import csw.services.config.api.commons.ConfigStreamExts.RichSource
-import csw.services.config.api.commons.{BinaryUtils, FileType}
+import csw.services.config.api.commons.{BinaryUtils, JsonSupport}
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
-import csw.services.config.api.models.{JsonSupport, _}
+import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 
 import scala.async.Async._

@@ -6,8 +6,7 @@ import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.{lang ⇒ jl, util ⇒ ju}
 
-import csw.services.config.api.commons.FileType
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 
 /**

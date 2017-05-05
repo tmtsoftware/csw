@@ -4,9 +4,8 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
-import csw.services.config.api.commons.FileType
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
-import csw.services.config.api.models._
+import csw.services.config.api.models.{FileType, _}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.PathValidator
 import csw.services.config.server.files.AnnexFileService

@@ -6,9 +6,8 @@ import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.config.api.commons.FileType
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
@@ -811,13 +810,6 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     val fileInfoes8 = configService.list(Some(FileType.Normal), Some(".*hcd.*")).await
     fileInfoes8.map(_.path).toSet shouldBe Set(hcdConfig)
-  }
-
-  //DEOPSCSW-75 List the names of configuration files that match a path
-  test("should throw invalid input exception if pattern is invalid") {
-    intercept[InvalidInput] {
-      configService.list(pattern = Some("?i)")).await
-    }
   }
 
   //DEOPSCSW-140 Provide new routes to get active file as of date

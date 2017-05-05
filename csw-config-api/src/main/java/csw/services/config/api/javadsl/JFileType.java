@@ -1,4 +1,6 @@
-package csw.services.config.api.commons;
+package csw.services.config.api.javadsl;
+
+import csw.services.config.api.models.FileType;
 
 public class JFileType {
     public static final FileType Annex = FileType.Annex$.MODULE$;

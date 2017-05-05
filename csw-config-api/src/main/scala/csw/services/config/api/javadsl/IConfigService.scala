@@ -1,16 +1,13 @@
 package csw.services.config.api.javadsl
 
 import java.nio.file.Path
-import java.util.concurrent.CompletableFuture
 import java.time.Instant
 import java.util.Optional
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.util.concurrent.CompletableFuture
+import java.{util ⇒ ju}
 
-import csw.services.config.api.commons.FileType
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
-
-import scala.concurrent.Future
 
 /**
  * Defines an interface for storing and retrieving configuration information

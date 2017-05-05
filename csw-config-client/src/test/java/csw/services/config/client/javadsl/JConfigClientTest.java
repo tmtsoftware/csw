@@ -2,12 +2,10 @@ package csw.services.config.client.javadsl;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import csw.services.config.api.commons.JFileType;
 import csw.services.config.api.exceptions.FileAlreadyExists;
 import csw.services.config.api.exceptions.FileNotFound;
 import csw.services.config.api.javadsl.IConfigService;
+import csw.services.config.api.javadsl.JFileType;
 import csw.services.config.api.models.*;
 import csw.services.config.client.internal.ActorRuntime;
 import csw.services.config.server.ServerWiring;

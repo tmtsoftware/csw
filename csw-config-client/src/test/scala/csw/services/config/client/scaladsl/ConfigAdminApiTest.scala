@@ -2,9 +2,8 @@ package csw.services.config.client.scaladsl
 
 import java.nio.file.Paths
 
-import csw.services.config.api.commons.FileType
 import csw.services.config.api.exceptions.InvalidInput
-import csw.services.config.api.models.ConfigData
+import csw.services.config.api.models.{ConfigData, FileType}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
@@ -78,4 +77,10 @@ class ConfigAdminApiTest extends ConfigServiceTest {
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
   }
 
+  //DEOPSCSW-75 List the names of configuration files that match a path
+  test("should throw invalid input exception if pattern is invalid") {
+    intercept[InvalidInput] {
+      configService.list(pattern = Some("?i)")).await
+    }
+  }
 }

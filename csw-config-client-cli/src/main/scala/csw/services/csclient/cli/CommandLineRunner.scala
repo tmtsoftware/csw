@@ -1,7 +1,6 @@
 package csw.services.csclient.cli
 
-import csw.services.config.api.commons.FileType
-import csw.services.config.api.models.{ConfigData, ConfigId}
+import csw.services.config.api.models.{ConfigData, ConfigId, FileType}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 
