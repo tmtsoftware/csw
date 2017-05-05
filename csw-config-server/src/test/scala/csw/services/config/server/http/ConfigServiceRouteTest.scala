@@ -321,6 +321,58 @@ class ConfigServiceRouteTest
 
   }
 
+  test("getActive by date - success status code") {
+
+    val timeWhenRepoWasEmpty = Instant.now()
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
+
+    val timeWhenFileWasCreated = Instant.now()
+
+    Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    Put("/active-version/test.conf?id=3&comment=commit1") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    val timeWhenFileWasUpdated = Instant.now()
+
+    Put("/config/test.conf?comment=updated", configFile2) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    Get(s"/active-config/test.conf?date=$timeWhenFileWasCreated") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+
+      responseAs[String] shouldEqual configValue1
+    }
+
+    Get(s"/active-config/test.conf?date=$timeWhenFileWasUpdated") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+
+      responseAs[String] shouldEqual updatedConfigValue1
+    }
+
+    Get(s"/active-config/test.conf?date=$timeWhenRepoWasEmpty") ~> Route.seal(route) ~> check {
+      status shouldBe StatusCodes.OK
+    }
+  }
+
+  test("getActive by date - failure status codes") {
+
+    //  try to fetch active version of file which does not exists
+    Get("/active-config/test1.conf") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.NotFound
+    }
+
+    Get(s"/active-config?date=${Instant.now}") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.NotFound
+    }
+  }
+
   test("setActive - success status code") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
