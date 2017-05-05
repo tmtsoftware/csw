@@ -3,6 +3,7 @@ package csw.services.config.server
 import java.io.InputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
@@ -289,6 +290,36 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.getByTime(file, time).await.get.toStringF.await shouldBe configValue1
   }
 
+  //DEOPSCSW-85 Record of time and date when config file is created/updated
+  test("should record datetime for creation of config file") {
+    val file       = Paths.get("/tmt/lgs/trombone/hcd.conf")
+    val commitMsg1 = "commit version: 1"
+
+    val now       = Instant.now()
+    val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = false, commitMsg1).await
+
+    val configFileHistories = configService.history(file).await
+
+    val expectedRecordedTimeSpread = now.toEpochMilli +- 100 //recorded time on server is within 100ms which is assumed to be worst case clock skew
+    configFileHistories.map(_.time.toEpochMilli).head shouldBe expectedRecordedTimeSpread
+  }
+
+  //DEOPSCSW-85 Record of time and date when config file is created/updated
+  test("should record datetime when config file is updated") {
+    val file = Paths.get("/tmt/lgs/trombone/hcd.conf")
+    val configId1 =
+      configService.create(file, ConfigData.fromString(configValue1), annex = false, "commit version: 1").await
+
+    val now       = Instant.now()
+    val configId2 = configService.update(file, ConfigData.fromString(configValue2), "commit version: 2").await
+
+    val configFileHistories = configService.history(file).await
+
+    val expectedRecordedTimeSpread = now.toEpochMilli +- 100 //recorded time on server is within 100ms which is assumed to be worst case clock skew
+    println(configFileHistories)
+    configFileHistories.map(_.time.toEpochMilli).head shouldBe expectedRecordedTimeSpread
+  }
+
   // DEOPSCSW-45: Saving version information for config. file
   // DEOPSCSW-76: Access a list of all the versions of a stored configuration file
   // DEOPSCSW-63: Add comment while creating or updating a configuration file
@@ -304,6 +335,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val commitMsg3 = "commit version: 3"
 
     val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = false, commitMsg1).await
+
     val configId2 = configService.update(file, ConfigData.fromString(configValue2), commitMsg2).await
     val configId3 = configService.update(file, ConfigData.fromString(configValue3), commitMsg3).await
 
