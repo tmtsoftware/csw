@@ -22,17 +22,15 @@ trait HttpSupport extends Directives with JsonSupport {
   val annexParam: Directive1[Boolean]          = parameter('annex.as[Boolean] ? false)
   val FilePath: PathMatcher1[Path]             = Remaining.map(path => Paths.get(path))
 
-  val rejectMissingContentLength: Directive0 = extractRequestEntity.flatMap {
-    case entity if entity.contentLengthOption.isDefined ⇒ pass
+  val configDataEntity: Directive1[ConfigData] = extractRequestEntity.flatMap {
+    case entity if entity.contentLengthOption.isDefined ⇒
+      provide(ConfigData.from(entity.dataBytes, entity.contentLengthOption.get))
     case _ ⇒
-      reject(UnsupportedRequestEncodingRejection(HttpEncoding("all encodings with contentLength are supported")))
+      reject(UnsupportedRequestEncodingRejection(HttpEncoding("All encodings with contentLength value")))
   }
 
-  //This marshaller is used to create a response chunked stream for get/getDefault requests
+  //This marshaller is used to create a response stream for get/getDefault requests
   implicit val configDataMarshaller: ToEntityMarshaller[ConfigData] = Marshaller.opaque { configData =>
     HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
   }
-
-  val configDataEntity: Directive1[ConfigData] = rejectMissingContentLength & extractRequestEntity
-    .map(entity => ConfigData.from(entity.dataBytes, entity.contentLengthOption.get))
 }
