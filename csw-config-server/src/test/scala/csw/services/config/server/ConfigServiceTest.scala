@@ -3,7 +3,6 @@ package csw.services.config.server
 import java.io.InputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
@@ -316,7 +315,6 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configFileHistories = configService.history(file).await
 
     val expectedRecordedTimeSpread = now.toEpochMilli +- 100 //recorded time on server is within 100ms which is assumed to be worst case clock skew
-    println(configFileHistories)
     configFileHistories.map(_.time.toEpochMilli).head shouldBe expectedRecordedTimeSpread
   }
 
