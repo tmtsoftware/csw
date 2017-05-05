@@ -59,8 +59,8 @@ class ConfigServiceRoute(
       put {
         (idParam & commentParam) {
           case (Some(configId), comment) ⇒
-            complete(configService.setActive(filePath, configId, comment).map(_ ⇒ Done))
-          case (_, comment) ⇒ complete(configService.resetActive(filePath, comment).map(_ ⇒ Done))
+            complete(configService.setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))
+          case (_, comment) ⇒ complete(configService.resetActiveVersion(filePath, comment).map(_ ⇒ Done))
         }
       } ~
       (get & rejectEmptyResponse) {

@@ -34,7 +34,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
 
     val id = await(createFile(path, configData, annex, comment))
-    await(setActive(path, id))
+    await(setActiveVersion(path, id))
     id
   }
 
@@ -159,7 +159,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  override def setActive(path: Path, id: ConfigId, comment: String): Future[Unit] = async {
+  override def setActiveVersion(path: Path, id: ConfigId, comment: String): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
       throw FileNotFound(path)
     }
@@ -174,13 +174,13 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  override def resetActive(path: Path, comment: String): Future[Unit] = async {
+  override def resetActiveVersion(path: Path, comment: String): Future[Unit] = async {
     if (!await(exists(path))) {
       throw FileNotFound(path)
     }
 
     val currentVersion = await(getCurrentVersion(path))
-    await(setActive(path, currentVersion.get))
+    await(setActiveVersion(path, currentVersion.get))
   }
 
   override def getActive(path: Path): Future[Option[ConfigData]] = {

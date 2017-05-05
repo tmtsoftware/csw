@@ -424,17 +424,17 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     // check that getActive call before any setActive call should return the file with id with which it was created
     configService.getActive(file).await.get.toStringF.await shouldBe configValue1
     // set active version of file to id=2
-    configService.setActive(file, configId, "Setting active version for the first time").await
+    configService.setActiveVersion(file, configId, "Setting active version for the first time").await
     // check that getActive file without ID returns file with id=2
     configService.getActive(file).await.get.toStringF.await shouldBe configValue2
     configService.getActiveVersion(file).await shouldBe configId
 
-    configService.resetActive(file, "resetting active version").await
+    configService.resetActiveVersion(file, "resetting active version").await
     configService.getActive(file).await.get.toStringF.await shouldBe configValue3
     configService.getActiveVersion(file).await shouldBe ConfigId(4)
 
     // check that setActive without id,resets active version of file
-    configService.resetActive(file, comment = "setting active version again").await
+    configService.resetActiveVersion(file, comment = "setting active version again").await
     configService.getActive(file).await.get.toStringF.await shouldBe configValue3
 
   }
@@ -531,7 +531,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId =
       configService.create(file, ConfigData.fromString(content), annex = true, "committing annex file").await
 
-    configService.setActive(file, configId).await
+    configService.setActiveVersion(file, configId).await
 
     val newContent = "testing annex file, again"
     val newComment = "Updating file"
@@ -540,7 +540,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val activeConfigData: ConfigData = configService.getActive(file).await.get
     activeConfigData.toStringF.await shouldBe content
 
-    configService.resetActive(file).await
+    configService.resetActiveVersion(file).await
 
     val resetActiveConfigData: ConfigData = configService.getActive(file).await.get
     resetActiveConfigData.toStringF.await shouldBe newContent
@@ -554,7 +554,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     activeAfterDelete shouldBe None
 
     intercept[FileNotFound] {
-      configService.resetActive(file).await
+      configService.resetActiveVersion(file).await
     }
   }
 
@@ -622,8 +622,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       .create(assemblyConfig, ConfigData.fromString(configValue2), annex = true, assemblyConfigComment)
       .await
 
-    configService.setActive(tromboneConfig, tromboneConfigId).await
-    configService.setActive(assemblyConfig, assemblyConfigId).await
+    configService.setActiveVersion(tromboneConfig, tromboneConfigId).await
+    configService.setActiveVersion(assemblyConfig, assemblyConfigId).await
 
     // list files from repo and assert that it contains added files
     val configFiles = configService.list().await
@@ -805,11 +805,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").await
 
     val tHeadRevision = Instant.now()
-    configService.setActive(file, configId, "Setting active version for the first time").await
+    configService.setActiveVersion(file, configId, "Setting active version for the first time").await
 
     val tActiveRevision1 = Instant.now()
 
-    configService.resetActive(file, "resetting active version").await
+    configService.resetActiveVersion(file, "resetting active version").await
 
     configService.getActiveByTime(file, tHeadRevision).await.get.toStringF.await shouldBe configValue1
     configService.getActiveByTime(file, tActiveRevision1).await.get.toStringF.await shouldBe configValue2

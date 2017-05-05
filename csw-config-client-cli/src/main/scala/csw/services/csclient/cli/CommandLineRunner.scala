@@ -77,12 +77,12 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
 
     def setActive(): Unit = {
       val maybeConfigId = options.id.map(id ⇒ ConfigId(id))
-      await(configService.setActive(options.relativeRepoPath.get, maybeConfigId.get, options.comment))
+      await(configService.setActiveVersion(options.relativeRepoPath.get, maybeConfigId.get, options.comment))
       println(s"${options.relativeRepoPath.get} file with id:${maybeConfigId.get.id} is set as default")
     }
 
     def resetActive(): Unit = {
-      await(configService.resetActive(options.relativeRepoPath.get, options.comment))
+      await(configService.resetActiveVersion(options.relativeRepoPath.get, options.comment))
       println(s"${options.relativeRepoPath.get} file is reset to default")
     }
 

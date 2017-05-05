@@ -141,10 +141,10 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     }
   }
 
-  override def setActive(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
+  override def setActiveVersion(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
     handleActiveConfig(path, Query("id" → id.id.toString, "comment" → comment))
 
-  override def resetActive(path: jnio.Path, comment: String): Future[Unit] =
+  override def resetActiveVersion(path: jnio.Path, comment: String): Future[Unit] =
     handleActiveConfig(path, Query.Empty)
 
   override def getActiveByTime(path: jnio.Path, time: Instant): Future[Option[ConfigData]] = async {
