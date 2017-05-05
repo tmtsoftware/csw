@@ -3,6 +3,7 @@ package csw.services.config.server.commons
 import java.util.Date
 import java.util.regex.Pattern
 
+import csw.services.config.api.models.FileType
 import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
 import org.scalatest.{FunSuite, Matchers}
@@ -51,7 +52,7 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
     val annexDirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt.$sha1", SVNNodeKind.FILE,
       100, false, 1, new Date(), "author", "comment")
 
-    normalDirEntry.isNormal(settings.`sha1-suffix`) shouldBe true
-    annexDirEntry.isAnnex(settings.`sha1-suffix`) shouldBe true
+    normalDirEntry.matchesFileType(Some(FileType.Normal), settings.`sha1-suffix`) shouldBe true
+    annexDirEntry.matchesFileType(Some(FileType.Annex), settings.`sha1-suffix`) shouldBe true
   }
 }
