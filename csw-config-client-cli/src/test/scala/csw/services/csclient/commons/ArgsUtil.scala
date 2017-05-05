@@ -29,13 +29,13 @@ class ArgsUtil {
   val updateAllArgs      = Array("update", relativeRepoPath, "-i", updatedInputFilePath, "-c", comment)
   val updateMinimalArgs  = Array("update", relativeRepoPath, "-i", updatedInputFileContents)
   val getLatestArgs      = Array("get", relativeRepoPath, "-o", outputFilePath, "--latest")
-  val getMinimalArgs     = Array("get", relativeRepoPath, "-o", outputFilePath)
+  val getMinimalArgs     = Array("getActive", relativeRepoPath, "-o", outputFilePath)
   val existsArgs         = Array("exists", relativeRepoPath)
   val deleteArgs         = Array("delete", relativeRepoPath)
   val listArgs           = Array("list")
   val historyArgs        = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
-  val setActiveAllArgs   = Array("setActive", relativeRepoPath, "--id", id)
-  val resetActiveAllArgs = Array("resetActive", relativeRepoPath, "-c", comment)
+  val setActiveAllArgs   = Array("setActiveVersion", relativeRepoPath, "--id", id)
+  val resetActiveAllArgs = Array("resetActiveVersion", relativeRepoPath, "-c", comment)
 
   private def createTempFile(fileName: String, fileContent: String): Path =
     Files.write(Files.createTempFile(fileName, ".conf"), fileContent.getBytes)
