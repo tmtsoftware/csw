@@ -7,7 +7,7 @@ import java.util.Optional
 import java.{lang ⇒ jl, util ⇒ ju}
 
 import csw.services.config.api.commons.FileType
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 
 import scala.concurrent.Future
@@ -133,6 +133,13 @@ trait IConfigService extends IConfigClientService {
    * @return     a future object that can be used to access the file's data, if found
    */
   def getActiveByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]]
+
+  /**
+   * Query the metadata of config server
+   *
+   * @return     future of object containing config server's metadata
+   */
+  def getMetadata: CompletableFuture[ConfigMetadata]
 
   /**
    * Returns the Scala API for this instance of config service

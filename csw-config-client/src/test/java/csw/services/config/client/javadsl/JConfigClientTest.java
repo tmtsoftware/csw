@@ -2,14 +2,13 @@ package csw.services.config.client.javadsl;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import csw.services.config.api.commons.JFileType;
 import csw.services.config.api.exceptions.FileAlreadyExists;
 import csw.services.config.api.exceptions.FileNotFound;
 import csw.services.config.api.javadsl.IConfigService;
-import csw.services.config.api.models.ConfigData;
-import csw.services.config.api.models.ConfigFileRevision;
-import csw.services.config.api.models.ConfigFileInfo;
-import csw.services.config.api.models.ConfigId;
+import csw.services.config.api.models.*;
 import csw.services.config.client.internal.ActorRuntime;
 import csw.services.config.server.ServerWiring;
 import csw.services.config.server.commons.TestFileUtils;
@@ -521,5 +520,15 @@ public class JConfigClientTest {
         Assert.assertEquals(configService.getActiveByTime(file, tHeadRevision).get().get().toJStringF(mat).get(), configValue1);
         Assert.assertEquals(configService.getActiveByTime(file, tActiveRevision1).get().get().toJStringF(mat).get(), configValue2);
         Assert.assertEquals(configService.getActiveByTime(file, Instant.now()).get().get().toJStringF(mat).get(), configValue3);
+    }
+
+    //DEOPSCSW-133: Provide meta config for normal and oversize repo
+    @Test
+    public void testGetMetadata() throws ExecutionException, InterruptedException {
+        ConfigMetadata metadata = configService.getMetadata().get();
+        Assert.assertNotEquals(metadata.repoPath(), "");
+        Assert.assertNotEquals(metadata.annexPath(), "");
+        Assert.assertNotEquals(metadata.annexMinFileSize(), "");
+        Assert.assertNotEquals(metadata.maxConfigFileSize(), "");
     }
 }

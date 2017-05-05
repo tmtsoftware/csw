@@ -8,7 +8,7 @@ import java.{util, lang ⇒ jl}
 
 import csw.services.config.api.commons.FileType
 import csw.services.config.api.javadsl.IConfigService
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 
 import scala.collection.JavaConverters._
@@ -94,11 +94,13 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def getActive(path: Path): CompletableFuture[Optional[ConfigData]] =
     configService.getActive(path).map(_.asJava).toJava.toCompletableFuture
 
-  override def asScala: ConfigService = configService
-
   override def getActiveVersion(path: Path): CompletableFuture[ConfigId] =
     configService.getActiveVersion(path).toJava.toCompletableFuture
 
   override def getActiveByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]] =
     configService.getActiveByTime(path, time).map(_.asJava).toJava.toCompletableFuture
+
+  override def getMetadata: CompletableFuture[ConfigMetadata] = configService.getMetadata.toJava.toCompletableFuture
+
+  override def asScala: ConfigService = configService
 }
