@@ -75,6 +75,9 @@ class ConfigServiceRoute(
       (typeParam & patternParam) { (fileType, pattern) ⇒
         complete(configService.list(fileType, pattern))
       }
+    } ~
+    (path("metadata") & get) {
+      complete(configService.getMetadata)
     }
   }
 }

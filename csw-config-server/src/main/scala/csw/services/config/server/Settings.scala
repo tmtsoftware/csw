@@ -8,7 +8,8 @@ import org.tmatesoft.svn.core.SVNURL
 
 class Settings(config: Config) {
 
-  private val `csw-config-server` = config.getConfig("csw-config-server")
+  private val `csw-config-server`        = config.getConfig("csw-config-server")
+  private val `akka.http.server.parsing` = config.getConfig("akka.http.server.parsing")
 
   val `repository-dir`: String         = `csw-config-server`.getString("repository-dir")
   val `annex-files-dir`: String        = `csw-config-server`.getString("annex-dir")
@@ -18,7 +19,7 @@ class Settings(config: Config) {
   def `service-port`: Int              = `csw-config-server`.getInt("service-port")
   val `blocking-io-dispatcher`: String = `csw-config-server`.getString("blocking-io-dispatcher")
   val `annex-min-file-size`: Long      = `csw-config-server`.getBytes("annex-min-file-size")
-  val `max-content-length`: String     = `csw-config-server`.getString("akka.http.server.parsing.max-content-length")
+  val `max-content-length`: String     = `akka.http.server.parsing`.getString("max-content-length")
 
   val repositoryFile: File               = Paths.get(`repository-dir`).toFile
   val svnUrl: SVNURL                     = SVNURL.fromFile(repositoryFile)

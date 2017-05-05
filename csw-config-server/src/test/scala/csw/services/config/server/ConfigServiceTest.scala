@@ -842,4 +842,23 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.getActiveByTime(file, tActiveRevision1).await.get.toStringF.await shouldBe configValue2
     configService.getActiveByTime(file, Instant.now()).await.get.toStringF.await shouldBe configValue3
   }
+
+  //DEOPSCSW-133: Provide meta config for normal and oversize repo
+  test("should get metadata") {
+    val config: Config = ConfigFactory.parseString("""
+    |csw-config-server.repository-dir=/test/csw-config-svn
+    |csw-config-server.annex-dir=/test/csw-config-temp
+    |csw-config-server.annex-min-file-size=333 MiB
+    |akka.http.server.parsing.max-content-length=500 MiB
+      """.stripMargin)
+
+    val serverWiringMetadataTest = ServerWiring.make(config)
+
+    val metadata = serverWiringMetadataTest.configService.getMetadata.await
+    metadata.repoPath shouldBe "/test/csw-config-svn"
+    metadata.annexPath shouldBe "/test/csw-config-temp"
+    metadata.annexMinFileSize shouldBe "333 MiB"
+    metadata.maxConfigFileSize shouldBe "500 MiB"
+    serverWiringMetadataTest.actorRuntime.shutdown().await
+  }
 }

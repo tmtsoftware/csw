@@ -5,7 +5,7 @@ import java.time.Instant
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.models._
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -464,7 +464,15 @@ class ConfigServiceRouteTest
     Head("/config/test_not_exists.conf") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
-
   }
 
+  test("getMetadata - success status code") {
+    Get("/metadata") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[ConfigMetadata].repoPath should not be empty
+      responseAs[ConfigMetadata].annexPath should not be empty
+      responseAs[ConfigMetadata].annexMinFileSize should not be empty
+      responseAs[ConfigMetadata].maxConfigFileSize should not be empty
+    }
+  }
 }
