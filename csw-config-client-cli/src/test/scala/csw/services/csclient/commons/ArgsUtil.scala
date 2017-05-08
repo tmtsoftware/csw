@@ -30,7 +30,6 @@ class ArgsUtil {
   val updateMinimalArgs  = Array("update", relativeRepoPath, "-i", updatedInputFileContents)
   val getLatestArgs      = Array("get", relativeRepoPath, "-o", outputFilePath)
   val getByIdArgs        = Array("get", relativeRepoPath, "-o", outputFilePath, "--id")
-  val getByDateArgs      = Array("get", relativeRepoPath, "-o", outputFilePath, "--date")
   val getMinimalArgs     = Array("getActive", relativeRepoPath, "-o", outputFilePath)
   val existsArgs         = Array("exists", relativeRepoPath)
   val deleteArgs         = Array("delete", relativeRepoPath)

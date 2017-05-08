@@ -626,7 +626,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     fileTimeStampedAfterDelete shouldBe None
   }
 
-  test("should exclude .default files from list") {
+  test("should exclude .$active files from list") {
     val tromboneConfig = Paths.get("trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
 

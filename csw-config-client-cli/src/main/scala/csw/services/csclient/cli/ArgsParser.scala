@@ -110,7 +110,7 @@ object ArgsParser {
       } text "file path in the repository",
       arg[String]("id") action { (x, c) =>
         c.copy(id = Some(x))
-      } text "optional version id of file to be set as default",
+      } text "version id of file to be set as active",
       opt[String]('c', "comment") action { (x, c) =>
         c.copy(comment = x)
       } text "optional create comment"
@@ -185,7 +185,7 @@ object ArgsParser {
     checkConfig { c =>
       if (c.op.isEmpty)
         failure(
-            "Please specify at least one command {get | create | update | exists | list | history | setDefault | getDefault | resetDefault}")
+            "Please specify at least one command {create | update | get | delete | list | history | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}")
       else
         success
     }

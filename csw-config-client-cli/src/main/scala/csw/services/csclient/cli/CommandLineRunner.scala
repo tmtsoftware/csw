@@ -69,20 +69,21 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
         fileEntries
     }
 
-  def history(options: Options): Unit = {
+  def history(options: Options): List[ConfigFileRevision] = {
     val histList = await(configService.history(options.relativeRepoPath.get, options.maxFileVersions))
     histList.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    histList
   }
 
   def setActiveVersion(options: Options): Unit = {
     val maybeConfigId = options.id.map(id ⇒ ConfigId(id))
     await(configService.setActiveVersion(options.relativeRepoPath.get, maybeConfigId.get, options.comment))
-    println(s"${options.relativeRepoPath.get} file with id:${maybeConfigId.get.id} is set as default")
+    println(s"${options.relativeRepoPath.get} file with id:${maybeConfigId.get.id} is set as active")
   }
 
   def resetActiveVersion(options: Options): Unit = {
     await(configService.resetActiveVersion(options.relativeRepoPath.get, options.comment))
-    println(s"${options.relativeRepoPath.get} file is reset to default")
+    println(s"${options.relativeRepoPath.get} file is reset to active")
   }
 
   def getActiveVersion(options: Options): ConfigId = {
@@ -91,14 +92,15 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     configId
   }
 
-  def getActiveByTime(options: Options): Unit = {
+  def getActiveByTime(options: Options): Option[Path] = {
     val configDataOpt = await(configService.getActiveByTime(options.relativeRepoPath.get, options.date.get))
 
     configDataOpt match {
       case Some(configData) ⇒
         val outputFile = await(configData.toPath(options.outputFilePath.get))
         println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
-      case None ⇒
+        Some(outputFile.toAbsolutePath)
+      case None ⇒ None
     }
 
   }
