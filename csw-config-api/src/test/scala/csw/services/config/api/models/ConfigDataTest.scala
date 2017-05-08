@@ -1,6 +1,6 @@
 package csw.services.config.api.models
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.Files
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}

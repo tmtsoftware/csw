@@ -1,7 +1,7 @@
 package csw.services.location.javadsl
 
 import java.util.Optional
-import java.util.concurrent.{Callable, CompletableFuture}
+import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 import java.{util ⇒ ju}
 

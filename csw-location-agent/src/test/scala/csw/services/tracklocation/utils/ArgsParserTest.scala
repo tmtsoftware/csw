@@ -46,7 +46,6 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("test parser with list of services containing leading/trailing whitespace, should error out") {
-    val services           = "redis,alarm,watchdog"
     val argv               = Array[String]("--name", "   redis-server,   alarm,watchdog   ")
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
 

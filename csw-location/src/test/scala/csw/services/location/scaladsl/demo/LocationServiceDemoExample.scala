@@ -81,8 +81,8 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
     Thread.sleep(200)
 
     async {
-      val tcpRegistrationResult  = await(locationService.register(tcpRegistration))
-      val httpRegistrationResult = await(locationService.register(httpRegistration))
+      val tcpRegistrationResult = await(locationService.register(tcpRegistration))
+      await(locationService.register(httpRegistration))
 
       Thread.sleep(200)
 

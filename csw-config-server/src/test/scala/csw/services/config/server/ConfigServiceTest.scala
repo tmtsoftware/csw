@@ -6,7 +6,7 @@ import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.TestFileUtils
@@ -293,8 +293,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val file       = Paths.get("/tmt/lgs/trombone/hcd.conf")
     val commitMsg1 = "commit version: 1"
 
-    val now       = Instant.now()
-    val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = false, commitMsg1).await
+    val now = Instant.now()
+    configService.create(file, ConfigData.fromString(configValue1), annex = false, commitMsg1).await
 
     val configFileHistories = configService.history(file).await
 
@@ -305,11 +305,10 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   //DEOPSCSW-85 Record of time and date when config file is created/updated
   test("should record datetime when config file is updated") {
     val file = Paths.get("/tmt/lgs/trombone/hcd.conf")
-    val configId1 =
-      configService.create(file, ConfigData.fromString(configValue1), annex = false, "commit version: 1").await
+    configService.create(file, ConfigData.fromString(configValue1), annex = false, "commit version: 1").await
 
-    val now       = Instant.now()
-    val configId2 = configService.update(file, ConfigData.fromString(configValue2), "commit version: 2").await
+    val now = Instant.now()
+    configService.update(file, ConfigData.fromString(configValue2), "commit version: 2").await
 
     val configFileHistories = configService.history(file).await
 

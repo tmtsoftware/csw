@@ -161,8 +161,6 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     println(request)
     val response = await(Http().singleRequest(request))
 
-    val lengthOption = response.entity.contentLengthOption
-
     await(
       handleResponse(response) {
         case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigId]

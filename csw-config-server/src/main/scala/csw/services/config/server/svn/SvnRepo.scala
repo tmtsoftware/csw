@@ -207,7 +207,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
   }
 
   // Test if there're no problems with accessing a repository
-  def testConnection() = {
+  def testConnection(): Unit = {
     val svn = svnHandle()
     try {
       svn.testConnection()

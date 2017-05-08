@@ -1,7 +1,7 @@
 package csw.services.config.client.internal
 
 import akka.Done
-import akka.actor.{ActorSystem, CoordinatedShutdown, Terminated}
+import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.stream.{ActorMaterializer, Materializer}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}

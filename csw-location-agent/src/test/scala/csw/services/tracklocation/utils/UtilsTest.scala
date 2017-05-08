@@ -4,7 +4,6 @@ import java.io.File
 import java.nio.file.Paths
 
 import com.typesafe.config.Config
-import csw.services.tracklocation.models.Options
 import org.scalatest.{FunSuite, Matchers}
 
 class UtilsTest extends FunSuite with Matchers {

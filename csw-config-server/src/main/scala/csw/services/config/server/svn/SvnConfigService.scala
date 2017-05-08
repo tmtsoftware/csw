@@ -4,10 +4,9 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models.{FileType, _}
 import csw.services.config.api.scaladsl.ConfigService
-import csw.services.config.server.commons.PathValidator
 import csw.services.config.server.files.AnnexFileService
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
@@ -245,7 +244,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  private def hist(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]] = async {
+  private def hist(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     await(svnRepo.hist(path, maxResults))
       .map(e => ConfigFileRevision(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
   }

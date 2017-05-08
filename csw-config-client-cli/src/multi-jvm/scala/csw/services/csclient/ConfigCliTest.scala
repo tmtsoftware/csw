@@ -11,7 +11,7 @@ import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.csclient.helpers.TwoClientsAndServer
 import csw.services.location.commons.ClusterSettings
-import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.services.location.helpers.LSNodeSpec
 import org.scalatest.FunSuiteLike
 
 class ConfigCliTestMultiJvmNode1 extends ConfigCliTest(0)

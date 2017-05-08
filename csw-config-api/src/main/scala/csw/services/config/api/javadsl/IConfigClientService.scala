@@ -1,10 +1,9 @@
 package csw.services.config.api.javadsl
 
 import java.nio.file.Path
-import java.time.Instant
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang ⇒ jl}
 
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService

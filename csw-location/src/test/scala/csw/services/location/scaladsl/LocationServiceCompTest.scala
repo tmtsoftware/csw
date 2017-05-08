@@ -266,7 +266,7 @@ class LocationServiceCompTest extends FunSuiteLike with Matchers with BeforeAndA
 
     val result = locationService.register(tcpRegistration).await
 
-    val illegalStateException1 = intercept[OtherLocationIsRegistered] {
+    intercept[OtherLocationIsRegistered] {
       locationService.register(duplicateTcpRegistration).await
     }
 
@@ -356,7 +356,7 @@ class LocationServiceCompTest extends FunSuiteLike with Matchers with BeforeAndA
     locationService.register(TcpRegistration(configTcpConnection, 1234)).await
 
     val assemblyHttpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
-    val registrationResult     = locationService.register(HttpRegistration(assemblyHttpConnection, 1234, "path123")).await
+    locationService.register(HttpRegistration(assemblyHttpConnection, 1234, "path123")).await
 
     locationService.list(ConnectionType.TcpType).await.map(_.connection).toSet shouldBe Set(redisTcpConnection,
       configTcpConnection)
@@ -372,8 +372,8 @@ class LocationServiceCompTest extends FunSuiteLike with Matchers with BeforeAndA
     val tcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
     locationService.register(TcpRegistration(tcpConnection, 1234)).await
 
-    val httpConnection     = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
-    val registrationResult = locationService.register(HttpRegistration(httpConnection, 1234, "path123")).await
+    val httpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
+    locationService.register(HttpRegistration(httpConnection, 1234, "path123")).await
 
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
     val actorRef = actorSystem.actorOf(
