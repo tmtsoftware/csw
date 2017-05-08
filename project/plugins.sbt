@@ -4,7 +4,7 @@ addSbtPlugin("com.dwijnand"                      % "sbt-dynver"              % "
 addSbtPlugin("com.lightbend.paradox"             % "sbt-paradox"             % "0.2.8")
 addSbtPlugin("com.eed3si9n"                      % "sbt-unidoc"              % "0.4.0")
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"        % "1.0.0")
-addSbtPlugin("org.foundweekends"                 % "sbt-bintray"             % "0.4.0")
+addSbtPlugin("me.lessis"                         % "bintray-sbt"             % "0.3.0")
 addSbtPlugin("com.timushev.sbt"                  % "sbt-updates"             % "0.3.0")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-ghpages"             % "0.6.0")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-site"                % "1.2.0")
