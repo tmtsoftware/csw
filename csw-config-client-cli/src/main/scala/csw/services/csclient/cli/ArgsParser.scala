@@ -62,19 +62,7 @@ object ArgsParser {
       } text "optional version id of the repository file to get",
       opt[String]("date") action { (x, c) =>
         c.copy(date = Some(Instant.parse(x)))
-      } text "optional date parameter ex. 2017-04-16T16:15:23.503Z",
-      opt[Unit]("latest") action { (_, c) =>
-        c.copy(latest = true)
-      } text "optional use this option to get the latest file"
-    )
-
-    //exists operation
-    cmd("exists") action { (_, c) =>
-      c.copy(op = "exists")
-    } text "checks if the file exists at specified path in the repository" children (
-      arg[String]("<relativeRepoPath>") action { (x, c) =>
-        c.copy(relativeRepoPath = Some(Paths.get(x)))
-      } text "file path in the repository"
+      } text "optional date parameter ex. 2017-04-16T16:15:23.503Z"
     )
 
     //delete operation
@@ -113,25 +101,81 @@ object ArgsParser {
       } text "optional maximum entries of file versions"
     )
 
-    //setDefault operation
-    cmd("setActive") action { (_, c) =>
-      c.copy(op = "setActive")
+    //setActiveVersion operation
+    cmd("setActiveVersion") action { (_, c) =>
+      c.copy(op = "setActiveVersion")
     } text "sets active version of the file in the repository" children (
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      opt[String]("id") action { (x, c) =>
+      arg[String]("id") action { (x, c) =>
         c.copy(id = Some(x))
-      } text "optional version id of file to be set as default"
+      } text "version id of file to be set as active",
+      opt[String]('c', "comment") action { (x, c) =>
+        c.copy(comment = x)
+      } text "optional create comment"
     )
 
-    //resetDefault operation
-    cmd("resetActive") action { (_, c) =>
-      c.copy(op = "resetActive")
+    //resetActiveVersion operation
+    cmd("resetActiveVersion") action { (_, c) =>
+      c.copy(op = "resetActiveVersion")
     } text "resets the active to the latest version of the file in the repository" children (
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
+      } text "file path in the repository",
+      opt[String]('c', "comment") action { (x, c) =>
+        c.copy(comment = x)
+      } text "optional create comment"
+    )
+
+    //getActiveVersion operation
+    cmd("getActiveVersion") action { (_, c) =>
+      c.copy(op = "getActiveVersion")
+    } text "gets the id of the active version of the file in the repository" children (
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository"
+    )
+
+    //getActiveByTime operation
+    cmd("getActiveByTime") action { (_, c) =>
+      c.copy(op = "getActiveByTime")
+    } text "gets the file that was active at a specified time" children (
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
+      } text "file path in the repository",
+      arg[String]("date") action { (x, c) =>
+        c.copy(date = Some(Instant.parse(x)))
+      } text "date parameter ex. 2017-04-16T16:15:23.503Z",
+      opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
+        c.copy(outputFilePath = Some(Paths.get(x)))
+      } text "output file path"
+    )
+
+    //getMetadata operation
+    cmd("getMetadata") action { (_, c) =>
+      c.copy(op = "getMetadata")
+    } text "gets the metadata of config server"
+
+    //exists operation
+    cmd("exists") action { (_, c) =>
+      c.copy(op = "exists")
+    } text "checks if the file exists at specified path in the repository" children (
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
+      } text "file path in the repository"
+    )
+
+    //getActive operation
+    cmd("getActive") action { (_, c) =>
+      c.copy(op = "getActive")
+    } text "retrieves active file for a given path from config service, and writes it to the output file" children (
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
+      } text "path of the file in the repository",
+      opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
+        c.copy(outputFilePath = Some(Paths.get(x)))
+      } text "output file path"
     )
 
     help("help")
@@ -141,7 +185,7 @@ object ArgsParser {
     checkConfig { c =>
       if (c.op.isEmpty)
         failure(
-            "Please specify at least one command {get | create | update | exists | list | history | setDefault | getDefault | resetDefault}")
+            "Please specify at least one command {create | update | get | delete | list | history | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}")
       else
         success
     }

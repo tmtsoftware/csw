@@ -1,9 +1,10 @@
-package csw.services.config.api.models
+package csw.services.config.api.commons
 
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import csw.services.config.api.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMetadata}
 import spray.json.{DefaultJsonProtocol, JsString, JsValue, JsonFormat, RootJsonFormat}
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
@@ -29,4 +30,5 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val configIdFormat: RootJsonFormat[ConfigId]                    = jsonFormat1(new ConfigId(_))
   implicit val configFileInfoFormat: RootJsonFormat[ConfigFileInfo]        = jsonFormat3(ConfigFileInfo.apply)
   implicit val configFileHistoryFormat: RootJsonFormat[ConfigFileRevision] = jsonFormat3(ConfigFileRevision.apply)
+  implicit val configMetadataFormat: RootJsonFormat[ConfigMetadata]        = jsonFormat4(ConfigMetadata.apply)
 }

@@ -2,17 +2,17 @@ package csw.services.location.commons
 
 import akka.Done
 import akka.actor.{ActorRef, ActorSystem, CoordinatedShutdown, PoisonPill}
-import akka.cluster.{Cluster, MemberStatus}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.cluster.http.management.ClusterHttpManagement
+import akka.cluster.{Cluster, MemberStatus}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.services.location.ClusterConfirmationActor
 import csw.services.location.ClusterConfirmationActor.HasJoinedCluster
 
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 /**

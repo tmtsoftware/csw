@@ -3,9 +3,9 @@ package csw.services.config.server.http
 import java.time.Instant
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{MalformedQueryParamRejection, Route}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId, FileType, _}
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -95,7 +95,7 @@ class ConfigServiceRouteTest
     }
 
     Get("/config/test.conf") ~> route ~> check {
-      responseAs[String] shouldEqual configValue1
+      responseAs[String] shouldEqual updatedConfigValue1
     }
 
   }
@@ -191,24 +191,19 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/default/test.conf?id=1") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf?id=1") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
-    }
-
-    Get("/config/test.conf?latest=true") ~> Route.seal(route) ~> check {
-      status shouldBe StatusCodes.OK
-      responseAs[String] shouldEqual updatedConfigValue1
     }
 
     Get("/config/test.conf") ~> Route.seal(route) ~> check {
       status shouldBe StatusCodes.OK
-      responseAs[String] shouldEqual configValue1
+      responseAs[String] shouldEqual updatedConfigValue1
     }
   }
 
   test("get latest - failure status code") {
     // try to fetch file which does not exists
-    Get("/get?path=test1.conf?latest=true") ~> Route.seal(route) ~> check {
+    Get("/get?path=test1.conf") ~> Route.seal(route) ~> check {
       status shouldBe StatusCodes.NotFound
     }
   }
@@ -216,11 +211,6 @@ class ConfigServiceRouteTest
   test("list - success status code") {
     // when list is empty
     Get("/list") ~> route ~> check {
-      status shouldEqual StatusCodes.OK
-      responseAs[List[ConfigFileInfo]].size shouldBe 0
-    }
-
-    Get("/list?pattern=a/b") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 0
     }
@@ -234,15 +224,33 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
+  }
+
+  test("list by pattern - success code") {
+    Get("/list?pattern=a/b") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 0
+    }
+
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
 
     Get("/list?pattern=.*.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
+  }
 
-    Get("/list?type=Annex&pattern=.*.conf") ~> route ~> check {
-      status shouldEqual StatusCodes.OK
-      responseAs[List[ConfigFileInfo]].size shouldBe 1
+  test("list by pattern - rejection") {
+    Get("/list?pattern=?i)") ~> route ~> check {
+      rejection shouldBe MalformedQueryParamRejection("pattern", "Dangling meta character '?' near index 0\n?i)\n^")
+    }
+  }
+
+  test("list by file type - success code") {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
     }
 
     Get("/list?type=Annex") ~> route ~> check {
@@ -253,6 +261,23 @@ class ConfigServiceRouteTest
     Get("/list?type=Normal") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 0
+    }
+  }
+
+  test("list by file type - rejection") {
+    Get("/list?type=invalidtype") ~> route ~> check {
+      rejection shouldBe MalformedQueryParamRejection("type", s"Supported types: ${FileType.stringify}")
+    }
+  }
+
+  test("list by file type and pattern - success code") {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
+
+    Get("/list?type=Annex&pattern=.*.conf") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 1
     }
   }
 
@@ -298,36 +323,87 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.NotFound
     }
 
-    Get("/history/test5.conf&maxResults=5") ~> Route.seal(route) ~> check {
-      status shouldEqual StatusCodes.NotFound
+    Get("/history/invalid=/chars/in/path.conf") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.BadRequest
     }
 
   }
 
-  test("getDefault - success status code") {
+  test("getActive - success status code") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
-    Get("/config/test.conf") ~> route ~> check {
+    Get("/active-config/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[String] shouldEqual configValue1
     }
-
   }
 
-  test("getDefault - failure status codes") {
+  test("getActive - failure status codes") {
 
-    //  try to fetch default version of file which does not exists
-    Get("/config/test1.conf?default=true") ~> Route.seal(route) ~> check {
+    //  try to fetch active version of file which does not exists
+    Get("/active-config/test1.conf") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
   }
 
-  test("setDefault - success status code") {
+  test("getActive by date - success status code") {
+
+    val timeWhenRepoWasEmpty = Instant.now()
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
+
+    val timeWhenFileWasCreated = Instant.now()
+
+    Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    Put("/active-version/test.conf?id=3&comment=commit1") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    val timeWhenFileWasUpdated = Instant.now()
+
+    Put("/config/test.conf?comment=updated", configFile2) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    Get(s"/active-config/test.conf?date=$timeWhenFileWasCreated") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+
+      responseAs[String] shouldEqual configValue1
+    }
+
+    Get(s"/active-config/test.conf?date=$timeWhenFileWasUpdated") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+
+      responseAs[String] shouldEqual updatedConfigValue1
+    }
+
+    Get(s"/active-config/test.conf?date=$timeWhenRepoWasEmpty") ~> Route.seal(route) ~> check {
+      status shouldBe StatusCodes.OK
+    }
+  }
+
+  test("getActive by date - failure status codes") {
+
+    //  try to fetch active version of file which does not exists
+    Get("/active-config/test1.conf") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.NotFound
+    }
+
+    Get(s"/active-config?date=${Instant.now}") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.NotFound
+    }
+  }
+
+  test("setActive - success status code") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -337,22 +413,21 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/default/test.conf?id=1&comment=commit1") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf?id=1&comment=commit1") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
-    Get("/config/test.conf") ~> route ~> check {
+    Get("/active-config/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[String] shouldEqual configValue1
     }
-
   }
 
-  test("setDefault - failure status codes") {
+  test("setActive - failure status codes") {
 
-    // try to set default version of file which does not exist
-    Put("/default/test.conf?id=1&comment=commit1") ~> Route.seal(route) ~> check {
+    // try to set active version of file which does not exist
+    Put("/active-version/test.conf?id=1&comment=commit1") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
@@ -361,14 +436,14 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.Created
     }
 
-    // try to set default version of file which exist but corresponding id does not exist
-    Put("/default/test.conf?id=3&comment=commit1") ~> Route.seal(route) ~> check {
+    // try to set active version of file which exist but corresponding id does not exist
+    Put("/active-version/test.conf?id=3&comment=commit1") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
   }
 
-  test("resetDefault - success status code") {
+  test("resetActive - success status code") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
@@ -378,23 +453,23 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/default/test.conf") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/default/test.conf?id=1") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf?id=1") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/default/test.conf") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
   }
 
-  test("resetDefault - failure status codes") {
+  test("resetActive - failure status codes") {
 
-    //  try to reset default version of file which does not exists
-    Put("/default/test.conf") ~> Route.seal(route) ~> check {
+    //  try to reset active version of file which does not exists
+    Put("/active-version/test.conf") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
@@ -419,7 +494,15 @@ class ConfigServiceRouteTest
     Head("/config/test_not_exists.conf") ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
-
   }
 
+  test("getMetadata - success status code") {
+    Get("/metadata") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[ConfigMetadata].repoPath should not be empty
+      responseAs[ConfigMetadata].annexPath should not be empty
+      responseAs[ConfigMetadata].annexMinFileSize should not be empty
+      responseAs[ConfigMetadata].maxConfigFileSize should not be empty
+    }
+  }
 }

@@ -14,7 +14,7 @@ object Common extends AutoPlugin {
   override lazy val projectSettings: Seq[Setting[_]] = extraSettings ++ Seq(
     organization := "org.tmt",
     organizationName := "TMT Org",
-    scalaVersion := "2.12.1",
+    scalaVersion := "2.12.2",
 
     concurrentRestrictions in Global += Tags.limit(Tags.All, 1),
 

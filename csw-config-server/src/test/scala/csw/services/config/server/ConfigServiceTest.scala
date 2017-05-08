@@ -6,9 +6,8 @@ import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.config.api.commons.FileType
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
+import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
@@ -257,7 +256,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configData6.toStringF.await shouldBe configValue2
   }
 
-  test("should get the correct version of file based on date") {
+  test("should get the correct version of file based on time") {
     val file = Paths.get("/test.conf")
     configService
       .create(file, ConfigData.fromString(configValue1), annex = false, "commit initial configuration")
@@ -289,6 +288,34 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.getByTime(file, time).await.get.toStringF.await shouldBe configValue1
   }
 
+  //DEOPSCSW-85 Record of time and date when config file is created/updated
+  test("should record datetime for creation of config file") {
+    val file       = Paths.get("/tmt/lgs/trombone/hcd.conf")
+    val commitMsg1 = "commit version: 1"
+
+    val now = Instant.now()
+    configService.create(file, ConfigData.fromString(configValue1), annex = false, commitMsg1).await
+
+    val configFileHistories = configService.history(file).await
+
+    val expectedRecordedTimeSpread = now.toEpochMilli +- 100 //recorded time on server is within 100ms which is assumed to be worst case clock skew
+    configFileHistories.map(_.time.toEpochMilli).head shouldBe expectedRecordedTimeSpread
+  }
+
+  //DEOPSCSW-85 Record of time and date when config file is created/updated
+  test("should record datetime when config file is updated") {
+    val file = Paths.get("/tmt/lgs/trombone/hcd.conf")
+    configService.create(file, ConfigData.fromString(configValue1), annex = false, "commit version: 1").await
+
+    val now = Instant.now()
+    configService.update(file, ConfigData.fromString(configValue2), "commit version: 2").await
+
+    val configFileHistories = configService.history(file).await
+
+    val expectedRecordedTimeSpread = now.toEpochMilli +- 100 //recorded time on server is within 100ms which is assumed to be worst case clock skew
+    configFileHistories.map(_.time.toEpochMilli).head shouldBe expectedRecordedTimeSpread
+  }
+
   // DEOPSCSW-45: Saving version information for config. file
   // DEOPSCSW-76: Access a list of all the versions of a stored configuration file
   // DEOPSCSW-63: Add comment while creating or updating a configuration file
@@ -304,6 +331,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val commitMsg3 = "commit version: 3"
 
     val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = false, commitMsg1).await
+
     val configId2 = configService.update(file, ConfigData.fromString(configValue2), commitMsg2).await
     val configId3 = configService.update(file, ConfigData.fromString(configValue3), commitMsg3).await
 
@@ -424,15 +452,17 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     // check that getActive call before any setActive call should return the file with id with which it was created
     configService.getActive(file).await.get.toStringF.await shouldBe configValue1
     // set active version of file to id=2
-    configService.setActive(file, configId, "Setting active version for the first time").await
+    configService.setActiveVersion(file, configId, "Setting active version for the first time").await
     // check that getActive file without ID returns file with id=2
     configService.getActive(file).await.get.toStringF.await shouldBe configValue2
+    configService.getActiveVersion(file).await shouldBe configId
 
-    configService.resetActive(file, "resetting active version").await
+    configService.resetActiveVersion(file, "resetting active version").await
     configService.getActive(file).await.get.toStringF.await shouldBe configValue3
+    configService.getActiveVersion(file).await shouldBe ConfigId(4)
 
     // check that setActive without id,resets active version of file
-    configService.resetActive(file, comment = "setting active  versionagain").await
+    configService.resetActiveVersion(file, comment = "setting active version again").await
     configService.getActive(file).await.get.toStringF.await shouldBe configValue3
 
   }
@@ -454,8 +484,13 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val fileContent = configService.getById(file, configId).await.get
     fileContent.toStringF.await shouldBe content
 
+    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
+    //This call is invalid from client side
     val svnConfigData =
-      configService.getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), configId).await.get
+      serverWiring.configService
+        .getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), configId)
+        .await
+        .get
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
   }
 
@@ -500,13 +535,17 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val updatedFileContent = configService.getById(file, newConfigId).await.get
     updatedFileContent.toStringF.await shouldBe newContent
 
-    val oldSvnConfigData = configService
+    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
+    //This call is invalid from client side
+    val oldSvnConfigData = serverWiring.configService
       .getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), creationConfigId)
       .await
       .get
     oldSvnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
 
-    val newSvnConfigData = configService
+    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
+    //This call is invalid from client side
+    val newSvnConfigData = serverWiring.configService
       .getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), newConfigId)
       .await
       .get
@@ -529,7 +568,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId =
       configService.create(file, ConfigData.fromString(content), annex = true, "committing annex file").await
 
-    configService.setActive(file, configId).await
+    configService.setActiveVersion(file, configId).await
 
     val newContent = "testing annex file, again"
     val newComment = "Updating file"
@@ -538,7 +577,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val activeConfigData: ConfigData = configService.getActive(file).await.get
     activeConfigData.toStringF.await shouldBe content
 
-    configService.resetActive(file).await
+    configService.resetActiveVersion(file).await
 
     val resetActiveConfigData: ConfigData = configService.getActive(file).await.get
     resetActiveConfigData.toStringF.await shouldBe newContent
@@ -552,7 +591,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     activeAfterDelete shouldBe None
 
     intercept[FileNotFound] {
-      configService.resetActive(file).await
+      configService.resetActiveVersion(file).await
     }
   }
 
@@ -587,19 +626,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     fileTimeStampedAfterDelete shouldBe None
   }
 
-  // DEOPSCSW-47: Unique name for configuration file
-  test("should allow to create files with valid path and throw error for invalid path") {
-    val filePath = Paths.get("/invalid path!/sample@.txt")
-
-    intercept[InvalidInput] {
-      configService
-        .create(filePath, ConfigData.fromString("testing invalid file path"), annex = false,
-          "testing invalid file path")
-        .await
-    }
-  }
-
-  test("should exclude .default files from list") {
+  test("should exclude .$active files from list") {
     val tromboneConfig = Paths.get("trombone.conf")
     val assemblyConfig = Paths.get("a/b/assembly/assembly.conf")
 
@@ -620,8 +647,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       .create(assemblyConfig, ConfigData.fromString(configValue2), annex = true, assemblyConfigComment)
       .await
 
-    configService.setActive(tromboneConfig, tromboneConfigId).await
-    configService.setActive(assemblyConfig, assemblyConfigId).await
+    configService.setActiveVersion(tromboneConfig, tromboneConfigId).await
+    configService.setActiveVersion(assemblyConfig, assemblyConfigId).await
 
     // list files from repo and assert that it contains added files
     val configFiles = configService.list().await
@@ -784,10 +811,45 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     fileInfoes8.map(_.path).toSet shouldBe Set(hcdConfig)
   }
 
-  //DEOPSCSW-75 List the names of configuration files that match a path
-  test("should throw invalid input exception if pattern is invalid") {
-    intercept[InvalidInput] {
-      configService.list(pattern = Some("?i)")).await
-    }
+  //DEOPSCSW-140 Provide new routes to get active file as of date
+  test("should get the correct active version of the file based on time") {
+
+    // create file
+    val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
+    configService.create(file, ConfigData.fromString(configValue1), annex = false, "hello world").await
+
+    // update file twice
+    val configId = configService.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").await
+    configService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").await
+
+    val tHeadRevision = Instant.now()
+    configService.setActiveVersion(file, configId, "Setting active version for the first time").await
+
+    val tActiveRevision1 = Instant.now()
+
+    configService.resetActiveVersion(file, "resetting active version").await
+
+    configService.getActiveByTime(file, tHeadRevision).await.get.toStringF.await shouldBe configValue1
+    configService.getActiveByTime(file, tActiveRevision1).await.get.toStringF.await shouldBe configValue2
+    configService.getActiveByTime(file, Instant.now()).await.get.toStringF.await shouldBe configValue3
+  }
+
+  //DEOPSCSW-133: Provide meta config for normal and oversize repo
+  test("should get metadata") {
+    val config: Config = ConfigFactory.parseString("""
+    |csw-config-server.repository-dir=/test/csw-config-svn
+    |csw-config-server.annex-dir=/test/csw-config-temp
+    |csw-config-server.annex-min-file-size=333 MiB
+    |akka.http.server.parsing.max-content-length=500 MiB
+      """.stripMargin)
+
+    val serverWiringMetadataTest = ServerWiring.make(config)
+
+    val metadata = serverWiringMetadataTest.configService.getMetadata.await
+    metadata.repoPath shouldBe "/test/csw-config-svn"
+    metadata.annexPath shouldBe "/test/csw-config-temp"
+    metadata.annexMinFileSize shouldBe "333 MiB"
+    metadata.maxConfigFileSize shouldBe "500 MiB"
+    serverWiringMetadataTest.actorRuntime.shutdown().await
   }
 }

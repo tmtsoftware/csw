@@ -1,6 +1,7 @@
 package csw.services.config.server.commons
 import java.util.regex.Pattern
 
+import csw.services.config.api.models.FileType
 import org.tmatesoft.svn.core.{SVNDirEntry, SVNNodeKind}
 
 object SVNDirEntryExt {
@@ -14,7 +15,11 @@ object SVNDirEntryExt {
       case None          ⇒ true
       case Some(pattern) ⇒ pattern.matcher(entry.getRelativePath).matches()
     }
-    def isAnnex(annexSuffix: String): Boolean  = entry.getName.endsWith(annexSuffix)
-    def isNormal(annexSuffix: String): Boolean = !entry.getName.endsWith(annexSuffix)
+    def matchesFileType(maybeFileType: Option[FileType], annexSuffix: String): Boolean = maybeFileType match {
+      case None                  ⇒ true
+      case Some(FileType.Annex)  ⇒ isAnnex(annexSuffix)
+      case Some(FileType.Normal) ⇒ !isAnnex(annexSuffix)
+    }
+    private def isAnnex(annexSuffix: String): Boolean = entry.getName.endsWith(annexSuffix)
   }
 }

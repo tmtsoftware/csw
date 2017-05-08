@@ -8,12 +8,13 @@ import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
-import csw.services.config.server.http.HttpService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.Connection.HttpConnection
 import csw.services.location.models.{ComponentId, ComponentType}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import org.tmatesoft.svn.core.SVNException
+
 import scala.concurrent.duration._
 
 // DEOPSCSW-130: Command line App for HTTP server
@@ -37,24 +38,24 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
     locationService.shutdown().await
   }
 
-  test("should be able to register with location service on start up") {
-    val httpService: HttpService = new Main(clusterSettings).start(Array.empty).get
-    val configConnection         = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-
-    try {
-      locationService.resolve(configConnection, 5.seconds).await.get.connection shouldBe configConnection
-    } finally {
-      httpService.shutdown().await
+  test("should not start HTTP server if repo does not exist") {
+    val actualException = intercept[Exception] {
+      new Main(clusterSettings).start(Array.empty).get
     }
+
+    actualException.getCause shouldBe a[SVNException]
+
+    val configConnection = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
     locationService.find(configConnection).await shouldBe None
   }
 
-  test("should init svn repo if --initRepo option is provided") {
+  test("should init svn repo and register with location service if --initRepo option is provided") {
     val httpService = new Main(clusterSettings).start(Array("--initRepo")).get
 
     try {
       val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
       val configServiceLocation = locationService.resolve(configConnection, 5.seconds).await.get
+      configServiceLocation.connection shouldBe configConnection
 
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
@@ -67,18 +68,24 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
     }
   }
 
-  test("should not initialize svn repo if --initRepo option is not provided") {
+  test("should not initialize svn repo if --initRepo option is not provided and should use existing repo if available") {
+
+    // temporary start a server to create a repo and then shutdown the server
+    val tmpHttpService = new Main(clusterSettings).start(Array("--initRepo")).get
+    tmpHttpService.shutdown().await
+
     val httpService = new Main(clusterSettings).start(Array.empty).get
 
     try {
       val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
       val configServiceLocation = locationService.resolve(configConnection, 5.seconds).await.get
 
+      configServiceLocation.connection shouldBe configConnection
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
       val request  = HttpRequest(uri = uri)
       val response = Http().singleRequest(request).await
-      response.status shouldBe StatusCodes.InternalServerError
+      response.status shouldBe StatusCodes.OK
     } finally {
       httpService.shutdown().await
     }

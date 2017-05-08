@@ -2,14 +2,11 @@ package csw.services.config.client.javadsl;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
-import csw.services.config.api.commons.JFileType;
 import csw.services.config.api.exceptions.FileAlreadyExists;
 import csw.services.config.api.exceptions.FileNotFound;
 import csw.services.config.api.javadsl.IConfigService;
-import csw.services.config.api.models.ConfigData;
-import csw.services.config.api.models.ConfigFileRevision;
-import csw.services.config.api.models.ConfigFileInfo;
-import csw.services.config.api.models.ConfigId;
+import csw.services.config.api.javadsl.JFileType;
+import csw.services.config.api.models.*;
 import csw.services.config.client.internal.ActorRuntime;
 import csw.services.config.server.ServerWiring;
 import csw.services.config.server.commons.TestFileUtils;
@@ -497,5 +494,39 @@ public class JConfigClientTest {
         Set<Path> expected8 = new HashSet<>(Collections.singleton(tromboneConfig));
         Stream<Path> actualStream8 = configService.list(JFileType.Normal, ".*trombone.*").get().stream().map(ConfigFileInfo::path);
         Assert.assertEquals(expected8, actualStream8.collect(Collectors.toSet()));
+    }
+
+    //DEOPSCSW-140 Provide new routes to get active file as of date
+    @Test
+    public void testActiveVersionBasedOnTime() throws ExecutionException, InterruptedException {
+
+        // create file
+        Path file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf");
+        configService.create(file, ConfigData.fromString(configValue1), false, "hello world").get();
+
+        // update file twice
+        ConfigId configId = configService.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").get();
+        configService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").get();
+
+        Instant tHeadRevision = Instant.now();
+        configService.setActive(file, configId, "Setting active version for the first time").get();
+
+        Instant tActiveRevision1 = Instant.now();
+
+        configService.resetActive(file, "resetting active version").get();
+
+        Assert.assertEquals(configService.getActiveByTime(file, tHeadRevision).get().get().toJStringF(mat).get(), configValue1);
+        Assert.assertEquals(configService.getActiveByTime(file, tActiveRevision1).get().get().toJStringF(mat).get(), configValue2);
+        Assert.assertEquals(configService.getActiveByTime(file, Instant.now()).get().get().toJStringF(mat).get(), configValue3);
+    }
+
+    //DEOPSCSW-133: Provide meta config for normal and oversize repo
+    @Test
+    public void testGetMetadata() throws ExecutionException, InterruptedException {
+        ConfigMetadata metadata = configService.getMetadata().get();
+        Assert.assertNotEquals(metadata.repoPath(), "");
+        Assert.assertNotEquals(metadata.annexPath(), "");
+        Assert.assertNotEquals(metadata.annexMinFileSize(), "");
+        Assert.assertNotEquals(metadata.maxConfigFileSize(), "");
     }
 }

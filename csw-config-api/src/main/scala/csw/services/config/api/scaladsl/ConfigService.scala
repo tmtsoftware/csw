@@ -3,8 +3,7 @@ package csw.services.config.api.scaladsl
 import java.nio.file.Path
 import java.time.Instant
 
-import csw.services.config.api.commons.FileType
-import csw.services.config.api.models._
+import csw.services.config.api.models.{FileType, _}
 
 import scala.concurrent.Future
 
@@ -98,7 +97,7 @@ trait ConfigService extends ConfigClientService {
    *             (by default the id of the version with which the file was created i.e. 1)
    * @return     a future result
    */
-  def setActive(path: Path, id: ConfigId, comment: String = ""): Future[Unit]
+  def setActiveVersion(path: Path, id: ConfigId, comment: String = ""): Future[Unit]
 
   /**
    * Resets the "active version" of the file with the given path to the latest version.
@@ -106,5 +105,30 @@ trait ConfigService extends ConfigClientService {
    * @param path the file path relative to the repository root
    * @return     a future result
    */
-  def resetActive(path: Path, comment: String = ""): Future[Unit]
+  def resetActiveVersion(path: Path, comment: String = ""): Future[Unit]
+
+  /**
+   * Returns the version which represents the "active version" of the file with the given path
+   *
+   * @param path the file path relative to the repository root
+   * @return     id which represents the current active version
+   */
+  def getActiveVersion(path: Path): Future[ConfigId]
+
+  /**
+   * Gets and returns the active version of the file stored under the given path.
+   * If no active was set, this returns the version with which the file was created.
+   *
+   * @param path the file path relative to the repository root
+   * @return     a future object that can be used to access the file's data, if found
+   */
+  def getActiveByTime(path: Path, time: Instant): Future[Option[ConfigData]]
+
+  /**
+   * Query the metadata of config server
+   *
+   * @return     future of object containing config server's metadata
+   */
+  def getMetadata: Future[ConfigMetadata]
+
 }

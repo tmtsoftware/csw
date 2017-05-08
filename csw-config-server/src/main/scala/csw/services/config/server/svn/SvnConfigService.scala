@@ -4,11 +4,9 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
-import csw.services.config.api.commons.FileType
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
+import csw.services.config.api.models.{FileType, _}
 import csw.services.config.api.scaladsl.ConfigService
-import csw.services.config.server.commons.PathValidator
 import csw.services.config.server.files.AnnexFileService
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.internal.StreamExt.RichSource
@@ -23,25 +21,22 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   import actorRuntime._
 
-  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
-    if (!PathValidator.isValid(path)) {
-      throw new InvalidInput(path, PathValidator.invalidCharsMessage)
-    }
+  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String = ""): Future[ConfigId] =
+    async {
+      // If the file already exists in the repo, throw exception
+      if (await(exists(path))) {
+        throw FileAlreadyExists(path)
+      }
 
-    // If the file already exists in the repo, throw exception
-    if (await(exists(path))) {
-      throw FileAlreadyExists(path)
+      val id = await(createFile(path, configData, annex, comment))
+      await(setActiveVersion(path, id))
+      id
     }
-
-    val id = await(createFile(path, configData, annex, comment))
-    await(setActive(path, id))
-    id
-  }
 
   private def createFile(path: Path,
                          configData: ConfigData,
                          annex: Boolean = false,
-                         comment: String = ""): Future[ConfigId] = {
+                         comment: String): Future[ConfigId] = {
 
     def createAnnex(): Future[ConfigId] = async {
       val sha1 = await(fileService.post(configData))
@@ -159,7 +154,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  override def setActive(path: Path, id: ConfigId, comment: String): Future[Unit] = async {
+  override def setActiveVersion(path: Path, id: ConfigId, comment: String = ""): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
       throw FileNotFound(path)
     }
@@ -174,13 +169,13 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  override def resetActive(path: Path, comment: String): Future[Unit] = async {
+  override def resetActiveVersion(path: Path, comment: String): Future[Unit] = async {
     if (!await(exists(path))) {
       throw FileNotFound(path)
     }
 
     val currentVersion = await(getCurrentVersion(path))
-    await(setActive(path, currentVersion.get))
+    await(setActiveVersion(path, currentVersion.get))
   }
 
   override def getActive(path: Path): Future[Option[ConfigData]] = {
@@ -197,6 +192,17 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
         case Some(configId) ⇒ await(getActiveById(configId))
       }
     }
+  }
+
+  override def getActiveByTime(path: Path, time: Instant): Future[Option[ConfigData]] = async {
+    val activeVersion = await(getByTime(activeFilePath(path), time))
+    val activeId      = await(activeVersion.get.toStringF)
+    await(getById(path, ConfigId(activeId)))
+  }
+
+  override def getActiveVersion(path: Path): Future[ConfigId] = async {
+    val configData = await(getLatest(activeFilePath(path)))
+    ConfigId(await(configData.get.toStringF))
   }
 
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
@@ -218,7 +224,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
    * @param comment    an optional comment to associate with this file
    * @return a future unique id that can be used to refer to the file
    */
-  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] =
+  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String): Future[ConfigId] =
     async {
       val inputStream = configData.toInputStream
 
@@ -239,7 +245,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  private def hist(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]] = async {
+  private def hist(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     await(svnRepo.hist(path, maxResults))
       .map(e => ConfigFileRevision(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
   }
@@ -249,4 +255,9 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   // File used to store the id of the active version of the file.
   private def activeFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`active-config-suffix`}")
+
+  override def getMetadata: Future[ConfigMetadata] = Future {
+    ConfigMetadata(settings.`repository-dir`, settings.`annex-files-dir`, settings.annexMinFileSizeAsMetaInfo,
+      settings.`max-content-length`)
+  }
 }

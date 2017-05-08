@@ -3,6 +3,7 @@ package csw.services.config.server
 import csw.services.config.server.cli.{ArgsParser, Options}
 import csw.services.config.server.http.HttpService
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import org.tmatesoft.svn.core.SVNException
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
@@ -19,8 +20,17 @@ class Main(clusterSettings: ClusterSettings) {
           svnRepo.initSvnRepo()
         }
 
-        Await.result(httpService.registeredLazyBinding, 5.seconds)
-        httpService
+        try {
+          svnRepo.testConnection()
+          Await.result(httpService.registeredLazyBinding, 5.seconds)
+          httpService
+        } catch {
+          case ex: SVNException ⇒ {
+            Await.result(actorRuntime.shutdown(), 10.seconds)
+            throw new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex)
+          }
+        }
+
     }
 }
 

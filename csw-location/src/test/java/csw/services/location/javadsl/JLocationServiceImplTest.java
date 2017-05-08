@@ -292,7 +292,7 @@ public class JLocationServiceImplTest {
     }
 
     @Test
-    public void testSubscribeConnection() {
+    public void testSubscribeConnection() throws ExecutionException, InterruptedException {
         int Port = 1234;
         TcpConnection redis1Connection = new TcpConnection(new ComponentId("redis1", JComponentType.Service));
         TcpRegistration redis1Registration = new TcpRegistration(redis1Connection, Port);
@@ -307,10 +307,10 @@ public class JLocationServiceImplTest {
             }
         });
 
-        locationService.register(redis1Registration);
+        locationService.register(redis1Registration).toCompletableFuture().get();
         probe.expectMsg(new LocationUpdated(redis1Registration.location(new Networks().hostname())));
 
-        locationService.unregister(redis1Connection);
+        locationService.unregister(redis1Connection).toCompletableFuture().get();
         probe.expectMsg(new LocationRemoved(redis1Registration.connection()));
 
         //shutdown the notification stream, should no longer receive any notifications

@@ -79,7 +79,7 @@ class ConfigClientApiTest extends FunSuite with Matchers with BeforeAndAfterEach
     // check that getActive call before any setActive call should return the file with id with which it was created
     configClientService.getActive(file).await.get.toStringF.await shouldBe configValue1
     // set active version of file to id=2
-    configAdminService.setActive(file, configId, "Setting active version for the first time").await
+    configAdminService.setActiveVersion(file, configId, "Setting active version for the first time").await
     // check that getActive file without ID returns file with id=2
     configClientService.getActive(file).await.get.toStringF.await shouldBe configValue2
   }

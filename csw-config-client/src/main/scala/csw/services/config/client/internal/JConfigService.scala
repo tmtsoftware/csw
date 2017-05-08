@@ -6,9 +6,8 @@ import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.{util, lang ⇒ jl}
 
-import csw.services.config.api.commons.FileType
 import csw.services.config.api.javadsl.IConfigService
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId}
+import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 
 import scala.collection.JavaConverters._
@@ -80,19 +79,27 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
     history(path, maxResults = Int.MaxValue)
 
   override def setActive(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit] =
-    configService.setActive(path, id, comment).toJava.toCompletableFuture
+    configService.setActiveVersion(path, id, comment).toJava.toCompletableFuture
 
   override def setActive(path: Path, id: ConfigId): CompletableFuture[Unit] =
     setActive(path, id, "")
 
   override def resetActive(path: Path, comment: String): CompletableFuture[Unit] =
-    configService.resetActive(path, comment).toJava.toCompletableFuture
+    configService.resetActiveVersion(path, comment).toJava.toCompletableFuture
 
   override def resetActive(path: Path): CompletableFuture[Unit] =
     resetActive(path, "")
 
   override def getActive(path: Path): CompletableFuture[Optional[ConfigData]] =
     configService.getActive(path).map(_.asJava).toJava.toCompletableFuture
+
+  override def getActiveVersion(path: Path): CompletableFuture[ConfigId] =
+    configService.getActiveVersion(path).toJava.toCompletableFuture
+
+  override def getActiveByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]] =
+    configService.getActiveByTime(path, time).map(_.asJava).toJava.toCompletableFuture
+
+  override def getMetadata: CompletableFuture[ConfigMetadata] = configService.getMetadata.toJava.toCompletableFuture
 
   override def asScala: ConfigService = configService
 }

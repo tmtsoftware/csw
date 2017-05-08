@@ -115,7 +115,7 @@ public class JLocationServiceNonBlockingDemoExample {
     }
 
     @Test
-    public void tracking2() throws ExecutionException, InterruptedException {
+    public void tracking() throws ExecutionException, InterruptedException {
         //#tracking
         Pair<KillSwitch, CompletionStage<Done>> stream = locationService.track(tcpConnection).toMat(Sink.foreach(System.out::println), Keep.both()).run(mat);
 
@@ -193,7 +193,7 @@ public class JLocationServiceNonBlockingDemoExample {
     }
 
     @Test
-    public void subscribing(){
+    public void subscribing() throws ExecutionException, InterruptedException {
         //#subscribing
         //Test probe actor to receive the TrackingEvent notifications
         TestProbe probe = new TestProbe(actorSystem);
@@ -205,10 +205,10 @@ public class JLocationServiceNonBlockingDemoExample {
             }
         });
 
-        locationService.register(tcpRegistration);
+        locationService.register(tcpRegistration).toCompletableFuture().get();
         probe.expectMsg(new LocationUpdated(tcpRegistration.location(new Networks().hostname())));
 
-        locationService.unregister(tcpConnection);
+        locationService.unregister(tcpConnection).toCompletableFuture().get();
         probe.expectMsg(new LocationRemoved(tcpRegistration.connection()));
 
         //shutdown the notification stream, should no longer receive any notifications

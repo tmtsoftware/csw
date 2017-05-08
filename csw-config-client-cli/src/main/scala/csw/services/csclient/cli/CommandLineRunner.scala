@@ -1,7 +1,8 @@
 package csw.services.csclient.cli
 
-import csw.services.config.api.commons.FileType
-import csw.services.config.api.models.{ConfigData, ConfigId}
+import java.nio.file.Path
+
+import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 
@@ -12,95 +13,124 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
 
   import actorRuntime._
 
-  def run(options: Options): Unit = {
+  //adminApi
+  def create(options: Options): ConfigId = {
+    val configData = ConfigData.fromPath(options.inputFilePath.get)
+    val configId =
+      await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex, options.comment))
+    println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
+    configId
+  }
 
-    def create(): Unit = {
-      val configData = ConfigData.fromPath(options.inputFilePath.get)
-      val configId =
-        await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex, options.comment))
-      println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
+  def update(options: Options): ConfigId = {
+    val configData = ConfigData.fromPath(options.inputFilePath.get)
+    val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment))
+    println(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
+    configId
+  }
+
+  def get(options: Options): Option[Path] = {
+    val configDataOpt = (options.date, options.id) match {
+      case (Some(date), _) ⇒ await(configService.getByTime(options.relativeRepoPath.get, date))
+      case (_, Some(id))   ⇒ await(configService.getById(options.relativeRepoPath.get, ConfigId(id)))
+      case (_, _)          ⇒ await(configService.getLatest(options.relativeRepoPath.get))
     }
 
-    def update(): Unit = {
-      val configData = ConfigData.fromPath(options.inputFilePath.get)
-      val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment))
-      println(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
+    configDataOpt match {
+      case Some(configData) ⇒
+        val outputFile = await(configData.toPath(options.outputFilePath.get))
+        println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
+        Some(outputFile.toAbsolutePath)
+      case None ⇒ None
+    }
+  }
+
+  def delete(options: Options): Unit = {
+    await(configService.delete(options.relativeRepoPath.get))
+    println(s"File ${options.relativeRepoPath.get} deletion is completed.")
+  }
+
+  def list(options: Options): List[ConfigFileInfo] =
+    (options.annex, options.normal) match {
+      case (true, true) ⇒
+        println("Please provide either normal or annex. See --help to know more.")
+        List.empty[ConfigFileInfo]
+      case (true, _) ⇒
+        val fileEntries = await(configService.list(Some(FileType.Annex), options.pattern))
+        fileEntries.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+        fileEntries
+      case (_, true) ⇒
+        val fileEntries = await(configService.list(Some(FileType.Normal), options.pattern))
+        fileEntries.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+        fileEntries
+      case (_, _) ⇒
+        val fileEntries = await(configService.list(pattern = options.pattern))
+        fileEntries.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+        fileEntries
     }
 
-    def get(): Unit = {
-      val configDataOpt = (options.date, options.id, options.latest) match {
-        case (Some(date), _, _) ⇒ await(configService.getByTime(options.relativeRepoPath.get, date))
-        case (_, Some(id), _)   ⇒ await(configService.getById(options.relativeRepoPath.get, ConfigId(id)))
-        case (_, _, true)       ⇒ await(configService.getLatest(options.relativeRepoPath.get))
-        case (_, _, _)          ⇒ await(configService.getActive(options.relativeRepoPath.get))
-      }
+  def history(options: Options): List[ConfigFileRevision] = {
+    val histList = await(configService.history(options.relativeRepoPath.get, options.maxFileVersions))
+    histList.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    histList
+  }
 
-      configDataOpt match {
-        case Some(configData) ⇒
-          val outputFile = await(configData.toPath(options.outputFilePath.get))
-          println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
-        case None ⇒
-      }
+  def setActiveVersion(options: Options): Unit = {
+    val maybeConfigId = options.id.map(id ⇒ ConfigId(id))
+    await(configService.setActiveVersion(options.relativeRepoPath.get, maybeConfigId.get, options.comment))
+    println(s"${options.relativeRepoPath.get} file with id:${maybeConfigId.get.id} is set as active")
+  }
+
+  def resetActiveVersion(options: Options): Unit = {
+    await(configService.resetActiveVersion(options.relativeRepoPath.get, options.comment))
+    println(s"${options.relativeRepoPath.get} file is reset to active")
+  }
+
+  def getActiveVersion(options: Options): ConfigId = {
+    val configId = await(configService.getActiveVersion(options.relativeRepoPath.get))
+    println(s"${configId.id} is the active version of the file.")
+    configId
+  }
+
+  def getActiveByTime(options: Options): Option[Path] = {
+    val configDataOpt = await(configService.getActiveByTime(options.relativeRepoPath.get, options.date.get))
+
+    configDataOpt match {
+      case Some(configData) ⇒
+        val outputFile = await(configData.toPath(options.outputFilePath.get))
+        println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
+        Some(outputFile.toAbsolutePath)
+      case None ⇒ None
     }
 
-    def exists(): Unit = {
-      val exists = await(configService.exists(options.relativeRepoPath.get))
-      println(s"File ${options.relativeRepoPath.get} exists in the repo? : $exists")
-    }
+  }
 
-    def delete(): Unit = {
-      await(configService.delete(options.relativeRepoPath.get))
-      println(s"File ${options.relativeRepoPath.get} deletion is completed.")
-    }
+  def getMetadata(options: Options): ConfigMetadata = {
+    val metaData = await(configService.getMetadata)
+    println(metaData)
+    metaData
+  }
 
-    def list(): Unit = {
-      val normal = options.normal
-      val annex  = options.annex
-      (annex, normal) match {
-        case (true, true) ⇒ println("Please provide either normal or annex. See --help to know more.")
-        case (true, _) ⇒
-          val fileInfoes = await(configService.list(Some(FileType.Annex), options.pattern))
-          fileInfoes.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
-        case (_, true) ⇒
-          val fileInfoes = await(configService.list(Some(FileType.Normal), options.pattern))
-          fileInfoes.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
-        case (_, _) ⇒
-          val fileInfoes = await(configService.list(pattern = options.pattern))
-          fileInfoes.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
-      }
-    }
+  //clientApi
+  def exists(options: Options): Boolean = {
+    val exists = await(configService.exists(options.relativeRepoPath.get))
+    println(s"File ${options.relativeRepoPath.get} exists in the repo? : $exists")
+    exists
+  }
 
-    def history(): Unit = {
-      val histList = await(configService.history(options.relativeRepoPath.get, options.maxFileVersions))
-      histList.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
-    }
+  def getActive(options: Options): Option[Path] = {
+    val configDataOpt = await(configService.getActive(options.relativeRepoPath.get))
 
-    def setActive(): Unit = {
-      val maybeConfigId = options.id.map(id ⇒ ConfigId(id))
-      await(configService.setActive(options.relativeRepoPath.get, maybeConfigId.get, options.comment))
-      println(s"${options.relativeRepoPath.get} file with id:${maybeConfigId.get.id} is set as default")
-    }
-
-    def resetActive(): Unit = {
-      await(configService.resetActive(options.relativeRepoPath.get, options.comment))
-      println(s"${options.relativeRepoPath.get} file is reset to default")
-    }
-
-    options.op match {
-      case "create"      ⇒ create()
-      case "update"      ⇒ update()
-      case "get"         ⇒ get()
-      case "exists"      ⇒ exists()
-      case "delete"      ⇒ delete()
-      case "list"        ⇒ list()
-      case "history"     ⇒ history()
-      case "setActive"   ⇒ setActive()
-      case "resetActive" ⇒ resetActive()
-      case x             ⇒ throw new RuntimeException(s"Unknown operation: $x")
+    configDataOpt match {
+      case Some(configData) ⇒
+        val outputFile = await(configData.toPath(options.outputFilePath.get))
+        println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
+        Some(outputFile.toAbsolutePath)
+      case None ⇒ None
     }
   }
 
   //command line app is by nature blocking.
   //Do not use such method in library/server side code
-  private def await[T](future: Future[T]): T = Await.result(future, Duration.Inf)
+  def await[T](future: Future[T]): T = Await.result(future, Duration.Inf)
 }

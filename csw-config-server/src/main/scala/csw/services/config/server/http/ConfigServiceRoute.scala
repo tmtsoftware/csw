@@ -15,13 +15,12 @@ class ConfigServiceRoute(
   import actorRuntime._
 
   def route: Route = handleExceptions(configExceptionHandler.exceptionHandler) {
-    path("config" / FilePath) { filePath ⇒
+    prefix("config") { filePath ⇒
       (get & rejectEmptyResponse) {
-        (dateParam & idParam & latestParam) {
-          case (Some(date), _, _) ⇒ complete(configService.getByTime(filePath, date))
-          case (_, Some(id), _)   ⇒ complete(configService.getById(filePath, id))
-          case (_, _, true)       ⇒ complete(configService.getLatest(filePath))
-          case (_, _, _)          ⇒ complete(configService.getActive(filePath))
+        (dateParam & idParam) {
+          case (Some(date), _) ⇒ complete(configService.getByTime(filePath, date))
+          case (_, Some(id))   ⇒ complete(configService.getById(filePath, id))
+          case (_, _)          ⇒ complete(configService.getLatest(filePath))
         }
       } ~
       head {
@@ -49,20 +48,25 @@ class ConfigServiceRoute(
         }
       }
     } ~
-    path("default" / FilePath) { filePath ⇒
+    (prefix("active-config") & get & rejectEmptyResponse) { filePath ⇒
+      dateParam {
+        case Some(date) ⇒ complete(configService.getActiveByTime(filePath, date))
+        case _          ⇒ complete(configService.getActive(filePath))
+      }
+    } ~
+    prefix("active-version") { filePath ⇒
       put {
         (idParam & commentParam) {
           case (Some(configId), comment) ⇒
-            complete(configService.setActive(filePath, configId, comment).map(_ ⇒ Done))
-          case (_, comment) ⇒ complete(configService.resetActive(filePath, comment).map(_ ⇒ Done))
+            complete(configService.setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))
+          case (_, comment) ⇒ complete(configService.resetActiveVersion(filePath, comment).map(_ ⇒ Done))
         }
       } ~
       (get & rejectEmptyResponse) {
-        println(s"------------------------getting default version of $filePath -----------------------")
-        complete(configService.getActive(filePath))
+        complete(configService.getActiveVersion(filePath))
       }
     } ~
-    (path("history" / FilePath) & get) { filePath ⇒
+    (prefix("history") & get) { filePath ⇒
       maxResultsParam { maxCount ⇒
         complete(configService.history(filePath, maxCount))
       }
@@ -71,6 +75,9 @@ class ConfigServiceRoute(
       (typeParam & patternParam) { (fileType, pattern) ⇒
         complete(configService.list(fileType, pattern))
       }
+    } ~
+    (path("metadata") & get) {
+      complete(configService.getMetadata)
     }
   }
 }

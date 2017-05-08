@@ -1,6 +1,6 @@
 package csw.services.config.api.models
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.Files
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
@@ -19,6 +19,7 @@ class ConfigDataTest extends TestKit(ActorSystem("test-system")) with FunSuiteLi
       |Then create a source from ByteString
       |""".stripMargin
 
+  //DEOPSCSW-73: Retrieve a configuration file to memory
   test("should able to retrieve string from Config Data source") {
     ConfigData.fromString(expectedStringConfigData).toStringF.await shouldEqual expectedStringConfigData
   }
