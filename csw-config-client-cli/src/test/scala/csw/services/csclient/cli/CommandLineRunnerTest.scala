@@ -1,8 +1,8 @@
 package csw.services.csclient.cli
 
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Paths}
 
-import csw.services.config.api.models.{ConfigFileInfo, ConfigId}
+import csw.services.config.api.models.ConfigId
 import csw.services.config.server.ServerWiring
 import csw.services.csclient.commons.TestFutureExtension.RichFuture
 import csw.services.csclient.commons.{ArgsUtil, TestFileUtils}
