@@ -34,7 +34,7 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
 
       enterBarrier("location-removed")
       val freshLocationService = LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
-      freshLocationService.register(AkkaRegistration(akkaConnection, newSystem.actorOf(Props.empty)))
+      freshLocationService.register(AkkaRegistration(akkaConnection, newSystem.actorOf(Props.empty))).await
 
       enterBarrier("member-re-registered")
     }
