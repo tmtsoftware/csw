@@ -4,7 +4,7 @@ A command line application that facilitates interaction with config service. It 
 
 ## Commands
 
-Note: Exactly one command must be specified from the list - `{create | update | get | exists | delete | list | history | setDefault | resetDefault | getDefault}`
+Note: Exactly one command must be specified from the list - `{create | update | get | exists | delete | list | history | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | getActive}`
 
 ### create
 creates the input file in the repository at a specified path
@@ -53,14 +53,14 @@ shows versioning history of the file in the repository
  * 'relativeRepoPath' is path in the repository
  * `--max` optional parameter. maximum no of files to be retrieved
  
-### setDefault
-sets default version of the file in the repository
+### setActiveVersion
+sets active version of the file in the repository
 
  * 'relativeRepoPath' is path in the repository
- * `--id` optional parameter. version id of file to be set as default.
+ * `--id` optional parameter. version id of file to be set as active.
  
-### resetDefault
-resets the default to the latest version of the file in the repository
+### resetActiveVersion
+resets the active to the latest version of the file in the repository
 
  * 'relativeRepoPath' is path in the repository
 

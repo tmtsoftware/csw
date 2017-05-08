@@ -55,7 +55,7 @@ trait HttpSupport extends Directives with JsonSupport {
       reject(UnsupportedRequestEncodingRejection(HttpEncoding("All encodings with contentLength value")))
   }
 
-  //This marshaller is used to create a response stream for get/getDefault requests
+  //This marshaller is used to create a response stream for get/getActive requests
   implicit val configDataMarshaller: ToEntityMarshaller[ConfigData] = Marshaller.opaque { configData =>
     HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
   }
