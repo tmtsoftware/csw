@@ -38,14 +38,12 @@ class ConfigAdminApiTest extends ConfigServiceTest {
   }
 
   // DEOPSCSW-47: Unique name for configuration file
-  test("should allow to create files with valid path and throw error for invalid path") {
-    val filePath = Paths.get("/invalid path!/sample@.txt")
+  // DEOPSCSW-135: Validation of suffix for active and sha files
+  test("should throw exception for invalid path") {
+    val filePath = Paths.get("/test/sample.$active")
 
     intercept[InvalidInput] {
-      configService
-        .create(filePath, ConfigData.fromString("testing invalid file path"), annex = false,
-          "testing invalid file path")
-        .await
+      configService.create(filePath, ConfigData.fromString(configValue1), annex = false, "invalid path").await
     }
   }
 
