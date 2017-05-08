@@ -21,21 +21,22 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   import actorRuntime._
 
-  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
-    // If the file already exists in the repo, throw exception
-    if (await(exists(path))) {
-      throw FileAlreadyExists(path)
-    }
+  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String = ""): Future[ConfigId] =
+    async {
+      // If the file already exists in the repo, throw exception
+      if (await(exists(path))) {
+        throw FileAlreadyExists(path)
+      }
 
-    val id = await(createFile(path, configData, annex, comment))
-    await(setActiveVersion(path, id))
-    id
-  }
+      val id = await(createFile(path, configData, annex, comment))
+      await(setActiveVersion(path, id))
+      id
+    }
 
   private def createFile(path: Path,
                          configData: ConfigData,
                          annex: Boolean = false,
-                         comment: String = ""): Future[ConfigId] = {
+                         comment: String): Future[ConfigId] = {
 
     def createAnnex(): Future[ConfigId] = async {
       val sha1 = await(fileService.post(configData))
@@ -153,7 +154,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  override def setActiveVersion(path: Path, id: ConfigId, comment: String): Future[Unit] = async {
+  override def setActiveVersion(path: Path, id: ConfigId, comment: String = ""): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
       throw FileNotFound(path)
     }
@@ -223,7 +224,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
    * @param comment    an optional comment to associate with this file
    * @return a future unique id that can be used to refer to the file
    */
-  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String = ""): Future[ConfigId] =
+  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String): Future[ConfigId] =
     async {
       val inputStream = configData.toInputStream
 
