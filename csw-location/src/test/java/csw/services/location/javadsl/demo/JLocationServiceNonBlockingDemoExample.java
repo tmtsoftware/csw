@@ -115,7 +115,7 @@ public class JLocationServiceNonBlockingDemoExample {
     }
 
     @Test
-    public void tracking2() throws ExecutionException, InterruptedException {
+    public void tracking() throws ExecutionException, InterruptedException {
         //#tracking
         Pair<KillSwitch, CompletionStage<Done>> stream = locationService.track(tcpConnection).toMat(Sink.foreach(System.out::println), Keep.both()).run(mat);
 
