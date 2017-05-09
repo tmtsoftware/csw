@@ -9,7 +9,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-config-server`,
   `csw-location`,
   `csw-location-agent`,
-  `integration`
+  `integration`,
+  `examples`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
@@ -18,7 +19,8 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-config-api`,
   `csw-config-server`,
   `csw-config-client-cli`,
-  `integration`
+  `integration`,
+  `examples`
 )
 
 //Root project

@@ -11,10 +11,7 @@ import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, Loca
 import scala.concurrent.Await
 
 /**
-  * A location service test client application that attempts to resolve one or more
-  * akka services.
-  * If a command line arg is given, it should be the number of services to resolve (default: 1).
-  * The client and service applications can be run on the same or different hosts.
+  * An example location service client application.
   */
 object LocationServiceExampleClientApp extends App {
   //#create-location-service
@@ -24,6 +21,8 @@ object LocationServiceExampleClientApp extends App {
   //#create-actor-system
   implicit val system = ActorSystemFactory.remote("csw-examples-locationServiceClient")
   //#create-actor-system
+
+  implicit val mat = ActorMaterializer()
 
   // create an actor ref to use for a dummy HCD registration
   private val dummyActorRef = system.actorOf(Props(new Actor {
