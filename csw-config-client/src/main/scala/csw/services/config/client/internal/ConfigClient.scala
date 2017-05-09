@@ -159,7 +159,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     await(get(await(activeConfig(path)).withQuery(Query("date" → time.toString))))
   }
 
-  override def getActiveVersion(path: jnio.Path): Future[ConfigId] = async {
+  override def getActiveVersion(path: jnio.Path): Future[Option[ConfigId]] = async {
     val uri = await(activeConfigVersion(path))
 
     val request = HttpRequest(uri = uri)
@@ -168,7 +168,8 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigId]
+        case StatusCodes.OK       ⇒ Unmarshal(response).to[ConfigId].map(Some(_))
+        case StatusCodes.NotFound ⇒ Future.successful(None)
       }
     )
   }

@@ -88,10 +88,14 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     logger.info(s"${options.relativeRepoPath.get} file is reset to active")
   }
 
-  def getActiveVersion(options: Options): ConfigId = {
-    val configId = await(configService.getActiveVersion(options.relativeRepoPath.get))
-    logger.info(s"${configId.id} is the active version of the file.")
-    configId
+  def getActiveVersion(options: Options): Option[ConfigId] = {
+    val id = await(configService.getActiveVersion(options.relativeRepoPath.get))
+    id match {
+      case Some(configId) ⇒
+        logger.info(s"$configId is the active version of the file.")
+        id
+      case None ⇒ None
+    }
   }
 
   def getActiveByTime(options: Options): Option[Path] = {

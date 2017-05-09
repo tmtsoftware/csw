@@ -214,9 +214,12 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     await(getById(path, ConfigId(activeId)))
   }
 
-  override def getActiveVersion(path: Path): Future[ConfigId] = async {
+  override def getActiveVersion(path: Path): Future[Option[ConfigId]] = async {
     val configData = await(getLatest(activeFilePath(path)))
-    ConfigId(await(configData.get.toStringF))
+    if (configData.isDefined)
+      Some(ConfigId(await(configData.get.toStringF)))
+    else
+      None
   }
 
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {

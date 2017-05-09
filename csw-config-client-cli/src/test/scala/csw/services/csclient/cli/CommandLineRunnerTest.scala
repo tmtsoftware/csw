@@ -143,7 +143,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
 
     //  get active version of file and store it at location: /tmp/output.txt
     val parsedGetActiveArgs: Option[Options] = ArgsParser.parse(getMinimalArgs)
-    commandLineRunner.getActiveVersion(parsedGetActiveArgs.get) shouldBe ConfigId(parsedSetActiveArgs.get.id.get)
+    commandLineRunner.getActiveVersion(parsedGetActiveArgs.get).get shouldBe ConfigId(parsedSetActiveArgs.get.id.get)
     commandLineRunner.getActive(parsedGetActiveArgs.get) shouldBe Some(Paths.get(outputFilePath))
 
     //  read locally saved output file (/tmp/output.conf) from disk and
@@ -153,7 +153,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     commandLineRunner.resetActiveVersion(ArgsParser.parse(resetActiveAllArgs).get)
 
     //  get active version of file and store it at location: /tmp/output.txt
-    commandLineRunner.getActiveVersion(parsedGetActiveArgs.get) shouldBe updateConfigId
+    commandLineRunner.getActiveVersion(parsedGetActiveArgs.get).get shouldBe updateConfigId
     commandLineRunner.getActive(parsedGetActiveArgs.get) shouldBe Some(Paths.get(outputFilePath))
 
     //  read locally saved output file (/tmp/output.conf) from disk and
