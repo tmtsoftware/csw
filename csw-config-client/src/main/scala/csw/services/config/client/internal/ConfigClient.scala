@@ -132,7 +132,10 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
     }
 
-  override def history(path: jnio.Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
+  override def history(path: jnio.Path,
+                       from: Instant,
+                       to: Instant,
+                       maxResults: Int): Future[List[ConfigFileRevision]] = async {
     val uri = await(historyUri(path)).withQuery(Query("maxResults" → maxResults.toString))
 
     val request = HttpRequest(uri = uri)
@@ -214,7 +217,6 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
         case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigMetadata]
       }
     )
-
   }
 
   private def handleResponse[T](response: HttpResponse)(pf: PartialFunction[StatusCode, Future[T]]): Future[T] = {

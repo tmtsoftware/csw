@@ -2,6 +2,7 @@ package csw.services.config.server.svn
 
 import java.io.{InputStream, OutputStream}
 import java.nio.file.Path
+import java.time.Instant
 import java.util.regex.Pattern
 
 import akka.dispatch.MessageDispatcher
@@ -155,13 +156,19 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
     }
   }
 
-  def hist(path: Path, maxResults: Int): Future[List[SVNLogEntry]] =
+  def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] =
     Future {
       val clientManager = SVNClientManager.newInstance()
       var logEntries    = List[SVNLogEntry]()
       try {
-        val logClient                    = clientManager.getLogClient
-        val handler: ISVNLogEntryHandler = logEntry => logEntries = logEntry :: logEntries
+        val logClient = clientManager.getLogClient
+        val handler: ISVNLogEntryHandler = logEntry =>
+          logEntries = {
+            if (logEntry.getDate.toInstant.isAfter(from) && logEntry.getDate.toInstant.isBefore(to))
+              logEntry :: logEntries
+            else
+              logEntries
+        }
         logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
           handler)
         logEntries.sortWith(_.getRevision > _.getRevision)

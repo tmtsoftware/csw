@@ -23,6 +23,8 @@ case class Options(
     outputFilePath: Option[Path] = None,
     id: Option[String] = None,
     date: Option[Instant] = None,
+    fromDate: Instant = Instant.MIN,
+    toDate: Instant = Instant.MAX,
     maxFileVersions: Int = Int.MaxValue,
     annex: Boolean = false,
     comment: String = "",

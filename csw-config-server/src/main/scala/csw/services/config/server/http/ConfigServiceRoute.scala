@@ -67,8 +67,8 @@ class ConfigServiceRoute(
       }
     } ~
     (prefix("history") & get) { filePath ⇒
-      maxResultsParam { maxCount ⇒
-        complete(configService.history(filePath, maxCount))
+      (maxResultsParam & fromParam & toParam) { (maxCount, from, to) ⇒
+        complete(configService.history(filePath, from, to, maxCount))
       }
     } ~
     (path("list") & get) {

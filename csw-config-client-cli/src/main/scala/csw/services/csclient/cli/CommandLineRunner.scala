@@ -71,7 +71,8 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     }
 
   def history(options: Options): List[ConfigFileRevision] = {
-    val histList = await(configService.history(options.relativeRepoPath.get, options.maxFileVersions))
+    val histList = await(configService.history(options.relativeRepoPath.get, options.fromDate, options.toDate,
+        options.maxFileVersions))
     histList.foreach(h => logger.info(s"${h.id.id}\t${h.time}\t${h.comment}"))
     histList
   }

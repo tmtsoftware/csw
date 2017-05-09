@@ -149,13 +149,24 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       }
     }
 
-  override def history(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
-    await(pathStatus(path)) match {
-      case PathStatus.NormalSize ⇒ await(hist(path, maxResults))
-      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), maxResults))
-      case PathStatus.Missing    ⇒ throw FileNotFound(path)
+  override def history(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
+    async {
+      await(pathStatus(path)) match {
+        case PathStatus.NormalSize ⇒ await(hist(path, from, to, maxResults))
+        case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), from, to, maxResults))
+        case PathStatus.Missing    ⇒ throw FileNotFound(path)
+      }
     }
-  }
+
+//  def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
+//    async {
+//      val configFileRevisions = await(histByRange(activeFilePath(path), from, to, maxResults))
+//
+//      configFileRevisions.map(activeFile ⇒ {
+//        val configData = await(getById(path, activeFile.id))
+//        ConfigFileRevision(ConfigId(await(configData.get.toStringF)), activeFile.comment, activeFile.time)
+//      })
+//    }
 
   override def setActiveVersion(path: Path, id: ConfigId, comment: String = ""): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
@@ -242,14 +253,14 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   // Returns the current version of the file, if known
   private def getCurrentVersion(path: Path): Future[Option[ConfigId]] = async {
     await(pathStatus(path)) match {
-      case PathStatus.NormalSize ⇒ await(hist(path, 1)).headOption.map(_.id)
-      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), 1)).headOption.map(_.id)
+      case PathStatus.NormalSize ⇒ await(hist(path, Instant.MIN, Instant.now, 1)).headOption.map(_.id)
+      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), Instant.MIN, Instant.now, 1)).headOption.map(_.id)
       case PathStatus.Missing    ⇒ None
     }
   }
 
-  private def hist(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
-    await(svnRepo.hist(path, maxResults))
+  private def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] = async {
+    await(svnRepo.hist(path, from, to, maxResults))
       .map(e => ConfigFileRevision(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
   }
 

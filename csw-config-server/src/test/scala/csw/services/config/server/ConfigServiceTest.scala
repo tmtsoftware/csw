@@ -340,7 +340,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configFileHistories.map(_.id) shouldBe List(configId3, configId2, configId1)
     configFileHistories.map(_.comment) shouldBe List(commitMsg3, commitMsg2, commitMsg1)
 
-    val configFileHistories1 = configService.history(file, 2).await
+    val configFileHistories1 = configService.history(file, maxResults = 2).await
     configFileHistories1.size shouldBe 2
     configFileHistories1.map(_.id) shouldBe List(configId3, configId2)
     configFileHistories1.map(_.comment) shouldBe List(commitMsg3, commitMsg2)

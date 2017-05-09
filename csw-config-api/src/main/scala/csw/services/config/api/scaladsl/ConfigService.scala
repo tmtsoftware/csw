@@ -85,7 +85,10 @@ trait ConfigService extends ConfigClientService {
    * @param maxResults the maximum number of history results to return (default: unlimited)
    * @return a list containing one ConfigFileRevision object for each version of path
    */
-  def history(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]]
+  def history(path: Path,
+              from: Instant = Instant.MIN,
+              to: Instant = Instant.MAX,
+              maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]]
 
   /**
    * Sets the "active version" to be the version provided for the file with the given path.
