@@ -25,12 +25,12 @@ overwrites the file specified in the repository by the input file
  * `-c, --comment` optional create comment
  
 ### get
-retrieves a file for a given path, stored in config service, and writes it to the output file. Latest file is fetched if neither date nor id is specified.
+retrieves a file for a given path and saves it to the output file. Latest file is fetched if neither date nor id is specified.
 
  * 'relativeRepoPath' is path in the repository
  * `-o`, `--out` is output file path
- * `--id` optional parameter. version id of the repository file to get.
- * `--date` optional parameter. ex. 2017-04-16T16:15:23.503Z
+ * `--id` optional. if specified this id will be matched
+ * `--date` optional. if specified will get the file matching this date. Format: 2017-04-16T16:15:23.503Z
  
 ### delete
  deletes the file at specified path in the repository
@@ -74,7 +74,7 @@ gets the file that was active at a specified time
 
   * 'relativeRepoPath' is path in the repository
   * `-o`, `--out` is output file path
-  * `--date` optional parameter. ex. 2017-04-16T16:15:23.503Z
+  * `--date` optional. if specified will get the active file matching this date. Format: 2017-04-16T16:15:23.503Z
   
 ### getMetadata
 gets the metadata of config server e.g. repository directory, annex directory, min annex file size, max config file size
