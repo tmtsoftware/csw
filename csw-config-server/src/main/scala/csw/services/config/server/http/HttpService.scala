@@ -4,6 +4,7 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
+import com.typesafe.scalalogging.LazyLogging
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.Connection.HttpConnection
@@ -17,7 +18,8 @@ import scala.util.control.NonFatal
 class HttpService(locationService: LocationService,
                   configServiceRoute: ConfigServiceRoute,
                   settings: Settings,
-                  actorRuntime: ActorRuntime) {
+                  actorRuntime: ActorRuntime)
+    extends LazyLogging {
 
   import actorRuntime._
 
@@ -35,7 +37,7 @@ class HttpService(locationService: LocationService,
       "location-service-shutdown"
     )(() ⇒ locationService.shutdown())
 
-    println(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
+    logger.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     (binding, registrationResult)
   } recoverWith {
     case NonFatal(ex) ⇒ shutdown().map(_ ⇒ throw ex)
@@ -55,7 +57,7 @@ class HttpService(locationService: LocationService,
       port = binding.localAddress.getPort,
       path = ""
     )
-    println("==== Registering Config Service HTTP Server with Location Service ====")
+    logger.info("==== Registering Config Service HTTP Server with Location Service ====")
     locationService.register(registration)
   }
 }

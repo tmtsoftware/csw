@@ -7,6 +7,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import com.typesafe.scalalogging.LazyLogging
 import csw.services.config.api.commons.ConfigStreamExts.RichSource
 import csw.services.config.api.commons.{BinaryUtils, JsonSupport}
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
@@ -18,7 +19,8 @@ import scala.concurrent.Future
 
 class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
     extends ConfigService
-    with JsonSupport {
+    with JsonSupport
+    with LazyLogging {
 
   import actorRuntime._
 
@@ -42,7 +44,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
-      println(request)
+      logger.info(request.toString())
       val response = await(Http().singleRequest(request))
 
       await(
@@ -58,7 +60,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri    = await(configUri(path)).withQuery(Query("comment" → comment))
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
@@ -88,7 +90,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(configUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
 
     val request = HttpRequest(HttpMethods.HEAD, uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
@@ -103,7 +105,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(configUri(path)).withQuery(Query("comment" → comment))
 
     val request = HttpRequest(HttpMethods.DELETE, uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
@@ -119,7 +121,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
         await(listUri).withQuery(Query(fileType.map("type" → _.entryName).toMap ++ pattern.map("pattern" → _).toMap))
 
       val request = HttpRequest(uri = uri)
-      println(request)
+      logger.info(request.toString())
       val response = await(Http().singleRequest(request))
 
       await(
@@ -134,7 +136,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(historyUri(path)).withQuery(Query("maxResults" → maxResults.toString))
 
     val request = HttpRequest(uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
@@ -158,7 +160,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(activeConfigVersion(path))
 
     val request = HttpRequest(uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
@@ -172,7 +174,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(activeConfigVersion(path)).withQuery(query)
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
@@ -184,7 +186,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   private def get(uri: Uri): Future[Option[ConfigData]] = async {
     val request = HttpRequest(uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     val lengthOption = response.entity.contentLengthOption
@@ -204,7 +206,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   override def getMetadata: Future[ConfigMetadata] = async {
     val request = HttpRequest(uri = await(metadataUri))
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(

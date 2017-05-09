@@ -4,6 +4,7 @@ import java.nio.file.{Path, Paths}
 import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
+import com.typesafe.scalalogging.LazyLogging
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models.{FileType, _}
 import csw.services.config.api.scaladsl.ConfigService
@@ -17,7 +18,8 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorRuntime: ActorRuntime, svnRepo: SvnRepo)
-    extends ConfigService {
+    extends ConfigService
+    with LazyLogging {
 
   import actorRuntime._
 
@@ -46,7 +48,8 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     async {
       // If the file does not already exists in the repo, create it
       if (annex || configData.length > settings.`annex-min-file-size`) {
-        //        println(s"Either annex=${annex} is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
+        logger.info(
+            s"Either annex=$annex is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
         await(createAnnex())
       } else {
         await(put(path, configData, update = false, comment))
