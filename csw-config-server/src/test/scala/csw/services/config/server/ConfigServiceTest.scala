@@ -331,9 +331,13 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val commitMsg3 = "commit version: 3"
 
     val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = false, commitMsg1).await
+    val createTS  = Instant.now
 
     val configId2 = configService.update(file, ConfigData.fromString(configValue2), commitMsg2).await
+    val updateTS1 = Instant.now
+
     val configId3 = configService.update(file, ConfigData.fromString(configValue3), commitMsg3).await
+    val updateTS2 = Instant.now
 
     val configFileHistories = configService.history(file).await
     configFileHistories.size shouldBe 3
@@ -344,6 +348,18 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configFileHistories1.size shouldBe 2
     configFileHistories1.map(_.id) shouldBe List(configId3, configId2)
     configFileHistories1.map(_.comment) shouldBe List(commitMsg3, commitMsg2)
+
+    val configFileHistoriesFrom = configService.history(file, from = updateTS1).await
+    configFileHistoriesFrom.size shouldBe 1
+    configFileHistoriesFrom.map(_.id) shouldBe List(configId3)
+
+    val configFileHistoriesTo = configService.history(file, to = updateTS1).await
+    configFileHistoriesTo.size shouldBe 2
+    configFileHistoriesTo.map(_.id) shouldBe List(configId2, configId1)
+
+    val configFileHistoriesFromTo = configService.history(file, createTS, updateTS2).await
+    configFileHistoriesFromTo.size shouldBe 2
+    configFileHistoriesFromTo.map(_.id) shouldBe List(configId3, configId2)
   }
 
   // DEOPSCSW-48: Store new configuration file in Config. service
