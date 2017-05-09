@@ -17,20 +17,18 @@ stop_app() {
 
 start_cluster_seed() {
     sbt csw-cluster-seed/clean
-    sbt csw-cluster-seed/universal:packageBin
-    echo "All" | unzip csw-cluster-seed/target/universal/csw-cluster-seed-0.1-SNAPSHOT.zip -d csw-cluster-seed/target/universal/
+    sbt csw-cluster-seed/universal:stage
 
     printf "${YELLOW}------ Starting Seed node on port $seed_port ------${NC}\n"
-     ./csw-cluster-seed/target/universal/csw-cluster-seed-0.1-SNAPSHOT/bin/csw-cluster-seed --clusterPort $1 -DclusterSeeds=$2 &
+     ./target/universal/stage/bin/csw-cluster-seed --clusterPort $1 -DclusterSeeds=$2 &
 }
 
 start_config_server() {
     sbt csw-config-server/clean
-    sbt csw-config-server/universal:packageBin
-    echo "All" | unzip csw-config-server/target/universal/csw-config-server-0.1-SNAPSHOT.zip -d csw-config-server/target/universal/
+    sbt csw-config-server/universal:stage
 
     printf "${YELLOW}------ Starting config http server on port: $http_port ------${NC}\n"
-    ./csw-config-server/target/universal/csw-config-server-0.1-SNAPSHOT/bin/csw-config-server --port $1 -DclusterSeeds=$2 $3
+    ./target/universal/stage/bin/csw-config-server --port $1 -DclusterSeeds=$2 $3
 }
 
 usage() {

@@ -16,7 +16,7 @@ docker pull twtmt/centos-tmt
 #3. Start first container and run TromboneHcdApp which acts as a seed
 # cmd line param : -DclusterPort=3552 => This will start app on port 3552 and create a cluster with a single node
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
-docker run -d --name=HCD $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/trombone-h-c-d -DclusterPort=3552'
+docker run -d --name=HCD $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./target/universal/stage/bin/trombone-h-c-d -DclusterPort=3552'
 
 #4. Store the ip address and port of first container (HCD App) into variable clusterSeeds
 clusterSeeds="$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD):3552"
@@ -27,7 +27,7 @@ sleep 5
 # cmd line param :-DclusterSeeds=$clusterSeeds (Ip:Port combination of seed - refer #4)
 # with clusterSeeds parameters, this container will join the cluster created at step #3
 printf "${YELLOW}----------- Starting Reddis App -----------${NC}\n"
-docker run -d --name=Reddis --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-service -DclusterSeeds=$clusterSeeds'
+docker run -d --name=Reddis --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./target/universal/stage/bin/test-service -DclusterSeeds=$clusterSeeds'
 
 sleep 5
 
@@ -35,7 +35,7 @@ sleep 5
 # cmd line param :-DclusterSeeds=$clusterSeeds (Ip:Port combination of seed - refer #4)
 # with clusterSeeds parameters, this container will join the cluster created at step #3
 printf "${YELLOW}------ Starting Test App ------${NC}\n"
-docker run --name=Test-App --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./integration/target/universal/integration-0.1-SNAPSHOT/bin/test-app -DclusterSeeds=$clusterSeeds'
+docker run --name=Test-App --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./target/universal/stage/bin/test-app -DclusterSeeds=$clusterSeeds'
 test_exit_code=$?
 
 printf "${PURPLE}---------- Stopping and Removing all docker containers ---------- ${NC}"

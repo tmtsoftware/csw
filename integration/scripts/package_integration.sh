@@ -6,5 +6,4 @@ if [[ "$unamestr" == 'Linux' ]]; then
 fi
 
 sbt -DenableCoverage=false integration/clean
-sbt -DenableCoverage=false integration/universal:packageBin
-echo "All" | unzip integration/target/universal/integration-0.1-SNAPSHOT.zip -d integration/target/universal/
+sbt -DenableCoverage=false integration/universal:stage
