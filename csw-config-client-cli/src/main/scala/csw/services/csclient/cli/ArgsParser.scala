@@ -50,7 +50,7 @@ object ArgsParser {
     //get operation
     cmd("get") action { (_, c) =>
       c.copy(op = "get")
-    } text "retrieves file with a given path from config service, and writes it to the output file" children (
+    } text "retrieves a file for a given path, stored in config service, and writes it to the output file. Latest file is fetched if neither date nor id is specified." children (
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path of the file in the repository",
@@ -71,7 +71,10 @@ object ArgsParser {
     } text "deletes the file at specified path in the repository" children (
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
-      } text "file path in the repository"
+      } text "file path in the repository",
+      opt[String]('c', "comment") action { (x, c) =>
+        c.copy(comment = x)
+      } text "optional delete comment"
     )
 
     //list operation
@@ -119,13 +122,13 @@ object ArgsParser {
     //resetActiveVersion operation
     cmd("resetActiveVersion") action { (_, c) =>
       c.copy(op = "resetActiveVersion")
-    } text "resets the active to the latest version of the file in the repository" children (
+    } text "resets the active version to the latest version for the specified file" children (
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
       opt[String]('c', "comment") action { (x, c) =>
         c.copy(comment = x)
-      } text "optional create comment"
+      } text "optional reset comment"
     )
 
     //getActiveVersion operation
@@ -155,7 +158,7 @@ object ArgsParser {
     //getMetadata operation
     cmd("getMetadata") action { (_, c) =>
       c.copy(op = "getMetadata")
-    } text "gets the metadata of config server"
+    } text "gets the metadata of config server e.g. repository directory, annex directory, min annex file size, max config file size"
 
     //exists operation
     cmd("exists") action { (_, c) =>
