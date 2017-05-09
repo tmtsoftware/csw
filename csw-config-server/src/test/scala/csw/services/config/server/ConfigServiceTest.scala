@@ -709,29 +709,6 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   }
 
-  //DEOPSCSW-132 List oversize and normal sized files
-  test("should list files based on file type") {
-    val tromboneConfig        = Paths.get("a/c/trombone.conf")
-    val hcdConfig             = Paths.get("a/b/c/hcd/hcd.conf")
-    val assemblyBinaryConfig1 = Paths.get("a/b/assembly/assembly1.fits")
-    val assemblyBinaryConfig2 = Paths.get("a/b/c/assembly/assembly2.fits")
-
-    configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
-    configService
-      .create(assemblyBinaryConfig1, ConfigData.fromString(configValue2), annex = true, "hello assembly1")
-      .await
-    configService
-      .create(assemblyBinaryConfig2, ConfigData.fromString(configValue2), annex = true, "hello assembly2")
-      .await
-    configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
-
-    val fileInfoes1 = configService.list(Some(FileType.Annex)).await
-    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyBinaryConfig1, assemblyBinaryConfig2)
-
-    val fileInfoes2 = configService.list(Some(FileType.Normal)).await
-    fileInfoes2.map(_.path).toSet shouldBe Set(tromboneConfig, hcdConfig)
-  }
-
   //DEOPSCSW-75 List the names of configuration files that match a path
   test("should give empty list if pattern does not match any file") {
     val tromboneConfig = Paths.get("a/c/trombone.conf")
@@ -772,41 +749,45 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   //DEOPSCSW-132 List oversize and normal sized files
   //DEOPSCSW-75 List the names of configuration files that match a path
   test("should filter list based on the type and pattern") {
-    val tromboneConfig        = Paths.get("a/c/trombone.conf")
-    val hcdConfig             = Paths.get("a/b/c/hcd/hcd.conf")
-    val assemblyBinaryConfig1 = Paths.get("a/b/assembly/assembly1.fits")
-    val assemblyBinaryConfig2 = Paths.get("a/b/c/assembly/assembly2.fits")
+    val tromboneConfig   = Paths.get("a/c/trombone.conf")
+    val hcdConfig        = Paths.get("a/b/c/hcd/hcd.conf")
+    val assemblyBinConf1 = Paths.get("a/b/assembly/assembly1.fits")
+    val assemblyBinConf2 = Paths.get("a/b/c/assembly/assembly2.fits")
 
     configService.create(tromboneConfig, ConfigData.fromString(configValue1), annex = false, "hello trombone").await
-    configService
-      .create(assemblyBinaryConfig1, ConfigData.fromString(configValue2), annex = true, "hello assembly1")
-      .await
-    configService
-      .create(assemblyBinaryConfig2, ConfigData.fromString(configValue2), annex = true, "hello assembly2")
-      .await
+    configService.create(assemblyBinConf1, ConfigData.fromString(configValue2), annex = true, "hello assembly1").await
+    configService.create(assemblyBinConf2, ConfigData.fromString(configValue2), annex = true, "hello assembly2").await
     configService.create(hcdConfig, ConfigData.fromString(configValue3), annex = false, "hello hcd").await
 
+    // list all annex files
     val fileInfoes1 = configService.list(Some(FileType.Annex)).await
-    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyBinaryConfig1, assemblyBinaryConfig2)
+    fileInfoes1.map(_.path).toSet shouldBe Set(assemblyBinConf1, assemblyBinConf2)
 
+    // list all normal files
     val fileInfoes2 = configService.list(Some(FileType.Normal)).await
     fileInfoes2.map(_.path).toSet shouldBe Set(tromboneConfig, hcdConfig)
 
-    val fileInfoes3 = configService.list(Some(FileType.Annex), Some("a/b/c.*")).await
-    fileInfoes3.map(_.path).toSet shouldBe Set(assemblyBinaryConfig2)
+    // list all annex files located at path : a/b/c/
+    val fileInfoes3 = configService.list(Some(FileType.Annex), Some("a/b/c/.*")).await
+    fileInfoes3.map(_.path).toSet shouldBe Set(assemblyBinConf2)
 
+    // list all annex files with extension : .fits
     val fileInfoes4 = configService.list(Some(FileType.Annex), Some(".*.fits")).await
-    fileInfoes4.map(_.path).toSet shouldBe Set(assemblyBinaryConfig1, assemblyBinaryConfig2)
+    fileInfoes4.map(_.path).toSet shouldBe Set(assemblyBinConf1, assemblyBinConf2)
 
+    // list all annex files which contains assembly substring
     val fileInfoes5 = configService.list(Some(FileType.Annex), Some(".*assembly.*")).await
-    fileInfoes5.map(_.path).toSet shouldBe Set(assemblyBinaryConfig1, assemblyBinaryConfig2)
+    fileInfoes5.map(_.path).toSet shouldBe Set(assemblyBinConf1, assemblyBinConf2)
 
-    val fileInfoes6 = configService.list(Some(FileType.Normal), Some("a/b/c.*")).await
+    // list all normal files located at path : a/b/c/
+    val fileInfoes6 = configService.list(Some(FileType.Normal), Some("a/b/c/.*")).await
     fileInfoes6.map(_.path).toSet shouldBe Set(hcdConfig)
 
+    // list all normal files with extension : .conf
     val fileInfoes7 = configService.list(Some(FileType.Normal), Some(".*.conf")).await
     fileInfoes7.map(_.path).toSet shouldBe Set(tromboneConfig, hcdConfig)
 
+    // list all normal files which contains hcd substring
     val fileInfoes8 = configService.list(Some(FileType.Normal), Some(".*hcd.*")).await
     fileInfoes8.map(_.path).toSet shouldBe Set(hcdConfig)
   }
