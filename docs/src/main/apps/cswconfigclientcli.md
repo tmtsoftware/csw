@@ -137,3 +137,10 @@ Prints the version of the application.
 
 **Example:** csw-config-client-cli "getActiveVersion" "/path/hcd/trombone.conf"    
 **Explanation:** Gets active version ID for repository file "/path/hcd/trombone.conf".
+
+**Example:** csw-config-client-cli "getActiveByTime" "/path/hcd/trombone.conf" -o "/usr/tmp/last_week_trombone.conf" --date "2017-05-09T07:29:53.242Z"
+**Explanation:** Gets version of repository file "/path/hcd/trombone.conf", that was active on "2017-05-09T07:29:53.242Z" and saves it on local disk.
+
+**Example:** csw-config-client-cli "getMetadata"
+**Explanation:** Prins the metadata on screen.
+
