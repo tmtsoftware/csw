@@ -453,33 +453,36 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-77: Set default version of configuration file in config service
   // DEOPSCSW-78: Get the default version of a configuration file
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
+  // DEOPSCSW-79: Reset the default version of a configuration file
   test("should able to get, set and reset the active version of config file") {
     // create file
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
-    configService.create(file, ConfigData.fromString(configValue1), annex = false, "hello world").await
+    configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue1
 
     // update file twice
-    val configId = configService.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").await
-    configService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").await
+    val configId3 = configService.update(file, ConfigData.fromString(configValue3), "Update 1").await
+    val configId4 = configService.update(file, ConfigData.fromString(configValue4), "Update 2").await
 
-    // check that get file without ID should return latest file
-    configService.getLatest(file).await.get.toStringF.await shouldBe configValue3
+    // check that get file without ID returns latest file
+    configService.getLatest(file).await.get.toStringF.await shouldBe configValue4
+
     // check that getActive call before any setActive call should return the file with id with which it was created
     configService.getActive(file).await.get.toStringF.await shouldBe configValue1
-    // set active version of file to id=2
-    configService.setActiveVersion(file, configId, "Setting active version for the first time").await
-    // check that getActive file without ID returns file with id=2
-    configService.getActive(file).await.get.toStringF.await shouldBe configValue2
-    configService.getActiveVersion(file).await shouldBe configId
 
+    // set active version of file to id=3 and check get active returns same
+    configService.setActiveVersion(file, configId3, "Setting active version for the first time").await
+    configService.getActive(file).await.get.toStringF.await shouldBe configValue3
+    configService.getActiveVersion(file).await shouldBe configId3
+
+    // reset active version and check that get active returns latest version
     configService.resetActiveVersion(file, "resetting active version").await
-    configService.getActive(file).await.get.toStringF.await shouldBe configValue3
-    configService.getActiveVersion(file).await shouldBe ConfigId(4)
+    configService.getActive(file).await.get.toStringF.await shouldBe configValue4
+    configService.getActiveVersion(file).await shouldBe configId4
 
-    // check that setActive without id,resets active version of file
-    configService.resetActiveVersion(file, comment = "setting active version again").await
-    configService.getActive(file).await.get.toStringF.await shouldBe configValue3
+    // update file and check get active returns last active version and not the latest version
+    configService.update(file, ConfigData.fromString(configValue5), "Update 3").await
+    configService.getActiveVersion(file).await shouldBe configId4
 
   }
 
