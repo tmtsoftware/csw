@@ -87,7 +87,7 @@ trait ConfigService extends ConfigClientService {
    */
   def history(path: Path,
               from: Instant = Instant.MIN,
-              to: Instant = Instant.MAX,
+              to: Instant = Instant.now,
               maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]]
 
   /**

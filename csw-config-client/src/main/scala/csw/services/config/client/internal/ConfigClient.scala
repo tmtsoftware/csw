@@ -136,7 +136,8 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
                        from: Instant,
                        to: Instant,
                        maxResults: Int): Future[List[ConfigFileRevision]] = async {
-    val uri = await(historyUri(path)).withQuery(Query("maxResults" → maxResults.toString))
+    val uri = await(historyUri(path))
+      .withQuery(Query("maxResults" → maxResults.toString, "from" → from.toString, "to" → to.toString))
 
     val request = HttpRequest(uri = uri)
     logger.info(request.toString())
