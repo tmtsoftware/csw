@@ -17,9 +17,13 @@ import scala.concurrent.Await
   * The client and service applications can be run on the same or different hosts.
   */
 object LocationServiceExampleClientApp extends App {
+  //#create-location-service
   private val locationService = LocationServiceFactory.make()
-  implicit val system = ActorSystemFactory.remote()
-  implicit val mat = ActorMaterializer()
+  //#create-location-service
+
+  //#create-actor-system
+  implicit val system = ActorSystemFactory.remote("csw-examples-locationServiceClient")
+  //#create-actor-system
 
   // create an actor ref to use for a dummy HCD registration
   private val dummyActorRef = system.actorOf(Props(new Actor {
@@ -27,18 +31,29 @@ object LocationServiceExampleClientApp extends App {
       case "print" => println("hello world")
     }
   }), name="my-actor-1")
-  system.actorOf(LocationServiceExampleClient.props(locationService))
+  private val thisActorRef = system.actorOf(LocationServiceExampleClient.props(locationService))
 
   private val timeout = 5.seconds
 
+  //#Components-Connections-Registrations
+
   // add some dummy registrations for illustrative purposes
+
+  // dummy http connection
   private val httpConnection   = HttpConnection(ComponentId("configuration", ComponentType.Service))
   private val httpRegistration = HttpRegistration(httpConnection, 8080, "path123")
   private val httpRegResult = Await.result(locationService.register(httpRegistration), timeout)
 
+  // dummy HCD connection
   private val hcdConnection   = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
   private val hcdRegistration = AkkaRegistration(hcdConnection, dummyActorRef)
   private val hcdRegResult = Await.result(locationService.register(hcdRegistration), timeout)
+
+  //. register the client "assembly" created in this example
+  private val assemblyConnection   = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
+  private val assemblyRegistration = AkkaRegistration(assemblyConnection, thisActorRef)
+  val assemblyRegResult = Await.result(locationService.register(assemblyRegistration), timeout)
+  //#Components-Connections-Registrations
 }
 
 object LocationServiceExampleClient {
@@ -56,6 +71,7 @@ object LocationServiceExampleClient {
 class LocationServiceExampleClient(locationService: LocationService)(implicit mat: Materializer) extends Actor with ActorLogging {
 
   import LocationServiceExampleClient._
+  import LocationServiceExampleClientApp.assemblyRegResult
 
   private val timeout = 5.seconds
   private val waitForResolveLimit = 30.seconds
@@ -73,6 +89,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   // Not only does this serve as an example for starting applications that are not written in CSW,
   // but it also will help demonstrate location filtering later in this demo.
 
+  //#find-resolve
   // find connection to LocationServiceExampleComponent in location service
   // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
   private val exampleConnection = LocationServiceExampleComponent.connection
@@ -105,7 +122,9 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   // If not,
   // Output should be:
   //    Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
+  //#find-resolve
 
+  //#filtering
   // list connections in location service
   private val connectionList = Await.result(locationService.list, timeout)
   println("All Registered Connections:")
@@ -138,7 +157,11 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   //    --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
   //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
+  //#filtering
   if (resolveResult.isDefined) {
+
+
+    //#tracking
     // the following two methods are examples of two ways to track a connection.
     // both are implemented but only one is really needed.
 
@@ -179,11 +202,21 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
     //    subscription event
     //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
-
+    //#tracking
   }
   def locationInfoToString(loc: Location): String = {
     val connection = loc.connection
     s"${connection.name}, component type=${connection.componentId.componentType}, connection type=${connection.connectionType}"
+  }
+
+  override def postStop(): Unit = {
+    //#unregister
+    assemblyRegResult.unregister()
+    //#unregister
+
+    //#shutdown
+    Await.result(locationService.shutdown(), 20.seconds)
+    //#shutdown
   }
 
   override def receive: Receive = {
