@@ -158,16 +158,6 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       }
     }
 
-//  def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
-//    async {
-//      val configFileRevisions = await(histByRange(activeFilePath(path), from, to, maxResults))
-//
-//      configFileRevisions.map(activeFile ⇒ {
-//        val configData = await(getById(path, activeFile.id))
-//        ConfigFileRevision(ConfigId(await(configData.get.toStringF)), activeFile.comment, activeFile.time)
-//      })
-//    }
-
   override def setActiveVersion(path: Path, id: ConfigId, comment: String = ""): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
       throw FileNotFound(path)
