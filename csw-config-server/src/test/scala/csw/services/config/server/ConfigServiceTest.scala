@@ -488,9 +488,30 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   // DEOPSCSW-77: Set default version of configuration file in config service
   // DEOPSCSW-78: Get the default version of a configuration file
-  test("getActive should return None if file does not exists") {
+  // DEOPSCSW-79: Reset the default version of a configuration file
+  test("getActive and getActiveVersion should return None if file does not exists") {
     val file = Paths.get("/tmt/test/ahgvfyfgpp.conf")
+
     configService.getActive(file).await shouldBe None
+
+    configService.getActiveVersion(file).await shouldBe None
+  }
+
+  // DEOPSCSW-77: Set default version of configuration file in config service
+  // DEOPSCSW-78: Get the default version of a configuration file
+  // DEOPSCSW-79: Reset the default version of a configuration file
+  test("set and reset active should throw FileNotFound exception if file or version does not exists") {
+    val file = Paths.get("/tmt/test/temp.conf")
+
+    intercept[FileNotFound] {
+      configService.resetActiveVersion(file).await
+    }
+
+    configService.create(file, ConfigData.fromString(configValue1), annex = false, "test file").await
+
+    intercept[FileNotFound] {
+      configService.setActiveVersion(file, ConfigId(3)).await
+    }
   }
 
   // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file

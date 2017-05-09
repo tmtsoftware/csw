@@ -290,9 +290,6 @@ public class JConfigAdminApiTest {
 
         configService.resetActive(path).get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
-
-        configService.resetActive(path, "setting active version again").get();
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
     // DEOPSCSW-78: Get the default version of a configuration file
