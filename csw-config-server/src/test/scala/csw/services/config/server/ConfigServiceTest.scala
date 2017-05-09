@@ -470,27 +470,19 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     // check that getActive call before any setActive call should return the file with id with which it was created
     configService.getActive(file).await.get.toStringF.await shouldBe configValue1
 
-    // set active version of file to id=2
-    configService.setActiveVersion(file, configId3, "Setting active version for the first time").await
-    // check that getActive file without ID returns file with id=2
-    configService.getActive(file).await.get.toStringF.await shouldBe configValue2
-    configService.getActiveVersion(file).await.get shouldBe configId3
-
     // set active version of file to id=3 and check get active returns same
     configService.setActiveVersion(file, configId3, "Setting active version for the first time").await
     configService.getActive(file).await.get.toStringF.await shouldBe configValue3
-
-    configService.getActiveVersion(file).await shouldBe configId3
-    configService.getActiveVersion(file).await.get shouldBe ConfigId(4)
+    configService.getActiveVersion(file).await.get shouldBe configId3
 
     // reset active version and check that get active returns latest version
     configService.resetActiveVersion(file, "resetting active version").await
     configService.getActive(file).await.get.toStringF.await shouldBe configValue4
-    configService.getActiveVersion(file).await shouldBe configId4
+    configService.getActiveVersion(file).await.get shouldBe configId4
 
     // update file and check get active returns last active version and not the latest version
     configService.update(file, ConfigData.fromString(configValue5), "Update 3").await
-    configService.getActiveVersion(file).await shouldBe configId4
+    configService.getActiveVersion(file).await.get shouldBe configId4
 
   }
 
