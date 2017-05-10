@@ -486,6 +486,70 @@ class ConfigServiceRouteTest
 
   }
 
+  test("history-active - success  status code") {
+
+    //consumes 2 revisions, one for actual file one for active file
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
+
+    val timeWhenFileWasCreated = Instant.now()
+
+    Put("/config/test.conf?comment=commit2", updatedConfigFile1) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    Put("/active-version/test.conf?id=3&comment=commit1") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    val timeWhenFileWasUpdated = Instant.now()
+
+    val configFileHistoryIdCommentTuples =
+      Set((ConfigId(1), "initializing active file with the first version"), (ConfigId(3), "commit1"))
+
+    Get("/history-active/test.conf") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+
+      responseAs[List[ConfigFileRevision]]
+        .map(history => (history.id, history.comment))
+        .toSet shouldEqual configFileHistoryIdCommentTuples
+    }
+
+    Get("/history-active/test.conf?maxResults=1") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+
+      responseAs[List[ConfigFileRevision]]
+        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit1"))
+    }
+
+    Get(s"/history-active/test.conf?maxResults=1&from=$timeWhenFileWasCreated&to=$timeWhenFileWasUpdated") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+
+      responseAs[List[ConfigFileRevision]]
+        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit1"))
+    }
+
+  }
+
+  test("history-active - failure  status codes") {
+
+    // query parameter missing
+    Get("/history-active") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.NotFound
+    }
+
+    // try to fetch history of a file which does not exists
+    Get("/history-active/test5.conf") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.NotFound
+    }
+
+    Get("/history-active/invalid=/chars/in/path.conf") ~> Route.seal(route) ~> check {
+      status shouldEqual StatusCodes.BadRequest
+    }
+
+  }
+
   test("exists - success status code") {
 
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
