@@ -82,6 +82,8 @@ trait ConfigService extends ConfigClientService {
    * Returns a list of all known versions of a given path
    *
    * @param path       the file path relative to the repository root
+   * @param from       the from date representing the start of history period
+   * @param to         the end date representing the start of history period
    * @param maxResults the maximum number of history results to return (default: unlimited)
    * @return a list containing one ConfigFileRevision object for each version of path
    */
@@ -126,6 +128,20 @@ trait ConfigService extends ConfigClientService {
    * @return     a future object that can be used to access the file's data, if found
    */
   def getActiveByTime(path: Path, time: Instant): Future[Option[ConfigData]]
+
+  /**
+   * Returns a list of all known versions of a given path
+   *
+   * @param path       the file path relative to the repository root
+   * @param from       the from date representing the start of history period
+   * @param to         the end date representing the start of history period
+   * @param maxResults the maximum number of history results to return (default: unlimited)
+   * @return a list containing one ConfigFileRevision object for each version of path
+   */
+  def historyActive(path: Path,
+                    from: Instant = Instant.MIN,
+                    to: Instant = Instant.now,
+                    maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]]
 
   /**
    * Query the metadata of config server

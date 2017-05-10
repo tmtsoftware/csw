@@ -28,6 +28,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   private def activeConfig(path: jnio.Path)           = baseUri(Path / "active-config" ++ Path / Path(path.toString))
   private def activeConfigVersion(path: jnio.Path)    = baseUri(Path / "active-version" ++ Path / Path(path.toString))
   private def historyUri(path: jnio.Path)             = baseUri(Path / "history" ++ Path / Path(path.toString))
+  private def historyActiveUri(path: jnio.Path)       = baseUri(Path / "history-active" ++ Path / Path(path.toString))
   private def metadataUri                             = baseUri(Path / "metadata")
 
   private def listUri = baseUri(Path / "list")
@@ -135,20 +136,8 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   override def history(path: jnio.Path,
                        from: Instant,
                        to: Instant,
-                       maxResults: Int): Future[List[ConfigFileRevision]] = async {
-    val uri = await(historyUri(path))
-      .withQuery(Query("maxResults" → maxResults.toString, "from" → from.toString, "to" → to.toString))
-
-    val request = HttpRequest(uri = uri)
-    logger.info(request.toString())
-    val response = await(Http().singleRequest(request))
-
-    await(
-      handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileRevision]]
-      }
-    )
-  }
+                       maxResults: Int): Future[List[ConfigFileRevision]] =
+    handleHistory(historyUri(path), from, to, maxResults)
 
   override def setActiveVersion(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
     handleActiveConfig(path, Query("id" → id.id.toString, "comment" → comment))
@@ -171,6 +160,24 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       handleResponse(response) {
         case StatusCodes.OK       ⇒ Unmarshal(response).to[ConfigId].map(Some(_))
         case StatusCodes.NotFound ⇒ Future.successful(None)
+      }
+    )
+  }
+
+  override def historyActive(path: jnio.Path,
+                             from: Instant,
+                             to: Instant,
+                             maxResults: Int): Future[List[ConfigFileRevision]] =
+    handleHistory(historyActiveUri(path), from, to, maxResults)
+
+  override def getMetadata: Future[ConfigMetadata] = async {
+    val request = HttpRequest(uri = await(metadataUri))
+    logger.info(request.toString())
+    val response = await(Http().singleRequest(request))
+
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigMetadata]
       }
     )
   }
@@ -209,18 +216,6 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     )
   }
 
-  override def getMetadata: Future[ConfigMetadata] = async {
-    val request = HttpRequest(uri = await(metadataUri))
-    logger.info(request.toString())
-    val response = await(Http().singleRequest(request))
-
-    await(
-      handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigMetadata]
-      }
-    )
-  }
-
   private def handleResponse[T](response: HttpResponse)(pf: PartialFunction[StatusCode, Future[T]]): Future[T] = {
     def contentF = Unmarshal(response).to[String]
 
@@ -233,4 +228,23 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val handler = pf.orElse(defaultHandler)
     handler(response.status)
   }
+
+  private def handleHistory(uri: Future[Uri],
+                            from: Instant,
+                            to: Instant,
+                            maxResults: Int): Future[List[ConfigFileRevision]] = async {
+    val _uri =
+      await(uri).withQuery(Query("maxResults" → maxResults.toString, "from" → from.toString, "to" → to.toString))
+
+    val request = HttpRequest(uri = _uri)
+    logger.info(request.toString())
+    val response = await(Http().singleRequest(request))
+
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileRevision]]
+      }
+    )
+  }
+
 }

@@ -31,7 +31,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       }
 
       val id = await(createFile(path, configData, annex, comment))
-      await(setActiveVersion(path, id))
+      await(setActiveVersion(path, id, "initializing active file with the first version"))
       id
     }
 
@@ -179,7 +179,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
 
     val currentVersion = await(getCurrentVersion(path))
-    await(setActiveVersion(path, currentVersion.get))
+    await(setActiveVersion(path, currentVersion.get, comment))
   }
 
   override def getActive(path: Path): Future[Option[ConfigData]] = {
@@ -210,6 +210,33 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       Some(ConfigId(await(configData.get.toStringF)))
     else
       None
+  }
+
+  def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
+    async {
+      val activePath = activeFilePath(path)
+
+      if (await(exists(activePath))) {
+
+        val configFileRevisions = await(hist(activePath, from, to, maxResults))
+
+        val history = Future.sequence(configFileRevisions.map(historyActiveRevisions(activePath, _)))
+
+        await(history)
+      } else
+        throw FileNotFound(path)
+    }
+
+  private def historyActiveRevisions(path: Path, configFileRevision: ConfigFileRevision): Future[ConfigFileRevision] =
+    async {
+      val configData = await(getById(path, configFileRevision.id))
+      ConfigFileRevision(ConfigId(await(configData.get.toStringF)), configFileRevision.comment,
+        configFileRevision.time)
+    }
+
+  override def getMetadata: Future[ConfigMetadata] = Future {
+    ConfigMetadata(settings.`repository-dir`, settings.`annex-files-dir`, settings.annexMinFileSizeAsMetaInfo,
+      settings.`max-content-length`)
   }
 
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
@@ -262,9 +289,4 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   // File used to store the id of the active version of the file.
   private def activeFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`active-config-suffix`}")
-
-  override def getMetadata: Future[ConfigMetadata] = Future {
-    ConfigMetadata(settings.`repository-dir`, settings.`annex-files-dir`, settings.annexMinFileSizeAsMetaInfo,
-      settings.`max-content-length`)
-  }
 }

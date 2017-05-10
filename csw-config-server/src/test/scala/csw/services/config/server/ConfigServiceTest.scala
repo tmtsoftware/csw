@@ -485,7 +485,34 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     // update file and check get active returns last active version and not the latest version
     configService.update(file, ConfigData.fromString(configValue5), "Update 3").await
     configService.getActiveVersion(file).await.get shouldBe configId4
+  }
 
+  test("should able to get history of active versions of file") {
+    val commentCreateActive = "initializing active file with the first version"
+    // create file
+    val file      = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
+    val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
+
+    // update file twice
+    val configId3 = configService.update(file, ConfigData.fromString(configValue3), "Update 1").await
+    val configId4 = configService.update(file, ConfigData.fromString(configValue4), "Update 2").await
+
+    // set active version of file to id=3
+    val commentSetActive = "Setting active version for the first time"
+    configService.setActiveVersion(file, configId3, commentSetActive).await
+
+    // reset active version and check that get active returns latest version
+    val commentResetActive = "resetting active version"
+    configService.resetActiveVersion(file, commentResetActive).await
+
+    // update file and check get active returns last active version and not the latest version
+    configService.update(file, ConfigData.fromString(configValue5), "Update 3").await
+    configService.getActiveVersion(file).await.get shouldBe configId4
+
+    val configFileHistories = configService.historyActive(file).await
+    configFileHistories.size shouldBe 3
+    configFileHistories.map(_.id) shouldBe List(configId4, configId3, configId1)
+    configFileHistories.map(_.comment) shouldBe List(commentResetActive, commentSetActive, commentCreateActive)
   }
 
   // DEOPSCSW-77: Set default version of configuration file in config service

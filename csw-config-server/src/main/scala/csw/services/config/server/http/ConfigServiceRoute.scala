@@ -71,6 +71,11 @@ class ConfigServiceRoute(
         complete(configService.history(filePath, from, to, maxCount))
       }
     } ~
+    (prefix("history-active") & get) { filePath ⇒
+      (maxResultsParam & fromParam & toParam) { (maxCount, from, to) ⇒
+        complete(configService.historyActive(filePath, from, to, maxCount))
+      }
+    } ~
     (path("list") & get) {
       (typeParam & patternParam) { (fileType, pattern) ⇒
         complete(configService.list(fileType, pattern))
