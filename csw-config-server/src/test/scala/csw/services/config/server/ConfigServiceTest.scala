@@ -319,6 +319,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-45: Saving version information for config. file
   // DEOPSCSW-76: Access a list of all the versions of a stored configuration file
   // DEOPSCSW-63: Add comment while creating or updating a configuration file
+  // DEOPSCSW-83: Retrieve file based on range of time for being most recent version
   test("should get the history of a file") {
     val file = Paths.get("/tmt/lgs/trombone/hcd.conf")
 
@@ -559,6 +560,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   }
 
   // DEOPSCSW-49: Update an Existing File with a New Version
+  // DEOPSCSW-83: Retrieve file based on range of time for being most recent version
   test("should be able to update and retrieve the history of a file in annex store") {
     val file            = Paths.get("SomeAnnexFile.txt")
     val creationContent = "testing annex file"
