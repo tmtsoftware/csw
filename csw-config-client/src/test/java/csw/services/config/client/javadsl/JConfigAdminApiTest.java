@@ -290,6 +290,7 @@ public class JConfigAdminApiTest {
     // DEOPSCSW-78: Get the default version of a configuration file
     // DEOPSCSW-79: Reset the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
+    // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
     @Test
     public void testGetSetAndResetActiveConfigFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
@@ -312,6 +313,7 @@ public class JConfigAdminApiTest {
 
     // DEOPSCSW-78: Get the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
+    // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
     @Test
     public void testGetActiveReturnsNoneIfFileNotExist() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
