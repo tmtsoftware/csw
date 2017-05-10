@@ -10,7 +10,7 @@ import csw.services.csclient.commons.{ArgsUtil, TestFileUtils}
 import csw.services.location.commons.ClusterAwareSettings
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class CommandLineRunnerRTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   private val serverWiring = ServerWiring.make(ClusterAwareSettings.onPort(3552))
   private val httpService  = serverWiring.httpService
@@ -172,6 +172,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     //  create file
     val parsedCreateArgs: Option[Options] = ArgsParser.parse(createMinimalArgs)
     val createConfigId                    = commandLineRunner.create(parsedCreateArgs.get)
+    val createTS                          = Instant.now
 
     //  update file content
     val parsedUpdateArgs: Option[Options] = ArgsParser.parse(updateAllArgs)
@@ -180,9 +181,14 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     //  update file content
     val parsedUpdate2Args: Option[Options] = ArgsParser.parse(updateAllArgs)
     val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get)
+    val updateTS                           = Instant.now
 
     commandLineRunner.history(ArgsParser.parse(historyArgs).get).map(_.id) shouldBe List(update2ConfigId,
       updateConfigId, createConfigId)
+
+    commandLineRunner
+      .history(ArgsParser.parse(historyArgs :+ "--from" :+ createTS.toString :+ "--to" :+ updateTS.toString).get)
+      .map(_.id) shouldBe List(update2ConfigId, updateConfigId)
   }
 
   test("get repository MetaData from server") {

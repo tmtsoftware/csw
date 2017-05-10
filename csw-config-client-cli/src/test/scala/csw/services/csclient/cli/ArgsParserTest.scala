@@ -130,11 +130,25 @@ class ArgsParserTest extends FunSuite with Matchers {
     x shouldEqual None
   }
 
-  test("test history with sub-options") {
+  test("test history with all sub-options") {
+    val argv               = Array("history", relativeRepoPath, "--from", date, "--to", date, "--max", maxFileVersions.toString)
+    val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
+    x should contain(Options("history", Some(Paths.get(relativeRepoPath)), fromDate = Instant.parse(date),
+        toDate = Instant.parse(date), maxFileVersions = maxFileVersions))
+  }
+
+  test("test history with max sub-option") {
     val argv               = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("history", Some(Paths.get(relativeRepoPath)), None, None, None, None,
         maxFileVersions = maxFileVersions))
+  }
+
+  test("test history with from and to sub-options") {
+    val argv               = Array("history", relativeRepoPath, "--from", date, "--to", date)
+    val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
+    x should contain(Options("history", Some(Paths.get(relativeRepoPath)), fromDate = Instant.parse(date),
+        toDate = Instant.parse(date)))
   }
 
   test("test setActiveVersion with no comment") {

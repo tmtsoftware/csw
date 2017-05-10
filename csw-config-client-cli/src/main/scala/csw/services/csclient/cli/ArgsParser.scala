@@ -100,10 +100,10 @@ object ArgsParser {
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
       opt[String]("from") action { (x, c) =>
-        c.copy(date = Some(Instant.parse(x)))
+        c.copy(fromDate = Instant.parse(x))
       } text "optional date parameter for start date ex. 2017-04-16T16:15:23.503Z",
       opt[String]("to") action { (x, c) =>
-        c.copy(date = Some(Instant.parse(x)))
+        c.copy(toDate = Instant.parse(x))
       } text "optional date parameter for upto date ex. 2017-04-16T16:15:23.503Z",
       opt[Int]("max") action { (x, c) =>
         c.copy(maxFileVersions = x)
