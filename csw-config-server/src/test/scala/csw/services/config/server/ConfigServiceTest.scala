@@ -564,16 +564,16 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configData       = ConfigData.fromString(creationContent)
     val creationConfigId = configService.create(file, configData, annex = true, creationComment).await
 
+    val createTS = Instant.now
+
     val newContent  = "testing annex file, again"
     val newComment  = "Updating file"
     val configData2 = ConfigData.fromString(newContent)
     val newConfigId = configService.update(file, configData2, newComment).await
 
-    val creationFileContent = configService.getById(file, creationConfigId).await.get
-    creationFileContent.toStringF.await shouldBe creationContent
+    configService.getById(file, creationConfigId).await.get.toStringF.await shouldBe creationContent
 
-    val updatedFileContent = configService.getById(file, newConfigId).await.get
-    updatedFileContent.toStringF.await shouldBe newContent
+    configService.getById(file, newConfigId).await.get.toStringF.await shouldBe newContent
 
     //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
     //This call is invalid from client side
@@ -597,6 +597,13 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       (newConfigId, newComment),
       (creationConfigId, creationComment)
     )
+
+    configService.history(file, createTS).await.map(history ⇒ (history.id, history.comment)) shouldBe List(
+        (newConfigId, newComment))
+
+    configService.history(file, to = createTS).await.map(history ⇒ (history.id, history.comment)) shouldBe List(
+        (creationConfigId, creationComment))
+
   }
 
   // DEOPSCSW-77: Set default version of configuration file in config service

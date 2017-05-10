@@ -76,7 +76,10 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
                        from: Instant,
                        to: Instant,
                        maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
-    configService.history(path, maxResults = maxResults).map(_.asJava).toJava.toCompletableFuture
+    configService.history(path, from, to, maxResults = maxResults).map(_.asJava).toJava.toCompletableFuture
+
+  override def history(path: Path, from: Instant, to: Instant): CompletableFuture[util.List[ConfigFileRevision]] =
+    configService.history(path, from, to, Int.MaxValue).map(_.asJava).toJava.toCompletableFuture
 
   override def history(path: Path, maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, Instant.MIN, Instant.now, maxResults)
@@ -89,10 +92,16 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
                            maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, from, Instant.now, maxResults)
 
+  override def historyFrom(path: Path, from: Instant): CompletableFuture[util.List[ConfigFileRevision]] =
+    history(path, from, Instant.now, Int.MaxValue)
+
   override def historyUpTo(path: Path,
                            upTo: Instant,
                            maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, Instant.MIN, upTo, maxResults)
+
+  override def historyUpTo(path: Path, upTo: Instant): CompletableFuture[util.List[ConfigFileRevision]] =
+    history(path, Instant.MIN, upTo, Int.MaxValue)
 
   override def setActive(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit] =
     configService.setActiveVersion(path, id, comment).toJava.toCompletableFuture

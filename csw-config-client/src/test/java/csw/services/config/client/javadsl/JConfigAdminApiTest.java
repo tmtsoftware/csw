@@ -209,8 +209,11 @@ public class JConfigAdminApiTest {
             String comment3 = "commit version 3";
 
             ConfigId configId1 = configService.create(path, ConfigData.fromString(configValue1), false, comment1).get();
+            Instant createTS = Instant.now();
+
             ConfigId configId2 = configService.update(path, ConfigData.fromString(configValue2), comment2).get();
             ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3), comment3).get();
+            Instant updateTS = Instant.now();
 
             Assert.assertEquals(configService.history(path).get().size(), 3);
             Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
@@ -224,6 +227,21 @@ public class JConfigAdminApiTest {
                     new ArrayList<>(Arrays.asList(configId3, configId2)));
             Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
                     new ArrayList<>(Arrays.asList(comment3, comment2)));
+
+            Assert.assertEquals(configService.history(path, createTS, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2)));
+
+            Assert.assertEquals(configService.historyFrom(path, createTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2)));
+
+            Assert.assertEquals(configService.historyFrom(path, createTS, 1).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3)));
+
+            Assert.assertEquals(configService.historyUpTo(path, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
+
+            Assert.assertEquals(configService.historyUpTo(path, updateTS, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2)));
         }
     }
 
@@ -338,10 +356,12 @@ public class JConfigAdminApiTest {
     public void testUpdateAndHistoryOfFilesInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration").get();
+        Instant createTS = Instant.now();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
         ConfigId configIdUpdate2 = configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
+        Instant updateTS = Instant.now();
 
         Assert.assertEquals(configService.history(path).get().size(), 3);
         Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
@@ -350,6 +370,19 @@ public class JConfigAdminApiTest {
         Assert.assertEquals(configService.history(path, 2).get().size(), 2);
         Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+
+        Assert.assertEquals(configService.history(path, createTS, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+
+        Assert.assertEquals(configService.historyFrom(path, createTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+
+        Assert.assertEquals(configService.historyUpTo(path, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1, configIdCreate)));
+
+        Assert.assertEquals(configService.historyUpTo(path, updateTS, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+
     }
 
     // DEOPSCSW-77: Set default version of configuration file in config. service
