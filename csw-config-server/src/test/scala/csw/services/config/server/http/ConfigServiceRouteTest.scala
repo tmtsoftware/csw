@@ -288,9 +288,13 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.Created
     }
 
+    val timeWhenFileWasCreated = Instant.now()
+
     Put("/config/test.conf?comment=commit2", updatedConfigFile1) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
+
+    val timeWhenFileWasUpdated = Instant.now()
 
     val configFileHistoryIdCommentTuples = Set((ConfigId(1), "commit1"), (ConfigId(3), "commit2"))
 
@@ -303,6 +307,13 @@ class ConfigServiceRouteTest
     }
 
     Get("/history/test.conf?maxResults=1") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+
+      responseAs[List[ConfigFileRevision]]
+        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit2"))
+    }
+
+    Get(s"/history/test.conf?maxResults=1&from=$timeWhenFileWasCreated&to=$timeWhenFileWasUpdated") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
