@@ -154,28 +154,25 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
     }
   }
 
-  def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] =
-    Future {
-      val clientManager = SVNClientManager.newInstance()
-      var logEntries    = List[SVNLogEntry]()
-      try {
-        val logClient = clientManager.getLogClient
-        val handler: ISVNLogEntryHandler = logEntry =>
-          logEntries = {
-            if (logEntry.getDate.toInstant.isAfter(from) && logEntry.getDate.toInstant.isBefore(to))
-              logEntry :: logEntries
-            else
-              logEntries
-        }
-        logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
-          handler)
-        logEntries.sortWith(_.getRevision > _.getRevision)
-      } finally {
-        clientManager.dispose()
+  def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] = Future {
+    val clientManager = SVNClientManager.newInstance()
+    var logEntries    = List[SVNLogEntry]()
+    try {
+      val logClient = clientManager.getLogClient
+      val handler: ISVNLogEntryHandler = logEntry =>
+        logEntries = {
+          if (logEntry.getDate.toInstant.isAfter(from) && logEntry.getDate.toInstant.isBefore(to))
+            logEntry :: logEntries
+          else
+            logEntries
       }
-    } recover {
-      case ex: SVNException => Nil
+      logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
+        handler)
+      logEntries.sortWith(_.getRevision > _.getRevision)
+    } finally {
+      clientManager.dispose()
     }
+  }
 
   // Gets the svn revision from the given id, defaulting to HEAD
   def svnRevision(id: Option[Long] = None): Future[SVNRevision] = Future {
