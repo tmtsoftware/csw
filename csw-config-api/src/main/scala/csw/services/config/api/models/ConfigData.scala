@@ -60,19 +60,21 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
 object ConfigData {
 
   /**
-   * The data is contained in the string
+   * Create from string
    */
-  def fromString(str: String): ConfigData = {
-    val byteString = ByteString(str.getBytes())
-    ConfigData.from(Source.single(byteString), byteString.length)
-  }
+  def fromString(str: String): ConfigData = ConfigData.fromBytes(str.getBytes())
 
   /**
-   * Initialize with the contents of the file from given path.
+   * Create from file path
    *
-   * @param path      the data source
    */
   def fromPath(path: Path): ConfigData = ConfigData.from(FileIO.fromPath(path), path.toFile.length())
+
+  /**
+   * Create from byte array
+   *
+   */
+  def fromBytes(bytes: Array[Byte]): ConfigData = ConfigData.from(Source.single(ByteString(bytes)), bytes.length)
 
   private[config] def from(dataBytes: Source[ByteString, Any], length: Long): ConfigData =
     new ConfigData(dataBytes, length)

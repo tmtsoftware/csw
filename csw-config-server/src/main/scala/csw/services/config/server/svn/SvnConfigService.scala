@@ -1,9 +1,11 @@
 package csw.services.config.server.svn
 
+import java.io.ByteArrayOutputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
-import akka.stream.scaladsl.StreamConverters
+import akka.stream.scaladsl.{Source, StreamConverters}
+import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models.{FileType, _}
@@ -76,14 +78,9 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   // Returns the contents of the given version of the file, if found
   private def getNormalSize(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
-    val outputStream = StreamConverters.asOutputStream().cancellableMat
-    val source = outputStream.mapMaterializedValue {
-      case (out, switch) ⇒
-        svnRepo.getFile(path, revision.getNumber, out).recover {
-          case NonFatal(ex) ⇒ switch.abort(ex)
-        }
-    }
-    Some(ConfigData.from(source, await(svnRepo.getFileSize(path, revision.getNumber))))
+    val outputStream = new ByteArrayOutputStream()
+    await(svnRepo.getFile(path, revision.getNumber, outputStream))
+    Some(ConfigData.fromBytes(outputStream.toByteArray))
   }
 
   // Get annex files that are stored in the annex server

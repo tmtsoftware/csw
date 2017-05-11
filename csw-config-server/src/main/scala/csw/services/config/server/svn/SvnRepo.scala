@@ -40,8 +40,6 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
     val svn = svnHandle()
     try {
       svn.getFile(path.toString, revision, null, outputStream)
-      outputStream.flush()
-      outputStream.close()
     } finally {
       svn.closeSession()
     }
