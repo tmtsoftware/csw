@@ -22,7 +22,7 @@ trait ConfigService extends ConfigClientService {
    * @param comment    an optional comment to associate with this file
    * @return a unique id that can be used to refer to the file
    */
-  def create(path: Path, configData: ConfigData, annex: Boolean = false, comment: String = ""): Future[ConfigId]
+  def create(path: Path, configData: ConfigData, annex: Boolean = false, comment: String): Future[ConfigId]
 
   /**
    * Updates the config file with the given path and data and optional comment.
@@ -33,7 +33,7 @@ trait ConfigService extends ConfigClientService {
    * @param comment    an optional comment to associate with this file
    * @return a unique id that can be used to refer to the file
    */
-  def update(path: Path, configData: ConfigData, comment: String = ""): Future[ConfigId]
+  def update(path: Path, configData: ConfigData, comment: String): Future[ConfigId]
 
   /**
    * Gets and returns the file stored under the given path.
@@ -69,7 +69,7 @@ trait ConfigService extends ConfigClientService {
    *
    * @param path the file path relative to the repository root
    */
-  def delete(path: Path, comment: String = "deleted"): Future[Unit]
+  def delete(path: Path, comment: String): Future[Unit]
 
   /**
    * Returns a list containing all of the known config files
@@ -82,10 +82,15 @@ trait ConfigService extends ConfigClientService {
    * Returns a list of all known versions of a given path
    *
    * @param path       the file path relative to the repository root
+   * @param from       the from date representing the start of history period
+   * @param to         the end date representing the start of history period
    * @param maxResults the maximum number of history results to return (default: unlimited)
    * @return a list containing one ConfigFileRevision object for each version of path
    */
-  def history(path: Path, maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]]
+  def history(path: Path,
+              from: Instant = Instant.MIN,
+              to: Instant = Instant.now,
+              maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]]
 
   /**
    * Sets the "active version" to be the version provided for the file with the given path.
@@ -97,7 +102,7 @@ trait ConfigService extends ConfigClientService {
    *             (by default the id of the version with which the file was created i.e. 1)
    * @return     a future result
    */
-  def setActiveVersion(path: Path, id: ConfigId, comment: String = ""): Future[Unit]
+  def setActiveVersion(path: Path, id: ConfigId, comment: String): Future[Unit]
 
   /**
    * Resets the "active version" of the file with the given path to the latest version.
@@ -105,7 +110,7 @@ trait ConfigService extends ConfigClientService {
    * @param path the file path relative to the repository root
    * @return     a future result
    */
-  def resetActiveVersion(path: Path, comment: String = ""): Future[Unit]
+  def resetActiveVersion(path: Path, comment: String): Future[Unit]
 
   /**
    * Returns the version which represents the "active version" of the file with the given path
@@ -113,7 +118,7 @@ trait ConfigService extends ConfigClientService {
    * @param path the file path relative to the repository root
    * @return     id which represents the current active version
    */
-  def getActiveVersion(path: Path): Future[ConfigId]
+  def getActiveVersion(path: Path): Future[Option[ConfigId]]
 
   /**
    * Gets and returns the active version of the file stored under the given path.
@@ -123,6 +128,20 @@ trait ConfigService extends ConfigClientService {
    * @return     a future object that can be used to access the file's data, if found
    */
   def getActiveByTime(path: Path, time: Instant): Future[Option[ConfigData]]
+
+  /**
+   * Returns a list of all known versions of a given path
+   *
+   * @param path       the file path relative to the repository root
+   * @param from       the from date representing the start of history period
+   * @param to         the end date representing the start of history period
+   * @param maxResults the maximum number of history results to return (default: unlimited)
+   * @return a list containing one ConfigFileRevision object for each version of path
+   */
+  def historyActive(path: Path,
+                    from: Instant = Instant.MIN,
+                    to: Instant = Instant.now,
+                    maxResults: Int = Int.MaxValue): Future[List[ConfigFileRevision]]
 
   /**
    * Query the metadata of config server

@@ -1,19 +1,19 @@
 #!groovy
-try{
-    ansiColor('xterm') {
-        node('master') {
+node('master'){
+    try{
+        ansiColor('xterm') {
             def failBuild = false
 
             stage('Checkout') {
                 git 'https://github.com/tmtsoftware/csw-prod.git'
             }
 
-            stage('Build') {
+             stage('Build') {
                 sh "sbt 'scalafmt --test'"
                 sh "sbt -Dcheck.cycles=true clean scalastyle compile"
-            }
+             }
 
-            stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
+             stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
                 try {
                     sh "sbt -DenableCoverage=true test:test"
                 }
@@ -27,51 +27,45 @@ try{
                 catch (Exception ex) {
                     failBuild = true
                 }
+
                 sh "sbt coverageAggregate"
+
                 if (failBuild == true)
                     sh "exit 1"
-            }
+             }
 
-            stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine.
+             stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine.
                 sh "sbt csw-location/multi-jvm:test"
                 sh "sbt csw-config-client/multi-jvm:test"
-            }
+             }
 
-            stage('Multi-Node Test') { // These tests cover the scenario of multiple components in multiple containers on different machines.
+             stage('Multi-Node Test') { // These tests cover the scenario of multiple components in multiple containers on different machines.
                 sh "sbt -DenableCoverage=false csw-location/multi-node-test"
                 sh "sbt -DenableCoverage=false csw-config-client/multi-node-test"
-            }
+             }
 
-            stage('Package') {
+             stage('Package') {
                 sh "./integration/scripts/package_integration.sh"
-                stash name: "repo"
-            }
-        }
+             }
 
-        node('JenkinsNode1') {
-            stage('Multi-Container Docker') {
-                unstash "repo"
+             stage('Multi-Container Docker') {
                 sh "./integration/scripts/runner.sh"
-            }
+             }
 
-            stage('Multi-NICs Docker') {
+             stage('Multi-NICs Docker') {
                 sh "./integration/scripts/multiple_nic_test.sh"
-            }
-        }
+             }
 
-        node('master') {
-            stage('Deploy') {
+             stage('Deploy') {
                 sh "./publish.sh"
-            }
+             }
         }
     }
-}
-catch (Exception e) {
-    currentBuild.result = "FAILED"
-    throw e
-}
-finally {
-    node('master') {
+    catch (Exception e) {
+        currentBuild.result = "FAILED"
+        throw e
+    }
+    finally {
         stage("Report") {
             try{
                 publishJunitReport()

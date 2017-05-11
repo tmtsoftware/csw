@@ -1,6 +1,7 @@
 package csw.services.location.commons
 
 import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.scalalogging.LazyLogging
 import csw.services.location.internal.Networks
 
 import scala.collection.JavaConverters._
@@ -47,14 +48,15 @@ import scala.collection.JavaConverters._
  *  - the `ClusterSettings` api of providing values should be used for testing purpose only.
  *
  */
-case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
+case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty)
+    extends LazyLogging {
   val InterfaceNameKey  = "interfaceName"
   val ClusterSeedsKey   = "clusterSeeds"
   val ClusterPortKey    = "clusterPort"
   val ManagementPortKey = "managementPort"
 
   def debug(): Unit =
-    println(s"""
+    logger.info(s"""
          |[debug] Using following cluster configurations:
          |[debug] ClusterSeedsKey: ${seedNodes.mkString(",")}
       """.stripMargin)

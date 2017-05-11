@@ -7,6 +7,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import com.typesafe.scalalogging.LazyLogging
 import csw.services.config.api.commons.ConfigStreamExts.RichSource
 import csw.services.config.api.commons.{BinaryUtils, JsonSupport}
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
@@ -18,7 +19,8 @@ import scala.concurrent.Future
 
 class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
     extends ConfigService
-    with JsonSupport {
+    with JsonSupport
+    with LazyLogging {
 
   import actorRuntime._
 
@@ -26,6 +28,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   private def activeConfig(path: jnio.Path)           = baseUri(Path / "active-config" ++ Path / Path(path.toString))
   private def activeConfigVersion(path: jnio.Path)    = baseUri(Path / "active-version" ++ Path / Path(path.toString))
   private def historyUri(path: jnio.Path)             = baseUri(Path / "history" ++ Path / Path(path.toString))
+  private def historyActiveUri(path: jnio.Path)       = baseUri(Path / "history-active" ++ Path / Path(path.toString))
   private def metadataUri                             = baseUri(Path / "metadata")
 
   private def listUri = baseUri(Path / "list")
@@ -42,7 +45,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
-      println(request)
+      logger.info(request.toString())
       val response = await(Http().singleRequest(request))
 
       await(
@@ -58,7 +61,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri    = await(configUri(path)).withQuery(Query("comment" → comment))
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
@@ -88,7 +91,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(configUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
 
     val request = HttpRequest(HttpMethods.HEAD, uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
@@ -103,7 +106,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(configUri(path)).withQuery(Query("comment" → comment))
 
     val request = HttpRequest(HttpMethods.DELETE, uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
@@ -119,7 +122,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
         await(listUri).withQuery(Query(fileType.map("type" → _.entryName).toMap ++ pattern.map("pattern" → _).toMap))
 
       val request = HttpRequest(uri = uri)
-      println(request)
+      logger.info(request.toString())
       val response = await(Http().singleRequest(request))
 
       await(
@@ -130,40 +133,51 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
     }
 
-  override def history(path: jnio.Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
-    val uri = await(historyUri(path)).withQuery(Query("maxResults" → maxResults.toString))
-
-    val request = HttpRequest(uri = uri)
-    println(request)
-    val response = await(Http().singleRequest(request))
-
-    await(
-      handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileRevision]]
-      }
-    )
-  }
+  override def history(path: jnio.Path,
+                       from: Instant,
+                       to: Instant,
+                       maxResults: Int): Future[List[ConfigFileRevision]] =
+    handleHistory(historyUri(path), from, to, maxResults)
 
   override def setActiveVersion(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
     handleActiveConfig(path, Query("id" → id.id.toString, "comment" → comment))
 
   override def resetActiveVersion(path: jnio.Path, comment: String): Future[Unit] =
-    handleActiveConfig(path, Query.Empty)
+    handleActiveConfig(path, Query("comment" → comment))
 
   override def getActiveByTime(path: jnio.Path, time: Instant): Future[Option[ConfigData]] = async {
     await(get(await(activeConfig(path)).withQuery(Query("date" → time.toString))))
   }
 
-  override def getActiveVersion(path: jnio.Path): Future[ConfigId] = async {
+  override def getActiveVersion(path: jnio.Path): Future[Option[ConfigId]] = async {
     val uri = await(activeConfigVersion(path))
 
     val request = HttpRequest(uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
       handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigId]
+        case StatusCodes.OK       ⇒ Unmarshal(response).to[ConfigId].map(Some(_))
+        case StatusCodes.NotFound ⇒ Future.successful(None)
+      }
+    )
+  }
+
+  override def historyActive(path: jnio.Path,
+                             from: Instant,
+                             to: Instant,
+                             maxResults: Int): Future[List[ConfigFileRevision]] =
+    handleHistory(historyActiveUri(path), from, to, maxResults)
+
+  override def getMetadata: Future[ConfigMetadata] = async {
+    val request = HttpRequest(uri = await(metadataUri))
+    logger.info(request.toString())
+    val response = await(Http().singleRequest(request))
+
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigMetadata]
       }
     )
   }
@@ -172,7 +186,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(activeConfigVersion(path)).withQuery(query)
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     await(
@@ -184,7 +198,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   private def get(uri: Uri): Future[Option[ConfigData]] = async {
     val request = HttpRequest(uri = uri)
-    println(request)
+    logger.info(request.toString())
     val response = await(Http().singleRequest(request))
 
     val lengthOption = response.entity.contentLengthOption
@@ -202,19 +216,6 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     )
   }
 
-  override def getMetadata: Future[ConfigMetadata] = async {
-    val request = HttpRequest(uri = await(metadataUri))
-    println(request)
-    val response = await(Http().singleRequest(request))
-
-    await(
-      handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[ConfigMetadata]
-      }
-    )
-
-  }
-
   private def handleResponse[T](response: HttpResponse)(pf: PartialFunction[StatusCode, Future[T]]): Future[T] = {
     def contentF = Unmarshal(response).to[String]
 
@@ -227,4 +228,23 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val handler = pf.orElse(defaultHandler)
     handler(response.status)
   }
+
+  private def handleHistory(uri: Future[Uri],
+                            from: Instant,
+                            to: Instant,
+                            maxResults: Int): Future[List[ConfigFileRevision]] = async {
+    val _uri =
+      await(uri).withQuery(Query("maxResults" → maxResults.toString, "from" → from.toString, "to" → to.toString))
+
+    val request = HttpRequest(uri = _uri)
+    logger.info(request.toString())
+    val response = await(Http().singleRequest(request))
+
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileRevision]]
+      }
+    )
+  }
+
 }

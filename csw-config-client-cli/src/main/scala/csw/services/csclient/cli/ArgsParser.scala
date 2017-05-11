@@ -50,7 +50,7 @@ object ArgsParser {
     //get operation
     cmd("get") action { (_, c) =>
       c.copy(op = "get")
-    } text "retrieves file with a given path from config service, and writes it to the output file" children (
+    } text "retrieves a file for a given path and saves it to the output file. Latest file is fetched if neither date nor id is specified." children (
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "path of the file in the repository",
@@ -59,10 +59,10 @@ object ArgsParser {
       } text "output file path",
       opt[String]("id") action { (x, c) =>
         c.copy(id = Some(x))
-      } text "optional version id of the repository file to get",
+      } text "optional. if specified this id will be matched",
       opt[String]("date") action { (x, c) =>
         c.copy(date = Some(Instant.parse(x)))
-      } text "optional date parameter ex. 2017-04-16T16:15:23.503Z"
+      } text "optional. if specified will get the file matching this date. Format: 2017-04-16T16:15:23.503Z"
     )
 
     //delete operation
@@ -71,7 +71,10 @@ object ArgsParser {
     } text "deletes the file at specified path in the repository" children (
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
-      } text "file path in the repository"
+      } text "file path in the repository",
+      opt[String]('c', "comment") action { (x, c) =>
+        c.copy(comment = x)
+      } text "optional delete comment"
     )
 
     //list operation
@@ -96,6 +99,12 @@ object ArgsParser {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
+      opt[String]("from") action { (x, c) =>
+        c.copy(fromDate = Instant.parse(x))
+      } text "optional date parameter for start date ex. 2017-04-16T16:15:23.503Z",
+      opt[String]("to") action { (x, c) =>
+        c.copy(toDate = Instant.parse(x))
+      } text "optional date parameter for upto date ex. 2017-04-16T16:15:23.503Z",
       opt[Int]("max") action { (x, c) =>
         c.copy(maxFileVersions = x)
       } text "optional maximum entries of file versions"
@@ -119,13 +128,13 @@ object ArgsParser {
     //resetActiveVersion operation
     cmd("resetActiveVersion") action { (_, c) =>
       c.copy(op = "resetActiveVersion")
-    } text "resets the active to the latest version of the file in the repository" children (
+    } text "resets the active version to the latest version for the specified file" children (
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
       opt[String]('c', "comment") action { (x, c) =>
         c.copy(comment = x)
-      } text "optional create comment"
+      } text "optional reset comment"
     )
 
     //getActiveVersion operation
@@ -146,16 +155,34 @@ object ArgsParser {
       } text "file path in the repository",
       arg[String]("date") action { (x, c) =>
         c.copy(date = Some(Instant.parse(x)))
-      } text "date parameter ex. 2017-04-16T16:15:23.503Z",
+      } text "optional. if specified will get the active file matching this date. Format: 2017-04-16T16:15:23.503Z",
       opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>
         c.copy(outputFilePath = Some(Paths.get(x)))
       } text "output file path"
     )
 
+    //history operation
+    cmd("historyActive") action { (_, c) =>
+      c.copy(op = "historyActive")
+    } text "shows versioning history of the active file in the repository" children (
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
+      } text "file path in the repository",
+      opt[String]("from") action { (x, c) =>
+        c.copy(fromDate = Instant.parse(x))
+      } text "optional date parameter for start date ex. 2017-04-16T16:15:23.503Z",
+      opt[String]("to") action { (x, c) =>
+        c.copy(toDate = Instant.parse(x))
+      } text "optional date parameter for upto date ex. 2017-04-16T16:15:23.503Z",
+      opt[Int]("max") action { (x, c) =>
+        c.copy(maxFileVersions = x)
+      } text "optional maximum entries of file versions"
+    )
+
     //getMetadata operation
     cmd("getMetadata") action { (_, c) =>
       c.copy(op = "getMetadata")
-    } text "gets the metadata of config server"
+    } text "gets the metadata of config server e.g. repository directory, annex directory, min annex file size, max config file size"
 
     //exists operation
     cmd("exists") action { (_, c) =>

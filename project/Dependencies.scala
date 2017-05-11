@@ -12,6 +12,8 @@ object Dependencies {
     Libs.`chill-akka`,
     Libs.`akka-management-cluster-http`,
     AkkaHttp.`akka-http`,
+    Libs.`scala-logging`,
+    Libs.`logback-classic`,
     Libs.`scalatest`               % Test,
     Libs.`junit`                   % Test,
     Libs.`junit-interface`         % Test,
@@ -23,6 +25,8 @@ object Dependencies {
   val CswLocationAgent = Seq(
     Akka.`akka-actor`,
     Libs.`scopt`,
+    Libs.`scala-logging`,
+    Libs.`logback-classic`,
     Libs.`scalatest`     % Test,
     Libs.`scala-logging` % Test
   )
@@ -30,6 +34,8 @@ object Dependencies {
   val CswConfigClientCli = Seq(
     Akka.`akka-actor`,
     Libs.`scopt`,
+    Libs.`scala-logging`,
+    Libs.`logback-classic`,
     Libs.`scalatest`               % Test,
     Libs.`scala-logging`           % Test,
     Akka.`akka-multi-node-testkit` % Test
@@ -52,6 +58,8 @@ object Dependencies {
     AkkaHttp.`akka-http`,
     Libs.svnkit,
     Libs.`scopt`,
+    Libs.`scala-logging`,
+    Libs.`logback-classic`,
     Libs.`scalatest`             % Test,
     AkkaHttp.`akka-http-testkit` % Test,
     Akka.`akka-stream-testkit`   % Test
@@ -59,6 +67,8 @@ object Dependencies {
 
   val ConfigClient = Seq(
     AkkaHttp.`akka-http`,
+    Libs.`scala-logging`,
+    Libs.`logback-classic`,
     Libs.`scalatest`               % Test,
     Libs.`junit`                   % Test,
     Libs.`junit-interface`         % Test,

@@ -135,7 +135,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     val updateConfigId = commandLineRunner.update(ArgsParser.parse(updateAllArgs).get)
 
     //  set active version of file to id=1 and store it at location: /tmp/output.txt
-    val parsedSetActiveArgs: Option[Options] = ArgsParser.parse(setActiveAllArgs)
+    val parsedSetActiveArgs: Option[Options] = ArgsParser.parse(setActiveAllArgs :+ "1")
     commandLineRunner.setActiveVersion(parsedSetActiveArgs.get)
 
     val getByDateArgs =
@@ -143,7 +143,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
 
     //  get active version of file and store it at location: /tmp/output.txt
     val parsedGetActiveArgs: Option[Options] = ArgsParser.parse(getMinimalArgs)
-    commandLineRunner.getActiveVersion(parsedGetActiveArgs.get) shouldBe ConfigId(parsedSetActiveArgs.get.id.get)
+    commandLineRunner.getActiveVersion(parsedGetActiveArgs.get).get shouldBe ConfigId(parsedSetActiveArgs.get.id.get)
     commandLineRunner.getActive(parsedGetActiveArgs.get) shouldBe Some(Paths.get(outputFilePath))
 
     //  read locally saved output file (/tmp/output.conf) from disk and
@@ -153,7 +153,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     commandLineRunner.resetActiveVersion(ArgsParser.parse(resetActiveAllArgs).get)
 
     //  get active version of file and store it at location: /tmp/output.txt
-    commandLineRunner.getActiveVersion(parsedGetActiveArgs.get) shouldBe updateConfigId
+    commandLineRunner.getActiveVersion(parsedGetActiveArgs.get).get shouldBe updateConfigId
     commandLineRunner.getActive(parsedGetActiveArgs.get) shouldBe Some(Paths.get(outputFilePath))
 
     //  read locally saved output file (/tmp/output.conf) from disk and
@@ -172,6 +172,31 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     //  create file
     val parsedCreateArgs: Option[Options] = ArgsParser.parse(createMinimalArgs)
     val createConfigId                    = commandLineRunner.create(parsedCreateArgs.get)
+    val createTS                          = Instant.now
+
+    //  update file content
+    val parsedUpdateArgs: Option[Options] = ArgsParser.parse(updateAllArgs)
+    val updateConfigId                    = commandLineRunner.update(parsedUpdateArgs.get)
+
+    //  update file content
+    val parsedUpdate2Args: Option[Options] = ArgsParser.parse(updateAllArgs)
+    val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get)
+    val updateTS                           = Instant.now
+
+    commandLineRunner.history(ArgsParser.parse(historyArgs).get).map(_.id) shouldBe List(update2ConfigId,
+      updateConfigId, createConfigId)
+
+    commandLineRunner
+      .history(ArgsParser.parse(historyArgs :+ "--from" :+ createTS.toString :+ "--to" :+ updateTS.toString).get)
+      .map(_.id) shouldBe List(update2ConfigId, updateConfigId)
+  }
+
+  test("should able to fetch history of active files.") {
+
+    //  create file
+    val parsedCreateArgs: Option[Options] = ArgsParser.parse(createMinimalArgs)
+    val createConfigId                    = commandLineRunner.create(parsedCreateArgs.get)
+    val createTS                          = Instant.now
 
     //  update file content
     val parsedUpdateArgs: Option[Options] = ArgsParser.parse(updateAllArgs)
@@ -181,8 +206,17 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     val parsedUpdate2Args: Option[Options] = ArgsParser.parse(updateAllArgs)
     val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get)
 
-    commandLineRunner.history(ArgsParser.parse(historyArgs).get).map(_.id) shouldBe List(update2ConfigId,
-      updateConfigId, createConfigId)
+    commandLineRunner.setActiveVersion(ArgsParser.parse(setActiveAllArgs :+ updateConfigId.id).get)
+
+    commandLineRunner.historyActive(ArgsParser.parse(historyActiveArgs).get).map(_.id) shouldBe List(updateConfigId,
+      createConfigId)
+
+    commandLineRunner.resetActiveVersion(ArgsParser.parse(resetActiveAllArgs).get)
+
+    commandLineRunner
+      .historyActive(
+          ArgsParser.parse(historyActiveArgs :+ "--from" :+ createTS.toString :+ "--to" :+ Instant.now.toString).get)
+      .map(_.id) shouldBe List(update2ConfigId, updateConfigId)
   }
 
   test("get repository MetaData from server") {

@@ -50,6 +50,7 @@ object DeployApp extends AutoPlugin {
     SettingsHelper.makeDeploymentSettings(Universal, packageBin in Universal, "zip") ++
     SettingsHelper.makeDeploymentSettings(UniversalDocs, packageBin in UniversalDocs, "zip") ++ Seq(
       buildInfoKeys := Seq[BuildInfoKey](name, version),
-      buildInfoPackage := "csw.services"
+      buildInfoPackage := "csw.services",
+      target in Universal := baseDirectory.value.getParentFile / "target" / "universal"
     )
 }

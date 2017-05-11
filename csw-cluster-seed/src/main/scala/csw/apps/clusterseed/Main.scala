@@ -1,5 +1,6 @@
 package csw.apps.clusterseed
 
+import com.typesafe.scalalogging.LazyLogging
 import csw.apps.clusterseed.cli.{ArgsParser, Options}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings, CswCluster}
 
@@ -13,10 +14,10 @@ class Main(clusterSettings: ClusterSettings) {
     }
 }
 
-object Main extends App {
+object Main extends App with LazyLogging {
   if (ClusterAwareSettings.seedNodes.isEmpty) {
-    println(
-      s"[error] clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
+    logger.error(
+      "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
     )
   } else {
     new Main(ClusterAwareSettings).start(args)

@@ -23,7 +23,7 @@ class ConfigClientApiTest extends FunSuite with Matchers with BeforeAndAfterEach
 
   import serverWiring.actorRuntime._
 
-  //Why 2 instances of ConfirgService? Use adminAPI is used to set configurations; clientAPI is used for validation/testing
+  //Why 2 instances of ConfigService? adminAPI is used to set configurations; clientAPI is used for validation/testing
   val configClientService: ConfigClientService = ConfigClientFactory.clientApi(actorSystem, clientLocationService)
   val configAdminService: ConfigService        = ConfigClientFactory.adminApi(actorSystem, clientLocationService)
 
@@ -37,7 +37,6 @@ class ConfigClientApiTest extends FunSuite with Matchers with BeforeAndAfterEach
     httpService.registeredLazyBinding.await
 
   override protected def afterAll(): Unit = {
-//    actorSystem.terminate().await
     httpService.shutdown().await
     clientLocationService.shutdown().await
   }
@@ -66,13 +65,12 @@ class ConfigClientApiTest extends FunSuite with Matchers with BeforeAndAfterEach
   test("should able to get, set and reset the active version of config file") {
     // create file
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
-    configAdminService.create(file, ConfigData.fromString(configValue1), annex = false, "hello world").await
+    configAdminService.create(file, ConfigData.fromString(configValue1), annex = false, "First commit").await
     configClientService.exists(file).await shouldBe true
 
     // update file twice
-    val configId =
-      configAdminService.update(file, ConfigData.fromString(configValue2), "Updated config to assembly").await
-    configAdminService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").await
+    val configId = configAdminService.update(file, ConfigData.fromString(configValue2), "second commit").await
+    configAdminService.update(file, ConfigData.fromString(configValue3), "third commit").await
 
     // check that get file without ID should return latest file
     configAdminService.getLatest(file).await.get.toStringF.await shouldBe configValue3

@@ -2,9 +2,11 @@ package csw.services.config.server.svn
 
 import java.io.{InputStream, OutputStream}
 import java.nio.file.Path
+import java.time.Instant
 import java.util.regex.Pattern
 
 import akka.dispatch.MessageDispatcher
+import com.typesafe.scalalogging.LazyLogging
 import csw.services.config.api.models.FileType
 import csw.services.config.server.Settings
 import csw.services.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
@@ -18,7 +20,7 @@ import org.tmatesoft.svn.core.wc2.{ISvnObjectReceiver, SvnOperationFactory, SvnT
 
 import scala.concurrent.Future
 
-class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
+class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) extends LazyLogging {
 
   private implicit val _blockingIoDispatcher = blockingIoDispatcher
 
@@ -27,19 +29,17 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       // Create the new main repo
       FSRepositoryFactory.setup()
       SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, false)
-      println(s"New Repository created at ${settings.svnUrl}")
+      logger.info(s"New Repository created at ${settings.svnUrl}")
     } catch {
       //If the repo already exists, print stracktrace and continue to boot
       case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.IO_ERROR ⇒
-        println(s"Repository already exists at ${settings.svnUrl}")
+        logger.info(s"Repository already exists at ${settings.svnUrl}")
     }
 
   def getFile(path: Path, revision: Long, outputStream: OutputStream): Future[Unit] = Future {
     val svn = svnHandle()
     try {
       svn.getFile(path.toString, revision, null, outputStream)
-      outputStream.flush()
-      outputStream.close()
     } finally {
       svn.closeSession()
     }
@@ -154,22 +154,25 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
-  def hist(path: Path, maxResults: Int): Future[List[SVNLogEntry]] =
-    Future {
-      val clientManager = SVNClientManager.newInstance()
-      var logEntries    = List[SVNLogEntry]()
-      try {
-        val logClient                    = clientManager.getLogClient
-        val handler: ISVNLogEntryHandler = logEntry => logEntries = logEntry :: logEntries
-        logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
-          handler)
-        logEntries.sortWith(_.getRevision > _.getRevision)
-      } finally {
-        clientManager.dispose()
+  def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] = Future {
+    val clientManager = SVNClientManager.newInstance()
+    var logEntries    = List[SVNLogEntry]()
+    try {
+      val logClient = clientManager.getLogClient
+      val handler: ISVNLogEntryHandler = logEntry =>
+        logEntries = {
+          if (logEntry.getDate.toInstant.isAfter(from) && logEntry.getDate.toInstant.isBefore(to))
+            logEntry :: logEntries
+          else
+            logEntries
       }
-    } recover {
-      case ex: SVNException => Nil
+      logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
+        handler)
+      logEntries.sortWith(_.getRevision > _.getRevision)
+    } finally {
+      clientManager.dispose()
     }
+  }
 
   // Gets the svn revision from the given id, defaulting to HEAD
   def svnRevision(id: Option[Long] = None): Future[SVNRevision] = Future {

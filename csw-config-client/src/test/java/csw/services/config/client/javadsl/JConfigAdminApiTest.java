@@ -29,7 +29,8 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.isA;
 
-public class JConfigClientTest {
+//DEOPSCSW-138:Split Config API into Admin API and Client API
+public class JConfigAdminApiTest {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
     private static ILocationService clientLocationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
     private static IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService);
@@ -94,7 +95,7 @@ public class JConfigClientTest {
     @Test
     public void testCreateFileInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("SomeAnnexFile.txt");
-        configService.create(path, ConfigData.fromString(configValue1), true).get();
+        configService.create(path, ConfigData.fromString(configValue1), true, "creating file for annex store").get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
     }
@@ -136,12 +137,12 @@ public class JConfigClientTest {
         Path tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf");
         Path redisConf             = Paths.get("redis/test/text/redis.conf");
 
-        ConfigId configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1)).get();
-        ConfigId configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2)).get();
-        ConfigId configId3 = configService.create(redisConf, ConfigData.fromString(configValue3)).get();
-        ConfigId configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4)).get();
-        ConfigId configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5)).get();
-        ConfigId configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).get();
+        ConfigId configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1), "creating tromboneHCD.conf").get();
+        ConfigId configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2), "creating tromboneAssembly.conf").get();
+        ConfigId configId3 = configService.create(redisConf, ConfigData.fromString(configValue3), "creating binary conf file").get();
+        ConfigId configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4), "creating trombone container.conf").get();
+        ConfigId configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5), "updating tromboneHCD.conf").get();
+        ConfigId configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2), "updating tromboneAssembly.conf").get();
 
         ConfigData configData1 = configService.getById(tromboneHcdConf, configId1).get().get();
         Assert.assertEquals(configData1.toJStringF(mat).get(), configValue1);
@@ -208,8 +209,11 @@ public class JConfigClientTest {
             String comment3 = "commit version 3";
 
             ConfigId configId1 = configService.create(path, ConfigData.fromString(configValue1), false, comment1).get();
+            Instant createTS = Instant.now();
+
             ConfigId configId2 = configService.update(path, ConfigData.fromString(configValue2), comment2).get();
             ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3), comment3).get();
+            Instant updateTS = Instant.now();
 
             Assert.assertEquals(configService.history(path).get().size(), 3);
             Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
@@ -223,6 +227,21 @@ public class JConfigClientTest {
                     new ArrayList<>(Arrays.asList(configId3, configId2)));
             Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
                     new ArrayList<>(Arrays.asList(comment3, comment2)));
+
+            Assert.assertEquals(configService.history(path, createTS, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2)));
+
+            Assert.assertEquals(configService.historyFrom(path, createTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2)));
+
+            Assert.assertEquals(configService.historyFrom(path, createTS, 1).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3)));
+
+            Assert.assertEquals(configService.historyUpTo(path, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
+
+            Assert.assertEquals(configService.historyUpTo(path, updateTS, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2)));
         }
     }
 
@@ -263,7 +282,7 @@ public class JConfigClientTest {
 
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
-        configService.delete(path).get();
+        configService.delete(path, "no longer needed").get();
         Assert.assertEquals(configService.getLatest(path).get(), Optional.empty());
     }
 
@@ -271,6 +290,7 @@ public class JConfigClientTest {
     // DEOPSCSW-78: Get the default version of a configuration file
     // DEOPSCSW-79: Reset the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
+    // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
     @Test
     public void testGetSetAndResetActiveConfigFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
@@ -281,21 +301,49 @@ public class JConfigClientTest {
         configService.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue1);
 
-        configService.setActive(path, configIdUpdate1).get();
+        configService.setActiveVersion(path, configIdUpdate1, "setting active version").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.resetActive(path, "resetting active version of file").get();
+        configService.resetActiveVersion(path, "resetting active version of file").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.resetActive(path).get();
+        configService.resetActiveVersion(path, "resetting active version").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
+    }
 
-        configService.resetActive(path, "setting active version again").get();
-        Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
+    //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
+    @Test
+    public void testGetHistoryOfActiveVersionsOfFile() throws ExecutionException, InterruptedException {
+        String commentCreateActive = "initializing active file with the first version";
+        // create file
+        Path file      = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf");
+        ConfigId configId1 = configService.create(file, ConfigData.fromString(configValue1),  false, "create").get();
+
+        // update file twice
+        ConfigId configId3 = configService.update(file, ConfigData.fromString(configValue3), "Update 1").get();
+        ConfigId configId4 = configService.update(file, ConfigData.fromString(configValue4), "Update 2").get();
+
+        // set active version of file to id=3
+        String commentSetActive = "Setting active version for the first time";
+        configService.setActiveVersion(file, configId3, commentSetActive).get();
+
+        // reset active version and check that get active returns latest version
+        String commentResetActive = "resetting active version";
+        configService.resetActiveVersion(file, commentResetActive).get();
+
+        // update file and check get active returns last active version and not the latest version
+        configService.update(file, ConfigData.fromString(configValue5), "Update 3").get();
+        Assert.assertEquals(configService.getActiveVersion(file).get().get(), configId4);
+
+        List<ConfigFileRevision> configFileHistories = configService.historyActive(file).get();
+        Assert.assertEquals(configFileHistories.size(), 3);
+        Assert.assertEquals(configFileHistories.stream().map(ConfigFileRevision::id).collect(Collectors.toList()), Arrays.asList(configId4, configId3, configId1));
+        Assert.assertEquals(configFileHistories.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()), Arrays.asList(commentResetActive, commentSetActive, commentCreateActive));
     }
 
     // DEOPSCSW-78: Get the default version of a configuration file
     // DEOPSCSW-70: Retrieve the current/most recent version of an existing configuration file
+    // DEOPSCSW-139: Provide new routes to get/set the current active version of the file
     @Test
     public void testGetActiveReturnsNoneIfFileNotExist() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/text-files/trombone_hcd/application.conf");
@@ -340,10 +388,12 @@ public class JConfigClientTest {
     public void testUpdateAndHistoryOfFilesInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
         ConfigId configIdCreate = configService.create(path, ConfigData.fromString(configValue1), true, "commit initial configuration").get();
+        Instant createTS = Instant.now();
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
         ConfigId configIdUpdate1 = configService.update(path, ConfigData.fromString(configValue2), "updated config to assembly").get();
         ConfigId configIdUpdate2 = configService.update(path, ConfigData.fromString(configValue3), "updated config to assembly").get();
+        Instant updateTS = Instant.now();
 
         Assert.assertEquals(configService.history(path).get().size(), 3);
         Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
@@ -352,6 +402,19 @@ public class JConfigClientTest {
         Assert.assertEquals(configService.history(path, 2).get().size(), 2);
         Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
                 new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+
+        Assert.assertEquals(configService.history(path, createTS, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+
+        Assert.assertEquals(configService.historyFrom(path, createTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+
+        Assert.assertEquals(configService.historyUpTo(path, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1, configIdCreate)));
+
+        Assert.assertEquals(configService.historyUpTo(path, updateTS, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                new ArrayList<>(Arrays.asList(configIdUpdate2, configIdUpdate1)));
+
     }
 
     // DEOPSCSW-77: Set default version of configuration file in config. service
@@ -369,10 +432,10 @@ public class JConfigClientTest {
         // check that getActive call before any setActive call should return the file with id with which it was created
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue1);
 
-        configService.setActive(path, configIdUpdate1).get();
+        configService.setActiveVersion(path, configIdUpdate1, "setting active version").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.resetActive(path).get();
+        configService.resetActiveVersion(path, "resetting active version").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
@@ -406,8 +469,8 @@ public class JConfigClientTest {
                 .create(assemblyConfig, ConfigData.fromString(configValue2),true, assemblyConfigComment)
                 .get();
 
-        configService.setActive(tromboneConfig, tromboneConfigId).get();
-        configService.setActive(assemblyConfig, assemblyConfigId).get();
+        configService.setActiveVersion(tromboneConfig, tromboneConfigId, "settting active version").get();
+        configService.setActiveVersion(assemblyConfig, assemblyConfigId, "settting active version").get();
 
         // list files from repo and assert that it contains added files
 
@@ -509,11 +572,11 @@ public class JConfigClientTest {
         configService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").get();
 
         Instant tHeadRevision = Instant.now();
-        configService.setActive(file, configId, "Setting active version for the first time").get();
+        configService.setActiveVersion(file, configId, "Setting active version for the first time").get();
 
         Instant tActiveRevision1 = Instant.now();
 
-        configService.resetActive(file, "resetting active version").get();
+        configService.resetActiveVersion(file, "resetting active version").get();
 
         Assert.assertEquals(configService.getActiveByTime(file, tHeadRevision).get().get().toJStringF(mat).get(), configValue1);
         Assert.assertEquals(configService.getActiveByTime(file, tActiveRevision1).get().get().toJStringF(mat).get(), configValue2);

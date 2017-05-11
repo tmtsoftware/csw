@@ -24,6 +24,8 @@ trait HttpSupport extends Directives with JsonSupport {
   val latestParam: Directive1[Boolean]       = parameter('latest.as[Boolean] ? false)
   val idParam: Directive1[Option[ConfigId]]  = parameter('id.?).map(_.map(new ConfigId(_)))
   val dateParam: Directive1[Option[Instant]] = parameter('date.?).map(_.map(Instant.parse))
+  val fromParam: Directive1[Instant]         = parameter('from.?).map(_.map(Instant.parse).getOrElse(Instant.MIN))
+  val toParam: Directive1[Instant]           = parameter('to.?).map(_.map(Instant.parse).getOrElse(Instant.now()))
   val maxResultsParam: Directive1[Int]       = parameter('maxResults.as[Int] ? Int.MaxValue)
   val commentParam: Directive1[String]       = parameter('comment ? "")
   val annexParam: Directive1[Boolean]        = parameter('annex.as[Boolean] ? false)

@@ -97,7 +97,9 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
       val actualActiveConfigValue = configService.getActive(Paths.get(repoPath1)).await.get.toStringF.await
       actualActiveConfigValue shouldBe inputFileContents
 
-      configService.create(Paths.get(repoPath2), ConfigData.fromString(inputFileContents)).await
+      configService
+        .create(Paths.get(repoPath2), ConfigData.fromString(inputFileContents), comment = "creating app.conf")
+        .await
       enterBarrier("member2-create")
     }
     enterBarrier("after-1")

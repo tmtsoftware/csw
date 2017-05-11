@@ -1,23 +1,23 @@
 package csw.services.config.server.svn
 
+import java.io.ByteArrayOutputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
-import akka.stream.scaladsl.StreamConverters
+import com.typesafe.scalalogging.LazyLogging
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models.{FileType, _}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.files.AnnexFileService
 import csw.services.config.server.{ActorRuntime, Settings}
-import csw.services.location.internal.StreamExt.RichSource
 import org.tmatesoft.svn.core.wc.SVNRevision
 
 import scala.async.Async._
 import scala.concurrent.Future
-import scala.util.control.NonFatal
 
 class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorRuntime: ActorRuntime, svnRepo: SvnRepo)
-    extends ConfigService {
+    extends ConfigService
+    with LazyLogging {
 
   import actorRuntime._
 
@@ -29,7 +29,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       }
 
       val id = await(createFile(path, configData, annex, comment))
-      await(setActiveVersion(path, id))
+      await(setActiveVersion(path, id, "initializing active file with the first version"))
       id
     }
 
@@ -46,7 +46,8 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     async {
       // If the file does not already exists in the repo, create it
       if (annex || configData.length > settings.`annex-min-file-size`) {
-        //        println(s"Either annex=${annex} is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
+        logger.info(
+            s"Either annex=$annex is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
         await(createAnnex())
       } else {
         await(put(path, configData, update = false, comment))
@@ -73,14 +74,9 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   // Returns the contents of the given version of the file, if found
   private def getNormalSize(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
-    val outputStream = StreamConverters.asOutputStream().cancellableMat
-    val source = outputStream.mapMaterializedValue {
-      case (out, switch) ⇒
-        svnRepo.getFile(path, revision.getNumber, out).recover {
-          case NonFatal(ex) ⇒ switch.abort(ex)
-        }
-    }
-    Some(ConfigData.from(source, await(svnRepo.getFileSize(path, revision.getNumber))))
+    val outputStream = new ByteArrayOutputStream()
+    await(svnRepo.getFile(path, revision.getNumber, outputStream))
+    Some(ConfigData.fromBytes(outputStream.toByteArray))
   }
 
   // Get annex files that are stored in the annex server
@@ -146,13 +142,14 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       }
     }
 
-  override def history(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
-    await(pathStatus(path)) match {
-      case PathStatus.NormalSize ⇒ await(hist(path, maxResults))
-      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), maxResults))
-      case PathStatus.Missing    ⇒ throw FileNotFound(path)
+  override def history(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
+    async {
+      await(pathStatus(path)) match {
+        case PathStatus.NormalSize ⇒ await(hist(path, from, to, maxResults))
+        case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), from, to, maxResults))
+        case PathStatus.Missing    ⇒ throw FileNotFound(path)
+      }
     }
-  }
 
   override def setActiveVersion(path: Path, id: ConfigId, comment: String = ""): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
@@ -175,7 +172,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
 
     val currentVersion = await(getCurrentVersion(path))
-    await(setActiveVersion(path, currentVersion.get))
+    await(setActiveVersion(path, currentVersion.get, comment))
   }
 
   override def getActive(path: Path): Future[Option[ConfigData]] = {
@@ -200,9 +197,39 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     await(getById(path, ConfigId(activeId)))
   }
 
-  override def getActiveVersion(path: Path): Future[ConfigId] = async {
+  override def getActiveVersion(path: Path): Future[Option[ConfigId]] = async {
     val configData = await(getLatest(activeFilePath(path)))
-    ConfigId(await(configData.get.toStringF))
+    if (configData.isDefined)
+      Some(ConfigId(await(configData.get.toStringF)))
+    else
+      None
+  }
+
+  def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
+    async {
+      val activePath = activeFilePath(path)
+
+      if (await(exists(activePath))) {
+
+        val configFileRevisions = await(hist(activePath, from, to, maxResults))
+
+        val history = Future.sequence(configFileRevisions.map(historyActiveRevisions(activePath, _)))
+
+        await(history)
+      } else
+        throw FileNotFound(path)
+    }
+
+  private def historyActiveRevisions(path: Path, configFileRevision: ConfigFileRevision): Future[ConfigFileRevision] =
+    async {
+      val configData = await(getById(path, configFileRevision.id))
+      ConfigFileRevision(ConfigId(await(configData.get.toStringF)), configFileRevision.comment,
+        configFileRevision.time)
+    }
+
+  override def getMetadata: Future[ConfigMetadata] = Future {
+    ConfigMetadata(settings.`repository-dir`, settings.`annex-files-dir`, settings.annexMinFileSizeAsMetaInfo,
+      settings.`max-content-length`)
   }
 
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
@@ -239,14 +266,14 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   // Returns the current version of the file, if known
   private def getCurrentVersion(path: Path): Future[Option[ConfigId]] = async {
     await(pathStatus(path)) match {
-      case PathStatus.NormalSize ⇒ await(hist(path, 1)).headOption.map(_.id)
-      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), 1)).headOption.map(_.id)
+      case PathStatus.NormalSize ⇒ await(hist(path, Instant.MIN, Instant.now, 1)).headOption.map(_.id)
+      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), Instant.MIN, Instant.now, 1)).headOption.map(_.id)
       case PathStatus.Missing    ⇒ None
     }
   }
 
-  private def hist(path: Path, maxResults: Int): Future[List[ConfigFileRevision]] = async {
-    await(svnRepo.hist(path, maxResults))
+  private def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] = async {
+    await(svnRepo.hist(path, from, to, maxResults))
       .map(e => ConfigFileRevision(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
   }
 
@@ -255,9 +282,4 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   // File used to store the id of the active version of the file.
   private def activeFilePath(path: Path): Path = Paths.get(s"${path.toString}${settings.`active-config-suffix`}")
-
-  override def getMetadata: Future[ConfigMetadata] = Future {
-    ConfigMetadata(settings.`repository-dir`, settings.`annex-files-dir`, settings.annexMinFileSizeAsMetaInfo,
-      settings.`max-content-length`)
-  }
 }
