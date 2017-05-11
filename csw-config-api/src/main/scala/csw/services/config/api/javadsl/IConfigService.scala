@@ -21,13 +21,11 @@ trait IConfigService extends IConfigClientService {
    * @param path       the file path relative to the repository root
    * @param configData used to read the contents of the file
    * @param annex      true if the file requires special handling (external storage)
-   * @param comment    an optional comment to associate with this file
+   * @param comment    comment to associate with this operation
    * @return           a unique id that can be used to refer to the file
    */
   def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): CompletableFuture[ConfigId]
   def create(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId]
-  def create(path: Path, configData: ConfigData, annex: Boolean): CompletableFuture[ConfigId]
-  def create(path: Path, configData: ConfigData): CompletableFuture[ConfigId]
 
   /**
    * Updates the config file with the given path and data and optional comment.
@@ -39,7 +37,6 @@ trait IConfigService extends IConfigClientService {
    * @return           a unique id that can be used to refer to the file
    */
   def update(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId]
-  def update(path: Path, configData: ConfigData): CompletableFuture[ConfigId]
 
   /**
    * Gets and returns the file stored under the given path.
@@ -67,10 +64,10 @@ trait IConfigService extends IConfigClientService {
   /**
    * Deletes the given config file (older versions will still be available)
    *
-   * @param path the file path relative to the repository root
+   * @param path    the file path relative to the repository root
+   * @param comment comment to associate with this operation
    */
   def delete(path: Path, comment: String): CompletableFuture[Unit]
-  def delete(path: Path): CompletableFuture[Unit]
 
   /**
    * Returns a list containing all of the known config files
@@ -105,22 +102,22 @@ trait IConfigService extends IConfigClientService {
    * If this method is not called, the active version will always be the version with which the file was created i.e. 1
    * After calling this method, the version with the given Id will be the active.
    *
-   * @param path the file path relative to the repository root
-   * @param id   an optional id used to specify a specific version
-   *             (by default the id of the version with which the file was created i.e. 1)
-   * @return     a future result
+   * @param path      the file path relative to the repository root
+   * @param comment   comment to associate with this operation
+   * @param id        an optional id used to specify a specific version
+   *                  (by default the id of the version with which the file was created i.e. 1)
+   * @return          a future result
    */
   def setActiveVersion(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit]
-  def setActiveVersion(path: Path, id: ConfigId): CompletableFuture[Unit]
 
   /**
    * Resets the "active version" of the file with the given path to the latest version.
    *
-   * @param path the file path relative to the repository root
-   * @return     a future result
+   * @param path      the file path relative to the repository root
+   * @param comment   comment to associate with this operation
+   * @return          a future result
    */
   def resetActiveVersion(path: Path, comment: String): CompletableFuture[Unit]
-  def resetActiveVersion(path: Path): CompletableFuture[Unit]
 
   /**
    * Returns the version which represents the "active version" of the file with the given path

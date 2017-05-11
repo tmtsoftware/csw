@@ -27,17 +27,8 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def create(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
     create(path, configData, annex = false, comment)
 
-  override def create(path: Path, configData: ConfigData, annex: Boolean): CompletableFuture[ConfigId] =
-    create(path, configData, annex, comment = "")
-
-  override def create(path: Path, configData: ConfigData): CompletableFuture[ConfigId] =
-    create(path, configData, annex = false, comment = "")
-
   override def update(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
     configService.update(path, configData, comment).toJava.toCompletableFuture
-
-  override def update(path: Path, configData: ConfigData): CompletableFuture[ConfigId] =
-    update(path, configData, comment = "")
 
   override def getById(path: Path, id: ConfigId): CompletableFuture[Optional[ConfigData]] =
     configService.getById(path, id).map(_.asJava).toJava.toCompletableFuture
@@ -56,9 +47,6 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
 
   override def delete(path: Path, comment: String): CompletableFuture[Unit] =
     configService.delete(path, comment).toJava.toCompletableFuture
-
-  override def delete(path: Path): CompletableFuture[Unit] =
-    delete(path, comment = "deleted")
 
   override def list(fileType: FileType, pattern: String): CompletableFuture[util.List[ConfigFileInfo]] =
     configService.list(Some(fileType), Some(pattern)).map(_.asJava).toJava.toCompletableFuture
@@ -106,14 +94,8 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def setActiveVersion(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit] =
     configService.setActiveVersion(path, id, comment).toJava.toCompletableFuture
 
-  override def setActiveVersion(path: Path, id: ConfigId): CompletableFuture[Unit] =
-    setActiveVersion(path, id, "")
-
   override def resetActiveVersion(path: Path, comment: String): CompletableFuture[Unit] =
     configService.resetActiveVersion(path, comment).toJava.toCompletableFuture
-
-  override def resetActiveVersion(path: Path): CompletableFuture[Unit] =
-    resetActiveVersion(path, "")
 
   override def getActive(path: Path): CompletableFuture[Optional[ConfigData]] =
     configService.getActive(path).map(_.asJava).toJava.toCompletableFuture

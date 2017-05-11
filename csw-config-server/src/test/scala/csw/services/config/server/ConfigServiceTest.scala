@@ -197,16 +197,28 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val expectedConfigIds     = List(ConfigId(1), ConfigId(3), ConfigId(5), ConfigId(7), ConfigId(9), ConfigId(10))
 
     //consumes 2 revisions, one for actual file one for active file
-    val configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1)).await
+    val configId1 = configService
+      .create(tromboneHcdConf, ConfigData.fromString(configValue1), comment = "creating tromboneHCD.conf")
+      .await
     //consumes 2 revisions, one for actual file one for active file
-    val configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
+    val configId2 = configService
+      .create(tromboneAssemblyConf, ConfigData.fromString(configValue2), comment = "creating tromboneAssembly.conf")
+      .await
     //consumes 2 revisions, one for actual file one for active file
-    val configId3 = configService.create(binaryConfPath, ConfigData.fromString(configValue3), annex = true).await
+    val configId3 = configService
+      .create(binaryConfPath, ConfigData.fromString(configValue3), annex = true, "creating binary conf file")
+      .await
     //consumes 2 revisions, one for actual file one for active file
-    val configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4)).await
+    val configId4 = configService
+      .create(tromboneContainerConf, ConfigData.fromString(configValue4), comment = "creating trombone container.conf")
+      .await
 
-    val configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5)).await
-    val configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
+    val configId5 = configService
+      .update(tromboneHcdConf, ConfigData.fromString(configValue5), comment = "updating tromboneHCD.conf")
+      .await
+    val configId6 = configService
+      .update(tromboneAssemblyConf, ConfigData.fromString(configValue2), comment = "updating tromboneAssembly.conf")
+      .await
 
     val actualConfigIds = List(configId1, configId2, configId3, configId4, configId5, configId6)
 
@@ -230,12 +242,23 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf")
     val redisConf             = Paths.get("redis/test/text/redis.conf")
 
-    val configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1)).await
-    val configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
-    val configId3 = configService.create(redisConf, ConfigData.fromString(configValue3)).await
-    val configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4)).await
-    val configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5)).await
-    val configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).await
+    val configId1 = configService
+      .create(tromboneHcdConf, ConfigData.fromString(configValue1), comment = "creating tromboneHCD conf")
+      .await
+    val configId2 = configService
+      .create(tromboneAssemblyConf, ConfigData.fromString(configValue2), comment = "creating tromboneHCD conf")
+      .await
+    val configId3 =
+      configService.create(redisConf, ConfigData.fromString(configValue3), comment = "creating redis conf").await
+    val configId4 = configService
+      .create(tromboneContainerConf, ConfigData.fromString(configValue4), comment = "creating trombone container conf")
+      .await
+    val configId5 = configService
+      .update(tromboneHcdConf, ConfigData.fromString(configValue5), comment = "updating tromboneHCD conf")
+      .await
+    val configId6 = configService
+      .update(tromboneAssemblyConf, ConfigData.fromString(configValue2), comment = "updating tromboneHCD conf")
+      .await
 
     val configData1 = configService.getById(tromboneHcdConf, configId1).await.get
     configData1.toStringF.await shouldBe configValue1
@@ -421,14 +444,14 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue1
 
-    configService.delete(file).await
+    configService.delete(file, "no longer needed").await
     configService.getLatest(file).await shouldBe None
   }
 
   test("deleting non existing file should throw FileNotFoundException") {
     val file = Paths.get("tromboneHCD.conf")
     intercept[FileNotFound] {
-      configService.delete(file).await
+      configService.delete(file, "not needed").await
     }
   }
 
@@ -442,7 +465,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId3 = configService.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
 
     configService.history(file).await.size shouldBe 3
-    configService.delete(file).await
+    configService.delete(file, "no longer needed").await
     intercept[FileNotFound] {
       configService.history(file).await.size shouldBe 0
     }
@@ -536,13 +559,13 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val file = Paths.get("/tmt/test/temp.conf")
 
     intercept[FileNotFound] {
-      configService.resetActiveVersion(file).await
+      configService.resetActiveVersion(file, "resetting active version").await
     }
 
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "test file").await
 
     intercept[FileNotFound] {
-      configService.setActiveVersion(file, ConfigId(3)).await
+      configService.setActiveVersion(file, ConfigId(3), "setting active version").await
     }
   }
 
@@ -648,7 +671,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId =
       configService.create(file, ConfigData.fromString(content), annex = true, "committing annex file").await
 
-    configService.setActiveVersion(file, configId).await
+    configService.setActiveVersion(file, configId, "setting active version").await
 
     val newContent = "testing annex file, again"
     val newComment = "Updating file"
@@ -657,7 +680,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val activeConfigData: ConfigData = configService.getActive(file).await.get
     activeConfigData.toStringF.await shouldBe content
 
-    configService.resetActiveVersion(file).await
+    configService.resetActiveVersion(file, "resetting active version to latest").await
 
     val resetActiveConfigData: ConfigData = configService.getActive(file).await.get
     resetActiveConfigData.toStringF.await shouldBe newContent
@@ -671,7 +694,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     activeAfterDelete shouldBe None
 
     intercept[FileNotFound] {
-      configService.resetActiveVersion(file).await
+      configService.resetActiveVersion(file, "resetting active version to latest").await
     }
   }
 
@@ -727,8 +750,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       .create(assemblyConfig, ConfigData.fromString(configValue2), annex = true, assemblyConfigComment)
       .await
 
-    configService.setActiveVersion(tromboneConfig, tromboneConfigId).await
-    configService.setActiveVersion(assemblyConfig, assemblyConfigId).await
+    configService.setActiveVersion(tromboneConfig, tromboneConfigId, "setting active version").await
+    configService.setActiveVersion(assemblyConfig, assemblyConfigId, "setting active version").await
 
     // list files from repo and assert that it contains added files
     val configFiles = configService.list().await

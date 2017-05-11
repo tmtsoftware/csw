@@ -47,7 +47,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
   }
 
   def delete(options: Options): Unit = {
-    await(configService.delete(options.relativeRepoPath.get))
+    await(configService.delete(options.relativeRepoPath.get, "no longer needed"))
     logger.info(s"File ${options.relativeRepoPath.get} deletion is completed.")
   }
 

@@ -27,7 +27,7 @@ class SvnConfigServiceTest extends ConfigServiceTest {
     configService.exists(filePath).await shouldBe true
     configService.exists(activeFilePath).await shouldBe true
 
-    configService.resetActiveVersion(filePath).await
+    configService.resetActiveVersion(filePath, "resetting active version to latest").await
 
     configService.exists(activeFilePath).await shouldBe true
   }

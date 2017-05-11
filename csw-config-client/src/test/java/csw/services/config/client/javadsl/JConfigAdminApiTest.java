@@ -95,7 +95,7 @@ public class JConfigAdminApiTest {
     @Test
     public void testCreateFileInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("SomeAnnexFile.txt");
-        configService.create(path, ConfigData.fromString(configValue1), true).get();
+        configService.create(path, ConfigData.fromString(configValue1), true, "creating file for annex store").get();
         Optional<ConfigData> configData = configService.getLatest(path).get();
         Assert.assertEquals(configData.get().toJStringF(mat).get(), configValue1);
     }
@@ -137,12 +137,12 @@ public class JConfigAdminApiTest {
         Path tromboneContainerConf = Paths.get("trombone/test/container/akka/container.conf");
         Path redisConf             = Paths.get("redis/test/text/redis.conf");
 
-        ConfigId configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1)).get();
-        ConfigId configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2)).get();
-        ConfigId configId3 = configService.create(redisConf, ConfigData.fromString(configValue3)).get();
-        ConfigId configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4)).get();
-        ConfigId configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5)).get();
-        ConfigId configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2)).get();
+        ConfigId configId1 = configService.create(tromboneHcdConf, ConfigData.fromString(configValue1), "creating tromboneHCD.conf").get();
+        ConfigId configId2 = configService.create(tromboneAssemblyConf, ConfigData.fromString(configValue2), "creating tromboneAssembly.conf").get();
+        ConfigId configId3 = configService.create(redisConf, ConfigData.fromString(configValue3), "creating binary conf file").get();
+        ConfigId configId4 = configService.create(tromboneContainerConf, ConfigData.fromString(configValue4), "creating trombone container.conf").get();
+        ConfigId configId5 = configService.update(tromboneHcdConf, ConfigData.fromString(configValue5), "updating tromboneHCD.conf").get();
+        ConfigId configId6 = configService.update(tromboneAssemblyConf, ConfigData.fromString(configValue2), "updating tromboneAssembly.conf").get();
 
         ConfigData configData1 = configService.getById(tromboneHcdConf, configId1).get().get();
         Assert.assertEquals(configData1.toJStringF(mat).get(), configValue1);
@@ -282,7 +282,7 @@ public class JConfigAdminApiTest {
 
         Assert.assertEquals(configService.getLatest(path).get().get().toJStringF(mat).get(), configValue1);
 
-        configService.delete(path).get();
+        configService.delete(path, "no longer needed").get();
         Assert.assertEquals(configService.getLatest(path).get(), Optional.empty());
     }
 
@@ -301,13 +301,13 @@ public class JConfigAdminApiTest {
         configService.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue1);
 
-        configService.setActiveVersion(path, configIdUpdate1).get();
+        configService.setActiveVersion(path, configIdUpdate1, "setting active version").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
         configService.resetActiveVersion(path, "resetting active version of file").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.resetActiveVersion(path).get();
+        configService.resetActiveVersion(path, "resetting active version").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
@@ -432,10 +432,10 @@ public class JConfigAdminApiTest {
         // check that getActive call before any setActive call should return the file with id with which it was created
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue1);
 
-        configService.setActiveVersion(path, configIdUpdate1).get();
+        configService.setActiveVersion(path, configIdUpdate1, "setting active version").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.resetActiveVersion(path).get();
+        configService.resetActiveVersion(path, "resetting active version").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
@@ -469,8 +469,8 @@ public class JConfigAdminApiTest {
                 .create(assemblyConfig, ConfigData.fromString(configValue2),true, assemblyConfigComment)
                 .get();
 
-        configService.setActiveVersion(tromboneConfig, tromboneConfigId).get();
-        configService.setActiveVersion(assemblyConfig, assemblyConfigId).get();
+        configService.setActiveVersion(tromboneConfig, tromboneConfigId, "settting active version").get();
+        configService.setActiveVersion(assemblyConfig, assemblyConfigId, "settting active version").get();
 
         // list files from repo and assert that it contains added files
 
