@@ -34,7 +34,8 @@ class ArgsUtil {
   val existsArgs         = Array("exists", relativeRepoPath)
   val deleteArgs         = Array("delete", relativeRepoPath)
   val historyArgs        = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
-  val setActiveAllArgs   = Array("setActiveVersion", relativeRepoPath, "--id", id)
+  val historyActiveArgs  = Array("historyActive", relativeRepoPath, "--max", maxFileVersions.toString)
+  val setActiveAllArgs   = Array("setActiveVersion", relativeRepoPath, "--id")
   val resetActiveAllArgs = Array("resetActiveVersion", relativeRepoPath, "-c", comment)
   val meteDataArgs       = Array("getMetadata")
 

@@ -117,6 +117,13 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     metaData
   }
 
+  def historyActive(options: Options): List[ConfigFileRevision] = {
+    val histList = await(configService.historyActive(options.relativeRepoPath.get, options.fromDate, options.toDate,
+        options.maxFileVersions))
+    histList.foreach(h => logger.info(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    histList
+  }
+
   //clientApi
   def exists(options: Options): Boolean = {
     val exists = await(configService.exists(options.relativeRepoPath.get))

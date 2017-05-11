@@ -25,6 +25,7 @@ class Main(clusterSettings: ClusterSettings) {
           case "resetActiveVersion" ⇒ commandLineRunner.resetActiveVersion(options)
           case "getActiveVersion"   ⇒ commandLineRunner.getActiveVersion(options)
           case "getActiveByTime"    ⇒ commandLineRunner.getActiveByTime(options)
+          case "historyActive"      ⇒ commandLineRunner.history(options)
           case "getMetadata"        ⇒ commandLineRunner.getMetadata(options)
           //clientApi
           case "exists"    ⇒ commandLineRunner.exists(options)

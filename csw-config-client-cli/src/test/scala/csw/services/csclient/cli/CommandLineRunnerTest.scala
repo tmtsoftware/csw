@@ -10,7 +10,7 @@ import csw.services.csclient.commons.{ArgsUtil, TestFileUtils}
 import csw.services.location.commons.ClusterAwareSettings
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class CommandLineRunnerRTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   private val serverWiring = ServerWiring.make(ClusterAwareSettings.onPort(3552))
   private val httpService  = serverWiring.httpService
@@ -135,7 +135,7 @@ class CommandLineRunnerRTest extends FunSuite with Matchers with BeforeAndAfterA
     val updateConfigId = commandLineRunner.update(ArgsParser.parse(updateAllArgs).get)
 
     //  set active version of file to id=1 and store it at location: /tmp/output.txt
-    val parsedSetActiveArgs: Option[Options] = ArgsParser.parse(setActiveAllArgs)
+    val parsedSetActiveArgs: Option[Options] = ArgsParser.parse(setActiveAllArgs :+ "1")
     commandLineRunner.setActiveVersion(parsedSetActiveArgs.get)
 
     val getByDateArgs =
@@ -188,6 +188,34 @@ class CommandLineRunnerRTest extends FunSuite with Matchers with BeforeAndAfterA
 
     commandLineRunner
       .history(ArgsParser.parse(historyArgs :+ "--from" :+ createTS.toString :+ "--to" :+ updateTS.toString).get)
+      .map(_.id) shouldBe List(update2ConfigId, updateConfigId)
+  }
+
+  test("should able to fetch history of active files.") {
+
+    //  create file
+    val parsedCreateArgs: Option[Options] = ArgsParser.parse(createMinimalArgs)
+    val createConfigId                    = commandLineRunner.create(parsedCreateArgs.get)
+    val createTS                          = Instant.now
+
+    //  update file content
+    val parsedUpdateArgs: Option[Options] = ArgsParser.parse(updateAllArgs)
+    val updateConfigId                    = commandLineRunner.update(parsedUpdateArgs.get)
+
+    //  update file content
+    val parsedUpdate2Args: Option[Options] = ArgsParser.parse(updateAllArgs)
+    val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get)
+
+    commandLineRunner.setActiveVersion(ArgsParser.parse(setActiveAllArgs :+ updateConfigId.id).get)
+
+    commandLineRunner.historyActive(ArgsParser.parse(historyActiveArgs).get).map(_.id) shouldBe List(updateConfigId,
+      createConfigId)
+
+    commandLineRunner.resetActiveVersion(ArgsParser.parse(resetActiveAllArgs).get)
+
+    commandLineRunner
+      .historyActive(
+          ArgsParser.parse(historyActiveArgs :+ "--from" :+ createTS.toString :+ "--to" :+ Instant.now.toString).get)
       .map(_.id) shouldBe List(update2ConfigId, updateConfigId)
   }
 

@@ -190,6 +190,34 @@ class ArgsParserTest extends FunSuite with Matchers {
         Some(Paths.get(outputFilePath)), None, Some(Instant.parse(date))))
   }
 
+  test("test historyActive with no sub-options") {
+    val argv               = Array("historyActive")
+    val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
+    x shouldEqual None
+  }
+
+  test("test historyActive with all sub-options") {
+    val argv =
+      Array("historyActive", relativeRepoPath, "--from", date, "--to", date, "--max", maxFileVersions.toString)
+    val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
+    x should contain(Options("historyActive", Some(Paths.get(relativeRepoPath)), fromDate = Instant.parse(date),
+        toDate = Instant.parse(date), maxFileVersions = maxFileVersions))
+  }
+
+  test("test historyActive with max sub-option") {
+    val argv               = Array("historyActive", relativeRepoPath, "--max", maxFileVersions.toString)
+    val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
+    x should contain(Options("historyActive", Some(Paths.get(relativeRepoPath)), None, None, None, None,
+        maxFileVersions = maxFileVersions))
+  }
+
+  test("test historyActive with from and to sub-options") {
+    val argv               = Array("historyActive", relativeRepoPath, "--from", date, "--to", date)
+    val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
+    x should contain(Options("historyActive", Some(Paths.get(relativeRepoPath)), fromDate = Instant.parse(date),
+        toDate = Instant.parse(date)))
+  }
+
   test("test getMetadata") {
     val argv               = Array("getMetadata")
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())

@@ -161,6 +161,24 @@ object ArgsParser {
       } text "output file path"
     )
 
+    //history operation
+    cmd("historyActive") action { (_, c) =>
+      c.copy(op = "historyActive")
+    } text "shows versioning history of the active file in the repository" children (
+      arg[String]("<relativeRepoPath>") action { (x, c) =>
+        c.copy(relativeRepoPath = Some(Paths.get(x)))
+      } text "file path in the repository",
+      opt[String]("from") action { (x, c) =>
+        c.copy(fromDate = Instant.parse(x))
+      } text "optional date parameter for start date ex. 2017-04-16T16:15:23.503Z",
+      opt[String]("to") action { (x, c) =>
+        c.copy(toDate = Instant.parse(x))
+      } text "optional date parameter for upto date ex. 2017-04-16T16:15:23.503Z",
+      opt[Int]("max") action { (x, c) =>
+        c.copy(maxFileVersions = x)
+      } text "optional maximum entries of file versions"
+    )
+
     //getMetadata operation
     cmd("getMetadata") action { (_, c) =>
       c.copy(op = "getMetadata")
