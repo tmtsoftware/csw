@@ -487,6 +487,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.getActiveVersion(file).await.get shouldBe configId4
   }
 
+  //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
   test("should able to get history of active versions of file") {
     val commentCreateActive = "initializing active file with the first version"
     // create file

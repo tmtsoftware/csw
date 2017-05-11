@@ -103,17 +103,17 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def historyUpTo(path: Path, upTo: Instant): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, Instant.MIN, upTo, Int.MaxValue)
 
-  override def setActive(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit] =
+  override def setActiveVersion(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit] =
     configService.setActiveVersion(path, id, comment).toJava.toCompletableFuture
 
-  override def setActive(path: Path, id: ConfigId): CompletableFuture[Unit] =
-    setActive(path, id, "")
+  override def setActiveVersion(path: Path, id: ConfigId): CompletableFuture[Unit] =
+    setActiveVersion(path, id, "")
 
-  override def resetActive(path: Path, comment: String): CompletableFuture[Unit] =
+  override def resetActiveVersion(path: Path, comment: String): CompletableFuture[Unit] =
     configService.resetActiveVersion(path, comment).toJava.toCompletableFuture
 
-  override def resetActive(path: Path): CompletableFuture[Unit] =
-    resetActive(path, "")
+  override def resetActiveVersion(path: Path): CompletableFuture[Unit] =
+    resetActiveVersion(path, "")
 
   override def getActive(path: Path): CompletableFuture[Optional[ConfigData]] =
     configService.getActive(path).map(_.asJava).toJava.toCompletableFuture
@@ -127,4 +127,37 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def getMetadata: CompletableFuture[ConfigMetadata] = configService.getMetadata.toJava.toCompletableFuture
 
   override def asScala: ConfigService = configService
+
+  override def historyActive(path: Path,
+                             from: Instant,
+                             to: Instant,
+                             maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
+    configService.historyActive(path, from, to, maxResults).map(_.asJava).toJava.toCompletableFuture
+
+  override def historyActive(path: Path,
+                             from: Instant,
+                             to: Instant): CompletableFuture[util.List[ConfigFileRevision]] =
+    historyActive(path, from, to, Int.MaxValue)
+
+  override def historyActive(path: Path, maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
+    historyActive(path, Instant.MIN, Instant.now, maxResults)
+
+  override def historyActive(path: Path): CompletableFuture[util.List[ConfigFileRevision]] =
+    historyActive(path, Instant.MIN, Instant.now, Int.MaxValue)
+
+  override def historyActiveFrom(path: Path,
+                                 from: Instant,
+                                 maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
+    historyActive(path, from, Instant.now, maxResults)
+
+  override def historyActiveFrom(path: Path, from: Instant): CompletableFuture[util.List[ConfigFileRevision]] =
+    historyActive(path, from, Instant.now, Int.MaxValue)
+
+  override def historyActiveUpTo(path: Path,
+                                 upTo: Instant,
+                                 maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
+    historyActive(path, Instant.MIN, upTo, maxResults)
+
+  override def historyActiveUpTo(path: Path, upTo: Instant): CompletableFuture[util.List[ConfigFileRevision]] =
+    historyActive(path, Instant.MIN, upTo, Int.MaxValue)
 }

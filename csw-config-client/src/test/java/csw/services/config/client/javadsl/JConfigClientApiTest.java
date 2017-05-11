@@ -76,10 +76,10 @@ public class JConfigClientApiTest {
         Assert.assertEquals(configClientApi.getActive(path).get().get().toJStringF(mat).get(), configValue1);
         Assert.assertTrue(configClientApi.exists(path, Optional.of(configId1)).get());
 
-        configAdminApi.setActive(path, configId1).get();
+        configAdminApi.setActiveVersion(path, configId1).get();
         Assert.assertEquals(configClientApi.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configAdminApi.resetActive(path, "resetting active version of file").get();
+        configAdminApi.resetActiveVersion(path, "resetting active version of file").get();
         Assert.assertEquals(configClientApi.getActive(path).get().get().toJStringF(mat).get(), configValue3);
     }
 }

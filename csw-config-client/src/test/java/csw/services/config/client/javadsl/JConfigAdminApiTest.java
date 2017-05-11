@@ -301,14 +301,44 @@ public class JConfigAdminApiTest {
         configService.update(path, ConfigData.fromString(configValue3), "Updated config to assembly").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue1);
 
-        configService.setActive(path, configIdUpdate1).get();
+        configService.setActiveVersion(path, configIdUpdate1).get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.resetActive(path, "resetting active version of file").get();
+        configService.resetActiveVersion(path, "resetting active version of file").get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
 
-        configService.resetActive(path).get();
+        configService.resetActiveVersion(path).get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
+    }
+
+    //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
+    @Test
+    public void testGetHistoryOfActiveVersionsOfFile() throws ExecutionException, InterruptedException {
+        String commentCreateActive = "initializing active file with the first version";
+        // create file
+        Path file      = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf");
+        ConfigId configId1 = configService.create(file, ConfigData.fromString(configValue1),  false, "create").get();
+
+        // update file twice
+        ConfigId configId3 = configService.update(file, ConfigData.fromString(configValue3), "Update 1").get();
+        ConfigId configId4 = configService.update(file, ConfigData.fromString(configValue4), "Update 2").get();
+
+        // set active version of file to id=3
+        String commentSetActive = "Setting active version for the first time";
+        configService.setActiveVersion(file, configId3, commentSetActive).get();
+
+        // reset active version and check that get active returns latest version
+        String commentResetActive = "resetting active version";
+        configService.resetActiveVersion(file, commentResetActive).get();
+
+        // update file and check get active returns last active version and not the latest version
+        configService.update(file, ConfigData.fromString(configValue5), "Update 3").get();
+        Assert.assertEquals(configService.getActiveVersion(file).get().get(), configId4);
+
+        List<ConfigFileRevision> configFileHistories = configService.historyActive(file).get();
+        Assert.assertEquals(configFileHistories.size(), 3);
+        Assert.assertEquals(configFileHistories.stream().map(ConfigFileRevision::id).collect(Collectors.toList()), Arrays.asList(configId4, configId3, configId1));
+        Assert.assertEquals(configFileHistories.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()), Arrays.asList(commentResetActive, commentSetActive, commentCreateActive));
     }
 
     // DEOPSCSW-78: Get the default version of a configuration file
@@ -402,10 +432,10 @@ public class JConfigAdminApiTest {
         // check that getActive call before any setActive call should return the file with id with which it was created
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue1);
 
-        configService.setActive(path, configIdUpdate1).get();
+        configService.setActiveVersion(path, configIdUpdate1).get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue2);
 
-        configService.resetActive(path).get();
+        configService.resetActiveVersion(path).get();
         Assert.assertEquals(configService.getActive(path).get().get().toJStringF(mat).get(), configValue3);
     }
 
@@ -439,8 +469,8 @@ public class JConfigAdminApiTest {
                 .create(assemblyConfig, ConfigData.fromString(configValue2),true, assemblyConfigComment)
                 .get();
 
-        configService.setActive(tromboneConfig, tromboneConfigId).get();
-        configService.setActive(assemblyConfig, assemblyConfigId).get();
+        configService.setActiveVersion(tromboneConfig, tromboneConfigId).get();
+        configService.setActiveVersion(assemblyConfig, assemblyConfigId).get();
 
         // list files from repo and assert that it contains added files
 
@@ -542,11 +572,11 @@ public class JConfigAdminApiTest {
         configService.update(file, ConfigData.fromString(configValue3), "Updated config to assembly").get();
 
         Instant tHeadRevision = Instant.now();
-        configService.setActive(file, configId, "Setting active version for the first time").get();
+        configService.setActiveVersion(file, configId, "Setting active version for the first time").get();
 
         Instant tActiveRevision1 = Instant.now();
 
-        configService.resetActive(file, "resetting active version").get();
+        configService.resetActiveVersion(file, "resetting active version").get();
 
         Assert.assertEquals(configService.getActiveByTime(file, tHeadRevision).get().get().toJStringF(mat).get(), configValue1);
         Assert.assertEquals(configService.getActiveByTime(file, tActiveRevision1).get().get().toJStringF(mat).get(), configValue2);

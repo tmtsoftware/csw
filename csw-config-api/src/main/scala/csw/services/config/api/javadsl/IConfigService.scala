@@ -110,8 +110,8 @@ trait IConfigService extends IConfigClientService {
    *             (by default the id of the version with which the file was created i.e. 1)
    * @return     a future result
    */
-  def setActive(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit]
-  def setActive(path: Path, id: ConfigId): CompletableFuture[Unit]
+  def setActiveVersion(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit]
+  def setActiveVersion(path: Path, id: ConfigId): CompletableFuture[Unit]
 
   /**
    * Resets the "active version" of the file with the given path to the latest version.
@@ -119,8 +119,8 @@ trait IConfigService extends IConfigClientService {
    * @param path the file path relative to the repository root
    * @return     a future result
    */
-  def resetActive(path: Path, comment: String): CompletableFuture[Unit]
-  def resetActive(path: Path): CompletableFuture[Unit]
+  def resetActiveVersion(path: Path, comment: String): CompletableFuture[Unit]
+  def resetActiveVersion(path: Path): CompletableFuture[Unit]
 
   /**
    * Returns the version which represents the "active version" of the file with the given path
@@ -138,6 +138,27 @@ trait IConfigService extends IConfigClientService {
    * @return     a future object that can be used to access the file's data, if found
    */
   def getActiveByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]]
+
+  /**
+   * Returns a list of all known versions of a given path
+   *
+   * @param path       the file path relative to the repository root
+   * @param maxResults the maximum number of history results to return (default: unlimited)
+   * @return           a list containing one ConfigFileHistory object for each version of path
+   */
+  def historyActive(path: Path,
+                    from: Instant,
+                    to: Instant,
+                    maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
+  def historyActive(path: Path, from: Instant, to: Instant): CompletableFuture[ju.List[ConfigFileRevision]]
+  def historyActive(path: Path, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
+  def historyActive(path: Path): CompletableFuture[ju.List[ConfigFileRevision]]
+
+  def historyActiveFrom(path: Path, from: Instant, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
+  def historyActiveFrom(path: Path, from: Instant): CompletableFuture[ju.List[ConfigFileRevision]]
+
+  def historyActiveUpTo(path: Path, upTo: Instant, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
+  def historyActiveUpTo(path: Path, upTo: Instant): CompletableFuture[ju.List[ConfigFileRevision]]
 
   /**
    * Query the metadata of config server
