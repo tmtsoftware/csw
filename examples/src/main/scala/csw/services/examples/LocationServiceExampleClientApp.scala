@@ -19,8 +19,6 @@ object LocationServiceExampleClientApp extends App {
   private val locationService = LocationServiceFactory.make()
   //#create-location-service
 
-  Thread.sleep(1000);
-
   //#create-actor-system
   implicit val system = ActorSystemFactory.remote("csw-examples-locationServiceClient")
   //#create-actor-system
