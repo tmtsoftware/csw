@@ -151,6 +151,24 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       }
     }
 
+  override def historyActive(path: Path,
+                             from: Instant,
+                             to: Instant,
+                             maxResults: Int): Future[List[ConfigFileRevision]] =
+    async {
+      val activePath = activeFilePath(path)
+
+      if (await(exists(activePath))) {
+
+        val configFileRevisions = await(hist(activePath, from, to, maxResults))
+
+        val history = Future.sequence(configFileRevisions.map(historyActiveRevisions(activePath, _)))
+
+        await(history)
+      } else
+        throw FileNotFound(path)
+    }
+
   override def setActiveVersion(path: Path, id: ConfigId, comment: String = ""): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
       throw FileNotFound(path)
@@ -205,20 +223,10 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       None
   }
 
-  def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
-    async {
-      val activePath = activeFilePath(path)
-
-      if (await(exists(activePath))) {
-
-        val configFileRevisions = await(hist(activePath, from, to, maxResults))
-
-        val history = Future.sequence(configFileRevisions.map(historyActiveRevisions(activePath, _)))
-
-        await(history)
-      } else
-        throw FileNotFound(path)
-    }
+  override def getMetadata: Future[ConfigMetadata] = Future {
+    ConfigMetadata(settings.`repository-dir`, settings.`annex-files-dir`, settings.annexMinFileSizeAsMetaInfo,
+      settings.`max-content-length`)
+  }
 
   private def historyActiveRevisions(path: Path, configFileRevision: ConfigFileRevision): Future[ConfigFileRevision] =
     async {
@@ -226,11 +234,6 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       ConfigFileRevision(ConfigId(await(configData.get.toStringF)), configFileRevision.comment,
         configFileRevision.time)
     }
-
-  override def getMetadata: Future[ConfigMetadata] = Future {
-    ConfigMetadata(settings.`repository-dir`, settings.`annex-files-dir`, settings.annexMinFileSizeAsMetaInfo,
-      settings.`max-content-length`)
-  }
 
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
     val revision = id.map(_.id.toLong)

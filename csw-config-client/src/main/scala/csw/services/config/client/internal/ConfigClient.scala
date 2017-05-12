@@ -139,6 +139,12 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
                        maxResults: Int): Future[List[ConfigFileRevision]] =
     handleHistory(historyUri(path), from, to, maxResults)
 
+  override def historyActive(path: jnio.Path,
+                             from: Instant,
+                             to: Instant,
+                             maxResults: Int): Future[List[ConfigFileRevision]] =
+    handleHistory(historyActiveUri(path), from, to, maxResults)
+
   override def setActiveVersion(path: jnio.Path, id: ConfigId, comment: String): Future[Unit] =
     handleActiveConfig(path, Query("id" → id.id.toString, "comment" → comment))
 
@@ -163,12 +169,6 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       }
     )
   }
-
-  override def historyActive(path: jnio.Path,
-                             from: Instant,
-                             to: Instant,
-                             maxResults: Int): Future[List[ConfigFileRevision]] =
-    handleHistory(historyActiveUri(path), from, to, maxResults)
 
   override def getMetadata: Future[ConfigMetadata] = async {
     val request = HttpRequest(uri = await(metadataUri))
