@@ -149,7 +149,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-42: Storing text based component configuration
   // DEOPSCSW-48: Store new configuration file in Config. service
   // DEOPSCSW-47: Unique name for configuration file
-  test("should throw FileAlreadyExists while creating a file if it already exists in repository") {
+  test("should throw FileAlreadyExists while creating a file if it already exists in repository - assume svn first") {
     val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
       .create(file, ConfigData.fromString(configValue1), annex = false, "commit redis conf for first time")
@@ -161,11 +161,45 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
         .await
     }
 
+    intercept[FileAlreadyExists] {
+      configService
+        .create(file, ConfigData.fromString(configValue1), annex = true, "commit redis conf again")
+        .await
+    }
+
+    // If this succeeds without exception, then the creation of a new file succeeded
     val newFile = Paths.get("/tmt/tcp/redis/text/redis_updated.conf")
-    val configId = configService
+    configService
       .create(newFile, ConfigData.fromString(configValue3), annex = false, "commit redis conf with unique name")
       .await
-    configId shouldBe ConfigId(3)
+  }
+
+  // DEOPSCSW-42: Storing text based component configuration
+  // DEOPSCSW-48: Store new configuration file in Config. service
+  // DEOPSCSW-47: Unique name for configuration file
+  test("should throw FileAlreadyExists while creating a file if it already exists in repository - assume annex first") {
+    val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
+    configService
+      .create(file, ConfigData.fromString(configValue1), annex = true, "commit redis conf for first time")
+      .await
+
+    intercept[FileAlreadyExists] {
+      configService
+        .create(file, ConfigData.fromString(configValue1), annex = true, "commit redis conf again")
+        .await
+    }
+
+    intercept[FileAlreadyExists] {
+      configService
+        .create(file, ConfigData.fromString(configValue1), annex = false, "commit redis conf again")
+        .await
+    }
+
+    // If this succeeds without exception, then the creation of a new file succeeded
+    val newFile = Paths.get("/tmt/tcp/redis/text/redis_updated.conf")
+    configService
+      .create(newFile, ConfigData.fromString(configValue3), annex = true, "commit redis conf with unique name")
+      .await
   }
 
   // DEOPSCSW-49: Update an Existing File with a New Version
