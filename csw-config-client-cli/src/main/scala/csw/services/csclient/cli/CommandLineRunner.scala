@@ -80,6 +80,13 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     histList
   }
 
+  def historyActive(options: Options): List[ConfigFileRevision] = {
+    val histList = await(configService.historyActive(options.relativeRepoPath.get, options.fromDate, options.toDate,
+        options.maxFileVersions))
+    histList.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    histList
+  }
+
   def setActiveVersion(options: Options): Unit = {
     val maybeConfigId = options.id.map(id ⇒ ConfigId(id))
     await(configService.setActiveVersion(options.relativeRepoPath.get, maybeConfigId.get, options.comment))
@@ -122,13 +129,6 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     val metaData = await(configService.getMetadata)
     println(metaData.toString)
     metaData
-  }
-
-  def historyActive(options: Options): List[ConfigFileRevision] = {
-    val histList = await(configService.historyActive(options.relativeRepoPath.get, options.fromDate, options.toDate,
-        options.maxFileVersions))
-    histList.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
-    histList
   }
 
   //clientApi
