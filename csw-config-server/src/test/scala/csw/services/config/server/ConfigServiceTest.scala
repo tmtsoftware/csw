@@ -483,6 +483,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     // create file
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
+
+    // verify that create does setActive to new version
+    configService.getActive(file).await.get.toStringF.await shouldBe configValue1
+
+    // Test latest is good also
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue1
 
     // update file twice
