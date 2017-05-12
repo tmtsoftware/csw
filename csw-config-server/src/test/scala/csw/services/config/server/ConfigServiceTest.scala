@@ -149,7 +149,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-42: Storing text based component configuration
   // DEOPSCSW-48: Store new configuration file in Config. service
   // DEOPSCSW-47: Unique name for configuration file
-  test("should throw FileAlreadyExists while creating a file if it already exists in repository") {
+  test("should throw FileAlreadyExists while creating a file if it already exists in repository - assume svn first") {
     val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
     configService
       .create(file, ConfigData.fromString(configValue1), annex = false, "commit redis conf for first time")
@@ -161,11 +161,45 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
         .await
     }
 
+    intercept[FileAlreadyExists] {
+      configService
+        .create(file, ConfigData.fromString(configValue1), annex = true, "commit redis conf again")
+        .await
+    }
+
+    // If this succeeds without exception, then the creation of a new file succeeded
     val newFile = Paths.get("/tmt/tcp/redis/text/redis_updated.conf")
-    val configId = configService
+    configService
       .create(newFile, ConfigData.fromString(configValue3), annex = false, "commit redis conf with unique name")
       .await
-    configId shouldBe ConfigId(3)
+  }
+
+  // DEOPSCSW-42: Storing text based component configuration
+  // DEOPSCSW-48: Store new configuration file in Config. service
+  // DEOPSCSW-47: Unique name for configuration file
+  test("should throw FileAlreadyExists while creating a file if it already exists in repository - assume annex first") {
+    val file = Paths.get("/tmt/tcp/redis/text/redis.conf")
+    configService
+      .create(file, ConfigData.fromString(configValue1), annex = true, "commit redis conf for first time")
+      .await
+
+    intercept[FileAlreadyExists] {
+      configService
+        .create(file, ConfigData.fromString(configValue1), annex = true, "commit redis conf again")
+        .await
+    }
+
+    intercept[FileAlreadyExists] {
+      configService
+        .create(file, ConfigData.fromString(configValue1), annex = false, "commit redis conf again")
+        .await
+    }
+
+    // If this succeeds without exception, then the creation of a new file succeeded
+    val newFile = Paths.get("/tmt/tcp/redis/text/redis_updated.conf")
+    configService
+      .create(newFile, ConfigData.fromString(configValue3), annex = true, "commit redis conf with unique name")
+      .await
   }
 
   // DEOPSCSW-49: Update an Existing File with a New Version
@@ -483,6 +517,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     // create file
     val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
     configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
+
+    // verify that create does setActive to new version
+    configService.getActive(file).await.get.toStringF.await shouldBe configValue1
+
+    // Test latest is good also
     configService.getLatest(file).await.get.toStringF.await shouldBe configValue1
 
     // update file twice
@@ -777,11 +816,13 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
         .create(Paths.get(fileName), configData, annex = false, s"committing file: $fileName")
         .await
 
+    // This test verifies that the binary file has been stored properly in the configuration service
     val expectedContent =
       serverWiringAnnexTest.configService.getById(Paths.get(fileName), configId).await.get.toInputStream.toByteArray
     val diskFile = getClass.getClassLoader.getResourceAsStream(fileName)
     expectedContent shouldBe diskFile.toByteArray
 
+    // This test verifies that the file was stored in the annex because the file with the sha1-suffix only exists if in the annex
     val svnConfigData =
       serverWiringAnnexTest.configService
         .getById(Paths.get(s"$fileName${serverWiring.settings.`sha1-suffix`}"), configId)
