@@ -18,4 +18,4 @@ request = function()
 end
 
 
-dofile "/scripts/debug.lua"
+dofile "debug.lua"
