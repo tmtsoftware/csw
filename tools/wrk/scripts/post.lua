@@ -20,7 +20,7 @@ wrk.body   = readAll('conf/tromboneHCD.conf')
 counter = 0
 
 request = function()
-    path = "/config/app_" .. counter .. "?annex=true"
+    path = "/config/app_" .. counter
     counter = counter + 1
     return wrk.format(nil, path)
 end
