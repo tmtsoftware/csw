@@ -3,6 +3,7 @@ package csw.services.examples
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.Sink
+
 import scala.concurrent.duration._
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
@@ -18,41 +19,15 @@ object LocationServiceExampleClientApp extends App {
   private val locationService = LocationServiceFactory.make()
   //#create-location-service
 
+  Thread.sleep(1000);
+
   //#create-actor-system
   implicit val system = ActorSystemFactory.remote("csw-examples-locationServiceClient")
   //#create-actor-system
 
   implicit val mat = ActorMaterializer()
 
-  // create an actor ref to use for a dummy HCD registration
-  private val dummyActorRef = system.actorOf(Props(new Actor {
-    override def receive: Receive = {
-      case "print" => println("hello world")
-    }
-  }), name="my-actor-1")
-  private val thisActorRef = system.actorOf(LocationServiceExampleClient.props(locationService))
-
-  private val timeout = 5.seconds
-
-  //#Components-Connections-Registrations
-
-  // add some dummy registrations for illustrative purposes
-
-  // dummy http connection
-  private val httpConnection   = HttpConnection(ComponentId("configuration", ComponentType.Service))
-  private val httpRegistration = HttpRegistration(httpConnection, 8080, "path123")
-  private val httpRegResult = Await.result(locationService.register(httpRegistration), timeout)
-
-  // dummy HCD connection
-  private val hcdConnection   = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-  private val hcdRegistration = AkkaRegistration(hcdConnection, dummyActorRef)
-  private val hcdRegResult = Await.result(locationService.register(hcdRegistration), timeout)
-
-  //. register the client "assembly" created in this example
-  private val assemblyConnection   = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
-  private val assemblyRegistration = AkkaRegistration(assemblyConnection, thisActorRef)
-  val assemblyRegResult = Await.result(locationService.register(assemblyRegistration), timeout)
-  //#Components-Connections-Registrations
+  system.actorOf(LocationServiceExampleClient.props(locationService))
 }
 
 object LocationServiceExampleClient {
@@ -70,7 +45,7 @@ object LocationServiceExampleClient {
 class LocationServiceExampleClient(locationService: LocationService)(implicit mat: Materializer) extends Actor with ActorLogging {
 
   import LocationServiceExampleClient._
-  import LocationServiceExampleClientApp.assemblyRegResult
+
 
   private val timeout = 5.seconds
   private val waitForResolveLimit = 30.seconds
@@ -87,6 +62,32 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   //
   // Not only does this serve as an example for starting applications that are not written in CSW,
   // but it also will help demonstrate location filtering later in this demo.
+
+  //#Components-Connections-Registrations
+
+  // add some dummy registrations for illustrative purposes
+
+  // dummy http connection
+  private val httpConnection   = HttpConnection(ComponentId("configuration", ComponentType.Service))
+  private val httpRegistration = HttpRegistration(httpConnection, 8080, "path123")
+  private val httpRegResult = Await.result(locationService.register(httpRegistration), timeout)
+
+  // dummy HCD connection
+  private val hcdConnection   = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+  private val hcdRegistration = AkkaRegistration(hcdConnection, context.actorOf(Props(new Actor {
+    override def receive: Receive = {
+      case "print" => println("hello world")
+    }
+  }), name="my-actor-1"))
+  private val hcdRegResult = Await.result(locationService.register(hcdRegistration), timeout)
+
+  //. register the client "assembly" created in this example
+  private val assemblyConnection   = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
+  private val assemblyRegistration = AkkaRegistration(assemblyConnection, self)
+  private val assemblyRegResult = Await.result(locationService.register(assemblyRegistration), timeout)
+  //#Components-Connections-Registrations
+
+
 
   //#find-resolve
   // find connection to LocationServiceExampleComponent in location service
@@ -132,6 +133,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   // Output should be:
   //    All Registered Connections:
   //    --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
+  //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
   //    --- redis-service-tcp, component type=Service, connection type=TcpType
   //    --- configuration-service-http, component type=Service, connection type=HttpType
   //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
@@ -144,6 +146,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
   // Output should be:
   //    Registered Assemblies:
+  //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
   //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
   // filter connections based on component type
@@ -154,6 +157,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   // Output should be:
   //    Registered Akka connections:
   //    --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
+  //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
   //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
   //#filtering
@@ -210,6 +214,8 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
   override def postStop(): Unit = {
     //#unregister
+    httpRegResult.unregister()
+    hcdRegResult.unregister()
     assemblyRegResult.unregister()
     //#unregister
 
