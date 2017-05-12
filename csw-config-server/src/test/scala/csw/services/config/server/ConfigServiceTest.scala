@@ -782,11 +782,13 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
         .create(Paths.get(fileName), configData, annex = false, s"committing file: $fileName")
         .await
 
+    // This test verifies that the binary file has been stored properly in the configuration service
     val expectedContent =
       serverWiringAnnexTest.configService.getById(Paths.get(fileName), configId).await.get.toInputStream.toByteArray
     val diskFile = getClass.getClassLoader.getResourceAsStream(fileName)
     expectedContent shouldBe diskFile.toByteArray
 
+    // This test verifies that the file was stored in the annex because the file with the sha1-suffix only exists if in the annex
     val svnConfigData =
       serverWiringAnnexTest.configService
         .getById(Paths.get(s"$fileName${serverWiring.settings.`sha1-suffix`}"), configId)
