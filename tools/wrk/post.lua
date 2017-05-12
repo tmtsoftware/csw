@@ -9,7 +9,7 @@ function readAll(file)
 end
 
 wrk.method = "POST"
-wrk.body   = readAll('conf/tromboneHCD.conf')
+wrk.body   = readAll('./conf/tromboneHCD.conf')
 
 -- example dynamic request script which demonstrates changing
 -- the request path and a header for each request
