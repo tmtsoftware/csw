@@ -556,31 +556,60 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
   test("should able to get history of active versions of file") {
-    val commentCreateActive = "initializing active file with the first version"
+    val file = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
+    // on create call, active file gets created with this comment by default, note that this is an internal implementation
+    val createActiveComment = "initializing active file with the first version"
+
     // create file
-    val file      = Paths.get("/tmt/test/setactive/getactive/resetactive/active.conf")
-    val configId1 = configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
+    val configId1      = configService.create(file, ConfigData.fromString(configValue1), annex = false, "create").await
+    val createActiveTS = Instant.now()
 
     // update file twice
     val configId3 = configService.update(file, ConfigData.fromString(configValue3), "Update 1").await
     val configId4 = configService.update(file, ConfigData.fromString(configValue4), "Update 2").await
 
     // set active version of file to id=3
-    val commentSetActive = "Setting active version for the first time"
-    configService.setActiveVersion(file, configId3, commentSetActive).await
+    val setActiveComment = "Setting active version for the first time"
+    configService.setActiveVersion(file, configId3, setActiveComment).await
+    val setActiveTS = Instant.now()
 
     // reset active version and check that get active returns latest version
-    val commentResetActive = "resetting active version"
-    configService.resetActiveVersion(file, commentResetActive).await
+    val resetActiveComment1 = "resetting active version"
+    configService.resetActiveVersion(file, resetActiveComment1).await
+    val resetActiveTS1 = Instant.now()
 
     // update file and check get active returns last active version and not the latest version
-    configService.update(file, ConfigData.fromString(configValue5), "Update 3").await
+    val configId5 = configService.update(file, ConfigData.fromString(configValue5), "Update 3").await
     configService.getActiveVersion(file).await.get shouldBe configId4
 
-    val configFileHistories = configService.historyActive(file).await
-    configFileHistories.size shouldBe 3
-    configFileHistories.map(_.id) shouldBe List(configId4, configId3, configId1)
-    configFileHistories.map(_.comment) shouldBe List(commentResetActive, commentSetActive, commentCreateActive)
+    val resetActiveComment2 = "resetting active version"
+    configService.resetActiveVersion(file, resetActiveComment2).await
+    val resetActiveTS2 = Instant.now()
+
+    // verify complete history of active file without any parameters
+    val completeHistory = configService.historyActive(file).await
+    completeHistory.size shouldBe 4
+    completeHistory.map(_.id) shouldBe List(configId5, configId4, configId3, configId1)
+    completeHistory.map(_.comment) shouldBe List(resetActiveComment2, resetActiveComment1, setActiveComment,
+      createActiveComment)
+
+    // verify history of active file with max results parameter
+    configService.historyActive(file, maxResults = 2).await.size shouldBe 2
+
+    // verify history of active file from given timestamp
+    val historyFrom = configService.historyActive(file, createActiveTS).await
+    historyFrom.map(h ⇒ (h.id, h.comment)) shouldBe List((configId5, resetActiveComment2),
+      (configId4, resetActiveComment1), (configId3, setActiveComment))
+
+    // verify history of active file till given timestamp
+    val historyTo = configService.historyActive(file, to = resetActiveTS1).await
+    historyTo.map(h ⇒ (h.id, h.comment)) shouldBe List((configId4, resetActiveComment1), (configId3, setActiveComment),
+      (configId1, createActiveComment))
+
+    // verify history of active file within given timestamps
+    val historyWithin = configService.historyActive(file, setActiveTS, resetActiveTS2).await
+    historyWithin.map(h ⇒ (h.id, h.comment)) shouldBe List((configId5, resetActiveComment2),
+      (configId4, resetActiveComment1))
   }
 
   // DEOPSCSW-77: Set default version of configuration file in config service
@@ -713,6 +742,54 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.history(file, updateTS2, updateTS3).await.map(history ⇒ (history.id, history.comment)) shouldBe List(
       (configId3, comment3)
     )
+  }
+
+  //DEOPSCSW-86: Retrieve a version of a configuration file based on time range for being default version
+  test("should able to get history of active versions of file from annex store") {
+    val file = Paths.get("/tmt/annex/hcd.bin")
+    // on create call, active file gets created with this comment by default, note that this is an internal implementation
+    val createActiveComment = "initializing active file with the first version"
+
+    // create file
+    val configId1      = configService.create(file, ConfigData.fromString(configValue1), annex = true, "create").await
+    val createActiveTS = Instant.now()
+
+    // update file twice
+    val configId3 = configService.update(file, ConfigData.fromString(configValue3), "Update 1").await
+    val configId4 = configService.update(file, ConfigData.fromString(configValue4), "Update 2").await
+
+    // set active version of file to configId3
+    val setActiveComment = "Setting active version for the first time"
+    configService.setActiveVersion(file, configId3, setActiveComment).await
+    val setActiveTS = Instant.now()
+
+    // reset active version and check that get active returns latest version
+    val resetActiveComment = "resetting active version"
+    configService.resetActiveVersion(file, resetActiveComment).await
+    val resetActiveTS = Instant.now()
+
+    // verify complete history of active file without any parameters
+    val completeHistory = configService.historyActive(file).await
+    completeHistory.size shouldBe 3
+    completeHistory.map(_.id) shouldBe List(configId4, configId3, configId1)
+    completeHistory.map(_.comment) shouldBe List(resetActiveComment, setActiveComment, createActiveComment)
+
+    // verify history of active file with max results parameter
+    configService.historyActive(file, maxResults = 2).await.size shouldBe 2
+
+    // verify history of active file from given timestamp
+    val historyFrom = configService.historyActive(file, createActiveTS).await
+    historyFrom.map(h ⇒ (h.id, h.comment)) shouldBe List((configId4, resetActiveComment),
+      (configId3, setActiveComment))
+
+    // verify history of active file till given timestamp
+    val historyTo = configService.historyActive(file, to = resetActiveTS).await
+    historyTo.map(h ⇒ (h.id, h.comment)) shouldBe List((configId4, resetActiveComment), (configId3, setActiveComment),
+      (configId1, createActiveComment))
+
+    // verify history of active file within given timestamps
+    val historyWithin = configService.historyActive(file, setActiveTS, resetActiveTS).await
+    historyWithin.map(h ⇒ (h.id, h.comment)) shouldBe List((configId4, resetActiveComment))
   }
 
   // DEOPSCSW-77: Set default version of configuration file in config service
