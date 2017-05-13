@@ -397,24 +397,29 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId3 = configService.update(file, ConfigData.fromString(configValue3), commitMsg3).await
     val updateTS2 = Instant.now
 
+    // verify history without any parameter
     val configFileHistories = configService.history(file).await
     configFileHistories.size shouldBe 3
     configFileHistories.map(_.id) shouldBe List(configId3, configId2, configId1)
     configFileHistories.map(_.comment) shouldBe List(commitMsg3, commitMsg2, commitMsg1)
 
+    // verify history with max results parameter
     val configFileHistories1 = configService.history(file, maxResults = 2).await
     configFileHistories1.size shouldBe 2
     configFileHistories1.map(_.id) shouldBe List(configId3, configId2)
     configFileHistories1.map(_.comment) shouldBe List(commitMsg3, commitMsg2)
 
+    // verify history from given timestamp
     val configFileHistoriesFrom = configService.history(file, from = updateTS1).await
     configFileHistoriesFrom.size shouldBe 1
     configFileHistoriesFrom.map(_.id) shouldBe List(configId3)
 
+    // verify history till given timestamp
     val configFileHistoriesTo = configService.history(file, to = updateTS1).await
     configFileHistoriesTo.size shouldBe 2
     configFileHistoriesTo.map(_.id) shouldBe List(configId2, configId1)
 
+    // verify history within range of given timestamps
     val configFileHistoriesFromTo = configService.history(file, createTS, updateTS2).await
     configFileHistoriesFromTo.size shouldBe 2
     configFileHistoriesFromTo.map(_.id) shouldBe List(configId3, configId2)
@@ -652,53 +657,62 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-49: Update an Existing File with a New Version
   // DEOPSCSW-83: Retrieve file based on range of time for being most recent version
   test("should be able to update and retrieve the history of a file in annex store") {
-    val file            = Paths.get("SomeAnnexFile.txt")
-    val creationContent = "testing annex file"
-    val creationComment = "initial commit"
+    val file = Paths.get("SomeAnnexFile.txt")
 
-    val configData       = ConfigData.fromString(creationContent)
-    val creationConfigId = configService.create(file, configData, annex = true, creationComment).await
+    val comment1    = "create"
+    val configData1 = ConfigData.fromString(configValue1)
+    val configId1   = configService.create(file, configData1, annex = true, comment1).await
+    val createTS1   = Instant.now
 
-    val createTS = Instant.now
+    val comment2    = "update 1"
+    val configData2 = ConfigData.fromString(configValue2)
+    val configId2   = configService.update(file, configData2, comment2).await
+    val updateTS2   = Instant.now
 
-    val newContent  = "testing annex file, again"
-    val newComment  = "Updating file"
-    val configData2 = ConfigData.fromString(newContent)
-    val newConfigId = configService.update(file, configData2, newComment).await
+    val comment3    = "update 2"
+    val configData3 = ConfigData.fromString(configValue3)
+    val configId3   = configService.update(file, configData3, comment3).await
+    val updateTS3   = Instant.now
 
-    configService.getById(file, creationConfigId).await.get.toStringF.await shouldBe creationContent
+    configService.getById(file, configId1).await.get.toStringF.await shouldBe configValue1
+    configService.getById(file, configId2).await.get.toStringF.await shouldBe configValue2
+    configService.getById(file, configId3).await.get.toStringF.await shouldBe configValue3
 
-    configService.getById(file, newConfigId).await.get.toStringF.await shouldBe newContent
-
+    val shaFilePath = Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}")
     //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
     //This call is invalid from client side
-    val oldSvnConfigData = serverWiring.configService
-      .getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), creationConfigId)
-      .await
-      .get
-    oldSvnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
+    val shaOfConfigData1 = serverWiring.configService.getById(shaFilePath, configId1).await.get
+    shaOfConfigData1.toStringF.await shouldBe Sha1.fromConfigData(configData1).await
 
-    //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
-    //This call is invalid from client side
-    val newSvnConfigData = serverWiring.configService
-      .getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), newConfigId)
-      .await
-      .get
-    newSvnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData2).await
+    val shaOfConfigData2 = serverWiring.configService.getById(shaFilePath, configId2).await.get
+    shaOfConfigData2.toStringF.await shouldBe Sha1.fromConfigData(configData2).await
 
+    val shaOfConfigData3 = serverWiring.configService.getById(shaFilePath, configId3).await.get
+    shaOfConfigData3.toStringF.await shouldBe Sha1.fromConfigData(configData3).await
+
+    // verify history without any parameter
     val fileHistories: List[ConfigFileRevision] = configService.history(file).await
-
     fileHistories.map(history => (history.id, history.comment)) shouldBe List(
-      (newConfigId, newComment),
-      (creationConfigId, creationComment)
+      (configId3, comment3),
+      (configId2, comment2),
+      (configId1, comment1)
     )
 
-    configService.history(file, createTS).await.map(history ⇒ (history.id, history.comment)) shouldBe List(
-        (newConfigId, newComment))
+    // verify history with max results parameter
+    configService.history(file, maxResults = 2).await.size shouldBe 2
 
-    configService.history(file, to = createTS).await.map(history ⇒ (history.id, history.comment)) shouldBe List(
-        (creationConfigId, creationComment))
+    // verify history from given timestamp
+    configService.history(file, createTS1).await.map(history ⇒ (history.id, history.comment)) shouldBe List((configId3,
+        comment3), (configId2, comment2))
 
+    // verify history till given timestamp
+    configService.history(file, to = createTS1).await.map(history ⇒ (history.id, history.comment)) shouldBe List(
+        (configId1, comment1))
+
+    // verify history within given range of timestamp
+    configService.history(file, updateTS2, updateTS3).await.map(history ⇒ (history.id, history.comment)) shouldBe List(
+      (configId3, comment3)
+    )
   }
 
   // DEOPSCSW-77: Set default version of configuration file in config service

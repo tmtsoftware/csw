@@ -196,6 +196,7 @@ public class JConfigAdminApiTest {
     // DEOPSCSW-45: Saving version information for config. file
     // DEOPSCSW-76: Access a list of all the versions of a stored configuration file
     // DEOPSCSW-63: Add comment while creating or updating a configuration file
+    // DEOPSCSW-83: Retrieve file based on range of time for being most recent version
     @Test
     public void testHistoryOfAFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
@@ -215,17 +216,20 @@ public class JConfigAdminApiTest {
             ConfigId configId3 = configService.update(path, ConfigData.fromString(configValue3), comment3).get();
             Instant updateTS = Instant.now();
 
-            Assert.assertEquals(configService.history(path).get().size(), 3);
-            Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
-                    new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
+            List<ConfigFileRevision> historyByPath = configService.history(path).get();
 
-            Assert.assertEquals(configService.history(path).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
+            Assert.assertEquals(historyByPath.size(), 3);
+            Assert.assertEquals(historyByPath.stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
+            Assert.assertEquals(historyByPath.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
                     new ArrayList<>(Arrays.asList(comment3, comment2, comment1)));
 
-            Assert.assertEquals(configService.history(path, 2).get().size(), 2);
-            Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
+            List<ConfigFileRevision> historyByPathAndSize = configService.history(path, 2).get();
+
+            Assert.assertEquals(historyByPathAndSize.size(), 2);
+            Assert.assertEquals(historyByPathAndSize.stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
                     new ArrayList<>(Arrays.asList(configId3, configId2)));
-            Assert.assertEquals(configService.history(path, 2).get().stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
+            Assert.assertEquals(historyByPathAndSize.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
                     new ArrayList<>(Arrays.asList(comment3, comment2)));
 
             Assert.assertEquals(configService.history(path, createTS, updateTS).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()),
@@ -384,6 +388,7 @@ public class JConfigAdminApiTest {
     }
 
     // DEOPSCSW-49: Update an Existing File with a New Version
+    // DEOPSCSW-83: Retrieve file based on range of time for being most recent version
     @Test
     public void testUpdateAndHistoryOfFilesInAnnexStore() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/tmt/binary-files/trombone_hcd/app.bin");
