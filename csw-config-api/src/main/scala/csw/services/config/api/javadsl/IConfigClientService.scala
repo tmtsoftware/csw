@@ -31,7 +31,7 @@ trait IConfigClientService {
   def exists(path: Path, id: Optional[ConfigId]): CompletableFuture[jl.Boolean]
 
   /**
-   * Gets and returns the active version of the file stored under the given path.
+   * Gets and returns the content of active version of the file stored under the given path.
    * If no active was set, this returns the version with which the file was created i.e. 1.
    *
    * @param path the file path relative to the repository root

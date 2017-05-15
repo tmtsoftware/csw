@@ -13,30 +13,30 @@ import scala.concurrent.Future
 trait ConfigService extends ConfigClientService {
 
   /**
-   * Creates a file with the given path and data and optional comment.
+   * Creates a file with the given path, data and comment.
    * An IOException is thrown if the file already exists.
    *
-   * @param path       the file path relative to the repository root
-   * @param configData used to read the contents of the file
-   * @param annex   true if the file is annex and requires special handling (external storage)
-   * @param comment    an optional comment to associate with this file
+   * @param path        the file path relative to the repository root
+   * @param configData  used to read the contents of the file
+   * @param annex       true if the file is annex and requires special handling (external storage)
+   * @param comment     comment to associate with this file
    * @return a unique id that can be used to refer to the file
    */
   def create(path: Path, configData: ConfigData, annex: Boolean = false, comment: String): Future[ConfigId]
 
   /**
-   * Updates the config file with the given path and data and optional comment.
+   * Updates the config file with the given path, data and comment.
    * An FileNotFoundException is thrown if the file does not exists.
    *
    * @param path       the file path relative to the repository root
    * @param configData used to read the contents of the file
-   * @param comment    an optional comment to associate with this file
+   * @param comment    comment to associate with this file
    * @return a unique id that can be used to refer to the file
    */
   def update(path: Path, configData: ConfigData, comment: String): Future[ConfigId]
 
   /**
-   * Gets and returns the file stored under the given path.
+   * Gets and returns the file stored under the given path and provided id.
    *
    * @param path the file path relative to the repository root
    * @param id   id used to specify a specific version to fetch
@@ -45,7 +45,7 @@ trait ConfigService extends ConfigClientService {
   def getById(path: Path, id: ConfigId): Future[Option[ConfigData]]
 
   /**
-   * Gets and returns the file stored under the given path.
+   * Gets and returns the latest file stored under the given path.
    *
    * @param path the file path relative to the repository root
    * @return a future object that can be used to access the file's data, if found
@@ -108,21 +108,22 @@ trait ConfigService extends ConfigClientService {
 
   /**
    * Sets the "active version" to be the version provided for the file with the given path.
-   * If this method is not called, the active version will always be the version with which the file was created i.e. 1
+   * If this method is not called, the active version will always be the version with which the file was created
    * After calling this method, the version with the given Id will be the active.
    *
-   * @param path the file path relative to the repository root
-   * @param id   an optional id used to specify a specific version
-   *             (by default the id of the version with which the file was created i.e. 1)
-   * @return     a future result
+   * @param path      the file path relative to the repository root
+   * @param id        an id used to specify a specific version
+   * @param comment   comment to associate with this file
+   * @return          a future result
    */
   def setActiveVersion(path: Path, id: ConfigId, comment: String): Future[Unit]
 
   /**
    * Resets the "active version" of the file with the given path to the latest version.
    *
-   * @param path the file path relative to the repository root
-   * @return     a future result
+   * @param path      the file path relative to the repository root
+   * @param comment   comment to associate with this file
+   * @return          a future result
    */
   def resetActiveVersion(path: Path, comment: String): Future[Unit]
 
@@ -135,7 +136,7 @@ trait ConfigService extends ConfigClientService {
   def getActiveVersion(path: Path): Future[Option[ConfigId]]
 
   /**
-   * Gets and returns the active version of the file stored under the given path.
+   * Gets and returns the content of active version of the file stored under the given path.
    * If no active was set, this returns the version with which the file was created.
    *
    * @param path the file path relative to the repository root

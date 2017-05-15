@@ -15,7 +15,7 @@ import csw.services.config.api.scaladsl.ConfigService
 trait IConfigService extends IConfigClientService {
 
   /**
-   * Creates a file with the given path and data and optional comment.
+   * Creates a file with the given path, data and comment.
    * An IOException is thrown if the file already exists.
    *
    * @param path       the file path relative to the repository root
@@ -28,12 +28,12 @@ trait IConfigService extends IConfigClientService {
   def create(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId]
 
   /**
-   * Updates the config file with the given path and data and optional comment.
+   * Updates the config file with the given path, data and comment.
    * An FileNotFoundException is thrown if the file does not exists.
    *
    * @param path       the file path relative to the repository root
    * @param configData used to read the contents of the file
-   * @param comment    an optional comment to associate with this file
+   * @param comment    comment to associate with this file
    * @return           a unique id that can be used to refer to the file
    */
   def update(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId]
@@ -124,9 +124,9 @@ trait IConfigService extends IConfigClientService {
    * After calling this method, the version with the given Id will be the active.
    *
    * @param path      the file path relative to the repository root
-   * @param comment   comment to associate with this operation
-   * @param id        an optional id used to specify a specific version
+   * @param id        an id used to specify a specific version
    *                  (by default the id of the version with which the file was created i.e. 1)
+   * @param comment   comment to associate with this operation
    * @return          a future result
    */
   def setActiveVersion(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit]
@@ -149,7 +149,7 @@ trait IConfigService extends IConfigClientService {
   def getActiveVersion(path: Path): CompletableFuture[Optional[ConfigId]]
 
   /**
-   * Gets and returns the active version of the file stored under the given path.
+   * Gets and returns the content of active version of the file stored under the given path.
    * If no active was set, this returns the version with which the file was created.
    *
    * @param path the file path relative to the repository root

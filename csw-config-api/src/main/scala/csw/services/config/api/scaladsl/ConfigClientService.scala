@@ -21,8 +21,7 @@ trait ConfigClientService {
   def exists(path: Path, id: Option[ConfigId] = None): Future[Boolean]
 
   /**
-   * Gets and returns the active version of the file stored under the given path.
-   * If no active was set, this returns the version with which the file was created i.e. 1.
+   * Gets and returns the content of active version of the file stored under the given path.
    *
    * @param path the file path relative to the repository root
    * @return     a future object that can be used to access the file's data, if found
