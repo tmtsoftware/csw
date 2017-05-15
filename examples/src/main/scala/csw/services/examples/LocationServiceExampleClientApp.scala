@@ -237,6 +237,9 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
     case LocationRemoved(conn) =>
       println(s"Location removed $conn")
 
+    case AllDone =>
+      println(s"Tracking of $exampleConnection complete.")
+
     case x =>
       log.error(s"Received unexpected message $x")
   }
