@@ -54,7 +54,7 @@ Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/test/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #create-location-service }
 
 Java
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #create-location-service }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/test/java/csw/services/examples/JLocationServiceExampleClient.java) { #create-location-service }
 
 
 ## Shutdown LocationService
@@ -67,7 +67,7 @@ Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/test/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #shutdown }
 
 Java
-:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #shutdown }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/test/java/csw/services/examples/JLocationServiceExampleClient.java) { #shutdown }
 
 ## Creating components, connections and registrations
 
@@ -85,7 +85,7 @@ Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/test/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #Components-Connections-Registrations }
 
 Java
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #Components-Connections-Registrations }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/test/java/csw/services/examples/JLocationServiceExampleClient.java) { #Components-Connections-Registrations }
 
 ## Creating ActorRef for registration
 
@@ -97,7 +97,7 @@ Scala
 :  @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/test/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #create-actor-system }
 
 Java
-:  @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #create-actor-system }
+:  @@snip [JLocationServiceExampleClient.java](../../../../examples/src/test/java/csw/services/examples/JLocationServiceExampleClient.java) { #create-actor-system }
 
 This is required to start a remote ActorSystem on the interface where csw-cluster is running. All the ActorRefs created using this
 ActorSystem will now be available for communication from other components that are part of csw-cluster.
@@ -117,7 +117,7 @@ Java
 :   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
 
 JavaBlocking
-:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #register-list-resolve-unregister }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/test/java/csw/services/examples/JLocationServiceExampleClient.java) { #find-resolve }
 
 
 ## Filtering
@@ -133,7 +133,7 @@ Java
 :   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #filtering }
 
 JavaBlocking
-:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #filtering }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/test/java/csw/services/examples/JLocationServiceExampleClient.java) { #filtering }
 
 
 ## Unregistering
@@ -147,7 +147,7 @@ Java
 :   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
 
 JavaBlocking
-:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #register-list-resolve-unregister }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/test/java/csw/services/examples/JLocationServiceExampleClient.java) { #unregister }
 
 
 ## Tracking and Subscribing
@@ -181,7 +181,7 @@ Java
 :   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #tracking }
 
 JavaBlocking
-:   @@snip [JLocationServiceBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java) { #tracking }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/test/java/csw/services/examples/JLocationServiceExampleClient.java) { #tracking }
 
 
 
@@ -189,4 +189,4 @@ JavaBlocking
 
 * @github[Scala Example](/examples/src/test/scala/csw/services/examples/LocationServiceExampleClientApp.scala)
 * @github[Java Example](/csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java)
-* @github[JavaBlocking Example](/csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceBlockingDemoExample.java)
+* @github[JavaBlocking Example](/examples/src/test/java/csw/services/examples/JLocationServiceExampleClientApp.java)
