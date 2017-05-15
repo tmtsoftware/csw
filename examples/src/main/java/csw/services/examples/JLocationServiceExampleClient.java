@@ -26,11 +26,7 @@ public class JLocationServiceExampleClient extends UntypedAbstractActor {
     private ILocationService locationService = JLocationServiceFactory.make();
     //#create-location-service
 
-    //#create-actor-system
-    private ActorSystem actorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient");
-    //#create-actor-system
 
-    private Materializer mat = ActorMaterializer.create(actorSystem);
 
     private Connection exampleConnection = LocationServiceExampleComponent.connection();
 
@@ -69,7 +65,7 @@ public class JLocationServiceExampleClient extends UntypedAbstractActor {
 
         // dummy HCD connection
         AkkaConnection hcdConnection = new AkkaConnection(new ComponentId("hcd1", JComponentType.HCD));
-        AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
+        AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
                     public Receive createReceive() {
                         return ReceiveBuilder.create().build();
@@ -182,7 +178,8 @@ public class JLocationServiceExampleClient extends UntypedAbstractActor {
 
         // track connection to LocationServiceExampleComponent
         // Calls track method for example connection and forwards location messages to this actor
-        System.out.println("Starting to track" + exampleConnection);
+        Materializer mat = ActorMaterializer.create(getContext());
+        System.out.println("Starting to track " + exampleConnection);
         locationService.track(exampleConnection).toMat(Sink.actorRef(getSelf(), AllDone.class), Keep.both()).run(mat);
 
         // subscribe to LocationServiceExampleComponent events
@@ -250,7 +247,11 @@ public class JLocationServiceExampleClient extends UntypedAbstractActor {
     }
 
     public static void main(String[] args) {
-        akka.Main.main(new String[] {JLocationServiceExampleClient.class.getName()});
+        //#create-actor-system
+        ActorSystem actorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient");
+        //#create-actor-system
+        actorSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
+
     }
 
 
