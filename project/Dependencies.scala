@@ -11,6 +11,7 @@ object Dependencies {
     Libs.`enumeratum`,
     Libs.`chill-akka`,
     Libs.`akka-management-cluster-http`,
+    Libs.`spray-json`,
     AkkaHttp.`akka-http`,
     Libs.`scala-logging`,
     Libs.`logback-classic`,

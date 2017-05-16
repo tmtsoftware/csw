@@ -13,9 +13,10 @@ object Libs {
   val `mockito-core`                 = "org.mockito"                % "mockito-core"                  % "2.7.22" //MIT License
   val `logback-classic`              = "ch.qos.logback"             % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `chill-akka`                   = "com.twitter"                %% "chill-akka"                   % "0.9.2" //Apache License 2.0
-  val `akka-management-cluster-http` = "com.lightbend.akka"         %% "akka-management-cluster-http" % "0.1-RC1" //N/A at the moment
+  val `akka-management-cluster-http` = "com.lightbend.akka"         %% "akka-management-cluster-http" % "0.3" //N/A at the moment
   val svnkit                         = "org.tmatesoft.svnkit"       % "svnkit"                        % "1.8.11" //TMate Open Source License
   val `commons-codec`                = "commons-codec"              % "commons-codec"                 % "1.10" //Apache 2.0
+  val `spray-json`                   = "io.spray"                   %% "spray-json"                   % "1.3.3" force ()
 }
 
 object Akka {
