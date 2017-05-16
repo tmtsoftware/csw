@@ -11,6 +11,7 @@ import csw.services.location.models.*;
 import csw.services.location.scaladsl.ActorSystemFactory;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
+import csw.services.location.scaladsl.LocationService;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.List;
@@ -18,17 +19,19 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import static csw.services.examples.LocationServiceExampleComponent.*;
+
 /**
  * An example location service client application.
  */
-public class JLocationServiceExampleClient extends UntypedAbstractActor {
+public class JLocationServiceExampleClient extends AbstractActor {
     //#create-location-service
     private ILocationService locationService = JLocationServiceFactory.make();
     //#create-location-service
 
 
 
-    private Connection exampleConnection = LocationServiceExampleComponent.connection();
+    private Connection exampleConnection = connection();
 
     private IRegistrationResult httpRegResult;
     private IRegistrationResult hcdRegResult;
@@ -122,6 +125,13 @@ public class JLocationServiceExampleClient extends UntypedAbstractActor {
         //    Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
         //#find-resolve
 
+        if (resolveResult.isPresent()) {
+            Location loc = resolveResult.get();
+            if (loc instanceof AkkaLocation) {
+                ActorRef actorRef = ((AkkaLocation)loc).actorRef();
+                actorRef.tell(LocationServiceExampleComponent.ClientMessage$.MODULE$, getSelf());
+            }
+        }
     }
 
     private void listingAndFilteringBlocking() throws ExecutionException, InterruptedException {
@@ -175,7 +185,6 @@ public class JLocationServiceExampleClient extends UntypedAbstractActor {
         // the following two methods are examples of two ways to track a connection.
         // both are implemented but only one is really needed.
 
-
         // track connection to LocationServiceExampleComponent
         // Calls track method for example connection and forwards location messages to this actor
         Materializer mat = ActorMaterializer.create(getContext());
@@ -217,20 +226,8 @@ public class JLocationServiceExampleClient extends UntypedAbstractActor {
     }
 
     private String connectionInfo(Connection connection) {
+        // construct string with useful information about a connection
         return connection.name()+", component type="+connection.componentId().componentType()+", connection type="+connection.connectionType();
-    }
-
-    @Override
-    public void onReceive(Object message) throws Throwable {
-        if (message instanceof LocationUpdated) {
-            System.out.println("Location updated " + connectionInfo(((LocationUpdated)message).connection()));
-        } else if (message instanceof LocationRemoved) {
-            System.out.println("Location removed " + ((LocationRemoved) message).connection());
-        } else if (message instanceof AllDone) {
-            System.out.println("Tracking of " + exampleConnection + " complete.");
-        } else {
-            System.out.println("Unexpected message: "+message);
-        }
     }
 
     @Override
@@ -244,6 +241,17 @@ public class JLocationServiceExampleClient extends UntypedAbstractActor {
         //#shutdown
         locationService.shutdown().get();
         //#shutdown
+    }
+
+    @Override
+    public Receive createReceive() {
+        // message handler for this actor
+        return receiveBuilder()
+                .match(LocationUpdated.class, l -> System.out.println("Location updated " + connectionInfo(l.connection())))
+                .match(LocationRemoved.class, l -> System.out.println("Location removed " + l.connection()))
+                .match(AllDone.class, x -> System.out.println("Tracking of " + exampleConnection + " complete."))
+                .matchAny(x -> System.out.println("Unexpected message: "+ x))
+                .build();
     }
 
     public static void main(String[] args) {

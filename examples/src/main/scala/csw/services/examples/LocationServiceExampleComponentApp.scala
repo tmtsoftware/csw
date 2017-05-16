@@ -5,6 +5,9 @@ import akka.stream.ActorMaterializer
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
+import scala.concurrent.duration._
+
+import scala.concurrent.Await
 
 /**
   * An example that shows how to register a component actor with the location service.
@@ -40,7 +43,9 @@ class LocationServiceExampleComponent(locationService: LocationService) extends 
   println("In actor LocationServiceExampleComponent")
 
   // Register with the location service
-  locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self))
+  Await.result(locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self)), 5.seconds)
+
+  println("LocationServiceExampleComponent registered.")
 
   override def receive: Receive = {
     // This is the message that TestServiceClient sends when it discovers this service
