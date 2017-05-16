@@ -5,7 +5,7 @@ import enumeratum.{Enum, EnumEntry}
 import scala.collection.immutable
 
 /**
- * Represents type of file based on the store to be used
+ * Represents the type of storage for a configuration file.
  */
 sealed abstract class FileType extends EnumEntry with Serializable
 
