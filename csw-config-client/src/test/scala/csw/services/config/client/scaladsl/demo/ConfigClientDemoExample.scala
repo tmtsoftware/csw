@@ -141,7 +141,7 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
         id2 shouldEqual ConfigId(3)
         id3 shouldEqual ConfigId(5)
       }
-    Await.result(futC, 5.seconds)
+    Await.result(futC, 2.seconds)
     //#create
 
     //#update
@@ -154,15 +154,15 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
       //validate the returned id
       newId shouldEqual ConfigId(7)
     }
-    Await.result(futU, 5.seconds)
+    Await.result(futU, 2.seconds)
     //#update
 
     //#delete
     val futD = async {
       val unwantedFilePath = Paths.get("/hcd/trombone/debug.bin")
-      adminApi.delete(unwantedFilePath, "no longer needed").await
+      await(adminApi.delete(unwantedFilePath, "no longer needed"))
     }
-    Await.result(futD, 5.seconds)
+    Await.result(futD, 2.seconds)
     //#delete
   }
 
@@ -178,7 +178,7 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
       val actualData = await(adminApi.getById(filePath, id)).get
       await(actualData.toStringF) shouldBe defaultStrConf
     }
-    Await.result(doneF, 5.seconds)
+    Await.result(doneF, 2.seconds)
     //#getById
   }
 
@@ -198,7 +198,7 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
       //validate
       await(newConfigData.toStringF) shouldBe newContent
     }
-    Await.result(assertionF, 5.seconds)
+    Await.result(assertionF, 2.seconds)
     //#getLatest
   }
 
@@ -220,7 +220,7 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
       val latestData = await(adminApi.getByTime(filePath, Instant.now())).get
       await(latestData.toStringF) shouldBe newContent
     }
-    Await.result(assertionF, 5.seconds)
+    Await.result(assertionF, 2.seconds)
     //#getByTime
   }
 
@@ -259,7 +259,82 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
       await(adminApi.list(Some(FileType.Annex), Some("a/c.*"))).size shouldBe 1
       await(adminApi.list(Some(FileType.Normal), Some("test.*"))).size shouldBe 1
     }
-    Await.result(assertionF, 5.seconds)
+    Await.result(assertionF, 2.seconds)
     //#list
+  }
+
+  test("history") {
+    //#history
+    val assertionF = async {
+      val filePath = Paths.get("/a/test.conf")
+      val id0      = await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "first commit"))
+
+      //override the contents twice
+      val tBeginUpdate = Instant.now()
+      val id1          = await(adminApi.update(filePath, ConfigData.fromString("changing contents"), "second commit"))
+      val id2          = await(adminApi.update(filePath, ConfigData.fromString("changing contents again"), "third commit"))
+      val tEndUpdate   = Instant.now()
+
+      val fullHistory = await(adminApi.history(filePath))
+      fullHistory.map(_.id) shouldBe List(id2, id1, id0)
+      fullHistory.map(_.comment) shouldBe List("third commit", "second commit", "first commit")
+
+      //drop initial revision and take only update revisions
+      await(adminApi.history(filePath, tBeginUpdate, tEndUpdate)).size shouldBe 2
+
+      //take last two revisions
+      await(adminApi.history(filePath, maxResults = 2)).map(_.id) shouldBe List(id2, id1)
+    }
+    Await.result(assertionF, 3.seconds)
+    //#history
+  }
+
+  test("historyActive-setActiveVersion-resetActiveVersion-getActiveVersion") {
+    //#active-file-mgmt
+    val assertionF = async {
+      val tBegin   = Instant.now()
+      val filePath = Paths.get("/a/test.conf")
+      //create will make the 1st revision active with a default comment
+      val id1 = await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "first"))
+      await(adminApi.historyActive(filePath)).map(_.id) shouldBe List(id1)
+      //ensure active version is set
+      await(adminApi.getActiveVersion(filePath)).get shouldBe id1
+
+      //override the contents four times
+      await(adminApi.update(filePath, ConfigData.fromString("changing contents"), "second"))
+      val id3 = await(adminApi.update(filePath, ConfigData.fromString("changing contents again"), "third"))
+      val id4 = await(adminApi.update(filePath, ConfigData.fromString("final contents"), "fourth"))
+      val id5 = await(adminApi.update(filePath, ConfigData.fromString("final final contents"), "fifth"))
+
+      //update doesn't change the active revision
+      await(adminApi.historyActive(filePath)).map(_.id) shouldBe List(id1)
+
+      //play with active version
+      await(adminApi.setActiveVersion(filePath, id3, s"$id3 active"))
+      await(adminApi.setActiveVersion(filePath, id4, s"$id4 active"))
+      await(adminApi.getActiveVersion(filePath)).get shouldBe id4
+      val tEnd = Instant.now()
+      //reset active version to latest
+      await(adminApi.resetActiveVersion(filePath, "latest active"))
+      await(adminApi.getActiveVersion(filePath)).get shouldBe id5
+      //finally set initial version as active
+      await(adminApi.setActiveVersion(filePath, id1, s"$id1 active"))
+      await(adminApi.getActiveVersion(filePath)).get shouldBe id1
+
+      //validate full history
+      val fullHistory = await(adminApi.historyActive(filePath))
+      fullHistory.map(_.id) shouldBe List(id1, id5, id4, id3, id1)
+      fullHistory.map(_.comment) shouldBe List(s"$id1 active", "latest active", s"$id4 active", s"$id3 active",
+        "initializing active file with the first version")
+
+      //drop initial revision and take only update revisions
+      val fragmentedHistory = await(adminApi.historyActive(filePath, tBegin, tEnd))
+      fragmentedHistory.size shouldBe 3
+
+      //take last three revisions
+      await(adminApi.historyActive(filePath, maxResults = 3)).map(_.id) shouldBe List(id1, id5, id4)
+    }
+    Await.result(assertionF, 5.seconds)
+    //#active-file-mgmt
   }
 }

@@ -90,6 +90,13 @@ Takes input ConfigData and overwrites the configuration specified in the reposit
 Scala
 :   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #update }
 
+## delete
+
+Deletes a file located at specified path in the repository
+
+Scala
+:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #delete }
+
 ## getById
 
 Returns file at a given path and matching revision Id
@@ -121,3 +128,27 @@ For a given FileType(Annex or Normal) and an optional pattern string, it will li
 Scala
 :   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #list }
 
+## history
+
+Returns the history of revisions of the file at the given path for a range of period specified by `from` and `to`. The size of the list can be restricted using `maxResults`.
+Returns the history of active revisions of the file at the given path for a range of period specified by `from` and `to`. The size of the list can be restricted using `maxResults`.
+
+Scala
+:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #history }
+
+## Managing active versions
+
+Following API functions are available to manage the active version of a config file. In it's lifetime a config file undergoes many revisions. An active version is a specific revision from a file's history and it is set by administrators.   
+
+* **historyActive** : Returns the history of active revisions of the file at the given path for a range of period specified by `from` and `to`. The size of the list can be restricted using `maxResults`.    
+* **setActiveVersion** : Sets the "active version" to be the version provided for the file at the given path. If this method is never called in a config's lifetime, the active version will always be the version returned by `create` function.    
+* **resetActiveVersion** : Resets the "active version" of the file at the given path to the latest version.    
+* **getActiveVersion** : Returns the revision Id which represents the "active version" of the file at the given path.          
+
+Scala
+:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #active-file-mgmt }
+
+
+## Source code for examples
+
+* @github[Scala Example](/csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala)
