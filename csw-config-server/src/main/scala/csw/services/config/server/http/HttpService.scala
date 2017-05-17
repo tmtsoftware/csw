@@ -30,6 +30,13 @@ class HttpService(locationService: LocationService,
 
   import actorRuntime._
 
+  // this task needs to be added before calling register
+  // so that location service shutdowns properly even in case of registration fails
+  coordinatedShutdown.addTask(
+    CoordinatedShutdown.PhaseServiceUnbind,
+    "location-service-shutdown"
+  )(() ⇒ locationService.shutdown())
+
   lazy val registeredLazyBinding: Future[(ServerBinding, RegistrationResult)] = async {
     val binding            = await(bind())
     val registrationResult = await(register(binding))
@@ -38,11 +45,6 @@ class HttpService(locationService: LocationService,
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       s"unregistering-${registrationResult.location}"
     )(() => registrationResult.unregister())
-
-    coordinatedShutdown.addTask(
-      CoordinatedShutdown.PhaseServiceUnbind,
-      "location-service-shutdown"
-    )(() ⇒ locationService.shutdown())
 
     logger.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     (binding, registrationResult)
