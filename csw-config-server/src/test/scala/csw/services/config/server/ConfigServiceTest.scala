@@ -475,6 +475,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   }
 
+  // DEOPSCSW-91: Delete a given path
   test("should able to delete existing file") {
     val file = Paths.get("tromboneHCD.conf")
     configService
@@ -487,6 +488,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     configService.getLatest(file).await shouldBe None
   }
 
+  // DEOPSCSW-91: Delete a given path
   test("deleting non existing file should throw FileNotFoundException") {
     val file = Paths.get("tromboneHCD.conf")
     intercept[FileNotFound] {
@@ -494,6 +496,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     }
   }
 
+  // DEOPSCSW-91: Delete a given path
   test("delete removes all versions of a file") {
     val file = Paths.get("/a/b/csw.conf")
 
@@ -503,11 +506,15 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configId2 = configService.update(file, ConfigData.fromString(configValue2), "updated config to assembly").await
     val configId3 = configService.update(file, ConfigData.fromString(configValue3), "updated config to assembly").await
 
+    // delete just removes the latest version of file by keeping the older versions
+    // history call gives file not found exception as file is deleted
+    // but you will still able to retrieve file with older versions
     configService.history(file).await.size shouldBe 3
     configService.delete(file, "no longer needed").await
     intercept[FileNotFound] {
       configService.history(file).await.size shouldBe 0
     }
+
     configService.getById(file, configId2).await.get.toStringF.await shouldBe configValue2
     configService.getById(file, configId3).await.get.toStringF.await shouldBe configValue3
     configService.getLatest(file).await shouldBe None

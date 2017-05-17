@@ -24,7 +24,8 @@ class SvnConfigServiceTest extends ConfigServiceTest {
     val filePath       = Paths.get("/tmt/tcp/redis/text/redis.conf")
     val activeFilePath = Paths.get(filePath.toString + serverWiring.settings.`active-config-suffix`)
 
-    val configId1 = configService.create(filePath, ConfigData.fromString(configValue1), annex = false, "initial commit").await
+    val configId1 =
+      configService.create(filePath, ConfigData.fromString(configValue1), annex = false, "initial commit").await
 
     configService.exists(filePath).await shouldBe true
     configService.exists(activeFilePath).await shouldBe true

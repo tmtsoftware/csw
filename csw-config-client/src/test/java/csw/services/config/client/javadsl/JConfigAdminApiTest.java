@@ -279,6 +279,7 @@ public class JConfigAdminApiTest {
         Assert.assertTrue(configService.exists(path1).get());
     }
 
+    // DEOPSCSW-91: Delete a given path
     @Test
     public void testDelete() throws ExecutionException, InterruptedException {
         Path path = Paths.get("tromboneHCD.conf");
