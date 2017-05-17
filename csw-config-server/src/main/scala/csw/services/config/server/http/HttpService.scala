@@ -15,6 +15,13 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
+/**
+ * Initialises ConfigServer
+ * @param locationService          LocationService instance to be used for registering this server with the location service
+ * @param configServiceRoute       ConfigServiceRoute instance representing the routes supported by this server
+ * @param settings                 Runtime configuration of server
+ * @param actorRuntime             ActorRuntime instance wrapper for actor system
+ */
 class HttpService(locationService: LocationService,
                   configServiceRoute: ConfigServiceRoute,
                   settings: Settings,

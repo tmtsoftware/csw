@@ -12,6 +12,9 @@ import csw.services.config.api.commons.JsonSupport
 import csw.services.config.api.models.{ConfigData, ConfigId, FileType}
 import csw.services.config.server.commons.PathValidator
 
+/**
+ * Helper class for ConfigServiceRoute
+ */
 trait HttpSupport extends Directives with JsonSupport {
 
   def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>

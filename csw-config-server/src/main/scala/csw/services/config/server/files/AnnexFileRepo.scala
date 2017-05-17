@@ -6,6 +6,10 @@ import akka.dispatch.MessageDispatcher
 
 import scala.concurrent.Future
 
+/**
+ * Represents file based repository for large/binary/annex files
+ * @param blockingIoDispatcher   dispatcher to be used for blocking file operations
+ */
 class AnnexFileRepo(blockingIoDispatcher: MessageDispatcher) {
 
   private implicit val _blockingIoDispatcher = blockingIoDispatcher

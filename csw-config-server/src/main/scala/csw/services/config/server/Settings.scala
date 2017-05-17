@@ -6,6 +6,10 @@ import java.nio.file.Paths
 import com.typesafe.config.Config
 import org.tmatesoft.svn.core.SVNURL
 
+/**
+ * Represents the runtime configuration
+ * @param config
+ */
 class Settings(config: Config) {
 
   private val `csw-config-server`        = config.getConfig("csw-config-server")

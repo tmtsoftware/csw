@@ -7,6 +7,9 @@ import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
+/**
+ * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
+ */
 class Main(clusterSettings: ClusterSettings) {
   def start(args: Array[String]): Unit =
     ArgsParser.parse(args).foreach { options ⇒

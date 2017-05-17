@@ -6,6 +6,9 @@ import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, Inva
 
 import scala.util.control.NonFatal
 
+/**
+ * Maps server side exceptions to Http Status codes
+ */
 class ConfigExceptionHandler extends Directives {
 
   val exceptionHandler: ExceptionHandler = ExceptionHandler {

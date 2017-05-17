@@ -6,6 +6,9 @@ import org.tmatesoft.svn.core.{SVNDirEntry, SVNNodeKind}
 
 object SVNDirEntryExt {
 
+  /**
+   * Adds extra features to SVNDirEntry
+   */
   implicit class RichSvnDirEntry(val entry: SVNDirEntry) extends AnyVal {
     def isFile: Boolean                                  = entry.getKind == SVNNodeKind.FILE
     def isNotActiveFile(activeFileName: String): Boolean = !entry.getName.endsWith(activeFileName)

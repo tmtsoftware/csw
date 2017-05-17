@@ -6,6 +6,12 @@ import akka.http.scaladsl.server.Route
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.ActorRuntime
 
+/**
+ * Routes supported by config server
+ * @param configService              instance of config service to which the routes will delegate operations
+ * @param actorRuntime               actor runtime
+ * @param configExceptionHandler     exception handler which maps server side exceptions to Http Status codes
+ */
 class ConfigServiceRoute(
     configService: ConfigService,
     actorRuntime: ActorRuntime,

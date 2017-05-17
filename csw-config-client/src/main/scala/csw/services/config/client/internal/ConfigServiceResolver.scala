@@ -9,6 +9,9 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
+/**
+ * Resolves the location of config server
+ */
 class ConfigServiceResolver(locationService: LocationService, actorRuntime: ActorRuntime) {
 
   import actorRuntime.ec

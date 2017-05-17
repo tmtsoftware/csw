@@ -10,6 +10,9 @@ import csw.services.config.api.models.ConfigData
 
 import scala.concurrent.Future
 
+/**
+ * Generated SHA1 for file represented as stream
+ */
 object Sha1 {
 
   private def fromSource(source: Source[ByteString, Any])(implicit mat: Materializer): Future[String] =

@@ -9,6 +9,9 @@ import org.tmatesoft.svn.core.SVNException
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
+/**
+ * Application object to start the ConfigServer from command line.
+ */
 class Main(clusterSettings: ClusterSettings) {
   def start(args: Array[String]): Option[HttpService] =
     new ArgsParser().parse(args).map {

@@ -9,6 +9,9 @@ import csw.services.config.server.svn.{SvnConfigService, SvnRepo}
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
+/**
+ * Server configuration
+ */
 class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
