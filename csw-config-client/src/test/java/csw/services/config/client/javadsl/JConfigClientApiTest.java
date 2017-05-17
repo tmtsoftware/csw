@@ -21,7 +21,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 
-//DEOPSCSW-138:Split Config API into Admin API and Client API
+// DEOPSCSW-138:Split Config API into Admin API and Client API
+// DEOPSCSW-103: Java API for Configuration service
 public class JConfigClientApiTest {
 
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());

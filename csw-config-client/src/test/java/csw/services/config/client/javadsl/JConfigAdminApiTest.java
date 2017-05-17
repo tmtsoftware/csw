@@ -29,7 +29,8 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.isA;
 
-//DEOPSCSW-138:Split Config API into Admin API and Client API
+// DEOPSCSW-138: Split Config API into Admin API and Client API
+// DEOPSCSW-103: Java API for Configuration service
 public class JConfigAdminApiTest {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
     private static ILocationService clientLocationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
