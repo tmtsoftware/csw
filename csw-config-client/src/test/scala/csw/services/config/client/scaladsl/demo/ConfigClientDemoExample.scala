@@ -1,9 +1,10 @@
 package csw.services.config.client.scaladsl.demo
 
 import java.io.InputStream
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
+import java.time.Instant
 
-import csw.services.config.api.models.{ConfigData, ConfigId}
+import csw.services.config.api.models.{ConfigData, ConfigId, FileType}
 import csw.services.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.ServerWiring
@@ -186,8 +187,7 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
     val assertionF: Future[Assertion] = async {
       //create a file
       val filePath = Paths.get("/test.conf")
-      await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false,
-          "commit initial configuration"))
+      await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "initial configuration"))
 
       //override the contents
       val newContent = "I changed the contents!!!"
@@ -195,9 +195,71 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
 
       //get the latest file
       val newConfigData = await(adminApi.getLatest(filePath)).get
+      //validate
       await(newConfigData.toStringF) shouldBe newContent
     }
     Await.result(assertionF, 5.seconds)
     //#getLatest
+  }
+
+  test("getByTime") {
+    //#getByTime
+    val assertionF = async {
+      val tInitial = Instant.MIN
+      //create a file
+      val filePath = Paths.get("/a/b/c/test.conf")
+      await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "initial configuration"))
+
+      //override the contents
+      val newContent = "I changed the contents!!!"
+      await(adminApi.update(filePath, ConfigData.fromString(newContent), "changed!!"))
+
+      val initialData: ConfigData = await(adminApi.getByTime(filePath, tInitial)).get
+      await(initialData.toStringF) shouldBe defaultStrConf
+
+      val latestData = await(adminApi.getByTime(filePath, Instant.now())).get
+      await(latestData.toStringF) shouldBe newContent
+    }
+    Await.result(assertionF, 5.seconds)
+    //#getByTime
+  }
+
+  test("list") {
+    //#list
+    //Here's a list of tuples containing FilePath and FileTyepe(Annex / Normal)
+    val paths: List[(Path, FileType)] = List[(Path, FileType)](
+      (Paths.get("a/c/trombone.conf"), FileType.Annex),
+      (Paths.get("a/b/c/hcd/hcd.conf"), FileType.Normal),
+      (Paths.get("a/b/assembly/assembly1.fits"), FileType.Annex),
+      (Paths.get("a/b/c/assembly/assembly2.fits"), FileType.Normal),
+      (Paths.get("testing/test.conf"), FileType.Normal)
+    )
+
+    //create config files at those paths
+    paths map {
+      case (path, fileType) ⇒
+        val createF = async {
+          await(adminApi.create(path, ConfigData.fromString(defaultStrConf), FileType.Annex == fileType,
+              "initial commit"))
+        }
+        Await.result(createF, 2.seconds)
+    }
+
+    val assertionF = async {
+      //retrieve list of all files
+      await(adminApi.list()).map(info ⇒ info.path).toSet shouldBe paths.map {
+        case (path, fileType) ⇒ path
+      }.toSet
+      //retrieve list of files based on type
+      await(adminApi.list(Some(FileType.Annex))).size shouldBe 2
+      await(adminApi.list(Some(FileType.Normal))).size shouldBe 3
+      //retrieve list using pattern
+      await(adminApi.list(None, Some(".*.conf"))).size shouldBe 3
+      await(adminApi.list(Some(FileType.Normal), Some(".*.conf"))).size shouldBe 2
+      await(adminApi.list(Some(FileType.Annex), Some("a/c.*"))).size shouldBe 1
+      await(adminApi.list(Some(FileType.Normal), Some("test.*"))).size shouldBe 1
+    }
+    Await.result(assertionF, 5.seconds)
+    //#list
   }
 }

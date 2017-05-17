@@ -103,3 +103,21 @@ Returns the latest versio of file stored at the given path.
 
 Scala
 :   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #getLatest }
+
+## getByTime
+
+Gets the file at the given path as it existed at a given time-instance. Note:    
+
+* If time-instance is before the file was created, the initial version is returned.    
+* If time-instance is after the last change, the most recent version is returned.    
+
+Scala
+:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #getByTime }
+
+## list
+
+For a given FileType(Annex or Normal) and an optional pattern string, it will list all files whose path matches the given pattern. Some pattern examples are: "/path/hcd/*.*", "a/b/c/d.*", ".*.conf", ".*hcd.*"
+
+Scala
+:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #list }
+
