@@ -16,9 +16,9 @@ class ClusterConfirmationActor extends Actor {
   var done: Option[Done] = None
 
   override def receive: Receive = {
-    case MemberUp(member) if member.address == cluster.selfAddress     ⇒ done = Some(Done)
-    case MemberJoined(member) if member.address == cluster.selfAddress ⇒ done = Some(Done)
-    case HasJoinedCluster                                              ⇒ sender() ! done
+    case MemberUp(member) if member.address == cluster.selfAddress       ⇒ done = Some(Done)
+    case MemberWeaklyUp(member) if member.address == cluster.selfAddress ⇒ done = Some(Done)
+    case HasJoinedCluster                                                ⇒ sender() ! done
   }
 
 }
