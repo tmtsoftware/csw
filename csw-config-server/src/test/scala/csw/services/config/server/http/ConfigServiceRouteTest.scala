@@ -10,6 +10,7 @@ import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
+// DEOPSCSW-80: HTTP based access for configuration file
 class ConfigServiceRouteTest
     extends FunSuite
     with ScalatestRouteTest
@@ -47,16 +48,13 @@ class ConfigServiceRouteTest
    */
   test("create - success status code") {
     // try to create by providing optional comment parameter
-    //consumes 2 revisions, one for actual file one for active file
     Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
       status shouldEqual StatusCodes.Created
-      responseAs[ConfigId] shouldBe ConfigId(1)
     }
 
     // try to create by not providing optional comment parameter
     Post("/config/test1.conf?annex=true", configFile2) ~> route ~> check {
       status shouldEqual StatusCodes.Created
-      responseAs[ConfigId] shouldBe ConfigId(3)
     }
 
   }
