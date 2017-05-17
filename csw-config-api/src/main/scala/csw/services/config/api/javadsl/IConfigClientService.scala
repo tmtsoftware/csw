@@ -9,33 +9,32 @@ import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 
 /**
- * Defines an interface for storing and retrieving configuration information
+ * Defines an interface to be used by clients for retrieving configuration information
  */
 trait IConfigClientService {
 
   /**
    * Returns true if the given path exists and is being managed
    *
-   * @param path the file path relative to the repository root
-   * @return     true the file exists
+   * @param path        the file path relative to the repository root
+   * @return            true if the file exists, false otherwise
    */
   def exists(path: Path): CompletableFuture[jl.Boolean]
 
   /**
-   * Returns true if the given path exists and is being managed
+   * Returns true if the given path exists at the given revision
    *
-   * @param path the file path relative to the repository root
-   * @param id   revision of the file
-   * @return     true the file exists
+   * @param path        the file path relative to the repository root
+   * @param id          revision of the file
+   * @return            true if the file exists, false otherwise
    */
-  def exists(path: Path, id: Optional[ConfigId]): CompletableFuture[jl.Boolean]
+  def exists(path: Path, id: ConfigId): CompletableFuture[jl.Boolean]
 
   /**
    * Gets and returns the content of active version of the file stored under the given path.
-   * If no active was set, this returns the version with which the file was created i.e. 1.
    *
-   * @param path the file path relative to the repository root
-   * @return     a future object that can be used to access the file's data, if found
+   * @param path        the file path relative to the repository root
+   * @return            a future object that can be used to access the file's data, if found
    */
   def getActive(path: Path): CompletableFuture[Optional[ConfigData]]
 
