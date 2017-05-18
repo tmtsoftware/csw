@@ -24,6 +24,9 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
   def toStringF(implicit mat: Materializer): Future[String] =
     source.runFold("")((str, bs) ⇒ str + bs.utf8String)
 
+  /**
+   * Returns a future of Config object if the data is in valid parseable HOCON format. Else, throws ConfigException.
+   */
   def toConfigObject(implicit mat: Materializer): Future[Config] = {
     import mat.executionContext
     toStringF.map { s ⇒
@@ -40,10 +43,10 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
     toStringF.toJava.toCompletableFuture
 
   /**
-   * Returns an inputStream which emits the bytes read from source
+   * Returns a future of Config object if the data is in valid parseable HOCON format. Else, throws ConfigException.
    */
-  private[config] def toInputStream(implicit mat: Materializer): InputStream =
-    source.runWith(StreamConverters.asInputStream())
+  private[config] def toJConfigObject(implicit mat: Materializer): CompletableFuture[Config] =
+    toConfigObject.toJava.toCompletableFuture
 
   /**
    * Writes config data to a provided file path and returns future file.
@@ -60,6 +63,12 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
       }
       .run()
   }
+
+  /**
+   * Returns an inputStream which emits the bytes read from source
+   */
+  private[config] def toInputStream(implicit mat: Materializer): InputStream =
+    source.runWith(StreamConverters.asInputStream())
 }
 
 /**

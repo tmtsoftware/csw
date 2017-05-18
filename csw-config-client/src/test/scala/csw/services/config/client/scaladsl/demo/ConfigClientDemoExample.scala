@@ -51,12 +51,7 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
   }
 
   //#declare_string_config
-  val defaultStrConf: String =
-    """
-      |axisName1 = tromboneAxis1
-      |axisName2 = tromboneAxis2
-      |axisName3 = tromboneAxis3
-      |""".stripMargin
+  val defaultStrConf: String = "foo { bar { baz : 1234 } }"
   //#declare_string_config
 
   test("exists") {
