@@ -35,6 +35,7 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
   val updatedInputFileContents = scala.io.Source.fromFile(updatedInputFilePath).mkString
   val repoPath1                = "/client1/hcd/text/tromboneHCD.conf"
   val repoPath2                = "/client2/hcd/text/app.conf"
+  val comment                  = "test comment"
 
   test("should upload, update, get and set active version of configuration files") {
     runOn(server) {
@@ -43,34 +44,36 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.registeredLazyBinding.await
       enterBarrier("server-started")
-      enterBarrier("member1-create")
-      enterBarrier("member1-update")
-      enterBarrier("member1-setActive")
-      enterBarrier("member2-create")
+      enterBarrier("client1-create")
+      enterBarrier("client1-update")
+      enterBarrier("client1-setActive")
+      enterBarrier("client2-create")
     }
+
+    // config client command line app is exercised on client1
     runOn(client1) {
       enterBarrier("server-started")
 
       // create file using cli app from client1 and verify client2 able to access it
       val cliMain    = new Main(ClusterSettings().joinLocal(3552))
-      val createArgs = Array("create", repoPath1, "-i", inputFilePath)
+      val createArgs = Array("create", repoPath1, "-i", inputFilePath, "-c", comment)
       cliMain.start(createArgs)
-      enterBarrier("member1-create")
+      enterBarrier("client1-create")
 
       // update file using cli app from client1 and verify client2 able to access it
       val cliMain1   = new Main(ClusterSettings().joinLocal(3552))
-      val updateArgs = Array("update", repoPath1, "-i", updatedInputFilePath)
+      val updateArgs = Array("update", repoPath1, "-i", updatedInputFilePath, "-c", comment)
       cliMain1.start(updateArgs)
-      enterBarrier("member1-update")
+      enterBarrier("client1-update")
 
       // set active version of file using cli app from client1 and verify client2 able to access it
       val cliMain2      = new Main(ClusterSettings().joinLocal(3552))
-      val setActiveArgs = Array("setActive", repoPath1, "--id", "1")
+      val setActiveArgs = Array("setActiveVersion", repoPath1, "--id", "1", "-c", comment)
       cliMain2.start(setActiveArgs)
-      enterBarrier("member1-setActive")
+      enterBarrier("client1-setActive")
 
       // Verify that client1 (cli app) is able to access file created by client2
-      enterBarrier("member2-create")
+      enterBarrier("client2-create")
       val cliMain3       = new Main(ClusterSettings().joinLocal(3552))
       val tempOutputFile = Files.createTempFile("output", ".conf").toString
       val getMinimalArgs = Array("get", repoPath2, "-o", tempOutputFile)
@@ -79,28 +82,29 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
 
     }
 
+    // config client admin api is exercised on client2
     runOn(client2) {
       enterBarrier("server-started")
       val actorRuntime = new ActorRuntime(ActorSystem())
       import actorRuntime._
       val configService = ConfigClientFactory.adminApi(actorSystem, locationService)
 
-      enterBarrier("member1-create")
+      enterBarrier("client1-create")
       val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
       actualConfigValue shouldBe inputFileContents
 
-      enterBarrier("member1-update")
+      enterBarrier("client1-update")
       val actualUpdatedConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
       actualUpdatedConfigValue shouldBe updatedInputFileContents
 
-      enterBarrier("member1-setActive")
+      enterBarrier("client1-setActive")
       val actualActiveConfigValue = configService.getActive(Paths.get(repoPath1)).await.get.toStringF.await
       actualActiveConfigValue shouldBe inputFileContents
 
       configService
         .create(Paths.get(repoPath2), ConfigData.fromString(inputFileContents), comment = "creating app.conf")
         .await
-      enterBarrier("member2-create")
+      enterBarrier("client2-create")
     }
     enterBarrier("after-1")
   }
