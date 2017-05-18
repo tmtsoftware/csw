@@ -60,41 +60,35 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
   //#declare_string_config
 
   test("exists") {
-    //#exists-snip1
+    //#exists
     //construct the path
     val filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf")
-    //#exists-snip1
 
-    // create file using admin API first
+    // create file using admin API
     adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "First commit").await
 
-    val doneF =
-      //#exists-snip2
-      async {
-        //check if file exists with config service
-        val exists: Boolean = await(clientApi.exists(filePath))
-        exists shouldBe true
-      }
-    //#exists-snip2
+    val doneF = async {
+      //check if file exists with config service
+      val exists: Boolean = await(clientApi.exists(filePath))
+      exists shouldBe true
+    }
     Await.result(doneF, 5.seconds)
+    //#exists
   }
 
   test("getActive") {
-    val doneF =
-      //#getActive-snip1
-      async {
-        // construct the path
-        val filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf")
-        //#getActive-snip1
+    //#getActive
+    val doneF = async {
+      // construct the path
+      val filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf")
 
-        await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "First commit"))
+      await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "First commit"))
 
-        //#getActive-snip2
-        val activeFile: Option[ConfigData] = await(clientApi.getActive(filePath))
-        await(activeFile.get.toStringF) shouldBe defaultStrConf
-      }
-    //#getActive-snip2
+      val activeFile: Option[ConfigData] = await(clientApi.getActive(filePath))
+      await(activeFile.get.toStringF) shouldBe defaultStrConf
+    }
     Await.result(doneF, 5.seconds)
+    //#getActive
   }
 
   test("create-update-delete") {
@@ -118,11 +112,9 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
         val config2: ConfigData = ConfigData.fromPath(Paths.get(srcFilePath))
 
         //construct ConfigData from Array[Byte] by reading a local file
-        val stream: InputStream = getClass.getClassLoader.getResourceAsStream("smallBinary.bin")
-
+        val stream: InputStream    = getClass.getClassLoader.getResourceAsStream("smallBinary.bin")
         def byteArray: Array[Byte] = Stream.continually(stream.read).takeWhile(_ != -1).map(_.toByte).toArray
-
-        val config3 = ConfigData.fromBytes(byteArray)
+        val config3                = ConfigData.fromBytes(byteArray)
 
         //store the config, at a specified path as normal text file
         val id1: ConfigId =
@@ -346,6 +338,8 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
     //#getMetadata
     val assertF = async {
       val metaData: ConfigMetadata = await(adminApi.getMetadata)
+      //repository path must not be empty
+      metaData.repoPath should not be empty
       println(s"Server returned => $metaData")
     }
     Await.result(assertF, 2.seconds)

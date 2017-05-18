@@ -62,19 +62,29 @@ ConfigClientFactory exposes functions to get clientAPI and adminAPI. Both the fu
 Scala
 :   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #create-api }
 
+Java
+:   @@snip [JConfigClientDemoExample.java](../../../../csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java) { #create-api }
+
 ## exists
 
 Function checks if the file exists at specified path in the repository. If it exists it returns Future of Boolean
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #exists-snip1 #exists-snip2 }
+:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #exists }
+
+Java
+:   @@snip [JConfigClientDemoExample.java](../../../../csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java) { #exists }
 
 ## getActive
 
 Function retrieves currently active file for a given path from config service. It returns a Future of Option of ConfigData.
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #declare_string_config #getActive-snip1 #getActive-snip2 }
+:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #declare_string_config #getActive }
+
+Java
+:   @@snip [JConfigClientDemoExample.java](../../../../csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java) { #declare_string_config #getActive }
+
 
 ## create
 
@@ -82,6 +92,10 @@ Takes input ConfigData and creates the configuration in the repository at a spec
 
 Scala
 :   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #create }
+
+Java
+:   @@snip [JConfigClientDemoExample.java](../../../../csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java) { #create }
+
 
 ## update
 
@@ -151,7 +165,8 @@ Scala
 
 ## getMetaData
 
-Used to get metadata information about config service. It includes:    
+Used to get metadata information about config service. It includes:
+    
 * repository directory    
 * annex directory    
 * min annex file size    
@@ -159,6 +174,9 @@ Used to get metadata information about config service. It includes:
 
 Scala
 :   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #getMetadata }
+
+Java
+:   @@snip [JConfigClientDemoExample.java](../../../../csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java) { #getMetadata }
 
 ## Source code for examples
 
