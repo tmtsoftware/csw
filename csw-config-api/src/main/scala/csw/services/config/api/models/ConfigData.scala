@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture
 import akka.stream.Materializer
 import akka.stream.scaladsl.{FileIO, Keep, Source, StreamConverters}
 import akka.util.ByteString
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.Future
@@ -22,6 +23,13 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
    */
   def toStringF(implicit mat: Materializer): Future[String] =
     source.runFold("")((str, bs) ⇒ str + bs.utf8String)
+
+  def toConfigObject(implicit mat: Materializer): Future[Config] = {
+    import mat.executionContext
+    toStringF.map { s ⇒
+      ConfigFactory.parseString(s)
+    }
+  }
 
   /**
    * * Java API
