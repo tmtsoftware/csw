@@ -24,7 +24,7 @@ class Main(clusterSettings: ClusterSettings) {
           case "delete"             ⇒ commandLineRunner.delete(options)
           case "list"               ⇒ commandLineRunner.list(options)
           case "history"            ⇒ commandLineRunner.history(options)
-          case "historyActive"      ⇒ commandLineRunner.history(options)
+          case "historyActive"      ⇒ commandLineRunner.historyActive(options)
           case "setActiveVersion"   ⇒ commandLineRunner.setActiveVersion(options)
           case "resetActiveVersion" ⇒ commandLineRunner.resetActiveVersion(options)
           case "getActiveVersion"   ⇒ commandLineRunner.getActiveVersion(options)
