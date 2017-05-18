@@ -181,3 +181,4 @@ Java
 ## Source code for examples
 
 * @github[Scala Example](/csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala)
+* @github[Java Example](/csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java)
