@@ -117,7 +117,7 @@ object ArgsParser {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      arg[String]("id") action { (x, c) =>
+      opt[String]("id") action { (x, c) =>
         c.copy(id = Some(x))
       } text "version id of file to be set as active",
       opt[String]('c', "comment") action { (x, c) =>
@@ -153,7 +153,7 @@ object ArgsParser {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      arg[String]("date") action { (x, c) =>
+      opt[String]("date") action { (x, c) =>
         c.copy(date = Some(Instant.parse(x)))
       } text "optional. if specified will get the active file matching this date. Format: 2017-04-16T16:15:23.503Z",
       opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>

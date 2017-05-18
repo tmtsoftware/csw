@@ -69,7 +69,10 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
         fileEntries
       case (_, _) ⇒
         val fileEntries = await(configService.list(pattern = options.pattern))
-        fileEntries.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+        fileEntries match {
+          case Nil     ⇒ println("List returned empty results.")
+          case entries ⇒ entries.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+        }
         fileEntries
     }
 
