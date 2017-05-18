@@ -1,4 +1,4 @@
-package csw.services.config.api.commons
+package csw.services.config.api.internal
 
 import akka.NotUsed
 import akka.stream.Materializer

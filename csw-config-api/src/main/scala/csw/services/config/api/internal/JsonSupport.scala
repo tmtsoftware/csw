@@ -1,4 +1,4 @@
-package csw.services.config.api.commons
+package csw.services.config.api.internal
 
 import java.nio.file.{Path, Paths}
 import java.time.Instant
