@@ -5,6 +5,7 @@ import java.time.Instant
 
 import org.scalatest.{FunSuite, Matchers}
 
+// DEOPSCSW-112: Command line interface client for Configuration service
 class ArgsParserTest extends FunSuite with Matchers {
 
   val relativeRepoPath = "path/in/repository"
