@@ -14,6 +14,11 @@ import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 
+/**
+ * Java Client for using configuration service
+ * @param configServiceResolver
+ * @param actorRuntime
+ */
 class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) extends IConfigService {
 
   import actorRuntime._

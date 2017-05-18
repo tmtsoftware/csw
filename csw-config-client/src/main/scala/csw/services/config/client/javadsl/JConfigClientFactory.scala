@@ -24,7 +24,7 @@ object JConfigClientFactory {
   }
 
   /**
-   * * Create ConfigClient instance for non admin users.
+   * Create ConfigClient instance for non admin users.
    *
    * @param actorSystem        local actor system of the client
    * @param locationService    location service instance which will be used to resolve the location of config server

@@ -8,7 +8,7 @@ import csw.services.config.api.models.{FileType, _}
 import scala.concurrent.Future
 
 /**
- * Defines an interface to be used by admin users for storing and retrieving configuration information
+ * Defines an interface to be used by admin users for storing, updating and retrieving configuration information
  */
 trait ConfigService extends ConfigClientService {
 

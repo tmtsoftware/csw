@@ -6,6 +6,9 @@ import akka.stream.scaladsl.{Sink, Source}
 
 import scala.concurrent.{Future, Promise}
 
+/**
+ * Extensions on akka streams
+ */
 object ConfigStreamExts {
 
   /**

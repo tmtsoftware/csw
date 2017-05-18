@@ -7,6 +7,9 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import csw.services.config.api.models.{ConfigFileInfo, ConfigFileRevision, ConfigId, ConfigMetadata}
 import spray.json.{DefaultJsonProtocol, JsString, JsValue, JsonFormat, RootJsonFormat}
 
+/**
+ * Convert types to JSON and vice versa
+ */
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
   implicit val fileFormat: JsonFormat[Path] = new JsonFormat[Path] {

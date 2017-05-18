@@ -17,6 +17,11 @@ import csw.services.config.api.scaladsl.ConfigService
 import scala.async.Async._
 import scala.concurrent.Future
 
+/**
+ * Scala Client for using configuration service
+ * @param configServiceResolver       ConfigServiceResolver to get the uri of Configuration Service
+ * @param actorRuntime                ActorRuntime instance for actor system, execution context and dispatcher
+ */
 class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
     extends ConfigService
     with JsonSupport

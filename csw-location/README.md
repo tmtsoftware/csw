@@ -7,4 +7,4 @@ If you want to get started with location service, refer the [examples](https://t
 
 You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/index.html).
 
-You can refer to Java ducumentation [here](https://tmtsoftware.github.io/csw-prod/api/java/?/index.html).
+You can refer to Java documentation [here](https://tmtsoftware.github.io/csw-prod/api/java/?/index.html).

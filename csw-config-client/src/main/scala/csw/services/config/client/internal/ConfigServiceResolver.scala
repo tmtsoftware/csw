@@ -10,7 +10,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
 /**
- * Resolves the location of config server
+ * Resolves the location of server hosting the configuration service
  */
 class ConfigServiceResolver(locationService: LocationService, actorRuntime: ActorRuntime) {
 
