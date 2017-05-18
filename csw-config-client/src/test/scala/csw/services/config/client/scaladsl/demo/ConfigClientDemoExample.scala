@@ -4,7 +4,7 @@ import java.io.InputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
-import csw.services.config.api.models.{ConfigData, ConfigId, FileType}
+import csw.services.config.api.models.{ConfigData, ConfigId, ConfigMetadata, FileType}
 import csw.services.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.ServerWiring
@@ -289,7 +289,7 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
     //#history
   }
 
-  test("historyActive-setActiveVersion-resetActiveVersion-getActiveVersion") {
+  test("historyActive-setActiveVersion-resetActiveVersion-getActiveVersion-getActiveByTime") {
     //#active-file-mgmt
     val assertionF = async {
       val tBegin   = Instant.now()
@@ -333,8 +333,22 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
 
       //take last three revisions
       await(adminApi.historyActive(filePath, maxResults = 3)).map(_.id) shouldBe List(id1, id5, id4)
+
+      //get contents of active version at a specified instance
+      val initialContents = await(adminApi.getActiveByTime(filePath, tBegin)).get
+      await(initialContents.toStringF) shouldBe defaultStrConf
     }
     Await.result(assertionF, 5.seconds)
     //#active-file-mgmt
+  }
+
+  test("getMetadata") {
+    //#getMetadata
+    val assertF = async {
+      val metaData: ConfigMetadata = await(adminApi.getMetadata)
+      println(s"Server returned => $metaData")
+    }
+    Await.result(assertF, 2.seconds)
+    //#getMetadata
   }
 }

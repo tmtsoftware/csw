@@ -143,11 +143,22 @@ Following API functions are available to manage the active version of a config f
 * **historyActive** : Returns the history of active revisions of the file at the given path for a range of period specified by `from` and `to`. The size of the list can be restricted using `maxResults`.    
 * **setActiveVersion** : Sets the "active version" to be the version provided for the file at the given path. If this method is never called in a config's lifetime, the active version will always be the version returned by `create` function.    
 * **resetActiveVersion** : Resets the "active version" of the file at the given path to the latest version.    
-* **getActiveVersion** : Returns the revision Id which represents the "active version" of the file at the given path.          
+* **getActiveVersion** : Returns the revision Id which represents the "active version" of the file at the given path.    
+* **getActiveByTime** : Returns the content of active version of the file existed at given instant 
 
 Scala
 :   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #active-file-mgmt }
 
+## getMetaData
+
+Used to get metadata information about config service. It includes:    
+* repository directory    
+* annex directory    
+* min annex file size    
+* max config file size    
+
+Scala
+:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #getMetadata }
 
 ## Source code for examples
 
