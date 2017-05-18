@@ -99,7 +99,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
       i ← 1 to 4
     } yield relativeRepoPath(normalFileName, i.toString)
     normalFiles.map { fileName ⇒
-      commandLineRunner.create(ArgsParser.parse(Array("create", fileName, "-i", inputFilePath)).get)
+      commandLineRunner.create(ArgsParser.parse(Array("create", fileName, "-i", inputFilePath, "-c", comment)).get)
     }
 
     //  create 3 annex files
@@ -107,7 +107,8 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
       i ← 1 to 3
     } yield relativeRepoPath(annexFileName, i.toString)
     annexFiles.map { fileName ⇒
-      commandLineRunner.create(ArgsParser.parse(Array("create", fileName, "-i", inputFilePath, "--annex")).get)
+      commandLineRunner
+        .create(ArgsParser.parse(Array("create", fileName, "-i", inputFilePath, "--annex", "-c", comment)).get)
     }
 
     commandLineRunner.list(ArgsParser.parse(Array("list", "--annex", "--normal")).get) shouldBe empty
@@ -135,7 +136,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     val updateConfigId = commandLineRunner.update(ArgsParser.parse(updateAllArgs).get)
 
     //  set active version of file to id=1 and store it at location: /tmp/output.txt
-    val parsedSetActiveArgs: Option[Options] = ArgsParser.parse(setActiveAllArgs :+ "1")
+    val parsedSetActiveArgs: Option[Options] = ArgsParser.parse(setActiveAllArgs)
     commandLineRunner.setActiveVersion(parsedSetActiveArgs.get)
 
     val getByDateArgs =
@@ -206,7 +207,8 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     val parsedUpdate2Args: Option[Options] = ArgsParser.parse(updateAllArgs)
     val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get)
 
-    commandLineRunner.setActiveVersion(ArgsParser.parse(setActiveAllArgs :+ updateConfigId.id).get)
+    val setActiveArgs = Array("setActiveVersion", relativeRepoPath, "--id", updateConfigId.id, "-c", comment)
+    commandLineRunner.setActiveVersion(ArgsParser.parse(setActiveArgs).get)
 
     commandLineRunner.historyActive(ArgsParser.parse(historyActiveArgs).get).map(_.id) shouldBe List(updateConfigId,
       createConfigId)

@@ -27,7 +27,7 @@ case class Options(
     toDate: Instant = Instant.MAX,
     maxFileVersions: Int = Int.MaxValue,
     annex: Boolean = false,
-    comment: String = "",
+    comment: Option[String] = None,
     latest: Boolean = false,
     pattern: Option[String] = None,
     normal: Boolean = false

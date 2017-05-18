@@ -31,14 +31,14 @@ class ArgsParserTest extends FunSuite with Matchers {
     val argv               = Array("create", relativeRepoPath, "-i", inputFilePath, "--annex", "-c", comment)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("create", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None, annex = true, comment = comment))
+        None, annex = true, comment = Some(comment)))
   }
 
   test("test create with bare minimum sub-options") {
-    val argv               = Array("create", relativeRepoPath, "-i", inputFilePath)
+    val argv               = Array("create", relativeRepoPath, "-i", inputFilePath, "-c", comment)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("create", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None))
+        None, comment = Some(comment)))
   }
 
   test("test update with no sub-options") {
@@ -51,14 +51,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     val argv               = Array("update", relativeRepoPath, "-i", inputFilePath, "-c", comment)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("update", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None, comment = comment))
-  }
-
-  test("test update with bare minimum sub-options") {
-    val argv               = Array("update", relativeRepoPath, "-i", inputFilePath)
-    val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
-    x should contain(Options("update", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None))
+        None, comment = Some(comment)))
   }
 
   test("test get with no sub-options") {
@@ -95,9 +88,10 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("test delete with sub-options") {
-    val argv               = Array("delete", relativeRepoPath)
+    val argv               = Array("delete", relativeRepoPath, "-c", comment)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
-    x should contain(Options("delete", Some(Paths.get(relativeRepoPath)), None, None, None, None))
+    x should contain(Options("delete", Some(Paths.get(relativeRepoPath)), None, None, None, None,
+        comment = Some(comment)))
   }
 
   test("test list") {
@@ -151,17 +145,11 @@ class ArgsParserTest extends FunSuite with Matchers {
         toDate = Instant.parse(date)))
   }
 
-  test("test setActiveVersion with no comment") {
-    val argv               = Array("setActiveVersion", relativeRepoPath, "--id", id)
-    val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
-    x should contain(Options("setActiveVersion", Some(Paths.get(relativeRepoPath)), None, None, Some(id), None))
-  }
-
   test("test setActiveVersion with all sub-options") {
     val argv               = Array("setActiveVersion", relativeRepoPath, "--id", id, "--comment", comment)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("setActiveVersion", Some(Paths.get(relativeRepoPath)), None, None, Some(id), None,
-        comment = comment))
+        comment = Some(comment)))
   }
 
   test("test resetActiveVersion with no sub-options") {
@@ -174,7 +162,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     val argv               = Array("resetActiveVersion", relativeRepoPath, "--comment", comment)
     val x: Option[Options] = ArgsParser.parser.parse(argv, Options())
     x should contain(Options("resetActiveVersion", Some(Paths.get(relativeRepoPath)), None, None, None, None,
-        comment = comment))
+        comment = Some(comment)))
   }
 
   test("test getActiveVersion") {
