@@ -122,6 +122,15 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   //    Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
   //#find-resolve
 
+  // example code showing how to get the actorReg for remote component and send it a message
+  if (resolveResult.isDefined) {
+    resolveResult.get match {
+      case AkkaLocation(_, _, actorRef) =>
+        actorRef ! LocationServiceExampleComponent.ClientMessage
+      case x => log.error(s"Received unexpected location type: $x")
+    }
+  }
+
   //#filtering
   // list connections in location service
   private val connectionList = Await.result(locationService.list, timeout)
@@ -160,7 +169,6 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
   //#filtering
   if (resolveResult.isDefined) {
-
 
     //#tracking
     // the following two methods are examples of two ways to track a connection.
@@ -227,11 +235,6 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
     // Receive a location from the location service and if it is an akka location, send it a message
     case LocationUpdated(loc) =>
       println(s"Location updated ${locationInfoToString(loc)}")
-      loc match {
-        case AkkaLocation(_, _, actorRef) =>
-          actorRef ! LocationServiceExampleComponent.ClientMessage
-        case x => log.error(s"Received unexpected location type: $x")
-      }
 
     // A location was removed
     case LocationRemoved(conn) =>

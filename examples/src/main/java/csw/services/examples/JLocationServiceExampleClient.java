@@ -125,11 +125,14 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //    Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
         //#find-resolve
 
-        if (resolveResult.isPresent()) {
+       // example code showing how to get the actorRef for remote component and send it a message
+         if (resolveResult.isPresent()) {
             Location loc = resolveResult.get();
             if (loc instanceof AkkaLocation) {
                 ActorRef actorRef = ((AkkaLocation)loc).actorRef();
                 actorRef.tell(LocationServiceExampleComponent.ClientMessage$.MODULE$, getSelf());
+            } else {
+                System.err.println("Received unexpected location type: " + loc.getClass());
             }
         }
     }
