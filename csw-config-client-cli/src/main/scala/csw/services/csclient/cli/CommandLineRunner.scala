@@ -19,14 +19,14 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
   def create(options: Options): ConfigId = {
     val configData = ConfigData.fromPath(options.inputFilePath.get)
     val configId =
-      await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex, options.comment))
+      await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex, options.comment.get))
     println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
     configId
   }
 
   def update(options: Options): ConfigId = {
     val configData = ConfigData.fromPath(options.inputFilePath.get)
-    val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment))
+    val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment.get))
     println(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
     configId
   }
@@ -69,7 +69,10 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
         fileEntries
       case (_, _) ⇒
         val fileEntries = await(configService.list(pattern = options.pattern))
-        fileEntries.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+        fileEntries match {
+          case Nil     ⇒ println("List returned empty results.")
+          case entries ⇒ entries.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+        }
         fileEntries
     }
 
@@ -89,12 +92,12 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
 
   def setActiveVersion(options: Options): Unit = {
     val maybeConfigId = options.id.map(id ⇒ ConfigId(id))
-    await(configService.setActiveVersion(options.relativeRepoPath.get, maybeConfigId.get, options.comment))
+    await(configService.setActiveVersion(options.relativeRepoPath.get, maybeConfigId.get, options.comment.get))
     println(s"${options.relativeRepoPath.get} file with id:${maybeConfigId.get.id} is set as active")
   }
 
   def resetActiveVersion(options: Options): Unit = {
-    await(configService.resetActiveVersion(options.relativeRepoPath.get, options.comment))
+    await(configService.resetActiveVersion(options.relativeRepoPath.get, options.comment.get))
     println(s"${options.relativeRepoPath.get} file is reset to active")
   }
 
@@ -102,7 +105,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     val id = await(configService.getActiveVersion(options.relativeRepoPath.get))
     id match {
       case Some(configId) ⇒
-        println(s"$configId is the active version of the file.")
+        println(s"Id : ${configId.id} is the active version of the file.")
         id
       case None ⇒
         println(FileNotFound(options.relativeRepoPath.get).message)

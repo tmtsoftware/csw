@@ -10,6 +10,9 @@ import akka.stream.{ActorMaterializer, Materializer}
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
+/**
+ * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
+ */
 class ActorRuntime(_actorSystem: ActorSystem, settings: Settings) {
   implicit val actorSystem: ActorSystem     = _actorSystem
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher

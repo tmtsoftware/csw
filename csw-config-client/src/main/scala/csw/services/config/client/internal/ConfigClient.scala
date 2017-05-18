@@ -8,20 +8,28 @@ import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.scalalogging.LazyLogging
-import csw.services.config.api.commons.ConfigStreamExts.RichSource
-import csw.services.config.api.commons.{BinaryUtils, JsonSupport}
+import csw.services.config.api.internal.ConfigStreamExts.RichSource
+import csw.services.config.api.commons.BinaryUtils
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
+import csw.services.config.api.internal.JsonSupport
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 
 import scala.async.Async._
 import scala.concurrent.Future
 
+/**
+ * Scala Client for using configuration service
+ * @param configServiceResolver       ConfigServiceResolver to get the uri of Configuration Service
+ * @param actorRuntime                ActorRuntime instance for actor system, execution context and dispatcher
+ */
 class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
     extends ConfigService
-    with JsonSupport
     with LazyLogging {
 
+  //Importing JsonSupport using an object to prevent JsonSupport methods appearing in ConfigClient scala documentation
+  private object JsonSupport extends JsonSupport
+  import JsonSupport._
   import actorRuntime._
 
   private def configUri(path: jnio.Path): Future[Uri] = baseUri(Path / "config" ++ Path / Path(path.toString))

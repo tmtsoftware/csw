@@ -20,10 +20,16 @@ import org.tmatesoft.svn.core.wc2.{ISvnObjectReceiver, SvnOperationFactory, SvnT
 
 import scala.concurrent.Future
 
+/**
+ * Performs file operations on SVN using SvnKit
+ * @param settings                  server runtime configuration
+ * @param blockingIoDispatcher      dispatcher to be used for blocking operations
+ */
 class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) extends LazyLogging {
 
   private implicit val _blockingIoDispatcher = blockingIoDispatcher
 
+  // Intitialize repository
   def initSvnRepo(): Unit =
     try {
       // Create the new main repo
@@ -31,11 +37,12 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
       SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, false)
       logger.info(s"New Repository created at ${settings.svnUrl}")
     } catch {
-      //If the repo already exists, print stracktrace and continue to boot
+      // If the repo already exists, print stracktrace and continue to boot
       case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.IO_ERROR ⇒
         logger.info(s"Repository already exists at ${settings.svnUrl}")
     }
 
+  // Fetch the file from svn repo and write the contents on outputStream
   def getFile(path: Path, revision: Long, outputStream: OutputStream): Future[Unit] = Future {
     val svn = svnHandle()
     try {

@@ -2,6 +2,9 @@ package csw.services.config.api.commons
 
 import akka.util.ByteString
 
+/**
+ * Utils for binary data
+ */
 object BinaryUtils {
 
   /**

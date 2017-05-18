@@ -10,7 +10,7 @@ Note: Exactly one operation must be specified from this list - `{create | update
 Below listed commands will be used by administrators and maintainers of Config service.
 
 ### create
-creates the input file in the repository at a specified path
+takes input source file and creates the configuration in the repository at a specified path
 
  * 'relativeRepoPath' is path in the repository
  * `-i`, `--in` is input file path

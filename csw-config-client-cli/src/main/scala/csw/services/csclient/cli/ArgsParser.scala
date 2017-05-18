@@ -27,9 +27,9 @@ object ArgsParser {
       opt[Unit]("annex") action { (_, c) =>
         c.copy(annex = true)
       } text "optional add this option for large/binary files",
-      opt[String]('c', "comment") action { (x, c) =>
-        c.copy(comment = x)
-      } text "optional create comment"
+      opt[String]('c', "comment") required () action { (x, c) =>
+        c.copy(comment = Some(x))
+      } text "create comment"
     )
 
     //update operation
@@ -42,9 +42,9 @@ object ArgsParser {
       opt[String]('i', "in") required () valueName "<inputFile>" action { (x, c) =>
         c.copy(inputFilePath = Some(Paths.get(x)))
       } text "input file path",
-      opt[String]('c', "comment") action { (x, c) =>
-        c.copy(comment = x)
-      } text "optional create comment"
+      opt[String]('c', "comment") required () action { (x, c) =>
+        c.copy(comment = Some(x))
+      } text "create comment"
     )
 
     //get operation
@@ -72,9 +72,9 @@ object ArgsParser {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      opt[String]('c', "comment") action { (x, c) =>
-        c.copy(comment = x)
-      } text "optional delete comment"
+      opt[String]('c', "comment") required () action { (x, c) =>
+        c.copy(comment = Some(x))
+      } text "delete comment"
     )
 
     //list operation
@@ -117,12 +117,12 @@ object ArgsParser {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      arg[String]("id") action { (x, c) =>
+      opt[String]("id") action { (x, c) =>
         c.copy(id = Some(x))
       } text "version id of file to be set as active",
-      opt[String]('c', "comment") action { (x, c) =>
-        c.copy(comment = x)
-      } text "optional create comment"
+      opt[String]('c', "comment") required () action { (x, c) =>
+        c.copy(comment = Some(x))
+      } text "create comment"
     )
 
     //resetActiveVersion operation
@@ -132,9 +132,9 @@ object ArgsParser {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      opt[String]('c', "comment") action { (x, c) =>
-        c.copy(comment = x)
-      } text "optional reset comment"
+      opt[String]('c', "comment") required () action { (x, c) =>
+        c.copy(comment = Some(x))
+      } text "reset comment"
     )
 
     //getActiveVersion operation
@@ -153,7 +153,7 @@ object ArgsParser {
       arg[String]("<relativeRepoPath>") action { (x, c) =>
         c.copy(relativeRepoPath = Some(Paths.get(x)))
       } text "file path in the repository",
-      arg[String]("date") action { (x, c) =>
+      opt[String]("date") action { (x, c) =>
         c.copy(date = Some(Instant.parse(x)))
       } text "optional. if specified will get the active file matching this date. Format: 2017-04-16T16:15:23.503Z",
       opt[String]('o', "out") required () valueName "<outputFile>" action { (x, c) =>

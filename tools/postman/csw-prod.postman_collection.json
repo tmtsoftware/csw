@@ -368,7 +368,63 @@
 					"response": []
 				},
 				{
-					"name": "8. exists",
+					"name": "8. history-active",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{hostname}}:{{port}}/history-active/{{path}}",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "code",
+									"value": "xWnkliVQJURqB2x1",
+									"type": "text",
+									"enabled": true
+								},
+								{
+									"key": "grant_type",
+									"value": "authorization_code",
+									"type": "text",
+									"enabled": true
+								},
+								{
+									"key": "redirect_uri",
+									"value": "https://www.getpostman.com/oauth2/callback",
+									"type": "text",
+									"enabled": true
+								},
+								{
+									"key": "client_id",
+									"value": "abc123",
+									"type": "text",
+									"enabled": true
+								},
+								{
+									"key": "client_secret",
+									"value": "ssh-secret",
+									"type": "text",
+									"enabled": true
+								}
+							]
+						},
+						"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests."
+					},
+					"response": []
+				},
+				{
+					"name": "9. exists",
 					"event": [
 						{
 							"listen": "test",
@@ -424,7 +480,7 @@
 					"response": []
 				},
 				{
-					"name": "9. get metadata",
+					"name": "10. get metadata",
 					"event": [
 						{
 							"listen": "test",
@@ -480,7 +536,7 @@
 					"response": []
 				},
 				{
-					"name": "10. get active version",
+					"name": "11. get active version",
 					"event": [
 						{
 							"listen": "test",
@@ -512,7 +568,7 @@
 					"response": []
 				},
 				{
-					"name": "11. set active version",
+					"name": "12. set active version",
 					"event": [
 						{
 							"listen": "test",
@@ -544,7 +600,7 @@
 					"response": []
 				},
 				{
-					"name": "12. reset active version",
+					"name": "13. reset active version",
 					"event": [
 						{
 							"listen": "test",
@@ -576,7 +632,7 @@
 					"response": []
 				},
 				{
-					"name": "13. get active",
+					"name": "14. get active",
 					"event": [
 						{
 							"listen": "test",
@@ -632,7 +688,7 @@
 					"response": []
 				},
 				{
-					"name": "14. get active by time",
+					"name": "15. get active by time",
 					"event": [
 						{
 							"listen": "test",
@@ -688,7 +744,7 @@
 					"response": []
 				},
 				{
-					"name": "15. delete",
+					"name": "16. delete",
 					"event": [
 						{
 							"listen": "test",

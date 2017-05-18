@@ -19,10 +19,10 @@ import scala.concurrent.duration.Duration;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-//DEOPSCSW-138:Split Config API into Admin API and Client API
+// DEOPSCSW-138:Split Config API into Admin API and Client API
+// DEOPSCSW-103: Java API for Configuration service
 public class JConfigClientApiTest {
 
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
@@ -74,7 +74,7 @@ public class JConfigClientApiTest {
         ConfigId configId1 = configAdminApi.update(path, ConfigData.fromString(configValue2), "second commit").get();
         configAdminApi.update(path, ConfigData.fromString(configValue3), "third commit").get();
         Assert.assertEquals(configClientApi.getActive(path).get().get().toJStringF(mat).get(), configValue1);
-        Assert.assertTrue(configClientApi.exists(path, Optional.of(configId1)).get());
+        Assert.assertTrue(configClientApi.exists(path, configId1).get());
 
         configAdminApi.setActiveVersion(path, configId1, "setting active version").get();
         Assert.assertEquals(configClientApi.getActive(path).get().get().toJStringF(mat).get(), configValue2);

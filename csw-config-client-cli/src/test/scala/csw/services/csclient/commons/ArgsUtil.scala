@@ -25,17 +25,16 @@ class ArgsUtil {
   val maxFileVersions              = 32
 
   val createAllArgs      = Array("create", relativeRepoPath, "-i", inputFilePath, "--annex", "-c", comment)
-  val createMinimalArgs  = Array("create", relativeRepoPath, "-i", inputFilePath)
+  val createMinimalArgs  = Array("create", relativeRepoPath, "-i", inputFilePath, "-c", comment)
   val updateAllArgs      = Array("update", relativeRepoPath, "-i", updatedInputFilePath, "-c", comment)
-  val updateMinimalArgs  = Array("update", relativeRepoPath, "-i", updatedInputFileContents)
   val getLatestArgs      = Array("get", relativeRepoPath, "-o", outputFilePath)
   val getByIdArgs        = Array("get", relativeRepoPath, "-o", outputFilePath, "--id")
   val getMinimalArgs     = Array("getActive", relativeRepoPath, "-o", outputFilePath)
   val existsArgs         = Array("exists", relativeRepoPath)
-  val deleteArgs         = Array("delete", relativeRepoPath)
+  val deleteArgs         = Array("delete", relativeRepoPath, "-c", comment)
   val historyArgs        = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
   val historyActiveArgs  = Array("historyActive", relativeRepoPath, "--max", maxFileVersions.toString)
-  val setActiveAllArgs   = Array("setActiveVersion", relativeRepoPath, "--id")
+  val setActiveAllArgs   = Array("setActiveVersion", relativeRepoPath, "--id", id, "-c", comment)
   val resetActiveAllArgs = Array("resetActiveVersion", relativeRepoPath, "-c", comment)
   val meteDataArgs       = Array("getMetadata")
 

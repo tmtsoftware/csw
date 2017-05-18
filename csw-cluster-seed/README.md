@@ -1,5 +1,5 @@
 csw-cluster-seed application
-------------------------
+============================
 
 This application will start a csw cluster seed required for all clustered services like
 location-service. It is required that you start one or more seed applications before consuming location-service.

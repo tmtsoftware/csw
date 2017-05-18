@@ -8,10 +8,13 @@ import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
 import akka.http.scaladsl.model.headers.HttpEncoding
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server._
-import csw.services.config.api.commons.JsonSupport
+import csw.services.config.api.internal.JsonSupport
 import csw.services.config.api.models.{ConfigData, ConfigId, FileType}
 import csw.services.config.server.commons.PathValidator
 
+/**
+ * Helper class for ConfigServiceRoute
+ */
 trait HttpSupport extends Directives with JsonSupport {
 
   def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>
