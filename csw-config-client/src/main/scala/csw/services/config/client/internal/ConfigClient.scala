@@ -24,9 +24,11 @@ import scala.concurrent.Future
  */
 class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
     extends ConfigService
-    with JsonSupport
     with LazyLogging {
 
+  //Importing JsonSupport using an object to prevent JsonSupport methods appearing in ConfigClient scala documentation
+  private object JsonSupport extends JsonSupport
+  import JsonSupport._
   import actorRuntime._
 
   private def configUri(path: jnio.Path): Future[Uri] = baseUri(Path / "config" ++ Path / Path(path.toString))

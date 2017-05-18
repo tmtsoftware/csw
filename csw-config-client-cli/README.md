@@ -1,8 +1,8 @@
-Configuration cli client
+Configuration CLI client
 =========================
 
-The examples of getting started is under development.
+Configuration Service is used to store and track changes in configurations used by components.
 
-You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/index.html).
+Configuration CLI Client can be used to interact with configuration service using a command line interface.
 
-You can refer to Java documentation [here](https://tmtsoftware.github.io/csw-prod/api/java/?/index.html).
+If you want to get started with using CLI client, refer the [examples](https://tmtsoftware.github.io/csw-prod/apps/cswconfigclientcli.html)
