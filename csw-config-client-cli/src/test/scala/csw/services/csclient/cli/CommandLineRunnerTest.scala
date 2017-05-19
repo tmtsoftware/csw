@@ -11,6 +11,7 @@ import csw.services.location.commons.ClusterAwareSettings
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 // DEOPSCSW-112: Command line interface client for Configuration service
+// DEOPSCSW-43: Access Configuration service from any CSW component
 class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   private val serverWiring = ServerWiring.make(ClusterAwareSettings.onPort(3552))

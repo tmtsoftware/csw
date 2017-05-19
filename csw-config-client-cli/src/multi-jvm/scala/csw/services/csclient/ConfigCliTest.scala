@@ -18,6 +18,7 @@ class ConfigCliTestMultiJvmNode1 extends ConfigCliTest(0)
 class ConfigCliTestMultiJvmNode2 extends ConfigCliTest(0)
 class ConfigCliTestMultiJvmNode3 extends ConfigCliTest(0)
 
+// DEOPSCSW-43: Access Configuration service from any CSW component
 class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndServer) with FunSuiteLike {
 
   import config._
