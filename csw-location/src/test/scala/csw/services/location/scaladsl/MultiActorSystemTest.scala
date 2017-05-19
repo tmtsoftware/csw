@@ -1,5 +1,6 @@
 package csw.services.location.scaladsl
 
+import csw.services.location.CswTestSuite
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.internal.Networks
@@ -9,7 +10,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
 
-class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class MultiActorSystemTest extends CswTestSuite {
 
   val connection: TcpConnection        = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
   val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
@@ -19,7 +20,7 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
   private val locationService2 =
     LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().joinLocal(3552)))
 
-  override protected def afterAll(): Unit =
+  override protected def afterAllTests(): Unit =
     locationService2.shutdown().await
 
   test("ensure that location service works across two actorSystems within the same JVM") {

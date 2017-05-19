@@ -1,31 +1,38 @@
 package csw.services.logging
 
+import java.net.InetAddress
+import java.util.concurrent.CompletableFuture
+
 import akka.actor.{ActorSystem, Props}
 import LogActor._
 import TimeActorMessages.TimeDone
+import akka.Done
 import ch.qos.logback.classic.LoggerContext
 import org.slf4j.LoggerFactory
+
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.language.postfixOps
 import com.persist.JsonOps._
 
+import scala.compat.java8.FutureConverters.FutureOps
+
 /**
  *
- * @param system the actor system.
  * @param serviceName name of the service (to log).
  * @param serviceVersion version of the service (to log).
  * @param host host name (to log).
  * @param appenderBuilders optional sequence of log appenders to use.
  *                         Default is to use built-in stdout and file appenders.
  */
-case class LoggingSystem(private val system: ActorSystem,
-                         private val serviceName: String,
-                         private val serviceVersion: String,
-                         private val host: String,
+case class LoggingSystem(private val serviceName: String = "serviceName1",
+                         private val serviceVersion: String = "serviceVersion1",
+                         private val host: String = InetAddress.getLocalHost.getHostName,
                          private val appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender))
     extends ClassLogging {
 
   import LoggingLevels._
+
+  private val system: ActorSystem = ActorSystem("logging")
 
   LoggingState.loggingSys = this
 
@@ -172,7 +179,7 @@ case class LoggingSystem(private val system: ActorSystem,
    * Shut down the logging system.
    * @return  future completes when the logging system is shut down.
    */
-  def stop: Future[Unit] = {
+  def stop: Future[Done] = {
     def stopAkka(): Future[Unit] = {
       LoggingState.sendMsg(LastAkkaMessage)
       LoggingState.akkaStopPromise.future
@@ -209,6 +216,8 @@ case class LoggingSystem(private val system: ActorSystem,
       logActorDone  <- finishAppenders()
       logActorDone  <- stopLogger()
       appendersDone <- stopAppenders()
-    } yield appendersDone
+    } yield Done
   }
+
+  def javaStop(): CompletableFuture[Done] = stop.toJava.toCompletableFuture
 }

@@ -1,8 +1,10 @@
 package csw.services.location.models
 
-import org.scalatest.{FunSuite, Matchers}
+import csw.services.location.CswTestSuite
 
-class ComponentTypeTest extends FunSuite with Matchers {
+class ComponentTypeTest extends CswTestSuite {
+
+  override protected def afterAllTests(): Unit = ()
 
   test("ComponentType should be any one of this types : 'container', 'hcd', 'assembly' and 'service'") {
 

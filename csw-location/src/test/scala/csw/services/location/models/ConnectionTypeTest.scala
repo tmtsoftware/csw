@@ -1,8 +1,10 @@
 package csw.services.location.models
 
-import org.scalatest.{FunSuite, Matchers}
+import csw.services.location.CswTestSuite
 
-class ConnectionTypeTest extends FunSuite with Matchers {
+class ConnectionTypeTest extends CswTestSuite {
+
+  override protected def afterAllTests(): Unit = ()
 
   test("ConnectionType should be any one of this types : 'http', 'tcp' and 'akka'") {
 

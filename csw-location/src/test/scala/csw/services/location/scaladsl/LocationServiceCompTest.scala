@@ -5,17 +5,16 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
+import csw.services.location.CswTestSuite
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import org.scalatest._
 
 import scala.concurrent.duration.DurationInt
 
-class LocationServiceCompTest extends FunSuiteLike with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
-
+class LocationServiceCompTest extends CswTestSuite {
   lazy val locationService: LocationService = LocationServiceFactory.make()
 
   implicit val actorSystem: ActorSystem = ActorSystemFactory.remote("test")
@@ -24,8 +23,10 @@ class LocationServiceCompTest extends FunSuiteLike with Matchers with BeforeAndA
   override protected def afterEach(): Unit =
     locationService.unregisterAll().await
 
-  override protected def afterAll(): Unit =
+  override protected def afterAllTests(): Unit = {
     locationService.shutdown().await
+    actorSystem.terminate().await
+  }
 
   test("should able to register, resolve, list and unregister tcp location") {
     val componentId: ComponentId         = ComponentId("exampleTCPService", ComponentType.Service)

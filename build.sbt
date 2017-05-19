@@ -45,6 +45,7 @@ lazy val `csw-cluster-seed` = project
 
 //Location service related projects
 lazy val `csw-location` = project
+  .dependsOn(`csw-logging`)
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Location
