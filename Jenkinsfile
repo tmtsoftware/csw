@@ -10,7 +10,7 @@ node('master'){
 
              stage('Build') {
                 sh "sbt 'scalafmt --test'"
-                sh "sbt -Dcheck.cycles=true clean scalastyle compile"
+                sh "sbt -Dcheck.cycles=false clean scalastyle compile"
              }
 
              stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
