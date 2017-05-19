@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
 
-  val Logger = Seq(
+  val Logging = Seq(
     Libs.`scala-logging`,
     Libs.`logback-classic`,
     Libs.`persist-json`,

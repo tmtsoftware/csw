@@ -29,10 +29,10 @@ lazy val `csw-prod` = project
   .settings(Settings.docExclusions(unidocExclusions))
 
 //Logging service
-lazy val `csw-logger` = project
+lazy val `csw-logging` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
-    libraryDependencies ++= Dependencies.Logger
+    libraryDependencies ++= Dependencies.Logging
   )
 
 //Cluster seed
