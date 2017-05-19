@@ -17,6 +17,8 @@ object Libs {
   val svnkit                         = "org.tmatesoft.svnkit"       % "svnkit"                        % "1.8.11" //TMate Open Source License
   val `commons-codec`                = "commons-codec"              % "commons-codec"                 % "1.10" //Apache 2.0
   val `spray-json`                   = "io.spray"                   %% "spray-json"                   % "1.3.3" force ()
+  val `persist-json`                 = "com.persist"                %% "persist-json"                 % "1.2.0"
+  val `joda-time`                    = "joda-time"                  % "joda-time"                     % "2.9.9"
 }
 
 object Akka {
@@ -28,6 +30,7 @@ object Akka {
   val `akka-distributed-data`   = "com.typesafe.akka" %% "akka-distributed-data" % Version
   val `akka-multi-node-testkit` = "com.typesafe.akka" %% "akka-multi-node-testkit" % Version
   val `akka-cluster-tools`      = "com.typesafe.akka" %% "akka-cluster-tools" % Version
+  val `akka-slf4j`              = "com.typesafe.akka" %% "akka-slf4j" % Version
 }
 
 object AkkaHttp {

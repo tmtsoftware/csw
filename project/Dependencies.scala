@@ -1,6 +1,16 @@
 import sbt._
 
 object Dependencies {
+
+  val Logger = Seq(
+    Libs.`scala-logging`,
+    Libs.`logback-classic`,
+    Libs.`persist-json`,
+    Libs.`joda-time`,
+    Akka.`akka-actor`,
+    Akka.`akka-slf4j`
+  )
+
   val Location = Seq(
     Akka.`akka-stream`,
     Akka.`akka-distributed-data`,

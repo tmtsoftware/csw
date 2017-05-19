@@ -28,6 +28,13 @@ lazy val `csw-prod` = project
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
 
+//Logging service
+lazy val `csw-logger` = project
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(
+    libraryDependencies ++= Dependencies.Logger
+  )
+
 //Cluster seed
 lazy val `csw-cluster-seed` = project
   .enablePlugins(DeployApp)
