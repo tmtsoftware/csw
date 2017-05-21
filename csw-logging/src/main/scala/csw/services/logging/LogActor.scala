@@ -1,13 +1,11 @@
 package csw.services.logging
 
 import scala.concurrent.Promise
-import akka.actor.Props
+import akka.actor.{Actor, Props}
 import com.persist.Exceptions.SystemException
 import org.joda.time.format.ISODateTimeFormat
 import com.persist.JsonOps._
 import LoggingLevels._
-import scala.language.postfixOps
-import scala.language.existentials
 
 private[logging] object LogActor {
 
@@ -65,7 +63,7 @@ private[logging] class LogActor(done: Promise[Unit],
                                 initLevel: Level,
                                 initSlf4jLevel: Level,
                                 initAkkaLevel: Level)
-    extends ActorLogging {
+    extends Actor {
 
   import LogActor._
 
@@ -75,10 +73,9 @@ private[logging] class LogActor(done: Promise[Unit],
   private[this] var slf4jLogLevel: Level                           = initSlf4jLevel
 
   private[this] val logFmt = ISODateTimeFormat.dateTime()
-  private[this] val system = context.system
 
   private def exToJson(ex: Throwable): Json = {
-    val name = ex.getClass.toString()
+    val name = ex.getClass.toString
     ex match {
       case ex: RichException =>
         JsonObject("ex" -> name, "msg" -> ex.richMsg)
@@ -90,19 +87,18 @@ private[logging] class LogActor(done: Promise[Unit],
   }
 
   private def getStack(ex: Throwable): Seq[JsonObject] = {
-    val stack = ex.getStackTrace map {
-      case trace =>
-        val j0 = if (trace.getLineNumber > 0) {
-          JsonObject("line" -> trace.getLineNumber)
-        } else {
-          emptyJsonObject
-        }
-        val j1 = JsonObject(
-          "class"  -> trace.getClassName,
-          "file"   -> trace.getFileName,
-          "method" -> trace.getMethodName
-        )
-        j0 ++ j1
+    val stack = ex.getStackTrace map { trace =>
+      val j0 = if (trace.getLineNumber > 0) {
+        JsonObject("line" -> trace.getLineNumber)
+      } else {
+        emptyJsonObject
+      }
+      val j1 = JsonObject(
+        "class"  -> trace.getClassName,
+        "file"   -> trace.getFileName,
+        "method" -> trace.getMethodName
+      )
+      j0 ++ j1
     }
     stack
   }
@@ -112,14 +108,14 @@ private[logging] class LogActor(done: Promise[Unit],
     val j1 = ex match {
       case r: RichException if r.cause != noException =>
         JsonObject("cause" -> exceptionJson(r.cause))
-      case ex1: Throwable if ex.getCause() != null =>
-        JsonObject("cause" -> exceptionJson(ex.getCause()))
+      case ex1: Throwable if ex.getCause != null =>
+        JsonObject("cause" -> exceptionJson(ex.getCause))
       case _ => emptyJsonObject
     }
     JsonObject("trace" -> JsonObject("msg" -> exToJson(ex), "stack" -> stack.toSeq)) ++ j1
   }
 
-  private def append(stdHeaders: JsonObject, baseMsg: JsonObject, category: String, level: Level) {
+  private def append(stdHeaders: JsonObject, baseMsg: JsonObject, category: String, level: Level): Unit = {
     val keep = category != "common" || (filter match {
       case Some(f) => f(stdHeaders ++ baseMsg, level)
       case None    => true
@@ -235,6 +231,6 @@ private[logging] class LogActor(done: Promise[Unit],
     case SetFilter(f) => filter = f
 
     case msg: Any =>
-      log.warn("Unrecognized LogActor message:" + msg)(() => DefaultSourceLocation)
+      println(("Unrecognized LogActor message:" + msg + DefaultSourceLocation))
   }
 }

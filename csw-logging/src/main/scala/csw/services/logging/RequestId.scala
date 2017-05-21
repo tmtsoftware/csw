@@ -1,7 +1,6 @@
 package csw.services.logging
 
 import java.util.UUID
-import scala.util.Random
 
 /**
  * The trait for logging ids. It can be either a RequestId io a specific request or

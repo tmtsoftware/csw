@@ -4,13 +4,15 @@ import ch.qos.logback.core.{Appender, UnsynchronizedAppenderBase}
 import ch.qos.logback.core.spi.AppenderAttachable
 import LogActor._
 
+import scala.collection.mutable
+
 private[logging] class Slf4jAppender[E]()
     extends UnsynchronizedAppenderBase[E]
     with AppenderAttachable[E]
     with ClassLogging {
   import LoggingLevels._
 
-  val appenders = scala.collection.mutable.HashSet[Appender[E]]()
+  val appenders: mutable.HashSet[Appender[E]] = scala.collection.mutable.HashSet[Appender[E]]()
 
   def detachAndStopAllAppenders(): Unit = {}
 
@@ -24,11 +26,10 @@ private[logging] class Slf4jAppender[E]()
 
   def iteratorForAppenders(): java.util.Iterator[ch.qos.logback.core.Appender[E]] = null
 
-  def addAppender(a: Appender[E]) {
+  def addAppender(a: Appender[E]): Unit =
     appenders.add(a)
-  }
 
-  def append(event: E) {
+  def append(event: E): Unit =
     event match {
       case e: ch.qos.logback.classic.spi.LoggingEvent =>
         val frame = e.getCallerData()(0)
@@ -41,9 +42,8 @@ private[logging] class Slf4jAppender[E]()
         }
         val msg = Slf4jMessage(level, e.getTimeStamp, frame.getClassName, e.getFormattedMessage, frame.getLineNumber,
           frame.getFileName, ex)
-        LoggingState.sendMsg(msg)
+        MessageHandler.sendMsg(msg)
       case x: Any =>
         log.warn(s"UNEXPECTED LOGBACK EVENT:${event.getClass}:$event")(() => DefaultSourceLocation)
     }
-  }
 }

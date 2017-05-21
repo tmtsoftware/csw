@@ -15,14 +15,14 @@ object LoggingLevels {
      * @param name a level name. Case is ignored.
      * @return the corresponding Level if there is one for that name. Otherwise WARN.
      */
-    def apply(name: String) = nameToLevelMap.get(name.toUpperCase()).getOrElse(WARN)
+    def apply(name: String): Level = nameToLevelMap.getOrElse(name.toUpperCase(), WARN)
 
     /**
      * Checks if a level name exists.
      * @param name the level name.
      * @return  true if a level with that name exists.
      */
-    def hasLevel(name: String) = nameToLevelMap.get(name.toUpperCase) != None
+    def hasLevel(name: String): Boolean = nameToLevelMap.get(name.toUpperCase).isDefined
   }
 
   /**
@@ -44,7 +44,7 @@ object LoggingLevels {
      *         - `x == 0` when `this == that`
      *         - `x > 0` when  `this > that`
      */
-    def compare(that: Level) = pos - that.pos
+    def compare(that: Level): Int = pos - that.pos
   }
 
   /**

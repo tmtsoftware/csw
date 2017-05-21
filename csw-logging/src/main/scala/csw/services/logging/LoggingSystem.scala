@@ -3,18 +3,15 @@ package csw.services.logging
 import java.net.InetAddress
 import java.util.concurrent.CompletableFuture
 
-import akka.actor.{ActorSystem, Props}
-import LogActor._
-import TimeActorMessages.TimeDone
 import akka.Done
+import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
+import csw.services.logging.LogActor._
+import csw.services.logging.TimeActorMessages.TimeDone
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.language.postfixOps
-import com.persist.JsonOps._
-
 import scala.compat.java8.FutureConverters.FutureOps
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 /**
  *
@@ -34,7 +31,7 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
 
   private val system: ActorSystem = ActorSystem("logging")
 
-  LoggingState.loggingSys = this
+//  LoggingState.loggingSys = this
 
   private[this] val loggingConfig = system.settings.config.getConfig("com.persist.logging")
   private[this] val levels        = loggingConfig.getString("logLevel")
@@ -43,7 +40,7 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
   } else {
     throw new Exception("Bad value for com.persist.logging.logLevel")
   }
-  @volatile var logLevel          = defaultLevel
+  @volatile var logLevel: Level   = defaultLevel
   private[this] val akkaLogLevelS = loggingConfig.getString("akkaLogLevel")
   private[this] val defaultAkkaLogLevel: Level = if (Level.hasLevel(akkaLogLevelS)) {
     Level(akkaLogLevelS)
@@ -68,7 +65,7 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
   /**
    * Standard headers.
    */
-  val standardHeaders = Map[String, RichMsg]("@version" -> 1, "@host" -> host,
+  val standardHeaders: Map[String, RichMsg] = Map[String, RichMsg]("@version" -> 1, "@host" -> host,
     "@service" -> Map[String, RichMsg]("name" -> serviceName, "version" -> serviceVersion))
 
   setLevel(defaultLevel)
@@ -82,7 +79,7 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
 
   private[this] val logActor = system.actorOf(LogActor.props(done, standardHeaders, appenders, defaultLevel,
       defaultSlf4jLogLevel, defaultAkkaLogLevel), name = "LoggingActor")
-  LoggingState.logger = Some(logActor)
+  LoggingState.logActor = Some(logActor)
 
   private[logging] val gcLogger: Option[GcLogger] = if (gc) {
     Some(GcLogger())
@@ -93,7 +90,7 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
   if (time) {
     // Start timing actor
     LoggingState.doTime = true
-    val timeActor = system.actorOf(Props(classOf[TimeActor], timeActorDonePromise), name = "TimingActor")
+    val timeActor = system.actorOf(Props(new TimeActor(timeActorDonePromise)), name = "TimingActor")
     LoggingState.timeActorOption = Some(timeActor)
   } else {
     timeActorDonePromise.success(())
@@ -101,10 +98,10 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
 
   // Deal with messages send before logger was ready
   LoggingState.msgs.synchronized {
-    if (LoggingState.msgs.size > 0) {
+    if (LoggingState.msgs.nonEmpty) {
       log.info(s"Saw ${LoggingState.msgs.size} messages before logger start")(() => DefaultSourceLocation)
       for (msg <- LoggingState.msgs) {
-        LoggingState.sendMsg(msg)
+        MessageHandler.sendMsg(msg)
       }
     }
     LoggingState.msgs.clear()
@@ -181,14 +178,12 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
    */
   def stop: Future[Done] = {
     def stopAkka(): Future[Unit] = {
-      LoggingState.sendMsg(LastAkkaMessage)
+      MessageHandler.sendMsg(LastAkkaMessage)
       LoggingState.akkaStopPromise.future
     }
 
     def stopTimeActor(): Future[Unit] = {
-      LoggingState.timeActorOption foreach {
-        case timeActor => timeActor ! TimeDone
-      }
+      LoggingState.timeActorOption foreach (timeActor => timeActor ! TimeDone)
       timeActorDonePromise.future
     }
 
@@ -205,10 +200,10 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
       Future.sequence(appenders map (_.stop())).map(x => ())
 
     //Stop gc logger
-    gcLogger foreach (_.stop)
+    gcLogger foreach (_.stop())
 
     // Stop Slf4j
-    val loggerContext = LoggerFactory.getILoggerFactory().asInstanceOf[LoggerContext]
+    val loggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
     loggerContext.stop()
 
     for {

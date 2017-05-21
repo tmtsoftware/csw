@@ -10,7 +10,7 @@ trait ClassLogging {
   /**
    * The logging system.
    */
-  def loggingSystem: LoggingSystem = LoggingState.loggingSys
+//  def loggingSystem: LoggingSystem = LoggingState.loggingSys
 
   /**
    * The framework logger.

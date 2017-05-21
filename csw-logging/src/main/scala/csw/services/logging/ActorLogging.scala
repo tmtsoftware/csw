@@ -14,7 +14,7 @@ trait ActorLogging extends Actor {
   /**
    * The logging system.
    */
-  def loggingSystem: LoggingSystem = LoggingState.loggingSys
+//  def loggingSystem: LoggingSystem = LoggingState.loggingSys
 
   /**
    * The logger.

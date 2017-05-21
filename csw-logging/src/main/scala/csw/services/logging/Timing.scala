@@ -20,7 +20,7 @@ trait Timing {
      */
     def start(id: RequestId, name: String): String = {
       val uid = Random.nextLong().toHexString
-      if (LoggingState.doTime) LoggingState.timeStart(id, name, uid)
+      if (LoggingState.doTime) MessageHandler.timeStart(id, name, uid)
       uid
     }
 
@@ -31,9 +31,8 @@ trait Timing {
      * @param name each region to be timed must have a different name.
      * @param token the token returned by the Timing.start call.
      */
-    def end(id: RequestId, name: String, token: String) {
-      if (LoggingState.doTime) LoggingState.timeEnd(id, name, token)
-    }
+    def end(id: RequestId, name: String, token: String): Unit =
+      if (LoggingState.doTime) MessageHandler.timeEnd(id, name, token)
   }
 
   /**
@@ -47,11 +46,11 @@ trait Timing {
   def Time[T](id: RequestId, name: String)(body: => T): T =
     if (LoggingState.doTime) {
       val uid = Random.nextLong().toHexString
-      LoggingState.timeStart(id, name, uid)
+      MessageHandler.timeStart(id, name, uid)
       try {
         body
       } finally {
-        LoggingState.timeEnd(id, name, uid)
+        MessageHandler.timeEnd(id, name, uid)
       }
     } else {
       body

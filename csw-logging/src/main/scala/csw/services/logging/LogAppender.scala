@@ -27,7 +27,7 @@ trait LogAppender {
    * @param baseMsg the message to be logged.
    * @param category  the kinds of log (for example, "common").
    */
-  def append(baseMsg: Map[String, RichMsg], category: String)
+  def append(baseMsg: Map[String, RichMsg], category: String): Unit
 
   /**
    * Called just before the logger shuts down.

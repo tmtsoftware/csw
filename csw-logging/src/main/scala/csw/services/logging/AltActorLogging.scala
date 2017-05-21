@@ -11,12 +11,12 @@ import akka.actor.Actor
  * You might also want to un-click the Actor button.
  */
 trait AltActorLogging extends Actor {
-  private[this] val actorName = self.path.toString()
+  private[this] val actorName = self.path.toString
 
   /**
    * The logging system.
    */
-  def loggingSystem: LoggingSystem = LoggingState.loggingSys
+//  def loggingSystem: LoggingSystem = LoggingState.loggingSys
 
   /**
    * The logger.

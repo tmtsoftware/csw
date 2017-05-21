@@ -12,15 +12,15 @@ private[logging] class AkkaLogger extends Actor {
                   clazz: Class[_],
                   msg: Any,
                   time: Long,
-                  cause: Option[Throwable] = None) {
+                  cause: Option[Throwable] = None): Unit = {
     val m = AkkaMessage(time, level, source, clazz, msg, cause)
-    LoggingState.akkaMsg(m)
+    MessageHandler.akkaMsg(m)
   }
 
   def receive: PartialFunction[Any, Unit] = {
     case InitializeLogger(_) => sender ! LoggerInitialized
     case event @ Error(cause, logSource, logClass, message) =>
-      val c = if (cause.toString().contains("NoCause$")) {
+      val c = if (cause.toString.contains("NoCause$")) {
         None
       } else {
         Some(cause)

@@ -18,7 +18,7 @@ object RichException {
 
   /** The unapply for matching the RichException trait.
    */
-  def unapply(f: RichException): Option[(Any)] = Some((f.richMsg))
+  def unapply(f: RichException): Option[(Any)] = Some(f.richMsg)
 
   private def stringify(j: Any): String =
     j match {

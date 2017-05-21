@@ -8,7 +8,6 @@ import csw.services.logging.LoggingLevels.Level
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.language.postfixOps
 
 private[logging] object FileAppenderActor {
 
@@ -34,7 +33,7 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
 
   private[this] var flushTimer: Option[Cancellable] = None
 
-  private def scheduleFlush() {
+  private def scheduleFlush(): Unit = {
     val time = system.scheduler.scheduleOnce(2 seconds) {
       self ! AppendFlush
     }
@@ -43,7 +42,7 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
 
   scheduleFlush()
 
-  private def open(date: String) {
+  private def open(date: String): Unit = {
     val dir = s"$path"
     new File(dir).mkdirs()
     val fname = s"$dir/$category.$date.log"
@@ -52,7 +51,7 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
     lastDate = date
   }
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case AppendAdd(date, line) =>
       optw match {
         case Some(w) =>
@@ -92,14 +91,13 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
     case x: Any => log.warn(s"Bad appender message: $x")(() => DefaultSourceLocation)
   }
 
-  override def postStop() {
+  override def postStop(): Unit =
     optw match {
       case Some(w) =>
         w.close()
         optw = None
       case None =>
     }
-  }
 }
 
 private[logging] case class FilesAppender(actorRefFactory: ActorRefFactory, path: String, category: String) {
@@ -109,9 +107,8 @@ private[logging] case class FilesAppender(actorRefFactory: ActorRefFactory, path
   private[this] val fileAppenderActor =
     actorRefFactory.actorOf(FileAppenderActor.props(path, category), name = s"FileAppender.$category")
 
-  def add(date: String, line: String) {
+  def add(date: String, line: String): Unit =
     fileAppenderActor ! AppendAdd(date, line)
-  }
 
   def close(): Future[Unit] = {
     val p = Promise[Unit]()
@@ -138,7 +135,7 @@ object FileAppender extends LogAppenderBuilder {
 /**
  * An appender that writes log messages to files.
  *
- * @param factory
+ * @param factory ActorRefFactory
  * @param stdHeaders the headers that are fixes for this service.
  */
 class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) extends LogAppender {

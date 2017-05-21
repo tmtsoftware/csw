@@ -1,8 +1,8 @@
 package csw.services.logging
 
-import LoggingState._
-import LoggingLevels._
-import LogActor._
+import csw.services.logging.LogActor._
+import csw.services.logging.LoggingLevels._
+import csw.services.logging.LoggingState._
 
 /**
  * This class provides the methods needed for logging.
@@ -10,9 +10,9 @@ import LogActor._
  */
 class Logger private[logging] (private val actorName: Option[String] = None) {
 
-  private def all(level: Level, id: AnyId, msg: => Any, ex: Throwable, sourceLocation: SourceLocation) {
+  private def all(level: Level, id: AnyId, msg: => Any, ex: Throwable, sourceLocation: SourceLocation): Unit = {
     val t = System.currentTimeMillis()
-    sendMsg(LogMessage(level, id, t, actorName, msg, sourceLocation, ex))
+    MessageHandler.sendMsg(LogMessage(level, id, t, actorName, msg, sourceLocation, ex))
   }
 
   private def has(id: AnyId, level: Level): Boolean =
@@ -33,9 +33,8 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
    */
   def trace(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
       implicit sourceLocation: () => SourceLocation
-  ) {
+  ): Unit =
     if (doTrace || has(id, TRACE)) all(TRACE, id, msg, ex, sourceLocation())
-  }
 
   /**
    * Writes a debug level log message.
@@ -45,9 +44,8 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
    */
   def debug(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
       implicit sourceLocation: () => SourceLocation
-  ) {
+  ): Unit =
     if (doDebug || has(id, DEBUG)) all(DEBUG, id, msg, ex, sourceLocation())
-  }
 
   /**
    * Writes an info level log message.
@@ -57,9 +55,8 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
    */
   def info(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
       implicit sourceLocation: () => SourceLocation
-  ) {
+  ): Unit =
     if (doInfo || has(id, INFO)) all(INFO, id, msg, ex, sourceLocation())
-  }
 
   /**
    * Writes a warn level log message.
@@ -69,9 +66,8 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
    */
   def warn(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
       implicit sourceLocation: () => SourceLocation
-  ) {
+  ): Unit =
     if (doWarn || has(id, WARN)) all(WARN, id, msg, ex, sourceLocation())
-  }
 
   /**
    * Writes an error level log message.
@@ -81,9 +77,8 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
    */
   def error(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
       implicit sourceLocation: () => SourceLocation
-  ) {
+  ): Unit =
     if (doError || has(id, ERROR)) all(ERROR, id, msg, ex, sourceLocation())
-  }
 
   /**
    * Writes a fatal level log message.
@@ -93,9 +88,8 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
    */
   def fatal(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
       implicit sourceLocation: () => SourceLocation
-  ) {
+  ): Unit =
     all(FATAL, id, msg, ex, sourceLocation())
-  }
 
   /**
    * Write a log message to an alternative log.
@@ -111,7 +105,6 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
                   m: Map[String, RichMsg],
                   ex: Throwable = noException,
                   id: AnyId = noId,
-                  time: Long = System.currentTimeMillis()) {
-    sendMsg(AltMessage(category, time, m ++ Map("@category" -> category), id, ex))
-  }
+                  time: Long = System.currentTimeMillis()): Unit =
+    MessageHandler.sendMsg(AltMessage(category, time, m ++ Map("@category" -> category), id, ex))
 }
