@@ -1,6 +1,5 @@
 package csw.services.logging
 
-import csw.services.logging.LogActor._
 import csw.services.logging.LoggingLevels._
 import csw.services.logging.LoggingState._
 
@@ -12,7 +11,7 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
 
   private def all(level: Level, id: AnyId, msg: => Any, ex: Throwable, sourceLocation: SourceLocation): Unit = {
     val t = System.currentTimeMillis()
-    MessageHandler.sendMsg(LogMessage(level, id, t, actorName, msg, sourceLocation, ex))
+    MessageHandler.sendMsg(Log(level, id, t, actorName, msg, sourceLocation, ex))
   }
 
   private def has(id: AnyId, level: Level): Boolean =
@@ -77,8 +76,7 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
    */
   def error(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
       implicit sourceLocation: () => SourceLocation
-  ): Unit =
-    if (doError || has(id, ERROR)) all(ERROR, id, msg, ex, sourceLocation())
+  ): Unit = if (doError || has(id, ERROR)) all(ERROR, id, msg, ex, sourceLocation())
 
   /**
    * Writes a fatal level log message.
@@ -88,8 +86,7 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
    */
   def fatal(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
       implicit sourceLocation: () => SourceLocation
-  ): Unit =
-    all(FATAL, id, msg, ex, sourceLocation())
+  ): Unit = all(FATAL, id, msg, ex, sourceLocation())
 
   /**
    * Write a log message to an alternative log.
@@ -106,5 +103,5 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
                   ex: Throwable = noException,
                   id: AnyId = noId,
                   time: Long = System.currentTimeMillis()): Unit =
-    MessageHandler.sendMsg(AltMessage(category, time, m ++ Map("@category" -> category), id, ex))
+    MessageHandler.sendMsg(LogAltMessage(category, time, m ++ Map("@category" -> category), id, ex))
 }

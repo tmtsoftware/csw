@@ -2,7 +2,6 @@ package csw.services.logging
 
 import akka.actor.Actor
 import akka.event.Logging._
-import LogActor.AkkaMessage
 
 private[logging] class AkkaLogger extends Actor {
   import LoggingLevels._
@@ -13,8 +12,8 @@ private[logging] class AkkaLogger extends Actor {
                   msg: Any,
                   time: Long,
                   cause: Option[Throwable] = None): Unit = {
-    val m = AkkaMessage(time, level, source, clazz, msg, cause)
-    MessageHandler.akkaMsg(m)
+    val logAkka = LogAkka(time, level, source, clazz, msg, cause)
+    MessageHandler.sendAkkaMsg(logAkka)
   }
 
   def receive: PartialFunction[Any, Unit] = {

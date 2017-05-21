@@ -1,6 +1,7 @@
 package csw.services.logging
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorPath}
+import akka.serialization.Serialization
 
 /**
  * This trait should be included in Akka Actors to enable logging in cases
@@ -11,7 +12,7 @@ import akka.actor.Actor
  * You might also want to un-click the Actor button.
  */
 trait AltActorLogging extends Actor {
-  private[this] val actorName = self.path.toString
+  private[this] val actorName = ActorPath.fromString(Serialization.serializedActorPath(self)).toString
 
   /**
    * The logging system.

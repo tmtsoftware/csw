@@ -1,17 +1,15 @@
 package csw.services.logging
 
-import csw.services.logging.LogActor.{AkkaMessage, LogActorMessage}
 import csw.services.logging.LoggingState._
 import csw.services.logging.TimeActorMessages.{TimeEnd, TimeStart}
 
 object MessageHandler {
-  private[logging] def sendMsg(msg: LogActorMessage): Unit =
+  private[logging] def sendMsg(msg: LogActorMessages): Unit =
     if (loggerStopping) {
       println(s"*** Log message received after logger shutdown: $msg")
     } else {
-      logActor match {
-        case Some(a) =>
-          a ! msg
+      maybeLogActor match {
+        case Some(logActor) => logActor ! msg
         case None =>
           msgs.synchronized {
             msgs.enqueue(msg)
@@ -19,11 +17,11 @@ object MessageHandler {
       }
     }
 
-  private[logging] def akkaMsg(m: AkkaMessage): Unit =
-    if (m.msg == "DIE") {
+  private[logging] def sendAkkaMsg(logAkka: LogAkka): Unit =
+    if (logAkka.msg == "DIE") {
       akkaStopPromise.trySuccess(())
     } else {
-      sendMsg(m)
+      sendMsg(logAkka)
     }
 
   private[logging] def timeStart(id: RequestId, name: String, uid: String): Unit =

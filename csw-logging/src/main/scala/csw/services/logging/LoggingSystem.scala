@@ -6,7 +6,6 @@ import java.util.concurrent.CompletableFuture
 import akka.Done
 import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
-import csw.services.logging.LogActor._
 import csw.services.logging.TimeActorMessages.TimeDone
 import org.slf4j.LoggerFactory
 
@@ -79,7 +78,7 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
 
   private[this] val logActor = system.actorOf(LogActor.props(done, standardHeaders, appenders, defaultLevel,
       defaultSlf4jLogLevel, defaultAkkaLogLevel), name = "LoggingActor")
-  LoggingState.logActor = Some(logActor)
+  LoggingState.maybeLogActor = Some(logActor)
 
   private[logging] val gcLogger: Option[GcLogger] = if (gc) {
     Some(GcLogger())
@@ -143,8 +142,10 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
    * Changes the Akka logger logging level.
    * @param level the new logging level for the Akka logger.
    */
-  def setAkkaLevel(level: Level): Unit =
+  def setAkkaLevel(level: Level): Unit = {
+    akkaLogLevel = level
     logActor ! SetAkkaLevel(level)
+  }
 
   /**
    * Get the Slf4j logging levels.
@@ -156,8 +157,10 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
    * Changes the slf4j logging level.
    * @param level the new logging level for slf4j.
    */
-  def setSlf4jLevel(level: Level): Unit =
+  def setSlf4jLevel(level: Level): Unit = {
+    slf4jLogLevel = level
     logActor ! SetSlf4jLevel(level)
+  }
 
   /**
    * Sets or removes the logging filter.
@@ -169,8 +172,7 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
    *                and returns false if
    *                that message is to be discarded.
    */
-  def setFilter(filter: Option[(Map[String, RichMsg], Level) => Boolean]): Unit =
-    logActor ! SetFilter(filter)
+  def setFilter(filter: Option[(Map[String, RichMsg], Level) => Boolean]): Unit = logActor ! SetFilter(filter)
 
   /**
    * Shut down the logging system.

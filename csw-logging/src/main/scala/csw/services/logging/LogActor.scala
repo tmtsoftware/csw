@@ -9,44 +9,6 @@ import LoggingLevels._
 
 private[logging] object LogActor {
 
-  sealed trait LogActorMessage
-
-  case class LogMessage(level: Level,
-                        id: AnyId,
-                        time: Long,
-                        actorName: Option[String],
-                        msg: Json,
-                        sourceLocation: SourceLocation,
-                        ex: Throwable,
-                        kind: String = "")
-      extends LogActorMessage
-
-  case class SetLevel(level: Level) extends LogActorMessage
-
-  case class AltMessage(category: String, time: Long, j: JsonObject, id: AnyId, ex: Throwable) extends LogActorMessage
-
-  case class Slf4jMessage(level: Level,
-                          time: Long,
-                          className: String,
-                          msg: String,
-                          line: Int,
-                          file: String,
-                          ex: Throwable)
-      extends LogActorMessage
-
-  case class SetSlf4jLevel(level: Level) extends LogActorMessage
-
-  case class AkkaMessage(time: Long, level: Level, source: String, clazz: Class[_], msg: Any, cause: Option[Throwable])
-      extends LogActorMessage
-
-  case class SetAkkaLevel(level: Level) extends LogActorMessage
-
-  case object LastAkkaMessage extends LogActorMessage
-
-  case class SetFilter(filter: Option[(JsonObject, Level) => Boolean]) extends LogActorMessage
-
-  case object StopLogging extends LogActorMessage
-
   def props(done: Promise[Unit],
             standardHeaders: JsonObject,
             appends: Seq[LogAppender],
@@ -64,8 +26,6 @@ private[logging] class LogActor(done: Promise[Unit],
                                 initSlf4jLevel: Level,
                                 initAkkaLevel: Level)
     extends Actor {
-
-  import LogActor._
 
   private[this] var filter: Option[(JsonObject, Level) => Boolean] = None
   private[this] var level: Level                                   = initLevel
@@ -125,112 +85,85 @@ private[logging] class LogActor(done: Promise[Unit],
     }
   }
 
-  def receive = {
-    case LogMessage(level, id, time, actorName, msg, sourceLocation, ex, kind) =>
-      val t = logFmt.print(time)
-      val j = JsonObject("@timestamp" -> t, "msg" -> msg, "file" -> sourceLocation.fileName, "@severity" -> level.name,
-        "@category" -> "common")
-      val j0 = if (sourceLocation.line > 0) {
-        JsonObject("line" -> sourceLocation.line)
-      } else {
-        emptyJsonObject
-      }
-      val className = (sourceLocation.packageName, sourceLocation.className) match {
-        case (p, "") => ""
-        case ("", c) => c
-        case (p, c)  => s"$p.$c"
-      }
-      val j1 = if (className == "") {
-        emptyJsonObject
-      } else {
-        JsonObject("class" -> className)
-      }
-      val j2 = actorName match {
-        case Some(actorName) => JsonObject("actor" -> actorName)
-        case None            => emptyJsonObject
-      }
-      val j3 = if (ex == noException) {
-        emptyJsonObject
-      } else {
-        exceptionJson(ex)
-      }
-      val j4 = id match {
-        case RequestId(trackingId, spanId, level) =>
-          JsonObject("@traceId" -> JsonArray(trackingId, spanId))
-        case noId => emptyJsonObject
-      }
-      val j5 = if (kind == "") {
-        emptyJsonObject
-      } else {
-        JsonObject("kind" -> kind)
-      }
-      val shortMsg = j ++ j0 ++ j1 ++ j2 ++ j3 ++ j4 ++ j5
-      append(standardHeaders, shortMsg, "common", level)
+  private def receiveLog(log: Log): Unit = {
+    var jsonObject = JsonObject("@timestamp" -> logFmt.print(log.time), "msg" -> log.msg,
+      "file" -> log.sourceLocation.fileName, "@severity" -> log.level.name, "@category" -> "common")
 
-    case SetLevel(level1) => level = level1
+    if (log.sourceLocation.line > 0) jsonObject = jsonObject ++ JsonObject("line" -> log.sourceLocation.line)
 
-    case AltMessage(category, time, j, id, ex) =>
-      val t = logFmt.print(time)
-      val j3 = if (ex == noException) {
-        emptyJsonObject
-      } else {
-        exceptionJson(ex)
-      }
-      val j4 = id match {
-        case RequestId(trackingId, spanId, level) =>
-          JsonObject("@traceId" -> JsonArray(trackingId, spanId))
-        case noId => emptyJsonObject
-      }
-      append(standardHeaders, j ++ j3 ++ j4 ++ JsonObject("@timestamp" -> t), category, LoggingLevels.INFO)
-
-    case Slf4jMessage(level, time, className, msg, line, file, ex) => {
-      if (level.pos >= slf4jLogLevel.pos) {
-        val t = logFmt.print(time)
-        val j = JsonObject("@timestamp" -> t, "msg" -> msg, "file" -> file, "@severity" -> level.name,
-          "class" -> className, "kind" -> "slf4j", "@category" -> "common")
-        val j0 = if (line > 0) {
-          JsonObject("line" -> line)
-        } else {
-          emptyJsonObject
-        }
-        val j1 = if (ex == noException) {
-          emptyJsonObject
-        } else {
-          exceptionJson(ex)
-        }
-        val shortMsg = j ++ j0 ++ j1
-        append(standardHeaders, shortMsg, "common", level)
-      }
+    jsonObject = (log.sourceLocation.packageName, log.sourceLocation.className) match {
+      case ("", c) => jsonObject ++ JsonObject("class" -> c)
+      case (p, c)  => jsonObject ++ JsonObject("class" -> s"$p.$c")
+      case _       ⇒ jsonObject
     }
 
-    case SetSlf4jLevel(level) => slf4jLogLevel = level
+    if (log.actorName.isDefined) jsonObject = jsonObject ++ JsonObject("actor" -> log.actorName)
+    if (log.ex != noException) jsonObject = jsonObject ++ exceptionJson(log.ex)
+    jsonObject = log.id match {
+      case RequestId(trackingId, spanId, _) ⇒ jsonObject ++ JsonObject("@traceId" -> JsonArray(trackingId, spanId))
+      case _                                ⇒ jsonObject
+    }
+    if (!log.kind.isEmpty) jsonObject = jsonObject ++ JsonObject("kind" -> log.kind)
+    append(standardHeaders, jsonObject, "common", log.level)
+  }
 
-    case AkkaMessage(time, level, source, clazz, msg, cause) =>
-      if (level.pos >= akkaLogLevel.pos) {
-        val msg1 = if (msg == null) "UNKNOWN" else msg
-        val t    = logFmt.print(time)
-        val j1 = cause match {
-          case Some(ex) => exceptionJson(ex)
-          case None     => emptyJsonObject
-        }
-        val shortMsg = JsonObject("@timestamp" -> t, "kind" -> "akka", "msg" -> msg1.toString(), "actor" -> source,
-          "@severity" -> level.name, "class" -> clazz.getName(), "@category" -> "common") ++ j1
-        append(standardHeaders, shortMsg, "common", level)
-      }
+  private def receiveAltMessage(logAltMessage: LogAltMessage) = {
+    var jsonObject = logAltMessage.jsonObject
+    if (logAltMessage.ex != noException) jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
+    jsonObject = logAltMessage.id match {
+      case RequestId(trackingId, spanId, _) => jsonObject ++ JsonObject("@traceId" -> JsonArray(trackingId, spanId))
+      case _                                => jsonObject
+    }
+    jsonObject = jsonObject ++ JsonObject("@timestamp" -> logFmt.print(logAltMessage.time))
+    append(standardHeaders, jsonObject, logAltMessage.category, LoggingLevels.INFO)
+  }
 
-    case SetAkkaLevel(level) => akkaLogLevel = level
+  private def receiveLogSlf4j(logSlf4j: LogSlf4j) =
+    if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
+      var jsonObject = JsonObject(
+        "@timestamp" -> logFmt.print(logSlf4j.time),
+        "msg"        -> logSlf4j.msg,
+        "file"       -> logSlf4j.file,
+        "@severity"  -> logSlf4j.level.name,
+        "class"      -> logSlf4j.className,
+        "kind"       -> "slf4j",
+        "@category"  -> "common"
+      )
+      if (logSlf4j.line > 0) jsonObject = jsonObject ++ JsonObject("line" -> logSlf4j.line)
+      if (logSlf4j.ex != noException) jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
+      append(standardHeaders, jsonObject, "common", logSlf4j.level)
+    }
 
-    case LastAkkaMessage =>
-      val akkaLog = akka.event.Logging(context.system, this)
-      akkaLog.error("DIE")
+  private def receiveLogAkkaMessage(logAkka: LogAkka) =
+    if (logAkka.level.pos >= akkaLogLevel.pos) {
+      val msg1 = if (logAkka.msg.toString.isEmpty) "UNKNOWN" else logAkka.msg
+      var jsonObject = JsonObject(
+        "@timestamp" -> logFmt.print(logAkka.time),
+        "kind"       -> "akka",
+        "msg"        -> msg1.toString,
+        "actor"      -> logAkka.source,
+        "@severity"  -> logAkka.level.name,
+        "class"      -> logAkka.clazz.getName,
+        "@category"  -> "common"
+      )
 
+      if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
+      append(standardHeaders, jsonObject, "common", logAkka.level)
+    }
+
+  def receive: PartialFunction[Any, Unit] = {
+    case log: Log                     => receiveLog(log)
+    case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage)
+    case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J)
+    case logAkka: LogAkka             => receiveLogAkkaMessage(logAkka)
+    case SetLevel(level1)             => level = level1
+    case SetSlf4jLevel(level)         => slf4jLogLevel = level
+    case SetAkkaLevel(level)          => akkaLogLevel = level
+    case SetFilter(f)                 => filter = f
+    case LastAkkaMessage              => akka.event.Logging(context.system, this).error("DIE")
     case StopLogging =>
       done.success(())
       context.stop(self)
-
-    case SetFilter(f) => filter = f
-
-    case msg: Any =>
-      println(("Unrecognized LogActor message:" + msg + DefaultSourceLocation))
+    case msg: Any => println("Unrecognized LogActor message:" + msg + DefaultSourceLocation)
   }
 }

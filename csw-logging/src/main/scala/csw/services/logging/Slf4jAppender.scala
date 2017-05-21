@@ -2,7 +2,6 @@ package csw.services.logging
 
 import ch.qos.logback.core.{Appender, UnsynchronizedAppenderBase}
 import ch.qos.logback.core.spi.AppenderAttachable
-import LogActor._
 
 import scala.collection.mutable
 
@@ -40,7 +39,7 @@ private[logging] class Slf4jAppender[E]()
         } catch {
           case ex: Any => noException
         }
-        val msg = Slf4jMessage(level, e.getTimeStamp, frame.getClassName, e.getFormattedMessage, frame.getLineNumber,
+        val msg = LogSlf4j(level, e.getTimeStamp, frame.getClassName, e.getFormattedMessage, frame.getLineNumber,
           frame.getFileName, ex)
         MessageHandler.sendMsg(msg)
       case x: Any =>

@@ -1,7 +1,6 @@
 package csw.services.logging
 
 import akka.actor._
-import csw.services.logging.LogActor.LogActorMessage
 
 import scala.collection.mutable
 import scala.concurrent.Promise
@@ -12,7 +11,7 @@ import scala.concurrent.Promise
 private[logging] object LoggingState {
 
   // Queue of messages sent before logger is started
-  private[logging] val msgs = new mutable.Queue[LogActorMessage]()
+  private[logging] val msgs = new mutable.Queue[LogActorMessages]()
 
   @volatile var doTrace: Boolean = false
   @volatile var doDebug: Boolean = false
@@ -22,8 +21,8 @@ private[logging] object LoggingState {
 
 //  private[logging] var loggingSys: LoggingSystem = null
 
-  private[logging] var logActor: Option[ActorRef] = None
-  @volatile private[logging] var loggerStopping   = false
+  private[logging] var maybeLogActor: Option[ActorRef] = None
+  @volatile private[logging] var loggerStopping        = false
 
   private[logging] var doTime: Boolean                   = false
   private[logging] var timeActorOption: Option[ActorRef] = None
