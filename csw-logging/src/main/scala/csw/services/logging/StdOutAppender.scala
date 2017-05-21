@@ -18,7 +18,8 @@ object StdOutAppender extends LogAppenderBuilder {
    * @param stdHeaders the headers that are fixes for this service.
    * @return the stdout appender.
    */
-  def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) = new StdOutAppender(factory, stdHeaders)
+  def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]): StdOutAppender =
+    new StdOutAppender(factory, stdHeaders)
 }
 
 /**
@@ -53,50 +54,62 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg])
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit = {
     val level = jgetString(baseMsg, "@severity")
+
     if (category == "common" && Level(level) >= logLevelLimit) {
+      val maybeKind = jgetString(baseMsg, "kind")
       if (summary) {
-        val cnt = levels.get(level).getOrElse(0) + 1
-        levels += (level -> cnt)
-        val kind = jgetString(baseMsg, "kind")
-        if (kind != "") {
-          val cnt = kinds.get(kind).getOrElse(0) + 1
-          kinds += (kind -> cnt)
-        }
+        buildSummary(maybeKind, level)
       }
       val msg = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
-      val txt = if (oneLine) {
-        val msg0 = jget(baseMsg, "msg")
-        val msg = msg0 match {
-          case s: String => s
-          case x: Any    => Compact(x, safe = true)
-        }
-        val kind0 = jgetString(baseMsg, "kind")
-        val kind  = if (kind0 == "") "" else s":$kind0"
-        val file  = jgetString(baseMsg, "file")
-        val line  = jgetInt(baseMsg, "line")
-        val where = if (file != "") s" ($file $line)" else ""
-        s"[$level$kind] $msg$where"
+      val normalText = if (oneLine) {
+        oneLine(baseMsg, level, maybeKind)
       } else if (pretty) {
         Pretty(msg - "@category", safe = true, width = width)
       } else {
         Compact(msg - "@category", safe = true)
       }
 
-      val colorTxt = if (color) {
-        level match {
-          case "FATAL" | "ERROR" =>
-            s"${Console.RED}$txt${Console.RESET}"
-          case "WARN" =>
-            s"${Console.YELLOW}$txt${Console.RESET}"
-          case _ => txt
-        }
+      val finalText = if (color) {
+        coloredText(level, normalText)
       } else {
-        txt
+        normalText
       }
-      println(colorTxt)
+      println(finalText)
+
     } else if (summary) {
-      val cnt = categories.get(category).getOrElse(0) + 1
-      categories += (category -> cnt)
+      val categoryCount = categories.getOrElse(category, 0) + 1
+      categories += (category -> categoryCount)
+    }
+  }
+
+  private def coloredText(level: String, normalText: String) =
+    level match {
+      case "FATAL" | "ERROR" =>
+        s"${Console.RED}$normalText${Console.RESET}"
+      case "WARN" =>
+        s"${Console.YELLOW}$normalText${Console.RESET}"
+      case _ => normalText
+    }
+
+  private def oneLine(baseMsg: Map[String, RichMsg], level: String, maybeKind: String) = {
+
+    val msg = jget(baseMsg, "msg") match {
+      case s: String => s
+      case x: Any    => Compact(x, safe = true)
+    }
+    val kind  = if (!maybeKind.isEmpty) s":$maybeKind" else ""
+    val file  = jgetString(baseMsg, "file")
+    val where = if (!file.isEmpty) s" ($file ${jgetInt(baseMsg, "line")})" else ""
+    s"[$level$kind] $msg$where"
+
+  }
+
+  private def buildSummary(level: String, kind: String) = {
+    val levelCount = levels.getOrElse(level, 0) + 1
+    levels += (level -> levelCount)
+    if (!kind.isEmpty) {
+      val cnt = kinds.getOrElse(kind, 0) + 1
+      kinds += (kind -> cnt)
     }
   }
 
@@ -115,9 +128,9 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg])
    */
   def stop(): Future[Unit] = {
     if (summary) {
-      val cats = if (categories.size == 0) emptyJsonObject else JsonObject("alts" -> categories)
-      val levs = if (levels.size == 0) emptyJsonObject else JsonObject("levels" -> levels)
-      val knds = if (kinds.size == 0) emptyJsonObject else JsonObject("kinds" -> kinds)
+      val cats = if (categories.isEmpty) emptyJsonObject else JsonObject("alts" -> categories)
+      val levs = if (levels.isEmpty) emptyJsonObject else JsonObject("levels" -> levels)
+      val knds = if (kinds.isEmpty) emptyJsonObject else JsonObject("kinds" -> kinds)
       val txt  = Pretty(levs ++ cats ++ knds, width = width)
       val colorTxt = if (color) {
         s"${Console.BLUE}$txt${Console.RESET}"

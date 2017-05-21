@@ -14,7 +14,7 @@ private[logging] object LogActor {
             appends: Seq[LogAppender],
             initLevel: Level,
             initSlf4jLevel: Level,
-            initAkkaLevel: Level) =
+            initAkkaLevel: Level): Props =
     Props(new LogActor(done, standardHeaders, appends, initLevel, initSlf4jLevel, initAkkaLevel))
 
 }
@@ -75,26 +75,30 @@ private[logging] class LogActor(done: Promise[Unit],
     JsonObject("trace" -> JsonObject("msg" -> exToJson(ex), "stack" -> stack.toSeq)) ++ j1
   }
 
-  private def append(stdHeaders: JsonObject, baseMsg: JsonObject, category: String, level: Level): Unit = {
+  private def append(baseMsg: JsonObject, category: String, level: Level): Unit = {
     val keep = category != "common" || (filter match {
-      case Some(f) => f(stdHeaders ++ baseMsg, level)
+      case Some(f) => f(standardHeaders ++ baseMsg, level)
       case None    => true
     })
     if (keep) {
-      for (a <- appenders) a.append(baseMsg, category)
+      for (appender <- appenders) appender.append(baseMsg, category)
     }
   }
 
   private def receiveLog(log: Log): Unit = {
     var jsonObject = JsonObject("@timestamp" -> logFmt.print(log.time), "msg" -> log.msg,
-      "file" -> log.sourceLocation.fileName, "@severity" -> log.level.name, "@category" -> "common")
+      "@severity" -> log.level.name, "@category" -> "common") ++ JsonObject("file" -> log.sourceLocation.fileName)
+
+    if (!log.sourceLocation.fileName.isEmpty) {
+      jsonObject = jsonObject ++ JsonObject("file" -> log.sourceLocation.fileName)
+    }
 
     if (log.sourceLocation.line > 0) jsonObject = jsonObject ++ JsonObject("line" -> log.sourceLocation.line)
 
     jsonObject = (log.sourceLocation.packageName, log.sourceLocation.className) match {
-      case ("", c) => jsonObject ++ JsonObject("class" -> c)
-      case (p, c)  => jsonObject ++ JsonObject("class" -> s"$p.$c")
-      case _       ⇒ jsonObject
+      case ("", "") ⇒ jsonObject
+      case ("", c)  ⇒ jsonObject ++ JsonObject("class" -> c)
+      case (p, c)   ⇒ jsonObject ++ JsonObject("class" -> s"$p.$c")
     }
 
     if (log.actorName.isDefined) jsonObject = jsonObject ++ JsonObject("actor" -> log.actorName)
@@ -104,7 +108,7 @@ private[logging] class LogActor(done: Promise[Unit],
       case _                                ⇒ jsonObject
     }
     if (!log.kind.isEmpty) jsonObject = jsonObject ++ JsonObject("kind" -> log.kind)
-    append(standardHeaders, jsonObject, "common", log.level)
+    append(jsonObject, "common", log.level)
   }
 
   private def receiveAltMessage(logAltMessage: LogAltMessage) = {
@@ -115,7 +119,7 @@ private[logging] class LogActor(done: Promise[Unit],
       case _                                => jsonObject
     }
     jsonObject = jsonObject ++ JsonObject("@timestamp" -> logFmt.print(logAltMessage.time))
-    append(standardHeaders, jsonObject, logAltMessage.category, LoggingLevels.INFO)
+    append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
   }
 
   private def receiveLogSlf4j(logSlf4j: LogSlf4j) =
@@ -131,7 +135,7 @@ private[logging] class LogActor(done: Promise[Unit],
       )
       if (logSlf4j.line > 0) jsonObject = jsonObject ++ JsonObject("line" -> logSlf4j.line)
       if (logSlf4j.ex != noException) jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
-      append(standardHeaders, jsonObject, "common", logSlf4j.level)
+      append(jsonObject, "common", logSlf4j.level)
     }
 
   private def receiveLogAkkaMessage(logAkka: LogAkka) =
@@ -148,7 +152,7 @@ private[logging] class LogActor(done: Promise[Unit],
       )
 
       if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
-      append(standardHeaders, jsonObject, "common", logAkka.level)
+      append(jsonObject, "common", logAkka.level)
     }
 
   def receive: PartialFunction[Any, Unit] = {
