@@ -33,13 +33,15 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
 //  LoggingState.loggingSys = this
 
   private[this] val loggingConfig = system.settings.config.getConfig("com.persist.logging")
-  private[this] val levels        = loggingConfig.getString("logLevel")
+
+  private[this] val levels = loggingConfig.getString("logLevel")
   private[this] val defaultLevel: Level = if (Level.hasLevel(levels)) {
     Level(levels)
   } else {
     throw new Exception("Bad value for com.persist.logging.logLevel")
   }
-  @volatile var logLevel: Level   = defaultLevel
+  @volatile var logLevel: Level = defaultLevel
+
   private[this] val akkaLogLevelS = loggingConfig.getString("akkaLogLevel")
   private[this] val defaultAkkaLogLevel: Level = if (Level.hasLevel(akkaLogLevelS)) {
     Level(akkaLogLevelS)
@@ -47,15 +49,17 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
     throw new Exception("Bad value for com.persist.logging.akkaLogLevel")
   }
   @volatile private[this] var akkaLogLevel = defaultAkkaLogLevel
-  private[this] var slf4jLogLevelS         = loggingConfig.getString("slf4jLogLevel")
+
+  private[this] val slf4jLogLevelS = loggingConfig.getString("slf4jLogLevel")
   private[this] val defaultSlf4jLogLevel: Level = if (Level.hasLevel(slf4jLogLevelS)) {
     Level(slf4jLogLevelS)
   } else {
     throw new Exception("Bad value for com.persist.logging.slf4jLogLevel")
   }
   @volatile private[this] var slf4jLogLevel = defaultSlf4jLogLevel
-  private[this] val gc                      = loggingConfig.getBoolean("gc")
-  private[this] val time                    = loggingConfig.getBoolean("time")
+
+  private[this] val gc   = loggingConfig.getBoolean("gc")
+  private[this] val time = loggingConfig.getBoolean("time")
 
   private[this] implicit val ec: ExecutionContext = system.dispatcher
   private[this] val done                          = Promise[Unit]
@@ -118,18 +122,12 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
    */
   def setLevel(level: Level): Unit = {
     import LoggingState._
-
     logLevel = level
-    val doTrace1 = level.pos <= TRACE.pos
-    if (doTrace != doTrace1) doTrace = doTrace1
-    val doDebug1 = level.pos <= DEBUG.pos
-    if (doDebug != doDebug1) doDebug = doDebug1
-    val doInfo1 = level.pos <= INFO.pos
-    if (doInfo != doInfo1) doInfo = doInfo1
-    val doWarn1 = level.pos <= WARN.pos
-    if (doWarn != doWarn1) doWarn = doWarn1
-    val doError1 = level.pos <= ERROR.pos
-    if (doError != doError1) doError = doError1
+    doTrace = level.pos <= TRACE.pos
+    doDebug = level.pos <= DEBUG.pos
+    doInfo = level.pos <= INFO.pos
+    doWarn = level.pos <= WARN.pos
+    doError = level.pos <= ERROR.pos
   }
 
   /**

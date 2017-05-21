@@ -19,7 +19,7 @@ private[logging] object FileAppenderActor {
 
   case object AppendFlush extends AppendMessages
 
-  def props(path: String, category: String) = Props(new FileAppenderActor(path, category))
+  def props(path: String, category: String): Props = Props(new FileAppenderActor(path, category))
 }
 
 private[logging] class FileAppenderActor(path: String, category: String) extends Actor with ActorLogging {
@@ -129,7 +129,8 @@ object FileAppender extends LogAppenderBuilder {
    * @param stdHeaders the headers that are fixes for this service.
    * @return
    */
-  def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) = new FileAppender(factory, stdHeaders)
+  def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]): FileAppender =
+    new FileAppender(factory, stdHeaders)
 }
 
 /**
