@@ -1,9 +1,8 @@
 package csw.services
 
-import scala.language.experimental.macros
-import scala.reflect.macros.whitebox.Context
 import com.persist.JsonOps._
 
+import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 
 /**

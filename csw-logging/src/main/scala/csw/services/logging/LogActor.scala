@@ -87,7 +87,7 @@ private[logging] class LogActor(done: Promise[Unit],
 
   private def receiveLog(log: Log): Unit = {
     var jsonObject = JsonObject("@timestamp" -> logFmt.print(log.time), "msg" -> log.msg,
-      "@severity" -> log.level.name, "@category" -> "common") ++ JsonObject("file" -> log.sourceLocation.fileName)
+      "@severity" -> log.level.name, "@category" -> "common")
 
     if (!log.sourceLocation.fileName.isEmpty) {
       jsonObject = jsonObject ++ JsonObject("file" -> log.sourceLocation.fileName)
