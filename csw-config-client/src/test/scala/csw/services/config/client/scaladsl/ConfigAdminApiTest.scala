@@ -56,6 +56,10 @@ class ConfigAdminApiTest extends ConfigServiceTest {
     val path       = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
     val configData = ConfigData.fromPath(path)
     val repoPath   = Paths.get(fileName)
+
+    //verify that files smaller than annex-min-file-size go to annex if encoding is Binary
+    serverWiring.settings.`annex-min-file-size` should be > configData.length
+
     val configId =
       configService.create(repoPath, configData, annex = false, s"committing file: $fileName").await
 
