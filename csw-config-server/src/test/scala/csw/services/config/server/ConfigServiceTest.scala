@@ -654,7 +654,12 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
 
+
     val configData  = ConfigData.fromString(content)
+
+    //verify that files smaller than annex-min-file-size go to annex if flag is set
+    serverWiring.settings.`annex-min-file-size` should be > configData.length
+
     val configId    = configService.create(file, configData, annex = true, "committing annex file").await
     val fileContent = configService.getById(file, configId).await.get
     fileContent.toStringF.await shouldBe content
