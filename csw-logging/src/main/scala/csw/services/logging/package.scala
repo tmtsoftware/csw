@@ -3,7 +3,7 @@ package csw.services
 import com.persist.JsonOps._
 
 import scala.language.experimental.macros
-import scala.reflect.macros.whitebox
+import scala.reflect.macros.blackbox
 
 /**
  * The package for the logging API.
@@ -36,7 +36,7 @@ package object logging {
 
   implicit def sourceLocation: () => SourceLocation = macro sourceLocationMacro
 
-  def sourceLocationMacro(c: whitebox.Context): c.Expr[() => SourceLocation] = {
+  def sourceLocationMacro(c: blackbox.Context): c.Expr[() => SourceLocation] = {
     import c.universe._
 
     val p    = c.macroApplication.pos

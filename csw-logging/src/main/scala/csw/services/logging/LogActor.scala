@@ -34,6 +34,22 @@ private[logging] class LogActor(done: Promise[Unit],
 
   private[this] val logFmt = ISODateTimeFormat.dateTime()
 
+  def receive: PartialFunction[Any, Unit] = {
+    case log: Log                     => receiveLog(log)
+    case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage)
+    case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J)
+    case logAkka: LogAkka             => receiveLogAkkaMessage(logAkka)
+    case SetLevel(level1)             => level = level1
+    case SetSlf4jLevel(level1)        => slf4jLogLevel = level1
+    case SetAkkaLevel(level1)         => akkaLogLevel = level1
+    case SetFilter(f)                 => filter = f
+    case LastAkkaMessage              => akka.event.Logging(context.system, this).error("DIE")
+    case StopLogging =>
+      done.success(())
+      context.stop(self)
+    case msg: Any => println("Unrecognized LogActor message:" + msg + DefaultSourceLocation)
+  }
+
   private def exToJson(ex: Throwable): Json = {
     val name = ex.getClass.toString
     ex match {
@@ -154,20 +170,4 @@ private[logging] class LogActor(done: Promise[Unit],
       if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
       append(jsonObject, "common", logAkka.level)
     }
-
-  def receive: PartialFunction[Any, Unit] = {
-    case log: Log                     => receiveLog(log)
-    case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage)
-    case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J)
-    case logAkka: LogAkka             => receiveLogAkkaMessage(logAkka)
-    case SetLevel(level1)             => level = level1
-    case SetSlf4jLevel(level)         => slf4jLogLevel = level
-    case SetAkkaLevel(level)          => akkaLogLevel = level
-    case SetFilter(f)                 => filter = f
-    case LastAkkaMessage              => akka.event.Logging(context.system, this).error("DIE")
-    case StopLogging =>
-      done.success(())
-      context.stop(self)
-    case msg: Any => println("Unrecognized LogActor message:" + msg + DefaultSourceLocation)
-  }
 }
