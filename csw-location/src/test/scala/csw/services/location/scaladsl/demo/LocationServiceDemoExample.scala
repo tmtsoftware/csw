@@ -25,15 +25,6 @@ class LocationServiceDemoExample extends CswTestSuite {
 
   import actorSystem.dispatcher
   implicit val mat = ActorMaterializer()
-  private val actorRef = actorSystem.actorOf(
-    Props(new Actor {
-      override def receive: Receive = {
-        case "print" => println("hello world")
-      }
-    }),
-    "my-actor-1"
-  )
-
   lazy
   //#create-location-service
   val locationService = LocationServiceFactory.make()
@@ -51,8 +42,16 @@ class LocationServiceDemoExample extends CswTestSuite {
   val httpConnection   = HttpConnection(ComponentId("configuration", ComponentType.Service))
   val httpRegistration = HttpRegistration(httpConnection, 8080, "path123")
 
-  val akkaConnection   = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-  val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
+  val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+  val akkaRegistration = AkkaRegistration(akkaConnection,
+    actorSystem.actorOf(
+      Props(new Actor {
+      override def receive: Receive = {
+        case "print" => println("hello world")
+      }
+    }),
+      "my-actor-1"
+    ))
   //#Components-Connections-Registrations
 
   test("demo") {
@@ -64,7 +63,7 @@ class LocationServiceDemoExample extends CswTestSuite {
         tcpRegistrationResult.location.connection shouldBe tcpConnection
 
         await(locationService.list) shouldBe List(tcpRegistrationResult.location)
-        await(locationService.find(tcpConnection)) shouldBe Some(tcpRegistrationResult.location)
+        await(locationService.resolve(tcpConnection, 5.seconds)) shouldBe Some(tcpRegistrationResult.location)
 
         println(tcpRegistrationResult.location.uri)
 

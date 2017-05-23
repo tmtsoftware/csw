@@ -2,7 +2,6 @@ package csw.services.location.javadsl.demo;
 
 import akka.Done;
 import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.japi.Pair;
@@ -25,27 +24,20 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class JLocationServiceBlockingDemoExample {
 
     private static LoggingSystem loggingSystem = LoggingSystemFactory.start();
     private ActorSystem actorSystem = ActorSystemFactory.remote();
     private Materializer mat = ActorMaterializer.create(actorSystem);
-
-    private ActorRef actorRef = actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
-                @Override
-                public Receive createReceive() {
-                    return ReceiveBuilder.create().build();
-                }
-            }),
-            "my-actor-1"
-    );
 
     //static instance is used in testing for reuse and to avoid creating/terminating it for each test.
     private static
@@ -74,7 +66,14 @@ public class JLocationServiceBlockingDemoExample {
     private HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
 
     private AkkaConnection akkaConnection = new Connection.AkkaConnection(new ComponentId("hcd1", JComponentType.HCD));
-    private AkkaRegistration akkaRegistration = new AkkaRegistration(akkaConnection, actorRef);
+    private AkkaRegistration akkaRegistration = new AkkaRegistration(akkaConnection, actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
+                @Override
+                public Receive createReceive() {
+                    return ReceiveBuilder.create().build();
+                }
+            }),
+            "my-actor-1"
+    ));
     //#Components-Connections-Registrations
 
     @Test
@@ -127,7 +126,7 @@ public class JLocationServiceBlockingDemoExample {
         expectedLocations.add(tcpRegistration.location(new Networks().hostname()));
 
         Assert.assertEquals(expectedLocations, locationService.list().get());
-        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.find(tcpConnection).get().get());
+        Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpConnection, new FiniteDuration(5, TimeUnit.SECONDS)).get().get());
 
         System.out.println(tcpRegistrationResult.location().uri());
 

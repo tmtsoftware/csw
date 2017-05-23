@@ -98,7 +98,11 @@ ActorSystem will now be available for communication from other components that a
 
 The `list` API returns a list of alive connections with LocationService.
   
-A connection of interest, can be checked if available using the `resolve` API. If the connection is alive, `resolve` returns the handle to the `Location`.
+A connection of interest, can be checked if available using the `resolve` or `find` API.    
+
+`resolve` will find the location for a connection from the local cache, if not found waits for the event to arrive within specified time limit. Returns None if both fail.    
+
+`find` will return the location for a connection from the local cache and if not found then returns None.    
 
 One of the ways to `unregister` a service is by calling unregister on registration result received from `register` API.
 
