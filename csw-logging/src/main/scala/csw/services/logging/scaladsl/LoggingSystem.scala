@@ -1,4 +1,4 @@
-package csw.services.logging
+package csw.services.logging.scaladsl
 
 import java.net.InetAddress
 import java.util.concurrent.CompletableFuture
@@ -6,7 +6,10 @@ import java.util.concurrent.CompletableFuture
 import akka.Done
 import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
-import csw.services.logging.TimeActorMessages.TimeDone
+import csw.services.logging.appenders.{FileAppender, LogAppenderBuilder, StdOutAppender}
+import csw.services.logging.internal.TimeActorMessages.TimeDone
+import csw.services.logging.internal._
+import csw.services.logging.{DefaultSourceLocation, RichMsg}
 import csw.services.models.FilterSet
 import org.slf4j.LoggerFactory
 
@@ -21,10 +24,10 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param appenderBuilders optional sequence of log appenders to use.
  *                         Default is to use built-in stdout and file appenders.
  */
-case class LoggingSystem(serviceName: String = "serviceName1",
-                         serviceVersion: String = "serviceVersion1",
-                         host: String = InetAddress.getLocalHost.getHostName,
-                         appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender))
+class LoggingSystem(serviceName: String = "serviceName1",
+                    serviceVersion: String = "serviceVersion1",
+                    host: String = InetAddress.getLocalHost.getHostName,
+                    appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender))
     extends GenericLogger.Simple {
 
   import LoggingLevels._
@@ -86,7 +89,7 @@ case class LoggingSystem(serviceName: String = "serviceName1",
   LoggingState.maybeLogActor = Some(logActor)
 
   private[logging] val gcLogger: Option[GcLogger] = if (gc) {
-    Some(GcLogger())
+    Some(new GcLogger)
   } else {
     None
   }

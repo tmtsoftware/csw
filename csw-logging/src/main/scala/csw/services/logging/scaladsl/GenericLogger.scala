@@ -1,3 +1,3 @@
-package csw.services.logging
+package csw.services.logging.scaladsl
 
 object GenericLogger extends ComponentLogger(None)

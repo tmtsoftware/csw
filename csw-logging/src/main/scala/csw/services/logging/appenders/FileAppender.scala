@@ -1,10 +1,12 @@
-package csw.services.logging
+package csw.services.logging.appenders
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, PrintWriter}
 
 import akka.actor._
 import com.persist.JsonOps._
-import csw.services.logging.LoggingLevels.Level
+import csw.services.logging.internal.LoggingLevels.Level
+import csw.services.logging.scaladsl.GenericLogger
+import csw.services.logging.{DefaultSourceLocation, RichMsg}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
@@ -102,7 +104,7 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
     }
 }
 
-private[logging] case class FilesAppender(actorRefFactory: ActorRefFactory, path: String, category: String) {
+private[logging] class FilesAppender(actorRefFactory: ActorRefFactory, path: String, category: String) {
 
   import FileAppenderActor._
 
@@ -177,7 +179,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
       val fa = fileAppenders.get(category) match {
         case Some(a) => a
         case None =>
-          val a = FilesAppender(factory, fullPath, category)
+          val a = new FilesAppender(factory, fullPath, category)
           fileAppenders += (category -> a)
           a
       }

@@ -1,4 +1,4 @@
-package csw.services.logging
+package csw.services.logging.internal
 
 object LoggingLevels {
 

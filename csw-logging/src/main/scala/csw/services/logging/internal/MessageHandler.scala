@@ -1,7 +1,8 @@
-package csw.services.logging
+package csw.services.logging.internal
 
-import csw.services.logging.LoggingState._
-import csw.services.logging.TimeActorMessages.{TimeEnd, TimeStart}
+import TimeActorMessages.{TimeEnd, TimeStart}
+import csw.services.logging.internal.LoggingState._
+import csw.services.logging.scaladsl.RequestId
 
 object MessageHandler {
   private[logging] def sendMsg(msg: LogActorMessages): Unit =

@@ -2,6 +2,7 @@ val enableCoverage         = sys.props.get("enableCoverage") == Some("true")
 val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
+  `csw-logging`,
   `csw-cluster-seed`,
   `csw-config-api`,
   `csw-config-client`,

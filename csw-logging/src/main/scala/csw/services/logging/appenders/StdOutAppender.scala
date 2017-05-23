@@ -1,8 +1,9 @@
-package csw.services.logging
+package csw.services.logging.appenders
 
 import akka.actor.{ActorContext, ActorRefFactory, ActorSystem}
 import com.persist.JsonOps._
-import csw.services.logging.LoggingLevels.Level
+import csw.services.logging.RichMsg
+import csw.services.logging.internal.LoggingLevels.Level
 
 import scala.concurrent.Future
 

@@ -19,8 +19,8 @@ import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.models.Connection.TcpConnection;
 import csw.services.location.scaladsl.ActorSystemFactory;
-import csw.services.logging.LoggingSystem;
-import csw.services.logging.LoggingSystemFactory;
+import csw.services.logging.scaladsl.LoggingSystem;
+import csw.services.logging.scaladsl.LoggingSystemFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutionException;
 
 public class JLocationServiceBlockingDemoExample {
 
-    private static LoggingSystem loggingSystem = LoggingSystemFactory.make();
+    private static LoggingSystem loggingSystem = LoggingSystemFactory.start();
     private ActorSystem actorSystem = ActorSystemFactory.remote();
     private Materializer mat = ActorMaterializer.create(actorSystem);
 

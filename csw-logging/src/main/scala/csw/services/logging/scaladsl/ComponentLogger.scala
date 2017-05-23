@@ -1,4 +1,4 @@
-package csw.services.logging
+package csw.services.logging.scaladsl
 
 import akka.actor.ActorPath
 import akka.serialization.Serialization

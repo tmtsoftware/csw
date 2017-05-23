@@ -1,10 +1,11 @@
-package csw.services.logging
+package csw.services.logging.compat
 
 import akka.actor.Actor
 import akka.event.Logging._
+import csw.services.logging.internal.{LogAkka, MessageHandler}
 
 private[logging] class AkkaLogger extends Actor {
-  import LoggingLevels._
+  import csw.services.logging.internal.LoggingLevels._
 
   private def log(level: Level,
                   source: String,

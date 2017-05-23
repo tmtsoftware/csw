@@ -1,4 +1,4 @@
-package csw.services.logging
+package csw.services.logging.internal
 
 import java.lang.management.MemoryUsage
 import javax.management.openmbean.CompositeData
@@ -6,10 +6,11 @@ import javax.management.{Notification, NotificationEmitter, NotificationListener
 
 import com.persist.JsonOps._
 import com.sun.management.GarbageCollectionNotificationInfo
+import csw.services.logging.scaladsl.GenericLogger
 
 import scala.collection.JavaConverters._
 
-private[logging] case class GcLogger() extends GenericLogger.Simple {
+private[logging] class GcLogger extends GenericLogger.Simple {
 
   private[this] val gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans
   private[this] val emitters = for (gcbean <- gcbeans.asScala) yield {

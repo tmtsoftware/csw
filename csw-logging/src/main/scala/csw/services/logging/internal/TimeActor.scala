@@ -1,6 +1,7 @@
-package csw.services.logging
+package csw.services.logging.internal
 
 import com.persist.JsonOps._
+import csw.services.logging.scaladsl.{GenericLogger, RequestId}
 
 import scala.collection.mutable
 import scala.concurrent.Promise

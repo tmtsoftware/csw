@@ -1,7 +1,10 @@
-package csw.services.logging
+package csw.services.logging.appenders
 
-import ch.qos.logback.core.{Appender, UnsynchronizedAppenderBase}
 import ch.qos.logback.core.spi.AppenderAttachable
+import ch.qos.logback.core.{Appender, UnsynchronizedAppenderBase}
+import csw.services.logging.internal.{LogSlf4j, MessageHandler}
+import csw.services.logging.scaladsl.GenericLogger
+import csw.services.logging.{noException, DefaultSourceLocation}
 
 import scala.collection.mutable
 
@@ -9,7 +12,7 @@ private[logging] class Slf4jAppender[E]()
     extends UnsynchronizedAppenderBase[E]
     with AppenderAttachable[E]
     with GenericLogger.Simple {
-  import LoggingLevels._
+  import csw.services.logging.internal.LoggingLevels._
 
   val appenders: mutable.HashSet[Appender[E]] = scala.collection.mutable.HashSet[Appender[E]]()
 

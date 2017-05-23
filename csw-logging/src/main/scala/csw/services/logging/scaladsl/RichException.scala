@@ -1,6 +1,7 @@
-package csw.services.logging
+package csw.services.logging.scaladsl
 
 import com.persist.JsonOps._
+import csw.services.logging.{noException, RichMsg}
 
 /**
  * This companion object for the RichException class. You might want to turn off

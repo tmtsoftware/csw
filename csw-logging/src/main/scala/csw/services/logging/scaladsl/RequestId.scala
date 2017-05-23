@@ -1,6 +1,8 @@
-package csw.services.logging
+package csw.services.logging.scaladsl
 
 import java.util.UUID
+
+import csw.services.logging.internal.LoggingLevels
 
 /**
  * The trait for logging ids. It can be either a RequestId io a specific request or

@@ -1,6 +1,8 @@
-package csw.services.logging
+package csw.services.logging.appenders
 
 import akka.actor.ActorRefFactory
+import csw.services.logging.RichMsg
+
 import scala.concurrent.Future
 
 /**

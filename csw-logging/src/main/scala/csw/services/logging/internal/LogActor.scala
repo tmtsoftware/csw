@@ -1,11 +1,15 @@
-package csw.services.logging
+package csw.services.logging.internal
 
-import scala.concurrent.Promise
 import akka.actor.{Actor, Props}
 import com.persist.Exceptions.SystemException
-import org.joda.time.format.ISODateTimeFormat
 import com.persist.JsonOps._
-import LoggingLevels._
+import LoggingLevels.Level
+import csw.services.logging.appenders.LogAppender
+import csw.services.logging.scaladsl.{RequestId, RichException}
+import org.joda.time.format.ISODateTimeFormat
+import csw.services.logging._
+
+import scala.concurrent.Promise
 
 private[logging] object LogActor {
 

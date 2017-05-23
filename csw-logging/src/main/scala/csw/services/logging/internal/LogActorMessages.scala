@@ -1,7 +1,9 @@
-package csw.services.logging
+package csw.services.logging.internal
 
 import com.persist.JsonOps.{Json, JsonObject}
-import csw.services.logging.LoggingLevels.Level
+import LoggingLevels.Level
+import csw.services.logging.SourceLocation
+import csw.services.logging.scaladsl.AnyId
 
 sealed trait LogActorMessages
 

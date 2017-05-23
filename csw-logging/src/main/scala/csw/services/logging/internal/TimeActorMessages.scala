@@ -1,4 +1,6 @@
-package csw.services.logging
+package csw.services.logging.internal
+
+import csw.services.logging.scaladsl.RequestId
 
 private[logging] object TimeActorMessages {
 

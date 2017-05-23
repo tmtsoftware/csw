@@ -1,7 +1,7 @@
 package csw.services.location
 
 import csw.services.location.commons.TestFutureExtension.RichFuture
-import csw.services.logging.{GenericLogger, LoggingSystem, StdOutAppender}
+import csw.services.logging.scaladsl.{GenericLogger, LoggingSystemFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 abstract class CswTestSuite
@@ -11,7 +11,7 @@ abstract class CswTestSuite
     with BeforeAndAfterEach
     with GenericLogger.Simple {
 
-  private val loggingSystem = LoggingSystem(appenderBuilders = Seq(StdOutAppender))
+  private val loggingSystem = LoggingSystemFactory.start()
 
   protected def afterAllTests(): Unit
 

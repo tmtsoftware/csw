@@ -16,8 +16,8 @@ import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.models.Connection.TcpConnection;
 import csw.services.location.scaladsl.ActorSystemFactory;
-import csw.services.logging.LoggingSystem;
-import csw.services.logging.LoggingSystemFactory;
+import csw.services.logging.scaladsl.LoggingSystem;
+import csw.services.logging.scaladsl.LoggingSystemFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class JLocationServiceImplTest {
-    private static LoggingSystem loggingSystem = LoggingSystemFactory.make();
+    private static LoggingSystem loggingSystem = LoggingSystemFactory.start();
 
     private static ILocationService locationService = JLocationServiceFactory.make();
     private ActorSystem actorSystem = ActorSystemFactory.remote();

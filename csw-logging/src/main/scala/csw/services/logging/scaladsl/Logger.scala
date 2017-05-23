@@ -1,7 +1,9 @@
-package csw.services.logging
+package csw.services.logging.scaladsl
 
-import csw.services.logging.LoggingLevels._
-import csw.services.logging.LoggingState._
+import csw.services.logging.internal.LoggingLevels._
+import csw.services.logging.internal.LoggingState._
+import csw.services.logging.internal.{Log, LogAltMessage, MessageHandler}
+import csw.services.logging.{noException, RichMsg, SourceLocation}
 
 /**
  * This class provides the methods needed for logging.
