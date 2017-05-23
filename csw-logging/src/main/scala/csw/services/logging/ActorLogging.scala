@@ -18,8 +18,7 @@ trait ActorLogging extends Actor {
 //  def loggingSystem: LoggingSystem = LoggingState.loggingSys
 
   /**
-   * The logger.
-   */
-  protected lazy val log = new Logger(actorName = Some(actorName))
+ * The logger.
+ */
 
 }

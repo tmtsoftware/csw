@@ -20,17 +20,15 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param appenderBuilders optional sequence of log appenders to use.
  *                         Default is to use built-in stdout and file appenders.
  */
-case class LoggingSystem(private val serviceName: String = "serviceName1",
+case class LoggingSystem(log: Logger,
+                         private val serviceName: String = "serviceName1",
                          private val serviceVersion: String = "serviceVersion1",
                          private val host: String = InetAddress.getLocalHost.getHostName,
-                         private val appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender))
-    extends ClassLogging {
+                         private val appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender)) {
 
   import LoggingLevels._
 
   private val system: ActorSystem = ActorSystem("logging")
-
-//  LoggingState.loggingSys = this
 
   private[this] val loggingConfig = system.settings.config.getConfig("com.persist.logging")
 
@@ -85,7 +83,7 @@ case class LoggingSystem(private val serviceName: String = "serviceName1",
   LoggingState.maybeLogActor = Some(logActor)
 
   private[logging] val gcLogger: Option[GcLogger] = if (gc) {
-    Some(GcLogger())
+    Some(GcLogger(log))
   } else {
     None
   }

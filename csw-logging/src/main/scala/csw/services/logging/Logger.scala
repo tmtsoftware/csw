@@ -1,5 +1,7 @@
 package csw.services.logging
 
+import akka.actor.{Actor, ActorContext, ActorPath}
+import akka.serialization.Serialization
 import csw.services.logging.LoggingLevels._
 import csw.services.logging.LoggingState._
 
@@ -7,11 +9,11 @@ import csw.services.logging.LoggingState._
  * This class provides the methods needed for logging.
  * It is accessed by including one of the traits ClassSupport or ActorSupport.
  */
-class Logger private[logging] (private val actorName: Option[String] = None) {
+class Logger private[logging] (componentName: Option[String], actorName: Option[String]) {
 
   private def all(level: Level, id: AnyId, msg: => Any, ex: Throwable, sourceLocation: SourceLocation): Unit = {
     val t = System.currentTimeMillis()
-    MessageHandler.sendMsg(Log(level, id, t, actorName, msg, sourceLocation, ex))
+    MessageHandler.sendMsg(Log(componentName, level, id, t, actorName, msg, sourceLocation, ex))
   }
 
   private def has(id: AnyId, level: Level): Boolean =
@@ -105,3 +107,15 @@ class Logger private[logging] (private val actorName: Option[String] = None) {
                   time: Long = System.currentTimeMillis()): Unit =
     MessageHandler.sendMsg(LogAltMessage(category, time, m ++ Map("@category" -> category), id, ex))
 }
+
+class ComponentLogger(componentName: Option[String]) {
+  trait Simple {
+    val log = new Logger(componentName, None)
+  }
+  trait Actor extends akka.actor.Actor {
+    val actorName = Some(ActorPath.fromString(Serialization.serializedActorPath(self)).toString)
+    val log       = new Logger(componentName, actorName)
+  }
+}
+
+object GenericLogger extends ComponentLogger(None)

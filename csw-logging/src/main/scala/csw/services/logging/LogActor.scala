@@ -88,7 +88,7 @@ private[logging] class LogActor(done: Promise[Unit],
         JsonObject("cause" -> exceptionJson(ex.getCause))
       case _ => emptyJsonObject
     }
-    JsonObject("trace" -> JsonObject("msg" -> exToJson(ex), "stack" -> stack.toSeq)) ++ j1
+    JsonObject("trace" -> JsonObject("msg" -> exToJson(ex), "stack" -> stack)) ++ j1
   }
 
   private def append(baseMsg: JsonObject, category: String, level: Level): Unit = {
@@ -117,7 +117,10 @@ private[logging] class LogActor(done: Promise[Unit],
       case (p, c)   ⇒ jsonObject ++ JsonObject("class" -> s"$p.$c")
     }
 
-    if (log.actorName.isDefined) jsonObject = jsonObject ++ JsonObject("actor" -> log.actorName)
+    if (log.actorName.isDefined) jsonObject = jsonObject ++ JsonObject("actor" -> log.actorName.get)
+
+    if (log.componentName.isDefined) jsonObject = jsonObject ++ JsonObject("@componentName" -> log.componentName.get)
+
     if (log.ex != noException) jsonObject = jsonObject ++ exceptionJson(log.ex)
     jsonObject = log.id match {
       case RequestId(trackingId, spanId, _) ⇒ jsonObject ++ JsonObject("@traceId" -> JsonArray(trackingId, spanId))

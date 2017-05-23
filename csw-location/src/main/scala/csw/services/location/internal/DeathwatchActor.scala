@@ -1,19 +1,20 @@
 package csw.services.location.internal
 
-import akka.actor.{Actor, ActorRef, Props, Terminated}
+import akka.actor.{ActorRef, Props, Terminated}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{Changed, Subscribe}
-import csw.services.location.commons.CswCluster
+import csw.services.location.commons.{CswCluster, LocationServiceLogger}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging._
 
 /**
  * DeathWatchActor tracks the health of all Actors registered with LocationService.
  *
  * @param locationService is used to unregister Actors that are no more alive
  */
-class DeathwatchActor(locationService: LocationService) extends Actor {
+class DeathwatchActor(locationService: LocationService) extends LocationServiceLogger.Actor {
 
   /**
    * List of all actors that DeathwatchActor needs to track
@@ -51,6 +52,7 @@ class DeathwatchActor(locationService: LocationService) extends Actor {
       //all akka locations are now watched
       watchedLocations = akkaLocations
     case Terminated(deadActorRef) =>
+      log.info(Map("@msg" → "removing terminated actor", "actorRef" → deadActorRef))
       //stop watching the terminated actor
       context.unwatch(deadActorRef)
 

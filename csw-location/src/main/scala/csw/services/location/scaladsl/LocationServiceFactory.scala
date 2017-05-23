@@ -1,6 +1,6 @@
 package csw.services.location.scaladsl
 
-import csw.services.location.commons.{ClusterSettings, CswCluster}
+import csw.services.location.commons.{ClusterSettings, CswCluster, LocationServiceLogger}
 import csw.services.location.internal._
 
 /**
@@ -9,7 +9,7 @@ import csw.services.location.internal._
  *
  * @note Hence, it is recommended to create a single instance of LocationService and use it throughout the application
  */
-object LocationServiceFactory {
+object LocationServiceFactory extends LocationServiceLogger.Simple {
 
   /**
    * Create a LocationService instance to manage registrations

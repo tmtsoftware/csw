@@ -22,6 +22,6 @@ trait AltActorLogging extends Actor {
   /**
    * The logger.
    */
-  protected lazy val altLog = new Logger(actorName = Some(actorName))
+//  protected lazy val altLog = new Logger(actorName = Some(actorName))
 
 }

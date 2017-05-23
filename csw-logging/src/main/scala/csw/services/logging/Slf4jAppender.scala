@@ -8,7 +8,7 @@ import scala.collection.mutable
 private[logging] class Slf4jAppender[E]()
     extends UnsynchronizedAppenderBase[E]
     with AppenderAttachable[E]
-    with ClassLogging {
+    with GenericLogger.Simple {
   import LoggingLevels._
 
   val appenders: mutable.HashSet[Appender[E]] = scala.collection.mutable.HashSet[Appender[E]]()

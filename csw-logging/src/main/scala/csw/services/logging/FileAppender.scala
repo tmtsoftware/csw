@@ -22,7 +22,7 @@ private[logging] object FileAppenderActor {
   def props(path: String, category: String): Props = Props(new FileAppenderActor(path, category))
 }
 
-private[logging] class FileAppenderActor(path: String, category: String) extends Actor with ActorLogging {
+private[logging] class FileAppenderActor(path: String, category: String) extends GenericLogger.Actor {
 
   import FileAppenderActor._
 

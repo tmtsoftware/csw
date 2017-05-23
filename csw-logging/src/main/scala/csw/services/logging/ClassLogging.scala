@@ -5,7 +5,7 @@ package csw.services.logging
  * Click the visibility All button to see protected
  * members that are defined here.
  */
-trait ClassLogging {
+trait ClassLogging1 {
 
   /**
    * The logging system.
@@ -15,6 +15,6 @@ trait ClassLogging {
   /**
    * The framework logger.
    */
-  protected lazy val log = new Logger()
+//  protected lazy val log = new Logger()
 
 }

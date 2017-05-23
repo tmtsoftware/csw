@@ -1,10 +1,11 @@
 package csw.services.logging
 
 import com.persist.JsonOps._
+
 import scala.collection.mutable
 import scala.concurrent.Promise
 
-private[logging] class TimeActor(tdone: Promise[Unit]) extends ActorLogging {
+private[logging] class TimeActor(tdone: Promise[Unit]) extends GenericLogger.Actor {
 
   import TimeActorMessages._
 

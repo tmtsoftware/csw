@@ -5,7 +5,8 @@ import csw.services.logging.LoggingLevels.Level
 
 sealed trait LogActorMessages
 
-case class Log(level: Level,
+case class Log(componentName: Option[String],
+               level: Level,
                id: AnyId,
                time: Long,
                actorName: Option[String],
