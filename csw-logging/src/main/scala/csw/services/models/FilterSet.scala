@@ -8,10 +8,11 @@ import scala.collection.JavaConverters._
 import scala.util.Try
 
 case class FilterSet(filters: Map[String, Level]) {
-  def check(record: Map[String, RichMsg], level: Level): Boolean = filters.exists {
-    case (name, filterLevel) =>
-      if (name == richToString(record("cls"))) filterLevel >= level else true
-  }
+  def check(record: Map[String, RichMsg], level: Level): Boolean =
+    filters.find(filter ⇒ filter._1 == richToString(record.getOrElse("@componentName", ""))) match {
+      case Some(filter) ⇒ filter._2 <= level
+      case _            ⇒ true
+    }
 
   def add(name: String, level: Level): FilterSet = FilterSet(filters + (name → level))
 }
@@ -24,7 +25,10 @@ object FilterSet {
         .unwrapped()
         .asScala
         .map {
-          case (name, filterLevel) ⇒ (name, Level(filterLevel.toString))
+          case (name, filterLevel) ⇒ {
+            println(s"name : $name , filterLevel: $filterLevel")
+            (name, Level(filterLevel.toString))
+          }
         }
         .toMap
     }.getOrElse(Map.empty)
