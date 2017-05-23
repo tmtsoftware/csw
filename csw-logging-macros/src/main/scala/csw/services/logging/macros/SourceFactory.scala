@@ -3,16 +3,16 @@ package csw.services.logging.macros
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
-trait SourceLocationFactory {
+trait SourceFactory {
   def get(): SourceLocation
 }
 
-object SourceLocationFactory {
-  implicit def factory: SourceLocationFactory = macro sourceLocationMacro
+object SourceFactory {
+  implicit def factory: SourceFactory = macro sourceLocationMacro
 
-  def from(f: () ⇒ SourceLocation): SourceLocationFactory = () => f()
+  def from(f: () ⇒ SourceLocation): SourceFactory = () => f()
 
-  def sourceLocationMacro(c: blackbox.Context): c.Expr[SourceLocationFactory] = {
+  def sourceLocationMacro(c: blackbox.Context): c.Expr[SourceFactory] = {
     import c.universe._
 
     val p    = c.macroApplication.pos
@@ -39,7 +39,7 @@ object SourceLocationFactory {
       .reverse
       .mkString(".")
 
-    c.Expr[SourceLocationFactory](
-        q"csw.services.logging.macros.SourceLocationFactory.from(() => csw.services.logging.macros.SourceLocation($file,$packageName,$className,$line))")
+    c.Expr[SourceFactory](
+        q"csw.services.logging.macros.SourceFactory.from(() => csw.services.logging.macros.SourceLocation($file,$packageName,$className,$line))")
   }
 }
