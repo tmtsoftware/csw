@@ -9,6 +9,8 @@ import csw.services.logging.LoggingLevels.Level
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
+import scala.language.postfixOps
+
 private[logging] object FileAppenderActor {
 
   trait AppendMessages

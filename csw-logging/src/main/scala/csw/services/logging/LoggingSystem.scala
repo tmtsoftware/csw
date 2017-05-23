@@ -7,6 +7,7 @@ import akka.Done
 import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
 import csw.services.logging.TimeActorMessages.TimeDone
+import csw.services.models.FilterSet
 import org.slf4j.LoggerFactory
 
 import scala.compat.java8.FutureConverters.FutureOps
@@ -63,6 +64,8 @@ case class LoggingSystem(serviceName: String = "serviceName1",
   private[this] val done                          = Promise[Unit]
   private[this] val timeActorDonePromise          = Promise[Unit]
 
+  @volatile private[this] var filterSet = FilterSet.from(loggingConfig)
+
   /**
    * Standard headers.
    */
@@ -87,6 +90,8 @@ case class LoggingSystem(serviceName: String = "serviceName1",
   } else {
     None
   }
+
+  setFilter(Some(filterSet.check))
 
   if (time) {
     // Start timing actor
