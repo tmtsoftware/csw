@@ -3,7 +3,8 @@ package csw.services.logging.scaladsl
 import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.internal.LoggingState._
 import csw.services.logging.internal.{Log, LogAltMessage, MessageHandler}
-import csw.services.logging.{noException, RichMsg, SourceLocation}
+import csw.services.logging.macros.{SourceLocation, SourceLocationFactory}
+import csw.services.logging.{noException, RichMsg}
 
 /**
  * This class provides the methods needed for logging.
@@ -33,9 +34,9 @@ class Logger private[logging] (componentName: Option[String], actorName: Option[
    * @param id optional id of a request
    */
   def trace(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
-      implicit sourceLocation: () => SourceLocation
+      implicit factory: SourceLocationFactory
   ): Unit =
-    if (doTrace || has(id, TRACE)) all(TRACE, id, msg, ex, sourceLocation())
+    if (doTrace || has(id, TRACE)) all(TRACE, id, msg, ex, factory.get())
 
   /**
    * Writes a debug level log message.
@@ -44,9 +45,9 @@ class Logger private[logging] (componentName: Option[String], actorName: Option[
    * @param id optional id of a request
    */
   def debug(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
-      implicit sourceLocation: () => SourceLocation
+      implicit factory: SourceLocationFactory
   ): Unit =
-    if (doDebug || has(id, DEBUG)) all(DEBUG, id, msg, ex, sourceLocation())
+    if (doDebug || has(id, DEBUG)) all(DEBUG, id, msg, ex, factory.get())
 
   /**
    * Writes an info level log message.
@@ -55,9 +56,9 @@ class Logger private[logging] (componentName: Option[String], actorName: Option[
    * @param id optional id of a request
    */
   def info(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
-      implicit sourceLocation: () => SourceLocation
+      implicit factory: SourceLocationFactory
   ): Unit =
-    if (doInfo || has(id, INFO)) all(INFO, id, msg, ex, sourceLocation())
+    if (doInfo || has(id, INFO)) all(INFO, id, msg, ex, factory.get())
 
   /**
    * Writes a warn level log message.
@@ -66,9 +67,9 @@ class Logger private[logging] (componentName: Option[String], actorName: Option[
    * @param id optional id of a request
    */
   def warn(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
-      implicit sourceLocation: () => SourceLocation
+      implicit factory: SourceLocationFactory
   ): Unit =
-    if (doWarn || has(id, WARN)) all(WARN, id, msg, ex, sourceLocation())
+    if (doWarn || has(id, WARN)) all(WARN, id, msg, ex, factory.get())
 
   /**
    * Writes an error level log message.
@@ -77,8 +78,8 @@ class Logger private[logging] (componentName: Option[String], actorName: Option[
    * @param id optional id of a request
    */
   def error(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
-      implicit sourceLocation: () => SourceLocation
-  ): Unit = if (doError || has(id, ERROR)) all(ERROR, id, msg, ex, sourceLocation())
+      implicit factory: SourceLocationFactory
+  ): Unit = if (doError || has(id, ERROR)) all(ERROR, id, msg, ex, factory.get())
 
   /**
    * Writes a fatal level log message.
@@ -87,8 +88,8 @@ class Logger private[logging] (componentName: Option[String], actorName: Option[
    * @param id optional id of a request
    */
   def fatal(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(
-      implicit sourceLocation: () => SourceLocation
-  ): Unit = all(FATAL, id, msg, ex, sourceLocation())
+      implicit factory: SourceLocationFactory
+  ): Unit = all(FATAL, id, msg, ex, factory.get())
 
   /**
    * Write a log message to an alternative log.

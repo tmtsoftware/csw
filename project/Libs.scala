@@ -1,6 +1,9 @@
 import sbt._
+import sbt.Keys._
 
 object Libs {
+  val ScalaVersion = "2.12.2"
+
   val `scalatest`                    = "org.scalatest"              %% "scalatest"                    % "3.0.3" //Apache License 2.0
   val `scala-java8-compat`           = "org.scala-lang.modules"     %% "scala-java8-compat"           % "0.8.0" //BSD 3-clause "New" or "Revised" License
   val `scala-async`                  = "org.scala-lang.modules"     %% "scala-async"                  % "0.9.6" //BSD 3-clause "New" or "Revised" License
@@ -19,6 +22,7 @@ object Libs {
   val `spray-json`                   = "io.spray"                   %% "spray-json"                   % "1.3.3" force ()
   val `persist-json`                 = "com.persist"                %% "persist-json"                 % "1.2.0"
   val `joda-time`                    = "joda-time"                  % "joda-time"                     % "2.9.9"
+  val `scala-reflect`                = "org.scala-lang"             % "scala-reflect"                 % ScalaVersion
 }
 
 object Akka {

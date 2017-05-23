@@ -2,9 +2,6 @@ package csw.services
 
 import com.persist.JsonOps._
 
-import scala.language.experimental.macros
-import scala.reflect.macros.blackbox
-
 /**
  * The package for the logging API.
  */
@@ -33,36 +30,4 @@ package object logging {
       case s: String => s
       case x         => Compact(x, safe = true)
     }
-
-  implicit def sourceLocation: () => SourceLocation = macro sourceLocationMacro
-
-  def sourceLocationMacro(c: blackbox.Context): c.Expr[() => SourceLocation] = {
-    import c.universe._
-
-    val p    = c.macroApplication.pos
-    val file = p.source.file.name
-    val line = p.line
-
-    def allOwners(s: c.Symbol): Seq[c.Symbol] =
-      if (s == `NoSymbol`) {
-        Seq()
-      } else {
-        s +: allOwners(s.owner)
-      }
-    val owners = allOwners(c.internal.enclosingOwner)
-
-    val className = owners
-      .filter(s => s.toString.startsWith("class") || s.toString.startsWith("object"))
-      .map(s => s.asClass.name.toString)
-      .reverse
-      .mkString("$")
-    val packageName = owners
-      .filter(_.isPackage)
-      .map(_.name.toString())
-      .filter(_ != "<root>")
-      .reverse
-      .mkString(".")
-
-    c.Expr[() => SourceLocation](q"() => SourceLocation($file,$packageName,$className,$line)")
-  }
 }

@@ -7,7 +7,6 @@ import csw.services.location.commons.{CswCluster, LocationServiceLogger}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging._
 
 /**
  * DeathWatchActor tracks the health of all Actors registered with LocationService.
@@ -55,7 +54,6 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
       log.info(Map("@msg" → "removing terminated actor", "actorRef" → deadActorRef))
       //stop watching the terminated actor
       context.unwatch(deadActorRef)
-
       //Unregister the dead akka location and remove it from the list of watched locations
       val maybeLocation = watchedLocations.find(_.actorRef == deadActorRef)
       maybeLocation.foreach { location =>

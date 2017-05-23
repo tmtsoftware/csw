@@ -1,4 +1,4 @@
-package csw.services.logging
+package csw.services.logging.macros
 
 private[logging] object DefaultSourceLocation extends SourceLocation("", "", "", -1)
 

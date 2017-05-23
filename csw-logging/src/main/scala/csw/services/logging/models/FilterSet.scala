@@ -1,7 +1,7 @@
-package csw.services.models
+package csw.services.logging.models
 
 import com.typesafe.config.Config
-import csw.services.logging.LoggingLevels.Level
+import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.{richToString, RichMsg}
 
 import scala.collection.JavaConverters._

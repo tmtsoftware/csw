@@ -6,12 +6,11 @@ import akka.actor._
 import com.persist.JsonOps._
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.scaladsl.GenericLogger
-import csw.services.logging.{DefaultSourceLocation, RichMsg}
+import csw.services.logging.RichMsg
+import csw.services.logging.macros.DefaultSourceLocation
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
-
-import scala.language.postfixOps
 
 private[logging] object FileAppenderActor {
 

@@ -29,9 +29,15 @@ lazy val `csw-prod` = project
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
 
+lazy val `csw-logging-macros` = project
+  .settings(
+    libraryDependencies += Libs.`scala-reflect`
+  )
+
 //Logging service
 lazy val `csw-logging` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .dependsOn(`csw-logging-macros`)
   .settings(
     libraryDependencies ++= Dependencies.Logging
   )

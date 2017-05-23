@@ -8,6 +8,7 @@ import csw.services.logging.appenders.LogAppender
 import csw.services.logging.scaladsl.{RequestId, RichException}
 import org.joda.time.format.ISODateTimeFormat
 import csw.services.logging._
+import csw.services.logging.macros.DefaultSourceLocation
 
 import scala.concurrent.Promise
 

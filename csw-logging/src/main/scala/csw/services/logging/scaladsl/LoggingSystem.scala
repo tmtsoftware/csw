@@ -6,11 +6,12 @@ import java.util.concurrent.CompletableFuture
 import akka.Done
 import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
+import csw.services.logging.RichMsg
 import csw.services.logging.appenders.{FileAppender, LogAppenderBuilder, StdOutAppender}
 import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.internal._
-import csw.services.logging.{DefaultSourceLocation, RichMsg}
-import csw.services.models.FilterSet
+import csw.services.logging.macros.DefaultSourceLocation
+import csw.services.logging.models.FilterSet
 import org.slf4j.LoggerFactory
 
 import scala.compat.java8.FutureConverters.FutureOps

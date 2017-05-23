@@ -3,7 +3,6 @@ import sbt._
 object Dependencies {
 
   val Logging = Seq(
-    Libs.`scala-logging`,
     Libs.`logback-classic`,
     Libs.`persist-json`,
     Libs.`joda-time`,

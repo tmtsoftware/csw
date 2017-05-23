@@ -1,7 +1,7 @@
-package csw.services.models
+package csw.services.logging.models
 
 import com.persist.JsonOps
-import csw.services.logging.LoggingLevels._
+import csw.services.logging.internal.LoggingLevels._
 import org.scalatest.{FunSuite, Matchers}
 
 class FilterSetTest extends FunSuite with Matchers {
