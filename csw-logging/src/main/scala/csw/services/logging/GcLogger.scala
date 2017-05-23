@@ -9,7 +9,8 @@ import com.sun.management.GarbageCollectionNotificationInfo
 
 import scala.collection.JavaConverters._
 
-private[logging] case class GcLogger(log: Logger) {
+private[logging] case class GcLogger() extends GenericLogger.Simple {
+
   private[this] val gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans
   private[this] val emitters = for (gcbean <- gcbeans.asScala) yield {
     val emitter = gcbean.asInstanceOf[NotificationEmitter]

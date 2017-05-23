@@ -34,7 +34,7 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
   private[this] var flushTimer: Option[Cancellable] = None
 
   private def scheduleFlush(): Unit = {
-    val time = system.scheduler.scheduleOnce(2 seconds) {
+    val time = system.scheduler.scheduleOnce(2.seconds) {
       self ! AppendFlush
     }
     flushTimer = Some(time)

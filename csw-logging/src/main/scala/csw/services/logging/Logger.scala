@@ -1,7 +1,5 @@
 package csw.services.logging
 
-import akka.actor.{Actor, ActorContext, ActorPath}
-import akka.serialization.Serialization
 import csw.services.logging.LoggingLevels._
 import csw.services.logging.LoggingState._
 
@@ -107,15 +105,3 @@ class Logger private[logging] (componentName: Option[String], actorName: Option[
                   time: Long = System.currentTimeMillis()): Unit =
     MessageHandler.sendMsg(LogAltMessage(category, time, m ++ Map("@category" -> category), id, ex))
 }
-
-class ComponentLogger(componentName: Option[String]) {
-  trait Simple {
-    val log = new Logger(componentName, None)
-  }
-  trait Actor extends akka.actor.Actor {
-    val actorName = Some(ActorPath.fromString(Serialization.serializedActorPath(self)).toString)
-    val log       = new Logger(componentName, actorName)
-  }
-}
-
-object GenericLogger extends ComponentLogger(None)

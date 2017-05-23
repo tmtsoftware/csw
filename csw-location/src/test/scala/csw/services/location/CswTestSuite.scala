@@ -11,7 +11,7 @@ abstract class CswTestSuite
     with BeforeAndAfterEach
     with GenericLogger.Simple {
 
-  private val loggingSystem = LoggingSystem(log, appenderBuilders = Seq(StdOutAppender))
+  private val loggingSystem = LoggingSystem(appenderBuilders = Seq(StdOutAppender))
 
   protected def afterAllTests(): Unit
 
