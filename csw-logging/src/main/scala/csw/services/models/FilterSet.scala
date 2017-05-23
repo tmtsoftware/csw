@@ -26,7 +26,6 @@ object FilterSet {
         .asScala
         .map {
           case (name, filterLevel) ⇒ {
-            println(s"name : $name , filterLevel: $filterLevel")
             (name, Level(filterLevel.toString))
           }
         }

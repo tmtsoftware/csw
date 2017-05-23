@@ -8,7 +8,8 @@ object Dependencies {
     Libs.`persist-json`,
     Libs.`joda-time`,
     Akka.`akka-actor`,
-    Akka.`akka-slf4j`
+    Akka.`akka-slf4j`,
+    Libs.`scalatest` % Test
   )
 
   val Location = Seq(
