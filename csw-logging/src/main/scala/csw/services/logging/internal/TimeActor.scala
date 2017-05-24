@@ -74,7 +74,7 @@ private[logging] class TimeActor(tdone: Promise[Unit]) extends GenericLogger.Act
       }
     }
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case TimeStart(id, name, uid, time) =>
       logStart(id, name, uid, time)
 

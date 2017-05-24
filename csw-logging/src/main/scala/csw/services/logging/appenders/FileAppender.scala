@@ -54,7 +54,7 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
     lastDate = date
   }
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case AppendAdd(date, line) =>
       optw match {
         case Some(w) =>

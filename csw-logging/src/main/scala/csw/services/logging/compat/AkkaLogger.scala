@@ -17,7 +17,7 @@ private[logging] class AkkaLogger extends Actor {
     MessageHandler.sendAkkaMsg(logAkka)
   }
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case InitializeLogger(_) => sender ! LoggerInitialized
     case event @ Error(cause, logSource, logClass, message) =>
       val c = if (cause.toString.contains("NoCause$")) {
