@@ -69,7 +69,7 @@ public class JLocationServiceBlockingDemoExample {
     private AkkaRegistration akkaRegistration = new AkkaRegistration(akkaConnection, actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                 @Override
                 public Receive createReceive() {
-                    return ReceiveBuilder.create().build();
+                    return receiveBuilder().build();
                 }
             }),
             "my-actor-1"

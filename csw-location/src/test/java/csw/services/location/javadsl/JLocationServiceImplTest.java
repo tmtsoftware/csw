@@ -333,7 +333,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         @Override
         public AbstractActor.Receive createReceive() {
             jLogger.info(() -> "in the test actor");
-            return ReceiveBuilder.create().build();
+            return receiveBuilder().build();
         }
     }
 

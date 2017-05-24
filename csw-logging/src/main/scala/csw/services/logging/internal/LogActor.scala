@@ -39,7 +39,7 @@ private[logging] class LogActor(done: Promise[Unit],
 
   private[this] val logFmt = ISODateTimeFormat.dateTime()
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case log: Log                     => receiveLog(log)
     case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage)
     case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J)
