@@ -107,7 +107,7 @@ private[logging] class LogActor(done: Promise[Unit],
   }
 
   private def receiveLog(log: Log): Unit = {
-    var jsonObject = JsonObject("@timestamp" -> logFmt.print(log.time), "msg" -> log.msg,
+    var jsonObject = JsonObject("@timestamp" -> logFmt.print(log.time), "msg" -> log.sanitizedMessage,
       "@severity" -> log.level.name, "@category" -> "common")
 
     if (!log.sourceLocation.fileName.isEmpty) {

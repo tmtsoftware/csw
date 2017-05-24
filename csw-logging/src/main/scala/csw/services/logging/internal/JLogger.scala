@@ -15,12 +15,12 @@ class JLogger private[logging] (componentName: Optional[String], actorName: Opti
 
   val log = new LoggerImpl(componentName.asScala, actorName.asScala)
 
-  override def info(msg: Supplier[RichMsg], ex: Throwable, id: AnyId): Unit =
+  override def info(msg: Supplier[Object], ex: Throwable, id: AnyId): Unit =
     log.info(msg.get(), ex, id)(SourceFactory.from(cls))
 
-  override def info(msg: Supplier[RichMsg], id: AnyId): Unit = info(msg, noException, id)
+  override def info(msg: Supplier[Object], id: AnyId): Unit = info(msg, noException, id)
 
-  override def info(msg: Supplier[RichMsg], ex: Throwable): Unit = info(msg, ex, noId)
+  override def info(msg: Supplier[Object], ex: Throwable): Unit = info(msg, ex, noId)
 
-  override def info(msg: Supplier[RichMsg]): Unit = info(msg, noException, noId)
+  override def info(msg: Supplier[Object]): Unit = info(msg, noException, noId)
 }

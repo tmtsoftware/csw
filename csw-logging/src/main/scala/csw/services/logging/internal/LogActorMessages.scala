@@ -5,6 +5,8 @@ import LoggingLevels.Level
 import csw.services.logging.macros.SourceLocation
 import csw.services.logging.scaladsl.AnyId
 
+import scala.collection.JavaConverters._
+
 sealed trait LogActorMessages
 
 case class Log(componentName: Option[String],
@@ -12,11 +14,16 @@ case class Log(componentName: Option[String],
                id: AnyId,
                time: Long,
                actorName: Option[String],
-               msg: Json,
+               private val msg: Json,
                sourceLocation: SourceLocation,
                ex: Throwable,
                kind: String = "")
-    extends LogActorMessages
+    extends LogActorMessages {
+  def sanitizedMessage: Json = msg match {
+    case x: java.util.Map[_, _] ⇒ x.asScala
+    case x                      ⇒ x
+  }
+}
 
 case class SetLevel(level: Level) extends LogActorMessages
 

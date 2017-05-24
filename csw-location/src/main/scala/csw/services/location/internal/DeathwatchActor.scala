@@ -51,7 +51,7 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
       //all akka locations are now watched
       watchedLocations = akkaLocations
     case Terminated(deadActorRef) =>
-      log.info(Map("@msg" → "removing terminated actor", "actorRef" → deadActorRef))
+      log.info(Map("@msg" → "removing terminated actor", "actorRef" → deadActorRef.toString()))
       //stop watching the terminated actor
       context.unwatch(deadActorRef)
       //Unregister the dead akka location and remove it from the list of watched locations
