@@ -3,6 +3,7 @@ val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-logging`,
+  `csw-logging-macros`,
   `csw-cluster-seed`,
   `csw-config-api`,
   `csw-config-client`,
@@ -14,6 +15,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
+  `csw-logging-macros`,
   `csw-cluster-seed`,
   `csw-location-agent`,
   `csw-config-server`,
