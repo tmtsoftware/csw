@@ -20,6 +20,17 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends Tmt
 
 object Connection {
 
+  def from(input: String): Connection =
+    input.split("-") match {
+      case Array(component, componentType, AkkaType.entryName) ⇒
+        AkkaConnection(ComponentId(component, ComponentType.withName(componentType)))
+      case Array(component, componentType, TcpType.entryName) ⇒
+        TcpConnection(ComponentId(component, ComponentType.withName(componentType)))
+      case Array(component, componentType, HttpType.entryName) ⇒
+        HttpConnection(ComponentId(component, ComponentType.withName(componentType)))
+      case _ ⇒ throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
+    }
+
   /**
    * Represents a connection offered by remote Actors
    */

@@ -37,4 +37,17 @@ class ConnectionTest extends CswTestSuite {
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
+  test("should able to form a connection for trombone assembly from a valid string representation") {
+    Connection.from("tromboneAssembly-assembly-akka") shouldBe
+    AkkaConnection(ComponentId("tromboneAssembly", ComponentType.Assembly))
+
+    Connection.from("tromboneHcd-hcd-akka") shouldBe
+    AkkaConnection(ComponentId("tromboneHcd", ComponentType.HCD))
+
+    Connection.from("redis-service-tcp") shouldBe
+    TcpConnection(ComponentId("redis", ComponentType.Service))
+
+    Connection.from("configService-service-http") shouldBe
+    HttpConnection(ComponentId("configService", ComponentType.Service))
+  }
 }
