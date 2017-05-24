@@ -12,8 +12,8 @@ import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-object TromboneHcdLogger      extends ComponentLogger(Some("tromboneHcd"))
-object TromboneAssemblyLogger extends ComponentLogger(Some("tromboneAssembly"))
+object TromboneHcdLogger      extends ComponentLogger("tromboneHcd")
+object TromboneAssemblyLogger extends ComponentLogger("tromboneAssembly")
 
 class TromboneHcd() extends TromboneHcdLogger.Simple {
   def startLogging(logs: Map[String, String]): Unit = {

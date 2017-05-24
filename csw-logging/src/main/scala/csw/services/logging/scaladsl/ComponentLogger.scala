@@ -3,7 +3,11 @@ package csw.services.logging.scaladsl
 import akka.actor.ActorPath
 import akka.serialization.Serialization
 
-class ComponentLogger(componentName: Option[String]) {
+object GenericLogger extends BasicLogger(None)
+
+class ComponentLogger(componentName: String) extends BasicLogger(Some(componentName))
+
+class BasicLogger(componentName: Option[String]) {
   trait Simple {
     val log = new LoggerImpl(componentName, None)
   }
