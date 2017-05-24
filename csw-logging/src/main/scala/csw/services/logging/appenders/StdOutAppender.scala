@@ -20,7 +20,7 @@ object StdOutAppender extends LogAppenderBuilder {
    * @return the stdout appender.
    */
   def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]): StdOutAppender =
-    new StdOutAppender(factory, stdHeaders)
+    new StdOutAppender(factory, stdHeaders, println)
 }
 
 /**
@@ -29,7 +29,8 @@ object StdOutAppender extends LogAppenderBuilder {
  * @param factory    an Akka factory.
  * @param stdHeaders the headers that are fixes for this service.
  */
-class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) extends LogAppender {
+class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg], logPrinter: Any ⇒ Unit)
+    extends LogAppender {
   private[this] val system = factory match {
     case context: ActorContext => context.system
     case s: ActorSystem        => s
@@ -75,7 +76,7 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg])
       } else {
         normalText
       }
-      println(finalText)
+      logPrinter(finalText)
 
     } else if (summary) {
       val categoryCount = categories.getOrElse(category, 0) + 1
@@ -137,7 +138,7 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg])
       } else {
         txt
       }
-      println(colorTxt)
+      logPrinter(colorTxt)
     }
     Future.successful(())
   }
