@@ -4,6 +4,7 @@ import com.persist.JsonOps
 import csw.services.logging.internal.LoggingLevels._
 import org.scalatest.{FunSuite, Matchers}
 
+// DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
 class FilterSetTest extends FunSuite with Matchers {
 
   val logMessage: String =
