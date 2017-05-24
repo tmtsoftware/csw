@@ -16,6 +16,7 @@ import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.models.Connection.TcpConnection;
 import csw.services.location.scaladsl.ActorSystemFactory;
+import csw.services.logging.internal.JLogger;
 import csw.services.logging.scaladsl.LoggingSystem;
 import csw.services.logging.scaladsl.LoggingSystemFactory;
 import org.junit.After;
@@ -27,8 +28,10 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-public class JLocationServiceImplTest {
+public class JLocationServiceImplTest implements JLocationServiceLogger {
     private static LoggingSystem loggingSystem = LoggingSystemFactory.start();
+
+    private JLogger jLogger = getLogger();
 
     private static ILocationService locationService = JLocationServiceFactory.make();
     private ActorSystem actorSystem = ActorSystemFactory.remote();
@@ -62,6 +65,8 @@ public class JLocationServiceImplTest {
     @Test
     public void testRegistrationAndUnregistrationOfHttpComponent() throws ExecutionException, InterruptedException {
         int port = 8080;
+
+        jLogger.info(() -> "in the test class");
 
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
 
@@ -323,19 +328,21 @@ public class JLocationServiceImplTest {
         probe.expectNoMsg();
     }
 
+    class TestActor extends JLocationServiceLoggerActor {
+        private JLogger jLogger = getLogger();
+        @Override
+        public AbstractActor.Receive createReceive() {
+            jLogger.info(() -> "in the test actor");
+            return ReceiveBuilder.create().build();
+        }
+    }
+
     @Test
     public void testUnregisteringDeadActorByDeathWatch() throws ExecutionException, InterruptedException {
         ComponentId componentId = new ComponentId("hcd1", JComponentType.HCD);
         AkkaConnection connection = new AkkaConnection(componentId);
 
-        ActorRef actorRef = actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
-                    @Override
-                    public Receive createReceive() {
-                        return ReceiveBuilder.create().build();
-                    }
-                }),
-                "my-actor-to-die"
-        );
+        ActorRef actorRef = actorSystem.actorOf(Props.create(AbstractActor.class, TestActor::new),"my-actor-to-die");
 
         Assert.assertEquals(connection, locationService.register(new AkkaRegistration(connection, actorRef)).get().location().connection());
 
