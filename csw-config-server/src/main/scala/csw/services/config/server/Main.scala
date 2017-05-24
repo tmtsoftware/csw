@@ -34,7 +34,6 @@ class Main(clusterSettings: ClusterSettings) {
             throw new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex)
           }
         }
-
     }
 }
 
