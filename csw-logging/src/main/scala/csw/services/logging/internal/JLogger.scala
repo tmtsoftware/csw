@@ -1,20 +1,15 @@
 package csw.services.logging.internal
 
-import java.util.Optional
 import java.util.function.Supplier
 
 import csw.services.logging._
 import csw.services.logging.javadsl.ILogger
 import csw.services.logging.macros.SourceFactory
-import csw.services.logging.scaladsl.{noId, AnyId, LoggerImpl}
+import csw.services.logging.scaladsl.{noId, AnyId, Logger}
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
-import scala.compat.java8.OptionConverters.RichOptionalGeneric
 
-class JLogger private[logging] (componentName: Optional[String], actorName: Optional[String], cls: Class[_])
-    extends ILogger {
-
-  val log = new LoggerImpl(componentName.asScala, actorName.asScala)
+class JLogger private[logging] (log: Logger, cls: Class[_]) extends ILogger {
 
   override def trace(msg: Supplier[Object], ex: Throwable, id: AnyId): Unit =
     log.trace(msg.get(), ex, id)(SourceFactory.from(cls))
@@ -60,4 +55,6 @@ class JLogger private[logging] (componentName: Optional[String], actorName: Opti
     alternative(category, msg, ex, noId)
   override def alternative(category: String, msg: java.util.Map[String, Object]): Unit =
     alternative(category, msg, noException, noId)
+
+  override def asScala: Logger = log
 }

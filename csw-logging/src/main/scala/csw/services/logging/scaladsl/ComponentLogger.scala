@@ -9,10 +9,10 @@ class ComponentLogger(componentName: String) extends BasicLogger(Some(componentN
 
 class BasicLogger(componentName: Option[String]) {
   trait Simple {
-    val log = new LoggerImpl(componentName, None)
+    protected val log: Logger = new LoggerImpl(componentName, None)
   }
   trait Actor extends akka.actor.Actor {
-    val actorName = Some(ActorPath.fromString(Serialization.serializedActorPath(self)).toString)
-    val log       = new LoggerImpl(componentName, actorName)
+    private val actorName     = Some(ActorPath.fromString(Serialization.serializedActorPath(self)).toString)
+    protected val log: Logger = new LoggerImpl(componentName, actorName)
   }
 }

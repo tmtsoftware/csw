@@ -2,7 +2,6 @@ package csw.services.location.javadsl;
 
 import akka.actor.*;
 import akka.japi.Pair;
-import akka.japi.pf.ReceiveBuilder;
 import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitch;
 import akka.stream.Materializer;
@@ -16,7 +15,7 @@ import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.models.Connection.TcpConnection;
 import csw.services.location.scaladsl.ActorSystemFactory;
-import csw.services.logging.internal.JLogger;
+import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.scaladsl.LoggingSystem;
 import csw.services.logging.scaladsl.LoggingSystemFactory;
 import org.junit.After;
@@ -31,7 +30,7 @@ import java.util.function.Consumer;
 public class JLocationServiceImplTest implements JLocationServiceLogger {
     private static LoggingSystem loggingSystem = LoggingSystemFactory.start();
 
-    private JLogger jLogger = getLogger();
+    private ILogger jLogger = getLogger();
 
     private static ILocationService locationService = JLocationServiceFactory.make();
     private ActorSystem actorSystem = ActorSystemFactory.remote();
@@ -329,7 +328,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     }
 
     class TestActor extends JLocationServiceLoggerActor {
-        private JLogger jLogger = getLogger();
+        private ILogger jLogger = getLogger();
         @Override
         public AbstractActor.Receive createReceive() {
             jLogger.info(() -> "in the test actor");

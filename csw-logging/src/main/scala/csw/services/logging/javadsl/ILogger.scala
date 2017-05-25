@@ -2,7 +2,7 @@ package csw.services.logging.javadsl
 
 import java.util.function.Supplier
 
-import csw.services.logging.scaladsl.AnyId
+import csw.services.logging.scaladsl.{AnyId, Logger}
 
 trait ILogger {
 
@@ -92,4 +92,5 @@ trait ILogger {
   def alternative(category: String, msg: java.util.Map[String, Object], ex: Throwable): Unit
   def alternative(category: String, msg: java.util.Map[String, Object]): Unit
 
+  def asScala: Logger
 }
