@@ -1,38 +1,41 @@
 package csw.services.admin
 
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{ComponentId, ComponentType}
+import csw.services.admin.exceptions.UnresolvedAkkaLocationException
+import csw.services.location.models.{AkkaLocation, Connection}
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.internal.LoggingLevels.{INFO, Level}
+import csw.services.logging.internal.{GetComponentLogMetadata, SetComponentLogLevel}
+import csw.services.logging.internal.LoggingLevels.Level
+import akka.pattern.ask
+import akka.util.Timeout
+import csw.services.logging.models.LoggerMetadata
 
 import scala.async.Async._
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationDouble
 
-class LogAdmin(locationService: LocationService) {
+class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-  def getLogLevel(componentName: String): Future[Unit] = async {
-
-    val component = getAkkaConnection(componentName) match {
-      case Some(connection) ⇒ await(locationService.find(connection))
-      case _                ⇒ throw new IllegalArgumentException(s"$componentName is not valid component name")
-    }
-
-    component match {
-      case Some(location) ⇒ location.connection
-      case None           ⇒ throw new RuntimeException
+  import actorRuntime._
+  def getLogLevel(componentName: String): Future[LoggerMetadata] = async {
+    implicit val timeout = Timeout(5.seconds)
+    await(getLocation(componentName)) match {
+      case Some(AkkaLocation(_, _, actorRef)) ⇒ await((actorRef ? GetComponentLogMetadata).mapTo[LoggerMetadata])
+      case _                                  ⇒ throw UnresolvedAkkaLocationException(componentName)
     }
   }
 
-  def setLogLevel(componentName: String, logLevel: Level): Boolean =
-    true
+  def setLogLevel(componentName: String, logLevel: Level): Future[Unit] = async {
 
-  def getAkkaConnection(componentName: String): Option[AkkaConnection] = {
-    val ComponentNamePattern = "([0-9a-zA-Z._]+)-([a-zA-Z]+)-(*)".r
-    componentName match {
-      case ComponentNamePattern(component, componentType, connection) ⇒
-        Some(AkkaConnection(ComponentId(component, ComponentType.withName(componentType))))
-      case _ ⇒ None
+    await(getLocation(componentName)) match {
+      case Some(AkkaLocation(_, _, actorRef)) ⇒ actorRef ! SetComponentLogLevel(logLevel)
+      case _                                  ⇒ throw UnresolvedAkkaLocationException(componentName)
+    }
+  }
+
+  private def getLocation(componentName: String) = async {
+    Connection.from(componentName) match {
+      case connection: Connection ⇒ await(locationService.find(connection))
+      case _                      ⇒ throw new IllegalArgumentException(s"$componentName is not a valid component name")
     }
   }
 }

@@ -1,25 +1,21 @@
 package csw.services.admin.http
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{Directive1, Route}
-import akka.stream.Materializer
-import csw.services.admin.LogAdmin
+import akka.Done
+import akka.http.scaladsl.server.Route
+import csw.services.admin.{ActorRuntime, LogAdmin}
 
-class AdminRoutes(adminExceptionHandler: AdminExceptionHandler,
-                  logAdmin: LogAdmin)(implicit val materializer: Materializer) {
+class AdminRoutes(adminExceptionHandler: AdminExceptionHandler, logAdmin: LogAdmin, actorRuntime: ActorRuntime)
+    extends HttpSupport {
 
-  val logLevelParam: Directive1[String] = parameter('value)
-
+  import actorRuntime._
   val route: Route = handleExceptions(adminExceptionHandler.exceptionHandler) {
     path("admin" / "logging" / Segment / "level") { componentName ⇒
       get {
-        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, s"<h1>Say hello to $componentName</h1>"))
+        complete(logAdmin.getLogLevel(componentName))
       } ~
       post {
         logLevelParam { (logLevel) ⇒
-          //complete(StatusCodes.Created -> configService.create(filePath, configData, annex, comment))
-          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
+          complete(logAdmin.setLogLevel(componentName, logLevel).map(_ ⇒ Done))
         }
       }
     }

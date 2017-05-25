@@ -1,11 +1,11 @@
 package csw.services.admin.http
 
 import akka.Done
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import akka.stream.Materializer
 import com.typesafe.scalalogging.LazyLogging
+import csw.services.admin.ActorRuntime
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationService
 
@@ -19,13 +19,12 @@ import scala.util.control.NonFatal
  */
 class AdminHttpService(
     locationService: LocationService,
-    adminRoutes: AdminRoutes
-)(implicit val materializer: Materializer, implicit val actorSystem: ActorSystem)
-    extends LazyLogging {
+    adminRoutes: AdminRoutes,
+    actorRuntime: ActorRuntime
+) extends LazyLogging {
 
-  import actorSystem._
+  import actorRuntime._
 
-  val coordinatedShutdown = CoordinatedShutdown(actorSystem)
   // this task needs to be added before calling register
   // so that location service shutdowns properly even in case of registration fails
   coordinatedShutdown.addTask(
