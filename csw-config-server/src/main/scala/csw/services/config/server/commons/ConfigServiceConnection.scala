@@ -1,6 +1,8 @@
 package csw.services.config.server.commons
 
-import csw.services.location.models.{ComponentId, ComponentType}
 import csw.services.location.models.Connection.HttpConnection
+import csw.services.location.models.{ComponentId, ComponentType}
 
-object ConfigServiceConnection extends HttpConnection(ComponentId("config", ComponentType.Service))
+object ConfigServiceConnection {
+  val value = HttpConnection(ComponentId("config", ComponentType.Service))
+}

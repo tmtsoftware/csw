@@ -19,10 +19,10 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     val serverWiring = new ServerWiring
     import serverWiring._
     val (binding, registrationResult) = httpService.registeredLazyBinding.await
-    locationService.find(ConfigServiceConnection).await.get.connection shouldBe ConfigServiceConnection
+    locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 
     binding.localAddress.getAddress.getHostAddress shouldBe new Networks().hostname()
-    registrationResult.location.connection shouldBe ConfigServiceConnection
+    registrationResult.location.connection shouldBe ConfigServiceConnection.value
     actorRuntime.shutdown().await
   }
 
@@ -38,7 +38,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
       httpService.registeredLazyBinding.await
     }
 
-    locationService1.find(ConfigServiceConnection).await shouldBe None
+    locationService1.find(ConfigServiceConnection.value).await shouldBe None
     locationService1.shutdown()
     try {
       actorRuntime.shutdown().await
@@ -50,9 +50,9 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   test("should not start server if registration with location service fails") {
     val serverWiring = new ServerWiring
     import serverWiring._
-    locationService.register(HttpRegistration(ConfigServiceConnection, 21212, "")).await
+    locationService.register(HttpRegistration(ConfigServiceConnection.value, 21212, "")).await
 
-    locationService.find(ConfigServiceConnection).await.get.connection shouldBe ConfigServiceConnection
+    locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 
     intercept[OtherLocationIsRegistered] {
       httpService.registeredLazyBinding.await

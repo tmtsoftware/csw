@@ -3,7 +3,9 @@ package csw.apps.clusterseed
 import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.apps.clusterseed.cli.{ArgsParser, Options}
 import csw.apps.clusterseed.commons.ClusterSeedLogger
+import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.services.logging.scaladsl.LoggingSystem
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -13,6 +15,7 @@ class Main(clusterSettings: ClusterSettings) {
     new ArgsParser().parse(args).foreach {
       case Options(port) =>
         val updatedClusterSettings = clusterSettings.onPort(port)
+        new LoggingSystem(BuildInfo.name, BuildInfo.version, updatedClusterSettings.hostname)
         updatedClusterSettings.debug()
         val adminWiring = AdminWiring.make(updatedClusterSettings)
         adminWiring.cswCluster

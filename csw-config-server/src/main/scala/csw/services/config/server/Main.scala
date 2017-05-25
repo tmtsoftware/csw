@@ -1,9 +1,11 @@
 package csw.services.config.server
 
+import csw.services.BuildInfo
 import csw.services.config.server.cli.{ArgsParser, Options}
 import csw.services.config.server.commons.ConfigServerLogger
 import csw.services.config.server.http.HttpService
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.services.logging.scaladsl.LoggingSystem
 import org.tmatesoft.svn.core.SVNException
 
 import scala.concurrent.Await
@@ -38,6 +40,7 @@ class Main(clusterSettings: ClusterSettings) {
 }
 
 object Main extends App with ConfigServerLogger.Simple {
+  new LoggingSystem(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname)
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     log.error(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."

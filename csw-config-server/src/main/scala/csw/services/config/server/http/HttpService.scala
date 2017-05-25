@@ -61,7 +61,7 @@ class HttpService(locationService: LocationService,
 
   private def register(binding: ServerBinding): Future[RegistrationResult] = {
     val registration = HttpRegistration(
-      connection = ConfigServiceConnection,
+      connection = ConfigServiceConnection.value,
       port = binding.localAddress.getPort,
       path = ""
     )

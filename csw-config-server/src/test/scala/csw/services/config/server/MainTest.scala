@@ -43,14 +43,14 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
 
     actualException.getCause shouldBe a[SVNException]
 
-    locationService.find(ConfigServiceConnection).await shouldBe None
+    locationService.find(ConfigServiceConnection.value).await shouldBe None
   }
 
   test("should init svn repo and register with location service if --initRepo option is provided") {
     val httpService = new Main(clusterSettings).start(Array("--initRepo")).get
 
     try {
-      val configServiceLocation = locationService.resolve(ConfigServiceConnection, 5.seconds).await.get
+      val configServiceLocation = locationService.resolve(ConfigServiceConnection.value, 5.seconds).await.get
       configServiceLocation.connection shouldBe ConfigServiceConnection
 
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
@@ -73,9 +73,9 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
     val httpService = new Main(clusterSettings).start(Array.empty).get
 
     try {
-      val configServiceLocation = locationService.resolve(ConfigServiceConnection, 5.seconds).await.get
+      val configServiceLocation = locationService.resolve(ConfigServiceConnection.value, 5.seconds).await.get
 
-      configServiceLocation.connection shouldBe ConfigServiceConnection
+      configServiceLocation.connection shouldBe ConfigServiceConnection.value
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
       val request  = HttpRequest(uri = uri)
