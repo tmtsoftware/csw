@@ -1,4 +1,4 @@
-package csw.services.admin.internal
+package csw.apps.clusterseed.admin.internal
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import csw.services.logging.models.LoggerMetadata

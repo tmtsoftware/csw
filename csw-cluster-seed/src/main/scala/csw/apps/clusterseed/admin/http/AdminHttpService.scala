@@ -1,10 +1,10 @@
-package csw.services.admin.http
+package csw.apps.clusterseed.admin.http
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import csw.services.admin.ActorRuntime
+import csw.apps.clusterseed.admin.internal.ActorRuntime
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationService
 

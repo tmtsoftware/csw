@@ -1,8 +1,8 @@
 package csw.apps.clusterseed
 
+import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.apps.clusterseed.cli.{ArgsParser, Options}
 import csw.apps.clusterseed.commons.ClusterSeedLogger
-import csw.services.config.server.AdminWiring
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 
 import scala.concurrent.Await

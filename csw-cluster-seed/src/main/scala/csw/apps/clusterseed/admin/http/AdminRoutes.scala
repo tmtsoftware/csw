@@ -1,8 +1,9 @@
-package csw.services.admin.http
+package csw.apps.clusterseed.admin.http
 
 import akka.Done
 import akka.http.scaladsl.server.Route
-import csw.services.admin.{ActorRuntime, LogAdmin}
+import csw.apps.clusterseed.admin.LogAdmin
+import csw.apps.clusterseed.admin.internal.ActorRuntime
 
 class AdminRoutes(adminExceptionHandler: AdminExceptionHandler, logAdmin: LogAdmin, actorRuntime: ActorRuntime)
     extends HttpSupport {

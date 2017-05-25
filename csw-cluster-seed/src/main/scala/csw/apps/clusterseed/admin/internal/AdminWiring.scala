@@ -1,8 +1,8 @@
-package csw.services.config.server
+package csw.apps.clusterseed.admin.internal
 
 import akka.actor.ActorSystem
-import csw.services.admin.http.{AdminExceptionHandler, AdminHttpService, AdminRoutes}
-import csw.services.admin.{ActorRuntime, LogAdmin}
+import csw.apps.clusterseed.admin.LogAdmin
+import csw.apps.clusterseed.admin.http.{AdminExceptionHandler, AdminHttpService, AdminRoutes}
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 

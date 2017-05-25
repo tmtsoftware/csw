@@ -1,7 +1,7 @@
-package csw.services.admin.http
+package csw.apps.clusterseed.admin.http
 
 import akka.http.scaladsl.server.{Directive1, Directives}
-import csw.services.admin.internal.JsonSupport
+import csw.apps.clusterseed.admin.internal.JsonSupport
 import csw.services.logging.internal.LoggingLevels.Level
 
 trait HttpSupport extends Directives with JsonSupport {

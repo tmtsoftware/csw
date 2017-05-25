@@ -1,4 +1,4 @@
-package csw.services.admin.exceptions
+package csw.apps.clusterseed.admin.exceptions
 
 /**
  * An Exception representing failure of non existing component name
