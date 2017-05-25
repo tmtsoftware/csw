@@ -3,7 +3,7 @@ package csw.apps.clusterseed
 import com.typesafe.scalalogging.LazyLogging
 import csw.apps.clusterseed.cli.{ArgsParser, Options}
 import csw.services.config.server.AdminWiring
-import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings, CswCluster}
+import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -16,7 +16,6 @@ class Main(clusterSettings: ClusterSettings) {
         updatedClusterSettings.debug()
         val adminWiring = AdminWiring.make(updatedClusterSettings)
         adminWiring.cswCluster
-        println("CSW cluster started")
         Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)
     }
 }

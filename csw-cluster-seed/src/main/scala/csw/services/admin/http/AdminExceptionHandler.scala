@@ -1,7 +1,8 @@
-package csw.admin
+package csw.services.admin.http
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, ExceptionHandler}
+import csw.services.admin.exceptions.InvalidComponentNameException
 
 import scala.util.control.NonFatal
 

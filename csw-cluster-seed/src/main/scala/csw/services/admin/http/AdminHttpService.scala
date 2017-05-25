@@ -1,4 +1,4 @@
-package csw.services.config.server.http
+package csw.services.admin.http
 
 import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
@@ -6,7 +6,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.stream.Materializer
 import com.typesafe.scalalogging.LazyLogging
-import csw.admin.AdminRoutes
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationService
 

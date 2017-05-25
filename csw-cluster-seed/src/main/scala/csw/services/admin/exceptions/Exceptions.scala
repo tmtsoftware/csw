@@ -1,4 +1,4 @@
-package csw.admin
+package csw.services.admin.exceptions
 
 /**
  * An Exception representing failure of non existing component name

@@ -1,9 +1,10 @@
-package csw.admin
+package csw.services.admin.http
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Directive1, Route}
 import akka.stream.Materializer
+import csw.services.admin.LogAdmin
 
 class AdminRoutes(adminExceptionHandler: AdminExceptionHandler,
                   logAdmin: LogAdmin)(implicit val materializer: Materializer) {

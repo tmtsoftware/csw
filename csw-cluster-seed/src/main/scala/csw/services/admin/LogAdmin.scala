@@ -1,4 +1,4 @@
-package csw.admin
+package csw.services.admin
 
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType}

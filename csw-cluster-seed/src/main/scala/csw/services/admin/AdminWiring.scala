@@ -2,8 +2,8 @@ package csw.services.config.server
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
-import csw.admin.{AdminExceptionHandler, AdminRoutes, LogAdmin}
-import csw.services.config.server.http.AdminHttpService
+import csw.services.admin.LogAdmin
+import csw.services.admin.http.{AdminExceptionHandler, AdminHttpService, AdminRoutes}
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
