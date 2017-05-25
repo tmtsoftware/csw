@@ -37,7 +37,7 @@ class ConnectionTest extends CswTestSuite {
     akkaConnection.name shouldBe expectedAkkaConnectionName
   }
 
-  test("should able to form a connection for trombone assembly from a valid string representation") {
+  test("should able to form a connection for components from a valid string representation") {
     Connection.from("tromboneAssembly-assembly-akka") shouldBe
     AkkaConnection(ComponentId("tromboneAssembly", ComponentType.Assembly))
 
@@ -49,5 +49,21 @@ class ConnectionTest extends CswTestSuite {
 
     Connection.from("configService-service-http") shouldBe
     HttpConnection(ComponentId("configService", ComponentType.Service))
+  }
+
+  test("should not be able to form a connection for components from an invalid string representation") {
+    val connection = "tromboneAssembly_assembly_akka"
+    val exception = intercept[IllegalArgumentException] {
+      Connection.from(connection)
+    }
+
+    exception.getMessage shouldBe s"Unable to parse '$connection' to make Connection object"
+
+    val connection2 = "trombone-hcd"
+    val exception2 = intercept[IllegalArgumentException] {
+      Connection.from(connection2)
+    }
+
+    exception2.getMessage shouldBe s"Unable to parse '$connection2' to make Connection object"
   }
 }
