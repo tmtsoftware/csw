@@ -1,7 +1,7 @@
 package csw.services.location.models
 
-import csw.services.location.CswTestSuite
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.logging.utils.CswTestSuite
 
 class ConnectionTest extends CswTestSuite {
 

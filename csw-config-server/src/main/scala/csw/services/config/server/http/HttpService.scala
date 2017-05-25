@@ -4,13 +4,12 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import com.typesafe.scalalogging.LazyLogging
+import csw.services.config.server.commons.ConfigServiceConnection
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.models.Connection.HttpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
-
+import csw.services.config.server.commons.ConfigServerLogger
 import scala.async.Async._
 import scala.concurrent.Future
 import scala.util.control.NonFatal
@@ -26,7 +25,7 @@ class HttpService(locationService: LocationService,
                   configServiceRoute: ConfigServiceRoute,
                   settings: Settings,
                   actorRuntime: ActorRuntime)
-    extends LazyLogging {
+    extends ConfigServerLogger.Simple {
 
   import actorRuntime._
 
@@ -46,7 +45,7 @@ class HttpService(locationService: LocationService,
       s"unregistering-${registrationResult.location}"
     )(() => registrationResult.unregister())
 
-    logger.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
+    log.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     (binding, registrationResult)
   } recoverWith {
     case NonFatal(ex) ⇒ shutdown().map(_ ⇒ throw ex)
@@ -62,11 +61,11 @@ class HttpService(locationService: LocationService,
 
   private def register(binding: ServerBinding): Future[RegistrationResult] = {
     val registration = HttpRegistration(
-      connection = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service)),
+      connection = ConfigServiceConnection,
       port = binding.localAddress.getPort,
       path = ""
     )
-    logger.info("==== Registering Config Service HTTP Server with Location Service ====")
+    log.info("==== Registering Config Service HTTP Server with Location Service ====")
     locationService.register(registration)
   }
 }

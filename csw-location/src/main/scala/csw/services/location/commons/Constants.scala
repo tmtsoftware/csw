@@ -9,5 +9,5 @@ object Constants {
   val ClusterName           = "csw-cluster"
   val RemoteActorSystemName = "csw-remote-actor-system"
 
-  val LocationService = "LocationService"
+  val LocationService = "location-service-lib"
 }

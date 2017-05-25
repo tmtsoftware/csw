@@ -1,8 +1,10 @@
-package csw.services.location
+package csw.services.logging.utils
 
-import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.logging.scaladsl.{GenericLogger, LoggingSystemFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationDouble
 
 abstract class CswTestSuite
     extends FunSuite
@@ -17,6 +19,6 @@ abstract class CswTestSuite
 
   override protected def afterAll(): Unit = {
     afterAllTests()
-    loggingSystem.stop.await
+    Await.result(loggingSystem.stop, 5.seconds)
   }
 }

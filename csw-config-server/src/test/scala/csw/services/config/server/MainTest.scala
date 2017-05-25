@@ -6,11 +6,9 @@ import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
-import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
+import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.services.location.commons.ClusterSettings
-import csw.services.location.models.Connection.HttpConnection
-import csw.services.location.models.{ComponentId, ComponentType}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import org.tmatesoft.svn.core.SVNException
@@ -45,17 +43,15 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
 
     actualException.getCause shouldBe a[SVNException]
 
-    val configConnection = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-    locationService.find(configConnection).await shouldBe None
+    locationService.find(ConfigServiceConnection).await shouldBe None
   }
 
   test("should init svn repo and register with location service if --initRepo option is provided") {
     val httpService = new Main(clusterSettings).start(Array("--initRepo")).get
 
     try {
-      val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-      val configServiceLocation = locationService.resolve(configConnection, 5.seconds).await.get
-      configServiceLocation.connection shouldBe configConnection
+      val configServiceLocation = locationService.resolve(ConfigServiceConnection, 5.seconds).await.get
+      configServiceLocation.connection shouldBe ConfigServiceConnection
 
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
@@ -77,10 +73,9 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
     val httpService = new Main(clusterSettings).start(Array.empty).get
 
     try {
-      val configConnection      = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-      val configServiceLocation = locationService.resolve(configConnection, 5.seconds).await.get
+      val configServiceLocation = locationService.resolve(ConfigServiceConnection, 5.seconds).await.get
 
-      configServiceLocation.connection shouldBe configConnection
+      configServiceLocation.connection shouldBe ConfigServiceConnection
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 
       val request  = HttpRequest(uri = uri)

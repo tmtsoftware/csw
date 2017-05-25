@@ -34,16 +34,16 @@ object Connection {
   /**
    * Represents a connection offered by remote Actors
    */
-  final case class AkkaConnection(componentId: ComponentId) extends Connection(AkkaType)
+  case class AkkaConnection(componentId: ComponentId) extends Connection(AkkaType)
 
   /**
    * Represents a http connection provided by the component
    */
-  final case class HttpConnection(componentId: ComponentId) extends Connection(HttpType)
+  case class HttpConnection(componentId: ComponentId) extends Connection(HttpType)
 
   /**
    * represents a tcp connection provided by the component
    */
-  final case class TcpConnection(componentId: ComponentId) extends Connection(TcpType)
+  case class TcpConnection(componentId: ComponentId) extends Connection(TcpType)
 
 }

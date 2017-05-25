@@ -1,6 +1,6 @@
 package csw.services.location.commons
 
-import csw.services.location.CswTestSuite
+import csw.services.logging.utils.CswTestSuite
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt

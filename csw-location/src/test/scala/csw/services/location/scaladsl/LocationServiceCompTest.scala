@@ -5,12 +5,12 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
-import csw.services.location.CswTestSuite
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
+import csw.services.logging.utils.CswTestSuite
 
 import scala.concurrent.duration.DurationInt
 

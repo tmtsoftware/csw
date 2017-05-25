@@ -1,6 +1,6 @@
 package csw.services.location.models
 
-import csw.services.location.CswTestSuite
+import csw.services.logging.utils.CswTestSuite
 
 class ComponentIdTest extends CswTestSuite {
 

@@ -2,7 +2,7 @@ package csw.services.location.internal
 
 import java.net.InetAddress
 
-import csw.services.location.CswTestSuite
+import csw.services.logging.utils.CswTestSuite
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 

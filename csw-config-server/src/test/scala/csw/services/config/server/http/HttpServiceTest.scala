@@ -2,12 +2,12 @@ package csw.services.config.server.http
 
 import akka.stream.BindFailedException
 import csw.services.config.server.ServerWiring
+import csw.services.config.server.commons.ConfigServiceConnection
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
-import csw.services.location.models.Connection.HttpConnection
-import csw.services.location.models.{ComponentId, ComponentType, HttpRegistration}
+import csw.services.location.models.HttpRegistration
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -19,11 +19,10 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     val serverWiring = new ServerWiring
     import serverWiring._
     val (binding, registrationResult) = httpService.registeredLazyBinding.await
-    val configConnection              = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-    locationService.find(configConnection).await.get.connection shouldBe configConnection
+    locationService.find(ConfigServiceConnection).await.get.connection shouldBe ConfigServiceConnection
 
     binding.localAddress.getAddress.getHostAddress shouldBe new Networks().hostname()
-    registrationResult.location.connection shouldBe configConnection
+    registrationResult.location.connection shouldBe ConfigServiceConnection
     actorRuntime.shutdown().await
   }
 
@@ -39,8 +38,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
       httpService.registeredLazyBinding.await
     }
 
-    val configConnection = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-    locationService1.find(configConnection).await shouldBe None
+    locationService1.find(ConfigServiceConnection).await shouldBe None
     locationService1.shutdown()
     try {
       actorRuntime.shutdown().await
@@ -52,10 +50,9 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   test("should not start server if registration with location service fails") {
     val serverWiring = new ServerWiring
     import serverWiring._
-    val configConnection = HttpConnection(ComponentId("ConfigServiceServer", ComponentType.Service))
-    locationService.register(HttpRegistration(configConnection, 21212, "")).await
+    locationService.register(HttpRegistration(ConfigServiceConnection, 21212, "")).await
 
-    locationService.find(configConnection).await.get.connection shouldBe configConnection
+    locationService.find(ConfigServiceConnection).await.get.connection shouldBe ConfigServiceConnection
 
     intercept[OtherLocationIsRegistered] {
       httpService.registeredLazyBinding.await

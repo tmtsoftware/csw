@@ -5,11 +5,11 @@ import java.net.URI
 import akka.actor.{Actor, ActorPath, ActorSystem, Props}
 import akka.serialization.Serialization
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.services.location.CswTestSuite
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.scaladsl.ActorSystemFactory
+import csw.services.logging.utils.CswTestSuite
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble

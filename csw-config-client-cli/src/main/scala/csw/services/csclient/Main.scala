@@ -1,7 +1,7 @@
 package csw.services.csclient
 
-import com.typesafe.scalalogging.LazyLogging
 import csw.services.csclient.cli.{ArgsParser, ClientCliWiring}
+import csw.services.csclient.commons.ConfigClientCliLogger
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 
 import scala.concurrent.Await
@@ -41,9 +41,9 @@ class Main(clusterSettings: ClusterSettings) {
     }
 }
 
-object Main extends App with LazyLogging {
+object Main extends App with ConfigClientCliLogger.Simple {
   if (ClusterAwareSettings.seedNodes.isEmpty) {
-    logger.error(
+    log.error(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
     )
   } else {

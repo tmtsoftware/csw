@@ -1,8 +1,8 @@
 package csw.services.location.commons
 
 import com.typesafe.config.ConfigException
-import csw.services.location.CswTestSuite
 import csw.services.location.internal.Networks
+import csw.services.logging.utils.CswTestSuite
 
 class ClusterSettingsTest extends CswTestSuite {
 

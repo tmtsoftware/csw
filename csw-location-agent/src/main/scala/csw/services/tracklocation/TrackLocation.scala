@@ -2,11 +2,11 @@ package csw.services.tracklocation
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
-import com.typesafe.scalalogging.LazyLogging
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.tracklocation.commons.LocationAgentLogger
 import csw.services.tracklocation.models.Command
 
 import scala.collection.immutable.Seq
@@ -18,7 +18,8 @@ import scala.util.control.NonFatal
 /**
  * Starts a given external program, registers it with the location service and unregisters it when the program exits.
  */
-class TrackLocation(names: List[String], command: Command, clusterSettings: ClusterSettings) extends LazyLogging {
+class TrackLocation(names: List[String], command: Command, clusterSettings: ClusterSettings)
+    extends LocationAgentLogger.Simple {
 
   private val cswCluster      = CswCluster.withSettings(clusterSettings)
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
@@ -51,14 +52,14 @@ class TrackLocation(names: List[String], command: Command, clusterSettings: Clus
    * specified command and awaits its termination.
    */
   private def unregisterOnTermination(results: Seq[RegistrationResult]): Process = {
-    logger.info(results.map(_.location.connection.componentId).toString())
+    log.info(results.map(_.location.connection.componentId).toString())
 
     coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       "unregistering"
     )(() => unregisterServices(results))
 
-    logger.info(s"Executing specified command: ${command.commandText}")
+    log.info(s"Executing specified command: ${command.commandText}")
     val process = command.commandText.run()
     Future(process.exitValue()).onComplete(_ ⇒ shutdown())
     process
@@ -68,9 +69,9 @@ class TrackLocation(names: List[String], command: Command, clusterSettings: Clus
    * INTERNAL API : Unregisters a service.
    */
   private def unregisterServices(results: Seq[RegistrationResult]): Future[Done] = {
-    logger.info("Shutdown hook reached, unregistering services.")
+    log.info("Shutdown hook reached, unregistering services.")
     Future.traverse(results)(_.unregister()).map { _ =>
-      logger.info(s"Services are unregistered.")
+      log.info(s"Services are unregistered.")
       Done
     }
   }

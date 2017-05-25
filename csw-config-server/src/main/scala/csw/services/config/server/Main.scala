@@ -1,7 +1,7 @@
 package csw.services.config.server
 
-import com.typesafe.scalalogging.LazyLogging
 import csw.services.config.server.cli.{ArgsParser, Options}
+import csw.services.config.server.commons.ConfigServerLogger
 import csw.services.config.server.http.HttpService
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import org.tmatesoft.svn.core.SVNException
@@ -37,9 +37,9 @@ class Main(clusterSettings: ClusterSettings) {
     }
 }
 
-object Main extends App with LazyLogging {
+object Main extends App with ConfigServerLogger.Simple {
   if (ClusterAwareSettings.seedNodes.isEmpty) {
-    logger.error(
+    log.error(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
     )
   } else {
