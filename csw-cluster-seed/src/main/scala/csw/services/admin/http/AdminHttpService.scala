@@ -4,7 +4,6 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import com.typesafe.scalalogging.LazyLogging
 import csw.services.admin.ActorRuntime
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationService
@@ -21,7 +20,7 @@ class AdminHttpService(
     locationService: LocationService,
     adminRoutes: AdminRoutes,
     actorRuntime: ActorRuntime
-) extends LazyLogging {
+) {
 
   import actorRuntime._
 
