@@ -99,7 +99,6 @@ public class JLocationServiceNonBlockingDemoExample {
                 Assert.assertEquals(expectedLocations, locations);
                 return locationService.resolve(tcpConnection, new FiniteDuration(5, TimeUnit.SECONDS)).thenCompose(locationOption -> {
                     Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationOption.get());
-                    System.out.println(tcpRegistrationResult.location().uri());
                     return tcpRegistrationResult.unregister().thenCompose(done -> {
                         return locationService.list().thenCompose(locations1 -> {
                             Assert.assertEquals(Collections.EMPTY_LIST, locations1);
@@ -120,7 +119,7 @@ public class JLocationServiceNonBlockingDemoExample {
     @Test
     public void tracking() throws ExecutionException, InterruptedException {
         //#tracking
-        Pair<KillSwitch, CompletionStage<Done>> stream = locationService.track(tcpConnection).toMat(Sink.foreach(System.out::println), Keep.both()).run(mat);
+        Pair<KillSwitch, CompletionStage<Done>> stream = locationService.track(tcpConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
 
         Thread.sleep(200);
 

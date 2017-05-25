@@ -64,8 +64,6 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
         await(locationService.list) shouldBe List(tcpRegistrationResult.location)
         await(locationService.resolve(tcpConnection, 5.seconds)) shouldBe Some(tcpRegistrationResult.location)
 
-        println(tcpRegistrationResult.location.uri)
-
         await(tcpRegistrationResult.unregister())
 
         await(locationService.list) shouldBe List.empty
@@ -77,7 +75,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
 
   test("tracking") {
     //#tracking
-    val (killSwitch, doneF) = locationService.track(tcpConnection).toMat(Sink.foreach(println))(Keep.both).run()
+    val (killSwitch, doneF) = locationService.track(tcpConnection).toMat(Sink.ignore)(Keep.both).run()
 
     Thread.sleep(200)
 

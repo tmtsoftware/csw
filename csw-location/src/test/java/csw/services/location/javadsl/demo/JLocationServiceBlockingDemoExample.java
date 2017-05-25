@@ -126,8 +126,6 @@ public class JLocationServiceBlockingDemoExample {
         Assert.assertEquals(expectedLocations, locationService.list().get());
         Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.resolve(tcpConnection, new FiniteDuration(5, TimeUnit.SECONDS)).get().get());
 
-        System.out.println(tcpRegistrationResult.location().uri());
-
         tcpRegistrationResult.unregister().get();
 
         Assert.assertEquals(Collections.EMPTY_LIST, locationService.list().get());
@@ -138,7 +136,7 @@ public class JLocationServiceBlockingDemoExample {
     @Test
     public void tracking() throws ExecutionException, InterruptedException {
         //#tracking
-        Pair<KillSwitch, CompletionStage<Done>> stream = locationService.track(tcpConnection).toMat(Sink.foreach(System.out::println), Keep.both()).run(mat);
+        Pair<KillSwitch, CompletionStage<Done>> stream = locationService.track(tcpConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
 
         Thread.sleep(200);
 
