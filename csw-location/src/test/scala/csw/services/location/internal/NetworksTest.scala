@@ -1,14 +1,11 @@
 package csw.services.location.internal
 
 import java.net.InetAddress
-
-import csw.services.logging.utils.CswTestSuite
 import org.mockito.Mockito._
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import org.scalatest.mockito.MockitoSugar
 
-class NetworksTest extends CswTestSuite with MockitoSugar {
-
-  override protected def afterAllTests(): Unit = ()
+class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with MockitoSugar {
 
   test("Should filter ipv6 addresses") {
     val mockedNetworkProvider = mock[NetworkInterfaceProvider]

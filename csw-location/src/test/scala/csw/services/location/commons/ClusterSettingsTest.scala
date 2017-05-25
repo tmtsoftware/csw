@@ -2,11 +2,11 @@ package csw.services.location.commons
 
 import com.typesafe.config.ConfigException
 import csw.services.location.internal.Networks
-import csw.services.logging.utils.CswTestSuite
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class ClusterSettingsTest extends CswTestSuite {
+class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  override protected def afterAllTests(): Unit = {
+  override protected def afterAll(): Unit = {
     System.clearProperty("clusterPort")
     System.clearProperty("clusterSeeds")
     System.clearProperty("interfaceName")

@@ -1,10 +1,8 @@
 package csw.services.location.models
 
-import csw.services.logging.utils.CswTestSuite
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class ConnectionTypeTest extends CswTestSuite {
-
-  override protected def afterAllTests(): Unit = ()
+class ConnectionTypeTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   test("ConnectionType should be any one of this types : 'http', 'tcp' and 'akka'") {
 

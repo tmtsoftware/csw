@@ -10,11 +10,12 @@ import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import csw.services.logging.utils.CswTestSuite
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
 
-class LocationServiceCompTest extends CswTestSuite {
+class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+
   lazy val locationService: LocationService = LocationServiceFactory.make()
 
   implicit val actorSystem: ActorSystem = ActorSystemFactory.remote("test")
@@ -23,7 +24,7 @@ class LocationServiceCompTest extends CswTestSuite {
   override protected def afterEach(): Unit =
     locationService.unregisterAll().await
 
-  override protected def afterAllTests(): Unit = {
+  override protected def afterAll(): Unit = {
     locationService.shutdown().await
     actorSystem.terminate().await
   }

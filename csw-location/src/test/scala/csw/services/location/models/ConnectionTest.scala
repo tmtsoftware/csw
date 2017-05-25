@@ -1,11 +1,9 @@
 package csw.services.location.models
 
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.services.logging.utils.CswTestSuite
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class ConnectionTest extends CswTestSuite {
-
-  override protected def afterAllTests(): Unit = ()
+class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   test("should able to form a string representation for akka connection for trombone HCD") {
     val expectedAkkaConnectionName = "tromboneHcd-hcd-akka"

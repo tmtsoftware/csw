@@ -9,19 +9,19 @@ import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.logging.utils.CswTestSuite
 import csw.services.tracklocation.common.TestFutureExtension.RichFuture
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration._
 
 /**
  * Test the csw-location-agent app in-line
  */
-class MainTest extends CswTestSuite {
+class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552))
 
-  override protected def afterAllTests(): Unit = locationService.shutdown().await
+  override protected def afterAll(): Unit = locationService.shutdown().await
 
   test("Test with command line args") {
     val name = "test1"

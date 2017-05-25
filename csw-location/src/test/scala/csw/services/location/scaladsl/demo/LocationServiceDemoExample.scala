@@ -9,14 +9,13 @@ import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationServiceFactory}
-import csw.services.logging.utils.CswTestSuite
 import org.scalatest._
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-class LocationServiceDemoExample extends CswTestSuite {
+class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   private implicit
   //#create-actor-system
@@ -30,7 +29,7 @@ class LocationServiceDemoExample extends CswTestSuite {
   val locationService = LocationServiceFactory.make()
   //#create-location-service
 
-  override protected def afterAllTests(): Unit = {
+  override protected def afterAll(): Unit = {
     locationService.shutdown().await
     actorSystem.terminate().await
   }

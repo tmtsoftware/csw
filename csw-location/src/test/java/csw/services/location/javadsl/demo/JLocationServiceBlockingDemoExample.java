@@ -35,7 +35,6 @@ import java.util.concurrent.TimeUnit;
 
 public class JLocationServiceBlockingDemoExample {
 
-    private static LoggingSystem loggingSystem = LoggingSystemFactory.start();
     private ActorSystem actorSystem = ActorSystemFactory.remote();
     private Materializer mat = ActorMaterializer.create(actorSystem);
 
@@ -55,7 +54,6 @@ public class JLocationServiceBlockingDemoExample {
         //#shutdown
         locationService.shutdown().get();
         //#shutdown
-        loggingSystem.javaStop().get();
     }
 
     //#Components-Connections-Registrations

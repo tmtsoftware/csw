@@ -1,14 +1,12 @@
 package csw.services.location.commons
 
-import csw.services.logging.utils.CswTestSuite
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.Success
 
-class BlockingUtilsTest extends CswTestSuite {
-
-  override protected def afterAllTests(): Unit = ()
+class BlockingUtilsTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   test("test that Poll method bottoms out and returns expected result") {
     BlockingUtils.poll(predicate = true) shouldBe true

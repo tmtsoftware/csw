@@ -46,7 +46,7 @@ lazy val `csw-logging` = project
 
 //Location service related projects
 lazy val `csw-location` = project
-  .dependsOn(`csw-logging` % "compile->compile;test->test")
+  .dependsOn(`csw-logging`)
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Location
@@ -55,14 +55,14 @@ lazy val `csw-location` = project
 //Cluster seed
 lazy val `csw-cluster-seed` = project
   .enablePlugins(DeployApp)
-  .dependsOn(`csw-location`, `csw-logging` % "compile->compile;test->test")
+  .dependsOn(`csw-location`)
   .settings(
     libraryDependencies ++= Dependencies.CswClusterSeed
   )
 
 lazy val `csw-location-agent` = project
   .enablePlugins(DeployApp, MaybeCoverage)
-  .dependsOn(`csw-location`, `csw-logging` % "compile->compile;test->test")
+  .dependsOn(`csw-location`)
   .settings(
     libraryDependencies ++= Dependencies.CswLocationAgent
   )
@@ -87,8 +87,7 @@ lazy val `csw-config-client` = project
   .dependsOn(
     `csw-config-api`,
     `csw-config-server` % "test->test",
-    `csw-location`      % "compile->compile;multi-jvm->multi-jvm",
-    `csw-logging`       % "compile->compile;test->test"
+    `csw-location`      % "compile->compile;multi-jvm->multi-jvm"
   )
   .settings(
     libraryDependencies ++= Dependencies.ConfigClient
@@ -99,8 +98,7 @@ lazy val `csw-config-client-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-config-server` % "test->test",
-    `csw-location`      % "multi-jvm->multi-jvm",
-    `csw-logging`       % "compile->compile;test->test"
+    `csw-location`      % "multi-jvm->multi-jvm"
   )
   .settings(
     libraryDependencies ++= Dependencies.CswConfigClientCli

@@ -42,8 +42,6 @@ import java.util.function.Consumer;
 
 public class JLocationServiceNonBlockingDemoExample {
 
-    private static LoggingSystem loggingSystem = LoggingSystemFactory.start();
-
     private
     //#create-actor-system
     ActorSystem actorSystem = ActorSystemFactory.remote();
@@ -68,7 +66,6 @@ public class JLocationServiceNonBlockingDemoExample {
         //#shutdown
         locationService.shutdown().get();
         //#shutdown
-        loggingSystem.javaStop().get();
     }
 
     //#Components-Connections-Registrations

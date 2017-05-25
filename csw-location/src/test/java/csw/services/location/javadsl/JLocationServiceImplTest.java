@@ -28,8 +28,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class JLocationServiceImplTest implements JLocationServiceLogger {
-    private static LoggingSystem loggingSystem = LoggingSystemFactory.start();
-
     private ILogger jLogger = getLogger();
 
     private static ILocationService locationService = JLocationServiceFactory.make();
@@ -58,7 +56,6 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
         locationService.shutdown().get();
-        loggingSystem.javaStop().get();
     }
 
     @Test
