@@ -33,7 +33,7 @@ class TromboneActor() extends TromboneLogger.Actor {
   }
 }
 
-class ActorLogger extends LoggingTestSuite {
+class ActorLoggingTest extends LoggingTestSuite {
   private val system = ActorSystem("test")
 
   override protected def afterEach(): Unit = logBuffer.clear()
