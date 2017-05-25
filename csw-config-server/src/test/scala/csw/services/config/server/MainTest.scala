@@ -51,7 +51,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
 
     try {
       val configServiceLocation = locationService.resolve(ConfigServiceConnection.value, 5.seconds).await.get
-      configServiceLocation.connection shouldBe ConfigServiceConnection
+      configServiceLocation.connection shouldBe ConfigServiceConnection.value
 
       val uri = Uri(configServiceLocation.uri.toString).withPath(Path / "list")
 

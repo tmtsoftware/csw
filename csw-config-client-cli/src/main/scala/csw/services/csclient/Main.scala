@@ -1,8 +1,10 @@
 package csw.services.csclient
 
+import csw.services.BuildInfo
 import csw.services.csclient.cli.{ArgsParser, ClientCliWiring}
 import csw.services.csclient.commons.ConfigClientCliLogger
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.services.logging.scaladsl.LoggingSystem
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
@@ -42,6 +44,7 @@ class Main(clusterSettings: ClusterSettings) {
 }
 
 object Main extends App with ConfigClientCliLogger.Simple {
+  new LoggingSystem(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname)
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     log.error(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."

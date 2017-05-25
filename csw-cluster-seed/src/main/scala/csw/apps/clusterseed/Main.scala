@@ -15,7 +15,6 @@ class Main(clusterSettings: ClusterSettings) {
     new ArgsParser().parse(args).foreach {
       case Options(port) =>
         val updatedClusterSettings = clusterSettings.onPort(port)
-        new LoggingSystem(BuildInfo.name, BuildInfo.version, updatedClusterSettings.hostname)
         updatedClusterSettings.debug()
         val adminWiring = AdminWiring.make(updatedClusterSettings)
         adminWiring.cswCluster
@@ -24,6 +23,7 @@ class Main(clusterSettings: ClusterSettings) {
 }
 
 object Main extends App with ClusterSeedLogger.Simple {
+  new LoggingSystem(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname)
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     log.error(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
