@@ -179,6 +179,11 @@ class LoggingSystem(serviceName: String = "serviceName1",
    */
   def setFilter(filter: Option[(Map[String, RichMsg], Level) => Boolean]): Unit = logActor ! SetFilter(filter)
 
+  def addFilter(name: String, level: Level): Unit = {
+    filterSet = filterSet.add(name, level)
+    setFilter(Some(filterSet.check))
+  }
+
   /**
    * Shut down the logging system.
    * @return  future completes when the logging system is shut down.
