@@ -179,10 +179,12 @@ class LoggingSystem(serviceName: String = "serviceName1",
    */
   def setFilter(filter: Option[(Map[String, RichMsg], Level) => Boolean]): Unit = logActor ! SetFilter(filter)
 
-  def addFilter(name: String, level: Level): Unit = {
-    filterSet = filterSet.add(name, level)
+  def addFilter(componentName: String, level: LoggingLevels.Level): Unit = {
+    filterSet = filterSet.add(componentName, level)
     setFilter(Some(filterSet.check))
   }
+
+  def getComponentLogLevel(componentName: String): String = filterSet.filters.getOrElse(componentName, logLevel).name
 
   /**
    * Shut down the logging system.

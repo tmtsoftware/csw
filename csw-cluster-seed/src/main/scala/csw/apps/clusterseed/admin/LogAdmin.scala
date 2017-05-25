@@ -8,7 +8,6 @@ import csw.services.location.models.{AkkaLocation, Connection}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.internal.{GetComponentLogMetadata, SetComponentLogLevel}
-import csw.services.logging.models.LoggerMetadata
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -17,10 +16,10 @@ import scala.concurrent.duration.DurationDouble
 class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
-  def getLogLevel(componentName: String): Future[LoggerMetadata] = async {
+  def getLogLevel(componentName: String): Future[String] = async {
     implicit val timeout = Timeout(5.seconds)
     await(getLocation(componentName)) match {
-      case Some(AkkaLocation(_, _, actorRef)) ⇒ await((actorRef ? GetComponentLogMetadata).mapTo[LoggerMetadata])
+      case Some(AkkaLocation(_, _, actorRef)) ⇒ await((actorRef ? GetComponentLogMetadata).mapTo[String])
       case _                                  ⇒ throw UnresolvedAkkaLocationException(componentName)
     }
   }
