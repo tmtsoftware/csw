@@ -216,9 +216,6 @@ object ArgsParser {
       else
         success
     }
-
-    override def errorOnUnknownArgument = false
-
   }
 
   /**
