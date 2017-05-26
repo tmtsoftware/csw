@@ -31,8 +31,8 @@ abstract class AdminLogTestSuite() extends FunSuite with Matchers with BeforeAnd
   override protected def afterEach(): Unit = logBuffer.clear()
 
   override protected def afterAll(): Unit = {
+    Await.result(adminWiring.actorRuntime.shutdown(), 10.seconds)
     Await.result(loggingSystem.stop, 10.seconds)
-    Await.result(adminWiring.actorRuntime.actorSystem.terminate(), 10.seconds)
   }
 
 }
