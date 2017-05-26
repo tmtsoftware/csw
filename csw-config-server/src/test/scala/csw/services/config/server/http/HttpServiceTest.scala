@@ -43,7 +43,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     try {
       actorRuntime.shutdown().await
     } catch {
-      case NonFatal(ex) ⇒ println(ex.getMessage)
+      case NonFatal(ex) ⇒
     }
   }
 
@@ -62,7 +62,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     try {
       actorRuntime.shutdown().await
     } catch {
-      case NonFatal(ex) ⇒ println(ex.getMessage)
+      case NonFatal(ex) ⇒
     }
   }
 }

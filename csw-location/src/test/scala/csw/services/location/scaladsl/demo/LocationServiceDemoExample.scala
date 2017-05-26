@@ -46,7 +46,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
     actorSystem.actorOf(
       Props(new Actor {
       override def receive: Receive = {
-        case "print" => println("hello world")
+        case "print" => //do something
       }
     }),
       "my-actor-1"

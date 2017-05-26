@@ -138,7 +138,6 @@ public class JConfigClientDemoExample {
         ConfigMetadata metadata = adminApi.getMetadata().get();
         //repository path must not be empty
         Assert.assertNotEquals(metadata.repoPath(), "");
-        System.out.println("Server returned => " + metadata.toString());
         //#getMetadata
     }
 }

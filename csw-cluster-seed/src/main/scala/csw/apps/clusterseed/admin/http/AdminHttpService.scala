@@ -34,7 +34,7 @@ class AdminHttpService(
   lazy val registeredLazyBinding: Future[ServerBinding] = async {
     val binding = await(bind())
 
-    println(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
+//    println(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     binding
   } recoverWith {
     case NonFatal(ex) ⇒ shutdown().map(_ ⇒ throw ex)

@@ -335,7 +335,6 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
       val metaData: ConfigMetadata = await(adminApi.getMetadata)
       //repository path must not be empty
       metaData.repoPath should not be empty
-      println(s"Server returned => $metaData")
     }
     Await.result(assertF, 2.seconds)
     //#getMetadata
