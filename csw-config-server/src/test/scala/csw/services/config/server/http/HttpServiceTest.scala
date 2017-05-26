@@ -40,11 +40,6 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
     locationService1.find(ConfigServiceConnection.value).await shouldBe None
     locationService1.shutdown()
-    try {
-      actorRuntime.shutdown().await
-    } catch {
-      case NonFatal(ex) ⇒
-    }
   }
 
   test("should not start server if registration with location service fails") {
