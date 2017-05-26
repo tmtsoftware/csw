@@ -182,9 +182,10 @@ class LoggingSystem(serviceName: String = "serviceName1",
   def addFilter(componentName: String, level: LoggingLevels.Level): Unit = {
     filterSet = filterSet.add(componentName, level)
     setFilter(Some(filterSet.check))
+    setLevel(filterSet.filters.values.min)
   }
 
-  def getComponentLogLevel(componentName: String): String = filterSet.filters.getOrElse(componentName, logLevel).name
+  def getComponentLogLevel(componentName: String): Level = filterSet.filters.getOrElse(componentName, logLevel)
 
   /**
    * Shut down the logging system.

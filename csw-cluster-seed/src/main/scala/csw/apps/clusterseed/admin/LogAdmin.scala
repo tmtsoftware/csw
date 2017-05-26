@@ -16,11 +16,12 @@ import scala.concurrent.duration.DurationDouble
 class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
-  def getLogLevel(componentName: String): Future[String] = async {
+  def getLogLevel(componentName: String): Future[Level] = async {
     implicit val timeout = Timeout(5.seconds)
     await(getLocation(componentName)) match {
-      case Some(AkkaLocation(_, _, actorRef)) ⇒ await((actorRef ? GetComponentLogMetadata).mapTo[String])
-      case _                                  ⇒ throw UnresolvedAkkaLocationException(componentName)
+      case Some(AkkaLocation(_, _, actorRef)) ⇒
+        await((actorRef ? GetComponentLogMetadata).mapTo[Level])
+      case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
     }
   }
 
