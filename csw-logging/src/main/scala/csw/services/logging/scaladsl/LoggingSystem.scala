@@ -28,12 +28,11 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 class LoggingSystem(serviceName: String = "serviceName1",
                     serviceVersion: String = "serviceVersion1",
                     host: String = InetAddress.getLocalHost.getHostName,
-                    appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender))
+                    appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender),
+                    system: ActorSystem = ActorSystem("logging"))
     extends GenericLogger.Simple {
 
   import LoggingLevels._
-
-  private val system: ActorSystem = ActorSystem("logging")
 
   private[this] val loggingConfig = system.settings.config.getConfig("com.persist.logging")
 

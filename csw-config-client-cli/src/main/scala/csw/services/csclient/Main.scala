@@ -1,9 +1,11 @@
 package csw.services.csclient
 
+import akka.actor.ActorSystem
 import csw.services.BuildInfo
 import csw.services.csclient.cli.{ArgsParser, ClientCliWiring}
 import csw.services.csclient.commons.ConfigClientCliLogger
-import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.services.location.commons.ClusterAwareSettings
+import csw.services.logging.appenders.FileAppender
 import csw.services.logging.scaladsl.LoggingSystem
 
 import scala.concurrent.Await
@@ -12,10 +14,10 @@ import scala.concurrent.duration.DurationLong
 /**
  * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
  */
-class Main(clusterSettings: ClusterSettings) {
+class Main(actorSystem: ActorSystem) {
   def start(args: Array[String]): Unit =
     ArgsParser.parse(args).foreach { options ⇒
-      val wiring = new ClientCliWiring(clusterSettings)
+      val wiring = new ClientCliWiring(actorSystem)
       import wiring._
       try {
         options.op match {
@@ -44,12 +46,15 @@ class Main(clusterSettings: ClusterSettings) {
 }
 
 object Main extends App with ConfigClientCliLogger.Simple {
-  new LoggingSystem(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname)
   if (ClusterAwareSettings.seedNodes.isEmpty) {
-    log.error(
+    println(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
     )
   } else {
-    new Main(ClusterAwareSettings).start(args)
+    val actorSystem = ClusterAwareSettings.system
+    new LoggingSystem(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, Seq(FileAppender),
+      system = actorSystem)
+
+    new Main(actorSystem).start(args)
   }
 }

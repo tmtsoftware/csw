@@ -1,5 +1,6 @@
 package csw.services.location.commons
 
+import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.location.internal.Networks
 
@@ -123,6 +124,8 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
       .parseMap(computedValues.asJava)
       .withFallback(ConfigFactory.load().getConfig(clusterName))
   }
+
+  def system: ActorSystem = ActorSystem(clusterName, config)
 }
 
 object ClusterAwareSettings extends ClusterSettings

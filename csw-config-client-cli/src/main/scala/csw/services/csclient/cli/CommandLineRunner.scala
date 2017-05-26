@@ -53,40 +53,35 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     println(s"File ${options.relativeRepoPath.get} deletion is completed.")
   }
 
-  def list(options: Options): List[ConfigFileInfo] =
-    (options.annex, options.normal) match {
-      case (true, true) ⇒
-        println("Please provide either normal or annex. See --help to know more.")
-        List.empty[ConfigFileInfo]
-      case (true, _) ⇒
-        val fileEntries = await(configService.list(Some(FileType.Annex), options.pattern))
-        fileEntries.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
-        fileEntries
-      case (_, true) ⇒
-        val fileEntries = await(configService.list(Some(FileType.Normal), options.pattern))
-        fileEntries.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
-        fileEntries
-      case (_, _) ⇒
-        val fileEntries = await(configService.list(pattern = options.pattern))
-        fileEntries match {
-          case Nil     ⇒ println("List returned empty results.")
-          case entries ⇒ entries.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
-        }
-        fileEntries
+  def list(options: Options): List[ConfigFileInfo] = {
+    val maybeList: Option[List[ConfigFileInfo]] = (options.annex, options.normal) match {
+      case (true, true) ⇒ None
+      case (true, _)    ⇒ Some(await(configService.list(Some(FileType.Annex), options.pattern)))
+      case (_, true)    ⇒ Some(await(configService.list(Some(FileType.Normal), options.pattern)))
+      case (_, _)       ⇒ Some(await(configService.list(pattern = options.pattern)))
     }
 
+    maybeList match {
+      case None     ⇒ println("Please provide either normal or annex. See --help to know more.")
+      case Some(xs) ⇒ xs.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+    }
+
+    maybeList.getOrElse(List.empty)
+  }
+
   def history(options: Options): List[ConfigFileRevision] = {
-    val histList = await(configService.history(options.relativeRepoPath.get, options.fromDate, options.toDate,
-        options.maxFileVersions))
-    histList.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
-    histList
+    val fileRevisions = await(
+      configService.history(options.relativeRepoPath.get, options.fromDate, options.toDate, options.maxFileVersions)
+    )
+    fileRevisions.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    fileRevisions
   }
 
   def historyActive(options: Options): List[ConfigFileRevision] = {
-    val histList = await(configService.historyActive(options.relativeRepoPath.get, options.fromDate, options.toDate,
-        options.maxFileVersions))
-    histList.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
-    histList
+    val fileRevisions = await(configService.historyActive(options.relativeRepoPath.get, options.fromDate,
+        options.toDate, options.maxFileVersions))
+    fileRevisions.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    fileRevisions
   }
 
   def setActiveVersion(options: Options): Unit = {
@@ -101,21 +96,20 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
   }
 
   def getActiveVersion(options: Options): Option[ConfigId] = {
-    val id = await(configService.getActiveVersion(options.relativeRepoPath.get))
-    id match {
-      case Some(configId) ⇒
-        println(s"Id : ${configId.id} is the active version of the file.")
-        id
-      case None ⇒
-        println(FileNotFound(options.relativeRepoPath.get).message)
-        None
+    val maybeId = await(configService.getActiveVersion(options.relativeRepoPath.get))
+
+    maybeId match {
+      case Some(configId) ⇒ println(s"Id : ${configId.id} is the active version of the file.")
+      case None           ⇒ println(FileNotFound(options.relativeRepoPath.get).message)
     }
+
+    maybeId
   }
 
   def getActiveByTime(options: Options): Option[Path] = {
-    val configDataOpt = await(configService.getActiveByTime(options.relativeRepoPath.get, options.date.get))
+    val maybeConfigData = await(configService.getActiveByTime(options.relativeRepoPath.get, options.date.get))
 
-    configDataOpt match {
+    maybeConfigData match {
       case Some(configData) ⇒
         val outputFile = await(configData.toPath(options.outputFilePath.get))
         println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
@@ -124,7 +118,6 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
         println(FileNotFound(options.relativeRepoPath.get).message)
         None
     }
-
   }
 
   def getMetadata(options: Options): ConfigMetadata = {
@@ -141,9 +134,9 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
   }
 
   def getActive(options: Options): Option[Path] = {
-    val configDataOpt = await(configService.getActive(options.relativeRepoPath.get))
+    val maybeConfigData = await(configService.getActive(options.relativeRepoPath.get))
 
-    configDataOpt match {
+    maybeConfigData match {
       case Some(configData) ⇒
         val outputFile = await(configData.toPath(options.outputFilePath.get))
         println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
