@@ -15,7 +15,7 @@ class Main(clusterSettings: ClusterSettings) {
     new ArgsParser().parse(args).foreach {
       case Options(port) =>
         val updatedClusterSettings = clusterSettings.onPort(port)
-        updatedClusterSettings.debug()
+        updatedClusterSettings.logDebugString()
         val adminWiring = AdminWiring.make(updatedClusterSettings)
         adminWiring.cswCluster
         Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)

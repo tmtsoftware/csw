@@ -55,11 +55,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   val ClusterPortKey    = "clusterPort"
   val ManagementPortKey = "managementPort"
 
-  def debug(): Unit =
-    log.info(s"""
-         |[debug] Using following cluster configurations:
-         |[debug] ClusterSeedsKey: ${seedNodes.mkString(",")}
-      """.stripMargin)
+  def logDebugString(): Unit = log.debug("clusterSeeds" → seedNodes.mkString(","))
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
   def withEntries(entries: Map[String, Any]): ClusterSettings     = copy(values = values ++ entries)
