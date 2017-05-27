@@ -2,24 +2,24 @@ package csw.services.csclient
 
 import java.nio.file.{Files, Paths}
 
-import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.{ServerWiring, Settings}
+import csw.services.csclient.cli.ClientCliWiring
 import csw.services.csclient.helpers.TwoClientsAndServer
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.helpers.LSNodeSpec
 import org.scalatest.FunSuiteLike
 
-class ConfigCliTestMultiJvmNode1 extends ConfigCliTest(0)
-class ConfigCliTestMultiJvmNode2 extends ConfigCliTest(0)
-class ConfigCliTestMultiJvmNode3 extends ConfigCliTest(0)
+class ConfigCliAppTestMultiJvmNode1 extends ConfigCliAppTest(0)
+class ConfigCliAppTestMultiJvmNode2 extends ConfigCliAppTest(0)
+class ConfigCliAppTestMultiJvmNode3 extends ConfigCliAppTest(0)
 
 // DEOPSCSW-43: Access Configuration service from any CSW component
-class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndServer) with FunSuiteLike {
+class ConfigCliAppTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndServer) with FunSuiteLike {
 
   import config._
 
@@ -56,26 +56,26 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
       enterBarrier("server-started")
 
       // create file using cli app from client1 and verify client2 able to access it
-      val cliMain    = new Main(ClusterSettings().joinLocal(3552).system)
+      val cliMain    = new ClientCliWiring(ClusterSettings().joinLocal(3552).system).cliApp
       val createArgs = Array("create", repoPath1, "-i", inputFilePath, "-c", comment)
       cliMain.start(createArgs)
       enterBarrier("client1-create")
 
       // update file using cli app from client1 and verify client2 able to access it
-      val cliMain1   = new Main(ClusterSettings().joinLocal(3552).system)
+      val cliMain1   = new ClientCliWiring(ClusterSettings().joinLocal(3552).system).cliApp
       val updateArgs = Array("update", repoPath1, "-i", updatedInputFilePath, "-c", comment)
       cliMain1.start(updateArgs)
       enterBarrier("client1-update")
 
       // set active version of file using cli app from client1 and verify client2 able to access it
-      val cliMain2      = new Main(ClusterSettings().joinLocal(3552).system)
+      val cliMain2      = new ClientCliWiring(ClusterSettings().joinLocal(3552).system).cliApp
       val setActiveArgs = Array("setActiveVersion", repoPath1, "--id", "1", "-c", comment)
       cliMain2.start(setActiveArgs)
       enterBarrier("client1-setActive")
 
       // Verify that client1 (cli app) is able to access file created by client2
       enterBarrier("client2-create")
-      val cliMain3       = new Main(ClusterSettings().joinLocal(3552).system)
+      val cliMain3       = new ClientCliWiring(ClusterSettings().joinLocal(3552).system).cliApp
       val tempOutputFile = Files.createTempFile("output", ".conf").toString
       val getMinimalArgs = Array("get", repoPath2, "-o", tempOutputFile)
       cliMain3.start(getMinimalArgs)
@@ -86,9 +86,9 @@ class ConfigCliTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndSe
     // config client admin api is exercised on client2
     runOn(client2) {
       enterBarrier("server-started")
-      val actorRuntime = new ActorRuntime(ActorSystem())
+      val actorRuntime = new ActorRuntime(system)
       import actorRuntime._
-      val configService = ConfigClientFactory.adminApi(actorSystem, locationService)
+      val configService = ConfigClientFactory.adminApi(system, locationService)
 
       enterBarrier("client1-create")
       val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await

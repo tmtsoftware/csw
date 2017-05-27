@@ -1,4 +1,4 @@
-package csw.services.csclient.commons
+package csw.services.csclient.cli
 
 import csw.services.logging.scaladsl.ComponentLogger
 
