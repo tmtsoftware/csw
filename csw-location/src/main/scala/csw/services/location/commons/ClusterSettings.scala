@@ -116,9 +116,12 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
       "startManagement"                       → managementPort.isDefined
     )
 
+    val fullConfig = ConfigFactory.load()
+
     ConfigFactory
       .parseMap(computedValues.asJava)
-      .withFallback(ConfigFactory.load().getConfig(clusterName))
+      .withFallback(fullConfig.getConfig(clusterName))
+      .withFallback(fullConfig)
   }
 
   def system: ActorSystem = ActorSystem(clusterName, config)

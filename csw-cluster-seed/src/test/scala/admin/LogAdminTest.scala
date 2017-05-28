@@ -7,7 +7,6 @@ import csw.apps.clusterseed.admin.TromboneHcd._
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
-import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.internal.{LoggingLevels, SetComponentLogLevel}
 import csw.services.logging.scaladsl.{ComponentLogger, LoggingSystem}
@@ -44,18 +43,11 @@ class TromboneHcd(componentName: String, loggingSystem: LoggingSystem) extends T
 }
 
 class LogAdminTest extends AdminLogTestSuite {
-  val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.joinLocal(3552))
-
   import adminWiring.actorRuntime._
   val componentName    = "tromboneHcd"
   val tromboneActorRef = actorSystem.actorOf(TromboneHcd.props(componentName, loggingSystem), name = "TromboneActor")
   val connection       = AkkaConnection(ComponentId(componentName, ComponentType.HCD))
-  Await.result(locationService.register(AkkaRegistration(connection, tromboneActorRef)), 5.seconds)
-
-  override def afterAll(): Unit = {
-    Await.result(locationService.shutdown(), 10.seconds)
-    super.afterAll()
-  }
+  Await.result(adminWiring.locationService.register(AkkaRegistration(connection, tromboneActorRef)), 5.seconds)
 
   // DEOPSCSW-127: Runtime update for logging characteristics
   test("should able to set filter of the component dynamically through http end point") {

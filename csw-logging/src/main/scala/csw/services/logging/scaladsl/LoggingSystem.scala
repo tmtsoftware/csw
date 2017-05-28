@@ -28,8 +28,8 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 class LoggingSystem(serviceName: String = "serviceName1",
                     serviceVersion: String = "serviceVersion1",
                     host: String = InetAddress.getLocalHost.getHostName,
-                    appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender),
-                    system: ActorSystem = ActorSystem("logging"))
+                    system: ActorSystem = ActorSystem("logging"),
+                    appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender))
     extends GenericLogger.Simple {
 
   import LoggingLevels._

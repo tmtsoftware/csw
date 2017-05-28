@@ -7,7 +7,7 @@ import csw.services.logging.scaladsl.RequestId
 object MessageHandler {
   private[logging] def sendMsg(msg: LogActorMessages): Unit =
     if (loggerStopping) {
-      println(s"*** Log message received after logger shutdown: $msg")
+//      println(s"*** Log message received after logger shutdown: $msg")
     } else {
       maybeLogActor match {
         case Some(logActor) => logActor ! msg

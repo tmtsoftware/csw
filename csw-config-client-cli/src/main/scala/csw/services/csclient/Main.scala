@@ -16,8 +16,7 @@ object Main extends App {
     )
   } else {
     val actorSystem = ClusterAwareSettings.system
-    new LoggingSystem(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, Seq(FileAppender),
-      system = actorSystem)
+    new LoggingSystem(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem, Seq(FileAppender))
 
     val wiring = new ClientCliWiring(actorSystem)
     try {

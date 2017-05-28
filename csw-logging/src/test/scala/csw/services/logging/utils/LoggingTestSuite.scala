@@ -15,8 +15,9 @@ abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndA
   protected val logBuffer  = mutable.Buffer.empty[JsonObject]
   private val testAppender = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
 
-  private val hostName        = InetAddress.getLocalHost.getHostName
-  protected val loggingSystem = new LoggingSystem("logging", "SNAPSHOT-1.0", hostName, Seq(testAppender))
+  private val hostName = InetAddress.getLocalHost.getHostName
+  protected val loggingSystem =
+    new LoggingSystem("logging", "SNAPSHOT-1.0", hostName, appenderBuilders = Seq(testAppender))
 
   protected val logMsgMap = Map(
     "trace" → "logging at trace level",

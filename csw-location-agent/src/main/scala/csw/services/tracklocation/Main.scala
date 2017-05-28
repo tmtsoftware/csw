@@ -17,8 +17,7 @@ class Main(clusterSettings: ClusterSettings) extends LocationAgentLogger.Simple 
   def start(args: Array[String]): Option[Process] =
     ArgsParser.parse(args).map { options =>
       val actorSystem = clusterSettings.system
-      new LoggingSystem(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, Seq(FileAppender),
-        system = actorSystem)
+      new LoggingSystem(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem, Seq(FileAppender))
 
       val command = Command.parse(options)
       log.info(s"commandText: ${command.commandText}, command: $command")

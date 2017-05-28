@@ -1,5 +1,6 @@
 package csw.services.location.scaladsl
 
+import akka.actor.ActorSystem
 import csw.services.location.commons.{ClusterSettings, CswCluster, LocationServiceLogger}
 import csw.services.location.internal._
 
@@ -15,6 +16,9 @@ object LocationServiceFactory extends LocationServiceLogger.Simple {
    * Create a LocationService instance to manage registrations
    */
   def make(): LocationService = withCluster(CswCluster.make())
+
+  def withSystem(actorSystem: ActorSystem): LocationService =
+    withCluster(CswCluster.withSystem(actorSystem))
 
   /**
    * Create a LocationService instance to manage registrations
