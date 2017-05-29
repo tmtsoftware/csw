@@ -16,8 +16,6 @@ import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.models.Connection.TcpConnection;
 import csw.services.location.scaladsl.ActorSystemFactory;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.scaladsl.LoggingSystem;
-import csw.services.logging.scaladsl.LoggingSystemFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
