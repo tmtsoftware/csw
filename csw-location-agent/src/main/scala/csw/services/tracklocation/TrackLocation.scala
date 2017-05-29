@@ -1,8 +1,8 @@
 package csw.services.tracklocation
 
 import akka.Done
-import akka.actor.CoordinatedShutdown
-import csw.services.location.commons.{ClusterSettings, CswCluster}
+import akka.actor.{ActorSystem, CoordinatedShutdown}
+import csw.services.location.commons.CswCluster
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
@@ -18,10 +18,10 @@ import scala.util.control.NonFatal
 /**
  * Starts a given external program, registers it with the location service and unregisters it when the program exits.
  */
-class TrackLocation(names: List[String], command: Command, clusterSettings: ClusterSettings)
+class TrackLocation(names: List[String], command: Command, actorSystem: ActorSystem)
     extends LocationAgentLogger.Simple {
 
-  private val cswCluster      = CswCluster.withSettings(clusterSettings)
+  private val cswCluster      = CswCluster.withSystem(actorSystem)
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
 
   import cswCluster._

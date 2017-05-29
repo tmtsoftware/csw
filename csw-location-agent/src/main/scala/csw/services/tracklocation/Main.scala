@@ -2,6 +2,7 @@ package csw.services.tracklocation
 
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.services.logging.appenders.FileAppender
 import csw.services.logging.scaladsl.LoggingSystem
 import csw.services.tracklocation.commons.LocationAgentLogger
 import csw.services.tracklocation.models.Command
@@ -15,17 +16,20 @@ import scala.sys.process.Process
 class Main(clusterSettings: ClusterSettings) extends LocationAgentLogger.Simple {
   def start(args: Array[String]): Option[Process] =
     ArgsParser.parse(args).map { options =>
+      val actorSystem = clusterSettings.system
+      new LoggingSystem(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, Seq(FileAppender),
+        system = actorSystem)
+
       val command = Command.parse(options)
       log.info(s"commandText: ${command.commandText}, command: $command")
-      val trackLocation = new TrackLocation(options.names, command, clusterSettings)
+      val trackLocation = new TrackLocation(options.names, command, actorSystem)
       trackLocation.run()
     }
 }
 
 object Main extends App with LocationAgentLogger.Simple {
-  new LoggingSystem(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname)
   if (ClusterAwareSettings.seedNodes.isEmpty) {
-    log.error(
+    println(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
     )
   } else {
