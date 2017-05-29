@@ -11,7 +11,7 @@ import csw.services.logging.appenders.{FileAppender, LogAppenderBuilder, StdOutA
 import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.internal._
 import csw.services.logging.macros.DefaultSourceLocation
-import csw.services.logging.models.FilterSet
+import csw.services.logging.models.{FilterSet, LogMetadata}
 import org.slf4j.LoggerFactory
 
 import scala.compat.java8.FutureConverters.FutureOps
@@ -184,7 +184,8 @@ class LoggingSystem(serviceName: String = "serviceName1",
     setLevel(filterSet.filters.values.min)
   }
 
-  def getComponentLogLevel(componentName: String): Level = filterSet.filters.getOrElse(componentName, logLevel)
+  def getLogMetadata(): LogMetadata =
+    LogMetadata(getLevel.current, getAkkaLevel.current, getSlf4jLevel.current, filterSet)
 
   /**
    * Shut down the logging system.

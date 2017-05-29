@@ -12,7 +12,7 @@ class AdminRoutes(adminExceptionHandler: AdminExceptionHandler, logAdmin: LogAdm
   val route: Route = handleExceptions(adminExceptionHandler.exceptionHandler) {
     path("admin" / "logging" / Segment / "level") { componentName ⇒
       get {
-        complete(logAdmin.getLogLevel(componentName))
+        complete(logAdmin.getLogMetadata(componentName))
       } ~
       post {
         logLevelParam { (logLevel) ⇒
