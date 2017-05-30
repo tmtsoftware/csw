@@ -104,7 +104,7 @@ class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfter
 
         //construct ConfigData from a local file containing binary data
         val srcFilePath         = getClass.getClassLoader.getResource("smallBinary.bin").toURI
-        val config2: ConfigData = ConfigData.fromPath(Paths.get(srcFilePath))
+        val config2: ConfigData = ConfigData.fromPath(Paths.get(srcFilePath)).get
 
         //construct ConfigData from Array[Byte] by reading a local file
         val stream: InputStream    = getClass.getClassLoader.getResourceAsStream("smallBinary.bin")

@@ -16,18 +16,29 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
 
   //adminApi
   def create(options: Options): ConfigId = {
-    val configData = ConfigData.fromPath(options.inputFilePath.get)
-    val configId =
-      await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex, options.comment.get))
-    println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
-    configId
+    val inputFilePath = options.inputFilePath.get
+    val configDataOpt = ConfigData.fromPath(inputFilePath)
+    configDataOpt match {
+      case None ⇒ throw FileNotFound(inputFilePath)
+      case Some(configData) ⇒
+        val configId =
+          await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex,
+              options.comment.get))
+        println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
+        configId
+    }
   }
 
   def update(options: Options): ConfigId = {
-    val configData = ConfigData.fromPath(options.inputFilePath.get)
-    val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment.get))
-    println(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
-    configId
+    val inputFilePath = options.inputFilePath.get
+    val configDataOpt = ConfigData.fromPath(inputFilePath)
+    configDataOpt match {
+      case None ⇒ throw FileNotFound(inputFilePath)
+      case Some(configData) ⇒
+        val configId = await(configService.update(options.relativeRepoPath.get, configData, options.comment.get))
+        println(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
+        configId
+    }
   }
 
   def get(options: Options): Option[Path] = {
@@ -62,8 +73,9 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     }
 
     maybeList match {
-      case None     ⇒ println("Please provide either normal or annex. See --help to know more.")
-      case Some(xs) ⇒ xs.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+      case None                   ⇒ println("Please provide either normal or annex. See --help to know more.")
+      case Some(xs) if xs.isEmpty ⇒ println("List returned empty results.")
+      case Some(xs)               ⇒ xs.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
     }
 
     maybeList.getOrElse(List.empty)

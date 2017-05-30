@@ -110,7 +110,7 @@ public class JConfigClientDemoExample {
 
         //construct ConfigData from a local file containing binary data
         URI srcFilePath = getClass().getClassLoader().getResource("smallBinary.bin").toURI();
-        ConfigData config2 = ConfigData.fromPath(Paths.get(srcFilePath));
+        ConfigData config2 = ConfigData.fromPath(Paths.get(srcFilePath)).get();
 
         ConfigId id1 = adminApi.create(Paths.get("/hcd/trombone/overnight.conf"), config1, false, "review done").get();
         ConfigId id2 = adminApi.create(Paths.get("/hcd/trombone/firmware.bin"), config2, true, "smoke test done").get();

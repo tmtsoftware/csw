@@ -909,7 +909,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   test("should be able to store and retrieve text file from annex store when size is greater than configured size") {
     val fileName              = "tromboneContainer.conf"
     val path                  = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
-    val configData            = ConfigData.fromPath(path)
+    val configData            = ConfigData.fromPath(path).get
     val config: Config        = ConfigFactory.parseString("csw-config-server.annex-min-file-size=1 KiB")
     val serverWiringAnnexTest = ServerWiring.make(config)
 

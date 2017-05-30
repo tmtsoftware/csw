@@ -1,7 +1,7 @@
 package csw.services.config.api.models
 
 import java.io.InputStream
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 import java.util.concurrent.CompletableFuture
 
 import akka.stream.Materializer
@@ -85,7 +85,10 @@ object ConfigData {
    * Create from file path
    *
    */
-  def fromPath(path: Path): ConfigData = ConfigData.from(FileIO.fromPath(path), path.toFile.length())
+  def fromPath(path: Path): Option[ConfigData] = {
+    if (Files.exists(path)) Some(ConfigData.from(FileIO.fromPath(path), path.toFile.length()))
+    else None
+  }
 
   /**
    * Create from byte array

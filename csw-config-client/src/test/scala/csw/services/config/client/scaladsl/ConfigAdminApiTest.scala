@@ -54,7 +54,7 @@ class ConfigAdminApiTest extends ConfigServiceTest {
   test("should be able to store and retrieve binary file in annex dir") {
     val fileName   = "smallBinary.bin"
     val path       = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
-    val configData = ConfigData.fromPath(path)
+    val configData = ConfigData.fromPath(path).get
     val repoPath   = Paths.get(fileName)
 
     //verify that files smaller than annex-min-file-size go to annex if encoding is Binary
