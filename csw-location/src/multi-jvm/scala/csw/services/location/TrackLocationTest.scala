@@ -6,7 +6,6 @@ import akka.stream.testkit.scaladsl.TestSink
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0)

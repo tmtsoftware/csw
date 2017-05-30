@@ -118,8 +118,7 @@ object CswCluster {
   /**
    * Creates CswCluster with the given customized settings
    */
-  def withSettings(settings: ClusterSettings): CswCluster =
-    withSystem(ActorSystem(settings.clusterName, settings.config))
+  def withSettings(settings: ClusterSettings): CswCluster = withSystem(settings.system)
 
   /**
    * Creates CswCluster with the given ActorSystem
