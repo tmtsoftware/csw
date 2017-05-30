@@ -10,7 +10,7 @@ import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentTyp
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.internal.{LoggingLevels, SetComponentLogLevel}
 import csw.services.logging.scaladsl.{ComponentLogger, LoggingSystem}
-import utils.AdminLogTestSuite
+import csw.apps.clusterseed.utils.AdminLogTestSuite
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble

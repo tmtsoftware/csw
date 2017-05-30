@@ -1,4 +1,4 @@
-package utils
+package csw.apps.clusterseed.utils
 
 import akka.actor.ActorRefFactory
 import csw.services.logging.RichMsg
