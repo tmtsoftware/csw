@@ -7,6 +7,7 @@ import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -18,6 +19,9 @@ class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest
 class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   test("should detect re-registering of new location for a connection that has crashed/gone away") {
 

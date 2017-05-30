@@ -1,9 +1,12 @@
 package csw.services.location.models
 
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   test("should able to form a string representation for akka connection for trombone HCD") {
     val expectedAkkaConnectionName = "tromboneHcd-hcd-akka"
