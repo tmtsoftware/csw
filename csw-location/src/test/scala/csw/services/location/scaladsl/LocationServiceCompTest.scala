@@ -10,11 +10,15 @@ import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
 
 class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   lazy val locationService: LocationService = LocationServiceFactory.make()
 

@@ -12,6 +12,7 @@ import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.files.Sha1
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
@@ -21,6 +22,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
 
   import serverWiring.actorRuntime._
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   def configService: ConfigService
 

@@ -7,6 +7,7 @@ import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.ActorSystemFactory
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -30,6 +31,9 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
 
   import config._
   import cswCluster.mat
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   test("component running on one node should detect if other component running on another node crashes") {
 
