@@ -1,6 +1,6 @@
 package csw.services.csclient.cli
 
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 
 import csw.services.config.api.exceptions.FileNotFound
 import csw.services.config.api.models._
@@ -17,27 +17,27 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
   //adminApi
   def create(options: Options): ConfigId = {
     val inputFilePath = options.inputFilePath.get
-    val configDataOpt = ConfigData.fromPath(inputFilePath)
-    configDataOpt match {
-      case None ⇒ throw FileNotFound(inputFilePath)
-      case Some(configData) ⇒
-        val configId =
-          await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex,
-              options.comment.get))
-        println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
-        configId
+    if (Files.exists(inputFilePath)) {
+      val configData = ConfigData.fromPath(inputFilePath)
+      val configId =
+        await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex,
+            options.comment.get))
+      println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
+      configId
+    } else {
+      throw FileNotFound(inputFilePath)
     }
   }
 
   def update(options: Options): ConfigId = {
     val inputFilePath = options.inputFilePath.get
-    val configDataOpt = ConfigData.fromPath(inputFilePath)
-    configDataOpt match {
-      case None ⇒ throw FileNotFound(inputFilePath)
-      case Some(configData) ⇒
-        val configId = await(configService.update(options.relativeRepoPath.get, configData, options.comment.get))
-        println(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
-        configId
+    if (Files.exists(inputFilePath)) {
+      val configData = ConfigData.fromPath(inputFilePath)
+      val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment.get))
+      println(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
+      configId
+    } else {
+      throw FileNotFound(inputFilePath)
     }
   }
 
