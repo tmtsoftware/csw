@@ -6,11 +6,15 @@ import java.util.regex.Pattern
 import csw.services.config.api.models.FileType
 import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{FunSuite, Matchers}
 import org.tmatesoft.svn.core.{SVNDirEntry, SVNNodeKind}
 
 class SVNDirEntryExtTest extends FunSuite with Matchers {
   val settings: Settings = new ServerWiring().settings
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   test("should match the pattern for relative path") {
     val dirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt", SVNNodeKind.FILE, 100, false, 1,

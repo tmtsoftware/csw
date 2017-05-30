@@ -8,6 +8,7 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId, FileType, _}
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFileUtils
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 // DEOPSCSW-80: HTTP based access for configuration file
@@ -18,6 +19,9 @@ class ConfigServiceRouteTest
     with BeforeAndAfterEach
     with Matchers
     with HttpSupport {
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   val serverWiring = new ServerWiring
   import serverWiring._
