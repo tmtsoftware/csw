@@ -42,7 +42,12 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
 
   def get(sha: String): Future[Option[ConfigData]] = async {
     val repoFilePath = makePath(settings.`annex-files-dir`, sha)
-    ConfigData.fromPath(repoFilePath)
+
+    if (await(fileRepo.exists(repoFilePath))) {
+      Some(ConfigData.fromPath(repoFilePath))
+    } else {
+      None
+    }
   }
 
   // Returns the name of the file to use in the configured directory.
