@@ -87,7 +87,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
 
 
-  //#find-resolve
+  //#find
   // find connection to LocationServiceExampleComponent in location service
   // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
   private val exampleConnection = LocationServiceExampleComponent.connection
@@ -95,11 +95,13 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   println(s"Attempting to find connection $exampleConnection ...")
   private val findResult = Await.result(locationService.find(exampleConnection), timeout)
   println(s"Find result: $findResult")
+  //#find
 
   // Output should be:
   //    Attempting to find connection AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) ...
   //    Find result: None
 
+  //#resolve
   // resolve connection to LocationServiceExampleComponent
   // [start LocationServiceExampleComponent after this command but before timeout]
   println(s"Attempting to resolve $exampleConnection with a wait of $waitForResolveLimit ...")
@@ -109,6 +111,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   } else {
     println(s"Resolve result: ${locationInfoToString(resolveResult.get)}")
   }
+  //#resolve
 
   // Output should be:
   //    Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds ...
@@ -120,7 +123,6 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   // If not,
   // Output should be:
   //    Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
-  //#find-resolve
 
   // example code showing how to get the actorReg for remote component and send it a message
   if (resolveResult.isDefined) {
@@ -131,11 +133,12 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
     }
   }
 
-  //#filtering
+  //#list
   // list connections in location service
   private val connectionList = Await.result(locationService.list, timeout)
   println("All Registered Connections:")
   connectionList.foreach(c => println(s"--- ${locationInfoToString(c)}"))
+  //#list
 
   // Output should be:
   //    All Registered Connections:
@@ -145,21 +148,24 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   //    --- configuration-service-http, component type=Service, connection type=HttpType
   //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
-
-  // filter connections based on connection type
+  //#filtering-component
+  // filter connections based on component type
   private val componentList = Await.result(locationService.list(ComponentType.Assembly), timeout)
   println("Registered Assemblies:")
   componentList.foreach(c => println(s"--- ${locationInfoToString(c)}"))
+  //#filtering-component
 
   // Output should be:
   //    Registered Assemblies:
   //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
   //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
-  // filter connections based on component type
+  //#filtering-connection
+  // filter connections based on connection type
   private val akkaList = Await.result(locationService.list(ConnectionType.AkkaType), timeout)
   println("Registered Akka connections:")
   akkaList.foreach(c => println(s"--- ${locationInfoToString(c)}"))
+  //#filtering-connection
 
   // Output should be:
   //    Registered Akka connections:
@@ -167,7 +173,6 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
   //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
-  //#filtering
   if (resolveResult.isDefined) {
 
     //#tracking
@@ -187,6 +192,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
       println("subscription event")
       self ! trackingEvent
     })
+    //#tracking
 
     // [tracking shows component unregister and re-register]
 
@@ -211,7 +217,6 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
     //    subscription event
     //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
-    //#tracking
   }
   def locationInfoToString(loc: Location): String = {
     val connection = loc.connection

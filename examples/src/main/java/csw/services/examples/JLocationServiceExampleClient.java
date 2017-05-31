@@ -87,7 +87,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
     private void findAndResolveConnectionsBlocking() throws ExecutionException, InterruptedException {
 
-        //#find-resolve
+        //#find
         // find connection to LocationServiceExampleComponent in location service
         // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
 
@@ -98,10 +98,12 @@ public class JLocationServiceExampleClient extends AbstractActor {
         } else {
             System.out.println("Find result: None");
         }
+        //#find
         // Output should be:
         //    Attempting to find connection AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) ...
         //    Find result: None
 
+        //#resolve
         // resolve connection to LocationServiceExampleComponent
         // [start LocationServiceExampleComponent after this command but before timeout]
         FiniteDuration waitForResolveLimit = new FiniteDuration(30, TimeUnit.SECONDS);
@@ -112,6 +114,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         } else {
             System.out.println("Timeout waiting for location " + exampleConnection + " to resolve.");
         }
+        //#resolve
 
         // Output should be:
         //    Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds ...
@@ -123,7 +126,6 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // If not,
         // Output should be:
         //    Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
-        //#find-resolve
 
        // example code showing how to get the actorRef for remote component and send it a message
          if (resolveResult.isPresent()) {
@@ -138,14 +140,14 @@ public class JLocationServiceExampleClient extends AbstractActor {
     }
 
     private void listingAndFilteringBlocking() throws ExecutionException, InterruptedException {
-        //#filtering
+        //#list
         // list connections in location service
         List<Location> connectionList = locationService.list().get();
         System.out.println("All Registered Connections:");
         for (Location loc: connectionList) {
             System.out.println("--- " + connectionInfo(loc.connection()));
         }
-
+        //#list
         // Output should be:
         //    All Registered Connections:
         //    --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
@@ -155,24 +157,28 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
 
-        // filter connections based on connection type
+        //#filtering-component
+        // filter connections based on component type
         List<Location> componentList = locationService.list(JComponentType.Assembly).get();
         System.out.println("Registered Assemblies:");
         for (Location loc: componentList) {
             System.out.println("--- " + connectionInfo(loc.connection()));
         }
+        //#filtering-component
 
         // Output should be:
         //    Registered Assemblies:
         //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
         //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
-        // filter connections based on component type
+        //#filtering-connection
+        // filter connections based on connection type
         List<Location> akkaList = locationService.list(JConnectionType.AkkaType).get();
         System.out.println("Registered Akka connections:");
         for (Location loc : akkaList) {
             System.out.println("--- " + connectionInfo(loc.connection()));
         }
+        //#filtering-connection
 
         // Output should be:
         //    Registered Akka connections:
@@ -180,7 +186,6 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
         //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
-        //#filtering
     }
 
     private void trackingAndSubscribingBlocking() {
@@ -200,6 +205,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
             System.out.println("subscription event");
             getSelf().tell(trackingEvent, ActorRef.noSender());
         });
+        //#tracking
 
         // [tracking shows component unregister and re-register]
 
@@ -224,7 +230,6 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //    subscription event
         //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
-        //#tracking
 
     }
 
