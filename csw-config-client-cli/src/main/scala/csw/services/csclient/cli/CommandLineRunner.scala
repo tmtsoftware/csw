@@ -10,7 +10,7 @@ import csw.services.config.client.internal.ActorRuntime
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime) {
+class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime, printLine: Any ⇒ Unit) {
 
   import actorRuntime._
 
@@ -22,7 +22,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
       val configId =
         await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex,
             options.comment.get))
-      println(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
+      printLine(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
       configId
     } else {
       throw FileNotFound(inputFilePath)
@@ -34,7 +34,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     if (Files.exists(inputFilePath)) {
       val configData = ConfigData.fromPath(inputFilePath)
       val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment.get))
-      println(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
+      printLine(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
       configId
     } else {
       throw FileNotFound(inputFilePath)
@@ -51,17 +51,17 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     configDataOpt match {
       case Some(configData) ⇒
         val outputFile = await(configData.toPath(options.outputFilePath.get))
-        println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
+        printLine(s"Output file is created at location : ${outputFile.toAbsolutePath}")
         Some(outputFile.toAbsolutePath)
       case None ⇒
-        println(FileNotFound(options.relativeRepoPath.get).message)
+        printLine(FileNotFound(options.relativeRepoPath.get).message)
         None
     }
   }
 
   def delete(options: Options): Unit = {
     await(configService.delete(options.relativeRepoPath.get, "no longer needed"))
-    println(s"File ${options.relativeRepoPath.get} deletion is completed.")
+    printLine(s"File ${options.relativeRepoPath.get} deletion is completed.")
   }
 
   def list(options: Options): List[ConfigFileInfo] = {
@@ -73,9 +73,9 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     }
 
     maybeList match {
-      case None                   ⇒ println("Please provide either normal or annex. See --help to know more.")
-      case Some(xs) if xs.isEmpty ⇒ println("List returned empty results.")
-      case Some(xs)               ⇒ xs.foreach(i ⇒ println(s"${i.path}\t${i.id.id}\t${i.comment}"))
+      case None                   ⇒ printLine("Please provide either normal or annex. See --help to know more.")
+      case Some(xs) if xs.isEmpty ⇒ printLine("List returned empty results.")
+      case Some(xs)               ⇒ xs.foreach(i ⇒ printLine(s"${i.path}\t${i.id.id}\t${i.comment}"))
     }
 
     maybeList.getOrElse(List.empty)
@@ -85,34 +85,34 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     val fileRevisions = await(
       configService.history(options.relativeRepoPath.get, options.fromDate, options.toDate, options.maxFileVersions)
     )
-    fileRevisions.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    fileRevisions.foreach(h => printLine(s"${h.id.id}\t${h.time}\t${h.comment}"))
     fileRevisions
   }
 
   def historyActive(options: Options): List[ConfigFileRevision] = {
     val fileRevisions = await(configService.historyActive(options.relativeRepoPath.get, options.fromDate,
         options.toDate, options.maxFileVersions))
-    fileRevisions.foreach(h => println(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    fileRevisions.foreach(h => printLine(s"${h.id.id}\t${h.time}\t${h.comment}"))
     fileRevisions
   }
 
   def setActiveVersion(options: Options): Unit = {
     val maybeConfigId = options.id.map(id ⇒ ConfigId(id))
     await(configService.setActiveVersion(options.relativeRepoPath.get, maybeConfigId.get, options.comment.get))
-    println(s"${options.relativeRepoPath.get} file with id:${maybeConfigId.get.id} is set as active")
+    printLine(s"${options.relativeRepoPath.get} file with id:${maybeConfigId.get.id} is set as active")
   }
 
   def resetActiveVersion(options: Options): Unit = {
     await(configService.resetActiveVersion(options.relativeRepoPath.get, options.comment.get))
-    println(s"${options.relativeRepoPath.get} file is reset to active")
+    printLine(s"${options.relativeRepoPath.get} file is reset to active")
   }
 
   def getActiveVersion(options: Options): Option[ConfigId] = {
     val maybeId = await(configService.getActiveVersion(options.relativeRepoPath.get))
 
     maybeId match {
-      case Some(configId) ⇒ println(s"Id : ${configId.id} is the active version of the file.")
-      case None           ⇒ println(FileNotFound(options.relativeRepoPath.get).message)
+      case Some(configId) ⇒ printLine(s"Id : ${configId.id} is the active version of the file.")
+      case None           ⇒ printLine(FileNotFound(options.relativeRepoPath.get).message)
     }
 
     maybeId
@@ -124,24 +124,24 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     maybeConfigData match {
       case Some(configData) ⇒
         val outputFile = await(configData.toPath(options.outputFilePath.get))
-        println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
+        printLine(s"Output file is created at location : ${outputFile.toAbsolutePath}")
         Some(outputFile.toAbsolutePath)
       case None ⇒
-        println(FileNotFound(options.relativeRepoPath.get).message)
+        printLine(FileNotFound(options.relativeRepoPath.get).message)
         None
     }
   }
 
   def getMetadata(options: Options): ConfigMetadata = {
     val metaData = await(configService.getMetadata)
-    println(metaData.toString)
+    printLine(metaData.toString)
     metaData
   }
 
   //clientApi
   def exists(options: Options): Boolean = {
     val exists = await(configService.exists(options.relativeRepoPath.get))
-    println(s"File ${options.relativeRepoPath.get} exists in the repo? : $exists")
+    printLine(s"File ${options.relativeRepoPath.get} exists in the repo? : $exists")
     exists
   }
 
@@ -151,10 +151,10 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     maybeConfigData match {
       case Some(configData) ⇒
         val outputFile = await(configData.toPath(options.outputFilePath.get))
-        println(s"Output file is created at location : ${outputFile.toAbsolutePath}")
+        printLine(s"Output file is created at location : ${outputFile.toAbsolutePath}")
         Some(outputFile.toAbsolutePath)
       case None ⇒
-        println(FileNotFound(options.relativeRepoPath.get).message)
+        printLine(FileNotFound(options.relativeRepoPath.get).message)
         None
     }
   }

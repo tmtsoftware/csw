@@ -10,7 +10,7 @@ import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.csclient.cli.ClientCliWiring
 import csw.services.csclient.helpers.TwoClientsAndServer
-import csw.services.location.commons.ClusterSettings
+import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.helpers.LSNodeSpec
 import org.scalatest.FunSuiteLike
 
@@ -55,30 +55,21 @@ class ConfigCliAppTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAn
     runOn(client1) {
       enterBarrier("server-started")
 
-      // create file using cli app from client1 and verify client2 able to access it
-      val cliMain    = new ClientCliWiring(ClusterSettings().joinLocal(3552).system).cliApp
-      val createArgs = Array("create", repoPath1, "-i", inputFilePath, "-c", comment)
-      cliMain.start(createArgs)
+      def cliApp() = ClientCliWiring.noPrinting(ClusterAwareSettings.joinLocal(3552)).cliApp
+
+      cliApp().start(Array("create", repoPath1, "-i", inputFilePath, "-c", comment))
       enterBarrier("client1-create")
 
-      // update file using cli app from client1 and verify client2 able to access it
-      val cliMain1   = new ClientCliWiring(ClusterSettings().joinLocal(3552).system).cliApp
-      val updateArgs = Array("update", repoPath1, "-i", updatedInputFilePath, "-c", comment)
-      cliMain1.start(updateArgs)
+      cliApp().start(Array("update", repoPath1, "-i", updatedInputFilePath, "-c", comment))
       enterBarrier("client1-update")
 
-      // set active version of file using cli app from client1 and verify client2 able to access it
-      val cliMain2      = new ClientCliWiring(ClusterSettings().joinLocal(3552).system).cliApp
-      val setActiveArgs = Array("setActiveVersion", repoPath1, "--id", "1", "-c", comment)
-      cliMain2.start(setActiveArgs)
+      cliApp().start(Array("setActiveVersion", repoPath1, "--id", "1", "-c", comment))
       enterBarrier("client1-setActive")
 
       // Verify that client1 (cli app) is able to access file created by client2
       enterBarrier("client2-create")
-      val cliMain3       = new ClientCliWiring(ClusterSettings().joinLocal(3552).system).cliApp
       val tempOutputFile = Files.createTempFile("output", ".conf").toString
-      val getMinimalArgs = Array("get", repoPath2, "-o", tempOutputFile)
-      cliMain3.start(getMinimalArgs)
+      cliApp().start(Array("get", repoPath2, "-o", tempOutputFile))
       new String(Files.readAllBytes(Paths.get(tempOutputFile))) shouldEqual inputFileContents
 
     }
