@@ -1,11 +1,12 @@
 package csw.services.location.internal
 
-import akka.actor.{ActorRef, Props, Terminated}
-import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{Changed, Subscribe}
+import akka.typed.scaladsl.Actor
+import akka.typed.scaladsl.adapter._
+import akka.typed.{ActorRef, Behavior, Terminated}
 import csw.services.location.commons.{CswCluster, LocationServiceLogger}
 import csw.services.location.internal.Registry.AllServices
-import csw.services.location.models._
+import csw.services.location.models.AkkaLocation
 import csw.services.location.scaladsl.LocationService
 
 /**
@@ -13,69 +14,62 @@ import csw.services.location.scaladsl.LocationService
  *
  * @param locationService is used to unregister Actors that are no more alive
  */
-class DeathwatchActor(locationService: LocationService) extends LocationServiceLogger.Actor {
+class DeathwatchActor(locationService: LocationService) extends LocationServiceLogger.Simple {
+  import DeathwatchActor.Msg
 
   /**
-   * List of all actors that DeathwatchActor needs to track
-   */
-  var watchedLocations: Set[AkkaLocation] = Set.empty
-
-  /**
-   * Before starting DeathWatchActor, it is subscribed to replicator to get events for locations registered with LocationService
+   * Deathwatch behaviour processes `DeathwatchActor.Msg` type events sent by replicator for newly registered Locations.
+   * Terminated signal will be received upon termination of an actor that was being watched.
    *
-   * @see [[csw.services.location.internal.Registry.AllServices]]
-   */
-  override def preStart(): Unit =
-    DistributedData(context.system).replicator ! Subscribe(AllServices.Key, self)
-
-  /**
-   * Receive function processes two events:
-   *
-   *  - Changed event will be sent by replicator for newly registered Locations.
-   *  - Terminated event will be received upon termination of an actor that was being watched
-   *
-   * @note DeathwatchActor is primarily interested in Terminated events, but to be able to get those events, it has to track new actor registrations.
-   *       So that they can be watched for termination.
-   *
-   * @see [[akka.cluster.ddata.Replicator.Changed]]
    * @see [[akka.actor.Terminated]]
    */
-  override def receive: Receive = {
-    case c @ Changed(AllServices.Key) ⇒
-      val allLocations = c.get(AllServices.Key).entries.values.toSet
+  def behavior(watchedLocations: Set[AkkaLocation]): Behavior[Msg] =
+    Actor.immutable[Msg] { (context, changeMsg) ⇒
+      val allLocations = changeMsg.get(AllServices.Key).entries.values.toSet
       //take only akka locations
       val akkaLocations = allLocations.collect { case x: AkkaLocation ⇒ x }
       //find out the ones that are not being watched and watch them
       val unwatchedLocations = akkaLocations diff watchedLocations
       unwatchedLocations.foreach(loc ⇒ context.watch(loc.actorRef))
       //all akka locations are now watched
-      watchedLocations = akkaLocations
-    case Terminated(deadActorRef) =>
-      log.info(Map("@msg" → "removing terminated actor", "actorRef" → deadActorRef.toString()))
-      //stop watching the terminated actor
-      context.unwatch(deadActorRef)
-      //Unregister the dead akka location and remove it from the list of watched locations
-      val maybeLocation = watchedLocations.find(_.actorRef == deadActorRef)
-      maybeLocation.foreach { location =>
-        locationService.unregister(location.connection)
-        watchedLocations -= location
-      }
-  }
+      behavior(akkaLocations)
+    } onSignal {
+      case (ctx, Terminated(deadActorRef)) ⇒
+        log.info(Map("@msg" → "removing terminated actor", "actorRef" → deadActorRef.toString))
+        //stop watching the terminated actor
+        ctx.unwatch(deadActorRef)
+        //Unregister the dead akka location and remove it from the list of watched locations
+        val maybeLocation = watchedLocations.find(_.actorRef == deadActorRef.toUntyped)
+        maybeLocation match {
+          case Some(location) =>
+            //if deadActorRef is mapped to a location, unregister it and remove it from watched locations
+            locationService.unregister(location.connection)
+            behavior(watchedLocations - location)
+          case None ⇒
+            //if deadActorRef does not match any location, don't change a thing!
+            Actor.same
+        }
+    }
 }
 
 object DeathwatchActor {
-
-  /**
-   * Create properties for DeathwatchActor
-   * @param locationService is used to construct the DeathwatchActor
-   */
-  def props(locationService: LocationService): Props = Props(new DeathwatchActor(locationService))
+  //message type handled by the for the typed deathwatch actor
+  type Msg = Changed[AllServices.Value]
 
   /**
    * Start the DeathwatchActor using the given locationService
    *
    * @param cswCluster is used to get remote ActorSystem to create DeathwatchActor
    */
-  def start(cswCluster: CswCluster, locationService: LocationService): ActorRef =
-    cswCluster.actorSystem.actorOf(props(locationService), name = "location-service-death-watch-actor")
+  def start(cswCluster: CswCluster, locationService: LocationService): ActorRef[Msg] = {
+    val actorRef = cswCluster.actorSystem.spawn(
+      //span the actor with empty set of watched locations
+      new DeathwatchActor(locationService).behavior(Set.empty),
+      name = "location-service-death-watch-actor"
+    )
+
+    //Subscribed to replicator to get events for locations registered with LocationService
+    cswCluster.replicator ! Subscribe(AllServices.Key, actorRef.toUntyped)
+    actorRef
+  }
 }

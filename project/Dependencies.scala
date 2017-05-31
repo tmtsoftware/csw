@@ -12,6 +12,8 @@ object Dependencies {
   )
 
   val Location = Seq(
+    Akka.`akka-typed`,
+    Akka.`akka-typed-testkit`,
     Akka.`akka-stream`,
     Akka.`akka-distributed-data`,
     Akka.`akka-remote`,
