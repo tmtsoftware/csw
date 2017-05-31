@@ -29,7 +29,7 @@ object Main extends App {
     try {
       wiring.cliApp.start(options)
     } finally {
-      Await.result(wiring.actorRuntime.shutdown(), 15.seconds)
+      Await.ready(wiring.actorRuntime.shutdown(), 30.seconds)
     }
   }
 }
