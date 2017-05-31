@@ -6,9 +6,9 @@ import java.time.Instant
 import java.util.regex.Pattern
 
 import akka.dispatch.MessageDispatcher
-import com.typesafe.scalalogging.LazyLogging
 import csw.services.config.api.models.FileType
 import csw.services.config.server.Settings
+import csw.services.config.server.commons.ConfigServerLogger
 import csw.services.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
@@ -25,7 +25,7 @@ import scala.concurrent.Future
  * @param settings                  server runtime configuration
  * @param blockingIoDispatcher      dispatcher to be used for blocking operations
  */
-class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) extends LazyLogging {
+class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) extends ConfigServerLogger.Simple {
 
   private implicit val _blockingIoDispatcher = blockingIoDispatcher
 
@@ -35,11 +35,11 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
       // Create the new main repo
       FSRepositoryFactory.setup()
       SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, false)
-      logger.info(s"New Repository created at ${settings.svnUrl}")
+      log.info(s"New Repository created at ${settings.svnUrl}")
     } catch {
       // If the repo already exists, print stracktrace and continue to boot
       case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.IO_ERROR ⇒
-        logger.info(s"Repository already exists at ${settings.svnUrl}")
+        log.info(s"Repository already exists at ${settings.svnUrl}")
     }
 
   // Fetch the file from svn repo and write the contents on outputStream

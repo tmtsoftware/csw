@@ -2,7 +2,7 @@ package csw.services.location.scaladsl
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
-import csw.services.location.commons.{ClusterSettings, Constants}
+import csw.services.location.commons.{ClusterSettings, Constants, LocationServiceLogger}
 
 /**
  * ActorSystemFactory creates a remote ActorSystem on the interface where csw-cluster is running. The ActorSystem starts on a
@@ -10,10 +10,10 @@ import csw.services.location.commons.{ClusterSettings, Constants}
  *
  * @note It is highly recommended to create actors via this factory if it has to be registered with LocationService
  */
-object ActorSystemFactory {
+object ActorSystemFactory extends LocationServiceLogger.Simple {
 
   /**
-   * Create an ActorSystem with default name and remote properties
+   * Create an ActorSystem with `Constants.RemoteActorSystemName` as componentName
    */
   def remote(): ActorSystem = remote(Constants.RemoteActorSystemName)
 
@@ -23,12 +23,12 @@ object ActorSystemFactory {
    * @note Even if the custom configuration is provided for the given name of ActorSystem, it will be simply
    *       ignored, instead default remote configuration will be used while creating ActorSystem
    */
-  def remote(name: String): ActorSystem = {
-
+  def remote(componentName: String): ActorSystem = {
     val config = ConfigFactory
       .parseString(s"akka.remote.netty.tcp.hostname = ${ClusterSettings().hostname}")
       .withFallback(ConfigFactory.load().getConfig(Constants.RemoteActorSystemName))
 
-    ActorSystem(name, config)
+    log.info("creating remote actor system")
+    ActorSystem(componentName, config)
   }
 }

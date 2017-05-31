@@ -1,8 +1,8 @@
 package csw.services.location.models
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class ComponentIdTest extends FunSuite with Matchers {
+class ComponentIdTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   test("should not contain leading or trailing spaces in component's name") {
 

@@ -1,7 +1,7 @@
 package csw.services.location.commons
 
+import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
-import com.typesafe.scalalogging.LazyLogging
 import csw.services.location.internal.Networks
 
 import scala.collection.JavaConverters._
@@ -49,17 +49,13 @@ import scala.collection.JavaConverters._
  *
  */
 case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty)
-    extends LazyLogging {
+    extends LocationServiceLogger.Simple {
   val InterfaceNameKey  = "interfaceName"
   val ClusterSeedsKey   = "clusterSeeds"
   val ClusterPortKey    = "clusterPort"
   val ManagementPortKey = "managementPort"
 
-  def debug(): Unit =
-    logger.info(s"""
-         |[debug] Using following cluster configurations:
-         |[debug] ClusterSeedsKey: ${seedNodes.mkString(",")}
-      """.stripMargin)
+  def logDebugString(): Unit = log.debug("clusterSeeds" → seedNodes.mkString(","))
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
   def withEntries(entries: Map[String, Any]): ClusterSettings     = copy(values = values ++ entries)
@@ -123,7 +119,10 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
     ConfigFactory
       .parseMap(computedValues.asJava)
       .withFallback(ConfigFactory.load().getConfig(clusterName))
+      .withFallback(ConfigFactory.defaultApplication().resolve())
   }
+
+  def system: ActorSystem = ActorSystem(clusterName, config)
 }
 
 object ClusterAwareSettings extends ClusterSettings

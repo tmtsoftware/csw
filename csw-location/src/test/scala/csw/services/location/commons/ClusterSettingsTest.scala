@@ -2,9 +2,13 @@ package csw.services.location.commons
 
 import com.typesafe.config.ConfigException
 import csw.services.location.internal.Networks
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   override protected def afterAll(): Unit = {
     System.clearProperty("clusterPort")

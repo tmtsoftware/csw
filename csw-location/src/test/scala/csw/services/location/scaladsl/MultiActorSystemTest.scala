@@ -5,11 +5,11 @@ import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models.{ComponentId, ComponentType, TcpRegistration}
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
 
-class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   val connection: TcpConnection        = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
   val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)

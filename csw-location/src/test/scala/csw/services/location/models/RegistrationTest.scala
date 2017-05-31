@@ -9,12 +9,12 @@ import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.scaladsl.ActorSystemFactory
-import org.scalatest.{FunSuiteLike, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-import scala.concurrent.duration.DurationDouble
 import scala.concurrent.Await
+import scala.concurrent.duration.DurationDouble
 
-class RegistrationTest extends FunSuiteLike with Matchers {
+class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   test("should able to create the AkkaRegistration which should internally create AkkaLocation") {
     val hostname = new Networks().hostname()

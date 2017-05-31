@@ -18,6 +18,8 @@ import scala.concurrent.duration.DurationDouble
  */
 class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) {
 
+  type Value = V
+
   /**
    * Creates an update message for replicator and it ensures that the response goes out only after majority nodes are written to
    *

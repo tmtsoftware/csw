@@ -4,21 +4,24 @@ import java.net.URI
 import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
-import com.typesafe.scalalogging.LazyLogging
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.internal.Networks
 import csw.services.location.models.Connection.TcpConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.tracklocation.common.TestFutureExtension.RichFuture
-import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration._
 
 /**
  * Test the csw-location-agent app in-line
  */
-class MainTest extends FunSuiteLike with Matchers with LazyLogging with BeforeAndAfterAll {
+class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552))
 

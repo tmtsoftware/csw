@@ -15,7 +15,7 @@ import scala.async.Async._
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAfterAll {
+class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   private implicit
   //#create-actor-system
@@ -24,22 +24,15 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
 
   import actorSystem.dispatcher
   implicit val mat = ActorMaterializer()
-  private val actorRef = actorSystem.actorOf(
-    Props(new Actor {
-      override def receive: Receive = {
-        case "print" => println("hello world")
-      }
-    }),
-    "my-actor-1"
-  )
-
   lazy
   //#create-location-service
   val locationService = LocationServiceFactory.make()
   //#create-location-service
 
-  override protected def afterAll(): Unit =
+  override protected def afterAll(): Unit = {
     locationService.shutdown().await
+    actorSystem.terminate().await
+  }
 
   //#Components-Connections-Registrations
   val tcpConnection   = TcpConnection(ComponentId("redis", ComponentType.Service))
@@ -48,8 +41,16 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
   val httpConnection   = HttpConnection(ComponentId("configuration", ComponentType.Service))
   val httpRegistration = HttpRegistration(httpConnection, 8080, "path123")
 
-  val akkaConnection   = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-  val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
+  val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+  val akkaRegistration = AkkaRegistration(akkaConnection,
+    actorSystem.actorOf(
+      Props(new Actor {
+      override def receive: Receive = {
+        case "print" => //do something
+      }
+    }),
+      "my-actor-1"
+    ))
   //#Components-Connections-Registrations
 
   test("demo") {
@@ -61,9 +62,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
         tcpRegistrationResult.location.connection shouldBe tcpConnection
 
         await(locationService.list) shouldBe List(tcpRegistrationResult.location)
-        await(locationService.find(tcpConnection)) shouldBe Some(tcpRegistrationResult.location)
-
-        println(tcpRegistrationResult.location.uri)
+        await(locationService.resolve(tcpConnection, 5.seconds)) shouldBe Some(tcpRegistrationResult.location)
 
         await(tcpRegistrationResult.unregister())
 
@@ -76,7 +75,7 @@ class LocationServiceDemoExample extends FunSuite with Matchers with BeforeAndAf
 
   test("tracking") {
     //#tracking
-    val (killSwitch, doneF) = locationService.track(tcpConnection).toMat(Sink.foreach(println))(Keep.both).run()
+    val (killSwitch, doneF) = locationService.track(tcpConnection).toMat(Sink.ignore)(Keep.both).run()
 
     Thread.sleep(200)
 

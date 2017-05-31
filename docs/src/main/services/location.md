@@ -106,9 +106,15 @@ ActorSystem will now be available for communication from other components that a
 
 ## Resolving Connections
 
-A connection of interest, can be checked if available using the `resolve` API. If the connection is alive, `resolve` returns the handle to the `Location`.   If not, `resolve` will wait for a time specified as an argument for the component to become available.  If it doesn't, it will return a Future[None].
- 
-To check for a connection without a waiting period, use the `find` API.
+`register` API takes a `Registration` parameter and returns a handle to registration result. The success of `register` API can be validated by checking the `Location` instance pointed by registration result.
+
+The `list` API returns a list of alive connections with LocationService.
+  
+A connection of interest, can be checked if available using the `resolve` or `find` API.    
+
+`resolve` will find the location for a connection from the local cache, if not found waits for the event to arrive within specified time limit. Returns None if both fail.    
+
+`find` will return the location for a connection from the local cache and if not found then returns None.    
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #find }

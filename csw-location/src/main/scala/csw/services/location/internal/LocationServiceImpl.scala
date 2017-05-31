@@ -7,7 +7,7 @@ import akka.pattern.ask
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, OverflowStrategy}
 import akka.util.Timeout
-import csw.services.location.commons.CswCluster
+import csw.services.location.commons.{CswCluster, LocationServiceLogger}
 import csw.services.location.exceptions.{
   OtherLocationIsRegistered,
   RegistrationFailed,
@@ -23,7 +23,9 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
-private[location] class LocationServiceImpl(cswCluster: CswCluster) extends LocationService { outer =>
+private[location] class LocationServiceImpl(cswCluster: CswCluster)
+    extends LocationService
+    with LocationServiceLogger.Simple { outer =>
 
   import cswCluster._
   implicit val timeout: Timeout = Timeout(5.seconds)
@@ -144,6 +146,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
    * Track the status of given connection
    */
   def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
+    log.debug(Map("@msg" → "started tracking", "connection" → connection.toString))
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
     //Get a stream that emits messages sent to the actor generated after materialization
