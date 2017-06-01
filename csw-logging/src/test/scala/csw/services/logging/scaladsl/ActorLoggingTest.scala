@@ -53,7 +53,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     tromboneActorRef ! LogError
     tromboneActorRef ! LogFatal
     tromboneActorRef ! "Unknown"
-    Thread.sleep(100)
+    Thread.sleep(200)
   }
 
   // DEOPSCSW-116: Make log messages identifiable with components
