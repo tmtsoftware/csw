@@ -195,7 +195,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         System.out.println("Starting to track " + exampleConnection);
         locationService.track(exampleConnection).toMat(Sink.actorRef(getSelf(), AllDone.class), Keep.both()).run(mat);
 
-        //track returns a Killswitch, that can be used to turn off if notifications arbitarily
+        //track returns a Killswitch, that can be used to turn off notifications arbitarily
         //in this case track a connection for 5 seconds, after that schedule switching off the stream
         Pair pair = (Pair)locationService.track(exampleConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
         context().system().scheduler().scheduleOnce(Duration.create(5, TimeUnit.SECONDS), new Runnable() {

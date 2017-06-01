@@ -173,7 +173,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
     //
     println(s"Starting to track $exampleConnection")
     locationService.track(exampleConnection).to(Sink.actorRef(self, AllDone)).run()
-    //track returns a Killswitch, that can be used to turn off if notifications arbitarily
+    //track returns a Killswitch, that can be used to turn off notifications arbitarily
     //in this case track a connection for 5 seconds, after that schedule switching off the stream
     val killswitch = locationService.track(httpConnection).toMat(Sink.foreach(println))(Keep.left).run()
     context.system.scheduler.scheduleOnce(5.seconds) {
