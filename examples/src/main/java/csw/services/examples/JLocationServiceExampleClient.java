@@ -13,7 +13,6 @@ import csw.services.location.models.*;
 import csw.services.location.scaladsl.ActorSystemFactory;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
-import csw.services.location.scaladsl.LocationService;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -21,8 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import static csw.services.examples.LocationServiceExampleComponent.*;
 
 /**
  * An example location service client application.
@@ -32,7 +29,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
     private ILocationService locationService = JLocationServiceFactory.make();
     //#create-location-service
 
-    private Connection exampleConnection = connection();
+    private Connection exampleConnection = LocationServiceExampleComponent.connection();
 
     private IRegistrationResult httpRegResult;
     private IRegistrationResult hcdRegResult;
