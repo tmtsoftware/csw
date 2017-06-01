@@ -1,15 +1,15 @@
 package csw.services.examples
 
 import akka.actor.{Actor, ActorLogging, Props}
+import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.stream.scaladsl.Sink
-
-import scala.concurrent.duration._
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Await
+import scala.concurrent.duration._
 
 /**
   * An example location service client application.
@@ -44,12 +44,8 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
   import LocationServiceExampleClient._
 
-
   private val timeout = 5.seconds
   private val waitForResolveLimit = 30.seconds
-
-
-
 
   // EXAMPLE DEMO START
 
@@ -84,8 +80,6 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   private val assemblyRegistration = AkkaRegistration(assemblyConnection, self)
   private val assemblyRegResult = Await.result(locationService.register(assemblyRegistration), timeout)
   //#Components-Connections-Registrations
-
-
 
   //#find-resolve
   // find connection to LocationServiceExampleComponent in location service
@@ -145,7 +139,6 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   //    --- configuration-service-http, component type=Service, connection type=HttpType
   //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
-
   // filter connections based on connection type
   private val componentList = Await.result(locationService.list(ComponentType.Assembly), timeout)
   println("Registered Assemblies:")
@@ -175,12 +168,19 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
     // both are implemented but only one is really needed.
 
 
-    // track connection to LocationServiceExampleComponent
+    // Method1: track connection to LocationServiceExampleComponent
     // Calls track method for example connection and forwards location messages to this actor
+    //
     println(s"Starting to track $exampleConnection")
     locationService.track(exampleConnection).to(Sink.actorRef(self, AllDone)).run()
+    //track returns a Killswitch, that can be used to turn off if notifications arbitarily
+    //in this case track a connection for 5 seconds, after that schedule switching off the stream
+    val killswitch = locationService.track(httpConnection).toMat(Sink.foreach(println))(Keep.left).run()
+    context.system.scheduler.scheduleOnce(5.seconds) {
+      killswitch.shutdown()
+    }
 
-    // subscribe to LocationServiceExampleComponent events
+    // Method2: subscribe to LocationServiceExampleComponent events
     println(s"Starting a subscription to $exampleConnection")
     locationService.subscribe(exampleConnection, trackingEvent => {
       // the following println is to distinguish subscription events from tracking events
@@ -213,6 +213,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
     //#tracking
   }
+
   def locationInfoToString(loc: Location): String = {
     val connection = loc.connection
     s"${connection.name}, component type=${connection.componentId.componentType}, connection type=${connection.connectionType}"

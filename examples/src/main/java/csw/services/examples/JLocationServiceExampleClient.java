@@ -1,8 +1,10 @@
 package csw.services.examples;
 
 import akka.actor.*;
+import akka.japi.Pair;
 import akka.japi.pf.ReceiveBuilder;
 import akka.stream.ActorMaterializer;
+import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
@@ -12,6 +14,7 @@ import csw.services.location.scaladsl.ActorSystemFactory;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.scaladsl.LocationService;
+import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.List;
@@ -28,8 +31,6 @@ public class JLocationServiceExampleClient extends AbstractActor {
     //#create-location-service
     private ILocationService locationService = JLocationServiceFactory.make();
     //#create-location-service
-
-
 
     private Connection exampleConnection = connection();
 
@@ -194,6 +195,16 @@ public class JLocationServiceExampleClient extends AbstractActor {
         System.out.println("Starting to track " + exampleConnection);
         locationService.track(exampleConnection).toMat(Sink.actorRef(getSelf(), AllDone.class), Keep.both()).run(mat);
 
+        //track returns a Killswitch, that can be used to turn off if notifications arbitarily
+        //in this case track a connection for 5 seconds, after that schedule switching off the stream
+        Pair pair = (Pair)locationService.track(exampleConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
+        context().system().scheduler().scheduleOnce(Duration.create(5, TimeUnit.SECONDS), new Runnable() {
+            @Override
+            public void run() {
+                ((KillSwitch)pair.first()).shutdown();
+            }
+        }, context().system().dispatcher());
+
         // subscribe to LocationServiceExampleComponent events
         System.out.println("Starting a subscription to " + exampleConnection);
         locationService.subscribe(exampleConnection, trackingEvent -> {
@@ -264,6 +275,4 @@ public class JLocationServiceExampleClient extends AbstractActor {
         actorSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
 
     }
-
-
 }
