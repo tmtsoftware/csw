@@ -11,7 +11,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-config-server`,
   `csw-location`,
   `csw-location-agent`,
-  `integration`
+  `integration`,
+  `examples`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
@@ -20,7 +21,8 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-location-agent`,
   `csw-config-server`,
   `csw-config-client-cli`,
-  `integration`
+  `integration`,
+  `examples`
 )
 
 //Root project
@@ -114,3 +116,11 @@ lazy val integration = project
 
 //Docs project
 lazy val docs = project.enablePlugins(ParadoxSite, NoPublish)
+
+//Example code
+lazy val examples = project
+  .enablePlugins(DeployApp)
+  .dependsOn(`csw-location`)
+  .settings(libraryDependencies ++= Dependencies.CswProdExamples
+  )
+

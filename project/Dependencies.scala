@@ -83,4 +83,11 @@ object Dependencies {
     Libs.`scopt`,
     Libs.`scalatest` % Test
   )
+
+  val CswProdExamples = Seq(
+    Akka.`akka-actor`,
+    Akka.`akka-stream`,
+    Akka.`akka-slf4j`,
+    Libs.`logback-classic`
+  )
 }
