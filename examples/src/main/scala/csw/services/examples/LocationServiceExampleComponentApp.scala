@@ -10,12 +10,12 @@ import scala.concurrent.duration._
 import scala.concurrent.Await
 
 /**
-  * An example that shows how to register a component actor with the location service.
-  */
+ * An example that shows how to register a component actor with the location service.
+ */
 object LocationServiceExampleComponentApp extends App {
   private val locationService = LocationServiceFactory.make()
-  implicit val system = ActorSystemFactory.remote()
-  implicit val mat = ActorMaterializer()
+  implicit val system         = ActorSystemFactory.remote()
+  implicit val mat            = ActorMaterializer()
 
   system.actorOf(LocationServiceExampleComponent.props(locationService))
 
@@ -36,8 +36,8 @@ object LocationServiceExampleComponent {
 }
 
 /**
-  * A dummy akka test service that registers with the location service
-  */
+ * A dummy akka test service that registers with the location service
+ */
 class LocationServiceExampleComponent(locationService: LocationService) extends Actor with ActorLogging {
 
   println("In actor LocationServiceExampleComponent")
