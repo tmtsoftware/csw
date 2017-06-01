@@ -36,7 +36,7 @@ object AppLogger extends ComponentLogger("app")
 class DemoApp extends AppLogger.Simple {
 
   private val actorSystem = ClusterAwareSettings.onPort(3552).system
-  val adminWiring         = new AdminWiring(actorSystem)
+  val adminWiring         = new AdminWiring(actorSystem, 7878)
   import adminWiring._
 
   private val loggingSystem = actorRuntime.startLogging()

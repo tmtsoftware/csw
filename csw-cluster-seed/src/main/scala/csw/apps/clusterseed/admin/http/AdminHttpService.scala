@@ -13,7 +13,8 @@ import scala.util.control.NonFatal
 /**
  * Initialise AdminServer
  */
-class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime) extends ClusterSeedLogger.Simple {
+class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, adminPort: Int)
+    extends ClusterSeedLogger.Simple {
 
   import actorRuntime._
 
@@ -30,6 +31,6 @@ class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime) ext
   private def bind() = Http().bindAndHandle(
     handler = adminRoutes.route,
     interface = ClusterAwareSettings.hostname,
-    port = 7878
+    port = adminPort
   )
 }

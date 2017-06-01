@@ -22,7 +22,7 @@ abstract class AdminLogTestSuite() extends FunSuite with Matchers with BeforeAnd
   protected val loggingSystem =
     new LoggingSystem("logging", "SNAPSHOT-1.0", hostName, actorSystem, Seq(testAppender))
 
-  protected val adminWiring = new AdminWiring(actorSystem)
+  protected val adminWiring = new AdminWiring(actorSystem, 7878)
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
