@@ -11,7 +11,7 @@ import java.time.Instant
  * @param outputFilePath Output file path from a local disc where a file will be created. Required for operations such as get, getActive.
  * @param id Optional: version id of the file to get.
  * @param annex Optional: if the file is an Annexd(large binary file)
- * @param comment Optional: Version history comment to add while creating the file.
+ * @param comment Version history comment to add while creating the file.
  * @param latest Optional: Get the latest file.
  * @param pattern Optional: List all files whose path matches the given pattern.
  * @param normal Optional: If the file is normal.

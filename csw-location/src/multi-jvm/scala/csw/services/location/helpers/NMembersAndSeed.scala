@@ -3,12 +3,16 @@ package csw.services.location.helpers
 import akka.actor.ActorSystem
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 
   private val settings = ClusterAwareSettings
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   def makeSystem(config: Config): ActorSystem = ActorSystem(settings.clusterName, config)
 
@@ -17,6 +21,8 @@ class NMembersAndSeed(n: Int) extends MultiNodeConfig {
   val members: Vector[RoleName] = (1 to n).toVector.map { x =>
     addRole(s"member-$x")(settings.joinLocal(3552))
   }
+
+  commonConfig(ConfigFactory.parseString("akka.loggers = [csw.services.logging.compat.AkkaLogger]"))
 
   private def addRole(name: String)(settings: ClusterSettings): RoleName = {
     val node = role(name)

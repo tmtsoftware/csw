@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture
 import akka.stream.Materializer
 import akka.stream.scaladsl.{FileIO, Keep, Source, StreamConverters}
 import akka.util.ByteString
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.Future
@@ -24,6 +25,16 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
     source.runFold("")((str, bs) ⇒ str + bs.utf8String)
 
   /**
+   * Returns a future of Config object if the data is in valid parseable HOCON format. Else, throws ConfigException.
+   */
+  def toConfigObject(implicit mat: Materializer): Future[Config] = {
+    import mat.executionContext
+    toStringF.map { s ⇒
+      ConfigFactory.parseString(s)
+    }
+  }
+
+  /**
    * * Java API
    *
    * Returns a future string by reading the source.
@@ -32,10 +43,10 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
     toStringF.toJava.toCompletableFuture
 
   /**
-   * Returns an inputStream which emits the bytes read from source
+   * Returns a future of Config object if the data is in valid parseable HOCON format. Else, throws ConfigException.
    */
-  private[config] def toInputStream(implicit mat: Materializer): InputStream =
-    source.runWith(StreamConverters.asInputStream())
+  private[config] def toJConfigObject(implicit mat: Materializer): CompletableFuture[Config] =
+    toConfigObject.toJava.toCompletableFuture
 
   /**
    * Writes config data to a provided file path and returns future file.
@@ -52,6 +63,12 @@ class ConfigData private (val source: Source[ByteString, Any], val length: Long)
       }
       .run()
   }
+
+  /**
+   * Returns an inputStream which emits the bytes read from source
+   */
+  private[config] def toInputStream(implicit mat: Materializer): InputStream =
+    source.runWith(StreamConverters.asInputStream())
 }
 
 /**

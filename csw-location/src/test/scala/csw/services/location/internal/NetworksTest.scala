@@ -2,11 +2,14 @@ package csw.services.location.internal
 
 import java.net.InetAddress
 
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.mockito.Mockito._
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
 
-class NetworksTest extends FunSuite with Matchers with MockitoSugar {
+class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with MockitoSugar {
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   test("Should filter ipv6 addresses") {
     val mockedNetworkProvider = mock[NetworkInterfaceProvider]

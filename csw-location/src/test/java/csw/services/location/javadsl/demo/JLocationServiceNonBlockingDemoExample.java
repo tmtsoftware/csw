@@ -6,7 +6,6 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.japi.Pair;
-import akka.japi.pf.ReceiveBuilder;
 import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitch;
 import akka.stream.Materializer;
@@ -27,6 +26,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class JLocationServiceNonBlockingDemoExample {
@@ -44,14 +45,6 @@ public class JLocationServiceNonBlockingDemoExample {
     //#create-actor-system
 
     private Materializer mat = ActorMaterializer.create(actorSystem);
-    private ActorRef actorRef = actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
-                @Override
-                public Receive createReceive() {
-                    return ReceiveBuilder.create().build();
-                }
-            }),
-            "my-actor-1"
-    );
 
     //static instance is used in testing for reuse and to avoid creating/terminating it for each test.
     private static
@@ -80,7 +73,14 @@ public class JLocationServiceNonBlockingDemoExample {
     private HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
 
     private AkkaConnection akkaConnection = new Connection.AkkaConnection(new ComponentId("hcd1", JComponentType.HCD));
-    private AkkaRegistration akkaRegistration = new AkkaRegistration(akkaConnection, actorRef);
+    private AkkaRegistration akkaRegistration = new AkkaRegistration(akkaConnection, actorSystem.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
+                @Override
+                public Receive createReceive() {
+                    return receiveBuilder().build();
+                }
+            }),
+            "my-actor-1"
+    ));
     //#Components-Connections-Registrations
 
     @Test
@@ -94,9 +94,8 @@ public class JLocationServiceNonBlockingDemoExample {
             Assert.assertEquals(tcpRegistration.connection(), tcpRegistrationResult.location().connection());
             return locationService.list().thenCompose(locations -> {
                 Assert.assertEquals(expectedLocations, locations);
-                return locationService.find(tcpConnection).thenCompose(locationOption -> {
+                return locationService.resolve(tcpConnection, new FiniteDuration(5, TimeUnit.SECONDS)).thenCompose(locationOption -> {
                     Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationOption.get());
-                    System.out.println(tcpRegistrationResult.location().uri());
                     return tcpRegistrationResult.unregister().thenCompose(done -> {
                         return locationService.list().thenCompose(locations1 -> {
                             Assert.assertEquals(Collections.EMPTY_LIST, locations1);
@@ -117,7 +116,7 @@ public class JLocationServiceNonBlockingDemoExample {
     @Test
     public void tracking() throws ExecutionException, InterruptedException {
         //#tracking
-        Pair<KillSwitch, CompletionStage<Done>> stream = locationService.track(tcpConnection).toMat(Sink.foreach(System.out::println), Keep.both()).run(mat);
+        Pair<KillSwitch, CompletionStage<Done>> stream = locationService.track(tcpConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
 
         Thread.sleep(200);
 

@@ -12,6 +12,7 @@ import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.files.Sha1
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
@@ -21,6 +22,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
 
   import serverWiring.actorRuntime._
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   def configService: ConfigService
 
@@ -654,7 +658,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val file    = Paths.get("SomeAnnexFile.txt")
     val content = "testing annex file"
 
-    val configData  = ConfigData.fromString(content)
+    val configData = ConfigData.fromString(content)
+
+    //verify that files smaller than annex-min-file-size go to annex if flag is set
+    serverWiring.settings.`annex-min-file-size` > configData.length shouldBe true
+
     val configId    = configService.create(file, configData, annex = true, "committing annex file").await
     val fileContent = configService.getById(file, configId).await.get
     fileContent.toStringF.await shouldBe content

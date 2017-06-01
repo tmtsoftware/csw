@@ -110,9 +110,6 @@ A connection of interest, can be checked if available using the `resolve` API. I
  
 To check for a connection without a waiting period, use the `find` API.
 
-Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #find-resolve }
-
 JavaBlocking
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #find-resolve }
 

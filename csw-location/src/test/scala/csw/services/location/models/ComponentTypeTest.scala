@@ -1,8 +1,8 @@
 package csw.services.location.models
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-class ComponentTypeTest extends FunSuite with Matchers {
+class ComponentTypeTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   test("ComponentType should be any one of this types : 'container', 'hcd', 'assembly' and 'service'") {
 

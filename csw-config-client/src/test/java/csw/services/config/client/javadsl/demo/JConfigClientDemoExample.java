@@ -19,18 +19,14 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
-import sun.misc.IOUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-
-import static sun.misc.IOUtils.readFully;
 
 public class JConfigClientDemoExample {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
@@ -50,7 +46,7 @@ public class JConfigClientDemoExample {
     private Materializer mat = actorRuntime.mat();
 
     //#declare_string_config
-    String defaultStrConf = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";
+    String defaultStrConf = "foo { bar { baz : 1234 } }";
     //#declare_string_config
 
     @Rule
@@ -101,7 +97,7 @@ public class JConfigClientDemoExample {
         adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "First commit").get();
 
         ConfigData activeFile = clientApi.getActive(filePath).get().get();
-        Assert.assertEquals(activeFile.toJStringF(mat).get(), defaultStrConf);
+        Assert.assertEquals(activeFile.toJConfigObject(mat).get().getString("foo.bar.baz"), "1234");
         //#getActive
     }
 
@@ -116,19 +112,12 @@ public class JConfigClientDemoExample {
         URI srcFilePath = getClass().getClassLoader().getResource("smallBinary.bin").toURI();
         ConfigData config2 = ConfigData.fromPath(Paths.get(srcFilePath));
 
-        //construct ConfigData from Array[Byte] by reading a local file
-        InputStream stream   = getClass().getClassLoader().getResourceAsStream("smallBinary.bin");
-        byte[] byteArray = sun.misc.IOUtils.readFully(stream, -1, true);
-        ConfigData config3 = ConfigData.fromBytes(byteArray);
-
         ConfigId id1 = adminApi.create(Paths.get("/hcd/trombone/overnight.conf"), config1, false, "review done").get();
         ConfigId id2 = adminApi.create(Paths.get("/hcd/trombone/firmware.bin"), config2, true, "smoke test done").get();
-        ConfigId id3 = adminApi.create(Paths.get("/hcd/trombone/debug.bin"), config3, true, "new file from vendor").get();
 
         //CAUTION: for demo example setup these IDs are returned. Don't assume them in production setup.
         Assert.assertEquals(id1, new ConfigId("1"));
         Assert.assertEquals(id2, new ConfigId("3"));
-        Assert.assertEquals(id3, new ConfigId("5"));
         //#create
     }
 
@@ -143,14 +132,12 @@ public class JConfigClientDemoExample {
         Assert.assertEquals(adminApi.getLatest(path).get(), Optional.empty());
     }
 
-
     @Test
     public void testGetMetadata() throws ExecutionException, InterruptedException {
         //#getMetadata
         ConfigMetadata metadata = adminApi.getMetadata().get();
         //repository path must not be empty
         Assert.assertNotEquals(metadata.repoPath(), "");
-        System.out.println("Server returned => " + metadata.toString());
         //#getMetadata
     }
 }
