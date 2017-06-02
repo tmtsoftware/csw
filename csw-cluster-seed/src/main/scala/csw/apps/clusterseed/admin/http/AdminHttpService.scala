@@ -2,7 +2,7 @@ package csw.apps.clusterseed.admin.http
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import csw.apps.clusterseed.admin.internal.ActorRuntime
+import csw.apps.clusterseed.admin.internal.{ActorRuntime, Settings}
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.services.location.commons.ClusterAwareSettings
 
@@ -13,7 +13,7 @@ import scala.util.control.NonFatal
 /**
  * Initialise AdminServer
  */
-class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, adminPort: Int)
+class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, settings: Settings)
     extends ClusterSeedLogger.Simple {
 
   import actorRuntime._
@@ -31,6 +31,6 @@ class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, adm
   private def bind() = Http().bindAndHandle(
     handler = adminRoutes.route,
     interface = ClusterAwareSettings.hostname,
-    port = adminPort
+    port = settings.`admin-port`
   )
 }

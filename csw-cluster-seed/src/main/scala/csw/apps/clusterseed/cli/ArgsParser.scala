@@ -14,7 +14,7 @@ class ArgsParser {
     } text "Port at which this cluster seed will run"
 
     opt[Int]("adminPort") action { (x, c) =>
-      c.copy(adminPort = x)
+      c.copy(adminPort = Some(x))
     } text "Optional: Port at which the http admin log server will start. Default is 7878"
 
     help("help")

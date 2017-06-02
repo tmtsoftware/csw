@@ -11,13 +11,14 @@ import scala.concurrent.duration.DurationInt
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) extends ClusterSeedLogger.Simple {
   def start(args: Array[String]): Unit =
     new ArgsParser().parse(args).map {
-      case Options(clusterPort, adminPort) =>
-        val updatedClusterSettings = clusterSettings.onPort(clusterPort)
-        val wiring                 = new AdminWiring(updatedClusterSettings.system, adminPort)
+      case Options(clusterPort, maybeAdminPort) =>
+        val wiring = AdminWiring.make(clusterSettings, clusterPort, maybeAdminPort)
+
         if (startLogging) wiring.actorRuntime.startLogging()
+
+        clusterSettings.logDebugString()
         wiring.locationService
-        updatedClusterSettings.logDebugString()
-        Await.result(wiring.adminHttpService.registeredLazyBinding, 5.seconds)
+        Await.result(wiring.adminHttpService.registeredLazyBinding, 10.seconds)
     }
 }
 

@@ -13,16 +13,15 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
 abstract class AdminLogTestSuite() extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
-  private val actorSystem = ClusterAwareSettings.onPort(3552).system
 
   protected val logBuffer    = mutable.Buffer.empty[JsonObject]
   protected val testAppender = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
 
   protected val hostName = InetAddress.getLocalHost.getHostName
-  protected val loggingSystem =
-    new LoggingSystem("logging", "SNAPSHOT-1.0", hostName, actorSystem, Seq(testAppender))
 
-  protected val adminWiring = new AdminWiring(actorSystem, 7878)
+  protected val adminWiring = AdminWiring.make(ClusterAwareSettings, 3552, Some(7878))
+  protected val loggingSystem =
+    new LoggingSystem("logging", "SNAPSHOT-1.0", hostName, adminWiring.actorSystem, Seq(testAppender))
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
