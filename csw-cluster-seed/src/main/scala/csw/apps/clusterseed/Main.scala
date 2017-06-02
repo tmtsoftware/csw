@@ -12,11 +12,12 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) exte
   def start(args: Array[String]): Unit =
     new ArgsParser().parse(args).map {
       case Options(clusterPort, maybeAdminPort) =>
-        val wiring = AdminWiring.make(clusterSettings, clusterPort, maybeAdminPort)
+        val updatedClusterSettings = clusterSettings.onPort(clusterPort)
+        val wiring                 = AdminWiring.make(updatedClusterSettings, maybeAdminPort)
 
         if (startLogging) wiring.actorRuntime.startLogging()
 
-        clusterSettings.logDebugString()
+        updatedClusterSettings.logDebugString()
         wiring.locationService
         Await.result(wiring.adminHttpService.registeredLazyBinding, 10.seconds)
     }

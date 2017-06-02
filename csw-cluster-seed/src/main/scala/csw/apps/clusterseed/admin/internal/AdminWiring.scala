@@ -25,9 +25,9 @@ class AdminWiring {
 
 object AdminWiring {
 
-  def make(_clusterSettings: ClusterSettings, clusterPort: Int, maybeAdminPort: Option[Int]): AdminWiring =
+  def make(_clusterSettings: ClusterSettings, maybeAdminPort: Option[Int]): AdminWiring =
     new AdminWiring {
-      override lazy val clusterSettings: ClusterSettings = _clusterSettings.onPort(clusterPort)
+      override lazy val clusterSettings: ClusterSettings = _clusterSettings
 
       override lazy val settings: Settings = new Settings(config) {
         override val `admin-port`: Int = maybeAdminPort.getOrElse(super.`admin-port`)
