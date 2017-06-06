@@ -47,6 +47,8 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   private val timeout = 5.seconds
   private val waitForResolveLimit = 30.seconds
 
+  // scalastyle:off print.ln
+
   // EXAMPLE DEMO START
 
   // This demo shows some basics of using the location service.  Before running this example,
@@ -62,8 +64,9 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   // add some dummy registrations for illustrative purposes
 
   // dummy http connection
+  private val httpPort = 8080
   private val httpConnection   = HttpConnection(ComponentId("configuration", ComponentType.Service))
-  private val httpRegistration = HttpRegistration(httpConnection, 8080, "path123")
+  private val httpRegistration = HttpRegistration(httpConnection, httpPort, "path123")
   private val httpRegResult = Await.result(locationService.register(httpRegistration), timeout)
 
   // dummy HCD connection
@@ -220,6 +223,8 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
     //    subscription event
     //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
+    // scalastyle:on print.ln
+
   }
 
   def locationInfoToString(loc: Location): String = {
@@ -243,14 +248,14 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
     // Receive a location from the location service and if it is an akka location, send it a message
     case LocationUpdated(loc) =>
-      println(s"Location updated ${locationInfoToString(loc)}")
+      println(s"Location updated ${locationInfoToString(loc)}")  // scalastyle:ignore
 
     // A location was removed
     case LocationRemoved(conn) =>
-      println(s"Location removed $conn")
+      println(s"Location removed $conn")   // scalastyle:ignore
 
     case AllDone =>
-      println(s"Tracking of $exampleConnection complete.")
+      println(s"Tracking of $exampleConnection complete.")   // scalastyle:ignore
 
     case x =>
       log.error(s"Received unexpected message $x")
