@@ -40,12 +40,12 @@ object LocationServiceExampleComponent {
  */
 class LocationServiceExampleComponent(locationService: LocationService) extends Actor with ActorLogging {
 
-  println("In actor LocationServiceExampleComponent")
+  log.info("In actor LocationServiceExampleComponent")
 
   // Register with the location service
   Await.result(locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self)), 5.seconds)
 
-  println("LocationServiceExampleComponent registered.")
+  log.info("LocationServiceExampleComponent registered.")
 
   override def receive: Receive = {
     // This is the message that TestServiceClient sends when it discovers this service
