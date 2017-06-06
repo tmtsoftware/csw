@@ -35,8 +35,7 @@ object AppLogger extends ComponentLogger("app")
 
 class DemoApp extends AppLogger.Simple {
 
-  private val actorSystem = ClusterAwareSettings.onPort(3552).system
-  val adminWiring         = new AdminWiring(actorSystem)
+  val adminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3552), Some(7878))
   import adminWiring._
 
   private val loggingSystem = actorRuntime.startLogging()
@@ -44,7 +43,7 @@ class DemoApp extends AppLogger.Simple {
   def run(): Unit = {
     startSeed()
     registerWithLocationService()
-    startLogging()
+    sampleLogging()
   }
 
   def startSeed(): Unit = {
@@ -73,7 +72,7 @@ class DemoApp extends AppLogger.Simple {
     log.debug(s"List of registered locations : $result")
   }
 
-  def startLogging(): Unit = {
+  def sampleLogging(): Unit = {
     while (true) {
       println("------------------------------------")
       log.trace("logging at trace level")

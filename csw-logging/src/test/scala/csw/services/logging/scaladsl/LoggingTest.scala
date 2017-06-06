@@ -49,7 +49,7 @@ class LoggingTest extends LoggingTestSuite {
     //  TromboneHcd component is logging 6 messages
     //  As per the filter, hcd should log 5 message of all the levels except TRACE
     new TromboneHcd().startLogging(logMsgMap)
-    Thread.sleep(100)
+    Thread.sleep(200)
 
     //  TromboneHcd component is logging 6 messages each of unique level
     //  As per the filter, hcd should log 5 message of all level except TRACE
@@ -74,7 +74,7 @@ class LoggingTest extends LoggingTestSuite {
   test("should apply default log level provided in configuration file for normal logging messages") {
 
     new TromboneAssembly().startLogging(logMsgMap)
-    Thread.sleep(100)
+    Thread.sleep(200)
 
     //  TromboneAssembly component is logging 6 messages each of unique level
     //  As per the default loglevel = trace, assembly should log all 6 message
