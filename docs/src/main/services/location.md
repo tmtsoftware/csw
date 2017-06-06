@@ -106,40 +106,125 @@ ActorSystem will now be available for communication from other components that a
 
 ## Resolving Connections
 
-A connection of interest, can be checked if available using the `resolve` API. If the connection is alive, `resolve` returns the handle to the `Location`.   If not, `resolve` will wait for a time specified as an argument for the component to become available.  If it doesn't, it will return a Future[None].
- 
-To check for a connection without a waiting period, use the `find` API.
+`register` API takes a `Registration` parameter and returns a handle to registration result. The success of `register` API can be validated by checking the `Location` instance pointed by registration result.
+
+The `list` API returns a list of alive connections with LocationService.
+  
+A connection of interest, can be checked if available using the `resolve` or `find` API.    
+
+`resolve` will find the location for a connection from the local cache, if not found waits for the event to arrive within specified time limit. Returns None if both fail.    
+
+`find` will return the location for a connection from the local cache and if not found then returns None.    
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #find-resolve }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #find }
 
-JavaBlocking
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #find-resolve }
+Java
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #find }
 
+Java Non-Blocking
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
+
+
+The output for this find operation when the compoment being search for is not registered should be:
+
+```
+Attempting to find connection AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) ...
+Find result: None
+```
+
+An example of the resolve command is shown in the following: 
+
+Scala
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #resolve }
+
+Java
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #resolve }
+
+Java Non-Blocking
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
+
+
+The output should be:
+
+```
+Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds ...
+```
+
+If you then start the LocationServiceExampleComponentApp, the following line will be outputted:
+```
+Resolve result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+```
+
+If not, eventually the operation will timeout and the output read:
+```
+Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
+```
 
 ## Filtering
 
-The `list` API and it's variants offer means to inquire about available connections with LocationService. The **parameter-less** `list` returns all available connections
-
-Other variants are filters using `ConnectionType`, `ComponentType` and `hostname`.
- 
-Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #filtering }
-
-JavaBlocking
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #filtering }
-
-
-## Unregistering
-
-One of the ways to `unregister` a service is by calling unregister on registration result received from `register` API.
+The `list` API and its variants offer means to inquire about available connections with LocationService. The **parameter-less** `list` returns all available connections
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #unregister }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #list }
 
-JavaBlocking
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #unregister }
+Java
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #list }
 
+Java Non-Blocking
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #filtering }
+
+The output should be:
+
+```
+All Registered Connections:
+--- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
+--- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
+--- redis-service-tcp, component type=Service, connection type=TcpType
+--- configuration-service-http, component type=Service, connection type=HttpType
+--- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+```
+
+Other variants are filters using `ConnectionType`, `ComponentType`, and `hostname`.
+
+Filtering by component type is shown below:
+
+Scala
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #filtering-component }
+
+Java
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #filtering-component }
+
+Java Non-Blocking
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #filtering }
+
+The output should be:
+
+```
+Registered Assemblies:
+--- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
+--- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+```
+
+Filtering by connection type is shown below:
+
+Scala
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #filtering-connection }
+
+Java
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #filtering-connection }
+
+Java Non-Blocking
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #filtering }
+
+The output should be:
+
+```
+Registered Akka connections:
+--- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
+--- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
+--- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+```
 
 ## Tracking and Subscribing
 
@@ -168,12 +253,55 @@ In return it gives a Killswitch that can be used to turn off the event notificat
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #tracking }
 
-JavaBlocking
+Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #tracking }
 
+Java Non-Blocking
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #tracking }
+
+The output should be:
+```
+Starting to track AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+Starting a subscription to AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+subscription event
+Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+```
+
+If you now stop the LocationServiceExampleComponentApp, it would print to the screen:
+```
+subscription event
+Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+```
+
+If you start the LocationServiceExampleComponentApp again, the output should be:
+```
+Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+subscription event
+Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+```
+
+Note: the line after the words "subscription event" in our example is generated by the subscription, and the other line is from
+tracking.  These two events could come in any order.
+
+
+## Unregistering
+
+One of the ways to `unregister` a service is by calling unregister on registration result received from `register` API.
+
+Scala
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala) { #unregister }
+
+Java
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #unregister }
+
+Java Non-Blocking
+:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
 
 
 ## Source code for examples
 
 * @github[Scala Example](/examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala)
-* @github[JavaBlocking Example](/examples/src/test/java/csw/services/examples/JLocationServiceExampleClientApp.java)
+* @github[Java Example](/csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java)
+* @github[JavaBlocking Example](/examples/src/main/java/csw/services/examples/JLocationServiceExampleClientApp.java)
