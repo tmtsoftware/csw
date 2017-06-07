@@ -122,10 +122,6 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #find }
 
-Java Non-Blocking
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
-
-
 The output for this find operation when the compoment being search for is not registered should be:
 
 ```
@@ -140,10 +136,6 @@ Scala
 
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #resolve }
-
-Java Non-Blocking
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
-
 
 The output should be:
 
@@ -171,9 +163,6 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #list }
 
-Java Non-Blocking
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #filtering }
-
 The output should be:
 
 ```
@@ -195,9 +184,6 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #filtering-component }
 
-Java Non-Blocking
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #filtering }
-
 The output should be:
 
 ```
@@ -213,9 +199,6 @@ Scala
 
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #filtering-connection }
-
-Java Non-Blocking
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #filtering }
 
 The output should be:
 
@@ -256,9 +239,6 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #tracking }
 
-Java Non-Blocking
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #tracking }
-
 The output should be:
 ```
 Starting to track AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
@@ -296,12 +276,8 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java) { #unregister }
 
-Java Non-Blocking
-:   @@snip [JLocationServiceNonBlockingDemoExample.scala](../../../../csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java) { #register-list-resolve-unregister }
-
 
 ## Source code for examples
 
 * @github[Scala Example](/examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala)
-* @github[Java Example](/csw-location/src/test/java/csw/services/location/javadsl/demo/JLocationServiceNonBlockingDemoExample.java)
 * @github[JavaBlocking Example](/examples/src/main/java/csw/services/examples/JLocationServiceExampleClientApp.java)
