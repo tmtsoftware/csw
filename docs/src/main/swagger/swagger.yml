@@ -1,23 +1,15 @@
 swagger: '2.0'
 info:
   version: '1.0'
-  title: csw-prod
+  title: TMT Common Software REST Endpoints
   description: |-
     Common Software is the package of services and infrastructure software that integrates the TMT software systems.
 
-    http://www.tmt.org
+    Visit [TMT Website](http://www.tmt.org) for more information.
 
-    This collection of routes consists of http end points exposed by TMT common software.
+    Complete codebase is available on [Github](https://github.com/tmtsoftware/csw-prod).
 
-    Complete codebase is available at https://github.com/tmtsoftware/csw-prod
-
-    This documentation covers log admin api and configuration service api.
-
-    ## Log Admin :
-      Log admin is the http server started on cluster seed application which exposes end points to get the current logging configuration for particular component as well as it allows administrator to change the log level of running component dynamically.
-
-    ## Configuration Service :
-      Configuration service application start Http server which exposes end points to manage configuration files by storing them in a repository (by default, using Subversion).
+    Collection of routes listed on this page are http end points exposed by TMT common software.
 
   x-logo:
     url: 'tmt.jpeg'
@@ -28,9 +20,9 @@ host: localhost:4000
 basePath: /
 tags:
   - name: Log Admin
-    description: Update/get component log levels.
+    description: Log admin is the http server started on cluster seed application which exposes end points to get the current logging configuration for particular component as well as it allows administrator to change the log level of running component dynamically.
   - name: Configuration Service
-    description: Collection of Api's to store, update and maintain history of configuration files.
+    description: Configuration service application start Http server which exposes end points to manage configuration files by storing them in a repository (by default, using Subversion).
 schemes:
   - http
 consumes:
@@ -41,7 +33,7 @@ paths:
   '/admin/logging/{componentName}/level':
     get:
       description: |-
-        Get log metatdata Api returns the current log level details for particular component. Response contains below details :
+        Returns the current log level details for particular component. Response contains below details :
         1. LogLevel
         2. AkkaLevel
         3. Slf4jLevel
@@ -66,7 +58,7 @@ paths:
         '404':
           description: Not Found
     post:
-      description: Set log level Api dynamically changes the log level of component.
+      description: Dynamically changes the log level of component.
       summary: Set Log Level
       tags:
         - Log Admin
@@ -96,7 +88,7 @@ paths:
           description: OK
   '/config/{path}':
     get:
-      description: Get Api fetches the latest version of requested configuration file from the repository either from normal/annex store.
+      description: Fetches the latest version of requested configuration file from the repository either from normal/annex store.
       summary: Get Config
       tags:
         - Configuration Service
@@ -126,7 +118,7 @@ paths:
         '404':
           description: Not Found
     put:
-      description: Update Api modifies the content of existing file with the updated content.
+      description: Modifies the content of existing file with the updated content.
       summary: Update Config
       tags:
         - Configuration Service
@@ -153,8 +145,8 @@ paths:
           description: Not Found
     post:
       description: |-
-        Create Api lets you upload configuration file in the repository.
-        Configuraion file gets stored in annex store if one of the below condition statisfies else gets stored in normal store :
+        Uploads configuration file in the repository.
+        Configuraion file is stored in annex store if one of the below condition statisfies else stored in normal store :
         1. Annex flag is true
         2. File size exceeds the maximum size configured in Configuration service.
       summary: Create Config
@@ -194,7 +186,7 @@ paths:
         '409':
           description: Conflict
     delete:
-      description: Delete Api removes the configuration file from repository.
+      description: Removes the configuration file from repository.
       summary: Delete Config
       tags:
         - Configuration Service
@@ -219,7 +211,7 @@ paths:
           description: Not Found
   '/active-config/{path}':
     get:
-      description: 'Get active Api retrieves the current active configuration file. If date query parameter is provided, active configuration file on provided timestamp gets retrieved.'
+      description: Retrieves the current active configuration file. If date query parameter is provided, active configuration file on provided timestamp is retrieved.
       summary: Get Active Config
       tags:
         - Configuration Service
@@ -239,7 +231,7 @@ paths:
           description: Not Found
   '/active-version/{path}':
     get:
-      description: Get active version Api fetches the current active version of a configuration file.
+      description: Fetches the current active version of a configuration file.
       summary: Get Active Version Of Config
       tags:
         - Configuration Service
@@ -260,7 +252,7 @@ paths:
         '404':
           description: Not Found
     put:
-      description: 'Reset active version api, sets the current active version of file to the master (latest version of file).'
+      description: Sets the current active version of file to the master (latest version of file).
       summary: Reset Active Version Of Config
       tags:
         - Configuration Service
@@ -285,7 +277,7 @@ paths:
           description: Not Found
   /list:
     get:
-      description: List Api returns the path of all the configuration files available in annex/normal store.
+      description: Returns the path of all the configuration files available in annex/normal store.
       summary: List Configs
       tags:
         - Configuration Service
@@ -313,7 +305,7 @@ paths:
             $ref: '#/definitions/ConfigFileInfo'
   '/history/{path}':
     get:
-      description: 'History Api retrieves id, comment and timestamp of all the revisons of configuration files.'
+      description: Retrieves id, comment and timestamp of all the revisons of configuration files.
       summary: Get Config History
       tags:
         - Configuration Service
@@ -350,7 +342,7 @@ paths:
           description: Not Found
   '/history-active/{path}':
     get:
-      description: 'History-Active Api retrieves id, comment and timestamp of only active revisons of configuration files.'
+      description: Retrieves id, comment and timestamp of only active revisons of configuration files.
       summary: Get Active Config History
       tags:
         - Configuration Service
@@ -388,7 +380,7 @@ paths:
   /metadata:
     get:
       description: |-
-        Get metadata Api returns the following configurations of Configuration service :
+        Retreives following metadata of Configuration service :
         1. Repository Path
         2. Annex store Path
         3. Annex file min Size
