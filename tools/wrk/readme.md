@@ -9,7 +9,8 @@ An optional LuaJIT script can perform HTTP request generation, response processi
     1. Mac users can simply install it through `brew`. Run below command :
         brew install wrk
     
-    2. For detailed instruction on how to install wrk on Linux / CentOS / RedHat / Fedora, visit [here](https://github.com/wg/wrk/wiki/Installing-Wrk-on-Linux)
+    2. For detailed instruction on how to install wrk on Linux / CentOS / RedHat / Fedora, 
+    visit this link https://github.com/wg/wrk/wiki/Installing-Wrk-on-Linux
 
 Verify wrk installation by running `wrk --version` and you should get something like this:
     
@@ -50,10 +51,11 @@ Verify wrk installation by running `wrk --version` and you should get something 
 3. `debug.lua` :
     - This script used by get.lua and post.lua for printing debug logs on console.
 
+## Test Instructions
 Once the wrk is installed on test machine, follow below instructions to run load test on Configuration Server :
 1. Start cluster seed app
 2. Start config service at port 4000 with initRepo option enabled
 3. Now run wrk command with test parameters
     - ex. 
-        - wrk -t1 -c10 -d60s -s post.lua http://<config-server-ip>:4000
-        - wrk -t100 -c100 -d30s -s get.lua http://<config-server-ip>:4000
+        - wrk -t1 -c10 -d60s -s post.lua http://127.0.0.1:4000
+        - wrk -t100 -c100 -d30s -s get.lua http://127.0.0.1:4000
