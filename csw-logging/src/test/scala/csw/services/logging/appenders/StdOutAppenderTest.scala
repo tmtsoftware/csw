@@ -4,13 +4,17 @@ import java.io.ByteArrayOutputStream
 
 import akka.actor.ActorSystem
 import com.persist.JsonOps
+import com.typesafe.config.ConfigFactory
 import csw.services.logging.RichMsg
-import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 // DEOPSCSW-122: Allow local component logs to be output to STDOUT
-class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach {
+class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  private val actorSystem = ActorSystem("test-actor-system")
+  private val actorSystem = ActorSystem("test-1")
 
   private val standardHeaders: Map[String, RichMsg] = Map[String, RichMsg]("@version" -> 1, "@host" -> "localhost",
     "@service" -> Map[String, RichMsg]("name" -> "test-service", "version" -> "1.2.3"))
@@ -22,7 +26,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       |"@componentName":"tromboneHcd",
       | "@severity":"WARN",
       | "@version":1,
-      | "@msg":"This is a test log message.",
+      | "msg":"This is a test log message.",
       | "class":"csw.services.logging.Class2",
       | }
     """.stripMargin
@@ -35,7 +39,12 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     outCapture.reset()
   }
 
-  test("StdOutAppender prints message to standard output stream if category is \'common\'") {
+  override protected def afterAll(): Unit = {
+    outCapture.close()
+    Await.result(actorSystem.terminate(), 5.seconds)
+  }
+
+  test("should print message to standard output stream if category is \'common\'") {
     val category = "common"
 
     Console.withOut(outCapture) {
@@ -46,7 +55,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     actualLogJson shouldBe expectedLogJson
   }
 
-  test("StdOutAppender should not print message to standard output stream if category is not \'common\'") {
+  test("should not print message to standard output stream if category is not \'common\'") {
     val category = "foo"
 
     Console.withOut(outCapture) {
@@ -54,6 +63,27 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     }
 
     outCapture.toString.isEmpty shouldBe true
+  }
+
+  test("should able to pretty-print one log message to one line") {
+
+    val config = ConfigFactory
+      .parseString("com.persist.logging.appenders.stdout.oneLine=true")
+      .withFallback(ConfigFactory.load)
+
+    val system          = ActorSystem("test-2", config)
+    val stdOutAppender1 = new StdOutAppender(system, standardHeaders, println)
+
+    Console.withOut(outCapture) {
+      stdOutAppender1.append(expectedLogJson, "common")
+    }
+
+    val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")
+    val expectedOneLineLogMsg = s"[${expectedLogJson.get("@severity").get}] ${expectedLogJson.get("msg").get}"
+
+    actualOneLineLogMsg shouldBe expectedOneLineLogMsg
+
+    Await.result(system.terminate(), 5.seconds)
   }
 
 }
