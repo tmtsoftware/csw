@@ -2,18 +2,12 @@ package csw.apps.clusterseed.admin
 
 import akka.pattern.ask
 import akka.util.Timeout
-import csw.apps.clusterseed.admin.exceptions.{
-  InvalidComponentNameException,
-  UnresolvedAkkaLocationException
-}
+import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaLocationException}
 import csw.apps.clusterseed.admin.internal.ActorRuntime
 import csw.services.location.models.{AkkaLocation, Connection, Location}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.internal.{
-  GetComponentLogMetadata,
-  SetComponentLogLevel
-}
+import csw.services.logging.internal.{GetComponentLogMetadata, SetComponentLogLevel}
 import csw.services.logging.models.LogMetadata
 
 import scala.async.Async._
@@ -47,7 +41,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
     async {
       Connection.from(componentName) match {
         case connection: Connection ⇒ await(locationService.find(connection))
-        case _ ⇒ throw InvalidComponentNameException(componentName)
+        case _                      ⇒ throw InvalidComponentNameException(componentName)
       }
     }
 }
