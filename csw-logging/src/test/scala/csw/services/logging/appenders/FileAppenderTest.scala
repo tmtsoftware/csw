@@ -13,6 +13,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
+// DEOPSCSW-123: Allow local component logs to be output to a file
 class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   private val logFileDir = Paths.get("/tmp/csw-test-logs/").toFile
   private val config = ConfigFactory
@@ -28,7 +29,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     """{
       |  "@category": "common",
       |  "@componentName": "FileAppenderTest",
-      |  "@host": "in-pritamkadam.local",
+      |  "@host": "localhost",
       |  "@service": {
       |    "name": "logging",
       |    "version": "SNAPSHOT-1.0"

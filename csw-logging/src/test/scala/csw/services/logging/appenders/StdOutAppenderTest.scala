@@ -23,12 +23,20 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
   val logMessage: String =
     """{
-      |"@componentName":"tromboneHcd",
-      | "@severity":"WARN",
-      | "@version":1,
-      | "msg":"This is a test log message.",
-      | "class":"csw.services.logging.Class2",
-      | }
+      |  "@componentName": "FileAppenderTest",
+      |  "@host": "localhost",
+      |  "@service": {
+      |    "name": "logging",
+      |    "version": "SNAPSHOT-1.0"
+      |  },
+      |  "@severity": "ERROR",
+      |  "@timestamp": "2017-06-19T16:10:19.397000000+05:30",
+      |  "@version": 1,
+      |  "class": "csw.services.logging.appenders.FileAppenderTest",
+      |  "file": "FileAppenderTest.scala",
+      |  "line": 25,
+      |  "msg": "This is at ERROR level"
+      |}
     """.stripMargin
 
   val expectedLogJson = JsonOps.Json(logMessage).asInstanceOf[Map[String, String]]
@@ -78,8 +86,9 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       stdOutAppenderForOneLineMsg.append(expectedLogJson, "common")
     }
 
-    val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")
-    val expectedOneLineLogMsg = s"[${expectedLogJson.get("@severity").get}] ${expectedLogJson.get("msg").get}"
+    val actualOneLineLogMsg = outCapture.toString.replace("\n", "")
+    val expectedOneLineLogMsg =
+      s"[${expectedLogJson.get("@severity").get}] ${expectedLogJson.get("msg").get} (${expectedLogJson.get("file").get} ${expectedLogJson.get("line").get})"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg
 
