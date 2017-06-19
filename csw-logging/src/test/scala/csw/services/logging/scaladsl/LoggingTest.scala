@@ -1,8 +1,10 @@
 package csw.services.logging.scaladsl
 
+import com.persist.JsonOps
 import csw.services.logging.internal.LoggingLevels
-import csw.services.logging.internal.LoggingLevels.Level
+import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.utils.LoggingTestSuite
+import org.scalatest.prop.TableDrivenPropertyChecks._
 
 object TromboneHcdLogger      extends ComponentLogger("tromboneHcd")
 object TromboneAssemblyLogger extends ComponentLogger("tromboneAssembly")
@@ -95,4 +97,43 @@ class LoggingTest extends LoggingTestSuite {
     }
   }
 
+  // DEOPSCSW-124: Define severity levels for log messages
+  // DEOPSCSW-125: Define severity levels for specific components/log instances
+  test("should able to filter logs based on configured/updated log level (covers all levels)") {
+    val testData = Table(
+      ("logLevel", "expectedLogCount"),
+      (FATAL, 1),
+      (ERROR, 2),
+      (WARN, 3),
+      (INFO, 4),
+      (DEBUG, 5),
+      (TRACE, 6)
+    )
+    val compName = "tromboneAssembly"
+
+    def filterLogsByComponentName(compName: String): Seq[JsonOps.JsonObject] = {
+      val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json("@componentName").toString)
+      groupByComponentNamesLog.get(compName).get
+    }
+
+    forAll(testData) { (logLevel: Level, logCount: Int) =>
+      loggingSystem.setLevel(logLevel)
+
+      new TromboneAssembly().startLogging(logMsgMap)
+      Thread.sleep(200)
+
+      val tromboneAssemblyLogs = filterLogsByComponentName(compName)
+      tromboneAssemblyLogs.size shouldBe logCount
+
+      tromboneAssemblyLogs.toList.foreach { log ⇒
+        val currentLogLevel = log("@severity").toString.toLowerCase
+        val currentLogMsg   = log("msg").toString
+        Level(currentLogLevel) >= logLevel shouldBe true
+        currentLogMsg shouldBe logMsgMap.get(currentLogLevel).get
+      }
+
+      logBuffer.clear()
+    }
+
+  }
 }
