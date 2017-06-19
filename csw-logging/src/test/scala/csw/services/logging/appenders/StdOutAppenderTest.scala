@@ -71,11 +71,11 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       .parseString("com.persist.logging.appenders.stdout.oneLine=true")
       .withFallback(ConfigFactory.load)
 
-    val system          = ActorSystem("test-2", config)
-    val stdOutAppender1 = new StdOutAppender(system, standardHeaders, println)
+    val actorSystemWithOneLineTrueConfig = ActorSystem("test-2", config)
+    val stdOutAppenderForOneLineMsg      = new StdOutAppender(actorSystemWithOneLineTrueConfig, standardHeaders, println)
 
     Console.withOut(outCapture) {
-      stdOutAppender1.append(expectedLogJson, "common")
+      stdOutAppenderForOneLineMsg.append(expectedLogJson, "common")
     }
 
     val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")
@@ -83,7 +83,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg
 
-    Await.result(system.terminate(), 5.seconds)
+    Await.result(actorSystemWithOneLineTrueConfig.terminate(), 5.seconds)
   }
 
 }
