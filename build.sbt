@@ -120,4 +120,5 @@ lazy val docs = project.enablePlugins(ParadoxSite, NoPublish)
 lazy val examples = project
   .enablePlugins(DeployApp)
   .dependsOn(`csw-location`)
+  .dependsOn(`csw-logging`)
   .settings(libraryDependencies ++= Dependencies.CswProdExamples)
