@@ -9,16 +9,19 @@ class AdminRoutes(adminExceptionHandler: AdminExceptionHandler, logAdmin: LogAdm
     extends HttpSupport {
 
   import actorRuntime._
-  val route: Route = handleExceptions(adminExceptionHandler.exceptionHandler) {
-    path("admin" / "logging" / Segment / "level") { componentName ⇒
-      get {
-        complete(logAdmin.getLogMetadata(componentName))
-      } ~
-      post {
-        logLevelParam { (logLevel) ⇒
-          complete(logAdmin.setLogLevel(componentName, logLevel).map(_ ⇒ Done))
+  val route: Route = routeLogger {
+    handleExceptions(adminExceptionHandler.exceptionHandler) {
+      path("admin" / "logging" / Segment / "level") { componentName ⇒
+        get {
+          complete(logAdmin.getLogMetadata(componentName))
+        } ~
+        post {
+          logLevelParam { (logLevel) ⇒
+            complete(logAdmin.setLogLevel(componentName, logLevel).map(_ ⇒ Done))
+          }
         }
       }
     }
   }
+
 }

@@ -4,6 +4,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaLocationException}
 import csw.apps.clusterseed.admin.internal.ActorRuntime
+import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.services.location.models.{AkkaLocation, Connection, Location}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.Level
@@ -14,7 +15,7 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
+class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) extends ClusterSeedLogger.Simple {
 
   import actorRuntime._
 
@@ -22,6 +23,8 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
     implicit val timeout = Timeout(5.seconds)
     await(getLocation(componentName)) match {
       case Some(AkkaLocation(_, _, actorRef)) ⇒
+        log.info(Map("@msg" → "Getting log information from logging system.", "componentName" → componentName,
+            "actorRef"      → actorRef))
         await((actorRef ? GetComponentLogMetadata).mapTo[LogMetadata])
       case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
     }
@@ -29,9 +32,10 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
 
   def setLogLevel(componentName: String, logLevel: Level): Future[Unit] =
     async {
-
       await(getLocation(componentName)) match {
         case Some(AkkaLocation(_, _, actorRef)) ⇒
+          log.info(Map("@msg" → s"Setting loglevel to $logLevel.", "componentName" → componentName,
+              "actorRef"      → actorRef))
           actorRef ! SetComponentLogLevel(logLevel)
         case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
       }

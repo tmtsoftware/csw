@@ -1,5 +1,6 @@
 package csw.apps.clusterseed.admin.internal
 
+import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.clusterseed.admin.LogAdmin
 import csw.apps.clusterseed.admin.http.{AdminExceptionHandler, AdminHttpService, AdminRoutes}
@@ -14,7 +15,7 @@ class AdminWiring {
   lazy val config: Config                     = ConfigFactory.load()
   lazy val settings                           = new Settings(config)
   lazy val clusterSettings                    = ClusterSettings()
-  lazy val actorSystem                        = clusterSettings.system
+  lazy val actorSystem: ActorSystem           = clusterSettings.system
   lazy val actorRuntime                       = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService   = LocationServiceFactory.withSystem(actorSystem)
   lazy val logAdmin: LogAdmin                 = new LogAdmin(locationService, actorRuntime)
