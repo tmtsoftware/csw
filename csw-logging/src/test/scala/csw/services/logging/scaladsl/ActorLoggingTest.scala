@@ -6,9 +6,6 @@ import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.scaladsl.TromboneActor._
 import csw.services.logging.utils.LoggingTestSuite
 
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
-
 object TromboneLogger extends ComponentLogger("tromboneHcdActor")
 
 object TromboneActor {
@@ -31,19 +28,16 @@ class TromboneActor() extends TromboneLogger.Actor {
     case LogWarn  => log.warn("Level is warn")
     case LogError => log.error("Level is error")
     case LogFatal => log.fatal("Level is fatal")
-    case x: Any   => log.error(Map("@msg" -> "Unexpected actor message", "message" -> x.toString))
+    case x: Any =>
+      log.error(Map("@errorMsg" -> "Unexpected actor message", "message" -> x.toString))
   }
 }
 
 class ActorLoggingTest extends LoggingTestSuite {
-  private val tromboneActorRef = actorSystem.actorOf(TromboneActor.props(), name = "TromboneActor")
+  private val tromboneActorRef =
+    actorSystem.actorOf(TromboneActor.props(), name = "TromboneActor")
 
   override protected def afterEach(): Unit = logBuffer.clear()
-
-  override protected def afterAll(): Unit = {
-    Await.result(loggingSystem.stop, 10.seconds)
-    Await.result(actorSystem.terminate(), 10.seconds)
-  }
 
   def sendMessagesToActor() = {
     tromboneActorRef ! LogTrace
@@ -69,14 +63,25 @@ class ActorLoggingTest extends LoggingTestSuite {
     }
   }
 
+  test("message logged with custom Map properties should get logged") {
+    tromboneActorRef ! "Unknown"
+    Thread.sleep(200)
+
+    val errorLevelLogMessages =
+      logBuffer.groupBy(json ⇒ json("@severity"))("ERROR")
+    errorLevelLogMessages.size shouldEqual 1
+    errorLevelLogMessages.head("msg") shouldBe Map("@errorMsg" -> "Unexpected actor message", "message" -> "Unknown")
+  }
+
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
   test("should load default filter provided in configuration file and applied to actor messages") {
 
     sendMessagesToActor()
     //  TromboneHcd component is logging 7 messages
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
-    val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json("@componentName").toString)
-    val tromboneHcdLogs          = groupByComponentNamesLog.get("tromboneHcdActor").get
+    val groupByComponentNamesLog =
+      logBuffer.groupBy(json ⇒ json("@componentName").toString)
+    val tromboneHcdLogs = groupByComponentNamesLog("tromboneHcdActor")
 
     tromboneHcdLogs.size shouldBe 3
 
