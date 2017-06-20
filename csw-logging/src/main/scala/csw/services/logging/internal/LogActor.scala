@@ -39,7 +39,8 @@ private[logging] class LogActor(done: Promise[Unit],
   private[this] var akkaLogLevel: Level                            = initAkkaLevel
   private[this] var slf4jLogLevel: Level                           = initSlf4jLevel
 
-  private[this] val ISOLogFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSxxxxx")
+  private[this] val ISOLogFmt =
+    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSxxxxx")
 
   def receive: Receive = {
     case log: Log                     => receiveLog(log)
@@ -50,11 +51,13 @@ private[logging] class LogActor(done: Promise[Unit],
     case SetSlf4jLevel(level1)        => slf4jLogLevel = level1
     case SetAkkaLevel(level1)         => akkaLogLevel = level1
     case SetFilter(f)                 => filter = f
-    case LastAkkaMessage              => akka.event.Logging(context.system, this).error("DIE")
+    case LastAkkaMessage =>
+      akka.event.Logging(context.system, this).error("DIE")
     case StopLogging =>
-      done.success(())
       context.stop(self)
-    case msg: Any => println("Unrecognized LogActor message:" + msg + DefaultSourceLocation)
+      done.success(())
+    case msg: Any =>
+      println("Unrecognized LogActor message:" + msg + DefaultSourceLocation)
   }
 
   private def exToJson(ex: Throwable): Json = {
@@ -116,7 +119,8 @@ private[logging] class LogActor(done: Promise[Unit],
       jsonObject = jsonObject ++ JsonObject("file" -> log.sourceLocation.fileName)
     }
 
-    if (log.sourceLocation.line > 0) jsonObject = jsonObject ++ JsonObject("line" -> log.sourceLocation.line)
+    if (log.sourceLocation.line > 0)
+      jsonObject = jsonObject ++ JsonObject("line" -> log.sourceLocation.line)
 
     jsonObject = (log.sourceLocation.packageName, log.sourceLocation.className) match {
       case ("", "") ⇒ jsonObject
@@ -124,25 +128,31 @@ private[logging] class LogActor(done: Promise[Unit],
       case (p, c)   ⇒ jsonObject ++ JsonObject("class" -> s"$p.$c")
     }
 
-    if (log.actorName.isDefined) jsonObject = jsonObject ++ JsonObject("actor" -> log.actorName.get)
+    if (log.actorName.isDefined)
+      jsonObject = jsonObject ++ JsonObject("actor" -> log.actorName.get)
 
-    if (log.componentName.isDefined) jsonObject = jsonObject ++ JsonObject("@componentName" -> log.componentName.get)
+    if (log.componentName.isDefined)
+      jsonObject = jsonObject ++ JsonObject("@componentName" -> log.componentName.get)
 
     if (log.ex != noException) jsonObject = jsonObject ++ exceptionJson(log.ex)
     jsonObject = log.id match {
-      case RequestId(trackingId, spanId, _) ⇒ jsonObject ++ JsonObject("@traceId" -> JsonArray(trackingId, spanId))
-      case _                                ⇒ jsonObject
+      case RequestId(trackingId, spanId, _) ⇒
+        jsonObject ++ JsonObject("@traceId" -> JsonArray(trackingId, spanId))
+      case _ ⇒ jsonObject
     }
-    if (!log.kind.isEmpty) jsonObject = jsonObject ++ JsonObject("kind" -> log.kind)
+    if (!log.kind.isEmpty)
+      jsonObject = jsonObject ++ JsonObject("kind" -> log.kind)
     append(jsonObject, "common", log.level)
   }
 
   private def receiveAltMessage(logAltMessage: LogAltMessage) = {
     var jsonObject = logAltMessage.jsonObject
-    if (logAltMessage.ex != noException) jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
+    if (logAltMessage.ex != noException)
+      jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
     jsonObject = logAltMessage.id match {
-      case RequestId(trackingId, spanId, _) => jsonObject ++ JsonObject("@traceId" -> JsonArray(trackingId, spanId))
-      case _                                => jsonObject
+      case RequestId(trackingId, spanId, _) =>
+        jsonObject ++ JsonObject("@traceId" -> JsonArray(trackingId, spanId))
+      case _ => jsonObject
     }
     jsonObject = jsonObject ++ JsonObject("@timestamp" -> formatLogTimeToISOFmt(logAltMessage.time))
     append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
@@ -159,8 +169,10 @@ private[logging] class LogActor(done: Promise[Unit],
         "kind"       -> "slf4j",
         "@category"  -> "common"
       )
-      if (logSlf4j.line > 0) jsonObject = jsonObject ++ JsonObject("line" -> logSlf4j.line)
-      if (logSlf4j.ex != noException) jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
+      if (logSlf4j.line > 0)
+        jsonObject = jsonObject ++ JsonObject("line" -> logSlf4j.line)
+      if (logSlf4j.ex != noException)
+        jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
       append(jsonObject, "common", logSlf4j.level)
     }
 
@@ -177,7 +189,8 @@ private[logging] class LogActor(done: Promise[Unit],
         "@category"  -> "common"
       )
 
-      if (logAkka.cause.isDefined) jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
+      if (logAkka.cause.isDefined)
+        jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
       append(jsonObject, "common", logAkka.level)
     }
 

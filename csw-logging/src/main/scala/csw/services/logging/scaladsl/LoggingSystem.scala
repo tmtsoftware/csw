@@ -34,7 +34,8 @@ class LoggingSystem(serviceName: String = "serviceName1",
 
   import LoggingLevels._
 
-  private[this] val loggingConfig = system.settings.config.getConfig("com.persist.logging")
+  private[this] val loggingConfig =
+    system.settings.config.getConfig("com.persist.logging")
 
   private[this] val levels = loggingConfig.getString("logLevel")
   private[this] val defaultLevel: Level = if (Level.hasLevel(levels)) {
@@ -45,19 +46,21 @@ class LoggingSystem(serviceName: String = "serviceName1",
   @volatile var logLevel: Level = defaultLevel
 
   private[this] val akkaLogLevelS = loggingConfig.getString("akkaLogLevel")
-  private[this] val defaultAkkaLogLevel: Level = if (Level.hasLevel(akkaLogLevelS)) {
-    Level(akkaLogLevelS)
-  } else {
-    throw new Exception("Bad value for com.persist.logging.akkaLogLevel")
-  }
+  private[this] val defaultAkkaLogLevel: Level =
+    if (Level.hasLevel(akkaLogLevelS)) {
+      Level(akkaLogLevelS)
+    } else {
+      throw new Exception("Bad value for com.persist.logging.akkaLogLevel")
+    }
   @volatile private[this] var akkaLogLevel = defaultAkkaLogLevel
 
   private[this] val slf4jLogLevelS = loggingConfig.getString("slf4jLogLevel")
-  private[this] val defaultSlf4jLogLevel: Level = if (Level.hasLevel(slf4jLogLevelS)) {
-    Level(slf4jLogLevelS)
-  } else {
-    throw new Exception("Bad value for com.persist.logging.slf4jLogLevel")
-  }
+  private[this] val defaultSlf4jLogLevel: Level =
+    if (Level.hasLevel(slf4jLogLevelS)) {
+      Level(slf4jLogLevelS)
+    } else {
+      throw new Exception("Bad value for com.persist.logging.slf4jLogLevel")
+    }
   @volatile private[this] var slf4jLogLevel = defaultSlf4jLogLevel
 
   private[this] val gc   = loggingConfig.getBoolean("gc")
@@ -176,7 +179,8 @@ class LoggingSystem(serviceName: String = "serviceName1",
    *                and returns false if
    *                that message is to be discarded.
    */
-  def setFilter(filter: Option[(Map[String, RichMsg], Level) => Boolean]): Unit = logActor ! SetFilter(filter)
+  def setFilter(filter: Option[(Map[String, RichMsg], Level) => Boolean]): Unit =
+    logActor ! SetFilter(filter)
 
   def addFilter(componentName: String, level: LoggingLevels.Level): Unit = {
     filterSet = filterSet.add(componentName, level)
@@ -205,6 +209,7 @@ class LoggingSystem(serviceName: String = "serviceName1",
     def stopLogger(): Future[Unit] = {
       LoggingState.loggerStopping = true
       logActor ! StopLogging
+      LoggingState.maybeLogActor = None
       done.future
     }
 
@@ -218,7 +223,8 @@ class LoggingSystem(serviceName: String = "serviceName1",
     gcLogger foreach (_.stop())
 
     // Stop Slf4j
-    val loggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
+    val loggerContext =
+      LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
     loggerContext.stop()
 
     for {
