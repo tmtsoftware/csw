@@ -10,6 +10,7 @@ import csw.services.logging.internal.LoggingLevels.Level
 trait HttpSupport extends Directives with JsonSupport with ClusterSeedLogger.Simple {
   val logLevelParam: Directive1[Level] = parameter('value).map(Level(_))
   private def logRequest(req: HttpRequest): Unit =
-    log.info(Map("url" → req.uri, "method" → req.method.value, "headers" → req.headers))
+    log.info(Map("@msg" → "Request received.", "url" → req.uri.toString(), "method" → req.method.value,
+        "headers"       → req.headers.mkString(",")))
   val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ => logRequest))
 }

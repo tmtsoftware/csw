@@ -1,5 +1,5 @@
 addSbtPlugin("org.scalastyle"                    %% "scalastyle-sbt-plugin"  % "0.8.0")
-addSbtPlugin("com.geirsson"                      % "sbt-scalafmt"            % "0.6.1")
+addSbtPlugin("com.geirsson"                      % "sbt-scalafmt"            % "0.6.8")
 addSbtPlugin("com.dwijnand"                      % "sbt-dynver"              % "1.2.0")
 addSbtPlugin("com.eed3si9n"                      % "sbt-unidoc"              % "0.4.0")
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"        % "1.0.0")

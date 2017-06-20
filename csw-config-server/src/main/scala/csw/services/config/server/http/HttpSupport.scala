@@ -6,22 +6,28 @@ import java.util.regex.{Pattern, PatternSyntaxException}
 
 import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
 import akka.http.scaladsl.model.headers.HttpEncoding
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest}
 import akka.http.scaladsl.server._
+import akka.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
 import csw.services.config.api.internal.JsonSupport
 import csw.services.config.api.models.{ConfigData, ConfigId, FileType}
-import csw.services.config.server.commons.PathValidator
+import csw.services.config.server.commons.{ConfigServerLogger, PathValidator}
 
 /**
  * Helper class for ConfigServiceRoute
  */
-trait HttpSupport extends Directives with JsonSupport {
+trait HttpSupport extends Directives with JsonSupport with ConfigServerLogger.Simple {
 
   def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>
     validate(PathValidator.isValid(path), PathValidator.message(path)).tmap[Path] { _ =>
       Paths.get(path)
     }
   }
+
+  private def logRequest(req: HttpRequest): Unit =
+    log.info(Map("@msg" → "Request received.", "url" → req.uri.toString(), "method" → req.method.value,
+        "headers"       → req.headers.mkString(",")))
+  val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ => logRequest))
 
   val pathParam: Directive1[Path]            = parameter('path).map(filePath ⇒ Paths.get(filePath))
   val latestParam: Directive1[Boolean]       = parameter('latest.as[Boolean] ? false)

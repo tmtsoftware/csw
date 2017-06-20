@@ -220,6 +220,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
   def testConnection(): Unit = {
     val svn = svnHandle()
     try {
+      log.debug("Testing svn connection.")
       svn.testConnection()
     } finally {
       svn.closeSession()
