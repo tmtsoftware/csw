@@ -2,12 +2,15 @@ package csw.services.examples
 
 import akka.actor._
 import akka.stream.ActorMaterializer
+import commons.ExampleLogger
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
-import scala.concurrent.duration._
 
+import scala.async.Async._
 import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 /**
  * An example that shows how to register a component actor with the location service.
@@ -38,12 +41,16 @@ object LocationServiceExampleComponent {
 /**
  * A dummy akka test service that registers with the location service
  */
-class LocationServiceExampleComponent(locationService: LocationService) extends Actor with ActorLogging {
+class LocationServiceExampleComponent(locationService: LocationService) extends Actor with ExampleLogger.Actor {
 
   log.info("In actor LocationServiceExampleComponent")
 
   // Register with the location service
-  Await.result(locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self)), 5.seconds)
+  val registrationResult = async {
+    locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self))
+  }
+
+  Await.result(registrationResult, 5.seconds)
 
   log.info("LocationServiceExampleComponent registered.")
 
