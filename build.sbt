@@ -72,7 +72,6 @@ lazy val `csw-location-agent` = project
 //Config service related projects
 lazy val `csw-config-api` = project
   .enablePlugins(GenJavadocPlugin, MaybeCoverage)
-  .dependsOn(`csw-logging`)
   .settings(
     libraryDependencies ++= Dependencies.ConfigApi
   )
