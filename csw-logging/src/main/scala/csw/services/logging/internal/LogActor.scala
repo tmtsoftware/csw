@@ -162,12 +162,12 @@ private[logging] class LogActor(done: Promise[Unit],
     if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
       var jsonObject = JsonObject(
         "timestamp" -> formatLogTimeToISOFmt(logSlf4j.time),
-        "message"        -> logSlf4j.msg,
-        "file"       -> logSlf4j.file,
-        "@severity"  -> logSlf4j.level.name,
-        "class"      -> logSlf4j.className,
-        "kind"       -> "slf4j",
-        "@category"  -> "common"
+        "message"   -> logSlf4j.msg,
+        "file"      -> logSlf4j.file,
+        "@severity" -> logSlf4j.level.name,
+        "class"     -> logSlf4j.className,
+        "kind"      -> "slf4j",
+        "@category" -> "common"
       )
       if (logSlf4j.line > 0)
         jsonObject = jsonObject ++ JsonObject("line" -> logSlf4j.line)
@@ -181,12 +181,12 @@ private[logging] class LogActor(done: Promise[Unit],
       val msg1 = if (logAkka.msg.toString.isEmpty) "UNKNOWN" else logAkka.msg
       var jsonObject = JsonObject(
         "timestamp" -> formatLogTimeToISOFmt(logAkka.time),
-        "kind"       -> "akka",
-        "message"        -> msg1.toString,
-        "actor"      -> logAkka.source,
-        "@severity"  -> logAkka.level.name,
-        "class"      -> logAkka.clazz.getName,
-        "@category"  -> "common"
+        "kind"      -> "akka",
+        "message"   -> msg1.toString,
+        "actor"     -> logAkka.source,
+        "@severity" -> logAkka.level.name,
+        "class"     -> logAkka.clazz.getName,
+        "@category" -> "common"
       )
 
       if (logAkka.cause.isDefined)

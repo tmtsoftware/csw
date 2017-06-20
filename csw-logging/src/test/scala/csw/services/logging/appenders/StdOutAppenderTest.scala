@@ -86,9 +86,12 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       stdOutAppenderForOneLineMsg.append(expectedLogJson, "common")
     }
 
-    val actualOneLineLogMsg = outCapture.toString.replace("\n", "")
-    val expectedOneLineLogMsg =
-      s"[${expectedLogJson.get("@severity").get}] ${expectedLogJson.get("message").get} (${expectedLogJson.get("file").get} ${expectedLogJson.get("line").get})"
+    val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")
+    val severity              = expectedLogJson.get("@severity").get
+    val msg                   = expectedLogJson.get("message").get
+    val fileName              = expectedLogJson.get("file").get
+    val lineNumber            = s"${expectedLogJson.get("line").get}"
+    val expectedOneLineLogMsg = s"[$severity] $msg ($fileName $lineNumber)"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg
 
