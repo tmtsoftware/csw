@@ -280,4 +280,4 @@ Java
 ## Source code for examples
 
 * @github[Scala Example](/examples/src/main/scala/csw/services/examples/LocationServiceExampleClientApp.scala)
-* @github[JavaBlocking Example](/examples/src/main/java/csw/services/examples/JLocationServiceExampleClientApp.java)
+* @github[JavaBlocking Example](/examples/src/main/java/csw/services/examples/JLocationServiceExampleClient.java)
