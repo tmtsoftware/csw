@@ -64,11 +64,11 @@ private[logging] class LogActor(done: Promise[Unit],
     val name = ex.getClass.toString
     ex match {
       case ex: RichException =>
-        JsonObject("ex" -> name, "msg" -> ex.richMsg)
+        JsonObject("ex" -> name, "message" -> ex.richMsg)
       case ex: SystemException =>
         JsonObject("kind" -> ex.kind, "info" -> ex.info)
       case ex: Throwable =>
-        JsonObject("ex" -> name, "msg" -> ex.getMessage)
+        JsonObject("ex" -> name, "message" -> ex.getMessage)
     }
   }
 
@@ -98,7 +98,7 @@ private[logging] class LogActor(done: Promise[Unit],
         JsonObject("cause" -> exceptionJson(ex.getCause))
       case _ => emptyJsonObject
     }
-    JsonObject("trace" -> JsonObject("msg" -> exToJson(ex), "stack" -> stack)) ++ j1
+    JsonObject("trace" -> JsonObject("message" -> exToJson(ex), "stack" -> stack)) ++ j1
   }
 
   private def append(baseMsg: JsonObject, category: String, level: Level): Unit = {
@@ -112,7 +112,7 @@ private[logging] class LogActor(done: Promise[Unit],
   }
 
   private def receiveLog(log: Log): Unit = {
-    var jsonObject = JsonObject("@timestamp" -> formatLogTimeToISOFmt(log.time), "msg" -> log.sanitizedMessage,
+    var jsonObject = JsonObject("timestamp" -> formatLogTimeToISOFmt(log.time), "message" -> log.sanitizedMessage,
       "@severity" -> log.level.name, "@category" -> "common")
 
     if (!log.sourceLocation.fileName.isEmpty) {
@@ -154,15 +154,15 @@ private[logging] class LogActor(done: Promise[Unit],
         jsonObject ++ JsonObject("@traceId" -> JsonArray(trackingId, spanId))
       case _ => jsonObject
     }
-    jsonObject = jsonObject ++ JsonObject("@timestamp" -> formatLogTimeToISOFmt(logAltMessage.time))
+    jsonObject = jsonObject ++ JsonObject("timestamp" -> formatLogTimeToISOFmt(logAltMessage.time))
     append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
   }
 
   private def receiveLogSlf4j(logSlf4j: LogSlf4j) =
     if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
       var jsonObject = JsonObject(
-        "@timestamp" -> formatLogTimeToISOFmt(logSlf4j.time),
-        "msg"        -> logSlf4j.msg,
+        "timestamp" -> formatLogTimeToISOFmt(logSlf4j.time),
+        "message"        -> logSlf4j.msg,
         "file"       -> logSlf4j.file,
         "@severity"  -> logSlf4j.level.name,
         "class"      -> logSlf4j.className,
@@ -180,9 +180,9 @@ private[logging] class LogActor(done: Promise[Unit],
     if (logAkka.level.pos >= akkaLogLevel.pos) {
       val msg1 = if (logAkka.msg.toString.isEmpty) "UNKNOWN" else logAkka.msg
       var jsonObject = JsonObject(
-        "@timestamp" -> formatLogTimeToISOFmt(logAkka.time),
+        "timestamp" -> formatLogTimeToISOFmt(logAkka.time),
         "kind"       -> "akka",
-        "msg"        -> msg1.toString,
+        "message"        -> msg1.toString,
         "actor"      -> logAkka.source,
         "@severity"  -> logAkka.level.name,
         "class"      -> logAkka.clazz.getName,

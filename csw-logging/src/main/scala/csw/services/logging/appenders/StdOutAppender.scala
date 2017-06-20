@@ -94,7 +94,7 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
     }
 
   private def oneLine(baseMsg: Map[String, RichMsg], level: String, maybeKind: String) = {
-    val msg = jget(baseMsg, "msg") match {
+    val msg = jget(baseMsg, "message") match {
       case s: String => s
       case x: Any    => Compact(x, safe = true)
     }

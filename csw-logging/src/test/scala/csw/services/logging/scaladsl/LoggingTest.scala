@@ -66,7 +66,7 @@ class LoggingTest extends LoggingTestSuite {
     // assert on actual log message
     tromboneHcdLogs.toList.foreach { log ⇒
       val currentLogLevel = log("@severity").toString.toLowerCase
-      val currentLogMsg   = log("msg").toString
+      val currentLogMsg   = log("message").toString
       Level(currentLogLevel) >= LoggingLevels.DEBUG shouldBe true
       currentLogMsg shouldBe logMsgMap.get(currentLogLevel).get
     }
@@ -91,7 +91,7 @@ class LoggingTest extends LoggingTestSuite {
     // assert on actual log message
     tromboneAssemblyLogs.toList.foreach { log ⇒
       val currentLogLevel = log("@severity").toString.toLowerCase
-      val currentLogMsg   = log("msg").toString
+      val currentLogMsg   = log("message").toString
       Level(currentLogLevel) >= LoggingLevels.TRACE shouldBe true
       currentLogMsg shouldBe logMsgMap.get(currentLogLevel).get
     }
@@ -127,7 +127,7 @@ class LoggingTest extends LoggingTestSuite {
 
       tromboneAssemblyLogs.toList.foreach { log ⇒
         val currentLogLevel = log("@severity").toString.toLowerCase
-        val currentLogMsg   = log("msg").toString
+        val currentLogMsg   = log("message").toString
         Level(currentLogLevel) >= logLevel shouldBe true
         currentLogMsg shouldBe logMsgMap.get(currentLogLevel).get
       }

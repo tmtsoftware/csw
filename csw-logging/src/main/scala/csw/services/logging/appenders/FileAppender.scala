@@ -182,7 +182,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
           fileAppenders += (category -> a)
           a
       }
-      val date = jgetString(msg, "@timestamp").substring(0, 10)
+      val date = jgetString(msg, "timestamp").substring(0, 10)
       fa.add(date, Compact(msg, safe = true, sort = sort))
     }
 

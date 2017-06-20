@@ -35,18 +35,18 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
       |    "version": "SNAPSHOT-1.0"
       |  },
       |  "@severity": "ERROR",
-      |  "@timestamp": "2017-06-19T16:10:19.397000000+05:30",
+      |  "timestamp": "2017-06-19T16:10:19.397000000+05:30",
       |  "@version": 1,
       |  "class": "csw.services.logging.appenders.FileAppenderTest",
       |  "file": "FileAppenderTest.scala",
       |  "line": 25,
-      |  "msg": "This is at ERROR level"
+      |  "message": "This is at ERROR level"
       |}
     """.stripMargin
 
   val expectedLogMsgJson = JsonOps.Json(logMsgString).asInstanceOf[Map[String, String]]
 
-  private val date            = jgetString(expectedLogMsgJson, "@timestamp").substring(0, 10)
+  private val date            = jgetString(expectedLogMsgJson, "timestamp").substring(0, 10)
   private val logFileFullPath = logFileDir.getAbsolutePath ++ s"/common.$date.log"
 
   override protected def beforeAll(): Unit = {

@@ -30,12 +30,12 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       |    "version": "SNAPSHOT-1.0"
       |  },
       |  "@severity": "ERROR",
-      |  "@timestamp": "2017-06-19T16:10:19.397000000+05:30",
+      |  "timestamp": "2017-06-19T16:10:19.397000000+05:30",
       |  "@version": 1,
       |  "class": "csw.services.logging.appenders.FileAppenderTest",
       |  "file": "FileAppenderTest.scala",
       |  "line": 25,
-      |  "msg": "This is at ERROR level"
+      |  "message": "This is at ERROR level"
       |}
     """.stripMargin
 
@@ -88,7 +88,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
     val actualOneLineLogMsg = outCapture.toString.replace("\n", "")
     val expectedOneLineLogMsg =
-      s"[${expectedLogJson.get("@severity").get}] ${expectedLogJson.get("msg").get} (${expectedLogJson.get("file").get} ${expectedLogJson.get("line").get})"
+      s"[${expectedLogJson.get("@severity").get}] ${expectedLogJson.get("message").get} (${expectedLogJson.get("file").get} ${expectedLogJson.get("line").get})"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg
 
