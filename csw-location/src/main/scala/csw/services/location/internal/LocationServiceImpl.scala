@@ -33,7 +33,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
   /**
    * Register a 'connection -> location' entry in CRDT
     **/
-  def register(registration: Registration): Future[RegistrationResult] = {
+  def register(registration: Registration): Future[RegistrationResult] = async {
 
     //Get the location from this registration
     val location = registration.location(cswCluster.hostname)
@@ -41,20 +41,31 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     //Create a message handler for this connection
     val service = new Registry.Service(registration.connection)
 
+    // Registering a location needs to read from other replicas to avoid duplicate location registration before performing the update
+    // This approach is taken from Migration Guide section of https://github.com/patriknw/akka-data-replication
+    // todo: Evaluate performance and see if there is any better approach
+    val initialValue = (replicator ? Get(service.Key, ReadMajority(5.seconds))).map {
+      case x @ GetSuccess(_, _) => x.get(service.Key)
+      case _                    ⇒ service.EmptyValue
+    }
+
     //Create an update message to update the value of connection key. if the current value is None or same as
     //this location then update it with this location. if it is some other location then an exception will be thrown and
     //it will be handled below by ModifyFailure.
-    val updateValue = service.update {
-      case r @ LWWRegister(Some(`location`) | None) => r.withValue(Some(location))
-      case LWWRegister(Some(otherLocation))         => throw OtherLocationIsRegistered(location, otherLocation)
-    }
+    val updateValue = service.update(
+      {
+        case r @ LWWRegister(Some(`location`) | None) => r.withValue(Some(location))
+        case LWWRegister(Some(otherLocation))         => throw OtherLocationIsRegistered(location, otherLocation)
+      },
+      await(initialValue)
+    )
 
     //Create a message to update connection -> location map in CRDT
     val updateRegistry = AllServices.update(_ + (registration.connection → location))
 
     //Send the update message for connection key to replicator. On success, send another message to update connection -> location
     //map. If that is successful then return a registrationResult for this Location. In case of any failure throw an exception.
-    (replicator ? updateValue).flatMap {
+    val registrationResultF = (replicator ? updateValue).flatMap {
       case _: UpdateSuccess[_] =>
         (replicator ? updateRegistry).map {
           case _: UpdateSuccess[_] => registrationResult(location)
@@ -63,6 +74,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
       case ModifyFailure(service.Key, _, cause, _) => throw cause
       case _                                       => throw RegistrationFailed(registration.connection)
     }
+    await(registrationResultF)
   }
 
   /**

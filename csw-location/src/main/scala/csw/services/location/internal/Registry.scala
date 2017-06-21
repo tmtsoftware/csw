@@ -26,7 +26,8 @@ class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) 
    * @see [[akka.cluster.ddata.Replicator.Update]]
    * @param f A callback function which is passed to Replicator.Update
    */
-  def update(f: V ⇒ V): Update[V] = Update(Key, EmptyValue, WriteMajority(5.seconds))(f)
+  def update(f: V ⇒ V, initialValue: V = EmptyValue): Update[V] =
+    Update(Key, initialValue, WriteMajority(5.seconds))(f)
 
   /**
    * Creates a get message for replicator. Unlike for update, it will read from the local cache of the node
