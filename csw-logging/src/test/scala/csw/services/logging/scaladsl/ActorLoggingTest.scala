@@ -60,6 +60,21 @@ class ActorLoggingTest extends LoggingTestSuite {
       log.contains("actor") shouldBe true
       log("@componentName") shouldBe "tromboneHcdActor"
       log("actor") shouldBe tromboneActorRef.path.toString
+      log.contains("file") shouldBe true
+      log.contains("line") shouldBe true
+      log.contains("class") shouldBe true
+    }
+  }
+
+  // DEOPSCSW-119: Make log messages identifiable with components
+  test("messages logged from actor should contain source location in terms of file name, class name and line number") {
+
+    sendMessagesToActor()
+
+    logBuffer.foreach { log ⇒
+      log("file") shouldBe "ActorLoggingTest.scala"
+      log.contains("line") shouldBe true
+      log("class") shouldBe "csw.services.logging.scaladsl.TromboneActor"
     }
   }
 

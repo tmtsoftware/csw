@@ -8,27 +8,54 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 
 object TromboneHcdLogger      extends ComponentLogger("tromboneHcd")
 object TromboneAssemblyLogger extends ComponentLogger("tromboneAssembly")
+object InnerSourceLogger extends ComponentLogger("InnerClass")
 
-class TromboneHcd() extends TromboneHcdLogger.Simple {
+class TromboneHcd() extends TromboneHcdLogger.Simple  {
   def startLogging(logs: Map[String, String]): Unit = {
-    log.trace(logs.get("trace").get)
-    log.debug(logs.get("debug").get)
-    log.info(logs.get("info").get)
-    log.warn(logs.get("warn").get)
-    log.error(logs.get("error").get)
-    log.fatal(logs.get("fatal").get)
+    log.trace(logs("trace"))
+    log.debug(logs("debug"))
+    log.info(logs("info"))
+    log.warn(logs("warn"))
+    log.error(logs("error"))
+    log.fatal(logs("fatal"))
   }
 }
 
 class TromboneAssembly() extends TromboneAssemblyLogger.Simple {
   def startLogging(logs: Map[String, String]): Unit = {
-    log.trace(logs.get("trace").get)
-    log.debug(logs.get("debug").get)
-    log.info(logs.get("info").get)
-    log.warn(logs.get("warn").get)
-    log.error(logs.get("error").get)
-    log.fatal(logs.get("fatal").get)
+    log.trace(logs("trace"))
+    log.debug(logs("debug"))
+    log.info(logs("info"))
+    log.warn(logs("warn"))
+    log.error(logs("error"))
+    log.fatal(logs("fatal"))
   }
+}
+
+object SingletonTest extends InnerSourceLogger.Simple {
+  def startLogging(logs: Map[String, String]): Unit = {
+    log.trace(logs("trace"))
+    log.debug(logs("debug"))
+    log.info(logs("info"))
+    log.warn(logs("warn"))
+    log.error(logs("error"))
+    log.fatal(logs("fatal"))
+  }
+}
+
+class InnerSourceTest extends InnerSourceLogger.Simple {
+  def startLogging(logs: Map[String, String]): Unit = new InnerSource().startLogging(logs)
+  class InnerSource {
+    def startLogging(logs: Map[String, String]): Unit = {
+      log.trace(logs("trace"))
+      log.debug(logs("debug"))
+      log.info(logs("info"))
+      log.warn(logs("warn"))
+      log.error(logs("error"))
+      log.fatal(logs("fatal"))
+    }
+  }
+
 }
 
 class LoggingTest extends LoggingTestSuite {
@@ -45,6 +72,18 @@ class LoggingTest extends LoggingTestSuite {
 
   }
 
+  // DEOPSCSW-119: Associate source with each log message
+  test("messages logged from component using simple logging should contain source location in terms of file name, class name and line number") {
+
+    new TromboneHcd().startLogging(logMsgMap)
+    Thread.sleep(100)
+    logBuffer.foreach { log ⇒
+      log.contains("file") shouldBe true
+      log.contains("line") shouldBe true
+      log.contains("class") shouldBe true
+    }
+  }
+
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
   test("should load default filter provided in configuration file and applied to normal logging messages") {
 
@@ -58,7 +97,7 @@ class LoggingTest extends LoggingTestSuite {
     logBuffer.size shouldBe 5
 
     val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json("@componentName").toString)
-    val tromboneHcdLogs          = groupByComponentNamesLog.get("tromboneHcd").get
+    val tromboneHcdLogs          = groupByComponentNamesLog("tromboneHcd")
 
     tromboneHcdLogs.size shouldBe 5
 
@@ -68,7 +107,7 @@ class LoggingTest extends LoggingTestSuite {
       val currentLogLevel = log("@severity").toString.toLowerCase
       val currentLogMsg   = log("message").toString
       Level(currentLogLevel) >= LoggingLevels.DEBUG shouldBe true
-      currentLogMsg shouldBe logMsgMap.get(currentLogLevel).get
+      currentLogMsg shouldBe logMsgMap(currentLogLevel)
     }
   }
 
@@ -83,7 +122,7 @@ class LoggingTest extends LoggingTestSuite {
     logBuffer.size shouldBe 6
 
     val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json("@componentName").toString)
-    val tromboneAssemblyLogs     = groupByComponentNamesLog.get("tromboneAssembly").get
+    val tromboneAssemblyLogs     = groupByComponentNamesLog("tromboneAssembly")
 
     tromboneAssemblyLogs.size shouldBe 6
 
@@ -93,7 +132,7 @@ class LoggingTest extends LoggingTestSuite {
       val currentLogLevel = log("@severity").toString.toLowerCase
       val currentLogMsg   = log("message").toString
       Level(currentLogLevel) >= LoggingLevels.TRACE shouldBe true
-      currentLogMsg shouldBe logMsgMap.get(currentLogLevel).get
+      currentLogMsg shouldBe logMsgMap(currentLogLevel)
     }
   }
 
@@ -113,7 +152,7 @@ class LoggingTest extends LoggingTestSuite {
 
     def filterLogsByComponentName(compName: String): Seq[JsonOps.JsonObject] = {
       val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json("@componentName").toString)
-      groupByComponentNamesLog.get(compName).get
+      groupByComponentNamesLog(compName)
     }
 
     forAll(testData) { (logLevel: Level, logCount: Int) =>
@@ -129,11 +168,32 @@ class LoggingTest extends LoggingTestSuite {
         val currentLogLevel = log("@severity").toString.toLowerCase
         val currentLogMsg   = log("message").toString
         Level(currentLogLevel) >= logLevel shouldBe true
-        currentLogMsg shouldBe logMsgMap.get(currentLogLevel).get
+        currentLogMsg shouldBe logMsgMap(currentLogLevel)
       }
 
       logBuffer.clear()
     }
 
+  }
+
+  test("messages logged from inner class should contain source location in terms of file name, class name and line number") {
+
+      new InnerSourceTest().startLogging(logMsgMap)
+      Thread.sleep(100)
+      logBuffer.foreach { log ⇒
+        log("file") shouldBe "LoggingTest.scala"
+        log.contains("line") shouldBe true
+        log("class") shouldBe "csw.services.logging.scaladsl.InnerSourceTest$InnerSource"
+      }
+  }
+
+  test("messages logged from singleton object should contain source location in terms of file name, class name and line number") {
+      SingletonTest.startLogging(logMsgMap)
+      Thread.sleep(100)
+      logBuffer.foreach { log ⇒
+        log("file") shouldBe "LoggingTest.scala"
+        log.contains("line") shouldBe true
+        log("class") shouldBe "csw.services.logging.scaladsl.SingletonTest"
+      }
   }
 }
