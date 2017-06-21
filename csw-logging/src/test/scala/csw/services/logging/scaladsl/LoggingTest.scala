@@ -8,9 +8,9 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 
 object TromboneHcdLogger      extends ComponentLogger("tromboneHcd")
 object TromboneAssemblyLogger extends ComponentLogger("tromboneAssembly")
-object InnerSourceLogger extends ComponentLogger("InnerClass")
+object InnerSourceLogger      extends ComponentLogger("InnerClass")
 
-class TromboneHcd() extends TromboneHcdLogger.Simple  {
+class TromboneHcd() extends TromboneHcdLogger.Simple {
   def startLogging(logs: Map[String, String]): Unit = {
     log.trace(logs("trace"))
     log.debug(logs("debug"))
@@ -73,7 +73,8 @@ class LoggingTest extends LoggingTestSuite {
   }
 
   // DEOPSCSW-119: Associate source with each log message
-  test("messages logged from component using simple logging should contain source location in terms of file name, class name and line number") {
+  test(
+      "messages logged from component using simple logging should contain source location in terms of file name, class name and line number") {
 
     new TromboneHcd().startLogging(logMsgMap)
     Thread.sleep(100)
@@ -173,27 +174,30 @@ class LoggingTest extends LoggingTestSuite {
 
       logBuffer.clear()
     }
-
   }
 
-  test("messages logged from inner class should contain source location in terms of file name, class name and line number") {
+  // DEOPSCSW-119: Associate source with each log message
+  test(
+      "messages logged from inner class should contain source location in terms of file name, class name and line number") {
 
-      new InnerSourceTest().startLogging(logMsgMap)
-      Thread.sleep(100)
-      logBuffer.foreach { log ⇒
-        log("file") shouldBe "LoggingTest.scala"
-        log.contains("line") shouldBe true
-        log("class") shouldBe "csw.services.logging.scaladsl.InnerSourceTest$InnerSource"
-      }
+    new InnerSourceTest().startLogging(logMsgMap)
+    Thread.sleep(100)
+    logBuffer.foreach { log ⇒
+      log("file") shouldBe "LoggingTest.scala"
+      log.contains("line") shouldBe true
+      log("class") shouldBe "csw.services.logging.scaladsl.InnerSourceTest$InnerSource"
+    }
   }
 
-  test("messages logged from singleton object should contain source location in terms of file name, class name and line number") {
-      SingletonTest.startLogging(logMsgMap)
-      Thread.sleep(100)
-      logBuffer.foreach { log ⇒
-        log("file") shouldBe "LoggingTest.scala"
-        log.contains("line") shouldBe true
-        log("class") shouldBe "csw.services.logging.scaladsl.SingletonTest"
-      }
+  // DEOPSCSW-119: Associate source with each log message
+  test(
+      "messages logged from singleton object should contain source location in terms of file name, class name and line number") {
+    SingletonTest.startLogging(logMsgMap)
+    Thread.sleep(100)
+    logBuffer.foreach { log ⇒
+      log("file") shouldBe "LoggingTest.scala"
+      log.contains("line") shouldBe true
+      log("class") shouldBe "csw.services.logging.scaladsl.SingletonTest"
+    }
   }
 }

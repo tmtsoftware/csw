@@ -66,7 +66,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     }
   }
 
-  // DEOPSCSW-119: Make log messages identifiable with components
+  // DEOPSCSW-119: Associate source with each log message
   test("messages logged from actor should contain source location in terms of file name, class name and line number") {
 
     sendMessagesToActor()
