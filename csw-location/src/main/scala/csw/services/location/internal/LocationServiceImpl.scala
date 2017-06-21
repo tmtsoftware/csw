@@ -25,7 +25,7 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 private[location] class LocationServiceImpl(cswCluster: CswCluster)
     extends LocationService
-    with LocationServiceLogger.Simple { outer =>
+    with LocationServiceLogger.Simple { outer ⇒
 
   import cswCluster._
   implicit val timeout: Timeout = Timeout(5.seconds)
@@ -43,10 +43,10 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     val service = new Registry.Service(registration.connection)
 
     // Registering a location needs to read from other replicas to avoid duplicate location registration before performing the update
-    // This approach is taken from Migration Guide section of https://github.com/patriknw/akka-data-replication
+    // This approach is inspired from Migration Guide section of https://github.com/patriknw/akka-data-replication
     // todo: Evaluate performance and see if there is any better approach
-    val initialValue = (replicator ? Get(service.Key, ReadMajority(5.seconds))).map {
-      case x @ GetSuccess(_, _) => x.get(service.Key)
+    val initialValue = (replicator ? service.getByMajority).map {
+      case x @ GetSuccess(_, _) ⇒ x.get(service.Key)
       case _                    ⇒ service.EmptyValue
     }
 
@@ -55,8 +55,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     //it will be handled below by ModifyFailure.
     val updateValue = service.update(
       {
-        case r @ LWWRegister(Some(`location`) | None) => r.withValue(Some(location))
-        case LWWRegister(Some(otherLocation)) =>
+        case r @ LWWRegister(Some(`location`) | None) ⇒ r.withValue(Some(location))
+        case LWWRegister(Some(otherLocation)) ⇒
           val locationIsRegistered = OtherLocationIsRegistered(location, otherLocation)
           log.error(locationIsRegistered.getMessage, locationIsRegistered)
           throw locationIsRegistered
@@ -70,18 +70,18 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     //Send the update message for connection key to replicator. On success, send another message to update connection -> location
     //map. If that is successful then return a registrationResult for this Location. In case of any failure throw an exception.
     val registrationResultF = (replicator ? updateValue).flatMap {
-      case _: UpdateSuccess[_] =>
+      case _: UpdateSuccess[_] ⇒
         (replicator ? updateRegistry).map {
-          case _: UpdateSuccess[_] => registrationResult(location)
-          case _ =>
+          case _: UpdateSuccess[_] ⇒ registrationResult(location)
+          case _ ⇒
             val registrationFailed = RegistrationFailed(registration.connection)
             log.error(registrationFailed.getMessage, registrationFailed)
             throw registrationFailed
         }
-      case ModifyFailure(service.Key, _, cause, _) =>
+      case ModifyFailure(service.Key, _, cause, _) ⇒
         log.error(cause.getMessage, cause)
         throw cause
-      case _ =>
+      case _ ⇒
         val registrationFailed = RegistrationFailed(registration.connection)
         log.error(registrationFailed.getMessage, registrationFailed)
         throw registrationFailed
@@ -100,15 +100,15 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     //Send an update message to replicator to update the connection key with None. On success send another message to remove the
     //corresponding connection -> location entry from map. In case of any failure throw an exception otherwise return Done.
     (replicator ? service.update(_.withValue(None))).flatMap {
-      case x: UpdateSuccess[_] =>
+      case x: UpdateSuccess[_] ⇒
         (replicator ? AllServices.update(_ - connection)).map {
-          case _: UpdateSuccess[_] => Done
-          case _ =>
+          case _: UpdateSuccess[_] ⇒ Done
+          case _ ⇒
             val unregistrationFailed = UnregistrationFailed(connection)
             log.error(unregistrationFailed.getMessage, unregistrationFailed)
             throw unregistrationFailed
         }
-      case _ =>
+      case _ ⇒
         val unregistrationFailed = UnregistrationFailed(connection)
         log.error(unregistrationFailed.getMessage, unregistrationFailed)
         throw unregistrationFailed
@@ -150,9 +150,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * List all locations registered with CRDT
    */
   def list: Future[List[Location]] = (replicator ? AllServices.get).map {
-    case x @ GetSuccess(AllServices.Key, _) => x.get(AllServices.Key).entries.values.toList
+    case x @ GetSuccess(AllServices.Key, _) ⇒ x.get(AllServices.Key).entries.values.toList
     case NotFound(AllServices.Key, _)       ⇒ List.empty
-    case _ =>
+    case _ ⇒
       val listingFailed = RegistrationListingFailed
       log.error(listingFailed.getMessage, listingFailed)
       throw listingFailed
@@ -197,9 +197,9 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     // If the changed event contains a Location, send LocationUpdated event.
     // If not, location must have been removed, send LocationRemoved event.
     val trackingEvents = source.collect {
-      case c @ Changed(service.Key) if c.get(service.Key).value.isDefined =>
+      case c @ Changed(service.Key) if c.get(service.Key).value.isDefined ⇒
         LocationUpdated(c.get(service.Key).value.get)
-      case c @ Changed(service.Key) => LocationRemoved(connection)
+      case c @ Changed(service.Key) ⇒ LocationRemoved(connection)
     }
     //Allow stream to be cancellable by giving it a KillSwitch in mat value.
     // Also, deduplicate identical messages in case multiple DeathWatch actors unregisters the same location.

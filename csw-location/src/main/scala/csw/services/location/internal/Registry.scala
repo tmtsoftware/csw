@@ -35,6 +35,14 @@ class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) 
    * @see [[akka.cluster.ddata.Replicator.Get]]
    */
   def get: Get[V] = Get(Key, ReadLocal)
+
+  /**
+   * Creates a get message for replicator and it ensures that data is read and merged from a majority of replicas,
+   * i.e. at least N/2 + 1 replicas, where N is the number of nodes in the cluster
+   *
+   * @see [[akka.cluster.ddata.Replicator.Get]]
+   */
+  def getByMajority: Get[V] = Get(Key, ReadMajority(5.seconds))
 }
 
 object Registry {
