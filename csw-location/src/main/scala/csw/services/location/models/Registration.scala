@@ -4,6 +4,7 @@ import java.net.URI
 
 import akka.actor.{ActorPath, ActorRef, Address}
 import akka.serialization.Serialization
+import csw.services.location.commons.LocationServiceLogger
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
@@ -27,7 +28,9 @@ sealed abstract class Registration {
  * @param actorRef Provide a remote actor that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
  */
-final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef) extends Registration {
+final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef)
+    extends Registration
+    with LocationServiceLogger.Simple {
 
   // ActorPath represents the akka path of an Actor
   private val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
@@ -35,8 +38,11 @@ final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef
   // Prepare the URI from the ActorPath. Allow only the remote actor to be registered with LocationService
   private val uri = {
     actorPath.address match {
-      case Address(_, _, None, None) => throw LocalAkkaActorRegistrationNotAllowed(actorRef)
-      case _                         => new URI(actorPath.toString)
+      case Address(_, _, None, None) =>
+        val registrationNotAllowed = LocalAkkaActorRegistrationNotAllowed(actorRef)
+        log.error(registrationNotAllowed.getMessage, registrationNotAllowed)
+        throw registrationNotAllowed
+      case _ => new URI(actorPath.toString)
     }
   }
 

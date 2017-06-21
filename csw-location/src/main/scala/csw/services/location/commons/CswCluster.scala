@@ -20,7 +20,7 @@ import scala.util.control.NonFatal
  *
  * ''Note: '' It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
  */
-class CswCluster private (_actorSystem: ActorSystem) {
+class CswCluster private (_actorSystem: ActorSystem) extends LocationServiceLogger.Simple {
 
   /**
    * Identifies the hostname where ActorSystem is running
@@ -73,7 +73,9 @@ class CswCluster private (_actorSystem: ActorSystem) {
     def status  = Await.result(statusF, 5.seconds)
     val success = BlockingUtils.poll(status.isDefined, 20.seconds)
     if (!success) {
-      throw new RuntimeException("could not join cluster")
+      val runtimeException = new RuntimeException("could not join cluster")
+      log.error(runtimeException.getMessage, runtimeException)
+      throw runtimeException
     }
     confirmationActor ! PoisonPill
     Done
@@ -90,7 +92,10 @@ class CswCluster private (_actorSystem: ActorSystem) {
     def upMembers     = cluster.state.members.count(_.status == MemberStatus.Up)
     val success       = BlockingUtils.poll(replicaCount >= upMembers, 10.seconds)
     if (!success) {
-      throw new RuntimeException("could not ensure that the data is replicated in location service cluster")
+      val runtimeException =
+        new RuntimeException("could not ensure that the data is replicated in location service cluster")
+      log.error(runtimeException.getMessage, runtimeException)
+      throw runtimeException
     }
   }
 
@@ -105,7 +110,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
  *
  * ''Note: '' The creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
  */
-object CswCluster {
+object CswCluster extends LocationServiceLogger.Simple {
   //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
 
   /**
@@ -133,6 +138,7 @@ object CswCluster {
     } catch {
       case NonFatal(ex) ⇒
         Await.result(cswCluster.shutdown(), 10.seconds)
+        log.error(ex.getMessage, ex)
         throw ex
     }
   }

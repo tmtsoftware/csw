@@ -52,7 +52,7 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
     }
 }
 
-object DeathwatchActor {
+object DeathwatchActor extends LocationServiceLogger.Simple {
   //message type handled by the for the typed deathwatch actor
   type Msg = Changed[AllServices.Value]
 
@@ -62,6 +62,7 @@ object DeathwatchActor {
    * @param cswCluster is used to get remote ActorSystem to create DeathwatchActor
    */
   def start(cswCluster: CswCluster, locationService: LocationService): ActorRef[Msg] = {
+    log.debug("Starting Deathwatch actor")
     val actorRef = cswCluster.actorSystem.spawn(
       //span the actor with empty set of watched locations
       new DeathwatchActor(locationService).behavior(Set.empty),

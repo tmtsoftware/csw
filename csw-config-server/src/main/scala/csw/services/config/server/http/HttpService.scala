@@ -65,7 +65,8 @@ class HttpService(locationService: LocationService,
       port = binding.localAddress.getPort,
       path = ""
     )
-    log.info("==== Registering Config Service HTTP Server with Location Service ====")
+    log.info(
+        s"Registering Config Service HTTP Server with Location Service using registration ${registration.toString}")
     locationService.register(registration)
   }
 }

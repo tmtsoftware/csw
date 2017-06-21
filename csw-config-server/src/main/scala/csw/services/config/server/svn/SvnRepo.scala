@@ -33,6 +33,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
   def initSvnRepo(): Unit =
     try {
       // Create the new main repo
+      log.debug("Creating repository setup")
       FSRepositoryFactory.setup()
       SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, false)
       log.info(s"New Repository created at ${settings.svnUrl}")

@@ -2,6 +2,8 @@ package csw.services.location.internal
 
 import java.net.{Inet6Address, InetAddress, NetworkInterface}
 
+import csw.services.location.commons.LocationServiceLogger
+
 import scala.collection.JavaConverters._
 
 case class NetworkInterfaceNotFound(message: String) extends Exception(message)
@@ -11,7 +13,7 @@ case class NetworkInterfaceNotFound(message: String) extends Exception(message)
  *
  * @param interfaceName Provide the name of network interface where csw cluster is running
  */
-class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider) {
+class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider) extends LocationServiceLogger.Simple {
 
   /**
    * Picks an appropriate ipv4 address from the network interface provided
@@ -27,7 +29,10 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
   /**
    * Gives the ipv4 host address
    */
-  def hostname(): String = ipv4Address.getHostAddress
+  def hostname(): String = {
+    log.info(s"Fetching hostname for interface $interfaceName")
+    ipv4Address.getHostAddress
+  }
 
   /**
    * Gives the non-loopback, ipv4 address for the given network interface. If no interface name is provided then the address mapped

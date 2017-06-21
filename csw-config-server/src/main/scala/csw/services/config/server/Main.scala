@@ -12,7 +12,7 @@ import scala.concurrent.duration.DurationDouble
 /**
  * Application object to start the ConfigServer from command line.
  */
-class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
+class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) extends ConfigServerLogger.Simple {
   def start(args: Array[String]): Option[HttpService] =
     new ArgsParser().parse(args).map {
       case Options(init, maybePort) =>
@@ -31,10 +31,12 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
           Await.result(httpService.registeredLazyBinding, 15.seconds)
           httpService
         } catch {
-          case ex: SVNException ⇒ {
+          case ex: SVNException ⇒
             Await.result(actorRuntime.shutdown(), 10.seconds)
-            throw new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex)
-          }
+            val runtimeException =
+              new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex)
+            log.error(runtimeException.getMessage, runtimeException)
+            throw runtimeException
         }
     }
 }

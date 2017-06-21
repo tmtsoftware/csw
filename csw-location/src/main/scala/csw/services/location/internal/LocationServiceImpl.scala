@@ -37,6 +37,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
 
     //Get the location from this registration
     val location = registration.location(cswCluster.hostname)
+    log.info(s"Registering connection ${registration.connection.name} with location $location")
 
     //Create a message handler for this connection
     val service = new Registry.Service(registration.connection)
@@ -55,7 +56,10 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     val updateValue = service.update(
       {
         case r @ LWWRegister(Some(`location`) | None) => r.withValue(Some(location))
-        case LWWRegister(Some(otherLocation))         => throw OtherLocationIsRegistered(location, otherLocation)
+        case LWWRegister(Some(otherLocation)) =>
+          val locationIsRegistered = OtherLocationIsRegistered(location, otherLocation)
+          log.error(locationIsRegistered.getMessage, locationIsRegistered)
+          throw locationIsRegistered
       },
       await(initialValue)
     )
@@ -69,10 +73,18 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
       case _: UpdateSuccess[_] =>
         (replicator ? updateRegistry).map {
           case _: UpdateSuccess[_] => registrationResult(location)
-          case _                   => throw RegistrationFailed(registration.connection)
+          case _ =>
+            val registrationFailed = RegistrationFailed(registration.connection)
+            log.error(registrationFailed.getMessage, registrationFailed)
+            throw registrationFailed
         }
-      case ModifyFailure(service.Key, _, cause, _) => throw cause
-      case _                                       => throw RegistrationFailed(registration.connection)
+      case ModifyFailure(service.Key, _, cause, _) =>
+        log.error(cause.getMessage, cause)
+        throw cause
+      case _ =>
+        val registrationFailed = RegistrationFailed(registration.connection)
+        log.error(registrationFailed.getMessage, registrationFailed)
+        throw registrationFailed
     }
     await(registrationResultF)
   }
@@ -81,6 +93,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Unregister the connection from CRDT
    */
   def unregister(connection: Connection): Future[Done] = {
+    log.info(s"Unregistering connection ${connection.name}")
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
 
@@ -90,17 +103,24 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
       case x: UpdateSuccess[_] =>
         (replicator ? AllServices.update(_ - connection)).map {
           case _: UpdateSuccess[_] => Done
-          case _                   => throw UnregistrationFailed(connection)
+          case _ =>
+            val unregistrationFailed = UnregistrationFailed(connection)
+            log.error(unregistrationFailed.getMessage, unregistrationFailed)
+            throw unregistrationFailed
         }
-      case _ => throw UnregistrationFailed(connection)
+      case _ =>
+        val unregistrationFailed = UnregistrationFailed(connection)
+        log.error(unregistrationFailed.getMessage, unregistrationFailed)
+        throw unregistrationFailed
     }
   }
 
   /**
    * Unregister all connections from CRDT
-   * Note : This method shold be used for testing purpose only
+   * Note : This method should be used for testing purpose only
    */
   def unregisterAll(): Future[Done] = async {
+    log.warn("It is not recommended to unregister all components from location service")
     //Get all locations registered with CRDT
     val locations = await(list)
 
@@ -113,6 +133,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Resolves the location for a connection from the local cache
    */
   def find(connection: Connection): Future[Option[Location]] = async {
+    log.info(s"Finding location for connection ${connection.name}")
     await(list).find(_.connection == connection)
   }
 
@@ -120,6 +141,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Resolve a location for the given connection
    */
   override def resolve(connection: Connection, within: FiniteDuration): Future[Option[Location]] = async {
+    log.info(s"Resolving location for connection ${connection.name} within ${within.toString()}")
     val foundInLocalCache = await(find(connection))
     if (foundInLocalCache.isDefined) foundInLocalCache else await(resolveWithin(connection, within))
   }
@@ -130,7 +152,10 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
   def list: Future[List[Location]] = (replicator ? AllServices.get).map {
     case x @ GetSuccess(AllServices.Key, _) => x.get(AllServices.Key).entries.values.toList
     case NotFound(AllServices.Key, _)       ⇒ List.empty
-    case _                                  => throw RegistrationListingFailed
+    case _ =>
+      val listingFailed = RegistrationListingFailed
+      log.error(listingFailed.getMessage, listingFailed)
+      throw listingFailed
   }
 
   /**
@@ -158,7 +183,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Track the status of given connection
    */
   def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
-    log.debug(Map("@msg" → "started tracking", "connection" → connection.toString))
+    log.debug(s"Tracking connection ${connection.name}")
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
     //Get a stream that emits messages sent to the actor generated after materialization
@@ -184,8 +209,10 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
   /**
    * Subscribe to events of a connection by providing a callback.
    */
-  override def subscribe(connection: Connection, callback: TrackingEvent ⇒ Unit): KillSwitch =
+  override def subscribe(connection: Connection, callback: TrackingEvent ⇒ Unit): KillSwitch = {
+    log.info(s"Subscribing to connection ${connection.name}")
     track(connection).to(Sink.foreach(callback)).run()
+  }
 
   /**
    * Terminate the ActorSystem and gracefully leave the akka cluster

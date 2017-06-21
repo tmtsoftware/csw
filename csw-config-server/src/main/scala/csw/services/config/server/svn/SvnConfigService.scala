@@ -57,6 +57,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   override def update(path: Path, configData: ConfigData, comment: String): Future[ConfigId] = {
 
     def updateAnnex(): Future[ConfigId] = async {
+      log.info(s"Updating annex file at path ${path.toString}")
       val sha1 = await(fileService.post(configData))
       await(update(shaFilePath(path), ConfigData.fromString(sha1), comment))
     }
@@ -94,16 +95,24 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       val svnRevision = await(svnRepo.svnRevision(configId.map(_.id.toLong)))
 
       await(pathStatus(path, configId)) match {
-        case PathStatus.NormalSize ⇒ await(getNormalSize(path, svnRevision))
-        case PathStatus.Annex      ⇒ await(getAnnex(path, svnRevision))
-        case PathStatus.Missing    ⇒ None
+        case PathStatus.NormalSize ⇒
+          log.info(s"Getting file for normal file at path ${path.toString}")
+          await(getNormalSize(path, svnRevision))
+        case PathStatus.Annex ⇒
+          log.info(s"Getting file for annex file at path ${path.toString}")
+          await(getAnnex(path, svnRevision))
+        case PathStatus.Missing ⇒ None
       }
     }
   // If the file exists in the repo, get data of its latest revision
-  override def getLatest(path: Path): Future[Option[ConfigData]] = get(path)
+  override def getLatest(path: Path): Future[Option[ConfigData]] = {
+    get(path)
+  }
 
   // If the version specified by configId for the file exists in the repo, get its data
-  override def getById(path: Path, configId: ConfigId): Future[Option[ConfigData]] = get(path, Some(configId))
+  override def getById(path: Path, configId: ConfigId): Future[Option[ConfigData]] = {
+    get(path, Some(configId))
+  }
 
   override def getByTime(path: Path, time: Instant): Future[Option[ConfigData]] = {
 
@@ -128,9 +137,13 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   override def delete(path: Path, comment: String = "deleted"): Future[Unit] = async {
     await(pathStatus(path)) match {
-      case PathStatus.NormalSize ⇒ await(svnRepo.delete(path, comment))
-      case PathStatus.Annex      ⇒ await(svnRepo.delete(shaFilePath(path), comment))
-      case PathStatus.Missing    ⇒ throw FileNotFound(path)
+      case PathStatus.NormalSize ⇒
+        log.info(s"Deleting normal file at path ${path.toString}")
+        await(svnRepo.delete(path, comment))
+      case PathStatus.Annex ⇒
+        log.info(s"Deleting annex file at path ${path.toString}")
+        await(svnRepo.delete(shaFilePath(path), comment))
+      case PathStatus.Missing ⇒ throw FileNotFound(path)
     }
   }
 
@@ -144,9 +157,13 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   override def history(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
     async {
       await(pathStatus(path)) match {
-        case PathStatus.NormalSize ⇒ await(hist(path, from, to, maxResults))
-        case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), from, to, maxResults))
-        case PathStatus.Missing    ⇒ throw FileNotFound(path)
+        case PathStatus.NormalSize ⇒
+          log.info(s"Fetching history for normal file for path ${path.toString}")
+          await(hist(path, from, to, maxResults))
+        case PathStatus.Annex ⇒
+          log.info(s"Fetching history for annex file for path ${path.toString}")
+          await(hist(shaFilePath(path), from, to, maxResults))
+        case PathStatus.Missing ⇒ throw FileNotFound(path)
       }
     }
 
@@ -177,8 +194,10 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     val present    = await(exists(activePath))
 
     if (present) {
+      log.info(s"Updating active version for file with path ${path.toString}")
       await(update(activePath, ConfigData.fromString(id.id), comment))
     } else {
+      log.info(s"Setting active version for file with path ${path.toString}")
       await(createFile(activePath, ConfigData.fromString(id.id), comment = comment))
     }
   }
@@ -237,8 +256,10 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
     val revision = id.map(_.id.toLong)
     if (await(svnRepo.pathExists(path, revision))) {
+      log.debug(s"Found the type of file at path ${path.toString} as a normal")
       PathStatus.NormalSize
     } else if (await(svnRepo.pathExists(shaFilePath(path), revision))) {
+      log.debug(s"Found the type of file at path ${path.toString} as an annex")
       PathStatus.Annex
     } else {
       PathStatus.Missing
@@ -258,8 +279,10 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       val inputStream = configData.toInputStream
 
       val commitInfo = if (update) {
+        log.info(s"Updating normal file at path ${path.toString}")
         await(svnRepo.modifyFile(path, comment, inputStream))
       } else {
+        log.info(s"Creating normal file at path ${path.toString}")
         await(svnRepo.addFile(path, comment, inputStream))
       }
       ConfigId(commitInfo.getNewRevision)
@@ -268,9 +291,13 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   // Returns the current version of the file, if known
   private def getCurrentVersion(path: Path): Future[Option[ConfigId]] = async {
     await(pathStatus(path)) match {
-      case PathStatus.NormalSize ⇒ await(hist(path, Instant.MIN, Instant.now, 1)).headOption.map(_.id)
-      case PathStatus.Annex      ⇒ await(hist(shaFilePath(path), Instant.MIN, Instant.now, 1)).headOption.map(_.id)
-      case PathStatus.Missing    ⇒ None
+      case PathStatus.NormalSize ⇒
+        log.info(s"Getting current version for normal file at path ${path.toString}")
+        await(hist(path, Instant.MIN, Instant.now, 1)).headOption.map(_.id)
+      case PathStatus.Annex ⇒
+        log.info(s"Getting current version for annex file at path ${path.toString}")
+        await(hist(shaFilePath(path), Instant.MIN, Instant.now, 1)).headOption.map(_.id)
+      case PathStatus.Missing ⇒ None
     }
   }
 

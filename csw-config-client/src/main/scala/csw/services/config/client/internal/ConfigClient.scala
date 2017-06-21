@@ -218,7 +218,9 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
         case StatusCodes.OK ⇒
           //Not consuming the file content will block the connection.
           response.entity.discardBytes()
-          throw new RuntimeException("response must have content-length")
+          val runtimeException = new RuntimeException("response must have content-length")
+          log.error(runtimeException.getMessage, runtimeException)
+          throw runtimeException
         case StatusCodes.NotFound ⇒ Future.successful(None)
       }
     )
@@ -228,9 +230,24 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     def contentF = Unmarshal(response).to[String]
 
     val defaultHandler: PartialFunction[StatusCode, Future[T]] = {
-      case StatusCodes.BadRequest ⇒ contentF.map(message ⇒ throw InvalidInput(message))
-      case StatusCodes.NotFound   ⇒ contentF.map(message ⇒ throw FileNotFound(message))
-      case _                      ⇒ contentF.map(message ⇒ throw new RuntimeException(message))
+      case StatusCodes.BadRequest ⇒
+        contentF.map(message ⇒ {
+          val invalidInput = InvalidInput(message)
+          log.error(invalidInput.getMessage, invalidInput)
+          throw invalidInput
+        })
+      case StatusCodes.NotFound ⇒
+        contentF.map(message ⇒ {
+          val fileNotFound = FileNotFound(message)
+          log.error(fileNotFound.getMessage, fileNotFound)
+          throw fileNotFound
+        })
+      case _ ⇒
+        contentF.map(message ⇒ {
+          val runtimeException = new RuntimeException(message)
+          log.error(runtimeException.getMessage, runtimeException)
+          throw runtimeException
+        })
     }
 
     val handler = pf.orElse(defaultHandler)

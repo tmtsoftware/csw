@@ -5,6 +5,7 @@ import akka.actor.{ActorSystem, PoisonPill}
 import akka.cluster.Cluster
 import akka.util.Timeout
 import csw.services.BuildInfo
+import csw.services.config.client.commons.ConfigClientLogger
 import csw.services.csclient.cli.{ArgsParser, ClientCliWiring, Options}
 import csw.services.csclient.commons.BlockingUtils
 import csw.services.location.ClusterConfirmationActor
@@ -16,7 +17,7 @@ import csw.services.logging.scaladsl.LoggingSystem
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
-object Main extends App {
+object Main extends App with ConfigClientLogger.Simple {
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     println(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
@@ -43,6 +44,7 @@ object Main extends App {
         // State transition from WeaklyUp cluster member is : WeaklyUp -> Unreachable -> Down -> Removed
         // todo there should be a better strategy to remove WeaklyUp member from cluster
         val cluster = Cluster(actorSystem)
+        log.debug("Disconnecting from cluster as weaklyup member")
         cluster.down(cluster.selfAddress)
       }
     }
