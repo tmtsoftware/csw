@@ -60,30 +60,30 @@ csw-config-client offers two APIs.
 ConfigClientFactory exposes functions to get clientAPI and adminAPI. Both the functions require LocationService instance which is used to resolve ConfigServer.
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #create-api }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #create-api }
 
 Java
-:   @@snip [JConfigClientDemoExample.java](../../../../csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java) { #create-api }
+:   @@snip [JConfigClientDemoExample.java](../../../../examples/src/test/java/csw/services/config/JConfigClientDemoExample.java) { #create-api }
 
 ## exists
 
 Function checks if the file exists at specified path in the repository. If it exists it returns Future of Boolean
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #exists }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #exists }
 
 Java
-:   @@snip [JConfigClientDemoExample.java](../../../../csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java) { #exists }
+:   @@snip [JConfigClientDemoExample.java](../../../../examples/src/test/java/csw/services/config/JConfigClientDemoExample.java) { #exists }
 
 ## getActive
 
 Function retrieves currently active file for a given path from config service. It returns a Future of Option of ConfigData.
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #declare_string_config #getActive }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #declare_string_config #getActive }
 
 Java
-:   @@snip [JConfigClientDemoExample.java](../../../../csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java) { #declare_string_config #getActive }
+:   @@snip [JConfigClientDemoExample.java](../../../../examples/src/test/java/csw/services/config/JConfigClientDemoExample.java) { #declare_string_config #getActive }
 
 
 ## create
@@ -91,10 +91,10 @@ Java
 Takes input ConfigData and creates the configuration in the repository at a specified path
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #create }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #create }
 
 Java
-:   @@snip [JConfigClientDemoExample.java](../../../../csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java) { #create }
+:   @@snip [JConfigClientDemoExample.java](../../../../examples/src/test/java/csw/services/config/JConfigClientDemoExample.java) { #create }
 
 
 ## update
@@ -102,28 +102,28 @@ Java
 Takes input ConfigData and overwrites the configuration specified in the repository
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #update }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #update }
 
 ## delete
 
 Deletes a file located at specified path in the repository
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #delete }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #delete }
 
 ## getById
 
 Returns file at a given path and matching revision Id
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #getById }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #getById }
 
 ## getLatest
 
 Returns the latest versio of file stored at the given path.
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #getLatest }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #getLatest }
 
 ## getByTime
 
@@ -133,14 +133,14 @@ Gets the file at the given path as it existed at a given time-instance. Note:
 * If time-instance is after the last change, the most recent version is returned.    
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #getByTime }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #getByTime }
 
 ## list
 
 For a given FileType(Annex or Normal) and an optional pattern string, it will list all files whose path matches the given pattern. Some pattern examples are: "/path/hcd/*.*", "a/b/c/d.*", ".*.conf", ".*hcd.*"
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #list }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #list }
 
 ## history
 
@@ -148,7 +148,7 @@ Returns the history of revisions of the file at the given path for a range of pe
 Returns the history of active revisions of the file at the given path for a range of period specified by `from` and `to`. The size of the list can be restricted using `maxResults`.
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #history }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #history }
 
 ## Managing active versions
 
@@ -161,7 +161,7 @@ Following API functions are available to manage the active version of a config f
 * **getActiveByTime** : Returns the content of active version of the file existed at given instant 
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #active-file-mgmt }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #active-file-mgmt }
 
 ## getMetaData
 
@@ -173,12 +173,12 @@ Used to get metadata information about config service. It includes:
 * max config file size    
 
 Scala
-:   @@snip [ConfigClientDemoExample.scala](../../../../csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala) { #getMetadata }
+:   @@snip [ConfigClientDemoExample.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala) { #getMetadata }
 
 Java
-:   @@snip [JConfigClientDemoExample.java](../../../../csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java) { #getMetadata }
+:   @@snip [JConfigClientDemoExample.java](../../../../examples/src/test/java/csw/services/config/JConfigClientDemoExample.java) { #getMetadata }
 
 ## Source code for examples
 
-* @github[Scala Example](/csw-config-client/src/test/scala/csw/services/config/client/scaladsl/demo/ConfigClientDemoExample.scala)
-* @github[Java Example](/csw-config-client/src/test/java/csw/services/config/client/javadsl/demo/JConfigClientDemoExample.java)
+* @github[Scala Example](/examples/src/test/scala/csw/services/config/ConfigClientDemoExample.scala)
+* @github[Java Example](/examples/src/test/java/csw/services/config/JConfigClientDemoExample.java)
