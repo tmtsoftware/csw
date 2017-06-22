@@ -19,14 +19,12 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 
 /**
  *
- * @param serviceName name of the service (to log).
- * @param serviceVersion version of the service (to log).
+ * @param name name of the service (to log).
  * @param host host name (to log).
  * @param appenderBuilders optional sequence of log appenders to use.
  *                         Default is to use built-in stdout and file appenders.
  */
-class LoggingSystem(serviceName: String = "serviceName1",
-                    serviceVersion: String = "serviceVersion1",
+class LoggingSystem(name: String = "serviceName1",
                     host: String = InetAddress.getLocalHost.getHostName,
                     system: ActorSystem = ActorSystem("logging"),
                     appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender))
@@ -75,8 +73,7 @@ class LoggingSystem(serviceName: String = "serviceName1",
   /**
    * Standard headers.
    */
-  val standardHeaders: Map[String, RichMsg] = Map[String, RichMsg]("@version" -> 1, "@host" -> host,
-    "@service" -> Map[String, RichMsg]("name" -> serviceName, "version" -> serviceVersion))
+  val standardHeaders: Map[String, RichMsg] = Map[String, RichMsg]("@host" -> host, "@name" → name)
 
   setLevel(defaultLevel)
   LoggingState.loggerStopping = false

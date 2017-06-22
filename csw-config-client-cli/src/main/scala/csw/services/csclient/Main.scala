@@ -31,7 +31,7 @@ object Main extends App with ConfigClientLogger.Simple {
 
   private def run(options: Options): Unit = {
     val actorSystem = ClusterAwareSettings.system
-    new LoggingSystem(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem, Seq(FileAppender))
+    new LoggingSystem(BuildInfo.name, ClusterAwareSettings.hostname, actorSystem, Seq(FileAppender))
 
     val wiring = new ClientCliWiring(actorSystem)
     try {

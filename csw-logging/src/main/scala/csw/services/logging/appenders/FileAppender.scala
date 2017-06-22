@@ -152,14 +152,9 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
   private[this] val fullHeaders               = config.getBoolean("fullHeaders")
   private[this] val logPath                   = config.getString("logPath")
   private[this] val sort                      = config.getBoolean("sorted")
-  private[this] val serviceInPath             = config.getBoolean("serviceInPath")
   private[this] val logLevelLimit             = Level(config.getString("logLevelLimit"))
   private[this] val fileAppenders             = scala.collection.mutable.HashMap[String, FilesAppender]()
-  private[this] val fullPath: String = if (serviceInPath) {
-    logPath + "/" + jgetString(stdHeaders, "@service", "name")
-  } else {
-    logPath
-  }
+  private val loggingSystemName               = jgetString(stdHeaders, "@name")
 
   private def checkLevel(baseMsg: Map[String, RichMsg]): Boolean = {
     val level = jgetString(baseMsg, "@severity")
@@ -174,12 +169,13 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit =
     if (category != "common" || checkLevel(baseMsg)) {
+      println(loggingSystemName)
       val msg = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
       val fa = fileAppenders.get(category) match {
         case Some(a) => a
         case None =>
-          val a = new FilesAppender(factory, fullPath, category)
-          fileAppenders += (category -> a)
+          val a = new FilesAppender(factory, logPath + "/" + loggingSystemName, category)
+          fileAppenders += (loggingSystemName + "-" + category -> a)
           a
       }
       val date = jgetString(msg, "timestamp").substring(0, 10)

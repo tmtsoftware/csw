@@ -18,7 +18,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) exte
       val actorSystem = clusterSettings.system
 
       if (startLogging)
-        new LoggingSystem(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
+        new LoggingSystem(BuildInfo.name, clusterSettings.hostname, actorSystem)
 
       val command = Command.parse(options)
       log.info(s"commandText: ${command.commandText}, command: $command")

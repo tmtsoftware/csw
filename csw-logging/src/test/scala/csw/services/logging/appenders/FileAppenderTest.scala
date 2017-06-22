@@ -20,8 +20,8 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     .parseString(s"com.persist.logging.appenders.file.logPath=${logFileDir.getAbsolutePath}")
     .withFallback(ConfigFactory.load)
   private val actorSystem = ActorSystem("test-1", config)
-  private val standardHeaders: Map[String, RichMsg] = Map[String, RichMsg]("@version" -> 1, "@host" -> "localhost",
-    "@service" -> Map[String, RichMsg]("name" -> "test-service", "version" -> "1.2.3"))
+  private val standardHeaders: Map[String, RichMsg] =
+    Map[String, RichMsg]("@host" -> "localhost", "@name" -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
 
@@ -30,13 +30,9 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
       |  "@category": "common",
       |  "@componentName": "FileAppenderTest",
       |  "@host": "localhost",
-      |  "@service": {
-      |    "name": "logging",
-      |    "version": "SNAPSHOT-1.0"
-      |  },
+      |  "@name": "test-service",
       |  "@severity": "ERROR",
       |  "timestamp": "2017-06-19T16:10:19.397000000+05:30",
-      |  "@version": 1,
       |  "class": "csw.services.logging.appenders.FileAppenderTest",
       |  "file": "FileAppenderTest.scala",
       |  "line": 25,
@@ -47,14 +43,14 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   val expectedLogMsgJson = JsonOps.Json(logMsgString).asInstanceOf[Map[String, String]]
 
   private val date            = jgetString(expectedLogMsgJson, "timestamp").substring(0, 10)
-  private val logFileFullPath = logFileDir.getAbsolutePath ++ s"/common.$date.log"
+  private val logFileFullPath = logFileDir.getAbsolutePath ++ s"/test-service/common.$date.log"
 
   override protected def beforeAll(): Unit = {
     deleteRecursively(logFileDir)
   }
 
   override protected def afterEach(): Unit = {
-    deleteRecursively(logFileDir)
+//    deleteRecursively(logFileDir)
   }
 
   override protected def afterAll(): Unit = {
