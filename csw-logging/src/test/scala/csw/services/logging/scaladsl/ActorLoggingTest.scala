@@ -66,8 +66,9 @@ class ActorLoggingTest extends LoggingTestSuite {
     }
   }
 
+  // DEOPSCSW-117: Provide unique name for each logging instance of components
   // DEOPSCSW-119: Associate source with each log message
-  test("messages logged from actor should contain source location in terms of file name, class name and line number") {
+  test("messages logged from actor should contain file name, class name, line number and actor path") {
 
     sendMessagesToActor()
 
@@ -75,6 +76,8 @@ class ActorLoggingTest extends LoggingTestSuite {
       log("file") shouldBe "ActorLoggingTest.scala"
       log.contains("line") shouldBe true
       log("class") shouldBe "csw.services.logging.scaladsl.TromboneActor"
+      log.contains("actor") shouldBe true
+      log("actor") shouldBe tromboneActorRef.path.toString
     }
   }
 
