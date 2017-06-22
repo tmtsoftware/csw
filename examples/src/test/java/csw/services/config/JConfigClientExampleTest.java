@@ -4,10 +4,8 @@ import akka.actor.ActorSystem;
 import akka.stream.Materializer;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.javadsl.IConfigService;
-import csw.services.config.api.models.ConfigData;
-import csw.services.config.api.models.ConfigFileRevision;
-import csw.services.config.api.models.ConfigId;
-import csw.services.config.api.models.ConfigMetadata;
+import csw.services.config.api.javadsl.JFileType;
+import csw.services.config.api.models.*;
 import csw.services.config.client.internal.ActorRuntime;
 import csw.services.config.client.javadsl.JConfigClientFactory;
 import csw.services.config.server.ServerWiring;
@@ -27,10 +25,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -193,6 +188,47 @@ public class JConfigClientExampleTest {
     }
 
     @Test
+    public void testList() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+        //#list
+        Path trombonePath = Paths.get("a/c/trombone.conf");
+        Path hcdPath = Paths.get("a/b/c/hcd/hcd.conf");
+        Path fits1Path = Paths.get("a/b/assembly/assembly1.fits");
+        Path fits2Path = Paths.get("a/b/c/assembly/assembly2.fits");
+        Path testConfPath = Paths.get("testing/test.conf");
+
+        String comment = "initial commit";
+
+        //create files
+        ConfigId tromboneId = adminApi.create(trombonePath, ConfigData.fromString(defaultStrConf), true, comment).get();
+        ConfigId hcdId = adminApi.create(hcdPath, ConfigData.fromString(defaultStrConf), false, comment).get();
+        ConfigId fits1Id = adminApi.create(fits1Path, ConfigData.fromString(defaultStrConf), true, comment).get();
+        ConfigId fits2Id = adminApi.create(fits2Path, ConfigData.fromString(defaultStrConf), false, comment).get();
+        ConfigId testId = adminApi.create(testConfPath, ConfigData.fromString(defaultStrConf), true, comment).get();
+
+        //retrieve full list; for demonstration purpose validate return values
+        Assert.assertEquals(new HashSet<ConfigId>(Arrays.asList(tromboneId, hcdId, fits1Id, fits2Id, testId)),
+                adminApi.list().get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+
+        //retrieve list of files based on type; for demonstration purpose validate return values
+        Assert.assertEquals(new HashSet<>(Arrays.asList(tromboneId, fits1Id, testId)),
+                adminApi.list(JFileType.Annex).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+        Assert.assertEquals(new HashSet<>(Arrays.asList(hcdId, fits2Id)),
+                adminApi.list(JFileType.Normal).get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+
+        //retrieve list using pattern; for demonstration purpose validate return values
+        Assert.assertEquals(new HashSet<>(Arrays.asList(tromboneId, hcdId, testId)),
+                adminApi.list(".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+        //retrieve list using pattern and file type; for demonstration purpose validate return values
+        Assert.assertEquals(new HashSet<>(Arrays.asList(tromboneId, testId)),
+                adminApi.list(JFileType.Annex, ".*.conf").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+        Assert.assertEquals(new HashSet<>(Arrays.asList(tromboneId)),
+                adminApi.list(JFileType.Annex, "a/c.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+        Assert.assertEquals(new HashSet<>(Arrays.asList(testId)),
+                adminApi.list(JFileType.Annex, "test.*").get().stream().map(ConfigFileInfo::id).collect(Collectors.toSet()));
+        //#list
+    }
+
+        @Test
     public void testHistory() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
         //#history
         Path filePath = Paths.get("/a/test.conf");
@@ -206,15 +242,21 @@ public class JConfigClientExampleTest {
 
         //full file history
         List<ConfigFileRevision> fullHistory = adminApi.history(filePath).get();
-        Assert.assertEquals(fullHistory.stream().map(ConfigFileRevision::id).collect(Collectors.toList()), new ArrayList<>(Arrays.asList(id2, id1, id0)));
-        Assert.assertEquals(fullHistory.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()), new ArrayList<>(Arrays.asList("third commit", "second commit", "first commit")));
+        Assert.assertEquals(new ArrayList<>(Arrays.asList(id2, id1, id0)),
+                fullHistory.stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+        Assert.assertEquals(new ArrayList<>(Arrays.asList("third commit", "second commit", "first commit")),
+                fullHistory.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()));
 
         //drop initial revision and take only update revisions
-
+        Assert.assertEquals(new ArrayList<>(Arrays.asList(id2, id1)),
+                adminApi.history(filePath, tBeginUpdate, tEndUpdate).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
+        //take last two revisions
+        Assert.assertEquals(new ArrayList<>(Arrays.asList(id2, id1)),
+                adminApi.history(filePath, 2).get().stream().map(ConfigFileRevision::id).collect(Collectors.toList()));
         //#history
     }
 
-        @Test
+    @Test
     public void testGetMetadata() throws ExecutionException, InterruptedException {
         //#getMetadata
         ConfigMetadata metadata = adminApi.getMetadata().get();

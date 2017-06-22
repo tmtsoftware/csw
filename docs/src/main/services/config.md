@@ -159,6 +159,9 @@ For a given FileType(Annex or Normal) and an optional pattern string, it will li
 Scala
 :   @@snip [ConfigClientExampleTest.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientExampleTest.scala) { #list }
 
+Java
+:   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/services/config/JConfigClientExampleTest.java) { #list }
+
 ## history
 
 Returns the history of revisions of the file at the given path for a range of period specified by `from` and `to`. The size of the list can be restricted using `maxResults`.

@@ -235,24 +235,23 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
     }
 
     val assertionF = async {
-      //retrieve list of all files; for demonstration purpose show validation of return values
+      //retrieve list of all files; for demonstration purpose show validate return values
       await(adminApi.list()).map(info ⇒ info.path).toSet shouldBe paths.map {
         case (path, fileType) ⇒ path
       }.toSet
 
-      //retrieve list of files based on type; for demonstration purpose show validation of return values
+      //retrieve list of files based on type; for demonstration purpose validate return values
       await(adminApi.list(Some(FileType.Annex))).map(info ⇒ info.path).toSet shouldBe paths.collect {
         case (path, fileType) if (fileType == FileType.Annex) ⇒ path
       }.toSet
-
       await(adminApi.list(Some(FileType.Normal))).map(info ⇒ info.path).toSet shouldBe paths.collect {
         case (path, fileType) if (fileType == FileType.Normal) ⇒ path
       }.toSet
 
-      //retrieve list using pattern; for demonstration purpose show validation of return values
+      //retrieve list using pattern; for demonstration purpose validate return values
       await(adminApi.list(None, Some(".*.conf"))).map(info ⇒ info.path.toString).toSet shouldBe Set(
           "a/b/c/hcd/hcd.conf", "a/c/trombone.conf", "testing/test.conf")
-      //retrieve list using pattern and file type; for demonstration purpose show validation of return values
+      //retrieve list using pattern and file type; for demonstration purpose validate return values
       await(adminApi.list(Some(FileType.Normal), Some(".*.conf"))).map(info ⇒ info.path.toString).toSet shouldBe
       Set("a/b/c/hcd/hcd.conf", "testing/test.conf")
       await(adminApi.list(Some(FileType.Annex), Some("a/c.*"))).map(info ⇒ info.path.toString).toSet shouldBe
