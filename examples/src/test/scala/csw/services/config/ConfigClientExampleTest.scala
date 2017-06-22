@@ -241,22 +241,13 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
       }.toSet
 
       //retrieve list of files based on type; for demonstration purpose show validation of return values
-      await(adminApi.list(Some(FileType.Annex))).map(info ⇒ info.path).toSet shouldBe paths
-        .filter {
-          case (path, fileType) ⇒ fileType == FileType.Annex
-        }
-        .map {
-          case (path, fileType) ⇒ path
-        }
-        .toSet
-      await(adminApi.list(Some(FileType.Normal))).map(info ⇒ info.path).toSet shouldBe paths
-        .filter {
-          case (path, fileType) ⇒ fileType == FileType.Normal
-        }
-        .map {
-          case (path, fileType) ⇒ path
-        }
-        .toSet
+      await(adminApi.list(Some(FileType.Annex))).map(info ⇒ info.path).toSet shouldBe paths.collect {
+        case (path, fileType) if (fileType == FileType.Annex) ⇒ path
+      }.toSet
+
+      await(adminApi.list(Some(FileType.Normal))).map(info ⇒ info.path).toSet shouldBe paths.collect {
+        case (path, fileType) if (fileType == FileType.Normal) ⇒ path
+      }.toSet
 
       //retrieve list using pattern; for demonstration purpose show validation of return values
       await(adminApi.list(None, Some(".*.conf"))).map(info ⇒ info.path.toString).toSet shouldBe Set(
