@@ -1,4 +1,4 @@
-package csw.services.examples;
+package csw.services.location;
 
 import akka.actor.*;
 import akka.japi.Pair;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import commons.JExampleLogger;
+import csw.services.commons.JExampleLogger;
 
 /**
  * An example location service client application.

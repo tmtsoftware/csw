@@ -1,15 +1,15 @@
-package csw.services.config.client.scaladsl.demo
+package csw.services.config
 
 import java.io.InputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
+import csw.services.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.models.{ConfigData, ConfigId, ConfigMetadata, FileType}
 import csw.services.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFileUtils
-import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest._

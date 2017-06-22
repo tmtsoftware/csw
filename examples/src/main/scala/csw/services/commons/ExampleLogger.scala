@@ -1,4 +1,4 @@
-package commons
+package csw.services.commons
 
 import csw.services.logging.scaladsl.ComponentLogger
 

@@ -85,9 +85,10 @@ object Dependencies {
   )
 
   val CswProdExamples = Seq(
+    AkkaHttp.`akka-http`,
     Akka.`akka-actor`,
     Akka.`akka-stream`,
-    Akka.`akka-slf4j`,
-    Libs.`logback-classic`
+    Libs.`scalatest` % Test,
+    Libs.`junit`     % Test
   )
 }

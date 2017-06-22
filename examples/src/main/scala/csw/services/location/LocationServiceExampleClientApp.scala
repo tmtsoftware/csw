@@ -1,9 +1,9 @@
-package csw.services.examples
+package csw.services.location
 
 import akka.actor.{Actor, Props}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
-import commons.ExampleLogger
+import csw.services.commons.ExampleLogger
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}

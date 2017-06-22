@@ -1,4 +1,4 @@
-package csw.services.config.client.javadsl.demo;
+package csw.services.config;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
