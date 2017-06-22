@@ -185,7 +185,7 @@ class LoggingSystem(name: String = "serviceName1",
     setLevel(filterSet.filters.values.min)
   }
 
-  def getLogMetadata(): LogMetadata =
+  def getLogMetadata: LogMetadata =
     LogMetadata(getLevel.current, getAkkaLevel.current, getSlf4jLevel.current, filterSet)
 
   /**
