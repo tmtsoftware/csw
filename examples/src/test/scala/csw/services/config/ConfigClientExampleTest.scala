@@ -148,6 +148,8 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
     val futD = async {
       val unwantedFilePath = Paths.get("/hcd/trombone/debug.bin")
       await(adminApi.delete(unwantedFilePath, "no longer needed"))
+      //validates the file is deleted
+      adminApi.getLatest(unwantedFilePath).await shouldBe None
     }
     Await.result(futD, 2.seconds)
     //#delete
@@ -283,12 +285,13 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
       val id2          = await(adminApi.update(filePath, ConfigData.fromString("changing contents again"), "third commit"))
       val tEndUpdate   = Instant.now()
 
+      //full file history
       val fullHistory = await(adminApi.history(filePath))
       fullHistory.map(_.id) shouldBe List(id2, id1, id0)
       fullHistory.map(_.comment) shouldBe List("third commit", "second commit", "first commit")
 
       //drop initial revision and take only update revisions
-      await(adminApi.history(filePath, tBeginUpdate, tEndUpdate)).size shouldBe 2
+      await(adminApi.history(filePath, tBeginUpdate, tEndUpdate)).map(_.id) shouldBe List(id2, id1)
 
       //take last two revisions
       await(adminApi.history(filePath, maxResults = 2)).map(_.id) shouldBe List(id2, id1)

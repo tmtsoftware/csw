@@ -104,12 +104,18 @@ Takes input ConfigData and overwrites the configuration specified in the reposit
 Scala
 :   @@snip [ConfigClientExampleTest.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientExampleTest.scala) { #update }
 
+Java
+:   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/services/config/JConfigClientExampleTest.java) { #update }
+
 ## delete
 
 Deletes a file located at specified path in the repository
 
 Scala
 :   @@snip [ConfigClientExampleTest.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientExampleTest.scala) { #delete }
+
+Java
+:   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/services/config/JConfigClientExampleTest.java) { #delete }
 
 ## getById
 
@@ -118,12 +124,19 @@ Returns file at a given path and matching revision Id
 Scala
 :   @@snip [ConfigClientExampleTest.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientExampleTest.scala) { #getById }
 
+Java
+:   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/services/config/JConfigClientExampleTest.java) { #getById }
+
 ## getLatest
 
 Returns the latest versio of file stored at the given path.
 
 Scala
 :   @@snip [ConfigClientExampleTest.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientExampleTest.scala) { #getLatest }
+
+Java
+:   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/services/config/JConfigClientExampleTest.java) { #getLatest }
+
 
 ## getByTime
 
@@ -134,6 +147,10 @@ Gets the file at the given path as it existed at a given time-instance. Note:
 
 Scala
 :   @@snip [ConfigClientExampleTest.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientExampleTest.scala) { #getByTime }
+
+Java
+:   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/services/config/JConfigClientExampleTest.java) { #getByTime }
+
 
 ## list
 
@@ -149,6 +166,9 @@ Returns the history of active revisions of the file at the given path for a rang
 
 Scala
 :   @@snip [ConfigClientExampleTest.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientExampleTest.scala) { #history }
+
+Java
+:   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/services/config/JConfigClientExampleTest.java) { #history }
 
 ## Managing active versions
 

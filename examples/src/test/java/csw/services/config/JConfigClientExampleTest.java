@@ -5,6 +5,7 @@ import akka.stream.Materializer;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.javadsl.IConfigService;
 import csw.services.config.api.models.ConfigData;
+import csw.services.config.api.models.ConfigFileRevision;
 import csw.services.config.api.models.ConfigId;
 import csw.services.config.api.models.ConfigMetadata;
 import csw.services.config.client.internal.ActorRuntime;
@@ -25,8 +26,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class JConfigClientExampleTest {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
@@ -119,20 +125,96 @@ public class JConfigClientExampleTest {
         Assert.assertEquals(id1, new ConfigId("1"));
         Assert.assertEquals(id2, new ConfigId("3"));
         //#create
+
+        //#update
+        Path destPath = Paths.get("/hcd/trombone/overnight.conf");
+        ConfigId newId = adminApi.update(destPath, ConfigData.fromString(defaultStrConf), "added debug statements").get();
+
+        //validate the returned id
+        Assert.assertEquals(newId, new ConfigId("5"));
+        //#update
+
+        //#delete
+        Path unwantedFilePath = Paths.get("/hcd/trombone/overnight.conf");
+        adminApi.delete(unwantedFilePath, "no longer needed").get();
+        Assert.assertEquals(adminApi.getLatest(unwantedFilePath).get(), Optional.empty());
+        //#delete
     }
 
     @Test
-    public void testDelete() throws ExecutionException, InterruptedException {
-        Path path = Paths.get("tromboneHCD.conf");
-        adminApi.create(path, ConfigData.fromString(defaultStrConf), false, "commit trombone config file").get();
+    public void testGetById() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+        //#getById
+        Path filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf");
+        ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "First commit").get();
 
-        Assert.assertEquals(adminApi.getLatest(path).get().get().toJStringF(mat).get(), defaultStrConf);
-
-        adminApi.delete(path, "no longer needed").get();
-        Assert.assertEquals(adminApi.getLatest(path).get(), Optional.empty());
+        //validate
+        ConfigData actualData = adminApi.getById(filePath, id).get().get();
+        Assert.assertEquals(defaultStrConf, actualData.toJStringF(mat).get());
+        //#getById
     }
 
     @Test
+    public void testGetLatest() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+        //#getLatest
+        //create a file
+        Path filePath = Paths.get("/test.conf");
+        ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "initial configuration").get();
+
+        //override the contents
+        String newContent = "I changed the contents!!!";
+        adminApi.update(filePath, ConfigData.fromString(newContent), "changed!!").get();
+
+        //get the latest file
+        ConfigData newConfigData = adminApi.getLatest(filePath).get().get();
+        //validate
+        Assert.assertEquals(newConfigData.toJStringF(mat).get(), newContent);
+        //#getLatest
+    }
+
+    @Test
+    public void testGetByTime() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+        //#getByTime
+        Instant tInitial = Instant.now();
+
+        //create a file
+        Path filePath = Paths.get("/test.conf");
+        ConfigId id = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "initial configuration").get();
+
+        //override the contents
+        String newContent = "I changed the contents!!!";
+        adminApi.update(filePath, ConfigData.fromString(newContent), "changed!!").get();
+
+        ConfigData initialData = adminApi.getByTime(filePath, tInitial).get().get();
+        Assert.assertEquals(defaultStrConf, initialData.toJStringF(mat).get());
+
+        ConfigData latestData = adminApi.getByTime(filePath, Instant.now()).get().get();
+        Assert.assertEquals(newContent, latestData.toJStringF(mat).get());
+        //#getByTime
+    }
+
+    @Test
+    public void testHistory() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+        //#history
+        Path filePath = Paths.get("/a/test.conf");
+        ConfigId id0 = adminApi.create(filePath, ConfigData.fromString(defaultStrConf), false, "first commit").get();
+
+        //override the contents twice
+        Instant tBeginUpdate = Instant.now();
+        ConfigId id1 = adminApi.update(filePath, ConfigData.fromString("changing contents"), "second commit").get();
+        ConfigId id2 = adminApi.update(filePath, ConfigData.fromString("changing contents again"), "third commit").get();
+        Instant tEndUpdate = Instant.now();
+
+        //full file history
+        List<ConfigFileRevision> fullHistory = adminApi.history(filePath).get();
+        Assert.assertEquals(fullHistory.stream().map(ConfigFileRevision::id).collect(Collectors.toList()), new ArrayList<>(Arrays.asList(id2, id1, id0)));
+        Assert.assertEquals(fullHistory.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()), new ArrayList<>(Arrays.asList("third commit", "second commit", "first commit")));
+
+        //drop initial revision and take only update revisions
+
+        //#history
+    }
+
+        @Test
     public void testGetMetadata() throws ExecutionException, InterruptedException {
         //#getMetadata
         ConfigMetadata metadata = adminApi.getMetadata().get();
