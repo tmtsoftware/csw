@@ -41,6 +41,10 @@ class LoggerImpl private[logging] (componentName: Option[String], actorName: Opt
   override def fatal(msg: => RichMsg, ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
     all(FATAL, id, msg, ex, factory.get())
 
-  override def alternative(category: String, m: Map[String, RichMsg], ex: Throwable, id: AnyId, time: Long): Unit =
+  private[logging] override def alternative(category: String,
+                                            m: Map[String, RichMsg],
+                                            ex: Throwable,
+                                            id: AnyId,
+                                            time: Long): Unit =
     MessageHandler.sendMsg(LogAltMessage(category, time, m ++ Map("@category" -> category), id, ex))
 }

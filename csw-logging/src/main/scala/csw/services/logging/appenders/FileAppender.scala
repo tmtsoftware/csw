@@ -169,7 +169,6 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit =
     if (category != "common" || checkLevel(baseMsg)) {
-      println(loggingSystemName)
       val msg = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
       val fa = fileAppenders.get(category) match {
         case Some(a) => a

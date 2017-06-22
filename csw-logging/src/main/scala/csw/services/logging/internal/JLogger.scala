@@ -7,8 +7,6 @@ import csw.services.logging.javadsl.ILogger
 import csw.services.logging.macros.SourceFactory
 import csw.services.logging.scaladsl.{noId, AnyId, Logger}
 
-import scala.collection.JavaConverters.mapAsScalaMapConverter
-
 class JLogger private[logging] (log: Logger, cls: Class[_]) extends ILogger {
 
   override def trace(msg: Supplier[Object], ex: Throwable, id: AnyId): Unit =
@@ -46,15 +44,6 @@ class JLogger private[logging] (log: Logger, cls: Class[_]) extends ILogger {
   override def fatal(msg: Supplier[Object], id: AnyId): Unit     = fatal(msg, noException, id)
   override def fatal(msg: Supplier[Object], ex: Throwable): Unit = fatal(msg, ex, noId)
   override def fatal(msg: Supplier[Object]): Unit                = fatal(msg, noException, noId)
-
-  override def alternative(category: String, msg: java.util.Map[String, Object], ex: Throwable, id: AnyId): Unit =
-    log.alternative(category, msg.asScala.toMap, ex)
-  override def alternative(category: String, msg: java.util.Map[String, Object], id: AnyId): Unit =
-    alternative(category, msg, noException, id)
-  override def alternative(category: String, msg: java.util.Map[String, Object], ex: Throwable): Unit =
-    alternative(category, msg, ex, noId)
-  override def alternative(category: String, msg: java.util.Map[String, Object]): Unit =
-    alternative(category, msg, noException, noId)
 
   override def asScala: Logger = log
 }
