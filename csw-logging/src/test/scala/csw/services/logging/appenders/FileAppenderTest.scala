@@ -25,7 +25,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
 
-  val logMsgString: String =
+  val logMsgStringDay1: String =
     """{
       |  "@category": "common",
       |  "@componentName": "FileAppenderTest",
@@ -40,34 +40,59 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
       |}
     """.stripMargin
 
-  val expectedLogMsgJson = JsonOps.Json(logMsgString).asInstanceOf[Map[String, String]]
+  val logMsgStringDay2: String =
+    """{
+      |  "@category": "common",
+      |  "@componentName": "FileAppenderTest",
+      |  "@host": "localhost",
+      |  "@name": "test-service",
+      |  "@severity": "ERROR",
+      |  "timestamp": "2017-06-20T16:10:19.397000000+05:30",
+      |  "class": "csw.services.logging.appenders.FileAppenderTest",
+      |  "file": "FileAppenderTest.scala",
+      |  "line": 25,
+      |  "message": "This is at ERROR level"
+      |}
+    """.stripMargin
 
-  private val date            = jgetString(expectedLogMsgJson, "timestamp").substring(0, 10)
-  private val logFileFullPath = logFileDir.getAbsolutePath ++ s"/test-service/common.$date.log"
+  val expectedLogMsgJsonDay1: Map[String, String] = JsonOps.Json(logMsgStringDay1).asInstanceOf[Map[String, String]]
+  val expectedLogMsgJsonDay2: Map[String, String] = JsonOps.Json(logMsgStringDay2).asInstanceOf[Map[String, String]]
+
+  private val date1               = jgetString(expectedLogMsgJsonDay1, "timestamp").substring(0, 10)
+  private val logFileFullPathDay1 = logFileDir.getAbsolutePath ++ s"/test-service/common.$date1.log"
+
+  private val date2               = jgetString(expectedLogMsgJsonDay2, "timestamp").substring(0, 10)
+  private val logFileFullPathDay2 = logFileDir.getAbsolutePath ++ s"/test-service/common.$date2.log"
 
   override protected def beforeAll(): Unit = {
     deleteRecursively(logFileDir)
   }
 
-  override protected def afterEach(): Unit = {
-//    deleteRecursively(logFileDir)
-  }
-
   override protected def afterAll(): Unit = {
+    deleteRecursively(logFileDir)
     Await.result(actorSystem.terminate(), 5.seconds)
   }
 
+  //DEOPSCSW-151 : Manage log file size
   test("should log messages to file") {
-    fileAppender.append(expectedLogMsgJson, "common")
+    fileAppender.append(expectedLogMsgJsonDay1, "common")
+    fileAppender.append(expectedLogMsgJsonDay2, "common")
     Thread.sleep(3000)
 
-    val sourceLogFile = scala.io.Source.fromFile(logFileFullPath)
-    val actualLogMsg  = sourceLogFile.mkString
-    val actualLogJson = JsonOps.Json(actualLogMsg).asInstanceOf[Map[String, String]]
+    val sourceLogFileDay1 = scala.io.Source.fromFile(logFileFullPathDay1)
+    val sourceLogFileDay2 = scala.io.Source.fromFile(logFileFullPathDay2)
 
-    actualLogJson shouldBe expectedLogMsgJson
+    val actualLogMsgDay1 = sourceLogFileDay1.mkString
+    val actualLogMsgDay2 = sourceLogFileDay2.mkString
 
-    sourceLogFile.close()
+    val actualLogJsonDay1 = JsonOps.Json(actualLogMsgDay1).asInstanceOf[Map[String, String]]
+    val actualLogJsonDay2 = JsonOps.Json(actualLogMsgDay2).asInstanceOf[Map[String, String]]
+
+    actualLogJsonDay1 shouldBe expectedLogMsgJsonDay1
+    actualLogJsonDay2 shouldBe expectedLogMsgJsonDay2
+
+    sourceLogFileDay1.close()
+    sourceLogFileDay2.close()
   }
 
   def deleteRecursively(file: File): Unit = {

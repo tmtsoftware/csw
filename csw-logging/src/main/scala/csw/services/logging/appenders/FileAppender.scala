@@ -169,12 +169,13 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit =
     if (category != "common" || checkLevel(baseMsg)) {
-      val msg = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
-      val fa = fileAppenders.get(category) match {
+      val msg             = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
+      val fileAppenderKey = loggingSystemName + "-" + category
+      val fa = fileAppenders.get(fileAppenderKey) match {
         case Some(a) => a
         case None =>
           val a = new FilesAppender(factory, logPath + "/" + loggingSystemName, category)
-          fileAppenders += (loggingSystemName + "-" + category -> a)
+          fileAppenders += (fileAppenderKey -> a)
           a
       }
       val date = jgetString(msg, "timestamp").substring(0, 10)
