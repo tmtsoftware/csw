@@ -18,7 +18,7 @@ import scala.async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
 
-class ConfigClientDemoExample extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
+class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
   private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552))
 

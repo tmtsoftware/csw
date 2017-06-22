@@ -28,7 +28,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-public class JConfigClientDemoExample {
+public class JConfigClientExampleTest {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
     private static ILocationService clientLocationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
 
