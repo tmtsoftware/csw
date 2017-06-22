@@ -33,13 +33,13 @@ class LoggingSystem(name: String = "serviceName1",
   import LoggingLevels._
 
   private[this] val loggingConfig =
-    system.settings.config.getConfig("com.persist.logging")
+    system.settings.config.getConfig("csw-logging")
 
   private[this] val levels = loggingConfig.getString("logLevel")
   private[this] val defaultLevel: Level = if (Level.hasLevel(levels)) {
     Level(levels)
   } else {
-    throw new Exception("Bad value for com.persist.logging.logLevel")
+    throw new Exception("Bad value for csw-logging.logLevel")
   }
   @volatile var logLevel: Level = defaultLevel
 
@@ -48,7 +48,7 @@ class LoggingSystem(name: String = "serviceName1",
     if (Level.hasLevel(akkaLogLevelS)) {
       Level(akkaLogLevelS)
     } else {
-      throw new Exception("Bad value for com.persist.logging.akkaLogLevel")
+      throw new Exception("Bad value for csw-logging.akkaLogLevel")
     }
   @volatile private[this] var akkaLogLevel = defaultAkkaLogLevel
 
@@ -57,7 +57,7 @@ class LoggingSystem(name: String = "serviceName1",
     if (Level.hasLevel(slf4jLogLevelS)) {
       Level(slf4jLogLevelS)
     } else {
-      throw new Exception("Bad value for com.persist.logging.slf4jLogLevel")
+      throw new Exception("Bad value for csw-logging.slf4jLogLevel")
     }
   @volatile private[this] var slf4jLogLevel = defaultSlf4jLogLevel
 

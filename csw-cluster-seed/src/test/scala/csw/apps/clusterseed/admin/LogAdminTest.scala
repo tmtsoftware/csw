@@ -67,7 +67,7 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
 
     getLogMetadataResponse1.status shouldBe StatusCodes.OK
 
-    val config     = ConfigFactory.load().getConfig("com.persist.logging")
+    val config     = ConfigFactory.load().getConfig("csw-logging")
     val logLevel   = Level(config.getString("logLevel"))
     val akkaLevel  = Level(config.getString("akkaLogLevel"))
     val slf4jLevel = Level(config.getString("slf4jLogLevel"))

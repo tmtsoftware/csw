@@ -11,7 +11,7 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // This will load default filter set in application.conf file if provided
   private val loggingSystem = LoggingSystemFactory.start()
-  private val config        = ConfigFactory.load().getConfig("com.persist.logging")
+  private val config        = ConfigFactory.load().getConfig("csw-logging")
 
   override protected def afterAll(): Unit =
     Await.result(loggingSystem.stop, 10.seconds)

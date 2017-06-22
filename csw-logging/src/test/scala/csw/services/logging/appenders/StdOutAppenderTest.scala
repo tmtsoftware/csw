@@ -76,7 +76,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
   test("should able to pretty-print one log message to one line") {
 
     val config = ConfigFactory
-      .parseString("com.persist.logging.appenders.stdout.oneLine=true")
+      .parseString("csw-logging.appenders.stdout.oneLine=true")
       .withFallback(ConfigFactory.load)
 
     val actorSystemWithOneLineTrueConfig = ActorSystem("test-2", config)

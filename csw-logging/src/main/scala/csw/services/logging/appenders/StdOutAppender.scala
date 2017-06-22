@@ -35,7 +35,7 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
     case context: ActorContext => context.system
     case s: ActorSystem        => s
   }
-  private[this] val config        = system.settings.config.getConfig("com.persist.logging.appenders.stdout")
+  private[this] val config        = system.settings.config.getConfig("csw-logging.appenders.stdout")
   private[this] val fullHeaders   = config.getBoolean("fullHeaders")
   private[this] val color         = config.getBoolean("color")
   private[this] val width         = config.getInt("width")
