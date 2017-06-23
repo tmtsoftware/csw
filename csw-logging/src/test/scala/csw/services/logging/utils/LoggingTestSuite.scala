@@ -22,12 +22,13 @@ abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndA
     new LoggingSystem("logging", hostName, appenderBuilders = Seq(testAppender), system = actorSystem)
 
   protected val logMsgMap = Map(
-    "trace" → "logging at trace level",
-    "debug" → "logging at debug level",
-    "info"  → "logging at info level",
-    "warn"  → "logging at warn level",
-    "error" → "logging at error level",
-    "fatal" → "logging at fatal level"
+    "trace"       → "logging at trace level",
+    "debug"       → "logging at debug level",
+    "info"        → "logging at info level",
+    "warn"        → "logging at warn level",
+    "error"       → "logging at error level",
+    "fatal"       → "logging at fatal level",
+    "alternative" → "logging at alternative level"
   )
 
   override protected def afterEach(): Unit = logBuffer.clear()

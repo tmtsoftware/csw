@@ -11,14 +11,25 @@ object TromboneAssemblyLogger extends ComponentLogger("tromboneAssembly")
 object InnerSourceLogger      extends ComponentLogger("InnerClass")
 
 class TromboneHcd() extends TromboneHcdLogger.Simple {
-  def startLogging(logs: Map[String, String]): Unit = {
-    log.trace(logs("trace"))
-    log.debug(logs("debug"))
-    log.info(logs("info"))
-    log.warn(logs("warn"))
-    log.error(logs("error"))
-    log.fatal(logs("fatal"))
+
+  def startLogging(logs: Map[String, String], kind: String = "all"): Unit = kind match {
+    case "trace"       ⇒ log.trace(logs("trace"))
+    case "debug"       ⇒ log.debug(logs("debug"))
+    case "info"        ⇒ log.info(logs("info"))
+    case "warn"        ⇒ log.warn(logs("warn"))
+    case "error"       ⇒ log.error(logs("error"))
+    case "fatal"       ⇒ log.fatal(logs("fatal"))
+    case "alternative" ⇒ log.alternative("some-alternative-category", Map("@msg" → logs("alternative")))
+    case "all" ⇒ {
+      log.trace(logs("trace"))
+      log.debug(logs("debug"))
+      log.info(logs("info"))
+      log.warn(logs("warn"))
+      log.error(logs("error"))
+      log.fatal(logs("fatal"))
+    }
   }
+
 }
 
 class TromboneAssembly() extends TromboneAssemblyLogger.Simple {
@@ -40,6 +51,7 @@ object SingletonTest extends InnerSourceLogger.Simple {
     log.warn(logs("warn"))
     log.error(logs("error"))
     log.fatal(logs("fatal"))
+    log.alternative("some-alternative-category", Map("@msg" → logs("alternative")))
   }
 }
 
@@ -200,4 +212,14 @@ class LoggingTest extends LoggingTestSuite {
       log("class") shouldBe "csw.services.logging.scaladsl.SingletonTest"
     }
   }
+
+  test("alternative log message should contain @category") {
+    new TromboneHcd().startLogging(logMsgMap, "alternative")
+    Thread.sleep(100)
+
+    logBuffer.foreach { log ⇒
+      log("@category") shouldBe true
+    }
+  }
+
 }
