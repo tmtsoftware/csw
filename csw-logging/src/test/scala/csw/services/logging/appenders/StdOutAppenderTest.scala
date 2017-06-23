@@ -21,7 +21,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
   private val stdOutAppender = new StdOutAppender(actorSystem, standardHeaders, println)
 
-  val logMessage: String =
+  private val logMessage: String =
     """{
       |  "@componentName": "FileAppenderTest",
       |  "@host": "localhost",
@@ -39,9 +39,9 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       |}
     """.stripMargin
 
-  val expectedLogJson = JsonOps.Json(logMessage).asInstanceOf[Map[String, String]]
+  private val expectedLogJson = JsonOps.Json(logMessage).asInstanceOf[Map[String, String]]
 
-  val outCapture = new ByteArrayOutputStream
+  private val outCapture = new ByteArrayOutputStream
 
   override protected def afterEach(): Unit = {
     outCapture.reset()

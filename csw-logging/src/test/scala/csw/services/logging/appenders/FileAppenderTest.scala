@@ -1,6 +1,5 @@
 package csw.services.logging.appenders
 
-import java.io.File
 import java.nio.file.Paths
 
 import akka.actor.ActorSystem
@@ -8,6 +7,7 @@ import com.persist.JsonOps
 import com.persist.JsonOps.jgetString
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.RichMsg
+import csw.services.logging.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -65,11 +65,11 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   private val logFileFullPathDay2 = logFileDir.getAbsolutePath ++ s"/test-service/common.$date2.log"
 
   override protected def beforeAll(): Unit = {
-    deleteRecursively(logFileDir)
+    FileUtils.deleteRecursively(logFileDir)
   }
 
   override protected def afterAll(): Unit = {
-    deleteRecursively(logFileDir)
+    FileUtils.deleteRecursively(logFileDir)
     Await.result(actorSystem.terminate(), 5.seconds)
   }
 
@@ -94,12 +94,4 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     sourceLogFileDay1.close()
     sourceLogFileDay2.close()
   }
-
-  def deleteRecursively(file: File): Unit = {
-    if (file.isDirectory)
-      file.listFiles.foreach(deleteRecursively)
-    if (file.exists && !file.delete)
-      throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
-  }
-
 }

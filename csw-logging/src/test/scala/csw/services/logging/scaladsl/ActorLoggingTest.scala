@@ -37,8 +37,6 @@ class ActorLoggingTest extends LoggingTestSuite {
   private val tromboneActorRef =
     actorSystem.actorOf(TromboneActor.props(), name = "TromboneActor")
 
-  override protected def afterEach(): Unit = logBuffer.clear()
-
   def sendMessagesToActor() = {
     tromboneActorRef ! LogTrace
     tromboneActorRef ! LogDebug
@@ -81,6 +79,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     }
   }
 
+  // DEOPSCSW-115: Format and control logging content
   test("message logged with custom Map properties should get logged") {
     tromboneActorRef ! "Unknown"
     Thread.sleep(200)

@@ -13,12 +13,12 @@ import scala.concurrent.duration.DurationLong
 
 abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  protected val actorSystem  = ActorSystem("test")
-  protected val logBuffer    = mutable.Buffer.empty[JsonObject]
-  protected val testAppender = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
+  protected lazy val actorSystem = ActorSystem("test")
+  protected val logBuffer        = mutable.Buffer.empty[JsonObject]
+  protected val testAppender     = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
 
   private val hostName = InetAddress.getLocalHost.getHostName
-  protected val loggingSystem =
+  protected lazy val loggingSystem =
     new LoggingSystem("logging", hostName, appenderBuilders = Seq(testAppender), system = actorSystem)
 
   protected val logMsgMap = Map(
@@ -30,6 +30,8 @@ abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndA
     "fatal"       → "logging at fatal level",
     "alternative" → "logging at alternative level"
   )
+
+  override protected def beforeAll(): Unit = loggingSystem
 
   override protected def afterEach(): Unit = logBuffer.clear()
 
