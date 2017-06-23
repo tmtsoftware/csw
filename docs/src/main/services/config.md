@@ -186,6 +186,9 @@ Following API functions are available to manage the active version of a config f
 Scala
 :   @@snip [ConfigClientExampleTest.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientExampleTest.scala) { #active-file-mgmt }
 
+Java
+:   @@snip [JConfigClientExampleTest.java](../../../../examples/src/test/java/csw/services/config/JConfigClientExampleTest.java) { #active-file-mgmt }
+
 ## getMetaData
 
 Used to get metadata information about config service. It includes:
