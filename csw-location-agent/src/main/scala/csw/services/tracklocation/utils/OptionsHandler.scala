@@ -19,7 +19,7 @@ final case class OptionsHandler(options: Options, appConfig: Option[Config]) {
     if (value.isDefined) { value } else { None }
   }
 
-  def intOpt(str: String, arg: Option[Int] = None): Option[Int] =
+  private def intOpt(str: String, arg: Option[Int]): Option[Int] =
     stringOpt(str, arg.map(_.toString)).map(_.toInt)
 
   def portOpt(portKey: String, portValue: Option[Int]): Int =

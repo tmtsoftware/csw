@@ -22,4 +22,10 @@ class UtilsTest extends FunSuite with Matchers {
     x.isDefined shouldBe true
     x.get.getString("redisTest.port") shouldBe "7777"
   }
+
+  test("testNonExistantAppConfig") {
+    val configFile        = new File("/doesNotExist.conf")
+    val x: Option[Config] = Utils.getAppConfig(configFile)
+    x shouldBe None
+  }
 }

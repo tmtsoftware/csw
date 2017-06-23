@@ -40,6 +40,17 @@ class CommandTest extends FunSuite with Matchers {
     c.noExit shouldBe false
   }
 
+  test("testParse with config file but undefined value") {
+    val url            = getClass.getResource("/redisTest.conf")
+    val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
+    val configFile     = new File(configFilePath)
+    val opt            = Options(List("redisTest-misSpelledKey"), None, None, Option(configFile))
+    val c: Command     = Command.parse(opt)
+
+    //due to mis-spelled key, false command is returned. which upon execution does nothing.
+    c.commandText shouldBe "false"
+  }
+
   test("testParse with config file port, command parameters are overrideable from command line") {
     val url            = getClass.getResource("/redisTest.conf")
     val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
