@@ -7,10 +7,9 @@ import akka.util.Timeout
 import csw.services.BuildInfo
 import csw.services.config.client.commons.ConfigClientLogger
 import csw.services.csclient.cli.{ArgsParser, ClientCliWiring, Options}
-import csw.services.csclient.commons.BlockingUtils
 import csw.services.location.ClusterConfirmationActor
 import csw.services.location.ClusterConfirmationActor.IsMemberUp
-import csw.services.location.commons.ClusterAwareSettings
+import csw.services.location.commons.{BlockingUtils, ClusterAwareSettings}
 import csw.services.logging.appenders.FileAppender
 import csw.services.logging.scaladsl.LoggingSystem
 
@@ -44,7 +43,7 @@ object Main extends App with ConfigClientLogger.Simple {
         // State transition from WeaklyUp cluster member is : WeaklyUp -> Unreachable -> Down -> Removed
         // todo there should be a better strategy to remove WeaklyUp member from cluster
         val cluster = Cluster(actorSystem)
-        log.debug("Disconnecting from cluster as weaklyup member")
+        log.debug("Disconnecting from cluster as WeaklyUp member")
         cluster.down(cluster.selfAddress)
       }
     }
