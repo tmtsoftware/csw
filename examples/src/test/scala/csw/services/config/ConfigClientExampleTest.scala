@@ -4,7 +4,6 @@ import java.io.InputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
-import csw.services.commons.TestFutureExtension.RichFuture
 import csw.services.config.api.models.{ConfigData, ConfigId, ConfigMetadata, FileType}
 import csw.services.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -42,12 +41,19 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
   override protected def afterEach(): Unit =
     testFileUtils.deleteServerFiles()
 
-  override protected def beforeAll(): Unit =
-    httpService.registeredLazyBinding.await
+  override protected def beforeAll(): Unit = {
+    val doneF = async {
+      httpService.registeredLazyBinding
+    }
+    Await.result(doneF, 5.seconds)
+  }
 
   override protected def afterAll(): Unit = {
-    httpService.shutdown().await
-    locationService.shutdown().await
+    val doneF = async {
+      httpService.shutdown()
+      locationService.shutdown()
+    }
+    Await.result(doneF, 5.seconds)
   }
 
   //#declare_string_config
@@ -59,10 +65,10 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
     //construct the path
     val filePath = Paths.get("/tmt/trmobone/assembly/hcd.conf")
 
-    // create file using admin API
-    adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "First commit").await
-
     val doneF = async {
+      // create file using admin API
+      await(adminApi.create(filePath, ConfigData.fromString(defaultStrConf), annex = false, "First commit"))
+
       //check if file exists with config service
       val exists: Boolean = await(clientApi.exists(filePath))
       exists shouldBe true
@@ -134,9 +140,9 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
     //#update
     val futU = async {
       val destPath = Paths.get("/hcd/trombone/debug.bin")
-      val newId = adminApi
-        .update(destPath, ConfigData.fromString(defaultStrConf), comment = "debug statements")
-        .await
+      val newId = await(
+          adminApi
+            .update(destPath, ConfigData.fromString(defaultStrConf), comment = "debug statements"))
 
       //validate the returned id
       newId shouldEqual ConfigId(7)
@@ -149,7 +155,7 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
       val unwantedFilePath = Paths.get("/hcd/trombone/debug.bin")
       await(adminApi.delete(unwantedFilePath, "no longer needed"))
       //validates the file is deleted
-      adminApi.getLatest(unwantedFilePath).await shouldBe None
+      await(adminApi.getLatest(unwantedFilePath)) shouldBe None
     }
     Await.result(futD, 2.seconds)
     //#delete
