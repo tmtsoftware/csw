@@ -49,7 +49,10 @@ class ActorLoggingTest extends LoggingTestSuite {
   }
 
   // DEOPSCSW-116: Make log messages identifiable with components
-  test("messages logged from actor should contain component name as well as actor path") {
+  // DEOPSCSW-117: Provide unique name for each logging instance of components
+  // DEOPSCSW-119: Associate source with each log message
+  // DEOPSCSW-121: Define structured tags for log messages
+  test("messages logged from actor should contain component name, file name, class name, line number and actor path") {
 
     sendMessagesToActor()
 
@@ -58,28 +61,14 @@ class ActorLoggingTest extends LoggingTestSuite {
       log.contains("actor") shouldBe true
       log("@componentName") shouldBe "tromboneHcdActor"
       log("actor") shouldBe tromboneActorRef.path.toString
-      log.contains("file") shouldBe true
-      log.contains("line") shouldBe true
-      log.contains("class") shouldBe true
-    }
-  }
-
-  // DEOPSCSW-117: Provide unique name for each logging instance of components
-  // DEOPSCSW-119: Associate source with each log message
-  test("messages logged from actor should contain file name, class name, line number and actor path") {
-
-    sendMessagesToActor()
-
-    logBuffer.foreach { log ⇒
       log("file") shouldBe "ActorLoggingTest.scala"
       log.contains("line") shouldBe true
       log("class") shouldBe "csw.services.logging.scaladsl.TromboneActor"
-      log.contains("actor") shouldBe true
-      log("actor") shouldBe tromboneActorRef.path.toString
     }
   }
 
   // DEOPSCSW-115: Format and control logging content
+  // DEOPSCSW-121: Define structured tags for log messages
   test("message logged with custom Map properties should get logged") {
     tromboneActorRef ! "Unknown"
     Thread.sleep(200)
