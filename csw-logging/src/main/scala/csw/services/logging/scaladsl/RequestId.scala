@@ -17,7 +17,7 @@ sealed trait AnyId
  * @param spanId a sub-id used when a a service is called multiple times for the same global request.
  *               Optional: defaults to 0.
  * @param level a field for controlling per request log levels.
- *              Optional, defaults to no per request control.
+ *              Optional: defaults to no per request control.
  */
 case class RequestId(trackingId: String = UUID.randomUUID().toString,
                      spanId: String = "",

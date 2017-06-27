@@ -7,6 +7,10 @@ import csw.services.logging.{richToString, RichMsg}
 import scala.collection.JavaConverters._
 import scala.util.Try
 
+/**
+ * Represents filters as a Map of componentName -> level. Filters can be used to control log levels for different components.
+ * @param filters
+ */
 case class FilterSet(filters: Map[String, Level]) {
   def check(record: Map[String, RichMsg], level: Level): Boolean =
     filters.find(filter ⇒ filter._1 == richToString(record.getOrElse("@componentName", ""))) match {
@@ -18,6 +22,12 @@ case class FilterSet(filters: Map[String, Level]) {
 }
 
 object FilterSet {
+
+  /**
+   * Extracts the set of filters configured in logging configuration
+   * @param loggingConfig the logging configuration object
+   * @return Set of Filters
+   */
   def from(loggingConfig: Config): FilterSet = FilterSet {
     Try {
       loggingConfig

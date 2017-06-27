@@ -9,6 +9,10 @@ import csw.services.logging.noException
 
 import scala.collection.mutable
 
+/**
+ *This class is used to allow the logs logged using SLF4J API to be routed to logback that in turn sends Slf4j messages to the common log.
+ * @tparam E logging Event
+ */
 private[logging] class Slf4jAppender[E]()
     extends UnsynchronizedAppenderBase[E]
     with AppenderAttachable[E]

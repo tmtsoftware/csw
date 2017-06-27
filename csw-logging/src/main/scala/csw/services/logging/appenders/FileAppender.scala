@@ -25,6 +25,11 @@ private[logging] object FileAppenderActor {
   def props(path: String, category: String): Props = Props(new FileAppenderActor(path, category))
 }
 
+/**
+ * Actor responsible for writing log messages to a file
+ * @param path path where the log file will be created
+ * @param category category of the log messages
+ */
 private[logging] class FileAppenderActor(path: String, category: String) extends GenericLogger.Actor {
 
   import FileAppenderActor._
@@ -169,17 +174,19 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit =
     if (category != "common" || checkLevel(baseMsg)) {
-      val msg             = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
+      val msg = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
+      //Maintain a file appender for each category in a logging system
       val fileAppenderKey = loggingSystemName + "-" + category
-      val fa = fileAppenders.get(fileAppenderKey) match {
-        case Some(a) => a
-        case None =>
-          val a = new FilesAppender(factory, logPath + "/" + loggingSystemName, category)
-          fileAppenders += (fileAppenderKey -> a)
-          a
+      val fileAppender = fileAppenders.get(fileAppenderKey) match {
+        case Some(appender) => appender
+        case None           =>
+          //Create a file appender with logging file directory as logging system name within the log file path
+          val filesAppender = new FilesAppender(factory, logPath + "/" + loggingSystemName, category)
+          fileAppenders += (fileAppenderKey -> filesAppender)
+          filesAppender
       }
       val date = jgetString(msg, "timestamp").substring(0, 10)
-      fa.add(date, Compact(msg, safe = true, sort = sort))
+      fileAppender.add(date, Compact(msg, safe = true, sort = sort))
     }
 
   /**

@@ -14,6 +14,10 @@ import csw.services.logging.scaladsl.{RequestId, RichException}
 
 import scala.concurrent.Promise
 
+/**
+ * All log messages are routed to this single Akka Actor. There is one LogActor per logging system.
+ * Logging messages from logging API, Java Slf4j and Akka loggers are sent to this actor.
+ */
 private[logging] object LogActor {
 
   def props(done: Promise[Unit],

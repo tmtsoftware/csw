@@ -19,8 +19,9 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 
 /**
  *
- * @param name name of the service (to log).
- * @param host host name (to log).
+ * @param name             name of the service (to log).
+ * @param host             host name (to log).
+ * @param system           actor system which will be used to create log actors
  * @param appenderBuilders optional sequence of log appenders to use.
  *                         Default is to use built-in stdout and file appenders.
  */
@@ -179,12 +180,21 @@ class LoggingSystem(name: String = "serviceName1",
   def setFilter(filter: Option[(Map[String, RichMsg], Level) => Boolean]): Unit =
     logActor ! SetFilter(filter)
 
+  /**
+   * Add a filter to get logs of a given component at a level different than the other components
+   * @param componentName name of the component
+   * @param level log level to be set for the given component
+   */
   def addFilter(componentName: String, level: LoggingLevels.Level): Unit = {
     filterSet = filterSet.add(componentName, level)
     setFilter(Some(filterSet.check))
     setLevel(filterSet.filters.values.min)
   }
 
+  /**
+   * Get the basic logging configuration values
+   * @return LogMetadata which comprises of current root log level, akka log level, sl4j log level and current set of filters
+   */
   def getLogMetadata: LogMetadata =
     LogMetadata(getLevel.current, getAkkaLevel.current, getSlf4jLevel.current, filterSet)
 

@@ -4,7 +4,7 @@ import java.net.InetAddress
 
 import csw.services.logging.appenders.StdOutAppender
 
-object LoggingSystemFactory extends GenericLogger.Simple {
+private[logging] object LoggingSystemFactory extends GenericLogger.Simple {
   def start(): LoggingSystem =
     new LoggingSystem("serviceName1", InetAddress.getLocalHost.getHostName, appenderBuilders = Seq(StdOutAppender))
 }

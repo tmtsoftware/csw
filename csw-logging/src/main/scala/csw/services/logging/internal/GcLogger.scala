@@ -10,6 +10,9 @@ import csw.services.logging.scaladsl.GenericLogger
 
 import scala.collection.JavaConverters._
 
+/**
+ * When enabled by the gc configuration option, Garbage collection events are logged to the 'gc' log following the same structure as the other logs.
+ */
 private[logging] class GcLogger extends GenericLogger.Simple {
 
   private[this] val gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans

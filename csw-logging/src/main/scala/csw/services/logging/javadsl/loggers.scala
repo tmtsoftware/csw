@@ -26,6 +26,9 @@ abstract class JComponentLoggerActor extends JBasicLoggerActor {
   override protected def maybeComponentName: Optional[String] = Optional.of(componentName)
 }
 
+/**
+ * Implement this trait to obtain a reference to a logger initialized with name of the component
+ */
 trait JBasicLogger {
   protected def maybeComponentName: Optional[String]
   protected def getLogger: ILogger = {
@@ -34,6 +37,9 @@ trait JBasicLogger {
   }
 }
 
+/**
+ * Extend this class to create an Actor and obtain a reference to a logger initialized with name of the component and it's ActorPath
+ */
 abstract class JBasicLoggerActor extends AbstractActor {
   protected def maybeComponentName: Optional[String]
   protected def getLogger: ILogger = {

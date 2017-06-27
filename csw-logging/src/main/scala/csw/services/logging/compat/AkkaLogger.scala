@@ -4,6 +4,9 @@ import akka.actor.Actor
 import akka.event.Logging._
 import csw.services.logging.internal.{LogAkka, MessageHandler}
 
+/**
+ * Actors log by mixing the trait `akka.actor.ActorLogging`. This logger is used to allow akka logs to be sent to the common log.
+ */
 private[logging] class AkkaLogger extends Actor {
   import csw.services.logging.internal.LoggingLevels._
 

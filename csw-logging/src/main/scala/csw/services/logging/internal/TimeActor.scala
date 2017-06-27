@@ -6,6 +6,10 @@ import csw.services.logging.scaladsl.{GenericLogger, RequestId}
 import scala.collection.mutable
 import scala.concurrent.Promise
 
+/**
+ * Actor responsible for writing log messages to a file
+ * @param tdone
+ */
 private[logging] class TimeActor(tdone: Promise[Unit]) extends GenericLogger.Actor {
 
   import TimeActorMessages._
