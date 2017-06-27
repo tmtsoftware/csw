@@ -1,13 +1,15 @@
 package csw.services.logging.appenders
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, PrintWriter}
+import java.time.{LocalDateTime, LocalTime}
 
 import akka.actor._
 import com.persist.JsonOps._
-import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.scaladsl.GenericLogger
 import csw.services.logging.RichMsg
+import csw.services.logging.commons.Constants
+import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
+import csw.services.logging.scaladsl.GenericLogger
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
@@ -16,7 +18,7 @@ private[logging] object FileAppenderActor {
 
   trait AppendMessages
 
-  case class AppendAdd(data: String, line: String) extends AppendMessages
+  case class AppendAdd(localDateTime: LocalDateTime, line: String) extends AppendMessages
 
   case class AppendClose(p: Promise[Unit]) extends AppendMessages
 
@@ -34,10 +36,10 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
 
   import FileAppenderActor._
 
-  private[this] val system                        = context.system
-  private[this] implicit val ec: ExecutionContext = context.dispatcher
-  private[this] var lastDate: String              = ""
-  private[this] var optw: Option[PrintWriter]     = None
+  private[this] val system                                   = context.system
+  private[this] implicit val ec: ExecutionContext            = context.dispatcher
+  private[this] var fileSpanTimestamp: Option[LocalDateTime] = None
+  private[this] var maybePrintWriter: Option[PrintWriter]    = None
 
   private[this] var flushTimer: Option[Cancellable] = None
 
@@ -50,33 +52,34 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
 
   scheduleFlush()
 
-  private def open(date: String): Unit = {
-    val dir = s"$path"
+  private def open(currentTimestamp: LocalDateTime): Unit = {
+    val fileTimestamp: LocalDateTime = FileAppender.decideTimestampForFile(currentTimestamp)
+    val dir                          = s"$path"
     new File(dir).mkdirs()
-    val fname = s"$dir/$category.$date.log"
-    val w     = new PrintWriter(new BufferedOutputStream(new FileOutputStream(fname, true)))
-    optw = Some(w)
-    lastDate = date
+    val fileName    = s"$dir/$category.$fileTimestamp.log"
+    val printWriter = new PrintWriter(new BufferedOutputStream(new FileOutputStream(fileName, true)))
+    maybePrintWriter = Some(printWriter)
+    fileSpanTimestamp = Some(LocalDateTime.of(fileTimestamp.plusDays(1L).toLocalDate, LocalTime.NOON))
   }
 
   def receive: Receive = {
-    case AppendAdd(date, line) =>
-      optw match {
+    case AppendAdd(currentTimestamp, line) =>
+      maybePrintWriter match {
         case Some(w) =>
-          if (date != lastDate) {
+          if (currentTimestamp.isAfter(fileSpanTimestamp.getOrElse(LocalDateTime.MIN))) {
             w.close()
-            open(date)
+            open(currentTimestamp)
           }
         case None =>
-          open(date)
+          open(currentTimestamp)
       }
-      optw match {
+      maybePrintWriter match {
         case Some(w) =>
           w.println(line)
         case None =>
       }
     case AppendFlush =>
-      optw match {
+      maybePrintWriter match {
         case Some(w) =>
           w.flush()
         case None =>
@@ -88,10 +91,10 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
         case Some(t) => t.cancel()
         case None    =>
       }
-      optw match {
+      maybePrintWriter match {
         case Some(w) =>
           w.close()
-          optw = None
+          maybePrintWriter = None
         case None =>
       }
       p.success(())
@@ -100,10 +103,10 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
   }
 
   override def postStop(): Unit =
-    optw match {
+    maybePrintWriter match {
       case Some(w) =>
         w.close()
-        optw = None
+        maybePrintWriter = None
       case None =>
     }
 }
@@ -115,8 +118,8 @@ private[logging] class FilesAppender(actorRefFactory: ActorRefFactory, path: Str
   private[this] val fileAppenderActor =
     actorRefFactory.actorOf(FileAppenderActor.props(path, category), name = s"FileAppender.$category")
 
-  def add(date: String, line: String): Unit =
-    fileAppenderActor ! AppendAdd(date, line)
+  def add(localDateTime: LocalDateTime, line: String): Unit =
+    fileAppenderActor ! AppendAdd(localDateTime, line)
 
   def close(): Future[Unit] = {
     val p = Promise[Unit]()
@@ -139,6 +142,13 @@ object FileAppender extends LogAppenderBuilder {
    */
   def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]): FileAppender =
     new FileAppender(factory, stdHeaders)
+
+  def decideTimestampForFile(timestamp: LocalDateTime): LocalDateTime = {
+    val localDateTime =
+      if (timestamp.getHour >= 12) LocalDateTime.of(timestamp.toLocalDate, LocalTime.NOON)
+      else LocalDateTime.of(timestamp.toLocalDate.minusDays(1L), LocalTime.NOON)
+    localDateTime
+  }
 }
 
 /**
@@ -185,8 +195,10 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
           fileAppenders += (fileAppenderKey -> filesAppender)
           filesAppender
       }
-      val date = jgetString(msg, "timestamp").substring(0, 10)
-      fileAppender.add(date, Compact(msg, safe = true, sort = sort))
+      val timestamp = jgetString(msg, "timestamp")
+
+      val currentTimestamp = LocalDateTime.parse(timestamp, Constants.ISOLogFmt)
+      fileAppender.add(currentTimestamp, Compact(msg, safe = true, sort = sort))
     }
 
   /**

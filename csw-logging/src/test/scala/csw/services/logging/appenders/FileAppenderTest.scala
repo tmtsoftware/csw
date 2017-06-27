@@ -1,12 +1,14 @@
 package csw.services.logging.appenders
 
 import java.nio.file.Paths
+import java.time.LocalDateTime
 
 import akka.actor.ActorSystem
 import com.persist.JsonOps
 import com.persist.JsonOps.jgetString
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.RichMsg
+import csw.services.logging.commons.Constants
 import csw.services.logging.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -25,7 +27,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
 
-  val logMsgStringDay1: String =
+  val logMsgString1: String =
     """{
       |  "@category": "alternative",
       |  "@componentName": "FileAppenderTest",
@@ -40,7 +42,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
       |}
     """.stripMargin
 
-  val logMsgStringDay2: String =
+  val logMsgString2: String =
     """{
       |  "@category": "common",
       |  "@componentName": "FileAppenderTest",
@@ -55,14 +57,36 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
       |}
     """.stripMargin
 
-  val expectedLogMsgJsonDay1: Map[String, String] = JsonOps.Json(logMsgStringDay1).asInstanceOf[Map[String, String]]
-  val expectedLogMsgJsonDay2: Map[String, String] = JsonOps.Json(logMsgStringDay2).asInstanceOf[Map[String, String]]
+  val logMsgString3: String =
+    """{
+      |  "@category": "common",
+      |  "@componentName": "FileAppenderTest",
+      |  "@host": "localhost",
+      |  "@name": "test-service",
+      |  "@severity": "INFO",
+      |  "timestamp": "2017-06-23T01:10:19.397000000+05:30",
+      |  "class": "csw.services.logging.appenders.FileAppenderTest",
+      |  "file": "FileAppenderTest.scala",
+      |  "line": 25,
+      |  "message": "This is at INFO level"
+      |}
+    """.stripMargin
 
-  private val date1               = jgetString(expectedLogMsgJsonDay1, "timestamp").substring(0, 10)
-  private val logFileFullPathDay1 = logFileDir.getAbsolutePath ++ s"/test-service/alternative.$date1.log"
+  val expectedLogMsgJson1: Map[String, String] = JsonOps.Json(logMsgString1).asInstanceOf[Map[String, String]]
+  val expectedLogMsgJson2: Map[String, String] = JsonOps.Json(logMsgString2).asInstanceOf[Map[String, String]]
+  val expectedLogMsgJson3: Map[String, String] = JsonOps.Json(logMsgString3).asInstanceOf[Map[String, String]]
 
-  private val date2               = jgetString(expectedLogMsgJsonDay2, "timestamp").substring(0, 10)
-  private val logFileFullPathDay2 = logFileDir.getAbsolutePath ++ s"/test-service/common.$date2.log"
+  private val date1            = jgetString(expectedLogMsgJson1, "timestamp")
+  private val localDateTime1   = FileAppender.decideTimestampForFile(LocalDateTime.parse(date1, Constants.ISOLogFmt))
+  private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service/alternative.$localDateTime1.log"
+
+  private val date2            = jgetString(expectedLogMsgJson2, "timestamp")
+  private val localDateTime2   = FileAppender.decideTimestampForFile(LocalDateTime.parse(date2, Constants.ISOLogFmt))
+  private val logFileFullPath2 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime2.log"
+
+  private val date3            = jgetString(expectedLogMsgJson3, "timestamp")
+  private val localDateTime3   = FileAppender.decideTimestampForFile(LocalDateTime.parse(date3, Constants.ISOLogFmt))
+  private val logFileFullPath3 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime3.log"
 
   override protected def beforeAll(): Unit = {
     FileUtils.deleteRecursively(logFileDir)
@@ -75,23 +99,17 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   //DEOPSCSW-151 : Manage log file size
   test("log file is rotated every day") {
-    fileAppender.append(expectedLogMsgJsonDay1, "alternative")
-    fileAppender.append(expectedLogMsgJsonDay2, "common")
+    fileAppender.append(expectedLogMsgJson1, "alternative")
+    fileAppender.append(expectedLogMsgJson2, "common")
+    fileAppender.append(expectedLogMsgJson3, "common")
     Thread.sleep(3000)
 
-    val sourceLogFileDay1 = scala.io.Source.fromFile(logFileFullPathDay1)
-    val sourceLogFileDay2 = scala.io.Source.fromFile(logFileFullPathDay2)
+    val actualLogBuffer1 = FileUtils.read(logFileFullPath1).toList
+    val actualLogBuffer2 = FileUtils.read(logFileFullPath2).toList
+    val actualLogBuffer3 = FileUtils.read(logFileFullPath3).toList
 
-    val actualLogMsgDay1 = sourceLogFileDay1.mkString
-    val actualLogMsgDay2 = sourceLogFileDay2.mkString
-
-    val actualLogJsonDay1 = JsonOps.Json(actualLogMsgDay1).asInstanceOf[Map[String, String]]
-    val actualLogJsonDay2 = JsonOps.Json(actualLogMsgDay2).asInstanceOf[Map[String, String]]
-
-    actualLogJsonDay1 shouldBe expectedLogMsgJsonDay1
-    actualLogJsonDay2 shouldBe expectedLogMsgJsonDay2
-
-    sourceLogFileDay1.close()
-    sourceLogFileDay2.close()
+    actualLogBuffer1.head shouldBe expectedLogMsgJson1
+    actualLogBuffer2.head shouldBe expectedLogMsgJson2
+    actualLogBuffer3.head shouldBe expectedLogMsgJson3
   }
 }

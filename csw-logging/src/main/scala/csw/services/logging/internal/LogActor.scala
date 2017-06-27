@@ -8,6 +8,7 @@ import com.persist.Exceptions.SystemException
 import com.persist.JsonOps._
 import csw.services.logging._
 import csw.services.logging.appenders.LogAppender
+import csw.services.logging.commons.Constants
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.{RequestId, RichException}
@@ -42,9 +43,6 @@ private[logging] class LogActor(done: Promise[Unit],
   private[this] var level: Level                                   = initLevel
   private[this] var akkaLogLevel: Level                            = initAkkaLevel
   private[this] var slf4jLogLevel: Level                           = initSlf4jLevel
-
-  private[this] val ISOLogFmt =
-    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSxxxxx")
 
   def receive: Receive = {
     case log: Log                     => receiveLog(log)
@@ -198,8 +196,8 @@ private[logging] class LogActor(done: Promise[Unit],
       append(jsonObject, "common", logAkka.level)
     }
 
-  private def formatLogTimeToISOFmt(time: Long) = {
+  private def formatLogTimeToISOFmt(time: Long): String = {
     val offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault)
-    offsetDateTime.format(ISOLogFmt)
+    offsetDateTime.format(Constants.ISOLogFmt)
   }
 }
