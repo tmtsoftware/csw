@@ -8,8 +8,7 @@ import akka.cluster.http.management.ClusterHttpManagement
 import akka.cluster.{Cluster, MemberStatus}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
-import csw.services.location.ClusterConfirmationActor
-import csw.services.location.ClusterConfirmationActor.HasJoinedCluster
+import csw.services.location.commons.ClusterConfirmationActor.HasJoinedCluster
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}

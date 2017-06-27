@@ -7,9 +7,8 @@ import akka.util.Timeout
 import csw.services.BuildInfo
 import csw.services.config.client.commons.ConfigClientLogger
 import csw.services.csclient.cli.{ArgsParser, ClientCliWiring, Options}
-import csw.services.location.ClusterConfirmationActor
-import csw.services.location.ClusterConfirmationActor.IsMemberUp
-import csw.services.location.commons.{BlockingUtils, ClusterAwareSettings}
+import csw.services.location.commons.ClusterConfirmationActor.IsMemberUp
+import csw.services.location.commons.{BlockingUtils, ClusterAwareSettings, ClusterConfirmationActor}
 import csw.services.logging.appenders.FileAppender
 import csw.services.logging.scaladsl.LoggingSystem
 

@@ -1,10 +1,10 @@
-package csw.services.location
+package csw.services.location.commons
 
 import akka.Done
 import akka.actor.{Actor, Props}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
-import csw.services.location.ClusterConfirmationActor.{HasJoinedCluster, IsMemberUp}
+import csw.services.location.commons.ClusterConfirmationActor.{HasJoinedCluster, IsMemberUp}
 
 class ClusterConfirmationActor extends Actor {
 
