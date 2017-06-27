@@ -55,6 +55,10 @@ csw-config-client offers two APIs.
 * **clientAPI** : Expected to be consumed by component developers. Available functions are: `{exists | getActive}`    
 * **adminAPI**  : Full functionality exposed by ConfigServer is available with this API. Expected to be used administrators. Available functions are: `{create | update | getById | getLatest | getByTime | delete | list | history | historyActive | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}`
 
+@@@ warning { title="Component developers are recommended to use clientAPI." }
+    
+@@@
+
 ## Accessing clientAPI and adminAPI
 
 ConfigClientFactory exposes functions to get clientAPI and adminAPI. Both the functions require LocationService instance which is used to resolve ConfigServer.
