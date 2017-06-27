@@ -1,11 +1,13 @@
 package csw.services.location.internal
 
-import java.net.InetAddress
+import java.net.{InetAddress, NetworkInterface}
 
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.mockito.Mockito._
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+
+import scala.collection.JavaConverters.enumerationAsScalaIteratorConverter
 
 class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with MockitoSugar {
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
@@ -21,6 +23,7 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
     ipv4Address shouldEqual (inet4Address)
 
   }
+
   test("Should get ip4 address of interface with lowest index when interfacename is not provided") {
     val inet4Address1         = InetAddress.getByAddress(Array[Byte](192.toByte, 168.toByte, 1, 2))
     val inet4Address2         = InetAddress.getByAddress(Array[Byte](172.toByte, 17.toByte, 1, 2))
@@ -36,5 +39,12 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
     intercept[NetworkInterfaceNotFound] {
       new Networks("test").ipv4Address
     }
+  }
+
+  test("testGetIpv4Address returns inet address when provided a valid interface name") {
+    val inetAddresses: List[InetAddress] = NetworkInterface.getNetworkInterfaces.asScala.toList.map { iface ⇒
+      new Networks(iface.getName).ipv4Address
+    }
+    inetAddresses.contains(InetAddress.getLocalHost) shouldEqual true
   }
 }
