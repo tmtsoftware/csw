@@ -1,6 +1,5 @@
 package csw.services.logging.internal
 
-import java.time.format.DateTimeFormatter
 import java.time.{Instant, OffsetDateTime, ZoneId}
 
 import akka.actor.{Actor, Props}

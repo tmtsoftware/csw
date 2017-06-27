@@ -1,7 +1,7 @@
 package csw.services.logging.internal
 
 import java.nio.file.Paths
-import java.time.Instant
+import java.time.LocalDateTime
 
 import akka.actor.ActorSystem
 import com.persist.JsonOps.JsonObject
@@ -28,10 +28,10 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val tromboneActorRef =
     actorSystem.actorOf(TromboneActor.props(), name = "TromboneActor")
 
-  private val currentDate     = Instant.now().toString.substring(0, 10)
+  private val fileTimestamp   = FileAppender.decideTimestampForFile(LocalDateTime.now())
   private val fullLogFileDir  = logFileDir + "/" + loggingSystemName
-  private val timeLogFilePath = fullLogFileDir + s"/time.$currentDate.log"
-  private val testLogFilePath = fullLogFileDir + s"/common.$currentDate.log"
+  private val timeLogFilePath = fullLogFileDir + s"/time.$fileTimestamp.log"
+  private val testLogFilePath = fullLogFileDir + s"/common.$fileTimestamp.log"
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
