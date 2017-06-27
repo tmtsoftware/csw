@@ -18,7 +18,8 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 /**
- *
+ * This class is responsible for programmatic interaction with the configuration of the logging system. It initializes
+ * the appenders, starts the log actor and manages clean up of logging system.
  * @param name             name of the service (to log).
  * @param host             host name (to log).
  * @param system           actor system which will be used to create log actors

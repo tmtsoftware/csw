@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
 import scala.util.Try
 
 /**
- * Represents filters as a Map of componentName -> level. Filters can be used to control log levels for different components.
+ * Represents filters as a Map of componentName as key and Level as value. Filters can be used to control log levels for different components.
  * @param filters
  */
 case class FilterSet(filters: Map[String, Level]) {
