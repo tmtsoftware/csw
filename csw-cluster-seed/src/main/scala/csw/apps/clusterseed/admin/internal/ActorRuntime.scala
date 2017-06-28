@@ -3,6 +3,7 @@ package csw.apps.clusterseed.admin.internal
 import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.stream.{ActorMaterializer, Materializer}
+import csw.services.BuildInfo
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.appenders.{FileAppender, StdOutAppender}
 import csw.services.logging.internal.LoggingSystem
@@ -18,7 +19,7 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   val coordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   def startLogging(): LoggingSystem =
-    LoggingSystemFactory.start("cluster-seed-app", ClusterAwareSettings.hostname, actorSystem,
+    LoggingSystemFactory.start(BuildInfo.name, ClusterAwareSettings.hostname, actorSystem,
       Seq(StdOutAppender, FileAppender))
 
   def shutdown(): Future[Done] = coordinatedShutdown.run()

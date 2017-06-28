@@ -37,8 +37,6 @@ import csw.services.commons.JExampleLogger;
  */
 public class JLocationServiceExampleClient extends AbstractActor implements JExampleLogger {
 
-    private ILogger jLogger = getLogger();
-
     //#create-location-service
     private ILocationService locationService = JLocationServiceFactory.make();
     //#create-location-service
@@ -49,13 +47,14 @@ public class JLocationServiceExampleClient extends AbstractActor implements JExa
     private IRegistrationResult hcdRegResult;
     private IRegistrationResult assemblyRegResult;
 
-    //#create-logging-system
     private ActorSystem actorSystem = ActorSystemFactory.remote();
-
+    //#create-logging-system
     private List<LogAppenderBuilder> appenders = Arrays.asList(JLogAppenderBuilders.StdOutAppender, JLogAppenderBuilders.FileAppender);
 
     private LoggingSystem loggingSystem = JLoggingSystemFactory.start("foo-name", "hostname", actorSystem, appenders);
     //#create-logging-system
+
+    private ILogger jLogger = getLogger();
 
     public JLocationServiceExampleClient() throws ExecutionException, InterruptedException {
 
