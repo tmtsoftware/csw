@@ -14,6 +14,7 @@ object Dependencies {
     Libs.`joda-time`,
     Akka.`akka-actor`,
     Akka.`akka-slf4j`,
+    Akka.`akka-remote`,
     Libs.`scalatest` % Test
   )
 

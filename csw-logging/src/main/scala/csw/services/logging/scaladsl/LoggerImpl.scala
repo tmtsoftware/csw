@@ -5,8 +5,12 @@ import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.internal.LoggingState._
 import csw.services.logging.internal.{Log, LogAltMessage, MessageHandler}
 import csw.services.logging.macros.{SourceFactory, SourceLocation}
+import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 class LoggerImpl private[logging] (componentName: Option[String], actorName: Option[String]) extends Logger {
+
+  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   private def all(level: Level, id: AnyId, msg: => Any, ex: Throwable, sourceLocation: SourceLocation): Unit = {
     val t = System.currentTimeMillis()
