@@ -8,6 +8,7 @@ import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
+// $COVERAGE-OFF$
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) extends ClusterSeedLogger.Simple {
   def start(args: Array[String]): Unit =
     new ArgsParser().parse(args).map {
@@ -32,3 +33,4 @@ object Main extends App {
     new Main(ClusterAwareSettings, startLogging = true).start(args)
   }
 }
+// $COVERAGE-ON$

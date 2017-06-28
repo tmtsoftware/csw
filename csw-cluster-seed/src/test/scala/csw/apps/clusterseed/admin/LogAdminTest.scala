@@ -141,4 +141,15 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
       Level(currentLogLevel) >= LoggingLevels.ERROR shouldBe true
     }
   }
+
+  test("should give appropriate exception when component name is incorrect") {
+    // send http get metadata request for invalid component
+    val getLogMetadataUri = Uri.from(scheme = "http", host = ClusterAwareSettings.hostname, port = 7878,
+      path = s"/admin/logging/abcd-hcd-akka/level")
+
+    val getLogMetadataRequest   = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
+    val getLogMetadataResponse1 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
+
+    getLogMetadataResponse1.status shouldBe StatusCodes.NotFound
+  }
 }

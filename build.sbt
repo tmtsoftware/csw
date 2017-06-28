@@ -61,7 +61,7 @@ lazy val `csw-location` = project
 
 //Cluster seed
 lazy val `csw-cluster-seed` = project
-  .enablePlugins(DeployApp)
+  .enablePlugins(DeployApp, MaybeCoverage)
   .dependsOn(`csw-location`)
   .settings(
     libraryDependencies ++= Dependencies.CswClusterSeed
