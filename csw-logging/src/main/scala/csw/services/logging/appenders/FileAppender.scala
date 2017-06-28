@@ -14,14 +14,21 @@ import csw.services.logging.scaladsl.GenericLogger
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
+/**
+ * Companion object of FileAppender Actor
+ */
 private[logging] object FileAppenderActor {
 
+  // Parent trait for messages handles by File Appender Actor
   trait AppendMessages
 
+  // Message to add log text to the writer
   case class AppendAdd(localDateTime: LocalDateTime, line: String) extends AppendMessages
 
+  // Message to close the appender
   case class AppendClose(p: Promise[Unit]) extends AppendMessages
 
+  // Message to flush content from writer to the file
   case object AppendFlush extends AppendMessages
 
   def props(path: String, category: String): Props = Props(new FileAppenderActor(path, category))
@@ -43,6 +50,7 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
 
   private[this] var flushTimer: Option[Cancellable] = None
 
+  // Send a message to self every 2 seconds to flush messages from PrintWriter
   private def scheduleFlush(): Unit = {
     val time = system.scheduler.scheduleOnce(2.seconds) {
       self ! AppendFlush
@@ -52,6 +60,7 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
 
   scheduleFlush()
 
+  // Initialize writer for log file
   private def open(currentTimestamp: LocalDateTime): Unit = {
     val fileTimestamp: LocalDateTime = FileAppender.decideTimestampForFile(currentTimestamp)
     val dir                          = s"$path"
@@ -111,6 +120,12 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
     }
 }
 
+/**
+ * Responsible for creating an actor which manages the file resource
+ * @param actorRefFactory factory for creating an actor
+ * @param path log file path
+ * @param category log category
+ */
 private[logging] class FilesAppender(actorRefFactory: ActorRefFactory, path: String, category: String) {
 
   import FileAppenderActor._

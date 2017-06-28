@@ -26,6 +26,7 @@ object MessageHandler {
       }
     }
 
+  // Route akka messages to common log actor
   private[logging] def sendAkkaMsg(logAkka: LogAkka): Unit =
     if (logAkka.msg == "DIE") {
       akkaStopPromise.trySuccess(())
@@ -33,12 +34,14 @@ object MessageHandler {
       sendMsg(logAkka)
     }
 
+  // Route time start messages to time actor
   private[logging] def timeStart(id: RequestId, name: String, uid: String): Unit =
     timeActorOption foreach { timeActor =>
       val time = System.nanoTime() / 1000
       timeActor ! TimeStart(id, name, uid, time)
     }
 
+  // Route time end messages to time actor
   private[logging] def timeEnd(id: RequestId, name: String, uid: String): Unit =
     timeActorOption foreach { timeActor =>
       val time = System.nanoTime() / 1000

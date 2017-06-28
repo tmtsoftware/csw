@@ -73,6 +73,7 @@ private[logging] class LogActor(done: Promise[Unit],
     }
   }
 
+  // Convert exception stack trace to JSON
   private def getStack(ex: Throwable): Seq[JsonObject] = {
     val stack = ex.getStackTrace map { trace =>
       val j0 = if (trace.getLineNumber > 0) {
@@ -90,6 +91,7 @@ private[logging] class LogActor(done: Promise[Unit],
     stack
   }
 
+  // Convert exception to JSON
   private def exceptionJson(ex: Throwable): JsonObject = {
     val stack = getStack(ex)
     val j1 = ex match {
@@ -102,7 +104,9 @@ private[logging] class LogActor(done: Promise[Unit],
     JsonObject("trace" -> JsonObject("message" -> exToJson(ex), "stack" -> stack)) ++ j1
   }
 
+  // Send JSON log object for each peender configured for the logging system
   private def append(baseMsg: JsonObject, category: String, level: Level): Unit = {
+    // Send message to appenders only if they pass through the filter or if they are 'gc' or 'time' messages
     val keep = category != "common" || (filter match {
       case Some(f) => f(standardHeaders ++ baseMsg, level)
       case None    => true

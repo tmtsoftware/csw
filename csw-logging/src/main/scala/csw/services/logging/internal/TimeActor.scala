@@ -7,8 +7,8 @@ import scala.collection.mutable
 import scala.concurrent.Promise
 
 /**
- * Actor responsible for writing log messages to a file
- * @param tdone
+ * Actor responsible for writing logs which time a functional block
+ * @param tdone A promise to let the caller know when this actors responsibility is done
  */
 private[logging] class TimeActor(tdone: Promise[Unit]) extends GenericLogger.Actor {
 

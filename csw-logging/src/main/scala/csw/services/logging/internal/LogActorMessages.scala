@@ -7,8 +7,10 @@ import csw.services.logging.scaladsl.AnyId
 
 import scala.collection.JavaConverters._
 
+// Parent trait for Log messages shared with Log Actor
 sealed trait LogActorMessages
 
+// Model for common Log messages shared with Log Actor
 case class Log(componentName: Option[String],
                level: Level,
                id: AnyId,
@@ -27,6 +29,7 @@ case class Log(componentName: Option[String],
 
 case class SetLevel(level: Level) extends LogActorMessages
 
+// Model for Log messages to be shared with Log Actor which are logged using 'alternative' method of logger
 case class LogAltMessage(category: String, time: Long, jsonObject: JsonObject, id: AnyId, ex: Throwable)
     extends LogActorMessages
 
