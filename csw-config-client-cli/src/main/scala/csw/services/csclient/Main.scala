@@ -15,6 +15,7 @@ import csw.services.logging.scaladsl.LoggingSystemFactory
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
+// $COVERAGE-OFF$
 object Main extends App with ConfigClientLogger.Simple {
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     println(
@@ -61,3 +62,4 @@ object Main extends App with ConfigClientLogger.Simple {
     success
   }
 }
+// $COVERAGE-ON$

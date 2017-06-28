@@ -1,8 +1,9 @@
 package csw.services.csclient.cli
 
 /**
- * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
+ * Application object allowing program execution from command line.
  */
+// $COVERAGE-OFF$
 class CliApp(commandLineRunner: CommandLineRunner) {
   def start(args: Array[String]): Unit =
     ArgsParser.parse(args).foreach { options ⇒
@@ -31,3 +32,4 @@ class CliApp(commandLineRunner: CommandLineRunner) {
     }
   }
 }
+// $COVERAGE-ON$
