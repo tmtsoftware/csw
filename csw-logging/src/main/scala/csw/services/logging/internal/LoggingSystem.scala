@@ -1,17 +1,16 @@
-package csw.services.logging.scaladsl
+package csw.services.logging.internal
 
-import java.net.InetAddress
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
 import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
 import csw.services.logging.RichMsg
-import csw.services.logging.appenders.{FileAppender, LogAppenderBuilder, StdOutAppender}
+import csw.services.logging.appenders.LogAppenderBuilder
 import csw.services.logging.internal.TimeActorMessages.TimeDone
-import csw.services.logging.internal._
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.models.{FilterSet, LogMetadata}
+import csw.services.logging.scaladsl.GenericLogger
 import org.slf4j.LoggerFactory
 
 import scala.compat.java8.FutureConverters.FutureOps
@@ -23,13 +22,10 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param name             name of the service (to log).
  * @param host             host name (to log).
  * @param system           actor system which will be used to create log actors
- * @param appenderBuilders optional sequence of log appenders to use.
- *                         Default is to use built-in stdout and file appenders.
+ * @param appenderBuilders sequence of log appenders to use.
+ *
  */
-class LoggingSystem(name: String = "serviceName1",
-                    host: String = InetAddress.getLocalHost.getHostName,
-                    system: ActorSystem = ActorSystem("logging"),
-                    appenderBuilders: Seq[LogAppenderBuilder] = Seq(StdOutAppender, FileAppender))
+class LoggingSystem(name: String, host: String, system: ActorSystem, appenderBuilders: Seq[LogAppenderBuilder])
     extends GenericLogger.Simple {
 
   import LoggingLevels._

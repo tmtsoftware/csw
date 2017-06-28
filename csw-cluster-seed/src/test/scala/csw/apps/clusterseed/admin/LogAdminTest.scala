@@ -12,9 +12,9 @@ import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
-import csw.services.logging.internal.{GetComponentLogMetadata, LoggingLevels, SetComponentLogLevel}
+import csw.services.logging.internal.{GetComponentLogMetadata, LoggingLevels, LoggingSystem, SetComponentLogLevel}
 import csw.services.logging.models.{FilterSet, LogMetadata}
-import csw.services.logging.scaladsl.{ComponentLogger, LoggingSystem}
+import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble

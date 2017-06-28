@@ -5,7 +5,7 @@ import java.net.InetAddress
 import com.persist.JsonOps.{Json, JsonObject}
 import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.logging.scaladsl.LoggingSystem
+import csw.services.logging.scaladsl.LoggingSystemFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.collection.mutable
@@ -21,7 +21,7 @@ abstract class AdminLogTestSuite() extends FunSuite with Matchers with BeforeAnd
 
   protected val adminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3552), Some(7878))
   protected val loggingSystem =
-    new LoggingSystem("logging", hostName, adminWiring.actorSystem, Seq(testAppender))
+    LoggingSystemFactory.start("logging", hostName, adminWiring.actorSystem, Seq(testAppender))
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()

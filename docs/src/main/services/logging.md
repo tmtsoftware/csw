@@ -81,6 +81,70 @@ All messages are logged by default as Json. Logs can contain the following field
 
 @@@
 
-## Using Log API
+## Create LoggingSystem
+
+In order to start logging you need to start `LoggingSystem` as follows:
+
+Scala
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #create-logging-system }
+
+Java
+:   @@snip [JLocationServiceExampleClientApp.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #create-logging-system }
+
+
+## Enable logging
+
+### Enable generic logging
+To enable logging for some utility code that does not require `@componentName` in log statements you can inherit following traits
+
+Scala
+:   * For actor class extend `GenericLogger.Actor`
+    * For non-actor class extend `GenericLogger.Simple`
+
+Java
+:   * For actor class inherit `JGenericLoggerActor`
+    * For non-actor class inherit `JGenericLogger`
+
+
+### Enable component level logging
+Whereas, if you want to include `@componentName` in your log statements you need to first create an object/interface as follows:
+
+Scala
+:   @@snip [ExampleLogger.scala](../../../../examples/src/main/scala/csw/services/commons/ExampleLogger.scala) { #component-logger }
+
+Java
+:   @@snip [JExampleLogger.scala](../../../../examples/src/main/java/csw/services/commons/JExampleLogger.java) { #jcomponent-logger }
+
+Then, you need to inherit following object/interface
+
+Scala
+:   * For actor class extend `ExampleLogger.Actor`
+    * For non-actor class extend `ExampleLogger.Simple`
+    
+Java
+:   * For actor class inherit `JComponentLoggerActor`
+    * For non-actor class inherit `JExampleLogger`
+
+## Start logging statements
+
+A basic info statement can be written as follows:
+
+Scala
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info }
+
+You can also use a `Map` in message as follows:
+
+Scala
+ :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info-map }
+ 
+Also you can log an error with stacktrace as follows:
+ 
+Scala
+  :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-error }
+  
+  
+  
+
+
 
 

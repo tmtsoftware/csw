@@ -4,13 +4,12 @@ import akka.Done
 import akka.actor.{ActorSystem, PoisonPill}
 import akka.cluster.Cluster
 import akka.util.Timeout
-import csw.services.BuildInfo
-import csw.services.config.client.commons.ConfigClientLogger
+import csw.services.config.client.commons.{ConfigClientLogger, ConfigServiceConnection}
 import csw.services.csclient.cli.{ArgsParser, ClientCliWiring, Options}
 import csw.services.location.commons.ClusterConfirmationActor.IsMemberUp
 import csw.services.location.commons.{BlockingUtils, ClusterAwareSettings, ClusterConfirmationActor}
 import csw.services.logging.appenders.FileAppender
-import csw.services.logging.scaladsl.LoggingSystem
+import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
@@ -29,7 +28,8 @@ object Main extends App with ConfigClientLogger.Simple {
 
   private def run(options: Options): Unit = {
     val actorSystem = ClusterAwareSettings.system
-    new LoggingSystem(BuildInfo.name, ClusterAwareSettings.hostname, actorSystem, Seq(FileAppender))
+    LoggingSystemFactory.start(s"${ConfigServiceConnection.value.componentId.fullName}-client",
+      ClusterAwareSettings.hostname, actorSystem, Seq(FileAppender))
 
     val wiring = new ClientCliWiring(actorSystem)
     try {

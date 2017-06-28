@@ -13,10 +13,19 @@ import csw.services.location.models.*;
 import csw.services.location.scaladsl.ActorSystemFactory;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
+import csw.services.logging.appenders.FileAppender$;
+import csw.services.logging.appenders.LogAppenderBuilder;
+import csw.services.logging.appenders.StdOutAppender;
+import csw.services.logging.appenders.StdOutAppender$;
+import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
+import csw.services.logging.javadsl.JLogAppenderBuilders;
+import csw.services.logging.javadsl.JLoggingSystemFactory;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -40,6 +49,13 @@ public class JLocationServiceExampleClient extends AbstractActor implements JExa
     private IRegistrationResult hcdRegResult;
     private IRegistrationResult assemblyRegResult;
 
+    //#create-logging-system
+    private ActorSystem actorSystem = ActorSystemFactory.remote();
+
+    private List<LogAppenderBuilder> appenders = Arrays.asList(JLogAppenderBuilders.StdOutAppender, JLogAppenderBuilders.FileAppender);
+
+    private LoggingSystem loggingSystem = JLoggingSystemFactory.start("foo-name", "hostname", actorSystem, appenders);
+    //#create-logging-system
 
     public JLocationServiceExampleClient() throws ExecutionException, InterruptedException {
 

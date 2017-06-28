@@ -1,12 +1,14 @@
 package csw.services.location
 
-import akka.actor.{Actor, Props}
+import akka.actor.{Actor, ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.commons.ExampleLogger
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
+import csw.services.logging.appenders.StdOutAppender
+import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.async.Async._
 import scala.concurrent.Await
@@ -17,15 +19,20 @@ import scala.concurrent.duration._
   * An example location service client application.
   */
 object LocationServiceExampleClientApp extends App {
+
   //#create-location-service
   private val locationService = LocationServiceFactory.make()
   //#create-location-service
 
   //#create-actor-system
-  implicit val system = ActorSystemFactory.remote("csw-examples-locationServiceClient")
+  implicit val system: ActorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient")
   //#create-actor-system
 
   implicit val mat = ActorMaterializer()
+
+  //#create-logging-system
+  private val loggingSystem = LoggingSystemFactory.start("foo-name", "hostname", system, Seq(StdOutAppender))
+  //#create-logging-system
 
   system.actorOf(LocationServiceExampleClient.props(locationService))
 }
@@ -275,17 +282,25 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
     // Receive a location from the location service and if it is an akka location, send it a message
     case LocationUpdated(loc) =>
-      log.info(s"Location updated ${locationInfoToString(loc)}")  // scalastyle:ignore
+      //#log-info
+      log.info(s"Location updated ${locationInfoToString(loc)}")
+      //#log-info
+
 
     // A location was removed
     case LocationRemoved(conn) =>
-      log.info(s"Location removed $conn")   // scalastyle:ignore
+      //#log-info-map
+      log.info(Map("@msg" → "Location removed", "connection" → conn.toString))
+      //#log-info-map
 
     case AllDone =>
-      log.info(s"Tracking of $exampleConnection complete.")   // scalastyle:ignore
+      log.info(s"Tracking of $exampleConnection complete.")
 
     case x =>
-      log.error(s"Received unexpected message $x")
+      //#log-error
+      val runtimeException = new RuntimeException(s"Received unexpected message $x")
+      log.error(runtimeException.getMessage, runtimeException)
+      //#log-error
   }
 
 }

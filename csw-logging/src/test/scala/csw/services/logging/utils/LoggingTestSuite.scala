@@ -4,7 +4,7 @@ import java.net.InetAddress
 
 import akka.actor.ActorSystem
 import com.persist.JsonOps.{Json, JsonObject}
-import csw.services.logging.scaladsl.LoggingSystem
+import csw.services.logging.internal.LoggingSystem
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.collection.mutable

@@ -7,7 +7,7 @@ import akka.actor.ActorSystem
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.appenders.FileAppender
-import csw.services.logging.scaladsl.{LoggingSystem, RequestId, TromboneActor}
+import csw.services.logging.scaladsl.{RequestId, TromboneActor}
 import csw.services.logging.utils.{FileUtils, LoggingTestSuite}
 
 import scala.collection.mutable
