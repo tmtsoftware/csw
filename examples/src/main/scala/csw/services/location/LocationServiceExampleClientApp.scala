@@ -31,7 +31,7 @@ object LocationServiceExampleClientApp extends App {
   implicit val mat = ActorMaterializer()
 
   //#create-logging-system
-  private val loggingSystem = LoggingSystemFactory.start("foo-name", "hostname", system, Seq(StdOutAppender))
+  private val loggingSystem = LoggingSystemFactory.start("foo-name", "hostname", ActorSystem("logging-system"), Seq(StdOutAppender))
   //#create-logging-system
 
   system.actorOf(LocationServiceExampleClient.props(locationService))
@@ -116,7 +116,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   val findResult = Await.result(findResultF, timeout)
 
   //#log-info
-  log.info(s"Find result: $findResult")
+  log.info(s"Result of the find call: $findResult")
   //#log-info
   //#find
 

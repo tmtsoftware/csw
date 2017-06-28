@@ -55,23 +55,23 @@ Following Log levels are supported by csw-logging library
 
 There are separate log levels for the logging API(logLevel), Akka logging(akkaLogLevel), and Slf4J(slf4jLogLevel). The initial values of these are set in the configuration file as seen above. These can be overriden in the application.conf file.
 
-These values can also be changed dynamically by calling methods**** on the LoggingSystem class.
+These values can also be changed dynamically by calling methods on `LoggingSystem` class.
 
 ## Log Structure
 All messages are logged by default as Json. Logs can contain the following fields. These are listed in alphabetical order (this is the order displayed by the Json pretty printer).
 
-* @componentName: The name of the component if present
-* @host: The local host name
-* @name: The name and version of the application being run
-* @severity: The message level: trace, debug, info, warn, error or fatal
-* actor: The path for an actor when using ActorLogging
-* class: The class for ClassLogging or ActorLogging
-* file: The file containing the log call
-* kind: Either slf4j or akka. Not present for logger API
-* line: The line where the message was logged
-* message: The log message
-* timestamp: The time the message was logged
-* trace: Information for any exception specified in the logging call
+* `@componentName`: The name of the component if present
+* `@host`: The local host name
+* `@name`: The name and version of the application being run
+* `@severity`: The message level: trace, debug, info, warn, error or fatal
+* `actor`: The path for an actor when using ActorLogging
+* `class`: The class for ClassLogging or ActorLogging
+* `file`: The file containing the log call
+* `kind`: Either slf4j or akka. Not present for logger API
+* `line`: The line where the message was logged
+* `message`: The log message
+* `timestamp`: The time the message was logged
+* `trace`: Information for any exception specified in the logging call
 
 
 
@@ -83,7 +83,9 @@ All messages are logged by default as Json. Logs can contain the following field
 
 ## Create LoggingSystem
 
-In order to start logging you need to start `LoggingSystem` as follows:
+In order to make logging statements appear in your program you need to start `LoggingSystem` as the first thing in your application.
+`LoggingSystem` should be started only once in your application. The name used while creating `LoggingSystem` will be used to create
+the folder and dump all logging files for your application in it.
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #create-logging-system }
@@ -129,7 +131,7 @@ Java
     * For non-actor class inherit `JExampleLogger`
 
 
-@@@ note { title="For java you need to get logger instance in your class " }
+@@@ note { title="If you are writing java code you need to get logger instance in your class "}
 
 Java
 :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #get-java-logger }
@@ -153,12 +155,12 @@ The output of log statement will be:
 {"@componentName":"examples",
  "@severity":"INFO",
  "actor":
-   "akka.tcp://csw-examples-locationServiceClient@10.131.20.68:51135/user/$a",
+   "akka.tcp://csw-examples-locationServiceClient@10.131.20.68:51495/user/$a",
  "class":"csw.services.location.LocationServiceExampleClient",
  "file":"LocationServiceExampleClientApp.scala",
  "line":119,
- "message":"Find result: None",
- "timestamp":"2017-06-28T17:17:34.853000000+05:30"
+ "message":"Result of the find call: None",
+ "timestamp":"2017-06-28T18:11:48.208000000+05:30"
 }
 
 ```

@@ -115,7 +115,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
             jLogger.info(() -> "Find result: " + connectionInfo(findResult.get().connection()));
         } else {
             //#log-info
-            jLogger.info(() -> "Find result: None");
+            jLogger.info(() -> "Result of the find call : None");
             //#log-info
         }
         //#find
@@ -305,7 +305,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         //#create-logging-system
         List<LogAppenderBuilder> appenders = Arrays.asList(JLogAppenderBuilders.StdOutAppender, JLogAppenderBuilders.FileAppender);
 
-        LoggingSystem loggingSystem = JLoggingSystemFactory.start("foo-name", "hostname", actorSystem, appenders);
+        LoggingSystem loggingSystem = JLoggingSystemFactory.start("foo-name", "hostname", ActorSystem.apply("logging-system"), appenders);
         //#create-logging-system
 
         actorSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
