@@ -35,6 +35,8 @@ object LocationServiceExampleClientApp extends App {
   //#create-logging-system
 
   system.actorOf(LocationServiceExampleClient.props(locationService))
+
+  Await.result(loggingSystem.stop, 20.seconds)
 }
 
 object LocationServiceExampleClient {
@@ -105,13 +107,17 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
   private val exampleConnection = LocationServiceExampleComponent.connection
 
-  log.info(s"Attempting to find connection $exampleConnection ...")
+  //#log-info-map
+  log.info(Map("@msg" → "Attempting to find connection", "exampleConnection" → exampleConnection.toString))
+  //#log-info-map
   val findResultF = async {
     await(locationService.find(exampleConnection))
   }
   val findResult = Await.result(findResultF, timeout)
 
+  //#log-info
   log.info(s"Find result: $findResult")
+  //#log-info
   //#find
 
   // Output should be:
@@ -282,23 +288,18 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
     // Receive a location from the location service and if it is an akka location, send it a message
     case LocationUpdated(loc) =>
-      //#log-info
       log.info(s"Location updated ${locationInfoToString(loc)}")
-      //#log-info
-
 
     // A location was removed
     case LocationRemoved(conn) =>
-      //#log-info-map
       log.info(Map("@msg" → "Location removed", "connection" → conn.toString))
-      //#log-info-map
 
     case AllDone =>
       log.info(s"Tracking of $exampleConnection complete.")
 
     case x =>
-      //#log-error
       val runtimeException = new RuntimeException(s"Received unexpected message $x")
+      //#log-error
       log.error(runtimeException.getMessage, runtimeException)
       //#log-error
   }

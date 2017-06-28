@@ -105,15 +105,18 @@ Java
 :   * For actor class inherit `JGenericLoggerActor`
     * For non-actor class inherit `JGenericLogger`
 
-
 ### Enable component level logging
-Whereas, if you want to include `@componentName` in your log statements you need to first create an object/interface as follows:
+Whereas, if you want to include `@componentName` in your log statements you need to first create an object/abstract class/interface as follows:
 
 Scala
 :   @@snip [ExampleLogger.scala](../../../../examples/src/main/scala/csw/services/commons/ExampleLogger.scala) { #component-logger }
 
-Java
+Actor Java Class
+:   @@snip [JExampleLogger.scala](../../../../examples/src/main/java/csw/services/commons/JExampleLoggerActor.java) { #jcomponent-logger-actor }
+
+Non-Actor Java class
 :   @@snip [JExampleLogger.scala](../../../../examples/src/main/java/csw/services/commons/JExampleLogger.java) { #jcomponent-logger }
+
 
 Then, you need to inherit following object/interface
 
@@ -122,27 +125,80 @@ Scala
     * For non-actor class extend `ExampleLogger.Simple`
     
 Java
-:   * For actor class inherit `JComponentLoggerActor`
+:   * For actor class inherit `JExampleLoggerActor`
     * For non-actor class inherit `JExampleLogger`
 
-## Start logging statements
+
+@@@ note { title="For java you need to get logger instance in your class " }
+
+Java
+:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #get-java-logger }
+
+@@@
+
+
+## Log statements
 
 A basic info statement can be written as follows:
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info }
 
+Java
+:   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info }
+
+The output of log statement will be:
+
+```
+{"@componentName":"examples",
+ "@severity":"INFO",
+ "actor":
+   "akka.tcp://csw-examples-locationServiceClient@10.131.20.68:51135/user/$a",
+ "class":"csw.services.location.LocationServiceExampleClient",
+ "file":"LocationServiceExampleClientApp.scala",
+ "line":119,
+ "message":"Find result: None",
+ "timestamp":"2017-06-28T17:17:34.853000000+05:30"
+}
+
+```
+
 You can also use a `Map` in message as follows:
 
 Scala
  :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info-map }
  
+Java
+ :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-map }
+
+The output of log statement will be: 
+ 
+```
+{"@componentName":"examples",
+ "@severity":"INFO",
+ "actor":
+   "akka.tcp://csw-examples-locationServiceClient@10.131.20.68:51135/user/$a",
+ "class":"csw.services.location.LocationServiceExampleClient",
+ "file":"LocationServiceExampleClientApp.scala",
+ "line":111,
+ "message":
+   {"@msg":"Attempting to find connection",
+    "exampleConnection":
+      "AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))"
+   },
+ "timestamp":"2017-06-28T17:17:34.848000000+05:30"
+}
+
+```
+ 
 Also you can log an error with stacktrace as follows:
  
 Scala
   :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-error }
-  
-  
+ 
+Java
+ :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error }
+   
   
 
 

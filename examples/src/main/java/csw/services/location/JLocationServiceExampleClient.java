@@ -1,6 +1,9 @@
 package csw.services.location;
 
-import akka.actor.*;
+import akka.actor.AbstractActor;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
 import akka.japi.Pair;
 import akka.japi.pf.ReceiveBuilder;
 import akka.stream.ActorMaterializer;
@@ -8,15 +11,13 @@ import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
+import csw.services.commons.JExampleLoggerActor;
 import csw.services.location.javadsl.*;
 import csw.services.location.models.*;
-import csw.services.location.scaladsl.ActorSystemFactory;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
-import csw.services.logging.appenders.FileAppender$;
+import csw.services.location.scaladsl.ActorSystemFactory;
 import csw.services.logging.appenders.LogAppenderBuilder;
-import csw.services.logging.appenders.StdOutAppender;
-import csw.services.logging.appenders.StdOutAppender$;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLogAppenderBuilders;
@@ -24,18 +25,14 @@ import csw.services.logging.javadsl.JLoggingSystemFactory;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import csw.services.commons.JExampleLogger;
 
 /**
  * An example location service client application.
  */
-public class JLocationServiceExampleClient extends AbstractActor implements JExampleLogger {
+public class JLocationServiceExampleClient extends JExampleLoggerActor {
 
     //#create-location-service
     private ILocationService locationService = JLocationServiceFactory.make();
@@ -47,14 +44,9 @@ public class JLocationServiceExampleClient extends AbstractActor implements JExa
     private IRegistrationResult hcdRegResult;
     private IRegistrationResult assemblyRegResult;
 
-    private ActorSystem actorSystem = ActorSystemFactory.remote();
-    //#create-logging-system
-    private List<LogAppenderBuilder> appenders = Arrays.asList(JLogAppenderBuilders.StdOutAppender, JLogAppenderBuilders.FileAppender);
-
-    private LoggingSystem loggingSystem = JLoggingSystemFactory.start("foo-name", "hostname", actorSystem, appenders);
-    //#create-logging-system
-
+    //#get-java-logger
     private ILogger jLogger = getLogger();
+    //#get-java-logger
 
     public JLocationServiceExampleClient() throws ExecutionException, InterruptedException {
 
@@ -109,12 +101,22 @@ public class JLocationServiceExampleClient extends AbstractActor implements JExa
         // find connection to LocationServiceExampleComponent in location service
         // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
 
-        jLogger.info(() -> "Attempting to find connection " + exampleConnection + "...");
+        //#log-info-map
+        jLogger.info(() -> {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("@msg", "Attempting to find connection");
+            map.put("exampleConnection", exampleConnection.toString());
+            return map;
+        });
+        //#log-info-map
+
         Optional<Location> findResult = locationService.find(exampleConnection).get();
         if (findResult.isPresent()) {
             jLogger.info(() -> "Find result: " + connectionInfo(findResult.get().connection()));
         } else {
+            //#log-info
             jLogger.info(() -> "Find result: None");
+            //#log-info
         }
         //#find
         // Output should be:
@@ -286,7 +288,12 @@ public class JLocationServiceExampleClient extends AbstractActor implements JExa
                 .match(LocationUpdated.class, l -> jLogger.info(() -> "Location updated " + connectionInfo(l.connection())))
                 .match(LocationRemoved.class, l -> jLogger.info(() -> "Location removed " + l.connection()))
                 .match(AllDone.class, x -> jLogger.info(() -> "Tracking of " + exampleConnection + " complete."))
-                .matchAny(x -> jLogger.info(() -> "Unexpected message: "+ x))
+                .matchAny((Object x) -> {
+                    RuntimeException runtimeException = new RuntimeException("Received unexpected message " + x);
+                    //#log-info-error
+                    jLogger.info(() -> runtimeException.getMessage(), runtimeException);
+                    //#log-info-error
+                })
                 .build();
     }
 
@@ -294,6 +301,13 @@ public class JLocationServiceExampleClient extends AbstractActor implements JExa
         //#create-actor-system
         ActorSystem actorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient");
         //#create-actor-system
+
+        //#create-logging-system
+        List<LogAppenderBuilder> appenders = Arrays.asList(JLogAppenderBuilders.StdOutAppender, JLogAppenderBuilders.FileAppender);
+
+        LoggingSystem loggingSystem = JLoggingSystemFactory.start("foo-name", "hostname", actorSystem, appenders);
+        //#create-logging-system
+
         actorSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
 
     }
