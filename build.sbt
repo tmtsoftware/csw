@@ -33,6 +33,11 @@ lazy val `csw-prod` = project
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
 
+lazy val `csw-params` = project
+  .settings(
+    libraryDependencies ++= Dependencies.Params
+  )
+
 lazy val `csw-logging-macros` = project
   .settings(
     libraryDependencies += Libs.`scala-reflect`

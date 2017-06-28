@@ -2,6 +2,12 @@ import sbt._
 
 object Dependencies {
 
+  val Params = Seq(
+    Libs.`spray-json`,
+    Libs.`scala-java8-compat`,
+    Libs.`scalatest` % Test
+  )
+
   val Logging = Seq(
     Libs.`logback-classic`,
     Libs.`persist-json`,

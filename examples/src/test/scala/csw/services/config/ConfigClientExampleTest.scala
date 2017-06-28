@@ -42,16 +42,14 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
     testFileUtils.deleteServerFiles()
 
   override protected def beforeAll(): Unit = {
-    val doneF = async {
-      httpService.registeredLazyBinding
-    }
-    Await.result(doneF, 5.seconds)
+    Await.result(httpService.registeredLazyBinding, 5.seconds)
   }
 
   override protected def afterAll(): Unit = {
     val doneF = async {
-      httpService.shutdown()
-      locationService.shutdown()
+      await(httpService.shutdown())
+      await(locationService.shutdown())
+      await(actorSystem.terminate())
     }
     Await.result(doneF, 5.seconds)
   }
