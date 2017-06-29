@@ -60,7 +60,7 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
     if (category == "common" && Level(level) >= logLevelLimit) {
       val maybeKind = jgetString(baseMsg, "kind")
       if (summary) {
-        buildSummary(maybeKind, level)
+        buildSummary(level, maybeKind)
       }
       val msg = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
       val normalText = if (oneLine) {

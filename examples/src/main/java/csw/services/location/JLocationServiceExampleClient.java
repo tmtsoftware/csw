@@ -24,6 +24,7 @@ import csw.services.logging.javadsl.JLogAppenderBuilders;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
+import java.util.concurrent.CompletableFuture;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -309,6 +310,14 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         //#create-logging-system
 
         actorSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
+
+        try {
+            //#stop-logging-system
+            loggingSystem.javaStop().get();
+            //#stop-logging-system
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
 
     }
 }

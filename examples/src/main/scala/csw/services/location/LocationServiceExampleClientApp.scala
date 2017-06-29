@@ -36,7 +36,11 @@ object LocationServiceExampleClientApp extends App {
 
   system.actorOf(LocationServiceExampleClient.props(locationService))
 
-  Await.result(loggingSystem.stop, 20.seconds)
+  //#stop-logging-system
+  Await.result(loggingSystem.stop, 30.seconds)
+  //#stop-logging-system
+  Await.result(system.terminate(), 30.seconds)
+
 }
 
 object LocationServiceExampleClient {

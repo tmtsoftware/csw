@@ -40,7 +40,7 @@ These are the relevant default configuration values for logging
 Scala
 :   @@snip [logging.conf](../../../../csw-logging/src/main/resources/logging.conf)
 
-These values can be overridden directly in your reference.conf or application.conf
+These values can be overridden directly in your `reference.conf` or `application.conf`
 
 ## Log Levels
 
@@ -62,7 +62,7 @@ All messages are logged by default as Json. Logs can contain the following field
 
 * `@componentName`: The name of the component if present
 * `@host`: The local host name
-* `@name`: The name and version of the application being run
+* `@name`: The name of the application being run
 * `@severity`: The message level: trace, debug, info, warn, error or fatal
 * `actor`: The path for an actor when using ActorLogging
 * `class`: The class for ClassLogging or ActorLogging
@@ -92,6 +92,16 @@ Scala
 
 Java
 :   @@snip [JLocationServiceExampleClientApp.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #create-logging-system }
+
+## Stop LoggingSystem
+
+Make sure you stop the `LoggingSystem` at the end of your application.
+
+Scala
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #stop-logging-system }
+
+Java
+:   @@snip [JLocationServiceExampleClientApp.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #stop-logging-system }
 
 
 ## Enable logging
@@ -200,6 +210,16 @@ Scala
  
 Java
  :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error }
+ 
+## Garbage Collection Logging
+
+Garbage collection events are logged to the gc log when enabled by the `gc` configuration option.
+
+## Source code for examples
+
+* @github[Scala Example](/examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala)
+* @github[Java Example](/examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java)
+  
    
   
 
