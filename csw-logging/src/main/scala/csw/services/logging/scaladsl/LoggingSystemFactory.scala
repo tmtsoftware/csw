@@ -10,12 +10,13 @@ object LoggingSystemFactory extends GenericLogger.Simple {
 
   //To be used for testing purpose only
   private[logging] def start(): LoggingSystem =
-    new LoggingSystem("foo-test", InetAddress.getLocalHost.getHostName, ActorSystem("logging"),
+    new LoggingSystem("foo-name", "foo-version", InetAddress.getLocalHost.getHostName, ActorSystem("logging"),
       appenderBuilders = Seq(StdOutAppender))
 
   def start(name: String,
+            version: String,
             hostName: String,
             actorSystem: ActorSystem,
             appenders: Seq[LogAppenderBuilder]): LoggingSystem =
-    new LoggingSystem(name, hostName, actorSystem, appenders)
+    new LoggingSystem(name, version, hostName, actorSystem, appenders)
 }

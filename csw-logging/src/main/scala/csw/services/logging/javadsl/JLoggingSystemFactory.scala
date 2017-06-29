@@ -12,13 +12,15 @@ object JLoggingSystemFactory {
 
   //To be used only for testing only
   private[logging] def start(): LoggingSystem = {
-    new LoggingSystem("foo-test", InetAddress.getLocalHost.getHostName, ActorSystem("logging"), Seq(StdOutAppender))
+    new LoggingSystem("foo-name", "foo-version", InetAddress.getLocalHost.getHostName, ActorSystem("logging"),
+      Seq(StdOutAppender))
   }
 
   def start(name: String,
+            version: String,
             hostName: String,
             actorSystem: ActorSystem,
             appenders: java.util.List[LogAppenderBuilder]): LoggingSystem = {
-    new LoggingSystem(name, hostName, actorSystem, appenders.asScala.toSeq)
+    new LoggingSystem(name, version, hostName, actorSystem, appenders.asScala.toSeq)
   }
 }

@@ -63,6 +63,7 @@ All messages are logged by default as Json. Logs can contain the following field
 * `@componentName`: The name of the component if present
 * `@host`: The local host name
 * `@name`: The name of the application being run
+* `@version`: The version of the application being run
 * `@severity`: The message level: trace, debug, info, warn, error or fatal
 * `actor`: The path for an actor when using ActorLogging
 * `class`: The class for ClassLogging or ActorLogging
@@ -77,7 +78,7 @@ All messages are logged by default as Json. Logs can contain the following field
 
 @@@ note
 
-* @host and @name will appear in log statements only if _fullHeaders_ is set as true in the configuration
+* @host, @name and @version will appear in log statements only if _fullHeaders_ is set as true in the configuration
 
 @@@
 

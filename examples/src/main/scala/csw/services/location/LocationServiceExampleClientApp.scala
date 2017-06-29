@@ -31,7 +31,7 @@ object LocationServiceExampleClientApp extends App {
   implicit val mat = ActorMaterializer()
 
   //#create-logging-system
-  private val loggingSystem = LoggingSystemFactory.start("foo-name", "hostname", ActorSystem("logging-system"), Seq(StdOutAppender))
+  private val loggingSystem = LoggingSystemFactory.start("application-name", "application-version", "hostname", ActorSystem("logging-system"), Seq(StdOutAppender))
   //#create-logging-system
 
   system.actorOf(LocationServiceExampleClient.props(locationService))
@@ -39,7 +39,6 @@ object LocationServiceExampleClientApp extends App {
   //#stop-logging-system
   Await.result(loggingSystem.stop, 30.seconds)
   //#stop-logging-system
-  Await.result(system.terminate(), 30.seconds)
 
 }
 

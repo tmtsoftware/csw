@@ -306,7 +306,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         //#create-logging-system
         List<LogAppenderBuilder> appenders = Arrays.asList(JLogAppenderBuilders.StdOutAppender, JLogAppenderBuilders.FileAppender);
 
-        LoggingSystem loggingSystem = JLoggingSystemFactory.start("foo-name", "hostname", ActorSystem.apply("logging-system"), appenders);
+        LoggingSystem loggingSystem = JLoggingSystemFactory.start("application-name", "application-version", "hostname", ActorSystem.apply("logging-system"), appenders);
         //#create-logging-system
 
         actorSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");

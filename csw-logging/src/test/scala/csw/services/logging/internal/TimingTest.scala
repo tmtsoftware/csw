@@ -22,8 +22,7 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val loggingSystemName = "TimingTest"
   override lazy val actorSystem = ActorSystem("timing-test-system", config)
   override lazy val loggingSystem =
-    new LoggingSystem(loggingSystemName, "localhost", appenderBuilders = Seq(testAppender, FileAppender),
-      system = actorSystem)
+    new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem, Seq(testAppender, FileAppender))
 
   private val tromboneActorRef =
     actorSystem.actorOf(TromboneActor.props(), name = "TromboneActor")

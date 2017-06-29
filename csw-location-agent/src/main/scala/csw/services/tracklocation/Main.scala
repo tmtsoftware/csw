@@ -19,7 +19,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) exte
       val actorSystem = clusterSettings.system
 
       if (startLogging)
-        LoggingSystemFactory.start(BuildInfo.name, clusterSettings.hostname, actorSystem,
+        LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem,
           Seq(StdOutAppender, FileAppender))
 
       val command = Command.parse(options)

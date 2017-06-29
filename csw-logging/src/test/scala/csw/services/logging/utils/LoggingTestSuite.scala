@@ -19,7 +19,7 @@ abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndA
 
   private val hostName = InetAddress.getLocalHost.getHostName
   protected lazy val loggingSystem =
-    new LoggingSystem("logging", hostName, appenderBuilders = Seq(testAppender), system = actorSystem)
+    new LoggingSystem("logging", "version", hostName, actorSystem, Seq(testAppender))
 
   protected val logMsgMap = Map(
     "trace"       → "logging at trace level",

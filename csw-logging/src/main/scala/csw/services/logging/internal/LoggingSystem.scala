@@ -20,12 +20,17 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * This class is responsible for programmatic interaction with the configuration of the logging system. It initializes
  * the appenders, starts the log actor and manages clean up of logging system.
  * @param name             name of the service (to log).
+ * @param version             version of the service (to log).
  * @param host             host name (to log).
  * @param system           actor system which will be used to create log actors
  * @param appenderBuilders sequence of log appenders to use.
  *
  */
-class LoggingSystem(name: String, host: String, system: ActorSystem, appenderBuilders: Seq[LogAppenderBuilder])
+class LoggingSystem(name: String,
+                    version: String,
+                    host: String,
+                    system: ActorSystem,
+                    appenderBuilders: Seq[LogAppenderBuilder])
     extends GenericLogger.Simple {
 
   import LoggingLevels._
@@ -71,7 +76,8 @@ class LoggingSystem(name: String, host: String, system: ActorSystem, appenderBui
   /**
    * Standard headers.
    */
-  val standardHeaders: Map[String, RichMsg] = Map[String, RichMsg]("@host" -> host, "@name" → name)
+  val standardHeaders: Map[String, RichMsg] =
+    Map[String, RichMsg]("@host" -> host, "@name" -> name, "@version" -> version)
 
   setLevel(defaultLevel)
   LoggingState.loggerStopping = false
