@@ -1,13 +1,11 @@
 package csw.services.logging.internal
 
-import java.time.{Instant, OffsetDateTime, ZoneId}
-
 import akka.actor.{Actor, Props}
 import com.persist.Exceptions.SystemException
 import com.persist.JsonOps._
 import csw.services.logging._
 import csw.services.logging.appenders.LogAppender
-import csw.services.logging.commons.Constants
+import csw.services.logging.commons.TMTDateTimeFormatter
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.{RequestId, RichException}
@@ -117,8 +115,8 @@ private[logging] class LogActor(done: Promise[Unit],
   }
 
   private def receiveLog(log: Log): Unit = {
-    var jsonObject = JsonObject("timestamp" -> formatLogTimeToISOFmt(log.time), "message" -> log.sanitizedMessage,
-      "@severity" -> log.level.name, "@category" -> "common")
+    var jsonObject = JsonObject("timestamp" -> TMTDateTimeFormatter.format(log.time),
+      "message" -> log.sanitizedMessage, "@severity" -> log.level.name, "@category" -> "common")
 
     if (!log.sourceLocation.fileName.isEmpty) {
       jsonObject = jsonObject ++ JsonObject("file" -> log.sourceLocation.fileName)
@@ -159,14 +157,14 @@ private[logging] class LogActor(done: Promise[Unit],
         jsonObject ++ JsonObject("@traceId" -> JsonArray(trackingId, spanId))
       case _ => jsonObject
     }
-    jsonObject = jsonObject ++ JsonObject("timestamp" -> formatLogTimeToISOFmt(logAltMessage.time))
+    jsonObject = jsonObject ++ JsonObject("timestamp" -> TMTDateTimeFormatter.format(logAltMessage.time))
     append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
   }
 
   private def receiveLogSlf4j(logSlf4j: LogSlf4j) =
     if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
       var jsonObject = JsonObject(
-        "timestamp" -> formatLogTimeToISOFmt(logSlf4j.time),
+        "timestamp" -> TMTDateTimeFormatter.format(logSlf4j.time),
         "message"   -> logSlf4j.msg,
         "file"      -> logSlf4j.file,
         "@severity" -> logSlf4j.level.name,
@@ -185,7 +183,7 @@ private[logging] class LogActor(done: Promise[Unit],
     if (logAkka.level.pos >= akkaLogLevel.pos) {
       val msg1 = if (logAkka.msg.toString.isEmpty) "UNKNOWN" else logAkka.msg
       var jsonObject = JsonObject(
-        "timestamp" -> formatLogTimeToISOFmt(logAkka.time),
+        "timestamp" -> TMTDateTimeFormatter.format(logAkka.time),
         "kind"      -> "akka",
         "message"   -> msg1.toString,
         "actor"     -> logAkka.source,
@@ -198,9 +196,4 @@ private[logging] class LogActor(done: Promise[Unit],
         jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
       append(jsonObject, "common", logAkka.level)
     }
-
-  private def formatLogTimeToISOFmt(time: Long): String = {
-    val offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault)
-    offsetDateTime.format(Constants.ISOLogFmt)
-  }
 }

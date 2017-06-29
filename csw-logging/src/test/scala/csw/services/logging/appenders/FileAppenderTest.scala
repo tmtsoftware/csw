@@ -1,14 +1,13 @@
 package csw.services.logging.appenders
 
 import java.nio.file.Paths
-import java.time.LocalDateTime
 
 import akka.actor.ActorSystem
 import com.persist.JsonOps
 import com.persist.JsonOps.jgetString
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.RichMsg
-import csw.services.logging.commons.Constants
+import csw.services.logging.commons.TMTDateTimeFormatter
 import csw.services.logging.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -77,15 +76,15 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   val expectedLogMsgJson3: Map[String, String] = JsonOps.Json(logMsgString3).asInstanceOf[Map[String, String]]
 
   private val date1            = jgetString(expectedLogMsgJson1, "timestamp")
-  private val localDateTime1   = FileAppender.decideTimestampForFile(LocalDateTime.parse(date1, Constants.ISOLogFmt))
+  private val localDateTime1   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date1))
   private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service/alternative.$localDateTime1.log"
 
   private val date2            = jgetString(expectedLogMsgJson2, "timestamp")
-  private val localDateTime2   = FileAppender.decideTimestampForFile(LocalDateTime.parse(date2, Constants.ISOLogFmt))
+  private val localDateTime2   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date2))
   private val logFileFullPath2 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime2.log"
 
   private val date3            = jgetString(expectedLogMsgJson3, "timestamp")
-  private val localDateTime3   = FileAppender.decideTimestampForFile(LocalDateTime.parse(date3, Constants.ISOLogFmt))
+  private val localDateTime3   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date3))
   private val logFileFullPath3 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime3.log"
 
   override protected def beforeAll(): Unit = {

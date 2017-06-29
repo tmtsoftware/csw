@@ -6,7 +6,7 @@ import java.time.{LocalDateTime, LocalTime}
 import akka.actor._
 import com.persist.JsonOps._
 import csw.services.logging.RichMsg
-import csw.services.logging.commons.Constants
+import csw.services.logging.commons.TMTDateTimeFormatter
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.GenericLogger
@@ -212,7 +212,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
       }
       val timestamp = jgetString(msg, "timestamp")
 
-      val currentTimestamp = LocalDateTime.parse(timestamp, Constants.ISOLogFmt)
+      val currentTimestamp = TMTDateTimeFormatter.parse(timestamp)
       fileAppender.add(currentTimestamp, Compact(msg, safe = true, sort = sort))
     }
 
