@@ -40,7 +40,21 @@ These are the relevant default configuration values for logging
 Scala
 :   @@snip [logging.conf](../../../../csw-logging/src/main/resources/logging.conf)
 
-These values can be overridden directly in your `reference.conf` or `application.conf`
+These values can be overridden directly in your `reference.conf` or `application.conf`. Also you can set a `logLevel` for each component
+in your reference.conf/application.conf by it's component name as follows:
+
+```
+filters {
+    tromboneHcd = info
+    tromboneAssembly = error
+  }
+  
+```
+@@@ note
+
+Here `tromboneHcd` and `tromboneAssembly` are the name of components that will be registered with `LocationService` 
+
+@@@
 
 ## Log Levels
 
