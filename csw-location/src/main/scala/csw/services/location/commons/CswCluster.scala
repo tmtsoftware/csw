@@ -47,8 +47,9 @@ class CswCluster private (_actorSystem: ActorSystem) extends LocationServiceLogg
   def makeMat(): Materializer = ActorMaterializer()
 
   /**
-   * aaa
+   * Starts cluster HTTP management service.
    */
+  // $COVERAGE-OFF$
   private def startClusterManagement(): Unit = {
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
@@ -56,6 +57,7 @@ class CswCluster private (_actorSystem: ActorSystem) extends LocationServiceLogg
       Await.result(clusterHttpManagement.start(), 10.seconds)
     }
   }
+  // $COVERAGE-ON$
 
   private def joinCluster(): Done = {
     // Check if seed nodes are provided to join csw-cluster

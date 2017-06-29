@@ -20,11 +20,6 @@ object StreamExt {
     def cancellable: Source[Out, KillSwitch] = source.viaMat(KillSwitches.single)(Keep.right)
 
     /**
-     * Gives an akka stream with the handle to its Mat and is also cancellable
-     */
-    def cancellableMat: Source[Out, (Mat, KillSwitch)] = source.viaMat(KillSwitches.single)(Keep.both)
-
-    /**
      * Deduplicate identical elements that consecutively appear in a stream
      */
     def distinctUntilChanged: Source[Out, Mat] =

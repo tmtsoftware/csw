@@ -19,7 +19,7 @@ abstract class AdminLogTestSuite() extends FunSuite with Matchers with BeforeAnd
 
   protected val hostName = InetAddress.getLocalHost.getHostName
 
-  protected val adminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3552), Some(7878))
+  protected val adminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3552), None)
   protected val loggingSystem =
     LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem, Seq(testAppender))
 
