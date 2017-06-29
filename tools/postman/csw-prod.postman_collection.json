@@ -1,7 +1,7 @@
 {
 	"variables": [],
 	"info": {
-		"name": "csw-prod",
+		"name": "csw-prod copy",
 		"_postman_id": "3066e393-a4ba-72ea-0947-ebb3ebffa0fa",
 		"description": "Common Software is the package of services and infrastructure software that integrates the TMT software systems.\n\nhttp://www.tmt.org\n\nThis collection of routes consists of http end points exposed by TMT common software.\n\nComplete codebase is available at https://github.com/tmtsoftware/csw-prod",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
@@ -93,7 +93,7 @@
 					},
 					"response": [
 						{
-							"id": "2b4035c7-a9dd-499e-a219-998d502ac12d",
+							"id": "702d1516-38d1-423b-bb01-ab037003a5e4",
 							"name": "Create normal conf file.",
 							"originalRequest": {
 								"url": {
@@ -148,7 +148,7 @@
 							"body": "{\n\"id\" : \"1\"\n}"
 						},
 						{
-							"id": "cd5176e6-780c-428b-a94d-f0f787103f68",
+							"id": "c5acb015-0620-40db-81b9-47a3104f38a8",
 							"name": "Invalid file path.",
 							"originalRequest": {
 								"url": {
@@ -959,7 +959,7 @@
 						}
 					],
 					"request": {
-						"url": "http://{{hostname}}:{{seedport}}/admin/logging/{{componentName}}/level",
+						"url": "http://{{hostname}}:{{adminPort}}/admin/logging/{{componentName}}/level",
 						"method": "GET",
 						"header": [],
 						"body": {

@@ -15,7 +15,10 @@ object Dependencies {
     Akka.`akka-actor`,
     Akka.`akka-slf4j`,
     Akka.`akka-remote`,
-    Libs.`scalatest` % Test
+    Libs.`scalatest`       % Test,
+    Libs.`junit`           % Test,
+    Libs.`junit-interface` % Test,
+    Libs.`gson`            % Test
   )
 
   val Location = Seq(
