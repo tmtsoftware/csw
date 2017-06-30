@@ -28,7 +28,6 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   val logMsgString1: String =
     """{
-      |  "@category": "common",
       |  "@componentName": "FileAppenderTest",
       |  "@host": "localhost",
       |  "@name": "test-service",
@@ -43,7 +42,6 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   val logMsgString2: String =
     """{
-      |  "@category": "common",
       |  "@componentName": "FileAppenderTest",
       |  "@host": "localhost",
       |  "@name": "test-service",
@@ -58,7 +56,6 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   val logMsgString3: String =
     """{
-      |  "@category": "common",
       |  "@componentName": "FileAppenderTest",
       |  "@host": "localhost",
       |  "@name": "test-service",
@@ -92,15 +89,15 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   }
 
   override protected def afterAll(): Unit = {
-    FileUtils.deleteRecursively(logFileDir)
+//    FileUtils.deleteRecursively(logFileDir)
     Await.result(actorSystem.terminate(), 5.seconds)
   }
 
   //DEOPSCSW-151 : Manage log file size
   test("log file is rotated every day") {
-    fileAppender.append(expectedLogMsgJson1, "common")
-    fileAppender.append(expectedLogMsgJson2, "common")
-    fileAppender.append(expectedLogMsgJson3, "common")
+    fileAppender.append(expectedLogMsgJson1)
+    fileAppender.append(expectedLogMsgJson2)
+    fileAppender.append(expectedLogMsgJson3)
     Thread.sleep(3000)
 
     val actualLogBuffer1 = FileUtils.read(logFileFullPath1).toList
