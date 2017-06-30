@@ -1,6 +1,7 @@
 package csw.services.logging.scaladsl
 
 import com.persist.JsonOps
+import com.persist.JsonOps.JsonObject
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.utils.LoggingTestSuite
@@ -27,6 +28,17 @@ class TromboneHcd() extends TromboneHcdLogger.Simple {
       log.warn(logs("warn"))
       log.error(logs("error"))
       log.fatal(logs("fatal"))
+    }
+  }
+
+  def compute(number1: Int, number2: Int): String = {
+    val exceptionMsg = "Arithmetic Exception occurred."
+
+    try {
+      val result = number1 / number2
+      s"Result of computation is $result"
+    } catch {
+      case ex: ArithmeticException ⇒ log.error(exceptionMsg, ex); exceptionMsg
     }
   }
 
@@ -218,6 +230,49 @@ class LoggingTest extends LoggingTestSuite {
 
     logBuffer.foreach { log ⇒
       log("@category") shouldBe true
+    }
+  }
+
+  test("should able to log exception at ERROR level with complete stacktrace") {
+    val tromboneHcd          = new TromboneHcd()
+    val tromboneHcdClassName = tromboneHcd.getClass.getName
+
+    val computationResultMsg = tromboneHcd.compute(10, 0)
+    Thread.sleep(300)
+
+    /*
+     * sample error log json looks like this, assertions are based on this structure.
+     * {
+     *   "@componentName":"tromboneHcd",
+     *   "@severity":"ERROR",
+     *   "class":"csw.services.logging.scaladsl.TromboneHcd",
+     *   "file":"LoggingTest.scala",
+     *   "line":37,
+     *   "message":"Arithmetic Exception occurred.",
+     *   "timestamp":"2017-06-30T12:21:39.784000000+05:30",
+     *   "trace":{
+     *      "message":{
+     *         "ex":"class java.lang.ArithmeticException",
+     *         "message":"/ by zero"
+     *      },
+     *      "stack":[ ... ]
+     *   }
+     * }
+     */
+    logBuffer.foreach { log ⇒
+      log("@componentName") shouldBe "tromboneHcd"
+      log("@severity") shouldBe ERROR.name
+      log("class") shouldBe tromboneHcdClassName
+      log("message") shouldBe computationResultMsg
+
+      log.contains("trace") shouldBe true
+      val traceBlock = log("trace").asInstanceOf[JsonObject]
+      traceBlock.contains("message") shouldBe true
+      traceBlock.contains("stack") shouldBe true
+
+      val traceMsgBlock = traceBlock("message").asInstanceOf[JsonObject]
+      traceMsgBlock.contains("ex") shouldBe true
+      traceMsgBlock.contains("message") shouldBe true
     }
   }
 

@@ -25,6 +25,7 @@ class Slf4jAppenderTest extends LoggingTestSuite {
       log("message").toString shouldBe currentLogLevel
       log("class").toString shouldBe className
       log("file").toString shouldBe "Slf4jAppenderTest.scala"
+      log("kind").toString shouldBe "slf4j"
     }
   }
 
