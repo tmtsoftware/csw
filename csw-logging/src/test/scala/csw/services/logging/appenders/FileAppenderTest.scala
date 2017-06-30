@@ -89,7 +89,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   }
 
   override protected def afterAll(): Unit = {
-//    FileUtils.deleteRecursively(logFileDir)
+    FileUtils.deleteRecursively(logFileDir)
     Await.result(actorSystem.terminate(), 5.seconds)
   }
 
