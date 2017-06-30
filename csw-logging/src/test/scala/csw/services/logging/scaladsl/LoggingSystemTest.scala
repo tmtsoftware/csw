@@ -1,7 +1,7 @@
 package csw.services.logging.scaladsl
 
 import com.typesafe.config.ConfigFactory
-import csw.services.logging.internal.LoggingLevels.Level
+import csw.services.logging.internal.LoggingLevels.{DEBUG, Level}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -35,6 +35,14 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
     loggingSystem.getLevel.current.name.toLowerCase shouldBe akkaLogLevel.toLowerCase
     loggingSystem.getAkkaLevel.current.name.toLowerCase shouldBe logLevel.toLowerCase
     loggingSystem.getSlf4jLevel.current.name.toLowerCase shouldBe slf4jLogLevel.toLowerCase
+  }
+
+  test("should able to add filter and get log metadata of component") {
+
+    loggingSystem.addFilter("IRIS", DEBUG)
+
+    loggingSystem.logLevel shouldBe DEBUG
+    loggingSystem.getLogMetadata.filters.filters.get("IRIS").get shouldBe DEBUG
   }
 
 }

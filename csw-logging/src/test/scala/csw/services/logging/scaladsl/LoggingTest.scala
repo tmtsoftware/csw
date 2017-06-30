@@ -31,7 +31,7 @@ class TromboneHcd() extends TromboneHcdLogger.Simple {
   }
 
   def compute(number1: Int, number2: Int): String = {
-    val exceptionMsg = "Arithmetic Exception occurred."
+    val exceptionMsg = "Exception occurred."
 
     try {
       val result = number1 / number2
@@ -40,6 +40,9 @@ class TromboneHcd() extends TromboneHcdLogger.Simple {
       case ex: ArithmeticException ⇒ log.error(exceptionMsg, ex); exceptionMsg
     }
   }
+
+  def logRichException(message: String) =
+    log.error(message, RichException("Rich Exception", new RuntimeException))
 
 }
 
@@ -227,6 +230,7 @@ class LoggingTest extends LoggingTestSuite {
     val tromboneHcdClassName = tromboneHcd.getClass.getName
 
     val computationResultMsg = tromboneHcd.compute(10, 0)
+    tromboneHcd.logRichException(computationResultMsg)
     Thread.sleep(300)
 
     /*
