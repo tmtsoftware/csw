@@ -1,18 +1,15 @@
-package csw.services.logging.javadsl;
+package csw.services.logging.utils;
 
-import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.Props;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
-import csw.services.logging.components.JTromboneHCDActor;
-import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
-import csw.services.logging.utils.LogUtil;
-import csw.services.logging.utils.TestAppender;
-import org.junit.*;
+import csw.services.logging.javadsl.JLoggingSystemFactory;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -21,7 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ILoggerActorTest {
+// todo: extend this class from all the test. Currently test fails if extended from this class. (Might be because of concurrency)
+public class JBaseTest {
+
     protected static ActorSystem actorSystem = ActorSystem.create("base-system");
     protected static LoggingSystem loggingSystem;
 
@@ -39,7 +38,6 @@ public class ILoggerActorTest {
     });
     protected static List<LogAppenderBuilder> appenderBuilders = Arrays.asList(testAppender);
 
-
     @BeforeClass
     public static void setup() {
         loggingSystem = JLoggingSystemFactory.start("Logger-Test", "SNAPSHOT-1.0", "localhost", actorSystem, appenderBuilders);
@@ -55,29 +53,4 @@ public class ILoggerActorTest {
         loggingSystem.javaStop().get();
         Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
     }
-    @Test
-    public void testDefaultLogConfigurationAndFilterForActor() throws InterruptedException {
-        ActorRef tromboneActor = actorSystem.actorOf(Props.create(JTromboneHCDActor.class), "JTromboneActor");
-        String actorPath = tromboneActor.path().toString();
-        String className = JTromboneHCDActor.class.getName();
-
-        LogUtil.sendLogMsgToActorInBulk(tromboneActor);
-
-        Thread.sleep(300);
-
-        logBuffer.forEach(log -> {
-            Assert.assertEquals("jTromboneHcdActor", log.get("@componentName").getAsString());
-            Assert.assertEquals(actorPath, log.get("actor").getAsString());
-
-            Assert.assertTrue(log.has("@severity"));
-            String severity = log.get("@severity").getAsString().toLowerCase();
-
-            Assert.assertEquals(severity, log.get("message").getAsString());
-            Assert.assertEquals(className, log.get("class").getAsString());
-
-            LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
-            Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.TRACE$.MODULE$));
-        });
-    }
-
 }

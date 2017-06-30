@@ -7,9 +7,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
-import csw.services.logging.components.JTromboneHCDActor;
 import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
+import csw.services.logging.utils.JGenericActor;
 import csw.services.logging.utils.LogUtil;
 import csw.services.logging.utils.TestAppender;
 import org.junit.*;
@@ -21,23 +21,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ILoggerActorTest {
-    protected static ActorSystem actorSystem = ActorSystem.create("base-system");
-    protected static LoggingSystem loggingSystem;
+public class JGenericLoggerTest {
+    private static ActorSystem actorSystem = ActorSystem.create("base-system");
+    private static LoggingSystem loggingSystem;
 
-    protected static List<JsonObject> logBuffer = new ArrayList<>();
+    private static List<JsonObject> logBuffer = new ArrayList<>();
 
-    protected static JsonObject parse(String json) {
+    private static JsonObject parse(String json) {
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject();
         return jsonObject;
     }
 
-    protected static TestAppender testAppender     = new TestAppender(x -> {
+    private static TestAppender testAppender     = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    protected static List<LogAppenderBuilder> appenderBuilders = Arrays.asList(testAppender);
+    private static List<LogAppenderBuilder> appenderBuilders = Arrays.asList(testAppender);
 
 
     @BeforeClass
@@ -55,18 +55,41 @@ public class ILoggerActorTest {
         loggingSystem.javaStop().get();
         Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
     }
+
+    private class JGenericLoggerUtil implements JGenericLogger {
+        private ILogger logger = getLogger();
+
+       public void start() {
+           LogUtil.logInBulk(logger);
+       }
+    }
+
     @Test
-    public void testDefaultLogConfigurationAndFilterForActor() throws InterruptedException {
-        ActorRef tromboneActor = actorSystem.actorOf(Props.create(JTromboneHCDActor.class), "JTromboneActor");
-        String actorPath = tromboneActor.path().toString();
-        String className = JTromboneHCDActor.class.getName();
-
-        LogUtil.sendLogMsgToActorInBulk(tromboneActor);
-
+    public void testGenericLoggerWithoutComponentName() throws InterruptedException {
+        new JGenericLoggerTest.JGenericLoggerUtil().start();
         Thread.sleep(300);
 
         logBuffer.forEach(log -> {
-            Assert.assertEquals("jTromboneHcdActor", log.get("@componentName").getAsString());
+            Assert.assertTrue(log.has("@severity"));
+            String severity = log.get("@severity").getAsString().toLowerCase();
+
+            Assert.assertEquals(LogUtil.logMsgMap.get(severity), log.get("message").getAsString());
+
+            LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
+            Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.TRACE$.MODULE$));
+        });
+    }
+
+    @Test
+    public void testGenericLoggerActorWithoutComponentName() throws InterruptedException {
+        ActorRef utilActor = actorSystem.actorOf(Props.create(JGenericActor.class), "JActorUtil");
+        String actorPath = utilActor.path().toString();
+        String className = JGenericActor.class.getName();
+
+        LogUtil.sendLogMsgToActorInBulk(utilActor);
+        Thread.sleep(200);
+
+        logBuffer.forEach(log -> {
             Assert.assertEquals(actorPath, log.get("actor").getAsString());
 
             Assert.assertTrue(log.has("@severity"));
@@ -79,5 +102,4 @@ public class ILoggerActorTest {
             Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.TRACE$.MODULE$));
         });
     }
-
 }

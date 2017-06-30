@@ -5,25 +5,27 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
+import csw.services.logging.components.JTromboneHCD;
 import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
-import csw.services.logging.components.JTromboneHCD;
+import csw.services.logging.utils.LogUtil;
 import csw.services.logging.utils.TestAppender;
 import org.junit.*;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ILoggerTest {
-
-    private static ActorSystem actorSystem = ActorSystem.create("logging");
+    private static ActorSystem actorSystem = ActorSystem.create("base-system");
     private static LoggingSystem loggingSystem;
 
-    public static List<JsonObject> logBuffer = new ArrayList<>();
+    private static List<JsonObject> logBuffer = new ArrayList<>();
 
-    public static JsonObject parse(String json) {
+    private static JsonObject parse(String json) {
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject();
         return jsonObject;
@@ -34,18 +36,6 @@ public class ILoggerTest {
         return null;
     });
     private static List<LogAppenderBuilder> appenderBuilders = Arrays.asList(testAppender);
-
-    private Map<String, String> logMsgMap = new HashMap<String, String>()
-    {
-        {
-            put("trace", "logging at trace level");
-            put("debug", "logging at debug level");
-            put("info" , "logging at info level");
-            put("warn" , "logging at warn level");
-            put("error", "logging at error level");
-            put("fatal", "logging at fatal level");
-        }
-    };
 
     @BeforeClass
     public static void setup() {
@@ -60,7 +50,7 @@ public class ILoggerTest {
     @AfterClass
     public static void teardown() throws Exception {
         loggingSystem.javaStop().get();
-        Await.result(actorSystem.terminate(), Duration.create(5, TimeUnit.SECONDS));
+        Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
     }
 
     @Test
@@ -68,7 +58,7 @@ public class ILoggerTest {
         JTromboneHCD jTromboneHCD = new JTromboneHCD();
         String tromboneHcdClassName = jTromboneHCD.getClass().getName();
 
-        jTromboneHCD.startLogging(logMsgMap);
+        jTromboneHCD.startLogging();
         Thread.sleep(300);
 
         logBuffer.forEach(log -> {
@@ -77,7 +67,7 @@ public class ILoggerTest {
             Assert.assertTrue(log.has("@severity"));
             String severity = log.get("@severity").getAsString().toLowerCase();
 
-            Assert.assertEquals(logMsgMap.get(severity), log.get("message").getAsString());
+            Assert.assertEquals(LogUtil.logMsgMap.get(severity), log.get("message").getAsString());
             Assert.assertEquals(tromboneHcdClassName, log.get("class").getAsString());
 
             LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
