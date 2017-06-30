@@ -4,6 +4,7 @@ import java.net.InetAddress
 
 import akka.actor.ActorSystem
 import com.persist.JsonOps.{Json, JsonObject}
+import csw.services.logging.appenders.StdOutAppender
 import csw.services.logging.internal.LoggingSystem
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -22,12 +23,12 @@ abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndA
     new LoggingSystem("logging", "version", hostName, actorSystem, Seq(testAppender))
 
   protected val logMsgMap = Map(
-    "trace"       → "logging at trace level",
-    "debug"       → "logging at debug level",
-    "info"        → "logging at info level",
-    "warn"        → "logging at warn level",
-    "error"       → "logging at error level",
-    "fatal"       → "logging at fatal level",
+    "trace" → "logging at trace level",
+    "debug" → "logging at debug level",
+    "info"  → "logging at info level",
+    "warn"  → "logging at warn level",
+    "error" → "logging at error level",
+    "fatal" → "logging at fatal level"
   )
 
   override protected def beforeAll(): Unit = loggingSystem
