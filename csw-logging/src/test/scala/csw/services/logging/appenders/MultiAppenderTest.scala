@@ -1,4 +1,4 @@
-package csw.services.logging.internal
+package csw.services.logging.appenders
 
 import java.nio.file.Paths
 import java.time.LocalDateTime
@@ -6,21 +6,21 @@ import java.time.LocalDateTime
 import akka.actor.ActorSystem
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
-import csw.services.logging.appenders.FileAppender
-import csw.services.logging.scaladsl.{RequestId, TromboneActor}
+import csw.services.logging.internal.LoggingSystem
+import csw.services.logging.scaladsl.TromboneActor
 import csw.services.logging.utils.{FileUtils, LoggingTestSuite}
 
 import scala.collection.mutable
 
-class TimingTest extends LoggingTestSuite with Timing {
+class MultiAppenderTest extends LoggingTestSuite {
 
   private val logFileDir = Paths.get("/tmp/csw-test-logs").toFile
   private val config = ConfigFactory
     .parseString(s"csw-logging.appenders.file.logPath=${logFileDir.getAbsolutePath}")
     .withFallback(ConfigFactory.load)
 
-  private val loggingSystemName = "TimingTest"
-  override lazy val actorSystem = ActorSystem("timing-test-system", config)
+  private val loggingSystemName = "MultiAppenderTest"
+  override lazy val actorSystem = ActorSystem("test-system", config)
   override lazy val loggingSystem =
     new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem, Seq(testAppender, FileAppender))
 
@@ -29,7 +29,6 @@ class TimingTest extends LoggingTestSuite with Timing {
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(LocalDateTime.now())
   private val fullLogFileDir  = logFileDir + "/" + loggingSystemName
-  private val timeLogFilePath = fullLogFileDir + s"/time.$fileTimestamp.log"
   private val testLogFilePath = fullLogFileDir + s"/common.$fileTimestamp.log"
 
   override protected def beforeAll(): Unit = {
@@ -41,42 +40,24 @@ class TimingTest extends LoggingTestSuite with Timing {
     super.afterEach()
     FileUtils.deleteRecursively(logFileDir)
   }
-
-  def logMessagesWithTimer() = {
+  def logMessages(): Unit = {
     import csw.services.logging.scaladsl.TromboneActor._
 
-    Time(RequestId(), "TestTimer") {
-      {
-        tromboneActorRef ! LogTrace
-        tromboneActorRef ! LogDebug
-        tromboneActorRef ! LogInfo
-        tromboneActorRef ! LogWarn
-        tromboneActorRef ! LogError
-        tromboneActorRef ! LogFatal
-      }
-    }
+    tromboneActorRef ! LogTrace
+    tromboneActorRef ! LogDebug
+    tromboneActorRef ! LogInfo
+    tromboneActorRef ! LogWarn
+    tromboneActorRef ! LogError
+    tromboneActorRef ! LogFatal
   }
 
   // DEOPSCSW-142: Flexibility of logging approaches
-  test("should able to log messages to combination of standard out and file concurrently and also log time messages.") {
-
-    logMessagesWithTimer()
+  test("should able to log messages to combination of standard out and file concurrently") {
+    logMessages()
     Thread.sleep(3000)
 
-    // Reading time logger file
-    val timeLogBuffer = FileUtils.read(timeLogFilePath)
     // Reading common logger file
     val fileLogBuffer = FileUtils.read(testLogFilePath)
-
-    // validating timer logger
-    timeLogBuffer.toList.foreach { log ⇒
-      val itemsMap = log("items").asInstanceOf[List[JsonObject]].head
-      itemsMap("name") shouldBe "TestTimer"
-      itemsMap.contains("time0") shouldBe true
-      itemsMap.contains("time1") shouldBe true
-      itemsMap.contains("total") shouldBe true
-      log("@name") shouldBe "TimingTest"
-    }
 
     // validating file logger
     testLogBuffer(fileLogBuffer)

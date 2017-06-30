@@ -24,9 +24,6 @@ private[logging] object LoggingState {
   private[logging] var maybeLogActor: Option[ActorRef] = None
   @volatile private[logging] var loggerStopping        = false
 
-  private[logging] var doTime: Boolean                   = false
-  private[logging] var timeActorOption: Option[ActorRef] = None
-
   // Use to sync akka logging actor shutdown
   private[logging] val akkaStopPromise = Promise[Unit]
 }
