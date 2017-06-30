@@ -29,10 +29,6 @@ case class Log(componentName: Option[String],
 
 case class SetLevel(level: Level) extends LogActorMessages
 
-// Model for Log messages to be shared with Log Actor which are logged using 'alternative' method of logger
-case class LogAltMessage(category: String, time: Long, jsonObject: JsonObject, id: AnyId, ex: Throwable)
-    extends LogActorMessages
-
 case class LogSlf4j(level: Level, time: Long, className: String, msg: String, line: Int, file: String, ex: Throwable)
     extends LogActorMessages
 

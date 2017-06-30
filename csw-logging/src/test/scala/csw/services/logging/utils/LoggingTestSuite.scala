@@ -28,7 +28,6 @@ abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndA
     "warn"        → "logging at warn level",
     "error"       → "logging at error level",
     "fatal"       → "logging at fatal level",
-    "alternative" → "logging at alternative level"
   )
 
   override protected def beforeAll(): Unit = loggingSystem

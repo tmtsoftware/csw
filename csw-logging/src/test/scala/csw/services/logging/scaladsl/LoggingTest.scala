@@ -14,13 +14,12 @@ object InnerSourceLogger      extends ComponentLogger("InnerClass")
 class TromboneHcd() extends TromboneHcdLogger.Simple {
 
   def startLogging(logs: Map[String, String], kind: String = "all"): Unit = kind match {
-    case "trace"       ⇒ log.trace(logs("trace"))
-    case "debug"       ⇒ log.debug(logs("debug"))
-    case "info"        ⇒ log.info(logs("info"))
-    case "warn"        ⇒ log.warn(logs("warn"))
-    case "error"       ⇒ log.error(logs("error"))
-    case "fatal"       ⇒ log.fatal(logs("fatal"))
-    case "alternative" ⇒ log.alternative("some-alternative-category", Map("@msg" → logs("alternative")))
+    case "trace" ⇒ log.trace(logs("trace"))
+    case "debug" ⇒ log.debug(logs("debug"))
+    case "info"  ⇒ log.info(logs("info"))
+    case "warn"  ⇒ log.warn(logs("warn"))
+    case "error" ⇒ log.error(logs("error"))
+    case "fatal" ⇒ log.fatal(logs("fatal"))
     case "all" ⇒ {
       log.trace(logs("trace"))
       log.debug(logs("debug"))
@@ -63,7 +62,6 @@ object SingletonTest extends InnerSourceLogger.Simple {
     log.warn(logs("warn"))
     log.error(logs("error"))
     log.fatal(logs("fatal"))
-    log.alternative("some-alternative-category", Map("@msg" → logs("alternative")))
   }
 }
 
@@ -221,15 +219,6 @@ class LoggingTest extends LoggingTestSuite {
       }
 
       logBuffer.clear()
-    }
-  }
-
-  test("alternative log message should contain @category") {
-    new TromboneHcd().startLogging(logMsgMap, "alternative")
-    Thread.sleep(100)
-
-    logBuffer.foreach { log ⇒
-      log("@category") shouldBe true
     }
   }
 
