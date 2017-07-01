@@ -6,8 +6,9 @@ import java.time.LocalDateTime
 import akka.actor.ActorSystem
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
+import csw.services.logging.components.TromboneActor
+import csw.services.logging.components.TromboneActor._
 import csw.services.logging.internal.LoggingSystem
-import csw.services.logging.scaladsl.TromboneActor
 import csw.services.logging.utils.{FileUtils, LoggingTestSuite}
 
 import scala.collection.mutable
@@ -41,7 +42,6 @@ class MultiAppenderTest extends LoggingTestSuite {
     FileUtils.deleteRecursively(logFileDir)
   }
   def logMessages(): Unit = {
-    import csw.services.logging.scaladsl.TromboneActor._
 
     tromboneActorRef ! LogTrace
     tromboneActorRef ! LogDebug

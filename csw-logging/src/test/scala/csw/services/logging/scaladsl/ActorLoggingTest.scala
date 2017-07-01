@@ -1,37 +1,10 @@
 package csw.services.logging.scaladsl
 
-import akka.actor.Props
+import csw.services.logging.components.TromboneActor
+import csw.services.logging.components.TromboneActor._
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.scaladsl.TromboneActor._
 import csw.services.logging.utils.LoggingTestSuite
-
-object TromboneLogger extends ComponentLogger("tromboneHcdActor")
-
-object TromboneActor {
-  def props() = Props(new TromboneActor())
-
-  case object LogTrace
-  case object LogDebug
-  case object LogInfo
-  case object LogWarn
-  case object LogError
-  case object LogFatal
-}
-
-class TromboneActor() extends TromboneLogger.Actor {
-
-  def receive = {
-    case LogTrace => log.trace("Level is trace")
-    case LogDebug => log.debug("Level is debug")
-    case LogInfo  => log.info("Level is info")
-    case LogWarn  => log.warn("Level is warn")
-    case LogError => log.error("Level is error")
-    case LogFatal => log.fatal("Level is fatal")
-    case x: Any =>
-      log.error(Map("@errorMsg" -> "Unexpected actor message", "message" -> x.toString))
-  }
-}
 
 class ActorLoggingTest extends LoggingTestSuite {
   private val tromboneActorRef =
@@ -56,14 +29,16 @@ class ActorLoggingTest extends LoggingTestSuite {
 
     sendMessagesToActor()
 
+    // default log level for TromboneActor is ERROR in config
+    var logMsgLineNumber = TromboneActor.ERROR_LINE_NO
+
     logBuffer.foreach { log ⇒
-      log.contains("@componentName") shouldBe true
-      log.contains("actor") shouldBe true
       log("@componentName") shouldBe "tromboneHcdActor"
       log("actor") shouldBe tromboneActorRef.path.toString
-      log("file") shouldBe "ActorLoggingTest.scala"
-      log.contains("line") shouldBe true
-      log("class") shouldBe "csw.services.logging.scaladsl.TromboneActor"
+      log("file") shouldBe "TromboneActor.scala"
+      log("line") shouldBe logMsgLineNumber
+      log("class") shouldBe "csw.services.logging.components.TromboneActor"
+      logMsgLineNumber += 1
     }
   }
 
@@ -76,7 +51,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     val errorLevelLogMessages =
       logBuffer.groupBy(json ⇒ json("@severity"))("ERROR")
     errorLevelLogMessages.size shouldEqual 1
-    val expectedMessage = Map("@errorMsg" -> "Unexpected actor message", "message" -> "Unknown")
+    val expectedMessage = Map("@msg" -> "Unknown message", "reason" -> "Unknown")
     errorLevelLogMessages.head("message") shouldBe expectedMessage
   }
 

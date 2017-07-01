@@ -2,135 +2,69 @@ package csw.services.logging.scaladsl
 
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
+import csw.services.logging.components.{InnerSourceComponent, SingletonComponent, TromboneAssembly, TromboneHcd}
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.utils.LoggingTestSuite
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
-object TromboneHcdLogger      extends ComponentLogger("tromboneHcd")
-object TromboneAssemblyLogger extends ComponentLogger("tromboneAssembly")
-object InnerSourceLogger      extends ComponentLogger("InnerClass")
-
-class TromboneHcd() extends TromboneHcdLogger.Simple {
-
-  def startLogging(logs: Map[String, String], kind: String = "all"): Unit = kind match {
-    case "trace" ⇒ log.trace(logs("trace"))
-    case "debug" ⇒ log.debug(logs("debug"))
-    case "info"  ⇒ log.info(logs("info"))
-    case "warn"  ⇒ log.warn(logs("warn"))
-    case "error" ⇒ log.error(logs("error"))
-    case "fatal" ⇒ log.fatal(logs("fatal"))
-    case "all" ⇒ {
-      log.trace(logs("trace"))
-      log.debug(logs("debug"))
-      log.info(logs("info"))
-      log.warn(logs("warn"))
-      log.error(logs("error"))
-      log.fatal(logs("fatal"))
-    }
-  }
-
-  def compute(number1: Int, number2: Int): String = {
-    val exceptionMsg = "Exception occurred."
-
-    try {
-      val result = number1 / number2
-      s"Result of computation is $result"
-    } catch {
-      case ex: ArithmeticException ⇒ log.error(exceptionMsg, ex); exceptionMsg
-    }
-  }
-
-  def logRichException(message: String) =
-    log.error(message, RichException("Rich Exception", new RuntimeException))
-
-}
-
-class TromboneAssembly() extends TromboneAssemblyLogger.Simple {
-  def startLogging(logs: Map[String, String]): Unit = {
-    log.trace(logs("trace"))
-    log.debug(logs("debug"))
-    log.info(logs("info"))
-    log.warn(logs("warn"))
-    log.error(logs("error"))
-    log.fatal(logs("fatal"))
-  }
-}
-
-object SingletonTest extends InnerSourceLogger.Simple {
-  def startLogging(logs: Map[String, String]): Unit = {
-    log.trace(logs("trace"))
-    log.debug(logs("debug"))
-    log.info(logs("info"))
-    log.warn(logs("warn"))
-    log.error(logs("error"))
-    log.fatal(logs("fatal"))
-  }
-}
-
-class InnerSourceTest extends InnerSourceLogger.Simple {
-  def startLogging(logs: Map[String, String]): Unit = new InnerSource().startLogging(logs)
-  class InnerSource {
-    def startLogging(logs: Map[String, String]): Unit = {
-      log.trace(logs("trace"))
-      log.debug(logs("debug"))
-      log.info(logs("info"))
-      log.warn(logs("warn"))
-      log.error(logs("error"))
-      log.fatal(logs("fatal"))
-    }
-  }
-
-}
-
 class LoggingTest extends LoggingTestSuite {
 
   // DEOPSCSW-116: Make log messages identifiable with components
-  // DEOPSCSW-121: Define structured tags for log messages
-  test("component logs should contain component name") {
-    new TromboneHcd().startLogging(logMsgMap)
-    Thread.sleep(100)
-
-    logBuffer.foreach { log ⇒
-      log.contains("@componentName") shouldBe true
-      log("@componentName") shouldBe "tromboneHcd"
-    }
-
-  }
-
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
-  test("component logs should contain source location in terms of file name, class name and line number") {
+  test("logs should contain component name and source location in terms of file name, class name and line number") {
     new TromboneHcd().startLogging(logMsgMap)
     Thread.sleep(100)
+
+    // filter for tromboneHcd is at debug level in config
+    var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
+
     logBuffer.foreach { log ⇒
-      log("file") shouldBe "LoggingTest.scala"
-      log.contains("line") shouldBe true
-      log("class") shouldBe "csw.services.logging.scaladsl.TromboneHcd"
+      log("@componentName") shouldBe "tromboneHcd"
+      log("file") shouldBe "TromboneHcd.scala"
+      log("line") shouldBe logMsgLineNumber
+      log("class") shouldBe "csw.services.logging.components.TromboneHcd"
+      logMsgLineNumber += 1
     }
   }
 
+  // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
   test("inner class logs should contain source location in terms of file name, class name and line number") {
-    new InnerSourceTest().startLogging(logMsgMap)
+    new InnerSourceComponent().startLogging(logMsgMap)
     Thread.sleep(100)
+
+    // default log level is TRACE in config
+    var logMsgLineNumber = InnerSourceComponent.TRACE_LINE_NO
+
     logBuffer.foreach { log ⇒
-      log("file") shouldBe "LoggingTest.scala"
-      log.contains("line") shouldBe true
-      log("class") shouldBe "csw.services.logging.scaladsl.InnerSourceTest$InnerSource"
+      log("@componentName") shouldBe "InnerSourceComponent"
+      log("file") shouldBe "InnerSourceComponent.scala"
+      log("line") shouldBe logMsgLineNumber
+      log("class") shouldBe "csw.services.logging.components.InnerSourceComponent$InnerSource"
+      logMsgLineNumber += 1
     }
   }
 
+  // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
   test("singleton object logs should contain source location in terms of file name, class name and line number") {
-    SingletonTest.startLogging(logMsgMap)
+    SingletonComponent.startLogging(logMsgMap)
     Thread.sleep(100)
+
+    // default log level is TRACE in config
+    var logMsgLineNumber = SingletonComponent.TRACE_LINE_NO
+
     logBuffer.foreach { log ⇒
-      log("file") shouldBe "LoggingTest.scala"
-      log.contains("line") shouldBe true
-      log("class") shouldBe "csw.services.logging.scaladsl.SingletonTest"
+      log.contains("@componentName") shouldBe true
+      log("@componentName") shouldBe "SingletonComponent"
+      log("file") shouldBe "SingletonComponent.scala"
+      log("line") shouldBe logMsgLineNumber
+      log("class") shouldBe "csw.services.logging.components.SingletonComponent"
+      logMsgLineNumber += 1
     }
   }
 
@@ -165,7 +99,7 @@ class LoggingTest extends LoggingTestSuite {
   test("should apply default log level provided in configuration file for normal logging messages") {
 
     new TromboneAssembly().startLogging(logMsgMap)
-    Thread.sleep(200)
+    Thread.sleep(300)
 
     //  TromboneAssembly component is logging 6 messages each of unique level
     //  As per the default loglevel = trace, assembly should log all 6 message
