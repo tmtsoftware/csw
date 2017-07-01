@@ -1,7 +1,10 @@
 package csw.services.logging.scaladsl
 
+import java.time._
+
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
+import csw.services.logging.commons.TMTDateTimeFormatter
 import csw.services.logging.components.{InnerSourceComponent, SingletonComponent, TromboneAssembly, TromboneHcd}
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels._
@@ -11,9 +14,11 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 class LoggingTest extends LoggingTestSuite {
 
   // DEOPSCSW-116: Make log messages identifiable with components
+  // DEOPSCSW-118: Provide UTC time for each log message
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
   test("logs should contain component name and source location in terms of file name, class name and line number") {
+    val expectedTimeMillis = Instant.now.toEpochMilli +- 50
     new TromboneHcd().startLogging(logMsgMap)
     Thread.sleep(100)
 
@@ -21,6 +26,11 @@ class LoggingTest extends LoggingTestSuite {
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
     logBuffer.foreach { log ⇒
+      val actualTimestamp  = TMTDateTimeFormatter.parse(log("timestamp").toString)
+      val actualTimeMillis = actualTimestamp.atZone(ZoneId.systemDefault).toInstant.toEpochMilli
+
+      actualTimeMillis shouldBe expectedTimeMillis
+
       log("@componentName") shouldBe "tromboneHcd"
       log("file") shouldBe "TromboneHcd.scala"
       log("line") shouldBe logMsgLineNumber

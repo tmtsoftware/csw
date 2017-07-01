@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-// todo: extend this class from all the test. Currently test fails if extended from this class. (Might be because of concurrency)
+// todo: extend this class from all the test. Currently test fails if extended from this class.
 public class JBaseTest {
 
     protected static ActorSystem actorSystem = ActorSystem.create("base-system");
