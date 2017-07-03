@@ -44,24 +44,36 @@ class TimingTest extends LoggingTestSuite with Timing {
     FileUtils.deleteRecursively(logFileDir)
   }
 
-  def logMessagesWithTimer() = {
+  def sendLogMsgToTromboneActor() = {
+    tromboneActorRef ! LogTrace
+    tromboneActorRef ! LogDebug
+    tromboneActorRef ! LogInfo
+    tromboneActorRef ! LogWarn
+    tromboneActorRef ! LogError
+    tromboneActorRef ! LogFatal
+  }
 
-    Time(RequestId(), "TestTimer") {
-      {
-        tromboneActorRef ! LogTrace
-        tromboneActorRef ! LogDebug
-        tromboneActorRef ! LogInfo
-        tromboneActorRef ! LogWarn
-        tromboneActorRef ! LogError
-        tromboneActorRef ! LogFatal
-      }
+  private val timerTestRegionName        = "Timer-Test"
+  private val startEndTimeTestRegionName = "Start-End-Time-Test"
+  private val timerRegionQueue           = mutable.Queue[String](timerTestRegionName, startEndTimeTestRegionName)
+
+  def logMessagesWithTimer() =
+    Time(RequestId(), timerTestRegionName) {
+      sendLogMsgToTromboneActor
     }
+
+  def logMessagesWithStartAndEndTimer() = {
+    val id         = RequestId()
+    val startToken = time.start(id, startEndTimeTestRegionName)
+    sendLogMsgToTromboneActor
+    time.end(id, startEndTimeTestRegionName, startToken)
   }
 
   // DEOPSCSW-142: Flexibility of logging approaches
   test("should able to log messages to combination of standard out and file concurrently and also log time messages.") {
 
-    logMessagesWithTimer()
+    logMessagesWithTimer
+    logMessagesWithStartAndEndTimer
     Thread.sleep(3000)
 
     // Reading time logger file
@@ -72,7 +84,7 @@ class TimingTest extends LoggingTestSuite with Timing {
     // validating timer logger
     timeLogBuffer.toList.foreach { log ⇒
       val itemsMap = log("items").asInstanceOf[List[JsonObject]].head
-      itemsMap("name") shouldBe "TestTimer"
+      itemsMap("name") shouldBe timerRegionQueue.dequeue
       itemsMap.contains("time0") shouldBe true
       itemsMap.contains("time1") shouldBe true
       itemsMap.contains("total") shouldBe true

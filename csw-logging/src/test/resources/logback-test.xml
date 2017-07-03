@@ -1,0 +1,10 @@
+<configuration scan="false">
+
+    <appender name="svc_appender" class="csw.services.logging.appenders.Slf4jAppender">
+    </appender>
+
+    <root level="${SLF4J_LEVEL:-TRACE}">
+        <appender-ref ref="svc_appender"/>
+    </root>
+
+</configuration>

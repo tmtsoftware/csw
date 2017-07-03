@@ -21,7 +21,7 @@ class Slf4jAppenderTest extends LoggingTestSuite {
 
     logBuffer.foreach { log ⇒
       val currentLogLevel = log("@severity").toString.toLowerCase
-      Level(currentLogLevel) >= LoggingLevels.WARN shouldBe true
+      Level(currentLogLevel) >= LoggingLevels.TRACE shouldBe true
       log("message").toString shouldBe currentLogLevel
       log("class").toString shouldBe className
       log("file").toString shouldBe "Slf4jAppenderTest.scala"
