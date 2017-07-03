@@ -27,6 +27,7 @@ object ActorSystemFactory extends LocationServiceLogger.Simple {
     val config = ConfigFactory
       .parseString(s"akka.remote.netty.tcp.hostname = ${ClusterSettings().hostname}")
       .withFallback(ConfigFactory.load().getConfig(Constants.RemoteActorSystemName))
+      .withFallback(ConfigFactory.defaultApplication().resolve())
 
     log.info("creating remote actor system")
     ActorSystem(componentName, config)
