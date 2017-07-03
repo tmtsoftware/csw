@@ -126,6 +126,11 @@ paths:
       produces:
         - application/json
       parameters:
+        - name: Content-Type
+          in: header
+          required: true
+          type: application/octet-stream
+          description: 'Arbitrary binary data'
         - name: comment
           in: query
           required: true
@@ -156,16 +161,16 @@ paths:
       produces:
         - application/json
       parameters:
+        - name: Content-Type
+          in: header
+          required: true
+          type: application/octet-stream
+          description: 'Arbitrary binary data'
         - name: comment
           in: query
           required: true
           type: string
           description: 'Commit message.'
-        - name: Content-Type
-          in: header
-          required: true
-          type: string
-          description: 'To-do'
         - name: path
           in: path
           required: true
