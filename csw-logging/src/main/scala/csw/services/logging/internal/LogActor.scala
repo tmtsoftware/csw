@@ -42,13 +42,14 @@ private[logging] class LogActor(done: Promise[Unit],
   private[this] var slf4jLogLevel: Level                           = initSlf4jLevel
 
   def receive: Receive = {
-    case log: Log              => receiveLog(log)
-    case logSlf4J: LogSlf4j    => receiveLogSlf4j(logSlf4J)
-    case logAkka: LogAkka      => receiveLogAkkaMessage(logAkka)
-    case SetLevel(level1)      => level = level1
-    case SetSlf4jLevel(level1) => slf4jLogLevel = level1
-    case SetAkkaLevel(level1)  => akkaLogLevel = level1
-    case SetFilter(f)          => filter = f
+    case log: Log                     => receiveLog(log)
+    case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage)
+    case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J)
+    case logAkka: LogAkka             => receiveLogAkkaMessage(logAkka)
+    case SetLevel(level1)             => level = level1
+    case SetSlf4jLevel(level1)        => slf4jLogLevel = level1
+    case SetAkkaLevel(level1)         => akkaLogLevel = level1
+    case SetFilter(f)                 => filter = f
     case LastAkkaMessage =>
       akka.event.Logging(context.system, this).error("DIE")
     case StopLogging =>
@@ -145,6 +146,19 @@ private[logging] class LogActor(done: Promise[Unit],
     if (!log.kind.isEmpty)
       jsonObject = jsonObject ++ JsonObject("kind" -> log.kind)
     append(jsonObject, "common", log.level)
+  }
+
+  private def receiveAltMessage(logAltMessage: LogAltMessage) = {
+    var jsonObject = logAltMessage.jsonObject
+    if (logAltMessage.ex != noException)
+      jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
+    jsonObject = logAltMessage.id match {
+      case RequestId(trackingId, spanId, _) =>
+        jsonObject ++ JsonObject("@traceId" -> JsonArray(trackingId, spanId))
+      case _ => jsonObject
+    }
+    jsonObject = jsonObject ++ JsonObject("timestamp" -> TMTDateTimeFormatter.format(logAltMessage.time))
+    append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
   }
 
   private def receiveLogSlf4j(logSlf4j: LogSlf4j) =

@@ -58,4 +58,20 @@ trait Logger {
    */
   def fatal(msg: => RichMsg, ex: Throwable = noException, id: AnyId = noId)(implicit factory: SourceFactory): Unit
 
+  /**
+   * Write a log message to an alternative log.
+   *
+   * @param category the category for the message. For log files, this will be part of the file name. The following
+   *                 categories are often used: server, client, gc, and time.
+   * @param m        fields to be included in the log message.
+   * @param ex       an optional exception to be logged together with its stack trace.
+   * @param id       optional id of a request
+   * @param time     the time to be written in the log. If not specified the default is the time this
+   *                 method is called.
+   */
+  private[logging] def alternative(category: String,
+                                   m: Map[String, RichMsg],
+                                   ex: Throwable = noException,
+                                   id: AnyId = noId,
+                                   time: Long = System.currentTimeMillis()): Unit
 }

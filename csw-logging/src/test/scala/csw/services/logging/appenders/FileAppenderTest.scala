@@ -28,7 +28,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   val logMsgString1: String =
     """{
-      |  "@category": "common",
+      |  "@category": "alternative",
       |  "@componentName": "FileAppenderTest",
       |  "@host": "localhost",
       |  "@name": "test-service",
@@ -77,7 +77,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   private val date1            = jgetString(expectedLogMsgJson1, "timestamp")
   private val localDateTime1   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date1))
-  private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime1.log"
+  private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service/alternative.$localDateTime1.log"
 
   private val date2            = jgetString(expectedLogMsgJson2, "timestamp")
   private val localDateTime2   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date2))
@@ -98,7 +98,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
 
   //DEOPSCSW-151 : Manage log file size
   test("log file is rotated every day") {
-    fileAppender.append(expectedLogMsgJson1, "common")
+    fileAppender.append(expectedLogMsgJson1, "alternative")
     fileAppender.append(expectedLogMsgJson2, "common")
     fileAppender.append(expectedLogMsgJson3, "common")
     Thread.sleep(3000)

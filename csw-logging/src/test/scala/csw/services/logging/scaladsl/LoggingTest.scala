@@ -169,6 +169,15 @@ class LoggingTest extends LoggingTestSuite {
     }
   }
 
+  test("alternative log message should contain @category") {
+    new TromboneHcd().startLogging(logMsgMap, "alternative")
+    Thread.sleep(100)
+
+    logBuffer.foreach { log ⇒
+      log("@category") shouldBe true
+    }
+  }
+
   test("should able to log exception at ERROR level with complete stacktrace") {
     val tromboneHcd          = new TromboneHcd()
     val tromboneHcdClassName = tromboneHcd.getClass.getName

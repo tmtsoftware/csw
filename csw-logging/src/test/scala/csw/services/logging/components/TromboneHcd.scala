@@ -9,13 +9,22 @@ class TromboneHcd() extends TromboneHcdLogger.Simple {
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers
   // In case any line needs to be added then update constants in companion object
-  def startLogging(logs: Map[String, String]): Unit = {
-    log.trace(logs("trace"))
-    log.debug(logs("debug"))
-    log.info(logs("info"))
-    log.warn(logs("warn"))
-    log.error(logs("error"))
-    log.fatal(logs("fatal"))
+  def startLogging(logs: Map[String, String], kind: String = "all"): Unit = kind match {
+    case "trace"       ⇒ log.trace(logs("trace"))
+    case "debug"       ⇒ log.debug(logs("debug"))
+    case "info"        ⇒ log.info(logs("info"))
+    case "warn"        ⇒ log.warn(logs("warn"))
+    case "error"       ⇒ log.error(logs("error"))
+    case "fatal"       ⇒ log.fatal(logs("fatal"))
+    case "alternative" ⇒ log.alternative("some-alternative-category", Map("@msg" → logs("alternative")))
+    case "all" ⇒ {
+      log.trace(logs("trace"))
+      log.debug(logs("debug"))
+      log.info(logs("info"))
+      log.warn(logs("warn"))
+      log.error(logs("error"))
+      log.fatal(logs("fatal"))
+    }
   }
 
   def compute(number1: Int, number2: Int): String = {
