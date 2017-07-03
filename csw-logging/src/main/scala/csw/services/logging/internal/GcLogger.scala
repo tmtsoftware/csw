@@ -13,6 +13,7 @@ import scala.collection.JavaConverters._
 /**
  * When enabled by the gc configuration option, Garbage collection events are logged to the 'gc' log following the same structure as the other logs.
  */
+// $COVERAGE-OFF$
 private[logging] class GcLogger extends GenericLogger.Simple {
 
   private[this] val gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans
@@ -63,3 +64,4 @@ private[logging] class GcLogger extends GenericLogger.Simple {
       e.removeNotificationListener(l)
     }
 }
+// $COVERAGE-ON$
