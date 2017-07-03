@@ -221,10 +221,14 @@ The output of log statement will be:
 Also you can log an error with stacktrace as follows:
  
 Scala
-  :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info-error }
+  :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-error }
  
 Java
-  :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error }
+ :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error }
+ 
+## Garbage Collection Logging
+
+Garbage collection events are logged to the gc log when enabled by the `gc` configuration option.
 
 ## Source code for examples
 

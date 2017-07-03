@@ -302,10 +302,9 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
     case x =>
       val runtimeException = new RuntimeException(s"Received unexpected message $x")
-      //#log-info-error
+      //#log-error
       log.error(runtimeException.getMessage, runtimeException)
-     //#log-info-error
-
+      //#log-error
   }
 
 }

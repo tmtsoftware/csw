@@ -10,12 +10,6 @@ class TromboneHcd() extends TromboneHcdLogger.Simple {
   // Tests are written to assert on this line numbers
   // In case any line needs to be added then update constants in companion object
   def startLogging(logs: Map[String, String], kind: String = "all"): Unit = kind match {
-    case "trace"       ⇒ log.trace(logs("trace"))
-    case "debug"       ⇒ log.debug(logs("debug"))
-    case "info"        ⇒ log.info(logs("info"))
-    case "warn"        ⇒ log.warn(logs("warn"))
-    case "error"       ⇒ log.error(logs("error"))
-    case "fatal"       ⇒ log.fatal(logs("fatal"))
     case "alternative" ⇒ log.alternative("some-alternative-category", Map("@msg" → logs("alternative")))
     case "all" ⇒ {
       log.trace(logs("trace"))
@@ -44,7 +38,7 @@ class TromboneHcd() extends TromboneHcdLogger.Simple {
 }
 
 object TromboneHcd {
-  val TRACE_LINE_NO = 13
+  val TRACE_LINE_NO = 15
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3

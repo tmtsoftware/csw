@@ -1,6 +1,8 @@
 package csw.services.logging.internal
 
+import TimeActorMessages.{TimeEnd, TimeStart}
 import csw.services.logging.internal.LoggingState._
+import csw.services.logging.scaladsl.RequestId
 
 /**
  * Acts as a single point of entry for messages from various loggers and redirects them to the log actor
@@ -30,5 +32,19 @@ object MessageHandler {
       akkaStopPromise.trySuccess(())
     } else {
       sendMsg(logAkka)
+    }
+
+  // Route time start messages to time actor
+  private[logging] def timeStart(id: RequestId, name: String, uid: String): Unit =
+    timeActorOption foreach { timeActor =>
+      val time = System.nanoTime() / 1000
+      timeActor ! TimeStart(id, name, uid, time)
+    }
+
+  // Route time end messages to time actor
+  private[logging] def timeEnd(id: RequestId, name: String, uid: String): Unit =
+    timeActorOption foreach { timeActor =>
+      val time = System.nanoTime() / 1000
+      timeActor ! TimeEnd(id, name, uid, time)
     }
 }

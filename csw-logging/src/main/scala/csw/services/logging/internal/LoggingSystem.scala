@@ -3,10 +3,11 @@ package csw.services.logging.internal
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
 import csw.services.logging.RichMsg
 import csw.services.logging.appenders.LogAppenderBuilder
+import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.models.{FilterSet, LogMetadata}
 import csw.services.logging.scaladsl.GenericLogger
@@ -63,8 +64,12 @@ class LoggingSystem(name: String,
     }
   @volatile private[this] var slf4jLogLevel = defaultSlf4jLogLevel
 
+  private[this] val gc   = loggingConfig.getBoolean("gc")
+  private[this] val time = loggingConfig.getBoolean("time")
+
   private[this] implicit val ec: ExecutionContext = system.dispatcher
   private[this] val done                          = Promise[Unit]
+  private[this] val timeActorDonePromise          = Promise[Unit]
 
   @volatile private[this] var filterSet = FilterSet.from(loggingConfig)
 
@@ -76,6 +81,8 @@ class LoggingSystem(name: String,
 
   setLevel(defaultLevel)
   LoggingState.loggerStopping = false
+  LoggingState.doTime = false
+  LoggingState.timeActorOption = None
 
   private[this] val appenders = appenderBuilders.map {
     _.apply(system, standardHeaders)
@@ -85,7 +92,22 @@ class LoggingSystem(name: String,
       defaultSlf4jLogLevel, defaultAkkaLogLevel), name = "LoggingActor")
   LoggingState.maybeLogActor = Some(logActor)
 
+  private[logging] val gcLogger: Option[GcLogger] = if (gc) {
+    Some(new GcLogger)
+  } else {
+    None
+  }
+
   setFilter(Some(filterSet.check))
+
+  if (time) {
+    // Start timing actor
+    LoggingState.doTime = true
+    val timeActor = system.actorOf(Props(new TimeActor(timeActorDonePromise)), name = "TimingActor")
+    LoggingState.timeActorOption = Some(timeActor)
+  } else {
+    timeActorDonePromise.success(())
+  }
 
   // Deal with messages send before logger was ready
   LoggingState.msgs.synchronized {
@@ -189,6 +211,11 @@ class LoggingSystem(name: String,
       LoggingState.akkaStopPromise.future
     }
 
+    def stopTimeActor(): Future[Unit] = {
+      LoggingState.timeActorOption foreach (timeActor => timeActor ! TimeDone)
+      timeActorDonePromise.future
+    }
+
     def stopLogger(): Future[Unit] = {
       LoggingState.loggerStopping = true
       logActor ! StopLogging
@@ -202,13 +229,16 @@ class LoggingSystem(name: String,
     def stopAppenders(): Future[Unit] =
       Future.sequence(appenders map (_.stop())).map(x => ())
 
+    //Stop gc logger
+    gcLogger foreach (_.stop())
+
     // Stop Slf4j
     val loggerContext =
       LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
     loggerContext.stop()
 
     for {
-      akkaDone      <- stopAkka()
+      akkaTimeDone  <- stopAkka() zip stopTimeActor()
       logActorDone  <- finishAppenders()
       logActorDone  <- stopLogger()
       appendersDone <- stopAppenders()
