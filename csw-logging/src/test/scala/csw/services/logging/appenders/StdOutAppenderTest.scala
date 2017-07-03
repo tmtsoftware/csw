@@ -52,14 +52,25 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     Await.result(actorSystem.terminate(), 5.seconds)
   }
 
-  test("should print message to standard output stream") {
+  test("should print message to standard output stream if category is \'common\'") {
+    val category = "common"
 
     Console.withOut(outCapture) {
-      stdOutAppender.append(expectedLogJson)
+      stdOutAppender.append(expectedLogJson, category)
     }
 
     val actualLogJson = JsonOps.Json(outCapture.toString).asInstanceOf[Map[String, String]]
     actualLogJson shouldBe expectedLogJson
+  }
+
+  test("should not print message to standard output stream if category is not \'common\'") {
+    val category = "foo"
+
+    Console.withOut(outCapture) {
+      stdOutAppender.append(expectedLogJson, category)
+    }
+
+    outCapture.toString.isEmpty shouldBe true
   }
 
   test("should able to pretty-print one log message to one line") {
@@ -72,7 +83,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     val stdOutAppenderForOneLineMsg      = new StdOutAppender(actorSystemWithOneLineTrueConfig, standardHeaders, println)
 
     Console.withOut(outCapture) {
-      stdOutAppenderForOneLineMsg.append(expectedLogJson)
+      stdOutAppenderForOneLineMsg.append(expectedLogJson, "common")
     }
 
     val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")

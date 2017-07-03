@@ -102,20 +102,20 @@ private[logging] class LogActor(done: Promise[Unit],
   }
 
   // Send JSON log object for each peender configured for the logging system
-  private def append(baseMsg: JsonObject, level: Level): Unit = {
+  private def append(baseMsg: JsonObject, category: String, level: Level): Unit = {
     // Send message to appenders only if they pass through the filter or if they are 'gc' or 'time' messages
-    val keep = filter match {
+    val keep = category != "common" || (filter match {
       case Some(f) => f(standardHeaders ++ baseMsg, level)
       case None    => true
-    }
+    })
     if (keep) {
-      for (appender <- appenders) appender.append(baseMsg)
+      for (appender <- appenders) appender.append(baseMsg, category)
     }
   }
 
   private def receiveLog(log: Log): Unit = {
     var jsonObject = JsonObject("timestamp" -> TMTDateTimeFormatter.format(log.time),
-      "message" -> log.sanitizedMessage, "@severity" -> log.level.name)
+      "message" -> log.sanitizedMessage, "@severity" -> log.level.name, "@category" -> "common")
 
     if (!log.sourceLocation.fileName.isEmpty) {
       jsonObject = jsonObject ++ JsonObject("file" -> log.sourceLocation.fileName)
@@ -144,7 +144,7 @@ private[logging] class LogActor(done: Promise[Unit],
     }
     if (!log.kind.isEmpty)
       jsonObject = jsonObject ++ JsonObject("kind" -> log.kind)
-    append(jsonObject, log.level)
+    append(jsonObject, "common", log.level)
   }
 
   private def receiveLogSlf4j(logSlf4j: LogSlf4j) =
@@ -155,13 +155,14 @@ private[logging] class LogActor(done: Promise[Unit],
         "file"      -> logSlf4j.file,
         "@severity" -> logSlf4j.level.name,
         "class"     -> logSlf4j.className,
-        "kind"      -> "slf4j"
+        "kind"      -> "slf4j",
+        "@category" -> "common"
       )
       if (logSlf4j.line > 0)
         jsonObject = jsonObject ++ JsonObject("line" -> logSlf4j.line)
       if (logSlf4j.ex != noException)
         jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
-      append(jsonObject, logSlf4j.level)
+      append(jsonObject, "common", logSlf4j.level)
     }
 
   private def receiveLogAkkaMessage(logAkka: LogAkka) =
@@ -173,11 +174,12 @@ private[logging] class LogActor(done: Promise[Unit],
         "message"   -> msg1.toString,
         "actor"     -> logAkka.source,
         "@severity" -> logAkka.level.name,
-        "class"     -> logAkka.clazz.getName
+        "class"     -> logAkka.clazz.getName,
+        "@category" -> "common"
       )
 
       if (logAkka.cause.isDefined)
         jsonObject = jsonObject ++ exceptionJson(logAkka.cause.get)
-      append(jsonObject, logAkka.level)
+      append(jsonObject, "common", logAkka.level)
     }
 }
