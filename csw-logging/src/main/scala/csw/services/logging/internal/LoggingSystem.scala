@@ -71,9 +71,9 @@ class LoggingSystem(name: String,
   private[this] val done                          = Promise[Unit]
   private[this] val timeActorDonePromise          = Promise[Unit]
 
-  @volatile private[this] var componentsLoggingState = ComponentLoggingStateManager.from(loggingConfig)
+  @volatile private[this] var initialComponentsLoggingState = ComponentLoggingStateManager.from(loggingConfig)
 
-  LoggingState.componentsLoggingState = LoggingState.componentsLoggingState ++ componentsLoggingState
+  LoggingState.componentsLoggingState = LoggingState.componentsLoggingState ++ initialComponentsLoggingState
 
   /**
    * Standard headers.
@@ -174,7 +174,7 @@ class LoggingSystem(name: String,
   // todo: this can be achieved through LoggerImpl as well, decide the place for setting log level dynamically while playing framework stories
   /**
    * Get the basic logging configuration values
-   * @return LogMetadata which comprises of current root log level, akka log level, sl4j log level and current set of filters
+   * @return LogMetadata which comprises of current root log level, akka log level, sl4j log level and component log level
    */
   def getLogMetadata(componentName: String): LogMetadata =
     LogMetadata(

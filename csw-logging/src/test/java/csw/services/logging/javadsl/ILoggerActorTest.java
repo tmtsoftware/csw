@@ -56,7 +56,7 @@ public class ILoggerActorTest {
         Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
     }
     @Test
-    public void testDefaultLogConfigurationAndFilterForActor() throws InterruptedException {
+    public void testDefaultLogConfigurationForActor() throws InterruptedException {
         ActorRef tromboneActor = actorSystem.actorOf(Props.create(JTromboneHCDActor.class), "JTromboneActor");
         String actorPath = tromboneActor.path().toString();
         String className = JTromboneHCDActor.class.getName();

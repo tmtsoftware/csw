@@ -992,7 +992,7 @@
 								}
 							]
 						},
-						"description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. FilterSet"
+						"description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
 					},
 					"response": []
 				},

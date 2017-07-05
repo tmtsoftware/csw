@@ -45,6 +45,4 @@ case class SetAkkaLevel(level: Level) extends LogActorMessages
 
 case object LastAkkaMessage extends LogActorMessages
 
-case class SetFilter(filter: Option[(JsonObject, Level) => Boolean]) extends LogActorMessages
-
 case object StopLogging extends LogActorMessages

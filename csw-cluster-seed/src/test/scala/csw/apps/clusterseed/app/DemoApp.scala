@@ -14,7 +14,7 @@ import scala.concurrent.duration.DurationInt
 object AppLogger extends ComponentLogger("app")
 
 /*
-  This app is for testing runtime changes of component filter level
+  This app is for testing runtime changes of component log level
 
   DemoApp does four things :
     1. Start seed node on port 3552
@@ -26,7 +26,7 @@ object AppLogger extends ComponentLogger("app")
     1. Start the app
     2. Import postman collection present under tools/postman which has two routes inside log admin folder (1. get log metadata 2. set log level)
     3. get log metadata :=> this will give current configuration for specified component
-    4. set log level :=> update component name and value and verify on the console that logs are printed as per the updated filter.
+    4. set log level :=> update component name and value and verify on the console that logs are printed as per the updated log level.
 
   Important :
     Make sure you stop the app once you finish testing as it will not terminate automatically.

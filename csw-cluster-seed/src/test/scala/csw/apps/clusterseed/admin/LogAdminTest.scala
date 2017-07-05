@@ -16,6 +16,7 @@ import csw.services.logging.internal._
 import csw.services.logging.models.LogMetadata
 import csw.services.logging.scaladsl.ComponentLogger
 
+import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
@@ -71,7 +72,7 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
     val logLevel          = Level(config.getString("logLevel"))
     val akkaLevel         = Level(config.getString("akkaLogLevel"))
     val slf4jLevel        = Level(config.getString("slf4jLogLevel"))
-    val componentLogLevel = ComponentLoggingStateManager.from(config)(componentName).componentLogLevel
+    val componentLogLevel = Level(config.getObject("component-log-levels").unwrapped().asScala(componentName).toString)
 
     logMetadata1 shouldBe LogMetadata(logLevel, akkaLevel, slf4jLevel, componentLogLevel)
 
@@ -91,7 +92,7 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
   }
 
   // DEOPSCSW-127: Runtime update for logging characteristics
-  test("should able to set filter of the component dynamically through http end point") {
+  test("should able to set log level of the component dynamically through http end point") {
 
     def sendLogMsgs(): Unit = {
       tromboneActorRef ! LogTrace

@@ -7,10 +7,10 @@ import csw.services.logging.models.ComponentLoggingState
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-object ComponentLoggingStateManager {
+private[logging] object ComponentLoggingStateManager {
 
   /**
-   * Extracts the set of filters configured in logging configuration
+   * Extracts the component-log-levels from logging configuration
    * @param loggingConfig the logging configuration object
    * @return Set of Filters
    */
@@ -21,9 +21,7 @@ object ComponentLoggingStateManager {
         .unwrapped()
         .asScala
         .map {
-          case (name, filterLevel) ⇒ {
-            (name, ComponentLoggingState(Level(filterLevel.toString)))
-          }
+          case (name, componentLogLevel) ⇒ (name, ComponentLoggingState(Level(componentLogLevel.toString)))
         }
         .toMap
     }.getOrElse(Map.empty)

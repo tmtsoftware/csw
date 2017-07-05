@@ -36,10 +36,9 @@ private[logging] class LogActor(done: Promise[Unit],
                                 initAkkaLevel: Level)
     extends Actor {
 
-  private[this] var filter: Option[(JsonObject, Level) => Boolean] = None
-  private[this] var level: Level                                   = initLevel
-  private[this] var akkaLogLevel: Level                            = initAkkaLevel
-  private[this] var slf4jLogLevel: Level                           = initSlf4jLevel
+  private[this] var level: Level         = initLevel
+  private[this] var akkaLogLevel: Level  = initAkkaLevel
+  private[this] var slf4jLogLevel: Level = initSlf4jLevel
 
   def receive: Receive = {
     case log: Log                     => receiveLog(log)
@@ -49,7 +48,6 @@ private[logging] class LogActor(done: Promise[Unit],
     case SetLevel(level1)             => level = level1
     case SetSlf4jLevel(level1)        => slf4jLogLevel = level1
     case SetAkkaLevel(level1)         => akkaLogLevel = level1
-    case SetFilter(f)                 => filter = f
     case LastAkkaMessage =>
       akka.event.Logging(context.system, this).error("DIE")
     case StopLogging =>
@@ -103,16 +101,8 @@ private[logging] class LogActor(done: Promise[Unit],
   }
 
   // Send JSON log object for each peender configured for the logging system
-  private def append(baseMsg: JsonObject, category: String, level: Level): Unit = {
-    // Send message to appenders only if they pass through the filter or if they are 'gc' or 'time' messages
-    val keep = category != "common" || (filter match {
-      case Some(f) => f(standardHeaders ++ baseMsg, level)
-      case None    => true
-    })
-    if (keep) {
-      for (appender <- appenders) appender.append(baseMsg, category)
-    }
-  }
+  private def append(baseMsg: JsonObject, category: String, level: Level): Unit =
+    for (appender <- appenders) appender.append(baseMsg, category)
 
   private def receiveLog(log: Log): Unit = {
     var jsonObject = JsonObject("timestamp" -> TMTDateTimeFormatter.format(log.time),

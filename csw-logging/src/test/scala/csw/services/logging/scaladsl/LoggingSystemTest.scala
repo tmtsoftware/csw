@@ -9,7 +9,7 @@ import scala.concurrent.duration.DurationDouble
 
 class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  // This will load default filter set in application.conf file if provided
+  // This will load default configuration in application.conf file if provided
   private val loggingSystem = LoggingSystemFactory.start()
   private val config        = ConfigFactory.load().getConfig("csw-logging")
 

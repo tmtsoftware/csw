@@ -4,7 +4,7 @@ import csw.services.logging.internal.LoggingLevels._
 
 private[logging] class ComponentLoggingState(level: Level) {
 
-  private[csw] var componentLogLevel: Level = level
+  private[logging] var componentLogLevel: Level = level
 
   @volatile var doTrace: Boolean = false
   @volatile var doDebug: Boolean = false

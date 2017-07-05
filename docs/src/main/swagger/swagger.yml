@@ -34,10 +34,10 @@ paths:
     get:
       description: |-
         Returns the current log level details for particular component. Response contains below details :
-        1. LogLevel
-        2. AkkaLevel
-        3. Slf4jLevel
-        4. FilterSet
+        1. DefaultLogLevel
+        2. AkkaLogLevel
+        3. Slf4jLogLevel
+        4. ComponentLogLevel
       summary: Get Log Metadata
       tags:
         - Log Admin
@@ -82,7 +82,7 @@ paths:
           in: path
           required: true
           type: string
-          description: 'Name of the component.'
+          description: 'Name of the component (This is connection name registered with location service. Ex. trombone-hcd-akka).'
       responses:
         '200':
           description: OK
@@ -469,26 +469,11 @@ definitions:
       - ERROR
       - FATAL
     example: INFO
-  Filter:
-    type: object
-    properties:
-      trombone:
-        allOf:
-          - $ref: '#/definitions/Level'
-      assembly:
-        allOf:
-          - $ref: '#/definitions/Level'
-  FilterSet:
-    type: object
-    properties:
-      filters:
-        allOf:
-          - $ref: '#/definitions/Filter'
   LogMetadata:
     type: object
     properties:
-      level:
-        description: "Normal log level."
+      defaultLevel:
+        description: "Default log level."
         allOf:
           - $ref: '#/definitions/Level'
       akkaLevel:
@@ -499,7 +484,7 @@ definitions:
         description: "Slf4j log level."
         allOf:
           - $ref: '#/definitions/Level'
-      filters:
-        description: "List of component log level filters."
+      componentLevel:
+        description: "Component specific log level."
         allOf:
-          - $ref: '#/definitions/FilterSet'
+          - $ref: '#/definitions/Level'
