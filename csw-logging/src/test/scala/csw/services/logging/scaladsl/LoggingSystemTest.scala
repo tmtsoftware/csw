@@ -1,7 +1,7 @@
 package csw.services.logging.scaladsl
 
 import com.typesafe.config.ConfigFactory
-import csw.services.logging.internal.LoggingLevels.{DEBUG, Level}
+import csw.services.logging.internal.LoggingLevels.Level
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -18,7 +18,7 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
   //  Await.result(system.terminate(), 20 seconds)
 
   test("should load default log level provided in configuration file") {
-    loggingSystem.getLevel.default.name shouldBe config.getString("logLevel").toUpperCase
+    loggingSystem.getDefaultLogLevel.default.name shouldBe config.getString("logLevel").toUpperCase
     loggingSystem.getAkkaLevel.default.name shouldBe config.getString("akkaLogLevel").toUpperCase
     loggingSystem.getSlf4jLevel.default.name shouldBe config.getString("slf4jLogLevel").toUpperCase
   }
@@ -28,21 +28,12 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val akkaLogLevel  = "Error"
     val slf4jLogLevel = "INFO"
 
-    loggingSystem.setLevel(Level(akkaLogLevel))
+    loggingSystem.setDefaultLogLevel(Level(akkaLogLevel))
     loggingSystem.setAkkaLevel(Level(logLevel))
     loggingSystem.setSlf4jLevel(Level(slf4jLogLevel))
 
-    loggingSystem.getLevel.current.name.toLowerCase shouldBe akkaLogLevel.toLowerCase
+    loggingSystem.getDefaultLogLevel.current.name.toLowerCase shouldBe akkaLogLevel.toLowerCase
     loggingSystem.getAkkaLevel.current.name.toLowerCase shouldBe logLevel.toLowerCase
     loggingSystem.getSlf4jLevel.current.name.toLowerCase shouldBe slf4jLogLevel.toLowerCase
   }
-
-  test("should able to add filter and get log metadata of component") {
-
-    loggingSystem.addFilter("IRIS", DEBUG)
-
-    loggingSystem.logLevel shouldBe DEBUG
-    loggingSystem.getLogMetadata.filters.filters.get("IRIS").get shouldBe DEBUG
-  }
-
 }

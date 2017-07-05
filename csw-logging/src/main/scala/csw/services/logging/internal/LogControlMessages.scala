@@ -6,7 +6,7 @@ import csw.services.logging.internal.LoggingLevels.Level
 sealed trait LogControlMessages
 
 // Message to get Logging configuration metadata of the receiver
-case object GetComponentLogMetadata extends LogControlMessages
+case class GetComponentLogMetadata(componentName: String) extends LogControlMessages
 
 // Message to change the log level of any component
-case class SetComponentLogLevel(logLevel: Level) extends LogControlMessages
+case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessages

@@ -9,7 +9,7 @@ import csw.services.logging.RichMsg
 import csw.services.logging.appenders.LogAppenderBuilder
 import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.macros.DefaultSourceLocation
-import csw.services.logging.models.{FilterSet, LogMetadata}
+import csw.services.logging.models.{ComponentLoggingState, LogMetadata}
 import csw.services.logging.scaladsl.GenericLogger
 import org.slf4j.LoggerFactory
 
@@ -71,7 +71,9 @@ class LoggingSystem(name: String,
   private[this] val done                          = Promise[Unit]
   private[this] val timeActorDonePromise          = Promise[Unit]
 
-  @volatile private[this] var filterSet = FilterSet.from(loggingConfig)
+  @volatile private[this] var componentsLoggingState = ComponentLoggingStateManager.from(loggingConfig)
+
+  LoggingState.componentsLoggingState = LoggingState.componentsLoggingState ++ componentsLoggingState
 
   /**
    * Standard headers.
@@ -79,7 +81,7 @@ class LoggingSystem(name: String,
   val standardHeaders: Map[String, RichMsg] =
     Map[String, RichMsg]("@host" -> host, "@name" -> name, "@version" -> version)
 
-  setLevel(defaultLevel)
+  setDefaultLogLevel(defaultLevel)
   LoggingState.loggerStopping = false
   LoggingState.doTime = false
   LoggingState.timeActorOption = None
@@ -97,8 +99,6 @@ class LoggingSystem(name: String,
   } else {
     None
   }
-
-  setFilter(Some(filterSet.check))
 
   if (time) {
     // Start timing actor
@@ -124,20 +124,15 @@ class LoggingSystem(name: String,
    * Get logging levels.
    * @return the current and default logging levels.
    */
-  def getLevel: Levels = Levels(logLevel, defaultLevel)
+  def getDefaultLogLevel: Levels = Levels(logLevel, defaultLevel)
 
   /**
    * Changes the logger API logging level.
    * @param level the new logging level for the logger API.
    */
-  def setLevel(level: Level): Unit = {
-    import LoggingState._
+  def setDefaultLogLevel(level: Level): Unit = {
     logLevel = level
-    doTrace = level.pos <= TRACE.pos
-    doDebug = level.pos <= DEBUG.pos
-    doInfo = level.pos <= INFO.pos
-    doWarn = level.pos <= WARN.pos
-    doError = level.pos <= ERROR.pos
+    LoggingState.componentsLoggingState("default").setLevel(level)
   }
 
   /**
@@ -170,36 +165,24 @@ class LoggingSystem(name: String,
     logActor ! SetSlf4jLevel(level)
   }
 
-  /**
-   * Sets or removes the logging filter.
-   * Filter applies only to the common log.
-   * You may want to increase the logging level after adding the filter.
-   * Note that a filter together with an increased logging level will
-   * require more processing overhead.
-   * @param filter  takes the complete common log message and the logging level
-   *                and returns false if
-   *                that message is to be discarded.
-   */
-  def setFilter(filter: Option[(Map[String, RichMsg], Level) => Boolean]): Unit =
-    logActor ! SetFilter(filter)
-
-  /**
-   * Add a filter to get logs of a given component at a level different than the other components
-   * @param componentName name of the component
-   * @param level log level to be set for the given component
-   */
-  def addFilter(componentName: String, level: LoggingLevels.Level): Unit = {
-    filterSet = filterSet.add(componentName, level)
-    setFilter(Some(filterSet.check))
-    setLevel(filterSet.filters.values.min)
+  // todo: this can be achieved through LoggerImpl as well, decide the place for setting log level dynamically while playing framework stories
+  def setComponentLogLevel(componentName: String, level: Level): Unit = {
+    LoggingState.componentsLoggingState = LoggingState.componentsLoggingState ++ Map(
+        componentName → ComponentLoggingState(level))
   }
 
+  // todo: this can be achieved through LoggerImpl as well, decide the place for setting log level dynamically while playing framework stories
   /**
    * Get the basic logging configuration values
    * @return LogMetadata which comprises of current root log level, akka log level, sl4j log level and current set of filters
    */
-  def getLogMetadata: LogMetadata =
-    LogMetadata(getLevel.current, getAkkaLevel.current, getSlf4jLevel.current, filterSet)
+  def getLogMetadata(componentName: String): LogMetadata =
+    LogMetadata(
+      getDefaultLogLevel.current,
+      getAkkaLevel.current,
+      getSlf4jLevel.current,
+      LoggingState.componentsLoggingState.getOrElse(componentName, LoggingState.componentsLoggingState("default")).componentLogLevel
+    )
 
   /**
    * Shut down the logging system.

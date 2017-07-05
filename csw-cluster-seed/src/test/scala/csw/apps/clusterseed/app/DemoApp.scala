@@ -56,9 +56,14 @@ class DemoApp extends AppLogger.Simple {
     val actorRef = actorSystem.actorOf(
       Props(new Actor {
         override def receive: Receive = {
-          case SetComponentLogLevel(level) ⇒ loggingSystem.addFilter(componentName, level)
-          case GetComponentLogMetadata     ⇒ sender ! loggingSystem.getLogMetadata
-          case unknown                     ⇒ log.error(s"Unknown message received => $unknown")
+          case SetComponentLogLevel(name, level) ⇒
+            loggingSystem.setComponentLogLevel(name, level)
+          case GetComponentLogMetadata(name) ⇒ {
+            println("getMetadata")
+            println(name)
+            sender ! loggingSystem.getLogMetadata(name)
+          }
+          case unknown ⇒ log.error(s"Unknown message received => $unknown")
         }
       }),
       "test-actor"

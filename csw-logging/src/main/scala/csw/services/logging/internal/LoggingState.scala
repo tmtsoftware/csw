@@ -1,6 +1,8 @@
 package csw.services.logging.internal
 
 import akka.actor._
+import csw.services.logging.internal.LoggingLevels.Level
+import csw.services.logging.models.ComponentLoggingState
 
 import scala.collection.mutable
 import scala.concurrent.Promise
@@ -10,16 +12,12 @@ import scala.concurrent.Promise
  */
 private[logging] object LoggingState {
 
+  // This is a default log level applied to all the components, if components does not specify explicitly
+  // This value gets overridden by 'logLevel' field from configuration file when logging system is started
+  private[logging] var defaultLogLevel = Level("INFO")
+
   // Queue of messages sent before logger is started
   private[logging] val msgs = new mutable.Queue[LogActorMessages]()
-
-  @volatile var doTrace: Boolean = false
-  @volatile var doDebug: Boolean = false
-  @volatile var doInfo: Boolean  = true
-  @volatile var doWarn: Boolean  = true
-  @volatile var doError: Boolean = true
-
-//  private[logging] var loggingSys: LoggingSystem = null
 
   private[logging] var maybeLogActor: Option[ActorRef] = None
   @volatile private[logging] var loggerStopping        = false
@@ -29,4 +27,7 @@ private[logging] object LoggingState {
 
   // Use to sync akka logging actor shutdown
   private[logging] val akkaStopPromise = Promise[Unit]
+
+  var componentsLoggingState: Map[String, ComponentLoggingState] =
+    Map("default" → ComponentLoggingState(defaultLogLevel))
 }

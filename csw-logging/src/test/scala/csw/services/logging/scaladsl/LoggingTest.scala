@@ -150,7 +150,7 @@ class LoggingTest extends LoggingTestSuite {
     }
 
     forAll(testData) { (logLevel: Level, logCount: Int) =>
-      loggingSystem.setLevel(logLevel)
+      loggingSystem.setDefaultLogLevel(logLevel)
 
       new TromboneAssembly().startLogging(logMsgMap)
       Thread.sleep(200)

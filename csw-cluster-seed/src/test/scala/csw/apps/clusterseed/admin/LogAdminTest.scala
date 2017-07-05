@@ -12,8 +12,8 @@ import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
-import csw.services.logging.internal.{GetComponentLogMetadata, LoggingLevels, LoggingSystem, SetComponentLogLevel}
-import csw.services.logging.models.{FilterSet, LogMetadata}
+import csw.services.logging.internal._
+import csw.services.logging.models.LogMetadata
 import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.Await
@@ -35,15 +35,15 @@ object TromboneHcd {
 class TromboneHcd(componentName: String, loggingSystem: LoggingSystem) extends TromboneHcdLogger.Actor {
 
   def receive = {
-    case LogTrace                    => log.trace("Level is trace")
-    case LogDebug                    => log.debug("Level is debug")
-    case LogInfo                     => log.info("Level is info")
-    case LogWarn                     => log.warn("Level is warn")
-    case LogError                    => log.error("Level is error")
-    case LogFatal                    => log.fatal("Level is fatal")
-    case SetComponentLogLevel(level) ⇒ loggingSystem.addFilter(componentName, level)
-    case GetComponentLogMetadata     ⇒ sender ! loggingSystem.getLogMetadata
-    case x: Any                      => log.error(Map("@reason" -> "Unexpected actor message", "message" -> x.toString))
+    case LogTrace                                     ⇒ log.trace("Level is trace")
+    case LogDebug                                     ⇒ log.debug("Level is debug")
+    case LogInfo                                      ⇒ log.info("Level is info")
+    case LogWarn                                      ⇒ log.warn("Level is warn")
+    case LogError                                     ⇒ log.error("Level is error")
+    case LogFatal                                     ⇒ log.fatal("Level is fatal")
+    case SetComponentLogLevel(`componentName`, level) ⇒ loggingSystem.setComponentLogLevel(componentName, level)
+    case GetComponentLogMetadata(`componentName`)     ⇒ sender ! loggingSystem.getLogMetadata(componentName)
+    case x: Any                                       ⇒ log.error(Map("@reason" -> "Unexpected actor message", "message" -> x.toString))
   }
 }
 
@@ -67,26 +67,26 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
 
     getLogMetadataResponse1.status shouldBe StatusCodes.OK
 
-    val config     = ConfigFactory.load().getConfig("csw-logging")
-    val logLevel   = Level(config.getString("logLevel"))
-    val akkaLevel  = Level(config.getString("akkaLogLevel"))
-    val slf4jLevel = Level(config.getString("slf4jLogLevel"))
-    val filterSet  = FilterSet.from(config)
+    val config            = ConfigFactory.load().getConfig("csw-logging")
+    val logLevel          = Level(config.getString("logLevel"))
+    val akkaLevel         = Level(config.getString("akkaLogLevel"))
+    val slf4jLevel        = Level(config.getString("slf4jLogLevel"))
+    val componentLogLevel = ComponentLoggingStateManager.from(config)(componentName).componentLogLevel
 
-    logMetadata1 shouldBe LogMetadata(logLevel, akkaLevel, slf4jLevel, filterSet)
+    logMetadata1 shouldBe LogMetadata(logLevel, akkaLevel, slf4jLevel, componentLogLevel)
 
     // updating default and akka log level
-    loggingSystem.setLevel(LoggingLevels.ERROR)
+    loggingSystem.setDefaultLogLevel(LoggingLevels.ERROR)
     loggingSystem.setAkkaLevel(LoggingLevels.WARN)
 
     // verify getLogMetadata http request gives updated log levels in response
     val getLogMetadataResponse2 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
     val logMetadata2            = Await.result(Unmarshal(getLogMetadataResponse2).to[LogMetadata], 5.seconds)
 
-    logMetadata2 shouldBe LogMetadata(ERROR, WARN, slf4jLevel, filterSet)
+    logMetadata2 shouldBe LogMetadata(ERROR, WARN, slf4jLevel, componentLogLevel)
 
     // reset log levels to default
-    loggingSystem.setLevel(logLevel)
+    loggingSystem.setDefaultLogLevel(logLevel)
     loggingSystem.setAkkaLevel(akkaLevel)
   }
 
