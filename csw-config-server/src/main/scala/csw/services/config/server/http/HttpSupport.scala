@@ -25,8 +25,8 @@ trait HttpSupport extends Directives with JsonSupport with ConfigServerLogger.Si
   }
 
   private def logRequest(req: HttpRequest): Unit =
-    log.info(Map("@msg" → "Request received.", "url" → req.uri.toString(), "method" → req.method.value,
-        "headers"       → req.headers.mkString(",")))
+    log.info("HTTP request received",
+      Map("url" → req.uri.toString(), "method" → req.method.value, "headers" → req.headers.mkString(",")))
   val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ => logRequest))
 
   val pathParam: Directive1[Path]            = parameter('path).map(filePath ⇒ Paths.get(filePath))

@@ -35,7 +35,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) exte
             Await.result(actorRuntime.shutdown(), 10.seconds)
             val runtimeException =
               new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex)
-            log.error(runtimeException.getMessage, runtimeException)
+            log.error(runtimeException.getMessage, ex = runtimeException)
             throw runtimeException
         }
     }

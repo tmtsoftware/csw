@@ -14,10 +14,10 @@ class AdminExceptionHandler extends Directives with ClusterSeedLogger.Simple {
 
   val exceptionHandler: ExceptionHandler = ExceptionHandler {
     case ex: UnresolvedAkkaLocationException ⇒
-      log.error(ex.getMessage, ex)
+      log.error(ex.getMessage, ex = ex)
       complete(StatusCodes.NotFound → ex.getMessage)
     case NonFatal(ex) ⇒
-      log.error(ex.getMessage, ex)
+      log.error(ex.getMessage, ex = ex)
       complete(StatusCodes.InternalServerError → ex.getMessage)
   }
 }

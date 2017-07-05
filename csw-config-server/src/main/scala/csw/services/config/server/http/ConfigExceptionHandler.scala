@@ -14,16 +14,16 @@ class ConfigExceptionHandler extends Directives with ConfigServerLogger.Simple {
 
   val exceptionHandler: ExceptionHandler = ExceptionHandler {
     case ex: FileAlreadyExists ⇒
-      log.error(ex.getMessage, ex)
+      log.error(ex.getMessage, ex = ex)
       complete(StatusCodes.Conflict → ex.getMessage)
     case ex: FileNotFound ⇒
-      log.error(ex.getMessage, ex)
+      log.error(ex.getMessage, ex = ex)
       complete(StatusCodes.NotFound → ex.getMessage)
     case ex: InvalidInput ⇒
-      log.error(ex.getMessage, ex)
+      log.error(ex.getMessage, ex = ex)
       complete(StatusCodes.BadRequest → ex.getMessage)
     case NonFatal(ex) ⇒
-      log.error(ex.getMessage, ex)
+      log.error(ex.getMessage, ex = ex)
       complete(StatusCodes.InternalServerError → ex.getMessage)
   }
 }

@@ -18,7 +18,7 @@ class IrisSupervisorActor() extends IRISLogger.Actor {
     case LogWarn  => log.warn("Level is warn")
     case LogError => log.error("Level is error")
     case LogFatal => log.fatal("Level is fatal")
-    case x: Any   => log.error(Map("@msg" -> "Unknown message", "reason" -> x.toString))
+    case x: Any   => log.error("Unknown message received", Map("reason" -> x, "actorRef" → self.toString))
   }
 }
 
@@ -76,7 +76,7 @@ class IrisActorUtil extends GenericLogger.Actor {
     case LogWarn  => log.warn("Level is warn")
     case LogError => log.error("Level is error")
     case LogFatal => log.fatal("Level is fatal")
-    case x: Any   => log.error(Map("@msg" -> "Unknown message", "reason" -> x.toString))
+    case x: Any   => log.error("Unknown message received", Map("reason" -> x, "actorRef" → self.toString))
   }
 }
 

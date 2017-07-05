@@ -1,11 +1,9 @@
 package csw.services.logging.internal
 
-import com.persist.JsonOps.{Json, JsonObject}
-import LoggingLevels.Level
+import com.persist.JsonOps.JsonObject
+import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.SourceLocation
 import csw.services.logging.scaladsl.AnyId
-
-import scala.collection.JavaConverters._
 
 // Parent trait for Log messages shared with Log Actor
 sealed trait LogActorMessages
@@ -16,16 +14,12 @@ case class Log(componentName: Option[String],
                id: AnyId,
                time: Long,
                actorName: Option[String],
-               private val msg: Json,
+               msg: String,
+               map: Map[String, Any],
                sourceLocation: SourceLocation,
                ex: Throwable,
                kind: String = "")
-    extends LogActorMessages {
-  def sanitizedMessage: Json = msg match {
-    case x: java.util.Map[_, _] ⇒ x.asScala
-    case x                      ⇒ x
-  }
-}
+    extends LogActorMessages
 
 case class SetLevel(level: Level) extends LogActorMessages
 

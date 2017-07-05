@@ -14,7 +14,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol with Cluster
       case JsString(value) ⇒ Level(value)
       case _ ⇒
         val runtimeException = new RuntimeException(s"can not parse $json")
-        log.error(runtimeException.getMessage, runtimeException)
+        log.error(runtimeException.getMessage, ex = runtimeException)
         throw runtimeException
     }
   }

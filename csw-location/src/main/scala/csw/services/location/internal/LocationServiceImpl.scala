@@ -58,7 +58,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
         case r @ LWWRegister(Some(`location`) | None) ⇒ r.withValue(Some(location))
         case LWWRegister(Some(otherLocation)) ⇒
           val locationIsRegistered = OtherLocationIsRegistered(location, otherLocation)
-          log.error(locationIsRegistered.getMessage, locationIsRegistered)
+          log.error(locationIsRegistered.getMessage, ex = locationIsRegistered)
           throw locationIsRegistered
       },
       await(initialValue)
@@ -75,15 +75,15 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
           case _: UpdateSuccess[_] ⇒ registrationResult(location)
           case _ ⇒
             val registrationFailed = RegistrationFailed(registration.connection)
-            log.error(registrationFailed.getMessage, registrationFailed)
+            log.error(registrationFailed.getMessage, ex = registrationFailed)
             throw registrationFailed
         }
       case ModifyFailure(service.Key, _, cause, _) ⇒
-        log.error(cause.getMessage, cause)
+        log.error(cause.getMessage, ex = cause)
         throw cause
       case _ ⇒
         val registrationFailed = RegistrationFailed(registration.connection)
-        log.error(registrationFailed.getMessage, registrationFailed)
+        log.error(registrationFailed.getMessage, ex = registrationFailed)
         throw registrationFailed
     }
     await(registrationResultF)
@@ -105,12 +105,12 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
           case _: UpdateSuccess[_] ⇒ Done
           case _ ⇒
             val unregistrationFailed = UnregistrationFailed(connection)
-            log.error(unregistrationFailed.getMessage, unregistrationFailed)
+            log.error(unregistrationFailed.getMessage, ex = unregistrationFailed)
             throw unregistrationFailed
         }
       case _ ⇒
         val unregistrationFailed = UnregistrationFailed(connection)
-        log.error(unregistrationFailed.getMessage, unregistrationFailed)
+        log.error(unregistrationFailed.getMessage, ex = unregistrationFailed)
         throw unregistrationFailed
     }
   }
@@ -154,7 +154,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     case NotFound(AllServices.Key, _)       ⇒ List.empty
     case _ ⇒
       val listingFailed = RegistrationListingFailed
-      log.error(listingFailed.getMessage, listingFailed)
+      log.error(listingFailed.getMessage, ex = listingFailed)
       throw listingFailed
   }
 

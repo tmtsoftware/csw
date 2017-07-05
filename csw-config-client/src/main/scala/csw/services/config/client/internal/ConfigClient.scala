@@ -219,7 +219,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
           //Not consuming the file content will block the connection.
           response.entity.discardBytes()
           val runtimeException = new RuntimeException("response must have content-length")
-          log.error(runtimeException.getMessage, runtimeException)
+          log.error(runtimeException.getMessage, ex = runtimeException)
           throw runtimeException
         case StatusCodes.NotFound ⇒ Future.successful(None)
       }
@@ -233,19 +233,19 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       case StatusCodes.BadRequest ⇒
         contentF.map(message ⇒ {
           val invalidInput = InvalidInput(message)
-          log.error(invalidInput.getMessage, invalidInput)
+          log.error(invalidInput.getMessage, ex = invalidInput)
           throw invalidInput
         })
       case StatusCodes.NotFound ⇒
         contentF.map(message ⇒ {
           val fileNotFound = FileNotFound(message)
-          log.error(fileNotFound.getMessage, fileNotFound)
+          log.error(fileNotFound.getMessage, ex = fileNotFound)
           throw fileNotFound
         })
       case _ ⇒
         contentF.map(message ⇒ {
           val runtimeException = new RuntimeException(message)
-          log.error(runtimeException.getMessage, runtimeException)
+          log.error(runtimeException.getMessage, ex = runtimeException)
           throw runtimeException
         })
     }

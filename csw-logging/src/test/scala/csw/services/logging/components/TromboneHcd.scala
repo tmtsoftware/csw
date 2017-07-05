@@ -28,12 +28,12 @@ class TromboneHcd() extends TromboneHcdLogger.Simple {
       val result = number1 / number2
       s"Result of computation is $result"
     } catch {
-      case ex: ArithmeticException ⇒ log.error(exceptionMsg, ex); exceptionMsg
+      case ex: ArithmeticException ⇒ log.error(exceptionMsg, ex = ex); exceptionMsg
     }
   }
 
   def logRichException(message: String) =
-    log.error(message, RichException("Rich Exception", new RuntimeException))
+    log.error(message, ex = RichException("Rich Exception", new RuntimeException))
 
 }
 

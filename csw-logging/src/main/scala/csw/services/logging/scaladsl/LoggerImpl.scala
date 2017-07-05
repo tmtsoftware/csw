@@ -20,9 +20,15 @@ class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  private def all(level: Level, id: AnyId, msg: => Any, ex: Throwable, sourceLocation: SourceLocation): Unit = {
+  private def all(level: Level,
+                  id: AnyId,
+                  msg: => String,
+                  map: ⇒ Map[String, Any],
+                  ex: Throwable,
+                  sourceLocation: SourceLocation): Unit = {
     val t = System.currentTimeMillis()
-    MessageHandler.sendMsg(Log(maybeComponentName, level, id, t, actorName, msg, sourceLocation, ex))
+
+    MessageHandler.sendMsg(Log(maybeComponentName, level, id, t, actorName, msg, map, sourceLocation, ex))
   }
 
   private def has(id: AnyId, level: Level): Boolean =
@@ -35,24 +41,32 @@ class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName
       case noId => false
     }
 
-  def trace(msg: => RichMsg, ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit = {
-    if (componentLoggingState.doTrace || has(id, TRACE)) all(TRACE, id, msg, ex, factory.get())
+  def trace(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit = {
+    if (componentLoggingState.doTrace || has(id, TRACE)) all(TRACE, id, msg, map, ex, factory.get())
   }
 
-  def debug(msg: => RichMsg, ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
-    if (componentLoggingState.doDebug || has(id, DEBUG)) all(DEBUG, id, msg, ex, factory.get())
+  def debug(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
+    if (componentLoggingState.doDebug || has(id, DEBUG)) all(DEBUG, id, msg, map, ex, factory.get())
 
-  override def info(msg: => RichMsg, ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
-    if (componentLoggingState.doInfo || has(id, INFO)) all(INFO, id, msg, ex, factory.get())
+  override def info(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
+      implicit factory: SourceFactory
+  ): Unit =
+    if (componentLoggingState.doInfo || has(id, INFO)) all(INFO, id, msg, map, ex, factory.get())
 
-  override def warn(msg: => RichMsg, ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
-    if (componentLoggingState.doWarn || has(id, WARN)) all(WARN, id, msg, ex, factory.get())
+  override def warn(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
+      implicit factory: SourceFactory
+  ): Unit =
+    if (componentLoggingState.doWarn || has(id, WARN)) all(WARN, id, msg, map, ex, factory.get())
 
-  override def error(msg: => RichMsg, ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
-    if (componentLoggingState.doError || has(id, ERROR)) all(ERROR, id, msg, ex, factory.get())
+  override def error(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
+      implicit factory: SourceFactory
+  ): Unit =
+    if (componentLoggingState.doError || has(id, ERROR)) all(ERROR, id, msg, map, ex, factory.get())
 
-  override def fatal(msg: => RichMsg, ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit =
-    all(FATAL, id, msg, ex, factory.get())
+  override def fatal(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
+      implicit factory: SourceFactory
+  ): Unit =
+    all(FATAL, id, msg, map, ex, factory.get())
 
   private[logging] override def alternative(category: String,
                                             m: Map[String, RichMsg],

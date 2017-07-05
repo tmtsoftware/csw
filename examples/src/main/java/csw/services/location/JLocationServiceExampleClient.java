@@ -24,9 +24,11 @@ import csw.services.logging.javadsl.JLogAppenderBuilders;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
-import java.util.concurrent.CompletableFuture;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -103,10 +105,10 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
 
         //#log-info-map
-        jLogger.info(() -> {
-            HashMap<String, String> map = new HashMap<>();
+        jLogger.info(() -> "Sample", () -> {
+            HashMap<String, Object> map = new HashMap<>();
             map.put("@msg", "Attempting to find connection");
-            map.put("exampleConnection", exampleConnection.toString());
+            map.put("exampleConnection", exampleConnection);
             return map;
         });
         //#log-info-map

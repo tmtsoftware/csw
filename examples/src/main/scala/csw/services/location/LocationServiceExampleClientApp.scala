@@ -111,7 +111,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   private val exampleConnection = LocationServiceExampleComponent.connection
 
   //#log-info-map
-  log.info(Map("@msg" → "Attempting to find connection", "exampleConnection" → exampleConnection.toString))
+  log.info("Attempting to find connection", Map("exampleConnection" → exampleConnection.toString))
   //#log-info-map
   val findResultF = async {
     await(locationService.find(exampleConnection))
@@ -295,7 +295,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
     // A location was removed
     case LocationRemoved(conn) =>
-      log.info(Map("@msg" → "Location removed", "connection" → conn.toString))
+      log.info("Location removed", Map("connection" → conn.toString))
 
     case AllDone =>
       log.info(s"Tracking of $exampleConnection complete.")
@@ -303,7 +303,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
     case x =>
       val runtimeException = new RuntimeException(s"Received unexpected message $x")
       //#log-error
-      log.error(runtimeException.getMessage, runtimeException)
+      log.error(runtimeException.getMessage, ex = runtimeException)
       //#log-error
   }
 

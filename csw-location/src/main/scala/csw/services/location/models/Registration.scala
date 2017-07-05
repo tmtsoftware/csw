@@ -40,7 +40,7 @@ final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef
     actorPath.address match {
       case Address(_, _, None, None) =>
         val registrationNotAllowed = LocalAkkaActorRegistrationNotAllowed(actorRef)
-        log.error(registrationNotAllowed.getMessage, registrationNotAllowed)
+        log.error(registrationNotAllowed.getMessage, ex = registrationNotAllowed)
         throw registrationNotAllowed
       case _ => new URI(actorPath.toString)
     }

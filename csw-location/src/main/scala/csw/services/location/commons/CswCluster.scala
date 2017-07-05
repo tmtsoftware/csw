@@ -75,7 +75,7 @@ class CswCluster private (_actorSystem: ActorSystem) extends LocationServiceLogg
     val success = BlockingUtils.poll(status.isDefined, 20.seconds)
     if (!success) {
       val runtimeException = new RuntimeException("could not join cluster")
-      log.error(runtimeException.getMessage, runtimeException)
+      log.error(runtimeException.getMessage, ex = runtimeException)
       throw runtimeException
     }
     confirmationActor ! PoisonPill
@@ -95,7 +95,7 @@ class CswCluster private (_actorSystem: ActorSystem) extends LocationServiceLogg
     if (!success) {
       val runtimeException =
         new RuntimeException("could not ensure that the data is replicated in location service cluster")
-      log.error(runtimeException.getMessage, runtimeException)
+      log.error(runtimeException.getMessage, ex = runtimeException)
       throw runtimeException
     }
   }
@@ -139,7 +139,7 @@ object CswCluster extends LocationServiceLogger.Simple {
     } catch {
       case NonFatal(ex) ⇒
         Await.result(cswCluster.shutdown(), 10.seconds)
-        log.error(ex.getMessage, ex)
+        log.error(ex.getMessage, ex = ex)
         throw ex
     }
   }

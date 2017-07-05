@@ -51,7 +51,8 @@ class ActorLoggingTest extends LoggingTestSuite {
     val errorLevelLogMessages =
       logBuffer.groupBy(json ⇒ json("@severity"))("ERROR")
     errorLevelLogMessages.size shouldEqual 1
-    val expectedMessage = Map("@msg" -> "Unknown message", "reason" -> "Unknown")
+    val expectedMessage =
+      Map("@msg" -> "Unknown message received", "reason" -> "Unknown", "actorRef" → tromboneActorRef.toString)
     errorLevelLogMessages.head("message") shouldBe expectedMessage
   }
 

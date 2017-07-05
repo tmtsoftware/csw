@@ -24,7 +24,7 @@ class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, set
     binding
   } recoverWith {
     case NonFatal(ex) ⇒
-      log.error("can not start admin http server", ex)
+      log.error("can not start admin http server", ex = ex)
       shutdown().map(_ ⇒ throw ex)
   }
 

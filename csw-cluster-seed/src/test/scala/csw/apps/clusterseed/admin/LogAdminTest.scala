@@ -44,7 +44,7 @@ class TromboneHcd(componentName: String, loggingSystem: LoggingSystem) extends T
     case LogFatal                                     ⇒ log.fatal("Level is fatal")
     case SetComponentLogLevel(`componentName`, level) ⇒ loggingSystem.setComponentLogLevel(componentName, level)
     case GetComponentLogMetadata(`componentName`)     ⇒ sender ! loggingSystem.getLogMetadata(componentName)
-    case x: Any                                       ⇒ log.error(Map("@reason" -> "Unexpected actor message", "message" -> x.toString))
+    case x: Any                                       ⇒ log.error("Unexpected actor message", Map("message" -> x.toString))
   }
 }
 

@@ -100,13 +100,16 @@ private[logging] class LogActor(done: Promise[Unit],
     JsonObject("trace" -> JsonObject("message" -> exToJson(ex), "stack" -> stack)) ++ j1
   }
 
-  // Send JSON log object for each peender configured for the logging system
+  // Send JSON log object for each appender configured for the logging system
   private def append(baseMsg: JsonObject, category: String, level: Level): Unit =
     for (appender <- appenders) appender.append(baseMsg, category)
 
   private def receiveLog(log: Log): Unit = {
-    var jsonObject = JsonObject("timestamp" -> TMTDateTimeFormatter.format(log.time),
-      "message" -> log.sanitizedMessage, "@severity" -> log.level.name, "@category" -> "common")
+
+    val msg = if (log.map.isEmpty) log.msg else Map("@msg" → log.msg) ++ log.map
+
+    var jsonObject = JsonObject("timestamp" -> TMTDateTimeFormatter.format(log.time), "message" → msg,
+      "@severity" -> log.level.name, "@category" -> "common")
 
     if (!log.sourceLocation.fileName.isEmpty) {
       jsonObject = jsonObject ++ JsonObject("file" -> log.sourceLocation.fileName)
