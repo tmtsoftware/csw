@@ -9,7 +9,7 @@ import csw.services.logging.RichMsg
 import csw.services.logging.appenders.LogAppenderBuilder
 import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.macros.DefaultSourceLocation
-import csw.services.logging.models.{ComponentLoggingState, LogMetadata}
+import csw.services.logging.models.LogMetadata
 import csw.services.logging.scaladsl.GenericLogger
 import org.slf4j.LoggerFactory
 
@@ -166,10 +166,8 @@ class LoggingSystem(name: String,
   }
 
   // todo: this can be achieved through LoggerImpl as well, decide the place for setting log level dynamically while playing framework stories
-  def setComponentLogLevel(componentName: String, level: Level): Unit = {
-    LoggingState.componentsLoggingState = LoggingState.componentsLoggingState ++ Map(
-        componentName → ComponentLoggingState(level))
-  }
+  def setComponentLogLevel(componentName: String, level: Level): Unit =
+    ComponentLoggingStateManager.add(componentName, level)
 
   // todo: this can be achieved through LoggerImpl as well, decide the place for setting log level dynamically while playing framework stories
   /**
