@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
-import csw.services.logging.components.JTromboneHCDActor;
+import csw.services.logging.components.trombone.JTromboneHCDSupervisorActor;
 import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.utils.JLogUtil;
@@ -57,9 +57,9 @@ public class ILoggerActorTest {
     }
     @Test
     public void testDefaultLogConfigurationForActor() throws InterruptedException {
-        ActorRef tromboneActor = actorSystem.actorOf(Props.create(JTromboneHCDActor.class), "JTromboneActor");
+        ActorRef tromboneActor = actorSystem.actorOf(Props.create(JTromboneHCDSupervisorActor.class), "JTromboneActor");
         String actorPath = tromboneActor.path().toString();
-        String className = JTromboneHCDActor.class.getName();
+        String className = JTromboneHCDSupervisorActor.class.getName();
 
         JLogUtil.sendLogMsgToActorInBulk(tromboneActor);
 

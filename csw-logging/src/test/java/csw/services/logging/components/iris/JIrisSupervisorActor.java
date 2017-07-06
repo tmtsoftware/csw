@@ -1,8 +1,8 @@
-package csw.services.logging.components;
+package csw.services.logging.components.iris;
 
 import csw.services.logging.javadsl.ILogger;
 
-public class JTromboneHCDActor extends JTromboneHCDActorLogger{
+public class JIrisSupervisorActor extends JIrisActorLogger {
 
     private ILogger log = getLogger();
 

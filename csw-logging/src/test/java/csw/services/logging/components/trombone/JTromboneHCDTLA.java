@@ -1,9 +1,9 @@
-package csw.services.logging.components;
+package csw.services.logging.components.trombone;
 
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.utils.JLogUtil;
 
-public class JTromboneHCD implements JTromboneHCDLogger {
+public class JTromboneHCDTLA implements JTromboneHCDSimpleLogger {
     private ILogger logger = getLogger();
 
     public void startLogging() {

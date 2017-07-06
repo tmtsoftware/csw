@@ -1,4 +1,4 @@
-package csw.services.logging.components;
+package csw.services.logging.components.trombone;
 
 import csw.services.logging.javadsl.JComponentLoggerActor;
 
