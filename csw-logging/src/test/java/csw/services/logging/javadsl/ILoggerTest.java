@@ -112,7 +112,7 @@ public class ILoggerTest {
     }
 
     @Test
-    public void testDefaultLogConfigurationAndFilter() throws InterruptedException {
+    public void testDefaultLogConfigurationAndDefaultComponentLogLevel() throws InterruptedException {
         JTromboneHCDTLA jTromboneHCD = new JTromboneHCDTLA();
         String tromboneHcdClassName = jTromboneHCD.getClass().getName();
 
@@ -135,22 +135,26 @@ public class ILoggerTest {
 
     // This test simulates single jvm multiple components use cases
     @Test
-    public void testLogLevel() throws InterruptedException {
+    public void testLogLevelOfMultipleComponentsInSingleContainer() throws InterruptedException {
 
         allComponentsStartLogging();
         Thread.sleep(200);
 
         splitAndGroupLogs();
 
+        // Log level of IRIS component is ERROR in config file
         Assert.assertEquals(4, irisLogBuffer.size());
         testLogBuffer(irisLogBuffer, LoggingLevels.ERROR$.MODULE$);
 
+        // Log level of jTromboneHcd component is ERROR in config file
         Assert.assertEquals(4, tromboneHcdLogBuffer.size());
         testLogBuffer(tromboneHcdLogBuffer, LoggingLevels.INFO$.MODULE$);
 
+        // Default log level is TRACE
         Assert.assertEquals(12, genericLogBuffer.size());
         testLogBuffer(genericLogBuffer, LoggingLevels.TRACE$.MODULE$);
-        
+
+        // Set log level of IRIS component to FATAL
         loggingSystem.setComponentLogLevel(JIrisActorLogger.NAME, LoggingLevels.FATAL$.MODULE$);
 
         allComponentsStartLogging();
@@ -158,12 +162,15 @@ public class ILoggerTest {
 
         splitAndGroupLogs();
 
+        // Updated log level of IRIS is FATAL
         Assert.assertEquals(2, irisLogBuffer.size());
         testLogBuffer(irisLogBuffer, LoggingLevels.FATAL$.MODULE$);
 
+        // Log level of jTromboneHcd component is unaffected
         Assert.assertEquals(4, tromboneHcdLogBuffer.size());
         testLogBuffer(tromboneHcdLogBuffer, LoggingLevels.INFO$.MODULE$);
 
+        // Default log level is unaffected
         Assert.assertEquals(12, genericLogBuffer.size());
         testLogBuffer(genericLogBuffer, LoggingLevels.TRACE$.MODULE$);
     }

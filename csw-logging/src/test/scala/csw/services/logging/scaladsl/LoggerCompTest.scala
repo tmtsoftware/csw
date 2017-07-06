@@ -18,10 +18,10 @@ class LoggerCompTest extends LoggingTestSuite {
   private val irisUtil               = new IrisUtil()
   private val tromboneHcd            = new TromboneHcd()
 
-  private var componentLogBuffer: Map[String, ArrayBuffer[JsonObject]] = Map.empty
-  var genericLogBuffer                                                 = mutable.Buffer.empty[JsonObject]
-  private var irisLogBuffer                                            = mutable.Buffer.empty[JsonObject]
-  private var tromboneHcdLogBuffer                                     = mutable.Buffer.empty[JsonObject]
+  private var componentLogBuffer: mutable.Map[String, ArrayBuffer[JsonObject]] = mutable.Map.empty
+  var genericLogBuffer                                                         = mutable.Buffer.empty[JsonObject]
+  private var irisLogBuffer                                                    = mutable.Buffer.empty[JsonObject]
+  private var tromboneHcdLogBuffer                                             = mutable.Buffer.empty[JsonObject]
 
   def sendMessagesToActor(actorRef: ActorRef) = {
     actorRef ! LogTrace
@@ -46,18 +46,21 @@ class LoggerCompTest extends LoggingTestSuite {
 
   def splitAndGroupLogs() = {
     // clear all logs
-    componentLogBuffer = Map.empty
+    componentLogBuffer = mutable.Map.empty
     irisLogBuffer.clear()
     genericLogBuffer.clear()
     tromboneHcdLogBuffer.clear()
 
     logBuffer.foreach { log ⇒
-      if (log.contains("@componentName")) {
-        val name = log("@componentName").toString
-        if (componentLogBuffer.contains(name)) componentLogBuffer(name) += log
-        else componentLogBuffer = componentLogBuffer ++ Map(name → ArrayBuffer(log))
-      } else
-        genericLogBuffer += log
+      log.get("@componentName") match {
+        case Some(_) ⇒
+          val name = log("@componentName").toString
+          componentLogBuffer.get(name) match {
+            case Some(xs) ⇒ componentLogBuffer.update(name, xs :+ log)
+            case None     ⇒ componentLogBuffer.put(name, ArrayBuffer(log))
+          }
+        case None ⇒ genericLogBuffer += log
+      }
     }
     irisLogBuffer = componentLogBuffer(IrisSupervisorActor.NAME)
     tromboneHcdLogBuffer = componentLogBuffer(TromboneHcd.NAME)
