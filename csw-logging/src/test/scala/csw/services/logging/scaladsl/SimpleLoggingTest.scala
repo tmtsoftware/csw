@@ -149,8 +149,14 @@ class SimpleLoggingTest extends LoggingTestSuite {
       groupByComponentNamesLog(compName)
     }
 
+    val defaultLogLevel = loggingSystem.getDefaultLogLevel
+
     forAll(testData) { (logLevel: Level, logCount: Int) =>
-      loggingSystem.setDefaultLogLevel(logLevel)
+//      loggingSystem.setDefaultLogLevel(logLevel)
+        loggingSystem.setComponentLogLevel(compName, logLevel)
+
+        // confirm default log level is not changing when we change the component log level
+        loggingSystem.getDefaultLogLevel shouldBe defaultLogLevel
 
       new TromboneAssembly().startLogging(logMsgMap)
       Thread.sleep(200)
@@ -159,6 +165,52 @@ class SimpleLoggingTest extends LoggingTestSuite {
       tromboneAssemblyLogs.size shouldBe logCount
 
       tromboneAssemblyLogs.toList.foreach { log ⇒
+        val currentLogLevel = log("@severity").toString.toLowerCase
+        val currentLogMsg   = log("message").toString
+        Level(currentLogLevel) >= logLevel shouldBe true
+        currentLogMsg shouldBe logMsgMap(currentLogLevel)
+      }
+
+      logBuffer.clear()
+    }
+  }
+
+  // DEOPSCSW-124: Define severity levels for log messages
+  // DEOPSCSW-125: Define severity levels for specific components/log instances
+  // This test is identical to above test, except uses a TromboneHcd, which differs from the TromboneAssembly
+  // because it gets its default log level from the configuration file.
+  test("should able to filter logs based on configured/updated log level (covers all levels) with non-default level") {
+    val testData = Table(
+      ("logLevel", "expectedLogCount"),
+      (FATAL, 1),
+      (ERROR, 2),
+      (WARN, 3),
+      (INFO, 4),
+      (DEBUG, 5),
+      (TRACE, 6)
+    )
+    val compName = TromboneHcd.NAME
+
+    def filterLogsByComponentName(compName: String): Seq[JsonOps.JsonObject] = {
+      val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json("@componentName").toString)
+      groupByComponentNamesLog(compName)
+    }
+
+    val defaultLogLevel = loggingSystem.getDefaultLogLevel
+
+    forAll(testData) { (logLevel: Level, logCount: Int) =>
+      loggingSystem.setComponentLogLevel(compName, logLevel)
+
+      // confirm default log level is not changing when we change the component log level
+      loggingSystem.getDefaultLogLevel shouldBe defaultLogLevel
+
+      new TromboneHcd().startLogging(logMsgMap)
+      Thread.sleep(200)
+
+      val tromboneHcdLogs = filterLogsByComponentName(compName)
+      tromboneHcdLogs.size shouldBe logCount
+
+      tromboneHcdLogs.toList.foreach { log ⇒
         val currentLogLevel = log("@severity").toString.toLowerCase
         val currentLogMsg   = log("message").toString
         Level(currentLogLevel) >= logLevel shouldBe true
