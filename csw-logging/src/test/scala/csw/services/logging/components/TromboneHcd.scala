@@ -2,7 +2,7 @@ package csw.services.logging.components
 
 import csw.services.logging.scaladsl.{ComponentLogger, RichException}
 
-object TromboneHcdLogger extends ComponentLogger("tromboneHcd")
+object TromboneHcdLogger extends ComponentLogger(TromboneHcd.NAME)
 
 class TromboneHcd() extends TromboneHcdLogger.Simple {
 
@@ -44,4 +44,6 @@ object TromboneHcd {
   val WARN_LINE_NO  = TRACE_LINE_NO + 3
   val ERROR_LINE_NO = TRACE_LINE_NO + 4
   val FATAL_LINE_NO = TRACE_LINE_NO + 5
+
+  val NAME = "tromboneHcd"
 }

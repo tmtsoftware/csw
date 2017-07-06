@@ -7,8 +7,8 @@ import akka.actor.ActorSystem
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.appenders.FileAppender
-import csw.services.logging.components.TromboneActor
-import csw.services.logging.components.TromboneActor._
+import csw.services.logging.components.IrisSupervisorActor
+import csw.services.logging.components.IrisSupervisorActor._
 import csw.services.logging.scaladsl.RequestId
 import csw.services.logging.utils.{FileUtils, LoggingTestSuite}
 
@@ -26,13 +26,14 @@ class TimingTest extends LoggingTestSuite with Timing {
   override lazy val loggingSystem =
     new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem, Seq(testAppender, FileAppender))
 
-  private val tromboneActorRef =
-    actorSystem.actorOf(TromboneActor.props(), name = "TromboneActor")
+  private val irisActorRef =
+    actorSystem.actorOf(IrisSupervisorActor.props(), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(LocalDateTime.now())
   private val fullLogFileDir  = logFileDir + "/" + loggingSystemName
   private val timeLogFilePath = fullLogFileDir + s"/time.$fileTimestamp.log"
   private val testLogFilePath = fullLogFileDir + s"/common.$fileTimestamp.log"
+  private val IRIS_NAME       = "IRIS"
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -45,12 +46,12 @@ class TimingTest extends LoggingTestSuite with Timing {
   }
 
   def sendLogMsgToTromboneActor() = {
-    tromboneActorRef ! LogTrace
-    tromboneActorRef ! LogDebug
-    tromboneActorRef ! LogInfo
-    tromboneActorRef ! LogWarn
-    tromboneActorRef ! LogError
-    tromboneActorRef ! LogFatal
+    irisActorRef ! LogTrace
+    irisActorRef ! LogDebug
+    irisActorRef ! LogInfo
+    irisActorRef ! LogWarn
+    irisActorRef ! LogError
+    irisActorRef ! LogFatal
   }
 
   private val timerTestRegionName        = "Timer-Test"
@@ -100,8 +101,8 @@ class TimingTest extends LoggingTestSuite with Timing {
       logBuffer.foreach { log ⇒
         log.contains("@componentName") shouldBe true
         log.contains("actor") shouldBe true
-        log("@componentName") shouldBe "tromboneHcdActor"
-        log("actor") shouldBe tromboneActorRef.path.toString
+        log("@componentName") shouldBe IRIS_NAME
+        log("actor") shouldBe irisActorRef.path.toString
         log.contains("file") shouldBe true
         log.contains("line") shouldBe true
         log.contains("class") shouldBe true

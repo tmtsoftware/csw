@@ -10,7 +10,7 @@ import csw.services.logging.appenders.LogAppenderBuilder;
 import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.utils.JGenericActor;
-import csw.services.logging.utils.LogUtil;
+import csw.services.logging.utils.JLogUtil;
 import csw.services.logging.utils.TestAppender;
 import org.junit.*;
 import scala.concurrent.Await;
@@ -60,7 +60,7 @@ public class JGenericLoggerTest {
         private ILogger logger = getLogger();
 
        public void start() {
-           LogUtil.logInBulk(logger);
+           JLogUtil.logInBulk(logger);
        }
     }
 
@@ -73,7 +73,7 @@ public class JGenericLoggerTest {
             Assert.assertTrue(log.has("@severity"));
             String severity = log.get("@severity").getAsString().toLowerCase();
 
-            Assert.assertEquals(LogUtil.logMsgMap.get(severity), log.get("message").getAsString());
+            Assert.assertEquals(JLogUtil.logMsgMap.get(severity), log.get("message").getAsString());
 
             LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
             Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.TRACE$.MODULE$));
@@ -86,7 +86,7 @@ public class JGenericLoggerTest {
         String actorPath = utilActor.path().toString();
         String className = JGenericActor.class.getName();
 
-        LogUtil.sendLogMsgToActorInBulk(utilActor);
+        JLogUtil.sendLogMsgToActorInBulk(utilActor);
         Thread.sleep(200);
 
         logBuffer.forEach(log -> {

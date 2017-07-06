@@ -6,7 +6,7 @@ import csw.services.logging.javadsl.ILogger;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LogUtil {
+public class JLogUtil {
 
     public static Map<String, String> logMsgMap = new HashMap<String, String>()
     {

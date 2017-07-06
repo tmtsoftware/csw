@@ -10,7 +10,7 @@ import csw.services.logging.appenders.LogAppenderBuilder;
 import csw.services.logging.components.JTromboneHCDActor;
 import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
-import csw.services.logging.utils.LogUtil;
+import csw.services.logging.utils.JLogUtil;
 import csw.services.logging.utils.TestAppender;
 import org.junit.*;
 import scala.concurrent.Await;
@@ -61,7 +61,7 @@ public class ILoggerActorTest {
         String actorPath = tromboneActor.path().toString();
         String className = JTromboneHCDActor.class.getName();
 
-        LogUtil.sendLogMsgToActorInBulk(tromboneActor);
+        JLogUtil.sendLogMsgToActorInBulk(tromboneActor);
 
         Thread.sleep(300);
 

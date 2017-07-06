@@ -11,7 +11,7 @@ import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.utils.LoggingTestSuite
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
-class LoggingTest extends LoggingTestSuite {
+class SimpleLoggingTest extends LoggingTestSuite {
 
   // DEOPSCSW-116: Make log messages identifiable with components
   // DEOPSCSW-118: Provide UTC time for each log message

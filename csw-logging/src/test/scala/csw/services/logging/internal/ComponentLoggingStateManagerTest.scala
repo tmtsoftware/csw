@@ -12,7 +12,7 @@ class ComponentLoggingStateManagerTest extends FunSuite with Matchers {
     val componentsLoggingState = ComponentLoggingStateManager.from(config)
 
     componentsLoggingState("tromboneHcd").componentLogLevel shouldBe DEBUG
-    componentsLoggingState("tromboneHcdActor").componentLogLevel shouldBe ERROR
+    componentsLoggingState("IRIS").componentLogLevel shouldBe ERROR
     componentsLoggingState("jTromboneHcdActor").componentLogLevel shouldBe INFO
   }
 
