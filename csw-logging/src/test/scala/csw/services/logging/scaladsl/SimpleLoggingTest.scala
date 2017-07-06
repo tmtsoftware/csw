@@ -152,11 +152,10 @@ class SimpleLoggingTest extends LoggingTestSuite {
     val defaultLogLevel = loggingSystem.getDefaultLogLevel
 
     forAll(testData) { (logLevel: Level, logCount: Int) =>
-//      loggingSystem.setDefaultLogLevel(logLevel)
-        loggingSystem.setComponentLogLevel(compName, logLevel)
+      loggingSystem.setComponentLogLevel(compName, logLevel)
 
-        // confirm default log level is not changing when we change the component log level
-        loggingSystem.getDefaultLogLevel shouldBe defaultLogLevel
+      // confirm default log level is not changing when we change the component log level
+      loggingSystem.getDefaultLogLevel shouldBe defaultLogLevel
 
       new TromboneAssembly().startLogging(logMsgMap)
       Thread.sleep(200)
