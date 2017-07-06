@@ -53,7 +53,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
-      log.info(request.toString())
+      log.info("Sending HTTP request", Map("request" → request.toString()))
       val response = await(Http().singleRequest(request))
 
       await(
@@ -69,7 +69,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri    = await(configUri(path)).withQuery(Query("comment" → comment))
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity)
-    log.info(request.toString())
+    log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
     await(
@@ -99,7 +99,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(configUri(path)).withQuery(Query(id.map(configId ⇒ "id" → configId.id.toString).toMap))
 
     val request = HttpRequest(HttpMethods.HEAD, uri = uri)
-    log.info(request.toString())
+    log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
     await(
@@ -114,7 +114,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(configUri(path)).withQuery(Query("comment" → comment))
 
     val request = HttpRequest(HttpMethods.DELETE, uri = uri)
-    log.info(request.toString())
+    log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
     await(
@@ -130,7 +130,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
         await(listUri).withQuery(Query(fileType.map("type" → _.entryName).toMap ++ pattern.map("pattern" → _).toMap))
 
       val request = HttpRequest(uri = uri)
-      log.info(request.toString())
+      log.info("Sending HTTP request", Map("request" → request.toString()))
       val response = await(Http().singleRequest(request))
 
       await(
@@ -167,7 +167,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(activeConfigVersion(path))
 
     val request = HttpRequest(uri = uri)
-    log.info(request.toString())
+    log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
     await(
@@ -180,7 +180,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   override def getMetadata: Future[ConfigMetadata] = async {
     val request = HttpRequest(uri = await(metadataUri))
-    log.info(request.toString())
+    log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
     await(
@@ -194,7 +194,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val uri = await(activeConfigVersion(path)).withQuery(query)
 
     val request = HttpRequest(HttpMethods.PUT, uri = uri)
-    log.info(request.toString())
+    log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
     await(
@@ -206,7 +206,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
   private def get(uri: Uri): Future[Option[ConfigData]] = async {
     val request = HttpRequest(uri = uri)
-    log.info(request.toString())
+    log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
     val lengthOption = response.entity.contentLengthOption
@@ -262,7 +262,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
       await(uri).withQuery(Query("maxResults" → maxResults.toString, "from" → from.toString, "to" → to.toString))
 
     val request = HttpRequest(uri = _uri)
-    log.info(request.toString())
+    log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
     await(

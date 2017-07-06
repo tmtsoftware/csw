@@ -19,7 +19,7 @@ object PathValidator {
    * @return           message for presence of invalid characters
    */
   def message(path: String): String =
-    s"Input file path '$path' contains invalid characters. Note, these characters $invalidCharsMessage are not allowed in file path."
+    s"Input file path '$path' contains invalid characters. Note, these characters $invalidCharsMessage are not allowed in file path"
 
   /**
    * validates string representation of path for the presence of unsupported characters in file path

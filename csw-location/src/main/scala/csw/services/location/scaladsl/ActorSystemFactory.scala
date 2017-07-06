@@ -29,7 +29,7 @@ object ActorSystemFactory extends LocationServiceLogger.Simple {
       .withFallback(ConfigFactory.load().getConfig(Constants.RemoteActorSystemName))
       .withFallback(ConfigFactory.defaultApplication().resolve())
 
-    log.info("creating remote actor system")
+    log.info(s"Creating remote actor system with name $componentName")
     ActorSystem(componentName, config)
   }
 }

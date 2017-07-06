@@ -37,14 +37,13 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
 
     //Get the location from this registration
     val location = registration.location(cswCluster.hostname)
-    log.info(s"Registering connection ${registration.connection.name} with location $location")
+    log.info(s"Registering connection ${registration.connection.name} with location ${location.uri.toString}")
 
     //Create a message handler for this connection
     val service = new Registry.Service(registration.connection)
 
     // Registering a location needs to read from other replicas to avoid duplicate location registration before performing the update
     // This approach is inspired from Migration Guide section of https://github.com/patriknw/akka-data-replication
-    // todo: Evaluate performance and see if there is any better approach
     val initialValue = (replicator ? service.getByMajority).map {
       case x @ GetSuccess(_, _) ⇒ x.get(service.Key)
       case _                    ⇒ service.EmptyValue
@@ -93,7 +92,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Unregister the connection from CRDT
    */
   def unregister(connection: Connection): Future[Done] = {
-    log.info(s"Unregistering connection ${connection.name}")
+    log.info(s"Un-registering connection ${connection.name}")
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
 
@@ -120,7 +119,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Note : This method should be used for testing purpose only
    */
   def unregisterAll(): Future[Done] = async {
-    log.warn("It is not recommended to unregister all components from location service")
+    log.warn("Un-registering all components from location service")
     //Get all locations registered with CRDT
     val locations = await(list)
 

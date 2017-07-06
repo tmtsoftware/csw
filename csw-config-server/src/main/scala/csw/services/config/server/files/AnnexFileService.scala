@@ -22,7 +22,7 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
   import actorRuntime._
 
   def post(configData: ConfigData): Future[String] = async {
-    log.debug("creating temporary file and calculating it's sha")
+    log.debug("Creating temporary file and calculating it's sha")
     val (tempFilePath, sha) = await(saveAndSha(configData))
 
     val outPath = makePath(settings.`annex-files-dir`, sha)

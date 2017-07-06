@@ -68,7 +68,7 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
 /**
  *  Provides InetAddresses for network interface
  */
-class NetworkInterfaceProvider {
+class NetworkInterfaceProvider extends LocationServiceLogger.Simple {
 
   /**
    * Get Seq of (Index -> List of InetAddress) mapping for each interface
@@ -83,6 +83,9 @@ class NetworkInterfaceProvider {
   def getInterface(interfaceName: String): Seq[(Int, List[InetAddress])] =
     Option(NetworkInterface.getByName(interfaceName)) match {
       case Some(nic) => List((nic.getIndex, nic.getInetAddresses.asScala.toList))
-      case None      => throw NetworkInterfaceNotFound(s"Network interface=$interfaceName not found.")
+      case None =>
+        val networkInterfaceNotFound = NetworkInterfaceNotFound(s"Network interface=$interfaceName not found")
+        log.error(networkInterfaceNotFound.getMessage, ex = networkInterfaceNotFound)
+        throw networkInterfaceNotFound
     }
 }

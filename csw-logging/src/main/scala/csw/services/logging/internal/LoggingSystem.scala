@@ -71,7 +71,7 @@ class LoggingSystem(name: String,
   private[this] val done                          = Promise[Unit]
   private[this] val timeActorDonePromise          = Promise[Unit]
 
-  @volatile private[this] var initialComponentsLoggingState = ComponentLoggingStateManager.from(loggingConfig)
+  private[this] val initialComponentsLoggingState = ComponentLoggingStateManager.from(loggingConfig)
 
   LoggingState.componentsLoggingState = LoggingState.componentsLoggingState ++ initialComponentsLoggingState
 

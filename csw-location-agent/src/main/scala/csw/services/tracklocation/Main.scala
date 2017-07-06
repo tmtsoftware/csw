@@ -23,7 +23,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) exte
           Seq(StdOutAppender, FileAppender))
 
       val command = Command.parse(options)
-      log.info(s"commandText: ${command.commandText}, command: $command")
+      log.info(s"commandText: ${command.commandText}, command: ${command.toString}")
       val trackLocation = new TrackLocation(options.names, command, actorSystem)
       trackLocation.run()
     }

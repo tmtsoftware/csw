@@ -105,9 +105,8 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
 
         //#log-info-map
-        jLogger.info(() -> "Sample", () -> {
+        jLogger.info(() -> "Attempting to find connection", () -> {
             HashMap<String, Object> map = new HashMap<>();
-            map.put("@msg", "Attempting to find connection");
             map.put("exampleConnection", exampleConnection);
             return map;
         });

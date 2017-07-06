@@ -33,14 +33,14 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
   def initSvnRepo(): Unit =
     try {
       // Create the new main repo
-      log.debug("Creating repository setup")
+      log.debug("Creating new repository")
       FSRepositoryFactory.setup()
       SVNRepositoryFactory.createLocalRepository(settings.repositoryFile, false, false)
       log.info(s"New Repository created at ${settings.svnUrl}")
     } catch {
       // If the repo already exists, print stracktrace and continue to boot
       case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.IO_ERROR ⇒
-        log.info(s"Repository already exists at ${settings.svnUrl}")
+        log.error(s"Repository already exists at ${settings.svnUrl}", ex = ex)
     }
 
   // Fetch the file from svn repo and write the contents on outputStream
@@ -221,7 +221,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
   def testConnection(): Unit = {
     val svn = svnHandle()
     try {
-      log.debug("Testing svn connection.")
+      log.debug("Testing svn connection")
       svn.testConnection()
     } finally {
       svn.closeSession()
