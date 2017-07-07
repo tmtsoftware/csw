@@ -6,7 +6,7 @@ import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import csw.services.logging.commons.TMTDateTimeFormatter
 import csw.services.logging.components.{InnerSourceComponent, SingletonComponent, TromboneAssembly, TromboneHcd}
-import csw.services.logging.internal.LoggingLevels
+import csw.services.logging.internal.{LoggingLevels, LoggingState}
 import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.utils.LoggingTestSuite
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -22,7 +22,9 @@ class SimpleLoggingTest extends LoggingTestSuite {
     new TromboneHcd().startLogging(logMsgMap)
     Thread.sleep(100)
 
-    // filter for tromboneHcd is at debug level in config
+    // Verify log level for tromboneHcd is at debug level in config
+    LoggingState.componentsLoggingState(TromboneHcd.NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
+
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
     logBuffer.foreach { log ⇒
@@ -46,7 +48,9 @@ class SimpleLoggingTest extends LoggingTestSuite {
     new InnerSourceComponent().startLogging(logMsgMap)
     Thread.sleep(100)
 
-    // default log level is TRACE in config
+    //   Verify that default level is TRACE in config
+    LoggingState.componentsLoggingState("default").componentLogLevel shouldBe LoggingLevels.TRACE
+
     var logMsgLineNumber = InnerSourceComponent.TRACE_LINE_NO
 
     logBuffer.foreach { log ⇒
@@ -65,7 +69,9 @@ class SimpleLoggingTest extends LoggingTestSuite {
     SingletonComponent.startLogging(logMsgMap)
     Thread.sleep(100)
 
-    // default log level is TRACE in config
+    //   Verify that default level is TRACE in config
+    LoggingState.componentsLoggingState("default").componentLogLevel shouldBe LoggingLevels.TRACE
+
     var logMsgLineNumber = SingletonComponent.TRACE_LINE_NO
 
     logBuffer.foreach { log ⇒
@@ -85,6 +91,9 @@ class SimpleLoggingTest extends LoggingTestSuite {
     //  As per the filter, hcd should log 5 message of all the levels except TRACE
     new TromboneHcd().startLogging(logMsgMap)
     Thread.sleep(200)
+
+    //  Verify that level is DEBUG
+    LoggingState.componentsLoggingState(TromboneHcd.NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
 
     //  TromboneHcd component is logging 6 messages each of unique level
     //  As per the filter, hcd should log 5 message of all level except TRACE
@@ -110,6 +119,9 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     new TromboneAssembly().startLogging(logMsgMap)
     Thread.sleep(300)
+
+    //   Verify that default level is TRACE in config
+    LoggingState.componentsLoggingState("default").componentLogLevel shouldBe LoggingLevels.TRACE
 
     //  TromboneAssembly component is logging 6 messages each of unique level
     //  As per the default loglevel = trace, assembly should log all 6 message

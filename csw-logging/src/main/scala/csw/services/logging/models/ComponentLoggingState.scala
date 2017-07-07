@@ -22,6 +22,8 @@ private[logging] class ComponentLoggingState(level: Level) {
     doError = level.pos <= ERROR.pos
     doFatal = level.pos <= FATAL.pos
   }
+
+  override def toString(): String = componentLogLevel.toString
 }
 
 private[logging] object ComponentLoggingState {
