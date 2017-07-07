@@ -20,7 +20,7 @@ class JLogger private[logging] (log: Logger, cls: Class[_]) extends ILogger {
   override def trace(msg: Supplier[String], map: Supplier[java.util.Map[String, Object]], ex: Throwable): Unit =
     log.trace(msg.get, map.get.asScala.toMap, ex)(SourceFactory.from(cls))
   override def trace(msg: Supplier[String], map: Supplier[java.util.Map[String, Object]], id: AnyId): Unit =
-    log.trace(msg.get, map.get.asScala.toMap, id = id)
+    log.trace(msg.get, map.get.asScala.toMap, id = id)(SourceFactory.from(cls))
   override def trace(msg: Supplier[String],
                      map: Supplier[java.util.Map[String, Object]],
                      ex: Throwable,

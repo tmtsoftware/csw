@@ -9,7 +9,7 @@ import csw.services.logging.internal.LoggingSystem
 object JLoggingSystemFactory {
 
   //To be used only for testing only
-  private[logging] def start(): LoggingSystem = {
+  def start(): LoggingSystem = {
     new LoggingSystem("foo-name", "foo-version", InetAddress.getLocalHost.getHostName, ActorSystem("logging"))
   }
 
