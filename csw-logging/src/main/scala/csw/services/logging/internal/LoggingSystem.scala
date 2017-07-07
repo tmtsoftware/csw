@@ -90,8 +90,10 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
     _.apply(system, standardHeaders)
   }
 
-  private[this] val logActor = system.actorOf(LogActor.props(done, standardHeaders, appenders, defaultLevel,
-      defaultSlf4jLogLevel, defaultAkkaLogLevel), name = "LoggingActor")
+  private[this] val logActor = system.actorOf(
+    LogActor.props(done, standardHeaders, appenders, defaultLevel, defaultSlf4jLogLevel, defaultAkkaLogLevel),
+    name = "LoggingActor"
+  )
   LoggingState.maybeLogActor = Some(logActor)
 
   private[logging] val gcLogger: Option[GcLogger] = if (gc) {
@@ -197,7 +199,9 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
       getDefaultLogLevel.current,
       getAkkaLevel.current,
       getSlf4jLevel.current,
-      LoggingState.componentsLoggingState.getOrElse(componentName, LoggingState.componentsLoggingState("default")).componentLogLevel
+      LoggingState.componentsLoggingState
+        .getOrElse(componentName, LoggingState.componentsLoggingState("default"))
+        .componentLogLevel
     )
 
   /**
@@ -248,7 +252,10 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
 
   private def getAppenderInstance(appender: String): LogAppenderBuilder = {
     try {
-      Class.forName(appender).getField("MODULE$").get(null).asInstanceOf[LogAppenderBuilder]
+      if (appender.endsWith("$"))
+        Class.forName(appender).getField("MODULE$").get(null).asInstanceOf[LogAppenderBuilder]
+      else
+        Class.forName(appender).newInstance().asInstanceOf[LogAppenderBuilder]
     } catch {
       case _: Throwable ⇒ throw AppenderNotFoundException(appender)
     }
