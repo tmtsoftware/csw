@@ -8,7 +8,6 @@ import akka.dispatch.MessageDispatcher
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.BuildInfo
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.logging.appenders.{FileAppender, StdOutAppender}
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
@@ -28,8 +27,7 @@ class ActorRuntime(_actorSystem: ActorSystem, settings: Settings) {
   val coordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   def startLogging(): LoggingSystem =
-    LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem,
-      Seq(StdOutAppender, FileAppender))
+    LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
   def shutdown(): Future[Done] = coordinatedShutdown.run()
 

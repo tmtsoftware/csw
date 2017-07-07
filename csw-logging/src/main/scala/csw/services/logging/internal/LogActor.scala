@@ -30,15 +30,16 @@ private[logging] object LogActor {
 
 private[logging] class LogActor(done: Promise[Unit],
                                 standardHeaders: JsonObject,
-                                appenders: Seq[LogAppender],
+                                initAppenders: Seq[LogAppender],
                                 initLevel: Level,
                                 initSlf4jLevel: Level,
                                 initAkkaLevel: Level)
     extends Actor {
 
-  private[this] var level: Level         = initLevel
-  private[this] var akkaLogLevel: Level  = initAkkaLevel
-  private[this] var slf4jLogLevel: Level = initSlf4jLevel
+  private[this] var level: Level                = initLevel
+  private[this] var akkaLogLevel: Level         = initAkkaLevel
+  private[this] var slf4jLogLevel: Level        = initSlf4jLevel
+  private[this] var appenders: Seq[LogAppender] = initAppenders
 
   def receive: Receive = {
     case log: Log                     => receiveLog(log)
@@ -48,6 +49,7 @@ private[logging] class LogActor(done: Promise[Unit],
     case SetLevel(level1)             => level = level1
     case SetSlf4jLevel(level1)        => slf4jLogLevel = level1
     case SetAkkaLevel(level1)         => akkaLogLevel = level1
+    case SetAppenders(_appenders)     => appenders = _appenders
     case LastAkkaMessage =>
       akka.event.Logging(context.system, this).error("DIE")
     case StopLogging =>

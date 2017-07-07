@@ -1,6 +1,7 @@
 package csw.services.logging.internal
 
 import com.persist.JsonOps.JsonObject
+import csw.services.logging.appenders.LogAppender
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.SourceLocation
 import csw.services.logging.scaladsl.AnyId
@@ -36,6 +37,8 @@ case class LogAkka(time: Long, level: Level, source: String, clazz: Class[_], ms
     extends LogActorMessages
 
 case class SetAkkaLevel(level: Level) extends LogActorMessages
+
+case class SetAppenders(appenders: List[LogAppender]) extends LogActorMessages
 
 case object LastAkkaMessage extends LogActorMessages
 

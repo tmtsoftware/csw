@@ -9,7 +9,6 @@ import csw.services.config.client.commons.ConfigClientLogger
 import csw.services.csclient.cli.{ArgsParser, ClientCliWiring, Options}
 import csw.services.location.commons.ClusterConfirmationActor.IsMemberUp
 import csw.services.location.commons.{BlockingUtils, ClusterAwareSettings, ClusterConfirmationActor}
-import csw.services.logging.appenders.FileAppender
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.Await
@@ -30,8 +29,7 @@ object Main extends App with ConfigClientLogger.Simple {
 
   private def run(options: Options): Unit = {
     val actorSystem = ClusterAwareSettings.system
-    LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem,
-      Seq(FileAppender))
+    LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
     val wiring = new ClientCliWiring(actorSystem)
     try {

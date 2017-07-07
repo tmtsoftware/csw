@@ -18,13 +18,13 @@ class TimingTest extends LoggingTestSuite with Timing {
 
   private val logFileDir = Paths.get("/tmp/csw-test-logs").toFile
   private val config = ConfigFactory
-    .parseString(s"csw-logging.appenders.file.logPath=${logFileDir.getAbsolutePath}")
+    .parseString(s"csw-logging.appender-config.file.logPath=${logFileDir.getAbsolutePath}")
     .withFallback(ConfigFactory.load)
 
   private val loggingSystemName = "TimingTest"
   override lazy val actorSystem = ActorSystem("timing-test-system", config)
   override lazy val loggingSystem =
-    new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem, Seq(testAppender, FileAppender))
+    new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
 
   private val irisActorRef =
     actorSystem.actorOf(IrisSupervisorActor.props(), name = "IRIS-Supervisor-Actor")
@@ -38,6 +38,7 @@ class TimingTest extends LoggingTestSuite with Timing {
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     FileUtils.deleteRecursively(logFileDir)
+    loggingSystem.setAppenders(List(testAppender, FileAppender))
   }
 
   override protected def afterEach(): Unit = {
@@ -45,7 +46,7 @@ class TimingTest extends LoggingTestSuite with Timing {
     FileUtils.deleteRecursively(logFileDir)
   }
 
-  def sendLogMsgToTromboneActor() = {
+  def sendLogMsgToTromboneActor(): Unit = {
     irisActorRef ! LogTrace
     irisActorRef ! LogDebug
     irisActorRef ! LogInfo
@@ -58,23 +59,23 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val startEndTimeTestRegionName = "Start-End-Time-Test"
   private val timerRegionQueue           = mutable.Queue[String](timerTestRegionName, startEndTimeTestRegionName)
 
-  def logMessagesWithTimer() =
+  def logMessagesWithTimer(): Unit =
     Time(RequestId(), timerTestRegionName) {
-      sendLogMsgToTromboneActor
+      sendLogMsgToTromboneActor()
     }
 
-  def logMessagesWithStartAndEndTimer() = {
+  def logMessagesWithStartAndEndTimer(): Unit = {
     val id         = RequestId()
     val startToken = time.start(id, startEndTimeTestRegionName)
-    sendLogMsgToTromboneActor
+    sendLogMsgToTromboneActor()
     time.end(id, startEndTimeTestRegionName, startToken)
   }
 
   // DEOPSCSW-142: Flexibility of logging approaches
   test("should able to log messages to combination of standard out and file concurrently and also log time messages.") {
 
-    logMessagesWithTimer
-    logMessagesWithStartAndEndTimer
+    logMessagesWithTimer()
+    logMessagesWithStartAndEndTimer()
     Thread.sleep(3000)
 
     // Reading time logger file

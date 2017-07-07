@@ -2,7 +2,6 @@ package csw.services.tracklocation
 
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.logging.appenders.{FileAppender, StdOutAppender}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 import csw.services.tracklocation.commons.LocationAgentLogger
 import csw.services.tracklocation.models.Command
@@ -19,8 +18,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) exte
       val actorSystem = clusterSettings.system
 
       if (startLogging)
-        LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem,
-          Seq(StdOutAppender, FileAppender))
+        LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
 
       val command = Command.parse(options)
       log.info(s"commandText: ${command.commandText}, command: ${command.toString}")

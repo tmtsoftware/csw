@@ -178,7 +178,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
     case s: ActorSystem        => s
   }
   private[this] implicit val executionContext = factory.dispatcher
-  private[this] val config                    = system.settings.config.getConfig("csw-logging.appenders.file")
+  private[this] val config                    = system.settings.config.getConfig("csw-logging.appender-config.file")
   private[this] val fullHeaders               = config.getBoolean("fullHeaders")
   private[this] val logPath                   = config.getString("logPath")
   private[this] val sort                      = config.getBoolean("sorted")

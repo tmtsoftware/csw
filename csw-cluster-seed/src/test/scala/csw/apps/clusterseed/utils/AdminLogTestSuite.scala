@@ -21,11 +21,12 @@ abstract class AdminLogTestSuite() extends FunSuite with Matchers with BeforeAnd
 
   protected val adminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3552), None)
   protected val loggingSystem =
-    LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem, Seq(testAppender))
+    LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     logBuffer.clear()
+    loggingSystem.setAppenders(List(testAppender))
     Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)
   }
 

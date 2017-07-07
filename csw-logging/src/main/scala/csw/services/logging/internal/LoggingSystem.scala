@@ -7,12 +7,14 @@ import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
 import csw.services.logging.RichMsg
 import csw.services.logging.appenders.LogAppenderBuilder
+import csw.services.logging.exceptions.AppenderNotFoundException
 import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.models.LogMetadata
 import csw.services.logging.scaladsl.GenericLogger
 import org.slf4j.LoggerFactory
 
+import scala.collection.JavaConverters.collectionAsScalaIterableConverter
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
@@ -23,26 +25,24 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param version             version of the service (to log).
  * @param host             host name (to log).
  * @param system           actor system which will be used to create log actors
- * @param appenderBuilders sequence of log appenders to use.
- *
  */
-class LoggingSystem(name: String,
-                    version: String,
-                    host: String,
-                    system: ActorSystem,
-                    appenderBuilders: Seq[LogAppenderBuilder])
-    extends GenericLogger.Simple {
+class LoggingSystem(name: String, version: String, host: String, system: ActorSystem) extends GenericLogger.Simple {
 
   import LoggingLevels._
 
   private[this] val loggingConfig =
     system.settings.config.getConfig("csw-logging")
 
+  private[this] val defaultAppenderBuilders: List[LogAppenderBuilder] =
+    loggingConfig.getStringList("appenders").asScala.toList.map(getAppenderInstance)
+
+  @volatile var appenderBuilders: List[LogAppenderBuilder] = defaultAppenderBuilders
+
   private[this] val levels = loggingConfig.getString("logLevel")
   private[this] val defaultLevel: Level = if (Level.hasLevel(levels)) {
     Level(levels)
   } else {
-    throw new Exception("Bad value for csw-logging.logLevel")
+    throw new Exception(s"Bad value $levels for csw-logging.logLevel")
   }
   @volatile var logLevel: Level = defaultLevel
 
@@ -51,7 +51,7 @@ class LoggingSystem(name: String,
     if (Level.hasLevel(akkaLogLevelS)) {
       Level(akkaLogLevelS)
     } else {
-      throw new Exception("Bad value for csw-logging.akkaLogLevel")
+      throw new Exception(s"Bad value $akkaLogLevelS for csw-logging.akkaLogLevel")
     }
   @volatile private[this] var akkaLogLevel = defaultAkkaLogLevel
 
@@ -60,7 +60,7 @@ class LoggingSystem(name: String,
     if (Level.hasLevel(slf4jLogLevelS)) {
       Level(slf4jLogLevelS)
     } else {
-      throw new Exception("Bad value for csw-logging.slf4jLogLevel")
+      throw new Exception(s"Bad value $slf4jLogLevelS for csw-logging.slf4jLogLevel")
     }
   @volatile private[this] var slf4jLogLevel = defaultSlf4jLogLevel
 
@@ -86,7 +86,7 @@ class LoggingSystem(name: String,
   LoggingState.doTime = false
   LoggingState.timeActorOption = None
 
-  private[this] val appenders = appenderBuilders.map {
+  @volatile private[this] var appenders = appenderBuilders.map {
     _.apply(system, standardHeaders)
   }
 
@@ -165,6 +165,24 @@ class LoggingSystem(name: String,
     logActor ! SetSlf4jLevel(level)
   }
 
+  /**
+   * Get the logging appenders.
+   * @return the current and default logging appenders.
+   */
+  def getAppenders: List[LogAppenderBuilder] = appenderBuilders
+
+  /**
+   * Changes the logging appenders.
+   * @param _appenderBuilders the list of new logging appenders.
+   */
+  def setAppenders(_appenderBuilders: List[LogAppenderBuilder]): Unit = {
+    appenderBuilders = _appenderBuilders
+    appenders = appenderBuilders.map {
+      _.apply(system, standardHeaders)
+    }
+    logActor ! SetAppenders(appenders)
+  }
+
   // todo: this can be achieved through LoggerImpl as well, decide the place for setting log level dynamically while playing framework stories
   def setComponentLogLevel(componentName: String, level: Level): Unit =
     ComponentLoggingStateManager.add(componentName, level)
@@ -227,4 +245,12 @@ class LoggingSystem(name: String,
   }
 
   def javaStop(): CompletableFuture[Done] = stop.toJava.toCompletableFuture
+
+  private def getAppenderInstance(appender: String): LogAppenderBuilder = {
+    try {
+      Class.forName(appender).getField("MODULE$").get(null).asInstanceOf[LogAppenderBuilder]
+    } catch {
+      case _: Throwable ⇒ throw AppenderNotFoundException(appender)
+    }
+  }
 }

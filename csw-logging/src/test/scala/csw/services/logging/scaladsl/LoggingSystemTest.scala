@@ -1,6 +1,11 @@
 package csw.services.logging.scaladsl
 
+import java.net.InetAddress
+
+import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
+import csw.services.logging.appenders.{FileAppender, StdOutAppender}
+import csw.services.logging.exceptions.AppenderNotFoundException
 import csw.services.logging.internal.LoggingLevels.Level
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -35,5 +40,22 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
     loggingSystem.getDefaultLogLevel.current.name.toLowerCase shouldBe akkaLogLevel.toLowerCase
     loggingSystem.getAkkaLevel.current.name.toLowerCase shouldBe logLevel.toLowerCase
     loggingSystem.getSlf4jLevel.current.name.toLowerCase shouldBe slf4jLogLevel.toLowerCase
+  }
+
+  test("should be able to configure appenders in configuration file") {
+    loggingSystem.getAppenders.toSet shouldBe Set(StdOutAppender, FileAppender)
+  }
+
+  test("should throw AppenderNotFoundException for an invalid appender configured") {
+    val config      = ConfigFactory.parseString("""
+        |csw-logging {
+        | appenders = ["abcd"]
+        |}
+      """.stripMargin)
+    val actorSystem = ActorSystem("test", config)
+    val exception = intercept[AppenderNotFoundException] {
+      LoggingSystemFactory.start("foo-name", "foo-version", InetAddress.getLocalHost.getHostName, actorSystem)
+    }
+    exception.appender shouldBe "abcd"
   }
 }

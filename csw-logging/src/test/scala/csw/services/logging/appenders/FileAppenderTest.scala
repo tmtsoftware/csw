@@ -18,7 +18,7 @@ import scala.concurrent.duration.DurationLong
 class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   private val logFileDir = Paths.get("/tmp/csw-test-logs/").toFile
   private val config = ConfigFactory
-    .parseString(s"csw-logging.appenders.file.logPath=${logFileDir.getAbsolutePath}")
+    .parseString(s"csw-logging.appender-config.file.logPath=${logFileDir.getAbsolutePath}")
     .withFallback(ConfigFactory.load)
   private val actorSystem = ActorSystem("test-1", config)
   private val standardHeaders: Map[String, RichMsg] =

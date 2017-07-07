@@ -76,7 +76,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
   test("should able to pretty-print one log message to one line") {
 
     val config = ConfigFactory
-      .parseString("csw-logging.appenders.stdout.oneLine=true")
+      .parseString("csw-logging.appender-config.stdout.oneLine=true")
       .withFallback(ConfigFactory.load)
 
     val actorSystemWithOneLineTrueConfig = ActorSystem("test-2", config)
@@ -87,10 +87,10 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     }
 
     val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")
-    val severity              = expectedLogJson.get("@severity").get
-    val msg                   = expectedLogJson.get("message").get
-    val fileName              = expectedLogJson.get("file").get
-    val lineNumber            = s"${expectedLogJson.get("line").get}"
+    val severity              = expectedLogJson("@severity")
+    val msg                   = expectedLogJson("message")
+    val fileName              = expectedLogJson("file")
+    val lineNumber            = s"${expectedLogJson("line")}"
     val expectedOneLineLogMsg = s"[$severity] $msg ($fileName $lineNumber)"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg

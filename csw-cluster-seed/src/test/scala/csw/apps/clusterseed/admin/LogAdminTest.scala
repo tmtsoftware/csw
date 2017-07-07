@@ -133,7 +133,7 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
     Thread.sleep(100)
 
     val groupByAfterFilter      = logBuffer.groupBy(json ⇒ json("@componentName").toString)
-    val tromboneLogsAfterFilter = groupByAfterFilter.get("tromboneHcd").get
+    val tromboneLogsAfterFilter = groupByAfterFilter("tromboneHcd")
 
     tromboneLogsAfterFilter.size shouldBe 3
 

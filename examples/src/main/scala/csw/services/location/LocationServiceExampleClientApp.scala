@@ -7,7 +7,6 @@ import csw.services.commons.ExampleLogger
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
-import csw.services.logging.appenders.StdOutAppender
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.async.Async._
@@ -31,7 +30,7 @@ object LocationServiceExampleClientApp extends App {
   implicit val mat = ActorMaterializer()
 
   //#create-logging-system
-  private val loggingSystem = LoggingSystemFactory.start("application-name", "application-version", "hostname", ActorSystem("logging-system"), Seq(StdOutAppender))
+  private val loggingSystem = LoggingSystemFactory.start("application-name", "application-version", "hostname", ActorSystem("logging-system"))
   //#create-logging-system
 
   system.actorOf(LocationServiceExampleClient.props(locationService))
