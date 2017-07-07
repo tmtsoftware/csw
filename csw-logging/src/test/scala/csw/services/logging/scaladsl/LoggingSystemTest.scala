@@ -16,7 +16,7 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // This will load default configuration in application.conf file if provided
   private val loggingSystem = LoggingSystemFactory.start()
-  private val config = ConfigFactory.load().getConfig("csw-logging")
+  private val config        = ConfigFactory.load().getConfig("csw-logging")
 
   override protected def afterAll(): Unit =
     Await.result(loggingSystem.stop, 10.seconds)
@@ -35,8 +35,8 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   test("should able to set log level for default logger, slf4j and akka") {
-    val logLevel = "debug"
-    val akkaLogLevel = "Error"
+    val logLevel      = "debug"
+    val akkaLogLevel  = "Error"
     val slf4jLogLevel = "INFO"
 
     loggingSystem.setDefaultLogLevel(Level(akkaLogLevel))
@@ -52,19 +52,15 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
     loggingSystem.getAppenders.toSet shouldBe Set(StdOutAppender, FileAppender)
   }
 
-  test(
-    "should throw AppenderNotFoundException for an invalid appender configured") {
-    val config = ConfigFactory.parseString("""
+  test("should throw AppenderNotFoundException for an invalid appender configured") {
+    val config      = ConfigFactory.parseString("""
         |csw-logging {
         | appenders = ["abcd"]
         |}
       """.stripMargin)
     val actorSystem = ActorSystem("test", config)
     val exception = intercept[AppenderNotFoundException] {
-      LoggingSystemFactory.start("foo-name",
-                                 "foo-version",
-                                 InetAddress.getLocalHost.getHostName,
-                                 actorSystem)
+      LoggingSystemFactory.start("foo-name", "foo-version", InetAddress.getLocalHost.getHostName, actorSystem)
     }
     exception.appender shouldBe "abcd"
     Await.result(actorSystem.terminate(), 10.seconds)

@@ -39,8 +39,7 @@ class CustomAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
     case context: ActorContext => context.system
     case s: ActorSystem        => s
   }
-  private[this] val config = system.settings.config
-    .getConfig("csw-logging.appender-config.my-fav-appender")
+  private[this] val config       = system.settings.config.getConfig("csw-logging.appender-config.my-fav-appender")
   private[this] val logIpAddress = config.getBoolean("logIpAddress")
 
   override def stop(): Future[Unit] = Future.successful(())

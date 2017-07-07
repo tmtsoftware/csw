@@ -30,8 +30,7 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
 
   import LoggingLevels._
 
-  private[this] val loggingConfig =
-    system.settings.config.getConfig("csw-logging")
+  private[this] val loggingConfig = system.settings.config.getConfig("csw-logging")
 
   private[this] val defaultAppenderBuilders: List[LogAppenderBuilder] =
     loggingConfig.getStringList("appenders").asScala.toList.map(getAppenderInstance)
