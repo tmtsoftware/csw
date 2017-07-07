@@ -27,7 +27,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     logBuffer.foreach { log ⇒
       val actualTimestamp  = TMTDateTimeFormatter.parse(log("timestamp").toString)
-      val actualTimeMillis = actualTimestamp.atZone(ZoneId.systemDefault).toInstant.toEpochMilli
+      val actualTimeMillis = actualTimestamp.toInstant.toEpochMilli
 
       actualTimeMillis shouldBe expectedTimeMillis
 

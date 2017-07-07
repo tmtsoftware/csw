@@ -4,15 +4,14 @@ import java.time._
 import java.time.format.DateTimeFormatter
 
 object TMTDateTimeFormatter {
-  val ISOLogFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSxxxxx")
+  val ISOLogFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss:n").withZone(ZoneOffset.UTC)
 
   def format(time: Long): String = {
-    val offsetDateTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault)
-    offsetDateTime.format(ISOLogFormatter)
+    ISOLogFormatter.format(Instant.ofEpochMilli(time))
   }
 
-  def parse(dateStr: String): LocalDateTime = {
-    LocalDateTime.parse(dateStr, ISOLogFormatter)
+  def parse(dateStr: String): ZonedDateTime = {
+    ZonedDateTime.parse(dateStr, ISOLogFormatter)
   }
 
 }

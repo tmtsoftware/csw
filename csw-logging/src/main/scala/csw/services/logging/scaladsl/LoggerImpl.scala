@@ -1,5 +1,7 @@
 package csw.services.logging.scaladsl
 
+import java.time.Instant
+
 import csw.services.logging.RichMsg
 import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.internal.LoggingState._
@@ -26,9 +28,8 @@ class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName
                   map: ⇒ Map[String, Any],
                   ex: Throwable,
                   sourceLocation: SourceLocation): Unit = {
-    val t = System.currentTimeMillis()
-
-    MessageHandler.sendMsg(Log(maybeComponentName, level, id, t, actorName, msg, map, sourceLocation, ex))
+    val time = Instant.now().toEpochMilli
+    MessageHandler.sendMsg(Log(maybeComponentName, level, id, time, actorName, msg, map, sourceLocation, ex))
   }
 
   private def has(id: AnyId, level: Level): Boolean =

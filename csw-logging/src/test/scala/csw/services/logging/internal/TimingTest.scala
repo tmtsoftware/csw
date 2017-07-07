@@ -1,7 +1,7 @@
 package csw.services.logging.internal
 
 import java.nio.file.Paths
-import java.time.LocalDateTime
+import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor.ActorSystem
 import com.persist.JsonOps.JsonObject
@@ -29,7 +29,7 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val irisActorRef =
     actorSystem.actorOf(IrisSupervisorActor.props(), name = "IRIS-Supervisor-Actor")
 
-  private val fileTimestamp   = FileAppender.decideTimestampForFile(LocalDateTime.now())
+  private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val fullLogFileDir  = logFileDir + "/" + loggingSystemName
   private val timeLogFilePath = fullLogFileDir + s"/time.$fileTimestamp.log"
   private val testLogFilePath = fullLogFileDir + s"/common.$fileTimestamp.log"

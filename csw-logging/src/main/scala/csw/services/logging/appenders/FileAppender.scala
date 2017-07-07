@@ -1,12 +1,13 @@
 package csw.services.logging.appenders
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, PrintWriter}
-import java.time.{LocalDateTime, LocalTime}
+import java.time.temporal.ChronoUnit
+import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor._
 import com.persist.JsonOps._
 import csw.services.logging.RichMsg
-import csw.services.logging.commons.TMTDateTimeFormatter
+import csw.services.logging.commons.{Keys, TMTDateTimeFormatter}
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.GenericLogger
@@ -23,7 +24,7 @@ private[logging] object FileAppenderActor {
   trait AppendMessages
 
   // Message to add log text to the writer
-  case class AppendAdd(localDateTime: LocalDateTime, line: String) extends AppendMessages
+  case class AppendAdd(logDateTime: ZonedDateTime, line: String) extends AppendMessages
 
   // Message to close the appender
   case class AppendClose(p: Promise[Unit]) extends AppendMessages
@@ -45,7 +46,7 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
 
   private[this] val system                                   = context.system
   private[this] implicit val ec: ExecutionContext            = context.dispatcher
-  private[this] var fileSpanTimestamp: Option[LocalDateTime] = None
+  private[this] var fileSpanTimestamp: Option[ZonedDateTime] = None
   private[this] var maybePrintWriter: Option[PrintWriter]    = None
 
   private[this] var flushTimer: Option[Cancellable] = None
@@ -61,26 +62,28 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
   scheduleFlush()
 
   // Initialize writer for log file
-  private def open(currentTimestamp: LocalDateTime): Unit = {
-    val fileTimestamp: LocalDateTime = FileAppender.decideTimestampForFile(currentTimestamp)
-    val dir                          = s"$path"
+  private def open(logDateTime: ZonedDateTime): Unit = {
+    val fileTimestamp = FileAppender.decideTimestampForFile(logDateTime)
+    val dir           = s"$path"
     new File(dir).mkdirs()
     val fileName    = s"$dir/$category.$fileTimestamp.log"
     val printWriter = new PrintWriter(new BufferedOutputStream(new FileOutputStream(fileName, true)))
     maybePrintWriter = Some(printWriter)
-    fileSpanTimestamp = Some(LocalDateTime.of(fileTimestamp.plusDays(1L).toLocalDate, LocalTime.NOON))
+    fileSpanTimestamp = Some(fileTimestamp.plusDays(1L))
   }
 
   def receive: Receive = {
-    case AppendAdd(currentTimestamp, line) =>
+    case AppendAdd(logDateTime, line) =>
       maybePrintWriter match {
         case Some(w) =>
-          if (currentTimestamp.isAfter(fileSpanTimestamp.getOrElse(LocalDateTime.MIN))) {
+          if (logDateTime
+                .isAfter(fileSpanTimestamp.getOrElse(ZonedDateTime.of(LocalDateTime.MIN,
+                      ZoneId.from(ZoneOffset.UTC))))) {
             w.close()
-            open(currentTimestamp)
+            open(logDateTime)
           }
         case None =>
-          open(currentTimestamp)
+          open(logDateTime)
       }
       maybePrintWriter match {
         case Some(w) =>
@@ -133,8 +136,8 @@ private[logging] class FilesAppender(actorRefFactory: ActorRefFactory, path: Str
   private[this] val fileAppenderActor =
     actorRefFactory.actorOf(FileAppenderActor.props(path, category), name = s"FileAppender.$category")
 
-  def add(localDateTime: LocalDateTime, line: String): Unit =
-    fileAppenderActor ! AppendAdd(localDateTime, line)
+  def add(logDateTime: ZonedDateTime, line: String): Unit =
+    fileAppenderActor ! AppendAdd(logDateTime, line)
 
   def close(): Future[Unit] = {
     val p = Promise[Unit]()
@@ -158,11 +161,13 @@ object FileAppender extends LogAppenderBuilder {
   def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]): FileAppender =
     new FileAppender(factory, stdHeaders)
 
-  def decideTimestampForFile(timestamp: LocalDateTime): LocalDateTime = {
-    val localDateTime =
-      if (timestamp.getHour >= 12) LocalDateTime.of(timestamp.toLocalDate, LocalTime.NOON)
-      else LocalDateTime.of(timestamp.toLocalDate.minusDays(1L), LocalTime.NOON)
-    localDateTime
+  def decideTimestampForFile(logDateTime: ZonedDateTime): ZonedDateTime = {
+    val fileTimestamp =
+      if (logDateTime.getHour >= Keys.FILE_ROTATION_HOUR)
+        logDateTime.truncatedTo(ChronoUnit.DAYS).plusHours(Keys.FILE_ROTATION_HOUR)
+      else
+        logDateTime.truncatedTo(ChronoUnit.DAYS).minusDays(1L).plusHours(Keys.FILE_ROTATION_HOUR)
+    fileTimestamp
   }
 }
 
@@ -212,8 +217,8 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
       }
       val timestamp = jgetString(msg, "timestamp")
 
-      val currentTimestamp = TMTDateTimeFormatter.parse(timestamp)
-      fileAppender.add(currentTimestamp, Compact(msg, safe = true, sort = sort))
+      val logDateTime = TMTDateTimeFormatter.parse(timestamp)
+      fileAppender.add(logDateTime, Compact(msg, safe = true, sort = sort))
     }
 
   /**
