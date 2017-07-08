@@ -112,7 +112,7 @@ private[logging] class LogActor(done: Promise[Unit],
       "@severity" -> log.level.name, "@category" -> "common")
 
     // This lime adds the user map objects as additional JsonObjects if the map is not empty
-    if (!log.map.isEmpty) jsonObject = jsonObject ++ log.map.flatMap(e => JsonObject(e._1 -> e._2))
+    jsonObject = jsonObject ++ log.map.flatMap(e => JsonObject(e._1 -> e._2))
 
     if (!log.sourceLocation.fileName.isEmpty) {
       jsonObject = jsonObject ++ JsonObject("file" -> log.sourceLocation.fileName)
