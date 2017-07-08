@@ -31,6 +31,12 @@ abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndA
     "alternative" → "logging at alternative level"
   )
 
+  // These extra messages are used to test user keys
+  protected val userMsgMap = Map(
+    "user1" -> "user1 message",
+    "user2" -> "user2 message"
+  )
+
   override protected def beforeAll(): Unit = loggingSystem.setAppenders(List(testAppender))
 
   override protected def afterEach(): Unit = logBuffer.clear()

@@ -24,4 +24,19 @@ object SingletonComponent extends SingletonTestLogger.Simple {
   val WARN_LINE_NO  = TRACE_LINE_NO + 3
   val ERROR_LINE_NO = TRACE_LINE_NO + 4
   val FATAL_LINE_NO = TRACE_LINE_NO + 5
+
+  // A special startLogging for adding in a variable set of user keys and values
+  // Do not add any lines before this method
+  // Tests are written to assert on this line numbers
+  // In case any line needs to be added then update ${LEVEL}_LINE_NO constants
+  def startLogging(logs: Map[String, String], userMsgMap: Map[String, String]): Unit = {
+    log.trace(logs("trace"), userMsgMap)
+    log.debug(logs("debug"), userMsgMap)
+    log.info(logs("info"), userMsgMap)
+    log.warn(logs("warn"), userMsgMap)
+    log.error(logs("error"), userMsgMap)
+    log.fatal(logs("fatal"), userMsgMap)
+  }
+
+  val USER_TRACE_LINE_NO = 33
 }
