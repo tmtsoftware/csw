@@ -52,9 +52,13 @@ class ActorLoggingTest extends LoggingTestSuite {
     val errorLevelLogMessages =
       logBuffer.groupBy(json ⇒ json(LoggingKeys.SEVERITY))("ERROR")
     errorLevelLogMessages.size shouldEqual 1
-    val expectedMessage =
-      Map(LoggingKeys.MSG -> "Unknown message received", "reason" -> "Unknown", "actorRef" → irisActorRef.toString)
-    errorLevelLogMessages.head(LoggingKeys.MESSAGE) shouldBe expectedMessage
+
+    val expectedMessage  = "Unknown message received"
+    val expectedReason   = "Unknown"
+    val expectedActorRef = irisActorRef.toString
+    errorLevelLogMessages.head("message") shouldBe expectedMessage
+    errorLevelLogMessages.head("reason") shouldBe expectedReason
+    errorLevelLogMessages.head("actorRef") shouldBe expectedActorRef
   }
 
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance

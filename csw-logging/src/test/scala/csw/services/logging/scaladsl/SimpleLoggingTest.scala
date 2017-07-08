@@ -84,6 +84,39 @@ class SimpleLoggingTest extends LoggingTestSuite {
     }
   }
 
+  // DEOPSCSW-116: Make log messages identifiable with components
+  // DEOPSCSW-119: Associate source with each log message
+  // DEOPSCSW-121: Define structured tags for log messages
+  test("object logs should allow user definable keys and values") {
+
+    //  Use SingletonComponent for test, but works identically for all cases
+    SingletonComponent.startLogging(logMsgMap, userMsgMap)
+    Thread.sleep(100)
+
+    //   Verify that default level is TRACE in config
+    LoggingState.componentsLoggingState("default").componentLogLevel shouldBe LoggingLevels.TRACE
+
+    var logMsgLineNumber = SingletonComponent.USER_TRACE_LINE_NO
+
+    logBuffer.foreach { log ⇒
+      //  Count the user messages for test at the end
+      var userMsgCount = 0
+      log.contains("@componentName") shouldBe true
+      log("@componentName") shouldBe "SingletonComponent"
+      log("file") shouldBe "SingletonComponent.scala"
+      log("line") shouldBe logMsgLineNumber
+      log("class") shouldBe "csw.services.logging.components.SingletonComponent"
+      //  This verifies that the user keys are present and the value is correct
+      //  Also make sure all user messages and values are present
+      userMsgMap.foreach { m =>
+        log(m._1) shouldBe userMsgMap(m._1)
+        userMsgCount += 1
+      }
+      logMsgLineNumber += 1
+      userMsgCount shouldBe userMsgMap.size
+    }
+  }
+
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
   test("should load default filter provided in configuration file and applied to normal logging messages") {
 

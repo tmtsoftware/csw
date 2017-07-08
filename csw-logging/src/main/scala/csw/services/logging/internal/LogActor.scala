@@ -112,10 +112,13 @@ private[logging] class LogActor(done: Promise[Unit],
 
     var jsonObject = JsonObject(
       LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(log.time),
-      LoggingKeys.MESSAGE   → msg,
+      LoggingKeys.MESSAGE   → log.msg,
       LoggingKeys.SEVERITY  -> log.level.name,
       LoggingKeys.CATEGORY  -> Category.Common.name
     )
+
+    // This lime adds the user map objects as additional JsonObjects if the map is not empty
+    if (log.map.nonEmpty) jsonObject = jsonObject ++ log.map.flatMap(e => JsonObject(e._1 -> e._2))
 
     if (!log.sourceLocation.fileName.isEmpty) {
       jsonObject = jsonObject ++ JsonObject(LoggingKeys.FILE -> log.sourceLocation.fileName)
