@@ -25,7 +25,14 @@ class MyFavComponent extends MyFavComponentLogger.Simple {
   }
 }
 
-object CustomAppenderBuilder extends LogAppenderBuilder {
+class CustomAppenderBuilderClass extends LogAppenderBuilder {
+  val logBuffer: mutable.Buffer[JsonObject] = mutable.Buffer.empty[JsonObject]
+
+  override def apply(factory: ActorRefFactory, standardHeaders: Map[String, RichMsg]): LogAppender =
+    new CustomAppender(factory, standardHeaders, x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
+}
+
+object CustomAppenderBuilderObject extends LogAppenderBuilder {
   val logBuffer: mutable.Buffer[JsonObject] = mutable.Buffer.empty[JsonObject]
 
   override def apply(factory: ActorRefFactory, standardHeaders: Map[String, RichMsg]): LogAppender =
@@ -57,11 +64,12 @@ class CustomAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
 class CustomAppenderTest extends FunSuite with Matchers {
   private val hostName = InetAddress.getLocalHost.getHostAddress
 
-  test("should throw AppenderNotFoundException for an invalid appender configured") {
+  test("should be able to add and configure a custom appender using an object extending from CustomAppenderBuilder") {
 
-    val config = ConfigFactory.parseString("""
+    val config =
+      ConfigFactory.parseString("""
         |csw-logging {
-        | appenders = ["csw.services.logging.appenders.CustomAppenderBuilder$"]
+        | appenders = ["csw.services.logging.appenders.CustomAppenderBuilderObject$"]
         | appender-config {
         |   my-fav-appender {
         |     logIpAddress = true
@@ -72,14 +80,42 @@ class CustomAppenderTest extends FunSuite with Matchers {
 
     val actorSystem   = ActorSystem("test", config)
     val loggingSystem = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
-    loggingSystem.setAppenders(List(CustomAppenderBuilder))
+    loggingSystem.setAppenders(List(CustomAppenderBuilderObject))
 
     new MyFavComponent().startLogging()
     Thread.sleep(200)
-    CustomAppenderBuilder.logBuffer.size shouldBe 4
+    CustomAppenderBuilderObject.logBuffer.size shouldBe 4
 
-    CustomAppenderBuilder.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe true
-    CustomAppenderBuilder.logBuffer.forall(log ⇒ log("IpAddress") == hostName) shouldBe true
+    CustomAppenderBuilderObject.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe true
+    CustomAppenderBuilderObject.logBuffer.forall(log ⇒ log("IpAddress") == hostName) shouldBe true
+
+    Await.result(actorSystem.terminate(), 10.seconds)
+  }
+
+  test("should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder") {
+
+    val config = ConfigFactory.parseString("""
+        |csw-logging {
+        | appenders = ["csw.services.logging.appenders.CustomAppenderBuilderClass"]
+        | appender-config {
+        |   my-fav-appender {
+        |     logIpAddress = true
+        |   }
+        | }
+        |}
+      """.stripMargin)
+
+    val actorSystem    = ActorSystem("test", config)
+    val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
+    val customAppender = new CustomAppenderBuilderClass
+    loggingSystem.setAppenders(List(customAppender))
+
+    new MyFavComponent().startLogging()
+    Thread.sleep(200)
+    customAppender.logBuffer.size shouldBe 4
+
+    customAppender.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe true
+    customAppender.logBuffer.forall(log ⇒ log("IpAddress") == hostName) shouldBe true
 
     Await.result(actorSystem.terminate(), 10.seconds)
   }
