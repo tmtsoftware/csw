@@ -33,9 +33,9 @@ public class JLogUtil {
         actorRef.tell("trace", ActorRef.noSender());
         actorRef.tell("debug", ActorRef.noSender());
         actorRef.tell("info", ActorRef.noSender());
-        actorRef.tell("warn", ActorRef.noSender());
-        actorRef.tell("error", ActorRef.noSender());
-        actorRef.tell("fatal", ActorRef.noSender());
+  //      actorRef.tell("warn", ActorRef.noSender());
+//        actorRef.tell("error", ActorRef.noSender());
+      //  actorRef.tell("fatal", ActorRef.noSender());
     }
 
 }

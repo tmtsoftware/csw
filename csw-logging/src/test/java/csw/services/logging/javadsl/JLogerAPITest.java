@@ -74,10 +74,9 @@ public class JLogerAPITest extends JGenericSimple {
     }
 
     private void testMessageWithMap(JsonObject fifthLogJsonObject) {
-        JsonObject messageJasonObject = fifthLogJsonObject.get("message").getAsJsonObject();
-        Assert.assertEquals(this.message, messageJasonObject.get("@msg").getAsString());
-        Assert.assertEquals(data.get("key1"), messageJasonObject.get("key1").getAsString());
-        Assert.assertEquals(data.get("key2"), messageJasonObject.get("key2").getAsString());
+        Assert.assertEquals(this.message, fifthLogJsonObject.get("message").getAsString());
+        Assert.assertEquals(data.get("key1"), fifthLogJsonObject.get("key1").getAsString());
+        Assert.assertEquals(data.get("key2"), fifthLogJsonObject.get("key2").getAsString());
     }
 
     private void testCommonProperties(LoggingLevels.Level level) {
