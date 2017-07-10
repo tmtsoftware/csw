@@ -1,3 +1,4 @@
+
 import Libs._
 import sbt.Keys._
 import sbt._
@@ -11,7 +12,7 @@ object Common extends AutoPlugin {
 
   override def requires: Plugins = JvmPlugin
 
-  override lazy val projectSettings: Seq[Setting[_]] = extraSettings ++ Seq(
+  override lazy val projectSettings: Seq[Setting[_]] = extraSettings ++ scalafmtSettings ++ Seq(
     organization := "org.tmt",
     organizationName := "TMT Org",
     scalaVersion := Libs.ScalaVersion,
@@ -69,5 +70,20 @@ object Common extends AutoPlugin {
     )
     case _            =>
       List.empty
+  }
+
+
+  // After upgrading from 0.6.6 to 0.6.8 scalafmt downloads stuff after every change to the project
+  // This is a workaround from github issue : https://github.com/scalameta/scalafmt/issues/879
+  private def scalafmtSettings() = {
+    def latestScalafmt = "0.6.8"
+
+    commands += Command.args("scalafmt", "Run scalafmt cli.") {
+      case (state, args) =>
+        val Right(scalafmt) =
+          org.scalafmt.bootstrap.ScalafmtBootstrap.fromVersion(latestScalafmt)
+        scalafmt.main("--non-interactive" +: args.toArray)
+        state
+    }
   }
 }
