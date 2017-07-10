@@ -3,7 +3,7 @@ package csw.services.logging.appenders
 import akka.actor.{ActorContext, ActorRefFactory, ActorSystem}
 import com.persist.JsonOps._
 import csw.services.logging.RichMsg
-import csw.services.logging.commons.{Category, Keys}
+import csw.services.logging.commons.{Category, LoggingKeys}
 import csw.services.logging.internal.LoggingLevels.Level
 
 import scala.concurrent.Future
@@ -56,10 +56,10 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
    * @param category the kinds of log (for example, "common").
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit = {
-    val level = jgetString(baseMsg, Keys.SEVERITY)
+    val level = jgetString(baseMsg, LoggingKeys.SEVERITY)
 
     if (category == Category.Common.name && Level(level) >= logLevelLimit) {
-      val maybeKind = jgetString(baseMsg, Keys.KIND)
+      val maybeKind = jgetString(baseMsg, LoggingKeys.KIND)
       if (summary) {
         buildSummary(level, maybeKind)
       }
@@ -67,9 +67,9 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
       val normalText = if (oneLine) {
         oneLine(baseMsg, level, maybeKind)
       } else if (pretty) {
-        Pretty(msg - Keys.CATEGORY, safe = true, width = width)
+        Pretty(msg - LoggingKeys.CATEGORY, safe = true, width = width)
       } else {
-        Compact(msg - Keys.CATEGORY, safe = true)
+        Compact(msg - LoggingKeys.CATEGORY, safe = true)
       }
 
       val finalText = if (color) {
@@ -95,13 +95,13 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
     }
 
   private def oneLine(baseMsg: Map[String, RichMsg], level: String, maybeKind: String) = {
-    val msg = jget(baseMsg, Keys.MESSAGE) match {
+    val msg = jget(baseMsg, LoggingKeys.MESSAGE) match {
       case s: String => s
       case x: Any    => Compact(x, safe = true)
     }
     val kind  = if (!maybeKind.isEmpty) s":$maybeKind" else ""
-    val file  = jgetString(baseMsg, Keys.FILE)
-    val where = if (!file.isEmpty) s" ($file ${jgetInt(baseMsg, Keys.LINE)})" else ""
+    val file  = jgetString(baseMsg, LoggingKeys.FILE)
+    val where = if (!file.isEmpty) s" ($file ${jgetInt(baseMsg, LoggingKeys.LINE)})" else ""
     s"[$level$kind] $msg$where"
 
   }

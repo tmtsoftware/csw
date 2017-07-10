@@ -1,7 +1,7 @@
 package csw.services.logging.compat
 
 import akka.actor.{Actor, ActorLogging, Props}
-import csw.services.logging.commons.Keys
+import csw.services.logging.commons.LoggingKeys
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.utils.LoggingTestSuite
@@ -32,16 +32,16 @@ class AkkaLoggerTest extends LoggingTestSuite with FunSuiteLike with Matchers {
     Thread.sleep(300)
 
     logBuffer.foreach { log ⇒
-      log.contains(Keys.COMPONENT_NAME) shouldBe false
+      log.contains(LoggingKeys.COMPONENT_NAME) shouldBe false
 
-      log.contains(Keys.SEVERITY) shouldBe true
-      val currentLogLevel = log(Keys.SEVERITY).toString.toLowerCase
+      log.contains(LoggingKeys.SEVERITY) shouldBe true
+      val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
       Level(currentLogLevel) >= LoggingLevels.INFO shouldBe true
 
-      log(Keys.MESSAGE) shouldBe currentLogLevel
-      log(Keys.ACTOR) shouldBe actorRef.path.toString
-      log(Keys.CLASS) shouldBe className
-      log(Keys.KIND) shouldBe "akka"
+      log(LoggingKeys.MESSAGE) shouldBe currentLogLevel
+      log(LoggingKeys.ACTOR) shouldBe actorRef.path.toString
+      log(LoggingKeys.CLASS) shouldBe className
+      log(LoggingKeys.KIND) shouldBe "akka"
     }
 
   }

@@ -7,7 +7,7 @@ import com.persist.JsonOps
 import com.persist.JsonOps.jgetString
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.RichMsg
-import csw.services.logging.commons.{Category, Keys, TMTDateTimeFormatter}
+import csw.services.logging.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.services.logging.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -22,52 +22,52 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     .withFallback(ConfigFactory.load)
   private val actorSystem = ActorSystem("test-1", config)
   private val standardHeaders: Map[String, RichMsg] =
-    Map[String, RichMsg](Keys.HOST -> "localhost", Keys.NAME -> "test-service")
+    Map[String, RichMsg](LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
 
   val logMsgString1: String =
     s"""{
-      |  "${Keys.CATEGORY}": "alternative",
-      |  "${Keys.COMPONENT_NAME}": "FileAppenderTest",
-      |  "${Keys.HOST}": "localhost",
-      |  "${Keys.NAME}": "test-service",
-      |  "${Keys.SEVERITY}": "ERROR",
-      |  "${Keys.TIMESTAMP}": "2017-06-19T16:10:19:397000000",
-      |  "${Keys.CLASS}": "csw.services.logging.appenders.FileAppenderTest",
-      |  "${Keys.FILE}": "FileAppenderTest.scala",
-      |  "${Keys.LINE}": 25,
-      |  "${Keys.MESSAGE}": "This is at ERROR level"
+      |  "${LoggingKeys.CATEGORY}": "alternative",
+      |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.HOST}": "localhost",
+      |  "${LoggingKeys.NAME}": "test-service",
+      |  "${LoggingKeys.SEVERITY}": "ERROR",
+      |  "${LoggingKeys.TIMESTAMP}": "2017-06-19T16:10:19:397000000",
+      |  "${LoggingKeys.CLASS}": "csw.services.logging.appenders.FileAppenderTest",
+      |  "${LoggingKeys.FILE}": "FileAppenderTest.scala",
+      |  "${LoggingKeys.LINE}": 25,
+      |  "${LoggingKeys.MESSAGE}": "This is at ERROR level"
       |}
     """.stripMargin
 
   val logMsgString2: String =
     s"""{
-      |  "${Keys.CATEGORY}": "${Category.Common.name}",
-      |  "${Keys.COMPONENT_NAME}": "FileAppenderTest",
-      |  "${Keys.HOST}": "localhost",
-      |  "${Keys.NAME}": "test-service",
-      |  "${Keys.SEVERITY}": "ERROR",
-      |  "${Keys.TIMESTAMP}": "2017-06-20T16:10:19:397000000",
-      |  "${Keys.CLASS}": "csw.services.logging.appenders.FileAppenderTest",
-      |  "${Keys.FILE}": "FileAppenderTest.scala",
-      |  "${Keys.LINE}": 25,
-      |  "${Keys.MESSAGE}": "This is at ERROR level"
+      |  "${LoggingKeys.CATEGORY}": "${Category.Common.name}",
+      |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.HOST}": "localhost",
+      |  "${LoggingKeys.NAME}": "test-service",
+      |  "${LoggingKeys.SEVERITY}": "ERROR",
+      |  "${LoggingKeys.TIMESTAMP}": "2017-06-20T16:10:19:397000000",
+      |  "${LoggingKeys.CLASS}": "csw.services.logging.appenders.FileAppenderTest",
+      |  "${LoggingKeys.FILE}": "FileAppenderTest.scala",
+      |  "${LoggingKeys.LINE}": 25,
+      |  "${LoggingKeys.MESSAGE}": "This is at ERROR level"
       |}
     """.stripMargin
 
   val logMsgString3: String =
     s"""{
-      |  "${Keys.CATEGORY}": "${Category.Common.name}",
-      |  "${Keys.COMPONENT_NAME}": "FileAppenderTest",
-      |  "${Keys.HOST}": "localhost",
-      |  "${Keys.NAME}": "test-service",
-      |  "${Keys.SEVERITY}": "INFO",
-      |  "${Keys.TIMESTAMP}": "2017-06-23T01:10:19:397000000",
-      |  "${Keys.CLASS}": "csw.services.logging.appenders.FileAppenderTest",
-      |  "${Keys.FILE}": "FileAppenderTest.scala",
-      |  "${Keys.LINE}": 25,
-      |  "${Keys.MESSAGE}": "This is at INFO level"
+      |  "${LoggingKeys.CATEGORY}": "${Category.Common.name}",
+      |  "${LoggingKeys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${LoggingKeys.HOST}": "localhost",
+      |  "${LoggingKeys.NAME}": "test-service",
+      |  "${LoggingKeys.SEVERITY}": "INFO",
+      |  "${LoggingKeys.TIMESTAMP}": "2017-06-23T01:10:19:397000000",
+      |  "${LoggingKeys.CLASS}": "csw.services.logging.appenders.FileAppenderTest",
+      |  "${LoggingKeys.FILE}": "FileAppenderTest.scala",
+      |  "${LoggingKeys.LINE}": 25,
+      |  "${LoggingKeys.MESSAGE}": "This is at INFO level"
       |}
     """.stripMargin
 
@@ -75,15 +75,15 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   val expectedLogMsgJson2: Map[String, String] = JsonOps.Json(logMsgString2).asInstanceOf[Map[String, String]]
   val expectedLogMsgJson3: Map[String, String] = JsonOps.Json(logMsgString3).asInstanceOf[Map[String, String]]
 
-  private val date1            = jgetString(expectedLogMsgJson1, Keys.TIMESTAMP)
+  private val date1            = jgetString(expectedLogMsgJson1, LoggingKeys.TIMESTAMP)
   private val localDateTime1   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date1))
   private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service/alternative.$localDateTime1.log"
 
-  private val date2            = jgetString(expectedLogMsgJson2, Keys.TIMESTAMP)
+  private val date2            = jgetString(expectedLogMsgJson2, LoggingKeys.TIMESTAMP)
   private val localDateTime2   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date2))
   private val logFileFullPath2 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime2.log"
 
-  private val date3            = jgetString(expectedLogMsgJson3, Keys.TIMESTAMP)
+  private val date3            = jgetString(expectedLogMsgJson3, LoggingKeys.TIMESTAMP)
   private val localDateTime3   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date3))
   private val logFileFullPath3 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime3.log"
 

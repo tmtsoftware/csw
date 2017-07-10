@@ -1,6 +1,6 @@
 package csw.services.logging.commons
 
-private[logging] object Keys {
+private[logging] object LoggingKeys {
 
   val CATEGORY       = "@category"
   val SEVERITY       = "@severity"

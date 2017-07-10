@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
-import csw.services.logging.commons.Keys$;
+import csw.services.logging.commons.LoggingKeys$;
 import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.scaladsl.RequestId;
@@ -72,50 +72,50 @@ public class JLoggerAPITest extends JGenericSimple {
 
     private void testExceptionJsonObject(JsonObject jsonObject) {
         Assert.assertTrue(jsonObject.has("trace"));
-        JsonObject messageBlock = jsonObject.get("trace").getAsJsonObject().get(Keys$.MODULE$.MESSAGE()).getAsJsonObject();
-        Assert.assertEquals(exceptionMessage, messageBlock.get(Keys$.MODULE$.MESSAGE()).getAsString());
+        JsonObject messageBlock = jsonObject.get("trace").getAsJsonObject().get(LoggingKeys$.MODULE$.MESSAGE()).getAsJsonObject();
+        Assert.assertEquals(exceptionMessage, messageBlock.get(LoggingKeys$.MODULE$.MESSAGE()).getAsString());
     }
 
     private void testMessageWithMap(JsonObject fifthLogJsonObject) {
-        JsonObject messageJasonObject = fifthLogJsonObject.get(Keys$.MODULE$.MESSAGE()).getAsJsonObject();
-        Assert.assertEquals(this.message, messageJasonObject.get(Keys$.MODULE$.MSG()).getAsString());
+        JsonObject messageJasonObject = fifthLogJsonObject.get(LoggingKeys$.MODULE$.MESSAGE()).getAsJsonObject();
+        Assert.assertEquals(this.message, messageJasonObject.get(LoggingKeys$.MODULE$.MSG()).getAsString());
         Assert.assertEquals(data.get("key1"), messageJasonObject.get("key1").getAsString());
         Assert.assertEquals(data.get("key2"), messageJasonObject.get("key2").getAsString());
     }
 
     private void testCommonProperties(LoggingLevels.Level level) {
         logBuffer.forEach(log -> {
-            String currentLogLevel = log.get(Keys$.MODULE$.SEVERITY()).getAsString();
+            String currentLogLevel = log.get(LoggingKeys$.MODULE$.SEVERITY()).getAsString();
             Assert.assertEquals(level, LoggingLevels.Level$.MODULE$.apply(currentLogLevel));
-            Assert.assertTrue(log.has(Keys$.MODULE$.TIMESTAMP()));
+            Assert.assertTrue(log.has(LoggingKeys$.MODULE$.TIMESTAMP()));
 
-            Assert.assertEquals(className, log.get(Keys$.MODULE$.CLASS()).getAsString());
+            Assert.assertEquals(className, log.get(LoggingKeys$.MODULE$.CLASS()).getAsString());
         });
     }
 
     private void testAllOverloads() {
         JsonObject firstLogJsonObject = logBuffer.remove(0);
-        Assert.assertEquals(message, firstLogJsonObject.get(Keys$.MODULE$.MESSAGE()).getAsString());
+        Assert.assertEquals(message, firstLogJsonObject.get(LoggingKeys$.MODULE$.MESSAGE()).getAsString());
 
         JsonObject secondLogJsonObject = logBuffer.remove(0);
-        Assert.assertEquals(message, secondLogJsonObject.get(Keys$.MODULE$.MESSAGE()).getAsString());
+        Assert.assertEquals(message, secondLogJsonObject.get(LoggingKeys$.MODULE$.MESSAGE()).getAsString());
         testExceptionJsonObject(secondLogJsonObject);
 
         JsonObject thirdLogJsonObject = logBuffer.remove(0);
-        Assert.assertEquals(message, thirdLogJsonObject.get(Keys$.MODULE$.MESSAGE()).getAsString());
-        Assert.assertEquals(requestId.trackingId(), thirdLogJsonObject.get(Keys$.MODULE$.TRACE_ID()).getAsJsonArray().get(0).getAsString());
+        Assert.assertEquals(message, thirdLogJsonObject.get(LoggingKeys$.MODULE$.MESSAGE()).getAsString());
+        Assert.assertEquals(requestId.trackingId(), thirdLogJsonObject.get(LoggingKeys$.MODULE$.TRACE_ID()).getAsJsonArray().get(0).getAsString());
 
         JsonObject fourthLogJsonObject = logBuffer.remove(0);
-        Assert.assertEquals(message, fourthLogJsonObject.get(Keys$.MODULE$.MESSAGE()).getAsString());
+        Assert.assertEquals(message, fourthLogJsonObject.get(LoggingKeys$.MODULE$.MESSAGE()).getAsString());
         testExceptionJsonObject(fourthLogJsonObject);
-        Assert.assertEquals(requestId.trackingId(), fourthLogJsonObject.get(Keys$.MODULE$.TRACE_ID()).getAsJsonArray().get(0).getAsString());
+        Assert.assertEquals(requestId.trackingId(), fourthLogJsonObject.get(LoggingKeys$.MODULE$.TRACE_ID()).getAsJsonArray().get(0).getAsString());
 
         JsonObject fifthLogJsonObject = logBuffer.remove(0);
         testMessageWithMap(fifthLogJsonObject);
 
         JsonObject sixthLogJsonObject = logBuffer.remove(0);
         testMessageWithMap(sixthLogJsonObject);
-        Assert.assertEquals(requestId.trackingId(), sixthLogJsonObject.get(Keys$.MODULE$.TRACE_ID()).getAsJsonArray().get(0).getAsString());
+        Assert.assertEquals(requestId.trackingId(), sixthLogJsonObject.get(LoggingKeys$.MODULE$.TRACE_ID()).getAsJsonArray().get(0).getAsString());
 
         JsonObject seventhLogJsonObject = logBuffer.remove(0);
         testMessageWithMap(seventhLogJsonObject);
@@ -124,7 +124,7 @@ public class JLoggerAPITest extends JGenericSimple {
         JsonObject eighthLogJsonObject = logBuffer.remove(0);
         testMessageWithMap(eighthLogJsonObject);
         testExceptionJsonObject(eighthLogJsonObject);
-        Assert.assertEquals(requestId.trackingId(), eighthLogJsonObject.get(Keys$.MODULE$.TRACE_ID()).getAsJsonArray().get(0).getAsString());
+        Assert.assertEquals(requestId.trackingId(), eighthLogJsonObject.get(LoggingKeys$.MODULE$.TRACE_ID()).getAsJsonArray().get(0).getAsString());
     }
 
     @Test

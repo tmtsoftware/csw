@@ -1,7 +1,7 @@
 package csw.services.logging.internal
 
 import com.persist.JsonOps._
-import csw.services.logging.commons.Keys
+import csw.services.logging.commons.LoggingKeys
 import csw.services.logging.scaladsl.{GenericLogger, RequestId}
 
 import scala.collection.mutable
@@ -42,7 +42,7 @@ private[logging] class TimeActor(tdone: Promise[Unit]) extends GenericLogger.Act
       }
       val traceId = JsonArray(id.trackingId, id.spanId)
       val jitems  = jitems0.toSeq.sortBy(jgetInt(_, "time0"))
-      val j       = JsonObject(Keys.TRACE_ID -> traceId, "items" -> jitems)
+      val j       = JsonObject(LoggingKeys.TRACE_ID -> traceId, "items" -> jitems)
       log.alternative("time", j)
       items -= key
     }

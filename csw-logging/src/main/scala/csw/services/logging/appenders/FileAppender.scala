@@ -7,7 +7,7 @@ import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 import akka.actor._
 import com.persist.JsonOps._
 import csw.services.logging.RichMsg
-import csw.services.logging.commons.{Category, Constants, Keys, TMTDateTimeFormatter}
+import csw.services.logging.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.GenericLogger
@@ -189,10 +189,10 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
   private[this] val sort                      = config.getBoolean("sorted")
   private[this] val logLevelLimit             = Level(config.getString("logLevelLimit"))
   private[this] val fileAppenders             = scala.collection.mutable.HashMap[String, FilesAppender]()
-  private val loggingSystemName               = jgetString(stdHeaders, Keys.NAME)
+  private val loggingSystemName               = jgetString(stdHeaders, LoggingKeys.NAME)
 
   private def checkLevel(baseMsg: Map[String, RichMsg]): Boolean = {
-    val level = jgetString(baseMsg, Keys.SEVERITY)
+    val level = jgetString(baseMsg, LoggingKeys.SEVERITY)
     Level(level) >= logLevelLimit
   }
 
@@ -215,7 +215,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
           fileAppenders += (fileAppenderKey -> filesAppender)
           filesAppender
       }
-      val timestamp = jgetString(msg, Keys.TIMESTAMP)
+      val timestamp = jgetString(msg, LoggingKeys.TIMESTAMP)
 
       val logDateTime = TMTDateTimeFormatter.parse(timestamp)
       fileAppender.add(logDateTime, Compact(msg, safe = true, sort = sort))

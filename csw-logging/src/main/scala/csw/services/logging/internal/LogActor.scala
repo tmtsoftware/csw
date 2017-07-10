@@ -5,7 +5,7 @@ import com.persist.Exceptions.SystemException
 import com.persist.JsonOps._
 import csw.services.logging._
 import csw.services.logging.appenders.LogAppender
-import csw.services.logging.commons.{Category, Keys, TMTDateTimeFormatter}
+import csw.services.logging.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.{RequestId, RichException}
@@ -63,11 +63,11 @@ private[logging] class LogActor(done: Promise[Unit],
     val name = ex.getClass.toString
     ex match {
       case ex: RichException =>
-        JsonObject(Keys.EX -> name, Keys.MESSAGE -> ex.richMsg)
+        JsonObject(LoggingKeys.EX -> name, LoggingKeys.MESSAGE -> ex.richMsg)
       case ex: SystemException =>
-        JsonObject(Keys.KIND -> ex.kind, "info" -> ex.info)
+        JsonObject(LoggingKeys.KIND -> ex.kind, "info" -> ex.info)
       case ex: Throwable =>
-        JsonObject(Keys.EX -> name, Keys.MESSAGE -> ex.getMessage)
+        JsonObject(LoggingKeys.EX -> name, LoggingKeys.MESSAGE -> ex.getMessage)
     }
   }
 
@@ -75,14 +75,14 @@ private[logging] class LogActor(done: Promise[Unit],
   private def getStack(ex: Throwable): Seq[JsonObject] = {
     val stack = ex.getStackTrace map { trace =>
       val j0 = if (trace.getLineNumber > 0) {
-        JsonObject(Keys.LINE -> trace.getLineNumber)
+        JsonObject(LoggingKeys.LINE -> trace.getLineNumber)
       } else {
         emptyJsonObject
       }
       val j1 = JsonObject(
-        Keys.CLASS  -> trace.getClassName,
-        Keys.FILE   -> trace.getFileName,
-        Keys.METHOD -> trace.getMethodName
+        LoggingKeys.CLASS  -> trace.getClassName,
+        LoggingKeys.FILE   -> trace.getFileName,
+        LoggingKeys.METHOD -> trace.getMethodName
       )
       j0 ++ j1
     }
@@ -94,12 +94,12 @@ private[logging] class LogActor(done: Promise[Unit],
     val stack = getStack(ex)
     val j1 = ex match {
       case r: RichException if r.cause != noException =>
-        JsonObject(Keys.CAUSE -> exceptionJson(r.cause))
+        JsonObject(LoggingKeys.CAUSE -> exceptionJson(r.cause))
       case ex1: Throwable if ex.getCause != null =>
-        JsonObject(Keys.CAUSE -> exceptionJson(ex.getCause))
+        JsonObject(LoggingKeys.CAUSE -> exceptionJson(ex.getCause))
       case _ => emptyJsonObject
     }
-    JsonObject(Keys.TRACE -> JsonObject(Keys.MESSAGE -> exToJson(ex), Keys.STACK -> stack)) ++ j1
+    JsonObject(LoggingKeys.TRACE -> JsonObject(LoggingKeys.MESSAGE -> exToJson(ex), LoggingKeys.STACK -> stack)) ++ j1
   }
 
   // Send JSON log object for each appender configured for the logging system
@@ -108,38 +108,42 @@ private[logging] class LogActor(done: Promise[Unit],
 
   private def receiveLog(log: Log): Unit = {
 
-    val msg = if (log.map.isEmpty) log.msg else Map(Keys.MSG → log.msg) ++ log.map
+    val msg = if (log.map.isEmpty) log.msg else Map(LoggingKeys.MSG → log.msg) ++ log.map
 
-    var jsonObject = JsonObject(Keys.TIMESTAMP -> TMTDateTimeFormatter.format(log.time), Keys.MESSAGE → msg,
-      Keys.SEVERITY -> log.level.name, Keys.CATEGORY -> Category.Common.name)
+    var jsonObject = JsonObject(
+      LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(log.time),
+      LoggingKeys.MESSAGE   → msg,
+      LoggingKeys.SEVERITY  -> log.level.name,
+      LoggingKeys.CATEGORY  -> Category.Common.name
+    )
 
     if (!log.sourceLocation.fileName.isEmpty) {
-      jsonObject = jsonObject ++ JsonObject(Keys.FILE -> log.sourceLocation.fileName)
+      jsonObject = jsonObject ++ JsonObject(LoggingKeys.FILE -> log.sourceLocation.fileName)
     }
 
     if (log.sourceLocation.line > 0)
-      jsonObject = jsonObject ++ JsonObject(Keys.LINE -> log.sourceLocation.line)
+      jsonObject = jsonObject ++ JsonObject(LoggingKeys.LINE -> log.sourceLocation.line)
 
     jsonObject = (log.sourceLocation.packageName, log.sourceLocation.className) match {
       case ("", "") ⇒ jsonObject
-      case ("", c)  ⇒ jsonObject ++ JsonObject(Keys.CLASS -> c)
-      case (p, c)   ⇒ jsonObject ++ JsonObject(Keys.CLASS -> s"$p.$c")
+      case ("", c)  ⇒ jsonObject ++ JsonObject(LoggingKeys.CLASS -> c)
+      case (p, c)   ⇒ jsonObject ++ JsonObject(LoggingKeys.CLASS -> s"$p.$c")
     }
 
     if (log.actorName.isDefined)
-      jsonObject = jsonObject ++ JsonObject(Keys.ACTOR -> log.actorName.get)
+      jsonObject = jsonObject ++ JsonObject(LoggingKeys.ACTOR -> log.actorName.get)
 
     if (log.componentName.isDefined)
-      jsonObject = jsonObject ++ JsonObject(Keys.COMPONENT_NAME -> log.componentName.get)
+      jsonObject = jsonObject ++ JsonObject(LoggingKeys.COMPONENT_NAME -> log.componentName.get)
 
     if (log.ex != noException) jsonObject = jsonObject ++ exceptionJson(log.ex)
     jsonObject = log.id match {
       case RequestId(trackingId, spanId, _) ⇒
-        jsonObject ++ JsonObject(Keys.TRACE_ID -> JsonArray(trackingId, spanId))
+        jsonObject ++ JsonObject(LoggingKeys.TRACE_ID -> JsonArray(trackingId, spanId))
       case _ ⇒ jsonObject
     }
     if (!log.kind.isEmpty)
-      jsonObject = jsonObject ++ JsonObject(Keys.KIND -> log.kind)
+      jsonObject = jsonObject ++ JsonObject(LoggingKeys.KIND -> log.kind)
     append(jsonObject, Category.Common.name, log.level)
   }
 
@@ -149,26 +153,26 @@ private[logging] class LogActor(done: Promise[Unit],
       jsonObject = jsonObject ++ exceptionJson(logAltMessage.ex)
     jsonObject = logAltMessage.id match {
       case RequestId(trackingId, spanId, _) =>
-        jsonObject ++ JsonObject(Keys.TRACE_ID -> JsonArray(trackingId, spanId))
+        jsonObject ++ JsonObject(LoggingKeys.TRACE_ID -> JsonArray(trackingId, spanId))
       case _ => jsonObject
     }
-    jsonObject = jsonObject ++ JsonObject(Keys.TIMESTAMP -> TMTDateTimeFormatter.format(logAltMessage.time))
+    jsonObject = jsonObject ++ JsonObject(LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAltMessage.time))
     append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
   }
 
   private def receiveLogSlf4j(logSlf4j: LogSlf4j) =
     if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
       var jsonObject = JsonObject(
-        Keys.TIMESTAMP -> TMTDateTimeFormatter.format(logSlf4j.time),
-        Keys.MESSAGE   -> logSlf4j.msg,
-        Keys.FILE      -> logSlf4j.file,
-        Keys.SEVERITY  -> logSlf4j.level.name,
-        Keys.CLASS     -> logSlf4j.className,
-        Keys.KIND      -> "slf4j",
-        Keys.CATEGORY  -> Category.Common.name
+        LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logSlf4j.time),
+        LoggingKeys.MESSAGE   -> logSlf4j.msg,
+        LoggingKeys.FILE      -> logSlf4j.file,
+        LoggingKeys.SEVERITY  -> logSlf4j.level.name,
+        LoggingKeys.CLASS     -> logSlf4j.className,
+        LoggingKeys.KIND      -> "slf4j",
+        LoggingKeys.CATEGORY  -> Category.Common.name
       )
       if (logSlf4j.line > 0)
-        jsonObject = jsonObject ++ JsonObject(Keys.LINE -> logSlf4j.line)
+        jsonObject = jsonObject ++ JsonObject(LoggingKeys.LINE -> logSlf4j.line)
       if (logSlf4j.ex != noException)
         jsonObject = jsonObject ++ exceptionJson(logSlf4j.ex)
       append(jsonObject, Category.Common.name, logSlf4j.level)
@@ -178,13 +182,13 @@ private[logging] class LogActor(done: Promise[Unit],
     if (logAkka.level.pos >= akkaLogLevel.pos) {
       val msg1 = if (logAkka.msg.toString.isEmpty) "UNKNOWN" else logAkka.msg
       var jsonObject = JsonObject(
-        Keys.TIMESTAMP -> TMTDateTimeFormatter.format(logAkka.time),
-        Keys.KIND      -> "akka",
-        Keys.MESSAGE   -> msg1.toString,
-        Keys.ACTOR     -> logAkka.source,
-        Keys.SEVERITY  -> logAkka.level.name,
-        Keys.CLASS     -> logAkka.clazz.getName,
-        Keys.CATEGORY  -> Category.Common.name
+        LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAkka.time),
+        LoggingKeys.KIND      -> "akka",
+        LoggingKeys.MESSAGE   -> msg1.toString,
+        LoggingKeys.ACTOR     -> logAkka.source,
+        LoggingKeys.SEVERITY  -> logAkka.level.name,
+        LoggingKeys.CLASS     -> logAkka.clazz.getName,
+        LoggingKeys.CATEGORY  -> Category.Common.name
       )
 
       if (logAkka.cause.isDefined)

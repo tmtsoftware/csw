@@ -1,6 +1,6 @@
 package csw.services.logging.components
 
-import csw.services.logging.commons.Keys
+import csw.services.logging.commons.LoggingKeys
 import csw.services.logging.scaladsl.{ComponentLogger, RichException}
 
 object TromboneHcdLogger extends ComponentLogger(TromboneHcd.NAME)
@@ -11,7 +11,7 @@ class TromboneHcd() extends TromboneHcdLogger.Simple {
   // Tests are written to assert on this line numbers
   // In case any line needs to be added then update constants in companion object
   def startLogging(logs: Map[String, String], kind: String = "all"): Unit = kind match {
-    case "alternative" ⇒ log.alternative("some-alternative-category", Map(Keys.MSG → logs("alternative")))
+    case "alternative" ⇒ log.alternative("some-alternative-category", Map(LoggingKeys.MSG → logs("alternative")))
     case "all" ⇒ {
       log.trace(logs("trace"))
       log.debug(logs("debug"))

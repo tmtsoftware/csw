@@ -2,7 +2,7 @@ package csw.services.logging.scaladsl
 
 import akka.actor.ActorRef
 import com.persist.JsonOps.JsonObject
-import csw.services.logging.commons.Keys
+import csw.services.logging.commons.LoggingKeys
 import csw.services.logging.components.IrisSupervisorActor._
 import csw.services.logging.components._
 import csw.services.logging.internal.LoggingLevels._
@@ -53,9 +53,9 @@ class LoggerCompTest extends LoggingTestSuite {
     tromboneHcdLogBuffer.clear()
 
     logBuffer.foreach { log ⇒
-      log.get(Keys.COMPONENT_NAME) match {
+      log.get(LoggingKeys.COMPONENT_NAME) match {
         case Some(_) ⇒
-          val name = log(Keys.COMPONENT_NAME).toString
+          val name = log(LoggingKeys.COMPONENT_NAME).toString
           componentLogBuffer.get(name) match {
             case Some(xs) ⇒ componentLogBuffer.update(name, xs :+ log)
             case None     ⇒ componentLogBuffer.put(name, ArrayBuffer(log))
@@ -78,7 +78,7 @@ class LoggerCompTest extends LoggingTestSuite {
 
     def testLogBuffer(logBuffer: mutable.Buffer[JsonObject], configuredLogLevel: Level): Unit = {
       logBuffer.foreach { log ⇒
-        val currentLogLevel = log(Keys.SEVERITY).toString.toLowerCase
+        val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
         Level(currentLogLevel) >= configuredLogLevel shouldBe true
       }
     }

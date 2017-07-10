@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
-import csw.services.logging.commons.Keys$;
+import csw.services.logging.commons.LoggingKeys$;
 import csw.services.logging.components.iris.JIrisActorLogger;
 import csw.services.logging.components.iris.JIrisSupervisorActor;
 import csw.services.logging.components.iris.JIrisTLA;
@@ -93,8 +93,8 @@ public class ILoggerTest {
         tromboneHcdLogBuffer.clear();
 
         logBuffer.forEach(log -> {
-            if (log.has(Keys$.MODULE$.COMPONENT_NAME())) {
-                String name = log.get(Keys$.MODULE$.COMPONENT_NAME()).getAsString();
+            if (log.has(LoggingKeys$.MODULE$.COMPONENT_NAME())) {
+                String name = log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString();
                 componentLogBuffer.computeIfAbsent(name, k -> new ArrayList<>()).add(log);
             } else
                 genericLogBuffer.add(log);
@@ -108,7 +108,7 @@ public class ILoggerTest {
 
     private void testLogBuffer(List<JsonObject> logBuffer, LoggingLevels.Level configuredLogLevel) {
         logBuffer.forEach( log -> {
-            String currentLogLevel = log.get(Keys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
+            String currentLogLevel = log.get(LoggingKeys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
             Assert.assertTrue(LoggingLevels.Level$.MODULE$.apply(currentLogLevel).$greater$eq(configuredLogLevel));
         });
     }
@@ -123,13 +123,13 @@ public class ILoggerTest {
 
         Assert.assertEquals(5, logBuffer.size());
         logBuffer.forEach(log -> {
-            Assert.assertEquals("tromboneHcd", log.get(Keys$.MODULE$.COMPONENT_NAME()).getAsString());
+            Assert.assertEquals("tromboneHcd", log.get(LoggingKeys$.MODULE$.COMPONENT_NAME()).getAsString());
 
-            Assert.assertTrue(log.has(Keys$.MODULE$.SEVERITY()));
-            String severity = log.get(Keys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
+            Assert.assertTrue(log.has(LoggingKeys$.MODULE$.SEVERITY()));
+            String severity = log.get(LoggingKeys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
 
-            Assert.assertEquals(JLogUtil.logMsgMap.get(severity), log.get(Keys$.MODULE$.MESSAGE()).getAsString());
-            Assert.assertEquals(tromboneHcdClassName, log.get(Keys$.MODULE$.CLASS()).getAsString());
+            Assert.assertEquals(JLogUtil.logMsgMap.get(severity), log.get(LoggingKeys$.MODULE$.MESSAGE()).getAsString());
+            Assert.assertEquals(tromboneHcdClassName, log.get(LoggingKeys$.MODULE$.CLASS()).getAsString());
 
             LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
             Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.DEBUG$.MODULE$));
