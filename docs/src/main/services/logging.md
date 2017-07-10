@@ -44,17 +44,34 @@ These values can be overridden directly in your `reference.conf` or `application
 in your reference.conf/application.conf by it's component name as follows:
 
 ```
-filters {
-    tromboneHcd = info
+component-log-levels {
+    tromboneHcd = debug
     tromboneAssembly = error
   }
   
 ```
 @@@ note
 
-Here `tromboneHcd` and `tromboneAssembly` are the name of components that will be registered with `LocationService` 
+Here `tromboneHcd` and `tromboneAssembly` are the name of components that will be registered with `LocationService`. By default
+all components will log at `INFO` level. 
 
 @@@
+
+We provide `FileAppender` as our default logging appender. If you want to use `StdOutAppender` or some custom appender along
+with `FileAppender` then you can override `appenders` property to include multiple appender in csv format as follows:
+ 
+```
+
+appenders = ["csw.services.logging.appenders.FileAppender$", "csw.services.logging.appenders.StdOutAppender$"]
+
+```
+
+@@@ note
+
+Make sure you provide full path of the appender since it will be spawned using java reflection.
+
+@@@
+
 
 ## Log Levels
 
