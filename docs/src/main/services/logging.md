@@ -52,7 +52,7 @@ component-log-levels {
 ```
 @@@ note
 
-Here `tromboneHcd` and `tromboneAssembly` are the name of components that will be registered with `LocationService`. By default
+Here `tromboneHcd` and `tromboneAssembly` is the name of component that will be registered with `LocationService`. By default
 all components will log at `INFO` level. 
 
 @@@
