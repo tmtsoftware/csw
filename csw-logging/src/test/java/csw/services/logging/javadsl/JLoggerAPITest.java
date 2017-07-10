@@ -30,6 +30,7 @@ public class JLoggerAPITest extends JGenericSimple {
     private RequestId requestId = JRequestId.id();
     private Map<String, Object> data = new HashMap<String, Object>() {
         {
+            put(JKeys.OBS_ID, "foo_obs_id");
             put("key1", "value1");
             put("key2", "value2");
         }
@@ -79,7 +80,8 @@ public class JLoggerAPITest extends JGenericSimple {
     private void testMessageWithMap(JsonObject fifthLogJsonObject) {
         JsonObject messageJasonObject = fifthLogJsonObject.get(LoggingKeys$.MODULE$.MESSAGE()).getAsJsonObject();
         Assert.assertEquals(this.message, messageJasonObject.get(LoggingKeys$.MODULE$.MSG()).getAsString());
-        Assert.assertEquals(data.get("key1"), messageJasonObject.get("key1").getAsString());
+        Assert.assertEquals(data.get(JKeys.OBS_ID), messageJasonObject.get(JKeys.OBS_ID).getAsString());
+        Assert.assertEquals(data.get("key2"), messageJasonObject.get("key2").getAsString());
         Assert.assertEquals(data.get("key2"), messageJasonObject.get("key2").getAsString());
     }
 

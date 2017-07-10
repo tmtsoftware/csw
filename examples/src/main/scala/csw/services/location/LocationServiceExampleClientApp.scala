@@ -110,7 +110,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   private val exampleConnection = LocationServiceExampleComponent.connection
 
   //#log-info-map
-  log.info("Attempting to find connection", Map(Keys.OBS_ID → "foo_obs_id", "exampleConnection" → exampleConnection.toString))
+  log.info("Attempting to find connection", Map(Keys.OBS_ID → "foo_obs_id", "exampleConnection" → exampleConnection.name))
   //#log-info-map
   val findResultF = async {
     await(locationService.find(exampleConnection))
