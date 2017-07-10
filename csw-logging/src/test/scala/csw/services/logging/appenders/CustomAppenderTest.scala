@@ -61,6 +61,7 @@ class CustomAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
   }
 }
 
+//DEOPSCSW-272: Choose Appenders from Conf file
 class CustomAppenderTest extends FunSuite with Matchers {
   private val hostName = InetAddress.getLocalHost.getHostAddress
 
