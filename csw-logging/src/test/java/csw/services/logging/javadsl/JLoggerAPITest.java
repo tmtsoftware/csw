@@ -18,7 +18,9 @@ import scala.concurrent.duration.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class JLogerAPITest extends JGenericSimple {
+// DEOPSCSW-115: Format and control logging content
+// DEOPSCSW-271: API change
+public class JLoggerAPITest extends JGenericSimple {
 
     private ILogger logger = getLogger();
 
