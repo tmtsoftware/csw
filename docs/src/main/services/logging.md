@@ -221,16 +221,17 @@ The output of log statement will be:
 {"@componentName":"examples",
  "@severity":"INFO",
  "actor":
-   "akka.tcp://csw-examples-locationServiceClient@10.131.20.68:51135/user/$a",
+   "akka.tcp://csw-examples-locationServiceClient@10.131.21.224:52516/user/$a",
  "class":"csw.services.location.LocationServiceExampleClient",
  "file":"LocationServiceExampleClientApp.scala",
- "line":111,
+ "line":113,
  "message":
    {"@msg":"Attempting to find connection",
     "exampleConnection":
-      "AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))"
+      "AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))",
+    "obsId":"foo_obs_id"
    },
- "timestamp":"2017-06-28T17:17:34.848000000+05:30"
+ "timestamp":"2017-07-10T10:40:47:712000000"
 }
 
 ```

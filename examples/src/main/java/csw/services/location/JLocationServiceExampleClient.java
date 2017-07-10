@@ -22,6 +22,8 @@ import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLogAppenderBuilders;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
+import csw.services.logging.scaladsl.Keys;
+import csw.services.logging.scaladsl.Keys$;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -107,6 +109,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         //#log-info-map
         jLogger.info(() -> "Attempting to find connection", () -> {
             HashMap<String, Object> map = new HashMap<>();
+            map.put(Keys$.MODULE$.OBS_ID(), "foo_obs_id");
             map.put("exampleConnection", exampleConnection);
             return map;
         });
@@ -299,7 +302,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
                 .build();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         //#create-actor-system
         ActorSystem actorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient");
         //#create-actor-system
@@ -312,6 +315,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
 
         actorSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
 
+        Thread.sleep(200);
         try {
             //#stop-logging-system
             loggingSystem.javaStop().get();

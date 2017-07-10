@@ -7,7 +7,7 @@ import csw.services.commons.ExampleLogger
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
-import csw.services.logging.scaladsl.LoggingSystemFactory
+import csw.services.logging.scaladsl.{Keys, LoggingSystemFactory}
 
 import scala.async.Async._
 import scala.concurrent.Await
@@ -110,7 +110,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   private val exampleConnection = LocationServiceExampleComponent.connection
 
   //#log-info-map
-  log.info("Attempting to find connection", Map("exampleConnection" → exampleConnection.toString))
+  log.info("Attempting to find connection", Map(Keys.OBS_ID → "foo_obs_id", "exampleConnection" → exampleConnection.toString))
   //#log-info-map
   val findResultF = async {
     await(locationService.find(exampleConnection))
