@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
-import csw.services.logging.commons.Keys;
 import csw.services.logging.commons.Keys$;
 import csw.services.logging.components.trombone.JTromboneHCDSupervisorActor;
 import csw.services.logging.internal.LoggingLevels;
@@ -67,6 +66,7 @@ public class ILoggerActorTest {
 
         Thread.sleep(300);
 
+        Assert.assertEquals(4, logBuffer.size());
         logBuffer.forEach(log -> {
             Assert.assertEquals("jTromboneHcdActor", log.get(Keys$.MODULE$.COMPONENT_NAME()).getAsString());
             Assert.assertEquals(actorPath, log.get(Keys$.MODULE$.ACTOR()).getAsString());
@@ -78,7 +78,7 @@ public class ILoggerActorTest {
             Assert.assertEquals(className, log.get(Keys$.MODULE$.CLASS()).getAsString());
 
             LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
-            Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.TRACE$.MODULE$));
+            Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.INFO$.MODULE$));
         });
     }
 

@@ -57,7 +57,7 @@ public class ILoggerTest {
     @BeforeClass
     public static void setup() {
         loggingSystem = JLoggingSystemFactory.start("Logger-Test", "SNAPSHOT-1.0", "localhost", actorSystem, appenderBuilders);
-        loggingSystem.setAppenders(scala.collection.JavaConverters.iterableAsScalaIterable(appenderBuilders).toList());
+//        loggingSystem.setAppenders(scala.collection.JavaConverters.iterableAsScalaIterable(appenderBuilders).toList());
     }
 
     @After
@@ -121,6 +121,7 @@ public class ILoggerTest {
         jTromboneHCD.startLogging();
         Thread.sleep(300);
 
+        Assert.assertEquals(5, logBuffer.size());
         logBuffer.forEach(log -> {
             Assert.assertEquals("tromboneHcd", log.get(Keys$.MODULE$.COMPONENT_NAME()).getAsString());
 

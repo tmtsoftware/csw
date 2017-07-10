@@ -70,6 +70,7 @@ public class JGenericLoggerTest {
         new JGenericLoggerTest.JGenericLoggerUtil().start();
         Thread.sleep(300);
 
+        Assert.assertEquals(6, logBuffer.size());
         logBuffer.forEach(log -> {
             Assert.assertTrue(log.has(Keys$.MODULE$.SEVERITY()));
             String severity = log.get(Keys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
@@ -90,6 +91,7 @@ public class JGenericLoggerTest {
         JLogUtil.sendLogMsgToActorInBulk(utilActor);
         Thread.sleep(200);
 
+        Assert.assertEquals(6, logBuffer.size());
         logBuffer.forEach(log -> {
             Assert.assertEquals(actorPath, log.get(Keys$.MODULE$.ACTOR()).getAsString());
 
