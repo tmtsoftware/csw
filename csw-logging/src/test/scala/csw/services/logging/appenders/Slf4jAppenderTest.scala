@@ -1,5 +1,6 @@
 package csw.services.logging.appenders
 
+import csw.services.logging.commons.Keys
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.utils.LoggingTestSuite
@@ -20,12 +21,12 @@ class Slf4jAppenderTest extends LoggingTestSuite {
     Thread.sleep(300)
 
     logBuffer.foreach { log ⇒
-      val currentLogLevel = log("@severity").toString.toLowerCase
+      val currentLogLevel = log(Keys.SEVERITY).toString.toLowerCase
       Level(currentLogLevel) >= LoggingLevels.TRACE shouldBe true
-      log("message").toString shouldBe currentLogLevel
-      log("class").toString shouldBe className
-      log("file").toString shouldBe "Slf4jAppenderTest.scala"
-      log("kind").toString shouldBe "slf4j"
+      log(Keys.MESSAGE).toString shouldBe currentLogLevel
+      log(Keys.CLASS).toString shouldBe className
+      log(Keys.FILE).toString shouldBe "Slf4jAppenderTest.scala"
+      log(Keys.KIND).toString shouldBe "slf4j"
     }
   }
 

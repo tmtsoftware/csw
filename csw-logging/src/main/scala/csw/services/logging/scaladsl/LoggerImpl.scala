@@ -3,6 +3,7 @@ package csw.services.logging.scaladsl
 import java.time.Instant
 
 import csw.services.logging.RichMsg
+import csw.services.logging.commons.Keys
 import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.internal.LoggingState._
 import csw.services.logging.internal.{Log, LogAltMessage, MessageHandler}
@@ -74,5 +75,5 @@ class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName
                                             ex: Throwable,
                                             id: AnyId,
                                             time: Long): Unit =
-    MessageHandler.sendMsg(LogAltMessage(category, time, m ++ Map("@category" -> category), id, ex))
+    MessageHandler.sendMsg(LogAltMessage(category, time, m ++ Map(Keys.CATEGORY -> category), id, ex))
 }

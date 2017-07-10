@@ -12,6 +12,7 @@ object Dependencies {
     Libs.`logback-classic`,
     Libs.`persist-json`,
     Libs.`joda-time`,
+    Libs.`enumeratum`,
     Akka.`akka-actor`,
     Akka.`akka-slf4j`,
     Akka.`akka-remote`,

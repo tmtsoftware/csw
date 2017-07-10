@@ -7,7 +7,7 @@ import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 import akka.actor._
 import com.persist.JsonOps._
 import csw.services.logging.RichMsg
-import csw.services.logging.commons.{Keys, TMTDateTimeFormatter}
+import csw.services.logging.commons.{Category, Keys, TMTDateTimeFormatter}
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.GenericLogger
@@ -189,10 +189,10 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
   private[this] val sort                      = config.getBoolean("sorted")
   private[this] val logLevelLimit             = Level(config.getString("logLevelLimit"))
   private[this] val fileAppenders             = scala.collection.mutable.HashMap[String, FilesAppender]()
-  private val loggingSystemName               = jgetString(stdHeaders, "@name")
+  private val loggingSystemName               = jgetString(stdHeaders, Keys.NAME)
 
   private def checkLevel(baseMsg: Map[String, RichMsg]): Boolean = {
-    val level = jgetString(baseMsg, "@severity")
+    val level = jgetString(baseMsg, Keys.SEVERITY)
     Level(level) >= logLevelLimit
   }
 
@@ -203,7 +203,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
    * @param category the kinds of log (for example, "common").
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit =
-    if (category != "common" || checkLevel(baseMsg)) {
+    if (category != Category.Common.name || checkLevel(baseMsg)) {
       val msg = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
       //Maintain a file appender for each category in a logging system
       val fileAppenderKey = loggingSystemName + "-" + category
@@ -215,7 +215,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
           fileAppenders += (fileAppenderKey -> filesAppender)
           filesAppender
       }
-      val timestamp = jgetString(msg, "timestamp")
+      val timestamp = jgetString(msg, Keys.TIMESTAMP)
 
       val logDateTime = TMTDateTimeFormatter.parse(timestamp)
       fileAppender.add(logDateTime, Compact(msg, safe = true, sort = sort))

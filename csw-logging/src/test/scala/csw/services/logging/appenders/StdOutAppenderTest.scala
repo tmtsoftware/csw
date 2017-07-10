@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import com.persist.JsonOps
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.RichMsg
+import csw.services.logging.commons.{Category, Keys}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -16,26 +17,26 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
   private val actorSystem = ActorSystem("test-1")
 
-  private val standardHeaders: Map[String, RichMsg] = Map[String, RichMsg]("@version" -> 1, "@host" -> "localhost",
-    "@service" -> Map[String, RichMsg]("name" -> "test-service", "version" -> "1.2.3"))
+  private val standardHeaders: Map[String, RichMsg] = Map[String, RichMsg](Keys.VERSION -> 1, Keys.EX -> "localhost",
+    Keys.SERVICE -> Map[String, RichMsg]("name" -> "test-service", "version" -> "1.2.3"))
 
   private val stdOutAppender = new StdOutAppender(actorSystem, standardHeaders, println)
 
   private val logMessage: String =
-    """{
-      |  "@componentName": "FileAppenderTest",
-      |  "@host": "localhost",
-      |  "@service": {
+    s"""{
+      |  "${Keys.COMPONENT_NAME}": "FileAppenderTest",
+      |  "${Keys.HOST}": "localhost",
+      |  "${Keys.SERVICE}": {
       |    "name": "logging",
       |    "version": "SNAPSHOT-1.0"
       |  },
-      |  "@severity": "ERROR",
-      |  "timestamp": "2017-06-19T16:10:19.397000000+05:30",
-      |  "@version": 1,
-      |  "class": "csw.services.logging.appenders.FileAppenderTest",
-      |  "file": "FileAppenderTest.scala",
-      |  "line": 25,
-      |  "message": "This is at ERROR level"
+      |  "${Keys.SEVERITY}": "ERROR",
+      |  "${Keys.TIMESTAMP}": "2017-06-19T16:10:19.397000000+05:30",
+      |  "${Keys.VERSION}": 1,
+      |  "${Keys.CLASS}": "csw.services.logging.appenders.FileAppenderTest",
+      |  "${Keys.FILE}": "FileAppenderTest.scala",
+      |  "${Keys.LINE}": 25,
+      |  "${Keys.MESSAGE}": "This is at ERROR level"
       |}
     """.stripMargin
 
@@ -53,10 +54,10 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
   }
 
   test("should print message to standard output stream if category is \'common\'") {
-    val category = "common"
 
+    println(Category.Common.name)
     Console.withOut(outCapture) {
-      stdOutAppender.append(expectedLogJson, category)
+      stdOutAppender.append(expectedLogJson, Category.Common.name)
     }
 
     val actualLogJson = JsonOps.Json(outCapture.toString).asInstanceOf[Map[String, String]]
@@ -83,14 +84,14 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     val stdOutAppenderForOneLineMsg      = new StdOutAppender(actorSystemWithOneLineTrueConfig, standardHeaders, println)
 
     Console.withOut(outCapture) {
-      stdOutAppenderForOneLineMsg.append(expectedLogJson, "common")
+      stdOutAppenderForOneLineMsg.append(expectedLogJson, Category.Common.name)
     }
 
     val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")
-    val severity              = expectedLogJson("@severity")
-    val msg                   = expectedLogJson("message")
-    val fileName              = expectedLogJson("file")
-    val lineNumber            = s"${expectedLogJson("line")}"
+    val severity              = expectedLogJson(Keys.SEVERITY)
+    val msg                   = expectedLogJson(Keys.MESSAGE)
+    val fileName              = expectedLogJson(Keys.FILE)
+    val lineNumber            = s"${expectedLogJson(Keys.LINE)}"
     val expectedOneLineLogMsg = s"[$severity] $msg ($fileName $lineNumber)"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg

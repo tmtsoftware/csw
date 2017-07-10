@@ -7,6 +7,7 @@ import akka.actor.ActorSystem
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.appenders.FileAppender
+import csw.services.logging.commons.Keys
 import csw.services.logging.components.IrisSupervisorActor
 import csw.services.logging.components.IrisSupervisorActor._
 import csw.services.logging.scaladsl.RequestId
@@ -90,7 +91,7 @@ class TimingTest extends LoggingTestSuite with Timing {
       itemsMap.contains("time0") shouldBe true
       itemsMap.contains("time1") shouldBe true
       itemsMap.contains("total") shouldBe true
-      log("@name") shouldBe "TimingTest"
+      log(Keys.NAME) shouldBe "TimingTest"
     }
 
     // validating file logger
@@ -100,13 +101,13 @@ class TimingTest extends LoggingTestSuite with Timing {
 
     def testLogBuffer(logBuffer: mutable.Buffer[JsonObject]): Unit = {
       logBuffer.foreach { log ⇒
-        log.contains("@componentName") shouldBe true
-        log.contains("actor") shouldBe true
-        log("@componentName") shouldBe IRIS_NAME
-        log("actor") shouldBe irisActorRef.path.toString
-        log.contains("file") shouldBe true
-        log.contains("line") shouldBe true
-        log.contains("class") shouldBe true
+        log.contains(Keys.COMPONENT_NAME) shouldBe true
+        log.contains(Keys.ACTOR) shouldBe true
+        log(Keys.COMPONENT_NAME) shouldBe IRIS_NAME
+        log(Keys.ACTOR) shouldBe irisActorRef.path.toString
+        log.contains(Keys.FILE) shouldBe true
+        log.contains(Keys.LINE) shouldBe true
+        log.contains(Keys.CLASS) shouldBe true
       }
     }
   }

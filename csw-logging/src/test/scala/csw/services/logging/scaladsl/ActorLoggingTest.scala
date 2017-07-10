@@ -1,5 +1,6 @@
 package csw.services.logging.scaladsl
 
+import csw.services.logging.commons.Keys
 import csw.services.logging.components.IrisSupervisorActor
 import csw.services.logging.components.IrisSupervisorActor._
 import csw.services.logging.internal.LoggingLevels
@@ -33,11 +34,11 @@ class ActorLoggingTest extends LoggingTestSuite {
     var logMsgLineNumber = IrisSupervisorActor.ERROR_LINE_NO
 
     logBuffer.foreach { log ⇒
-      log("@componentName") shouldBe IrisSupervisorActor.NAME
-      log("actor") shouldBe irisActorRef.path.toString
-      log("file") shouldBe IrisSupervisorActor.FILE_NAME
-      log("line") shouldBe logMsgLineNumber
-      log("class").toString shouldBe IrisSupervisorActor.CLASS_NAME
+      log(Keys.COMPONENT_NAME) shouldBe IrisSupervisorActor.NAME
+      log(Keys.ACTOR) shouldBe irisActorRef.path.toString
+      log(Keys.FILE) shouldBe IrisSupervisorActor.FILE_NAME
+      log(Keys.LINE) shouldBe logMsgLineNumber
+      log(Keys.CLASS).toString shouldBe IrisSupervisorActor.CLASS_NAME
       logMsgLineNumber += 1
     }
   }
@@ -49,11 +50,11 @@ class ActorLoggingTest extends LoggingTestSuite {
     Thread.sleep(200)
 
     val errorLevelLogMessages =
-      logBuffer.groupBy(json ⇒ json("@severity"))("ERROR")
+      logBuffer.groupBy(json ⇒ json(Keys.SEVERITY))("ERROR")
     errorLevelLogMessages.size shouldEqual 1
     val expectedMessage =
-      Map("@msg" -> "Unknown message received", "reason" -> "Unknown", "actorRef" → irisActorRef.toString)
-    errorLevelLogMessages.head("message") shouldBe expectedMessage
+      Map(Keys.MSG -> "Unknown message received", "reason" -> "Unknown", "actorRef" → irisActorRef.toString)
+    errorLevelLogMessages.head(Keys.MESSAGE) shouldBe expectedMessage
   }
 
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
@@ -63,7 +64,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     //  IrisSupervisorActor is logging 7 messages
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
     val groupByComponentNamesLog =
-      logBuffer.groupBy(json ⇒ json("@componentName").toString)
+      logBuffer.groupBy(json ⇒ json(Keys.COMPONENT_NAME).toString)
     val irisLogs = groupByComponentNamesLog(IrisSupervisorActor.NAME)
 
     irisLogs.size shouldBe 3
@@ -71,8 +72,8 @@ class ActorLoggingTest extends LoggingTestSuite {
     // check that log level should be greater than or equal to debug and
     // assert on actual log message
     irisLogs.toList.foreach { log ⇒
-      log.contains("actor") shouldBe true
-      val currentLogLevel = log("@severity").toString.toLowerCase
+      log.contains(Keys.ACTOR) shouldBe true
+      val currentLogLevel = log(Keys.SEVERITY).toString.toLowerCase
       Level(currentLogLevel) >= LoggingLevels.ERROR shouldBe true
     }
 

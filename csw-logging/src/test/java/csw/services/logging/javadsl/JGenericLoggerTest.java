@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
+import csw.services.logging.commons.Keys$;
 import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.utils.JGenericActor;
@@ -70,10 +71,10 @@ public class JGenericLoggerTest {
         Thread.sleep(300);
 
         logBuffer.forEach(log -> {
-            Assert.assertTrue(log.has("@severity"));
-            String severity = log.get("@severity").getAsString().toLowerCase();
+            Assert.assertTrue(log.has(Keys$.MODULE$.SEVERITY()));
+            String severity = log.get(Keys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
 
-            Assert.assertEquals(JLogUtil.logMsgMap.get(severity), log.get("message").getAsString());
+            Assert.assertEquals(JLogUtil.logMsgMap.get(severity), log.get(Keys$.MODULE$.MESSAGE()).getAsString());
 
             LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
             Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.TRACE$.MODULE$));
@@ -90,13 +91,13 @@ public class JGenericLoggerTest {
         Thread.sleep(200);
 
         logBuffer.forEach(log -> {
-            Assert.assertEquals(actorPath, log.get("actor").getAsString());
+            Assert.assertEquals(actorPath, log.get(Keys$.MODULE$.ACTOR()).getAsString());
 
-            Assert.assertTrue(log.has("@severity"));
-            String severity = log.get("@severity").getAsString().toLowerCase();
+            Assert.assertTrue(log.has(Keys$.MODULE$.SEVERITY()));
+            String severity = log.get(Keys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
 
-            Assert.assertEquals(severity, log.get("message").getAsString());
-            Assert.assertEquals(className, log.get("class").getAsString());
+            Assert.assertEquals(severity, log.get(Keys$.MODULE$.MESSAGE()).getAsString());
+            Assert.assertEquals(className, log.get(Keys$.MODULE$.CLASS()).getAsString());
 
             LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
             Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.TRACE$.MODULE$));

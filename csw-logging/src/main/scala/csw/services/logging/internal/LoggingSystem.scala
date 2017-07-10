@@ -7,6 +7,7 @@ import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
 import csw.services.logging.RichMsg
 import csw.services.logging.appenders.LogAppenderBuilder
+import csw.services.logging.commons.Keys
 import csw.services.logging.exceptions.AppenderNotFoundException
 import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.macros.DefaultSourceLocation
@@ -78,7 +79,7 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
    * Standard headers.
    */
   val standardHeaders: Map[String, RichMsg] =
-    Map[String, RichMsg]("@host" -> host, "@name" -> name, "@version" -> version)
+    Map[String, RichMsg](Keys.HOST -> host, Keys.NAME -> name, Keys.VERSION -> version)
 
   setDefaultLogLevel(defaultLevel)
   LoggingState.loggerStopping = false

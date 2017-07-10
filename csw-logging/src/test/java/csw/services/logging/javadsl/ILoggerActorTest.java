@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
+import csw.services.logging.commons.Keys;
+import csw.services.logging.commons.Keys$;
 import csw.services.logging.components.trombone.JTromboneHCDSupervisorActor;
 import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
@@ -66,14 +68,14 @@ public class ILoggerActorTest {
         Thread.sleep(300);
 
         logBuffer.forEach(log -> {
-            Assert.assertEquals("jTromboneHcdActor", log.get("@componentName").getAsString());
-            Assert.assertEquals(actorPath, log.get("actor").getAsString());
+            Assert.assertEquals("jTromboneHcdActor", log.get(Keys$.MODULE$.COMPONENT_NAME()).getAsString());
+            Assert.assertEquals(actorPath, log.get(Keys$.MODULE$.ACTOR()).getAsString());
 
-            Assert.assertTrue(log.has("@severity"));
-            String severity = log.get("@severity").getAsString().toLowerCase();
+            Assert.assertTrue(log.has(Keys$.MODULE$.SEVERITY()));
+            String severity = log.get(Keys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
 
-            Assert.assertEquals(severity, log.get("message").getAsString());
-            Assert.assertEquals(className, log.get("class").getAsString());
+            Assert.assertEquals(severity, log.get(Keys$.MODULE$.MESSAGE()).getAsString());
+            Assert.assertEquals(className, log.get(Keys$.MODULE$.CLASS()).getAsString());
 
             LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
             Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.TRACE$.MODULE$));
