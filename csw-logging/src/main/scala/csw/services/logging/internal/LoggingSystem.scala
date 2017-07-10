@@ -7,7 +7,7 @@ import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
 import csw.services.logging.RichMsg
 import csw.services.logging.appenders.LogAppenderBuilder
-import csw.services.logging.commons.Keys
+import csw.services.logging.commons.{Constants, Keys}
 import csw.services.logging.exceptions.AppenderNotFoundException
 import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.macros.DefaultSourceLocation
@@ -134,7 +134,7 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
    */
   def setDefaultLogLevel(level: Level): Unit = {
     logLevel = level
-    LoggingState.componentsLoggingState("default").setLevel(level)
+    LoggingState.componentsLoggingState(Constants.DEFAULT_KEY).setLevel(level)
   }
 
   /**
@@ -200,7 +200,7 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
       getAkkaLevel.current,
       getSlf4jLevel.current,
       LoggingState.componentsLoggingState
-        .getOrElse(componentName, LoggingState.componentsLoggingState("default"))
+        .getOrElse(componentName, LoggingState.componentsLoggingState(Constants.DEFAULT_KEY))
         .componentLogLevel
     )
 

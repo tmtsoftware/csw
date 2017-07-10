@@ -3,7 +3,7 @@ package csw.services.logging.scaladsl
 import java.time.Instant
 
 import csw.services.logging.RichMsg
-import csw.services.logging.commons.Keys
+import csw.services.logging.commons.{Constants, Keys}
 import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.internal.LoggingState._
 import csw.services.logging.internal.{Log, LogAltMessage, MessageHandler}
@@ -14,11 +14,11 @@ import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName: Option[String]) extends Logger {
 
   // this is to apply default log level for non-component classes like some common file utility classes
-  private[this] val componentName: String = maybeComponentName.getOrElse("default")
+  private[this] val componentName: String = maybeComponentName.getOrElse(Constants.DEFAULT_KEY)
 
   // default log level will be applied if component specific log level is not provided in logging configuration inside component-log-levels block
   private[this] def componentLoggingState: ComponentLoggingState =
-    componentsLoggingState.getOrElse(componentName, componentsLoggingState("default"))
+    componentsLoggingState.getOrElse(componentName, componentsLoggingState(Constants.DEFAULT_KEY))
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)

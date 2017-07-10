@@ -4,7 +4,7 @@ import java.time._
 
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
-import csw.services.logging.commons.{Keys, TMTDateTimeFormatter}
+import csw.services.logging.commons.{Constants, Keys, TMTDateTimeFormatter}
 import csw.services.logging.components.{InnerSourceComponent, SingletonComponent, TromboneAssembly, TromboneHcd}
 import csw.services.logging.internal.{LoggingLevels, LoggingState}
 import csw.services.logging.internal.LoggingLevels._
@@ -49,7 +49,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState("default").componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
 
     var logMsgLineNumber = InnerSourceComponent.TRACE_LINE_NO
 
@@ -70,7 +70,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
     Thread.sleep(100)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState("default").componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
 
     var logMsgLineNumber = SingletonComponent.TRACE_LINE_NO
 
@@ -121,7 +121,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
     Thread.sleep(300)
 
     //   Verify that default level is TRACE in config
-    LoggingState.componentsLoggingState("default").componentLogLevel shouldBe LoggingLevels.TRACE
+    LoggingState.componentsLoggingState(Constants.DEFAULT_KEY).componentLogLevel shouldBe LoggingLevels.TRACE
 
     //  TromboneAssembly component is logging 6 messages each of unique level
     //  As per the default loglevel = trace, assembly should log all 6 message

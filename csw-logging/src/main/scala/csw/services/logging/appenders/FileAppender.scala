@@ -7,7 +7,7 @@ import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 import akka.actor._
 import com.persist.JsonOps._
 import csw.services.logging.RichMsg
-import csw.services.logging.commons.{Category, Keys, TMTDateTimeFormatter}
+import csw.services.logging.commons.{Category, Constants, Keys, TMTDateTimeFormatter}
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.GenericLogger
@@ -163,10 +163,10 @@ object FileAppender extends LogAppenderBuilder {
 
   def decideTimestampForFile(logDateTime: ZonedDateTime): ZonedDateTime = {
     val fileTimestamp =
-      if (logDateTime.getHour >= Keys.FILE_ROTATION_HOUR)
-        logDateTime.truncatedTo(ChronoUnit.DAYS).plusHours(Keys.FILE_ROTATION_HOUR)
+      if (logDateTime.getHour >= Constants.FILE_ROTATION_HOUR)
+        logDateTime.truncatedTo(ChronoUnit.DAYS).plusHours(Constants.FILE_ROTATION_HOUR)
       else
-        logDateTime.truncatedTo(ChronoUnit.DAYS).minusDays(1L).plusHours(Keys.FILE_ROTATION_HOUR)
+        logDateTime.truncatedTo(ChronoUnit.DAYS).minusDays(1L).plusHours(Constants.FILE_ROTATION_HOUR)
     fileTimestamp
   }
 }

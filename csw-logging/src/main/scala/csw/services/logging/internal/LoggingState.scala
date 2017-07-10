@@ -1,6 +1,7 @@
 package csw.services.logging.internal
 
 import akka.actor._
+import csw.services.logging.commons.Constants
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.models.ComponentLoggingState
 
@@ -29,5 +30,5 @@ private[logging] object LoggingState {
   private[logging] val akkaStopPromise = Promise[Unit]
 
   var componentsLoggingState: Map[String, ComponentLoggingState] =
-    Map("default" → ComponentLoggingState(defaultLogLevel))
+    Map(Constants.DEFAULT_KEY → ComponentLoggingState(defaultLogLevel))
 }

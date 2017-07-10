@@ -80,9 +80,9 @@ private[logging] class LogActor(done: Promise[Unit],
         emptyJsonObject
       }
       val j1 = JsonObject(
-        Keys.CLASS -> trace.getClassName,
-        Keys.FILE  -> trace.getFileName,
-        "method"   -> trace.getMethodName
+        Keys.CLASS  -> trace.getClassName,
+        Keys.FILE   -> trace.getFileName,
+        Keys.METHOD -> trace.getMethodName
       )
       j0 ++ j1
     }
@@ -94,12 +94,12 @@ private[logging] class LogActor(done: Promise[Unit],
     val stack = getStack(ex)
     val j1 = ex match {
       case r: RichException if r.cause != noException =>
-        JsonObject("cause" -> exceptionJson(r.cause))
+        JsonObject(Keys.CAUSE -> exceptionJson(r.cause))
       case ex1: Throwable if ex.getCause != null =>
-        JsonObject("cause" -> exceptionJson(ex.getCause))
+        JsonObject(Keys.CAUSE -> exceptionJson(ex.getCause))
       case _ => emptyJsonObject
     }
-    JsonObject("trace" -> JsonObject(Keys.MESSAGE -> exToJson(ex), "stack" -> stack)) ++ j1
+    JsonObject(Keys.TRACE -> JsonObject(Keys.MESSAGE -> exToJson(ex), Keys.STACK -> stack)) ++ j1
   }
 
   // Send JSON log object for each appender configured for the logging system
