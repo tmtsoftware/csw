@@ -65,8 +65,10 @@ public class JGenericLoggerTest {
        }
     }
 
+    // DEOPSCSW-277: Java nested class name is not logged correctly in log messages.
     @Test
     public void testGenericLoggerWithoutComponentName() throws InterruptedException {
+        String className = JGenericLoggerTest.JGenericLoggerUtil.class.getName();
         new JGenericLoggerTest.JGenericLoggerUtil().start();
         Thread.sleep(300);
 
@@ -76,7 +78,7 @@ public class JGenericLoggerTest {
             String severity = log.get(LoggingKeys$.MODULE$.SEVERITY()).getAsString().toLowerCase();
 
             Assert.assertEquals(JLogUtil.logMsgMap.get(severity), log.get(LoggingKeys$.MODULE$.MESSAGE()).getAsString());
-
+            Assert.assertEquals(className, log.get(LoggingKeys$.MODULE$.CLASS()).getAsString());
             LoggingLevels.Level currentLogLevel = LoggingLevels.Level$.MODULE$.apply(severity);
             Assert.assertTrue(currentLogLevel.$greater$eq(LoggingLevels.TRACE$.MODULE$));
         });
