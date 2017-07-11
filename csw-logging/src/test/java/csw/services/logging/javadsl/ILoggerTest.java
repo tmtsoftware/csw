@@ -138,6 +138,7 @@ public class ILoggerTest {
 
     // This test simulates single jvm multiple components use cases
     // DEOPSCSW-117: Provide unique name for each logging instance of components
+    // DEOPSCSW-127: Runtime update for logging characteristics
     @Test
     public void testLogLevelOfMultipleComponentsInSingleContainer() throws InterruptedException {
 
