@@ -68,7 +68,8 @@ appenders = ["csw.services.logging.appenders.FileAppender$", "csw.services.loggi
 
 @@@ note
 
-Make sure you provide full path of the appender since it will be spawned using java reflection.
+Make sure you provide full path of the appender since it will be spawned using java reflection. In csw code base, a working example of custom appender can be found at:
+@github[Custom Appender](/csw-logging/src/test/scala/csw/services/logging/appenders/CustomAppenderTest.scala)
 
 @@@
 
