@@ -19,6 +19,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-126: Configurability of logging characteristics for component / log instance
+// DEOPSCSW-142: Flexibility of logging approaches
 class LoggingConfigurationTest
     extends FunSuite
     with Matchers
@@ -78,7 +79,7 @@ class LoggingConfigurationTest
     val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
     log.info(sampleLogMessage)
-    Thread.sleep(3000)
+    Thread.sleep(100)
 
     // Reading common logger file
     val fileLogBuffer = FileUtils.read(testLogFilePathWithServiceName)
@@ -123,7 +124,7 @@ class LoggingConfigurationTest
 
     log.info(sampleLogMessage)
     log.debug(sampleLogMessage)
-    Thread.sleep(3000)
+    Thread.sleep(200)
 
     // Reading common logger file
     val fileLogBuffer = FileUtils.read(testLogFilePathWithServiceName)
@@ -215,7 +216,7 @@ class LoggingConfigurationTest
     Console.withOut(outStream) {
       loggingSystem
       log.info(sampleLogMessage)
-      Thread.sleep(200)
+      Thread.sleep(100)
     }
 
     parse(outStream.toString)
@@ -261,7 +262,7 @@ class LoggingConfigurationTest
     Console.withOut(os) {
       loggingSystem
       log.info(sampleLogMessage)
-      Thread.sleep(300)
+      Thread.sleep(100)
     }
 
     val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 263)"
