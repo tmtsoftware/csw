@@ -101,7 +101,7 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
     fileAppender.append(expectedLogMsgJson1, "alternative")
     fileAppender.append(expectedLogMsgJson2, Category.Common.name)
     fileAppender.append(expectedLogMsgJson3, Category.Common.name)
-    Thread.sleep(3000)
+    Thread.sleep(10)
 
     val actualLogBuffer1 = FileUtils.read(logFileFullPath1).toList
     val actualLogBuffer2 = FileUtils.read(logFileFullPath2).toList

@@ -12,8 +12,7 @@ import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.GenericLogger
 
-import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{Future, Promise}
 
 /**
  * Companion object of FileAppender Actor
@@ -32,7 +31,8 @@ private[logging] object FileAppenderActor {
   // Message to flush content from writer to the file
   case object AppendFlush extends AppendMessages
 
-  def props(path: String, category: String): Props = Props(new FileAppenderActor(path, category))
+  def props(path: String, category: String): Props =
+    Props(new FileAppenderActor(path, category)).withDispatcher("csw-logging.logging-blocking-io-dispatcher")
 }
 
 /**
@@ -44,22 +44,10 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
 
   import FileAppenderActor._
 
-  private[this] val system                                   = context.system
-  private[this] implicit val ec: ExecutionContext            = context.dispatcher
   private[this] var fileSpanTimestamp: Option[ZonedDateTime] = None
   private[this] var maybePrintWriter: Option[PrintWriter]    = None
 
   private[this] var flushTimer: Option[Cancellable] = None
-
-  // Send a message to self every 2 seconds to flush messages from PrintWriter
-  private def scheduleFlush(): Unit = {
-    val time = system.scheduler.scheduleOnce(2.seconds) {
-      self ! AppendFlush
-    }
-    flushTimer = Some(time)
-  }
-
-  scheduleFlush()
 
   // Initialize writer for log file
   private def open(logDateTime: ZonedDateTime): Unit = {
@@ -88,15 +76,9 @@ private[logging] class FileAppenderActor(path: String, category: String) extends
       maybePrintWriter match {
         case Some(w) =>
           w.println(line)
-        case None =>
-      }
-    case AppendFlush =>
-      maybePrintWriter match {
-        case Some(w) =>
           w.flush()
         case None =>
       }
-      scheduleFlush()
 
     case AppendClose(p) =>
       flushTimer match {
