@@ -265,7 +265,7 @@ class LoggingConfigurationTest
       Thread.sleep(100)
     }
 
-    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 263)"
+    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 264)"
 
     os.toString.trim shouldBe expectedOneLineLog
 
