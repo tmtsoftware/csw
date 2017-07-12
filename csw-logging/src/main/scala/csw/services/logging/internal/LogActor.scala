@@ -108,8 +108,6 @@ private[logging] class LogActor(done: Promise[Unit],
 
   private def receiveLog(log: Log): Unit = {
 
-    val msg = if (log.map.isEmpty) log.msg else Map(LoggingKeys.MSG → log.msg) ++ log.map
-
     var jsonObject = JsonObject(
       LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(log.time),
       LoggingKeys.MESSAGE   → log.msg,
