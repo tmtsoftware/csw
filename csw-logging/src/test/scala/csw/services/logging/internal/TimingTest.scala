@@ -73,6 +73,8 @@ class TimingTest extends LoggingTestSuite with Timing {
   }
 
   // DEOPSCSW-142: Flexibility of logging approaches
+  // DEOPSCSW-122: Allow local component logs to be output to STDOUT
+  // DEOPSCSW-123: Allow local component logs to be output to a file
   test("should able to log messages to combination of standard out and file concurrently and also log time messages.") {
 
     logMessagesWithTimer()
