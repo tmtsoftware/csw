@@ -56,7 +56,6 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
   test("should print message to standard output stream if category is \'common\'") {
 
-    println(Category.Common.name)
     Console.withOut(outCapture) {
       stdOutAppender.append(expectedLogJson, Category.Common.name)
     }
