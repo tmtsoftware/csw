@@ -26,10 +26,7 @@ import csw.services.logging.javadsl.JLoggingSystemFactory;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -106,20 +103,19 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
 
         //#log-info-map
-        jLogger.info(() -> "Attempting to find connection", () -> {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put(JKeys.OBS_ID, "foo_obs_id");
-            map.put("exampleConnection", exampleConnection.name());
-            return map;
-        });
+        Map<String, Object> map = new HashMap<>();
+        map.put(JKeys.OBS_ID, "foo_obs_id");
+        map.put("exampleConnection", exampleConnection.name());
+
+        jLogger.info("Attempting to find connection", map);
         //#log-info-map
 
         Optional<Location> findResult = locationService.find(exampleConnection).get();
         if (findResult.isPresent()) {
-            jLogger.info(() -> "Find result: " + connectionInfo(findResult.get().connection()));
+            jLogger.info("Find result: " + connectionInfo(findResult.get().connection()));
         } else {
             //#log-info
-            jLogger.info(() -> "Result of the find call : None");
+            jLogger.info("Result of the find call : None");
             //#log-info
         }
         //#find
@@ -131,12 +127,12 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         // resolve connection to LocationServiceExampleComponent
         // [start LocationServiceExampleComponent after this command but before timeout]
         FiniteDuration waitForResolveLimit = new FiniteDuration(30, TimeUnit.SECONDS);
-        jLogger.info(() -> "Attempting to resolve " + exampleConnection + " with a wait of " + waitForResolveLimit + "...");
+        jLogger.info("Attempting to resolve " + exampleConnection + " with a wait of " + waitForResolveLimit + "...");
         Optional<Location> resolveResult = locationService.resolve(exampleConnection, waitForResolveLimit).get();
         if (resolveResult.isPresent()) {
-            jLogger.info(() -> "Resolve result: " + connectionInfo(resolveResult.get().connection()));
+            jLogger.info("Resolve result: " + connectionInfo(resolveResult.get().connection()));
         } else {
-            jLogger.info(() -> "Timeout waiting for location " + exampleConnection + " to resolve.");
+            jLogger.info("Timeout waiting for location " + exampleConnection + " to resolve.");
         }
         //#resolve
 
@@ -158,7 +154,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
                 ActorRef actorRef = ((AkkaLocation)loc).actorRef();
                 actorRef.tell(LocationServiceExampleComponent.ClientMessage$.MODULE$, getSelf());
             } else {
-                jLogger.error(() -> "Received unexpected location type: " + loc.getClass());
+                jLogger.error("Received unexpected location type: " + loc.getClass());
             }
         }
     }
@@ -167,9 +163,9 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         //#list
         // list connections in location service
         List<Location> connectionList = locationService.list().get();
-        jLogger.info(() -> "All Registered Connections:");
+        jLogger.info("All Registered Connections:");
         for (Location loc: connectionList) {
-            jLogger.info(() -> "--- " + connectionInfo(loc.connection()));
+            jLogger.info("--- " + connectionInfo(loc.connection()));
         }
         //#list
         // Output should be:
@@ -184,9 +180,9 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         //#filtering-component
         // filter connections based on component type
         List<Location> componentList = locationService.list(JComponentType.Assembly).get();
-        jLogger.info(() -> "Registered Assemblies:");
+        jLogger.info("Registered Assemblies:");
         for (Location loc: componentList) {
-            jLogger.info(() -> "--- " + connectionInfo(loc.connection()));
+            jLogger.info("--- " + connectionInfo(loc.connection()));
         }
         //#filtering-component
 
@@ -198,9 +194,9 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         //#filtering-connection
         // filter connections based on connection type
         List<Location> akkaList = locationService.list(JConnectionType.AkkaType).get();
-        jLogger.info(() -> "Registered Akka connections:");
+        jLogger.info("Registered Akka connections:");
         for (Location loc : akkaList) {
-            jLogger.info(() -> "--- " + connectionInfo(loc.connection()));
+            jLogger.info("--- " + connectionInfo(loc.connection()));
         }
         //#filtering-connection
 
@@ -220,7 +216,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         // track connection to LocationServiceExampleComponent
         // Calls track method for example connection and forwards location messages to this actor
         Materializer mat = ActorMaterializer.create(getContext());
-        jLogger.info(() -> "Starting to track " + exampleConnection);
+        jLogger.info("Starting to track " + exampleConnection);
         locationService.track(exampleConnection).toMat(Sink.actorRef(getSelf(), AllDone.class), Keep.both()).run(mat);
 
         //track returns a Killswitch, that can be used to turn off notifications arbitarily
@@ -234,9 +230,9 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         }, context().system().dispatcher());
 
         // subscribe to LocationServiceExampleComponent events
-        jLogger.info(() -> "Starting a subscription to " + exampleConnection);
+        jLogger.info("Starting a subscription to " + exampleConnection);
         locationService.subscribe(exampleConnection, trackingEvent -> {
-            jLogger.info(() -> "subscription event");
+            jLogger.info("subscription event");
             getSelf().tell(trackingEvent, ActorRef.noSender());
         });
         //#tracking
@@ -289,13 +285,13 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
     public Receive createReceive() {
         // message handler for this actor
         return receiveBuilder()
-                .match(LocationUpdated.class, l -> jLogger.info(() -> "Location updated " + connectionInfo(l.connection())))
-                .match(LocationRemoved.class, l -> jLogger.info(() -> "Location removed " + l.connection()))
-                .match(AllDone.class, x -> jLogger.info(() -> "Tracking of " + exampleConnection + " complete."))
+                .match(LocationUpdated.class, l -> jLogger.info("Location updated " + connectionInfo(l.connection())))
+                .match(LocationRemoved.class, l -> jLogger.info("Location removed " + l.connection()))
+                .match(AllDone.class, x -> jLogger.info("Tracking of " + exampleConnection + " complete."))
                 .matchAny((Object x) -> {
                     RuntimeException runtimeException = new RuntimeException("Received unexpected message " + x);
                     //#log-info-error
-                    jLogger.info(() -> runtimeException.getMessage(), runtimeException);
+                    jLogger.info(runtimeException.getMessage(), runtimeException);
                     //#log-info-error
                 })
                 .build();
