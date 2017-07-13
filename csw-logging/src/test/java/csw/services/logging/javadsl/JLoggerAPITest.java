@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 // DEOPSCSW-115: Format and control logging content
 // DEOPSCSW-271: API change
+// DEOPSCSW-278: Create Java API without arguments as suppliers
 public class JLoggerAPITest extends JGenericSimple {
 
     private ILogger logger = getLogger();

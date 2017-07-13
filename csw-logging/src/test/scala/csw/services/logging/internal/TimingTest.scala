@@ -79,7 +79,7 @@ class TimingTest extends LoggingTestSuite with Timing {
 
     logMessagesWithTimer()
     logMessagesWithStartAndEndTimer()
-    Thread.sleep(10)
+    Thread.sleep(200)
 
     // Reading time logger file
     val timeLogBuffer = FileUtils.read(timeLogFilePath)
