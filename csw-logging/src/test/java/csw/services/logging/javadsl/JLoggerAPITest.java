@@ -130,7 +130,7 @@ public class JLoggerAPITest extends JGenericSimple {
 
     @Test
     public void testOverloadedTraceLogLevel() throws InterruptedException {
-
+        // test trace overloads with supplier
         logger.trace(() -> message);
         logger.trace(() -> message, runtimeException);
         logger.trace(() -> message, requestId);
@@ -139,6 +139,15 @@ public class JLoggerAPITest extends JGenericSimple {
         logger.trace(() -> message, () -> data, requestId);
         logger.trace(() -> message, () -> data, runtimeException);
         logger.trace(() -> message, () -> data, runtimeException, requestId);
+        // test trace overloads without supplier
+        logger.trace(message);
+        logger.trace(message, runtimeException);
+        logger.trace(message, requestId);
+        logger.trace(message, runtimeException, requestId);
+        logger.trace(message, data);
+        logger.trace(message, data, requestId);
+        logger.trace(message, data, runtimeException);
+        logger.trace(message, data, runtimeException, requestId);
 
         Thread.sleep(200);
 
@@ -148,7 +157,7 @@ public class JLoggerAPITest extends JGenericSimple {
 
     @Test
     public void testOverloadedDebugLogLevel() throws InterruptedException {
-
+        // test debug overloads with supplier
         logger.debug(() -> message);
         logger.debug(() -> message, runtimeException);
         logger.debug(() -> message, requestId);
@@ -157,6 +166,15 @@ public class JLoggerAPITest extends JGenericSimple {
         logger.debug(() -> message, () -> data, requestId);
         logger.debug(() -> message, () -> data, runtimeException);
         logger.debug(() -> message, () -> data, runtimeException, requestId);
+        // test debug overloads without supplier
+        logger.debug(message);
+        logger.debug(message, runtimeException);
+        logger.debug(message, requestId);
+        logger.debug(message, runtimeException, requestId);
+        logger.debug(message, data);
+        logger.debug(message, data, requestId);
+        logger.debug(message, data, runtimeException);
+        logger.debug(message, data, runtimeException, requestId);
 
         Thread.sleep(200);
 
@@ -166,7 +184,7 @@ public class JLoggerAPITest extends JGenericSimple {
 
     @Test
     public void testOverloadedInfoLogLevel() throws InterruptedException {
-
+        // test info overloads with supplier
         logger.info(() -> message);
         logger.info(() -> message, runtimeException);
         logger.info(() -> message, requestId);
@@ -175,6 +193,15 @@ public class JLoggerAPITest extends JGenericSimple {
         logger.info(() -> message, () -> data, requestId);
         logger.info(() -> message, () -> data, runtimeException);
         logger.info(() -> message, () -> data, runtimeException, requestId);
+        // test info overloads without supplier
+        logger.info(message);
+        logger.info(message, runtimeException);
+        logger.info(message, requestId);
+        logger.info(message, runtimeException, requestId);
+        logger.info(message, data);
+        logger.info(message, data, requestId);
+        logger.info(message, data, runtimeException);
+        logger.info(message, data, runtimeException, requestId);
 
         Thread.sleep(200);
 
@@ -184,7 +211,7 @@ public class JLoggerAPITest extends JGenericSimple {
 
     @Test
     public void testOverloadedWarnLogLevel() throws InterruptedException {
-
+        // test warn overloads with supplier
         logger.warn(() -> message);
         logger.warn(() -> message, runtimeException);
         logger.warn(() -> message, requestId);
@@ -193,6 +220,15 @@ public class JLoggerAPITest extends JGenericSimple {
         logger.warn(() -> message, () -> data, requestId);
         logger.warn(() -> message, () -> data, runtimeException);
         logger.warn(() -> message, () -> data, runtimeException, requestId);
+        // test warn overloads without supplier
+        logger.warn(message);
+        logger.warn(message, runtimeException);
+        logger.warn(message, requestId);
+        logger.warn(message, runtimeException, requestId);
+        logger.warn(message, data);
+        logger.warn(message, data, requestId);
+        logger.warn(message, data, runtimeException);
+        logger.warn(message, data, runtimeException, requestId);
 
         Thread.sleep(200);
 
@@ -202,7 +238,7 @@ public class JLoggerAPITest extends JGenericSimple {
 
     @Test
     public void testOverloadedErrorLogLevel() throws InterruptedException {
-
+        // test error overloads with supplier
         logger.error(() -> message);
         logger.error(() -> message, runtimeException);
         logger.error(() -> message, requestId);
@@ -211,6 +247,15 @@ public class JLoggerAPITest extends JGenericSimple {
         logger.error(() -> message, () -> data, requestId);
         logger.error(() -> message, () -> data, runtimeException);
         logger.error(() -> message, () -> data, runtimeException, requestId);
+        // test error overloads with supplier
+        logger.error(message);
+        logger.error(message, runtimeException);
+        logger.error(message, requestId);
+        logger.error(message, runtimeException, requestId);
+        logger.error(message, data);
+        logger.error(message, data, requestId);
+        logger.error(message, data, runtimeException);
+        logger.error(message, data, runtimeException, requestId);
 
         Thread.sleep(200);
 
@@ -220,7 +265,7 @@ public class JLoggerAPITest extends JGenericSimple {
 
     @Test
     public void testOverloadedFatalLogLevel() throws InterruptedException {
-
+        // test fatal overloads with supplier
         logger.fatal(() -> message);
         logger.fatal(() -> message, runtimeException);
         logger.fatal(() -> message, requestId);
@@ -229,6 +274,15 @@ public class JLoggerAPITest extends JGenericSimple {
         logger.fatal(() -> message, () -> data, requestId);
         logger.fatal(() -> message, () -> data, runtimeException);
         logger.fatal(() -> message, () -> data, runtimeException, requestId);
+        // test fatal overloads without supplier
+        logger.fatal(message);
+        logger.fatal(message, runtimeException);
+        logger.fatal(message, requestId);
+        logger.fatal(message, runtimeException, requestId);
+        logger.fatal(message, data);
+        logger.fatal(message, data, requestId);
+        logger.fatal(message, data, runtimeException);
+        logger.fatal(message, data, runtimeException, requestId);
 
         Thread.sleep(200);
 
