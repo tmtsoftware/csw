@@ -3,7 +3,7 @@ package csw.services.logging.scaladsl
 import akka.actor.ActorRef
 import com.persist.JsonOps.JsonObject
 import csw.services.logging.commons.LoggingKeys
-import csw.services.logging.components.IrisSupervisorActor._
+import csw.services.logging.components.IRIS._
 import csw.services.logging.components._
 import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.utils.LoggingTestSuite
@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class LoggerCompTest extends LoggingTestSuite {
 
-  private val irisSupervisorActorRef = actorSystem.actorOf(IrisSupervisorActor.props())
+  private val irisSupervisorActorRef = actorSystem.actorOf(IRIS.props())
   private val irisUtilActorRef       = actorSystem.actorOf(IrisActorUtil.props)
   private val irisTLA                = new IrisTLA()
   private val irisUtil               = new IrisUtil()
@@ -36,7 +36,7 @@ class LoggerCompTest extends LoggingTestSuite {
   def allComponentsStartLogging() = {
     //componentName = IRIS
     sendMessagesToActor(irisSupervisorActorRef)
-    irisTLA.startLogging(logMsgMap)
+    irisTLA.startLogging()
     //Generic Logger
     sendMessagesToActor(irisUtilActorRef)
     irisUtil.startLogging(logMsgMap)
@@ -63,8 +63,8 @@ class LoggerCompTest extends LoggingTestSuite {
         case None ⇒ genericLogBuffer += log
       }
     }
-    irisLogBuffer = componentLogBuffer(IrisSupervisorActor.NAME)
-    tromboneHcdLogBuffer = componentLogBuffer(TromboneHcd.NAME)
+    irisLogBuffer = componentLogBuffer(IRIS.COMPONENT_NAME)
+    tromboneHcdLogBuffer = componentLogBuffer(TromboneHcd.COMPONENT_NAME)
 
     logBuffer.clear()
   }
@@ -78,24 +78,30 @@ class LoggerCompTest extends LoggingTestSuite {
     // extract component and non-component logs and group them
     splitAndGroupLogs
 
-    def testLogBuffer(logBuffer: mutable.Buffer[JsonObject], configuredLogLevel: Level): Unit = {
+    def testLogBuffer(logBuffer: mutable.Buffer[JsonObject],
+                      configuredLogLevel: Level,
+                      expectedLogsMap: Map[String, String] = Map.empty,
+                      expectedFileName: String = "",
+                      expectedCompName: String = ""): Unit = {
       logBuffer.foreach { log ⇒
         val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
         Level(currentLogLevel) >= configuredLogLevel shouldBe true
+        if (!expectedLogsMap.isEmpty) log(LoggingKeys.MESSAGE).toString shouldBe expectedLogsMap(currentLogLevel)
+        if (!expectedFileName.isEmpty) log(LoggingKeys.FILE).toString shouldBe expectedFileName
       }
     }
 
     irisLogBuffer.size shouldBe 4
-    testLogBuffer(irisLogBuffer, ERROR)
+    testLogBuffer(irisLogBuffer, ERROR, IRIS.irisLogs, IRIS.FILE_NAME, IRIS.COMPONENT_NAME)
 
     genericLogBuffer.size shouldBe 12
     testLogBuffer(genericLogBuffer, TRACE)
 
     tromboneHcdLogBuffer.size shouldBe 5
-    testLogBuffer(tromboneHcdLogBuffer, DEBUG)
+    testLogBuffer(tromboneHcdLogBuffer, DEBUG, logMsgMap, TromboneHcd.FILE_NAME, TromboneHcd.COMPONENT_NAME)
 
     // setting log level of IRIS comp to FATAL and it should not change log levels of other comps or generic classes
-    loggingSystem.setComponentLogLevel(IrisSupervisorActor.NAME, FATAL)
+    loggingSystem.setComponentLogLevel(IRIS.COMPONENT_NAME, FATAL)
 
     // start logging at all component levels
     allComponentsStartLogging
@@ -104,12 +110,12 @@ class LoggerCompTest extends LoggingTestSuite {
     splitAndGroupLogs
 
     irisLogBuffer.size shouldBe 2
-    testLogBuffer(irisLogBuffer, FATAL)
+    testLogBuffer(irisLogBuffer, FATAL, IRIS.irisLogs, IRIS.FILE_NAME, IRIS.COMPONENT_NAME)
 
     genericLogBuffer.size shouldBe 12
     testLogBuffer(genericLogBuffer, TRACE)
 
     tromboneHcdLogBuffer.size shouldBe 5
-    testLogBuffer(tromboneHcdLogBuffer, DEBUG)
+    testLogBuffer(tromboneHcdLogBuffer, DEBUG, logMsgMap, TromboneHcd.FILE_NAME, TromboneHcd.COMPONENT_NAME)
   }
 }

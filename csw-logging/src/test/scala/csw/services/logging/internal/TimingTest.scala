@@ -8,8 +8,8 @@ import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.appenders.FileAppender
 import csw.services.logging.commons.LoggingKeys
-import csw.services.logging.components.IrisSupervisorActor
-import csw.services.logging.components.IrisSupervisorActor._
+import csw.services.logging.components.IRIS
+import csw.services.logging.components.IRIS._
 import csw.services.logging.scaladsl.RequestId
 import csw.services.logging.utils.{FileUtils, LoggingTestSuite}
 
@@ -28,7 +28,7 @@ class TimingTest extends LoggingTestSuite with Timing {
     new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
 
   private val irisActorRef =
-    actorSystem.actorOf(IrisSupervisorActor.props(), name = "IRIS-Supervisor-Actor")
+    actorSystem.actorOf(IRIS.props(), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val fullLogFileDir  = logFileDir + "/" + loggingSystemName

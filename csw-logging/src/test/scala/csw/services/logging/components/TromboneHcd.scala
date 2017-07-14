@@ -3,7 +3,7 @@ package csw.services.logging.components
 import csw.services.logging.commons.LoggingKeys
 import csw.services.logging.scaladsl.{ComponentLogger, RichException}
 
-object TromboneHcdLogger extends ComponentLogger(TromboneHcd.NAME)
+object TromboneHcdLogger extends ComponentLogger(TromboneHcd.COMPONENT_NAME)
 
 class TromboneHcd() extends TromboneHcdLogger.Simple {
 
@@ -46,5 +46,6 @@ object TromboneHcd {
   val ERROR_LINE_NO = TRACE_LINE_NO + 4
   val FATAL_LINE_NO = TRACE_LINE_NO + 5
 
-  val NAME = "tromboneHcd"
+  val COMPONENT_NAME = "tromboneHcd"
+  val FILE_NAME      = "TromboneHcd.scala"
 }

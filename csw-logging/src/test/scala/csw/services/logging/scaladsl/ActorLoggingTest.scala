@@ -1,15 +1,15 @@
 package csw.services.logging.scaladsl
 
 import csw.services.logging.commons.LoggingKeys
-import csw.services.logging.components.IrisSupervisorActor
-import csw.services.logging.components.IrisSupervisorActor._
+import csw.services.logging.components.IRIS
+import csw.services.logging.components.IRIS._
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.utils.LoggingTestSuite
 
 class ActorLoggingTest extends LoggingTestSuite {
   private val irisActorRef =
-    actorSystem.actorOf(IrisSupervisorActor.props(), name = "IRIS-Supervisor-Actor")
+    actorSystem.actorOf(IRIS.props(), name = "IRIS-Supervisor-Actor")
 
   def sendMessagesToActor() = {
     irisActorRef ! LogTrace
@@ -31,14 +31,14 @@ class ActorLoggingTest extends LoggingTestSuite {
     sendMessagesToActor()
 
     // default log level for IrisSupervisorActor is ERROR in config
-    var logMsgLineNumber = IrisSupervisorActor.ERROR_LINE_NO
+    var logMsgLineNumber = IRIS.ERROR_LINE_NO
 
     logBuffer.foreach { log ⇒
-      log(LoggingKeys.COMPONENT_NAME) shouldBe IrisSupervisorActor.NAME
+      log(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
       log(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
-      log(LoggingKeys.FILE) shouldBe IrisSupervisorActor.FILE_NAME
+      log(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
       log(LoggingKeys.LINE) shouldBe logMsgLineNumber
-      log(LoggingKeys.CLASS).toString shouldBe IrisSupervisorActor.CLASS_NAME
+      log(LoggingKeys.CLASS).toString shouldBe IRIS.CLASS_NAME
       logMsgLineNumber += 1
     }
   }
@@ -69,7 +69,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
     val groupByComponentNamesLog =
       logBuffer.groupBy(json ⇒ json(LoggingKeys.COMPONENT_NAME).toString)
-    val irisLogs = groupByComponentNamesLog(IrisSupervisorActor.NAME)
+    val irisLogs = groupByComponentNamesLog(IRIS.COMPONENT_NAME)
 
     irisLogs.size shouldBe 3
 

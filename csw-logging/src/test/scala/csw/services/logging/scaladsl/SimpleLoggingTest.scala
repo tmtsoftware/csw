@@ -23,7 +23,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
     Thread.sleep(100)
 
     // Verify log level for tromboneHcd is at debug level in config
-    LoggingState.componentsLoggingState(TromboneHcd.NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
+    LoggingState.componentsLoggingState(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
 
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
@@ -126,7 +126,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
     Thread.sleep(200)
 
     //  Verify that level is DEBUG
-    LoggingState.componentsLoggingState(TromboneHcd.NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
+    LoggingState.componentsLoggingState(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
 
     //  TromboneHcd component is logging 6 messages each of unique level
     //  As per the filter, hcd should log 5 message of all level except TRACE
@@ -233,7 +233,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
       (DEBUG, 5),
       (TRACE, 6)
     )
-    val compName = TromboneHcd.NAME
+    val compName = TromboneHcd.COMPONENT_NAME
 
     def filterLogsByComponentName(compName: String): Seq[JsonOps.JsonObject] = {
       val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json(LoggingKeys.COMPONENT_NAME).toString)
