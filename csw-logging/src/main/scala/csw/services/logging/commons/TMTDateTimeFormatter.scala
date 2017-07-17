@@ -4,7 +4,7 @@ import java.time._
 import java.time.format.DateTimeFormatter
 
 object TMTDateTimeFormatter {
-  val ISOLogFormatter = DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.UTC)
+  val ISOLogFormatter: DateTimeFormatter = DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.UTC)
 
   def format(time: Long): String = {
     ISOLogFormatter.format(Instant.ofEpochMilli(time))

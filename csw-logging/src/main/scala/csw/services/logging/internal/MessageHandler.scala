@@ -2,12 +2,12 @@ package csw.services.logging.internal
 
 import TimeActorMessages.{TimeEnd, TimeStart}
 import csw.services.logging.internal.LoggingState._
-import csw.services.logging.scaladsl.RequestId
+import csw.services.logging.scaladsl.{GenericLogger, RequestId}
 
 /**
  * Acts as a single point of entry for messages from various loggers and redirects them to the log actor
  */
-object MessageHandler {
+object MessageHandler extends GenericLogger.Simple {
 
   /**
    * Sends message to LogActor or maintains it in a queue till the log actor is not available
@@ -15,7 +15,7 @@ object MessageHandler {
    */
   private[logging] def sendMsg(msg: LogActorMessages): Unit =
     if (loggerStopping) {
-//      println(s"*** Log message received after logger shutdown: $msg")
+      log.info(s"*** Log message received after logger shutdown: $msg")
     } else {
       maybeLogActor match {
         case Some(logActor) => logActor ! msg

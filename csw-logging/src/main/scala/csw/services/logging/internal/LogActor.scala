@@ -36,7 +36,6 @@ private[logging] class LogActor(done: Promise[Unit],
                                 initAkkaLevel: Level)
     extends Actor {
 
-  private[this] var level: Level                = initLevel
   private[this] var akkaLogLevel: Level         = initAkkaLevel
   private[this] var slf4jLogLevel: Level        = initSlf4jLevel
   private[this] var appenders: Seq[LogAppender] = initAppenders
@@ -46,7 +45,6 @@ private[logging] class LogActor(done: Promise[Unit],
     case logAltMessage: LogAltMessage => receiveAltMessage(logAltMessage)
     case logSlf4J: LogSlf4j           => receiveLogSlf4j(logSlf4J)
     case logAkka: LogAkka             => receiveLogAkkaMessage(logAkka)
-    case SetLevel(level1)             => level = level1
     case SetSlf4jLevel(level1)        => slf4jLogLevel = level1
     case SetAkkaLevel(level1)         => akkaLogLevel = level1
     case SetAppenders(_appenders)     => appenders = _appenders
