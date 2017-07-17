@@ -22,6 +22,13 @@ object Dependencies {
     Libs.`gson`            % Test
   )
 
+  val Benchmark = Seq(
+    Libs.`persist-json`,
+    Libs.`gson`,
+    Libs.`jackson-core`,
+    Libs.`jackson-databind`
+  )
+
   val Location = Seq(
     Akka.`akka-typed`,
     Akka.`akka-typed-testkit`,

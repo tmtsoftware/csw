@@ -1,0 +1,50 @@
+package csw.services.logging.perf.jmh
+
+import java.net.InetAddress
+import java.util.concurrent.TimeUnit
+
+import akka.actor.ActorSystem
+import csw.services.logging.appenders.FileAppender
+import csw.services.logging.internal.LoggingSystem
+import csw.services.logging.scaladsl.{Logger, LoggerImpl}
+import org.openjdk.jmh.annotations._
+
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationLong
+
+/**
+ * Tests CSW E2E logging performance.
+ */
+// ============================== HOW TO RUN THIS TEST: ====================================
+//
+// single thread:
+// sbt csw-benchmark/jmh:run -f 1 -wi 10 -i 20 .*E2ELoggingBenchmark.*
+//
+// multiple threads (for example, 4 threads):
+// sbt csw-benchmark/jmh:run -f 1 -wi 10 -i 20 -t 4 -si true .*E2ELoggingBenchmark.*
+//
+@State(Scope.Benchmark)
+class E2ELoggingBenchmark {
+  var actorSystem: ActorSystem   = _
+  var log: Logger                = _
+  var fileAppender: FileAppender = _
+
+  @Setup(Level.Trial)
+  def setup(): Unit = {
+    actorSystem = ActorSystem("logging")
+    new LoggingSystem("E2E", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, actorSystem)
+    log = new LoggerImpl(None, None)
+  }
+
+  @TearDown(Level.Trial)
+  def teardown(): Unit = {
+    Await.result(actorSystem.terminate(), 5.seconds)
+  }
+
+  @Benchmark
+  @BenchmarkMode(Array(Mode.Throughput))
+  @OutputTimeUnit(TimeUnit.SECONDS)
+  def e2eLoggingThroughput(): Unit = {
+    log.info("See if this is logged.")
+  }
+}

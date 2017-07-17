@@ -11,6 +11,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-config-server`,
   `csw-location`,
   `csw-location-agent`,
+  `csw-benchmark`,
   `integration`,
   `examples`
 )
@@ -49,6 +50,13 @@ lazy val `csw-logging` = project
   .dependsOn(`csw-logging-macros`)
   .settings(
     libraryDependencies ++= Dependencies.Logging
+  )
+
+lazy val `csw-benchmark` = project
+  .enablePlugins(JmhPlugin)
+  .dependsOn(`csw-logging`)
+  .settings(
+    libraryDependencies ++= Dependencies.Benchmark
   )
 
 //Location service related projects

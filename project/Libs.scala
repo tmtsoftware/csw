@@ -3,25 +3,27 @@ import sbt._
 object Libs {
   val ScalaVersion = "2.12.2"
 
-  val `scalatest`                    = "org.scalatest"          %% "scalatest"                    % "3.0.3" //Apache License 2.0
-  val `scala-java8-compat`           = "org.scala-lang.modules" %% "scala-java8-compat"           % "0.8.0" //BSD 3-clause "New" or "Revised" License
-  val `scala-async`                  = "org.scala-lang.modules" %% "scala-async"                  % "0.9.6" //BSD 3-clause "New" or "Revised" License
-  val `scopt`                        = "com.github.scopt"       %% "scopt"                        % "3.5.0" //MIT License
-  val `acyclic`                      = "com.lihaoyi"            %% "acyclic"                      % "0.1.7" % Provided //MIT License
-  val `enumeratum`                   = "com.beachape"           %% "enumeratum"                   % "1.5.12" //MIT License
-  val `junit`                        = "junit"                  % "junit"                         % "4.12" //Eclipse Public License 1.0
-  val `junit-interface`              = "com.novocode"           % "junit-interface"               % "0.11" //BSD 2-clause "Simplified" License
-  val `mockito-core`                 = "org.mockito"            % "mockito-core"                  % "2.7.22" //MIT License
-  val `logback-classic`              = "ch.qos.logback"         % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
-  val `chill-akka`                   = "com.twitter"            %% "chill-akka"                   % "0.9.2" //Apache License 2.0
-  val `akka-management-cluster-http` = "com.lightbend.akka"     %% "akka-management-cluster-http" % "0.3" //N/A at the moment
-  val svnkit                         = "org.tmatesoft.svnkit"   % "svnkit"                        % "1.8.11" //TMate Open Source License
-  val `commons-codec`                = "commons-codec"          % "commons-codec"                 % "1.10" //Apache 2.0
-  val `spray-json`                   = "io.spray"               %% "spray-json"                   % "1.3.3" force () //Apache 2.0
-  val `persist-json`                 = "com.persist"            %% "persist-json"                 % "1.2.0" //Apache 2.0
-  val `joda-time`                    = "joda-time"              % "joda-time"                     % "2.9.9" //Apache 2.0
-  val `scala-reflect`                = "org.scala-lang"         % "scala-reflect"                 % ScalaVersion //BSD-3
-  val `gson`                         = "com.google.code.gson"   % "gson"                          % "2.8.1" //Apache 2.0
+  val `scalatest`                    = "org.scalatest"              %% "scalatest"                    % "3.0.3" //Apache License 2.0
+  val `scala-java8-compat`           = "org.scala-lang.modules"     %% "scala-java8-compat"           % "0.8.0" //BSD 3-clause "New" or "Revised" License
+  val `scala-async`                  = "org.scala-lang.modules"     %% "scala-async"                  % "0.9.6" //BSD 3-clause "New" or "Revised" License
+  val `scopt`                        = "com.github.scopt"           %% "scopt"                        % "3.5.0" //MIT License
+  val `acyclic`                      = "com.lihaoyi"                %% "acyclic"                      % "0.1.7" % Provided //MIT License
+  val `enumeratum`                   = "com.beachape"               %% "enumeratum"                   % "1.5.12" //MIT License
+  val `junit`                        = "junit"                      % "junit"                         % "4.12" //Eclipse Public License 1.0
+  val `junit-interface`              = "com.novocode"               % "junit-interface"               % "0.11" //BSD 2-clause "Simplified" License
+  val `mockito-core`                 = "org.mockito"                % "mockito-core"                  % "2.7.22" //MIT License
+  val `logback-classic`              = "ch.qos.logback"             % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
+  val `chill-akka`                   = "com.twitter"                %% "chill-akka"                   % "0.9.2" //Apache License 2.0
+  val `akka-management-cluster-http` = "com.lightbend.akka"         %% "akka-management-cluster-http" % "0.3" //N/A at the moment
+  val svnkit                         = "org.tmatesoft.svnkit"       % "svnkit"                        % "1.8.11" //TMate Open Source License
+  val `commons-codec`                = "commons-codec"              % "commons-codec"                 % "1.10" //Apache 2.0
+  val `spray-json`                   = "io.spray"                   %% "spray-json"                   % "1.3.3" force () //Apache 2.0
+  val `persist-json`                 = "com.persist"                %% "persist-json"                 % "1.2.0" //Apache 2.0
+  val `joda-time`                    = "joda-time"                  % "joda-time"                     % "2.9.9" //Apache 2.0
+  val `scala-reflect`                = "org.scala-lang"             % "scala-reflect"                 % ScalaVersion //BSD-3
+  val `gson`                         = "com.google.code.gson"       % "gson"                          % "2.8.1" //Apache 2.0
+  val `jackson-core`                 = "com.fasterxml.jackson.core" % "jackson-core"                  % "2.8.9"
+  val `jackson-databind`             = "com.fasterxml.jackson.core" % "jackson-databind"              % "2.8.9"
 }
 
 object Akka {

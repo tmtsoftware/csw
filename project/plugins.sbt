@@ -17,6 +17,7 @@ addSbtPlugin("io.spray"                          % "sbt-revolver"            % "
 addSbtPlugin("com.dwijnand"                      % "sbt-project-graph"       % "0.2.0")
 addSbtPlugin("net.virtual-void"                  % "sbt-dependency-graph"    % "0.8.2")
 addSbtPlugin("com.eed3si9n"                      % "sbt-buildinfo"           % "0.7.0")
+addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                 % "0.2.24")
 
 libraryDependencies += "com.lightbend.paradox" % "paradox-theme-generic" % "0.2.12"
 
