@@ -1,6 +1,7 @@
 package csw.services.logging.internal
 
 import akka.actor.{Actor, Props}
+import akka.dispatch.{BoundedMessageQueueSemantics, RequiresMessageQueue}
 import com.persist.Exceptions.SystemException
 import com.persist.JsonOps._
 import csw.services.logging._
@@ -34,7 +35,8 @@ private[logging] class LogActor(done: Promise[Unit],
                                 initLevel: Level,
                                 initSlf4jLevel: Level,
                                 initAkkaLevel: Level)
-    extends Actor {
+    extends Actor
+    with RequiresMessageQueue[BoundedMessageQueueSemantics] {
 
   private[this] var level: Level                = initLevel
   private[this] var akkaLogLevel: Level         = initAkkaLevel
