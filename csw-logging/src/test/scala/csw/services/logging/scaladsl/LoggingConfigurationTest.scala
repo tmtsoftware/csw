@@ -173,12 +173,13 @@ class LoggingConfigurationTest
                       """.stripMargin)
         .withFallback(ConfigFactory.load)
 
-    lazy val actorSystem   = ActorSystem("test", config)
-    lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+    lazy val actorSystem                = ActorSystem("test", config)
+    lazy val loggingSystem              = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+    var expectedDateTime: ZonedDateTime = null
 
-    val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     Console.withOut(outStream) {
       loggingSystem
+      expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
       log.debug(sampleLogMessage)
       log.info(sampleLogMessage)
       Thread.sleep(200)
@@ -277,7 +278,7 @@ class LoggingConfigurationTest
       Thread.sleep(100)
     }
 
-    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 276)"
+    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 277)"
 
     os.toString.trim shouldBe expectedOneLineLog
 
