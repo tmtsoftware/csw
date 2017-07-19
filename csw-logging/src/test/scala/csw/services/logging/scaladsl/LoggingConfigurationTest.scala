@@ -18,6 +18,8 @@ import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
+// DEOPSCSW-122: Allow local component logs to be output to STDOUT
+// DEOPSCSW-123: Allow local component logs to be output to a file
 // DEOPSCSW-126: Configurability of logging characteristics for component / log instance
 // DEOPSCSW-142: Flexibility of logging approaches
 class LoggingConfigurationTest
@@ -265,7 +267,7 @@ class LoggingConfigurationTest
       Thread.sleep(100)
     }
 
-    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 264)"
+    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 266)"
 
     os.toString.trim shouldBe expectedOneLineLog
 

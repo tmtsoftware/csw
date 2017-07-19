@@ -34,7 +34,6 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val fullLogFileDir  = logFileDir + "/" + loggingSystemName
   private val timeLogFilePath = fullLogFileDir + s"/time.$fileTimestamp.log"
   private val testLogFilePath = fullLogFileDir + s"/common.$fileTimestamp.log"
-  private val IRIS_NAME       = "IRIS"
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -47,7 +46,7 @@ class TimingTest extends LoggingTestSuite with Timing {
     FileUtils.deleteRecursively(logFileDir)
   }
 
-  def sendLogMsgToTromboneActor(): Unit = {
+  def sendLogMsgToIRISActor(): Unit = {
     irisActorRef ! LogTrace
     irisActorRef ! LogDebug
     irisActorRef ! LogInfo
@@ -62,13 +61,13 @@ class TimingTest extends LoggingTestSuite with Timing {
 
   def logMessagesWithTimer(): Unit =
     Time(RequestId(), timerTestRegionName) {
-      sendLogMsgToTromboneActor()
+      sendLogMsgToIRISActor()
     }
 
   def logMessagesWithStartAndEndTimer(): Unit = {
     val id         = RequestId()
     val startToken = time.start(id, startEndTimeTestRegionName)
-    sendLogMsgToTromboneActor()
+    sendLogMsgToIRISActor()
     time.end(id, startEndTimeTestRegionName, startToken)
   }
 
@@ -103,13 +102,14 @@ class TimingTest extends LoggingTestSuite with Timing {
 
     def testLogBuffer(logBuffer: mutable.Buffer[JsonObject]): Unit = {
       logBuffer.foreach { log ⇒
-        log.contains(LoggingKeys.COMPONENT_NAME) shouldBe true
-        log.contains(LoggingKeys.ACTOR) shouldBe true
-        log(LoggingKeys.COMPONENT_NAME) shouldBe IRIS_NAME
+        val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
+        log(LoggingKeys.MESSAGE).toString shouldBe IRIS.irisLogs(currentLogLevel)
+
+        log(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
         log(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
-        log.contains(LoggingKeys.FILE) shouldBe true
+        log(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
+        log(LoggingKeys.CLASS) shouldBe IRIS.CLASS_NAME
         log.contains(LoggingKeys.LINE) shouldBe true
-        log.contains(LoggingKeys.CLASS) shouldBe true
       }
     }
   }
