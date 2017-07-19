@@ -2,6 +2,7 @@ package csw.services.logging.scaladsl
 
 import java.io.ByteArrayOutputStream
 import java.nio.file.Paths
+import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor.ActorSystem
@@ -9,7 +10,7 @@ import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.appenders.FileAppender
-import csw.services.logging.commons.LoggingKeys
+import csw.services.logging.commons.{LoggingKeys, TMTDateTimeFormatter}
 import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -61,6 +62,7 @@ class LoggingConfigurationTest
     }
   }
 
+  // DEOPSCSW-118: Provide UTC time for each log message
   test("should log messages in the file with standard headers") {
     val config =
       ConfigFactory
@@ -80,6 +82,7 @@ class LoggingConfigurationTest
     val actorSystem   = ActorSystem("test", config)
     val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
+    val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     log.info(sampleLogMessage)
     Thread.sleep(100)
 
@@ -98,6 +101,9 @@ class LoggingConfigurationTest
     jsonLogMessage(LoggingKeys.SEVERITY) shouldBe INFO.name
     jsonLogMessage(LoggingKeys.CLASS) shouldBe className
     jsonLogMessage(LoggingKeys.FILE) shouldBe fileName
+
+    val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString)
+    ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
 
     // clean up
     Await.result(loggingSystem.stop, 5.seconds)
@@ -150,6 +156,7 @@ class LoggingConfigurationTest
     Await.result(actorSystem.terminate, 5.seconds)
   }
 
+  // DEOPSCSW-118: Provide UTC time for each log message
   test("should log messages on the console with standard headers based on the log level configured in the config") {
     val config =
       ConfigFactory
@@ -169,6 +176,7 @@ class LoggingConfigurationTest
     lazy val actorSystem   = ActorSystem("test", config)
     lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
+    val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     Console.withOut(outStream) {
       loggingSystem
       log.debug(sampleLogMessage)
@@ -191,6 +199,8 @@ class LoggingConfigurationTest
     jsonLogMessage(LoggingKeys.SEVERITY) shouldBe INFO.name
     jsonLogMessage(LoggingKeys.CLASS) shouldBe className
     jsonLogMessage(LoggingKeys.FILE) shouldBe fileName
+    val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString)
+    ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
 
     // clean up
     Await.result(loggingSystem.stop, 5.seconds)
@@ -267,7 +277,7 @@ class LoggingConfigurationTest
       Thread.sleep(100)
     }
 
-    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 266)"
+    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 276)"
 
     os.toString.trim shouldBe expectedOneLineLog
 

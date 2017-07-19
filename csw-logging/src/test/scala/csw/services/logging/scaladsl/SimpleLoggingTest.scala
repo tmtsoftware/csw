@@ -1,6 +1,7 @@
 package csw.services.logging.scaladsl
 
 import java.time._
+import java.time.temporal.ChronoUnit
 
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
@@ -18,7 +19,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
   // DEOPSCSW-119: Associate source with each log message
   // DEOPSCSW-121: Define structured tags for log messages
   test("logs should contain component name and source location in terms of file name, class name and line number") {
-    val expectedTimeMillis = Instant.now.toEpochMilli +- 50
+    val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     new TromboneHcd().startLogging(logMsgMap)
     Thread.sleep(100)
 
@@ -28,10 +29,8 @@ class SimpleLoggingTest extends LoggingTestSuite {
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
     logBuffer.foreach { log ⇒
-      val actualTimestamp  = TMTDateTimeFormatter.parse(log(LoggingKeys.TIMESTAMP).toString)
-      val actualTimeMillis = actualTimestamp.toInstant.toEpochMilli
-
-      actualTimeMillis shouldBe expectedTimeMillis
+      val actualDateTime = TMTDateTimeFormatter.parse(log(LoggingKeys.TIMESTAMP).toString)
+      ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
 
       log(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
       log(LoggingKeys.FILE) shouldBe "TromboneHcd.scala"
