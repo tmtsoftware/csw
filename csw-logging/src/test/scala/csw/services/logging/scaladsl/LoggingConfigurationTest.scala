@@ -2,6 +2,7 @@ package csw.services.logging.scaladsl
 
 import java.io.ByteArrayOutputStream
 import java.nio.file.Paths
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
@@ -102,6 +103,9 @@ class LoggingConfigurationTest
     jsonLogMessage(LoggingKeys.CLASS) shouldBe className
     jsonLogMessage(LoggingKeys.FILE) shouldBe fileName
 
+    // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
+    // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
+    noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString))
     val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString)
     ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
 
@@ -200,6 +204,10 @@ class LoggingConfigurationTest
     jsonLogMessage(LoggingKeys.SEVERITY) shouldBe INFO.name
     jsonLogMessage(LoggingKeys.CLASS) shouldBe className
     jsonLogMessage(LoggingKeys.FILE) shouldBe fileName
+
+    // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
+    // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
+    noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString))
     val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString)
     ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
 
@@ -278,7 +286,7 @@ class LoggingConfigurationTest
       Thread.sleep(100)
     }
 
-    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 277)"
+    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 285)"
 
     os.toString.trim shouldBe expectedOneLineLog
 

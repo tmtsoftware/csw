@@ -1,14 +1,15 @@
 package csw.services.logging.scaladsl
 
 import java.time._
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import csw.services.logging.commons.{Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.services.logging.components.{InnerSourceComponent, SingletonComponent, TromboneAssembly, TromboneHcd}
-import csw.services.logging.internal.{LoggingLevels, LoggingState}
 import csw.services.logging.internal.LoggingLevels._
+import csw.services.logging.internal.{LoggingLevels, LoggingState}
 import csw.services.logging.utils.LoggingTestSuite
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
@@ -29,6 +30,13 @@ class SimpleLoggingTest extends LoggingTestSuite {
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
     logBuffer.foreach { log ⇒
+      // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
+      // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
+      // Ex.  2017-07-19T13:23:55.358+03:00 :=> DateTimeFormatter.ISO_INSTANT.parse will throw exception
+      //      2017-07-19T01:23:55.360+05:30 :=> DateTimeFormatter.ISO_INSTANT.parse will throw exception
+      //      2017-07-19T01:23:55.360Z      :=> DateTimeFormatter.ISO_INSTANT.parse will not throw exception
+      noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(log(LoggingKeys.TIMESTAMP).toString))
+
       val actualDateTime = TMTDateTimeFormatter.parse(log(LoggingKeys.TIMESTAMP).toString)
       ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
 
