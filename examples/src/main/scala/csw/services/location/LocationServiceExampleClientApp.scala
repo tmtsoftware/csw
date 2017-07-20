@@ -6,7 +6,11 @@ import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.commons.ExampleLogger
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
-import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.{
+  ActorSystemFactory,
+  LocationService,
+  LocationServiceFactory
+}
 import csw.services.logging.scaladsl.{Keys, LoggingSystemFactory}
 
 import scala.async.Async._
@@ -24,13 +28,18 @@ object LocationServiceExampleClientApp extends App {
   //#create-location-service
 
   //#create-actor-system
-  implicit val system: ActorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient")
+  implicit val system: ActorSystem =
+    ActorSystemFactory.remote("csw-examples-locationServiceClient")
   //#create-actor-system
 
   implicit val mat = ActorMaterializer()
 
   //#create-logging-system
-  private val loggingSystem = LoggingSystemFactory.start("application-name", "application-version", "hostname", ActorSystem("logging-system"))
+  private val loggingSystem = LoggingSystemFactory.start(
+    "application-name",
+    "application-version",
+    "hostname",
+    ActorSystem("logging-system"))
   //#create-logging-system
 
   system.actorOf(LocationServiceExampleClient.props(locationService))
@@ -46,15 +55,20 @@ object LocationServiceExampleClient {
   // message sent when location stream ends (should not happen?)
   case object AllDone
 
-  def props(locationService: LocationService)(implicit mat: Materializer): Props =
+  def props(locationService: LocationService)(
+      implicit mat: Materializer): Props =
     Props(new LocationServiceExampleClient(locationService))
 }
 
 /**
   * A test client actor that uses the location service to resolve services
   */
-class LocationServiceExampleClient(locationService: LocationService)(implicit mat: Materializer) extends Actor with ExampleLogger.Actor {
-
+//#actor-mixin
+class LocationServiceExampleClient(locationService: LocationService)(
+    implicit mat: Materializer)
+    extends ExampleLogger.Actor
+    //#actor-mixin
+    {
   import LocationServiceExampleClient._
 
   private val timeout = 5.seconds
@@ -76,7 +90,8 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
   // dummy http connection
   val httpPort = 8080
-  val httpConnection = HttpConnection(ComponentId("configuration", ComponentType.Service))
+  val httpConnection = HttpConnection(
+    ComponentId("configuration", ComponentType.Service))
   val httpRegistration = HttpRegistration(httpConnection, httpPort, "path123")
   val httpRegResultF = async {
     await(locationService.register(httpRegistration))
@@ -85,18 +100,20 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
 
   // dummy HCD connection
   val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-  val hcdRegistration = AkkaRegistration(hcdConnection, context.actorOf(Props(new Actor {
-    override def receive: Receive = {
-      case "print" => log.info("hello world")
-    }
-  }), name = "my-actor-1"))
+  val hcdRegistration =
+    AkkaRegistration(hcdConnection, context.actorOf(Props(new Actor {
+      override def receive: Receive = {
+        case "print" => log.info("hello world")
+      }
+    }), name = "my-actor-1"))
   val hcdRegResultF = async {
     await(locationService.register(hcdRegistration))
   }
   val hcdRegResult = Await.result(hcdRegResultF, 2.seconds)
 
   //register the client "assembly" created in this example
-  val assemblyConnection = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
+  val assemblyConnection = AkkaConnection(
+    ComponentId("assembly1", ComponentType.Assembly))
   val assemblyRegistration = AkkaRegistration(assemblyConnection, self)
   val assemblyRegResultF = async {
     await(locationService.register(assemblyRegistration))
@@ -110,7 +127,9 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   private val exampleConnection = LocationServiceExampleComponent.connection
 
   //#log-info-map
-  log.info("Attempting to find connection", Map(Keys.OBS_ID → "foo_obs_id", "exampleConnection" → exampleConnection.name))
+  log.info("Attempting to find connection",
+           Map(Keys.OBS_ID → "foo_obs_id",
+               "exampleConnection" → exampleConnection.name))
   //#log-info-map
   val findResultF = async {
     await(locationService.find(exampleConnection))
@@ -129,15 +148,19 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   //#resolve
   // resolve connection to LocationServiceExampleComponent
   // [start LocationServiceExampleComponent after this command but before timeout]
-  log.info(s"Attempting to resolve $exampleConnection with a wait of $waitForResolveLimit ...")
+  log.info(
+    s"Attempting to resolve $exampleConnection with a wait of $waitForResolveLimit ...")
 
   val resolveResultF = async {
     await(locationService.resolve(exampleConnection, waitForResolveLimit))
   }
-  private val resolveResult = Await.result(resolveResultF, waitForResolveLimit + timeout)
+  private val resolveResult =
+    Await.result(resolveResultF, waitForResolveLimit + timeout)
   resolveResult match {
-    case Some(result) ⇒ log.info(s"Resolve result: ${locationInfoToString(result)}")
-    case None ⇒ log.info(s"Timeout waiting for location $exampleConnection to resolve.")
+    case Some(result) ⇒
+      log.info(s"Resolve result: ${locationInfoToString(result)}")
+    case None ⇒
+      log.info(s"Timeout waiting for location $exampleConnection to resolve.")
   }
   //#resolve
 
@@ -197,7 +220,7 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
   //#filtering-connection
   // filter connections based on connection type
   val akkaListF = async {
-   await(locationService.list(ConnectionType.AkkaType))
+    await(locationService.list(ConnectionType.AkkaType))
   }
   private val akkaList = Await.result(akkaListF, timeout)
   log.info("Registered Akka connections:")
@@ -216,32 +239,37 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
     // the following two methods are examples of two ways to track a connection.
     // both are implemented but only one is really needed.
 
-
     // Method1: track connection to LocationServiceExampleComponent
     // Calls track method for example connection and forwards location messages to this actor
     //
     log.info(s"Starting to track $exampleConnection")
-    locationService.track(exampleConnection).to(Sink.actorRef(self, AllDone)).run()
+    locationService
+      .track(exampleConnection)
+      .to(Sink.actorRef(self, AllDone))
+      .run()
     //track returns a Killswitch, that can be used to turn off notifications arbitarily
     //in this case track a connection for 5 seconds, after that schedule switching off the stream
-    val killswitch = locationService.track(httpConnection).toMat(Sink.foreach(println))(Keep.left).run()
+    val killswitch = locationService
+      .track(httpConnection)
+      .toMat(Sink.foreach(println))(Keep.left)
+      .run()
     context.system.scheduler.scheduleOnce(5.seconds) {
       killswitch.shutdown()
     }
 
     // Method2: subscribe to LocationServiceExampleComponent events
     log.info(s"Starting a subscription to $exampleConnection")
-    locationService.subscribe(exampleConnection, trackingEvent => {
-      // the following println is to distinguish subscription events from tracking events
-      log.info("subscription event")
-      self ! trackingEvent
-    })
+    locationService.subscribe(
+      exampleConnection,
+      trackingEvent => {
+        // the following println is to distinguish subscription events from tracking events
+        log.info("subscription event")
+        self ! trackingEvent
+      }
+    )
     //#tracking
 
     // [tracking shows component unregister and re-register]
-
-
-
     // Output should be:
     //    Starting to track AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
     //    Starting a subscription to AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
@@ -300,11 +328,11 @@ class LocationServiceExampleClient(locationService: LocationService)(implicit ma
       log.info(s"Tracking of $exampleConnection complete.")
 
     case x =>
-      val runtimeException = new RuntimeException(s"Received unexpected message $x")
+      val runtimeException = new RuntimeException(
+        s"Received unexpected message $x")
       //#log-error
       log.error(runtimeException.getMessage, ex = runtimeException)
-      //#log-error
+    //#log-error
   }
 
 }
-

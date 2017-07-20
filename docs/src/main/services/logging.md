@@ -37,7 +37,7 @@ gradle
 
 These are the relevant default configuration values for logging
 
-Scala
+logging.conf
 :   @@snip [logging.conf](../../../../csw-logging/src/main/resources/logging.conf)
 
 These values can be overridden directly in your `reference.conf` or `application.conf`. Also you can set a `logLevel` for each component
@@ -53,12 +53,12 @@ component-log-levels {
 @@@ note
 
 Here `tromboneHcd` and `tromboneAssembly` is the name of component that will be registered with `LocationService`. By default
-all components will log at `INFO` level. 
+all components will log at level specified by `csw-logging.logLevel`. 
 
 @@@
 
-We provide `FileAppender` as our default logging appender. If you want to use `StdOutAppender` or some custom appender along
-with `FileAppender` then you can override `appenders` property to include multiple appender in csv format as follows:
+Library provides `StdOutAppender` as default logging appender. If you want to use `FileAppender` or some custom appender along
+with `StdOutAppender` then you can override `appenders` property to include multiple appender in csv format as follows:
  
 ```
 
@@ -73,6 +73,48 @@ Make sure you provide full path of the appender since it will be spawned using j
 
 @@@
 
+For `StdOutAppender` specify the format of log statements in `csw-logging.stdout` via `csw-logging.stdout.pretty` and `csw-logging.stdout.oneLine`.  
+Turning `pretty` on or off will produce log statements in following format:
+
+pretty=true
+:   @@@vars
+    ```
+    {"@componentName":"my-component-name",
+     "@severity":"INFO",
+     "actor":
+       "akka.tcp://csw-examples-locationServiceClient@10.131.124.238:51256/user/$a",
+     "class":"csw.services.location.LocationServiceExampleClient",
+     "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
+     "file":"LocationServiceExampleClientApp.scala",
+     "line":131,
+     "message":"Attempting to find connection",
+     "obsId":"foo_obs_id",
+     "timestamp":"2017-07-20T08:15:01.657Z"
+    }
+    ```
+    @@@
+      
+pretty=false
+:   @@@vars
+    ```
+    {"@componentName":"my-component-name","@severity":"INFO","actor":"akka.tcp://csw-examples-locationServiceClient@10.131.124.238:51172/user/$a","class":"csw.services.location.LocationServiceExampleClient","exampleConnection":"LocationServiceExampleComponent-assembly-akka","file":"LocationServiceExampleClientApp.scala","line":131,"message":"Attempting to find connection","obsId":"foo_obs_id","timestamp":"2017-07-20T08:03:08.065Z"}
+    ```
+    @@@
+    
+Similarly, turning `oneLine` on will produce log statements in following format:
+
+oneLine=true
+:   @@@vars
+    ```
+    [INFO] Attempting to find connection (LocationServiceExampleClientApp.scala 131)
+    ```
+    @@@
+  
+@@@ note
+
+* If `oneLine` is set to `true` then value of `pretty` will be ignored
+
+@@@
 
 ## Log Levels
 
@@ -110,15 +152,16 @@ All messages are logged by default as Json. Logs can contain the following field
 
 @@@ note
 
-* @host, @name and @version will appear in log statements only if _fullHeaders_ is set as true in the configuration
+* `@host`, `@name` and `@version` will appear in log statements only if _fullHeaders_ is set as true in the configuration
+* `file` and `line` will appear only if log statements are being logged from scala classes/actors       
 
 @@@
 
 ## Create LoggingSystem
 
-In order to make logging statements appear in your program you need to start `LoggingSystem` as the first thing in your application.
-`LoggingSystem` should be started only once in your application. The name used while creating `LoggingSystem` will be used to create
-the folder and dump all logging files for your application in it.
+For logging statements to appear in the program start `LoggingSystem` as the first thing in an application.
+`LoggingSystem` should be started only once in an application. The name used while creating `LoggingSystem` will be used to create
+the folder and dump all logging files.
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #create-logging-system }
@@ -174,10 +217,16 @@ Java
     * For non-actor class inherit `JExampleLogger`
 
 
-@@@ note { title="If you are writing java code you need to get logger instance in your class "}
+
+@@@ note { title="Example to mixin above loggers in actors "}
+
+Scala
+:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #actor-mixin }
 
 Java
-:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #get-java-logger }
+:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #actor-mixin }
+
+You can mixin loggers for classes in a similar way  
 
 @@@
 
@@ -194,19 +243,35 @@ Java
 
 The output of log statement will be:
 
-```
-{"@componentName":"examples",
- "@severity":"INFO",
- "actor":
-   "akka.tcp://csw-examples-locationServiceClient@10.131.20.68:51495/user/$a",
- "class":"csw.services.location.LocationServiceExampleClient",
- "file":"LocationServiceExampleClientApp.scala",
- "line":119,
- "message":"Result of the find call: None",
- "timestamp":"2017-06-28T18:11:48.208000000+05:30"
-}
+Scala
+:   @@@vars
+    ```
+    {"@componentName":"my-component-name",
+     "@severity":"INFO",
+     "actor":
+       "akka.tcp://csw-examples-locationServiceClient@10.131.124.238:50721/user/$a",
+     "class":"csw.services.location.LocationServiceExampleClient",
+     "file":"LocationServiceExampleClientApp.scala",
+     "line":141,
+     "message":"Result of the find call: None",
+     "timestamp":"2017-07-20T06:47:46.468Z"
+    }
+    ```
+    @@@
 
-```
+Java
+:   @@@vars
+    ```
+    {"@componentName":"my-component-name",
+     "@severity":"INFO",
+     "actor":
+       "akka.tcp://csw-examples-locationServiceClient@10.131.124.238:50737/user/LocationServiceExampleClient",
+     "class":"csw.services.location.JLocationServiceExampleClient",
+     "message":"Result of the find call : None",
+     "timestamp":"2017-07-20T06:49:13.059Z"
+    }
+    ```
+    @@@
 
 You can also use a `Map` in message as follows:
 
@@ -217,25 +282,41 @@ Java
  :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-map }
 
 The output of log statement will be: 
- 
-```
-{"@componentName":"examples",
- "@severity":"INFO",
- "actor":
-   "akka.tcp://csw-examples-locationServiceClient@10.131.22.99:52787/user/$a",
- "class":"csw.services.location.LocationServiceExampleClient",
- "file":"LocationServiceExampleClientApp.scala",
- "line":113,
- "message":
-   {"@msg":"Attempting to find connection",
-    "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
-    "obsId":"foo_obs_id"
-   },
- "timestamp":"2017-07-10T11:37:12:943000000"
-}
 
-```
- 
+Scala
+:   @@@vars
+    ```
+    {"@componentName":"my-component-name",
+     "@severity":"INFO",
+     "actor":
+       "akka.tcp://csw-examples-locationServiceClient@10.131.124.238:50721/user/$a",
+     "class":"csw.services.location.LocationServiceExampleClient",
+     "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
+     "file":"LocationServiceExampleClientApp.scala",
+     "line":131,
+     "message":"Attempting to find connection",
+     "obsId":"foo_obs_id",
+     "timestamp":"2017-07-20T06:47:46.464Z"
+    }
+    ```
+    @@@
+    
+Java
+:   @@@vars
+    ```
+    {"@componentName":"my-component-name",
+     "@severity":"INFO",
+     "actor":
+       "akka.tcp://csw-examples-locationServiceClient@10.131.124.238:50737/user/LocationServiceExampleClient",
+     "class":"csw.services.location.JLocationServiceExampleClient",
+     "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
+     "message":"Attempting to find connection",
+     "obsId":"foo_obs_id",
+     "timestamp":"2017-07-20T06:49:13.054Z"
+    }
+    ```
+    @@@
+    
 Also you can log an error with stacktrace as follows:
  
 Scala
@@ -244,10 +325,6 @@ Scala
 Java
  :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error }
  
-## Garbage Collection Logging
-
-Garbage collection events are logged to the gc log when enabled by the `gc` configuration option.
-
 ## Source code for examples
 
 * @github[Scala Example](/examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala)
