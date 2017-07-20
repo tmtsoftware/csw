@@ -105,11 +105,12 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
 
         //#log-info-map
-        Map<String, Object> map = new HashMap<>();
-        map.put(JKeys.OBS_ID, "foo_obs_id");
-        map.put("exampleConnection", exampleConnection.name());
-
-        log.info("Attempting to find connection", map);
+        log.info(() -> "Attempting to find connection", () -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put(JKeys.OBS_ID, "foo_obs_id");
+            map.put("exampleConnection", exampleConnection.name());
+            return map;
+        });
         //#log-info-map
 
         Optional<Location> findResult = locationService.find(exampleConnection).get();
@@ -117,7 +118,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
             log.info("Find result: " + connectionInfo(findResult.get().connection()));
         } else {
             //#log-info
-            log.info("Result of the find call : None");
+            log.info(() -> "Result of the find call : None");
             //#log-info
         }
         //#find
@@ -300,7 +301,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
                 .matchAny((Object x) -> {
                     RuntimeException runtimeException = new RuntimeException("Received unexpected message " + x);
                     //#log-info-error
-                    log.info(runtimeException.getMessage(), runtimeException);
+                    log.info(() -> runtimeException.getMessage(), runtimeException);
                     //#log-info-error
                 })
                 .build();

@@ -329,6 +329,12 @@ Scala
 Java
  :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error }
  
+@@@ note
+
+* It is recommended in java to use api that has `Supplier` for `msg` and `map` since it is more efficient compared to non-supplier version of it  
+
+@@@
+ 
 ## Source code for examples
 
 * @github[Scala Example](/examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala)
