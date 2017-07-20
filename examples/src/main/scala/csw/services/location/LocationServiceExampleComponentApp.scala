@@ -1,15 +1,16 @@
 package csw.services.location
 
+import java.net.InetAddress
+
 import akka.actor._
 import akka.stream.ActorMaterializer
 import csw.services.commons.ExampleLogger
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
+import csw.services.logging.scaladsl.LoggingSystemFactory
 
-import scala.async.Async._
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
 /**
@@ -20,8 +21,12 @@ object LocationServiceExampleComponentApp extends App {
   implicit val system         = ActorSystemFactory.remote()
   implicit val mat            = ActorMaterializer()
 
-  system.actorOf(LocationServiceExampleComponent.props(locationService))
+  //#create-logging-system
+  private val host = InetAddress.getLocalHost.getHostName
+  LoggingSystemFactory.start("LocationServiceExampleComponent", "0.1", host, system)
+  //#create-logging-system
 
+  system.actorOf(LocationServiceExampleComponent.props(locationService))
 }
 
 object LocationServiceExampleComponent {
@@ -46,10 +51,7 @@ class LocationServiceExampleComponent(locationService: LocationService) extends 
   log.info("In actor LocationServiceExampleComponent")
 
   // Register with the location service
-  val registrationResult = async {
-    locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self))
-  }
-
+  val registrationResult: Future[RegistrationResult] = locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self))
   Await.result(registrationResult, 5.seconds)
 
   log.info("LocationServiceExampleComponent registered.")
