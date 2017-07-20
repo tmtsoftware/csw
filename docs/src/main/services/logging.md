@@ -40,8 +40,8 @@ These are the relevant default configuration values for logging
 logging.conf
 :   @@snip [logging.conf](../../../../csw-logging/src/main/resources/logging.conf)
 
-These values can be overridden directly in your `reference.conf` or `application.conf`. Also you can set a `logLevel` for each component
-in your reference.conf/application.conf by it's component name as follows:
+These values can be overridden directly in the `reference.conf` or `application.conf`. Also `logLevel` for each component can be set
+in reference.conf/application.conf as follows:
 
 ```
 component-log-levels {
@@ -57,8 +57,8 @@ all components will log at level specified by `csw-logging.logLevel`.
 
 @@@
 
-Library provides `StdOutAppender` as default logging appender. If you want to use `FileAppender` or some custom appender along
-with `StdOutAppender` then you can override `appenders` property to include multiple appender in csv format as follows:
+Library provides `StdOutAppender` as default logging appender. To use `FileAppender` or some custom appender along-with 
+`StdOutAppender`, override `appenders` property to include multiple appender in csv format as follows:
  
 ```
 
@@ -68,13 +68,13 @@ appenders = ["csw.services.logging.appenders.FileAppender$", "csw.services.loggi
 
 @@@ note
 
-Make sure you provide full path of the appender since it will be spawned using java reflection. In csw code base, a working example of custom appender can be found at:
+Make sure to provide full path of the appender since it will be spawned using java reflection. In csw code base, a working example of custom appender can be found at:
 @github[Custom Appender](/csw-logging/src/test/scala/csw/services/logging/appenders/CustomAppenderTest.scala)
 
 @@@
 
 For `StdOutAppender` specify the format of log statements in `csw-logging.stdout` via `csw-logging.stdout.pretty` and `csw-logging.stdout.oneLine`.  
-Turning `pretty` on or off will produce log statements in following format:
+Turning `pretty` **on** or **off** will produce log statements in following format:
 
 pretty=true
 :   @@@vars
@@ -127,12 +127,12 @@ Following Log levels are supported by csw-logging library
 * DEBUG
 * TRACE
 
-There are separate log levels for the logging API(logLevel), Akka logging(akkaLogLevel), and Slf4J(slf4jLogLevel). The initial values of these are set in the configuration file as seen above. These can be overriden in the application.conf file.
+Library allows separate log levels for the logging API(logLevel), Akka logging(akkaLogLevel), and Slf4J(slf4jLogLevel). The initial values of these are set in the configuration file as seen above. These can be overriden in the application.conf file.
 
 These values can also be changed dynamically by calling methods on `LoggingSystem` class.
 
 ## Log Structure
-All messages are logged by default as Json. Logs can contain the following fields. These are listed in alphabetical order (this is the order displayed by the Json pretty printer).
+All messages are logged by default as Json. Logs can contain following fields:
 
 * `@componentName`: The name of the component if present
 * `@host`: The local host name
@@ -145,9 +145,8 @@ All messages are logged by default as Json. Logs can contain the following field
 * `kind`: Either slf4j or akka. Not present for logger API
 * `line`: The line where the message was logged
 * `message`: The log message
-* `timestamp`: The time the message was logged
+* `timestamp`: The UTC time when the message was logged
 * `trace`: Information for any exception specified in the logging call
-
 
 
 @@@ note
@@ -159,8 +158,8 @@ All messages are logged by default as Json. Logs can contain the following field
 
 ## Create LoggingSystem
 
-For logging statements to appear in the program start `LoggingSystem` as the first thing in an application.
-`LoggingSystem` should be started only once in an application. The name used while creating `LoggingSystem` will be used to create
+For logging statements to appear in the program, start `LoggingSystem` at an earliest location in an application.
+**Also note, `LoggingSystem` should be started only once in an application.** The name used while creating `LoggingSystem` will be used to create
 the folder and dump all logging files.
 
 Scala
@@ -169,9 +168,15 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClientApp.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #create-logging-system }
 
+@@@ note
+
+* The `hostname` that is provided while creating `LoggingSystem` will appear in log statements against `@host` tag
+
+@@@
+
 ## Stop LoggingSystem
 
-Make sure you stop the `LoggingSystem` at the end of your application.
+Please ensure to stop `LoggingSystem` before application exits.
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #stop-logging-system }
@@ -183,7 +188,7 @@ Java
 ## Enable logging
 
 ### Enable generic logging
-To enable logging for some utility code that does not require `@componentName` in log statements you can inherit following traits
+To enable logging for some utility code that does not require `@componentName` in log statements, inherit from following traits:
 
 Scala
 :   * For actor class extend `GenericLogger.Actor`
@@ -194,7 +199,7 @@ Java
     * For non-actor class inherit `JGenericLogger`
 
 ### Enable component level logging
-Whereas, if you want to include `@componentName` in your log statements you need to first create an object/abstract class/interface as follows:
+To include `@componentName` in your log statements, create an object/abstract class/interface as follows:
 
 Scala
 :   @@snip [ExampleLogger.scala](../../../../examples/src/main/scala/csw/services/commons/ExampleLogger.scala) { #component-logger }
@@ -206,7 +211,7 @@ Non-Actor Java class
 :   @@snip [JExampleLogger.scala](../../../../examples/src/main/java/csw/services/commons/JExampleLogger.java) { #jcomponent-logger }
 
 
-Then, you need to inherit following object/interface
+Then, inherit following object/interface:
 
 Scala
 :   * For actor class extend `ExampleLogger.Actor`
@@ -217,7 +222,6 @@ Java
     * For non-actor class inherit `JExampleLogger`
 
 
-
 @@@ note { title="Example to mixin above loggers in actors "}
 
 Scala
@@ -226,7 +230,7 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #actor-mixin }
 
-You can mixin loggers for classes in a similar way  
+Loggers for classes can be mixed in a similar way  
 
 @@@
 
@@ -273,7 +277,7 @@ Java
     ```
     @@@
 
-You can also use a `Map` in message as follows:
+Library allows usage of `Map` in message as follows:
 
 Scala
  :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info-map }
@@ -317,7 +321,7 @@ Java
     ```
     @@@
     
-Also you can log an error with stacktrace as follows:
+Library allows to log an error with it's full stacktrace as follows:
  
 Scala
   :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-error }
@@ -330,6 +334,9 @@ Java
 * @github[Scala Example](/examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala)
 * @github[Java Example](/examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java)
   
+
+## Acknowledgement
+The codebase in **csw-logging** module is based on [persist-logging library](https://github.com/nestorpersist/logging) library. We appreciate efforts put in by authors of the persist-logging library which made our development fast and easy.
    
   
 
