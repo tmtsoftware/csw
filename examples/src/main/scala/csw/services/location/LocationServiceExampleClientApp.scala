@@ -270,6 +270,9 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     s"${connection.name}, component type=${connection.componentId.componentType}, connection type=${connection.connectionType}"
   }
 
+  // Note: This method is never actually called in this example, since the actor does not shutdown
+  // unless the application is killed. It is here to demonstrate how you might cleanly shutdown
+  // tha application.
   override def postStop(): Unit = {
 
     //#unregister
@@ -282,6 +285,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     //#unregister
 
     //#shutdown
+    // Only call this once per application
     Await.result(locationService.shutdown(), 20.seconds)
     //#shutdown
 

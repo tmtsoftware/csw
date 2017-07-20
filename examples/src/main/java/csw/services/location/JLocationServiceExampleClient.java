@@ -17,15 +17,15 @@ import csw.services.location.models.*;
 import csw.services.location.models.Connection.AkkaConnection;
 import csw.services.location.models.Connection.HttpConnection;
 import csw.services.location.scaladsl.ActorSystemFactory;
-import csw.services.logging.appenders.LogAppenderBuilder;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JKeys;
-import csw.services.logging.javadsl.JLogAppenderBuilders;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +47,8 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
     private IRegistrationResult httpRegResult;
     private IRegistrationResult hcdRegResult;
     private IRegistrationResult assemblyRegResult;
+
+    private static LoggingSystem loggingSystem;
 
 
     public JLocationServiceExampleClient() throws ExecutionException, InterruptedException {
@@ -221,13 +223,11 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
 
         //track returns a Killswitch, that can be used to turn off notifications arbitarily
         //in this case track a connection for 5 seconds, after that schedule switching off the stream
-        Pair pair = (Pair)locationService.track(exampleConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
-        context().system().scheduler().scheduleOnce(Duration.create(5, TimeUnit.SECONDS), new Runnable() {
-            @Override
-            public void run() {
-                ((KillSwitch)pair.first()).shutdown();
-            }
-        }, context().system().dispatcher());
+        Pair pair = locationService.track(exampleConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
+        context().system().scheduler().scheduleOnce(
+            Duration.create(5, TimeUnit.SECONDS),
+            () -> ((KillSwitch)pair.first()).shutdown(),
+            context().system().dispatcher());
 
         // subscribe to LocationServiceExampleComponent events
         log.info("Starting a subscription to " + exampleConnection);
@@ -279,6 +279,15 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         //#shutdown
         locationService.shutdown().get();
         //#shutdown
+
+        try {
+            //#stop-logging-system
+            // Only call this once per application
+            loggingSystem.javaStop().get();
+            //#stop-logging-system
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -297,24 +306,16 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
                 .build();
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, UnknownHostException {
         //#create-actor-system
         ActorSystem actorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient");
         //#create-actor-system
 
         //#create-logging-system
-        LoggingSystem loggingSystem = JLoggingSystemFactory.start("application-name", "application-version", "hostname", ActorSystem.apply("logging-system"));
+        String host = InetAddress.getLocalHost().getHostName();
+        loggingSystem = JLoggingSystemFactory.start("JLocationServiceExampleClient", "0.1", host, actorSystem);
         //#create-logging-system
 
         actorSystem.actorOf(Props.create(JLocationServiceExampleClient.class), "LocationServiceExampleClient");
-
-        try {
-            //#stop-logging-system
-            loggingSystem.javaStop().get();
-            //#stop-logging-system
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
     }
 }
