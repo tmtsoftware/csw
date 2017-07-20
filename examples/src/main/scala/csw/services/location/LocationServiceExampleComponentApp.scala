@@ -51,7 +51,8 @@ class LocationServiceExampleComponent(locationService: LocationService) extends 
   log.info("In actor LocationServiceExampleComponent")
 
   // Register with the location service
-  val registrationResult: Future[RegistrationResult] = locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self))
+  val registrationResult: Future[RegistrationResult] =
+    locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self))
   Await.result(registrationResult, 5.seconds)
 
   log.info("LocationServiceExampleComponent registered.")
