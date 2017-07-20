@@ -7,7 +7,7 @@ import csw.services.logging.javadsl.JComponentLoggerActor;
 public abstract class JExampleLoggerActor extends JComponentLoggerActor {
     @Override
     public String componentName() {
-        return "examples";
+        return "my-component-name";
     }
 }
 //#jcomponent-logger-actor
