@@ -54,12 +54,12 @@ public class JE2ELoggingBenchmark implements JGenericLogger {
     /**
     * All the benchmarks in this file exercises end to end java logging
     *
-    * @Setup : 1. Getting logger instance
+    * `Setup` : 1. Getting logger instance
     *          2. Starting LoggingSystem with FileAppender
     *          3. Setting default log level to INFO
     *          4. Creating instance of Person class just for logging purpose
     *
-    * @TearDown : 1. Terminating ActorSystem
+    * `TearDown` : 1. Terminating ActorSystem
     *
     * There are two benchmarks to show the difference between supplier and string version of logger API
     * when log level is not enabled (TRACE)
