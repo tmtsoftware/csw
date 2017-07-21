@@ -48,10 +48,12 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
     loggingSystem.getSlf4jLevel.current.name.toLowerCase shouldBe slf4jLogLevel.toLowerCase
   }
 
-  test("should be able to configure appenders in configuration file") {
+  // DEOPSCSW-142: Flexibility of logging approaches
+  test("should able to parse appenders from configuration file") {
     loggingSystem.getAppenders.toSet shouldBe Set(StdOutAppender, FileAppender)
   }
 
+  // DEOPSCSW-142: Flexibility of logging approaches
   test("should throw AppenderNotFoundException for an invalid appender configured") {
     val config      = ConfigFactory.parseString("""
         |csw-logging {

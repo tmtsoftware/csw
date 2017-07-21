@@ -10,7 +10,7 @@ import akka.actor.ActorSystem
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
-import csw.services.logging.appenders.FileAppender
+import csw.services.logging.appenders.{FileAppender, StdOutAppender}
 import csw.services.logging.commons.{LoggingKeys, TMTDateTimeFormatter}
 import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.utils.FileUtils
@@ -63,6 +63,36 @@ class LoggingConfigurationTest
     }
   }
 
+  def testLogConfiguration(logBuffer: mutable.Seq[JsonObject],
+                           headersEnabled: Boolean,
+                           expectedTimestamp: ZonedDateTime): Unit = {
+    logBuffer.size shouldBe 1
+
+    val jsonLogMessage = logBuffer.head
+    // Standard header fields -> Logging System Name, Hostname, Version
+    jsonLogMessage.contains(LoggingKeys.NAME) shouldBe headersEnabled
+    jsonLogMessage.contains(LoggingKeys.HOST) shouldBe headersEnabled
+    jsonLogMessage.contains(LoggingKeys.VERSION) shouldBe headersEnabled
+
+    if (headersEnabled == true) {
+      jsonLogMessage(LoggingKeys.NAME) shouldBe loggingSystemName
+      jsonLogMessage(LoggingKeys.HOST) shouldBe hostname
+      jsonLogMessage(LoggingKeys.VERSION) shouldBe version
+    }
+
+    jsonLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
+    jsonLogMessage(LoggingKeys.SEVERITY) shouldBe INFO.name
+    jsonLogMessage(LoggingKeys.CLASS) shouldBe className
+    jsonLogMessage(LoggingKeys.FILE) shouldBe fileName
+
+    // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
+    // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
+    noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString))
+    val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString)
+    ChronoUnit.MILLIS.between(expectedTimestamp, actualDateTime) <= 50 shouldBe true
+
+  }
+
   // DEOPSCSW-118: Provide UTC time for each log message
   test("should log messages in the file with standard headers") {
     val config =
@@ -74,6 +104,7 @@ class LoggingConfigurationTest
                         |   file {
                         |     fullHeaders = true
                         |     logPath = ${logFileDir.getAbsolutePath}
+                        |     logLevelLimit = info
                         |   }
                         | }
                         |}
@@ -83,31 +114,17 @@ class LoggingConfigurationTest
     val actorSystem   = ActorSystem("test", config)
     val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
-    val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
+    loggingSystem.getAppenders shouldBe List(FileAppender)
+
+    val expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
+
     log.info(sampleLogMessage)
     Thread.sleep(100)
 
     // Reading common logger file
     val fileLogBuffer = FileUtils.read(testLogFilePathWithServiceName)
 
-    fileLogBuffer.size shouldBe 1
-    val jsonLogMessage = fileLogBuffer.head
-
-    // Standard header fields -> Logging System Name, Hostname, Version
-    jsonLogMessage(LoggingKeys.NAME) shouldBe loggingSystemName
-    jsonLogMessage(LoggingKeys.HOST) shouldBe hostname
-    jsonLogMessage(LoggingKeys.VERSION) shouldBe version
-
-    jsonLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
-    jsonLogMessage(LoggingKeys.SEVERITY) shouldBe INFO.name
-    jsonLogMessage(LoggingKeys.CLASS) shouldBe className
-    jsonLogMessage(LoggingKeys.FILE) shouldBe fileName
-
-    // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
-    // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
-    noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString))
-    val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString)
-    ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
+    testLogConfiguration(fileLogBuffer, true, expectedTimestamp)
 
     // clean up
     Await.result(loggingSystem.stop, 5.seconds)
@@ -134,6 +151,9 @@ class LoggingConfigurationTest
     val actorSystem   = ActorSystem("test", config)
     val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
 
+    loggingSystem.getAppenders shouldBe List(FileAppender)
+
+    val expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     log.info(sampleLogMessage)
     log.debug(sampleLogMessage)
     Thread.sleep(200)
@@ -141,19 +161,7 @@ class LoggingConfigurationTest
     // Reading common logger file
     val fileLogBuffer = FileUtils.read(testLogFilePathWithServiceName)
 
-    // LogLevelLimit configured in file appender is INFO, hence only one message with the level info should be logged
-    fileLogBuffer.size shouldBe 1
-    val jsonLogMessage = fileLogBuffer.head
-
-    // Standard header fields -> Logging System Name, Hostname, Version
-    jsonLogMessage.contains(LoggingKeys.NAME) shouldBe false
-    jsonLogMessage.contains(LoggingKeys.HOST) shouldBe false
-    jsonLogMessage.contains(LoggingKeys.VERSION) shouldBe false
-
-    jsonLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
-    jsonLogMessage(LoggingKeys.SEVERITY) shouldBe INFO.name
-    jsonLogMessage(LoggingKeys.CLASS) shouldBe className
-    jsonLogMessage(LoggingKeys.FILE) shouldBe fileName
+    testLogConfiguration(fileLogBuffer, false, expectedTimestamp)
 
     // clean up
     Await.result(loggingSystem.stop, 5.seconds)
@@ -177,39 +185,21 @@ class LoggingConfigurationTest
                       """.stripMargin)
         .withFallback(ConfigFactory.load)
 
-    lazy val actorSystem                = ActorSystem("test", config)
-    lazy val loggingSystem              = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
-    var expectedDateTime: ZonedDateTime = null
+    lazy val actorSystem                 = ActorSystem("test", config)
+    lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+    var expectedTimestamp: ZonedDateTime = null
 
     Console.withOut(outStream) {
       loggingSystem
-      expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
+      expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
       log.debug(sampleLogMessage)
       log.info(sampleLogMessage)
       Thread.sleep(200)
     }
+    loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
     parse(outStream.toString)
-
-    // LogLevelLimit configured in stdout appender is INFO, hence only one message with the level info should be logged
-    stdOutLogBuffer.size shouldBe 1
-    val jsonLogMessage = stdOutLogBuffer.head
-
-    // Standard header fields -> Logging System Name, Hostname, Version
-    jsonLogMessage(LoggingKeys.NAME) shouldBe loggingSystemName
-    jsonLogMessage(LoggingKeys.HOST) shouldBe hostname
-    jsonLogMessage(LoggingKeys.VERSION) shouldBe version
-
-    jsonLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
-    jsonLogMessage(LoggingKeys.SEVERITY) shouldBe INFO.name
-    jsonLogMessage(LoggingKeys.CLASS) shouldBe className
-    jsonLogMessage(LoggingKeys.FILE) shouldBe fileName
-
-    // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
-    // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
-    noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString))
-    val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString)
-    ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
+    testLogConfiguration(stdOutLogBuffer, true, expectedTimestamp)
 
     // clean up
     Await.result(loggingSystem.stop, 5.seconds)
@@ -225,35 +215,28 @@ class LoggingConfigurationTest
                        | appender-config {
                        |   stdout {
                        |     fullHeaders = false
+                       |     logLevelLimit = info
                        |   }
                        | }
                        |}
                      """.stripMargin)
         .withFallback(ConfigFactory.load)
 
-    lazy val actorSystem   = ActorSystem("test", config)
-    lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+    lazy val actorSystem                 = ActorSystem("test", config)
+    lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+    var expectedTimestamp: ZonedDateTime = null
 
     Console.withOut(outStream) {
       loggingSystem
+      expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
       log.info(sampleLogMessage)
       Thread.sleep(100)
     }
 
+    loggingSystem.getAppenders shouldBe List(StdOutAppender)
+
     parse(outStream.toString)
-
-    stdOutLogBuffer.size shouldBe 1
-    val jsonLogMessage = stdOutLogBuffer.head
-
-    // Standard header fields -> Logging System Name, Hostname, Version
-    jsonLogMessage.contains(LoggingKeys.NAME) shouldBe false
-    jsonLogMessage.contains(LoggingKeys.HOST) shouldBe false
-    jsonLogMessage.contains(LoggingKeys.VERSION) shouldBe false
-
-    jsonLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
-    jsonLogMessage(LoggingKeys.SEVERITY) shouldBe INFO.name
-    jsonLogMessage(LoggingKeys.CLASS) shouldBe className
-    jsonLogMessage(LoggingKeys.FILE) shouldBe fileName
+    testLogConfiguration(stdOutLogBuffer, false, expectedTimestamp)
 
     // clean up
     stdOutLogBuffer.clear()
@@ -261,7 +244,7 @@ class LoggingConfigurationTest
     Await.result(actorSystem.terminate, 5.seconds)
   }
 
-  test("should log messages on the console in one line 1") {
+  test("should log messages on the console in one line") {
     val os = new ByteArrayOutputStream
     val config =
       ConfigFactory
@@ -271,6 +254,7 @@ class LoggingConfigurationTest
                        | appender-config {
                        |   stdout {
                        |     oneLine = true
+                       |     logLevelLimit = info
                        |   }
                        | }
                        |}
@@ -285,8 +269,9 @@ class LoggingConfigurationTest
       log.info(sampleLogMessage)
       Thread.sleep(100)
     }
+    loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 285)"
+    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 269)"
 
     os.toString.trim shouldBe expectedOneLineLog
 
