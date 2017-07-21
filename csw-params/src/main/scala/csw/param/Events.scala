@@ -3,6 +3,8 @@ package csw.param
 import java.time.{Clock, Instant}
 import java.util.UUID
 
+import csw.param
+
 import scala.language.implicitConversions
 
 /**
@@ -103,7 +105,7 @@ object Events {
     /**
      * The observation ID
      */
-    def obsIdOption[ObsId] = info.obsId
+    def obsIdOption[ObsId]: Option[param.ObsId] = info.obsId
   }
 
   /**

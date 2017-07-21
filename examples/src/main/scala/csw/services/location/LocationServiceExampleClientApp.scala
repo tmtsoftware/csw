@@ -18,8 +18,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 /**
-  * An example location service client application.
-  */
+ * An example location service client application.
+ */
 object LocationServiceExampleClientApp extends App {
 
   //#create-location-service
@@ -36,11 +36,7 @@ object LocationServiceExampleClientApp extends App {
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName
   // Only call this once per application
-  val loggingSystem: LoggingSystem = LoggingSystemFactory.start(
-    "LocationServiceExampleClient",
-    "0.1",
-    host,
-    system)
+  val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, system)
   //#create-logging-system
 
   system.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem))
@@ -51,23 +47,22 @@ object LocationServiceExampleClient {
   // message sent when location stream ends (should not happen?)
   case object AllDone
 
-  def props(locationService: LocationService, loggingSystem: LoggingSystem)(
-    implicit mat: Materializer): Props =
+  def props(locationService: LocationService, loggingSystem: LoggingSystem)(implicit mat: Materializer): Props =
     Props(new LocationServiceExampleClient(locationService, loggingSystem))
 }
 
 /**
-  * A test client actor that uses the location service to resolve services
-  */
+ * A test client actor that uses the location service to resolve services
+ */
 //#actor-mixin
-class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(
-  implicit mat: Materializer)
-  extends ExampleLogger.Actor
+class LocationServiceExampleClient(locationService: LocationService,
+                                   loggingSystem: LoggingSystem)(implicit mat: Materializer)
+    extends ExampleLogger.Actor
     //#actor-mixin
-{
+    {
   import LocationServiceExampleClient._
 
-  private val timeout = 5.seconds
+  private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds
 
   // EXAMPLE DEMO START
@@ -85,10 +80,9 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // add some dummy registrations for illustrative purposes
 
   // dummy http connection
-  val httpPort = 8080
-  val httpConnection = HttpConnection(
-    ComponentId("configuration", ComponentType.Service))
-  val httpRegistration = HttpRegistration(httpConnection, httpPort, "path123")
+  val httpPort                          = 8080
+  val httpConnection                    = HttpConnection(ComponentId("configuration", ComponentType.Service))
+  val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123")
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
 
   // dummy HCD connection
@@ -102,9 +96,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val hcdRegResult: RegistrationResult = Await.result(locationService.register(hcdRegistration), 2.seconds)
 
   //register the client "assembly" created in this example
-  val assemblyConnection = AkkaConnection(
-    ComponentId("assembly1", ComponentType.Assembly))
-  val assemblyRegistration = AkkaRegistration(assemblyConnection, self)
+  val assemblyConnection                    = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
+  val assemblyRegistration                  = AkkaRegistration(assemblyConnection, self)
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations
 
@@ -115,8 +108,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   //#log-info-map
   log.info("Attempting to find connection",
-    Map(Keys.OBS_ID → "foo_obs_id",
-      "exampleConnection" → exampleConnection.name))
+           Map(Keys.OBS_ID → "foo_obs_id", "exampleConnection" → exampleConnection.name))
   //#log-info-map
   val findResult: Option[Location] = Await.result(locationService.find(exampleConnection), timeout)
 
@@ -132,11 +124,10 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   //#resolve
   // resolve connection to LocationServiceExampleComponent
   // [start LocationServiceExampleComponent after this command but before timeout]
-  log.info(
-    s"Attempting to resolve $exampleConnection with a wait of $waitForResolveLimit ...")
+  log.info(s"Attempting to resolve $exampleConnection with a wait of $waitForResolveLimit ...")
 
   val resolveResultF: Future[Option[Location]] = locationService.resolve(exampleConnection, waitForResolveLimit)
-  val resolveResult: Option[Location] = Await.result(resolveResultF, waitForResolveLimit + timeout)
+  val resolveResult: Option[Location]          = Await.result(resolveResultF, waitForResolveLimit + timeout)
   resolveResult match {
     case Some(result) ⇒
       log.info(s"Resolve result: ${locationInfoToString(result)}")
@@ -309,8 +300,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
       log.info(s"Tracking of $exampleConnection complete.")
 
     case x =>
-      val runtimeException = new RuntimeException(
-        s"Received unexpected message $x")
+      val runtimeException = new RuntimeException(s"Received unexpected message $x")
       //#log-error
       log.error(runtimeException.getMessage, ex = runtimeException)
     //#log-error

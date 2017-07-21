@@ -46,7 +46,7 @@ object LocationServiceExampleComponent {
 /**
  * A dummy akka test service that registers with the location service
  */
-class LocationServiceExampleComponent(locationService: LocationService) extends Actor with ExampleLogger.Actor {
+class LocationServiceExampleComponent(locationService: LocationService) extends ExampleLogger.Actor {
 
   log.info("In actor LocationServiceExampleComponent")
 

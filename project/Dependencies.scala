@@ -16,6 +16,7 @@ object Dependencies {
     Akka.`akka-actor`,
     Akka.`akka-slf4j`,
     Akka.`akka-remote`,
+    Akka.`akka-typed`,
     Libs.`scalatest`       % Test,
     Libs.`junit`           % Test,
     Libs.`junit-interface` % Test,
@@ -94,6 +95,13 @@ object Dependencies {
     Libs.`mockito-core`            % Test,
     Akka.`akka-multi-node-testkit` % Test,
     Akka.`akka-stream-testkit`     % Test
+  )
+
+  val Vslice = Seq(
+    Libs.`scala-async`,
+    Akka.`akka-typed`,
+    Akka.`akka-typed-testkit` % Test,
+    Libs.`scalatest`          % Test
   )
 
   val CswClusterSeed = Seq(

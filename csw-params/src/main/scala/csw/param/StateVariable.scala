@@ -103,7 +103,7 @@ object StateVariable {
 
   }
 
-  object CurrentState {
+  object eCurrentState {
 
     /**
      * Converts a Setup to a CurrentState
