@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import csw.services.logging.appenders.FileAppender
+import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.{Logger, LoggerImpl}
 import org.openjdk.jmh.annotations._
@@ -23,6 +24,8 @@ import scala.concurrent.duration.DurationLong
 // multiple threads (for example, 4 threads):
 // sbt csw-benchmark/jmh:run -f 1 -wi 10 -i 20 -t 4 -si true .*E2ELoggingBenchmark.*
 //
+
+// DEOPSCSW-279: Test logging performance
 @State(Scope.Benchmark)
 class E2ELoggingBenchmark {
   var actorSystem: ActorSystem   = _
@@ -32,7 +35,9 @@ class E2ELoggingBenchmark {
   @Setup(Level.Trial)
   def setup(): Unit = {
     actorSystem = ActorSystem("logging")
-    new LoggingSystem("E2E", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, actorSystem)
+    val loggingSystem = new LoggingSystem("E2E", "SNAPSHOT-1.0", InetAddress.getLocalHost.getHostName, actorSystem)
+    loggingSystem.setAppenders(List(FileAppender))
+    loggingSystem.setDefaultLogLevel(INFO)
     log = new LoggerImpl(None, None)
   }
 

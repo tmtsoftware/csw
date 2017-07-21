@@ -18,6 +18,8 @@ import org.openjdk.jmh.annotations._
 // multiple threads (for example, 4 threads):
 // sbt csw-benchmark/jmh:run -f 1 -wi 10 -i 20 -t 4 -si true .*TMTDateTimeFormatterBenchmark.*
 //
+
+// DEOPSCSW-279: Test logging performance
 @State(Scope.Benchmark)
 class TMTDateTimeFormatterBenchmark {
   var logMsgString1: String = s"""{

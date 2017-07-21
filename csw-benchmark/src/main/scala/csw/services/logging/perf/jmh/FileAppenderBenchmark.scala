@@ -23,6 +23,8 @@ import scala.concurrent.duration.DurationLong
 // multiple threads (for example, 4 threads):
 // sbt csw-benchmark/jmh:run -f 1 -wi 10 -i 20 -t 4 -si true .*FileAppenderBenchmark.*
 //
+
+// DEOPSCSW-279: Test logging performance
 @State(Scope.Benchmark)
 class FileAppenderBenchmark {
   var actorSystem: ActorSystem   = _
@@ -40,6 +42,8 @@ class FileAppenderBenchmark {
     Await.result(actorSystem.terminate(), 5.seconds)
   }
 
+  // This benchmark is for file appender. The result of this benchmark will be the number of messages
+  // actually written to the file
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
