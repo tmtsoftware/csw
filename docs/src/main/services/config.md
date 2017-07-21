@@ -1,15 +1,24 @@
 # Configuration service
 
-Configuration Service provides a centralized persistent store for any configuration file used in the TMT Software System. All versions of configuration files are retained providing a historical record of each configuration file.
+Configuration Service provides a centralized persistent store for any configuration file used in the TMT Software System. 
+All versions of configuration files are retained, providing a historical record of each configuration file.
 
-This service will be part of observatory cluster and exposes Rest endpoints that can be accessed over HTTP. Component developers can use the csw-config-client library in their code. The library wraps the low level communication with ConfigServer and exposes simple to use methods to access and manage configuration files.  
- 
+Note that in order to use the APIs described here, the [location service](../services/location.html)
+and [config service server](../apps/cswonfigserverapp.html) need to be running somewhere in the local network
+and the necessary configuration, environment variables or system properties should be defined to point to the 
+correct host and port number(s) for the location service seed nodes.
+
+This service will be part of the observatory cluster and exposes Rest endpoints that can be accessed over HTTP. 
+Component developers can use the csw-config-client library in their code. 
+The library wraps the low level communication with ConfigServer and exposes simple to use methods to access and 
+manage configuration files.
+
 ## Artifacts
 
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-config_$scala.binaryVersion$" % "$version$"
+    libraryDependencies += "org.tmt" %% "csw-config-client_$scala.binaryVersion$" % "$version$"
     ```
     @@@
 
@@ -18,7 +27,7 @@ maven
     ```xml
     <dependency>
      <groupId>org.tmt</groupId>
-     <artifactId>csw-config_$scala.binaryVersion$</artifactId>
+     <artifactId>csw-config-client_$scala.binaryVersion$</artifactId>
      <version>$version$</version>
      <type>pom</type>
     </dependency>
@@ -29,7 +38,7 @@ gradle
 :   @@@vars
     ```gradle
     dependencies {
-      compile group: "org.tmt", name: "csw-config_$scala.binaryVersion$", version: "$version$"
+      compile group: "org.tmt", name: "csw-config-client_$scala.binaryVersion$", version: "$version$"
     }
     ```
     @@@
