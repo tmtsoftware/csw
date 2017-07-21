@@ -23,7 +23,7 @@ private[logging] object FileAppenderActor {
   trait AppendMessages
 
   // Message to add log text to the writer
-  case class AppendAdd(logDateTime: ZonedDateTime, line: String) extends AppendMessages
+  case class AppendAdd(logDateTime: ZonedDateTime, line: String, rotateFlag: Boolean) extends AppendMessages
 
   // Message to close the appender
   case class AppendClose(p: Promise[Unit]) extends AppendMessages
@@ -51,21 +51,27 @@ private[logging] class FileAppenderActor(path: String, category: String) {
   protected val log: Logger                         = new LoggerImpl(None, None)
 
   // Initialize writer for log file
-  private def open(logDateTime: ZonedDateTime): Unit = {
-    val fileTimestamp = FileAppender.decideTimestampForFile(logDateTime)
-    val dir           = s"$path"
+  private def open(logDateTime: ZonedDateTime, rotateFlag: Boolean): Unit = {
+    val dir = s"$path"
+
+    val fileName = if (rotateFlag) {
+      val fileTimestamp = FileAppender.decideTimestampForFile(logDateTime)
+      fileSpanTimestamp = Some(fileTimestamp.plusDays(1L))
+      s"$dir/$category.$fileTimestamp.log"
+    } else {
+      s"$dir/$category.log"
+    }
+
     new File(dir).mkdirs()
-    val fileName    = s"$dir/$category.$fileTimestamp.log"
     val printWriter = new PrintWriter(new BufferedOutputStream(new FileOutputStream(fileName, true)))
     maybePrintWriter = Some(printWriter)
-    fileSpanTimestamp = Some(fileTimestamp.plusDays(1L))
   }
 
   def !(msg: AppendMessages) = msg match {
-    case AppendAdd(logDateTime, line) =>
+    case AppendAdd(logDateTime, line, rotateFlag) =>
       maybePrintWriter match {
         case Some(w) =>
-          if (logDateTime
+          if (rotateFlag && logDateTime
                 .isAfter(
                   fileSpanTimestamp.getOrElse(
                     ZonedDateTime
@@ -73,10 +79,10 @@ private[logging] class FileAppenderActor(path: String, category: String) {
                   )
                 )) {
             w.close()
-            open(logDateTime)
+            open(logDateTime, rotateFlag)
           }
         case None =>
-          open(logDateTime)
+          open(logDateTime, rotateFlag)
       }
       maybePrintWriter match {
         case Some(w) =>
@@ -123,8 +129,8 @@ private[logging] class FilesAppender(actorRefFactory: ActorRefFactory, path: Str
 
   private[this] val fileAppenderActor = new FileAppenderActor(path, category)
 
-  def add(logDateTime: ZonedDateTime, line: String): Unit =
-    fileAppenderActor ! AppendAdd(logDateTime, line)
+  def add(logDateTime: ZonedDateTime, line: String, rotateFlag: Boolean): Unit =
+    fileAppenderActor ! AppendAdd(logDateTime, line, rotateFlag)
 
   def close(): Future[Unit] = {
     val p = Promise[Unit]()
@@ -181,6 +187,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
   private[this] val logPath       = config.getString("logPath")
   private[this] val sort          = config.getBoolean("sorted")
   private[this] val logLevelLimit = Level(config.getString("logLevelLimit"))
+  private[this] val rotateFlag    = config.getBoolean("rotate")
   private[this] val fileAppenders =
     scala.collection.mutable.HashMap[String, FilesAppender]()
   private val loggingSystemName = jgetString(stdHeaders, LoggingKeys.NAME)
@@ -212,7 +219,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
       val timestamp = jgetString(msg, LoggingKeys.TIMESTAMP)
 
       val logDateTime = TMTDateTimeFormatter.parse(timestamp)
-      fileAppender.add(logDateTime, Compact(msg, safe = true, sort = sort))
+      fileAppender.add(logDateTime, Compact(msg, safe = true, sort = sort), rotateFlag)
     }
 
   /**
