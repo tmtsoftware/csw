@@ -50,12 +50,12 @@ class TromboneHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLi
   override def onShutdownComplete(): Unit = println("received Shutdown complete during Initial state")
 
   def onLifecycle(x: ToComponentLifecycleMessage): Unit = x match {
-    case DoShutdown =>
+    case Shutdown =>
       println("Received doshutdown")
       supervisor ! ShutdownComplete
-    case DoRestart                           => println("Received dorestart")
-    case ToComponentLifecycleMessage.Running => println("Received running")
-    case RunningOffline                      => println("Received running offline")
+    case Restart                             => println("Received do restart")
+    case Run                                 => println("Received running")
+    case RunOffline                          => println("Received running offline")
     case LifecycleFailureInfo(state, reason) => println(s"Received failed state: $state for reason: $reason")
     case ShutdownComplete                    => println("shutdown complete during Running context")
   }

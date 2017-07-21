@@ -24,10 +24,10 @@ object LifecycleState {
 sealed trait ToComponentLifecycleMessage
 
 object ToComponentLifecycleMessage {
-  case object DoShutdown                                                 extends ToComponentLifecycleMessage
-  case object DoRestart                                                  extends ToComponentLifecycleMessage
-  case object Running                                                    extends ToComponentLifecycleMessage
-  case object RunningOffline                                             extends ToComponentLifecycleMessage
+  case object Shutdown                                                   extends ToComponentLifecycleMessage
+  case object Restart                                                    extends ToComponentLifecycleMessage
+  case object Run                                                        extends ToComponentLifecycleMessage
+  case object RunOffline                                                 extends ToComponentLifecycleMessage
   case class LifecycleFailureInfo(state: LifecycleState, reason: String) extends ToComponentLifecycleMessage
 }
 

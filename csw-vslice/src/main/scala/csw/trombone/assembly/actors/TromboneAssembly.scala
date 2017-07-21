@@ -6,14 +6,9 @@ import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validation
 import csw.common.ccs.Validation.{Valid, Validation}
 import csw.common.framework.models.Component.AssemblyInfo
+import csw.common.framework.models.ToComponentLifecycleMessage.{LifecycleFailureInfo, Restart, Run, RunOffline}
 import csw.common.framework.models._
-import csw.common.framework.models.ToComponentLifecycleMessage.{
-  DoRestart,
-  DoShutdown,
-  LifecycleFailureInfo,
-  RunningOffline
-}
-import csw.common.framework.scaladsl._
+import csw.common.framework.scaladsl.AssemblyActor
 import csw.param.Parameters.{Observe, Setup}
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}
@@ -61,15 +56,15 @@ class TromboneAssembly(ctx: ActorContext[AssemblyMsg],
   }
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case ShutdownComplete                    ⇒
-    case ToComponentLifecycleMessage.Running =>
-    case RunningOffline                      => println("Received running offline")
-    case DoRestart                           => println("Received dorestart")
-    case DoShutdown =>
+    case ShutdownComplete ⇒
+    case Run              =>
+    case RunOffline       => println("Received running offline")
+    case Restart          => println("Received dorestart")
+    case ToComponentLifecycleMessage.Shutdown =>
       println("Received doshutdown")
       runningHcd.foreach(
         _.hcdRef ! RunningHcdMsg
-          .Lifecycle(DoShutdown)
+          .Lifecycle(ToComponentLifecycleMessage.Shutdown)
       )
       supervisor ! ShutdownComplete
     case LifecycleFailureInfo(state: LifecycleState, reason: String) =>
