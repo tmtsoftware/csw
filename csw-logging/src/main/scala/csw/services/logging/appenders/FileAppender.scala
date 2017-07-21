@@ -66,8 +66,12 @@ private[logging] class FileAppenderActor(path: String, category: String) {
       maybePrintWriter match {
         case Some(w) =>
           if (logDateTime
-                .isAfter(fileSpanTimestamp.getOrElse(ZonedDateTime
-                      .of(LocalDateTime.MIN, ZoneId.from(ZoneOffset.UTC))))) {
+                .isAfter(
+                  fileSpanTimestamp.getOrElse(
+                    ZonedDateTime
+                      .of(LocalDateTime.MIN, ZoneId.from(ZoneOffset.UTC))
+                  )
+                )) {
             w.close()
             open(logDateTime)
           }

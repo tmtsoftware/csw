@@ -66,7 +66,8 @@ class HttpService(locationService: LocationService,
       path = ""
     )
     log.info(
-        s"Registering Config Service HTTP Server with Location Service using registration ${registration.toString}")
+      s"Registering Config Service HTTP Server with Location Service using registration ${registration.toString}"
+    )
     locationService.register(registration)
   }
 }

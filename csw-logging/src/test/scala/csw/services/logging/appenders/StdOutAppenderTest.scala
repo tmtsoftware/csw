@@ -18,8 +18,9 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
   private val actorSystem = ActorSystem("test-1")
 
   private val standardHeaders: Map[String, RichMsg] =
-    Map[String, RichMsg](LoggingKeys.VERSION -> 1, LoggingKeys.EX -> "localhost",
-      LoggingKeys.SERVICE                    -> Map[String, RichMsg]("name" -> "test-service", "version" -> "1.2.3"))
+    Map[String, RichMsg](LoggingKeys.VERSION -> 1,
+                         LoggingKeys.EX      -> "localhost",
+                         LoggingKeys.SERVICE -> Map[String, RichMsg]("name" -> "test-service", "version" -> "1.2.3"))
 
   private val stdOutAppender = new StdOutAppender(actorSystem, standardHeaders, println)
 

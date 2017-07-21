@@ -11,6 +11,6 @@ trait HttpSupport extends Directives with JsonSupport with ClusterSeedLogger.Sim
   val logLevelParam: Directive1[Level] = parameter('value).map(Level(_))
   private def logRequest(req: HttpRequest): Unit =
     log.info("HTTP Request received",
-      Map("url" → req.uri.toString(), "method" → req.method.value, "headers" → req.headers.mkString(",")))
+             Map("url" → req.uri.toString(), "method" → req.method.value, "headers" → req.headers.mkString(",")))
   val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ => logRequest))
 }

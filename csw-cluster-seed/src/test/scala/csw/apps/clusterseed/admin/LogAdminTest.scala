@@ -59,8 +59,10 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
   test("should able to get the current component log meta data") {
 
     // send http get metadata request and verify the response has correct log levels
-    val getLogMetadataUri = Uri.from(scheme = "http", host = ClusterAwareSettings.hostname, port = 7878,
-      path = s"/admin/logging/${connection.name}/level")
+    val getLogMetadataUri = Uri.from(scheme = "http",
+                                     host = ClusterAwareSettings.hostname,
+                                     port = 7878,
+                                     path = s"/admin/logging/${connection.name}/level")
 
     val getLogMetadataRequest   = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
     val getLogMetadataResponse1 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
@@ -121,8 +123,11 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
     logBuffer.clear()
 
     // set level of tromboneHcd to error through http endpoint
-    val uri = Uri.from(scheme = "http", host = ClusterAwareSettings.hostname, port = 7878,
-      path = s"/admin/logging/${connection.name}/level", queryString = Some("value=error"))
+    val uri = Uri.from(scheme = "http",
+                       host = ClusterAwareSettings.hostname,
+                       port = 7878,
+                       path = s"/admin/logging/${connection.name}/level",
+                       queryString = Some("value=error"))
 
     val request  = HttpRequest(HttpMethods.POST, uri = uri)
     val response = Await.result(Http().singleRequest(request), 5.seconds)
@@ -145,8 +150,10 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   test("should give appropriate exception when component name is incorrect") {
     // send http get metadata request for invalid component
-    val getLogMetadataUri = Uri.from(scheme = "http", host = ClusterAwareSettings.hostname, port = 7878,
-      path = s"/admin/logging/abcd-hcd-akka/level")
+    val getLogMetadataUri = Uri.from(scheme = "http",
+                                     host = ClusterAwareSettings.hostname,
+                                     port = 7878,
+                                     path = s"/admin/logging/abcd-hcd-akka/level")
 
     val getLogMetadataRequest   = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
     val getLogMetadataResponse1 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)

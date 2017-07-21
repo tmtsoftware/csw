@@ -2,6 +2,7 @@ package csw.services.logging.scaladsl
 
 import akka.actor.ActorPath
 import akka.serialization.Serialization
+
 /**
  * Extend this object to obtain a reference to a Simple or Actor Logger without a component name
  */

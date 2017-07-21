@@ -52,15 +52,30 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   test("test create with all applicable sub-options") {
     val args               = Array("create", relativeRepoPath, "-i", inputFilePath, "--annex", "-c", comment)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("create", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None, annex = true, comment = Some(comment)))
+    x should contain(
+      Options("create",
+              Some(Paths.get(relativeRepoPath)),
+              Some(Paths.get(inputFilePath)),
+              None,
+              None,
+              None,
+              annex = true,
+              comment = Some(comment))
+    )
   }
 
   test("test create with bare minimum sub-options") {
     val args               = Array("create", relativeRepoPath, "-i", inputFilePath, "-c", comment)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("create", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None, comment = Some(comment)))
+    x should contain(
+      Options("create",
+              Some(Paths.get(relativeRepoPath)),
+              Some(Paths.get(inputFilePath)),
+              None,
+              None,
+              None,
+              comment = Some(comment))
+    )
   }
 
   test("test update with no sub-options") {
@@ -72,8 +87,15 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   test("test update with all applicable sub-options") {
     val args               = Array("update", relativeRepoPath, "-i", inputFilePath, "-c", comment)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("update", Some(Paths.get(relativeRepoPath)), Some(Paths.get(inputFilePath)), None, None,
-        None, comment = Some(comment)))
+    x should contain(
+      Options("update",
+              Some(Paths.get(relativeRepoPath)),
+              Some(Paths.get(inputFilePath)),
+              None,
+              None,
+              None,
+              comment = Some(comment))
+    )
   }
 
   test("test get with no sub-options") {
@@ -85,22 +107,30 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   test("test get with all applicable sub-options") {
     val args               = Array("get", relativeRepoPath, "-o", outputFilePath, "--id", id)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("get", Some(Paths.get(relativeRepoPath)), None, Some(Paths.get(outputFilePath)), Some(id),
-        None))
+    x should contain(
+      Options("get", Some(Paths.get(relativeRepoPath)), None, Some(Paths.get(outputFilePath)), Some(id), None)
+    )
   }
 
   test("test get with date sub-option") {
     val args               = Array("get", relativeRepoPath, "-o", outputFilePath, "--date", date)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("get", Some(Paths.get(relativeRepoPath)), None, Some(Paths.get(outputFilePath)), None,
-        Some(Instant.parse(date))))
+    x should contain(
+      Options("get",
+              Some(Paths.get(relativeRepoPath)),
+              None,
+              Some(Paths.get(outputFilePath)),
+              None,
+              Some(Instant.parse(date)))
+    )
   }
 
   test("test get with bare minimum sub-options") {
     val args               = Array("get", relativeRepoPath, "-o", outputFilePath)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("get", Some(Paths.get(relativeRepoPath)), None, Some(Paths.get(outputFilePath)), None,
-        None))
+    x should contain(
+      Options("get", Some(Paths.get(relativeRepoPath)), None, Some(Paths.get(outputFilePath)), None, None)
+    )
   }
 
   test("test delete with no sub-options") {
@@ -112,8 +142,9 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   test("test delete with sub-options") {
     val args               = Array("delete", relativeRepoPath, "-c", comment)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("delete", Some(Paths.get(relativeRepoPath)), None, None, None, None,
-        comment = Some(comment)))
+    x should contain(
+      Options("delete", Some(Paths.get(relativeRepoPath)), None, None, None, None, comment = Some(comment))
+    )
   }
 
   test("test list") {
@@ -149,29 +180,46 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   test("test history with all sub-options") {
     val args               = Array("history", relativeRepoPath, "--from", date, "--to", date, "--max", maxFileVersions.toString)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("history", Some(Paths.get(relativeRepoPath)), fromDate = Instant.parse(date),
-        toDate = Instant.parse(date), maxFileVersions = maxFileVersions))
+    x should contain(
+      Options("history",
+              Some(Paths.get(relativeRepoPath)),
+              fromDate = Instant.parse(date),
+              toDate = Instant.parse(date),
+              maxFileVersions = maxFileVersions)
+    )
   }
 
   test("test history with max sub-option") {
     val args               = Array("history", relativeRepoPath, "--max", maxFileVersions.toString)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("history", Some(Paths.get(relativeRepoPath)), None, None, None, None,
-        maxFileVersions = maxFileVersions))
+    x should contain(
+      Options("history", Some(Paths.get(relativeRepoPath)), None, None, None, None, maxFileVersions = maxFileVersions)
+    )
   }
 
   test("test history with from and to sub-options") {
     val args               = Array("history", relativeRepoPath, "--from", date, "--to", date)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("history", Some(Paths.get(relativeRepoPath)), fromDate = Instant.parse(date),
-        toDate = Instant.parse(date)))
+    x should contain(
+      Options("history",
+              Some(Paths.get(relativeRepoPath)),
+              fromDate = Instant.parse(date),
+              toDate = Instant.parse(date))
+    )
   }
 
   test("test setActiveVersion with all sub-options") {
     val args               = Array("setActiveVersion", relativeRepoPath, "--id", id, "--comment", comment)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("setActiveVersion", Some(Paths.get(relativeRepoPath)), None, None, Some(id), None,
-        comment = Some(comment)))
+    x should contain(
+      Options("setActiveVersion",
+              Some(Paths.get(relativeRepoPath)),
+              None,
+              None,
+              Some(id),
+              None,
+              comment = Some(comment))
+    )
   }
 
   test("test resetActiveVersion with no sub-options") {
@@ -183,8 +231,9 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   test("test resetActiveVersion with sub-options") {
     val args               = Array("resetActiveVersion", relativeRepoPath, "--comment", comment)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("resetActiveVersion", Some(Paths.get(relativeRepoPath)), None, None, None, None,
-        comment = Some(comment)))
+    x should contain(
+      Options("resetActiveVersion", Some(Paths.get(relativeRepoPath)), None, None, None, None, comment = Some(comment))
+    )
   }
 
   test("test getActiveVersion") {
@@ -196,8 +245,14 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   test("test getActiveByTime with date sub-option") {
     val args               = Array("getActiveByTime", relativeRepoPath, "--date", date, "-o", outputFilePath)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("getActiveByTime", Some(Paths.get(relativeRepoPath)), None,
-        Some(Paths.get(outputFilePath)), None, Some(Instant.parse(date))))
+    x should contain(
+      Options("getActiveByTime",
+              Some(Paths.get(relativeRepoPath)),
+              None,
+              Some(Paths.get(outputFilePath)),
+              None,
+              Some(Instant.parse(date)))
+    )
   }
 
   test("test historyActive with no sub-options") {
@@ -210,22 +265,38 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     val args =
       Array("historyActive", relativeRepoPath, "--from", date, "--to", date, "--max", maxFileVersions.toString)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("historyActive", Some(Paths.get(relativeRepoPath)), fromDate = Instant.parse(date),
-        toDate = Instant.parse(date), maxFileVersions = maxFileVersions))
+    x should contain(
+      Options("historyActive",
+              Some(Paths.get(relativeRepoPath)),
+              fromDate = Instant.parse(date),
+              toDate = Instant.parse(date),
+              maxFileVersions = maxFileVersions)
+    )
   }
 
   test("test historyActive with max sub-option") {
     val args               = Array("historyActive", relativeRepoPath, "--max", maxFileVersions.toString)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("historyActive", Some(Paths.get(relativeRepoPath)), None, None, None, None,
-        maxFileVersions = maxFileVersions))
+    x should contain(
+      Options("historyActive",
+              Some(Paths.get(relativeRepoPath)),
+              None,
+              None,
+              None,
+              None,
+              maxFileVersions = maxFileVersions)
+    )
   }
 
   test("test historyActive with from and to sub-options") {
     val args               = Array("historyActive", relativeRepoPath, "--from", date, "--to", date)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("historyActive", Some(Paths.get(relativeRepoPath)), fromDate = Instant.parse(date),
-        toDate = Instant.parse(date)))
+    x should contain(
+      Options("historyActive",
+              Some(Paths.get(relativeRepoPath)),
+              fromDate = Instant.parse(date),
+              toDate = Instant.parse(date))
+    )
   }
 
   test("test getMetadata") {
@@ -249,8 +320,9 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   test("test getActive") {
     val args               = Array("getActive", relativeRepoPath, "-o", outputFilePath)
     val x: Option[Options] = silentParse(args)
-    x should contain(Options("getActive", Some(Paths.get(relativeRepoPath)), None, Some(Paths.get(outputFilePath)),
-        None, None))
+    x should contain(
+      Options("getActive", Some(Paths.get(relativeRepoPath)), None, Some(Paths.get(outputFilePath)), None, None)
+    )
   }
 
 }

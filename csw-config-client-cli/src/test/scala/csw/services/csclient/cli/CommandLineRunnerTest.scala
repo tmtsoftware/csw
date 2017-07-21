@@ -66,7 +66,8 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     commandLineRunner.get(ArgsParser.parse(getLatestArgs).get) shouldBe Some(Paths.get(outputFilePath))
 
     commandLineRunner.get(ArgsParser.parse(getByIdArgs :+ updateConfigId.id).get) shouldBe Some(
-        Paths.get(outputFilePath))
+      Paths.get(outputFilePath)
+    )
 
     //  read locally saved output file (/tmp/output.conf) from disk and
     //  match the contents with input file content
@@ -187,7 +188,8 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     val updateTS                           = Instant.now
 
     commandLineRunner.history(ArgsParser.parse(historyArgs).get).map(_.id) shouldBe List(update2ConfigId,
-      updateConfigId, createConfigId)
+                                                                                         updateConfigId,
+                                                                                         createConfigId)
 
     commandLineRunner
       .history(ArgsParser.parse(historyArgs :+ "--from" :+ createTS.toString :+ "--to" :+ updateTS.toString).get)
@@ -213,13 +215,14 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     commandLineRunner.setActiveVersion(ArgsParser.parse(setActiveArgs).get)
 
     commandLineRunner.historyActive(ArgsParser.parse(historyActiveArgs).get).map(_.id) shouldBe List(updateConfigId,
-      createConfigId)
+                                                                                                     createConfigId)
 
     commandLineRunner.resetActiveVersion(ArgsParser.parse(resetActiveAllArgs).get)
 
     commandLineRunner
       .historyActive(
-          ArgsParser.parse(historyActiveArgs :+ "--from" :+ createTS.toString :+ "--to" :+ Instant.now.toString).get)
+        ArgsParser.parse(historyActiveArgs :+ "--from" :+ createTS.toString :+ "--to" :+ Instant.now.toString).get
+      )
       .map(_.id) shouldBe List(update2ConfigId, updateConfigId)
   }
 

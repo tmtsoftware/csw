@@ -25,7 +25,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
 
       case Some(AkkaLocation(connection, _, actorRef)) ⇒
         log.info("Getting log information from logging system",
-          Map("componentName" → componentName, "actorRef" → actorRef.toString))
+                 Map("componentName" → componentName, "actorRef" → actorRef.toString))
         await((actorRef ? GetComponentLogMetadata(connection.componentId.name)).mapTo[LogMetadata])
 
       case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
@@ -38,7 +38,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
 
         case Some(AkkaLocation(connection, _, actorRef)) ⇒
           log.info(s"Setting log level to $logLevel",
-            Map("componentName" → componentName, "actorRef" → actorRef.toString))
+                   Map("componentName" → componentName, "actorRef" → actorRef.toString))
           actorRef ! SetComponentLogLevel(connection.componentId.name, logLevel)
 
         case _ ⇒ throw UnresolvedAkkaLocationException(componentName)

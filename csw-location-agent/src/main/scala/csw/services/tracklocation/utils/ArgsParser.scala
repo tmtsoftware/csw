@@ -31,7 +31,8 @@ object ArgsParser {
       .action((x, c) => c.copy(names = x.toList))
       .validate(xs => acceptableServiceNames(xs))
       .text(
-          "Required: The name (or names, separated by comma) used to register the application (also root name in config file).")
+        "Required: The name (or names, separated by comma) used to register the application (also root name in config file)."
+      )
 
     opt[String]('c', "command") valueName "<name>" action { (x, c) =>
       c.copy(command = Some(x))

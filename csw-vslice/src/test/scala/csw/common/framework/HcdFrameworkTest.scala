@@ -27,15 +27,15 @@ class TestHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecy
 
   override def onRun(): Unit = Unit
 
-  override def onShutdown(): Unit = ???
+  override def onShutdown(): Unit = Unit
 
-  override def onShutdownComplete(): Unit = ???
+  override def onShutdownComplete(): Unit = Unit
 
-  override def onLifecycle(x: ToComponentLifecycleMessage): Unit = ???
+  override def onLifecycle(x: ToComponentLifecycleMessage): Unit = Unit
 
-  override def onSetup(sc: Parameters.Setup): Unit = ???
+  override def onSetup(sc: Parameters.Setup): Unit = Unit
 
-  override def onDomainMsg(msg: TestHcdMessage): Unit = ???
+  override def onDomainMsg(msg: TestHcdMessage): Unit = Unit
 }
 
 class HcdFrameworkTest extends FunSuite with Matchers {
@@ -54,6 +54,7 @@ class HcdFrameworkTest extends FunSuite with Matchers {
     initialized.hcdRef shouldBe hcdRef
 
     initialized.hcdRef ! Run(testProbe.ref)
-    testProbe.expectMsgType[Running]
+    val running = testProbe.expectMsgType[Running]
+    running.hcdRef shouldBe hcdRef
   }
 }

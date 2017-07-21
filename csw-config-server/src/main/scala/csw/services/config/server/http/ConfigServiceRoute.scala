@@ -43,8 +43,9 @@ class ConfigServiceRoute(
         post {
           (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
             complete(
-                StatusCodes.Created -> configService
-                  .create(filePath, configData, annex, comment))
+              StatusCodes.Created -> configService
+                .create(filePath, configData, annex, comment)
+            )
           }
         } ~
         put {
@@ -70,14 +71,16 @@ class ConfigServiceRoute(
           (idParam & commentParam) {
             case (Some(configId), comment) ⇒
               complete(
-                  configService
-                    .setActiveVersion(filePath, configId, comment)
-                    .map(_ ⇒ Done))
+                configService
+                  .setActiveVersion(filePath, configId, comment)
+                  .map(_ ⇒ Done)
+              )
             case (_, comment) ⇒
               complete(
-                  configService
-                    .resetActiveVersion(filePath, comment)
-                    .map(_ ⇒ Done))
+                configService
+                  .resetActiveVersion(filePath, comment)
+                  .map(_ ⇒ Done)
+              )
           }
         } ~
         (get & rejectEmptyResponse) {

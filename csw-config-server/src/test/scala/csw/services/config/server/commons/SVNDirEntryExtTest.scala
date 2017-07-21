@@ -17,8 +17,16 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   test("should match the pattern for relative path") {
-    val dirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt", SVNNodeKind.FILE, 100, false, 1,
-      new Date(), "author", "comment")
+    val dirEntry = new SVNDirEntry(settings.svnUrl,
+                                   settings.svnUrl,
+                                   "a/b/sample.txt",
+                                   SVNNodeKind.FILE,
+                                   100,
+                                   false,
+                                   1,
+                                   new Date(),
+                                   "author",
+                                   "comment")
 
     val patterns = List(
       Pattern.compile("a/.*"),
@@ -38,8 +46,16 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
   }
 
   test("should not match invalid pattern for relative path") {
-    val dirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt", SVNNodeKind.FILE, 100, false, 1,
-      new Date(), "author", "comment")
+    val dirEntry = new SVNDirEntry(settings.svnUrl,
+                                   settings.svnUrl,
+                                   "a/b/sample.txt",
+                                   SVNNodeKind.FILE,
+                                   100,
+                                   false,
+                                   1,
+                                   new Date(),
+                                   "author",
+                                   "comment")
 
     val patterns = List(
       Pattern.compile(""),
@@ -50,11 +66,27 @@ class SVNDirEntryExtTest extends FunSuite with Matchers {
   }
 
   test("should detect annex and normal file based on type") {
-    val normalDirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt", SVNNodeKind.FILE, 100,
-      false, 1, new Date(), "author", "comment")
+    val normalDirEntry = new SVNDirEntry(settings.svnUrl,
+                                         settings.svnUrl,
+                                         "a/b/sample.txt",
+                                         SVNNodeKind.FILE,
+                                         100,
+                                         false,
+                                         1,
+                                         new Date(),
+                                         "author",
+                                         "comment")
 
-    val annexDirEntry = new SVNDirEntry(settings.svnUrl, settings.svnUrl, "a/b/sample.txt.$sha1", SVNNodeKind.FILE,
-      100, false, 1, new Date(), "author", "comment")
+    val annexDirEntry = new SVNDirEntry(settings.svnUrl,
+                                        settings.svnUrl,
+                                        "a/b/sample.txt.$sha1",
+                                        SVNNodeKind.FILE,
+                                        100,
+                                        false,
+                                        1,
+                                        new Date(),
+                                        "author",
+                                        "comment")
 
     normalDirEntry.matchesFileType(Some(FileType.Normal), settings.`sha1-suffix`) shouldBe true
     annexDirEntry.matchesFileType(Some(FileType.Annex), settings.`sha1-suffix`) shouldBe true

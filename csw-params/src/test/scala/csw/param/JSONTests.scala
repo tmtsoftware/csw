@@ -308,11 +308,12 @@ class JSONTests extends FunSpec {
     it("Should allow double matrix values") {
       val k1 = DoubleMatrixKey("myMatrix")
       val m1 = DoubleMatrix(
-          Array(
-            Array(1.0, 2.0, 3.0),
-            Array(4.1, 5.1, 6.1),
-            Array(7.2, 8.2, 9.2)
-          ))
+        Array(
+          Array(1.0, 2.0, 3.0),
+          Array(4.1, 5.1, 6.1),
+          Array(7.2, 8.2, 9.2)
+        )
+      )
       val sc1 = Setup(commandInfo, ck).add(k1.set(m1))
       assert(sc1(k1).head == m1)
 

@@ -40,7 +40,8 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
         sha
       } else {
         log.debug(
-            s"Deleting annex file from path ${outPath.toString} and temporary file from path ${tempFilePath.toString}")
+          s"Deleting annex file from path ${outPath.toString} and temporary file from path ${tempFilePath.toString}"
+        )
         await(fileRepo.delete(outPath))
         await(fileRepo.delete(tempFilePath))
         throw new RuntimeException(s" Error in creating file for $sha")

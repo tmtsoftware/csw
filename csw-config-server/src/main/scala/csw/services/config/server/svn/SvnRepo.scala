@@ -141,8 +141,8 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
     val compiledPattern            = pattern.map(pat ⇒ Pattern.compile(pat.stripPrefix("/")))
     var entries: List[SVNDirEntry] = List.empty
     val receiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
-      if (entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`) && entry.matchesFileType(fileType,
-            settings.`sha1-suffix`)) {
+      if (entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`) && entry
+            .matchesFileType(fileType, settings.`sha1-suffix`)) {
         entry.stripAnnexSuffix(settings.`sha1-suffix`)
         if (entry.matches(compiledPattern)) {
           entries = entry :: entries
@@ -174,8 +174,15 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
           else
             logEntries
       }
-      logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults,
-        handler)
+      logClient.doLog(settings.svnUrl,
+                      Array(path.toString),
+                      SVNRevision.HEAD,
+                      null,
+                      null,
+                      true,
+                      true,
+                      maxResults,
+                      handler)
       logEntries.sortWith(_.getRevision > _.getRevision)
     } finally {
       clientManager.dispose()

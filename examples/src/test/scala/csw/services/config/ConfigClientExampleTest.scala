@@ -139,8 +139,9 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
     val futU = async {
       val destPath = Paths.get("/hcd/trombone/debug.bin")
       val newId = await(
-          adminApi
-            .update(destPath, ConfigData.fromString(defaultStrConf), comment = "debug statements"))
+        adminApi
+          .update(destPath, ConfigData.fromString(defaultStrConf), comment = "debug statements")
+      )
 
       //validate the returned id
       newId shouldEqual ConfigId(7)
@@ -232,8 +233,9 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
     paths map {
       case (path, fileType) ⇒
         val createF = async {
-          await(adminApi.create(path, ConfigData.fromString(defaultStrConf), FileType.Annex == fileType,
-              "initial commit"))
+          await(
+            adminApi.create(path, ConfigData.fromString(defaultStrConf), FileType.Annex == fileType, "initial commit")
+          )
         }
         Await.result(createF, 2.seconds)
     }
@@ -254,7 +256,10 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
 
       //retrieve list using pattern; for demonstration purpose validate return values
       await(adminApi.list(None, Some(".*.conf"))).map(info ⇒ info.path.toString).toSet shouldBe Set(
-          "a/b/c/hcd/hcd.conf", "a/c/trombone.conf", "testing/test.conf")
+        "a/b/c/hcd/hcd.conf",
+        "a/c/trombone.conf",
+        "testing/test.conf"
+      )
       //retrieve list using pattern and file type; for demonstration purpose validate return values
       await(adminApi.list(Some(FileType.Normal), Some(".*.conf"))).map(info ⇒ info.path.toString).toSet shouldBe
       Set("a/b/c/hcd/hcd.conf", "testing/test.conf")
@@ -329,8 +334,11 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
       //validate full history
       val fullHistory = await(adminApi.historyActive(filePath))
       fullHistory.map(_.id) shouldBe List(id1, id5, id4, id3, id1)
-      fullHistory.map(_.comment) shouldBe List(s"$id1 active", "latest active", s"$id4 active", s"$id3 active",
-        "initializing active file with the first version")
+      fullHistory.map(_.comment) shouldBe List(s"$id1 active",
+                                               "latest active",
+                                               s"$id4 active",
+                                               s"$id3 active",
+                                               "initializing active file with the first version")
 
       //drop initial revision and take only update revisions
       val fragmentedHistory = await(adminApi.historyActive(filePath, tBegin, tEnd))

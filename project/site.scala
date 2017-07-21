@@ -2,7 +2,7 @@ import sbt.Keys._
 import sbt._
 
 object UnidocSite extends AutoPlugin {
-  import sbtunidoc.{JavaUnidocPlugin, ScalaUnidocPlugin, BaseUnidocPlugin}
+  import sbtunidoc.{BaseUnidocPlugin, JavaUnidocPlugin, ScalaUnidocPlugin}
   import JavaUnidocPlugin.autoImport._
   import ScalaUnidocPlugin.autoImport._
   import BaseUnidocPlugin.autoImport.unidoc
@@ -14,11 +14,9 @@ object UnidocSite extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     siteSubdirName in ScalaUnidoc := "api/scala",
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
-
     siteSubdirName in JavaUnidoc := "api/java",
     filterNotSources(sources in (JavaUnidoc, unidoc), Set("internal", "scaladsl")),
     addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
-
     autoAPIMappings := true
     //      apiURL := Some(url(s"http://tmtsoftware.github.io/csw-prod/api/${version.value}"))
   )
@@ -38,12 +36,12 @@ object ParadoxSite extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     sourceDirectory in Paradox := baseDirectory.value / "src" / "main",
     paradoxProperties in Paradox ++= Map(
-      "version" -> version.value,
-      "scala.binaryVersion" -> scalaBinaryVersion.value,
-      "scaladoc.base_url" -> "https://tmtsoftware.github.io/csw-prod/api/scala",
-      "javadoc.base_url" -> "https://tmtsoftware.github.io/csw-prod/api/java",
+      "version"                -> version.value,
+      "scala.binaryVersion"    -> scalaBinaryVersion.value,
+      "scaladoc.base_url"      -> "https://tmtsoftware.github.io/csw-prod/api/scala",
+      "javadoc.base_url"       -> "https://tmtsoftware.github.io/csw-prod/api/java",
       "extref.manual.base_url" -> "https://tmtsoftware.github.io/csw-prod/manual/index.html",
-      "github.base_url" -> s"https://github.com/tmtsoftware/csw-prod/tree/master"
+      "github.base_url"        -> s"https://github.com/tmtsoftware/csw-prod/tree/master"
     )
   )
 }

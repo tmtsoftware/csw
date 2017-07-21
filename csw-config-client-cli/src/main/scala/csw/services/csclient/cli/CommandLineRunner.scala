@@ -20,8 +20,9 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     if (Files.exists(inputFilePath)) {
       val configData = ConfigData.fromPath(inputFilePath)
       val configId =
-        await(configService.create(options.relativeRepoPath.get, configData, annex = options.annex,
-            options.comment.get))
+        await(
+          configService.create(options.relativeRepoPath.get, configData, annex = options.annex, options.comment.get)
+        )
       printLine(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
       configId
     } else {
@@ -90,8 +91,10 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
   }
 
   def historyActive(options: Options): List[ConfigFileRevision] = {
-    val fileRevisions = await(configService.historyActive(options.relativeRepoPath.get, options.fromDate,
-        options.toDate, options.maxFileVersions))
+    val fileRevisions = await(
+      configService
+        .historyActive(options.relativeRepoPath.get, options.fromDate, options.toDate, options.maxFileVersions)
+    )
     fileRevisions.foreach(h => printLine(s"${h.id.id}\t${h.time}\t${h.comment}"))
     fileRevisions
   }

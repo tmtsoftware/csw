@@ -69,7 +69,7 @@ class TrackLocation(names: List[String], command: Command, actorSystem: ActorSys
    */
   private def unregisterServices(results: Seq[RegistrationResult]): Future[Done] = {
     log.info("Shutdown hook reached, un-registering connections",
-      Map("services" → results.map(_.location.connection.name)))
+             Map("services" → results.map(_.location.connection.name)))
     Future.traverse(results)(_.unregister()).map { _ =>
       log.info(s"Services are unregistered")
       Done

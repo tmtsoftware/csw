@@ -23,7 +23,8 @@ abstract class JGenericLoggerActor extends JBasicLoggerActor {
   override protected def maybeComponentName: Optional[String] = Optional.empty()
 }
 
-abstract class JGenericLoggerTypedActor[T](actorContext: ActorContext[T]) extends JBasicLoggerTypedActor[T](actorContext) {
+abstract class JGenericLoggerTypedActor[T](actorContext: ActorContext[T])
+    extends JBasicLoggerTypedActor[T](actorContext) {
   override protected def maybeComponentName: Optional[String] = Optional.empty()
 }
 
@@ -43,7 +44,8 @@ abstract class JComponentLoggerActor extends JBasicLoggerActor {
   override protected def maybeComponentName: Optional[String] = Optional.of(componentName)
 }
 
-abstract class JComponentLoggerTypedActor[T](actorContext: ActorContext[T]) extends JBasicLoggerTypedActor(actorContext) {
+abstract class JComponentLoggerTypedActor[T](actorContext: ActorContext[T])
+    extends JBasicLoggerTypedActor(actorContext) {
   protected def componentName: String
   override protected def maybeComponentName: Optional[String] = Optional.of(componentName)
 }
@@ -72,7 +74,8 @@ abstract class JBasicLoggerActor extends AbstractActor {
 }
 
 import akka.typed.scaladsl.adapter._
-abstract class JBasicLoggerTypedActor[T](actorContext: ActorContext[T]) extends akka.typed.javadsl.Actor.MutableBehavior[T] {
+abstract class JBasicLoggerTypedActor[T](actorContext: ActorContext[T])
+    extends akka.typed.javadsl.Actor.MutableBehavior[T] {
   protected def maybeComponentName: Optional[String]
   protected def getLogger: ILogger = {
     val actorName = ActorPath.fromString(Serialization.serializedActorPath(actorContext.getSelf.toUntyped)).toString

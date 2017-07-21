@@ -1,4 +1,3 @@
-
 import Libs._
 import sbt.Keys._
 import sbt._
@@ -16,15 +15,15 @@ object Common extends AutoPlugin {
     organization := "org.tmt",
     organizationName := "TMT Org",
     scalaVersion := Libs.ScalaVersion,
-
     concurrentRestrictions in Global += Tags.limit(Tags.All, 1),
-
     homepage := Some(url("https://github.com/tmtsoftware/csw-prod")),
-    scmInfo := Some(ScmInfo(url("https://github.com/tmtsoftware/csw-prod"), "git@github.com:tmtsoftware/csw-prod.git")),
+    scmInfo := Some(
+      ScmInfo(url("https://github.com/tmtsoftware/csw-prod"), "git@github.com:tmtsoftware/csw-prod.git")
+    ),
     licenses := Seq(("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))),
-
     scalacOptions ++= Seq(
-      "-encoding", "UTF-8",
+      "-encoding",
+      "UTF-8",
       "-feature",
       "-unchecked",
       "-deprecation",
@@ -34,11 +33,9 @@ object Common extends AutoPlugin {
       "-Ywarn-dead-code",
       "-Xfuture"
     ),
-
     javacOptions ++= Seq(
       //        "-Xlint:unchecked"
     ),
-
     testOptions in Test ++= Seq(
       // show full stack traces and test case durations
       Tests.Argument("-oDF"),
@@ -46,32 +43,29 @@ object Common extends AutoPlugin {
       // -a Show stack traces and exception class name for AssertionErrors.
       Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
     ),
-
     shellPrompt := { state =>
       Plugin.messageOnBuildFilesChanged(state) + GitCommand.prompt(state)
     },
-
     version := {
       sys.props.get("prod.publish") match {
         case Some("true") => version.value
         case _            => "0.1-SNAPSHOT"
       }
     },
-
     isSnapshot := sys.props.get("prod.publish") != Some("true")
   )
 
   private def extraSettings = sys.props.get("check.cycles") match {
-    case Some("true") => Seq(
-      libraryDependencies += `acyclic`,
-      autoCompilerPlugins := true,
-      addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
-      scalacOptions += "-P:acyclic:force"
-    )
-    case _            =>
+    case Some("true") =>
+      Seq(
+        libraryDependencies += `acyclic`,
+        autoCompilerPlugins := true,
+        addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
+        scalacOptions += "-P:acyclic:force"
+      )
+    case _ =>
       List.empty
   }
-
 
   // After upgrading from 0.6.6 to 0.6.8 scalafmt downloads stuff after every change to the project
   // This is a workaround from github issue : https://github.com/scalameta/scalafmt/issues/879

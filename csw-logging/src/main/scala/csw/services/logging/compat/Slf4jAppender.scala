@@ -46,8 +46,13 @@ private[logging] class Slf4jAppender[E]()
         } catch {
           case ex: Any => noException
         }
-        val msg = LogSlf4j(level, e.getTimeStamp, frame.getClassName, e.getFormattedMessage, frame.getLineNumber,
-          frame.getFileName, ex)
+        val msg = LogSlf4j(level,
+                           e.getTimeStamp,
+                           frame.getClassName,
+                           e.getFormattedMessage,
+                           frame.getLineNumber,
+                           frame.getFileName,
+                           ex)
         MessageHandler.sendMsg(msg)
       case x: Any =>
         log.warn(s"UNEXPECTED LOGBACK EVENT:${event.getClass}:$event")(() => DefaultSourceLocation)

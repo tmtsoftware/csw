@@ -114,7 +114,8 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
   }
 
   test(
-      "ensure that component is able to resolve and send message to remote actor created through separate actor system than LocationService actor system") {
+    "ensure that component is able to resolve and send message to remote actor created through separate actor system than LocationService actor system"
+  ) {
 
     val tcpConnection = TcpConnection(ComponentId("redis1", ComponentType.Service))
 

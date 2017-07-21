@@ -25,10 +25,12 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
   test("ensure that location service works across two actorSystems within the same JVM") {
     locationService.register(tcpRegistration).await
     locationService2.resolve(connection, 5.seconds).await.get shouldBe tcpRegistration.location(
-        new Networks().hostname())
+      new Networks().hostname()
+    )
 
     locationService.shutdown().await
     locationService2.resolve(connection, 5.seconds).await.get shouldBe tcpRegistration.location(
-        new Networks().hostname())
+      new Networks().hostname()
+    )
   }
 }

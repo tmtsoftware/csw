@@ -16,8 +16,24 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
   test("Should filter ipv6 addresses") {
     val mockedNetworkProvider = mock[NetworkInterfaceProvider]
     val inet4Address          = InetAddress.getByAddress(Array[Byte](192.toByte, 168.toByte, 1, 2))
-    val inet6Address = InetAddress.getByAddress(Array[Byte](192.toByte, 168.toByte, 1, 2, 192.toByte, 168.toByte, 1, 2,
-        192.toByte, 168.toByte, 1, 2, 192.toByte, 168.toByte, 1, 2))
+    val inet6Address = InetAddress.getByAddress(
+      Array[Byte](192.toByte,
+                  168.toByte,
+                  1,
+                  2,
+                  192.toByte,
+                  168.toByte,
+                  1,
+                  2,
+                  192.toByte,
+                  168.toByte,
+                  1,
+                  2,
+                  192.toByte,
+                  168.toByte,
+                  1,
+                  2)
+    )
     when(mockedNetworkProvider.getInterface("eth0")).thenReturn(Seq((1, List(inet6Address, inet4Address))))
     val ipv4Address: InetAddress = new Networks("eth0", mockedNetworkProvider).ipv4Address
     ipv4Address shouldEqual (inet4Address)

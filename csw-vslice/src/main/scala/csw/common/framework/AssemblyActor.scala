@@ -32,7 +32,7 @@ abstract class AssemblyActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[Assem
                                                          supervisor: ActorRef[AssemblyComponentLifecycleMessage])
     extends MutableBehavior[AssemblyMsg] {
 
-  val runningHcd: Option[HcdComponentLifecycleMessage.Running] = ???
+  val runningHcd: Option[HcdComponentLifecycleMessage.Running] = None
 
   var mode: Mode = _
 

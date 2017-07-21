@@ -212,7 +212,8 @@ object ArgsParser {
     checkConfig { c =>
       if (c.op.isEmpty)
         failure(
-            "Please specify at least one command {create | update | get | delete | list | history | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}")
+          "Please specify at least one command {create | update | get | delete | list | history | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}"
+        )
       else
         success
     }

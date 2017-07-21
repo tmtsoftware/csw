@@ -42,7 +42,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     // register, resolve & list tcp connection for the first time
     locationService.register(tcpRegistration).await
     locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration.location(
-        new Networks().hostname())
+      new Networks().hostname()
+    )
     locationService.list.await shouldBe List(tcpRegistration.location(new Networks().hostname()))
 
     // unregister, resolve & list tcp connection
@@ -53,7 +54,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     // re-register, resolve & list tcp connection
     locationService.register(tcpRegistration).await
     locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration.location(
-        new Networks().hostname())
+      new Networks().hostname()
+    )
     locationService.list.await shouldBe List(tcpRegistration.location(new Networks().hostname()))
   }
 
@@ -67,7 +69,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     // register, resolve & list http connection for the first time
     locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
     locationService.resolve(httpConnection, 2.seconds).await.get shouldBe httpRegistration.location(
-        new Networks().hostname())
+      new Networks().hostname()
+    )
     locationService.list.await shouldBe List(httpRegistration.location(new Networks().hostname()))
 
     // unregister, resolve & list http connection
@@ -78,7 +81,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     // re-register, resolve & list http connection
     locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
     locationService.resolve(httpConnection, 2.seconds).await.get shouldBe httpRegistration.location(
-        new Networks().hostname())
+      new Networks().hostname()
+    )
     locationService.list.await shouldBe List(httpRegistration.location(new Networks().hostname()))
   }
 
@@ -96,7 +100,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     // register, resolve & list akka connection for the first time
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
     locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration.location(
-        new Networks().hostname())
+      new Networks().hostname()
+    )
     locationService.list.await shouldBe List(akkaRegistration.location(new Networks().hostname()))
 
     // unregister, resolve & list akka connection
@@ -107,7 +112,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     // re-register, resolve & list akka connection
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
     locationService.resolve(connection, 2.seconds).await.get shouldBe akkaRegistration.location(
-        new Networks().hostname())
+      new Networks().hostname()
+    )
     locationService.list.await shouldBe List(akkaRegistration.location(new Networks().hostname()))
   }
 
@@ -126,8 +132,9 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
 
     Thread.sleep(10)
 
-    locationService.list.await shouldBe List(AkkaRegistration(connection,
-        actorRef).location(new Networks().hostname()))
+    locationService.list.await shouldBe List(
+      AkkaRegistration(connection, actorRef).location(new Networks().hostname())
+    )
 
     actorRef ! PoisonPill
 
@@ -137,7 +144,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
   }
 
   test(
-      "should able to track tcp connection and get location updated(on registration) and remove(on unregistration) messages") {
+    "should able to track tcp connection and get location updated(on registration) and remove(on unregistration) messages"
+  ) {
     val Port               = 1234
     val redis1Connection   = TcpConnection(ComponentId("redis1", ComponentType.Service))
     val redis1Registration = TcpRegistration(redis1Connection, Port)
@@ -280,7 +288,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
   }
 
   test(
-      "registering an already registered Registration(connection + port/URI/actorRef) on same machine should not result in failure") {
+    "registering an already registered Registration(connection + port/URI/actorRef) on same machine should not result in failure"
+  ) {
     val componentId = ComponentId("redis4", ComponentType.Service)
     val connection  = TcpConnection(componentId)
 
@@ -365,7 +374,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     locationService.register(HttpRegistration(assemblyHttpConnection, 1234, "path123")).await
 
     locationService.list(ConnectionType.TcpType).await.map(_.connection).toSet shouldBe Set(redisTcpConnection,
-      configTcpConnection)
+                                                                                            configTcpConnection)
 
     val httpConnections = locationService.list(ConnectionType.HttpType).await
     httpConnections.map(_.connection).toSet shouldBe Set(assemblyHttpConnection)
@@ -391,7 +400,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
 
     locationService.list(new Networks().hostname()).await.map(_.connection).toSet shouldBe Set(tcpConnection,
-      httpConnection, akkaConnection)
+                                                                                               httpConnection,
+                                                                                               akkaConnection)
 
     locationService.list("Invalid_hostname").await shouldBe List.empty
   }

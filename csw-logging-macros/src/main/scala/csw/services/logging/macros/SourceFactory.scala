@@ -42,6 +42,7 @@ object SourceFactory {
       .mkString(".")
 
     c.Expr[SourceFactory](
-        q"csw.services.logging.macros.SourceFactory.from(() => csw.services.logging.macros.SourceLocation($file,$packageName,$className,$line))")
+      q"csw.services.logging.macros.SourceFactory.from(() => csw.services.logging.macros.SourceLocation($file,$packageName,$className,$line))"
+    )
   }
 }

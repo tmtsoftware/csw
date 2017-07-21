@@ -46,7 +46,8 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       // If the file does not already exists in the repo, create it
       if (annex || configData.length > settings.`annex-min-file-size`) {
         log.info(
-            s"Either annex=$annex is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex")
+          s"Either annex=$annex is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex"
+        )
         await(createAnnex())
       } else {
         await(put(path, configData, update = false, comment))
@@ -242,15 +243,18 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   }
 
   override def getMetadata: Future[ConfigMetadata] = Future {
-    ConfigMetadata(settings.`repository-dir`, settings.`annex-files-dir`, settings.annexMinFileSizeAsMetaInfo,
-      settings.`max-content-length`)
+    ConfigMetadata(settings.`repository-dir`,
+                   settings.`annex-files-dir`,
+                   settings.annexMinFileSizeAsMetaInfo,
+                   settings.`max-content-length`)
   }
 
   private def historyActiveRevisions(path: Path, configFileRevision: ConfigFileRevision): Future[ConfigFileRevision] =
     async {
       val configData = await(getById(path, configFileRevision.id))
-      ConfigFileRevision(ConfigId(await(configData.get.toStringF)), configFileRevision.comment,
-        configFileRevision.time)
+      ConfigFileRevision(ConfigId(await(configData.get.toStringF)),
+                         configFileRevision.comment,
+                         configFileRevision.time)
     }
 
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {

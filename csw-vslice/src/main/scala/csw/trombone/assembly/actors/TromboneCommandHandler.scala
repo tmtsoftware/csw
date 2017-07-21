@@ -30,7 +30,11 @@ object TromboneCommandHandler {
   def make(assemblyContext: AssemblyContext,
            tromboneHCDIn: Option[Running],
            allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]): Behavior[NotFollowingMsgs] =
-    Actor.mutable[TromboneCommandHandlerMsgs](ctx ⇒ new TromboneCommandHandler(ctx, assemblyContext, tromboneHCDIn, allEventPublisher)).narrow
+    Actor
+      .mutable[TromboneCommandHandlerMsgs](
+        ctx ⇒ new TromboneCommandHandler(ctx, assemblyContext, tromboneHCDIn, allEventPublisher)
+      )
+      .narrow
 
   def executeMatch(ctx: ActorContext[_],
                    stateMatcher: StateMatcher,
@@ -192,7 +196,7 @@ class TromboneCommandHandler(ctx: ActorContext[TromboneCommandHandlerMsgs],
             )
           )
       }
-    case TromboneStateE(x)                   ⇒ currentState = x
+    case TromboneStateE(x) ⇒ currentState = x
   }
 
   def onFollowing(msg: FollowingMsgs): Unit = msg match {
@@ -240,7 +244,7 @@ class TromboneCommandHandler(ctx: ActorContext[TromboneCommandHandlerMsgs],
 
         case other => println(s"Unknown config key: $msg")
       }
-    case TromboneStateE(x)                   ⇒ currentState = x
+    case TromboneStateE(x) ⇒ currentState = x
 
   }
 
@@ -260,8 +264,8 @@ class TromboneCommandHandler(ctx: ActorContext[TromboneCommandHandlerMsgs],
       mode = Mode.NotFollowing
       replyTo ! Cancelled
 
-    case TromboneStateE(x)                   ⇒ currentState = x
-    case s: Submit ⇒
+    case TromboneStateE(x) ⇒ currentState = x
+    case s: Submit         ⇒
   }
 
   private def hcdNotAvailableResponse(commandOriginator: Option[ActorRef[CommandResponse]]): Unit = {

@@ -105,7 +105,7 @@ object Events {
     /**
      * The observation ID
      */
-    def obsIdOption[ObsId]: Option[param.ObsId] = info.obsId
+    def obsIdOption: Option[param.ObsId] = info.obsId
   }
 
   /**
