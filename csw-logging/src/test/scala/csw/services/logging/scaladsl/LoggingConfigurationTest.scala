@@ -12,7 +12,7 @@ import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.appenders.{FileAppender, StdOutAppender}
 import csw.services.logging.commons.{LoggingKeys, TMTDateTimeFormatter}
-import csw.services.logging.internal.LoggingLevels.INFO
+import csw.services.logging.internal.LoggingLevels.{DEBUG, INFO, TRACE}
 import csw.services.logging.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -93,6 +93,11 @@ class LoggingConfigurationTest
 
   }
 
+  def doLogging() = {
+    log.info(sampleLogMessage)
+    log.debug(sampleLogMessage)
+  }
+
   // DEOPSCSW-118: Provide UTC time for each log message
   test("should log messages in the file with standard headers") {
     val config =
@@ -118,7 +123,7 @@ class LoggingConfigurationTest
 
     val expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
 
-    log.info(sampleLogMessage)
+    doLogging()
     Thread.sleep(100)
 
     // Reading common logger file
@@ -154,14 +159,82 @@ class LoggingConfigurationTest
     loggingSystem.getAppenders shouldBe List(FileAppender)
 
     val expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
-    log.info(sampleLogMessage)
-    log.debug(sampleLogMessage)
+    doLogging()
     Thread.sleep(200)
 
     // Reading common logger file
     val fileLogBuffer = FileUtils.read(testLogFilePathWithServiceName)
 
     testLogConfiguration(fileLogBuffer, false, expectedTimestamp)
+
+    // clean up
+    Await.result(loggingSystem.stop, 5.seconds)
+    Await.result(actorSystem.terminate, 5.seconds)
+  }
+
+  test(
+    "should log messages in the file and on console based on the log level configured in the file and stdout appender config"
+  ) {
+    val config =
+      ConfigFactory
+        .parseString(s"""
+                        |csw-logging {
+                        | appenders = ["csw.services.logging.appenders.FileAppender$$", "csw.services.logging.appenders.StdOutAppender$$"]
+                        | appender-config {
+                        |   file {
+                        |     logPath = ${logFileDir.getAbsolutePath}
+                        |     logLevelLimit = debug
+                        |   }
+                        |   stdout {
+                        |     logLevelLimit = trace
+                        |   }
+                        | }
+                        | logLevel = trace
+                        |}
+                      """.stripMargin)
+        .withFallback(ConfigFactory.load)
+
+    lazy val actorSystem   = ActorSystem("test", config)
+    lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+
+    // default log level is trace but file appender is filtering logs at debug level, hence trace level log should not be written to file
+    // log level for stdOut appender is trace, hence std out appender should log all messages
+    Console.withOut(outStream) {
+      loggingSystem
+      log.trace(sampleLogMessage)
+      log.debug(sampleLogMessage)
+      Thread.sleep(200)
+    }
+
+    loggingSystem.getAppenders shouldBe List(FileAppender, StdOutAppender)
+
+    //*************************** Start Testing File Logs *****************************************
+    val fileLogBuffer = FileUtils.read(testLogFilePathWithServiceName)
+    fileLogBuffer.size shouldBe 1
+
+    val jsonFileLogMessage = fileLogBuffer.head
+    jsonFileLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
+    jsonFileLogMessage(LoggingKeys.SEVERITY) shouldBe DEBUG.name
+    jsonFileLogMessage(LoggingKeys.CLASS) shouldBe className
+    jsonFileLogMessage(LoggingKeys.FILE) shouldBe fileName
+    //*************************** End Testing File Logs *********************************************
+
+    //*************************** Start Testing StdOut Logs *****************************************
+    parse(outStream.toString)
+    stdOutLogBuffer.size shouldBe 2
+
+    val firstStdOutLogMessage = stdOutLogBuffer.head
+    firstStdOutLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
+    firstStdOutLogMessage(LoggingKeys.SEVERITY) shouldBe TRACE.name
+    firstStdOutLogMessage(LoggingKeys.CLASS) shouldBe className
+    firstStdOutLogMessage(LoggingKeys.FILE) shouldBe fileName
+
+    val secondStdOutLogMessage = stdOutLogBuffer.tail.head
+    secondStdOutLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
+    secondStdOutLogMessage(LoggingKeys.SEVERITY) shouldBe DEBUG.name
+    secondStdOutLogMessage(LoggingKeys.CLASS) shouldBe className
+    secondStdOutLogMessage(LoggingKeys.FILE) shouldBe fileName
+    //*************************** End Testing StdOut Logs *******************************************
 
     // clean up
     Await.result(loggingSystem.stop, 5.seconds)
@@ -192,8 +265,7 @@ class LoggingConfigurationTest
     Console.withOut(outStream) {
       loggingSystem
       expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
-      log.debug(sampleLogMessage)
-      log.info(sampleLogMessage)
+      doLogging()
       Thread.sleep(200)
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
@@ -229,7 +301,7 @@ class LoggingConfigurationTest
     Console.withOut(outStream) {
       loggingSystem
       expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
-      log.info(sampleLogMessage)
+      doLogging()
       Thread.sleep(100)
     }
 
@@ -266,12 +338,12 @@ class LoggingConfigurationTest
 
     Console.withOut(os) {
       loggingSystem
-      log.info(sampleLogMessage)
+      doLogging()
       Thread.sleep(100)
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 269)"
+    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 97)"
 
     os.toString.trim shouldBe expectedOneLineLog
 
