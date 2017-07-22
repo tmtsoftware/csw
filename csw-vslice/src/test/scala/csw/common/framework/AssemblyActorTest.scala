@@ -28,8 +28,10 @@ class AssemblyActorTest extends FunSuite with Matchers {
     val assemblyInfo =
       AssemblyInfo("trombone", "wfos", "csw.common.components.SampleAssembly", DoNotRegister, Set(AkkaType), Set.empty)
     val assemblyRef =
-      Await.result(system.systemActorOf[AssemblyMsg](SampleAssembly.behaviour(assemblyInfo, testProbe.ref), "assembly"),
-                   5.seconds)
+      Await.result(
+        system.systemActorOf[AssemblyMsg](SampleAssembly.behaviour(assemblyInfo, testProbe.ref), "assembly"),
+        5.seconds
+      )
 
     val initialized = testProbe.expectMsgType[Initialized]
     initialized.assemblyRef shouldBe assemblyRef
