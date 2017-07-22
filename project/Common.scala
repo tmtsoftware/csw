@@ -1,9 +1,9 @@
 import Libs._
+import com.github.tototoshi.sbt.buildfileswatcher.Plugin
+import com.typesafe.sbt.SbtGit.GitCommand
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
-import com.github.tototoshi.sbt.buildfileswatcher.Plugin
-import com.typesafe.sbt.SbtGit.GitCommand
 
 object Common extends AutoPlugin {
 
@@ -65,10 +65,11 @@ object Common extends AutoPlugin {
       List.empty
   }
 
-  // After upgrading from 0.6.6 to 0.6.8 scalafmt downloads stuff after every change to the project
+  // After upgrading from 0.6.6 to 1.1.0 scalafmt downloads stuff after every change to the project
   // This is a workaround from github issue : https://github.com/scalameta/scalafmt/issues/879
+  // scalafmtSettings requires scalafmt-bootstrap library
   private def scalafmtSettings() = {
-    def latestScalafmt = "0.6.8"
+    def latestScalafmt = "1.1.0"
 
     commands += Command.args("scalafmt", "Run scalafmt cli.") {
       case (state, args) =>

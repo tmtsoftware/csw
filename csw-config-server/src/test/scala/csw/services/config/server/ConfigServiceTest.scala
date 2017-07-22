@@ -801,8 +801,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // verify history of active file from given timestamp
     val historyFrom = configService.historyActive(file, createActiveTS).await
-    historyFrom.map(h ⇒ (h.id, h.comment)) shouldBe List((configId4, resetActiveComment),
-                                                         (configId3, setActiveComment))
+    historyFrom.map(h ⇒ (h.id, h.comment)) shouldBe List((configId4, resetActiveComment), (configId3, setActiveComment))
 
     // verify history of active file till given timestamp
     val historyTo = configService.historyActive(file, to = resetActiveTS).await

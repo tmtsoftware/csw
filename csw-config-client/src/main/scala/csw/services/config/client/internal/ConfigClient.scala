@@ -141,10 +141,7 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
 
     }
 
-  override def history(path: jnio.Path,
-                       from: Instant,
-                       to: Instant,
-                       maxResults: Int): Future[List[ConfigFileRevision]] =
+  override def history(path: jnio.Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
     handleHistory(historyUri(path), from, to, maxResults)
 
   override def historyActive(path: jnio.Path,

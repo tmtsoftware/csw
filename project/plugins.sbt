@@ -1,5 +1,6 @@
-addSbtPlugin("org.scalastyle"                    %% "scalastyle-sbt-plugin"  % "0.8.0")
-addSbtPlugin("com.geirsson"                      % "sbt-scalafmt"            % "0.6.8")
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
+//neo-sbt-scalafmt is required as a wrapper to download sbt-scalafmt 1.1.0
+addSbtPlugin("com.lucidchart"                    % "sbt-scalafmt"            % "1.8")
 addSbtPlugin("com.dwijnand"                      % "sbt-dynver"              % "1.2.0")
 addSbtPlugin("com.eed3si9n"                      % "sbt-unidoc"              % "0.4.0")
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"        % "1.0.0")
@@ -19,6 +20,7 @@ addSbtPlugin("net.virtual-void"                  % "sbt-dependency-graph"    % "
 addSbtPlugin("com.eed3si9n"                      % "sbt-buildinfo"           % "0.7.0")
 addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                 % "0.2.24")
 
+libraryDependencies += "com.geirsson"          %% "scalafmt-bootstrap"   % "0.6.6"
 libraryDependencies += "com.lightbend.paradox" % "paradox-theme-generic" % "0.2.12"
 
 scalacOptions ++= Seq(

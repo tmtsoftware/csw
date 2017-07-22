@@ -252,9 +252,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   private def historyActiveRevisions(path: Path, configFileRevision: ConfigFileRevision): Future[ConfigFileRevision] =
     async {
       val configData = await(getById(path, configFileRevision.id))
-      ConfigFileRevision(ConfigId(await(configData.get.toStringF)),
-                         configFileRevision.comment,
-                         configFileRevision.time)
+      ConfigFileRevision(ConfigId(await(configData.get.toStringF)), configFileRevision.comment, configFileRevision.time)
     }
 
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
