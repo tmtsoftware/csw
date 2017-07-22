@@ -33,9 +33,7 @@ object Common extends AutoPlugin {
       "-Ywarn-dead-code",
       "-Xfuture"
     ),
-    javacOptions ++= Seq(
-      //        "-Xlint:unchecked"
-    ),
+    javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
     testOptions in Test ++= Seq(
       // show full stack traces and test case durations
       Tests.Argument("-oDF"),

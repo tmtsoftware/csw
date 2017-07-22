@@ -4,6 +4,7 @@ Configuration Service provides a centralized persistent store for any configurat
 All versions of configuration files are retained, providing a historical record of each configuration file.
 
 Note that in order to use the APIs described here, the [location service](../services/location.html)
+([csw-cluster-seed](../apps/cswclusterseed.html))
 and [config service server](../apps/cswonfigserverapp.html) need to be running somewhere in the local network
 and the necessary configuration, environment variables or system properties should be defined to point to the 
 correct host and port number(s) for the location service seed nodes.
