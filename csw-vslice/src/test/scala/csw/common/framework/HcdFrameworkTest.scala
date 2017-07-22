@@ -1,42 +1,19 @@
 package csw.common.framework
 
-import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.typed.ActorSystem
+import akka.typed.scaladsl.Actor
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
+import csw.common.components.TestHcd
 import csw.common.framework.HcdComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.InitialHcdMsg.Run
-import csw.param.Parameters
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
 
 sealed trait TestHcdMessage extends DomainMsg
-
-object TestHcd {
-  def behaviour(supervisor: ActorRef[HcdComponentLifecycleMessage]): Behavior[Nothing] =
-    Actor.mutable[HcdMsg](ctx ⇒ new TestHcd(ctx, supervisor)).narrow
-}
-
-class TestHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage])
-    extends HcdActor[TestHcdMessage](ctx, supervisor) {
-
-  override def initialize(): Future[Unit] = Future.unit
-
-  override def onRun(): Unit = Unit
-
-  override def onShutdown(): Unit = Unit
-
-  override def onShutdownComplete(): Unit = Unit
-
-  override def onLifecycle(x: ToComponentLifecycleMessage): Unit = Unit
-
-  override def onSetup(sc: Parameters.Setup): Unit = Unit
-
-  override def onDomainMsg(msg: TestHcdMessage): Unit = Unit
-}
 
 class HcdFrameworkTest extends FunSuite with Matchers {
 

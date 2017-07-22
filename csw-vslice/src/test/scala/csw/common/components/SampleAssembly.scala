@@ -34,6 +34,6 @@ class SampleAssembly(ctx: ActorContext[AssemblyMsg],
 
 object SampleAssembly {
   def behaviour(assemblyInfo: AssemblyInfo,
-                supervisor: ActorRef[AssemblyComponentLifecycleMessage]): Behavior[Nothing] =
+                supervisor: ActorRef[AssemblyComponentLifecycleMessage]): Behavior[AssemblyMsg] =
     Actor.mutable[AssemblyMsg](ctx ⇒ new SampleAssembly(ctx, assemblyInfo, supervisor)).narrow
 }
