@@ -23,8 +23,8 @@ import org.junit.Test;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
+@SuppressWarnings("ConstantConditions")
 public class JLocationServiceImplTest implements JLocationServiceLogger {
     private ILogger jLogger = getLogger();
 
@@ -160,7 +160,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         locations.add(akkaHcdRegistration.location(new Networks().hostname()));
         locations.add(tcpServiceRegistration.location(new Networks().hostname()));
 
-        Set<Location> actualSetOfLocations = new HashSet(locationService.list().get());
+        Set<Location> actualSetOfLocations = new HashSet<>(locationService.list().get());
         Assert.assertEquals(locations, actualSetOfLocations);
     }
 
@@ -214,7 +214,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         Set<Location> serviceLocations = new HashSet<>();
         serviceLocations.add(tcpServiceRegistration.location(new Networks().hostname()));
         serviceLocations.add(httpServiceRegistration.location(new Networks().hostname()));
-        Set<Location> actualSetOfLocations = new HashSet(locationService.list(JComponentType.Service).get());
+        Set<Location> actualSetOfLocations = new HashSet<>(locationService.list(JComponentType.Service).get());
         Assert.assertEquals(serviceLocations, actualSetOfLocations);
     }
 
@@ -232,7 +232,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         locations.add(tcpRegistration.location(new Networks().hostname()));
         locations.add(akkaRegistration.location(new Networks().hostname()));
 
-        Set<Location> actualSetOfLocations = new HashSet(locationService.list(new Networks().hostname()).get());
+        Set<Location> actualSetOfLocations = new HashSet<>(locationService.list(new Networks().hostname()).get());
         Assert.assertEquals(locations, actualSetOfLocations);
     }
 
@@ -304,12 +304,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         //Test probe actor to receive the TrackingEvent notifications
         TestProbe probe = new TestProbe(actorSystem);
 
-        KillSwitch killSwitch = locationService.subscribe(redis1Connection, new Consumer<TrackingEvent>() {
-            @Override
-            public void accept(TrackingEvent trackingEvent) {
-                probe.ref().tell(trackingEvent, ActorRef.noSender());
-            }
-        });
+        KillSwitch killSwitch = locationService.subscribe(redis1Connection, trackingEvent -> probe.ref().tell(trackingEvent, ActorRef.noSender()));
 
         locationService.register(redis1Registration).toCompletableFuture().get();
         probe.expectMsg(new LocationUpdated(redis1Registration.location(new Networks().hostname())));
