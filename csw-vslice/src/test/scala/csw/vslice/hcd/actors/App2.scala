@@ -10,6 +10,17 @@ import csw.services.location.scaladsl.{ActorSystemFactory, LocationServiceFactor
 import csw.trombone.hcd.MotionWorkerMsgs
 
 object App2 extends App {
+
+  class DummyHcd() extends Actor.MutableBehavior[MotionWorkerMsgs] {
+    override def onMessage(msg: MotionWorkerMsgs): Behavior[MotionWorkerMsgs] = {
+      msg match {
+        case x @ _ ⇒
+          println(s"Received command--$x")
+          this
+      }
+    }
+  }
+
   private val actorSystem: actor.ActorSystem = ActorSystemFactory.remote()
   private val locationService                = LocationServiceFactory.make()
   private val akkaConnection                 = AkkaConnection(ComponentId("DummyHcd", ComponentType.HCD))
@@ -20,14 +31,4 @@ object App2 extends App {
   private val akkaRegistration = AkkaRegistration(akkaConnection, actorRef.toUntyped)
 
   locationService.register(akkaRegistration)
-}
-
-class DummyHcd() extends Actor.MutableBehavior[MotionWorkerMsgs] {
-  override def onMessage(msg: MotionWorkerMsgs): Behavior[MotionWorkerMsgs] = {
-    msg match {
-      case x @ _ ⇒
-        println(s"Received command--$x")
-        this
-    }
-  }
 }

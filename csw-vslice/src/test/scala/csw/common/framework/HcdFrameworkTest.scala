@@ -5,15 +5,13 @@ import akka.typed.scaladsl.Actor
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
-import csw.common.components.TestHcd
+import csw.common.components.hcd.TestHcd
 import csw.common.framework.HcdComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.InitialHcdMsg.Run
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-
-sealed trait TestHcdMessage extends DomainMsg
 
 class HcdFrameworkTest extends FunSuite with Matchers {
 
