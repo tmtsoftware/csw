@@ -61,8 +61,11 @@ class SetElevationCommand(ctx: ActorContext[CommandMsgs],
 
         stateActor.foreach(
           _ !
-          SetState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss,
-            setStateResponseAdapter)
+          SetState(cmdItem(cmdBusy),
+                   moveItem(moveMoving),
+                   startState.sodiumLayer,
+                   startState.nss,
+                   setStateResponseAdapter)
         )
         tromboneHCD.hcdRef ! Submit(scOut)
 
@@ -70,8 +73,11 @@ class SetElevationCommand(ctx: ActorContext[CommandMsgs],
           case Completed =>
             stateActor.foreach(
               _ !
-              SetState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(true), startState.nss,
-                setStateResponseAdapter)
+              SetState(cmdItem(cmdReady),
+                       moveItem(moveIndexed),
+                       sodiumItem(true),
+                       startState.nss,
+                       setStateResponseAdapter)
             )
           case Error(message) =>
             println(s"setElevation command match failed with message: $message")

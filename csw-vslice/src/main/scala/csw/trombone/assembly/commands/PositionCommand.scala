@@ -59,8 +59,11 @@ class PositionCommand(ctx: ActorContext[CommandMsgs],
 
         stateActor.foreach(
           _ !
-          SetState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss,
-            setStateResponseAdapter)
+          SetState(cmdItem(cmdBusy),
+                   moveItem(moveMoving),
+                   startState.sodiumLayer,
+                   startState.nss,
+                   setStateResponseAdapter)
         )
         tromboneHCD.hcdRef ! Submit(scOut)
 
@@ -68,8 +71,11 @@ class PositionCommand(ctx: ActorContext[CommandMsgs],
           case Completed =>
             stateActor.foreach(
               _ !
-              SetState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss,
-                setStateResponseAdapter)
+              SetState(cmdItem(cmdReady),
+                       moveItem(moveIndexed),
+                       sodiumItem(false),
+                       startState.nss,
+                       setStateResponseAdapter)
             )
           case Error(message) =>
             println(s"Position command match failed with message: $message")

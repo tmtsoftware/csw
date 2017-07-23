@@ -42,8 +42,11 @@ class DatumCommand(ctx: ActorContext[CommandMsgs],
         )
       } else {
         stateActor.foreach(
-          _ ! SetState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss,
-            setStateResponseAdapter)
+          _ ! SetState(cmdItem(cmdBusy),
+                       moveItem(moveIndexing),
+                       startState.sodiumLayer,
+                       startState.nss,
+                       setStateResponseAdapter)
         )
         tromboneHCD.hcdRef ! Submit(Setup(s.info, TromboneHcdState.axisDatumCK))
         TromboneCommandHandler.executeMatch(ctx, idleMatcher, tromboneHCD.pubSubRef, Some(replyTo)) {
