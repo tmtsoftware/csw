@@ -1,18 +1,19 @@
 package csw.trombone.hcd.actors
 
 import akka.actor.Scheduler
-import akka.typed.{ActorRef, Behavior}
-import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.scaladsl.AskPattern.Askable
+import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.typed.{ActorRef, Behavior}
 import akka.util.Timeout
+import csw.common.framework.models.ToComponentLifecycleMessage._
+import csw.common.framework.models._
+import csw.common.framework.scaladsl._
 import csw.param.Parameters.Setup
 import csw.param.UnitsOfMeasure.encoder
-import csw.common.framework.ToComponentLifecycleMessage._
-import csw.common.framework._
-import csw.trombone.hcd._
 import csw.trombone.hcd.AxisRequest._
 import csw.trombone.hcd.AxisResponse._
 import csw.trombone.hcd.TromboneEngineering.{GetAxisConfig, GetAxisStats, GetAxisUpdate, GetAxisUpdateNow}
+import csw.trombone.hcd._
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -28,13 +29,13 @@ class TromboneHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLi
 
   implicit val timeout              = Timeout(2.seconds)
   implicit val scheduler: Scheduler = ctx.system.scheduler
-  import ctx.executionContext
 
   var current: AxisUpdate                 = _
   var stats: AxisStatistics               = _
   var tromboneAxis: ActorRef[AxisRequest] = _
   var axisConfig: AxisConfig              = _
 
+  import scala.concurrent.ExecutionContext.Implicits.global
   override def initialize(): Future[Unit] = async {
     axisConfig = await(getAxisConfig)
     tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behaviour(axisConfig, Some(domainAdapter)))

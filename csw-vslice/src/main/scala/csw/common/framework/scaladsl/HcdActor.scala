@@ -1,13 +1,14 @@
-package csw.common.framework
+package csw.common.framework.scaladsl
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
+import csw.common.framework.scaladsl.HcdActor.Mode
+import csw.common.framework.models.HcdComponentLifecycleMessage.{Initialized, Running}
+import csw.common.framework.models.InitialHcdMsg.Run
+import csw.common.framework.models.RunningHcdMsg._
+import csw.common.framework.models._
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
-import csw.common.framework.HcdActor.Mode
-import csw.common.framework.HcdComponentLifecycleMessage.{Initialized, Running}
-import csw.common.framework.InitialHcdMsg.Run
-import csw.common.framework.RunningHcdMsg._
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

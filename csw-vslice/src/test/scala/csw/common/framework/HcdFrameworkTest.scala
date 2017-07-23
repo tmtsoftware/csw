@@ -6,8 +6,9 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.common.components.hcd.TestHcd
-import csw.common.framework.HcdComponentLifecycleMessage.{Initialized, Running}
-import csw.common.framework.InitialHcdMsg.Run
+import csw.common.framework.models.HcdComponentLifecycleMessage
+import csw.common.framework.models.HcdComponentLifecycleMessage.{Initialized, Running}
+import csw.common.framework.models.InitialHcdMsg.Run
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.Await

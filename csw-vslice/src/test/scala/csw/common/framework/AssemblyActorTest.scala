@@ -6,9 +6,10 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.common.components.assembly.SampleAssembly
-import csw.common.framework.AssemblyComponentLifecycleMessage.{Initialized, Running}
-import csw.common.framework.Component.{AssemblyInfo, DoNotRegister}
-import csw.common.framework.InitialAssemblyMsg.Run
+import csw.common.framework.models.{AssemblyComponentLifecycleMessage, AssemblyMsg}
+import csw.common.framework.models.AssemblyComponentLifecycleMessage.{Initialized, Running}
+import csw.common.framework.models.Component.{AssemblyInfo, DoNotRegister}
+import csw.common.framework.models.InitialAssemblyMsg.Run
 import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.{FunSuite, Matchers}
 

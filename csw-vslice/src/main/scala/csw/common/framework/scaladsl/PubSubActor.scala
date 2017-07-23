@@ -1,8 +1,9 @@
-package csw.common.framework
+package csw.common.framework.scaladsl
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, Signal, Terminated}
-import csw.common.framework.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.common.framework.models.PubSub
+import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 
 object PubSubActor {
   def behaviour[T]: Behavior[PubSub[T]] = Actor.mutable(ctx ⇒ new PubSubActor[T](ctx))

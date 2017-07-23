@@ -8,10 +8,10 @@ import csw.trombone.assembly.actors.TromboneCommandHandler
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.common.ccs.CommandStatus.{Completed, Error, NoLongerValid}
 import csw.common.ccs.Validation.WrongInternalStateIssue
-import csw.common.framework.CommandMsgs
-import csw.common.framework.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
-import csw.common.framework.HcdComponentLifecycleMessage.Running
-import csw.common.framework.RunningHcdMsg.Submit
+import csw.common.framework.models.CommandMsgs
+import csw.common.framework.models.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
+import csw.common.framework.models.HcdComponentLifecycleMessage.Running
+import csw.common.framework.models.RunningHcdMsg.Submit
 import csw.trombone.hcd.TromboneHcdState
 
 object DatumCommand {
@@ -42,11 +42,8 @@ class DatumCommand(ctx: ActorContext[CommandMsgs],
         )
       } else {
         stateActor.foreach(
-          _ ! SetState(cmdItem(cmdBusy),
-                       moveItem(moveIndexing),
-                       startState.sodiumLayer,
-                       startState.nss,
-                       setStateResponseAdapter)
+          _ ! SetState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss,
+            setStateResponseAdapter)
         )
         tromboneHCD.hcdRef ! Submit(Setup(s.info, TromboneHcdState.axisDatumCK))
         TromboneCommandHandler.executeMatch(ctx, idleMatcher, tromboneHCD.pubSubRef, Some(replyTo)) {

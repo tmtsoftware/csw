@@ -8,8 +8,8 @@ import akka.util.Timeout
 import csw.param.StateVariable.CurrentState
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.MultiStateMatcherMsgs._
-import csw.common.framework.PubSub
-import csw.common.framework.PubSub.{Subscribe, Unsubscribe}
+import csw.common.framework.models.PubSub
+import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 
 object MultiStateMatcherActor {
 

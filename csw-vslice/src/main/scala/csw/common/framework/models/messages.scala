@@ -1,11 +1,11 @@
-package csw.common.framework
+package csw.common.framework.models
 
 import akka.typed.ActorRef
+import csw.common.ccs.CommandStatus.CommandResponse
+import csw.common.framework.models.HcdComponentLifecycleMessage.Running
 import csw.param.Parameters.{ControlCommand, Setup}
 import csw.param.StateVariable.CurrentState
 import csw.trombone.assembly.actors.TromboneStateActor.StateWasSet
-import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.HcdComponentLifecycleMessage.Running
 
 sealed trait LifecycleState
 

@@ -16,6 +16,7 @@ dist
 /RUNNING_PID
 .settings
 .DS_Store
+integration/project/build.properties
 
 # hidden cross project folders
 shared/.js

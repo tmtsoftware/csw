@@ -2,7 +2,8 @@ package csw.common.components.hcd
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.common.framework._
+import csw.common.framework.models.{HcdComponentLifecycleMessage, HcdMsg, ToComponentLifecycleMessage}
+import csw.common.framework.scaladsl.HcdActor
 import csw.param.Parameters
 
 import scala.concurrent.Future

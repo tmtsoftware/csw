@@ -17,9 +17,9 @@ import csw.common.ccs.CommandStatus._
 import csw.common.ccs.MultiStateMatcherMsgs.StartMatch
 import csw.common.ccs.Validation.{RequiredHCDUnavailableIssue, UnsupportedCommandInStateIssue, WrongInternalStateIssue}
 import csw.common.ccs._
-import csw.common.framework.CommandMsgs.StopCurrentCommand
-import csw.common.framework.HcdComponentLifecycleMessage.Running
-import csw.common.framework.{CommandMsgs, PubSub}
+import csw.common.framework.models.CommandMsgs.StopCurrentCommand
+import csw.common.framework.models.{CommandMsgs, PubSub}
+import csw.common.framework.models.HcdComponentLifecycleMessage.Running
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Await

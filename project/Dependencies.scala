@@ -101,7 +101,9 @@ object Dependencies {
     Libs.`scala-async`,
     Akka.`akka-typed`,
     Akka.`akka-typed-testkit` % Test,
-    Libs.`scalatest`          % Test
+    Libs.`scalatest`          % Test,
+    Libs.`junit`              % Test,
+    Libs.`junit-interface`    % Test
   )
 
   val CswClusterSeed = Seq(

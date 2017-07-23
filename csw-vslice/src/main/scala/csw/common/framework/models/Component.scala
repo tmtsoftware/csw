@@ -1,8 +1,8 @@
-package csw.common.framework
+package csw.common.framework.models
 
+import csw.common.framework.models.Component.ComponentInfo
 import csw.services.location.models.ComponentType.{Assembly, Container, HCD}
 import csw.services.location.models.{ComponentType, Connection, ConnectionType}
-import csw.common.framework.Component.ComponentInfo
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._

@@ -12,9 +12,9 @@ import csw.trombone.assembly.actors.DiagPublisher._
 import csw.trombone.assembly.TrombonePublisherMsg.{AxisStateUpdate, AxisStatsUpdate}
 import csw.trombone.assembly.actors.DiagPublisher.Mode
 import csw.trombone.assembly.{AssemblyContext, DiagPublisherMessages, TrombonePublisherMsg}
-import csw.common.framework.HcdComponentLifecycleMessage.Running
-import csw.common.framework.PubSub
-import csw.common.framework.RunningHcdMsg.DomainHcdMsg
+import csw.common.framework.models.HcdComponentLifecycleMessage.Running
+import csw.common.framework.models.PubSub
+import csw.common.framework.models.RunningHcdMsg.DomainHcdMsg
 import csw.trombone.hcd.TromboneEngineering.GetAxisStats
 import csw.trombone.hcd.TromboneHcdState
 
@@ -98,9 +98,8 @@ class DiagPublisher(ctx: ActorContext[DiagPublisherMessages],
     case TimeForAxisStats(periodInSeconds) =>
       running.foreach(_.hcdRef ! DomainHcdMsg(GetAxisStats))
       val canceltoken: Cancellable =
-        ctx.schedule(Instant.now().plusSeconds(periodInSeconds).toEpochMilli.millis,
-                     ctx.self,
-                     TimeForAxisStats(periodInSeconds))
+        ctx.schedule(Instant.now().plusSeconds(periodInSeconds).toEpochMilli.millis, ctx.self,
+          TimeForAxisStats(periodInSeconds))
       this.cancelToken = canceltoken
 
     case DiagnosticState => // Do nothing, already in this mode

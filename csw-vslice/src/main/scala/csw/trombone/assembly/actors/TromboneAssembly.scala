@@ -5,9 +5,15 @@ import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validation
 import csw.common.ccs.Validation.{Valid, Validation}
-import csw.common.framework.Component.AssemblyInfo
-import csw.common.framework.ToComponentLifecycleMessage.{DoRestart, DoShutdown, LifecycleFailureInfo, RunningOffline}
-import csw.common.framework._
+import csw.common.framework.models.Component.AssemblyInfo
+import csw.common.framework.models._
+import csw.common.framework.models.ToComponentLifecycleMessage.{
+  DoRestart,
+  DoShutdown,
+  LifecycleFailureInfo,
+  RunningOffline
+}
+import csw.common.framework.scaladsl._
 import csw.param.Parameters.{Observe, Setup}
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}
@@ -17,6 +23,7 @@ import csw.trombone.assembly._
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object TromboneAssembly {
   def make(assemblyInfo: AssemblyInfo, supervisor: ActorRef[AssemblyComponentLifecycleMessage]): Behavior[Nothing] =
@@ -33,7 +40,6 @@ class TromboneAssembly(ctx: ActorContext[AssemblyMsg],
   private var commandHandler: ActorRef[NotFollowingMsgs] = _
 
   implicit var ac: AssemblyContext = _
-  import ctx.executionContext
 
   def onRun(): Unit = ()
 

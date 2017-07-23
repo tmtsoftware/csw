@@ -7,9 +7,9 @@ import csw.param.StateVariable.CurrentState
 import csw.param._
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.DomainMsg
-import csw.common.framework.HcdComponentLifecycleMessage.Running
-import csw.common.framework.RunningHcdMsg.Submit
+import csw.common.framework.models.DomainMsg
+import csw.common.framework.models.HcdComponentLifecycleMessage.Running
+import csw.common.framework.models.RunningHcdMsg.Submit
 
 sealed trait FollowCommandMessages
 object FollowCommandMessages {

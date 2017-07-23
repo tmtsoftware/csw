@@ -4,8 +4,9 @@ import akka.typed.{ActorRef, Behavior}
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.common.ccs.Validation.Valid
 import csw.common.ccs.{CommandStatus, Validation}
-import csw.common.framework.{AssemblyActor, AssemblyComponentLifecycleMessage, AssemblyMsg, ToComponentLifecycleMessage}
-import csw.common.framework.Component.AssemblyInfo
+import csw.common.framework.models.Component.AssemblyInfo
+import csw.common.framework.models.{AssemblyComponentLifecycleMessage, AssemblyMsg, ToComponentLifecycleMessage}
+import csw.common.framework.scaladsl.AssemblyActor
 import csw.param.Parameters
 
 import scala.concurrent.Future
@@ -13,7 +14,7 @@ import scala.concurrent.Future
 class SampleAssembly(ctx: ActorContext[AssemblyMsg],
                      assemblyInfo: AssemblyInfo,
                      supervisor: ActorRef[AssemblyComponentLifecycleMessage])
-    extends AssemblyActor[SampleAssemblyMessage](ctx, assemblyInfo, supervisor) {
+    extends AssemblyActor[AssemblyDomainMessages](ctx, assemblyInfo, supervisor) {
 
   override def initialize(): Future[Unit] = Future.unit
 
@@ -27,7 +28,7 @@ class SampleAssembly(ctx: ActorContext[AssemblyMsg],
 
   override def onLifecycle(message: ToComponentLifecycleMessage): Unit = Unit
 
-  override def onDomainMsg(msg: SampleAssemblyMessage): Unit = Unit
+  override def onDomainMsg(msg: AssemblyDomainMessages): Unit = Unit
 }
 
 object SampleAssembly {

@@ -9,10 +9,10 @@ import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.common.ccs.CommandStatus.{Completed, Error, NoLongerValid}
 import csw.common.ccs.Validation.WrongInternalStateIssue
-import csw.common.framework.CommandMsgs
-import csw.common.framework.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
-import csw.common.framework.HcdComponentLifecycleMessage.Running
-import csw.common.framework.RunningHcdMsg.Submit
+import csw.common.framework.models.CommandMsgs
+import csw.common.framework.models.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
+import csw.common.framework.models.HcdComponentLifecycleMessage.Running
+import csw.common.framework.models.RunningHcdMsg.Submit
 import csw.trombone.hcd.TromboneHcdState
 
 object PositionCommand {
@@ -59,11 +59,8 @@ class PositionCommand(ctx: ActorContext[CommandMsgs],
 
         stateActor.foreach(
           _ !
-          SetState(cmdItem(cmdBusy),
-                   moveItem(moveMoving),
-                   startState.sodiumLayer,
-                   startState.nss,
-                   setStateResponseAdapter)
+          SetState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss,
+            setStateResponseAdapter)
         )
         tromboneHCD.hcdRef ! Submit(scOut)
 
@@ -71,11 +68,8 @@ class PositionCommand(ctx: ActorContext[CommandMsgs],
           case Completed =>
             stateActor.foreach(
               _ !
-              SetState(cmdItem(cmdReady),
-                       moveItem(moveIndexed),
-                       sodiumItem(false),
-                       startState.nss,
-                       setStateResponseAdapter)
+              SetState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss,
+                setStateResponseAdapter)
             )
           case Error(message) =>
             println(s"Position command match failed with message: $message")
