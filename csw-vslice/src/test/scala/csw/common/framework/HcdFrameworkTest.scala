@@ -16,7 +16,7 @@ import scala.concurrent.duration.DurationInt
 
 class HcdFrameworkTest extends FunSuite with Matchers {
 
-  test("hcd") {
+  test("hcd component should send initialize and running message to supervisor") {
     implicit val system   = ActorSystem("testHcd", Actor.empty)
     implicit val settings = TestKitSettings(system)
     implicit val timeout  = Timeout(5.seconds)
