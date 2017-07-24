@@ -4,6 +4,7 @@ import csw.param.UnitsOfMeasure.{NoUnits, Units}
 import spray.json.{JsArray, JsObject, JsString, JsValue, JsonFormat}
 
 import scala.collection.immutable.Vector
+import spray.json.DefaultJsonProtocol._
 
 object GenericParameter {
 
@@ -49,7 +50,7 @@ case class GenericParameter[S: JsonFormat](typeName: String, keyName: String, va
    */
   def toJson: JsValue = {
     val valueFormat = implicitly[JsonFormat[S]]
-    val unitsFormat = ParameterSetJson.unitsFormat
+    val unitsFormat = jsonFormat1(Units.apply)
     JsObject(
       "keyName" -> JsString(keyName),
       "value"   -> JsArray(values.map(valueFormat.write)),

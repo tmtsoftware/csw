@@ -6,21 +6,17 @@ import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
+import csw.common.ccs.CommandStatus._
+import csw.common.ccs.Validation.{RequiredHCDUnavailableIssue, UnsupportedCommandInStateIssue, WrongInternalStateIssue}
+import csw.common.framework.models.CommandMsgs
+import csw.common.framework.models.CommandMsgs.StopCurrentCommand
+import csw.common.framework.models.HcdComponentLifecycleMessage.Running
 import csw.param.Parameters.Setup
-import csw.param.StateVariable.{CurrentState, DemandState}
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.TromboneCommandHandlerMsgs._
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneCommandHandler.Mode
 import csw.trombone.assembly.commands._
-import csw.common.ccs.CommandStatus._
-import csw.common.ccs.MultiStateMatcherMsgs.StartMatch
-import csw.common.ccs.Validation.{RequiredHCDUnavailableIssue, UnsupportedCommandInStateIssue, WrongInternalStateIssue}
-import csw.common.ccs._
-import csw.common.framework.models.CommandMsgs.StopCurrentCommand
-import csw.common.framework.models.{CommandMsgs, PubSub}
-import csw.common.framework.models.HcdComponentLifecycleMessage.Running
-import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -35,38 +31,6 @@ object TromboneCommandHandler {
         ctx ⇒ new TromboneCommandHandler(ctx, assemblyContext, tromboneHCDIn, allEventPublisher)
       )
       .narrow
-
-  def executeMatch(ctx: ActorContext[_],
-                   stateMatcher: StateMatcher,
-                   currentStateSource: ActorRef[PubSub[CurrentState]],
-                   replyTo: Option[ActorRef[CommandResponse]] = None,
-                   timeout: Timeout = Timeout(5.seconds))(codeBlock: PartialFunction[CommandResponse, Unit]): Unit = {
-    implicit val t                    = Timeout(timeout.duration + 1.seconds)
-    implicit val scheduler: Scheduler = ctx.system.scheduler
-    import ctx.executionContext
-
-    val matcher: ActorRef[MultiStateMatcherMsgs.WaitingMsg] =
-      ctx.spawnAnonymous(MultiStateMatcherActor.make(currentStateSource, timeout))
-    for {
-      cmdStatus <- matcher ? { x: ActorRef[CommandStatus.CommandResponse] ⇒
-        StartMatch(x, stateMatcher)
-      }
-    } {
-      codeBlock(cmdStatus)
-      replyTo.foreach(_ ! cmdStatus)
-    }
-  }
-
-  def idleMatcher: DemandMatcher =
-    DemandMatcher(
-      DemandState(TromboneHcdState.axisStateCK).add(TromboneHcdState.stateKey -> TromboneHcdState.AXIS_IDLE)
-    )
-
-  def posMatcher(position: Int): DemandMatcher =
-    DemandMatcher(
-      DemandState(TromboneHcdState.axisStateCK)
-        .madd(TromboneHcdState.stateKey -> TromboneHcdState.AXIS_IDLE, TromboneHcdState.positionKey -> position)
-    )
 
   sealed trait Mode
   object Mode {
@@ -219,7 +183,7 @@ class TromboneCommandHandler(ctx: ActorContext[TromboneCommandHandlerMsgs],
 
           val zenithAngleItem = s(ac.zenithAngleKey)
           followCommandActor ! SetZenithAngle(zenithAngleItem)
-          executeMatch(ctx, idleMatcher, tromboneHCD.pubSubRef, Some(replyTo)) {
+          Matchers.executeMatch(ctx, Matchers.idleMatcher, tromboneHCD.pubSubRef, Some(replyTo)) {
             case Completed =>
               Await.ready(
                 tromboneStateActor ? { x: ActorRef[StateWasSet] ⇒

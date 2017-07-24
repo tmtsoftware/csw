@@ -13,6 +13,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-location-agent`,
   `csw-benchmark`,
   `csw-vslice`,
+  `csw-params`,
   `integration`,
   `examples`
 )

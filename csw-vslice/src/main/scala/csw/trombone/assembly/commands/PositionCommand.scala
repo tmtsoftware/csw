@@ -3,16 +3,16 @@ package csw.trombone.assembly.commands
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.param.Parameters.Setup
-import csw.param.UnitsOfMeasure.encoder
-import csw.trombone.assembly._
-import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.common.ccs.CommandStatus.{Completed, Error, NoLongerValid}
 import csw.common.ccs.Validation.WrongInternalStateIssue
 import csw.common.framework.models.CommandMsgs
 import csw.common.framework.models.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
 import csw.common.framework.models.HcdComponentLifecycleMessage.Running
 import csw.common.framework.models.RunningHcdMsg.Submit
+import csw.param.Parameters.Setup
+import csw.param.UnitsOfMeasure.encoder
+import csw.trombone.assembly._
+import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.trombone.hcd.TromboneHcdState
 
 object PositionCommand {
@@ -33,7 +33,6 @@ class PositionCommand(ctx: ActorContext[CommandMsgs],
                       stateActor: Option[ActorRef[TromboneStateMsg]])
     extends MutableBehavior[CommandMsgs] {
 
-  import csw.trombone.assembly.actors.TromboneCommandHandler._
   import csw.trombone.assembly.actors.TromboneStateActor._
 
   private val setStateResponseAdapter: ActorRef[StateWasSet] = ctx.spawnAdapter(SetStateResponseE)
@@ -53,7 +52,7 @@ class PositionCommand(ctx: ActorContext[CommandMsgs],
           s"Using rangeDistance: ${rangeDistance.head} to get stagePosition: $stagePosition to encoder: $encoderPosition"
         )
 
-        val stateMatcher = posMatcher(encoderPosition)
+        val stateMatcher = Matchers.posMatcher(encoderPosition)
         val scOut = Setup(s.info, TromboneHcdState.axisMoveCK)
           .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
 
@@ -67,7 +66,7 @@ class PositionCommand(ctx: ActorContext[CommandMsgs],
         )
         tromboneHCD.hcdRef ! Submit(scOut)
 
-        executeMatch(ctx, stateMatcher, tromboneHCD.pubSubRef, Some(replyTo)) {
+        Matchers.executeMatch(ctx, stateMatcher, tromboneHCD.pubSubRef, Some(replyTo)) {
           case Completed =>
             stateActor.foreach(
               _ !

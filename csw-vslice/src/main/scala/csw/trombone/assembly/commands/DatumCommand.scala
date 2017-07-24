@@ -3,15 +3,15 @@ package csw.trombone.assembly.commands
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.param.Parameters.Setup
-import csw.trombone.assembly.actors.TromboneCommandHandler
-import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.common.ccs.CommandStatus.{Completed, Error, NoLongerValid}
 import csw.common.ccs.Validation.WrongInternalStateIssue
 import csw.common.framework.models.CommandMsgs
 import csw.common.framework.models.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
 import csw.common.framework.models.HcdComponentLifecycleMessage.Running
 import csw.common.framework.models.RunningHcdMsg.Submit
+import csw.param.Parameters.Setup
+import csw.trombone.assembly.Matchers
+import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.trombone.hcd.TromboneHcdState
 
 object DatumCommand {
@@ -29,7 +29,6 @@ class DatumCommand(ctx: ActorContext[CommandMsgs],
                    stateActor: Option[ActorRef[TromboneStateMsg]])
     extends MutableBehavior[CommandMsgs] {
 
-  import csw.trombone.assembly.actors.TromboneCommandHandler._
   import csw.trombone.assembly.actors.TromboneStateActor._
 
   private val setStateResponseAdapter: ActorRef[StateWasSet] = ctx.spawnAdapter(SetStateResponseE)
@@ -49,7 +48,7 @@ class DatumCommand(ctx: ActorContext[CommandMsgs],
                        setStateResponseAdapter)
         )
         tromboneHCD.hcdRef ! Submit(Setup(s.info, TromboneHcdState.axisDatumCK))
-        TromboneCommandHandler.executeMatch(ctx, idleMatcher, tromboneHCD.pubSubRef, Some(replyTo)) {
+        Matchers.executeMatch(ctx, Matchers.idleMatcher, tromboneHCD.pubSubRef, Some(replyTo)) {
           case Completed =>
             stateActor.foreach(
               _ ! SetState(cmdReady, moveIndexed, sodiumLayer = false, nss = false, setStateResponseAdapter)
