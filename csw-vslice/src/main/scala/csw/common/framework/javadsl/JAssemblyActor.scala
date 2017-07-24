@@ -29,7 +29,7 @@ abstract class JAssemblyActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[Asse
   def jOnDomainMsg(msg: Msg): Void
   def jOnLifecycle(message: ToComponentLifecycleMessage): Void
 
-  import scala.concurrent.ExecutionContext.Implicits.global
+  implicit val ec                         = ctx.getExecutionContext
   override def initialize(): Future[Unit] = jInitialize().toScala.map(_ ⇒ Unit)
 
   override def onRun(): Unit = jOnRun()

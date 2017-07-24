@@ -5,8 +5,8 @@ import akka.typed.scaladsl.Actor
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
-import csw.common.components.assembly.SampleAssembly
-import csw.common.framework.models.{AssemblyComponentLifecycleMessage, AssemblyMsg}
+import csw.common.components.assembly.SampleAssemblyFactory
+import csw.common.framework.models.AssemblyComponentLifecycleMessage
 import csw.common.framework.models.AssemblyComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.Component.{AssemblyInfo, DoNotRegister}
 import csw.common.framework.models.InitialAssemblyMsg.Run
@@ -36,7 +36,8 @@ class AssemblyActorTest extends FunSuite with Matchers {
 
     val assemblyRef =
       Await.result(
-        system.systemActorOf[AssemblyMsg](SampleAssembly.behaviour(assemblyInfo, supervisorProbe.ref), "assembly"),
+        system.systemActorOf[Nothing](new SampleAssemblyFactory().behaviour(assemblyInfo, supervisorProbe.ref),
+                                      "assembly"),
         5.seconds
       )
 

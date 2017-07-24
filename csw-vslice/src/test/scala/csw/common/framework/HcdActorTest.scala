@@ -5,7 +5,7 @@ import akka.typed.scaladsl.Actor
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
-import csw.common.components.hcd.TestHcdFactory
+import csw.common.components.hcd.SampleHcdFactory
 import csw.common.framework.models.HcdComponentLifecycleMessage
 import csw.common.framework.models.HcdComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
@@ -14,7 +14,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-class HcdFrameworkTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class HcdActorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   implicit val system   = ActorSystem("testHcd", Actor.empty)
   implicit val settings = TestKitSettings(system)
@@ -27,10 +27,8 @@ class HcdFrameworkTest extends FunSuite with Matchers with BeforeAndAfterAll {
   test("hcd component should send initialize and running message to supervisor") {
     val testProbe: TestProbe[HcdComponentLifecycleMessage] = TestProbe[HcdComponentLifecycleMessage]
 
-    val testHcdFactory = new TestHcdFactory
-
     val hcdRef =
-      Await.result(system.systemActorOf[Nothing](testHcdFactory.behaviour(testProbe.ref), "Hcd"), 5.seconds)
+      Await.result(system.systemActorOf[Nothing]((new SampleHcdFactory).behaviour(testProbe.ref), "Hcd"), 5.seconds)
 
     val initialized = testProbe.expectMsgType[Initialized]
     initialized.hcdRef shouldBe hcdRef

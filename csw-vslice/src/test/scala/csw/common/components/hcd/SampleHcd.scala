@@ -9,30 +9,20 @@ import csw.common.framework.models.ToComponentLifecycleMessage.{
   RunOffline,
   Shutdown
 }
-import csw.common.framework.models._
-import csw.common.framework.scaladsl.{HcdActor, HcdActorFactory}
+import csw.common.framework.models.{HcdComponentLifecycleMessage, HcdMsg, ShutdownComplete, ToComponentLifecycleMessage}
+import csw.common.framework.scaladsl.HcdActor
 import csw.param.Parameters
 
 import scala.concurrent.Future
 
-class TestHcdFactory extends HcdActorFactory[TestHcdMessage] {
-  override def make(ctx: ActorContext[HcdMsg],
-                    supervisor: ActorRef[HcdComponentLifecycleMessage]): HcdActor[TestHcdMessage] =
-    new TestHcd(ctx, supervisor)
-}
-
-class TestHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage])
-    extends HcdActor[TestHcdMessage](ctx, supervisor) {
+class SampleHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage])
+    extends HcdActor[HcdDomainMessage](ctx, supervisor) {
 
   override def initialize(): Future[Unit] = Future.unit
 
   override def onInitialRun(): Unit = ()
 
   override def onRunningHcdShutdownComplete(): Unit = ()
-
-  override def onSetup(sc: Parameters.Setup): Unit = ()
-
-  override def onDomainMsg(msg: TestHcdMessage): Unit = ()
 
   override def onInitialHcdShutdownComplete(): Unit = ()
 
@@ -44,4 +34,8 @@ class TestHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecy
     case LifecycleFailureInfo(state, reason) =>
     case ShutdownComplete                    =>
   }
+
+  override def onSetup(sc: Parameters.Setup): Unit = ()
+
+  override def onDomainMsg(msg: HcdDomainMessage): Unit = ()
 }

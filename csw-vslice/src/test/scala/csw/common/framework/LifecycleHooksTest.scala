@@ -5,7 +5,7 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.common.components.hcd.TestHcdFactory
+import csw.common.components.hcd.SampleHcdFactory
 import csw.common.framework.models.HcdComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg.Lifecycle
@@ -23,10 +23,10 @@ class LifecycleHooksTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
   val testProbe: TestProbe[HcdComponentLifecycleMessage] = TestProbe[HcdComponentLifecycleMessage]
 
-  val testHcdFactory = new TestHcdFactory
+  val SampleHcdFactory = new SampleHcdFactory
 
   val hcdRef: ActorRef[Nothing] =
-    Await.result(system.systemActorOf[Nothing](testHcdFactory.behaviour(testProbe.ref), "Hcd"), 5.seconds)
+    Await.result(system.systemActorOf[Nothing](SampleHcdFactory.behaviour(testProbe.ref), "Hcd"), 5.seconds)
 
   val initialized: Initialized = testProbe.expectMsgType[Initialized]
   initialized.hcdRef ! Run(testProbe.ref)
