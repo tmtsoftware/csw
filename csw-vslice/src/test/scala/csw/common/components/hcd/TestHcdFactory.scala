@@ -8,7 +8,7 @@ import csw.param.Parameters
 
 import scala.concurrent.Future
 
-object TestHcd extends HcdActorFactory[TestHcdMessage] {
+class TestHcdFactory extends HcdActorFactory[TestHcdMessage] {
   override def make(ctx: ActorContext[HcdMsg],
                     supervisor: ActorRef[HcdComponentLifecycleMessage]): HcdActor[TestHcdMessage] =
     new TestHcd(ctx, supervisor)

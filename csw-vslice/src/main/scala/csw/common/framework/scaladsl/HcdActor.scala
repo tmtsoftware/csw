@@ -56,7 +56,7 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
   async {
     await(initialize())
     supervisor ! Initialized(ctx.self, pubSubRef)
-    context = Mode.Initial
+    context = Mode.Initial //TODO: Is this thread safe?
   }
 
   override def onMessage(msg: HcdMsg): Behavior[HcdMsg] = {

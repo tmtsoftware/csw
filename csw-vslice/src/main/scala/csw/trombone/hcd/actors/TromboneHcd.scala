@@ -19,7 +19,7 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
-object TromboneHcd extends HcdActorFactory[TromboneMsg] {
+class TromboneHcdFactory extends HcdActorFactory[TromboneMsg] {
   override def make(ctx: ActorContext[HcdMsg],
                     supervisor: ActorRef[HcdComponentLifecycleMessage]): HcdActor[TromboneMsg] =
     new TromboneHcd(ctx, supervisor)

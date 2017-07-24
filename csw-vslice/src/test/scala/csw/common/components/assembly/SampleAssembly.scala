@@ -1,12 +1,13 @@
 package csw.common.components.assembly
 
-import akka.typed.{ActorRef, Behavior}
+import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.Validation.Valid
 import csw.common.ccs.{CommandStatus, Validation}
-import csw.common.framework.models.Component.AssemblyInfo
-import csw.common.framework.models.{AssemblyComponentLifecycleMessage, AssemblyMsg, ToComponentLifecycleMessage}
-import csw.common.framework.scaladsl.AssemblyActor
+import csw.common.framework.models.Component.{AssemblyInfo, HcdInfo}
+import csw.common.framework.models._
+import csw.common.framework.scaladsl.{AssemblyActor, HcdActorFactory}
 import csw.param.Parameters
 
 import scala.concurrent.Future
@@ -33,6 +34,20 @@ class SampleAssembly(ctx: ActorContext[AssemblyMsg],
 
 object SampleAssembly {
   def behaviour(assemblyInfo: AssemblyInfo,
-                supervisor: ActorRef[AssemblyComponentLifecycleMessage]): Behavior[AssemblyMsg] =
-    Actor.mutable[AssemblyMsg](ctx ⇒ new SampleAssembly(ctx, assemblyInfo, supervisor)).narrow
+                supervisor: ActorRef[AssemblyComponentLifecycleMessage]): Behavior[AssemblyMsg] = {
+    val assemblyClass = Class.forName(assemblyInfo.componentClassName)
+    val constructor =
+      assemblyClass.getConstructor(classOf[ActorContext[AssemblyMsg]],
+                                   classOf[AssemblyInfo],
+                                   classOf[ActorRef[AssemblyComponentLifecycleMessage]])
+    val assemblyFactory: (ActorContext[AssemblyMsg]) ⇒ MutableBehavior[AssemblyMsg] = (ctx: ActorContext[AssemblyMsg]) ⇒
+      constructor.newInstance(ctx, assemblyInfo, supervisor).asInstanceOf[MutableBehavior[AssemblyMsg]]
+    Actor.mutable[AssemblyMsg](assemblyFactory)
+  }
+
+  def behaviour(hcdInfo: HcdInfo, supervisor: ActorRef[HcdComponentLifecycleMessage]): Behavior[Nothing] = {
+    val hcdClass   = Class.forName(hcdInfo.componentClassName + "Factory")
+    val hcdFactory = hcdClass.newInstance().asInstanceOf[HcdActorFactory[_]]
+    hcdFactory.behaviour(supervisor)
+  }
 }

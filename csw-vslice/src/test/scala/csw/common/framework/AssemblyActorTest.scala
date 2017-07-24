@@ -27,7 +27,12 @@ class AssemblyActorTest extends FunSuite with Matchers {
     val supervisorProbe: TestProbe[AssemblyComponentLifecycleMessage] = TestProbe[AssemblyComponentLifecycleMessage]
 
     val assemblyInfo =
-      AssemblyInfo("trombone", "wfos", "csw.common.components.SampleAssembly", DoNotRegister, Set(AkkaType), Set.empty)
+      AssemblyInfo("trombone",
+                   "wfos",
+                   "csw.common.components.assembly.SampleAssembly",
+                   DoNotRegister,
+                   Set(AkkaType),
+                   Set.empty)
 
     val assemblyRef =
       Await.result(
