@@ -341,6 +341,36 @@ Java
 * @github[Java Example](/examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java)
   
 
+## Performance
+Performance results documented on this page is measured in terms of Throughput and obtained with the JMH Java benchmark harness. 
+Sourcecode for all the JMH benchmarks can be found here at [CSW Benchmarks](https://github.com/tmtsoftware/csw-prod/tree/master/csw-benchmark/src/main) 
+
+[Wikipedia](https://en.wikipedia.org/wiki/Throughput) definition of Throughput is the maximum rate of production or the maximum rate at which something can be processed. 
+In our case, throughput is defined as how many messages can be logged in a certain period of time.
+
+### Test Machine Configuration :
+* MacBook Pro (Retina, 15-inch, Mid 2015)
+* Processor Name:       Intel Core i7
+* Processor Speed:      2.8 GHz
+* No. of Processors:    1
+* No. of Cores:         4
+* L2 Cache (per Core):  256 KB
+* L3 Cache:             6 MB
+* Memory:               16 GB 1600 MHz DDR3
+* JDK:                  1.8.0_121
+
+![Logging Appenders Throughput](./logging-appenders-perf-results.png)
+
+Above graph includes the throughput results for File and StdOut appender when messages are logged with synchronous and asynchronous mode. 
+
+In synchronous mode, messages are not dropped when multiple threads are logging simultaneously.
+
+In asynchronous mode, all the logging messages are sent to LogActor (Akka actor) which is a fire and forget call. It is the responsibility of LogActor to write a message to console/file.
+LogActor uses BoundedMailbox with a mailbox-capacity = 262144, messages are dropped if mailbox gets full.
+FileAppender flushes the buffered output stream on every log message which guarantees that there is no loss of log message on system failure. 
+All the above results were taken with immediate flush.  
+ 
+
 ## Acknowledgement
 The codebase in **csw-logging** module is based on [persist-logging library](https://github.com/nestorpersist/logging) library. We appreciate efforts put in by authors of the persist-logging library which made our development fast and easy.
    

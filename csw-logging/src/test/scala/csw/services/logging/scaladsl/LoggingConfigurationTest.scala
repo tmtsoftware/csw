@@ -237,6 +237,7 @@ class LoggingConfigurationTest
     //*************************** End Testing StdOut Logs *******************************************
 
     // clean up
+    stdOutLogBuffer.clear()
     Await.result(loggingSystem.stop, 5.seconds)
     Await.result(actorSystem.terminate, 5.seconds)
   }
