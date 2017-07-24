@@ -7,6 +7,8 @@ import akka.typed.javadsl.Adapter;
 import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
 import csw.common.components.hcd.JSampleHcd;
+import csw.common.components.hcd.JSampleHcdFactory;
+import csw.common.components.hcd.messages.HcdSampleMessages;
 import csw.common.framework.models.HcdComponentLifecycleMessage;
 import csw.common.framework.models.HcdMsg;
 import csw.common.framework.models.InitialHcdMsg;
@@ -14,6 +16,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import scala.concurrent.duration.FiniteDuration;
 import scala.reflect.ClassTag;
+import scala.runtime.Nothing$;
 
 import java.util.concurrent.TimeUnit;
 
@@ -31,9 +34,10 @@ public class JHcdActorTest {
                 typedActorSystem,
                 testKitSettings);
 
-        Behavior<HcdMsg> hcdMsgBehavior = JSampleHcd.behavior(supervisorProbe.ref());
 
-        ActorRef<HcdMsg> hcdMsgActorRef = Adapter.spawn(untypedActorSystem, hcdMsgBehavior, "hcd");
+        Behavior<Nothing$> hcdMsgBehavior = new JSampleHcdFactory(HcdSampleMessages.class).behaviour(supervisorProbe.ref()).narrow();
+
+        ActorRef<Nothing$> hcdMsgActorRef = Adapter.spawn(untypedActorSystem, hcdMsgBehavior, "hcd");
 
         ClassTag<HcdComponentLifecycleMessage.Initialized> initializedClassTag = scala.reflect.ClassTag$.MODULE$.apply(HcdComponentLifecycleMessage.Initialized.class);
         HcdComponentLifecycleMessage.Initialized initialized = supervisorProbe.expectMsgType(FiniteDuration.apply(5, TimeUnit.SECONDS), initializedClassTag);

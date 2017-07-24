@@ -74,6 +74,7 @@ abstract class AssemblyActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[Assem
     case Submit(command, replyTo)         => onSubmit(command, replyTo)
     case Oneway(command, replyTo)         ⇒ onOneWay(command, replyTo)
     case DomainAssemblyMsg(diagMode: Msg) ⇒ onDomainMsg(diagMode)
+    case DomainAssemblyMsg(y)             ⇒ println(s"unhandled domain msg: $y")
   }
 
   def onSubmit(command: Parameters.ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = command match {

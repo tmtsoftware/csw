@@ -1,7 +1,7 @@
 package csw.common.framework.scaladsl
 
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior}
+import akka.typed.{javadsl, ActorRef, Behavior}
 import csw.common.framework.scaladsl.HcdActor.Mode
 import csw.common.framework.models.HcdComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
@@ -11,8 +11,16 @@ import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 
 import scala.async.Async.{async, await}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
+
+abstract class HcdActorFactory[Msg <: DomainMsg: ClassTag] {
+
+  def make(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage]): HcdActor[Msg]
+
+  def behaviour(supervisor: ActorRef[HcdComponentLifecycleMessage]): Behavior[Nothing] =
+    Actor.mutable[HcdMsg](ctx ⇒ make(ctx, supervisor)).narrow
+}
 
 object HcdActor {
   sealed trait Mode
@@ -26,11 +34,14 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
                                                     supervisor: ActorRef[HcdComponentLifecycleMessage])
     extends Actor.MutableBehavior[HcdMsg] {
 
+  def this(ctx: javadsl.ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage]) =
+    this(ctx.asScala, supervisor)
+
   val domainAdapter: ActorRef[Msg] = ctx.spawnAdapter(DomainHcdMsg.apply)
 
   val pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.spawnAnonymous(PubSubActor.behaviour[CurrentState])
 
-  import ctx.executionContext
+  implicit val ec: ExecutionContext = ctx.executionContext
 
   var context: Mode = _
 

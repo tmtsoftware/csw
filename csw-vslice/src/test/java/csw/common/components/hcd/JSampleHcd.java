@@ -1,9 +1,7 @@
 package csw.common.components.hcd;
 
-import akka.typed.javadsl.ActorContext;
 import akka.typed.ActorRef;
-import akka.typed.Behavior;
-import akka.typed.javadsl.Actor;
+import akka.typed.javadsl.ActorContext;
 import csw.common.components.hcd.messages.HcdSampleMessages;
 import csw.common.framework.javadsl.JHcdActor;
 import csw.common.framework.models.HcdComponentLifecycleMessage;
@@ -14,12 +12,8 @@ import csw.param.Parameters;
 import java.util.concurrent.CompletableFuture;
 
 public class JSampleHcd extends JHcdActor<HcdSampleMessages> {
-    private JSampleHcd(ActorContext<HcdMsg> ctx, ActorRef<HcdComponentLifecycleMessage> supervisor) {
-        super(ctx, supervisor, scala.reflect.ClassTag$.MODULE$.apply(HcdSampleMessages.class));
-    }
-
-    public static Behavior<HcdMsg> behavior(ActorRef<HcdComponentLifecycleMessage> supervisor) {
-        return Actor.deferred((ActorContext<HcdMsg> ctx) -> new JSampleHcd(ctx, supervisor)).narrow();
+    public JSampleHcd(ActorContext<HcdMsg> ctx, ActorRef<HcdComponentLifecycleMessage> supervisor, Class<HcdSampleMessages> klass) {
+        super(ctx, supervisor, klass);
     }
 
     @Override

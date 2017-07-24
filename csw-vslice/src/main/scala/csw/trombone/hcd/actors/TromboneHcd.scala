@@ -1,9 +1,9 @@
 package csw.trombone.hcd.actors
 
 import akka.actor.Scheduler
+import akka.typed.ActorRef
+import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior}
 import akka.util.Timeout
 import csw.common.framework.models.ToComponentLifecycleMessage._
 import csw.common.framework.models._
@@ -19,9 +19,10 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
-object TromboneHcd {
-  def behaviour(supervisor: ActorRef[HcdComponentLifecycleMessage]): Behavior[Nothing] =
-    Actor.mutable[HcdMsg](ctx ⇒ new TromboneHcd(ctx, supervisor)).narrow
+object TromboneHcd extends HcdActorFactory[TromboneMsg] {
+  override def make(ctx: ActorContext[HcdMsg],
+                    supervisor: ActorRef[HcdComponentLifecycleMessage]): HcdActor[TromboneMsg] =
+    new TromboneHcd(ctx, supervisor)
 }
 
 class TromboneHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage])
@@ -35,7 +36,6 @@ class TromboneHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLi
   var tromboneAxis: ActorRef[AxisRequest] = _
   var axisConfig: AxisConfig              = _
 
-  import scala.concurrent.ExecutionContext.Implicits.global
   override def initialize(): Future[Unit] = async {
     axisConfig = await(getAxisConfig)
     tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behaviour(axisConfig, Some(domainAdapter)))
