@@ -3,14 +3,15 @@ package csw.common.components.hcd
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.models.{HcdComponentLifecycleMessage, HcdMsg, ToComponentLifecycleMessage}
-import csw.common.framework.scaladsl.HcdActor
+import csw.common.framework.scaladsl.{HcdActor, HcdActorFactory}
 import csw.param.Parameters
 
 import scala.concurrent.Future
 
-object TestHcd {
-  def behaviour(supervisor: ActorRef[HcdComponentLifecycleMessage]): Behavior[Nothing] =
-    Actor.mutable[HcdMsg](ctx ⇒ new TestHcd(ctx, supervisor)).narrow
+object TestHcd extends HcdActorFactory[TestHcdMessage] {
+  override def make(ctx: ActorContext[HcdMsg],
+                    supervisor: ActorRef[HcdComponentLifecycleMessage]): HcdActor[TestHcdMessage] =
+    new TestHcd(ctx, supervisor)
 }
 
 class TestHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage])
