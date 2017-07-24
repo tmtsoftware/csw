@@ -1,8 +1,15 @@
 package csw.common.components.hcd
 
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior}
-import csw.common.framework.models.{HcdComponentLifecycleMessage, HcdMsg, ToComponentLifecycleMessage}
+import akka.typed.ActorRef
+import akka.typed.scaladsl.ActorContext
+import csw.common.framework.models.ToComponentLifecycleMessage.{
+  LifecycleFailureInfo,
+  Restart,
+  Run,
+  RunOffline,
+  Shutdown
+}
+import csw.common.framework.models._
 import csw.common.framework.scaladsl.{HcdActor, HcdActorFactory}
 import csw.param.Parameters
 
@@ -19,15 +26,22 @@ class TestHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecy
 
   override def initialize(): Future[Unit] = Future.unit
 
-  override def onRun(): Unit = Unit
+  override def onInitialRun(): Unit = ()
 
-  override def onShutdown(): Unit = Unit
+  override def onRunningHcdShutdownComplete(): Unit = ()
 
-  override def onShutdownComplete(): Unit = Unit
+  override def onSetup(sc: Parameters.Setup): Unit = ()
 
-  override def onLifecycle(x: ToComponentLifecycleMessage): Unit = Unit
+  override def onDomainMsg(msg: TestHcdMessage): Unit = ()
 
-  override def onSetup(sc: Parameters.Setup): Unit = Unit
+  override def onInitialHcdShutdownComplete(): Unit = ()
 
-  override def onDomainMsg(msg: TestHcdMessage): Unit = Unit
+  override def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
+    case Shutdown                            => supervisor ! ShutdownComplete
+    case Restart                             => init.map(_ ⇒ ())
+    case Run                                 =>
+    case RunOffline                          =>
+    case LifecycleFailureInfo(state, reason) =>
+    case ShutdownComplete                    =>
+  }
 }

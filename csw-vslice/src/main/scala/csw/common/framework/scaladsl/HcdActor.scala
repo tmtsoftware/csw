@@ -2,11 +2,11 @@ package csw.common.framework.scaladsl
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{javadsl, ActorRef, Behavior}
-import csw.common.framework.scaladsl.HcdActor.Mode
 import csw.common.framework.models.HcdComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg._
 import csw.common.framework.models._
+import csw.common.framework.scaladsl.HcdActor.Mode
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 
@@ -46,14 +46,16 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
   var context: Mode = _
 
   def initialize(): Future[Unit]
-  def onRun(): Unit
-  def onShutdown(): Unit
-  def onShutdownComplete(): Unit
-  def onLifecycle(x: ToComponentLifecycleMessage): Unit
+  def onInitialRun(): Unit
+  def onInitialHcdShutdownComplete(): Unit
+  def onRunningHcdShutdownComplete(): Unit
+  def onLifecycle(message: ToComponentLifecycleMessage): Unit
   def onSetup(sc: Setup): Unit
   def onDomainMsg(msg: Msg): Unit
 
-  async {
+  init
+
+  protected def init: Future[Unit] = async {
     await(initialize())
     supervisor ! Initialized(ctx.self, pubSubRef)
     context = Mode.Initial //TODO: Is this thread safe?
@@ -70,15 +72,15 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
 
   private def handleInitial(x: InitialHcdMsg): Unit = x match {
     case Run(replyTo) =>
-      onRun()
+      onInitialRun()
       context = Mode.Running
       replyTo ! Running(ctx.self, pubSubRef)
     case HcdShutdownComplete =>
-      onShutdown()
+      onInitialHcdShutdownComplete()
   }
 
   private def handleRunning(x: RunningHcdMsg): Unit = x match {
-    case HcdShutdownComplete  => onShutdownComplete()
+    case HcdShutdownComplete  => onRunningHcdShutdownComplete()
     case Lifecycle(message)   => onLifecycle(message)
     case Submit(command)      => onSetup(command)
     case DomainHcdMsg(y: Msg) ⇒ onDomainMsg(y)

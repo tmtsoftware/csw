@@ -5,7 +5,13 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
-import csw.common.framework.models.ToComponentLifecycleMessage._
+import csw.common.framework.models.ToComponentLifecycleMessage.{
+  LifecycleFailureInfo,
+  Restart,
+  Run,
+  RunOffline,
+  Shutdown
+}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl._
 import csw.param.Parameters.Setup
@@ -43,11 +49,11 @@ class TromboneHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLi
     stats = await(tromboneAxis ? GetStatistics)
   }
 
-  override def onRun(): Unit = println("received Running")
+  override def onInitialRun(): Unit = println("received Running")
 
-  override def onShutdown(): Unit = println("received Shutdown complete during Initial context")
+  override def onInitialHcdShutdownComplete(): Unit = println("received Shutdown complete during Initial context")
 
-  override def onShutdownComplete(): Unit = println("received Shutdown complete during Initial state")
+  override def onRunningHcdShutdownComplete(): Unit = println("received Shutdown complete during Initial state")
 
   def onLifecycle(x: ToComponentLifecycleMessage): Unit = x match {
     case Shutdown =>

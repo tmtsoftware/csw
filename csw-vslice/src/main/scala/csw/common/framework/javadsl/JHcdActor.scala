@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture
 import akka.typed.javadsl.ActorContext
 import akka.typed.scaladsl.Actor
 import akka.typed.{javadsl, ActorRef, Behavior}
-import csw.common.framework.models.{DomainMsg, HcdComponentLifecycleMessage, HcdMsg, ToComponentLifecycleMessage}
+import csw.common.framework.models._
 import csw.common.framework.scaladsl.HcdActor
 import csw.param.Parameters
 
@@ -30,24 +30,24 @@ abstract class JHcdActor[Msg <: DomainMsg](ctx: ActorContext[HcdMsg],
     extends HcdActor[Msg](ctx.asScala, supervisor)(ClassTag(klass)) {
 
   def jInitialize(): CompletableFuture[Void]
-  def jOnRun(): Void
-  def jOnShutdown(): Void
-  def jOnShutdownComplete(): Void
-  def jOnLifecycle(x: ToComponentLifecycleMessage): Void
+  def jOnInitialRun(): Void
+  def jOnRunningHcdShutdownComplete(): Void
   def jOnSetup(sc: Parameters.Setup): Void
   def jOnDomainMsg(msg: Msg): Void
+  def jOnInitialHcdShutdownComplete(): Void
+  def jOnLifecycle(message: ToComponentLifecycleMessage): Void
 
   override def initialize(): Future[Unit] = jInitialize().toScala.map(_ ⇒ Unit)
 
-  override def onRun(): Unit = jOnRun()
+  override def onInitialRun(): Unit = jOnInitialRun()
 
-  override def onShutdown(): Unit = jOnShutdown()
-
-  override def onShutdownComplete(): Unit = jOnShutdownComplete()
-
-  override def onLifecycle(x: ToComponentLifecycleMessage): Unit = jOnLifecycle(x)
+  override def onRunningHcdShutdownComplete(): Unit = jOnRunningHcdShutdownComplete()
 
   override def onSetup(sc: Parameters.Setup): Unit = jOnSetup(sc)
 
   override def onDomainMsg(msg: Msg): Unit = jOnDomainMsg(msg)
+
+  override def onInitialHcdShutdownComplete(): Unit = jOnInitialHcdShutdownComplete()
+
+  override def onLifecycle(message: ToComponentLifecycleMessage): Unit = jOnLifecycle(message)
 }

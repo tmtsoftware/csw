@@ -24,24 +24,12 @@ public class JSampleHcd extends JHcdActor<HcdSampleMessages> {
     }
 
     @Override
-    public Void jOnRun() {
+    public Void jOnInitialRun() {
         return null;
     }
 
     @Override
-    public Void jOnShutdown() {
-        return null;
-    }
-
-    @Override
-    public Void jOnShutdownComplete() {
-        return null;
-    }
-
-    @Override
-    public Void jOnLifecycle(ToComponentLifecycleMessage x) {
-        return null;
-    }
+    public Void jOnRunningHcdShutdownComplete() { return null; }
 
     @Override
     public Void jOnSetup(Parameters.Setup sc) {
@@ -49,7 +37,11 @@ public class JSampleHcd extends JHcdActor<HcdSampleMessages> {
     }
 
     @Override
-    public Void jOnDomainMsg(HcdSampleMessages hcdSampleMessages) {
-        return null;
-    }
+    public Void jOnDomainMsg(HcdSampleMessages hcdSampleMessages) { return null; }
+
+    @Override
+    public Void jOnInitialHcdShutdownComplete() { return null; }
+
+    @Override
+    public Void jOnLifecycle(ToComponentLifecycleMessage message) { return null; }
 }
