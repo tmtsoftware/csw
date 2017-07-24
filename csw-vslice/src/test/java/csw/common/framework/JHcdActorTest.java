@@ -3,17 +3,21 @@ package csw.common.framework;
 import akka.typed.ActorRef;
 import akka.typed.ActorSystem;
 import akka.typed.Behavior;
-import akka.typed.javadsl.Adapter;
+import akka.typed.Props;
+import akka.typed.javadsl.Actor;
 import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
-import csw.common.components.hcd.JSampleHcd;
+import akka.util.Timeout;
 import csw.common.components.hcd.JSampleHcdFactory;
 import csw.common.components.hcd.messages.HcdSampleMessages;
+import csw.common.framework.javadsl.JClassTag;
 import csw.common.framework.models.HcdComponentLifecycleMessage;
-import csw.common.framework.models.HcdMsg;
 import csw.common.framework.models.InitialHcdMsg;
 import org.junit.Assert;
 import org.junit.Test;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 import scala.reflect.ClassTag;
 import scala.runtime.Nothing$;
@@ -23,23 +27,23 @@ import java.util.concurrent.TimeUnit;
 public class JHcdActorTest {
 
     @Test
-    public void testHcdActorInitialization() {
-        akka.actor.ActorSystem untypedActorSystem = akka.actor.ActorSystem.create("untypedActorSystem");
+    public void testHcdActorInitialization() throws Exception {
+        ActorSystem<Object> actorSystem = ActorSystem.create("actorSystem", Actor.empty());
 
-        ActorSystem<Void> typedActorSystem = Adapter.toTyped(untypedActorSystem);
-        TestKitSettings testKitSettings = TestKitSettings.apply(typedActorSystem);
+        TestKitSettings testKitSettings = TestKitSettings.apply(actorSystem);
 
         TestProbe<HcdComponentLifecycleMessage> supervisorProbe = new TestProbe<HcdComponentLifecycleMessage>(
                 "supervisor-probe",
-                typedActorSystem,
+                actorSystem,
                 testKitSettings);
 
 
         Behavior<Nothing$> hcdMsgBehavior = new JSampleHcdFactory(HcdSampleMessages.class).behaviour(supervisorProbe.ref()).narrow();
 
-        ActorRef<Nothing$> hcdMsgActorRef = Adapter.spawn(untypedActorSystem, hcdMsgBehavior, "hcd");
+        Future<ActorRef<Nothing$>> hcdMsgActorRefF = actorSystem.systemActorOf(hcdMsgBehavior, "ddd", Props.empty(), Timeout.apply(5, TimeUnit.SECONDS));
+        ActorRef<Nothing$> hcdMsgActorRef = Await.result(hcdMsgActorRefF, Duration.create(5, TimeUnit.SECONDS));
 
-        ClassTag<HcdComponentLifecycleMessage.Initialized> initializedClassTag = scala.reflect.ClassTag$.MODULE$.apply(HcdComponentLifecycleMessage.Initialized.class);
+        ClassTag<HcdComponentLifecycleMessage.Initialized> initializedClassTag = JClassTag.make(HcdComponentLifecycleMessage.Initialized.class);
         HcdComponentLifecycleMessage.Initialized initialized = supervisorProbe.expectMsgType(FiniteDuration.apply(5, TimeUnit.SECONDS), initializedClassTag);
 
         Assert.assertEquals(hcdMsgActorRef, initialized.hcdRef());
@@ -48,7 +52,7 @@ public class JHcdActorTest {
         initialized.hcdRef().tell(new InitialHcdMsg.Run(replyTo));
 
 
-        ClassTag<HcdComponentLifecycleMessage.Running> runningClassTag = scala.reflect.ClassTag$.MODULE$.apply(HcdComponentLifecycleMessage.Running.class);
+        ClassTag<HcdComponentLifecycleMessage.Running> runningClassTag = JClassTag.make(HcdComponentLifecycleMessage.Running.class);
         HcdComponentLifecycleMessage.Running running = supervisorProbe.expectMsgType(FiniteDuration.apply(5, TimeUnit.SECONDS), runningClassTag);
 
         Assert.assertEquals(hcdMsgActorRef, running.hcdRef());
