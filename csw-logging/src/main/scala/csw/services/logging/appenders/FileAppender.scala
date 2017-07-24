@@ -1,6 +1,6 @@
 package csw.services.logging.appenders
 
-import java.io.{BufferedOutputStream, File, FileOutputStream, PrintWriter}
+import java.io._
 import java.time.temporal.ChronoUnit
 import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 
@@ -9,46 +9,21 @@ import com.persist.JsonOps._
 import csw.services.logging.RichMsg
 import csw.services.logging.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.{Logger, LoggerImpl}
 
 import scala.concurrent.{Future, Promise}
 
 /**
- * Companion object of FileAppender Actor
- */
-private[logging] object FileAppenderActor {
-
-  // Parent trait for messages handles by File Appender Actor
-  trait AppendMessages
-
-  // Message to add log text to the writer
-  case class AppendAdd(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean) extends AppendMessages
-
-  // Message to close the appender
-  case class AppendClose(p: Promise[Unit]) extends AppendMessages
-
-  // Message to flush content from writer to the file
-  case object AppendFlush extends AppendMessages
-
-  def props(path: String, category: String): FileAppenderActor =
-    new FileAppenderActor(path, category)
-}
-
-/**
- * Actor responsible for writing log messages to a file
+ * Responsible for writing log messages to a file
  * @param path path where the log file will be created
  * @param category category of the log messages
  */
-private[logging] class FileAppenderActor(path: String, category: String) {
-
-  import FileAppenderActor._
+private[logging] class FileAppenderHelper(path: String, category: String) {
 
   private[this] var fileSpanTimestamp: Option[ZonedDateTime] = None
   private[this] var maybePrintWriter: Option[PrintWriter]    = None
 
-  private[this] var flushTimer: Option[Cancellable] = None
-  protected val log: Logger                         = new LoggerImpl(None, None)
+  protected val log: Logger = new LoggerImpl(None, None)
 
   // Initialize writer for log file
   private def open(maybeTimestamp: Option[ZonedDateTime], rotateFlag: Boolean): Unit = {
@@ -67,45 +42,39 @@ private[logging] class FileAppenderActor(path: String, category: String) {
     maybePrintWriter = Some(printWriter)
   }
 
-  def !(msg: AppendMessages) = msg match {
-    case AppendAdd(maybeTimestamp, line, rotateFlag) =>
-      maybePrintWriter match {
-        case Some(w) =>
-          if (rotateFlag && maybeTimestamp.get
-                .isAfter(
-                  fileSpanTimestamp.getOrElse(
-                    ZonedDateTime
-                      .of(LocalDateTime.MIN, ZoneId.from(ZoneOffset.UTC))
-                  )
-                )) {
-            w.close()
-            open(maybeTimestamp, rotateFlag)
-          }
-        case None =>
-          open(maybeTimestamp, rotateFlag)
-      }
-      maybePrintWriter match {
-        case Some(w) =>
-          w.println(line)
-          w.flush()
-        case None =>
-      }
-
-    case AppendClose(p) =>
-      flushTimer match {
-        case Some(t) => t.cancel()
-        case None    =>
-      }
-      maybePrintWriter match {
-        case Some(w) =>
+  def appendAdd(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean) = {
+    maybePrintWriter match {
+      case Some(w) =>
+        if (rotateFlag && maybeTimestamp.get
+              .isAfter(
+                fileSpanTimestamp.getOrElse(
+                  ZonedDateTime
+                    .of(LocalDateTime.MIN, ZoneId.from(ZoneOffset.UTC))
+                )
+              )) {
           w.close()
-          maybePrintWriter = None
-        case None =>
-      }
-      p.success(())
-      postStop
-    case x: Any =>
-      log.warn(s"Bad appender message: $x")(() => DefaultSourceLocation)
+          open(maybeTimestamp, rotateFlag)
+        }
+      case None =>
+        open(maybeTimestamp, rotateFlag)
+    }
+    maybePrintWriter match {
+      case Some(w) =>
+        w.println(line)
+        w.flush()
+      case None =>
+    }
+  }
+
+  def appendClose(p: Promise[Unit]) = {
+    maybePrintWriter match {
+      case Some(w) =>
+        w.close()
+        maybePrintWriter = None
+      case None =>
+    }
+    p.success(())
+    postStop()
   }
 
   def postStop(): Unit =
@@ -118,23 +87,20 @@ private[logging] class FileAppenderActor(path: String, category: String) {
 }
 
 /**
- * Responsible for creating an actor which manages the file resource
- * @param actorRefFactory factory for creating an actor
+ * Responsible for creating an FileAppenderHelper which manages the file resource
  * @param path log file path
  * @param category log category
  */
-private[logging] class FilesAppender(actorRefFactory: ActorRefFactory, path: String, category: String) {
+private[logging] class FilesAppender(path: String, category: String) {
 
-  import FileAppenderActor._
-
-  private[this] val fileAppenderActor = new FileAppenderActor(path, category)
+  private[this] val fileAppenderHelper = new FileAppenderHelper(path, category)
 
   def add(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean): Unit =
-    fileAppenderActor ! AppendAdd(maybeTimestamp, line, rotateFlag)
+    fileAppenderHelper.appendAdd(maybeTimestamp, line, rotateFlag)
 
   def close(): Future[Unit] = {
     val p = Promise[Unit]()
-    fileAppenderActor ! AppendClose(p)
+    fileAppenderHelper.appendClose(p)
     p.future
   }
 }
@@ -190,10 +156,10 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
   private[this] val rotateFlag    = config.getBoolean("rotate")
   private[this] val fileAppenders =
     scala.collection.mutable.HashMap[String, FilesAppender]()
-  private val loggingSystemName = jgetString(stdHeaders, LoggingKeys.NAME)
+  private val loggingSystemName = stdHeaders(LoggingKeys.NAME).toString
 
   private def checkLevel(baseMsg: Map[String, RichMsg]): Boolean = {
-    val level = jgetString(baseMsg, LoggingKeys.SEVERITY)
+    val level = baseMsg(LoggingKeys.SEVERITY).toString
     Level(level) >= logLevelLimit
   }
 
@@ -206,18 +172,18 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
   def append(baseMsg: Map[String, RichMsg], category: String): Unit =
     if (category != Category.Common.name || checkLevel(baseMsg)) {
       val msg = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
-      //Maintain a file appender for each category in a logging system
+      // Maintain a file appender for each category in a logging system
       val fileAppenderKey = loggingSystemName + "-" + category
       val fileAppender = fileAppenders.get(fileAppenderKey) match {
         case Some(appender) => appender
         case None           =>
-          //Create a file appender with logging file directory as logging system name within the log file path
-          val filesAppender = new FilesAppender(factory, logPath + "/" + loggingSystemName, category)
+          // Create a file appender with logging file directory as logging system name within the log file path
+          val filesAppender = new FilesAppender(logPath + "/" + loggingSystemName, category)
           fileAppenders += (fileAppenderKey -> filesAppender)
           filesAppender
       }
       val maybeTimestamp = if (rotateFlag) {
-        val timestamp = jgetString(msg, LoggingKeys.TIMESTAMP)
+        val timestamp = baseMsg(LoggingKeys.TIMESTAMP).toString
         Some(TMTDateTimeFormatter.parse(timestamp))
       } else None
 
@@ -241,6 +207,6 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
     val fs = for ((category, appender) <- fileAppenders) yield {
       appender.close()
     }
-    Future.sequence(fs).map(s => ())
+    Future.sequence(fs).map(_ => ())
   }
 }
