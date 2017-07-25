@@ -77,7 +77,7 @@ sealed trait HcdMsg
 
 sealed trait IdleHcdMsg extends HcdMsg
 object IdleHcdMsg {
-  case object Initialize extends IdleHcdMsg
+  case class Initialize(isRestart: Boolean) extends IdleHcdMsg
 }
 
 sealed trait InitialHcdMsg extends HcdMsg

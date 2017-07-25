@@ -27,7 +27,7 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
   implicit val ec: ExecutionContext = ctx.executionContext
 
   var mode: HcdResponseMode = Idle
-  ctx.self ! Initialize
+  ctx.self ! Initialize(false)
 
   def initialize(): Future[Unit]
   def onRun(): Unit
@@ -52,11 +52,14 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
   }
 
   private def onIdle(x: IdleHcdMsg): Unit = x match {
-    case Initialize =>
+    case Initialize(isRestart) =>
       async {
         await(initialize())
         mode = Initialized(ctx.self, pubSubRef)
-        supervisor ! mode
+        if (isRestart)
+          ctx.self ! Run(supervisor)
+        else
+          supervisor ! mode
       }
   }
 
@@ -84,8 +87,7 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
     case Restart =>
       onRestart()
       mode = Idle
-      ctx.self ! Initialize
-      ctx.self ! Run(supervisor)
+      ctx.self ! Initialize(true)
     case GoOffline =>
       onGoOffline()
       mode = Initialized(ctx.self, pubSubRef)
