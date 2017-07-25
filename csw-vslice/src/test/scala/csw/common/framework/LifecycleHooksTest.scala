@@ -23,7 +23,7 @@ class LifecycleHooksTest extends FunSuite with Matchers with BeforeAndAfterEach 
   implicit val timeout  = Timeout(5.seconds)
 
   def run(testProbeSupervisor: TestProbe[HcdResponseMode]): Running = {
-    val testHcd = Await.result(
+    Await.result(
       system.systemActorOf[Nothing](SampleHcdFactory.behaviour(testProbeSupervisor.ref), "Hcd"),
       5.seconds
     )

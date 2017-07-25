@@ -23,14 +23,6 @@ public class JSampleAssembly extends JAssemblyActor<JAssemblyDomainMessages> {
         super(ctx, assemblyInfo, supervisor, scala.reflect.ClassTag$.MODULE$.apply(JAssemblyDomainMessages.class));
     }
 
-
-    public static Behavior<AssemblyMsg> behavior(AssemblyInfo assemblyInfo, ActorRef<AssemblyComponentLifecycleMessage> supervisor) {
-        return Actor.deferred((ActorContext<AssemblyMsg> ctx) -> {
-            JSampleAssembly jSampleAssembly = new JSampleAssembly(ctx, assemblyInfo, supervisor);
-            return jSampleAssembly;
-        });
-    }
-
     @Override
     public CompletableFuture jInitialize() {
         CompletableFuture completableFuture = new CompletableFuture();

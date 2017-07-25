@@ -356,16 +356,9 @@ private[param] object JavaHelpers {
                                                               key: Key[S, I],
                                                               index: Int): java.util.Optional[J] = {
     sc.get(key) match {
-      case Some(item) => (if (index >= 0 && index < item.size) Some(jvalue(sc, key, index)) else None).asJava
-      case None       => None.asJava
-    }
-  }
-
-  def jvalue[S, I <: Parameter[S], T <: ParameterSetType[T], J](sc: T, key: Key[S, I], index: Int): J = {
-    val item = sc.get(key)
-    item match {
-      case Some(x) => x.values(index).asInstanceOf[J]
-      case None    => throw new NoSuchElementException(s"Item: $key not found")
+      case Some(item) =>
+        (if (index >= 0 && index < item.size) Some(item.values(index).asInstanceOf[J]) else None).asJava
+      case None => None.asJava
     }
   }
 
