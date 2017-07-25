@@ -48,9 +48,6 @@ class LifecycleHooksTest extends FunSuite with Matchers with BeforeAndAfterEach 
     val testProbeSupervisor = TestProbe[HcdResponseMode]
     val running             = run(testProbeSupervisor)
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.Restart)
-    val initialized = testProbeSupervisor.expectMsgType[Initialized]
-
-    initialized.hcdRef ! Run(testProbeSupervisor.ref)
     val running1 = testProbeSupervisor.expectMsgType[Running]
 
     val testProbeStateReceiver: TestProbe[DomainResponseMsg] = TestProbe[DomainResponseMsg]
