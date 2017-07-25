@@ -7,7 +7,7 @@ import csw.common.ccs.Validation
 import csw.common.ccs.Validation.{Valid, Validation}
 import csw.common.framework.models.Component.AssemblyInfo
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
-import csw.common.framework.models.ToComponentLifecycleMessage.{LifecycleFailureInfo, Restart, RunOffline, RunOnline}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, LifecycleFailureInfo, Restart}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.assembly.AssemblyActor
 import csw.param.Parameters.{Observe, Setup}
@@ -18,8 +18,7 @@ import csw.trombone.assembly.TromboneCommandHandlerMsgs.NotFollowingMsgs
 import csw.trombone.assembly._
 
 import scala.async.Async.{async, await}
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 object TromboneAssembly {
   def make(assemblyInfo: AssemblyInfo, supervisor: ActorRef[AssemblyComponentLifecycleMessage]): Behavior[Nothing] =
@@ -35,7 +34,8 @@ class TromboneAssembly(ctx: ActorContext[AssemblyMsg],
 
   private var commandHandler: ActorRef[NotFollowingMsgs] = _
 
-  implicit var ac: AssemblyContext = _
+  implicit var ac: AssemblyContext          = _
+  implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
   def onRun(): Unit = ()
 
@@ -57,9 +57,8 @@ class TromboneAssembly(ctx: ActorContext[AssemblyMsg],
   }
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case RunOnline  =>
-    case RunOffline => println("Received running offline")
-    case Restart    => println("Received dorestart")
+    case GoOffline => println("Received running offline")
+    case Restart   => println("Received dorestart")
     case ToComponentLifecycleMessage.Shutdown =>
       println("Received doshutdown")
       runningHcd.foreach(

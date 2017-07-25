@@ -37,14 +37,14 @@ class LifecycleHooksTest extends FunSuite with Matchers with BeforeAndAfterEach 
     system.terminate()
   }
 
-  test("A runnning Hcd component should accept Shutdown lifecycle message") {
+  test("A running Hcd component should accept Shutdown lifecycle message") {
     val testProbeSupervisor = TestProbe[HcdResponseMode]
     val running             = run(testProbeSupervisor)
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
     testProbeSupervisor.expectMsg(ShutdownComplete)
   }
 
-  test("A runnning Hcd component should accept Restart lifecycle message") {
+  test("A running Hcd component should accept Restart lifecycle message") {
     val testProbeSupervisor = TestProbe[HcdResponseMode]
     val running             = run(testProbeSupervisor)
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.Restart)
@@ -53,9 +53,16 @@ class LifecycleHooksTest extends FunSuite with Matchers with BeforeAndAfterEach 
     initialized.hcdRef ! Run(testProbeSupervisor.ref)
     val running1 = testProbeSupervisor.expectMsgType[Running]
 
-    val testProbeStateRecieiver: TestProbe[DomainResponseMsg] = TestProbe[DomainResponseMsg]
-    running1.hcdRef ! DomainHcdMsg(GetCurrentState(testProbeStateRecieiver.ref))
-    val response = testProbeStateRecieiver.expectMsgType[HcdDomainResponseMsg]
+    val testProbeStateReceiver: TestProbe[DomainResponseMsg] = TestProbe[DomainResponseMsg]
+    running1.hcdRef ! DomainHcdMsg(GetCurrentState(testProbeStateReceiver.ref))
+    val response = testProbeStateReceiver.expectMsgType[HcdDomainResponseMsg]
     response.state shouldBe LifecycleMessageReceived.Restart
+  }
+
+  test("A running Hcd component should accept RunOffline lifecycle message") {
+    val testProbeSupervisor = TestProbe[HcdResponseMode]
+    val running             = run(testProbeSupervisor)
+    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
+
   }
 }

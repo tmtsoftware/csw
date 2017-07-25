@@ -19,10 +19,8 @@ abstract class JHcdActor[Msg <: DomainMsg](ctx: ActorContext[HcdMsg],
 
   def jInitialize(): CompletableFuture[Unit]
   def jOnInitialRun(): Unit
-  def jOnRunningHcdShutdownComplete(): Unit
   def jOnSetup(sc: Parameters.Setup): Unit
   def jOnDomainMsg(msg: Msg): Unit
-  def jOnInitialHcdShutdownComplete(): Unit
   def jOnShutdown(): Unit
   def jOnRestart(): Unit
   def jOnRun(): Unit
@@ -32,15 +30,11 @@ abstract class JHcdActor[Msg <: DomainMsg](ctx: ActorContext[HcdMsg],
 
   override def initialize(): Future[Unit] = jInitialize().toScala.map(_ ⇒ Unit)
 
-  override def onInitialRun(): Unit = jOnInitialRun()
-
-  override def onRunningHcdShutdownComplete(): Unit = jOnRunningHcdShutdownComplete()
+  override def onRun(): Unit = jOnInitialRun()
 
   override def onSetup(sc: Parameters.Setup): Unit = jOnSetup(sc)
 
   override def onDomainMsg(msg: Msg): Unit = jOnDomainMsg(msg)
-
-  override def onInitialHcdShutdownComplete(): Unit = jOnInitialHcdShutdownComplete()
 
   override def onShutdown(): Unit = jOnShutdown()
 
@@ -48,7 +42,7 @@ abstract class JHcdActor[Msg <: DomainMsg](ctx: ActorContext[HcdMsg],
 
   override def onRunOnline(): Unit = jOnRun()
 
-  override def onRunOffline(): Unit = jOnRunOffline()
+  override def onGoOffline(): Unit = jOnRunOffline()
 
   override def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit =
     jOnLifecycleFailureInfo(state, reason)

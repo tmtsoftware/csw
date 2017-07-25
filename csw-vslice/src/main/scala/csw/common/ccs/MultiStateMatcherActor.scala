@@ -67,7 +67,6 @@ class MultiStateMatcherActor(ctx: ActorContext[MultiStateMatcherMsgs],
           currentStateReceiver ! Unsubscribe(currentStateAdapter)
           replyTo ! CommandStatus.Completed
           ctx.stop(currentStateAdapter)
-          ctx.stop(ctx.self)
         } else {
           matchers = newMatchers
         }
@@ -77,6 +76,5 @@ class MultiStateMatcherActor(ctx: ActorContext[MultiStateMatcherMsgs],
       replyTo ! CommandStatus.Error("Current state matching timed out")
       currentStateReceiver ! Unsubscribe(currentStateAdapter)
       ctx.stop(currentStateAdapter)
-      ctx.stop(ctx.self)
   }
 }

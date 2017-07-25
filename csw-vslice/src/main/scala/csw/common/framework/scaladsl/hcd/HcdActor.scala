@@ -7,13 +7,7 @@ import csw.common.framework.models.HcdResponseMode.{Idle, Initialized, Running}
 import csw.common.framework.models.IdleHcdMsg.Initialize
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg._
-import csw.common.framework.models.ToComponentLifecycleMessage.{
-  LifecycleFailureInfo,
-  Restart,
-  RunOffline,
-  RunOnline,
-  Shutdown
-}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, LifecycleFailureInfo, Restart, Shutdown}
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.PubSubActor
 import csw.param.Parameters.Setup
@@ -33,20 +27,17 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
   implicit val ec: ExecutionContext = ctx.executionContext
 
   var mode: HcdResponseMode = Idle
-
   ctx.self ! Initialize
 
   def initialize(): Future[Unit]
-  def onInitialRun(): Unit
-  def onInitialHcdShutdownComplete(): Unit
-  def onRunningHcdShutdownComplete(): Unit
+  def onRun(): Unit
   def onSetup(sc: Setup): Unit
   def onDomainMsg(msg: Msg): Unit
 
   def onShutdown(): Unit
   def onRestart(): Unit
   def onRunOnline(): Unit
-  def onRunOffline(): Unit
+  def onGoOffline(): Unit
   def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit
   def onShutdownComplete(): Unit
 
@@ -71,16 +62,13 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
 
   private def onInitial(x: InitialHcdMsg): Unit = x match {
     case Run(replyTo) =>
-      onInitialRun()
+      onRun()
       val running = Running(ctx.self, pubSubRef)
       mode = running
       replyTo ! running
-    case HcdShutdownComplete =>
-      onInitialHcdShutdownComplete()
   }
 
   private def onRunning(x: RunningHcdMsg): Unit = x match {
-    case HcdShutdownComplete  => onRunningHcdShutdownComplete()
     case Lifecycle(message)   => onLifecycle(message)
     case Submit(command)      => onSetup(command)
     case DomainHcdMsg(y: Msg) ⇒ onDomainMsg(y)
@@ -97,12 +85,11 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
       onRestart()
       mode = Idle
       ctx.self ! Initialize
-    case RunOnline =>
-      onRunOnline()
-      mode = Running(ctx.self, pubSubRef)
-    case RunOffline =>
-      onRunOffline()
-      mode = Idle
+      ctx.self ! Run(supervisor)
+    case GoOffline =>
+      onGoOffline()
+      mode = Initialized(ctx.self, pubSubRef)
+      supervisor ! mode
     case LifecycleFailureInfo(state, reason) => onLifecycleFailureInfo(state, reason)
   }
 }

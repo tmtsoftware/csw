@@ -41,11 +41,7 @@ class TromboneHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMod
     stats = await(tromboneAxis ? GetStatistics)
   }
 
-  override def onInitialRun(): Unit = println("received Running")
-
-  override def onInitialHcdShutdownComplete(): Unit = println("received Shutdown complete during Initial context")
-
-  override def onRunningHcdShutdownComplete(): Unit = println("received Shutdown complete during Running state")
+  override def onRun(): Unit = println("received Running")
 
   override def onShutdown(): Unit = println("shutdown complete during Running context")
 
@@ -53,7 +49,7 @@ class TromboneHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMod
 
   override def onRunOnline(): Unit = println("Received running")
 
-  override def onRunOffline(): Unit = println("Received running offline")
+  override def onGoOffline(): Unit = println("Received running offline")
 
   override def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit =
     println(s"Received failed state: $state for reason: $reason")

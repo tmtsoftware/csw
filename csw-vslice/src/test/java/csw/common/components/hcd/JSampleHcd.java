@@ -12,7 +12,7 @@ import csw.param.Parameters;
 import java.util.concurrent.CompletableFuture;
 
 public class JSampleHcd extends JHcdActor<JHcdDomainMessages> {
-    public JSampleHcd(ActorContext<HcdMsg> ctx, ActorRef<HcdResponseMode> supervisor, Class<JHcdDomainMessages> klass) {
+    JSampleHcd(ActorContext<HcdMsg> ctx, ActorRef<HcdResponseMode> supervisor, Class<JHcdDomainMessages> klass) {
         super(ctx, supervisor, klass);
     }
 
@@ -27,16 +27,10 @@ public class JSampleHcd extends JHcdActor<JHcdDomainMessages> {
     public void jOnInitialRun() {}
 
     @Override
-    public void jOnRunningHcdShutdownComplete() { return; }
-
-    @Override
     public void jOnSetup(Parameters.Setup sc) {}
 
     @Override
     public void jOnDomainMsg(JHcdDomainMessages hcdSampleMessages) {}
-
-    @Override
-    public void jOnInitialHcdShutdownComplete() {}
 
     @Override
     public void jOnShutdown() {}

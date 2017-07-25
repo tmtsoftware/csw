@@ -26,8 +26,7 @@ sealed trait ToComponentLifecycleMessage
 object ToComponentLifecycleMessage {
   case object Shutdown                                                   extends ToComponentLifecycleMessage
   case object Restart                                                    extends ToComponentLifecycleMessage
-  case object RunOnline                                                  extends ToComponentLifecycleMessage
-  case object RunOffline                                                 extends ToComponentLifecycleMessage
+  case object GoOffline                                                  extends ToComponentLifecycleMessage
   case class LifecycleFailureInfo(state: LifecycleState, reason: String) extends ToComponentLifecycleMessage
 }
 
@@ -92,9 +91,6 @@ object RunningHcdMsg {
   case class Submit(command: Setup)                          extends RunningHcdMsg
   case class DomainHcdMsg[T <: DomainMsg](msg: T)            extends RunningHcdMsg
 }
-
-case object HcdShutdownComplete extends InitialHcdMsg with RunningHcdMsg
-case class StateUpdated()       extends HcdMsg
 
 //////////////////////////
 sealed trait AssemblyMsg

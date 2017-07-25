@@ -64,7 +64,6 @@ class FollowCommand(ac: AssemblyContext,
 
     case StopFollowing =>
       ctx.stop(followActor)
-      ctx.stop(ctx.self)
       this
 
     case m: FollowActorMessages =>
