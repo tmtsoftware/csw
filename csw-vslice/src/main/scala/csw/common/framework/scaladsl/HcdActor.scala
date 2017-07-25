@@ -2,7 +2,8 @@ package csw.common.framework.scaladsl
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{javadsl, ActorRef, Behavior}
-import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
+import csw.common.framework.models.HcdResponseMode.{Idle, Initialized, Running}
+import csw.common.framework.models.IdleHcdMsg.Initialize
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg._
 import csw.common.framework.models._
@@ -33,7 +34,9 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  var mode: HcdResponseMode = _
+  var mode: HcdResponseMode = Idle
+
+  ctx.self ! Initialize
 
   def initialize(): Future[Unit]
   def onInitialRun(): Unit
@@ -43,24 +46,26 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
   def onSetup(sc: Setup): Unit
   def onDomainMsg(msg: Msg): Unit
 
-  init
-
-  protected def init: Future[Unit] = async {
-    await(initialize())
-    mode = Initialized(ctx.self, pubSubRef)
-    supervisor ! Initialized(ctx.self, pubSubRef)
-  }
-
   override def onMessage(msg: HcdMsg): Behavior[HcdMsg] = {
     (mode, msg) match {
-      case (_: Initialized, x: InitialHcdMsg) ⇒ handleInitial(x)
-      case (_: Running, x: RunningHcdMsg)     ⇒ handleRunning(x)
+      case (Idle, x: IdleHcdMsg)              ⇒ onIdle(x)
+      case (_: Initialized, x: InitialHcdMsg) ⇒ onInitial(x)
+      case (_: Running, x: RunningHcdMsg)     ⇒ onRunning(x)
       case _                                  ⇒ println(s"current context=$mode does not handle message=$msg")
     }
     this
   }
 
-  private def handleInitial(x: InitialHcdMsg): Unit = x match {
+  private def onIdle(x: IdleHcdMsg): Unit = x match {
+    case Initialize =>
+      async {
+        await(initialize())
+        mode = Initialized(ctx.self, pubSubRef)
+        supervisor ! Initialized(ctx.self, pubSubRef)
+      }
+  }
+
+  private def onInitial(x: InitialHcdMsg): Unit = x match {
     case Run(replyTo) =>
       onInitialRun()
       mode = Running(ctx.self, pubSubRef)
@@ -69,7 +74,7 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
       onInitialHcdShutdownComplete()
   }
 
-  private def handleRunning(x: RunningHcdMsg): Unit = x match {
+  private def onRunning(x: RunningHcdMsg): Unit = x match {
     case HcdShutdownComplete  => onRunningHcdShutdownComplete()
     case Lifecycle(message)   => onLifecycle(message)
     case Submit(command)      => onSetup(command)

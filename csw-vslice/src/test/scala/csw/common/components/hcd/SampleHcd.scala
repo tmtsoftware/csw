@@ -28,7 +28,7 @@ class SampleHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode]
 
   override def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case Shutdown                            => supervisor ! ShutdownComplete
-    case Restart                             => init.map(_ ⇒ ())
+    case Restart                             =>
     case Run                                 =>
     case RunOffline                          =>
     case LifecycleFailureInfo(state, reason) =>

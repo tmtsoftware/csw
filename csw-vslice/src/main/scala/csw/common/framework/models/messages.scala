@@ -36,6 +36,7 @@ object ToComponentLifecycleMessage {
 sealed trait HcdResponseMode
 
 object HcdResponseMode {
+  case object Idle extends HcdResponseMode
   case class Initialized(hcdRef: ActorRef[InitialHcdMsg], pubSubRef: ActorRef[PubSub[CurrentState]])
       extends HcdResponseMode
   case class Running(hcdRef: ActorRef[RunningHcdMsg], pubSubRef: ActorRef[PubSub[CurrentState]]) extends HcdResponseMode
@@ -75,6 +76,11 @@ trait DomainMsg
 ///////////////
 
 sealed trait HcdMsg
+
+sealed trait IdleHcdMsg extends HcdMsg
+object IdleHcdMsg {
+  case object Initialize extends IdleHcdMsg
+}
 
 sealed trait InitialHcdMsg extends HcdMsg
 object InitialHcdMsg {
