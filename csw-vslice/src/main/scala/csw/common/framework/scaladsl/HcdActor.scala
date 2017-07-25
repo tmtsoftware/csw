@@ -1,7 +1,7 @@
 package csw.common.framework.scaladsl
 
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{javadsl, ActorRef, Behavior}
+import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.models.HcdResponseMode.{Idle, Initialized, Running}
 import csw.common.framework.models.IdleHcdMsg.Initialize
 import csw.common.framework.models.InitialHcdMsg.Run
@@ -24,9 +24,6 @@ abstract class HcdActorFactory[Msg <: DomainMsg: ClassTag] {
 
 abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode])
     extends Actor.MutableBehavior[HcdMsg] {
-
-  def this(ctx: javadsl.ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode]) =
-    this(ctx.asScala, supervisor)
 
   val domainAdapter: ActorRef[Msg] = ctx.spawnAdapter(DomainHcdMsg.apply)
 
