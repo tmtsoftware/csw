@@ -32,16 +32,14 @@ public class JSampleAssembly extends JAssemblyActor<JAssemblyDomainMessages> {
     }
 
     @Override
-    public CompletableFuture<Void> jInitialize() {
-        CompletableFuture<Void> completableFuture = new CompletableFuture<>();
+    public CompletableFuture jInitialize() {
+        CompletableFuture completableFuture = new CompletableFuture();
         completableFuture.complete(null);
         return completableFuture;
     }
 
     @Override
-    public Void jOnRun() {
-        return null;
-    }
+    public void jOnRun() {}
 
     @Override
     public Validation.Validation jSetup(Parameters.Setup s, Optional<ActorRef<CommandStatus.CommandResponse>> commandOriginator) {
@@ -54,12 +52,8 @@ public class JSampleAssembly extends JAssemblyActor<JAssemblyDomainMessages> {
     }
 
     @Override
-    public Void jOnDomainMsg(JAssemblyDomainMessages jAssemblyDomainMessages) {
-        return null;
-    }
+    public void jOnDomainMsg(JAssemblyDomainMessages jAssemblyDomainMessages) {}
 
     @Override
-    public Void jOnLifecycle(ToComponentLifecycleMessage message) {
-        return null;
-    }
+    public void jOnLifecycle(ToComponentLifecycleMessage message) {}
 }

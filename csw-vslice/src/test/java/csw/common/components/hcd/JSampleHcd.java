@@ -17,46 +17,42 @@ public class JSampleHcd extends JHcdActor<JHcdDomainMessages> {
     }
 
     @Override
-    public CompletableFuture<Void> jInitialize() {
-        CompletableFuture<Void> completableFuture = new CompletableFuture<>();
+    public CompletableFuture jInitialize() {
+        CompletableFuture completableFuture = new CompletableFuture();
         completableFuture.complete(null);
         return completableFuture;
     }
 
     @Override
-    public Void jOnInitialRun() {
-        return null;
-    }
+    public void jOnInitialRun() {}
 
     @Override
-    public Void jOnRunningHcdShutdownComplete() { return null; }
+    public void jOnRunningHcdShutdownComplete() { return; }
 
     @Override
-    public Void jOnSetup(Parameters.Setup sc) {
-        return null;
-    }
+    public void jOnSetup(Parameters.Setup sc) {}
 
     @Override
-    public Void jOnDomainMsg(JHcdDomainMessages hcdSampleMessages) { return null; }
+    public void jOnDomainMsg(JHcdDomainMessages hcdSampleMessages) {}
 
     @Override
-    public Void jOnInitialHcdShutdownComplete() { return null; }
+    public void jOnInitialHcdShutdownComplete() {}
 
     @Override
-    public Void jOnShutdown() { return null; }
+    public void jOnShutdown() {}
 
     @Override
-    public Void jOnRestart() { return null; }
+    public void jOnRestart() {}
 
     @Override
-    public Void jOnRun() { return null; }
+    public void jOnRun() {}
 
     @Override
-    public Void jOnRunOffline() { return null; }
+    public void jOnRunOffline() {}
 
     @Override
-    public Void jOnLifecycleFailureInfo(LifecycleState state, String reason) { return null; }
+    public void jOnLifecycleFailureInfo(LifecycleState state, String reason) {}
 
     @Override
-    public Void jOnShutdownComplete() { return null; }
+    public void jOnShutdownComplete() {}
 }

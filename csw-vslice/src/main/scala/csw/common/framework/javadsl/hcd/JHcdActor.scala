@@ -17,18 +17,18 @@ abstract class JHcdActor[Msg <: DomainMsg](ctx: ActorContext[HcdMsg],
                                            klass: Class[Msg])
     extends HcdActor[Msg](ctx.asScala, supervisor)(ClassTag(klass)) {
 
-  def jInitialize(): CompletableFuture[Void]
-  def jOnInitialRun(): Void
-  def jOnRunningHcdShutdownComplete(): Void
-  def jOnSetup(sc: Parameters.Setup): Void
-  def jOnDomainMsg(msg: Msg): Void
-  def jOnInitialHcdShutdownComplete(): Void
-  def jOnShutdown(): Void
-  def jOnRestart(): Void
-  def jOnRun(): Void
-  def jOnRunOffline(): Void
-  def jOnLifecycleFailureInfo(state: LifecycleState, reason: String): Void
-  def jOnShutdownComplete(): Void
+  def jInitialize(): CompletableFuture[Unit]
+  def jOnInitialRun(): Unit
+  def jOnRunningHcdShutdownComplete(): Unit
+  def jOnSetup(sc: Parameters.Setup): Unit
+  def jOnDomainMsg(msg: Msg): Unit
+  def jOnInitialHcdShutdownComplete(): Unit
+  def jOnShutdown(): Unit
+  def jOnRestart(): Unit
+  def jOnRun(): Unit
+  def jOnRunOffline(): Unit
+  def jOnLifecycleFailureInfo(state: LifecycleState, reason: String): Unit
+  def jOnShutdownComplete(): Unit
 
   override def initialize(): Future[Unit] = jInitialize().toScala.map(_ ⇒ Unit)
 

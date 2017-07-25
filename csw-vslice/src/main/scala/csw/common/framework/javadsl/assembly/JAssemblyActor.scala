@@ -21,13 +21,13 @@ abstract class JAssemblyActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[Asse
                                                           supervisor: ActorRef[AssemblyComponentLifecycleMessage])
     extends AssemblyActor[Msg](ctx.asScala, assemblyInfo, supervisor) {
 
-  def jInitialize(): CompletableFuture[Void]
-  def jOnRun(): Void
+  def jInitialize(): CompletableFuture[Unit]
+  def jOnRun(): Unit
   def jSetup(s: Parameters.Setup,
              commandOriginator: Optional[ActorRef[CommandStatus.CommandResponse]]): Validation.Validation
   def jObserve(o: Parameters.Observe, replyTo: Optional[ActorRef[CommandStatus.CommandResponse]]): Validation.Validation
-  def jOnDomainMsg(msg: Msg): Void
-  def jOnLifecycle(message: ToComponentLifecycleMessage): Void
+  def jOnDomainMsg(msg: Msg): Unit
+  def jOnLifecycle(message: ToComponentLifecycleMessage): Unit
 
   implicit val ec                         = ctx.getExecutionContext
   override def initialize(): Future[Unit] = jInitialize().toScala.map(_ ⇒ Unit)
