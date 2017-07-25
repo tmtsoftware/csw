@@ -120,4 +120,32 @@ class CustomAppenderTest extends FunSuite with Matchers {
 
     Await.result(actorSystem.terminate(), 10.seconds)
   }
+
+  // Added this test to show that custom appender config file changes work
+  test("should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder showing config changes") {
+
+    val config = ConfigFactory.parseString("""
+                                             |csw-logging {
+                                             | appenders = ["csw.services.logging.appenders.CustomAppenderBuilderClass"]
+                                             | appender-config {
+                                             |   my-fav-appender {
+                                             |     logIpAddress = false
+                                             |   }
+                                             | }
+                                             |}
+                                           """.stripMargin)
+
+    val actorSystem    = ActorSystem("test", config)
+    val loggingSystem  = LoggingSystemFactory.start("foo-name", "foo-version", hostName, actorSystem)
+    val customAppender = new CustomAppenderBuilderClass
+    loggingSystem.setAppenders(List(customAppender))
+
+    new MyFavComponent().startLogging()
+    Thread.sleep(200)
+    customAppender.logBuffer.size shouldBe 4
+
+    customAppender.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe false
+
+    Await.result(actorSystem.terminate(), 10.seconds)
+  }
 }
