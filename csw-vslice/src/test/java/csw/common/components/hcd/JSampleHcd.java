@@ -4,7 +4,7 @@ import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.common.components.hcd.messages.HcdSampleMessages;
 import csw.common.framework.javadsl.JHcdActor;
-import csw.common.framework.models.HcdComponentLifecycleMessage;
+import csw.common.framework.models.HcdResponseMode;
 import csw.common.framework.models.HcdMsg;
 import csw.common.framework.models.ToComponentLifecycleMessage;
 import csw.param.Parameters;
@@ -12,7 +12,7 @@ import csw.param.Parameters;
 import java.util.concurrent.CompletableFuture;
 
 public class JSampleHcd extends JHcdActor<HcdSampleMessages> {
-    public JSampleHcd(ActorContext<HcdMsg> ctx, ActorRef<HcdComponentLifecycleMessage> supervisor, Class<HcdSampleMessages> klass) {
+    public JSampleHcd(ActorContext<HcdMsg> ctx, ActorRef<HcdResponseMode> supervisor, Class<HcdSampleMessages> klass) {
         super(ctx, supervisor, klass);
     }
 

@@ -2,11 +2,10 @@ package csw.common.framework.scaladsl
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{javadsl, ActorRef, Behavior}
-import csw.common.framework.models.HcdComponentLifecycleMessage.{Initialized, Running}
+import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg._
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.HcdActor.Mode
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 
@@ -16,25 +15,16 @@ import scala.reflect.ClassTag
 
 abstract class HcdActorFactory[Msg <: DomainMsg: ClassTag] {
 
-  protected def make(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage]): HcdActor[Msg]
+  protected def make(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode]): HcdActor[Msg]
 
-  def behaviour(supervisor: ActorRef[HcdComponentLifecycleMessage]): Behavior[Nothing] =
+  def behaviour(supervisor: ActorRef[HcdResponseMode]): Behavior[Nothing] =
     Actor.mutable[HcdMsg](ctx ⇒ make(ctx, supervisor)).narrow
 }
 
-object HcdActor {
-  sealed trait Mode
-  object Mode {
-    case object Initial extends Mode
-    case object Running extends Mode
-  }
-}
-
-abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
-                                                    supervisor: ActorRef[HcdComponentLifecycleMessage])
+abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode])
     extends Actor.MutableBehavior[HcdMsg] {
 
-  def this(ctx: javadsl.ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage]) =
+  def this(ctx: javadsl.ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode]) =
     this(ctx.asScala, supervisor)
 
   val domainAdapter: ActorRef[Msg] = ctx.spawnAdapter(DomainHcdMsg.apply)
@@ -43,7 +33,7 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  var context: Mode = _
+  var mode: HcdResponseMode = _
 
   def initialize(): Future[Unit]
   def onInitialRun(): Unit
@@ -57,15 +47,15 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
 
   protected def init: Future[Unit] = async {
     await(initialize())
+    mode = Initialized(ctx.self, pubSubRef)
     supervisor ! Initialized(ctx.self, pubSubRef)
-    context = Mode.Initial //TODO: Is this thread safe?
   }
 
   override def onMessage(msg: HcdMsg): Behavior[HcdMsg] = {
-    (context, msg) match {
-      case (Mode.Initial, x: InitialHcdMsg) ⇒ handleInitial(x)
-      case (Mode.Running, x: RunningHcdMsg) ⇒ handleRunning(x)
-      case _                                ⇒ println(s"current context=$context does not handle message=$msg")
+    (mode, msg) match {
+      case (_: Initialized, x: InitialHcdMsg) ⇒ handleInitial(x)
+      case (_: Running, x: RunningHcdMsg)     ⇒ handleRunning(x)
+      case _                                  ⇒ println(s"current context=$mode does not handle message=$msg")
     }
     this
   }
@@ -73,7 +63,7 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
   private def handleInitial(x: InitialHcdMsg): Unit = x match {
     case Run(replyTo) =>
       onInitialRun()
-      context = Mode.Running
+      mode = Running(ctx.self, pubSubRef)
       replyTo ! Running(ctx.self, pubSubRef)
     case HcdShutdownComplete =>
       onInitialHcdShutdownComplete()

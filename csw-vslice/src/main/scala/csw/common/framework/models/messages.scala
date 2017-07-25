@@ -2,7 +2,7 @@ package csw.common.framework.models
 
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.models.HcdComponentLifecycleMessage.Running
+import csw.common.framework.models.HcdResponseMode.Running
 import csw.param.Parameters.{ControlCommand, Setup}
 import csw.param.StateVariable.CurrentState
 import csw.trombone.assembly.actors.TromboneStateActor.StateWasSet
@@ -33,13 +33,12 @@ object ToComponentLifecycleMessage {
 
 ///////////////
 
-sealed trait HcdComponentLifecycleMessage
+sealed trait HcdResponseMode
 
-object HcdComponentLifecycleMessage {
+object HcdResponseMode {
   case class Initialized(hcdRef: ActorRef[InitialHcdMsg], pubSubRef: ActorRef[PubSub[CurrentState]])
-      extends HcdComponentLifecycleMessage
-  case class Running(hcdRef: ActorRef[RunningHcdMsg], pubSubRef: ActorRef[PubSub[CurrentState]])
-      extends HcdComponentLifecycleMessage
+      extends HcdResponseMode
+  case class Running(hcdRef: ActorRef[RunningHcdMsg], pubSubRef: ActorRef[PubSub[CurrentState]]) extends HcdResponseMode
 }
 
 sealed trait AssemblyComponentLifecycleMessage
@@ -49,7 +48,7 @@ object AssemblyComponentLifecycleMessage {
   case class Running(assemblyRef: ActorRef[RunningAssemblyMsg])     extends AssemblyComponentLifecycleMessage
 }
 
-sealed trait FromComponentLifecycleMessage extends HcdComponentLifecycleMessage with AssemblyComponentLifecycleMessage
+sealed trait FromComponentLifecycleMessage extends HcdResponseMode with AssemblyComponentLifecycleMessage
 
 object FromComponentLifecycleMessage {
   case class InitializeFailure(reason: String) extends FromComponentLifecycleMessage
@@ -90,6 +89,7 @@ object RunningHcdMsg {
 }
 
 case object HcdShutdownComplete extends InitialHcdMsg with RunningHcdMsg
+case class StateUpdated()       extends HcdMsg
 
 //////////////////////////
 sealed trait AssemblyMsg

@@ -5,7 +5,7 @@ import akka.typed.javadsl.ActorContext;
 import csw.common.components.hcd.messages.HcdSampleMessages;
 import csw.common.framework.javadsl.JHcdActor;
 import csw.common.framework.javadsl.JHcdActorFactory;
-import csw.common.framework.models.HcdComponentLifecycleMessage;
+import csw.common.framework.models.HcdResponseMode;
 import csw.common.framework.models.HcdMsg;
 
 public class JSampleHcdFactory extends JHcdActorFactory<HcdSampleMessages> {
@@ -17,7 +17,7 @@ public class JSampleHcdFactory extends JHcdActorFactory<HcdSampleMessages> {
     }
 
     @Override
-    public JHcdActor<HcdSampleMessages> make(ActorContext<HcdMsg> ctx, ActorRef<HcdComponentLifecycleMessage> supervisor) {
+    public JHcdActor<HcdSampleMessages> make(ActorContext<HcdMsg> ctx, ActorRef<HcdResponseMode> supervisor) {
         return new JSampleHcd(ctx, supervisor, klass);
     }
 }

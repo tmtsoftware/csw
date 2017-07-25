@@ -9,13 +9,13 @@ import csw.common.framework.models.ToComponentLifecycleMessage.{
   RunOffline,
   Shutdown
 }
-import csw.common.framework.models.{HcdComponentLifecycleMessage, HcdMsg, ShutdownComplete, ToComponentLifecycleMessage}
+import csw.common.framework.models.{HcdMsg, HcdResponseMode, ShutdownComplete, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.HcdActor
 import csw.param.Parameters
 
 import scala.concurrent.Future
 
-class SampleHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage])
+class SampleHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode])
     extends HcdActor[HcdDomainMessage](ctx, supervisor) {
 
   override def initialize(): Future[Unit] = Future.unit

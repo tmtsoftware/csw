@@ -45,7 +45,7 @@ object SampleAssembly {
     Actor.mutable[AssemblyMsg](assemblyFactory)
   }
 
-  def behaviour(hcdInfo: HcdInfo, supervisor: ActorRef[HcdComponentLifecycleMessage]): Behavior[Nothing] = {
+  def behaviour(hcdInfo: HcdInfo, supervisor: ActorRef[HcdResponseMode]): Behavior[Nothing] = {
     val hcdClass   = Class.forName(hcdInfo.componentClassName + "Factory")
     val hcdFactory = hcdClass.newInstance().asInstanceOf[HcdActorFactory[_]]
     hcdFactory.behaviour(supervisor)

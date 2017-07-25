@@ -11,7 +11,7 @@ import akka.util.Timeout;
 import csw.common.components.hcd.JSampleHcdFactory;
 import csw.common.components.hcd.messages.HcdSampleMessages;
 import csw.common.framework.javadsl.JClassTag;
-import csw.common.framework.models.HcdComponentLifecycleMessage;
+import csw.common.framework.models.HcdResponseMode;
 import csw.common.framework.models.InitialHcdMsg;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class JHcdActorTest {
 
         TestKitSettings testKitSettings = TestKitSettings.apply(actorSystem);
 
-        TestProbe<HcdComponentLifecycleMessage> supervisorProbe = new TestProbe<HcdComponentLifecycleMessage>(
+        TestProbe<HcdResponseMode> supervisorProbe = new TestProbe<HcdResponseMode>(
                 "supervisor-probe",
                 actorSystem,
                 testKitSettings);
@@ -43,17 +43,17 @@ public class JHcdActorTest {
         Future<ActorRef<Nothing$>> hcdMsgActorRefF = actorSystem.systemActorOf(hcdMsgBehavior, "ddd", Props.empty(), Timeout.apply(5, TimeUnit.SECONDS));
         ActorRef<Nothing$> hcdMsgActorRef = Await.result(hcdMsgActorRefF, Duration.create(5, TimeUnit.SECONDS));
 
-        ClassTag<HcdComponentLifecycleMessage.Initialized> initializedClassTag = JClassTag.make(HcdComponentLifecycleMessage.Initialized.class);
-        HcdComponentLifecycleMessage.Initialized initialized = supervisorProbe.expectMsgType(FiniteDuration.apply(5, TimeUnit.SECONDS), initializedClassTag);
+        ClassTag<HcdResponseMode.Initialized> initializedClassTag = JClassTag.make(HcdResponseMode.Initialized.class);
+        HcdResponseMode.Initialized initialized = supervisorProbe.expectMsgType(FiniteDuration.apply(5, TimeUnit.SECONDS), initializedClassTag);
 
         Assert.assertEquals(hcdMsgActorRef, initialized.hcdRef());
 
-        ActorRef<HcdComponentLifecycleMessage.Running> replyTo = supervisorProbe.ref().narrow();
+        ActorRef<HcdResponseMode.Running> replyTo = supervisorProbe.ref().narrow();
         initialized.hcdRef().tell(new InitialHcdMsg.Run(replyTo));
 
 
-        ClassTag<HcdComponentLifecycleMessage.Running> runningClassTag = JClassTag.make(HcdComponentLifecycleMessage.Running.class);
-        HcdComponentLifecycleMessage.Running running = supervisorProbe.expectMsgType(FiniteDuration.apply(5, TimeUnit.SECONDS), runningClassTag);
+        ClassTag<HcdResponseMode.Running> runningClassTag = JClassTag.make(HcdResponseMode.Running.class);
+        HcdResponseMode.Running running = supervisorProbe.expectMsgType(FiniteDuration.apply(5, TimeUnit.SECONDS), runningClassTag);
 
         Assert.assertEquals(hcdMsgActorRef, running.hcdRef());
     }

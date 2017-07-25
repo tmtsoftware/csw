@@ -10,7 +10,7 @@ import csw.common.ccs.CommandStatus._
 import csw.common.ccs.Validation.{RequiredHCDUnavailableIssue, UnsupportedCommandInStateIssue, WrongInternalStateIssue}
 import csw.common.framework.models.CommandMsgs
 import csw.common.framework.models.CommandMsgs.StopCurrentCommand
-import csw.common.framework.models.HcdComponentLifecycleMessage.Running
+import csw.common.framework.models.HcdResponseMode.Running
 import csw.param.Parameters.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.TromboneCommandHandlerMsgs._

@@ -7,7 +7,7 @@ import csw.common.ccs.CommandStatus.{Completed, Error, NoLongerValid}
 import csw.common.ccs.Validation.WrongInternalStateIssue
 import csw.common.framework.models.CommandMsgs
 import csw.common.framework.models.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
-import csw.common.framework.models.HcdComponentLifecycleMessage.Running
+import csw.common.framework.models.HcdResponseMode.Running
 import csw.common.framework.models.RunningHcdMsg.Submit
 import csw.param.Parameters.Setup
 import csw.param.UnitsOfMeasure.encoder

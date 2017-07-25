@@ -7,13 +7,13 @@ import akka.typed.{ActorRef, ActorSystem, Behavior}
 import csw.sample.Messages.Command.IdleCommand.Initialize
 import csw.sample.Messages.Command.InitializedCommand.{Add, Reset}
 import csw.sample.Messages.Command.{GetMode, IdleCommand, InitializedCommand, Stop}
-import csw.sample.Messages.Mode.{Idle, Initialized}
-import csw.sample.Messages.{Command, Mode}
+import csw.sample.Messages.ResponseMode.{Idle, Initialized}
+import csw.sample.Messages.{Command, ResponseMode}
 
 object Messages {
   sealed trait Command
   object Command {
-    case class GetMode(replyTo: ActorRef[Mode]) extends Command
+    case class GetMode(replyTo: ActorRef[ResponseMode]) extends Command
 
     sealed trait IdleCommand extends Command
     object IdleCommand {
@@ -29,10 +29,10 @@ object Messages {
     case object Stop extends IdleCommand with InitializedCommand
   }
 
-  sealed trait Mode
-  object Mode {
-    case class Idle(ref: ActorRef[IdleCommand])               extends Mode
-    case class Initialized(ref: ActorRef[InitializedCommand]) extends Mode
+  sealed trait ResponseMode
+  object ResponseMode {
+    case class Idle(ref: ActorRef[IdleCommand])               extends ResponseMode
+    case class Initialized(ref: ActorRef[InitializedCommand]) extends ResponseMode
   }
 }
 
@@ -42,8 +42,8 @@ object Aggregator {
 
 class Aggregator(ctx: ActorContext[Command]) extends MutableBehavior[Command] {
 
-  var mode: Mode = Idle(ctx.self)
-  var sum: Int   = 0
+  var mode: ResponseMode = Idle(ctx.self)
+  var sum: Int           = 0
 
   override def onMessage(msg: Command): Behavior[Command] = {
     (mode, msg) match {
@@ -82,7 +82,7 @@ class Aggregator(ctx: ActorContext[Command]) extends MutableBehavior[Command] {
 }
 
 object Client {
-  def behavior(count: Int): Behavior[Mode] = Actor.immutable[Mode] {
+  def behavior(count: Int): Behavior[ResponseMode] = Actor.immutable[ResponseMode] {
     case (ctx, msg) ⇒
       msg match {
         case Idle(ref) ⇒

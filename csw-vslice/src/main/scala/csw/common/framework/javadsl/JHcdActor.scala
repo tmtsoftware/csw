@@ -18,14 +18,14 @@ object JClassTag {
 }
 
 abstract class JHcdActorFactory[Msg <: DomainMsg](klass: Class[Msg]) {
-  def make(ctx: javadsl.ActorContext[HcdMsg], supervisor: ActorRef[HcdComponentLifecycleMessage]): JHcdActor[Msg]
+  def make(ctx: javadsl.ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode]): JHcdActor[Msg]
 
-  def behaviour(supervisor: ActorRef[HcdComponentLifecycleMessage]): Behavior[Nothing] =
+  def behaviour(supervisor: ActorRef[HcdResponseMode]): Behavior[Nothing] =
     Actor.mutable[HcdMsg](ctx ⇒ make(ctx.asJava, supervisor)).narrow
 }
 
 abstract class JHcdActor[Msg <: DomainMsg](ctx: ActorContext[HcdMsg],
-                                           supervisor: ActorRef[HcdComponentLifecycleMessage],
+                                           supervisor: ActorRef[HcdResponseMode],
                                            klass: Class[Msg])
     extends HcdActor[Msg](ctx.asScala, supervisor)(ClassTag(klass)) {
 
