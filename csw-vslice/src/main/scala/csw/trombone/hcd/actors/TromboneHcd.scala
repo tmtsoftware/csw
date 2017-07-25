@@ -5,13 +5,6 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
-import csw.common.framework.models.ToComponentLifecycleMessage.{
-  LifecycleFailureInfo,
-  Restart,
-  Run,
-  RunOffline,
-  Shutdown
-}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl._
 import csw.param.Parameters.Setup
@@ -52,18 +45,20 @@ class TromboneHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMod
 
   override def onInitialHcdShutdownComplete(): Unit = println("received Shutdown complete during Initial context")
 
-  override def onRunningHcdShutdownComplete(): Unit = println("received Shutdown complete during Initial state")
+  override def onRunningHcdShutdownComplete(): Unit = println("received Shutdown complete during Running state")
 
-  def onLifecycle(x: ToComponentLifecycleMessage): Unit = x match {
-    case Shutdown =>
-      println("Received doshutdown")
-      supervisor ! ShutdownComplete
-    case Restart                             => println("Received do restart")
-    case Run                                 => println("Received running")
-    case RunOffline                          => println("Received running offline")
-    case LifecycleFailureInfo(state, reason) => println(s"Received failed state: $state for reason: $reason")
-    case ShutdownComplete                    => println("shutdown complete during Running context")
-  }
+  override def onShutdown(): Unit = println("shutdown complete during Running context")
+
+  override def onRestart(): Unit = println("Received do restart")
+
+  override def onRunOnline(): Unit = println("Received running")
+
+  override def onRunOffline(): Unit = println("Received running offline")
+
+  override def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit =
+    println(s"Received failed state: $state for reason: $reason")
+
+  override def onShutdownComplete(): Unit = println("received Shutdown complete during Running state")
 
   def onSetup(sc: Setup): Unit = {
     import csw.trombone.hcd.TromboneHcdState._

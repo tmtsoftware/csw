@@ -4,9 +4,9 @@ import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.common.components.hcd.messages.HcdSampleMessages;
 import csw.common.framework.javadsl.JHcdActor;
-import csw.common.framework.models.HcdResponseMode;
 import csw.common.framework.models.HcdMsg;
-import csw.common.framework.models.ToComponentLifecycleMessage;
+import csw.common.framework.models.HcdResponseMode;
+import csw.common.framework.models.LifecycleState;
 import csw.param.Parameters;
 
 import java.util.concurrent.CompletableFuture;
@@ -43,5 +43,20 @@ public class JSampleHcd extends JHcdActor<HcdSampleMessages> {
     public Void jOnInitialHcdShutdownComplete() { return null; }
 
     @Override
-    public Void jOnLifecycle(ToComponentLifecycleMessage message) { return null; }
+    public Void jOnShutdown() { return null; }
+
+    @Override
+    public Void jOnRestart() { return null; }
+
+    @Override
+    public Void jOnRun() { return null; }
+
+    @Override
+    public Void jOnRunOffline() { return null; }
+
+    @Override
+    public Void jOnLifecycleFailureInfo(LifecycleState state, String reason) { return null; }
+
+    @Override
+    public Void jOnShutdownComplete() { return null; }
 }

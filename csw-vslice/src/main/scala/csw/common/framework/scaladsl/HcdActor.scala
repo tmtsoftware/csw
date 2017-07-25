@@ -2,11 +2,19 @@ package csw.common.framework.scaladsl
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
+import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
 import csw.common.framework.models.HcdResponseMode.{Idle, Initialized, Running}
 import csw.common.framework.models.IdleHcdMsg.Initialize
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg._
-import csw.common.framework.models._
+import csw.common.framework.models.ToComponentLifecycleMessage.{
+  LifecycleFailureInfo,
+  Restart,
+  RunOffline,
+  RunOnline,
+  Shutdown
+}
+import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 
@@ -39,9 +47,15 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
   def onInitialRun(): Unit
   def onInitialHcdShutdownComplete(): Unit
   def onRunningHcdShutdownComplete(): Unit
-  def onLifecycle(message: ToComponentLifecycleMessage): Unit
   def onSetup(sc: Setup): Unit
   def onDomainMsg(msg: Msg): Unit
+
+  def onShutdown(): Unit
+  def onRestart(): Unit
+  def onRunOnline(): Unit
+  def onRunOffline(): Unit
+  def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit
+  def onShutdownComplete(): Unit
 
   override def onMessage(msg: HcdMsg): Behavior[HcdMsg] = {
     (mode, msg) match {
@@ -58,15 +72,16 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
       async {
         await(initialize())
         mode = Initialized(ctx.self, pubSubRef)
-        supervisor ! Initialized(ctx.self, pubSubRef)
+        supervisor ! mode
       }
   }
 
   private def onInitial(x: InitialHcdMsg): Unit = x match {
     case Run(replyTo) =>
       onInitialRun()
-      mode = Running(ctx.self, pubSubRef)
-      replyTo ! Running(ctx.self, pubSubRef)
+      val running = Running(ctx.self, pubSubRef)
+      mode = running
+      replyTo ! running
     case HcdShutdownComplete =>
       onInitialHcdShutdownComplete()
   }
@@ -77,5 +92,26 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
     case Submit(command)      => onSetup(command)
     case DomainHcdMsg(y: Msg) ⇒ onDomainMsg(y)
     case DomainHcdMsg(y)      ⇒ println(s"unhandled domain msg: $y")
+  }
+
+  private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
+    case Shutdown =>
+      onShutdown()
+      supervisor ! ShutdownComplete
+      val b1 = ctx.stop(domainAdapter)
+      val b2 = ctx.stop(pubSubRef)
+      val b3 = ctx.stop(supervisor)
+      println((b1, b2, b3))
+    case Restart =>
+      onRestart()
+      mode = Idle
+      ctx.self ! Initialize
+    case RunOnline =>
+      onRunOnline()
+      mode = Running(ctx.self, pubSubRef)
+    case RunOffline =>
+      onRunOffline()
+      mode = Idle
+    case LifecycleFailureInfo(state, reason) => onLifecycleFailureInfo(state, reason)
   }
 }

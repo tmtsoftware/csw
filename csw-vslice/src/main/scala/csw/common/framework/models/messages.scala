@@ -26,7 +26,7 @@ sealed trait ToComponentLifecycleMessage
 object ToComponentLifecycleMessage {
   case object Shutdown                                                   extends ToComponentLifecycleMessage
   case object Restart                                                    extends ToComponentLifecycleMessage
-  case object Run                                                        extends ToComponentLifecycleMessage
+  case object RunOnline                                                  extends ToComponentLifecycleMessage
   case object RunOffline                                                 extends ToComponentLifecycleMessage
   case class LifecycleFailureInfo(state: LifecycleState, reason: String) extends ToComponentLifecycleMessage
 }
@@ -55,9 +55,8 @@ object FromComponentLifecycleMessage {
   case class InitializeFailure(reason: String) extends FromComponentLifecycleMessage
   case class ShutdownFailure(reason: String)   extends FromComponentLifecycleMessage
   case object HaltComponent                    extends FromComponentLifecycleMessage
+  case object ShutdownComplete                 extends FromComponentLifecycleMessage
 }
-
-case object ShutdownComplete extends FromComponentLifecycleMessage with ToComponentLifecycleMessage
 
 /////////////
 
