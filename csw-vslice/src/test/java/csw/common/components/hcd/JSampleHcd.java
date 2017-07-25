@@ -2,7 +2,7 @@ package csw.common.components.hcd;
 
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
-import csw.common.components.hcd.messages.HcdSampleMessages;
+import csw.common.components.hcd.messages.JHcdDomainMessages;
 import csw.common.framework.javadsl.JHcdActor;
 import csw.common.framework.models.HcdMsg;
 import csw.common.framework.models.HcdResponseMode;
@@ -11,8 +11,8 @@ import csw.param.Parameters;
 
 import java.util.concurrent.CompletableFuture;
 
-public class JSampleHcd extends JHcdActor<HcdSampleMessages> {
-    public JSampleHcd(ActorContext<HcdMsg> ctx, ActorRef<HcdResponseMode> supervisor, Class<HcdSampleMessages> klass) {
+public class JSampleHcd extends JHcdActor<JHcdDomainMessages> {
+    public JSampleHcd(ActorContext<HcdMsg> ctx, ActorRef<HcdResponseMode> supervisor, Class<JHcdDomainMessages> klass) {
         super(ctx, supervisor, klass);
     }
 
@@ -37,7 +37,7 @@ public class JSampleHcd extends JHcdActor<HcdSampleMessages> {
     }
 
     @Override
-    public Void jOnDomainMsg(HcdSampleMessages hcdSampleMessages) { return null; }
+    public Void jOnDomainMsg(JHcdDomainMessages hcdSampleMessages) { return null; }
 
     @Override
     public Void jOnInitialHcdShutdownComplete() { return null; }

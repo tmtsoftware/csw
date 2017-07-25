@@ -9,7 +9,7 @@ import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
 import akka.util.Timeout;
 import csw.common.components.hcd.JSampleHcdFactory;
-import csw.common.components.hcd.messages.HcdSampleMessages;
+import csw.common.components.hcd.messages.JHcdDomainMessages;
 import csw.common.framework.javadsl.JClassTag;
 import csw.common.framework.models.HcdResponseMode;
 import csw.common.framework.models.InitialHcdMsg;
@@ -38,7 +38,7 @@ public class JHcdActorTest {
                 testKitSettings);
 
 
-        Behavior<Nothing$> hcdMsgBehavior = new JSampleHcdFactory(HcdSampleMessages.class).behaviour(supervisorProbe.ref()).narrow();
+        Behavior<Nothing$> hcdMsgBehavior = new JSampleHcdFactory(JHcdDomainMessages.class).behaviour(supervisorProbe.ref()).narrow();
 
         Future<ActorRef<Nothing$>> hcdMsgActorRefF = actorSystem.systemActorOf(hcdMsgBehavior, "ddd", Props.empty(), Timeout.apply(5, TimeUnit.SECONDS));
         ActorRef<Nothing$> hcdMsgActorRef = Await.result(hcdMsgActorRefF, Duration.create(5, TimeUnit.SECONDS));
