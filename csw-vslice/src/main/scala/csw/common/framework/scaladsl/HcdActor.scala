@@ -98,10 +98,8 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
     case Shutdown =>
       onShutdown()
       supervisor ! ShutdownComplete
-      val b1 = ctx.stop(domainAdapter)
-      val b2 = ctx.stop(pubSubRef)
-      val b3 = ctx.stop(supervisor)
-      println((b1, b2, b3))
+      ctx.stop(domainAdapter)
+      ctx.stop(pubSubRef)
     case Restart =>
       onRestart()
       mode = Idle
