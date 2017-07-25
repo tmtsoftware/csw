@@ -1,16 +1,16 @@
 package csw.common.framework
 
-import akka.typed.{ActorSystem, Behavior, PostStop, Signal}
+import akka.typed.ActorSystem
 import akka.typed.scaladsl.Actor
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.common.components.hcd._
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
-import csw.common.framework.models.HcdResponseMode.{Idle, Initialized, Running}
+import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg.{DomainHcdMsg, Lifecycle}
-import csw.common.framework.models.{HcdMsg, HcdResponseMode, ToComponentLifecycleMessage}
+import csw.common.framework.models.{HcdResponseMode, ToComponentLifecycleMessage}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -22,11 +22,12 @@ class LifecycleHooksTest extends FunSuite with Matchers with BeforeAndAfterEach 
   implicit val settings = TestKitSettings(system)
   implicit val timeout  = Timeout(5.seconds)
 
-  def run(testProbeSupervisor: TestProbe[HcdResponseMode], value1: Behavior[Nothing]): Running = {
-    Await.result(
-      system.systemActorOf[Nothing](value1, "Hcd"),
+  def run(testProbeSupervisor: TestProbe[HcdResponseMode]): Running = {
+    val testHcd = Await.result(
+      system.systemActorOf[Nothing](SampleHcdFactory.behaviour(testProbeSupervisor.ref), "Hcd"),
       5.seconds
     )
+
     val initialized = testProbeSupervisor.expectMsgType[Initialized]
     initialized.hcdRef ! Run(testProbeSupervisor.ref)
     testProbeSupervisor.expectMsgType[Running]
@@ -38,24 +39,14 @@ class LifecycleHooksTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
   test("A runnning Hcd component should accept Shutdown lifecycle message") {
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val beh = Actor
-      .mutable[HcdMsg](ctx ⇒ {
-        new SampleHcd(ctx, testProbeSupervisor.ref) {
-          override def onSignal: PartialFunction[Signal, Behavior[HcdMsg]] = {
-            case PostStop ⇒ testProbeSupervisor.ref ! Idle; Actor.same
-          }
-        }
-      })
-      .narrow
-    val running = run(testProbeSupervisor, beh)
+    val running             = run(testProbeSupervisor)
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
     testProbeSupervisor.expectMsg(ShutdownComplete)
-//    testProbeSupervisor.expectMsg(Idle)
   }
 
   test("A runnning Hcd component should accept Restart lifecycle message") {
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(testProbeSupervisor, SampleHcdFactory.behaviour(testProbeSupervisor.ref))
+    val running             = run(testProbeSupervisor)
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.Restart)
     val initialized = testProbeSupervisor.expectMsgType[Initialized]
 
