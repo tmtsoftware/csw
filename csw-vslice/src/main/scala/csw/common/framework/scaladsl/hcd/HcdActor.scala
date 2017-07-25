@@ -4,7 +4,7 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
 import csw.common.framework.models.HcdResponseMode.{Idle, Initialized, Running}
-import csw.common.framework.models.IdleHcdMsg.Initialize
+import csw.common.framework.models.IdleHcdMsg.{Initialize, Start}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg._
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, LifecycleFailureInfo, Restart, Shutdown}
@@ -27,7 +27,7 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
   implicit val ec: ExecutionContext = ctx.executionContext
 
   var mode: HcdResponseMode = Idle
-  ctx.self ! Initialize(false)
+  ctx.self ! Initialize
 
   def initialize(): Future[Unit]
   def onRun(): Unit
@@ -51,15 +51,19 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
     this
   }
 
+  def initialization(): Future[Unit] = async {
+    await(initialize())
+    mode = Initialized(ctx.self, pubSubRef)
+    supervisor ! mode
+  }
+
   private def onIdle(x: IdleHcdMsg): Unit = x match {
-    case Initialize(isRestart) =>
+    case Initialize =>
+      initialization()
+    case Start ⇒
       async {
-        await(initialize())
-        mode = Initialized(ctx.self, pubSubRef)
-        if (isRestart)
-          ctx.self ! Run(supervisor)
-        else
-          supervisor ! mode
+        await(initialization())
+        ctx.self ! Run(supervisor)
       }
   }
 
@@ -87,7 +91,7 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
     case Restart =>
       onRestart()
       mode = Idle
-      ctx.self ! Initialize(true)
+      ctx.self ! Start
     case GoOffline =>
       onGoOffline()
       mode = Initialized(ctx.self, pubSubRef)
