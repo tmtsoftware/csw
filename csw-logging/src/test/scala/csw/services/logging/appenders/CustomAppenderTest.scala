@@ -122,7 +122,9 @@ class CustomAppenderTest extends FunSuite with Matchers {
   }
 
   // Added this test to show that custom appender config file changes work
-  test("should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder showing config changes") {
+  test(
+    "should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder showing config changes"
+  ) {
 
     val config = ConfigFactory.parseString("""
                                              |csw-logging {
