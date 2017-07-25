@@ -54,12 +54,14 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
   def initialization(): Future[Unit] = async {
     await(initialize())
     mode = Initialized(ctx.self, pubSubRef)
-    supervisor ! mode
   }
 
   private def onIdle(x: IdleHcdMsg): Unit = x match {
     case Initialize =>
-      initialization()
+      async {
+        await(initialization())
+        supervisor ! mode
+      }
     case Start ⇒
       async {
         await(initialization())
