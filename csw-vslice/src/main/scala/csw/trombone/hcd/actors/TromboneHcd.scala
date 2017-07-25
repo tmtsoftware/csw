@@ -6,7 +6,7 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import csw.common.framework.models._
-import csw.common.framework.scaladsl._
+import csw.common.framework.scaladsl.hcd.{HcdActor, HcdActorFactory}
 import csw.param.Parameters.Setup
 import csw.param.UnitsOfMeasure.encoder
 import csw.trombone.hcd.AxisRequest._

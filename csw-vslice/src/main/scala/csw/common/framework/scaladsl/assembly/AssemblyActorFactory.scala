@@ -1,7 +1,7 @@
-package csw.common.framework.scaladsl
+package csw.common.framework.scaladsl.assembly
 
-import akka.typed.{ActorRef, Behavior}
 import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.models.Component.AssemblyInfo
 import csw.common.framework.models.{AssemblyComponentLifecycleMessage, AssemblyMsg, DomainMsg}
 

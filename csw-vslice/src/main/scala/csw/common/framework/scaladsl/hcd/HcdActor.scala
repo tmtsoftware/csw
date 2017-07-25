@@ -1,4 +1,4 @@
-package csw.common.framework.scaladsl
+package csw.common.framework.scaladsl.hcd
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
@@ -15,20 +15,13 @@ import csw.common.framework.models.ToComponentLifecycleMessage.{
   Shutdown
 }
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
+import csw.common.framework.scaladsl.PubSubActor
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
-
-abstract class HcdActorFactory[Msg <: DomainMsg: ClassTag] {
-
-  protected def make(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode]): HcdActor[Msg]
-
-  def behaviour(supervisor: ActorRef[HcdResponseMode]): Behavior[Nothing] =
-    Actor.mutable[HcdMsg](ctx ⇒ make(ctx, supervisor)).narrow
-}
 
 abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode])
     extends Actor.MutableBehavior[HcdMsg] {

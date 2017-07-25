@@ -9,7 +9,7 @@ import csw.common.framework.models.Component.AssemblyInfo
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
 import csw.common.framework.models.ToComponentLifecycleMessage.{LifecycleFailureInfo, Restart, RunOffline, RunOnline}
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.AssemblyActor
+import csw.common.framework.scaladsl.assembly.AssemblyActor
 import csw.param.Parameters.{Observe, Setup}
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}

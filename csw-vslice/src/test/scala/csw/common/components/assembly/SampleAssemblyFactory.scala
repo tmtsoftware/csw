@@ -3,7 +3,7 @@ package csw.common.components.assembly
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.framework.models.{AssemblyComponentLifecycleMessage, AssemblyMsg, Component}
-import csw.common.framework.scaladsl.{AssemblyActor, AssemblyActorFactory}
+import csw.common.framework.scaladsl.assembly.{AssemblyActor, AssemblyActorFactory}
 
 class SampleAssemblyFactory extends AssemblyActorFactory[AssemblyDomainMessages] {
   override def make(ctx: ActorContext[AssemblyMsg],

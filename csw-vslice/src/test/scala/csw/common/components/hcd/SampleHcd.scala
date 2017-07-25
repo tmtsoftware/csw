@@ -3,7 +3,7 @@ package csw.common.components.hcd
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.HcdActor
+import csw.common.framework.scaladsl.hcd.HcdActor
 import csw.param.Parameters
 
 import scala.concurrent.Future

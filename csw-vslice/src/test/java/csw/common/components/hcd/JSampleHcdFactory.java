@@ -3,8 +3,8 @@ package csw.common.components.hcd;
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.common.components.hcd.messages.JHcdDomainMessages;
-import csw.common.framework.javadsl.JHcdActor;
-import csw.common.framework.javadsl.JHcdActorFactory;
+import csw.common.framework.javadsl.hcd.JHcdActor;
+import csw.common.framework.javadsl.hcd.JHcdActorFactory;
 import csw.common.framework.models.HcdResponseMode;
 import csw.common.framework.models.HcdMsg;
 

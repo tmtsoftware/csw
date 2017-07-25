@@ -7,7 +7,8 @@ import csw.common.ccs.Validation.Valid
 import csw.common.ccs.{CommandStatus, Validation}
 import csw.common.framework.models.Component.{AssemblyInfo, HcdInfo}
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.{AssemblyActor, HcdActorFactory}
+import csw.common.framework.scaladsl.assembly.AssemblyActor
+import csw.common.framework.scaladsl.hcd.HcdActorFactory
 import csw.param.Parameters
 
 import scala.concurrent.Future
@@ -19,7 +20,7 @@ class SampleAssembly(ctx: ActorContext[AssemblyMsg],
 
   override def initialize(): Future[Unit] = Future.unit
 
-  override def onRun(): Unit = Unit
+  override def onRun(): Unit = ()
 
   override def setup(s: Parameters.Setup,
                      commandOriginator: Option[ActorRef[CommandStatus.CommandResponse]]): Validation.Validation = Valid
@@ -27,9 +28,9 @@ class SampleAssembly(ctx: ActorContext[AssemblyMsg],
   override def observe(o: Parameters.Observe,
                        replyTo: Option[ActorRef[CommandStatus.CommandResponse]]): Validation.Validation = Valid
 
-  override def onLifecycle(message: ToComponentLifecycleMessage): Unit = Unit
+  override def onLifecycle(message: ToComponentLifecycleMessage): Unit = ()
 
-  override def onDomainMsg(msg: AssemblyDomainMessages): Unit = Unit
+  override def onDomainMsg(msg: AssemblyDomainMessages): Unit = ()
 }
 
 object SampleAssembly {

@@ -10,7 +10,7 @@ import akka.typed.testkit.scaladsl.TestProbe;
 import akka.util.Timeout;
 import csw.common.components.hcd.JSampleHcdFactory;
 import csw.common.components.hcd.messages.JHcdDomainMessages;
-import csw.common.framework.javadsl.JClassTag;
+import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.HcdResponseMode;
 import csw.common.framework.models.InitialHcdMsg;
 import org.junit.Assert;

@@ -1,4 +1,4 @@
-package csw.common.framework.javadsl
+package csw.common.framework.javadsl.assembly
 
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
@@ -8,7 +8,7 @@ import akka.typed.javadsl.ActorContext
 import csw.common.ccs.{CommandStatus, Validation}
 import csw.common.framework.models.Component.AssemblyInfo
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.AssemblyActor
+import csw.common.framework.scaladsl.assembly.AssemblyActor
 import csw.param.Parameters
 
 import scala.compat.java8.FutureConverters._

@@ -1,4 +1,4 @@
-package csw.common.framework.javadsl
+package csw.common.framework.javadsl.assembly
 
 import csw.common.framework.models.Component.{AssemblyInfo, LocationServiceUsage}
 import csw.services.location.models.{Connection, ConnectionType}

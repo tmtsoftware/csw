@@ -1,4 +1,4 @@
-package csw.common.framework.scaladsl
+package csw.common.framework.scaladsl.assembly
 
 import akka.actor.Scheduler
 import akka.typed.scaladsl.Actor.MutableBehavior
@@ -12,7 +12,7 @@ import csw.common.framework.models.Component.AssemblyInfo
 import csw.common.framework.models.InitialAssemblyMsg.Run
 import csw.common.framework.models.RunningAssemblyMsg._
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.AssemblyActor.Mode
+import csw.common.framework.scaladsl.assembly.AssemblyActor.Mode
 import csw.param.Parameters
 import csw.param.Parameters.{Observe, Setup}
 

@@ -7,7 +7,7 @@ import akka.typed.javadsl.ActorContext;
 import csw.common.ccs.CommandStatus;
 import csw.common.ccs.Validation;
 import csw.common.components.assembly.messages.JAssemblyDomainMessages;
-import csw.common.framework.javadsl.JAssemblyActor;
+import csw.common.framework.javadsl.assembly.JAssemblyActor;
 import csw.common.framework.models.AssemblyComponentLifecycleMessage;
 import csw.common.framework.models.AssemblyMsg;
 import csw.common.framework.models.Component.AssemblyInfo;
