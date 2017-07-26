@@ -96,7 +96,7 @@ object RunningHcdMsg {
 sealed trait AssemblyMsg
 sealed trait InitialAssemblyMsg extends AssemblyMsg
 object InitialAssemblyMsg {
-  case class Run(replyTo: ActorRef[AssemblyComponentLifecycleMessage.Running]) extends InitialAssemblyMsg
+  case object Run extends InitialAssemblyMsg
 }
 
 sealed trait RunningAssemblyMsg extends AssemblyMsg

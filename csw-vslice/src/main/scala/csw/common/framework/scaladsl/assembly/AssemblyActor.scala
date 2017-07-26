@@ -63,10 +63,10 @@ abstract class AssemblyActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[Assem
   }
 
   def handleInitial(x: InitialAssemblyMsg): Unit = x match {
-    case Run(replyTo) =>
+    case Run =>
       onRun()
       mode = Mode.Running
-      replyTo ! Running(ctx.self)
+      supervisor ! Running(ctx.self)
   }
 
   def handleRunning(x: RunningAssemblyMsg): Unit = x match {

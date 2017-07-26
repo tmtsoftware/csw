@@ -61,7 +61,7 @@ public class JAssemblyActorTest {
         Assert.assertEquals(assemblyMsgActorRef, initialized.assemblyRef());
 
         ActorRef<Running> replyTo = supervisorProbe.ref().narrow();
-        initialized.assemblyRef().tell(new InitialAssemblyMsg.Run(replyTo));
+        initialized.assemblyRef().tell(InitialAssemblyMsg.Run$.MODULE$);
 
         ClassTag<Running> runningClassTag = JClassTag.make(Running.class);
         Running running = supervisorProbe.expectMsgType(FiniteDuration.apply(5, TimeUnit.SECONDS), runningClassTag);

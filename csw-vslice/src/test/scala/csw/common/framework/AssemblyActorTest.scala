@@ -44,7 +44,7 @@ class AssemblyActorTest extends FunSuite with Matchers {
     val initialized = supervisorProbe.expectMsgType[Initialized]
     initialized.assemblyRef shouldBe assemblyRef
 
-    initialized.assemblyRef ! Run(supervisorProbe.ref)
+    initialized.assemblyRef ! Run
 
     val running = supervisorProbe.expectMsgType[Running]
     running.assemblyRef shouldBe assemblyRef
