@@ -74,6 +74,7 @@ Make sure to provide full path of the appender since it will be spawned using ja
 @@@
 
 For `StdOutAppender` specify the format of log statements in `csw-logging.stdout` via `csw-logging.stdout.pretty` and `csw-logging.stdout.oneLine`.  
+
 Turning `pretty` **on** or **off** will produce log statements in following format:
 
 pretty=true
@@ -101,6 +102,12 @@ pretty=false
     ```
     @@@
     
+@@@ note
+
+* Due to lack of macros in Java, file names and line numbers of log statements will not be available for Java code.
+
+@@@
+
 Similarly, turning `oneLine` on will produce log statements in following format:
 
 oneLine=true
@@ -237,6 +244,8 @@ Loggers for classes can be mixed in a similar way
 
 ## Log statements
 
+Logging statements are used very much like existing logging services such as log4j.  For Java, there is an additional way of writing log messages using Supplier methods (lambdas).  The use of lambdas is more efficient since the computations in a message (e.g. string concatenation) are not performed unless the message is actually being logged.  Therefore, these supplier methods should be used in cases where high performance is required (see [performance results below](#java-logging-string-vs-supplier-api-performance)).
+
 A basic info statement can be written as follows:
 
 Scala
@@ -245,35 +254,54 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info }
 
+Java (Supplier)
+:   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-supplier }
+
 The output of log statement will be:
 
 Scala
 :   @@@vars
     ```
-    {"@componentName":"my-component-name",
-     "@severity":"INFO",
-     "actor":
-       "akka.tcp://csw-examples-locationServiceClient@10.131.124.238:50721/user/$a",
-     "class":"csw.services.location.LocationServiceExampleClient",
-     "file":"LocationServiceExampleClientApp.scala",
-     "line":141,
-     "message":"Result of the find call: None",
-     "timestamp":"2017-07-20T06:47:46.468Z"
-    }
+{"@componentName":"my-component-name",
+ "@severity":"INFO",
+ "actor":
+   "akka.tcp://csw-examples-locationServiceClient@131.215.210.170:55532/user/$a",
+ "class":"csw.services.location.LocationServiceExampleClient",
+ "file":"LocationServiceExampleClientApp.scala",
+ "line":116,
+ "message":"Result of the find call: None",
+ "timestamp":"2017-07-26T19:39:59.764Z"
+}
     ```
     @@@
 
 Java
 :   @@@vars
     ```
-    {"@componentName":"my-component-name",
-     "@severity":"INFO",
-     "actor":
-       "akka.tcp://csw-examples-locationServiceClient@10.131.124.238:50737/user/LocationServiceExampleClient",
-     "class":"csw.services.location.JLocationServiceExampleClient",
-     "message":"Result of the find call : None",
-     "timestamp":"2017-07-20T06:49:13.059Z"
-    }
+{"@componentName":"my-component-name",
+ "@severity":"INFO",
+ "actor":
+   "akka.tcp://csw-examples-locationServiceClient@131.215.210.170:55556/user/LocationServiceExampleClient",
+ "class":"csw.services.location.JLocationServiceExampleClient",
+ "message":
+   "Find result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType",
+ "timestamp":"2017-07-26T19:44:58.623Z"
+}
+    ```
+    @@@
+
+Java (Supplier)
+:   @@@vars
+    ```
+{"@componentName":"my-component-name",
+ "@severity":"INFO",
+ "actor":
+   "akka.tcp://csw-examples-locationServiceClient@131.215.210.170:55556/user/LocationServiceExampleClient",
+ "class":"csw.services.location.JLocationServiceExampleClient",
+ "message":
+   "Resolve result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType",
+ "timestamp":"2017-07-26T19:44:58.636Z"
+}
     ```
     @@@
 
@@ -285,41 +313,64 @@ Scala
 Java
  :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-map }
 
+Java (Supplier)
+ :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-map-supplier }
+
 The output of log statement will be: 
 
 Scala
 :   @@@vars
     ```
-    {"@componentName":"my-component-name",
-     "@severity":"INFO",
-     "actor":
-       "akka.tcp://csw-examples-locationServiceClient@10.131.124.238:50721/user/$a",
-     "class":"csw.services.location.LocationServiceExampleClient",
-     "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
-     "file":"LocationServiceExampleClientApp.scala",
-     "line":131,
-     "message":"Attempting to find connection",
-     "obsId":"foo_obs_id",
-     "timestamp":"2017-07-20T06:47:46.464Z"
-    }
+{"@componentName":"my-component-name",
+ "@severity":"INFO",
+ "actor":
+   "akka.tcp://csw-examples-locationServiceClient@131.215.210.170:55532/user/$a",
+ "class":"csw.services.location.LocationServiceExampleClient",
+ "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
+ "file":"LocationServiceExampleClientApp.scala",
+ "line":110,
+ "message":
+   "Attempting to find AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))",
+ "obsId":"foo_obs_id",
+ "timestamp":"2017-07-26T19:39:59.756Z"
+}
     ```
     @@@
     
 Java
 :   @@@vars
     ```
-    {"@componentName":"my-component-name",
-     "@severity":"INFO",
-     "actor":
-       "akka.tcp://csw-examples-locationServiceClient@10.131.124.238:50737/user/LocationServiceExampleClient",
-     "class":"csw.services.location.JLocationServiceExampleClient",
-     "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
-     "message":"Attempting to find connection",
-     "obsId":"foo_obs_id",
-     "timestamp":"2017-07-20T06:49:13.054Z"
-    }
+{"@componentName":"my-component-name",
+ "@severity":"INFO",
+ "actor":
+   "akka.tcp://csw-examples-locationServiceClient@131.215.210.170:55556/user/LocationServiceExampleClient",
+ "class":"csw.services.location.JLocationServiceExampleClient",
+ "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
+ "message":
+   "Attempting to find AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))",
+ "obsId":"foo_obs_id",
+ "timestamp":"2017-07-26T19:44:58.575Z"
+}
     ```
     @@@
+
+Java (Supplier)
+:   @@@vars
+    ```
+{"@componentName":"my-component-name",
+ "@severity":"INFO",
+ "actor":
+   "akka.tcp://csw-examples-locationServiceClient@131.215.210.170:55556/user/LocationServiceExampleClient",
+ "class":"csw.services.location.JLocationServiceExampleClient",
+ "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
+ "message":
+   "Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds...",
+ "obsId":"foo_obs_id",
+ "timestamp":"2017-07-26T19:44:58.628Z"
+}
+    ```
+    @@@
+
     
 Library allows to log an error with it's full stacktrace as follows:
  
@@ -329,11 +380,9 @@ Scala
 Java
  :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error }
  
-@@@ note
-
-* It is recommended in java to use api that has `Supplier` for `msg` and `map` since it is more efficient compared to non-supplier version of it  
-
-@@@
+Java (Supplier)
+ :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error-supplier }
+ 
  
 ## Source code for examples
 
@@ -378,8 +427,8 @@ As shown in the above graph, experiment was carried out for 1, 2, 4, 8 and 16 th
 
 
 ### Scala Logging : Throughput Comparision (Log Level Enabled vs Disabled)
-Below graph depicts the throughput of scala's logging API when log level was enabled and disabled. 
-As we are using by name parameter in the Scala's logging API, numbers are very high in case of log level is disabled. String parameter which is passed in the logger API does not get evaluated if log level is disabled.   
+Below graph depicts the throughput of Scala's logging API for a log message that is enabled and disabled due to the log level setting. 
+As we are using by name parameter in the Scala's logging API, numbers are very high in case when the log level disables the message. Note that the string parameter which is passed in the Scala logger API does not get evaluated if the log message is disabled.   
 
 ![Scala Throughput Comparision](./scala-by-name-log-api-throughput.png)
 
@@ -391,11 +440,7 @@ This graph is produced based on the result generated by [JE2ELoggingBenchmark](h
 
 ![String Vs Supplier Throughput](./java-logging-StringVsSupplier-comparision.png)
 
-@@@ note
-
-* As you can see in the above graph, Supplier version of log API is very efficient and throughput is much higher than String version. It is recommended to use Supplier API.
-
-@@@
+As you can see in the above graph, the Supplier version of log API is very efficient and throughput is much higher than the String version. It is recommended to use the Supplier API where performance is required.
 
 
 ## Acknowledgement

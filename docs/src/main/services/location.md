@@ -139,8 +139,8 @@ Java
 The logging output from the above example when the given component is not registered should include:
 
 ```
-Attempting to find connection AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) ...
-Find result: None
+[INFO] Attempting to find connection AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+[INFO] Result of the find call: None 
 ```
 
 An example of the resolve command is shown in the following: 
@@ -154,19 +154,18 @@ Java
 The logging output from the above example should include:
 
 ```
-Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds ...
+[INFO] Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds ...
 ```
 
 If you then start the LocationServiceExampleComponentApp, the following message will be logged:
 ```
-Resolve result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Resolve result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 ```
 
 If not, eventually the operation will timeout and the output should read:
 ```
-Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
+[INFO] Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
 ```
-
 ## Filtering
 
 The `list` API and its variants offer means to inquire about available connections with the LocationService. 
@@ -181,14 +180,13 @@ Java
 The log output from the above should contain:
 
 ```
-All Registered Connections:
---- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
---- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
---- redis-service-tcp, component type=Service, connection type=TcpType
---- configuration-service-http, component type=Service, connection type=HttpType
---- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] All Registered Connections:
+[INFO] --- configuration-service-http, component type=Service, connection type=HttpType
+[INFO] --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
+[INFO] --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] --- redis-service-tcp, component type=Service, connection type=TcpType
+[INFO] --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
 ```
-
 Other variants are filters using `ConnectionType`, `ComponentType`, and `hostname`.
 
 Filtering by component type is shown below:
@@ -202,9 +200,9 @@ Java
 The log output from the above code should contain:
 
 ```
-Registered Assemblies:
---- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
---- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Registered Assemblies:
+[INFO] --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
 ```
 
 Filtering by connection type is shown below:
@@ -218,10 +216,10 @@ Java
 The log output should contain:
 
 ```
-Registered Akka connections:
---- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
---- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
---- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Registered Akka connections:
+[INFO] --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
+[INFO] --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
 ```
 
 ## Tracking and Subscribing
@@ -258,25 +256,26 @@ Java
 
 The log output should contain the following:
 ```
-Starting to track AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-Starting a subscription to AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-subscription event
-Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Starting to track AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) LocationUpdated(HttpLocation(HttpConnection(ComponentId(configuration,Service)),http://131.215.210.170:8080/path123))
+[INFO] Starting a subscription to AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+[INFO] Subscribing to connection LocationServiceExampleComponent-assembly-akka
+[INFO] Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] subscription event
+[INFO] Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 ```
 
 If you now stop the LocationServiceExampleComponentApp, it would log:
 ```
-subscription event
-Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+[INFO] subscription event
+[INFO] Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
+[INFO] Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
 ```
 
 If you start the LocationServiceExampleComponentApp again, the log output should be:
 ```
-Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-subscription event
-Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] subscription event
+[INFO] Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
+[INFO] Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 ```
 
 Note: the line after the words "subscription event" in our example is generated by the subscription, and the other line is from

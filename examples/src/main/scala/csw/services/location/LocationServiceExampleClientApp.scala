@@ -107,7 +107,7 @@ class LocationServiceExampleClient(locationService: LocationService,
   val exampleConnection: AkkaConnection = LocationServiceExampleComponent.connection
 
   //#log-info-map
-  log.info("Attempting to find connection",
+  log.info(s"Attempting to find $exampleConnection",
            Map(Keys.OBS_ID → "foo_obs_id", "exampleConnection" → exampleConnection.name))
   //#log-info-map
   val findResult: Option[Location] = Await.result(locationService.find(exampleConnection), timeout)
@@ -116,10 +116,6 @@ class LocationServiceExampleClient(locationService: LocationService,
   log.info(s"Result of the find call: $findResult")
   //#log-info
   //#find
-
-  // Output should be:
-  //    Attempting to find connection AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) ...
-  //    Find result: None
 
   //#resolve
   // resolve connection to LocationServiceExampleComponent
@@ -135,17 +131,6 @@ class LocationServiceExampleClient(locationService: LocationService,
       log.info(s"Timeout waiting for location $exampleConnection to resolve.")
   }
   //#resolve
-
-  // Output should be:
-  //    Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds ...
-
-  // If you then start the LocationServiceExampleComponentApp,
-  // Output should be:
-  //    Resolve result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-
-  // If not,
-  // Output should be:
-  //    Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
 
   // example code showing how to get the actorReg for remote component and send it a message
   if (resolveResult.isDefined) {
@@ -163,14 +148,6 @@ class LocationServiceExampleClient(locationService: LocationService,
   connectionList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
   //#list
 
-  // Output should be:
-  //    All Registered Connections:
-  //    --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
-  //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
-  //    --- redis-service-tcp, component type=Service, connection type=TcpType
-  //    --- configuration-service-http, component type=Service, connection type=HttpType
-  //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-
   //#filtering-component
   // filter connections based on component type
   val componentList: List[Location] = Await.result(locationService.list(ComponentType.Assembly), timeout)
@@ -178,23 +155,12 @@ class LocationServiceExampleClient(locationService: LocationService,
   componentList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
   //#filtering-component
 
-  // Output should be:
-  //    Registered Assemblies:
-  //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
-  //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-
   //#filtering-connection
   // filter connections based on connection type
   val akkaList: List[Location] = Await.result(locationService.list(ConnectionType.AkkaType), timeout)
   log.info("Registered Akka connections:")
   akkaList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
   //#filtering-connection
-
-  // Output should be:
-  //    Registered Akka connections:
-  //    --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
-  //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
-  //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
   if (resolveResult.isDefined) {
 
@@ -231,26 +197,6 @@ class LocationServiceExampleClient(locationService: LocationService,
       }
     )
     //#tracking
-
-    // [tracking shows component unregister and re-register]
-    // Output should be:
-    //    Starting to track AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-    //    Starting a subscription to AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-    //    subscription event
-    //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-    //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-
-    // If you now stop the LocationServiceExampleComponentApp,
-    // Output should be:
-    //    subscription event
-    //    Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-    //    Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-
-    // If you start the LocationServiceExampleComponentApp again,
-    // Output should be:
-    //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-    //    subscription event
-    //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
     // scalastyle:on print.ln
 
@@ -294,14 +240,14 @@ class LocationServiceExampleClient(locationService: LocationService,
 
     // A location was removed
     case LocationRemoved(conn) =>
-      log.info("Location removed", Map("connection" → conn.toString))
+      log.info(s"Location removed $conn", Map("connection" → conn.toString))
 
     case AllDone =>
       log.info(s"Tracking of $exampleConnection complete.")
 
     case x =>
-      val runtimeException = new RuntimeException(s"Received unexpected message $x")
       //#log-error
+      val runtimeException = new RuntimeException(s"Received unexpected message $x")
       log.error(runtimeException.getMessage, ex = runtimeException)
     //#log-error
   }

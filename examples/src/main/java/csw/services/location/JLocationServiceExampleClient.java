@@ -105,50 +105,46 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         // [do this before starting LocationServiceExampleComponent.  this should return Future[None]]
 
         //#log-info-map
-        log.info(() -> "Attempting to find connection", () -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put(JKeys.OBS_ID, "foo_obs_id");
-            map.put("exampleConnection", exampleConnection.name());
-            return map;
-        });
+        log.info("Attempting to find " + exampleConnection,
+                new HashMap<String, Object>() {{
+                    put(JKeys.OBS_ID, "foo_obs_id");
+                    put("exampleConnection", exampleConnection.name());
+                }});
         //#log-info-map
 
         Optional<Location> findResult = locationService.find(exampleConnection).get();
         if (findResult.isPresent()) {
+            //#log-info
             log.info("Find result: " + connectionInfo(findResult.get().connection()));
+            //#log-info
         } else {
-            //#log-info
             log.info(() -> "Result of the find call : None");
-            //#log-info
         }
         //#find
-        // Output should be:
-        //    Attempting to find connection AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) ...
-        //    Find result: None
 
         //#resolve
         // resolve connection to LocationServiceExampleComponent
         // [start LocationServiceExampleComponent after this command but before timeout]
         FiniteDuration waitForResolveLimit = new FiniteDuration(30, TimeUnit.SECONDS);
-        log.info("Attempting to resolve " + exampleConnection + " with a wait of " + waitForResolveLimit + "...");
+
+        //#log-info-map-supplier
+        log.info(() -> "Attempting to resolve " + exampleConnection + " with a wait of " + waitForResolveLimit + "...", () -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put(JKeys.OBS_ID, "foo_obs_id");
+            map.put("exampleConnection", exampleConnection.name());
+            return map;
+        });
+        //#log-info-map-supplier
+
         Optional<Location> resolveResult = locationService.resolve(exampleConnection, waitForResolveLimit).get();
         if (resolveResult.isPresent()) {
-            log.info("Resolve result: " + connectionInfo(resolveResult.get().connection()));
+            //#log-info-supplier
+            log.info(() -> "Resolve result: " + connectionInfo(resolveResult.get().connection()));
+            //#log-info-supplier
         } else {
-            log.info("Timeout waiting for location " + exampleConnection + " to resolve.");
+            log.info(() -> "Timeout waiting for location " + exampleConnection + " to resolve.");
         }
         //#resolve
-
-        // Output should be:
-        //    Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds ...
-
-        // If you then start the LocationServiceExampleComponentApp,
-        // Output should be:
-        //    Resolve result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-
-        // If not,
-        // Output should be:
-        //    Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
 
        // example code showing how to get the actorRef for remote component and send it a message
          if (resolveResult.isPresent()) {
@@ -171,14 +167,6 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
             log.info("--- " + connectionInfo(loc.connection()));
         }
         //#list
-        // Output should be:
-        //    All Registered Connections:
-        //    --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
-        //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
-        //    --- redis-service-tcp, component type=Service, connection type=TcpType
-        //    --- configuration-service-http, component type=Service, connection type=HttpType
-        //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-
 
         //#filtering-component
         // filter connections based on component type
@@ -189,10 +177,6 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         }
         //#filtering-component
 
-        // Output should be:
-        //    Registered Assemblies:
-        //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
-        //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
         //#filtering-connection
         // filter connections based on connection type
@@ -202,12 +186,6 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
             log.info("--- " + connectionInfo(loc.connection()));
         }
         //#filtering-connection
-
-        // Output should be:
-        //    Registered Akka connections:
-        //    --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
-        //    --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
-        //    --- LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
 
     }
 
@@ -240,28 +218,6 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
 
         // [tracking shows component unregister and re-register]
 
-
-
-        // Output should be:
-        //    Starting to track AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-        //    Starting a subscription to AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-        //    subscription event
-        //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-        //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-
-        // If you now stop the LocationServiceExampleComponentApp,
-        // Output should be:
-        //    subscription event
-        //    Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-        //    Location removed AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))
-
-        // If you start the LocationServiceExampleComponentApp again,
-        // Output should be:
-        //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-        //    subscription event
-        //    Location updated LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType
-
-
     }
 
     private String connectionInfo(Connection connection) {
@@ -277,17 +233,26 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         assemblyRegResult.unregister();
         //#unregister
 
-        //#shutdown
-        locationService.shutdown().get();
-        //#shutdown
+        try {
+            //#shutdown
+            locationService.shutdown().get();
+            //#shutdown
+        // #log-info-error
+        } catch (InterruptedException | ExecutionException ex) {
+            log.info(ex.getMessage(), ex);
+            throw ex;
+        }
+        //#log-info-error
 
         try {
             //#stop-logging-system
             // Only call this once per application
             loggingSystem.javaStop().get();
             //#stop-logging-system
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+
+        } catch (InterruptedException | ExecutionException ex) {
+            ex.printStackTrace();
+            throw ex;
         }
     }
 
@@ -299,10 +264,10 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
                 .match(LocationRemoved.class, l -> log.info("Location removed " + l.connection()))
                 .match(AllDone.class, x -> log.info("Tracking of " + exampleConnection + " complete."))
                 .matchAny((Object x) -> {
+                    //#log-info-error-supplier
                     RuntimeException runtimeException = new RuntimeException("Received unexpected message " + x);
-                    //#log-info-error
                     log.info(() -> runtimeException.getMessage(), runtimeException);
-                    //#log-info-error
+                    //#log-info-error-supplier
                 })
                 .build();
     }
