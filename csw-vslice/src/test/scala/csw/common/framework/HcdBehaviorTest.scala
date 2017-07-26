@@ -33,6 +33,8 @@ class HcdBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll with
       override def make(ctx: ActorContext[HcdMsg]): HcdHandlers[HcdDomainMessage] = sampleHcdHandler
     }
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+    doNothing().when(sampleHcdHandler).onRun()
+
     val testProbe: TestProbe[HcdResponseMode] = TestProbe[HcdResponseMode]
 
     val hcdRef =
@@ -40,11 +42,14 @@ class HcdBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll with
                    5.seconds)
 
     val initialized = testProbe.expectMsgType[Initialized]
+
+    verify(sampleHcdHandler).initialize()
     initialized.hcdRef shouldBe hcdRef
 
     initialized.hcdRef ! Run
 
     val running = testProbe.expectMsgType[Running]
+    verify(sampleHcdHandler).onRun()
     running.hcdRef shouldBe hcdRef
   }
 }
