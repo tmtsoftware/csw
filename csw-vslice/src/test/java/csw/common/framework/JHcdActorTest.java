@@ -49,7 +49,7 @@ public class JHcdActorTest {
         Assert.assertEquals(hcdMsgActorRef, initialized.hcdRef());
 
         ActorRef<HcdResponseMode.Running> replyTo = supervisorProbe.ref().narrow();
-        initialized.hcdRef().tell(new InitialHcdMsg.Run(replyTo));
+        initialized.hcdRef().tell(InitialHcdMsg.Run$.MODULE$);
 
 
         ClassTag<HcdResponseMode.Running> runningClassTag = JClassTag.make(HcdResponseMode.Running.class);

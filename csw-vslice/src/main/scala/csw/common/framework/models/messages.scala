@@ -2,7 +2,6 @@ package csw.common.framework.models
 
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.models.HcdResponseMode.Running
 import csw.param.Parameters.{ControlCommand, Setup}
 import csw.param.StateVariable.CurrentState
 import csw.trombone.assembly.actors.TromboneStateActor.StateWasSet
@@ -83,7 +82,7 @@ object IdleHcdMsg {
 
 sealed trait InitialHcdMsg extends HcdMsg
 object InitialHcdMsg {
-  case class Run(replyTo: ActorRef[Running]) extends InitialHcdMsg
+  case object Run extends InitialHcdMsg
 }
 
 sealed trait RunningHcdMsg extends HcdMsg

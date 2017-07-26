@@ -29,7 +29,7 @@ class LifecycleHooksTest extends FunSuite with Matchers with BeforeAndAfterEach 
     )
 
     val initialized = testProbeSupervisor.expectMsgType[Initialized]
-    initialized.hcdRef ! Run(testProbeSupervisor.ref)
+    initialized.hcdRef ! Run
     testProbeSupervisor.expectMsgType[Running]
   }
 

@@ -33,7 +33,7 @@ class HcdActorTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val initialized = testProbe.expectMsgType[Initialized]
     initialized.hcdRef shouldBe hcdRef
 
-    initialized.hcdRef ! Run(testProbe.ref)
+    initialized.hcdRef ! Run
     val running = testProbe.expectMsgType[Running]
     running.hcdRef shouldBe hcdRef
   }

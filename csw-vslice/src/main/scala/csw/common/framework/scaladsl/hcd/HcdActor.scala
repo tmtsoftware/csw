@@ -65,16 +65,16 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
     case Start ⇒
       async {
         await(initialization())
-        ctx.self ! Run(supervisor)
+        ctx.self ! Run
       }
   }
 
   private def onInitial(x: InitialHcdMsg): Unit = x match {
-    case Run(replyTo) =>
+    case Run =>
       onRun()
       val running = Running(ctx.self, pubSubRef)
       mode = running
-      replyTo ! running
+      supervisor ! running
   }
 
   private def onRunning(x: RunningHcdMsg): Unit = x match {
