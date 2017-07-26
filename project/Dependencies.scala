@@ -103,7 +103,8 @@ object Dependencies {
     Akka.`akka-typed-testkit` % Test,
     Libs.`scalatest`          % Test,
     Libs.`junit`              % Test,
-    Libs.`junit-interface`    % Test
+    Libs.`junit-interface`    % Test,
+    Libs.`mockito-core`       % Test
   )
 
   val CswClusterSeed = Seq(

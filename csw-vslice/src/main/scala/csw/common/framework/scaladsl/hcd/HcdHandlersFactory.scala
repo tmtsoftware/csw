@@ -6,10 +6,9 @@ import csw.common.framework.models.{DomainMsg, HcdMsg, HcdResponseMode}
 
 import scala.reflect.ClassTag
 
-abstract class HcdActorFactory[Msg <: DomainMsg: ClassTag] {
-
-  protected def make(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode]): HcdActor[Msg]
+abstract class HcdHandlersFactory[Msg <: DomainMsg: ClassTag] {
+  def make(ctx: ActorContext[HcdMsg]): HcdHandlers[Msg]
 
   def behaviour(supervisor: ActorRef[HcdResponseMode]): Behavior[Nothing] =
-    Actor.mutable[HcdMsg](ctx ⇒ make(ctx, supervisor)).narrow
+    Actor.mutable[HcdMsg](ctx ⇒ new HcdBehavior[Msg](ctx, supervisor, make(ctx))).narrow
 }

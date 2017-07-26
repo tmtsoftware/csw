@@ -5,11 +5,12 @@ import csw.common.framework.models.DomainMsg
 
 sealed trait HcdDomainMessage extends DomainMsg
 
-case class GetCurrentState(replyTo: ActorRef[DomainResponseMsg]) extends HcdDomainMessage
+case class GetCurrentState(replyTo: ActorRef[HcdDomainResponseMsg]) extends HcdDomainMessage
 
-sealed trait DomainResponseMsg
+sealed trait HcdDomainResponseMsg
 
-case class HcdDomainResponseMsg(state: LifecycleMessageReceived) extends DomainResponseMsg
+case object ReceivedRunOffline extends HcdDomainResponseMsg
+case object ReceivedRestart    extends HcdDomainResponseMsg
 
 sealed trait LifecycleMessageReceived
 object LifecycleMessageReceived {

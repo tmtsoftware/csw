@@ -8,7 +8,7 @@ import csw.common.ccs.{CommandStatus, Validation}
 import csw.common.framework.models.Component.{AssemblyInfo, HcdInfo}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.assembly.AssemblyActor
-import csw.common.framework.scaladsl.hcd.HcdActorFactory
+import csw.common.framework.scaladsl.hcd.HcdHandlersFactory
 import csw.param.Parameters
 
 import scala.concurrent.Future
@@ -47,8 +47,9 @@ object SampleAssembly {
   }
 
   def behaviour(hcdInfo: HcdInfo, supervisor: ActorRef[HcdResponseMode]): Behavior[Nothing] = {
-    val hcdClass   = Class.forName(hcdInfo.componentClassName + "Factory")
-    val hcdFactory = hcdClass.newInstance().asInstanceOf[HcdActorFactory[_]]
-    hcdFactory.behaviour(supervisor)
+    val klass           = Class.forName(hcdInfo.componentClassName + "HandlersFactory")
+    val handlersFactory = klass.newInstance().asInstanceOf[HcdHandlersFactory[_]]
+
+    handlersFactory.behaviour(supervisor)
   }
 }

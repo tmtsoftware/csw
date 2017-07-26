@@ -1,8 +1,6 @@
 package csw.common.components.assembly;
 
 import akka.typed.ActorRef;
-import akka.typed.Behavior;
-import akka.typed.javadsl.Actor;
 import akka.typed.javadsl.ActorContext;
 import csw.common.ccs.CommandStatus;
 import csw.common.ccs.Validation;
@@ -19,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class JSampleAssembly extends JAssemblyActor<JAssemblyDomainMessages> {
 
-    public JSampleAssembly(ActorContext<AssemblyMsg> ctx, AssemblyInfo assemblyInfo, ActorRef<AssemblyComponentLifecycleMessage> supervisor) {
+    JSampleAssembly(ActorContext<AssemblyMsg> ctx, AssemblyInfo assemblyInfo, ActorRef<AssemblyComponentLifecycleMessage> supervisor) {
         super(ctx, assemblyInfo, supervisor, scala.reflect.ClassTag$.MODULE$.apply(JAssemblyDomainMessages.class));
     }
 

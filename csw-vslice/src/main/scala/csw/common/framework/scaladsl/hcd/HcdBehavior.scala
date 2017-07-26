@@ -14,39 +14,21 @@ import csw.common.framework.models.ToComponentLifecycleMessage.{
   Restart,
   Shutdown
 }
-import csw.common.framework.models.{ToComponentLifecycleMessage, _}
-import csw.common.framework.scaladsl.PubSubActor
-import csw.param.Parameters.Setup
-import csw.param.StateVariable.CurrentState
+import csw.common.framework.models._
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 
-abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode])
+class HcdBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
+                                              supervisor: ActorRef[HcdResponseMode],
+                                              hcdHandlers: HcdHandlers[Msg])
     extends Actor.MutableBehavior[HcdMsg] {
-
-  val domainAdapter: ActorRef[Msg] = ctx.spawnAdapter(DomainHcdMsg.apply)
-
-  val pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.spawnAnonymous(PubSubActor.behaviour[CurrentState])
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
   var mode: HcdResponseMode = Idle
   ctx.self ! Initialize
-
-  var isOnline: Boolean = false
-
-  def initialize(): Future[Unit]
-  def onRun(): Unit
-  def onSetup(sc: Setup): Unit
-  def onDomainMsg(msg: Msg): Unit
-
-  def onShutdown(): Unit
-  def onRestart(): Unit
-  def onGoOffline(): Unit
-  def onGoOnline(): Unit
-  def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit
 
   override def onMessage(msg: HcdMsg): Behavior[HcdMsg] = {
     (mode, msg) match {
@@ -59,8 +41,8 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
   }
 
   def initialization(): Future[Unit] = async {
-    await(initialize())
-    mode = Initialized(ctx.self, pubSubRef)
+    await(hcdHandlers.initialize())
+    mode = Initialized(ctx.self, hcdHandlers.pubSubRef)
   }
 
   private def onIdle(x: IdleHcdMsg): Unit = x match {
@@ -78,40 +60,40 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
 
   private def onInitial(x: InitialHcdMsg): Unit = x match {
     case Run =>
-      onRun()
-      val running = Running(ctx.self, pubSubRef)
+      hcdHandlers.onRun()
+      val running = Running(ctx.self, hcdHandlers.pubSubRef)
       mode = running
-      isOnline = true
+      hcdHandlers.isOnline = true
       supervisor ! running
   }
 
   private def onRunning(x: RunningHcdMsg): Unit = x match {
     case Lifecycle(message)   => onLifecycle(message)
-    case Submit(command)      => onSetup(command)
-    case DomainHcdMsg(y: Msg) ⇒ onDomainMsg(y)
+    case Submit(command)      => hcdHandlers.onSetup(command)
+    case DomainHcdMsg(y: Msg) ⇒ hcdHandlers.onDomainMsg(y)
     case DomainHcdMsg(y)      ⇒ println(s"unhandled domain msg: $y")
   }
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case Shutdown =>
-      onShutdown()
-      ctx.stop(domainAdapter)
-      ctx.stop(pubSubRef)
+      hcdHandlers.onShutdown()
+      ctx.stop(hcdHandlers.domainAdapter)
+      ctx.stop(hcdHandlers.pubSubRef)
       supervisor ! ShutdownComplete
     case Restart =>
-      onRestart()
+      hcdHandlers.onRestart()
       mode = Idle
       ctx.self ! Start
     case GoOnline =>
-      if (!isOnline) {
-        onGoOnline()
-        isOnline = true
+      if (!hcdHandlers.isOnline) {
+        hcdHandlers.onGoOnline()
+        hcdHandlers.isOnline = true
       }
     case GoOffline =>
-      if (isOnline) {
-        onGoOffline()
-        isOnline = false
+      if (hcdHandlers.isOnline) {
+        hcdHandlers.onGoOffline()
+        hcdHandlers.isOnline = false
       }
-    case LifecycleFailureInfo(state, reason) => onLifecycleFailureInfo(state, reason)
+    case LifecycleFailureInfo(state, reason) => hcdHandlers.onLifecycleFailureInfo(state, reason)
   }
 }
