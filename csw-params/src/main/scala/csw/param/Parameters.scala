@@ -18,6 +18,15 @@ object Parameters {
    */
   case class Prefix(subsystem: Subsystem, prefix: String) {
     override def toString = s"[$subsystem, $prefix]"
+
+    /**
+     * Creates a Prefix from the given string
+     *
+     * @return a Prefix object parsed for the subsystem and prefix
+     */
+    def this(prefix: String) {
+      this(Prefix.subsystem(prefix), prefix)
+    }
   }
 
   /**
@@ -61,7 +70,8 @@ object Parameters {
      */
     final def prefixStr: String = prefix.prefix
 
-    override def toString = s"$typeName[$subsystem, $prefixStr]$dataToString"
+    // This is the format for a Setup/Observe/Wait
+    override def toString = s"$typeName([$subsystem, $prefixStr]$dataToString)"
   }
 
   /**
@@ -228,7 +238,7 @@ object Parameters {
      */
     protected def create(data: ParameterSet): T
 
-    protected def dataToString: String = paramSet.mkString("(", ",", ")")
+    protected def dataToString: String = paramSet.mkString("(", ", ", ")")
 
     override def toString = s"$typeName$dataToString"
 

@@ -43,7 +43,6 @@ object ParameterSetJson extends DefaultJsonProtocol {
   implicit def structFormat: JsonFormat[Struct] = new JsonFormat[Struct] {
     def write(s: Struct): JsValue = JsObject(
       "type"     -> JsString(s.typeName),
-      "name"     -> JsString(s.name),
       "paramSet" -> s.paramSet.toJson
     )
 
@@ -53,7 +52,7 @@ object ParameterSetJson extends DefaultJsonProtocol {
           (fields("type"), fields("name"), fields("paramSet")) match {
             case (JsString(typeName), JsString(name), paramSet) =>
               typeName match {
-                case `structType` => Struct(name, paramSetFormat.read(paramSet))
+                case `structType` => Struct(paramSetFormat.read(paramSet))
                 case _            => unexpectedJsValueError(json)
               }
             case _ => unexpectedJsValueError(json)
