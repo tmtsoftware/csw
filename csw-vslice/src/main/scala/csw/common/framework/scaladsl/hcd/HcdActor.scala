@@ -7,7 +7,13 @@ import csw.common.framework.models.HcdResponseMode.{Idle, Initialized, Running}
 import csw.common.framework.models.IdleHcdMsg.{Initialize, Start}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg._
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, LifecycleFailureInfo, Restart, Shutdown}
+import csw.common.framework.models.ToComponentLifecycleMessage.{
+  GoOffline,
+  GoOnline,
+  LifecycleFailureInfo,
+  Restart,
+  Shutdown
+}
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.PubSubActor
 import csw.param.Parameters.Setup
@@ -29,6 +35,8 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
   var mode: HcdResponseMode = Idle
   ctx.self ! Initialize
 
+  var isOnline: Boolean = false
+
   def initialize(): Future[Unit]
   def onRun(): Unit
   def onSetup(sc: Setup): Unit
@@ -36,10 +44,9 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
 
   def onShutdown(): Unit
   def onRestart(): Unit
-  def onRunOnline(): Unit
   def onGoOffline(): Unit
+  def onGoOnline(): Unit
   def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit
-  def onShutdownComplete(): Unit
 
   override def onMessage(msg: HcdMsg): Behavior[HcdMsg] = {
     (mode, msg) match {
@@ -74,6 +81,7 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
       onRun()
       val running = Running(ctx.self, pubSubRef)
       mode = running
+      isOnline = true
       supervisor ! running
   }
 
@@ -87,17 +95,23 @@ abstract class HcdActor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], s
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case Shutdown =>
       onShutdown()
-      supervisor ! ShutdownComplete
       ctx.stop(domainAdapter)
       ctx.stop(pubSubRef)
+      supervisor ! ShutdownComplete
     case Restart =>
       onRestart()
       mode = Idle
       ctx.self ! Start
+    case GoOnline =>
+      if (!isOnline) {
+        onGoOnline()
+        isOnline = true
+      }
     case GoOffline =>
-      onGoOffline()
-      mode = Initialized(ctx.self, pubSubRef)
-      supervisor ! mode
+      if (isOnline) {
+        onGoOffline()
+        isOnline = false
+      }
     case LifecycleFailureInfo(state, reason) => onLifecycleFailureInfo(state, reason)
   }
 }

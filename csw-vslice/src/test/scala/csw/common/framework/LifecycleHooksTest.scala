@@ -53,7 +53,7 @@ class LifecycleHooksTest extends FunSuite with Matchers with BeforeAndAfterEach 
     val testProbeStateReceiver: TestProbe[DomainResponseMsg] = TestProbe[DomainResponseMsg]
     running1.hcdRef ! DomainHcdMsg(GetCurrentState(testProbeStateReceiver.ref))
     val response = testProbeStateReceiver.expectMsgType[HcdDomainResponseMsg]
-    response.state shouldBe LifecycleMessageReceived.Restart
+    response.state shouldBe null
   }
 
   test("A running Hcd component should accept RunOffline lifecycle message") {
@@ -61,5 +61,32 @@ class LifecycleHooksTest extends FunSuite with Matchers with BeforeAndAfterEach 
     val running             = run(testProbeSupervisor)
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
 
+    val testProbeStateReceiver: TestProbe[DomainResponseMsg] = TestProbe[DomainResponseMsg]
+    running.hcdRef ! DomainHcdMsg(GetCurrentState(testProbeStateReceiver.ref))
+    val response = testProbeStateReceiver.expectMsgType[HcdDomainResponseMsg]
+    response.state shouldBe LifecycleMessageReceived.RunOffline
+  }
+
+  test("A running Hcd component should accept RunOnline lifecycle message when it is Offline") {
+    val testProbeSupervisor = TestProbe[HcdResponseMode]
+    val running             = run(testProbeSupervisor)
+    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
+    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
+
+    val testProbeStateReceiver: TestProbe[DomainResponseMsg] = TestProbe[DomainResponseMsg]
+    running.hcdRef ! DomainHcdMsg(GetCurrentState(testProbeStateReceiver.ref))
+    val response = testProbeStateReceiver.expectMsgType[HcdDomainResponseMsg]
+    response.state shouldBe LifecycleMessageReceived.RunOnline
+  }
+
+  test("A running Hcd component should not accept RunOnline lifecycle message when it is already Online") {
+    val testProbeSupervisor = TestProbe[HcdResponseMode]
+    val running             = run(testProbeSupervisor)
+    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
+
+    val testProbeStateReceiver: TestProbe[DomainResponseMsg] = TestProbe[DomainResponseMsg]
+    running.hcdRef ! DomainHcdMsg(GetCurrentState(testProbeStateReceiver.ref))
+    val response = testProbeStateReceiver.expectMsgType[HcdDomainResponseMsg]
+    response.state should not be LifecycleMessageReceived.RunOnline
   }
 }

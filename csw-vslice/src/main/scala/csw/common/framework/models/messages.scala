@@ -26,6 +26,7 @@ object ToComponentLifecycleMessage {
   case object Shutdown                                                   extends ToComponentLifecycleMessage
   case object Restart                                                    extends ToComponentLifecycleMessage
   case object GoOffline                                                  extends ToComponentLifecycleMessage
+  case object GoOnline                                                   extends ToComponentLifecycleMessage
   case class LifecycleFailureInfo(state: LifecycleState, reason: String) extends ToComponentLifecycleMessage
 }
 

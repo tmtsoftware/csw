@@ -42,11 +42,11 @@ public class JSampleHcd extends JHcdActor<JHcdDomainMessages> {
     public void jOnRun() {}
 
     @Override
-    public void jOnRunOffline() {}
+    public void jOnGoOffline() {}
+
+    @Override
+    public void jOnGoOnline() {}
 
     @Override
     public void jOnLifecycleFailureInfo(LifecycleState state, String reason) {}
-
-    @Override
-    public void jOnShutdownComplete() {}
 }

@@ -15,6 +15,7 @@ sealed trait LifecycleMessageReceived
 object LifecycleMessageReceived {
   case object Restart              extends LifecycleMessageReceived
   case object RunOffline           extends LifecycleMessageReceived
+  case object RunOnline            extends LifecycleMessageReceived
   case object Shutdown             extends LifecycleMessageReceived
   case object LifecyclefailureInfo extends LifecycleMessageReceived
 }

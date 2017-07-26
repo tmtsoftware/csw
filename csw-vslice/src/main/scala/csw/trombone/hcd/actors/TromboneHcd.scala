@@ -47,14 +47,12 @@ class TromboneHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMod
 
   override def onRestart(): Unit = println("Received do restart")
 
-  override def onRunOnline(): Unit = println("Received running")
-
   override def onGoOffline(): Unit = println("Received running offline")
+
+  override def onGoOnline(): Unit = println("Received running offline")
 
   override def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit =
     println(s"Received failed state: $state for reason: $reason")
-
-  override def onShutdownComplete(): Unit = println("received Shutdown complete during Running state")
 
   def onSetup(sc: Setup): Unit = {
     import csw.trombone.hcd.TromboneHcdState._

@@ -13,7 +13,9 @@ class SampleHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode]
 
   var lifeCycleMessageReceived: LifecycleMessageReceived = _
 
-  override def initialize(): Future[Unit] = Future.unit
+  override def initialize(): Future[Unit] = Future {
+    lifeCycleMessageReceived = null
+  }
 
   override def onRun(): Unit = ()
 
@@ -25,19 +27,19 @@ class SampleHcd(ctx: ActorContext[HcdMsg], supervisor: ActorRef[HcdResponseMode]
     lifeCycleMessageReceived = LifecycleMessageReceived.Restart
   }
 
-  override def onRunOnline(): Unit = ()
-
   override def onGoOffline(): Unit = {
     lifeCycleMessageReceived = LifecycleMessageReceived.RunOffline
   }
 
   override def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit = ()
 
-  override def onShutdownComplete(): Unit = ()
-
   override def onSetup(sc: Parameters.Setup): Unit = ()
 
   override def onDomainMsg(msg: HcdDomainMessage): Unit = msg match {
     case GetCurrentState(replyTo) => replyTo ! HcdDomainResponseMsg(lifeCycleMessageReceived)
+  }
+
+  override def onGoOnline(): Unit = {
+    lifeCycleMessageReceived = LifecycleMessageReceived.RunOnline
   }
 }
