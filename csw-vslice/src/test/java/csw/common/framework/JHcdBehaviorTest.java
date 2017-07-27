@@ -24,24 +24,25 @@ import scala.concurrent.duration.FiniteDuration;
 import scala.reflect.ClassTag;
 import scala.runtime.Nothing$;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 
 public class JHcdBehaviorTest {
 
-    JHcdHandlers hcdHandlers = mock(JHcdHandlers.class);
-    JHcdHandlersFactory<JHcdDomainMessages> hcdHandlerFactory = new JHcdHandlersFactory<JHcdDomainMessages>(JHcdDomainMessages.class) {
-
-        @Override
-        public JHcdHandlers<JHcdDomainMessages> make(akka.typed.javadsl.ActorContext<HcdMsg> ctx) {
-            return hcdHandlers;
-        }
-    };
-
     @Ignore
     public void testHcdActorInitialization() throws Exception {
+        JHcdHandlers hcdHandlers = mock(JHcdHandlers.class);
+        JHcdHandlersFactory<JHcdDomainMessages> hcdHandlerFactory = new JHcdHandlersFactory<JHcdDomainMessages>(JHcdDomainMessages.class) {
+
+            @Override
+            public JHcdHandlers<JHcdDomainMessages> make(akka.typed.javadsl.ActorContext<HcdMsg> ctx) {
+                return hcdHandlers;
+            }
+        };
+
         ActorSystem<Object> actorSystem = ActorSystem.create("actorSystem", Actor.empty());
 
         TestKitSettings testKitSettings = TestKitSettings.apply(actorSystem);
@@ -51,6 +52,8 @@ public class JHcdBehaviorTest {
                 actorSystem,
                 testKitSettings);
 
+        when(hcdHandlers.jInitialize()).thenReturn(CompletableFuture.completedFuture(null));
+        doNothing().when(hcdHandlers).onRun();
 
         Behavior<Nothing$> hcdMsgBehavior = hcdHandlerFactory.behaviour(supervisorProbe.ref()).narrow();
 
@@ -62,9 +65,7 @@ public class JHcdBehaviorTest {
 
         Assert.assertEquals(hcdMsgActorRef, initialized.hcdRef());
 
-        ActorRef<HcdResponseMode.Running> replyTo = supervisorProbe.ref().narrow();
         initialized.hcdRef().tell(InitialHcdMsg.Run$.MODULE$);
-
 
         ClassTag<HcdResponseMode.Running> runningClassTag = JClassTag.make(HcdResponseMode.Running.class);
         HcdResponseMode.Running running = supervisorProbe.expectMsgType(FiniteDuration.apply(5, TimeUnit.SECONDS), runningClassTag);
