@@ -4,7 +4,7 @@ import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
-import csw.services.logging.appenders.FileAppender
+import csw.services.logging.appenders.{FileAppender, StdOutAppender}
 import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.{Logger, LoggerImpl}
@@ -31,6 +31,7 @@ class E2ELoggingBenchmark {
   var actorSystem: ActorSystem   = _
   var log: Logger                = _
   var fileAppender: FileAppender = _
+  var person: Person             = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {
@@ -39,6 +40,7 @@ class E2ELoggingBenchmark {
     loggingSystem.setAppenders(List(FileAppender))
     loggingSystem.setDefaultLogLevel(INFO)
     log = new LoggerImpl(None, None)
+    person = Person.createDummy
   }
 
   @TearDown(Level.Trial)
@@ -50,6 +52,19 @@ class E2ELoggingBenchmark {
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
   def e2eLoggingThroughput(): Unit = {
-    log.info("See if this is logged.")
+    log.info(s"My name is $person, logging with ByNameAPI@INFO Level")
+  }
+
+  @Benchmark
+  @BenchmarkMode(Array(Mode.Throughput))
+  @OutputTimeUnit(TimeUnit.SECONDS)
+  def e2eLoggingThroughputWhenLogLevelIsNotEnabled(): Unit = {
+    log.trace(s"My name is $person, logging with ByNameAPI@TRACE Level")
   }
 }
+
+object Person {
+  private[jmh] def createDummy = Person("James", "Bond", "Downtown", "Omaha")
+}
+
+case class Person(var firstName: String, var lastName: String, var address: String, var city: String)

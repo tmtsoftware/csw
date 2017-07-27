@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class JE2ELoggingBenchmark implements JGenericLogger {
     private ILogger log;
     private static ActorSystem actorSystem;
-    private Person person;
+    private JPerson person;
 
     @Setup
     public void setup() {
@@ -43,7 +43,7 @@ public class JE2ELoggingBenchmark implements JGenericLogger {
         actorSystem = ActorSystem.create("JE2E");
         LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", actorSystem, Collections.singletonList(JLogAppenderBuilders.FileAppender));
         loggingSystem.setDefaultLogLevel(LoggingLevels.INFO$.MODULE$);
-        person = Person.createDummy();
+        person = JPerson.createDummy();
     }
 
     @TearDown
@@ -101,21 +101,21 @@ public class JE2ELoggingBenchmark implements JGenericLogger {
     }
 }
 
-class Person {
+class JPerson {
     private String firstName;
     private String lastName;
     private String address;
     private String city;
 
-    public Person(String firstName, String lastName, String address, String city) {
+    public JPerson(String firstName, String lastName, String address, String city) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
         this.city = city;
     }
 
-    static Person createDummy() {
-        return new Person("James", "Bond", "Downtown", "Omaha");
+    static JPerson createDummy() {
+        return new JPerson("James", "Bond", "Downtown", "Omaha");
     }
 
     @Override
