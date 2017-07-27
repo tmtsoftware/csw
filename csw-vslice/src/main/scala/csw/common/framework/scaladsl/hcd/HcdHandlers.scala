@@ -29,4 +29,9 @@ abstract class HcdHandlers[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg]
   def onGoOffline(): Unit
   def onGoOnline(): Unit
   def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit
+
+  def stopChildren(): Unit = {
+    ctx.stop(domainAdapter)
+    ctx.stop(pubSubRef)
+  }
 }

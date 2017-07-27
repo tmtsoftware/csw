@@ -37,6 +37,7 @@ class LifecycleHooksTest
 
   def run(testProbeSupervisor: TestProbe[HcdResponseMode]): Running = {
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+    when(sampleHcdHandler.isOnline_=(true))
     Await.result(
       system.systemActorOf[Nothing](sampleHcdHandlersFactory.behaviour(testProbeSupervisor.ref), "Hcd"),
       5.seconds
@@ -60,6 +61,7 @@ class LifecycleHooksTest
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
     testProbeSupervisor.expectMsg(ShutdownComplete)
     verify(sampleHcdHandler).onShutdown()
+    verify(sampleHcdHandler).stopChildren()
   }
 
   ignore("A running Hcd component should accept Restart lifecycle message") {

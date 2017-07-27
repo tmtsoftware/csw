@@ -77,8 +77,7 @@ class HcdBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case Shutdown =>
       hcdHandlers.onShutdown()
-      ctx.stop(hcdHandlers.domainAdapter)
-      ctx.stop(hcdHandlers.pubSubRef)
+      hcdHandlers.stopChildren()
       supervisor ! ShutdownComplete
     case Restart =>
       hcdHandlers.onRestart()
