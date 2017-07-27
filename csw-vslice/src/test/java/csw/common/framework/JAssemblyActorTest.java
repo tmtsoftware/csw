@@ -21,6 +21,7 @@ import csw.common.framework.models.JComponent;
 import csw.services.location.javadsl.JConnectionType;
 import csw.services.location.models.Connection;
 import csw.services.location.models.ConnectionType;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 import scala.concurrent.Await;
@@ -35,9 +36,16 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class JAssemblyActorTest {
+
+    static ActorSystem<Nothing$> actorSystem = ActorSystem.create("actorSystem", Actor.empty());
+
+    @AfterClass
+    public static void cleanup() {
+        actorSystem.terminate();
+    }
+
     @Test
     public void testAssemblyActorSendsInitializedAndRunningMessageToSupervisor() throws Exception {
-        ActorSystem<Nothing$> actorSystem = ActorSystem.create("actorSystem", Actor.empty());
 
         TestKitSettings testKitSettings = TestKitSettings.apply(actorSystem);
 
