@@ -1,15 +1,13 @@
 package csw.trombone.assembly.actors
 
-import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validation
 import csw.common.ccs.Validation.{Valid, Validation}
 import csw.common.framework.models.Component.AssemblyInfo
-import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, LifecycleFailureInfo, Restart}
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.assembly.AssemblyActor
+import csw.common.framework.scaladsl.assembly.{AssemblyHandlers, AssemblyHandlersFactory}
 import csw.param.Parameters.{Observe, Setup}
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}
@@ -18,24 +16,22 @@ import csw.trombone.assembly.TromboneCommandHandlerMsgs.NotFollowingMsgs
 import csw.trombone.assembly._
 
 import scala.async.Async.{async, await}
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.Future
 
-object TromboneAssembly {
-  def make(assemblyInfo: AssemblyInfo, supervisor: ActorRef[AssemblyComponentLifecycleMessage]): Behavior[Nothing] =
-    Actor.mutable[AssemblyMsg](ctx ⇒ new TromboneAssembly(ctx, assemblyInfo, supervisor)).narrow
+class TromboneAssemblyHandlersFactory extends AssemblyHandlersFactory[DiagPublisherMessages] {
+  override def make(ctx: ActorContext[AssemblyMsg],
+                    assemblyInfo: AssemblyInfo): AssemblyHandlers[DiagPublisherMessages] =
+    new TromboneAssemblyHandlers(ctx, assemblyInfo)
 }
 
-class TromboneAssembly(ctx: ActorContext[AssemblyMsg],
-                       info: AssemblyInfo,
-                       supervisor: ActorRef[AssemblyComponentLifecycleMessage])
-    extends AssemblyActor[DiagPublisherMessages](ctx, info, supervisor) {
+class TromboneAssemblyHandlers(ctx: ActorContext[AssemblyMsg], info: AssemblyInfo)
+    extends AssemblyHandlers[DiagPublisherMessages](ctx, info) {
 
   private var diagPublsher: ActorRef[DiagPublisherMessages] = _
 
   private var commandHandler: ActorRef[NotFollowingMsgs] = _
 
-  implicit var ac: AssemblyContext          = _
-  implicit val ec: ExecutionContextExecutor = ctx.executionContext
+  implicit var ac: AssemblyContext = _
 
   def onRun(): Unit = ()
 
@@ -50,24 +46,27 @@ class TromboneAssembly(ctx: ActorContext[AssemblyMsg],
     diagPublsher = ctx.spawnAnonymous(DiagPublisher.make(ac, runningHcd, Some(eventPublisher)))
   }
 
+  override def onShutdown(): Unit = println("Received Shutdown")
+
+  override def onRestart(): Unit = println("Received dorestart")
+
+  override def onGoOffline(): Unit = println("Received running offline")
+
+  override def onGoOnline(): Unit = {
+    println("Received doshutdown")
+    runningHcd.foreach(
+      _.hcdRef ! RunningHcdMsg
+        .Lifecycle(ToComponentLifecycleMessage.Shutdown)
+    )
+  }
+
+  override def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit =
+    println(s"TromboneAssembly received failed lifecycle state: $state for reason: $reason")
+
   def onDomainMsg(mode: DiagPublisherMessages): Unit = mode match {
     case DiagnosticState => diagPublsher ! DiagnosticState
     case OperationsState => diagPublsher ! OperationsState
     case _               ⇒
-  }
-
-  def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case GoOffline => println("Received running offline")
-    case Restart   => println("Received dorestart")
-    case ToComponentLifecycleMessage.Shutdown =>
-      println("Received doshutdown")
-      runningHcd.foreach(
-        _.hcdRef ! RunningHcdMsg
-          .Lifecycle(ToComponentLifecycleMessage.Shutdown)
-      )
-      supervisor ! ShutdownComplete
-    case LifecycleFailureInfo(state: LifecycleState, reason: String) =>
-      println(s"TromboneAssembly received failed lifecycle state: $state for reason: $reason")
   }
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???

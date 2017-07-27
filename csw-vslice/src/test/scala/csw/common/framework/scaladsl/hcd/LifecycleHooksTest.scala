@@ -1,4 +1,4 @@
-package csw.common.framework
+package csw.common.framework.scaladsl.hcd
 
 import akka.typed.ActorSystem
 import akka.typed.scaladsl.{Actor, ActorContext}
@@ -11,7 +11,6 @@ import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg.Lifecycle
 import csw.common.framework.models.{HcdMsg, HcdResponseMode, ToComponentLifecycleMessage}
-import csw.common.framework.scaladsl.hcd.{HcdHandlers, HcdHandlersFactory}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}

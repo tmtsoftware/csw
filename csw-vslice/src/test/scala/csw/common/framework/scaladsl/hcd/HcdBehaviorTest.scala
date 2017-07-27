@@ -1,4 +1,4 @@
-package csw.common.framework
+package csw.common.framework.scaladsl.hcd
 
 import akka.typed.ActorSystem
 import akka.typed.scaladsl.{Actor, ActorContext}
@@ -9,13 +9,12 @@ import csw.common.components.hcd.HcdDomainMessage
 import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.{HcdMsg, HcdResponseMode}
-import csw.common.framework.scaladsl.hcd.{HcdHandlers, HcdHandlersFactory}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, Future}
 
 class HcdBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll with MockitoSugar {
 
@@ -27,28 +26,33 @@ class HcdBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll with
     system.terminate()
   }
 
+  def getSampleHcdFactory(hcdHandlers: HcdHandlers[HcdDomainMessage]): HcdHandlersFactory[HcdDomainMessage] =
+    new HcdHandlersFactory[HcdDomainMessage] {
+      override def make(ctx: ActorContext[HcdMsg]): HcdHandlers[HcdDomainMessage] = hcdHandlers
+    }
+
   test("hcd component should send initialize and running message to supervisor") {
     val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessage]]
-    val sampleHcdHandlersFactory = new HcdHandlersFactory[HcdDomainMessage] {
-      override def make(ctx: ActorContext[HcdMsg]): HcdHandlers[HcdDomainMessage] = sampleHcdHandler
-    }
-    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
-    doNothing().when(sampleHcdHandler).onRun()
 
-    val testProbe: TestProbe[HcdResponseMode] = TestProbe[HcdResponseMode]
+    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+
+    val supervisorProbe: TestProbe[HcdResponseMode] = TestProbe[HcdResponseMode]
 
     val hcdRef =
-      Await.result(system.systemActorOf[Nothing](sampleHcdHandlersFactory.behaviour(testProbe.ref), "sampleHcd"),
-                   5.seconds)
+      Await.result(
+        system.systemActorOf[Nothing](getSampleHcdFactory(sampleHcdHandler).behaviour(supervisorProbe.ref),
+                                      "sampleHcd"),
+        5.seconds
+      )
 
-    val initialized = testProbe.expectMsgType[Initialized]
+    val initialized = supervisorProbe.expectMsgType[Initialized]
 
     verify(sampleHcdHandler).initialize()
     initialized.hcdRef shouldBe hcdRef
 
     initialized.hcdRef ! Run
 
-    val running = testProbe.expectMsgType[Running]
+    val running = supervisorProbe.expectMsgType[Running]
 
     verify(sampleHcdHandler).onRun()
     verify(sampleHcdHandler).isOnline_=(true)

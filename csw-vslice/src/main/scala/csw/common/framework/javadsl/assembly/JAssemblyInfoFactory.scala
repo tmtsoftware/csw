@@ -20,5 +20,4 @@ object JAssemblyInfoFactory {
                  registerAs.asScala.toSet,
                  connections.asScala.toSet)
   }
-
 }

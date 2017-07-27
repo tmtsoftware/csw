@@ -41,14 +41,9 @@ object HcdResponseMode {
   case class Running(hcdRef: ActorRef[RunningHcdMsg], pubSubRef: ActorRef[PubSub[CurrentState]]) extends HcdResponseMode
 }
 
-sealed trait AssemblyComponentLifecycleMessage
+///////////////
 
-object AssemblyComponentLifecycleMessage {
-  case class Initialized(assemblyRef: ActorRef[InitialAssemblyMsg]) extends AssemblyComponentLifecycleMessage
-  case class Running(assemblyRef: ActorRef[RunningAssemblyMsg])     extends AssemblyComponentLifecycleMessage
-}
-
-sealed trait FromComponentLifecycleMessage extends HcdResponseMode with AssemblyComponentLifecycleMessage
+sealed trait FromComponentLifecycleMessage extends HcdResponseMode with AssemblyResponseMode
 
 object FromComponentLifecycleMessage {
   case class InitializeFailure(reason: String) extends FromComponentLifecycleMessage
@@ -94,7 +89,24 @@ object RunningHcdMsg {
 }
 
 //////////////////////////
+
+sealed trait AssemblyResponseMode
+
+object AssemblyResponseMode {
+  case object Idle                                                  extends AssemblyResponseMode
+  case class Initialized(assemblyRef: ActorRef[InitialAssemblyMsg]) extends AssemblyResponseMode
+  case class Running(assemblyRef: ActorRef[RunningAssemblyMsg])     extends AssemblyResponseMode
+}
+
+//////////////////////////
 sealed trait AssemblyMsg
+
+sealed trait IdleAssemblyMsg extends AssemblyMsg
+object IdleAssemblyMsg {
+  case object Initialize extends IdleAssemblyMsg
+  case object Start      extends IdleAssemblyMsg
+}
+
 sealed trait InitialAssemblyMsg extends AssemblyMsg
 object InitialAssemblyMsg {
   case object Run extends InitialAssemblyMsg
