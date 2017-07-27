@@ -49,7 +49,10 @@ class HcdBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll with
     initialized.hcdRef ! Run
 
     val running = testProbe.expectMsgType[Running]
+
     verify(sampleHcdHandler).onRun()
+    verify(sampleHcdHandler).isOnline_=(true)
+
     running.hcdRef shouldBe hcdRef
   }
 }

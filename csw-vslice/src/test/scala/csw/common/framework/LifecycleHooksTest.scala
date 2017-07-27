@@ -30,16 +30,15 @@ class LifecycleHooksTest
   implicit val settings = TestKitSettings(system)
   implicit val timeout  = Timeout(5.seconds)
 
-  val sampleHcdHandler: HcdHandlers[HcdDomainMessage] = mock[HcdHandlers[HcdDomainMessage]]
-  val sampleHcdHandlersFactory = new HcdHandlersFactory[HcdDomainMessage] {
+  class SampleHcdHandlersFactory(sampleHcdHandler: HcdHandlers[HcdDomainMessage])
+      extends HcdHandlersFactory[HcdDomainMessage] {
     override def make(ctx: ActorContext[HcdMsg]): HcdHandlers[HcdDomainMessage] = sampleHcdHandler
   }
 
-  def run(testProbeSupervisor: TestProbe[HcdResponseMode]): Running = {
-    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
-    when(sampleHcdHandler.isOnline_=(true))
+  def run(hcdHandlersFactory: HcdHandlersFactory[HcdDomainMessage],
+          testProbeSupervisor: TestProbe[HcdResponseMode]): Running = {
     Await.result(
-      system.systemActorOf[Nothing](sampleHcdHandlersFactory.behaviour(testProbeSupervisor.ref), "Hcd"),
+      system.systemActorOf[Nothing](hcdHandlersFactory.behaviour(testProbeSupervisor.ref), "Hcd"),
       5.seconds
     )
 
@@ -52,9 +51,12 @@ class LifecycleHooksTest
     system.terminate()
   }
 
-  ignore("A running Hcd component should accept Shutdown lifecycle message") {
+  test("A running Hcd component should accept Shutdown lifecycle message") {
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessage]]
+    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(testProbeSupervisor)
+    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
 
     doNothing().when(sampleHcdHandler).onShutdown()
 
@@ -64,38 +66,71 @@ class LifecycleHooksTest
     verify(sampleHcdHandler).stopChildren()
   }
 
-  ignore("A running Hcd component should accept Restart lifecycle message") {
+  test("A running Hcd component should accept Restart lifecycle message") {
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessage]]
+    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(testProbeSupervisor)
+    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
 
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.Restart)
+    Thread.sleep(1000)
 
     verify(sampleHcdHandler).onRestart()
   }
 
-  ignore("A running Hcd component should accept RunOffline lifecycle message") {
+  test("A running Hcd component should accept RunOffline lifecycle message") {
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessage]]
+    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+    when(sampleHcdHandler.isOnline).thenReturn(true)
+
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(testProbeSupervisor)
+    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
 
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
+    Thread.sleep(1000)
 
     verify(sampleHcdHandler).onGoOffline()
   }
 
-  ignore("A running Hcd component should accept RunOnline lifecycle message when it is Offline") {
+  test("A running Hcd component should not accept RunOffline lifecycle message when it is already offline") {
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessage]]
+    when(sampleHcdHandler.isOnline).thenReturn(false)
+    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(testProbeSupervisor)
+    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
 
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
-    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
+    Thread.sleep(1000)
 
-    verify(sampleHcdHandler).onGoOffline()
+    verify(sampleHcdHandler, never).onGoOffline()
   }
 
-  ignore("A running Hcd component should not accept RunOnline lifecycle message when it is already Online") {
+  test("A running Hcd component should accept RunOnline lifecycle message when it is Offline") {
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessage]]
+    when(sampleHcdHandler.isOnline).thenReturn(false)
+    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(testProbeSupervisor)
+    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
+
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
+    Thread.sleep(1000)
+
+    verify(sampleHcdHandler).onGoOnline()
+  }
+
+  test("A running Hcd component should not accept RunOnline lifecycle message when it is already Online") {
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessage]]
+    when(sampleHcdHandler.isOnline).thenReturn(true)
+    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+
+    val testProbeSupervisor = TestProbe[HcdResponseMode]
+    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
+
+    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
+    Thread.sleep(1000)
 
     verify(sampleHcdHandler, never).onGoOnline()
   }
