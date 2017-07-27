@@ -6,10 +6,10 @@ import csw.param.Parameters.Result
 
 object CommandStatus {
 
-  /**
-   * Returns a name for the status
-   */
-  def name: String = this.getClass.getSimpleName.toLowerCase
+//  /**
+//   * Returns a name for the status
+//   */
+//  def name: String = this.getClass.getSimpleName.toLowerCase
 
   /**
    * Trait for a response message from an assembly to a submit or observe request
