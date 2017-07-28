@@ -1,6 +1,5 @@
 package csw.param.parameters
 
-import csw.param
 import csw.param.ParameterSetJson._
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
 import spray.json.{JsValue, JsonFormat}
@@ -42,41 +41,8 @@ case class GParam[S] private (typeName: String,
   override def withUnits(unitsIn: Units): GParam[S] = copy(units = unitsIn)
 }
 
-/**
- * A key of S values
- *
- * @param nameIn   the name of the key
- */
-sealed class GKey[S: JsonFormat: ClassTag](nameIn: String) extends Key[S, GParam[S]](nameIn) {
-
-  val typeName: String = getClass.getSimpleName
+case class GKey[S: JsonFormat: ClassTag](nameIn: String, typeName: String) extends Key[S, GParam[S]](nameIn) {
 
   override def set(v: Vector[S], units: Units = NoUnits): GParam[S] =
     GParam(typeName, keyName, v, units, implicitly[JsonFormat[S]])
-}
-
-object Keys {
-  case class RaDec(name: String)   extends GKey[csw.param.RaDec](name)
-  case class Integer(name: String) extends GKey[scala.Int](name)
-  case class Boolean(name: String) extends GKey[scala.Boolean](name)
-}
-
-object JKeys {
-  case class Integer(name: String) extends GKey[java.lang.Integer](name)
-  case class Boolean(name: String) extends GKey[java.lang.Boolean](name)
-}
-
-object Formats {
-  val values: Map[String, JsonFormat[GParam[_]]] = Map(
-    getPair[param.RaDec],
-    getPair[java.lang.Integer],
-    getPair[java.lang.Boolean],
-  )
-
-  print(values)
-
-  def getPair[T: ClassTag: JsonFormat]: (String, JsonFormat[GParam[_]]) = (
-    implicitly[ClassTag[T]].runtimeClass.getSimpleName,
-    implicitly[JsonFormat[GParam[T]]].asInstanceOf[JsonFormat[GParam[_]]]
-  )
 }

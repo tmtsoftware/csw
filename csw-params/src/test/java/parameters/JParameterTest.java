@@ -1,21 +1,18 @@
 package parameters;
 
-import csw.param.JavaHelpers;
-import csw.param.UnitsOfMeasure;
-import csw.param.parameters.GParam;
-import csw.param.parameters.JKeys;
-import csw.param.parameters.Keys;
-import org.junit.Assert;
+import csw.param.parameters.*;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import static csw.param.parameters.Keys.*;
 
 public class JParameterTest {
 
     @Test
     public void testBooleanParameter() {
         String encoder = "encoder";
+//        GKey<Boolean> asds = BooleanKey().make("asds");
 //        BooleanKey encoderKey = BooleanKey.apply(encoder);
 
 //        JKeys.Integer key = new Keys.Integer("aa");

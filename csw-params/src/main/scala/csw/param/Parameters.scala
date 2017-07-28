@@ -72,7 +72,7 @@ object Parameters {
      */
     final def prefixStr: String = prefix.prefix
 
-    // This is the format for a Setup/Observe/Wait
+    // This is the get for a Setup/Observe/Wait
     override def toString = s"$typeName([$subsystem, $prefixStr]$dataToString)"
   }
 
@@ -269,8 +269,8 @@ object Parameters {
     def jMissingKeys(keys: Key[_, _]*): java.util.Set[String] = missingKeys(keys: _*).asJava
 
     /**
-     * Returns a map based on this object where the keys and values are in string format
-     * (Could be useful for exporting in a format that other languages can read).
+     * Returns a map based on this object where the keys and values are in string get
+     * (Could be useful for exporting in a get that other languages can read).
      * Derived classes might want to add values to this map for fixed fields.
      */
     def getStringMap: Map[String, String] =

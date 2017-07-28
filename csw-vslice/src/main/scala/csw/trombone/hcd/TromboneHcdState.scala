@@ -30,9 +30,9 @@ object TromboneHcdState {
   val stateKey                    = ChoiceKey("axisState", AXIS_IDLE, AXIS_MOVING, AXIS_ERROR)
   val positionKey                 = IntKey("position")
   val positionUnits: encoder.type = encoder
-  val inLowLimitKey               = Keys.Boolean("lowLimit")
-  val inHighLimitKey              = Keys.Boolean("highLimit")
-  val inHomeKey                   = Keys.Boolean("homed")
+  val inLowLimitKey               = Keys.BooleanKey.make("lowLimit")
+  val inHighLimitKey              = Keys.BooleanKey.make("highLimit")
+  val inHomeKey                   = Keys.BooleanKey.make("homed")
 
   val defaultAxisState: StateVariable.CurrentState = CurrentState(axisStateCK).madd(
     axisNameKey    -> tromboneAxisName,

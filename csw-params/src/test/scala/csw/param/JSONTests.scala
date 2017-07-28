@@ -26,11 +26,9 @@ class JSONTests extends FunSpec {
     val wfos: Subsystem = Subsystem.WFOS
 
     it("should encode and decode properly") {
-      val key                    = Keys.Boolean("abc")
+      val key                    = Keys.BooleanKey.make("abc")
       val value: GParam[Boolean] = key.set(Vector(true))
-      println(key.typeName)
-      println(value.toJson)
-      val json = wfos.toJson
+      val json                   = wfos.toJson
       //info("wfos: " + json)
       val sub = json.convertTo[Subsystem]
       assert(sub == wfos)
@@ -95,12 +93,11 @@ class JSONTests extends FunSpec {
     }
 
     it("boolean item encode/decode") {
-      val k1 = Keys.Boolean(s1)
+      val k1 = Keys.BooleanKey.make(s1)
       val i1 = k1.set(true, false).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1 = i1.toJson
       //      info("j1: " + j1)
-      println(j1)
       val in1 = j1.convertTo[GParam[Boolean]]
       assert(in1 == i1)
 
@@ -147,7 +144,7 @@ class JSONTests extends FunSpec {
     val k3 = LongKey("c")
     val k4 = FloatKey("d")
     val k5 = DoubleKey("e")
-    val k6 = Keys.Boolean("f")
+    val k6 = Keys.BooleanKey.make("f")
     val k7 = StringKey("g")
 
     val i1 = k1.set('d').withUnits(UnitsOfMeasure.NoUnits)
@@ -234,7 +231,7 @@ class JSONTests extends FunSpec {
 
   describe("Test Custom RaDecItem") {
     it("Should allow cutom RaDecItem") {
-      val k1  = Keys.RaDec("coords")
+      val k1  = Keys.RaDecKey.make("coords")
       val c1  = RaDec(7.3, 12.1)
       val c2  = RaDec(9.1, 2.9)
       val i1  = k1.set(c1, c2)

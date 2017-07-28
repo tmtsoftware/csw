@@ -217,7 +217,7 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
         case (JsString(`choiceType`), parameter)          => choiceParameterFormat.read(parameter)
         case (JsString(`structParameterType`), parameter) => structParameterFormat.read(parameter)
         case (JsString(name), parameter) =>
-          Formats.values.get(name) match {
+          Formats.get(name) match {
             case None         ⇒ unexpectedJsValueError(parameter)
             case Some(format) ⇒ format.read(parameter)
           }

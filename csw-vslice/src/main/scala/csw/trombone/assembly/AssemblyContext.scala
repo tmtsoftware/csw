@@ -66,7 +66,7 @@ case class AssemblyContext(info: AssemblyInfo,
   // Follow submit command
   val followPrefix     = s"$componentPrefix.follow"
   val followCK: Prefix = followPrefix
-  val nssInUseKey      = Keys.Boolean("nssInUse")
+  val nssInUseKey      = Keys.BooleanKey.make("nssInUse")
 
   def setNssInUse(value: Boolean) = nssInUseKey -> value
 
