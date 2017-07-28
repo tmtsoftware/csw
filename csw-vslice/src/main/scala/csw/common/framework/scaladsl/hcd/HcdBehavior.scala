@@ -7,13 +7,7 @@ import csw.common.framework.models.HcdResponseMode.{Idle, Initialized, Running}
 import csw.common.framework.models.IdleHcdMsg.{Initialize, Start}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg._
-import csw.common.framework.models.ToComponentLifecycleMessage.{
-  GoOffline,
-  GoOnline,
-  LifecycleFailureInfo,
-  Restart,
-  Shutdown
-}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
 
 import scala.async.Async.{async, await}
@@ -93,6 +87,5 @@ class HcdBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
         hcdHandlers.onGoOffline()
         hcdHandlers.isOnline = false
       }
-    case LifecycleFailureInfo(state, reason) => hcdHandlers.onLifecycleFailureInfo(state, reason)
   }
 }

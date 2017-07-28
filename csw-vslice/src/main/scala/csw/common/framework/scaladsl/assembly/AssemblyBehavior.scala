@@ -11,13 +11,7 @@ import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplet
 import csw.common.framework.models.IdleAssemblyMsg.{Initialize, Start}
 import csw.common.framework.models.InitialAssemblyMsg.Run
 import csw.common.framework.models.RunningAssemblyMsg._
-import csw.common.framework.models.ToComponentLifecycleMessage.{
-  GoOffline,
-  GoOnline,
-  LifecycleFailureInfo,
-  Restart,
-  Shutdown
-}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
 import csw.param.Parameters
 import csw.param.Parameters.{Observe, Setup}
@@ -104,7 +98,6 @@ class AssemblyBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[AssemblyMsg
         assemblyHandlers.onGoOffline()
         assemblyHandlers.isOnline = false
       }
-    case LifecycleFailureInfo(state, reason) => assemblyHandlers.onLifecycleFailureInfo(state, reason)
   }
 
   def onSubmit(command: Parameters.ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = command match {
