@@ -72,7 +72,7 @@ package csw.util
  *
  * - DoubleArrayKey, DoubleMatrixKey
  *
- * In addition there is a GenericKey class that can be used for custom types. It is however recommended to
+ * In addition there is a GKey class that can be used for custom types. It is however recommended to
  * use only the standard key types, in oder to ensure that binary and JSON serialization and deserialization
  * works everywhere.
  *

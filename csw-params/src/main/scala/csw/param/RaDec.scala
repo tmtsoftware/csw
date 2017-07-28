@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.parameters.GenericParameter
+import csw.param.parameters.GParam
 import spray.json.{DefaultJsonProtocol, DeserializationException, JsArray, JsString, JsValue}
 
 /**
@@ -24,15 +24,15 @@ case object RaDec extends DefaultJsonProtocol {
   /**
    * Creates a GenericItem[RaDec] from a JSON value (This didn't work with the jsonFormat3 method)
    */
-  def reader(json: JsValue): GenericParameter[RaDec] = {
+  def reader(json: JsValue): GParam[RaDec] = {
     json.asJsObject.getFields("keyName", "value", "units") match {
       case Seq(JsString(keyName), JsArray(v), u) =>
         val units = ParameterSetJson.unitsFormat.read(u)
         val value = v.map(RaDec.raDecFormat.read)
-        GenericParameter[RaDec](typeName, keyName, value, units)
+        GParam[RaDec](typeName, keyName, value, units)
       case _ => throw new DeserializationException("Color expected")
     }
   }
 
-  GenericParameter.register(typeName, reader)
+  GParam.register(typeName, reader)
 }

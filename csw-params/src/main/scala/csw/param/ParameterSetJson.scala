@@ -168,7 +168,7 @@ object ParameterSetJson extends DefaultJsonProtocol {
       case i: LongArrayParameter    => (JsString(longArrayType), longArrayParameterFormat.write(i))
       case i: ChoiceParameter       => (JsString(choiceType), choiceParameterFormat.write(i))
       case i: StructParameter       => (JsString(structParameterType), structParameterFormat.write(i))
-      case i: GenericParameter[S]   => (JsString(i.typeName), i.toJson)
+      case i: GParam[S]             => (JsString(i.typeName), i.toJson)
     }
     JsObject("type" -> result._1, "parameter" -> result._2)
   }
@@ -199,7 +199,7 @@ object ParameterSetJson extends DefaultJsonProtocol {
         case (JsString(`choiceType`), parameter)          => choiceParameterFormat.read(parameter)
         case (JsString(`structParameterType`), parameter) => structParameterFormat.read(parameter)
         case (JsString(typeTag), parameter) =>
-          GenericParameter.lookup(typeTag) match {
+          GParam.lookup(typeTag) match {
             case Some(jsonReaderFunc) => jsonReaderFunc(parameter)
             case None                 => unexpectedJsValueError(parameter)
           }

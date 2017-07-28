@@ -24,17 +24,17 @@ object JSONTests extends DefaultJsonProtocol {
     implicit val myData2Format = jsonFormat4(MyData2.apply)
 
     // Creates a GenericItem[MyData2] from a JSON value (This didn't work with the jsonFormat3 method)
-    def reader(json: JsValue): GenericParameter[MyData2] = {
+    def reader(json: JsValue): GParam[MyData2] = {
       json.asJsObject.getFields("keyName", "value", "units") match {
         case Seq(JsString(keyName), JsArray(v), u) =>
           val units = ParameterSetJson.unitsFormat.read(u)
           val value = v.map(MyData2.myData2Format.read)
-          GenericParameter[MyData2]("MyData2", keyName, value, units)
+          GParam[MyData2]("MyData2", keyName, value, units)
         case _ => throw DeserializationException("Invalid JSON for GenericItem[MyData2]")
       }
     }
 
-    GenericParameter.register("MyData2", reader)
+    GParam.register("MyData2", reader)
   }
 }
 
@@ -258,7 +258,7 @@ class JSONTests extends FunSpec {
 
   describe("Test GenericItem") {
     it("Should allow a GenericItem with a custom type") {
-      val k1  = GenericKey[MyData2]("MyData2", "testData")
+      val k1  = GKey[MyData2]("MyData2", "testData")
       val d1  = MyData2(1, 2.0f, 3.0, "4")
       val d2  = MyData2(10, 20.0f, 30.0, "40")
       val i1  = k1.set(d1, d2).withUnits(UnitsOfMeasure.meters)
@@ -285,7 +285,7 @@ class JSONTests extends FunSpec {
 
   describe("Test Custom RaDecItem") {
     it("Should allow cutom RaDecItem") {
-      val k1  = GenericKey[RaDec]("RaDec", "coords")
+      val k1  = GKey[RaDec]("RaDec", "coords")
       val c1  = RaDec(7.3, 12.1)
       val c2  = RaDec(9.1, 2.9)
       val i1  = k1.set(c1, c2)

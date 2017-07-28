@@ -7,12 +7,12 @@ import spray.json.{JsArray, JsObject, JsString, JsValue, JsonFormat}
 
 import scala.collection.immutable.Vector
 
-object GenericParameter {
+object GParam {
 
   /**
    * type of a function that reads JSON and returns a new GenericItem
    */
-  type JsonReaderFunc = JsValue => GenericParameter[_]
+  type JsonReaderFunc = JsValue => GParam[_]
 
   // Used to register a JsonFormat instance to use to read and write JSON for a given GenericItem subclass
   private var jsonReaderMap = Map[String, JsonReaderFunc]()
@@ -36,14 +36,14 @@ object GenericParameter {
 }
 
 /**
- * The type of a value for an GenericKey
+ * The type of a value for an GKey
  *
  * @param typeName the name of the type S (for JSON serialization)
  * @param keyName  the name of the key
  * @param values    the value for the key
  * @param units    the units of the value
  */
-case class GenericParameter[S: JsonFormat](typeName: String, keyName: String, values: Vector[S], units: Units)
+case class GParam[S: JsonFormat](typeName: String, keyName: String, values: Vector[S], units: Units)
     extends Parameter[S] {
 
   /**
@@ -68,11 +68,11 @@ case class GenericParameter[S: JsonFormat](typeName: String, keyName: String, va
  * @param typeName the name of the type S (for JSON serialization)
  * @param nameIn   the name of the key
  */
-case class GenericKey[S: JsonFormat](typeName: String, nameIn: String) extends Key[S, GenericParameter[S]](nameIn) {
+case class GKey[S: JsonFormat](typeName: String, nameIn: String) extends Key[S, GParam[S]](nameIn) {
 
-  override def set(v: Vector[S], units: Units = NoUnits): GenericParameter[S] =
-    GenericParameter(typeName, keyName, v, units)
+  override def set(v: Vector[S], units: Units = NoUnits): GParam[S] =
+    GParam(typeName, keyName, v, units)
 
-  override def set(v: S*): GenericParameter[S /*, S*/ ] =
-    GenericParameter(typeName, keyName, v.toVector, UnitsOfMeasure.NoUnits)
+  override def set(v: S*): GParam[S /*, S*/ ] =
+    GParam(typeName, keyName, v.toVector, UnitsOfMeasure.NoUnits)
 }

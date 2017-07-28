@@ -3,7 +3,7 @@ package csw.param
 import csw.param.Parameters._
 import csw.param.Events.StatusEvent
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
-import csw.param.parameters.GenericKey
+import csw.param.parameters.GKey
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import csw.param.parameters.primitives._
@@ -128,7 +128,7 @@ class ConfigTests extends FunSpec {
 
   describe("Generic key tests") {
     // Note: It is recommended to use the standard keys, such as IntKey, StringKey, DoubleKey, etc.
-    val k1 = GenericKey[MyData]("MyData", "atest")
+    val k1 = GKey[MyData]("MyData", "atest")
     val d1 = MyData(1, 2.0f, 3.0, "4")
     val d2 = MyData(10, 20.0f, 30.0, "40")
 
