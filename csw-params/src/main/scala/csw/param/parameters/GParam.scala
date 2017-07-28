@@ -6,6 +6,7 @@ import spray.json.DefaultJsonProtocol._
 import spray.json.{JsArray, JsObject, JsString, JsValue, JsonFormat}
 
 import scala.collection.immutable.Vector
+import scala.reflect.ClassTag
 
 object GParam {
 
@@ -40,11 +41,13 @@ object GParam {
  *
  * @param typeName the name of the type S (for JSON serialization)
  * @param keyName  the name of the key
- * @param values    the value for the key
+ * @param items    the value for the key
  * @param units    the units of the value
  */
-case class GParam[S: JsonFormat](typeName: String, keyName: String, values: Vector[S], units: Units)
+case class GParam[S: JsonFormat](typeName: String, keyName: String, items: Array[S], units: Units)
     extends Parameter[S] {
+
+  override val values: Vector[S] = items.toVector
 
   /**
    * @return a JsValue representing this item
@@ -68,11 +71,14 @@ case class GParam[S: JsonFormat](typeName: String, keyName: String, values: Vect
  * @param typeName the name of the type S (for JSON serialization)
  * @param nameIn   the name of the key
  */
-case class GKey[S: JsonFormat](typeName: String, nameIn: String) extends Key[S, GParam[S]](nameIn) {
+case class GKey[S: JsonFormat: ClassTag](typeName: String, nameIn: String) extends Key[S, GParam[S]](nameIn) {
 
-  override def set(v: Vector[S], units: Units = NoUnits): GParam[S] =
+  def gset(v: Array[S], units: Units = NoUnits): GParam[S] =
     GParam(typeName, keyName, v, units)
 
+  override def set(v: Vector[S], units: Units = NoUnits): GParam[S] =
+    GParam(typeName, keyName, v.toArray, units)
+
   override def set(v: S*): GParam[S /*, S*/ ] =
-    GParam(typeName, keyName, v.toVector, UnitsOfMeasure.NoUnits)
+    GParam(typeName, keyName, v.toArray, UnitsOfMeasure.NoUnits)
 }

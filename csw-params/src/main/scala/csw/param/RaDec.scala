@@ -29,7 +29,7 @@ case object RaDec extends DefaultJsonProtocol {
       case Seq(JsString(keyName), JsArray(v), u) =>
         val units = ParameterSetJson.unitsFormat.read(u)
         val value = v.map(RaDec.raDecFormat.read)
-        GParam[RaDec](typeName, keyName, value, units)
+        GParam[RaDec](typeName, keyName, value.toArray, units)
       case _ => throw new DeserializationException("Color expected")
     }
   }

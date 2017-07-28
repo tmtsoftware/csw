@@ -29,7 +29,7 @@ object JSONTests extends DefaultJsonProtocol {
         case Seq(JsString(keyName), JsArray(v), u) =>
           val units = ParameterSetJson.unitsFormat.read(u)
           val value = v.map(MyData2.myData2Format.read)
-          GParam[MyData2]("MyData2", keyName, value, units)
+          GParam[MyData2]("MyData2", keyName, value.toArray, units)
         case _ => throw DeserializationException("Invalid JSON for GenericItem[MyData2]")
       }
     }

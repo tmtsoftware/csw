@@ -3,6 +3,7 @@ package csw.param.parameters
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
 import csw.param.{ParameterSetDsl, UnitsOfMeasure}
 
+import scala.annotation.varargs
 import scala.collection.immutable.Vector
 
 /**
@@ -101,6 +102,7 @@ abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializab
    * @param v one or more values
    * @return a parameter containing the key name, values (call withUnits() on the result to set the units)
    */
+  @varargs
   def set(v: S*): I
 
   /**
