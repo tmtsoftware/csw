@@ -5,7 +5,9 @@ object Dependencies {
   val Params = Seq(
     Libs.`spray-json`,
     Libs.`scala-java8-compat`,
-    Libs.`scalatest` % Test
+    Libs.`scalatest`       % Test,
+    Libs.`junit`           % Test,
+    Libs.`junit-interface` % Test
   )
 
   val Logging = Seq(

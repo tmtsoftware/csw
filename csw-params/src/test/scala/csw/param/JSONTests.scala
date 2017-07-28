@@ -26,6 +26,10 @@ class JSONTests extends FunSpec {
     val wfos: Subsystem = Subsystem.WFOS
 
     it("should encode and decode properly") {
+      val key                    = Keys.Boolean("abc")
+      val value: GParam[Boolean] = key.gset(Array(true))
+      println(key.typeName)
+      println(value.toJson)
       val json = wfos.toJson
       //info("wfos: " + json)
       val sub = json.convertTo[Subsystem]
@@ -229,7 +233,7 @@ class JSONTests extends FunSpec {
 
   describe("Test Custom RaDecItem") {
     it("Should allow cutom RaDecItem") {
-      val k1  = GKey[RaDec]("RaDec", "coords")
+      val k1  = Keys.RaDec("coords")
       val c1  = RaDec(7.3, 12.1)
       val c2  = RaDec(9.1, 2.9)
       val i1  = k1.set(c1, c2)

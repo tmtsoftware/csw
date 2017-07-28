@@ -342,3 +342,10 @@ object ParameterSetJson extends DefaultJsonProtocol {
     }
   }
 }
+
+object JavaFormatters {
+  import DefaultJsonProtocol._
+  //JSON Formats for Java by converting scala types to java types.
+  implicit val jIntergerFormat = IntJsonFormat.asInstanceOf[JsonFormat[java.lang.Integer]]
+  implicit val jBooleanFormat  = BooleanJsonFormat.asInstanceOf[JsonFormat[java.lang.Boolean]]
+}

@@ -7,7 +7,7 @@ import csw.param.UnitsOfMeasure
 import scala.collection.immutable.Vector
 
 /**
- * The type of a value for an IntKey
+ * The type of a value for an Integer
  *
  * @param keyName the name of the key
  * @param values   the value for the key

@@ -44,7 +44,7 @@ package csw.util
  * A set of standard key types and matching items are defined. Each key accepts one or more values
  * of the given type. The values are stored internally in a Vector:
  *
- * - IntKey
+ * - Integer
  *
  * - ShortKey
  *
@@ -58,7 +58,7 @@ package csw.util
  *
  * - CharKey
  *
- * - BooleanKey
+ * - Boolean
  *
  * The following keys support one or more values that are each one or two dimensional arrays (stored internally as Arrays):
  *
@@ -82,7 +82,7 @@ package csw.util
  *   val commandInfo = CommandInfo(ObsId("001"))
  *
  *   // Define a key for an event id
- *   val eventNum = IntKey("eventNum")
+ *   val eventNum = Integer("eventNum")
  *
  *   val exposureTime = DoubleKey("exposureTime")
  *
@@ -122,7 +122,7 @@ package csw.util
  *     static final DoubleKey exposureTime = new DoubleKey("exposureTime");
  *
  *     // Define a key for an event id
- *     static final IntKey eventNum = new IntKey("eventNum");
+ *     static final Integer eventNum = new Integer("eventNum");
  *
  *     // Define a key for image data
  *     static final IntArrayKey imageData = new IntArrayKey("imageData");

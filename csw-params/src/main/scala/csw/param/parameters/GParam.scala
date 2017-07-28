@@ -1,7 +1,7 @@
 package csw.param.parameters
 
-import csw.param.UnitsOfMeasure.{NoUnits, Units}
 import csw.param.UnitsOfMeasure
+import csw.param.UnitsOfMeasure.{NoUnits, Units}
 import spray.json.DefaultJsonProtocol._
 import spray.json.{JsArray, JsObject, JsString, JsValue, JsonFormat}
 
@@ -34,6 +34,12 @@ object GParam {
    * @return the JsonFormat, if registered
    */
   def lookup(typeName: String): Option[JsonReaderFunc] = jsonReaderMap.get(typeName)
+
+  private[parameters] def apply[S: JsonFormat](typeName: String,
+                                               keyName: String,
+                                               items: Array[S],
+                                               units: Units): GParam[S] =
+    new GParam(typeName, keyName, items, units)
 }
 
 /**
@@ -44,7 +50,7 @@ object GParam {
  * @param items    the value for the key
  * @param units    the units of the value
  */
-case class GParam[S: JsonFormat](typeName: String, keyName: String, items: Array[S], units: Units)
+case class GParam[S: JsonFormat] private (typeName: String, keyName: String, items: Array[S], units: Units)
     extends Parameter[S] {
 
   override val values: Vector[S] = items.toVector
@@ -68,11 +74,11 @@ case class GParam[S: JsonFormat](typeName: String, keyName: String, items: Array
 /**
  * A key of S values
  *
- * @param typeName the name of the type S (for JSON serialization)
  * @param nameIn   the name of the key
  */
-case class GKey[S: JsonFormat: ClassTag: ParamType](typeName: String, nameIn: String)
-    extends Key[S, GParam[S]](nameIn) {
+sealed class GKey[S: JsonFormat: ClassTag](nameIn: String) extends Key[S, GParam[S]](nameIn) {
+
+  val typeName: String = getClass.getSimpleName
 
   def gset(v: Array[S], units: Units = NoUnits): GParam[S] =
     GParam(typeName, keyName, v, units)
@@ -82,4 +88,16 @@ case class GKey[S: JsonFormat: ClassTag: ParamType](typeName: String, nameIn: St
 
   override def set(v: S*): GParam[S /*, S*/ ] =
     GParam(typeName, keyName, v.toArray, UnitsOfMeasure.NoUnits)
+}
+
+object Keys {
+  case class RaDec(name: String)   extends GKey[csw.param.RaDec](name)
+  case class Integer(name: String) extends GKey[scala.Int](name)
+  case class Boolean(name: String) extends GKey[scala.Boolean](name)
+}
+
+object JKeys {
+  import csw.param.JavaFormatters._
+  case class Integer(name: String) extends GKey[java.lang.Integer](name)
+  case class Boolean(name: String) extends GKey[java.lang.Boolean](name)
 }
