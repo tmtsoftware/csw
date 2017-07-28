@@ -8,7 +8,7 @@ package csw.util
  * === Commands and Events ===
  *
  * This project contains classes and traits used for *commands* and *events*.
- * These are all based on type-safe keys and items (a set of values with optional units).
+ * These are all based on type-safe keys and items (a gset of values with optional units).
  * Each key has a specific type and the key's values must be of that type.
  *
  * There are a variety of similar classes, used for different purposes:
@@ -35,13 +35,13 @@ package csw.util
  *
  * === Scala and Java APIs ===
  *
- * All the param and event classes are immutable. The `set` methods return a new instance of the object with a
+ * All the param and event classes are immutable. The `gset` methods return a new instance of the object with a
  * new item added and the `get` methods return an Option, in case the Key is not found. There are also `value` methods
  * that return a value directly, throwing an exception if the key or value is not found.
  *
  * === Key Types ===
  *
- * A set of standard key types and matching items are defined. Each key accepts one or more values
+ * A gset of standard key types and matching items are defined. Each key accepts one or more values
  * of the given type. The values are stored internally in a Vector:
  *
  * - Integer
@@ -97,9 +97,9 @@ package csw.util
  *   // ...
  *
  *     val config = Setup(commandInfo, prefix)
- *       .add(eventNum.set(num))
- *       .add(exposureTime.set(1.0))
- *       .add(imageData.set(testImageData))
+ *       .add(eventNum.gset(num))
+ *       .add(exposureTime.gset(1.0))
+ *       .add(imageData.gset(testImageData))
  *
  *   // Or you can use the Scala DSL to do the same thing:
  *

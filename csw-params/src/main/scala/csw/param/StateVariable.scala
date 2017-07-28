@@ -26,7 +26,7 @@ object StateVariable {
     val prefix: Prefix
 
     /**
-     * an optional initial set of items (keys with values)
+     * an optional initial gset of items (keys with values)
      */
     val paramSet: ParameterSet
   }
@@ -51,7 +51,7 @@ object StateVariable {
    * A state variable that indicates the ''demand'' or requested state.
    *
    * @param prefix identifies the target subsystem
-   * @param paramSet     an optional initial set of items (keys with values)
+   * @param paramSet     an optional initial gset of items (keys with values)
    */
   case class DemandState(prefix: Prefix, paramSet: ParameterSet = Set.empty[Parameter[_]])
       extends ParameterSetType[DemandState]
@@ -83,7 +83,7 @@ object StateVariable {
    * A state variable that indicates the ''current'' or actual state.
    *
    * @param prefix identifies the target subsystem
-   * @param paramSet     an optional initial set of items (keys with values)
+   * @param paramSet     an optional initial gset of items (keys with values)
    */
   case class CurrentState(prefix: Prefix, paramSet: ParameterSet = Set.empty[Parameter[_]])
       extends ParameterSetType[CurrentState]

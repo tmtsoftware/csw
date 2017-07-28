@@ -21,7 +21,7 @@ final case class StructKey(nameIn: String) extends Key[Struct, StructParameter](
 /**
  * A configuration for setting telescope and instrument parameters
  *
- * @param paramSet an optional initial set of items (keys with values)
+ * @param paramSet an optional initial gset of items (keys with values)
  */
 case class Struct(paramSet: ParameterSet = Set.empty[Parameter[_]]) extends ParameterSetType[Struct] {
 

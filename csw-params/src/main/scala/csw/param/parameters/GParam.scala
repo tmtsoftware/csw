@@ -1,6 +1,6 @@
 package csw.param.parameters
 
-import csw.param.ParameterSetJson._
+import csw.param.JsonSupport._
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
 import spray.json.{JsArray, JsObject, JsString, JsValue, JsonFormat, RootJsonFormat}
 
@@ -9,14 +9,13 @@ import scala.reflect.ClassTag
 
 object GParam {
 
-  private[parameters] def apply[S](typeName: String,
-                                   keyName: String,
-                                   items: Vector[S],
-                                   units: Units,
-                                   valueFormat: JsonFormat[S]): GParam[S] =
-    new GParam(typeName, keyName, items, units, valueFormat)
+  private[parameters] def apply[S: JsonFormat: ClassTag](typeName: String,
+                                                         keyName: String,
+                                                         items: Array[S],
+                                                         units: Units): GParam[S] =
+    new GParam(typeName, keyName, items, units)
 
-  implicit def parameterFormat[T: JsonFormat]: RootJsonFormat[GParam[T]] = new RootJsonFormat[GParam[T]] {
+  implicit def parameterFormat[T: JsonFormat: ClassTag]: RootJsonFormat[GParam[T]] = new RootJsonFormat[GParam[T]] {
     override def write(obj: GParam[T]): JsValue = {
       JsObject(
         "typeName" -> JsString(obj.typeName),
@@ -31,13 +30,13 @@ object GParam {
       GParam(
         fields("typeName").convertTo[String],
         fields("keyName").convertTo[String],
-        fields("values").convertTo[Vector[T]],
-        fields("units").convertTo[Units],
-        implicitly[JsonFormat[T]]
+        fields("values").convertTo[Vector[T]].toArray,
+        fields("units").convertTo[Units]
       )
     }
   }
 
+  def apply[T](implicit x: JsonFormat[GParam[T]]): JsonFormat[GParam[T]] = x
 }
 
 /**
@@ -45,25 +44,29 @@ object GParam {
  *
  * @param typeName the name of the type S (for JSON serialization)
  * @param keyName  the name of the key
- * @param values    the value for the key
+ * @param items    the value for the key
  * @param units    the units of the value
  */
-case class GParam[S] private (typeName: String,
-                              keyName: String,
-                              values: Vector[S],
-                              units: Units,
-                              valueFormat: JsonFormat[S])
-    extends Parameter[S] {
+case class GParam[S: JsonFormat: ClassTag] private (typeName: String, keyName: String, items: Array[S], units: Units)
+    extends Parameter[S]
+    with Proxy {
+
+  override def self: Any = (typeName: String, keyName: String, items.toVector, units)
+
+  /**
+   * @return All the values for this parameter
+   */
+  override def values: Vector[S] = items.toVector
 
   /**
    * @return a JsValue representing this item
    */
-  def toJson: JsValue                               = GParam.parameterFormat[S](valueFormat).write(this)
+  def toJson: JsValue                               = GParam.parameterFormat[S].write(this)
   override def withUnits(unitsIn: Units): GParam[S] = copy(units = unitsIn)
 }
 
 class GKey[S: JsonFormat: ClassTag] private[parameters] (nameIn: String, typeName: String)
     extends Key[S, GParam[S]](nameIn) {
-  override def set(v: Vector[S], units: Units = NoUnits): GParam[S] =
-    GParam(typeName, keyName, v, units, implicitly[JsonFormat[S]])
+
+  override def set(v: Vector[S], units: Units = NoUnits): GParam[S] = GParam(typeName, keyName, v.toArray, units)
 }

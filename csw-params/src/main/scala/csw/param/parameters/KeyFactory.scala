@@ -3,7 +3,7 @@ import csw.param.RaDec
 import spray.json.JsonFormat
 
 import scala.reflect.ClassTag
-import csw.param.ParameterSetJson._
+import csw.param.JsonSupport._
 
 sealed class KeyFactory[S: JsonFormat: ClassTag] {
   def make(name: String): GKey[S] = new GKey[S](name, typeName)
@@ -20,7 +20,7 @@ object Keys {
   val BooleanKey = new KeyFactory[Boolean]
 }
 
-object Jkeys {
+object JKeys {
   val IntegerKey = new KeyFactory[java.lang.Integer]
   val BooleanKey = new KeyFactory[java.lang.Boolean]
 }

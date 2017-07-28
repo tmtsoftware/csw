@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.ParameterSetJson._
+import csw.param.JsonSupport._
 import spray.json.RootJsonFormat
 
 /**

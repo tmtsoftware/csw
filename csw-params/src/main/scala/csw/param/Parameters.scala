@@ -32,7 +32,7 @@ object Parameters {
   }
 
   /**
-   * A top level key for a parameter set: combines subsystem and the subsystem's prefix
+   * A top level key for a parameter gset: combines subsystem and the subsystem's prefix
    */
   object Prefix {
     private val SEPARATOR = '.'
@@ -53,22 +53,22 @@ object Parameters {
   type ParameterSet = Set[Parameter[_]]
 
   /**
-   * A trait to be mixed in that provides a parameter set and prefix info
+   * A trait to be mixed in that provides a parameter gset and prefix info
    */
   trait ParameterSetKeyData { self: ParameterSetType[_] =>
 
     /**
-     * Returns an object providing the subsystem and prefix for the parameter set
+     * Returns an object providing the subsystem and prefix for the parameter gset
      */
     def prefix: Prefix
 
     /**
-     * The subsystem for the parameter set
+     * The subsystem for the parameter gset
      */
     final def subsystem: Subsystem = prefix.subsystem
 
     /**
-     * The prefix for the parameter set
+     * The prefix for the parameter gset
      */
     final def prefixStr: String = prefix.prefix
 
@@ -77,36 +77,36 @@ object Parameters {
   }
 
   /**
-   * The base trait for various parameter set types (commands or events)
+   * The base trait for various parameter gset types (commands or events)
    *
    * @tparam T the subclass of ParameterSetType
    */
   trait ParameterSetType[T <: ParameterSetType[T]] { self: T =>
 
     /**
-     * A name identifying the type of parameter set, such as "setup", "observe".
+     * A name identifying the type of parameter gset, such as "setup", "observe".
      * This is used in the JSON and toString output.
      */
     def typeName: String = getClass.getSimpleName
 
     /**
-     * Holds the parameters for this parameter set
+     * Holds the parameters for this parameter gset
      */
     def paramSet: ParameterSet
 
     /**
-     * The number of parameters in this parameter set
+     * The number of parameters in this parameter gset
      *
-     * @return the number of parameters in the parameter set
+     * @return the number of parameters in the parameter gset
      */
     def size: Int = paramSet.size
 
     /**
-     * Adds a parameter to the parameter set
+     * Adds a parameter to the parameter gset
      *
      * @param parameter the parameter to add
      * @tparam P the Parameter type
-     * @return a new instance of this parameter set with the given parameter added
+     * @return a new instance of this parameter gset with the given parameter added
      */
     def add[P <: Parameter[_]](parameter: P): T = doAdd(this, parameter)
 
@@ -116,11 +116,11 @@ object Parameters {
     }
 
     /**
-     * Adds several parameters to the parameter set
+     * Adds several parameters to the parameter gset
      *
-     * @param parametersToAdd the list of parameters to add to the parameter set
+     * @param parametersToAdd the list of parameters to add to the parameter gset
      * @tparam P must be a subclass of Parameter
-     * @return a new instance of this parameter set with the given parameter added
+     * @return a new instance of this parameter gset with the given parameter added
      */
     def madd[P <: Parameter[_]](parametersToAdd: P*): T =
       parametersToAdd.foldLeft(this)((c, parameter) => doAdd(c, parameter))
@@ -167,7 +167,7 @@ object Parameters {
     final def parameter[S, P <: Parameter[S]](key: Key[S, P]): P = get(key).get
 
     /**
-     * Returns true if the key exists in the parameter set
+     * Returns true if the key exists in the parameter gset
      *
      * @param key the key to check for
      * @return true if the key is found
@@ -177,31 +177,31 @@ object Parameters {
     def exists[S, P <: Parameter[S]](key: Key[S, P]): Boolean = get(key).isDefined
 
     /**
-     * Remove a parameter from the parameter set by key
+     * Remove a parameter from the parameter gset by key
      *
      * @param key the Key to be used for removal
      * @tparam S the Scala value type
      * @tparam P the parameter type used with Scala type S
-     * @return a new T, where T is a parameter set child with the key removed or identical if the key is not present
+     * @return a new T, where T is a parameter gset child with the key removed or identical if the key is not present
      */
     def remove[S, P <: Parameter[S]](key: Key[S, P]): T = removeByKeyname(this, key.keyName) //doRemove(this, key)
 
     /**
      * Removes a parameter based on the parameter
      *
-     * @param parameter to be removed from the parameter set
+     * @param parameter to be removed from the parameter gset
      * @tparam P the type of the parameter to be removed
-     * @return a new T, where T is a parameter set child with the parameter removed or identical if the parameter is not present
+     * @return a new T, where T is a parameter gset child with the parameter removed or identical if the parameter is not present
      */
     def remove[P <: Parameter[_]](parameter: P): T = removeByParameter(this, parameter)
 
     /**
-     * Function removes a parameter from the parameter set c based on keyname
+     * Function removes a parameter from the parameter gset c based on keyname
      *
-     * @param c       the parameter set to remove from
+     * @param c       the parameter gset to remove from
      * @param keyname the key name of the parameter to remove
      * @tparam P the Parameter type
-     * @return a new T, where T is a parameter set child with the parameter removed or identical if the parameter is not present
+     * @return a new T, where T is a parameter gset child with the parameter removed or identical if the parameter is not present
      */
     private def removeByKeyname[P <: Parameter[_]](c: ParameterSetType[T], keyname: String): T = {
       val f: Option[P] = getByKeyname(c.paramSet, keyname)
@@ -212,12 +212,12 @@ object Parameters {
     }
 
     /**
-     * Function removes a parameter from the parameter set c based on parameter content
+     * Function removes a parameter from the parameter gset c based on parameter content
      *
-     * @param c           the parameter set to remove from
+     * @param c           the parameter gset to remove from
      * @param parameterIn the parameter that should be removed
      * @tparam P the Parameter type
-     * @return a new T, where T is a parameter set child with the parameter removed or identical if the parameter is not presen
+     * @return a new T, where T is a parameter gset child with the parameter removed or identical if the parameter is not presen
      */
     private def removeByParameter[P <: Parameter[_]](c: ParameterSetType[T], parameterIn: P): T = {
       val f: Option[P] = getByParameter(c.paramSet, parameterIn)
@@ -231,7 +231,7 @@ object Parameters {
     private def getByKeyname[P](parametersIn: ParameterSet, keyname: String): Option[P] =
       parametersIn.find(_.keyName == keyname).asInstanceOf[Option[P]]
 
-    // Function to find a given parameter in the parameter set
+    // Function to find a given parameter in the parameter gset
     private def getByParameter[P](parametersIn: ParameterSet, parameter: Parameter[_]): Option[P] =
       parametersIn.find(_.equals(parameter)).asInstanceOf[Option[P]]
 
@@ -250,7 +250,7 @@ object Parameters {
     def contains(key: Key[_, _]): Boolean = paramSet.exists(_.keyName == key.keyName)
 
     /**
-     * Returns a set containing the names of any of the given keys that are missing in the data
+     * Returns a gset containing the names of any of the given keys that are missing in the data
      *
      * @param keys one or more keys
      */
@@ -261,7 +261,7 @@ object Parameters {
     }
 
     /**
-     * java API: Returns a set containing the names of any of the given keys that are missing in the data
+     * java API: Returns a gset containing the names of any of the given keys that are missing in the data
      *
      * @param keys one or more keys
      */
@@ -278,11 +278,11 @@ object Parameters {
   }
 
   /**
-   * This will include information related to the observation that is tied to a parameter set
+   * This will include information related to the observation that is tied to a parameter gset
    * This will grow and develop.
    *
    * @param obsId the observation id
-   * @param runId unique ID for this parameter set
+   * @param runId unique ID for this parameter gset
    */
   case class CommandInfo(obsId: ObsId, runId: RunId = RunId()) {
 
@@ -302,13 +302,13 @@ object Parameters {
   sealed trait Command {
 
     /**
-     * A name identifying the type of parameter set, such as "setup", "observe".
+     * A name identifying the type of parameter gset, such as "setup", "observe".
      * This is used in the JSON and toString output.
      */
     def typeName: String
 
     /**
-     * information related to the parameter set
+     * information related to the parameter gset
      */
     val info: CommandInfo
 
@@ -318,7 +318,7 @@ object Parameters {
     val prefix: Prefix
 
     /**
-     * an optional initial set of parameters (keys with values)
+     * an optional initial gset of parameters (keys with values)
      */
     val paramSet: ParameterSet
   }
@@ -334,11 +334,11 @@ object Parameters {
   sealed trait ControlCommand extends Command
 
   /**
-   * a parameter set for setting telescope and instrument parameters
+   * a parameter gset for setting telescope and instrument parameters
    *
-   * @param info     information related to the parameter set
+   * @param info     information related to the parameter gset
    * @param prefix   identifies the target subsystem
-   * @param paramSet an optional initial set of parameters (keys with values)
+   * @param paramSet an optional initial gset of parameters (keys with values)
    */
   case class Setup(info: CommandInfo, prefix: Prefix, paramSet: ParameterSet = Set.empty[Parameter[_]])
       extends ParameterSetType[Setup]
@@ -359,11 +359,11 @@ object Parameters {
   }
 
   /**
-   * a parameter set for setting observation parameters
+   * a parameter gset for setting observation parameters
    *
-   * @param info     information related to the parameter set
+   * @param info     information related to the parameter gset
    * @param prefix   identifies the target subsystem
-   * @param paramSet an optional initial set of parameters (keys with values)
+   * @param paramSet an optional initial gset of parameters (keys with values)
    */
   case class Observe(info: CommandInfo, prefix: Prefix, paramSet: ParameterSet = Set.empty[Parameter[_]])
       extends ParameterSetType[Observe]
@@ -384,11 +384,11 @@ object Parameters {
   }
 
   /**
-   * a parameter set indicating a pause in processing
+   * a parameter gset indicating a pause in processing
    *
-   * @param info     information related to the parameter set
+   * @param info     information related to the parameter gset
    * @param prefix   identifies the target subsystem
-   * @param paramSet an optional initial set of parameters (keys with values)
+   * @param paramSet an optional initial gset of parameters (keys with values)
    */
   case class Wait(info: CommandInfo, prefix: Prefix, paramSet: ParameterSet = Set.empty[Parameter[_]])
       extends ParameterSetType[Wait]
@@ -408,11 +408,11 @@ object Parameters {
   }
 
   /**
-   * A parameters set for returning results
+   * A parameters gset for returning results
    *
-   * @param info     information related to the parameter set
+   * @param info     information related to the parameter gset
    * @param prefix   identifies the target subsystem
-   * @param paramSet an optional initial set of parameters (keys with values)
+   * @param paramSet an optional initial gset of parameters (keys with values)
    */
   case class Result(info: CommandInfo, prefix: Prefix, paramSet: ParameterSet = Set.empty[Parameter[_]])
       extends ParameterSetType[Result]
@@ -434,7 +434,7 @@ object Parameters {
    * Filters
    */
   object ParameterSetFilters {
-    // A filter type for various parameter set data
+    // A filter type for various parameter gset data
     type ParamSetFilter[A] = A => Boolean
 
     def prefixes(paramSets: Seq[ParameterSetKeyData]): Set[String] = paramSets.map(_.prefixStr).toSet

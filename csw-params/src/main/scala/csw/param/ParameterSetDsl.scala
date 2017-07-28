@@ -150,7 +150,7 @@ object ParameterSetDsl {
    * Create a parameter by setting a key with a Vector of values associated with the key
    *
    * @param key   the key that is used to create the needed parameter
-   * @param v     a Vector of values of the parameter's type that is being used to set the parameter
+   * @param v     a Vector of values of the parameter's type that is being used to gset the parameter
    * @param units optional units for the parameter
    * @return a new parameter of the type associated with the key
    */
@@ -168,7 +168,7 @@ object ParameterSetDsl {
   /**
    * Create a Setup with a number of parameters
    *
-   * @param info      information related to the parameter set
+   * @param info      information related to the parameter gset
    * @param prefix can be a String form - "wfos.red.filter
    * @param parameters     0 or more parameters to be added during creation
    * @return a new Setup with the parameters added
@@ -179,7 +179,7 @@ object ParameterSetDsl {
   /**
    * Create an Observe with a number of parameters
    *
-   * @param info information related to the parameter set
+   * @param info information related to the parameter gset
    * @param prefix can be a String form - "wfos.red.filter
    * @param parameters     0 or more parameters to be added during creation
    * @return a new Observe with the parameters added

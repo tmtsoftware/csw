@@ -129,7 +129,7 @@ object Events {
    * Defines a status event
    *
    * @param info event related information
-   * @param paramSet an optional initial set of parameters (keys with values)
+   * @param paramSet an optional initial gset of parameters (keys with values)
    */
   case class StatusEvent(info: EventInfo, paramSet: ParameterSet = Set.empty[Parameter[_]])
       extends EventType[StatusEvent]
@@ -158,7 +158,7 @@ object Events {
    * Defines a observe event
    *
    * @param info event related information
-   * @param paramSet an optional initial set of parameters (keys with values)
+   * @param paramSet an optional initial gset of parameters (keys with values)
    */
   case class ObserveEvent(info: EventInfo, paramSet: ParameterSet = Set.empty[Parameter[_]])
       extends EventType[ObserveEvent]
@@ -187,7 +187,7 @@ object Events {
    * Defines a system event
    *
    * @param info event related information
-   * @param paramSet an optional initial set of parameters (keys with values)
+   * @param paramSet an optional initial gset of parameters (keys with values)
    */
   case class SystemEvent(info: EventInfo, paramSet: ParameterSet = Set.empty[Parameter[_]])
       extends EventType[SystemEvent]

@@ -21,7 +21,7 @@ object Choice {
 }
 
 /**
- * Represents a set of choices
+ * Represents a gset of choices
  */
 case class Choices(values: Set[Choice]) {
   def contains(one: Choice) = values.contains(one)
@@ -50,7 +50,7 @@ object Choices {
  */
 final case class ChoiceParameter(keyName: String, choices: Choices, values: Vector[Choice], units: Units)
     extends Parameter[Choice] {
-  // Check to make sure set values are in the choices -- could be done with type system
+  // Check to paramFormat sure gset values are in the choices -- could be done with type system
   assert(values.forall(choices.contains), s"Bad choice for key: $keyName which must be one of: $choices")
 
   override def withUnits(unitsIn: Units) = copy(units = unitsIn)
@@ -64,7 +64,7 @@ final case class ChoiceParameter(keyName: String, choices: Choices, values: Vect
  * A key for a choice item similar to an enumeration
  *
  * @param nameIn  the name of the key
- * @param choices the available choices, the values set must be in the choices
+ * @param choices the available choices, the values gset must be in the choices
  */
 final case class ChoiceKey(nameIn: String, choices: Choices) extends Key[Choice, ChoiceParameter](nameIn) {
 

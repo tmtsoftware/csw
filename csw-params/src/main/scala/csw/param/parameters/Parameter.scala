@@ -69,7 +69,7 @@ trait Parameter[S] {
    * Sets the units for the values
    *
    * @param units the units for the values
-   * @return a new instance of this parameter with the units set
+   * @return a new instance of this parameter with the units gset
    */
   def withUnits(units: Units): Parameter[S]
 
@@ -87,6 +87,8 @@ trait Parameter[S] {
  */
 abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializable {
 
+  def gset(v: Array[S], units: Units = NoUnits): I = set(v.toVector, units)
+
   /**
    * Sets the values for the key as a Scala Vector
    *
@@ -100,7 +102,7 @@ abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializab
    * Sets the values for the key using a variable number of arguments
    *
    * @param v one or more values
-   * @return a parameter containing the key name, values (call withUnits() on the result to set the units)
+   * @return a parameter containing the key name, values (call withUnits() on the result to gset the units)
    */
   @varargs
   def set(v: S*): I = set(v.toVector)
@@ -117,7 +119,7 @@ abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializab
    * }}}
    *
    * @param v the value
-   * @return a parameter containing the key name and one value (call withUnits() on the result to set the units)
+   * @return a parameter containing the key name and one value (call withUnits() on the result to gset the units)
    */
   def ->(v: S): I = set(v)
 
@@ -148,7 +150,7 @@ abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializab
    * }}}
    *
    * @param v a vector of values
-   * @return a parameter containing the key name and values (call withUnits() on the result to set the units)
+   * @return a parameter containing the key name and values (call withUnits() on the result to gset the units)
    */
   def ->(v: Vector[S]): I = set(v)
 

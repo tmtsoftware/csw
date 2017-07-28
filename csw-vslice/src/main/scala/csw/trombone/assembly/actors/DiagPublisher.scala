@@ -69,7 +69,7 @@ class DiagPublisher(ctx: ActorContext[DiagPublisherMessages],
       }
 
     case CurrentStateE(cs) if cs.prefix == TromboneHcdState.axisStatsCK => // No nothing
-    case TimeForAxisStats(_)                                            => // Do nothing, here so it doesn't make an error
+    case TimeForAxisStats(_)                                            => // Do nothing, here so it doesn't paramFormat an error
     case OperationsState                                                => // Already in operations mode
 
     case DiagnosticState =>

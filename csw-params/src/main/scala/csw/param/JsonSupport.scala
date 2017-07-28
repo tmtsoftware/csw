@@ -12,11 +12,13 @@ import csw.param.parameters.matrices._
 import csw.param.parameters.primitives._
 import spray.json._
 
+import scala.reflect.ClassTag
+
 /**
  * Supports conversion of commands and events to/from JSON
  */
 //noinspection TypeAnnotation
-object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
+object JsonSupport extends DefaultJsonProtocol with JavaFormats {
 
   // JSON formats
   implicit val charParameterFormat         = jsonFormat3(CharParameter.apply)
@@ -337,8 +339,12 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
   }
 }
 
-trait JavaFormatters { self: DefaultJsonProtocol =>
+trait JavaFormats { self: DefaultJsonProtocol =>
   //JSON Formats for Java by converting scala types to java types.
-  implicit val jIntergerFormat: JsonFormat[Integer]     = IntJsonFormat.asInstanceOf[JsonFormat[java.lang.Integer]]
-  implicit val jBooleanFormat: JsonFormat[lang.Boolean] = BooleanJsonFormat.asInstanceOf[JsonFormat[java.lang.Boolean]]
+  implicit val integerFormat: JsonFormat[Integer]      = IntJsonFormat.asInstanceOf[JsonFormat[java.lang.Integer]]
+  implicit val booleanFormat: JsonFormat[lang.Boolean] = BooleanJsonFormat.asInstanceOf[JsonFormat[java.lang.Boolean]]
+
+  def paramFormat[T: JsonFormat: ClassTag]: JsonFormat[GParam[T]] = implicitly[JsonFormat[GParam[T]]]
+
+  val dd: JsonFormat[GParam[lang.Boolean]] = paramFormat[lang.Boolean]
 }
