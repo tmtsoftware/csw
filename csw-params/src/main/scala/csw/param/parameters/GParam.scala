@@ -71,7 +71,8 @@ case class GParam[S: JsonFormat](typeName: String, keyName: String, items: Array
  * @param typeName the name of the type S (for JSON serialization)
  * @param nameIn   the name of the key
  */
-case class GKey[S: JsonFormat: ClassTag](typeName: String, nameIn: String) extends Key[S, GParam[S]](nameIn) {
+case class GKey[S: JsonFormat: ClassTag: ParamType](typeName: String, nameIn: String)
+    extends Key[S, GParam[S]](nameIn) {
 
   def gset(v: Array[S], units: Units = NoUnits): GParam[S] =
     GParam(typeName, keyName, v, units)

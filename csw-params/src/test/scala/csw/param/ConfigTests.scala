@@ -1,31 +1,18 @@
 package csw.param
 
-import csw.param.Parameters._
 import csw.param.Events.StatusEvent
+import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
-import csw.param.parameters.GKey
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import csw.param.parameters.primitives._
 import org.scalatest.FunSpec
-import spray.json.DefaultJsonProtocol
 
 import scala.collection.immutable.Vector
 import scala.util.Try
 
-object ConfigTests {
-
-  import DefaultJsonProtocol._
-
-  case class MyData(i: Int, f: Float, d: Double, s: String)
-
-  implicit val MyDataFormat = jsonFormat4(MyData.apply)
-}
-
 //noinspection ComparingUnrelatedTypes,ScalaUnusedSymbol
 class ConfigTests extends FunSpec {
-
-  import ConfigTests._
 
   private val s1: String = "encoder"
   private val s2: String = "filter"
@@ -123,21 +110,6 @@ class ConfigTests extends FunSpec {
       assert(sc1.exists(k2))
       assert(sc1(k2).units == meters)
       assert(sc1(k2).values == Vector("E"))
-    }
-  }
-
-  describe("Generic key tests") {
-    // Note: It is recommended to use the standard keys, such as IntKey, StringKey, DoubleKey, etc.
-    val k1 = GKey[MyData]("MyData", "atest")
-    val d1 = MyData(1, 2.0f, 3.0, "4")
-    val d2 = MyData(10, 20.0f, 30.0, "40")
-
-    it("Should allow an Int array") {
-      val i1 = k1.set(d1, d2).withUnits(UnitsOfMeasure.NoUnits)
-      assert(i1.values == Vector(d1, d2))
-      assert(i1(0) == d1)
-      assert(i1(1) == d2)
-      assert(i1(0).i == 1)
     }
   }
 

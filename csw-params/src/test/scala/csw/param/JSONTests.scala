@@ -1,47 +1,18 @@
 package csw.param
 
-import csw.param.Parameters.{CommandInfo, Observe, Setup, Wait}
-import org.scalatest.FunSpec
-import spray.json._
-import ParameterSetJson._
 import csw.param.Events.{ObserveEvent, StatusEvent, SystemEvent}
+import csw.param.ParameterSetJson._
+import csw.param.Parameters.{CommandInfo, Observe, Setup, Wait}
 import csw.param.StateVariable.{CurrentState, DemandState}
-import csw.param.UnitsOfMeasure.meters
 import csw.param.parameters._
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import csw.param.parameters.primitives._
-
-object JSONTests extends DefaultJsonProtocol {
-
-  // Example custom data type for a GenericItem
-  case class MyData2(i: Int, f: Float, d: Double, s: String)
-
-  //noinspection TypeAnnotation
-  // Since automatic JSON reading doesn't work with generic types, we need to do it manually here
-  case object MyData2 {
-    // JSON read/write for MyData2
-    implicit val myData2Format = jsonFormat4(MyData2.apply)
-
-    // Creates a GenericItem[MyData2] from a JSON value (This didn't work with the jsonFormat3 method)
-    def reader(json: JsValue): GParam[MyData2] = {
-      json.asJsObject.getFields("keyName", "value", "units") match {
-        case Seq(JsString(keyName), JsArray(v), u) =>
-          val units = ParameterSetJson.unitsFormat.read(u)
-          val value = v.map(MyData2.myData2Format.read)
-          GParam[MyData2]("MyData2", keyName, value.toArray, units)
-        case _ => throw DeserializationException("Invalid JSON for GenericItem[MyData2]")
-      }
-    }
-
-    GParam.register("MyData2", reader)
-  }
-}
+import org.scalatest.FunSpec
+import spray.json._
 
 //noinspection ScalaUnusedSymbol
 class JSONTests extends FunSpec {
-
-  import JSONTests._
 
   private val s1: String = "encoder"
   private val s2: String = "filter"
@@ -253,33 +224,6 @@ class JSONTests extends FunSpec {
       val c1in  = ParameterSetJson.readSequenceCommand[Wait](c1out)
       assert(c1in(k3).head == 1234L)
       assert(c1in == c1)
-    }
-  }
-
-  describe("Test GenericItem") {
-    it("Should allow a GenericItem with a custom type") {
-      val k1  = GKey[MyData2]("MyData2", "testData")
-      val d1  = MyData2(1, 2.0f, 3.0, "4")
-      val d2  = MyData2(10, 20.0f, 30.0, "40")
-      val i1  = k1.set(d1, d2).withUnits(UnitsOfMeasure.meters)
-      val sc1 = Setup(commandInfo, ck).add(i1)
-      assert(sc1.get(k1).get.values.size == 2)
-      assert(sc1.get(k1).get.values(0) == d1)
-      assert(sc1.get(k1).get.values(1) == d2)
-      assert(sc1.get(k1).get.units == UnitsOfMeasure.meters)
-
-      val sc1out = ParameterSetJson.writeSequenceCommand(sc1)
-      //      info("2: sc1out: " + sc1out.prettyPrint)
-
-      val sc1in = ParameterSetJson.readSequenceCommand[Setup](sc1out)
-      assert(sc1.equals(sc1in))
-      assert(sc1in.get(k1).get.values.size == 2)
-      assert(sc1in.get(k1).get.values(0) == d1)
-      assert(sc1in.get(k1).get.values(1) == d2)
-      assert(sc1in.get(k1).get.units == UnitsOfMeasure.meters)
-
-      val sc2 = Setup(commandInfo, ck).add(k1.set(d1, d2).withUnits(meters))
-      assert(sc2 == sc1)
     }
   }
 
