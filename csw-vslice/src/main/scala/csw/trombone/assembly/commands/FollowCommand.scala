@@ -4,12 +4,12 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.param.Events.EventTime
-import csw.param.{BooleanParameter, DoubleParameter}
 import csw.trombone.assembly.FollowActorMessages.{StopFollowing, UpdatedEventData}
 import csw.trombone.assembly.FollowCommandMessages.{UpdateNssInUse, UpdateTromboneHcd, UpdateZAandFE}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.{FollowActor, TromboneControl}
 import csw.common.framework.models.RunningHcdMsg.Submit
+import csw.param.parameters.primitives.{BooleanParameter, DoubleParameter}
 
 object FollowCommand {
 

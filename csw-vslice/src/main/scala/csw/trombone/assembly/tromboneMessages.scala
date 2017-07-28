@@ -10,6 +10,7 @@ import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.models.DomainMsg
 import csw.common.framework.models.HcdResponseMode.Running
 import csw.common.framework.models.RunningHcdMsg.Submit
+import csw.param.parameters.primitives.{BooleanParameter, DoubleParameter, IntParameter, StringParameter}
 
 sealed trait FollowCommandMessages
 object FollowCommandMessages {
@@ -77,7 +78,10 @@ object DiagPublisherMessages {
 ////////////////////
 sealed trait TromboneCommandHandlerMsgs
 object TromboneCommandHandlerMsgs {
-  case class TromboneStateE(tromboneState: TromboneState) extends NotFollowingMsgs with FollowingMsgs with ExecutingMsgs
+  case class TromboneStateE(tromboneState: TromboneState)
+      extends NotFollowingMsgs
+      with FollowingMsgs
+      with ExecutingMsgs
 
   sealed trait NotFollowingMsgs extends TromboneCommandHandlerMsgs
   sealed trait FollowingMsgs    extends TromboneCommandHandlerMsgs

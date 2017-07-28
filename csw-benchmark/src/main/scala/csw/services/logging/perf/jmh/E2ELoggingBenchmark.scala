@@ -4,7 +4,7 @@ import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
-import csw.services.logging.appenders.{FileAppender, StdOutAppender}
+import csw.services.logging.appenders.FileAppender
 import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.{Logger, LoggerImpl}

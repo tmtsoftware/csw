@@ -1,6 +1,7 @@
-package csw.param
+package csw.param.parameters.primitives
 
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
+import csw.param.{Key, Parameter, UnitsOfMeasure}
 
 import scala.collection.immutable.Vector
 

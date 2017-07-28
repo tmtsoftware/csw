@@ -1,12 +1,12 @@
 package csw.trombone.assembly
 
 import com.typesafe.config.Config
-import csw.param.{BooleanKey, DoubleKey, DoubleParameter, StringKey}
 import csw.param.Parameters.{CommandInfo, Prefix, Setup}
 import csw.param.UnitsOfMeasure.{degrees, kilometers, micrometers, millimeters}
 import csw.services.location.models.ComponentId
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.common.framework.models.Component.AssemblyInfo
+import csw.param.parameters.primitives.{BooleanKey, DoubleKey, DoubleParameter, StringKey}
 
 /**
  * TMT Source Code: 10/4/16.
@@ -186,7 +186,11 @@ object AssemblyContext {
       val upperFocusLimit         = config.getDouble(s"$prefix.calculation-config.upperFocusLimit")
       val lowerFocusLimit         = config.getDouble(s"$prefix.calculation-config.lowerFocusLimit")
       val zenithFactor            = config.getDouble(s"$prefix.calculation-config.zenithFactor")
-      TromboneCalculationConfig(defaultInitialElevation, focusGainError, upperFocusLimit, lowerFocusLimit, zenithFactor)
+      TromboneCalculationConfig(defaultInitialElevation,
+                                focusGainError,
+                                upperFocusLimit,
+                                lowerFocusLimit,
+                                zenithFactor)
     }
   }
 

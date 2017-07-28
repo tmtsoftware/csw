@@ -2,6 +2,8 @@ package csw.param
 
 import csw.param.ParameterSetDsl._
 import csw.param.Parameters.CommandInfo
+import csw.param.parameters.matrices.{DoubleMatrix, DoubleMatrixKey}
+import csw.param.parameters.primitives.{DoubleKey, IntKey, StringKey}
 import org.scalatest.FunSpec
 
 /**

@@ -7,6 +7,9 @@ import ParameterSetJson._
 import csw.param.Events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.StateVariable.{CurrentState, DemandState}
 import csw.param.UnitsOfMeasure.meters
+import csw.param.parameters.arrays._
+import csw.param.parameters.matrices._
+import csw.param.parameters.primitives._
 
 object JSONTests extends DefaultJsonProtocol {
 

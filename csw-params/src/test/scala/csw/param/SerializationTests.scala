@@ -3,6 +3,7 @@ package csw.param
 import csw.param.Parameters._
 import csw.param.Events.{EventServiceEvent, SystemEvent}
 import csw.param.StateVariable._
+import csw.param.parameters.primitives.{DoubleKey, IntKey, StringKey}
 import org.scalatest.FunSuite
 
 //noinspection TypeAnnotation

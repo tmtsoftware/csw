@@ -4,6 +4,7 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.param._
+import csw.param.parameters.primitives.{BooleanParameter, DoubleParameter, IntParameter, StringParameter}
 import csw.trombone.assembly.TrombonePublisherMsg._
 import csw.trombone.assembly.{AssemblyContext, TrombonePublisherMsg}
 

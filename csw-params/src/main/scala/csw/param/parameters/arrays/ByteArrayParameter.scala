@@ -1,6 +1,7 @@
-package csw.param
+package csw.param.parameters.arrays
 
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
+import csw.param._
 import spray.json.DefaultJsonProtocol
 
 import scala.collection.immutable.Vector
@@ -10,7 +11,6 @@ import scala.language.implicitConversions
  * A Scala Vector of Bytes
  */
 case class ByteArray(data: Array[Byte]) {
-  import ArrayAndMatrixEquality._
 
   override def toString = data.mkString("(", ",", ")")
 
@@ -23,7 +23,7 @@ case class ByteArray(data: Array[Byte]) {
 
   override def equals(other: Any) = other match {
     case that: ByteArray =>
-      this.canEqual(that) && deepArrayEquals(this.data, that.data)
+      this.canEqual(that) && ArrayAndMatrixEquality.deepArrayEquals(this.data, that.data)
     case _ => false
   }
 }

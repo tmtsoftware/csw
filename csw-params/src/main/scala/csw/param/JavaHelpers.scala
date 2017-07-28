@@ -2,6 +2,9 @@ package csw.param
 
 import csw.param.Parameters.ParameterSetType
 import csw.param.UnitsOfMeasure.Units
+import csw.param.parameters.arrays._
+import csw.param.parameters.matrices._
+import csw.param.parameters.primitives._
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._

@@ -4,6 +4,9 @@ import csw.param.UnitsOfMeasure.{degrees, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 import csw.param.ParameterSetDsl._
 import csw.param.Parameters.{CommandInfo, Setup}
+import csw.param.parameters.arrays.{LongArray, LongArrayKey}
+import csw.param.parameters.matrices.{LongMatrix, LongMatrixKey}
+import csw.param.parameters.primitives._
 
 /**
  * Tests the config DSL

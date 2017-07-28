@@ -6,6 +6,7 @@ import csw.param.Parameters.{CommandInfo, Prefix, Setup}
 import csw.param.StateVariable.CurrentState
 import csw.param.UnitsOfMeasure.encoder
 import csw.param._
+import csw.param.parameters.primitives.{BooleanKey, IntKey, StringKey}
 
 object TromboneHcdState {
   val tromboneConfigFile = new File("trombone/tromboneHCD.conf")

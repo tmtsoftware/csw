@@ -1,7 +1,8 @@
 package csw.param
 
 import csw.param.Parameters._
-
+import csw.param.parameters.arrays.{LongArray, LongArrayKey}
+import csw.param.parameters.primitives.{DoubleKey, IntKey, StringKey}
 import org.scalatest.FunSpec
 import spray.json.DefaultJsonProtocol
 

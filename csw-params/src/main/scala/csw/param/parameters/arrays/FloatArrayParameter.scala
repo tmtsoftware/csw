@@ -1,6 +1,7 @@
-package csw.param
+package csw.param.parameters.arrays
 
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
+import csw.param._
 import spray.json.DefaultJsonProtocol
 
 import scala.collection.immutable.Vector
@@ -10,7 +11,6 @@ import scala.language.implicitConversions
  * A Scala Array of Floats
  */
 case class FloatArray(data: Array[Float]) {
-  import ArrayAndMatrixEquality._
 
   override def toString = data.mkString("(", ",", ")")
 
@@ -23,7 +23,7 @@ case class FloatArray(data: Array[Float]) {
 
   override def equals(other: Any) = other match {
     case that: FloatArray =>
-      this.canEqual(that) && deepArrayEquals(this.data, that.data)
+      this.canEqual(that) && ArrayAndMatrixEquality.deepArrayEquals(this.data, that.data)
     case _ => false
   }
 }

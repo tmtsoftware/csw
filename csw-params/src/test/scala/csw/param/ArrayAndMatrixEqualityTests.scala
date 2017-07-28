@@ -1,5 +1,7 @@
 package csw.param
 
+import csw.param.parameters.arrays.LongArray
+import csw.param.parameters.matrices.LongMatrix
 import org.scalatest.FunSpec
 
 /**

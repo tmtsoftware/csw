@@ -1,6 +1,7 @@
-package csw.param
+package csw.param.parameters.matrices
 
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
+import csw.param._
 import spray.json.DefaultJsonProtocol
 
 import scala.collection.immutable.Vector
@@ -10,7 +11,6 @@ import scala.language.implicitConversions
  * A Scala equivalent of a 2d array of Longs
  */
 case class LongMatrix(data: Array[Array[Long]]) {
-  import ArrayAndMatrixEquality._
 
   override def toString = (for (l <- data) yield l.mkString("(", ",", ")")).mkString("(", ",", ")")
 
@@ -23,7 +23,7 @@ case class LongMatrix(data: Array[Array[Long]]) {
 
   override def equals(other: Any) = other match {
     case that: LongMatrix =>
-      this.canEqual(that) && deepMatrixValueEquals(this.data, that.data)
+      this.canEqual(that) && ArrayAndMatrixEquality.deepMatrixValueEquals(this.data, that.data)
     case _ => false
   }
 }

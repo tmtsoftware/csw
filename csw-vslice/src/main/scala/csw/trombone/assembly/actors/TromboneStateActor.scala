@@ -4,6 +4,7 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.param._
+import csw.param.parameters.primitives.{BooleanKey, BooleanParameter}
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneStateMsg
 
 object TromboneStateActor {
@@ -63,7 +64,11 @@ object TromboneStateActor {
               nss: BooleanParameter,
               replyTo: ActorRef[StateWasSet]): SetState = SetState(TromboneState(cmd, move, sodiumLayer, nss), replyTo)
 
-    def apply(cmd: Choice, move: Choice, sodiumLayer: Boolean, nss: Boolean, replyTo: ActorRef[StateWasSet]): SetState =
+    def apply(cmd: Choice,
+              move: Choice,
+              sodiumLayer: Boolean,
+              nss: Boolean,
+              replyTo: ActorRef[StateWasSet]): SetState =
       SetState(TromboneState(cmdItem(cmd), moveItem(move), sodiumItem(sodiumLayer), nssItem(nss)), replyTo)
   }
 
