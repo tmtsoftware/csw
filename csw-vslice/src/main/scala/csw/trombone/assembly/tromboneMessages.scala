@@ -78,10 +78,7 @@ object DiagPublisherMessages {
 ////////////////////
 sealed trait TromboneCommandHandlerMsgs
 object TromboneCommandHandlerMsgs {
-  case class TromboneStateE(tromboneState: TromboneState)
-      extends NotFollowingMsgs
-      with FollowingMsgs
-      with ExecutingMsgs
+  case class TromboneStateE(tromboneState: TromboneState) extends NotFollowingMsgs with FollowingMsgs with ExecutingMsgs
 
   sealed trait NotFollowingMsgs extends TromboneCommandHandlerMsgs
   sealed trait FollowingMsgs    extends TromboneCommandHandlerMsgs
