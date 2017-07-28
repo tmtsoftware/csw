@@ -1,5 +1,6 @@
 package csw.param
 
+import csw.param.parameters.GenericParameter
 import spray.json.{DefaultJsonProtocol, DeserializationException, JsArray, JsString, JsValue}
 
 /**

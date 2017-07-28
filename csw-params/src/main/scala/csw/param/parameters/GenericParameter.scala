@@ -1,10 +1,11 @@
-package csw.param
+package csw.param.parameters
 
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
+import csw.param.UnitsOfMeasure
+import spray.json.DefaultJsonProtocol._
 import spray.json.{JsArray, JsObject, JsString, JsValue, JsonFormat}
 
 import scala.collection.immutable.Vector
-import spray.json.DefaultJsonProtocol._
 
 object GenericParameter {
 

@@ -2,6 +2,7 @@ package csw.param.parameters.matrices
 
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
 import csw.param._
+import csw.param.parameters.{Key, Parameter}
 import spray.json.DefaultJsonProtocol
 
 import scala.collection.immutable.Vector

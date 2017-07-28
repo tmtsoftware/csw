@@ -1,6 +1,7 @@
 package csw.param
 
 import csw.param.UnitsOfMeasure.{degrees, meters, seconds}
+import csw.param.parameters._
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import csw.param.parameters.primitives._

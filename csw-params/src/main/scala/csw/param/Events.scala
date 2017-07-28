@@ -4,6 +4,7 @@ import java.time.{Clock, Instant}
 import java.util.UUID
 
 import csw.param
+import csw.param.parameters.{Key, Parameter}
 
 import scala.language.implicitConversions
 

@@ -2,6 +2,7 @@ package csw.param
 
 import csw.param.Parameters.ParameterSetType
 import csw.param.UnitsOfMeasure.Units
+import csw.param.parameters._
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import csw.param.parameters.primitives._

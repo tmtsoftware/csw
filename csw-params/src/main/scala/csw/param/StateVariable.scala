@@ -1,6 +1,7 @@
 package csw.param
 
 import csw.param.Parameters._
+import csw.param.parameters.Parameter
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._

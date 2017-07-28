@@ -3,6 +3,7 @@ package csw.param
 import csw.param.Parameters._
 import csw.param.Events.StatusEvent
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
+import csw.param.parameters.GenericKey
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import csw.param.parameters.primitives._

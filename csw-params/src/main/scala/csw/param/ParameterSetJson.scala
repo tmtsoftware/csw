@@ -6,6 +6,7 @@ import csw.param.Events._
 import csw.param.Parameters._
 import csw.param.StateVariable._
 import csw.param.UnitsOfMeasure.Units
+import csw.param.parameters._
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import csw.param.parameters.primitives._
