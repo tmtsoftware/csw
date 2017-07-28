@@ -6,16 +6,18 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.common.components.hcd._
+import csw.common.framework.models.Component.{DoNotRegister, HcdInfo}
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
 import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg.Lifecycle
 import csw.common.framework.models.{HcdMsg, HcdResponseMode, ToComponentLifecycleMessage}
+import csw.services.location.models.ConnectionType.AkkaType
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.concurrent.{Await, Future}
 
 class LifecycleHooksTest
@@ -31,13 +33,21 @@ class LifecycleHooksTest
 
   class SampleHcdHandlersFactory(sampleHcdHandler: HcdHandlers[HcdDomainMessage])
       extends HcdHandlersFactory[HcdDomainMessage] {
-    override def make(ctx: ActorContext[HcdMsg]): HcdHandlers[HcdDomainMessage] = sampleHcdHandler
+    override def make(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo): HcdHandlers[HcdDomainMessage] = sampleHcdHandler
   }
 
   def run(hcdHandlersFactory: HcdHandlersFactory[HcdDomainMessage],
           testProbeSupervisor: TestProbe[HcdResponseMode]): Running = {
+    val hcdInfo =
+      HcdInfo("SampleHcd",
+              "wfos",
+              "csw.common.components.assembly.SampleAssembly",
+              DoNotRegister,
+              Set(AkkaType),
+              FiniteDuration(5, "seconds"))
+
     Await.result(
-      system.systemActorOf[Nothing](hcdHandlersFactory.behaviour(testProbeSupervisor.ref), "Hcd"),
+      system.systemActorOf[Nothing](hcdHandlersFactory.behaviour(hcdInfo, testProbeSupervisor.ref), "Hcd"),
       5.seconds
     )
 

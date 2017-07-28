@@ -12,6 +12,6 @@ abstract class AssemblyHandlersFactory[Msg <: DomainMsg: ClassTag] {
 
   def behaviour(assemblyInfo: AssemblyInfo, supervisor: ActorRef[AssemblyResponseMode]): Behavior[Nothing] =
     Actor
-      .mutable[AssemblyMsg](ctx ⇒ new AssemblyBehavior[Msg](ctx, assemblyInfo, supervisor, make(ctx, assemblyInfo)))
+      .mutable[AssemblyMsg](ctx ⇒ new AssemblyBehavior[Msg](ctx, supervisor, make(ctx, assemblyInfo)))
       .narrow
 }

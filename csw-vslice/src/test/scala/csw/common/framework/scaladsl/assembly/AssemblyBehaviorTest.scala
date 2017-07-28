@@ -18,7 +18,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-class AssemblyActorTest extends FunSuite with Matchers with BeforeAndAfterAll with MockitoSugar {
+class AssemblyBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll with MockitoSugar {
 
   implicit val system   = ActorSystem("actor-system", Actor.empty)
   implicit val settings = TestKitSettings(system)

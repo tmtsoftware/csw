@@ -7,7 +7,6 @@ import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.models.AssemblyResponseMode.{Idle, Initialized, Running}
-import csw.common.framework.models.Component.AssemblyInfo
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
 import csw.common.framework.models.IdleAssemblyMsg.{Initialize, Start}
 import csw.common.framework.models.InitialAssemblyMsg.Run
@@ -28,7 +27,6 @@ import scala.concurrent.Future
 import scala.reflect.ClassTag
 
 class AssemblyBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[AssemblyMsg],
-                                                   info: AssemblyInfo,
                                                    supervisor: ActorRef[AssemblyResponseMode],
                                                    assemblyHandlers: AssemblyHandlers[Msg])
     extends MutableBehavior[AssemblyMsg] {

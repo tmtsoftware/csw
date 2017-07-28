@@ -5,6 +5,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
+import csw.common.framework.models.Component.HcdInfo
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.hcd.{HcdHandlers, HcdHandlersFactory}
 import csw.param.Parameters.Setup
@@ -19,10 +20,11 @@ import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
 class TromboneHcdHandlersFactory extends HcdHandlersFactory[TromboneMsg] {
-  override def make(ctx: ActorContext[HcdMsg]): HcdHandlers[TromboneMsg] = new TromboneHcdHandlers(ctx)
+  override def make(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo): HcdHandlers[TromboneMsg] =
+    new TromboneHcdHandlers(ctx, hcdInfo)
 }
 
-class TromboneHcdHandlers(ctx: ActorContext[HcdMsg]) extends HcdHandlers[TromboneMsg](ctx) {
+class TromboneHcdHandlers(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo) extends HcdHandlers[TromboneMsg](ctx, hcdInfo) {
 
   implicit val timeout              = Timeout(2.seconds)
   implicit val scheduler: Scheduler = ctx.system.scheduler
