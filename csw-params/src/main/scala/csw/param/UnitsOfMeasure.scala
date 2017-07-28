@@ -1,5 +1,8 @@
 package csw.param
 
+import csw.param.ParameterSetJson._
+import spray.json.RootJsonFormat
+
 /**
  * This Units stuff is just for play
  * although something should be developed or borrowed
@@ -42,5 +45,7 @@ object UnitsOfMeasure {
       case milliseconds.name => milliseconds
       case _                 => NoUnits
     }
+
+    implicit val unitsFormat: RootJsonFormat[Units] = jsonFormat1(Units.apply)
   }
 }

@@ -6,7 +6,6 @@ import java.time.Instant
 import csw.param.Events._
 import csw.param.Parameters._
 import csw.param.StateVariable._
-import csw.param.UnitsOfMeasure.Units
 import csw.param.parameters._
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
@@ -18,7 +17,6 @@ import spray.json._
  */
 //noinspection TypeAnnotation
 object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
-  implicit val unitsFormat = jsonFormat1(Units.apply)
 
   // JSON formats
   implicit val charParameterFormat         = jsonFormat3(CharParameter.apply)
@@ -44,28 +42,6 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
   implicit val choicesFormat               = jsonFormat1(Choices.apply)
   implicit val choiceParameterFormat       = jsonFormat4(ChoiceParameter.apply)
   implicit val structParameterFormat       = jsonFormat3(StructParameter.apply)
-
-  implicit def parameterFormat[T: JsonFormat]: RootJsonFormat[GParam[T]] = new RootJsonFormat[GParam[T]] {
-    override def write(obj: GParam[T]): JsValue = {
-      JsObject(
-        "typeName" -> JsString(obj.typeName),
-        "keyName"  -> JsString(obj.keyName),
-        "values"   -> JsArray(obj.values.map(implicitly[JsonFormat[T]].write)),
-        "units"    -> unitsFormat.write(obj.units)
-      )
-    }
-
-    override def read(json: JsValue): GParam[T] = {
-      val fields = json.asJsObject.fields
-      GParam(
-        fields("typeName").convertTo[String],
-        fields("keyName").convertTo[String],
-        fields("values").convertTo[Vector[T]],
-        fields("units").convertTo[Units],
-        implicitly[JsonFormat[T]]
-      )
-    }
-  }
 
   implicit def structFormat: JsonFormat[Struct] = new JsonFormat[Struct] {
     def write(s: Struct): JsValue = JsObject(

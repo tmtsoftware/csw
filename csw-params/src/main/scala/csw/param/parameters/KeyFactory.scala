@@ -6,7 +6,7 @@ import scala.reflect.ClassTag
 import csw.param.ParameterSetJson._
 
 sealed class KeyFactory[S: JsonFormat: ClassTag] {
-  def make(name: String): GKey[S] = GKey[S](name, typeName)
+  def make(name: String): GKey[S] = new GKey[S](name, typeName)
 
   // typeName should be unique for each GKey
   private val typeName: String = implicitly[ClassTag[S]].runtimeClass.getSimpleName

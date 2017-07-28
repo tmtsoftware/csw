@@ -1,5 +1,4 @@
 package csw.param.parameters
-import csw.param.ParameterSetJson._
 import spray.json.JsonFormat
 
 object Formats {
