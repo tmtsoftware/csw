@@ -1,7 +1,7 @@
 package csw.param.parameters
 
+import csw.param.UnitsOfMeasure
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
-import csw.param.{ParameterSetDsl, UnitsOfMeasure}
 
 import scala.annotation.varargs
 import scala.collection.immutable.Vector
@@ -107,7 +107,7 @@ abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializab
 
   /**
    * Sets the values for the key
-   * This definition enables writing code like this (see [[ParameterSetDsl]]):
+   * This definition enables writing code like this (see [[csw.param.ParameterSetDsl]]):
    * {{{
    *   val setup = sc(
    *    prefix,
@@ -123,7 +123,7 @@ abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializab
 
   /**
    * Sets the value and units for the key
-   * This definition enables writing code like this (see [[ParameterSetDsl]]):
+   * This definition enables writing code like this (see [[csw.param.ParameterSetDsl]]):
    * {{{
    *   val setup = sc(
    *    prefix,
@@ -139,7 +139,7 @@ abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializab
 
   /**
    * Sets the values for the key as a Scala Vector
-   * This definition enables writing code like this (see [[ParameterSetDsl]]):
+   * This definition enables writing code like this (see [[csw.param.ParameterSetDsl]]):
    * {{{
    *   val setup = sc(prefix,
    *     key1 -> Vector(...),

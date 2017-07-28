@@ -43,5 +43,4 @@ object UnitsOfMeasure {
       case _                 => NoUnits
     }
   }
-
 }

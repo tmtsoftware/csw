@@ -34,7 +34,7 @@ class ItemsTests extends FunSpec with Matchers {
   describe("test booleanKey") {
 
     val tval = false
-    val bk   = BooleanKey(s1)
+    val bk   = Keys.Boolean(s1)
 
     it("should allow single val") {
       val ii = bk.set(tval)

@@ -16,24 +16,6 @@ import scala.compat.java8.OptionConverters._
  */
 private[param] object JavaHelpers {
 
-  // BooleanItem
-  def jvalue(item: BooleanParameter): java.lang.Boolean = item.values(0)
-
-  def jvalue(item: BooleanParameter, index: Int): java.lang.Boolean = item.values(index)
-
-  def jvalues(item: BooleanParameter): java.util.List[java.lang.Boolean] =
-    item.values.map(i => i: java.lang.Boolean).asJava
-
-  def jget(item: BooleanParameter, index: Int): java.util.Optional[java.lang.Boolean] =
-    item.get(index).map(i => i: java.lang.Boolean).asJava
-
-  def jset(key: BooleanKey, v: java.util.List[java.lang.Boolean], units: Units): BooleanParameter =
-    BooleanParameter(key.keyName, v.asScala.toVector.map(i => i: Boolean), units)
-
-  @varargs
-  def jset(key: BooleanKey, v: java.lang.Boolean*) =
-    BooleanParameter(key.keyName, v.map(i => i: Boolean).toVector, units = UnitsOfMeasure.NoUnits)
-
   // ByteArrayItem
   def jvalue(item: ByteArrayParameter): ByteArray = item.values(0)
 

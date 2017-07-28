@@ -95,18 +95,19 @@ class JSONTests extends FunSpec {
     }
 
     it("boolean item encode/decode") {
-      val k1 = BooleanKey(s1)
+      val k1 = Keys.Boolean(s1)
       val i1 = k1.set(true, false).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1 = i1.toJson
       //      info("j1: " + j1)
-      val in1 = j1.convertTo[BooleanParameter]
+      println(j1)
+      val in1 = j1.convertTo[GParam[Boolean]]
       assert(in1 == i1)
 
       val i2 = k1.set(true)
 
       val j2  = i2.toJson
-      val in2 = j2.convertTo[BooleanParameter]
+      val in2 = j2.convertTo[GParam[Boolean]]
       assert(in2 == i2)
     }
 
@@ -146,7 +147,7 @@ class JSONTests extends FunSpec {
     val k3 = LongKey("c")
     val k4 = FloatKey("d")
     val k5 = DoubleKey("e")
-    val k6 = BooleanKey("f")
+    val k6 = Keys.Boolean("f")
     val k7 = StringKey("g")
 
     val i1 = k1.set('d').withUnits(UnitsOfMeasure.NoUnits)

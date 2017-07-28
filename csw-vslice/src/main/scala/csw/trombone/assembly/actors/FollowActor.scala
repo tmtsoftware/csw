@@ -4,7 +4,8 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.param.Events.EventTime
-import csw.param.parameters.primitives.{BooleanParameter, DoubleParameter}
+import csw.param.parameters.GParam
+import csw.param.parameters.primitives.DoubleParameter
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.FollowActorMessages.{SetElevation, SetZenithAngle, StopFollowing, UpdatedEventData}
 import csw.trombone.assembly.TromboneControlMsg.GoToStagePosition
@@ -15,7 +16,7 @@ object FollowActor {
   def make(
       ac: AssemblyContext,
       initialElevation: DoubleParameter,
-      inNSSMode: BooleanParameter,
+      inNSSMode: GParam[Boolean],
       tromboneControl: Option[ActorRef[TromboneControlMsg]],
       aoPublisher: Option[ActorRef[TrombonePublisherMsg]],
       engPublisher: Option[ActorRef[TrombonePublisherMsg]]
@@ -29,7 +30,7 @@ class FollowActor(
     ctx: ActorContext[FollowActorMessages],
     ac: AssemblyContext,
     val initialElevation: DoubleParameter,
-    val inNSSMode: BooleanParameter,
+    val inNSSMode: GParam[Boolean],
     val tromboneControl: Option[ActorRef[TromboneControlMsg]],
     val aoPublisher: Option[ActorRef[TrombonePublisherMsg]],
     val engPublisher: Option[ActorRef[TrombonePublisherMsg]]

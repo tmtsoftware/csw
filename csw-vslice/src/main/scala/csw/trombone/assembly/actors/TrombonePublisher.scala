@@ -3,8 +3,8 @@ package csw.trombone.assembly.actors
 import akka.typed.Behavior
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.param.parameters.ChoiceParameter
-import csw.param.parameters.primitives.{BooleanParameter, DoubleParameter, IntParameter, StringParameter}
+import csw.param.parameters.{ChoiceParameter, GParam}
+import csw.param.parameters.primitives.{DoubleParameter, IntParameter, StringParameter}
 import csw.trombone.assembly.TrombonePublisherMsg._
 import csw.trombone.assembly.{AssemblyContext, TrombonePublisherMsg}
 
@@ -77,9 +77,9 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
   private def publishAxisState(axisName: StringParameter,
                                position: IntParameter,
                                state: ChoiceParameter,
-                               inLowLimit: BooleanParameter,
-                               inHighLimit: BooleanParameter,
-                               inHome: BooleanParameter) = {
+                               inLowLimit: GParam[Boolean],
+                               inHighLimit: GParam[Boolean],
+                               inHome: GParam[Boolean]) = {
 //    val ste = StatusEvent(axisStateEventPrefix).madd(axisName, position, state, inLowLimit, inHighLimit, inHome)
 //    log.debug(s"Axis state publish of $axisStateEventPrefix: $ste")
 //    telemetryService.foreach(_.publish(ste).onComplete {

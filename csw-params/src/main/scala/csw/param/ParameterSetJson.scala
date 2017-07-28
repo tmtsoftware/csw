@@ -27,7 +27,6 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
   implicit val longParameterFormat         = jsonFormat3(LongParameter.apply)
   implicit val floatParameterFormat        = jsonFormat3(FloatParameter.apply)
   implicit val doubleParameterFormat       = jsonFormat3(DoubleParameter.apply)
-  implicit val booleanParameterFormat      = jsonFormat3(BooleanParameter.apply)
   implicit val stringParameterFormat       = jsonFormat3(StringParameter.apply)
   implicit val doubleMatrixParameterFormat = jsonFormat3(DoubleMatrixParameter.apply)
   implicit val doubleArrayParameterFormat  = jsonFormat3(DoubleArrayParameter.apply)
@@ -44,6 +43,29 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
   implicit val choiceFormat                = jsonFormat1(Choice.apply)
   implicit val choicesFormat               = jsonFormat1(Choices.apply)
   implicit val choiceParameterFormat       = jsonFormat4(ChoiceParameter.apply)
+  implicit val structParameterFormat       = jsonFormat3(StructParameter.apply)
+
+  implicit def parameterFormat[T: JsonFormat]: RootJsonFormat[GParam[T]] = new RootJsonFormat[GParam[T]] {
+    override def write(obj: GParam[T]): JsValue = {
+      JsObject(
+        "typeName" -> JsString(obj.typeName),
+        "keyName"  -> JsString(obj.keyName),
+        "values"   -> JsArray(obj.values.map(implicitly[JsonFormat[T]].write)),
+        "units"    -> unitsFormat.write(obj.units)
+      )
+    }
+
+    override def read(json: JsValue): GParam[T] = {
+      val fields = json.asJsObject.fields
+      GParam(
+        fields("typeName").convertTo[String],
+        fields("keyName").convertTo[String],
+        fields("values").convertTo[Vector[T]],
+        fields("units").convertTo[Units],
+        implicitly[JsonFormat[T]]
+      )
+    }
+  }
 
   implicit def structFormat: JsonFormat[Struct] = new JsonFormat[Struct] {
     def write(s: Struct): JsValue = JsObject(
@@ -66,8 +88,6 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
       }
     }
   }
-
-  implicit val structParameterFormat = jsonFormat3(StructParameter.apply)
 
   implicit def subsystemFormat: JsonFormat[Subsystem] = new JsonFormat[Subsystem] {
     def write(obj: Subsystem) = JsString(obj.name)
@@ -114,7 +134,6 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
   private val longType            = classOf[LongParameter].getSimpleName
   private val floatType           = classOf[FloatParameter].getSimpleName
   private val doubleType          = classOf[DoubleParameter].getSimpleName
-  private val booleanType         = classOf[BooleanParameter].getSimpleName
   private val stringType          = classOf[StringParameter].getSimpleName
   private val doubleMatrixType    = classOf[DoubleMatrixParameter].getSimpleName
   private val doubleArrayType     = classOf[DoubleArrayParameter].getSimpleName
@@ -153,7 +172,6 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
       case i: LongParameter         => (JsString(longType), longParameterFormat.write(i))
       case i: FloatParameter        => (JsString(floatType), floatParameterFormat.write(i))
       case i: DoubleParameter       => (JsString(doubleType), doubleParameterFormat.write(i))
-      case i: BooleanParameter      => (JsString(booleanType), booleanParameterFormat.write(i))
       case i: StringParameter       => (JsString(stringType), stringParameterFormat.write(i))
       case i: DoubleMatrixParameter => (JsString(doubleMatrixType), doubleMatrixParameterFormat.write(i))
       case i: DoubleArrayParameter  => (JsString(doubleArrayType), doubleArrayParameterFormat.write(i))
@@ -169,7 +187,7 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
       case i: LongArrayParameter    => (JsString(longArrayType), longArrayParameterFormat.write(i))
       case i: ChoiceParameter       => (JsString(choiceType), choiceParameterFormat.write(i))
       case i: StructParameter       => (JsString(structParameterType), structParameterFormat.write(i))
-      case i: GParam[S]             => (JsString(i.typeName), i.toJson)
+      case i: GParam[_]             => (JsString(i.typeName), i.toJson)
     }
     JsObject("type" -> result._1, "parameter" -> result._2)
   }
@@ -183,7 +201,6 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
         case (JsString(`longType`), parameter)            => longParameterFormat.read(parameter)
         case (JsString(`floatType`), parameter)           => floatParameterFormat.read(parameter)
         case (JsString(`doubleType`), parameter)          => doubleParameterFormat.read(parameter)
-        case (JsString(`booleanType`), parameter)         => booleanParameterFormat.read(parameter)
         case (JsString(`stringType`), parameter)          => stringParameterFormat.read(parameter)
         case (JsString(`doubleMatrixType`), parameter)    => doubleMatrixParameterFormat.read(parameter)
         case (JsString(`doubleArrayType`), parameter)     => doubleArrayParameterFormat.read(parameter)
@@ -199,10 +216,10 @@ object ParameterSetJson extends DefaultJsonProtocol with JavaFormatters {
         case (JsString(`longArrayType`), parameter)       => longArrayParameterFormat.read(parameter)
         case (JsString(`choiceType`), parameter)          => choiceParameterFormat.read(parameter)
         case (JsString(`structParameterType`), parameter) => structParameterFormat.read(parameter)
-        case (JsString(typeTag), parameter) =>
-          GParam.lookup(typeTag) match {
-            case Some(jsonReaderFunc) => jsonReaderFunc(parameter)
-            case None                 => unexpectedJsValueError(parameter)
+        case (JsString(name), parameter) =>
+          Formats.values.get(name) match {
+            case None         ⇒ unexpectedJsValueError(parameter)
+            case Some(format) ⇒ format.read(parameter)
           }
         case _ => unexpectedJsValueError(json)
       }

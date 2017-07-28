@@ -6,8 +6,8 @@ import csw.param.Parameters.{CommandInfo, Prefix, Setup}
 import csw.param.StateVariable.CurrentState
 import csw.param.UnitsOfMeasure.encoder
 import csw.param._
-import csw.param.parameters.{Choice, ChoiceKey}
-import csw.param.parameters.primitives.{BooleanKey, IntKey, StringKey}
+import csw.param.parameters.{Choice, ChoiceKey, Keys}
+import csw.param.parameters.primitives.{IntKey, StringKey}
 
 object TromboneHcdState {
   val tromboneConfigFile = new File("trombone/tromboneHCD.conf")
@@ -30,9 +30,9 @@ object TromboneHcdState {
   val stateKey                    = ChoiceKey("axisState", AXIS_IDLE, AXIS_MOVING, AXIS_ERROR)
   val positionKey                 = IntKey("position")
   val positionUnits: encoder.type = encoder
-  val inLowLimitKey               = BooleanKey("lowLimit")
-  val inHighLimitKey              = BooleanKey("highLimit")
-  val inHomeKey                   = BooleanKey("homed")
+  val inLowLimitKey               = Keys.Boolean("lowLimit")
+  val inHighLimitKey              = Keys.Boolean("highLimit")
+  val inHomeKey                   = Keys.Boolean("homed")
 
   val defaultAxisState: StateVariable.CurrentState = CurrentState(axisStateCK).madd(
     axisNameKey    -> tromboneAxisName,
