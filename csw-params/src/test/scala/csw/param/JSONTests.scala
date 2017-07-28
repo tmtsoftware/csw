@@ -27,7 +27,7 @@ class JSONTests extends FunSpec {
 
     it("should encode and decode properly") {
       val key                    = Keys.Boolean("abc")
-      val value: GParam[Boolean] = key.gset(Array(true))
+      val value: GParam[Boolean] = key.set(Vector(true))
       println(key.typeName)
       println(value.toJson)
       val json = wfos.toJson

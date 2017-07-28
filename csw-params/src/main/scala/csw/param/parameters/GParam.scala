@@ -1,8 +1,7 @@
 package csw.param.parameters
 
-import csw.param.UnitsOfMeasure
+import csw.param.ParameterSetJson._
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
-import spray.json.DefaultJsonProtocol._
 import spray.json.{JsArray, JsObject, JsString, JsValue, JsonFormat}
 
 import scala.collection.immutable.Vector
@@ -80,14 +79,8 @@ sealed class GKey[S: JsonFormat: ClassTag](nameIn: String) extends Key[S, GParam
 
   val typeName: String = getClass.getSimpleName
 
-  def gset(v: Array[S], units: Units = NoUnits): GParam[S] =
-    GParam(typeName, keyName, v, units)
-
   override def set(v: Vector[S], units: Units = NoUnits): GParam[S] =
     GParam(typeName, keyName, v.toArray, units)
-
-  override def set(v: S*): GParam[S /*, S*/ ] =
-    GParam(typeName, keyName, v.toArray, UnitsOfMeasure.NoUnits)
 }
 
 object Keys {
@@ -97,7 +90,6 @@ object Keys {
 }
 
 object JKeys {
-  import csw.param.JavaFormatters._
   case class Integer(name: String) extends GKey[java.lang.Integer](name)
   case class Boolean(name: String) extends GKey[java.lang.Boolean](name)
 }

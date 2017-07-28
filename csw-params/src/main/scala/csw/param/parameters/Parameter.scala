@@ -103,7 +103,7 @@ abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializab
    * @return a parameter containing the key name, values (call withUnits() on the result to set the units)
    */
   @varargs
-  def set(v: S*): I
+  def set(v: S*): I = set(v.toVector)
 
   /**
    * Sets the values for the key
