@@ -2,14 +2,14 @@ package csw.param.parameters
 import csw.param.RaDec
 import spray.json.JsonFormat
 
-import scala.reflect.ClassTag
+import scala.reflect.{classTag, ClassTag}
 import csw.param.JsonSupport._
 
 sealed class KeyFactory[S: JsonFormat: ClassTag] {
   def make(name: String): GKey[S] = new GKey[S](name, typeName)
 
   // typeName should be unique for each GKey
-  private val typeName: String = implicitly[ClassTag[S]].runtimeClass.getSimpleName
+  private val typeName: String = classTag[S].runtimeClass.getSimpleName
 
   Formats.register[S](typeName)
 }
