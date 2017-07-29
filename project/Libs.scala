@@ -28,7 +28,7 @@ object Libs {
 }
 
 object Akka {
-  val Version                   = "2.5.2" //all akka is Apache License 2.0
+  val Version                   = "2.5.3" //all akka is Apache License 2.0
   val `akka-stream`             = "com.typesafe.akka" %% "akka-stream" % Version
   val `akka-remote`             = "com.typesafe.akka" %% "akka-remote" % Version
   val `akka-stream-testkit`     = "com.typesafe.akka" %% "akka-stream-testkit" % Version
@@ -42,7 +42,7 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version                = "10.0.6"
+  val Version                = "10.0.9"
   val `akka-http`            = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version //ApacheV2
   val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
