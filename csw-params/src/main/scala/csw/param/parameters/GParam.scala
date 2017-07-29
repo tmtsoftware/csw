@@ -1,14 +1,13 @@
 package csw.param.parameters
 
-import csw.param.JsonSupport._
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
-import spray.json.{pimpAny, JsObject, JsValue, JsonFormat, RootJsonFormat}
+import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat, RootJsonFormat}
 
 import scala.collection.immutable.Vector
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
-object GParam {
+object GParam extends DefaultJsonProtocol {
 
   private[parameters] def apply[S: JsonFormat: ClassTag](typeName: String,
                                                          keyName: String,

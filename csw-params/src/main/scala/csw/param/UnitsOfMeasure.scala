@@ -1,14 +1,13 @@
 package csw.param
 
-import csw.param.JsonSupport._
-import spray.json.RootJsonFormat
+import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
 /**
  * This Units stuff is just for play
  * although something should be developed or borrowed
  * for use.
  */
-object UnitsOfMeasure {
+object UnitsOfMeasure extends DefaultJsonProtocol {
 
   // Should parameterize Units so concat can be created concat[A, B]
   case class Units(name: String) {

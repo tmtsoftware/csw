@@ -1,6 +1,7 @@
 package parameters;
 
 import csw.param.JsonSupport;
+import csw.param.TestJavaFormats;
 import csw.param.parameters.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class JParameterTest {
 
         JsValue jsValue = param.toJson();
 
-        GParam<Boolean> booleanGParam = jsValue.convertTo(JsonSupport.dd());
+        GParam<Boolean> booleanGParam = jsValue.convertTo(TestJavaFormats.dd());
 
         Assert.assertEquals(param, booleanGParam);
 //        Assert.assertNotEquals(param2, booleanGParam);
