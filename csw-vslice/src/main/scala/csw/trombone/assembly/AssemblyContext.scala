@@ -187,12 +187,7 @@ object AssemblyContext {
       val upperFocusLimit         = config.getDouble(s"$prefix.calculation-config.upperFocusLimit")
       val lowerFocusLimit         = config.getDouble(s"$prefix.calculation-config.lowerFocusLimit")
       val zenithFactor            = config.getDouble(s"$prefix.calculation-config.zenithFactor")
-      TromboneCalculationConfig(defaultInitialElevation,
-                                focusGainError,
-                                upperFocusLimit,
-                                lowerFocusLimit,
-                                zenithFactor)
+      TromboneCalculationConfig(defaultInitialElevation, focusGainError, upperFocusLimit, lowerFocusLimit, zenithFactor)
     }
   }
-
 }
