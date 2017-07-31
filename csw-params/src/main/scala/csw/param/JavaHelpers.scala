@@ -196,23 +196,6 @@ private[param] object JavaHelpers {
   def jset(key: LongMatrixKey, v: LongMatrix*) =
     LongMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
 
-  // ShortItem
-  def jvalue(item: ShortParameter): java.lang.Short = item.values(0)
-
-  def jvalue(item: ShortParameter, index: Int): java.lang.Short = item.values(index)
-
-  def jvalues(item: ShortParameter): java.util.List[java.lang.Short] = item.values.map(i => i: java.lang.Short).asJava
-
-  def jget(item: ShortParameter, index: Int): java.util.Optional[java.lang.Short] =
-    item.get(index).map(i => i: java.lang.Short).asJava
-
-  def jset(key: ShortKey, v: java.util.List[java.lang.Short], units: Units): ShortParameter =
-    ShortParameter(key.keyName, v.asScala.toVector.map(i => i: Short), units)
-
-  @varargs
-  def jset(key: ShortKey, v: java.lang.Short*) =
-    ShortParameter(key.keyName, v.map(i => i: Short).toVector, units = UnitsOfMeasure.NoUnits)
-
   // ShortArrayItem
   def jvalue(item: ShortArrayParameter): ShortArray = item.values(0)
 

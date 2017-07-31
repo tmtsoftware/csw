@@ -741,7 +741,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test ShortItem") {
     val tval: Short = 1234
-    val lk          = ShortKey(s1)
+    val lk          = Keys.ShortKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)

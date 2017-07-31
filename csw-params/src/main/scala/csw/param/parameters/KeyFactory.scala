@@ -17,6 +17,7 @@ object Keys extends DefaultJsonProtocol {
   val IntMatrixKey = new KeyFactory[GArray[Array[Int]]]("IntMatrixKey")
   val BooleanKey   = new KeyFactory[Boolean]("BooleanKey")
   val CharKey      = new KeyFactory[Char]("CharKey")
+  val ShortKey     = new KeyFactory[Short]("ShortKey")
 }
 
 object JKeys extends JavaFormats {
@@ -26,4 +27,5 @@ object JKeys extends JavaFormats {
   val IntegerMatrixKey = new KeyFactory[GArray[Array[Int]]]("JIntegerMatrixKey")
   val BooleanKey       = new KeyFactory[java.lang.Boolean]("JBooleanKey")
   val CharacterKey     = new KeyFactory[java.lang.Character]("JCharacterKey")
+  val ShortKey         = new KeyFactory[java.lang.Short]("JShortKey")
 }

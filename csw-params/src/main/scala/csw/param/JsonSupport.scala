@@ -20,7 +20,6 @@ object JsonSupport extends JsonSupport
 trait JsonSupport extends DefaultJsonProtocol {
 
   // JSON formats
-  implicit val shortParameterFormat        = jsonFormat3(ShortParameter.apply)
   implicit val longParameterFormat         = jsonFormat3(LongParameter.apply)
   implicit val floatParameterFormat        = jsonFormat3(FloatParameter.apply)
   implicit val doubleParameterFormat       = jsonFormat3(DoubleParameter.apply)
@@ -102,7 +101,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   implicit val eventInfoFormat       = jsonFormat4(EventInfo.apply)
 
   // JSON type tags
-  private val shortType           = classOf[ShortParameter].getSimpleName
   private val longType            = classOf[LongParameter].getSimpleName
   private val floatType           = classOf[FloatParameter].getSimpleName
   private val doubleType          = classOf[DoubleParameter].getSimpleName
@@ -137,7 +135,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   // XXX TODO Use JNumber?
   def writeParameter[S, I /*, J */ ](parameter: Parameter[S /*, J */ ]): JsValue = {
     val result: (JsString, JsValue) = parameter match {
-      case i: ShortParameter        => (JsString(shortType), shortParameterFormat.write(i))
       case i: LongParameter         => (JsString(longType), longParameterFormat.write(i))
       case i: FloatParameter        => (JsString(floatType), floatParameterFormat.write(i))
       case i: DoubleParameter       => (JsString(doubleType), doubleParameterFormat.write(i))
@@ -163,7 +160,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   def readParameterAndType(json: JsValue): Parameter[_ /*, _ */ ] = json match {
     case JsObject(fields) =>
       (fields("type"), fields("parameter")) match {
-        case (JsString(`shortType`), parameter)           => shortParameterFormat.read(parameter)
         case (JsString(`longType`), parameter)            => longParameterFormat.read(parameter)
         case (JsString(`floatType`), parameter)           => floatParameterFormat.read(parameter)
         case (JsString(`doubleType`), parameter)          => doubleParameterFormat.read(parameter)

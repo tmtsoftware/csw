@@ -45,12 +45,12 @@ class JSONTests extends FunSpec {
     }
 
     it("short item encode/decode") {
-      val k1       = ShortKey(s3)
+      val k1       = Keys.ShortKey.make(s3)
       val s: Short = -1
       val i1       = k1.set(s).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[ShortParameter]
+      val in1 = j1.convertTo[GParam[Short]]
       assert(in1 == i1)
     }
 
