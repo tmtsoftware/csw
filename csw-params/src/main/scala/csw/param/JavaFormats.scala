@@ -10,5 +10,6 @@ trait JavaFormats extends DefaultJsonProtocol {
   implicit val booleanFormat: JsonFormat[lang.Boolean] = BooleanJsonFormat.asInstanceOf[JsonFormat[java.lang.Boolean]]
   implicit val characterFormat: JsonFormat[lang.Character] =
     BooleanJsonFormat.asInstanceOf[JsonFormat[java.lang.Character]]
-  implicit val shortFormat: JsonFormat[lang.Short] = BooleanJsonFormat.asInstanceOf[JsonFormat[java.lang.Short]]
+  implicit val shortFormat: JsonFormat[lang.Short]   = BooleanJsonFormat.asInstanceOf[JsonFormat[java.lang.Short]]
+  implicit val doubleFormat: JsonFormat[lang.Double] = BooleanJsonFormat.asInstanceOf[JsonFormat[java.lang.Double]]
 }

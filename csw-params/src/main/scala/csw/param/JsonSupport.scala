@@ -22,7 +22,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   // JSON formats
   implicit val longParameterFormat         = jsonFormat3(LongParameter.apply)
   implicit val floatParameterFormat        = jsonFormat3(FloatParameter.apply)
-  implicit val doubleParameterFormat       = jsonFormat3(DoubleParameter.apply)
   implicit val stringParameterFormat       = jsonFormat3(StringParameter.apply)
   implicit val doubleMatrixParameterFormat = jsonFormat3(DoubleMatrixParameter.apply)
   implicit val doubleArrayParameterFormat  = jsonFormat3(DoubleArrayParameter.apply)
@@ -103,7 +102,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   // JSON type tags
   private val longType            = classOf[LongParameter].getSimpleName
   private val floatType           = classOf[FloatParameter].getSimpleName
-  private val doubleType          = classOf[DoubleParameter].getSimpleName
   private val stringType          = classOf[StringParameter].getSimpleName
   private val doubleMatrixType    = classOf[DoubleMatrixParameter].getSimpleName
   private val doubleArrayType     = classOf[DoubleArrayParameter].getSimpleName
@@ -137,7 +135,6 @@ trait JsonSupport extends DefaultJsonProtocol {
     val result: (JsString, JsValue) = parameter match {
       case i: LongParameter         => (JsString(longType), longParameterFormat.write(i))
       case i: FloatParameter        => (JsString(floatType), floatParameterFormat.write(i))
-      case i: DoubleParameter       => (JsString(doubleType), doubleParameterFormat.write(i))
       case i: StringParameter       => (JsString(stringType), stringParameterFormat.write(i))
       case i: DoubleMatrixParameter => (JsString(doubleMatrixType), doubleMatrixParameterFormat.write(i))
       case i: DoubleArrayParameter  => (JsString(doubleArrayType), doubleArrayParameterFormat.write(i))
@@ -162,7 +159,6 @@ trait JsonSupport extends DefaultJsonProtocol {
       (fields("type"), fields("parameter")) match {
         case (JsString(`longType`), parameter)            => longParameterFormat.read(parameter)
         case (JsString(`floatType`), parameter)           => floatParameterFormat.read(parameter)
-        case (JsString(`doubleType`), parameter)          => doubleParameterFormat.read(parameter)
         case (JsString(`stringType`), parameter)          => stringParameterFormat.read(parameter)
         case (JsString(`doubleMatrixType`), parameter)    => doubleMatrixParameterFormat.read(parameter)
         case (JsString(`doubleArrayType`), parameter)     => doubleArrayParameterFormat.read(parameter)

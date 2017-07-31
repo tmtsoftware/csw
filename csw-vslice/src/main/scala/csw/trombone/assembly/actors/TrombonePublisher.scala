@@ -4,7 +4,7 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.param.parameters.{ChoiceParameter, GParam}
-import csw.param.parameters.primitives.{DoubleParameter, StringParameter}
+import csw.param.parameters.primitives.StringParameter
 import csw.trombone.assembly.TrombonePublisherMsg._
 import csw.trombone.assembly.{AssemblyContext, TrombonePublisherMsg}
 
@@ -47,7 +47,7 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 
   }
 
-  private def publishAOESW(elevationItem: DoubleParameter, rangeItem: DoubleParameter) = {
+  private def publishAOESW(elevationItem: GParam[Double], rangeItem: GParam[Double]) = {
 //    val se = SystemEvent(aoSystemEventPrefix).madd(elevationItem, rangeItem)
 //    eventService.foreach(_.publish(se).onComplete {
 //      case Failure(ex) => log.error("TrombonePublisher failed to publish AO system event: $se", ex)
@@ -55,9 +55,7 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 //    })
   }
 
-  private def publishEngr(rtcFocusError: DoubleParameter,
-                          stagePosition: DoubleParameter,
-                          zenithAngle: DoubleParameter) = {
+  private def publishEngr(rtcFocusError: GParam[Double], stagePosition: GParam[Double], zenithAngle: GParam[Double]) = {
 //    val ste = StatusEvent(engStatusEventPrefix).madd(rtcFocusError, stagePosition, zenithAngle)
 //    telemetryService.foreach(_.publish(ste).onComplete {
 //      case Failure(ex) => log.error(s"TrombonePublisher failed to publish engr event: $ste", ex)

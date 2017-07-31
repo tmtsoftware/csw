@@ -308,9 +308,9 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Checking for item types in configs") {
-    val k1: GKey[Int] = Keys.IntKey.make("itest")
-    val k2: DoubleKey = DoubleKey("dtest")
-    val k3: StringKey = StringKey("stest")
+    val k1: GKey[Int]    = Keys.IntKey.make("itest")
+    val k2: GKey[Double] = Keys.DoubleKey.make("dtest")
+    val k3: StringKey    = StringKey("stest")
 
     val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
@@ -320,7 +320,7 @@ class ConfigTests extends FunSpec {
       val sc = Setup(commandInfo, ck1).add(i1).add(i2).add(i3)
 
       val out1: Option[GParam[Int]]     = sc.get(k1)
-      val out2: Option[DoubleParameter] = sc.get(k2)
+      val out2: Option[GParam[Double]]  = sc.get(k2)
       val out3: Option[StringParameter] = sc.get(k3)
 
       assert(out1.get.values === Vector(1, 2, 3))
@@ -330,9 +330,9 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Check for multi-add") {
-    val k1: GKey[Int] = Keys.IntKey.make("itest")
-    val k2: DoubleKey = DoubleKey("dtest")
-    val k3: StringKey = StringKey("stest")
+    val k1: GKey[Int]    = Keys.IntKey.make("itest")
+    val k2: GKey[Double] = Keys.DoubleKey.make("dtest")
+    val k3: StringKey    = StringKey("stest")
 
     val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
@@ -351,7 +351,7 @@ class ConfigTests extends FunSpec {
 
   describe("Should work with remove") {
     val k1 = Keys.IntKey.make("itest")
-    val k2 = DoubleKey("dtest")
+    val k2 = Keys.DoubleKey.make("dtest")
     val k3 = StringKey("stest")
     val k4 = LongArrayKey("lartest")
 
@@ -416,7 +416,7 @@ class ConfigTests extends FunSpec {
 
   describe("should work with remove by item") {
     val k1 = Keys.IntKey.make("itest")
-    val k2 = DoubleKey("dtest")
+    val k2 = Keys.DoubleKey.make("dtest")
     val k3 = StringKey("stest")
     val k4 = LongArrayKey("lartest")
 

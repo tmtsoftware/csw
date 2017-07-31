@@ -5,7 +5,6 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.param.Events.EventTime
 import csw.param.parameters.GParam
-import csw.param.parameters.primitives.DoubleParameter
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.FollowActorMessages.{SetElevation, SetZenithAngle, StopFollowing, UpdatedEventData}
 import csw.trombone.assembly.TromboneControlMsg.GoToStagePosition
@@ -15,7 +14,7 @@ import csw.trombone.assembly._
 object FollowActor {
   def make(
       ac: AssemblyContext,
-      initialElevation: DoubleParameter,
+      initialElevation: GParam[Double],
       inNSSMode: GParam[Boolean],
       tromboneControl: Option[ActorRef[TromboneControlMsg]],
       aoPublisher: Option[ActorRef[TrombonePublisherMsg]],
@@ -29,7 +28,7 @@ object FollowActor {
 class FollowActor(
     ctx: ActorContext[FollowActorMessages],
     ac: AssemblyContext,
-    val initialElevation: DoubleParameter,
+    val initialElevation: GParam[Double],
     val inNSSMode: GParam[Boolean],
     val tromboneControl: Option[ActorRef[TromboneControlMsg]],
     val aoPublisher: Option[ActorRef[TrombonePublisherMsg]],
@@ -42,13 +41,13 @@ class FollowActor(
   val calculationConfig: TromboneCalculationConfig = ac.calculationConfig
   val controlConfig: TromboneControlConfig         = ac.controlConfig
 
-  val initialFocusError: DoubleParameter  = focusErrorKey  -> 0.0 withUnits focusErrorUnits
-  val initialZenithAngle: DoubleParameter = zenithAngleKey -> 0.0 withUnits zenithAngleUnits
-  val nSSModeZenithAngle: DoubleParameter = zenithAngleKey -> 0.0 withUnits zenithAngleUnits
+  val initialFocusError: GParam[Double]  = focusErrorKey  -> 0.0 withUnits focusErrorUnits
+  val initialZenithAngle: GParam[Double] = zenithAngleKey -> 0.0 withUnits zenithAngleUnits
+  val nSSModeZenithAngle: GParam[Double] = zenithAngleKey -> 0.0 withUnits zenithAngleUnits
 
-  var cElevation: DoubleParameter   = initialElevation
-  var cFocusError: DoubleParameter  = initialFocusError
-  var cZenithAngle: DoubleParameter = initialZenithAngle
+  var cElevation: GParam[Double]   = initialElevation
+  var cFocusError: GParam[Double]  = initialFocusError
+  var cZenithAngle: GParam[Double] = initialZenithAngle
 
   override def onMessage(msg: FollowActorMessages): Behavior[FollowActorMessages] = msg match {
 
@@ -94,9 +93,9 @@ class FollowActor(
   }
 
   def calculateNewTrombonePosition(calculationConfig: TromboneCalculationConfig,
-                                   elevationIn: DoubleParameter,
-                                   focusErrorIn: DoubleParameter,
-                                   zenithAngleIn: DoubleParameter): DoubleParameter = {
+                                   elevationIn: GParam[Double],
+                                   focusErrorIn: GParam[Double],
+                                   zenithAngleIn: GParam[Double]): GParam[Double] = {
     val totalRangeDistance =
       focusZenithAngleToRangeDistance(calculationConfig, elevationIn.head, focusErrorIn.head, zenithAngleIn.head)
 
@@ -104,17 +103,15 @@ class FollowActor(
     spos(stagePosition)
   }
 
-  def sendTrombonePosition(controlConfig: TromboneControlConfig, stagePosition: DoubleParameter): Unit = {
+  def sendTrombonePosition(controlConfig: TromboneControlConfig, stagePosition: GParam[Double]): Unit = {
     tromboneControl.foreach(_ ! GoToStagePosition(stagePosition))
   }
 
-  def sendAOESWUpdate(elevationItem: DoubleParameter, rangeItem: DoubleParameter): Unit = {
+  def sendAOESWUpdate(elevationItem: GParam[Double], rangeItem: GParam[Double]): Unit = {
     aoPublisher.foreach(_ ! AOESWUpdate(elevationItem, rangeItem))
   }
 
-  def sendEngrUpdate(focusError: DoubleParameter,
-                     trombonePosition: DoubleParameter,
-                     zenithAngle: DoubleParameter): Unit = {
+  def sendEngrUpdate(focusError: GParam[Double], trombonePosition: GParam[Double], zenithAngle: GParam[Double]): Unit = {
     engPublisher.foreach(_ ! EngrUpdate(focusError, trombonePosition, zenithAngle))
   }
 }

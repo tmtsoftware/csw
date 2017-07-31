@@ -10,12 +10,11 @@ import csw.trombone.assembly._
 import csw.trombone.assembly.actors.{FollowActor, TromboneControl}
 import csw.common.framework.models.RunningHcdMsg.Submit
 import csw.param.parameters.GParam
-import csw.param.parameters.primitives.DoubleParameter
 
 object FollowCommand {
 
   def make(assemblyContext: AssemblyContext,
-           initialElevation: DoubleParameter,
+           initialElevation: GParam[Double],
            nssInUse: GParam[Boolean],
            tromboneHCD: Option[ActorRef[Submit]],
            eventPublisher: Option[ActorRef[TrombonePublisherMsg]]): Behavior[FollowCommandMessages] =
@@ -25,7 +24,7 @@ object FollowCommand {
 }
 
 class FollowCommand(ac: AssemblyContext,
-                    initialElevation: DoubleParameter,
+                    initialElevation: GParam[Double],
                     val nssInUseIn: GParam[Boolean],
                     val tromboneHCDIn: Option[ActorRef[Submit]],
                     eventPublisher: Option[ActorRef[TrombonePublisherMsg]],

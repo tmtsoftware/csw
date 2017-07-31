@@ -197,7 +197,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test doubleItem") {
     val tval: Double = 123.456
-    val lk           = DoubleKey(s1)
+    val lk           = Keys.DoubleKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -926,7 +926,7 @@ class ItemsTests extends FunSpec with Matchers {
 
       val ra    = StringKey("ra")
       val dec   = StringKey("dec")
-      val epoch = DoubleKey("epoch")
+      val epoch = Keys.DoubleKey.make("epoch")
       val sc1   = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
 
       val citem = skey.set(sc1)
@@ -942,7 +942,7 @@ class ItemsTests extends FunSpec with Matchers {
 
       val ra    = StringKey("ra")
       val dec   = StringKey("dec")
-      val epoch = DoubleKey("epoch")
+      val epoch = Keys.DoubleKey.make("epoch")
       val sc1   = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
 
       val citem = skey.set(sc1)

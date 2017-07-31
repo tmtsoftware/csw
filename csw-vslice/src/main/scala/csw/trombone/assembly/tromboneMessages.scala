@@ -9,34 +9,34 @@ import csw.param.Events.EventTime
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 import csw.param.parameters.{ChoiceParameter, GParam}
-import csw.param.parameters.primitives.{DoubleParameter, StringParameter}
+import csw.param.parameters.primitives.StringParameter
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 
 sealed trait FollowCommandMessages
 object FollowCommandMessages {
-  case class UpdateNssInUse(nssInUse: GParam[Boolean])                                extends FollowCommandMessages
-  case class UpdateZAandFE(zenithAngle: DoubleParameter, focusError: DoubleParameter) extends FollowCommandMessages
-  case class UpdateTromboneHcd(running: Option[ActorRef[Submit]])                     extends FollowCommandMessages
+  case class UpdateNssInUse(nssInUse: GParam[Boolean])                              extends FollowCommandMessages
+  case class UpdateZAandFE(zenithAngle: GParam[Double], focusError: GParam[Double]) extends FollowCommandMessages
+  case class UpdateTromboneHcd(running: Option[ActorRef[Submit]])                   extends FollowCommandMessages
 }
 
 ////////////////////////
 
 sealed trait FollowActorMessages extends FollowCommandMessages
 object FollowActorMessages {
-  case class UpdatedEventData(zenithAngle: DoubleParameter, focusError: DoubleParameter, time: EventTime)
+  case class UpdatedEventData(zenithAngle: GParam[Double], focusError: GParam[Double], time: EventTime)
       extends FollowActorMessages
-  case class SetElevation(elevation: DoubleParameter)     extends FollowActorMessages
-  case class SetZenithAngle(zenithAngle: DoubleParameter) extends FollowActorMessages
-  case object StopFollowing                               extends FollowActorMessages
+  case class SetElevation(elevation: GParam[Double])     extends FollowActorMessages
+  case class SetZenithAngle(zenithAngle: GParam[Double]) extends FollowActorMessages
+  case object StopFollowing                              extends FollowActorMessages
 }
 
 ////////////////////////
 
 sealed trait TrombonePublisherMsg
 object TrombonePublisherMsg {
-  case class TrombonePublisherMsgE(tromboneState: TromboneState)                 extends TrombonePublisherMsg
-  case class AOESWUpdate(naElevation: DoubleParameter, naRange: DoubleParameter) extends TrombonePublisherMsg
-  case class EngrUpdate(focusError: DoubleParameter, stagePosition: DoubleParameter, zenithAngle: DoubleParameter)
+  case class TrombonePublisherMsgE(tromboneState: TromboneState)               extends TrombonePublisherMsg
+  case class AOESWUpdate(naElevation: GParam[Double], naRange: GParam[Double]) extends TrombonePublisherMsg
+  case class EngrUpdate(focusError: GParam[Double], stagePosition: GParam[Double], zenithAngle: GParam[Double])
       extends TrombonePublisherMsg
   case class AxisStateUpdate(axisName: StringParameter,
                              position: GParam[Int],
@@ -61,7 +61,7 @@ object TrombonePublisherMsg {
 sealed trait TromboneControlMsg
 object TromboneControlMsg {
   case class UpdateTromboneHcd(running: Option[ActorRef[Submit]]) extends TromboneControlMsg
-  case class GoToStagePosition(stagePosition: DoubleParameter)    extends TromboneControlMsg
+  case class GoToStagePosition(stagePosition: GParam[Double])     extends TromboneControlMsg
 }
 
 /////////////////////

@@ -4,7 +4,7 @@ import csw.param.Parameters._
 import csw.param.Events.{EventServiceEvent, SystemEvent}
 import csw.param.StateVariable._
 import csw.param.parameters.Keys
-import csw.param.parameters.primitives.{DoubleKey, StringKey}
+import csw.param.parameters.primitives.StringKey
 import org.scalatest.FunSuite
 
 //noinspection TypeAnnotation
@@ -19,11 +19,11 @@ class SerializationTests extends FunSuite {
   val fqn2       = "tcs.base.pos.ra"
   val fqn3       = "tcs.base.pos.dec"
 
-  val exposureTime = DoubleKey("exposureTime")
+  val exposureTime = Keys.DoubleKey.make("exposureTime")
   val repeats      = Keys.IntKey.make("repeats")
   val ra           = StringKey("ra")
   val dec          = StringKey("dec")
-  val epoch        = DoubleKey("epoch")
+  val epoch        = Keys.DoubleKey.make("epoch")
   val test         = Keys.IntKey.make("test")
 
   val sc1 = Setup(commandInfo, "tcs.pos").madd(
