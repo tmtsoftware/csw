@@ -4,7 +4,6 @@ import csw.param.UnitsOfMeasure.{degrees, meters, seconds}
 import csw.param.parameters._
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
-import csw.param.parameters.primitives._
 import org.scalatest.{FunSpec, Matchers}
 
 /**
@@ -605,8 +604,8 @@ class ItemsTests extends FunSpec with Matchers {
   }
 
   describe("test longKey") {
-    val lval        = 1234L
-    val lk: LongKey = LongKey(s1)
+    val lval           = 1234L
+    val lk: GKey[Long] = Keys.LongKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(lval)

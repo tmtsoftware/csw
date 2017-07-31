@@ -6,7 +6,6 @@ import csw.param.UnitsOfMeasure.{degrees, meters, _}
 import csw.param.parameters.{GKey, GParam, Keys}
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
-import csw.param.parameters.primitives._
 import org.scalatest.FunSpec
 
 import scala.collection.immutable.Vector
@@ -142,14 +141,14 @@ class ConfigTests extends FunSpec {
   describe("Test Long") {
     it("should allow setting from Long") {
       val tval = 1234L
-      val k1   = LongKey(s1)
+      val k1   = Keys.LongKey.make(s1)
       val i1   = k1.set(tval)
       assert(i1.values == Vector(tval))
       assert(i1.values(0) == tval)
       assert(i1.head == tval)
 
       val tval2 = 4567L
-      val k2    = LongKey(s1)
+      val k2    = Keys.LongKey.make(s1)
       val i2    = k2.set(tval2)
       assert(i2.values == Vector(tval2))
     }

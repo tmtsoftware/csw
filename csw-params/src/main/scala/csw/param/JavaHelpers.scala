@@ -5,7 +5,6 @@ import csw.param.UnitsOfMeasure.Units
 import csw.param.parameters._
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
-import csw.param.parameters.primitives._
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -107,23 +106,6 @@ private[param] object JavaHelpers {
   @varargs
   def jset(key: FloatMatrixKey, v: FloatMatrix*) =
     FloatMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
-
-  // LongItem
-  def jvalue(item: LongParameter): java.lang.Long = item.values(0)
-
-  def jvalue(item: LongParameter, index: Int): java.lang.Long = item.values(index)
-
-  def jvalues(item: LongParameter): java.util.List[java.lang.Long] = item.values.map(i => i: java.lang.Long).asJava
-
-  def jget(item: LongParameter, index: Int): java.util.Optional[java.lang.Long] =
-    item.get(index).map(i => i: java.lang.Long).asJava
-
-  def jset(key: LongKey, v: java.util.List[java.lang.Long], units: Units): LongParameter =
-    LongParameter(key.keyName, v.asScala.toVector.map(i => i: Long), units)
-
-  @varargs
-  def jset(key: LongKey, v: java.lang.Long*) =
-    LongParameter(key.keyName, v.map(i => i: Long).toVector, units = UnitsOfMeasure.NoUnits)
 
   // LongArrayItem
   def jvalue(item: LongArrayParameter): LongArray = item.values(0)

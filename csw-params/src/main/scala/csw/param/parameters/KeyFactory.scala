@@ -21,17 +21,19 @@ object Keys extends DefaultJsonProtocol {
   val DoubleKey    = new KeyFactory[Double]("DoubleKey")
   val StringKey    = new KeyFactory[String]("StringKey")
   val FloatKey     = new KeyFactory[Float]("FloatKey")
+  val LongKey      = new KeyFactory[Long]("LongKey")
 }
 
 object JKeys extends JavaFormats {
   val RaDecKey         = new KeyFactory[RaDec]("JRaDecKey")
   val IntegerKey       = new KeyFactory[java.lang.Integer]("JIntegerKey")
   val IntegerArrayKey  = new KeyFactory[GArray[java.lang.Integer]]("JIntegerArrayKey")
-  val IntegerMatrixKey = new KeyFactory[GArray[Array[Int]]]("JIntegerMatrixKey")
+  val IntegerMatrixKey = new KeyFactory[GArray[Array[java.lang.Integer]]]("JIntegerMatrixKey")
   val BooleanKey       = new KeyFactory[java.lang.Boolean]("JBooleanKey")
   val CharacterKey     = new KeyFactory[java.lang.Character]("JCharacterKey")
   val ShortKey         = new KeyFactory[java.lang.Short]("JShortKey")
   val DoubleKey        = new KeyFactory[java.lang.Double]("JDoubleKey")
   val StringKey        = new KeyFactory[java.lang.String]("JStringKey")
   val FloatKey         = new KeyFactory[java.lang.Float]("JFloatKey")
+  val LongKey          = new KeyFactory[java.lang.Long]("JLongKey")
 }
