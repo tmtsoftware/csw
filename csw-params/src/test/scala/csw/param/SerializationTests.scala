@@ -4,7 +4,6 @@ import csw.param.Parameters._
 import csw.param.Events.{EventServiceEvent, SystemEvent}
 import csw.param.StateVariable._
 import csw.param.parameters.Keys
-import csw.param.parameters.primitives.StringKey
 import org.scalatest.FunSuite
 
 //noinspection TypeAnnotation
@@ -21,8 +20,8 @@ class SerializationTests extends FunSuite {
 
   val exposureTime = Keys.DoubleKey.make("exposureTime")
   val repeats      = Keys.IntKey.make("repeats")
-  val ra           = StringKey("ra")
-  val dec          = StringKey("dec")
+  val ra           = Keys.StringKey.make("ra")
+  val dec          = Keys.StringKey.make("dec")
   val epoch        = Keys.DoubleKey.make("epoch")
   val test         = Keys.IntKey.make("test")
 
@@ -40,8 +39,8 @@ class SerializationTests extends FunSuite {
     test.set(1)
   ) //.second
 
-  val disperser = StringKey("disperser")
-  val filter1   = StringKey("filter1")
+  val disperser = Keys.StringKey.make("disperser")
+  val filter1   = Keys.StringKey.make("filter1")
   val sc2 = Setup(commandInfo, "wfos.blue")
     .add(disperser.set("gr243"))
     .add(filter1.set("GG433"))

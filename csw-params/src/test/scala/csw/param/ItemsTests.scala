@@ -924,8 +924,8 @@ class ItemsTests extends FunSpec with Matchers {
     it("should allow creating one of them") {
       val skey = StructKey("ao.sys.oiwfs")
 
-      val ra    = StringKey("ra")
-      val dec   = StringKey("dec")
+      val ra    = Keys.StringKey.make("ra")
+      val dec   = Keys.StringKey.make("dec")
       val epoch = Keys.DoubleKey.make("epoch")
       val sc1   = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
 
@@ -940,8 +940,8 @@ class ItemsTests extends FunSpec with Matchers {
     it("should allow creating Struct items") {
       val skey = StructKey("myStruct")
 
-      val ra    = StringKey("ra")
-      val dec   = StringKey("dec")
+      val ra    = Keys.StringKey.make("ra")
+      val dec   = Keys.StringKey.make("dec")
       val epoch = Keys.DoubleKey.make("epoch")
       val sc1   = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
 

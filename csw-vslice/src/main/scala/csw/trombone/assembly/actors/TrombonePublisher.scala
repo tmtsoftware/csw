@@ -4,7 +4,6 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.param.parameters.{ChoiceParameter, GParam}
-import csw.param.parameters.primitives.StringParameter
 import csw.trombone.assembly.TrombonePublisherMsg._
 import csw.trombone.assembly.{AssemblyContext, TrombonePublisherMsg}
 
@@ -72,7 +71,7 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 //    })
   }
 
-  private def publishAxisState(axisName: StringParameter,
+  private def publishAxisState(axisName: GParam[String],
                                position: GParam[Int],
                                state: ChoiceParameter,
                                inLowLimit: GParam[Boolean],
@@ -86,7 +85,7 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 //    })
   }
 
-  def publishAxisStats(axisName: StringParameter,
+  def publishAxisStats(axisName: GParam[String],
                        datumCount: GParam[Int],
                        moveCount: GParam[Int],
                        homeCount: GParam[Int],

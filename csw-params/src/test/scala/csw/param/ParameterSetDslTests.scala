@@ -119,7 +119,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
 
   describe("adding items to sc") {
     val k1 = Keys.IntKey.make(s1)
-    val k2 = StringKey(s2)
+    val k2 = Keys.StringKey.make(s2)
     val k3 = Keys.DoubleKey.make(s3)
 
     it("should allow adding single items") {
@@ -139,7 +139,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
 
   describe("accessing items in an sc") {
     val k1 = Keys.IntKey.make(s1)
-    val k2 = StringKey(s2)
+    val k2 = Keys.StringKey.make(s2)
     val k3 = Keys.DoubleKey.make(s3)
 
     val i1 = set(k1, 1000)
@@ -173,7 +173,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
 
   describe("accessing items in an sc as option") {
     val k1 = Keys.IntKey.make(s1)
-    val k2 = StringKey(s2)
+    val k2 = Keys.StringKey.make(s2)
     val k3 = Keys.DoubleKey.make(s3)
 
     val i1 = set(k1, 1000)
@@ -203,9 +203,9 @@ class ParameterSetDslTests extends FunSpec with Matchers {
 
   describe("should allow option get") {
     val k1 = Keys.IntKey.make(s1)
-    val k2 = StringKey(s2)
+    val k2 = Keys.StringKey.make(s2)
     val k3 = Keys.DoubleKey.make(s3)
-    val k4 = StringKey("Not Present")
+    val k4 = Keys.StringKey.make("Not Present")
 
     val i1 = set(k1, 1000, 2000)
     val i2 = set(k2, "1000", "2000")
@@ -227,7 +227,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   describe("removing items from a configuration by keyname") {
     val k1 = Keys.IntKey.make("itest")
     val k2 = Keys.DoubleKey.make("dtest")
-    val k3 = StringKey("stest")
+    val k3 = Keys.StringKey.make("stest")
     val k4 = LongArrayKey("lartest")
 
     val i1 = set(k1, 1, 2, 3).withUnits(UnitsOfMeasure.degrees)
@@ -292,7 +292,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   describe("removing items from a configuration as items") {
     val k1 = Keys.IntKey.make("itest")
     val k2 = Keys.DoubleKey.make("dtest")
-    val k3 = StringKey("stest")
+    val k3 = Keys.StringKey.make("stest")
     val k4 = LongArrayKey("lartest")
 
     val i1 = set(k1, 1, 2, 3).withUnits(UnitsOfMeasure.degrees)
@@ -385,8 +385,8 @@ class ParameterSetDslTests extends FunSpec with Matchers {
 
   describe("config as template tests") {
     val zeroPoint = Keys.IntKey.make("zeroPoint")
-    val filter    = StringKey("filter")
-    val mode      = StringKey("mode")
+    val filter    = Keys.StringKey.make("filter")
+    val mode      = Keys.StringKey.make("mode")
 
     val i1 = set(mode, "Fast")    // default value
     val i2 = set(filter, "home")  // default value

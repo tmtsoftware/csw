@@ -54,7 +54,7 @@ object ParamValidation {
       else if (Try(sc(configurationNameKey)).isFailure || Try(sc(configurationVersionKey)).isFailure)
         Invalid(
           WrongParameterTypeIssue(
-            s"The init Setup requires StringParameters named: $configurationVersionKey and $configurationVersionKey"
+            s"The init Setup requires keys named: $configurationVersionKey and $configurationVersionKey of type GParam[String]"
           )
         )
       else Valid

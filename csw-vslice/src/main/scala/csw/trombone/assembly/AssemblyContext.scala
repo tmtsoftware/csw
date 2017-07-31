@@ -7,7 +7,6 @@ import csw.services.location.models.ComponentId
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.common.framework.models.Component.AssemblyInfo
 import csw.param.parameters.{GParam, Keys}
-import csw.param.parameters.primitives.StringKey
 
 /**
  * TMT Source Code: 10/4/16.
@@ -78,8 +77,8 @@ case class AssemblyContext(info: AssemblyInfo,
 
   // Shared key values --
   // Used by setElevation, setAngle
-  val configurationNameKey    = StringKey("initConfigurationName")
-  val configurationVersionKey = StringKey("initConfigurationVersion")
+  val configurationNameKey    = Keys.StringKey.make("initConfigurationName")
+  val configurationVersionKey = Keys.StringKey.make("initConfigurationVersion")
 
   val focusErrorKey   = Keys.DoubleKey.make("focus")
   val focusErrorUnits = micrometers

@@ -7,7 +7,6 @@ import csw.param.StateVariable.CurrentState
 import csw.param.UnitsOfMeasure.encoder
 import csw.param._
 import csw.param.parameters.{Choice, ChoiceKey, Keys}
-import csw.param.parameters.primitives.StringKey
 
 object TromboneHcdState {
   val tromboneConfigFile = new File("trombone/tromboneHCD.conf")
@@ -23,7 +22,7 @@ object TromboneHcdState {
 
   val axisStatePrefix             = s"$trombonePrefix.axis1State"
   val axisStateCK: Prefix         = axisStatePrefix
-  val axisNameKey                 = StringKey("axisName")
+  val axisNameKey                 = Keys.StringKey.make("axisName")
   val AXIS_IDLE                   = Choice(AxisState.AXIS_IDLE.toString)
   val AXIS_MOVING                 = Choice(AxisState.AXIS_MOVING.toString)
   val AXIS_ERROR                  = Choice(AxisState.AXIS_ERROR.toString)

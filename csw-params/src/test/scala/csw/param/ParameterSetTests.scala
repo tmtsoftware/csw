@@ -3,7 +3,6 @@ package csw.param
 import csw.param.Parameters._
 import csw.param.parameters.Keys
 import csw.param.parameters.arrays.{LongArray, LongArrayKey}
-import csw.param.parameters.primitives.StringKey
 import org.scalatest.FunSpec
 import spray.json.DefaultJsonProtocol
 
@@ -27,7 +26,7 @@ class ParameterSetTests extends FunSpec {
 
   val k1 = Keys.IntKey.make("itest")
   val k2 = Keys.DoubleKey.make("dtest")
-  val k3 = StringKey("stest")
+  val k3 = Keys.StringKey.make("stest")
   val k4 = LongArrayKey("lartest")
 
   val i1  = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)

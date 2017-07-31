@@ -107,11 +107,11 @@ class JSONTests extends FunSpec {
     }
 
     it("string item encode/decode") {
-      val k1 = StringKey(s2)
+      val k1 = Keys.StringKey.make(s2)
       val i1 = k1.set("Blue", "Green").withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[StringParameter]
+      val in1 = j1.convertTo[GParam[String]]
       assert(in1 == i1)
     }
   }
@@ -119,7 +119,7 @@ class JSONTests extends FunSpec {
   describe("Testing Items") {
 
     val k1 = Keys.IntKey.make(s1)
-    val k2 = StringKey(s2)
+    val k2 = Keys.StringKey.make(s2)
 
     val i1 = k1.set(22, 33, 44)
     val i2 = k2.set("a", "b", "c").withUnits(UnitsOfMeasure.degrees)
@@ -143,7 +143,7 @@ class JSONTests extends FunSpec {
     val k4 = FloatKey("d")
     val k5 = Keys.DoubleKey.make("e")
     val k6 = Keys.BooleanKey.make("f")
-    val k7 = StringKey("g")
+    val k7 = Keys.StringKey.make("g")
 
     val i1 = k1.set('d').withUnits(UnitsOfMeasure.NoUnits)
     val i2 = k2.set(22).withUnits(UnitsOfMeasure.NoUnits)

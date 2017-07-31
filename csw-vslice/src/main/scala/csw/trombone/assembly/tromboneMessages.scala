@@ -9,7 +9,6 @@ import csw.param.Events.EventTime
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 import csw.param.parameters.{ChoiceParameter, GParam}
-import csw.param.parameters.primitives.StringParameter
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 
 sealed trait FollowCommandMessages
@@ -38,14 +37,14 @@ object TrombonePublisherMsg {
   case class AOESWUpdate(naElevation: GParam[Double], naRange: GParam[Double]) extends TrombonePublisherMsg
   case class EngrUpdate(focusError: GParam[Double], stagePosition: GParam[Double], zenithAngle: GParam[Double])
       extends TrombonePublisherMsg
-  case class AxisStateUpdate(axisName: StringParameter,
+  case class AxisStateUpdate(axisName: GParam[String],
                              position: GParam[Int],
                              state: ChoiceParameter,
                              inLowLimit: GParam[Boolean],
                              inHighLimit: GParam[Boolean],
                              inHome: GParam[Boolean])
       extends TrombonePublisherMsg
-  case class AxisStatsUpdate(axisName: StringParameter,
+  case class AxisStatsUpdate(axisName: GParam[String],
                              initCount: GParam[Int],
                              moveCount: GParam[Int],
                              homeCount: GParam[Int],
