@@ -436,10 +436,10 @@ class JSONTests extends FunSpec {
 
   describe("Test Long Array items") {
     it("Should allow long array values") {
-      val k1  = LongArrayKey("myArray")
-      val m1  = LongArray(Array(1, 2, 3))
-      val i1  = k1.set(m1)
-      val sc1 = Setup(commandInfo, ck).add(i1)
+      val k1: GKey[GArray[Long]]   = Keys.LongArrayKey.make("myArray")
+      val m1: GArray[Long]         = GArray(Array(1, 2, 3))
+      val i1: GParam[GArray[Long]] = k1.set(m1)
+      val sc1                      = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
 
       val sc1out = JsonSupport.writeSequenceCommand(sc1)

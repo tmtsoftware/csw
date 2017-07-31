@@ -2,6 +2,7 @@ package csw.param
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Vector
+import scala.collection.mutable
 
 /**
  * Utility functions for comparing arrays and vectors
@@ -21,11 +22,20 @@ object ArrayAndMatrixEquality {
     // Internet says sameElements is faster because of lack of matches
     one sameElements two
   }
+  def deepWrappedArrayValueEquals[T](one: mutable.WrappedArray[T], two: mutable.WrappedArray[T]): Boolean = {
+    //one.deep == two.deep
+    // Internet says sameElements is faster because of lack of matches
+    one sameElements two
+  }
 
   def arraySizeEqual(one: Array[_], two: Array[_]): Boolean = one.length == two.length
+  def wrappedArraySizeEqual(one: mutable.WrappedArray[_], two: mutable.WrappedArray[_]): Boolean =
+    one.length == two.length
 
   def deepArrayEquals[T](one: Array[T], two: Array[T]): Boolean =
     arraySizeEqual(one, two) && deepArrayValueEquals(one, two)
+  def deepWrappedArrayEquals[T](one: mutable.WrappedArray[T], two: mutable.WrappedArray[T]): Boolean =
+    wrappedArraySizeEqual(one, two) && deepWrappedArrayValueEquals(one, two)
 
   /**
    * This function takes Vectors of values from two items of the same type to compare their elements.

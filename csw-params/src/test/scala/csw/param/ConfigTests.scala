@@ -354,12 +354,12 @@ class ConfigTests extends FunSpec {
     val k1 = Keys.IntKey.make("itest")
     val k2 = Keys.DoubleKey.make("dtest")
     val k3 = Keys.StringKey.make("stest")
-    val k4 = LongArrayKey("lartest")
+    val k4 = Keys.LongArrayKey.make("lartest")
 
     val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
     val i3 = k3.set("A", "B", "C")
-    val i4 = k4.set(LongArray(Array.fill[Long](100)(10)), LongArray(Array.fill[Long](100)(100)))
+    val i4 = k4.set(GArray(Array.fill[Long](100)(10)), GArray(Array.fill[Long](100)(100)))
 
     it("Should allow removing one at a time") {
       var sc1 = Setup(commandInfo, ck1).madd(i1, i2, i3, i4)
@@ -419,13 +419,13 @@ class ConfigTests extends FunSpec {
     val k1 = Keys.IntKey.make("itest")
     val k2 = Keys.DoubleKey.make("dtest")
     val k3 = Keys.StringKey.make("stest")
-    val k4 = LongArrayKey("lartest")
+    val k4 = Keys.LongArrayKey.make("lartest")
 
     val i1  = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i11 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees) // This is here to see if it is checking equality or address
     val i2  = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
     val i3  = k3.set("A", "B", "C")
-    val i4  = k4.set(LongArray(Array.fill[Long](100)(10)), LongArray(Array.fill[Long](100)(100)))
+    val i4  = k4.set(GArray(Array.fill[Long](100)(10)), GArray(Array.fill[Long](100)(100)))
     val i5  = k1.set(22) // This is not added for testing not present removal
 
     it("Should allow removing one at a time") {
@@ -492,13 +492,13 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based long array equality") {
-    val k1 = LongArrayKey("myLongArray")
-    val m1 = LongArray(Array(1, 2, 3))
-    val m2 = LongArray(Array(1, 2, 3))
-    val m3 = LongArray(Array(1, 2, 4))
-    val i1 = k1.set(m1)
-    val i2 = k1.set(m2)
-    val i3 = k1.set(m3)
+    val k1               = Keys.LongArrayKey.make("myLongArray")
+    val m1: GArray[Long] = GArray(Array(1, 2, 3))
+    val m2: GArray[Long] = GArray(Array(1, 2, 3))
+    val m3: GArray[Long] = GArray(Array(1, 2, 4))
+    val i1               = k1.set(m1)
+    val i2               = k1.set(m2)
+    val i3               = k1.set(m3)
 
     it("should short circuit with identical same arrays") {
       assert(k1.set(m1).equals(k1.set(m1)))

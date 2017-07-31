@@ -59,22 +59,6 @@ private[param] object JavaHelpers {
   def jset(key: FloatMatrixKey, v: FloatMatrix*) =
     FloatMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
 
-  // LongArrayItem
-  def jvalue(item: LongArrayParameter): LongArray = item.values(0)
-
-  def jvalue(item: LongArrayParameter, index: Int): LongArray = item.values(index)
-
-  def jvalues(item: LongArrayParameter): java.util.List[LongArray] = item.values.asJava
-
-  def jget(item: LongArrayParameter, index: Int): java.util.Optional[LongArray] = item.get(index).asJava
-
-  def jset(key: LongArrayKey, v: java.util.List[LongArray], units: Units): LongArrayParameter =
-    LongArrayParameter(key.keyName, v.asScala.toVector, units)
-
-  @varargs
-  def jset(key: LongArrayKey, v: LongArray*) =
-    LongArrayParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
-
   // LongMatrixItem
   def jvalue(item: LongMatrixParameter): LongMatrix = item.values(0)
 

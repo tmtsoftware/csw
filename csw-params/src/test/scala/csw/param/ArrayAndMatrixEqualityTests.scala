@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.parameters.arrays.LongArray
+import csw.param.parameters.GArray
 import csw.param.parameters.matrices.LongMatrix
 import org.scalatest.FunSpec
 
@@ -11,53 +11,53 @@ class ArrayAndMatrixEqualityTests extends FunSpec {
   import ArrayAndMatrixEquality._
 
   describe("arraySizeEqual") {
-    val m1 = LongArray(Array(1, 2, 3))
-    val m2 = LongArray(Array(1, 2, 3))
-    val m3 = LongArray(Array(1, 2, 4, 8, 16))
+    val m1: GArray[Long] = GArray(Array(1, 2, 3))
+    val m2: GArray[Long] = GArray(Array(1, 2, 3))
+    val m3: GArray[Long] = GArray(Array(1, 2, 4, 8, 16))
     it("should notice if arrays are equal length") {
-      assert(arraySizeEqual(m1.data, m2.data))
+      assert(wrappedArraySizeEqual(m1.data, m2.data))
     }
     it("should notice if they aren't equal length") {
-      assert(!arraySizeEqual(m1.data, m3.data))
+      assert(!wrappedArraySizeEqual(m1.data, m3.data))
     }
   }
 
   describe("deepArrayValueEquals") {
-    val m1 = LongArray(Array(1, 2, 3))
-    val m2 = LongArray(Array(1, 2, 3))
-    val m3 = LongArray(Array(1, 2, 4))
+    val m1: GArray[Long] = GArray(Array(1, 2, 3))
+    val m2: GArray[Long] = GArray(Array(1, 2, 3))
+    val m3: GArray[Long] = GArray(Array(1, 2, 4))
 
     it("should see two arrays equal") {
-      assert(deepArrayValueEquals(m1.data, m2.data))
+      assert(deepWrappedArrayValueEquals(m1.data, m2.data))
     }
     it("should see to arrays that are not equal") {
-      assert(!deepArrayValueEquals(m1.data, m3.data))
+      assert(!deepWrappedArrayValueEquals(m1.data, m3.data))
     }
   }
 
   describe("deepArrayValueEquals") {
-    val m1 = LongArray(Array(1, 2, 3))
-    val m2 = LongArray(Array(1, 2, 3))
-    val m3 = LongArray(Array(1, 2, 4, 8, 16))
-    val m4 = LongArray(Array(1, 2, 4, 9, 16))
+    val m1: GArray[Long] = GArray(Array(1, 2, 3))
+    val m2: GArray[Long] = GArray(Array(1, 2, 3))
+    val m3: GArray[Long] = GArray(Array(1, 2, 4, 8, 16))
+    val m4: GArray[Long] = GArray(Array(1, 2, 4, 9, 16))
 
     it("should succeed with equal lengths and values") {
-      assert(deepArrayEquals(m1.data, m2.data))
+      assert(deepWrappedArrayEquals(m1.data, m2.data))
     }
     it("should fail with different lengths") {
-      assert(!deepArrayEquals(m1.data, m3.data))
+      assert(!deepWrappedArrayEquals(m1.data, m3.data))
     }
     it("should fail with same lengths, but different values") {
-      assert(!deepArrayEquals(m2.data, m4.data))
+      assert(!deepWrappedArrayEquals(m2.data, m4.data))
     }
   }
 
   describe("vectorEquals2") {
-    val m1 = LongArray(Array(1, 2, 3))
-    val m2 = LongArray(Array(1, 2, 3))
-    val m3 = LongArray(Array(1, 2, 4))
+    val m1: GArray[Long] = GArray(Array(1, 2, 3))
+    val m2: GArray[Long] = GArray(Array(1, 2, 3))
+    val m3: GArray[Long] = GArray(Array(1, 2, 4))
 
-    val f = (l: LongArray) => l.data
+    val f = (l: GArray[Long]) => l.data.toArray
     it("should notice equality for single member vectors of arrays") {
       // One member vectors, same values but different vectors, should be true
       assert(vectorEquals2(Vector(m1), Vector(m2), f))
