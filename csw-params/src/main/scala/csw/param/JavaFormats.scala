@@ -14,4 +14,5 @@ trait JavaFormats extends DefaultJsonProtocol {
   implicit val doubleFormat: JsonFormat[lang.Double] = DoubleJsonFormat.asInstanceOf[JsonFormat[java.lang.Double]]
   implicit val floatFormat: JsonFormat[lang.Float]   = FloatJsonFormat.asInstanceOf[JsonFormat[java.lang.Float]]
   implicit val longFormat: JsonFormat[lang.Long]     = LongJsonFormat.asInstanceOf[JsonFormat[java.lang.Long]]
+  implicit val byteFormat: JsonFormat[lang.Byte]     = ByteJsonFormat.asInstanceOf[JsonFormat[java.lang.Byte]]
 }

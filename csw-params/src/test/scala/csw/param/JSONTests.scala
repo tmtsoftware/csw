@@ -357,8 +357,8 @@ class JSONTests extends FunSpec {
 
   describe("Test Byte Array items") {
     it("Should allow byte array values") {
-      val k1  = ByteArrayKey("myArray")
-      val m1  = ByteArray(Array[Byte](1, 2, 3))
+      val k1  = Keys.ByteArrayKey.make("myArray")
+      val m1  = GArray(Array[Byte](1, 2, 3))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)

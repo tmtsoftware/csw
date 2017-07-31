@@ -25,7 +25,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   implicit val floatArrayParameterFormat   = jsonFormat3(FloatArrayParameter.apply)
   implicit val intMatrixParameterFormat    = jsonFormat3(IntMatrixParameter.apply)
   implicit val byteMatrixParameterFormat   = jsonFormat3(ByteMatrixParameter.apply)
-  implicit val byteArrayParameterFormat    = jsonFormat3(ByteArrayParameter.apply)
   implicit val shortMatrixParameterFormat  = jsonFormat3(ShortMatrixParameter.apply)
   implicit val shortArrayParameterFormat   = jsonFormat3(ShortArrayParameter.apply)
   implicit val longMatrixParameterFormat   = jsonFormat3(LongMatrixParameter.apply)
@@ -102,7 +101,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   private val floatArrayType      = classOf[FloatArrayParameter].getSimpleName
   private val intMatrixType       = classOf[IntMatrixParameter].getSimpleName
   private val byteMatrixType      = classOf[ByteMatrixParameter].getSimpleName
-  private val byteArrayType       = classOf[ByteArrayParameter].getSimpleName
   private val shortMatrixType     = classOf[ShortMatrixParameter].getSimpleName
   private val shortArrayType      = classOf[ShortArrayParameter].getSimpleName
   private val longMatrixType      = classOf[LongMatrixParameter].getSimpleName
@@ -132,7 +130,6 @@ trait JsonSupport extends DefaultJsonProtocol {
       case i: FloatArrayParameter   => (JsString(floatArrayType), floatArrayParameterFormat.write(i))
       case i: IntMatrixParameter    => (JsString(intMatrixType), intMatrixParameterFormat.write(i))
       case i: ByteMatrixParameter   => (JsString(byteMatrixType), byteMatrixParameterFormat.write(i))
-      case i: ByteArrayParameter    => (JsString(byteArrayType), byteArrayParameterFormat.write(i))
       case i: ShortMatrixParameter  => (JsString(shortMatrixType), shortMatrixParameterFormat.write(i))
       case i: ShortArrayParameter   => (JsString(shortArrayType), shortArrayParameterFormat.write(i))
       case i: LongMatrixParameter   => (JsString(longMatrixType), longMatrixParameterFormat.write(i))
@@ -153,7 +150,6 @@ trait JsonSupport extends DefaultJsonProtocol {
         case (JsString(`floatArrayType`), parameter)      => floatArrayParameterFormat.read(parameter)
         case (JsString(`intMatrixType`), parameter)       => intMatrixParameterFormat.read(parameter)
         case (JsString(`byteMatrixType`), parameter)      => byteMatrixParameterFormat.read(parameter)
-        case (JsString(`byteArrayType`), parameter)       => byteArrayParameterFormat.read(parameter)
         case (JsString(`shortMatrixType`), parameter)     => shortMatrixParameterFormat.read(parameter)
         case (JsString(`shortArrayType`), parameter)      => shortArrayParameterFormat.read(parameter)
         case (JsString(`longMatrixType`), parameter)      => longMatrixParameterFormat.read(parameter)

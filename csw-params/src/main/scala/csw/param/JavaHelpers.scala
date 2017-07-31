@@ -15,22 +15,6 @@ import scala.compat.java8.OptionConverters._
  */
 private[param] object JavaHelpers {
 
-  // ByteArrayItem
-  def jvalue(item: ByteArrayParameter): ByteArray = item.values(0)
-
-  def jvalue(item: ByteArrayParameter, index: Int): ByteArray = item.values(index)
-
-  def jvalues(item: ByteArrayParameter): java.util.List[ByteArray] = item.values.asJava
-
-  def jget(item: ByteArrayParameter, index: Int): java.util.Optional[ByteArray] = item.get(index).asJava
-
-  def jset(key: ByteArrayKey, v: java.util.List[ByteArray], units: Units): ByteArrayParameter =
-    ByteArrayParameter(key.keyName, v.asScala.toVector, units)
-
-  @varargs
-  def jset(key: ByteArrayKey, v: ByteArray*) =
-    ByteArrayParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
-
   // ByteMatrixItem
   def jvalue(item: ByteMatrixParameter): ByteMatrix = item.values(0)
 

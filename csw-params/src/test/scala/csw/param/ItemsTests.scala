@@ -62,12 +62,12 @@ class ItemsTests extends FunSpec with Matchers {
     val a1: Array[Byte] = Array[Byte](1, 2, 3, 4, 5)
     val a2: Array[Byte] = Array[Byte](10, 20, 30, 40, 50)
 
-    val la1 = ByteArray(a1)
-    val la2 = ByteArray(a2)
-    val lk  = ByteArrayKey(s1)
+    val la1 = GArray(a1)
+    val la2 = GArray(a2)
+    val lk  = Keys.ByteArrayKey.make(s1)
 
     it("should test single item") {
-      val di: ByteArrayParameter = lk.set(la1)
+      val di: GParam[GArray[Byte]] = lk.set(la1)
       di.values should equal(Vector(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
@@ -76,7 +76,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Vector(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2: ByteArrayParameter = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2: GParam[GArray[Byte]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
@@ -98,7 +98,7 @@ class ItemsTests extends FunSpec with Matchers {
     }
 
     it("should test using var args") {
-      val li3: ByteArrayParameter = lk.set(la1, la2)
+      val li3: GParam[GArray[Byte]] = lk.set(la1, la2)
       li3.value(1) should equal(la2)
       li3.values should equal(listIn)
 
@@ -106,9 +106,9 @@ class ItemsTests extends FunSpec with Matchers {
       val b: Array[Byte] = Array[Byte](10, 20, 30)
       val c: Array[Byte] = Array[Byte](100, 101, 102)
 
-      val li4: ByteArrayParameter = lk.set(a, b, c).withUnits(meters)
+      val li4: GParam[GArray[Byte]] = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
-      li4.value(2) should equal(ByteArray(c))
+      li4.value(2) should equal(GArray(c))
     }
   }
 
