@@ -76,23 +76,6 @@ private[param] object JavaHelpers {
   def jset(key: DoubleMatrixKey, v: DoubleMatrix*) =
     DoubleMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
 
-  // FloatItem
-  def jvalue(item: FloatParameter): java.lang.Float = item.values(0)
-
-  def jvalue(item: FloatParameter, index: Int): java.lang.Float = item.values(index)
-
-  def jvalues(item: FloatParameter): java.util.List[java.lang.Float] = item.values.map(i => i: java.lang.Float).asJava
-
-  def jget(item: FloatParameter, index: Int): java.util.Optional[java.lang.Float] =
-    item.get(index).map(i => i: java.lang.Float).asJava
-
-  def jset(key: FloatKey, v: java.util.List[java.lang.Float], units: Units): FloatParameter =
-    FloatParameter(key.keyName, v.asScala.toVector.map(i => i: Float), units)
-
-  @varargs
-  def jset(key: FloatKey, v: java.lang.Float*) =
-    FloatParameter(key.keyName, v.map(i => i: Float).toVector, units = UnitsOfMeasure.NoUnits)
-
   // FloatArrayItem
   def jvalue(item: FloatArrayParameter): FloatArray = item.values(0)
 

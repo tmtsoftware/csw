@@ -20,6 +20,7 @@ object Keys extends DefaultJsonProtocol {
   val ShortKey     = new KeyFactory[Short]("ShortKey")
   val DoubleKey    = new KeyFactory[Double]("DoubleKey")
   val StringKey    = new KeyFactory[String]("StringKey")
+  val FloatKey     = new KeyFactory[Float]("FloatKey")
 }
 
 object JKeys extends JavaFormats {
@@ -32,4 +33,5 @@ object JKeys extends JavaFormats {
   val ShortKey         = new KeyFactory[java.lang.Short]("JShortKey")
   val DoubleKey        = new KeyFactory[java.lang.Double]("JDoubleKey")
   val StringKey        = new KeyFactory[java.lang.String]("JStringKey")
+  val FloatKey         = new KeyFactory[java.lang.Float]("JFloatKey")
 }

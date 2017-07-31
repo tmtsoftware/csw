@@ -7,7 +7,6 @@ import csw.param.Parameters.{CommandInfo, Setup}
 import csw.param.parameters.{GParam, Keys}
 import csw.param.parameters.arrays.{LongArray, LongArrayKey}
 import csw.param.parameters.matrices.{LongMatrix, LongMatrixKey}
-import csw.param.parameters.primitives._
 
 /**
  * Tests the config DSL
@@ -158,7 +157,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     it("should throw NoSuchElementException if not present") {
       val sc1 = madd(Setup(commandInfo, ck2), i1, i2, i3)
 
-      val k4 = FloatKey("not present")
+      val k4 = Keys.FloatKey.make("not present")
 
       exists(sc1, k1) shouldBe true
       exists(sc1, k2) shouldBe true
@@ -193,7 +192,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     it("should be None if not present") {
       val sc1 = madd(Setup(commandInfo, ck2), i1, i2, i3)
 
-      val k4 = FloatKey("not present")
+      val k4 = Keys.FloatKey.make("not present")
       get(sc1, k1) should equal(Option(i1))
       get(sc1, k2) should equal(Option(i2))
       get(sc1, k3) should equal(Option(i3))

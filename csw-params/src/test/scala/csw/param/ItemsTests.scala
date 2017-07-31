@@ -333,7 +333,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test floatItem") {
     val tval: Float = 123.456f
-    val lk          = FloatKey(s1)
+    val lk          = Keys.FloatKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
