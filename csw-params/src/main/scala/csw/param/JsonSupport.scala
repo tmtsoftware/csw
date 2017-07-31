@@ -20,7 +20,6 @@ object JsonSupport extends JsonSupport
 trait JsonSupport extends DefaultJsonProtocol {
 
   // JSON formats
-  implicit val charParameterFormat         = jsonFormat3(CharParameter.apply)
   implicit val shortParameterFormat        = jsonFormat3(ShortParameter.apply)
   implicit val longParameterFormat         = jsonFormat3(LongParameter.apply)
   implicit val floatParameterFormat        = jsonFormat3(FloatParameter.apply)
@@ -103,7 +102,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   implicit val eventInfoFormat       = jsonFormat4(EventInfo.apply)
 
   // JSON type tags
-  private val charType            = classOf[CharParameter].getSimpleName
   private val shortType           = classOf[ShortParameter].getSimpleName
   private val longType            = classOf[LongParameter].getSimpleName
   private val floatType           = classOf[FloatParameter].getSimpleName
@@ -139,7 +137,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   // XXX TODO Use JNumber?
   def writeParameter[S, I /*, J */ ](parameter: Parameter[S /*, J */ ]): JsValue = {
     val result: (JsString, JsValue) = parameter match {
-      case i: CharParameter         => (JsString(charType), charParameterFormat.write(i))
       case i: ShortParameter        => (JsString(shortType), shortParameterFormat.write(i))
       case i: LongParameter         => (JsString(longType), longParameterFormat.write(i))
       case i: FloatParameter        => (JsString(floatType), floatParameterFormat.write(i))
@@ -166,7 +163,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   def readParameterAndType(json: JsValue): Parameter[_ /*, _ */ ] = json match {
     case JsObject(fields) =>
       (fields("type"), fields("parameter")) match {
-        case (JsString(`charType`), parameter)            => charParameterFormat.read(parameter)
         case (JsString(`shortType`), parameter)           => shortParameterFormat.read(parameter)
         case (JsString(`longType`), parameter)            => longParameterFormat.read(parameter)
         case (JsString(`floatType`), parameter)           => floatParameterFormat.read(parameter)

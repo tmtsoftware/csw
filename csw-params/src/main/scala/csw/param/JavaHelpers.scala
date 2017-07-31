@@ -48,24 +48,6 @@ private[param] object JavaHelpers {
   def jset(key: ByteMatrixKey, v: ByteMatrix*) =
     ByteMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
 
-  // CharItem
-  def jvalue(item: CharParameter): java.lang.Character = item.values(0)
-
-  def jvalue(item: CharParameter, index: Int): java.lang.Character = item.values(index)
-
-  def jvalues(item: CharParameter): java.util.List[java.lang.Character] =
-    item.values.map(i => i: java.lang.Character).asJava
-
-  def jget(item: CharParameter, index: Int): java.util.Optional[java.lang.Character] =
-    item.get(index).map(i => i: java.lang.Character).asJava
-
-  def jset(key: CharKey, v: java.util.List[java.lang.Character], units: Units): CharParameter =
-    CharParameter(key.keyName, v.asScala.toVector.map(i => i: Char), units)
-
-  @varargs
-  def jset(key: CharKey, v: java.lang.Character*) =
-    CharParameter(key.keyName, v.map(i => i: Char).toVector, units = UnitsOfMeasure.NoUnits)
-
   // DoubleItem
   def jvalue(item: DoubleParameter): java.lang.Double = item.values(0)
 

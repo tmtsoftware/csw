@@ -36,11 +36,11 @@ class JSONTests extends FunSpec {
   describe("Test concrete items") {
 
     it("char item encode/decode") {
-      val k1 = CharKey(s3)
+      val k1 = Keys.CharKey.make(s3)
       val i1 = k1.set('d').withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[CharParameter]
+      val in1 = j1.convertTo[GParam[Char]]
       assert(in1 == i1)
     }
 
@@ -137,7 +137,7 @@ class JSONTests extends FunSpec {
 
   describe("Setup JSON") {
 
-    val k1 = CharKey("a")
+    val k1 = Keys.CharKey.make("a")
     val k2 = Keys.IntKey.make("b")
     val k3 = LongKey("c")
     val k4 = FloatKey("d")

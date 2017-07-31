@@ -169,7 +169,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test charItem") {
     val tval = 'K'
-    val lk   = CharKey(s1)
+    val lk   = Keys.CharKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
