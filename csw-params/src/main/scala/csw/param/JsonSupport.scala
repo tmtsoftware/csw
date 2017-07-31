@@ -21,7 +21,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   // JSON formats
   implicit val doubleMatrixParameterFormat = jsonFormat3(DoubleMatrixParameter.apply)
   implicit val floatMatrixParameterFormat  = jsonFormat3(FloatMatrixParameter.apply)
-  implicit val floatArrayParameterFormat   = jsonFormat3(FloatArrayParameter.apply)
   implicit val intMatrixParameterFormat    = jsonFormat3(IntMatrixParameter.apply)
   implicit val byteMatrixParameterFormat   = jsonFormat3(ByteMatrixParameter.apply)
   implicit val shortMatrixParameterFormat  = jsonFormat3(ShortMatrixParameter.apply)
@@ -96,7 +95,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   // JSON type tags
   private val doubleMatrixType    = classOf[DoubleMatrixParameter].getSimpleName
   private val floatMatrixType     = classOf[FloatMatrixParameter].getSimpleName
-  private val floatArrayType      = classOf[FloatArrayParameter].getSimpleName
   private val intMatrixType       = classOf[IntMatrixParameter].getSimpleName
   private val byteMatrixType      = classOf[ByteMatrixParameter].getSimpleName
   private val shortMatrixType     = classOf[ShortMatrixParameter].getSimpleName
@@ -124,7 +122,6 @@ trait JsonSupport extends DefaultJsonProtocol {
     val result: (JsString, JsValue) = parameter match {
       case i: DoubleMatrixParameter => (JsString(doubleMatrixType), doubleMatrixParameterFormat.write(i))
       case i: FloatMatrixParameter  => (JsString(floatMatrixType), floatMatrixParameterFormat.write(i))
-      case i: FloatArrayParameter   => (JsString(floatArrayType), floatArrayParameterFormat.write(i))
       case i: IntMatrixParameter    => (JsString(intMatrixType), intMatrixParameterFormat.write(i))
       case i: ByteMatrixParameter   => (JsString(byteMatrixType), byteMatrixParameterFormat.write(i))
       case i: ShortMatrixParameter  => (JsString(shortMatrixType), shortMatrixParameterFormat.write(i))
@@ -143,7 +140,6 @@ trait JsonSupport extends DefaultJsonProtocol {
       (fields("type"), fields("parameter")) match {
         case (JsString(`doubleMatrixType`), parameter)    => doubleMatrixParameterFormat.read(parameter)
         case (JsString(`floatMatrixType`), parameter)     => floatMatrixParameterFormat.read(parameter)
-        case (JsString(`floatArrayType`), parameter)      => floatArrayParameterFormat.read(parameter)
         case (JsString(`intMatrixType`), parameter)       => intMatrixParameterFormat.read(parameter)
         case (JsString(`byteMatrixType`), parameter)      => byteMatrixParameterFormat.read(parameter)
         case (JsString(`shortMatrixType`), parameter)     => shortMatrixParameterFormat.read(parameter)

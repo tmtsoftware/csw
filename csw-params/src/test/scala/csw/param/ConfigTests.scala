@@ -665,10 +665,10 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based float array equality") {
-    val k1 = FloatArrayKey("myArray")
-    val m1 = FloatArray(Array[Float](1, 2, 3))
-    val m2 = FloatArray(Array[Float](1, 2, 3))
-    val m3 = FloatArray(Array[Float](1, 2, 4))
+    val k1 = Keys.FloatArrayKey.make("myArray")
+    val m1 = GArray(Array[Float](1, 2, 3))
+    val m2 = GArray(Array[Float](1, 2, 3))
+    val m3 = GArray(Array[Float](1, 2, 4))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)
