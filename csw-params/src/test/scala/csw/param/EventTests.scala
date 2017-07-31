@@ -11,7 +11,7 @@ import org.scalatest.{FunSpec, Matchers}
 class EventTests extends FunSpec with Matchers {
   private val s1: String = "encoder"
 
-  private val s1Key = Keys.IntegerKey.make(s1)
+  private val s1Key = Keys.IntKey.make(s1)
 
   private val ck = "wfos.blue.filter"
 

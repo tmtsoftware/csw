@@ -16,13 +16,13 @@ class ItemsTests extends FunSpec with Matchers {
   private val s2: String = "filter"
 
   describe("basic key tests") {
-    val k1: GKey[Int] = Keys.IntegerKey.make(s1)
-    val k2: GKey[Int] = Keys.IntegerKey.make(s2)
+    val k1: GKey[Int] = Keys.IntKey.make(s1)
+    val k2: GKey[Int] = Keys.IntKey.make(s2)
     it("should have correct name") {
       assert(k1.keyName.equals(s1))
     }
 
-    val k3: GKey[Int] = Keys.IntegerKey.make(s1)
+    val k3: GKey[Int] = Keys.IntKey.make(s1)
 
     it("should have equality based on name") {
       assert(k3 == k1)
@@ -469,7 +469,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test IntItem") {
     val tval: Int = 1234
-    val lk        = Keys.IntegerKey.make(s1)
+    val lk        = Keys.IntKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -500,9 +500,9 @@ class ItemsTests extends FunSpec with Matchers {
     val a1 = Array[Int](1, 2, 3, 4, 5)
     val a2 = Array[Int](10, 20, 30, 40, 50)
 
-    val la1 = IntArray(a1)
-    val la2 = IntArray(a2)
-    val lk  = IntArrayKey(s1)
+    val la1 = GArray(a1)
+    val la2 = GArray(a2)
+    val lk  = Keys.IntArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -546,7 +546,7 @@ class ItemsTests extends FunSpec with Matchers {
 
       val li4 = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
-      li4.value(2) should equal(IntArray(c))
+      li4.value(2) should equal(GArray(c))
     }
   }
 

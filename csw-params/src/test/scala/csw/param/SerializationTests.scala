@@ -20,11 +20,11 @@ class SerializationTests extends FunSuite {
   val fqn3       = "tcs.base.pos.dec"
 
   val exposureTime = DoubleKey("exposureTime")
-  val repeats      = Keys.IntegerKey.make("repeats")
+  val repeats      = Keys.IntKey.make("repeats")
   val ra           = StringKey("ra")
   val dec          = StringKey("dec")
   val epoch        = DoubleKey("epoch")
-  val test         = Keys.IntegerKey.make("test")
+  val test         = Keys.IntKey.make("test")
 
   val sc1 = Setup(commandInfo, "tcs.pos").madd(
     ra.set("12:32:11"),

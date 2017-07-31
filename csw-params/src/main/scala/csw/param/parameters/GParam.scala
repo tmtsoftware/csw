@@ -6,6 +6,7 @@ import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat, 
 import scala.collection.immutable.Vector
 import scala.collection.mutable
 import scala.reflect.ClassTag
+import language.implicitConversions
 
 object GParam extends DefaultJsonProtocol {
 
@@ -48,8 +49,8 @@ object GParam extends DefaultJsonProtocol {
  * @param units    the units of the value
  */
 case class GParam[S] private[param] (typeName: String, keyName: String, items: mutable.WrappedArray[S], units: Units)(
-    implicit @transient jsonFormat: JsonFormat[S],
-    @transient classTag: ClassTag[S]
+    implicit @transient jsFormat: JsonFormat[S],
+    @transient cTag: ClassTag[S]
 ) extends Parameter[S] {
 
   /**
@@ -68,4 +69,28 @@ class GKey[S: JsonFormat: ClassTag] private[parameters] (nameIn: String, typeNam
     extends Key[S, GParam[S]](nameIn) {
 
   override def set(v: Vector[S], units: Units = NoUnits): GParam[S] = GParam(typeName, keyName, v.toArray[S], units)
+
+  override def set(xs: S*): GParam[S] = GParam(typeName, keyName, xs.toArray[S], NoUnits)
+}
+
+case class GArray[T](data: mutable.WrappedArray[T])
+
+object GArray extends WrappedArrayProtocol with DefaultJsonProtocol {
+  implicit def format[T: JsonFormat: ClassTag]: JsonFormat[GArray[T]] = jsonFormat1(GArray[T])
+  implicit def fromArray[T](xs: Array[T]): GArray[T]                  = GArray(xs)
+}
+
+//case class GMatrix[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])
+//
+//object GMatrix extends WrappedArrayProtocol with DefaultJsonProtocol {
+//  implicit def format[T: JsonFormat: ClassTag]: JsonFormat[GMatrix[T]] = jsonFormat1(GMatrix[T])
+//  implicit def fromArrays[T](xs: Array[Array[T]]): GMatrix[T]          = GMatrix[T](mutable.WrappedArray.make(xs))
+//}
+
+trait WrappedArrayProtocol { self: DefaultJsonProtocol ⇒
+  implicit def wrappedArrayFormat[T: JsonFormat: ClassTag]: JsonFormat[mutable.WrappedArray[T]] =
+    new JsonFormat[mutable.WrappedArray[T]] {
+      override def write(obj: mutable.WrappedArray[T]): JsValue = obj.array.toJson
+      override def read(json: JsValue): mutable.WrappedArray[T] = json.convertTo[Array[T]]
+    }
 }

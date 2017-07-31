@@ -11,7 +11,7 @@ import scala.collection.immutable.Vector
  *
  * @tparam S the Scala type
  */
-trait Parameter[S] extends Serializable {
+trait Parameter[S] {
 
   /**
    * @return the name of the key for this parameter

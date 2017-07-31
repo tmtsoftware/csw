@@ -165,37 +165,6 @@ private[param] object JavaHelpers {
   def jset(key: FloatMatrixKey, v: FloatMatrix*) =
     FloatMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
 
-  // IntArrayItem
-  def jvalue(item: IntArrayParameter): IntArray = item.values(0)
-
-  def jvalue(item: IntArrayParameter, index: Int): IntArray = item.values(index)
-
-  def jvalues(item: IntArrayParameter): java.util.List[IntArray] = item.values.asJava
-
-  def jget(item: IntArrayParameter, index: Int): java.util.Optional[IntArray] = item.get(index).asJava
-
-  def jset(key: IntArrayKey, v: java.util.List[IntArray], units: Units): IntArrayParameter =
-    IntArrayParameter(key.keyName, v.asScala.toVector, units)
-
-  @varargs
-  def jset(key: IntArrayKey, v: IntArray*) = IntArrayParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
-
-  // IntMatrixItem
-  def jvalue(item: IntMatrixParameter): IntMatrix = item.values(0)
-
-  def jvalue(item: IntMatrixParameter, index: Int): IntMatrix = item.values(index)
-
-  def jvalues(item: IntMatrixParameter): java.util.List[IntMatrix] = item.values.asJava
-
-  def jget(item: IntMatrixParameter, index: Int): java.util.Optional[IntMatrix] = item.get(index).asJava
-
-  def jset(key: IntMatrixKey, v: java.util.List[IntMatrix], units: Units): IntMatrixParameter =
-    IntMatrixParameter(key.keyName, v.asScala.toVector, units)
-
-  @varargs
-  def jset(key: IntMatrixKey, v: IntMatrix*) =
-    IntMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
-
   // LongItem
   def jvalue(item: LongParameter): java.lang.Long = item.values(0)
 

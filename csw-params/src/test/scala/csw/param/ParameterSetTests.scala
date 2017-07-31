@@ -25,7 +25,7 @@ class ParameterSetTests extends FunSpec {
 
   private val ck1 = "wfos.prog.cloudcover"
 
-  val k1 = Keys.IntegerKey.make("itest")
+  val k1 = Keys.IntKey.make("itest")
   val k2 = DoubleKey("dtest")
   val k3 = StringKey("stest")
   val k4 = LongArrayKey("lartest")
@@ -38,8 +38,8 @@ class ParameterSetTests extends FunSpec {
   val i5  = k1.set(22) // This is not added for testing not present removal
 
   describe("test Configurations3 Setup") {
-    val encoder1 = Keys.IntegerKey.make("encoder1")
-    val encoder2 = Keys.IntegerKey.make("encoder2")
+    val encoder1 = Keys.IntKey.make("encoder1")
+    val encoder2 = Keys.IntKey.make("encoder2")
 
     val obsId = "Obs001"
 
