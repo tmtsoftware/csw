@@ -27,22 +27,6 @@ private[param] object JavaHelpers {
   def jset(key: ByteMatrixKey, v: java.util.List[ByteMatrix], units: Units): ByteMatrixParameter =
     ByteMatrixParameter(key.keyName, v.asScala.toVector, units)
 
-  // DoubleArrayItem
-  def jvalue(item: DoubleArrayParameter): DoubleArray = item.values(0)
-
-  def jvalue(item: DoubleArrayParameter, index: Int): DoubleArray = item.values(index)
-
-  def jvalues(item: DoubleArrayParameter): java.util.List[DoubleArray] = item.values.asJava
-
-  def jget(item: DoubleArrayParameter, index: Int): java.util.Optional[DoubleArray] = item.get(index).asJava
-
-  def jset(key: DoubleArrayKey, v: java.util.List[DoubleArray], units: Units): DoubleArrayParameter =
-    DoubleArrayParameter(key.keyName, v.asScala.toVector, units)
-
-  @varargs
-  def jset(key: DoubleArrayKey, v: DoubleArray*) =
-    DoubleArrayParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
-
   // DoubleMatrixItem
   def jvalue(item: DoubleMatrixParameter): DoubleMatrix = item.values(0)
 

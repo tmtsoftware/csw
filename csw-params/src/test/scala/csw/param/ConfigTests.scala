@@ -607,10 +607,10 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based double array equality") {
-    val k1 = DoubleArrayKey("myArray")
-    val m1 = DoubleArray(Array[Double](1, 2, 3))
-    val m2 = DoubleArray(Array[Double](1, 2, 3))
-    val m3 = DoubleArray(Array[Double](1, 2, 4))
+    val k1 = Keys.DoubleArrayKey.make("myArray")
+    val m1 = GArray(Array[Double](1, 2, 3))
+    val m2 = GArray(Array[Double](1, 2, 3))
+    val m3 = GArray(Array[Double](1, 2, 4))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)

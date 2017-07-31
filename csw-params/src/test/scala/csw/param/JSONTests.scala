@@ -278,8 +278,8 @@ class JSONTests extends FunSpec {
 
   describe("Test Double Array items") {
     it("Should allow double array values") {
-      val k1  = DoubleArrayKey("myArray")
-      val m1  = DoubleArray(Array(1.0, 2.0, 3.0))
+      val k1  = Keys.DoubleArrayKey.make("myArray")
+      val m1  = GArray(Array(1.0, 2.0, 3.0))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)

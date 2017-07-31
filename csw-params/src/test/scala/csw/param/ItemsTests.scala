@@ -226,9 +226,9 @@ class ItemsTests extends FunSpec with Matchers {
     val a1 = Array[Double](1.0, 2.0, 3.0, 4.0, 5.0)
     val a2 = Array[Double](10.0, 20.0, 30.0, 40.0, 50.0)
 
-    val la1 = DoubleArray(a1)
-    val la2 = DoubleArray(a2)
-    val lk  = DoubleArrayKey(s1)
+    val la1 = GArray(a1)
+    val la2 = GArray(a2)
+    val lk  = Keys.DoubleArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -272,7 +272,7 @@ class ItemsTests extends FunSpec with Matchers {
 
       val li4 = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
-      li4.value(2) should equal(DoubleArray(c))
+      li4.value(2) should equal(GArray(c))
     }
   }
 
