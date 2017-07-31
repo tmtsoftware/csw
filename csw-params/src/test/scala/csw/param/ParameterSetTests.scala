@@ -1,8 +1,9 @@
 package csw.param
 
 import csw.param.Parameters._
+import csw.param.parameters.Keys
 import csw.param.parameters.arrays.{LongArray, LongArrayKey}
-import csw.param.parameters.primitives.{DoubleKey, IntKey, StringKey}
+import csw.param.parameters.primitives.{DoubleKey, StringKey}
 import org.scalatest.FunSpec
 import spray.json.DefaultJsonProtocol
 
@@ -24,7 +25,7 @@ class ParameterSetTests extends FunSpec {
 
   private val ck1 = "wfos.prog.cloudcover"
 
-  val k1 = IntKey("itest")
+  val k1 = Keys.IntegerKey.make("itest")
   val k2 = DoubleKey("dtest")
   val k3 = StringKey("stest")
   val k4 = LongArrayKey("lartest")
@@ -37,8 +38,8 @@ class ParameterSetTests extends FunSpec {
   val i5  = k1.set(22) // This is not added for testing not present removal
 
   describe("test Configurations3 Setup") {
-    val encoder1 = IntKey("encoder1")
-    val encoder2 = IntKey("encoder2")
+    val encoder1 = Keys.IntegerKey.make("encoder1")
+    val encoder2 = Keys.IntegerKey.make("encoder2")
 
     val obsId = "Obs001"
 

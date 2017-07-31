@@ -9,7 +9,7 @@ import csw.param.Events.EventTime
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 import csw.param.parameters.{ChoiceParameter, GParam}
-import csw.param.parameters.primitives.{DoubleParameter, IntParameter, StringParameter}
+import csw.param.parameters.primitives.{DoubleParameter, StringParameter}
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 
 sealed trait FollowCommandMessages
@@ -39,20 +39,20 @@ object TrombonePublisherMsg {
   case class EngrUpdate(focusError: DoubleParameter, stagePosition: DoubleParameter, zenithAngle: DoubleParameter)
       extends TrombonePublisherMsg
   case class AxisStateUpdate(axisName: StringParameter,
-                             position: IntParameter,
+                             position: GParam[Int],
                              state: ChoiceParameter,
                              inLowLimit: GParam[Boolean],
                              inHighLimit: GParam[Boolean],
                              inHome: GParam[Boolean])
       extends TrombonePublisherMsg
   case class AxisStatsUpdate(axisName: StringParameter,
-                             initCount: IntParameter,
-                             moveCount: IntParameter,
-                             homeCount: IntParameter,
-                             limitCount: IntParameter,
-                             successCount: IntParameter,
-                             failCount: IntParameter,
-                             cancelCount: IntParameter)
+                             initCount: GParam[Int],
+                             moveCount: GParam[Int],
+                             homeCount: GParam[Int],
+                             limitCount: GParam[Int],
+                             successCount: GParam[Int],
+                             failCount: GParam[Int],
+                             cancelCount: GParam[Int])
       extends TrombonePublisherMsg
 }
 
@@ -78,7 +78,10 @@ object DiagPublisherMessages {
 ////////////////////
 sealed trait TromboneCommandHandlerMsgs
 object TromboneCommandHandlerMsgs {
-  case class TromboneStateE(tromboneState: TromboneState) extends NotFollowingMsgs with FollowingMsgs with ExecutingMsgs
+  case class TromboneStateE(tromboneState: TromboneState)
+      extends NotFollowingMsgs
+      with FollowingMsgs
+      with ExecutingMsgs
 
   sealed trait NotFollowingMsgs extends TromboneCommandHandlerMsgs
   sealed trait FollowingMsgs    extends TromboneCommandHandlerMsgs

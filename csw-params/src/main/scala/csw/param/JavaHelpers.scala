@@ -165,24 +165,6 @@ private[param] object JavaHelpers {
   def jset(key: FloatMatrixKey, v: FloatMatrix*) =
     FloatMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
 
-  // IntItem
-  def jvalue(item: IntParameter): java.lang.Integer = item.values(0)
-
-  def jvalue(item: IntParameter, index: Int): java.lang.Integer = item.values(index)
-
-  def jvalues(item: IntParameter): java.util.List[java.lang.Integer] =
-    item.values.map(i => i: java.lang.Integer).asJava
-
-  def jget(item: IntParameter, index: Int): java.util.Optional[java.lang.Integer] =
-    item.get(index).map(i => i: java.lang.Integer).asJava
-
-  def jset(key: IntKey, v: java.util.List[java.lang.Integer], units: Units): IntParameter =
-    IntParameter(key.keyName, v.asScala.toVector.map(i => i: Int), units)
-
-  @varargs
-  def jset(key: IntKey, v: java.lang.Integer*) =
-    IntParameter(key.keyName, v.map(i => i: Int).toVector, units = UnitsOfMeasure.NoUnits)
-
   // IntArrayItem
   def jvalue(item: IntArrayParameter): IntArray = item.values(0)
 

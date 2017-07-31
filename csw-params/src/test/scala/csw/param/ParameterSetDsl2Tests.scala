@@ -2,8 +2,9 @@ package csw.param
 
 import csw.param.ParameterSetDsl._
 import csw.param.Parameters.CommandInfo
+import csw.param.parameters.Keys
 import csw.param.parameters.matrices.{DoubleMatrix, DoubleMatrixKey}
-import csw.param.parameters.primitives.{DoubleKey, IntKey, StringKey}
+import csw.param.parameters.primitives.{DoubleKey, StringKey}
 import org.scalatest.FunSpec
 
 /**
@@ -14,7 +15,7 @@ class ParameterSetDsl2Tests extends FunSpec {
   val commandInfo = CommandInfo(ObsId("Obs001"))
 
   describe("Tests DSL functions") {
-    val k1 = IntKey("itest")
+    val k1 = Keys.IntegerKey.make("itest")
     val k2 = DoubleKey("dtest")
     val k3 = StringKey("stest")
     val k4 = DoubleMatrixKey("myMatrix")

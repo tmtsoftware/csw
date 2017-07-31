@@ -47,11 +47,10 @@ object GParam extends DefaultJsonProtocol {
  * @param items    the value for the key
  * @param units    the units of the value
  */
-case class GParam[S: JsonFormat: ClassTag] private[param] (typeName: String,
-                                                           keyName: String,
-                                                           items: mutable.WrappedArray[S],
-                                                           units: Units)
-    extends Parameter[S] {
+case class GParam[S] private[param] (typeName: String, keyName: String, items: mutable.WrappedArray[S], units: Units)(
+    implicit @transient jsonFormat: JsonFormat[S],
+    @transient classTag: ClassTag[S]
+) extends Parameter[S] {
 
   /**
    * @return All the values for this parameter

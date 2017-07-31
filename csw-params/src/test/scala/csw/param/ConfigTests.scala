@@ -3,6 +3,7 @@ package csw.param
 import csw.param.Events.StatusEvent
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
+import csw.param.parameters.{GKey, GParam, Keys}
 import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import csw.param.parameters.primitives._
@@ -23,7 +24,7 @@ class ConfigTests extends FunSpec {
   private val commandInfo: CommandInfo = "Obs001"
 
   describe("Basic key tests") {
-    val k1 = IntKey(s1)
+    val k1 = Keys.IntegerKey.make(s1)
     val k2 = StringKey(s2)
 
     it("Should be constructed properly") {
@@ -31,7 +32,7 @@ class ConfigTests extends FunSpec {
     }
 
     it("Should use gset properly") {
-      val i: IntParameter = k1.set(22)
+      val i: GParam[Int] = k1.set(22)
       // Check that name and value are gset
       assert(i.keyName eq s1)
       assert(i.values == Vector(22))
@@ -44,7 +45,7 @@ class ConfigTests extends FunSpec {
     }
 
     it("Should support equality of keys") {
-      val k3 = IntKey(s1)
+      val k3 = Keys.IntegerKey.make(s1)
       assert(k3 == k1)
       assert(k3 != k2)
       assert(k1 != k2)
@@ -52,10 +53,10 @@ class ConfigTests extends FunSpec {
   }
 
   describe("SC Basic Tests") {
-    val k1    = IntKey("encoder")
+    val k1    = Keys.IntegerKey.make("encoder")
     val k2    = StringKey("stringThing")
-    val k2bad = IntKey("stringThing")
-    val k3    = IntKey("notUsed")
+    val k2bad = Keys.IntegerKey.make("stringThing")
+    val k3    = Keys.IntegerKey.make("notUsed")
 
     it("Should allow adding keys using single gset") {
       val i1  = k1.set(22)
@@ -91,7 +92,7 @@ class ConfigTests extends FunSpec {
       var sc1 = Setup(commandInfo, ck1)
       sc1 = sc1.madd(k1.set(22).withUnits(degrees), k2.set("C"))
 
-      val v1: IntParameter    = sc1(k1)
+      val v1: GParam[Int]     = sc1(k1)
       val v2: StringParameter = sc1(k2)
       assert(sc1.get(k1).isDefined)
       assert(sc1.get(k2).isDefined)
@@ -114,7 +115,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Checking key updates") {
-    val k1: IntKey = IntKey("atest")
+    val k1 = Keys.IntegerKey.make("atest")
 
     it("Should allow updates") {
       val i1 = k1.set(22)
@@ -154,9 +155,9 @@ class ConfigTests extends FunSpec {
 
   describe("StatusEvent Test") {
 
-    val k1 = IntKey("encoder")
-    val k2 = IntKey("windspeed")
-    val k3 = IntKey("notUsed")
+    val k1 = Keys.IntegerKey.make("encoder")
+    val k2 = Keys.IntegerKey.make("windspeed")
+    val k3 = Keys.IntegerKey.make("notUsed")
 
     it("Should allow adding keys") {
       val i1  = k1.set(22)
@@ -205,8 +206,8 @@ class ConfigTests extends FunSpec {
 
   describe("OC Test") {
 
-    val k1 = IntKey("repeat")
-    val k2 = IntKey("expTime")
+    val k1 = Keys.IntegerKey.make("repeat")
+    val k2 = Keys.IntegerKey.make("expTime")
     it("Should allow adding keys") {
       val i1  = k1.set(22)
       val i2  = k2.set(44)
@@ -262,7 +263,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("test setting multiple values") {
-    val t1 = IntKey("test1")
+    val t1 = Keys.IntegerKey.make("test1")
     it("should allow setting a single value") {
       val i1 = t1.set(1)
       assert(i1.values == Vector(1))
@@ -292,11 +293,11 @@ class ConfigTests extends FunSpec {
   }
 
   describe("testing for getting typed items") {
-    val t1  = IntKey("test1")
+    val t1  = Keys.IntegerKey.make("test1")
     val sc1 = Setup(commandInfo, ck1).add(t1.set(Vector(22), degrees))
 
-    val item: Option[IntParameter] = sc1.get(t1) // Works now!
-    val itm: IntParameter          = item.get
+    val item: Option[GParam[Int]] = sc1.get(t1) // Works now!
+    val itm: GParam[Int]          = item.get
     assert(itm.units == UnitsOfMeasure.degrees)
     val i: Int = itm(0)
     assert(i == 22)
@@ -307,7 +308,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Checking for item types in configs") {
-    val k1: IntKey    = IntKey("itest")
+    val k1: GKey[Int] = Keys.IntegerKey.make("itest")
     val k2: DoubleKey = DoubleKey("dtest")
     val k3: StringKey = StringKey("stest")
 
@@ -318,7 +319,7 @@ class ConfigTests extends FunSpec {
     it("Should get as IntItem") {
       val sc = Setup(commandInfo, ck1).add(i1).add(i2).add(i3)
 
-      val out1: Option[IntParameter]    = sc.get(k1)
+      val out1: Option[GParam[Int]]     = sc.get(k1)
       val out2: Option[DoubleParameter] = sc.get(k2)
       val out3: Option[StringParameter] = sc.get(k3)
 
@@ -329,7 +330,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Check for multi-add") {
-    val k1: IntKey    = IntKey("itest")
+    val k1: GKey[Int] = Keys.IntegerKey.make("itest")
     val k2: DoubleKey = DoubleKey("dtest")
     val k3: StringKey = StringKey("stest")
 
@@ -349,7 +350,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Should work with remove") {
-    val k1 = IntKey("itest")
+    val k1 = Keys.IntegerKey.make("itest")
     val k2 = DoubleKey("dtest")
     val k3 = StringKey("stest")
     val k4 = LongArrayKey("lartest")
@@ -414,7 +415,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("should work with remove by item") {
-    val k1 = IntKey("itest")
+    val k1 = Keys.IntegerKey.make("itest")
     val k2 = DoubleKey("dtest")
     val k3 = StringKey("stest")
     val k4 = LongArrayKey("lartest")

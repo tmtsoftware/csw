@@ -22,7 +22,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   // JSON formats
   implicit val charParameterFormat         = jsonFormat3(CharParameter.apply)
   implicit val shortParameterFormat        = jsonFormat3(ShortParameter.apply)
-  implicit val intParameterFormat          = jsonFormat3(IntParameter.apply)
   implicit val longParameterFormat         = jsonFormat3(LongParameter.apply)
   implicit val floatParameterFormat        = jsonFormat3(FloatParameter.apply)
   implicit val doubleParameterFormat       = jsonFormat3(DoubleParameter.apply)
@@ -107,7 +106,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   // JSON type tags
   private val charType            = classOf[CharParameter].getSimpleName
   private val shortType           = classOf[ShortParameter].getSimpleName
-  private val integerType         = classOf[IntParameter].getSimpleName
   private val longType            = classOf[LongParameter].getSimpleName
   private val floatType           = classOf[FloatParameter].getSimpleName
   private val doubleType          = classOf[DoubleParameter].getSimpleName
@@ -145,7 +143,6 @@ trait JsonSupport extends DefaultJsonProtocol {
     val result: (JsString, JsValue) = parameter match {
       case i: CharParameter         => (JsString(charType), charParameterFormat.write(i))
       case i: ShortParameter        => (JsString(shortType), shortParameterFormat.write(i))
-      case i: IntParameter          => (JsString(integerType), intParameterFormat.write(i))
       case i: LongParameter         => (JsString(longType), longParameterFormat.write(i))
       case i: FloatParameter        => (JsString(floatType), floatParameterFormat.write(i))
       case i: DoubleParameter       => (JsString(doubleType), doubleParameterFormat.write(i))
@@ -174,7 +171,6 @@ trait JsonSupport extends DefaultJsonProtocol {
       (fields("type"), fields("parameter")) match {
         case (JsString(`charType`), parameter)            => charParameterFormat.read(parameter)
         case (JsString(`shortType`), parameter)           => shortParameterFormat.read(parameter)
-        case (JsString(`integerType`), parameter)         => intParameterFormat.read(parameter)
         case (JsString(`longType`), parameter)            => longParameterFormat.read(parameter)
         case (JsString(`floatType`), parameter)           => floatParameterFormat.read(parameter)
         case (JsString(`doubleType`), parameter)          => doubleParameterFormat.read(parameter)

@@ -4,7 +4,7 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.param.parameters.{ChoiceParameter, GParam}
-import csw.param.parameters.primitives.{DoubleParameter, IntParameter, StringParameter}
+import csw.param.parameters.primitives.{DoubleParameter, StringParameter}
 import csw.trombone.assembly.TrombonePublisherMsg._
 import csw.trombone.assembly.{AssemblyContext, TrombonePublisherMsg}
 
@@ -75,7 +75,7 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
   }
 
   private def publishAxisState(axisName: StringParameter,
-                               position: IntParameter,
+                               position: GParam[Int],
                                state: ChoiceParameter,
                                inLowLimit: GParam[Boolean],
                                inHighLimit: GParam[Boolean],
@@ -89,13 +89,13 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
   }
 
   def publishAxisStats(axisName: StringParameter,
-                       datumCount: IntParameter,
-                       moveCount: IntParameter,
-                       homeCount: IntParameter,
-                       limitCount: IntParameter,
-                       successCount: IntParameter,
-                       failureCount: IntParameter,
-                       cancelCount: IntParameter): Unit = {
+                       datumCount: GParam[Int],
+                       moveCount: GParam[Int],
+                       homeCount: GParam[Int],
+                       limitCount: GParam[Int],
+                       successCount: GParam[Int],
+                       failureCount: GParam[Int],
+                       cancelCount: GParam[Int]): Unit = {
 //    val ste = StatusEvent(axisStatsEventPrefix).madd(axisName,
 //                                                     datumCount,
 //                                                     moveCount,

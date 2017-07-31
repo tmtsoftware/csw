@@ -16,13 +16,13 @@ class ItemsTests extends FunSpec with Matchers {
   private val s2: String = "filter"
 
   describe("basic key tests") {
-    val k1: IntKey = IntKey(s1)
-    val k2: IntKey = IntKey(s2)
+    val k1: GKey[Int] = Keys.IntegerKey.make(s1)
+    val k2: GKey[Int] = Keys.IntegerKey.make(s2)
     it("should have correct name") {
       assert(k1.keyName.equals(s1))
     }
 
-    val k3: IntKey = IntKey(s1)
+    val k3: GKey[Int] = Keys.IntegerKey.make(s1)
 
     it("should have equality based on name") {
       assert(k3 == k1)
@@ -469,7 +469,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test IntItem") {
     val tval: Int = 1234
-    val lk        = IntKey(s1)
+    val lk        = Keys.IntegerKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)

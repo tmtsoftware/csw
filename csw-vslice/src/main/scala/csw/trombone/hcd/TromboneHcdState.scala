@@ -7,7 +7,7 @@ import csw.param.StateVariable.CurrentState
 import csw.param.UnitsOfMeasure.encoder
 import csw.param._
 import csw.param.parameters.{Choice, ChoiceKey, Keys}
-import csw.param.parameters.primitives.{IntKey, StringKey}
+import csw.param.parameters.primitives.StringKey
 
 object TromboneHcdState {
   val tromboneConfigFile = new File("trombone/tromboneHCD.conf")
@@ -28,7 +28,7 @@ object TromboneHcdState {
   val AXIS_MOVING                 = Choice(AxisState.AXIS_MOVING.toString)
   val AXIS_ERROR                  = Choice(AxisState.AXIS_ERROR.toString)
   val stateKey                    = ChoiceKey("axisState", AXIS_IDLE, AXIS_MOVING, AXIS_ERROR)
-  val positionKey                 = IntKey("position")
+  val positionKey                 = Keys.IntegerKey.make("position")
   val positionUnits: encoder.type = encoder
   val inLowLimitKey               = Keys.BooleanKey.make("lowLimit")
   val inHighLimitKey              = Keys.BooleanKey.make("highLimit")
@@ -45,13 +45,13 @@ object TromboneHcdState {
 
   val axisStatsPrefix     = s"$trombonePrefix.axisStats"
   val axisStatsCK: Prefix = axisStatsPrefix
-  val datumCountKey       = IntKey("initCount")
-  val moveCountKey        = IntKey("moveCount")
-  val homeCountKey        = IntKey("homeCount")
-  val limitCountKey       = IntKey("limitCount")
-  val successCountKey     = IntKey("successCount")
-  val failureCountKey     = IntKey("failureCount")
-  val cancelCountKey      = IntKey("cancelCount")
+  val datumCountKey       = Keys.IntegerKey.make("initCount")
+  val moveCountKey        = Keys.IntegerKey.make("moveCount")
+  val homeCountKey        = Keys.IntegerKey.make("homeCount")
+  val limitCountKey       = Keys.IntegerKey.make("limitCount")
+  val successCountKey     = Keys.IntegerKey.make("successCount")
+  val failureCountKey     = Keys.IntegerKey.make("failureCount")
+  val cancelCountKey      = Keys.IntegerKey.make("cancelCount")
   val defaultStatsState: StateVariable.CurrentState = CurrentState(axisStatsCK).madd(
     axisNameKey     -> tromboneAxisName,
     datumCountKey   -> 0,
@@ -66,13 +66,13 @@ object TromboneHcdState {
   val axisConfigPrefix     = s"$trombonePrefix.axisConfig"
   val axisConfigCK: Prefix = axisConfigPrefix
   // axisNameKey
-  val lowLimitKey    = IntKey("lowLimit")
-  val lowUserKey     = IntKey("lowUser")
-  val highUserKey    = IntKey("highUser")
-  val highLimitKey   = IntKey("highLimit")
-  val homeValueKey   = IntKey("homeValue")
-  val startValueKey  = IntKey("startValue")
-  val stepDelayMSKey = IntKey("stepDelayMS")
+  val lowLimitKey    = Keys.IntegerKey.make("lowLimit")
+  val lowUserKey     = Keys.IntegerKey.make("lowUser")
+  val highUserKey    = Keys.IntegerKey.make("highUser")
+  val highLimitKey   = Keys.IntegerKey.make("highLimit")
+  val homeValueKey   = Keys.IntegerKey.make("homeValue")
+  val startValueKey  = Keys.IntegerKey.make("startValue")
+  val stepDelayMSKey = Keys.IntegerKey.make("stepDelayMS")
   // No full default current state because it is determined at runtime
   val defaultConfigState: StateVariable.CurrentState = CurrentState(axisConfigCK).madd(
     axisNameKey -> tromboneAxisName

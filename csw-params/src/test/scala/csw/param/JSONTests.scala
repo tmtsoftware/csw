@@ -55,11 +55,11 @@ class JSONTests extends FunSpec {
     }
 
     it("int item encode/decode") {
-      val k1 = IntKey(s3)
+      val k1 = Keys.IntegerKey.make(s3)
       val i1 = k1.set(23).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[IntParameter]
+      val in1 = j1.convertTo[GParam[Int]]
       assert(in1 == i1)
     }
 
@@ -118,7 +118,7 @@ class JSONTests extends FunSpec {
 
   describe("Testing Items") {
 
-    val k1 = IntKey(s1)
+    val k1 = Keys.IntegerKey.make(s1)
     val k2 = StringKey(s2)
 
     val i1 = k1.set(22, 33, 44)
@@ -138,7 +138,7 @@ class JSONTests extends FunSpec {
   describe("Setup JSON") {
 
     val k1 = CharKey("a")
-    val k2 = IntKey("b")
+    val k2 = Keys.IntegerKey.make("b")
     val k3 = LongKey("c")
     val k4 = FloatKey("d")
     val k5 = DoubleKey("e")
@@ -228,7 +228,7 @@ class JSONTests extends FunSpec {
   }
 
   describe("Test Custom RaDecItem") {
-    it("Should allow cutom RaDecItem") {
+    it("Should allow custom RaDecItem") {
       val k1  = Keys.RaDecKey.make("coords")
       val c1  = RaDec(7.3, 12.1)
       val c2  = RaDec(9.1, 2.9)
