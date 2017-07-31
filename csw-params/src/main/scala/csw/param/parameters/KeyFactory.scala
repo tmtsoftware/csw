@@ -26,6 +26,7 @@ object Keys extends DefaultJsonProtocol {
   val DoubleArrayKey = new KeyFactory[GArray[Double]]("DoubleArrayKey")
   val FloatArrayKey  = new KeyFactory[GArray[Float]]("FloatArrayKey")
   val LongArrayKey   = new KeyFactory[GArray[Long]]("LongArrayKey")
+  val ShortArrayKey  = new KeyFactory[GArray[Short]]("ShortArrayKey")
 
   val IntMatrixKey = new KeyFactory[GArray[Array[Int]]]("IntMatrixKey")
 }
@@ -46,6 +47,7 @@ object JKeys extends JavaFormats {
   val DoubleArrayKey  = new KeyFactory[GArray[java.lang.Double]]("JDoubleArrayKey")
   val FloatArrayKey   = new KeyFactory[GArray[java.lang.Float]]("JFloatArrayKey")
   val LongArrayKey    = new KeyFactory[GArray[java.lang.Long]]("JLongArrayKey")
+  val ShortArrayKey   = new KeyFactory[GArray[java.lang.Short]]("JShortArrayKey")
 
   val IntegerMatrixKey = new KeyFactory[GArray[Array[java.lang.Integer]]]("JIntegerMatrixKey")
 }

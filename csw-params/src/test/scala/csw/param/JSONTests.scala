@@ -5,7 +5,6 @@ import csw.param.JsonSupport._
 import csw.param.Parameters.{CommandInfo, Observe, Setup, Wait}
 import csw.param.StateVariable.{CurrentState, DemandState}
 import csw.param.parameters._
-import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
 import spray.json._
@@ -397,8 +396,8 @@ class JSONTests extends FunSpec {
 
   describe("Test Short Array items") {
     it("Should allow short array values") {
-      val k1  = ShortArrayKey("myArray")
-      val m1  = ShortArray(Array[Short](1, 2, 3))
+      val k1  = Keys.ShortArrayKey.make("myArray")
+      val m1  = GArray(Array[Short](1, 2, 3))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)

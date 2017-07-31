@@ -2,7 +2,6 @@ package csw.param
 
 import csw.param.UnitsOfMeasure.{degrees, meters, seconds}
 import csw.param.parameters._
-import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import org.scalatest.{FunSpec, Matchers}
 
@@ -771,9 +770,9 @@ class ItemsTests extends FunSpec with Matchers {
     val a1 = Array[Short](1, 2, 3, 4, 5)
     val a2 = Array[Short](10, 20, 30, 40, 50)
 
-    val la1 = ShortArray(a1)
-    val la2 = ShortArray(a2)
-    val lk  = ShortArrayKey(s1)
+    val la1 = GArray(a1)
+    val la2 = GArray(a2)
+    val lk  = Keys.ShortArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -817,7 +816,7 @@ class ItemsTests extends FunSpec with Matchers {
 
       val li4 = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
-      li4.value(2) should equal(ShortArray(c))
+      li4.value(2) should equal(GArray(c))
     }
   }
 

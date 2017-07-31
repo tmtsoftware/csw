@@ -3,7 +3,6 @@ package csw.param
 import csw.param.Parameters.ParameterSetType
 import csw.param.UnitsOfMeasure.Units
 import csw.param.parameters._
-import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 
 import scala.annotation.varargs
@@ -74,22 +73,6 @@ private[param] object JavaHelpers {
   @varargs
   def jset(key: LongMatrixKey, v: LongMatrix*) =
     LongMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
-
-  // ShortArrayItem
-  def jvalue(item: ShortArrayParameter): ShortArray = item.values(0)
-
-  def jvalue(item: ShortArrayParameter, index: Int): ShortArray = item.values(index)
-
-  def jvalues(item: ShortArrayParameter): java.util.List[ShortArray] = item.values.asJava
-
-  def jget(item: ShortArrayParameter, index: Int): java.util.Optional[ShortArray] = item.get(index).asJava
-
-  def jset(key: ShortArrayKey, v: java.util.List[ShortArray], units: Units): ShortArrayParameter =
-    ShortArrayParameter(key.keyName, v.asScala.toVector, units)
-
-  @varargs
-  def jset(key: ShortArrayKey, v: ShortArray*) =
-    ShortArrayParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
 
   // ShortMatrixItem
   def jvalue(item: ShortMatrixParameter): ShortMatrix = item.values(0)

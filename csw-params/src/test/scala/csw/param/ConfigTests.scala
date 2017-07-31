@@ -4,7 +4,6 @@ import csw.param.Events.StatusEvent
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
 import csw.param.parameters.{GArray, GKey, GParam, Keys}
-import csw.param.parameters.arrays._
 import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
 
@@ -781,10 +780,10 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based short array equality") {
-    val k1 = ShortArrayKey("myArray")
-    val m1 = ShortArray(Array[Short](1, 2, 3))
-    val m2 = ShortArray(Array[Short](1, 2, 3))
-    val m3 = ShortArray(Array[Short](1, 2, 4))
+    val k1 = Keys.ShortArrayKey.make("myArray")
+    val m1 = GArray(Array[Short](1, 2, 3))
+    val m2 = GArray(Array[Short](1, 2, 3))
+    val m3 = GArray(Array[Short](1, 2, 4))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)
