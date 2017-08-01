@@ -3,7 +3,6 @@ package csw.param
 import csw.param.Parameters.ParameterSetType
 import csw.param.UnitsOfMeasure.Units
 import csw.param.parameters._
-import csw.param.parameters.matrices._
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -13,22 +12,6 @@ import scala.compat.java8.OptionConverters._
  * TMT Source Code: 6/23/16.
  */
 private[param] object JavaHelpers {
-
-  // LongMatrixItem
-  def jvalue(item: LongMatrixParameter): LongMatrix = item.values(0)
-
-  def jvalue(item: LongMatrixParameter, index: Int): LongMatrix = item.values(index)
-
-  def jvalues(item: LongMatrixParameter): java.util.List[LongMatrix] = item.values.asJava
-
-  def jget(item: LongMatrixParameter, index: Int): java.util.Optional[LongMatrix] = item.get(index).asJava
-
-  def jset(key: LongMatrixKey, v: java.util.List[LongMatrix], units: Units): LongMatrixParameter =
-    LongMatrixParameter(key.keyName, v.asScala.toVector, units)
-
-  @varargs
-  def jset(key: LongMatrixKey, v: LongMatrix*) =
-    LongMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
 
   def jadd[I <: Parameter[_], T <: ParameterSetType[T]](sc: T, items: java.util.List[I]): T = {
     val x = items.asScala

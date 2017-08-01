@@ -92,12 +92,13 @@ object ArrayAndMatrixEquality {
    * @tparam T the Scala type of the values
    * @return True if the two matrices are equal
    */
-  def deepMatrixValueEquals[T](one: Array[Array[T]], two: Array[Array[T]]): Boolean = {
+  def deepMatrixValueEquals[T](one: mutable.WrappedArray[mutable.WrappedArray[T]],
+                               two: mutable.WrappedArray[mutable.WrappedArray[T]]): Boolean = {
     @tailrec
-    def doCheck(v: Array[(Array[T], Array[T])]): Boolean = {
+    def doCheck(v: mutable.WrappedArray[(mutable.WrappedArray[T], mutable.WrappedArray[T])]): Boolean = {
       if (v.isEmpty) true
       else {
-        if (!ArrayAndMatrixEquality.deepArrayEquals(v.head._1, v.head._2)) {
+        if (!ArrayAndMatrixEquality.deepWrappedArrayEquals(v.head._1, v.head._2)) {
           false
         } else {
           doCheck(v.tail)

@@ -4,8 +4,8 @@ import csw.param.UnitsOfMeasure.{degrees, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 import csw.param.ParameterSetDsl._
 import csw.param.Parameters.{CommandInfo, Setup}
-import csw.param.parameters.{GArray, GParam, KeyType}
-import csw.param.parameters.matrices.{LongMatrix, LongMatrixKey}
+import csw.param.parameters.KeyType.LongMatrixKey
+import csw.param.parameters.{GArray, GMatrix, GParam, KeyType}
 
 /**
  * Tests the config DSL
@@ -86,17 +86,17 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("work with a matrix type") {
-    val k1 = LongMatrixKey(s2)
+    val k1 = LongMatrixKey.make(s2)
 
     it("should allow setting") {
       val m1: Array[Array[Long]] = Array(Array(1, 2, 4), Array(2, 4, 8), Array(4, 8, 16))
       // Note that LongMatrix implicit doesn't work here?
-      val i1 = set(k1, LongMatrix(m1))
+      val i1 = set(k1, GMatrix.fromArrays(m1))
       i1.size should be(1)
-      head(i1) should equal(LongMatrix(m1))
+      head(i1) should equal(GMatrix.fromArrays(m1))
       head(i1).data should equal(m1)
-      values(i1) should equal(Vector(LongMatrix(m1)))
-      values(i1)(0) should equal(LongMatrix(m1))
+      values(i1) should equal(Vector(GMatrix.fromArrays(m1)))
+      values(i1)(0) should equal(GMatrix.fromArrays(m1))
     }
   }
 

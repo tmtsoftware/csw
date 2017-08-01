@@ -4,9 +4,8 @@ import csw.param.Events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.JsonSupport._
 import csw.param.Parameters.{CommandInfo, Observe, Setup, Wait}
 import csw.param.StateVariable.{CurrentState, DemandState}
-import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, IntMatrixKey, ShortMatrixKey}
+import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, IntMatrixKey, LongMatrixKey, ShortMatrixKey}
 import csw.param.parameters._
-import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
 import spray.json._
 
@@ -413,10 +412,10 @@ class JSONTests extends FunSpec {
 
   describe("Test Long Matrix items") {
     it("Should allow long matrix values") {
-      val k1  = LongMatrixKey("myMatrix")
-      val m1  = LongMatrix(Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9)))
-      val i1  = k1.set(m1)
-      val sc1 = Setup(commandInfo, ck).add(i1)
+      val k1                = LongMatrixKey.make("myMatrix")
+      val m1: GMatrix[Long] = GMatrix.fromArrays(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
+      val i1                = k1.set(m1)
+      val sc1               = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
 
       val sc1out = JsonSupport.writeSequenceCommand(sc1)

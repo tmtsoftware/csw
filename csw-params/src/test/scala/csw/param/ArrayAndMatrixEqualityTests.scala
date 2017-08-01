@@ -1,7 +1,6 @@
 package csw.param
 
-import csw.param.parameters.GArray
-import csw.param.parameters.matrices.LongMatrix
+import csw.param.parameters.{GArray, GMatrix}
 import org.scalatest.FunSpec
 
 /**
@@ -77,9 +76,9 @@ class ArrayAndMatrixEqualityTests extends FunSpec {
   }
 
   describe("deepMatrixValueEquals") {
-    val m1 = LongMatrix(Array(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12)))
-    val m2 = LongMatrix(Array(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12)))
-    val m3 = LongMatrix(Array(Array(1, 2, 3), Array(2, 3, 0), Array(4, 6, 12)))
+    val m1 = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
+    val m2 = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
+    val m3 = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 0), Array(4, 6, 12))
 
     it("should return true for the same matrix") {
       assert(deepMatrixValueEquals(m1.data, m1.data))

@@ -3,9 +3,15 @@ package csw.param
 import csw.param.Events.StatusEvent
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
-import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, FloatMatrixKey, IntMatrixKey, ShortMatrixKey}
+import csw.param.parameters.KeyType.{
+  ByteMatrixKey,
+  DoubleMatrixKey,
+  FloatMatrixKey,
+  IntMatrixKey,
+  LongMatrixKey,
+  ShortMatrixKey
+}
 import csw.param.parameters._
-import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
 
 import scala.collection.immutable.Vector
@@ -521,15 +527,16 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based long matrix equality") {
-    val k1 = LongMatrixKey("myMatrix")
-    val m1 = LongMatrix(Array(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12)))
-    val m2 = LongMatrix(Array(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12)))
-    val m3 = LongMatrix(Array(Array(1, 2, 3), Array(2, 3, 6), Array(0, 6, 12))) // Note one value different
-    val m4 = LongMatrix(Array(Array(1, 0, 0), Array(0, 1, 0), Array(0, 0, 1)))
-    val i1 = k1.set(m1)
-    val i2 = k1.set(m2)
-    val i3 = k1.set(m3)
-    val i4 = k1.set(m4)
+    val k1                = LongMatrixKey.make("myMatrix")
+    val m1: GMatrix[Long] = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
+    val m2: GMatrix[Long] = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
+    val m3
+      : GMatrix[Long]     = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(0, 6, 12)) // Note one value different
+    val m4: GMatrix[Long] = GMatrix.fromArrays(Array(1, 0, 0), Array(0, 1, 0), Array(0, 0, 1))
+    val i1                = k1.set(m1)
+    val i2                = k1.set(m2)
+    val i3                = k1.set(m3)
+    val i4                = k1.set(m4)
 
     it("should short circuit with identical same matrices") {
       assert(i1.equals(i1))
