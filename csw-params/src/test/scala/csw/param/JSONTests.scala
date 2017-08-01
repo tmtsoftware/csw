@@ -4,7 +4,14 @@ import csw.param.Events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.JsonSupport._
 import csw.param.Parameters.{CommandInfo, Observe, Setup, Wait}
 import csw.param.StateVariable.{CurrentState, DemandState}
-import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, IntMatrixKey, LongMatrixKey, ShortMatrixKey}
+import csw.param.parameters.KeyType.{
+  ByteMatrixKey,
+  ChoiceKey,
+  DoubleMatrixKey,
+  IntMatrixKey,
+  LongMatrixKey,
+  ShortMatrixKey
+}
 import csw.param.parameters._
 import org.scalatest.FunSpec
 import spray.json._
@@ -451,7 +458,7 @@ class JSONTests extends FunSpec {
 
   describe("Test Choice items") {
     it("Should allow choice/enum values") {
-      val k1  = ChoiceKey("myChoice", Choices.from("A", "B", "C"))
+      val k1  = ChoiceKey.make("myChoice", Choices.from("A", "B", "C"))
       val c1  = Choice("B")
       val i1  = k1.set(c1)
       val sc1 = Setup(commandInfo, ck).add(i1)

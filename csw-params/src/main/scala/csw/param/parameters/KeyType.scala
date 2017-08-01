@@ -10,64 +10,72 @@ import scala.reflect.ClassTag
 sealed class KeyType[S](implicit @transient jsFormat: JsonFormat[S], @transient clsTag: ClassTag[S])
     extends EnumEntry
     with Serializable {
-
-  def make(name: String): GKey[S]        = new GKey[S](name, this)
   def paramFormat: JsonFormat[GParam[S]] = GParam[S]
+}
+
+sealed class SimpleKeyType[S](implicit @transient jsFormat: JsonFormat[S], @transient clsTag: ClassTag[S])
+    extends KeyType[S] {
+  def make(name: String): GKey[S] = new GKey[S](name, this)
 }
 
 object KeyType extends JsonSupport with JavaFormats with Enum[KeyType[_]] {
 
   override def values: immutable.IndexedSeq[KeyType[_]] = findValues
 
-  case object RaDecKey  extends KeyType[RaDec]
-  case object StringKey extends KeyType[String]
-  case object StructKey extends KeyType[Struct]
+  case object ChoiceKey extends KeyType[Choice] {
+    def make(name: String, choices: Choices): GChoiceKey = new GChoiceKey(name, this, choices)
+    def make(name: String, choices: Choice*): GChoiceKey = new GChoiceKey(name, this, Choices(choices.toSet))
+  }
+
+  case object RaDecKey  extends SimpleKeyType[RaDec]
+  case object StringKey extends SimpleKeyType[String]
+  case object StructKey extends SimpleKeyType[Struct]
 
   //scala
-  case object BooleanKey extends KeyType[Boolean]
-  case object CharKey    extends KeyType[Char]
-  case object ShortKey   extends KeyType[Short]
-  case object LongKey    extends KeyType[Long]
-  case object IntKey     extends KeyType[Int]
-  case object FloatKey   extends KeyType[Float]
-  case object DoubleKey  extends KeyType[Double]
+  case object BooleanKey extends SimpleKeyType[Boolean]
+  case object CharKey    extends SimpleKeyType[Char]
+  case object ShortKey   extends SimpleKeyType[Short]
+  case object LongKey    extends SimpleKeyType[Long]
+  case object IntKey     extends SimpleKeyType[Int]
+  case object FloatKey   extends SimpleKeyType[Float]
+  case object DoubleKey  extends SimpleKeyType[Double]
 
-  case object ByteArrayKey   extends KeyType[GArray[Byte]]
-  case object ShortArrayKey  extends KeyType[GArray[Short]]
-  case object LongArrayKey   extends KeyType[GArray[Long]]
-  case object IntArrayKey    extends KeyType[GArray[Int]]
-  case object FloatArrayKey  extends KeyType[GArray[Float]]
-  case object DoubleArrayKey extends KeyType[GArray[Double]]
+  case object ByteArrayKey   extends SimpleKeyType[GArray[Byte]]
+  case object ShortArrayKey  extends SimpleKeyType[GArray[Short]]
+  case object LongArrayKey   extends SimpleKeyType[GArray[Long]]
+  case object IntArrayKey    extends SimpleKeyType[GArray[Int]]
+  case object FloatArrayKey  extends SimpleKeyType[GArray[Float]]
+  case object DoubleArrayKey extends SimpleKeyType[GArray[Double]]
 
-  case object ByteMatrixKey   extends KeyType[GMatrix[Byte]]
-  case object ShortMatrixKey  extends KeyType[GMatrix[Short]]
-  case object LongMatrixKey   extends KeyType[GMatrix[Long]]
-  case object IntMatrixKey    extends KeyType[GMatrix[Int]]
-  case object FloatMatrixKey  extends KeyType[GMatrix[Float]]
-  case object DoubleMatrixKey extends KeyType[GMatrix[Double]]
+  case object ByteMatrixKey   extends SimpleKeyType[GMatrix[Byte]]
+  case object ShortMatrixKey  extends SimpleKeyType[GMatrix[Short]]
+  case object LongMatrixKey   extends SimpleKeyType[GMatrix[Long]]
+  case object IntMatrixKey    extends SimpleKeyType[GMatrix[Int]]
+  case object FloatMatrixKey  extends SimpleKeyType[GMatrix[Float]]
+  case object DoubleMatrixKey extends SimpleKeyType[GMatrix[Double]]
 
   //java
-  case object JBooleanKey extends KeyType[java.lang.Boolean]
-  case object JCharKey    extends KeyType[java.lang.Character]
-  case object JShortKey   extends KeyType[java.lang.Short]
-  case object JLongKey    extends KeyType[java.lang.Long]
-  case object JIntKey     extends KeyType[java.lang.Integer]
-  case object JFloatKey   extends KeyType[java.lang.Float]
-  case object JDoubleKey  extends KeyType[java.lang.Double]
+  case object JBooleanKey extends SimpleKeyType[java.lang.Boolean]
+  case object JCharKey    extends SimpleKeyType[java.lang.Character]
+  case object JShortKey   extends SimpleKeyType[java.lang.Short]
+  case object JLongKey    extends SimpleKeyType[java.lang.Long]
+  case object JIntKey     extends SimpleKeyType[java.lang.Integer]
+  case object JFloatKey   extends SimpleKeyType[java.lang.Float]
+  case object JDoubleKey  extends SimpleKeyType[java.lang.Double]
 
-  case object JByteArrayKey   extends KeyType[GArray[java.lang.Byte]]
-  case object JShortArrayKey  extends KeyType[GArray[java.lang.Short]]
-  case object JLongArrayKey   extends KeyType[GArray[java.lang.Long]]
-  case object JIntArrayKey    extends KeyType[GArray[java.lang.Integer]]
-  case object JFloatArrayKey  extends KeyType[GArray[java.lang.Float]]
-  case object JDoubleArrayKey extends KeyType[GArray[java.lang.Double]]
+  case object JByteArrayKey   extends SimpleKeyType[GArray[java.lang.Byte]]
+  case object JShortArrayKey  extends SimpleKeyType[GArray[java.lang.Short]]
+  case object JLongArrayKey   extends SimpleKeyType[GArray[java.lang.Long]]
+  case object JIntArrayKey    extends SimpleKeyType[GArray[java.lang.Integer]]
+  case object JFloatArrayKey  extends SimpleKeyType[GArray[java.lang.Float]]
+  case object JDoubleArrayKey extends SimpleKeyType[GArray[java.lang.Double]]
 
-  case object JByteMatrixKey   extends KeyType[GArray[Array[java.lang.Byte]]]
-  case object JShortMatrixKey  extends KeyType[GMatrix[java.lang.Short]]
-  case object JLongMatrixKey   extends KeyType[GMatrix[java.lang.Long]]
-  case object JIntMatrixKey    extends KeyType[GArray[Array[java.lang.Integer]]]
-  case object JFloatMatrixKey  extends KeyType[GMatrix[java.lang.Float]]
-  case object JDoubleMatrixKey extends KeyType[GMatrix[java.lang.Double]]
+  case object JByteMatrixKey   extends SimpleKeyType[GArray[Array[java.lang.Byte]]]
+  case object JShortMatrixKey  extends SimpleKeyType[GMatrix[java.lang.Short]]
+  case object JLongMatrixKey   extends SimpleKeyType[GMatrix[java.lang.Long]]
+  case object JIntMatrixKey    extends SimpleKeyType[GArray[Array[java.lang.Integer]]]
+  case object JFloatMatrixKey  extends SimpleKeyType[GMatrix[java.lang.Float]]
+  case object JDoubleMatrixKey extends SimpleKeyType[GMatrix[java.lang.Double]]
 
   implicit def format[T]: JsonFormat[KeyType[T]] = EnumJsonSupport.format[KeyType, T](this)
 }

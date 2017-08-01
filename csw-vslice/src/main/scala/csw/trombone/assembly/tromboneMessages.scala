@@ -8,7 +8,7 @@ import csw.common.framework.models.RunningHcdMsg.Submit
 import csw.param.Events.EventTime
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
-import csw.param.parameters.{ChoiceParameter, GParam}
+import csw.param.parameters.{Choice, GParam}
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 
 sealed trait FollowCommandMessages
@@ -39,7 +39,7 @@ object TrombonePublisherMsg {
       extends TrombonePublisherMsg
   case class AxisStateUpdate(axisName: GParam[String],
                              position: GParam[Int],
-                             state: ChoiceParameter,
+                             state: GParam[Choice],
                              inLowLimit: GParam[Boolean],
                              inHighLimit: GParam[Boolean],
                              inHome: GParam[Boolean])
@@ -77,7 +77,10 @@ object DiagPublisherMessages {
 ////////////////////
 sealed trait TromboneCommandHandlerMsgs
 object TromboneCommandHandlerMsgs {
-  case class TromboneStateE(tromboneState: TromboneState) extends NotFollowingMsgs with FollowingMsgs with ExecutingMsgs
+  case class TromboneStateE(tromboneState: TromboneState)
+      extends NotFollowingMsgs
+      with FollowingMsgs
+      with ExecutingMsgs
 
   sealed trait NotFollowingMsgs extends TromboneCommandHandlerMsgs
   sealed trait FollowingMsgs    extends TromboneCommandHandlerMsgs

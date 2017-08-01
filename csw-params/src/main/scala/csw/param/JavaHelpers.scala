@@ -1,10 +1,8 @@
 package csw.param
 
 import csw.param.Parameters.ParameterSetType
-import csw.param.UnitsOfMeasure.Units
 import csw.param.parameters._
 
-import scala.annotation.varargs
 import scala.collection.JavaConverters._
 import scala.compat.java8.OptionConverters._
 
@@ -46,20 +44,4 @@ private[param] object JavaHelpers {
       case None    => throw new NoSuchElementException(s"Item: $key not found")
     }
   }
-
-  // ChoiceItem
-  def jvalue(item: ChoiceParameter): Choice = item.values(0)
-
-  def jvalue(item: ChoiceParameter, index: Int): Choice = item.values(index)
-
-  def jvalues(item: ChoiceParameter): java.util.List[Choice] = item.values.map(i => i: Choice).asJava
-
-  def jget(item: ChoiceParameter, index: Int): java.util.Optional[Choice] = item.get(index).map(i => i: Choice).asJava
-
-  def jset(key: ChoiceKey, v: java.util.List[Choice], units: Units): ChoiceParameter =
-    ChoiceParameter(key.keyName, key.choices, v.asScala.toVector.map(i => i: Choice), units)
-
-  @varargs
-  def jset(key: ChoiceKey, v: Choice*) =
-    ChoiceParameter(key.keyName, key.choices, v.map(i => i: Choice).toVector, units = UnitsOfMeasure.NoUnits)
 }

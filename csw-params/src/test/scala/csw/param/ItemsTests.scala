@@ -3,6 +3,7 @@ package csw.param
 import csw.param.UnitsOfMeasure.{degrees, meters, seconds}
 import csw.param.parameters.KeyType.{
   ByteMatrixKey,
+  ChoiceKey,
   DoubleMatrixKey,
   FloatMatrixKey,
   IntMatrixKey,
@@ -887,7 +888,7 @@ class ItemsTests extends FunSpec with Matchers {
       // Choices as object with String input
       val choices = Choices.from("A", "B", "C")
 
-      val ci1 = ChoiceKey("mode", choices)
+      val ci1 = ChoiceKey.make("mode", choices)
       ci1.choices should equal(choices)
       ci1.keyName should be("mode")
 
@@ -899,7 +900,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should allow creating with varargs of Strings") {
       // Create directly with keyname, and Choice names
-      val ci2 = ChoiceKey("test", "A", "B")
+      val ci2 = ChoiceKey.make("test", "A", "B")
       ci2.choices should equal(Choices.from("A", "B"))
       ci2.keyName should be("test")
 
@@ -917,7 +918,7 @@ class ItemsTests extends FunSpec with Matchers {
       val continuous    = Choice("continuous")
       val error         = Choice("error")
 
-      val cmd = ChoiceKey("cmd", uninitialized, ready, busy, continuous, error)
+      val cmd = ChoiceKey.make("cmd", uninitialized, ready, busy, continuous, error)
       cmd.choices should be(Choices(Set(uninitialized, ready, busy, continuous, error)))
 
       // setting values

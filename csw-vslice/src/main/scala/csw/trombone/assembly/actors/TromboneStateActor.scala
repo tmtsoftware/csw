@@ -3,6 +3,7 @@ package csw.trombone.assembly.actors
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
+import csw.param.parameters.KeyType.ChoiceKey
 import csw.param.parameters._
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneStateMsg
 
@@ -16,21 +17,21 @@ object TromboneStateActor {
   val cmdBusy                        = Choice("busy")
   val cmdContinuous                  = Choice("continuous")
   val cmdError                       = Choice("error")
-  val cmdKey                         = ChoiceKey("cmd", cmdUninitialized, cmdReady, cmdBusy, cmdContinuous, cmdError)
+  val cmdKey                         = ChoiceKey.make("cmd", cmdUninitialized, cmdReady, cmdBusy, cmdContinuous, cmdError)
   val cmdDefault                     = cmdItem(cmdUninitialized)
   def cmd(ts: TromboneState): Choice = ts.cmd.head
 
-  def cmdItem(ch: Choice): ChoiceParameter = cmdKey.set(ch)
+  def cmdItem(ch: Choice): GParam[Choice] = cmdKey.set(ch)
 
   val moveUnindexed                   = Choice("unindexed")
   val moveIndexing                    = Choice("indexing")
   val moveIndexed                     = Choice("indexed")
   val moveMoving                      = Choice("moving")
-  val moveKey                         = ChoiceKey("move", moveUnindexed, moveIndexing, moveIndexed, moveMoving)
+  val moveKey                         = ChoiceKey.make("move", moveUnindexed, moveIndexing, moveIndexed, moveMoving)
   val moveDefault                     = moveItem(moveUnindexed)
   def move(ts: TromboneState): Choice = ts.move.head
 
-  def moveItem(ch: Choice): ChoiceParameter = moveKey.set(ch)
+  def moveItem(ch: Choice): GParam[Choice] = moveKey.set(ch)
 
   def sodiumKey                               = KeyType.BooleanKey.make("sodiumLayer")
   val sodiumLayerDefault                      = sodiumItem(false)
@@ -46,8 +47,8 @@ object TromboneStateActor {
 
   val defaultTromboneState = TromboneState(cmdDefault, moveDefault, sodiumLayerDefault, nssDefault)
 
-  case class TromboneState(cmd: ChoiceParameter,
-                           move: ChoiceParameter,
+  case class TromboneState(cmd: GParam[Choice],
+                           move: GParam[Choice],
                            sodiumLayer: GParam[Boolean],
                            nss: GParam[Boolean])
 
@@ -57,13 +58,17 @@ object TromboneStateActor {
 
   object SetState {
 
-    def apply(cmd: ChoiceParameter,
-              move: ChoiceParameter,
+    def apply(cmd: GParam[Choice],
+              move: GParam[Choice],
               sodiumLayer: GParam[Boolean],
               nss: GParam[Boolean],
               replyTo: ActorRef[StateWasSet]): SetState = SetState(TromboneState(cmd, move, sodiumLayer, nss), replyTo)
 
-    def apply(cmd: Choice, move: Choice, sodiumLayer: Boolean, nss: Boolean, replyTo: ActorRef[StateWasSet]): SetState =
+    def apply(cmd: Choice,
+              move: Choice,
+              sodiumLayer: Boolean,
+              nss: Boolean,
+              replyTo: ActorRef[StateWasSet]): SetState =
       SetState(TromboneState(cmdItem(cmd), moveItem(move), sodiumItem(sodiumLayer), nssItem(nss)), replyTo)
   }
 

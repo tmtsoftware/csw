@@ -17,9 +17,8 @@ object JsonSupport extends JsonSupport
 trait JsonSupport extends DefaultJsonProtocol {
 
   // JSON formats
-  implicit val choiceFormat          = jsonFormat1(Choice.apply)
-  implicit val choicesFormat         = jsonFormat1(Choices.apply)
-  implicit val choiceParameterFormat = jsonFormat4(ChoiceParameter.apply)
+  implicit val choiceFormat  = jsonFormat1(Choice.apply)
+  implicit val choicesFormat = jsonFormat1(Choices.apply)
 
   implicit def structFormat: JsonFormat[Struct] = new JsonFormat[Struct] {
     def write(s: Struct): JsValue = JsObject(
@@ -81,9 +80,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   implicit val obsIdFormat           = jsonFormat1(ObsId.apply)
   implicit val eventInfoFormat       = jsonFormat4(EventInfo.apply)
 
-  // JSON type tags
-  private val choiceType = classOf[ChoiceParameter].getSimpleName
-
   // config and event type JSON tags
   private val setupType        = classOf[Setup].getSimpleName
   private val observeType      = classOf[Observe].getSimpleName
@@ -100,8 +96,7 @@ trait JsonSupport extends DefaultJsonProtocol {
   // XXX TODO Use JNumber?
   def writeParameter[S, I /*, J */ ](parameter: Parameter[S /*, J */ ]): JsValue = {
     val result: (JsString, JsValue) = parameter match {
-      case i: ChoiceParameter => (JsString(choiceType), choiceParameterFormat.write(i))
-      case i: GParam[_]       => (JsString(i.keyType.entryName), i.toJson)
+      case i: GParam[_] => (JsString(i.keyType.entryName), i.toJson)
     }
     JsObject("type" -> result._1, "parameter" -> result._2)
   }
@@ -109,9 +104,8 @@ trait JsonSupport extends DefaultJsonProtocol {
   def readParameterAndType(json: JsValue): Parameter[_ /*, _ */ ] = json match {
     case JsObject(fields) =>
       (fields("type"), fields("parameter")) match {
-        case (JsString(`choiceType`), parameter) => choiceParameterFormat.read(parameter)
-        case (JsString(name), parameter)         => KeyType.withName(name).paramFormat.read(parameter)
-        case _                                   => unexpectedJsValueError(json)
+        case (JsString(name), parameter) => KeyType.withName(name).paramFormat.read(parameter)
+        case _                           => unexpectedJsValueError(json)
       }
     case _ => unexpectedJsValueError(json)
   }

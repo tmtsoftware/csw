@@ -6,7 +6,8 @@ import csw.param.Parameters.{CommandInfo, Prefix, Setup}
 import csw.param.StateVariable.CurrentState
 import csw.param.UnitsOfMeasure.encoder
 import csw.param._
-import csw.param.parameters.{Choice, ChoiceKey, KeyType}
+import csw.param.parameters.KeyType.ChoiceKey
+import csw.param.parameters.{Choice, KeyType}
 
 object TromboneHcdState {
   val tromboneConfigFile = new File("trombone/tromboneHCD.conf")
@@ -26,7 +27,7 @@ object TromboneHcdState {
   val AXIS_IDLE                   = Choice(AxisState.AXIS_IDLE.toString)
   val AXIS_MOVING                 = Choice(AxisState.AXIS_MOVING.toString)
   val AXIS_ERROR                  = Choice(AxisState.AXIS_ERROR.toString)
-  val stateKey                    = ChoiceKey("axisState", AXIS_IDLE, AXIS_MOVING, AXIS_ERROR)
+  val stateKey                    = ChoiceKey.make("axisState", AXIS_IDLE, AXIS_MOVING, AXIS_ERROR)
   val positionKey                 = KeyType.IntKey.make("position")
   val positionUnits: encoder.type = encoder
   val inLowLimitKey               = KeyType.BooleanKey.make("lowLimit")
