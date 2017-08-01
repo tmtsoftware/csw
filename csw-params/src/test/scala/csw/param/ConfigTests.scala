@@ -3,7 +3,7 @@ package csw.param
 import csw.param.Events.StatusEvent
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
-import csw.param.parameters.KeyType.{ByteMatrixKey, IntMatrixKey}
+import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, IntMatrixKey}
 import csw.param.parameters._
 import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
@@ -637,11 +637,11 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based double matrix equality") {
-    val k1 = DoubleMatrixKey("myMatrix")
-    val m1 = DoubleMatrix(Array(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12)))
-    val m2 = DoubleMatrix(Array(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12)))
-    val m3 = DoubleMatrix(Array(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](0, 6, 12))) // Note one value different
-    val m4 = DoubleMatrix(Array(Array[Double](1, 0, 0), Array[Double](0, 1, 0), Array[Double](0, 0, 1)))
+    val k1 = DoubleMatrixKey.make("myMatrix")
+    val m1 = GMatrix.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12))
+    val m2 = GMatrix.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12))
+    val m3 = GMatrix.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](0, 6, 12)) // Note one value different
+    val m4 = GMatrix.fromArrays(Array[Double](1, 0, 0), Array[Double](0, 1, 0), Array[Double](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)

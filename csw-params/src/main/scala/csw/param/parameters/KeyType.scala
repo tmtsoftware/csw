@@ -37,8 +37,9 @@ object KeyType extends DefaultJsonProtocol with JavaFormats with Enum[KeyType[_]
   case object LongArrayKey   extends KeyType[GArray[Long]]
   case object ShortArrayKey  extends KeyType[GArray[Short]]
 
-  case object IntMatrixKey  extends KeyType[GMatrix[Int]]
-  case object ByteMatrixKey extends KeyType[GMatrix[Byte]]
+  case object IntMatrixKey    extends KeyType[GMatrix[Int]]
+  case object ByteMatrixKey   extends KeyType[GMatrix[Byte]]
+  case object DoubleMatrixKey extends KeyType[GMatrix[Double]]
 
   case object JIntKey     extends KeyType[java.lang.Integer]
   case object JBooleanKey extends KeyType[java.lang.Boolean]
@@ -55,8 +56,9 @@ object KeyType extends DefaultJsonProtocol with JavaFormats with Enum[KeyType[_]
   case object JLongArrayKey   extends KeyType[GArray[java.lang.Long]]
   case object JShortArrayKey  extends KeyType[GArray[java.lang.Short]]
 
-  case object JIntMatrixKey  extends KeyType[GArray[Array[java.lang.Integer]]]
-  case object JByteMatrixKey extends KeyType[GArray[Array[java.lang.Byte]]]
+  case object JIntMatrixKey    extends KeyType[GArray[Array[java.lang.Integer]]]
+  case object JByteMatrixKey   extends KeyType[GArray[Array[java.lang.Byte]]]
+  case object JDoubleMatrixKey extends KeyType[GMatrix[java.lang.Double]]
 
   implicit def format[T]: JsonFormat[KeyType[T]] = EnumJsonSupport.format[KeyType, T](this)
 }

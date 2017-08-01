@@ -18,14 +18,13 @@ object JsonSupport extends JsonSupport
 trait JsonSupport extends DefaultJsonProtocol {
 
   // JSON formats
-  implicit val doubleMatrixParameterFormat = jsonFormat3(DoubleMatrixParameter.apply)
-  implicit val floatMatrixParameterFormat  = jsonFormat3(FloatMatrixParameter.apply)
-  implicit val shortMatrixParameterFormat  = jsonFormat3(ShortMatrixParameter.apply)
-  implicit val longMatrixParameterFormat   = jsonFormat3(LongMatrixParameter.apply)
-  implicit val choiceFormat                = jsonFormat1(Choice.apply)
-  implicit val choicesFormat               = jsonFormat1(Choices.apply)
-  implicit val choiceParameterFormat       = jsonFormat4(ChoiceParameter.apply)
-  implicit val structParameterFormat       = jsonFormat3(StructParameter.apply)
+  implicit val floatMatrixParameterFormat = jsonFormat3(FloatMatrixParameter.apply)
+  implicit val shortMatrixParameterFormat = jsonFormat3(ShortMatrixParameter.apply)
+  implicit val longMatrixParameterFormat  = jsonFormat3(LongMatrixParameter.apply)
+  implicit val choiceFormat               = jsonFormat1(Choice.apply)
+  implicit val choicesFormat              = jsonFormat1(Choices.apply)
+  implicit val choiceParameterFormat      = jsonFormat4(ChoiceParameter.apply)
+  implicit val structParameterFormat      = jsonFormat3(StructParameter.apply)
 
   implicit def structFormat: JsonFormat[Struct] = new JsonFormat[Struct] {
     def write(s: Struct): JsValue = JsObject(
@@ -88,7 +87,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   implicit val eventInfoFormat       = jsonFormat4(EventInfo.apply)
 
   // JSON type tags
-  private val doubleMatrixType    = classOf[DoubleMatrixParameter].getSimpleName
   private val floatMatrixType     = classOf[FloatMatrixParameter].getSimpleName
   private val shortMatrixType     = classOf[ShortMatrixParameter].getSimpleName
   private val longMatrixType      = classOf[LongMatrixParameter].getSimpleName
@@ -111,13 +109,12 @@ trait JsonSupport extends DefaultJsonProtocol {
   // XXX TODO Use JNumber?
   def writeParameter[S, I /*, J */ ](parameter: Parameter[S /*, J */ ]): JsValue = {
     val result: (JsString, JsValue) = parameter match {
-      case i: DoubleMatrixParameter => (JsString(doubleMatrixType), doubleMatrixParameterFormat.write(i))
-      case i: FloatMatrixParameter  => (JsString(floatMatrixType), floatMatrixParameterFormat.write(i))
-      case i: ShortMatrixParameter  => (JsString(shortMatrixType), shortMatrixParameterFormat.write(i))
-      case i: LongMatrixParameter   => (JsString(longMatrixType), longMatrixParameterFormat.write(i))
-      case i: ChoiceParameter       => (JsString(choiceType), choiceParameterFormat.write(i))
-      case i: StructParameter       => (JsString(structParameterType), structParameterFormat.write(i))
-      case i: GParam[_]             => (JsString(i.key.keyType.entryName), i.toJson)
+      case i: FloatMatrixParameter => (JsString(floatMatrixType), floatMatrixParameterFormat.write(i))
+      case i: ShortMatrixParameter => (JsString(shortMatrixType), shortMatrixParameterFormat.write(i))
+      case i: LongMatrixParameter  => (JsString(longMatrixType), longMatrixParameterFormat.write(i))
+      case i: ChoiceParameter      => (JsString(choiceType), choiceParameterFormat.write(i))
+      case i: StructParameter      => (JsString(structParameterType), structParameterFormat.write(i))
+      case i: GParam[_]            => (JsString(i.key.keyType.entryName), i.toJson)
     }
     JsObject("type" -> result._1, "parameter" -> result._2)
   }
@@ -125,7 +122,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   def readParameterAndType(json: JsValue): Parameter[_ /*, _ */ ] = json match {
     case JsObject(fields) =>
       (fields("type"), fields("parameter")) match {
-        case (JsString(`doubleMatrixType`), parameter)    => doubleMatrixParameterFormat.read(parameter)
         case (JsString(`floatMatrixType`), parameter)     => floatMatrixParameterFormat.read(parameter)
         case (JsString(`shortMatrixType`), parameter)     => shortMatrixParameterFormat.read(parameter)
         case (JsString(`longMatrixType`), parameter)      => longMatrixParameterFormat.read(parameter)

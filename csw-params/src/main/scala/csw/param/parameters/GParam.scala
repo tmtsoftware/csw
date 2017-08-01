@@ -104,7 +104,9 @@ object GArray extends WrappedArrayProtocol with DefaultJsonProtocol {
   def fromArray[T: ClassTag](xs: T*): GArray[T] = new GArray(xs.toArray[T])
 }
 
-case class GMatrix[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])
+case class GMatrix[T](data: mutable.WrappedArray[mutable.WrappedArray[T]]) {
+  def apply(row: Int, col: Int): T = data(row)(col)
+}
 
 object GMatrix extends WrappedArrayProtocol with DefaultJsonProtocol {
   implicit def format[T: JsonFormat: ClassTag]: JsonFormat[GMatrix[T]] =

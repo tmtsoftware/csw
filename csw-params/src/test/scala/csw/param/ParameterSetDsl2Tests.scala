@@ -2,8 +2,8 @@ package csw.param
 
 import csw.param.ParameterSetDsl._
 import csw.param.Parameters.CommandInfo
-import csw.param.parameters.KeyType
-import csw.param.parameters.matrices.{DoubleMatrix, DoubleMatrixKey}
+import csw.param.parameters.{GMatrix, KeyType}
+import csw.param.parameters.KeyType.DoubleMatrixKey
 import org.scalatest.FunSpec
 
 /**
@@ -17,7 +17,7 @@ class ParameterSetDsl2Tests extends FunSpec {
     val k1 = KeyType.IntKey.make("itest")
     val k2 = KeyType.DoubleKey.make("dtest")
     val k3 = KeyType.StringKey.make("stest")
-    val k4 = DoubleMatrixKey("myMatrix")
+    val k4 = DoubleMatrixKey.make("myMatrix")
 
     val i1 = set(k1, 1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
@@ -47,7 +47,7 @@ class ParameterSetDsl2Tests extends FunSpec {
     }
 
     it("should support key -> value syntax for building configs") {
-      val dm1 = DoubleMatrix(Array(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12)))
+      val dm1 = GMatrix.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12))
       val setupConfig1 = setup(
         commandInfo,
         "test",
