@@ -1,6 +1,6 @@
 package csw.trombone.assembly
 
-import csw.param.parameters.GParam
+import csw.param.parameters.Parameter
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 
 /**
@@ -23,7 +23,7 @@ object Algorithms {
    * @param zenithAngle DoubleParameter that contains zenith angle
    * @return true if valid else false
    */
-  def verifyZenithAngle(zenithAngle: GParam[Double]): Boolean = zenithAngle.head < 90.0 && zenithAngle.head >= 0.0
+  def verifyZenithAngle(zenithAngle: Parameter[Double]): Boolean = zenithAngle.head < 90.0 && zenithAngle.head >= 0.0
 
   /**
    * Checking the input focus error against fake limits of +/- 20
@@ -31,7 +31,7 @@ object Algorithms {
    * @param focusError DoubleParameter that contains focusError
    * @return true if valid else false
    */
-  def verifyFocusError(calculationConfig: TromboneCalculationConfig, focusError: GParam[Double]): Boolean =
+  def verifyFocusError(calculationConfig: TromboneCalculationConfig, focusError: Parameter[Double]): Boolean =
     focusError.head >= calculationConfig.lowerFocusLimit && focusError.head <= calculationConfig.upperFocusLimit
 
   def zenithAngleToRangeDistance(elevation: Double, zenithAngle: Double): Double =

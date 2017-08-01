@@ -75,7 +75,7 @@ class ItemsTests extends FunSpec with Matchers {
     val lk  = KeyType.ByteArrayKey.make(s1)
 
     it("should test single item") {
-      val di: GParam[GArray[Byte]] = lk.set(la1)
+      val di: Parameter[GArray[Byte]] = lk.set(la1)
       di.values should equal(Vector(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
@@ -84,7 +84,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Vector(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2: GParam[GArray[Byte]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2: Parameter[GArray[Byte]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
@@ -106,7 +106,7 @@ class ItemsTests extends FunSpec with Matchers {
     }
 
     it("should test using var args") {
-      val li3: GParam[GArray[Byte]] = lk.set(la1, la2)
+      val li3: Parameter[GArray[Byte]] = lk.set(la1, la2)
       li3.value(1) should equal(la2)
       li3.values should equal(listIn)
 
@@ -114,7 +114,7 @@ class ItemsTests extends FunSpec with Matchers {
       val b: Array[Byte] = Array[Byte](10, 20, 30)
       val c: Array[Byte] = Array[Byte](100, 101, 102)
 
-      val li4: GParam[GArray[Byte]] = lk.set(a, b, c).withUnits(meters)
+      val li4: Parameter[GArray[Byte]] = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
       li4.value(2) should equal(GArray(c))
     }
@@ -647,7 +647,7 @@ class ItemsTests extends FunSpec with Matchers {
     val lk: Key[GArray[Long]] = KeyType.LongArrayKey.make(s1)
 
     it("should test single item") {
-      val di: GParam[GArray[Long]] = lk.set(la1)
+      val di: Parameter[GArray[Long]] = lk.set(la1)
       di.values should equal(Vector(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
@@ -656,7 +656,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Vector(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2: GParam[GArray[Long]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2: Parameter[GArray[Long]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
@@ -678,7 +678,7 @@ class ItemsTests extends FunSpec with Matchers {
     }
 
     it("should test using var args") {
-      val li3: GParam[GArray[Long]] = lk.set(la1, la2)
+      val li3: Parameter[GArray[Long]] = lk.set(la1, la2)
       li3.value(1) should equal(la2)
       li3.values should equal(listIn)
 
@@ -686,7 +686,7 @@ class ItemsTests extends FunSpec with Matchers {
       val b: Array[Long] = Array(10, 20, 30)
       val c: Array[Long] = Array(100, 200, 300)
 
-      val li4: GParam[GArray[Long]] = lk.set(a, b, c).withUnits(meters)
+      val li4: Parameter[GArray[Long]] = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
       li4.value(2) should equal(GArray(c))
     }

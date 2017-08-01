@@ -9,13 +9,13 @@ import csw.trombone.assembly.FollowCommandMessages.{UpdateNssInUse, UpdateTrombo
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.{FollowActor, TromboneControl}
 import csw.common.framework.models.RunningHcdMsg.Submit
-import csw.param.parameters.GParam
+import csw.param.parameters.Parameter
 
 object FollowCommand {
 
   def make(assemblyContext: AssemblyContext,
-           initialElevation: GParam[Double],
-           nssInUse: GParam[Boolean],
+           initialElevation: Parameter[Double],
+           nssInUse: Parameter[Boolean],
            tromboneHCD: Option[ActorRef[Submit]],
            eventPublisher: Option[ActorRef[TrombonePublisherMsg]]): Behavior[FollowCommandMessages] =
     Actor.mutable(
@@ -24,8 +24,8 @@ object FollowCommand {
 }
 
 class FollowCommand(ac: AssemblyContext,
-                    initialElevation: GParam[Double],
-                    val nssInUseIn: GParam[Boolean],
+                    initialElevation: Parameter[Double],
+                    val nssInUseIn: Parameter[Boolean],
                     val tromboneHCDIn: Option[ActorRef[Submit]],
                     eventPublisher: Option[ActorRef[TrombonePublisherMsg]],
                     ctx: ActorContext[FollowCommandMessages])
@@ -39,7 +39,7 @@ class FollowCommand(ac: AssemblyContext,
     "FollowActor"
   )
 
-  val nssInUse: GParam[Boolean] = nssInUseIn
+  val nssInUse: Parameter[Boolean] = nssInUseIn
 
   var tromboneHCD: Option[ActorRef[Submit]] = tromboneHCDIn
 

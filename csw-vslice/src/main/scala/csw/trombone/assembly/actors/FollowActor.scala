@@ -4,7 +4,7 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.param.Events.EventTime
-import csw.param.parameters.GParam
+import csw.param.parameters.Parameter
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.FollowActorMessages.{SetElevation, SetZenithAngle, StopFollowing, UpdatedEventData}
 import csw.trombone.assembly.TromboneControlMsg.GoToStagePosition
@@ -14,8 +14,8 @@ import csw.trombone.assembly._
 object FollowActor {
   def make(
       ac: AssemblyContext,
-      initialElevation: GParam[Double],
-      inNSSMode: GParam[Boolean],
+      initialElevation: Parameter[Double],
+      inNSSMode: Parameter[Boolean],
       tromboneControl: Option[ActorRef[TromboneControlMsg]],
       aoPublisher: Option[ActorRef[TrombonePublisherMsg]],
       engPublisher: Option[ActorRef[TrombonePublisherMsg]]
@@ -28,8 +28,8 @@ object FollowActor {
 class FollowActor(
     ctx: ActorContext[FollowActorMessages],
     ac: AssemblyContext,
-    val initialElevation: GParam[Double],
-    val inNSSMode: GParam[Boolean],
+    val initialElevation: Parameter[Double],
+    val inNSSMode: Parameter[Boolean],
     val tromboneControl: Option[ActorRef[TromboneControlMsg]],
     val aoPublisher: Option[ActorRef[TrombonePublisherMsg]],
     val engPublisher: Option[ActorRef[TrombonePublisherMsg]]
@@ -41,13 +41,13 @@ class FollowActor(
   val calculationConfig: TromboneCalculationConfig = ac.calculationConfig
   val controlConfig: TromboneControlConfig         = ac.controlConfig
 
-  val initialFocusError: GParam[Double]  = focusErrorKey  -> 0.0 withUnits focusErrorUnits
-  val initialZenithAngle: GParam[Double] = zenithAngleKey -> 0.0 withUnits zenithAngleUnits
-  val nSSModeZenithAngle: GParam[Double] = zenithAngleKey -> 0.0 withUnits zenithAngleUnits
+  val initialFocusError: Parameter[Double]  = focusErrorKey  -> 0.0 withUnits focusErrorUnits
+  val initialZenithAngle: Parameter[Double] = zenithAngleKey -> 0.0 withUnits zenithAngleUnits
+  val nSSModeZenithAngle: Parameter[Double] = zenithAngleKey -> 0.0 withUnits zenithAngleUnits
 
-  var cElevation: GParam[Double]   = initialElevation
-  var cFocusError: GParam[Double]  = initialFocusError
-  var cZenithAngle: GParam[Double] = initialZenithAngle
+  var cElevation: Parameter[Double]   = initialElevation
+  var cFocusError: Parameter[Double]  = initialFocusError
+  var cZenithAngle: Parameter[Double] = initialZenithAngle
 
   override def onMessage(msg: FollowActorMessages): Behavior[FollowActorMessages] = msg match {
 
@@ -93,9 +93,9 @@ class FollowActor(
   }
 
   def calculateNewTrombonePosition(calculationConfig: TromboneCalculationConfig,
-                                   elevationIn: GParam[Double],
-                                   focusErrorIn: GParam[Double],
-                                   zenithAngleIn: GParam[Double]): GParam[Double] = {
+                                   elevationIn: Parameter[Double],
+                                   focusErrorIn: Parameter[Double],
+                                   zenithAngleIn: Parameter[Double]): Parameter[Double] = {
     val totalRangeDistance =
       focusZenithAngleToRangeDistance(calculationConfig, elevationIn.head, focusErrorIn.head, zenithAngleIn.head)
 
@@ -103,15 +103,17 @@ class FollowActor(
     spos(stagePosition)
   }
 
-  def sendTrombonePosition(controlConfig: TromboneControlConfig, stagePosition: GParam[Double]): Unit = {
+  def sendTrombonePosition(controlConfig: TromboneControlConfig, stagePosition: Parameter[Double]): Unit = {
     tromboneControl.foreach(_ ! GoToStagePosition(stagePosition))
   }
 
-  def sendAOESWUpdate(elevationItem: GParam[Double], rangeItem: GParam[Double]): Unit = {
+  def sendAOESWUpdate(elevationItem: Parameter[Double], rangeItem: Parameter[Double]): Unit = {
     aoPublisher.foreach(_ ! AOESWUpdate(elevationItem, rangeItem))
   }
 
-  def sendEngrUpdate(focusError: GParam[Double], trombonePosition: GParam[Double], zenithAngle: GParam[Double]): Unit = {
+  def sendEngrUpdate(focusError: Parameter[Double],
+                     trombonePosition: Parameter[Double],
+                     zenithAngle: Parameter[Double]): Unit = {
     engPublisher.foreach(_ ! EngrUpdate(focusError, trombonePosition, zenithAngle))
   }
 }

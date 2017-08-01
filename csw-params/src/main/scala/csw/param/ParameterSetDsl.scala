@@ -3,7 +3,7 @@ package csw.param
 import csw.param.Events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
-import csw.param.parameters.{GParam, Key, Parameter}
+import csw.param.parameters.{Key, Parameter}
 
 /**
  * Defines a Scala DSL for dealing with configurations.
@@ -87,7 +87,7 @@ object ParameterSetDsl {
    * @param key the key of the parameter that is needed
    * @return returns the parameter itself or the NoSuchElementException if the key is not present
    */
-  def parameter[S, T <: ParameterSetType[T]](sc: T, key: Key[S]): GParam[S] = sc.parameter(key)
+  def parameter[S, T <: ParameterSetType[T]](sc: T, key: Key[S]): Parameter[S] = sc.parameter(key)
 
   /**
    * Find the parameter in the configuraiton and return as Option with the parameter
@@ -96,7 +96,7 @@ object ParameterSetDsl {
    * @param key the key of the parameter that is needed
    * @return the parameter as an Option or None if the parameter is not found
    */
-  def get[S, T <: ParameterSetType[T]](sc: T, key: Key[S]): Option[GParam[S]] = sc.get(key)
+  def get[S, T <: ParameterSetType[T]](sc: T, key: Key[S]): Option[Parameter[S]] = sc.get(key)
 
   /**
    * Finds a parameter and returns the value at an index as an Option
@@ -144,7 +144,7 @@ object ParameterSetDsl {
    * @param parameter the parameter with the needed values
    * @return all of the values for the parameter as a Vector
    */
-  def values[S](parameter: Parameter[S]): Vector[S] = parameter.values
+  def values[S](parameter: Parameter[S]): Vector[S] = parameter.values.toVector
 
   /**
    * Create a parameter by setting a key with a Vector of values associated with the key
@@ -154,7 +154,7 @@ object ParameterSetDsl {
    * @param units optional units for the parameter
    * @return a new parameter of the type associated with the key
    */
-  def vset[S](key: Key[S], v: Vector[S], units: Units = NoUnits): GParam[S] = key.set(v, units)
+  def vset[S](key: Key[S], v: Vector[S], units: Units = NoUnits): Parameter[S] = key.set(v, units)
 
   /**
    * Create a parameter by settign a key with one or more values associated with the key
@@ -163,7 +163,7 @@ object ParameterSetDsl {
    * @param v   a varargs argument with one or more values of the parameter's type
    * @return a new parameter of the type associated with the key
    */
-  def set[S](key: Key[S], v: S*): GParam[S] = key.set(v: _*)
+  def set[S](key: Key[S], v: S*): Parameter[S] = key.set(v: _*)
 
   /**
    * Create a Setup with a number of parameters

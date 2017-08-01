@@ -15,15 +15,15 @@ public class JParameterTest {
         String encoder = "encoder";
 
         Key<Boolean> key = JKeyTypes.BooleanKey().make(encoder);
-        GParam<Boolean> param = key.set(true, false);
+        Parameter<Boolean> parameter = key.set(true, false);
 
         Vector<Boolean> booleanVector = new Vector<Boolean>();
         booleanVector.add(true);
         booleanVector.add(false);
 
-        JsValue jsValue = param.toJson();
-        GParam<Boolean> booleanGParam = jsValue.convertTo(TestJavaFormats.dd());
-        Assert.assertEquals(param, booleanGParam);
+        JsValue jsValue = parameter.toJson();
+        Parameter<Boolean> booleanParameter = jsValue.convertTo(TestJavaFormats.dd());
+        Assert.assertEquals(parameter, booleanParameter);
     }
 
     @Test
@@ -32,7 +32,7 @@ public class JParameterTest {
 
         GArray<Integer> gArray = GArray.fromArray(array);
         Key<GArray<Integer>> arrayKey = JKeyTypes.IntArrayKey().make("arrayKey");
-        GParam<GArray<Integer>> arrayGParam = arrayKey.set(gArray);
+        Parameter<GArray<Integer>> arrayParameter = arrayKey.set(gArray);
 
 //        Assert.assertEquals(arrayGParam.values(),
     }

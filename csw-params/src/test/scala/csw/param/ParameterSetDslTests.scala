@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import csw.param.ParameterSetDsl._
 import csw.param.Parameters.{CommandInfo, Setup}
 import csw.param.parameters.KeyType.LongMatrixKey
-import csw.param.parameters.{GArray, GMatrix, GParam, KeyType}
+import csw.param.parameters.{GArray, GMatrix, KeyType, Parameter}
 
 /**
  * Tests the config DSL
@@ -28,7 +28,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
 
     it("should work to gset single items") {
       val i1 = set(k1, 2)
-      i1 shouldBe an[GParam[Int]]
+      i1 shouldBe an[Parameter[Int]]
       ssize(i1) should equal(1)
       units(i1) should be(NoUnits)
     }
@@ -40,7 +40,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
 
     it("should work with units too") {
       val i1 = set(detectorTemp, 100.0).withUnits(degrees)
-      i1 shouldBe an[GParam[Double]]
+      i1 shouldBe an[Parameter[Double]]
       ssize(i1) shouldBe 1
       units(i1) should be(degrees)
     }

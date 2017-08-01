@@ -16,7 +16,7 @@ private[param] object JavaHelpers {
     x.foldLeft(sc)((r, i) => r.add(i))
   }
 
-  def jget[S, T <: ParameterSetType[T]](sc: T, key: Key[S]): java.util.Optional[GParam[S]] =
+  def jget[S, T <: ParameterSetType[T]](sc: T, key: Key[S]): java.util.Optional[Parameter[S]] =
     sc.get(key).asJava
 
   def jget[S, I <: Parameter[S], T <: ParameterSetType[T], J](sc: T, key: Key[S], index: Int): java.util.Optional[J] = {

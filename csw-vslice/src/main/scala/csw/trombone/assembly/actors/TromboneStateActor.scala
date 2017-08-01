@@ -21,7 +21,7 @@ object TromboneStateActor {
   val cmdDefault                     = cmdItem(cmdUninitialized)
   def cmd(ts: TromboneState): Choice = ts.cmd.head
 
-  def cmdItem(ch: Choice): GParam[Choice] = cmdKey.set(ch)
+  def cmdItem(ch: Choice): Parameter[Choice] = cmdKey.set(ch)
 
   val moveUnindexed                   = Choice("unindexed")
   val moveIndexing                    = Choice("indexing")
@@ -31,26 +31,26 @@ object TromboneStateActor {
   val moveDefault                     = moveItem(moveUnindexed)
   def move(ts: TromboneState): Choice = ts.move.head
 
-  def moveItem(ch: Choice): GParam[Choice] = moveKey.set(ch)
+  def moveItem(ch: Choice): Parameter[Choice] = moveKey.set(ch)
 
   def sodiumKey                               = KeyType.BooleanKey.make("sodiumLayer")
   val sodiumLayerDefault                      = sodiumItem(false)
   def sodiumLayer(ts: TromboneState): Boolean = ts.sodiumLayer.head
 
-  def sodiumItem(flag: Boolean): GParam[Boolean] = sodiumKey.set(flag)
+  def sodiumItem(flag: Boolean): Parameter[Boolean] = sodiumKey.set(flag)
 
   def nssKey                          = KeyType.BooleanKey.make("nss")
   val nssDefault                      = nssItem(false)
   def nss(ts: TromboneState): Boolean = ts.nss.head
 
-  def nssItem(flag: Boolean): GParam[Boolean] = nssKey.set(flag)
+  def nssItem(flag: Boolean): Parameter[Boolean] = nssKey.set(flag)
 
   val defaultTromboneState = TromboneState(cmdDefault, moveDefault, sodiumLayerDefault, nssDefault)
 
-  case class TromboneState(cmd: GParam[Choice],
-                           move: GParam[Choice],
-                           sodiumLayer: GParam[Boolean],
-                           nss: GParam[Boolean])
+  case class TromboneState(cmd: Parameter[Choice],
+                           move: Parameter[Choice],
+                           sodiumLayer: Parameter[Boolean],
+                           nss: Parameter[Boolean])
 
   sealed trait TromboneStateMsg
 
@@ -58,10 +58,10 @@ object TromboneStateActor {
 
   object SetState {
 
-    def apply(cmd: GParam[Choice],
-              move: GParam[Choice],
-              sodiumLayer: GParam[Boolean],
-              nss: GParam[Boolean],
+    def apply(cmd: Parameter[Choice],
+              move: Parameter[Choice],
+              sodiumLayer: Parameter[Boolean],
+              nss: Parameter[Boolean],
               replyTo: ActorRef[StateWasSet]): SetState = SetState(TromboneState(cmd, move, sodiumLayer, nss), replyTo)
 
     def apply(cmd: Choice, move: Choice, sodiumLayer: Boolean, nss: Boolean, replyTo: ActorRef[StateWasSet]): SetState =

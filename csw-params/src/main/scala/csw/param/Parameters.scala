@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.parameters.{GParam, Key, Parameter}
+import csw.param.parameters.{Key, Parameter}
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -132,7 +132,7 @@ object Parameters {
      * @return the parameter for the key, if found
      * @tparam S the Scala value type
      */
-    def get[S](key: Key[S]): Option[GParam[S]] = getByKeyname[GParam[S]](paramSet, key.keyName)
+    def get[S](key: Key[S]): Option[Parameter[S]] = getByKeyname[Parameter[S]](paramSet, key.keyName)
 
     /**
      * Returns an Option with the parameter for the key if found, otherwise None. Access with keyname rather
@@ -152,7 +152,7 @@ object Parameters {
      * @tparam S the Scala value type
      * @return the parameter associated with the Key or a NoSuchElementException if the key does not exist
      */
-    final def apply[S](key: Key[S]): GParam[S] = get(key).get
+    final def apply[S](key: Key[S]): Parameter[S] = get(key).get
 
     /**
      * Returns the actual parameter associated with a key
@@ -161,7 +161,7 @@ object Parameters {
      * @tparam S the Scala value type
      * @return the parameter associated with the key or a NoSuchElementException if the key does not exist
      */
-    final def parameter[S](key: Key[S]): GParam[S] = get(key).get
+    final def parameter[S](key: Key[S]): Parameter[S] = get(key).get
 
     /**
      * Returns true if the key exists in the parameter gset

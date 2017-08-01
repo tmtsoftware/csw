@@ -3,7 +3,7 @@ package csw.trombone.assembly.actors
 import akka.typed.Behavior
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.param.parameters.{Choice, GParam}
+import csw.param.parameters.{Choice, Parameter}
 import csw.trombone.assembly.TrombonePublisherMsg._
 import csw.trombone.assembly.{AssemblyContext, TrombonePublisherMsg}
 
@@ -46,7 +46,7 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 
   }
 
-  private def publishAOESW(elevationItem: GParam[Double], rangeItem: GParam[Double]) = {
+  private def publishAOESW(elevationItem: Parameter[Double], rangeItem: Parameter[Double]) = {
 //    val se = SystemEvent(aoSystemEventPrefix).madd(elevationItem, rangeItem)
 //    eventService.foreach(_.publish(se).onComplete {
 //      case Failure(ex) => log.error("TrombonePublisher failed to publish AO system event: $se", ex)
@@ -54,7 +54,9 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 //    })
   }
 
-  private def publishEngr(rtcFocusError: GParam[Double], stagePosition: GParam[Double], zenithAngle: GParam[Double]) = {
+  private def publishEngr(rtcFocusError: Parameter[Double],
+                          stagePosition: Parameter[Double],
+                          zenithAngle: Parameter[Double]) = {
 //    val ste = StatusEvent(engStatusEventPrefix).madd(rtcFocusError, stagePosition, zenithAngle)
 //    telemetryService.foreach(_.publish(ste).onComplete {
 //      case Failure(ex) => log.error(s"TrombonePublisher failed to publish engr event: $ste", ex)
@@ -71,12 +73,12 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 //    })
   }
 
-  private def publishAxisState(axisName: GParam[String],
-                               position: GParam[Int],
-                               state: GParam[Choice],
-                               inLowLimit: GParam[Boolean],
-                               inHighLimit: GParam[Boolean],
-                               inHome: GParam[Boolean]) = {
+  private def publishAxisState(axisName: Parameter[String],
+                               position: Parameter[Int],
+                               state: Parameter[Choice],
+                               inLowLimit: Parameter[Boolean],
+                               inHighLimit: Parameter[Boolean],
+                               inHome: Parameter[Boolean]) = {
 //    val ste = StatusEvent(axisStateEventPrefix).madd(axisName, position, state, inLowLimit, inHighLimit, inHome)
 //    log.debug(s"Axis state publish of $axisStateEventPrefix: $ste")
 //    telemetryService.foreach(_.publish(ste).onComplete {
@@ -85,14 +87,14 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 //    })
   }
 
-  def publishAxisStats(axisName: GParam[String],
-                       datumCount: GParam[Int],
-                       moveCount: GParam[Int],
-                       homeCount: GParam[Int],
-                       limitCount: GParam[Int],
-                       successCount: GParam[Int],
-                       failureCount: GParam[Int],
-                       cancelCount: GParam[Int]): Unit = {
+  def publishAxisStats(axisName: Parameter[String],
+                       datumCount: Parameter[Int],
+                       moveCount: Parameter[Int],
+                       homeCount: Parameter[Int],
+                       limitCount: Parameter[Int],
+                       successCount: Parameter[Int],
+                       failureCount: Parameter[Int],
+                       cancelCount: Parameter[Int]): Unit = {
 //    val ste = StatusEvent(axisStatsEventPrefix).madd(axisName,
 //                                                     datumCount,
 //                                                     moveCount,

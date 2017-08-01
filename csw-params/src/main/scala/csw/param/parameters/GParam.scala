@@ -1,82 +1,28 @@
 package csw.param.parameters
 
-import csw.param.UnitsOfMeasure.{NoUnits, Units}
-import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat, RootJsonFormat}
+import csw.param.UnitsOfMeasure.Units
+import spray.json.{pimpAny, DefaultJsonProtocol, JsValue, JsonFormat}
 
 import scala.collection.immutable.Vector
 import scala.collection.mutable
+import scala.language.implicitConversions
 import scala.reflect.ClassTag
-import language.implicitConversions
-
-object GParam extends DefaultJsonProtocol {
-
-  private[parameters] def apply[S: JsonFormat: ClassTag](
-      keyName: String,
-      keyType: KeyType[S],
-      items: mutable.WrappedArray[S],
-      units: Units
-  ): GParam[S] =
-    new GParam(keyName, keyType, items, units)
-
-  implicit def parameterFormat[T: JsonFormat: ClassTag]: RootJsonFormat[GParam[T]] = new RootJsonFormat[GParam[T]] {
-    override def write(obj: GParam[T]): JsValue = {
-      JsObject(
-        "keyName" -> obj.keyName.toJson,
-        "keyType" -> obj.keyType.toJson,
-        "items"   -> obj.items.array.toJson,
-        "units"   -> obj.units.toJson
-      )
-    }
-
-    override def read(json: JsValue): GParam[T] = {
-      val fields = json.asJsObject.fields
-      GParam(
-        fields("keyName").convertTo[String],
-        fields("keyType").convertTo[KeyType[T]],
-        fields("items").convertTo[Array[T]],
-        fields("units").convertTo[Units]
-      )
-    }
-  }
-
-  def apply[T](implicit x: JsonFormat[GParam[T]]): JsonFormat[GParam[T]] = x
-}
-
-case class GParam[S] private[param] (keyName: String,
-                                     keyType: KeyType[S],
-                                     items: mutable.WrappedArray[S],
-                                     units: Units)(
-    implicit @transient jsFormat: JsonFormat[S],
-    @transient cTag: ClassTag[S]
-) extends Parameter[S] {
-
-  /**
-   * @return All the values for this parameter
-   */
-  override def values: Vector[S] = items.toVector
-
-  /**
-   * @return a JsValue representing this item
-   */
-  def toJson: JsValue                               = GParam.parameterFormat[S].write(this)
-  override def withUnits(unitsIn: Units): GParam[S] = copy(units = unitsIn)
-}
 
 class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) extends Key[Choice](name, keyType) {
   private def validate(xs: Seq[Choice]) =
     assert(xs.forall(choices.contains), s"Bad choice for key: $keyName which must be one of: $choices")
 
-  override def set(v: Vector[Choice], units: Units): GParam[Choice] = {
+  override def set(v: Vector[Choice], units: Units): Parameter[Choice] = {
     validate(v)
     super.set(v, units)
   }
 
-  override def set(xs: Choice*): GParam[Choice] = {
+  override def set(xs: Choice*): Parameter[Choice] = {
     validate(xs)
     super.set(xs: _*)
   }
 
-  override def gset(v: Array[Choice], units: Units): GParam[Choice] = {
+  override def gset(v: Array[Choice], units: Units): Parameter[Choice] = {
     validate(v)
     super.gset(v, units)
   }

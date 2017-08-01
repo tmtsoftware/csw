@@ -96,7 +96,7 @@ trait JsonSupport extends DefaultJsonProtocol {
   // XXX TODO Use JNumber?
   def writeParameter[S, I /*, J */ ](parameter: Parameter[S /*, J */ ]): JsValue = {
     val result: (JsString, JsValue) = parameter match {
-      case i: GParam[_] => (JsString(i.keyType.entryName), i.toJson)
+      case i: Parameter[_] => (JsString(i.keyType.entryName), i.toJson)
     }
     JsObject("type" -> result._1, "parameter" -> result._2)
   }

@@ -6,7 +6,7 @@ import csw.param.UnitsOfMeasure.{degrees, kilometers, micrometers, millimeters}
 import csw.services.location.models.ComponentId
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.common.framework.models.Component.AssemblyInfo
-import csw.param.parameters.{GParam, KeyType}
+import csw.param.parameters.{KeyType, Parameter}
 
 /**
  * TMT Source Code: 10/4/16.
@@ -83,30 +83,31 @@ case class AssemblyContext(info: AssemblyInfo,
   val focusErrorKey   = KeyType.DoubleKey.make("focus")
   val focusErrorUnits = micrometers
 
-  def fe(error: Double): GParam[Double] = focusErrorKey -> error withUnits focusErrorUnits
+  def fe(error: Double): Parameter[Double] = focusErrorKey -> error withUnits focusErrorUnits
 
   val zenithAngleKey   = KeyType.DoubleKey.make("zenithAngle")
   val zenithAngleUnits = degrees
 
-  def za(angle: Double): GParam[Double] = zenithAngleKey -> angle withUnits zenithAngleUnits
+  def za(angle: Double): Parameter[Double] = zenithAngleKey -> angle withUnits zenithAngleUnits
 
   val naRangeDistanceKey   = KeyType.DoubleKey.make("rangeDistance")
   val naRangeDistanceUnits = kilometers
 
-  def rd(rangedistance: Double): GParam[Double] = naRangeDistanceKey -> rangedistance withUnits naRangeDistanceUnits
+  def rd(rangedistance: Double): Parameter[Double] = naRangeDistanceKey -> rangedistance withUnits naRangeDistanceUnits
 
-  val naElevationKey                                 = KeyType.DoubleKey.make("elevation")
-  val naElevationUnits                               = kilometers
-  def naElevation(elevation: Double): GParam[Double] = naElevationKey -> elevation withUnits naElevationUnits
+  val naElevationKey                                    = KeyType.DoubleKey.make("elevation")
+  val naElevationUnits                                  = kilometers
+  def naElevation(elevation: Double): Parameter[Double] = naElevationKey -> elevation withUnits naElevationUnits
 
-  val initialElevationKey                           = KeyType.DoubleKey.make("initialElevation")
-  val initialElevationUnits                         = kilometers
-  def iElevation(elevation: Double): GParam[Double] = initialElevationKey -> elevation withUnits initialElevationUnits
+  val initialElevationKey   = KeyType.DoubleKey.make("initialElevation")
+  val initialElevationUnits = kilometers
+  def iElevation(elevation: Double): Parameter[Double] =
+    initialElevationKey -> elevation withUnits initialElevationUnits
 
   val stagePositionKey   = KeyType.DoubleKey.make("stagePosition")
   val stagePositionUnits = millimeters
 
-  def spos(pos: Double): GParam[Double] = stagePositionKey -> pos withUnits stagePositionUnits
+  def spos(pos: Double): Parameter[Double] = stagePositionKey -> pos withUnits stagePositionUnits
 
   // ---------- Keys used by TromboneEventSubscriber and Others
   // This is the zenith angle from TCS
@@ -186,7 +187,11 @@ object AssemblyContext {
       val upperFocusLimit         = config.getDouble(s"$prefix.calculation-config.upperFocusLimit")
       val lowerFocusLimit         = config.getDouble(s"$prefix.calculation-config.lowerFocusLimit")
       val zenithFactor            = config.getDouble(s"$prefix.calculation-config.zenithFactor")
-      TromboneCalculationConfig(defaultInitialElevation, focusGainError, upperFocusLimit, lowerFocusLimit, zenithFactor)
+      TromboneCalculationConfig(defaultInitialElevation,
+                                focusGainError,
+                                upperFocusLimit,
+                                lowerFocusLimit,
+                                zenithFactor)
     }
   }
 }

@@ -45,7 +45,7 @@ class JSONTests extends FunSpec {
       val i1 = k1.set('d').withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[GParam[Char]]
+      val in1 = j1.convertTo[Parameter[Char]]
       assert(in1 == i1)
     }
 
@@ -55,7 +55,7 @@ class JSONTests extends FunSpec {
       val i1       = k1.set(s).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[GParam[Short]]
+      val in1 = j1.convertTo[Parameter[Short]]
       assert(in1 == i1)
     }
 
@@ -64,7 +64,7 @@ class JSONTests extends FunSpec {
       val i1 = k1.set(23).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[GParam[Int]]
+      val in1 = j1.convertTo[Parameter[Int]]
       assert(in1 == i1)
     }
 
@@ -73,7 +73,7 @@ class JSONTests extends FunSpec {
       val i1 = k1.set(123456L).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[GParam[Long]]
+      val in1 = j1.convertTo[Parameter[Long]]
       assert(in1 == i1)
     }
 
@@ -82,7 +82,7 @@ class JSONTests extends FunSpec {
       val i1 = k1.set(123.456f).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[GParam[Float]]
+      val in1 = j1.convertTo[Parameter[Float]]
       assert(in1 == i1)
     }
 
@@ -91,7 +91,7 @@ class JSONTests extends FunSpec {
       val i1 = k1.set(123.456).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[GParam[Double]]
+      val in1 = j1.convertTo[Parameter[Double]]
       assert(in1 == i1)
     }
 
@@ -101,13 +101,13 @@ class JSONTests extends FunSpec {
 
       val j1 = i1.toJson
       //      info("j1: " + j1)
-      val in1: GParam[Boolean] = j1.convertTo[GParam[Boolean]]
+      val in1: Parameter[Boolean] = j1.convertTo[Parameter[Boolean]]
       assert(in1 == i1)
 
       val i2 = k1.set(true)
 
       val j2  = i2.toJson
-      val in2 = j2.convertTo[GParam[Boolean]]
+      val in2 = j2.convertTo[Parameter[Boolean]]
       assert(in2 == i2)
     }
 
@@ -116,7 +116,7 @@ class JSONTests extends FunSpec {
       val i1 = k1.set("Blue", "Green").withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[GParam[String]]
+      val in1 = j1.convertTo[Parameter[String]]
       assert(in1 == i1)
     }
   }
@@ -438,10 +438,10 @@ class JSONTests extends FunSpec {
 
   describe("Test Long Array items") {
     it("Should allow long array values") {
-      val k1: Key[GArray[Long]]    = KeyType.LongArrayKey.make("myArray")
-      val m1: GArray[Long]         = GArray(Array(1, 2, 3))
-      val i1: GParam[GArray[Long]] = k1.set(m1)
-      val sc1                      = Setup(commandInfo, ck).add(i1)
+      val k1: Key[GArray[Long]]       = KeyType.LongArrayKey.make("myArray")
+      val m1: GArray[Long]            = GArray(Array(1, 2, 3))
+      val i1: Parameter[GArray[Long]] = k1.set(m1)
+      val sc1                         = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
 
       val sc1out = JsonSupport.writeSequenceCommand(sc1)

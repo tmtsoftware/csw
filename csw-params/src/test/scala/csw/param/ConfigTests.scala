@@ -37,14 +37,14 @@ class ConfigTests extends FunSpec {
     }
 
     it("Should use gset properly") {
-      val i: GParam[Int] = k1.set(22)
+      val i: Parameter[Int] = k1.set(22)
       // Check that name and value are gset
       assert(i.keyName eq s1)
       assert(i.values == Vector(22))
       assert(i.head == 22)
 
       assert(k2.keyName eq s2)
-      val j: GParam[String] = k2.set("Bob").withUnits(UnitsOfMeasure.meters)
+      val j: Parameter[String] = k2.set("Bob").withUnits(UnitsOfMeasure.meters)
       assert(j.values == Vector("Bob"))
       assert(j.units == meters)
     }
@@ -99,8 +99,8 @@ class ConfigTests extends FunSpec {
       var sc1 = Setup(commandInfo, ck1)
       sc1 = sc1.madd(k1.set(22).withUnits(degrees), k2.set("C"))
 
-      val v1: GParam[Int]    = sc1(k1)
-      val v2: GParam[String] = sc1(k2)
+      val v1: Parameter[Int]    = sc1(k1)
+      val v2: Parameter[String] = sc1(k2)
       assert(sc1.get(k1).isDefined)
       assert(sc1.get(k2).isDefined)
       assert(v1.values == Vector(22))
@@ -303,8 +303,8 @@ class ConfigTests extends FunSpec {
     val t1  = KeyType.IntKey.make("test1")
     val sc1 = Setup(commandInfo, ck1).add(t1.set(Vector(22), degrees))
 
-    val item: Option[GParam[Int]] = sc1.get(t1) // Works now!
-    val itm: GParam[Int]          = item.get
+    val item: Option[Parameter[Int]] = sc1.get(t1) // Works now!
+    val itm: Parameter[Int]          = item.get
     assert(itm.units == UnitsOfMeasure.degrees)
     val i: Int = itm(0)
     assert(i == 22)
@@ -326,9 +326,9 @@ class ConfigTests extends FunSpec {
     it("Should get as IntItem") {
       val sc = Setup(commandInfo, ck1).add(i1).add(i2).add(i3)
 
-      val out1: Option[GParam[Int]]    = sc.get(k1)
-      val out2: Option[GParam[Double]] = sc.get(k2)
-      val out3: Option[GParam[String]] = sc.get(k3)
+      val out1: Option[Parameter[Int]]    = sc.get(k1)
+      val out2: Option[Parameter[Double]] = sc.get(k2)
+      val out3: Option[Parameter[String]] = sc.get(k3)
 
       assert(out1.get.values === Vector(1, 2, 3))
       assert(out2.get.values === Vector(1.0, 2.0, 3.0))

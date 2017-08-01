@@ -2,33 +2,54 @@ package csw.param.parameters
 
 import csw.param.UnitsOfMeasure
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
-import spray.json.JsonFormat
+import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat, RootJsonFormat}
 
 import scala.annotation.varargs
 import scala.collection.immutable.Vector
+import scala.collection.mutable
 import scala.reflect.ClassTag
 
-/**
- * The type of a parameter in a parameterSet
- *
- * @tparam S the Scala type
- */
-trait Parameter[S] {
+object Parameter extends DefaultJsonProtocol {
 
-  /**
-   * @return the name of the key for this parameter
-   */
-  def keyName: String
+  private[parameters] def apply[S: JsonFormat: ClassTag](
+      keyName: String,
+      keyType: KeyType[S],
+      items: mutable.WrappedArray[S],
+      units: Units
+  ): Parameter[S] =
+    new Parameter(keyName, keyType, items, units)
 
-  /**
-   * @return the units for the values
-   */
-  def units: Units
+  implicit def parameterFormat[T: JsonFormat: ClassTag]: RootJsonFormat[Parameter[T]] =
+    new RootJsonFormat[Parameter[T]] {
+      override def write(obj: Parameter[T]): JsValue = {
+        JsObject(
+          "keyName" -> obj.keyName.toJson,
+          "keyType" -> obj.keyType.toJson,
+          "values"  -> obj.values.array.toJson,
+          "units"   -> obj.units.toJson
+        )
+      }
 
-  /**
-   * @return All the values for this parameter
-   */
-  def values: Vector[S]
+      override def read(json: JsValue): Parameter[T] = {
+        val fields = json.asJsObject.fields
+        Parameter(
+          fields("keyName").convertTo[String],
+          fields("keyType").convertTo[KeyType[T]],
+          fields("values").convertTo[Array[T]],
+          fields("units").convertTo[Units]
+        )
+      }
+    }
+
+  def apply[T](implicit x: JsonFormat[Parameter[T]]): JsonFormat[Parameter[T]] = x
+}
+
+case class Parameter[S] private[param] (
+    keyName: String,
+    keyType: KeyType[S],
+    values: mutable.WrappedArray[S],
+    units: Units
+)(implicit @transient jsFormat: JsonFormat[S], @transient cTag: ClassTag[S]) {
 
   /**
    * The number of values in this parameter (values.size)
@@ -70,13 +91,14 @@ trait Parameter[S] {
   /**
    * Sets the units for the values
    *
-   * @param units the units for the values
+   * @param unitsIn the units for the values
    * @return a new instance of this parameter with the units gset
    */
-  def withUnits(units: Units): Parameter[S]
+  def withUnits(unitsIn: Units): Parameter[S] = copy(units = unitsIn)
 
   def valuesToString: String = values.mkString("(", ",", ")")
   override def toString      = s"$keyName($valuesToString$units)"
+  def toJson: JsValue        = Parameter.parameterFormat[S].write(this)
 }
 
 case class Key[S] private[parameters] (
@@ -85,7 +107,7 @@ case class Key[S] private[parameters] (
 )(implicit @transient jsFormat: JsonFormat[S], @transient clsTag: ClassTag[S])
     extends Serializable {
 
-  type I = GParam[S]
+  type I = Parameter[S]
 
   def gset(v: Array[S], units: Units = NoUnits): I = set(v.toVector, units)
 
@@ -96,7 +118,7 @@ case class Key[S] private[parameters] (
    * @param units optional units of the values (defaults to no units)
    * @return a parameter containing the key name, values and units
    */
-  def set(v: Vector[S], units: Units = NoUnits): I = GParam(keyName, keyType, v.toArray[S], units)
+  def set(v: Vector[S], units: Units = NoUnits): I = Parameter(keyName, keyType, v.toArray[S], units)
 
   /**
    * Sets the values for the key using a variable number of arguments
@@ -105,7 +127,7 @@ case class Key[S] private[parameters] (
    * @return a parameter containing the key name, values (call withUnits() on the result to gset the units)
    */
   @varargs
-  def set(xs: S*): I = GParam(keyName, keyType, xs.toArray[S], NoUnits)
+  def set(xs: S*): I = Parameter(keyName, keyType, xs.toArray[S], NoUnits)
 
   /**
    * Sets the values for the key
