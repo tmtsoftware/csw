@@ -1,11 +1,11 @@
 package csw.common.framework.scaladsl.hcd
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.hcd.HcdDomainMessages
 import csw.common.framework.models.FromComponentLifecycleMessage.InitializeFailure
 import csw.common.framework.models.HcdResponseMode
 import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
+import csw.common.framework.models.RunningHcdMsg.HcdDomainMsg
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -16,7 +16,7 @@ import scala.concurrent.{Await, Future}
 class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   test("hcd component should send initialize and running message to supervisor") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessages]]
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
 
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
@@ -45,7 +45,7 @@ class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
   }
 
   test("A Hcd component should send InitializationFailure message if it fails in initialization") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessages]]
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
     val exceptionReason  = "test Exception"
     when(sampleHcdHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
 

@@ -1,11 +1,10 @@
 package csw.common.framework.scaladsl.hcd
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.hcd._
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
 import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
-import csw.common.framework.models.RunningHcdMsg.Lifecycle
+import csw.common.framework.models.RunningHcdMsg.{HcdDomainMsg, Lifecycle}
 import csw.common.framework.models.{HcdResponseMode, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito._
@@ -16,7 +15,7 @@ import scala.concurrent.{Await, Future}
 
 class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSugar {
 
-  def run(hcdHandlersFactory: HcdHandlersFactory[HcdDomainMessages],
+  def run(hcdHandlersFactory: HcdHandlersFactory[HcdDomainMsg],
           testProbeSupervisor: TestProbe[HcdResponseMode]): Running = {
 
     Await.result(
@@ -34,7 +33,7 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
   }
 
   test("A running Hcd component should accept Shutdown lifecycle message") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessages]]
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val testProbeSupervisor = TestProbe[HcdResponseMode]
@@ -49,7 +48,7 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
   }
 
   test("A running Hcd component should accept Restart lifecycle message") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessages]]
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val testProbeSupervisor = TestProbe[HcdResponseMode]
@@ -62,7 +61,7 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
   }
 
   test("A running Hcd component should accept RunOffline lifecycle message") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessages]]
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
     when(sampleHcdHandler.isOnline).thenReturn(true)
 
@@ -76,7 +75,7 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
   }
 
   test("A running Hcd component should not accept RunOffline lifecycle message when it is already offline") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessages]]
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
     when(sampleHcdHandler.isOnline).thenReturn(false)
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
@@ -90,7 +89,7 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
   }
 
   test("A running Hcd component should accept RunOnline lifecycle message when it is Offline") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessages]]
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
     when(sampleHcdHandler.isOnline).thenReturn(false)
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
@@ -104,7 +103,7 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
   }
 
   test("A running Hcd component should not accept RunOnline lifecycle message when it is already Online") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessages]]
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
     when(sampleHcdHandler.isOnline).thenReturn(true)
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 

@@ -1,11 +1,9 @@
 package csw.common.framework.scaladsl
 
-import csw.common.framework.models.DomainMsg
-
 import scala.concurrent.Future
 import scala.reflect.ClassTag
 
-abstract class LifecycleHandlers[Msg <: DomainMsg: ClassTag] {
+abstract class LifecycleHandlers[Msg: ClassTag] {
   var isOnline: Boolean = false
 
   def initialize(): Future[Unit]

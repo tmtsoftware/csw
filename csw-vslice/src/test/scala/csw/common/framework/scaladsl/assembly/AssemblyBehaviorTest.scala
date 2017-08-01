@@ -1,11 +1,11 @@
 package csw.common.framework.scaladsl.assembly
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.assembly.AssemblyDomainMessages
 import csw.common.framework.models.AssemblyResponseMode
 import csw.common.framework.models.AssemblyResponseMode.{Initialized, Running}
 import csw.common.framework.models.FromComponentLifecycleMessage.InitializeFailure
 import csw.common.framework.models.InitialAssemblyMsg.Run
+import csw.common.framework.models.RunningAssemblyMsg.AssemblyDomainMsg
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
@@ -16,7 +16,7 @@ import scala.concurrent.{Await, Future}
 class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   test("Assembly actor sends Initialized and Running message to Supervisor") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMessages]]
+    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
 
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
@@ -44,7 +44,7 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
   }
 
   test("A Assembly component should send InitializationFailure message if it fails in initialization") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMessages]]
+    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
     val exceptionReason       = "test Exception"
     when(sampleAssemblyHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
 

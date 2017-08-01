@@ -14,7 +14,6 @@ import csw.trombone.assembly.actors.DiagPublisher.Mode
 import csw.trombone.assembly.{AssemblyContext, DiagPublisherMessages, TrombonePublisherMsg}
 import csw.common.framework.models.HcdResponseMode.Running
 import csw.common.framework.models.PubSub
-import csw.common.framework.models.RunningHcdMsg.DomainHcdMsg
 import csw.trombone.hcd.TromboneEngineering.GetAxisStats
 import csw.trombone.hcd.TromboneHcdState
 
@@ -96,7 +95,7 @@ class DiagPublisher(ctx: ActorContext[DiagPublisherMessages],
       publishStatsUpdate(cs)
 
     case TimeForAxisStats(periodInSeconds) =>
-      running.foreach(_.hcdRef ! DomainHcdMsg(GetAxisStats))
+      running.foreach(_.hcdRef ! GetAxisStats)
       val canceltoken: Cancellable =
         ctx.schedule(Instant.now().plusSeconds(periodInSeconds).toEpochMilli.millis,
                      ctx.self,

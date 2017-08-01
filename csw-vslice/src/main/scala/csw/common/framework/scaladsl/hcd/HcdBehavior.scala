@@ -15,9 +15,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
-class HcdBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
-                                              supervisor: ActorRef[HcdResponseMode],
-                                              hcdHandlers: HcdHandlers[Msg])
+class HcdBehavior[Msg <: HcdDomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
+                                                 supervisor: ActorRef[HcdResponseMode],
+                                                 hcdHandlers: HcdHandlers[Msg])
     extends Actor.MutableBehavior[HcdMsg] {
 
   implicit val ec: ExecutionContext = ctx.executionContext
@@ -66,10 +66,10 @@ class HcdBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
   }
 
   private def onRunning(x: RunningHcdMsg): Unit = x match {
-    case Lifecycle(message)   => onLifecycle(message)
-    case Submit(command)      => hcdHandlers.onSetup(command)
-    case DomainHcdMsg(y: Msg) ⇒ hcdHandlers.onDomainMsg(y)
-    case DomainHcdMsg(y)      ⇒ println(s"unhandled domain msg: $y")
+    case Lifecycle(message) => onLifecycle(message)
+    case Submit(command)    => hcdHandlers.onSetup(command)
+    case y: Msg             ⇒ hcdHandlers.onDomainMsg(y)
+    case y                  ⇒ println(s"unhandled msg: $y")
   }
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {

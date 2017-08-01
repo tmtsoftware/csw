@@ -1,11 +1,10 @@
 package csw.common.framework.scaladsl.assembly
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.assembly.AssemblyDomainMessages
 import csw.common.framework.models.AssemblyResponseMode.{Initialized, Running}
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
 import csw.common.framework.models.InitialAssemblyMsg.Run
-import csw.common.framework.models.RunningAssemblyMsg.Lifecycle
+import csw.common.framework.models.RunningAssemblyMsg.{AssemblyDomainMsg, Lifecycle}
 import csw.common.framework.models.{AssemblyResponseMode, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito._
@@ -16,7 +15,7 @@ import scala.concurrent.{Await, Future}
 
 class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSugar {
 
-  def run(assemblyHandlersFactory: AssemblyHandlersFactory[AssemblyDomainMessages],
+  def run(assemblyHandlersFactory: AssemblyHandlersFactory[AssemblyDomainMsg],
           supervisorProbe: TestProbe[AssemblyResponseMode]): Running = {
 
     Await.result(
@@ -34,7 +33,7 @@ class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with Mockit
   }
 
   test("A running Assembly component should accept Shutdown lifecycle message") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMessages]]
+    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe = TestProbe[AssemblyResponseMode]
@@ -48,7 +47,7 @@ class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with Mockit
   }
 
   test("A running Assembly component should accept Restart lifecycle message") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMessages]]
+    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe = TestProbe[AssemblyResponseMode]
@@ -61,7 +60,7 @@ class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with Mockit
   }
 
   test("A running Assembly component should accept RunOffline lifecycle message") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMessages]]
+    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
     when(sampleAssemblyHandler.isOnline).thenReturn(true)
 
@@ -75,7 +74,7 @@ class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with Mockit
   }
 
   test("A running Assembly component should not accept RunOffline lifecycle message when it is already offline") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMessages]]
+    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
     when(sampleAssemblyHandler.isOnline).thenReturn(false)
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
@@ -89,7 +88,7 @@ class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with Mockit
   }
 
   test("A running Assembly component should accept RunOnline lifecycle message when it is Offline") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMessages]]
+    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
     when(sampleAssemblyHandler.isOnline).thenReturn(false)
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
@@ -103,7 +102,7 @@ class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with Mockit
   }
 
   test("A running Assembly component should not accept RunOnline lifecycle message when it is already Online") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMessages]]
+    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
     when(sampleAssemblyHandler.isOnline).thenReturn(true)
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 

@@ -1,6 +1,5 @@
 package csw.common.components.hcd
 
-import csw.common.framework.models.DomainMsg
+import csw.common.framework.models.RunningHcdMsg.HcdDomainMsg
 
-sealed trait HcdDomainMessages        extends DomainMsg
-case class AxisStatistics(value: Int) extends HcdDomainMessages
+case class AxisStatistics(value: Int) extends HcdDomainMsg

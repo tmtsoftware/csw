@@ -1,11 +1,11 @@
 package csw.common.framework.scaladsl.assembly
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.assembly.{AssemblyDomainMessages, OperationsMode}
+import csw.common.components.assembly.OperationsMode
 import csw.common.framework.models.AssemblyResponseMode
 import csw.common.framework.models.AssemblyResponseMode.{Initialized, Running}
 import csw.common.framework.models.InitialAssemblyMsg.Run
-import csw.common.framework.models.RunningAssemblyMsg.DomainAssemblyMsg
+import csw.common.framework.models.RunningAssemblyMsg.AssemblyDomainMsg
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
@@ -16,7 +16,7 @@ import scala.concurrent.{Await, Future}
 class AssemblyUniqueActionTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   test("assembly component should be able to handle Domain specific messages") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMessages]]
+    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
 
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
@@ -34,7 +34,7 @@ class AssemblyUniqueActionTest extends FrameworkComponentTestSuite with MockitoS
     initialized.assemblyRef ! Run
 
     val running = supervisorProbe.expectMsgType[Running]
-    running.assemblyRef ! DomainAssemblyMsg(OperationsMode)
+    running.assemblyRef ! OperationsMode
 
     Thread.sleep(1000)
     verify(sampleAssemblyHandler).onDomainMsg(OperationsMode)

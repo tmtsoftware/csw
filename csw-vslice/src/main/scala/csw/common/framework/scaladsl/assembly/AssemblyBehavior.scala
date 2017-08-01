@@ -21,9 +21,9 @@ import scala.concurrent.Future
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
-class AssemblyBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[AssemblyMsg],
-                                                   supervisor: ActorRef[AssemblyResponseMode],
-                                                   assemblyHandlers: AssemblyHandlers[Msg])
+class AssemblyBehavior[Msg <: AssemblyDomainMsg: ClassTag](ctx: ActorContext[AssemblyMsg],
+                                                           supervisor: ActorRef[AssemblyResponseMode],
+                                                           assemblyHandlers: AssemblyHandlers[Msg])
     extends MutableBehavior[AssemblyMsg] {
 
   implicit val scheduler: Scheduler = ctx.system.scheduler
@@ -78,11 +78,11 @@ class AssemblyBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[AssemblyMsg
   }
 
   def onRunning(x: RunningAssemblyMsg): Unit = x match {
-    case Lifecycle(message)               => onLifecycle(message)
-    case Submit(command, replyTo)         => onSubmit(command, replyTo)
-    case Oneway(command, replyTo)         ⇒ onOneWay(command, replyTo)
-    case DomainAssemblyMsg(diagMode: Msg) ⇒ assemblyHandlers.onDomainMsg(diagMode)
-    case DomainAssemblyMsg(y)             ⇒ println(s"unhandled domain msg: $y")
+    case Lifecycle(message)       => onLifecycle(message)
+    case Submit(command, replyTo) => onSubmit(command, replyTo)
+    case Oneway(command, replyTo) ⇒ onOneWay(command, replyTo)
+    case diagMode: Msg            ⇒ assemblyHandlers.onDomainMsg(diagMode)
+    case y                        ⇒ println(s"unhandled msg: $y")
   }
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {

@@ -62,10 +62,6 @@ object PubSub {
 
 ///////////////
 
-trait DomainMsg
-
-///////////////
-
 sealed trait HcdMsg
 
 sealed trait IdleHcdMsg extends HcdMsg
@@ -83,7 +79,7 @@ sealed trait RunningHcdMsg extends HcdMsg
 object RunningHcdMsg {
   case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningHcdMsg
   case class Submit(command: Setup)                          extends RunningHcdMsg
-  case class DomainHcdMsg[T <: DomainMsg](msg: T)            extends RunningHcdMsg
+  trait HcdDomainMsg                                         extends RunningHcdMsg
 }
 
 //////////////////////////
@@ -115,7 +111,7 @@ object RunningAssemblyMsg {
   case class Lifecycle(message: ToComponentLifecycleMessage)                     extends RunningAssemblyMsg
   case class Submit(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends RunningAssemblyMsg
   case class Oneway(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends RunningAssemblyMsg
-  case class DomainAssemblyMsg[T <: DomainMsg](msg: T)                           extends RunningAssemblyMsg
+  trait AssemblyDomainMsg                                                        extends RunningAssemblyMsg
 }
 
 ///////////////////////
