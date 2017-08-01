@@ -6,10 +6,10 @@ import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
+import csw.common.ccs.CommandMsgs
+import csw.common.ccs.CommandMsgs.StopCurrentCommand
 import csw.common.ccs.CommandStatus._
 import csw.common.ccs.Validation.{RequiredHCDUnavailableIssue, UnsupportedCommandInStateIssue, WrongInternalStateIssue}
-import csw.common.framework.models.CommandMsgs
-import csw.common.framework.models.CommandMsgs.StopCurrentCommand
 import csw.common.framework.models.HcdResponseMode.Running
 import csw.param.Parameters.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
@@ -65,7 +65,8 @@ class TromboneCommandHandler(ctx: ActorContext[TromboneCommandHandlerMsgs],
   private var currentState: TromboneState = defaultTromboneState
 
   private val badHCDReference = ctx.system.deadLetters
-  private val tromboneHCD     = tromboneHCDIn.getOrElse(Running(badHCDReference, badHCDReference))
+  private val pubSubRef       = ctx.system.deadLetters
+  private val tromboneHCD     = tromboneHCDIn.getOrElse(Running(badHCDReference))
 
   private var setElevationItem = naElevation(calculationConfig.defaultInitialElevation)
 
@@ -183,7 +184,7 @@ class TromboneCommandHandler(ctx: ActorContext[TromboneCommandHandlerMsgs],
 
           val zenithAngleItem = s(ac.zenithAngleKey)
           followCommandActor ! SetZenithAngle(zenithAngleItem)
-          Matchers.executeMatch(ctx, Matchers.idleMatcher, tromboneHCD.pubSubRef, Some(replyTo)) {
+          Matchers.executeMatch(ctx, Matchers.idleMatcher, pubSubRef, Some(replyTo)) {
             case Completed =>
               Await.ready(
                 tromboneStateActor ? { x: ActorRef[StateWasSet] ⇒

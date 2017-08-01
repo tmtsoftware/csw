@@ -3,13 +3,15 @@ package csw.trombone.assembly.commands
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
+import csw.common.ccs.CommandMsgs
+import csw.common.ccs.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
 import csw.common.ccs.CommandStatus.{Completed, Error, NoLongerValid}
 import csw.common.ccs.Validation.WrongInternalStateIssue
-import csw.common.framework.models.CommandMsgs
-import csw.common.framework.models.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
 import csw.common.framework.models.HcdResponseMode.Running
+import csw.common.framework.models.PubSub
 import csw.common.framework.models.RunningHcdMsg.Submit
 import csw.param.Parameters.Setup
+import csw.param.StateVariable.CurrentState
 import csw.param.UnitsOfMeasure.encoder
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
@@ -37,6 +39,7 @@ class SetElevationCommand(ctx: ActorContext[CommandMsgs],
   import csw.trombone.assembly.actors.TromboneStateActor._
 
   private val setStateResponseAdapter: ActorRef[StateWasSet] = ctx.spawnAdapter(SetStateResponseE)
+  private val pubSubRef: ActorRef[PubSub[CurrentState]]      = ctx.system.deadLetters
 
   override def onMessage(msg: CommandMsgs): Behavior[CommandMsgs] = msg match {
     case CommandStart(replyTo) =>
@@ -68,7 +71,7 @@ class SetElevationCommand(ctx: ActorContext[CommandMsgs],
         )
         tromboneHCD.hcdRef ! Submit(scOut)
 
-        Matchers.executeMatch(ctx, stateMatcher, tromboneHCD.pubSubRef, Some(replyTo)) {
+        Matchers.executeMatch(ctx, stateMatcher, pubSubRef, Some(replyTo)) {
           case Completed =>
             stateActor.foreach(
               _ !

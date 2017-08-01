@@ -38,7 +38,7 @@ class HcdBehavior[Msg <: HcdDomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
   def initialization(): Future[Unit] =
     async {
       await(hcdHandlers.initialize())
-      mode = Initialized(ctx.self, hcdHandlers.pubSubRef)
+      mode = Initialized(ctx.self)
     } recover {
       case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
     }
@@ -59,7 +59,7 @@ class HcdBehavior[Msg <: HcdDomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
   private def onInitial(x: InitialHcdMsg): Unit = x match {
     case Run =>
       hcdHandlers.onRun()
-      val running = Running(ctx.self, hcdHandlers.pubSubRef)
+      val running = Running(ctx.self)
       mode = running
       hcdHandlers.isOnline = true
       supervisor ! running

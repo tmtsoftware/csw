@@ -3,8 +3,6 @@ package csw.common.framework.models
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.param.Parameters.{ControlCommand, Setup}
-import csw.param.StateVariable.CurrentState
-import csw.trombone.assembly.actors.TromboneStateActor.StateWasSet
 
 /////////////
 
@@ -56,10 +54,9 @@ object FromComponentLifecycleMessage {
 sealed trait HcdResponseMode
 
 object HcdResponseMode {
-  case object Idle extends HcdResponseMode
-  case class Initialized(hcdRef: ActorRef[InitialHcdMsg], pubSubRef: ActorRef[PubSub[CurrentState]])
-      extends HcdResponseMode
-  case class Running(hcdRef: ActorRef[RunningHcdMsg], pubSubRef: ActorRef[PubSub[CurrentState]]) extends HcdResponseMode
+  case object Idle                                        extends HcdResponseMode
+  case class Initialized(hcdRef: ActorRef[InitialHcdMsg]) extends HcdResponseMode
+  case class Running(hcdRef: ActorRef[RunningHcdMsg])     extends HcdResponseMode
 }
 
 //////////////////////////

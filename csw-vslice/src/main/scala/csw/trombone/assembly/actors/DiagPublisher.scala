@@ -45,12 +45,13 @@ class DiagPublisher(ctx: ActorContext[DiagPublisherMessages],
 
   val currentStateAdapter: ActorRef[CurrentState] = ctx.spawnAdapter(CurrentStateE)
 
-  var stateMessageCounter: Int = 0
-  var running: Option[Running] = runningIn
-  var context: Mode            = _
-  var cancelToken: Cancellable = _
+  val pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.system.deadLetters
+  var stateMessageCounter: Int                  = 0
+  var running: Option[Running]                  = runningIn
+  var context: Mode                             = _
+  var cancelToken: Cancellable                  = _
 
-  running.foreach(_.pubSubRef ! PubSub.Subscribe(currentStateAdapter))
+  pubSubRef ! PubSub.Subscribe(currentStateAdapter)
 
   override def onMessage(msg: DiagPublisherMessages): Behavior[DiagPublisherMessages] = {
     context match {
