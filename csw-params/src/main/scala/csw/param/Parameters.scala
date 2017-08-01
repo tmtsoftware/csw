@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.parameters.{Key, Parameter}
+import csw.param.parameters.{GParam, Key, Parameter}
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -131,9 +131,8 @@ object Parameters {
      * @param key the Key to be used for lookup
      * @return the parameter for the key, if found
      * @tparam S the Scala value type
-     * @tparam P the parameter type for the Scala value S
      */
-    def get[S, P <: Parameter[S]](key: Key[S, P]): Option[P] = getByKeyname[P](paramSet, key.keyName)
+    def get[S](key: Key[S]): Option[GParam[S]] = getByKeyname[GParam[S]](paramSet, key.keyName)
 
     /**
      * Returns an Option with the parameter for the key if found, otherwise None. Access with keyname rather
@@ -151,20 +150,18 @@ object Parameters {
      *
      * @param key the Key to be used for lookup
      * @tparam S the Scala value type
-     * @tparam P the Parameter type associated with S
      * @return the parameter associated with the Key or a NoSuchElementException if the key does not exist
      */
-    final def apply[S, P <: Parameter[S]](key: Key[S, P]): P = get(key).get
+    final def apply[S](key: Key[S]): GParam[S] = get(key).get
 
     /**
      * Returns the actual parameter associated with a key
      *
      * @param key the Key to be used for lookup
      * @tparam S the Scala value type
-     * @tparam P the Parameter type associated with S
      * @return the parameter associated with the key or a NoSuchElementException if the key does not exist
      */
-    final def parameter[S, P <: Parameter[S]](key: Key[S, P]): P = get(key).get
+    final def parameter[S](key: Key[S]): GParam[S] = get(key).get
 
     /**
      * Returns true if the key exists in the parameter gset
@@ -172,19 +169,17 @@ object Parameters {
      * @param key the key to check for
      * @return true if the key is found
      * @tparam S the Scala value type
-     * @tparam P the type of the Parameter associated with the key
      */
-    def exists[S, P <: Parameter[S]](key: Key[S, P]): Boolean = get(key).isDefined
+    def exists[S](key: Key[S]): Boolean = get(key).isDefined
 
     /**
      * Remove a parameter from the parameter gset by key
      *
      * @param key the Key to be used for removal
      * @tparam S the Scala value type
-     * @tparam P the parameter type used with Scala type S
      * @return a new T, where T is a parameter gset child with the key removed or identical if the key is not present
      */
-    def remove[S, P <: Parameter[S]](key: Key[S, P]): T = removeByKeyname(this, key.keyName) //doRemove(this, key)
+    def remove[S](key: Key[S]): T = removeByKeyname(this, key.keyName) //doRemove(this, key)
 
     /**
      * Removes a parameter based on the parameter
@@ -247,14 +242,14 @@ object Parameters {
     /**
      * Returns true if the data contains the given key
      */
-    def contains(key: Key[_, _]): Boolean = paramSet.exists(_.keyName == key.keyName)
+    def contains(key: Key[_]): Boolean = paramSet.exists(_.keyName == key.keyName)
 
     /**
      * Returns a gset containing the names of any of the given keys that are missing in the data
      *
      * @param keys one or more keys
      */
-    def missingKeys(keys: Key[_, _]*): Set[String] = {
+    def missingKeys(keys: Key[_]*): Set[String] = {
       val argKeySet        = keys.map(_.keyName).toSet
       val parametersKeySet = paramSet.map(_.keyName)
       argKeySet.diff(parametersKeySet)
@@ -266,7 +261,7 @@ object Parameters {
      * @param keys one or more keys
      */
     @varargs
-    def jMissingKeys(keys: Key[_, _]*): java.util.Set[String] = missingKeys(keys: _*).asJava
+    def jMissingKeys(keys: Key[_]*): java.util.Set[String] = missingKeys(keys: _*).asJava
 
     /**
      * Returns a map based on this object where the keys and values are in string get
@@ -355,7 +350,7 @@ object Parameters {
     // (Using a Java interface caused various Java compiler errors)
     override def add[P <: Parameter[_]](parameter: P): Setup = super.add(parameter)
 
-    override def remove[S, P <: Parameter[S]](key: Key[S, P]): Setup = super.remove(key)
+    override def remove[S](key: Key[S]): Setup = super.remove(key)
   }
 
   /**
@@ -380,7 +375,7 @@ object Parameters {
     // (Using a Java interface caused various Java compiler errors)
     override def add[P <: Parameter[_]](parameter: P): Observe = super.add(parameter)
 
-    override def remove[S, P <: Parameter[S]](key: Key[S, P]): Observe = super.remove(key)
+    override def remove[S](key: Key[S]): Observe = super.remove(key)
   }
 
   /**
@@ -404,7 +399,7 @@ object Parameters {
     // (Using a Java interface caused various Java compiler errors)
     override def add[P <: Parameter[_]](parameter: P): Wait = super.add(parameter)
 
-    override def remove[S, P <: Parameter[S]](key: Key[S, P]): Wait = super.remove(key)
+    override def remove[S](key: Key[S]): Wait = super.remove(key)
   }
 
   /**
@@ -427,7 +422,7 @@ object Parameters {
     // (Using a Java interface caused various Java compiler errors)
     override def add[P <: Parameter[_]](parameter: P): Result = super.add(parameter)
 
-    override def remove[S, P <: Parameter[S]](key: Key[S, P]): Result = super.remove(key)
+    override def remove[S](key: Key[S]): Result = super.remove(key)
   }
 
   /**

@@ -315,9 +315,9 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Checking for item types in configs") {
-    val k1: GKey[Int]    = KeyType.IntKey.make("itest")
-    val k2: GKey[Double] = KeyType.DoubleKey.make("dtest")
-    val k3: GKey[String] = KeyType.StringKey.make("stest")
+    val k1: Key[Int]    = KeyType.IntKey.make("itest")
+    val k2: Key[Double] = KeyType.DoubleKey.make("dtest")
+    val k3: Key[String] = KeyType.StringKey.make("stest")
 
     val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
@@ -337,9 +337,9 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Check for multi-add") {
-    val k1: GKey[Int]    = KeyType.IntKey.make("itest")
-    val k2: GKey[Double] = KeyType.DoubleKey.make("dtest")
-    val k3: GKey[String] = KeyType.StringKey.make("stest")
+    val k1: Key[Int]    = KeyType.IntKey.make("itest")
+    val k2: Key[Double] = KeyType.DoubleKey.make("dtest")
+    val k3: Key[String] = KeyType.StringKey.make("stest")
 
     val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)

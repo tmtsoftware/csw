@@ -2,9 +2,11 @@ package csw.param.parameters
 
 import csw.param.UnitsOfMeasure
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
+import spray.json.JsonFormat
 
 import scala.annotation.varargs
 import scala.collection.immutable.Vector
+import scala.reflect.ClassTag
 
 /**
  * The type of a parameter in a parameterSet
@@ -77,15 +79,13 @@ trait Parameter[S] {
   override def toString      = s"$keyName($valuesToString$units)"
 }
 
-/**
- * The type of a parameter key.
- * Note that the Parameter is f-bounded polymorphic so that parameter returns will have the correct types
- *
- * @param keyName the key
- * @tparam S the value's Scala type
- * @tparam I the type of the parameter created by this Key
- */
-abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializable {
+case class Key[S] private[parameters] (
+    keyName: String,
+    keyType: KeyType[S]
+)(implicit @transient jsFormat: JsonFormat[S], @transient clsTag: ClassTag[S])
+    extends Serializable {
+
+  type I = GParam[S]
 
   def gset(v: Array[S], units: Units = NoUnits): I = set(v.toVector, units)
 
@@ -96,16 +96,16 @@ abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializab
    * @param units optional units of the values (defaults to no units)
    * @return a parameter containing the key name, values and units
    */
-  def set(v: Vector[S], units: Units = NoUnits): I
+  def set(v: Vector[S], units: Units = NoUnits): I = GParam(keyName, keyType, v.toArray[S], units)
 
   /**
    * Sets the values for the key using a variable number of arguments
    *
-   * @param v one or more values
+   * @param xs one or more values
    * @return a parameter containing the key name, values (call withUnits() on the result to gset the units)
    */
   @varargs
-  def set(v: S*): I = set(v.toVector)
+  def set(xs: S*): I = GParam(keyName, keyType, xs.toArray[S], NoUnits)
 
   /**
    * Sets the values for the key
@@ -158,8 +158,8 @@ abstract class Key[S, I <: Parameter[S]](val keyName: String) extends Serializab
 
   override def equals(that: Any): Boolean = {
     that match {
-      case that: Key[S, I] => this.keyName == that.keyName
-      case _               => false
+      case that: Key[S] => this.keyName == that.keyName
+      case _            => false
     }
   }
 

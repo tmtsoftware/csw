@@ -15,7 +15,7 @@ sealed class KeyType[S](implicit @transient jsFormat: JsonFormat[S], @transient 
 
 sealed class SimpleKeyType[S](implicit @transient jsFormat: JsonFormat[S], @transient clsTag: ClassTag[S])
     extends KeyType[S] {
-  def make(name: String): GKey[S] = new GKey[S](name, this)
+  def make(name: String): Key[S] = new Key[S](name, this)
 }
 
 object KeyType extends JsonSupport with JavaFormats with Enum[KeyType[_]] {

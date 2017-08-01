@@ -62,7 +62,7 @@ case class GParam[S] private[param] (keyName: String,
   override def withUnits(unitsIn: Units): GParam[S] = copy(units = unitsIn)
 }
 
-class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) extends GKey[Choice](name, keyType) {
+class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) extends Key[Choice](name, keyType) {
   private def validate(xs: Seq[Choice]) =
     assert(xs.forall(choices.contains), s"Bad choice for key: $keyName which must be one of: $choices")
 
@@ -80,15 +80,6 @@ class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) e
     validate(v)
     super.gset(v, units)
   }
-}
-
-case class GKey[S] private[parameters] (name: String, keyType: KeyType[S])(implicit @transient jsFormat: JsonFormat[S],
-                                                                           @transient clsTag: ClassTag[S])
-    extends Key[S, GParam[S]](name) {
-
-  override def set(v: Vector[S], units: Units = NoUnits): GParam[S] = GParam(name, keyType, v.toArray[S], units)
-
-  override def set(xs: S*): GParam[S] = GParam(name, keyType, xs.toArray[S], NoUnits)
 }
 
 case class GArray[T](data: mutable.WrappedArray[T])

@@ -14,7 +14,7 @@ public class JParameterTest {
     public void testBooleanParameter() {
         String encoder = "encoder";
 
-        GKey<Boolean> key = JKeyTypes.BooleanKey().make(encoder);
+        Key<Boolean> key = JKeyTypes.BooleanKey().make(encoder);
         GParam<Boolean> param = key.set(true, false);
 
         Vector<Boolean> booleanVector = new Vector<Boolean>();
@@ -31,7 +31,7 @@ public class JParameterTest {
         Integer[] array = {1, 2, 3};
 
         GArray<Integer> gArray = GArray.fromArray(array);
-        GKey<GArray<Integer>> arrayKey = JKeyTypes.IntArrayKey().make("arrayKey");
+        Key<GArray<Integer>> arrayKey = JKeyTypes.IntArrayKey().make("arrayKey");
         GParam<GArray<Integer>> arrayGParam = arrayKey.set(gArray);
 
 //        Assert.assertEquals(arrayGParam.values(),

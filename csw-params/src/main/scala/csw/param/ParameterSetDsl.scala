@@ -3,7 +3,7 @@ package csw.param
 import csw.param.Events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{NoUnits, Units}
-import csw.param.parameters.{Key, Parameter}
+import csw.param.parameters.{GParam, Key, Parameter}
 
 /**
  * Defines a Scala DSL for dealing with configurations.
@@ -52,7 +52,7 @@ object ParameterSetDsl {
    * @param key the key of the parameter to be tested for existence
    * @return true if the parameter is present and false if not present
    */
-  def exists[S, P <: Parameter[S], T <: ParameterSetType[T]](sc: T, key: Key[S, P]): Boolean = sc.exists(key)
+  def exists[S, T <: ParameterSetType[T]](sc: T, key: Key[S]): Boolean = sc.exists(key)
 
   /**
    * Return the number of parameters in the configuration
@@ -69,7 +69,7 @@ object ParameterSetDsl {
    * @param key the key of the parameter to remove
    * @return a new configuration with the parameter with key removed or unchanged if not present
    */
-  def remove[S, P <: Parameter[S], T <: ParameterSetType[T]](sc: T, key: Key[S, P]): T = sc.remove(key)
+  def remove[S, T <: ParameterSetType[T]](sc: T, key: Key[S]): T = sc.remove(key)
 
   /**
    * Remove a parameter from the configuration based on the parameter contents
@@ -87,7 +87,7 @@ object ParameterSetDsl {
    * @param key the key of the parameter that is needed
    * @return returns the parameter itself or the NoSuchElementException if the key is not present
    */
-  def parameter[S, P <: Parameter[S], T <: ParameterSetType[T]](sc: T, key: Key[S, P]): P = sc.parameter(key)
+  def parameter[S, T <: ParameterSetType[T]](sc: T, key: Key[S]): GParam[S] = sc.parameter(key)
 
   /**
    * Find the parameter in the configuraiton and return as Option with the parameter
@@ -96,7 +96,7 @@ object ParameterSetDsl {
    * @param key the key of the parameter that is needed
    * @return the parameter as an Option or None if the parameter is not found
    */
-  def get[S, P <: Parameter[S], T <: ParameterSetType[T]](sc: T, key: Key[S, P]): Option[P] = sc.get(key)
+  def get[S, T <: ParameterSetType[T]](sc: T, key: Key[S]): Option[GParam[S]] = sc.get(key)
 
   /**
    * Finds a parameter and returns the value at an index as an Option
@@ -107,7 +107,7 @@ object ParameterSetDsl {
    * @param index the index of the value needed
    * @return the index value as an Option or None if the parameter with key is not present or there is no value at the index
    */
-  def get[S, P <: Parameter[S], T <: ParameterSetType[T]](sc: T, key: Key[S, P], index: Int): Option[S] =
+  def get[S, T <: ParameterSetType[T]](sc: T, key: Key[S], index: Int): Option[S] =
     sc.get(key).flatMap((i: Parameter[S]) => i.get(index))
 
   /**
@@ -154,7 +154,7 @@ object ParameterSetDsl {
    * @param units optional units for the parameter
    * @return a new parameter of the type associated with the key
    */
-  def vset[S, P <: Parameter[S]](key: Key[S, P], v: Vector[S], units: Units = NoUnits): P = key.set(v, units)
+  def vset[S](key: Key[S], v: Vector[S], units: Units = NoUnits): GParam[S] = key.set(v, units)
 
   /**
    * Create a parameter by settign a key with one or more values associated with the key
@@ -163,7 +163,7 @@ object ParameterSetDsl {
    * @param v   a varargs argument with one or more values of the parameter's type
    * @return a new parameter of the type associated with the key
    */
-  def set[S, P <: Parameter[S]](key: Key[S, P], v: S*): P = key.set(v: _*)
+  def set[S](key: Key[S], v: S*): GParam[S] = key.set(v: _*)
 
   /**
    * Create a Setup with a number of parameters

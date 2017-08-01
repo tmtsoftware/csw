@@ -23,13 +23,13 @@ class ItemsTests extends FunSpec with Matchers {
   private val s2: String = "filter"
 
   describe("basic key tests") {
-    val k1: GKey[Int] = KeyType.IntKey.make(s1)
-    val k2: GKey[Int] = KeyType.IntKey.make(s2)
+    val k1: Key[Int] = KeyType.IntKey.make(s1)
+    val k2: Key[Int] = KeyType.IntKey.make(s2)
     it("should have correct name") {
       assert(k1.keyName.equals(s1))
     }
 
-    val k3: GKey[Int] = KeyType.IntKey.make(s1)
+    val k3: Key[Int] = KeyType.IntKey.make(s1)
 
     it("should have equality based on name") {
       assert(k3 == k1)
@@ -612,8 +612,8 @@ class ItemsTests extends FunSpec with Matchers {
   }
 
   describe("test longKey") {
-    val lval           = 1234L
-    val lk: GKey[Long] = KeyType.LongKey.make(s1)
+    val lval          = 1234L
+    val lk: Key[Long] = KeyType.LongKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(lval)
@@ -642,9 +642,9 @@ class ItemsTests extends FunSpec with Matchers {
     val a1: Array[Long] = Array(1, 2, 3, 4, 5)
     val a2: Array[Long] = Array(10, 20, 30, 40, 50)
 
-    val la1: GArray[Long]      = GArray(a1)
-    val la2: GArray[Long]      = GArray(a2)
-    val lk: GKey[GArray[Long]] = KeyType.LongArrayKey.make(s1)
+    val la1: GArray[Long]     = GArray(a1)
+    val la2: GArray[Long]     = GArray(a2)
+    val lk: Key[GArray[Long]] = KeyType.LongArrayKey.make(s1)
 
     it("should test single item") {
       val di: GParam[GArray[Long]] = lk.set(la1)
@@ -696,9 +696,9 @@ class ItemsTests extends FunSpec with Matchers {
     val m1: Array[Array[Long]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
     val m2: Array[Array[Long]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
 
-    val lm1: GMatrix[Long]      = GMatrix.fromArrays(m1)
-    val lm2: GMatrix[Long]      = GMatrix.fromArrays(m2)
-    val dk: GKey[GMatrix[Long]] = LongMatrixKey.make(s1)
+    val lm1: GMatrix[Long]     = GMatrix.fromArrays(m1)
+    val lm2: GMatrix[Long]     = GMatrix.fromArrays(m2)
+    val dk: Key[GMatrix[Long]] = LongMatrixKey.make(s1)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
