@@ -3,7 +3,8 @@ package csw.param
 import csw.param.Events.StatusEvent
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
-import csw.param.parameters.{GArray, GKey, GParam, KeyType}
+import csw.param.parameters.KeyType.IntMatrixKey
+import csw.param.parameters._
 import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
 
@@ -752,13 +753,15 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based int matrix equality") {
-    val k1 = IntMatrixKey("myMatrix")
-    val m1 = IntMatrix(Array(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12)))
-    val m2 = IntMatrix(Array(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12)))
-    val m3 = IntMatrix(Array(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](0, 6, 12))) // Note one value different
-    val m4 = IntMatrix(Array(Array[Int](1, 0, 0), Array[Int](0, 1, 0), Array[Int](0, 0, 1)))
-    val i1 = k1.set(m1)
-    val i2 = k1.set(m2)
+    val k1               = IntMatrixKey.make("myMatrix")
+    val m1: GMatrix[Int] = GMatrix.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12))
+    val m2: GMatrix[Int] = GMatrix.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12))
+    val m3: GMatrix[Int] = GMatrix.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](0, 6, 12)) // Note one value different
+    val m4: GMatrix[Int] = GMatrix.fromArrays(Array[Int](1, 0, 0), Array[Int](0, 1, 0), Array[Int](0, 0, 1))
+    val i1               = k1.set(m1)
+    val i2               = k1.set(m2)
+    println(i1 == i2)
+    println(m1 == m2)
     val i3 = k1.set(m3)
     val i4 = k1.set(m4)
 
@@ -767,6 +770,8 @@ class ConfigTests extends FunSpec {
     }
 
     it("should be equal with identical different matrices") {
+      println(i1)
+      println(i2)
       assert(i1.equals(i2))
     }
 

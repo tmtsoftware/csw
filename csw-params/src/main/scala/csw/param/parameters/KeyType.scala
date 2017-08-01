@@ -37,7 +37,7 @@ object KeyType extends DefaultJsonProtocol with JavaFormats with Enum[KeyType[_]
   case object LongArrayKey   extends KeyType[GArray[Long]]
   case object ShortArrayKey  extends KeyType[GArray[Short]]
 
-  case object IntMatrixKey extends KeyType[GArray[Array[Int]]]
+  case object IntMatrixKey extends KeyType[GMatrix[Int]]
 
   case object JIntKey     extends KeyType[java.lang.Integer]
   case object JBooleanKey extends KeyType[java.lang.Boolean]

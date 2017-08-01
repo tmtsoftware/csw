@@ -96,16 +96,25 @@ object GKey extends DefaultJsonProtocol {
 case class GArray[T](data: mutable.WrappedArray[T])
 
 object GArray extends WrappedArrayProtocol with DefaultJsonProtocol {
-  implicit def format[T: JsonFormat: ClassTag]: JsonFormat[GArray[T]] = jsonFormat1(GArray[T])
-  implicit def fromArray[T](xs: Array[T]): GArray[T]                  = GArray(xs)
+  implicit def format[T: JsonFormat: ClassTag]: JsonFormat[GArray[T]] =
+    jsonFormat1((xs: mutable.WrappedArray[T]) ⇒ new GArray[T](xs))
+
+  implicit def fromArray[T](xs: Array[T]): GArray[T] = new GArray(xs)
+
+  def fromArray[T: ClassTag](xs: T*): GArray[T] = new GArray(xs.toArray[T])
 }
 
-//case class GMatrix[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])
-//
-//object GMatrix extends WrappedArrayProtocol with DefaultJsonProtocol {
-//  implicit def format[T: JsonFormat: ClassTag]: JsonFormat[GMatrix[T]] = jsonFormat1(GMatrix[T])
-//  implicit def fromArrays[T](xs: Array[Array[T]]): GMatrix[T]          = GMatrix[T](mutable.WrappedArray.make(xs))
-//}
+case class GMatrix[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])
+
+object GMatrix extends WrappedArrayProtocol with DefaultJsonProtocol {
+  implicit def format[T: JsonFormat: ClassTag]: JsonFormat[GMatrix[T]] =
+    jsonFormat1((xs: mutable.WrappedArray[mutable.WrappedArray[T]]) => new GMatrix[T](xs))
+
+  implicit def fromArrays[T](xs: Array[Array[T]]): GMatrix[T] = new GMatrix[T](xs.map(x ⇒ x: mutable.WrappedArray[T]))
+
+  def fromArrays[T: ClassTag](xs: Array[T]*): GMatrix[T] =
+    new GMatrix[T](xs.toArray.map(x ⇒ x: mutable.WrappedArray[T]))
+}
 
 trait WrappedArrayProtocol { self: DefaultJsonProtocol ⇒
   implicit def wrappedArrayFormat[T: JsonFormat: ClassTag]: JsonFormat[mutable.WrappedArray[T]] =
