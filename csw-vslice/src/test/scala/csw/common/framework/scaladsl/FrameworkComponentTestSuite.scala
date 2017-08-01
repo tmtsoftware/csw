@@ -5,7 +5,7 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.testkit.TestKitSettings
 import akka.util.Timeout
 import csw.common.components.assembly.AssemblyDomainMessages
-import csw.common.components.hcd.HcdDomainMessage
+import csw.common.components.hcd.HcdDomainMessages
 import csw.common.framework.models.Component.{AssemblyInfo, DoNotRegister, HcdInfo}
 import csw.common.framework.models.{AssemblyMsg, HcdMsg}
 import csw.common.framework.scaladsl.assembly.{AssemblyHandlers, AssemblyHandlersFactory}
@@ -39,9 +39,9 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
                         Set(AkkaType),
                         FiniteDuration(5, "seconds"))
 
-  def getSampleHcdFactory(hcdHandlers: HcdHandlers[HcdDomainMessage]): HcdHandlersFactory[HcdDomainMessage] =
-    new HcdHandlersFactory[HcdDomainMessage] {
-      override def make(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo): HcdHandlers[HcdDomainMessage] = hcdHandlers
+  def getSampleHcdFactory(hcdHandlers: HcdHandlers[HcdDomainMessages]): HcdHandlersFactory[HcdDomainMessages] =
+    new HcdHandlersFactory[HcdDomainMessages] {
+      override def make(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo): HcdHandlers[HcdDomainMessages] = hcdHandlers
     }
 
   def getSampleAssemblyFactory(

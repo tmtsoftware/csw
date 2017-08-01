@@ -1,7 +1,7 @@
 package csw.common.framework.scaladsl.hcd
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.hcd.{AxisStatistics, HcdDomainMessage}
+import csw.common.components.hcd.{AxisStatistics, HcdDomainMessages}
 import csw.common.framework.models.HcdResponseMode
 import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
@@ -16,7 +16,7 @@ import scala.concurrent.{Await, Future}
 class HcdUniqueActionTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   test("hcd component should be able to handle Domain specific messages") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessage]]
+    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMessages]]
 
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 

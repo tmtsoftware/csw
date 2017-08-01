@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
 
 abstract class AssemblyHandlers[Msg <: DomainMsg: ClassTag](ctx: ActorContext[AssemblyMsg], info: AssemblyInfo)
-    extends LifecycleHandlers {
+    extends LifecycleHandlers[Msg] {
   val runningHcd: Option[HcdResponseMode.Running] = None
 
   implicit val scheduler: Scheduler = ctx.system.scheduler

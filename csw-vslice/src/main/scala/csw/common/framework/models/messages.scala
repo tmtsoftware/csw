@@ -46,6 +46,7 @@ sealed trait FromComponentLifecycleMessage extends HcdResponseMode with Assembly
 
 object FromComponentLifecycleMessage {
   case class InitializeFailure(reason: String) extends FromComponentLifecycleMessage
+  case class RestartFailure(reason: String)    extends FromComponentLifecycleMessage
   case class ShutdownFailure(reason: String)   extends FromComponentLifecycleMessage
   case object HaltComponent                    extends FromComponentLifecycleMessage
   case object ShutdownComplete                 extends FromComponentLifecycleMessage

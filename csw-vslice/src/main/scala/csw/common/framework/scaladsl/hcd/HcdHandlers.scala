@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
 
 abstract class HcdHandlers[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo)
-    extends LifecycleHandlers {
+    extends LifecycleHandlers[Msg] {
   val domainAdapter: ActorRef[Msg]              = ctx.spawnAdapter(DomainHcdMsg.apply)
   val pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.spawnAnonymous(PubSubActor.behavior[CurrentState])
 

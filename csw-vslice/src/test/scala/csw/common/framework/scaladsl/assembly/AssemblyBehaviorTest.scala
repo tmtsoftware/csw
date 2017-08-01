@@ -4,6 +4,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.assembly.AssemblyDomainMessages
 import csw.common.framework.models.AssemblyResponseMode
 import csw.common.framework.models.AssemblyResponseMode.{Initialized, Running}
+import csw.common.framework.models.FromComponentLifecycleMessage.InitializeFailure
 import csw.common.framework.models.InitialAssemblyMsg.Run
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito.{verify, when}
@@ -41,4 +42,24 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
 
     running.assemblyRef shouldBe assemblyRef
   }
+
+  test("A Assembly component should send InitializationFailure message if it fails in initialization") {
+    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMessages]]
+    val exceptionReason       = "test Exception"
+    when(sampleAssemblyHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
+
+    val supervisorProbe: TestProbe[AssemblyResponseMode] = TestProbe[AssemblyResponseMode]
+
+    Await.result(
+      system.systemActorOf[Nothing](
+        getSampleAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref),
+        "sampleAssembly"
+      ),
+      5.seconds
+    )
+
+    val initializationFailure = supervisorProbe.expectMsgType[InitializeFailure]
+    initializationFailure.reason shouldBe exceptionReason
+  }
+
 }

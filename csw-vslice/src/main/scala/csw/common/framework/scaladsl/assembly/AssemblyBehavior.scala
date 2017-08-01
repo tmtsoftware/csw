@@ -7,7 +7,7 @@ import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.models.AssemblyResponseMode.{Idle, Initialized, Running}
-import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
+import csw.common.framework.models.FromComponentLifecycleMessage.{InitializeFailure, RestartFailure, ShutdownComplete}
 import csw.common.framework.models.IdleAssemblyMsg.{Initialize, Start}
 import csw.common.framework.models.InitialAssemblyMsg.Run
 import csw.common.framework.models.RunningAssemblyMsg._
@@ -19,6 +19,7 @@ import csw.param.Parameters.{Observe, Setup}
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 import scala.reflect.ClassTag
+import scala.util.control.NonFatal
 
 class AssemblyBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[AssemblyMsg],
                                                    supervisor: ActorRef[AssemblyResponseMode],
@@ -54,11 +55,16 @@ class AssemblyBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[AssemblyMsg
       async {
         await(initialization())
         supervisor ! mode
+      } recover {
+        case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
       }
+
     case Start ⇒
       async {
         await(initialization())
         ctx.self ! Run
+      } recover {
+        case NonFatal(ex) ⇒ supervisor ! RestartFailure(ex.getMessage)
       }
   }
 

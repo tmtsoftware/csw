@@ -2,7 +2,7 @@ package csw.common.framework.scaladsl.hcd
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
+import csw.common.framework.models.FromComponentLifecycleMessage.{InitializeFailure, RestartFailure, ShutdownComplete}
 import csw.common.framework.models.HcdResponseMode.{Idle, Initialized, Running}
 import csw.common.framework.models.IdleHcdMsg.{Initialize, Start}
 import csw.common.framework.models.InitialHcdMsg.Run
@@ -13,6 +13,7 @@ import csw.common.framework.models._
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
+import scala.util.control.NonFatal
 
 class HcdBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
                                               supervisor: ActorRef[HcdResponseMode],
@@ -44,11 +45,15 @@ class HcdBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
       async {
         await(initialization())
         supervisor ! mode
+      } recover {
+        case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
       }
     case Start ⇒
       async {
         await(initialization())
         ctx.self ! Run
+      } recover {
+        case NonFatal(ex) ⇒ supervisor ! RestartFailure(ex.getMessage)
       }
   }
 
