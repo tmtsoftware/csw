@@ -60,9 +60,6 @@ class TromboneAssemblyHandlers(ctx: ActorContext[AssemblyMsg], info: AssemblyInf
     )
   }
 
-  override def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit =
-    println(s"TromboneAssembly received failed lifecycle state: $state for reason: $reason")
-
   def onDomainMsg(mode: DiagPublisherMessages): Unit = mode match {
     case DiagnosticState => diagPublsher ! DiagnosticState
     case OperationsState => diagPublsher ! OperationsState

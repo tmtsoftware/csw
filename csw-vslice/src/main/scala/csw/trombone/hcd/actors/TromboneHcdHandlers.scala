@@ -51,9 +51,6 @@ class TromboneHcdHandlers(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo) extends H
 
   override def onGoOnline(): Unit = println("Received running offline")
 
-  override def onLifecycleFailureInfo(state: LifecycleState, reason: String): Unit =
-    println(s"Received failed state: $state for reason: $reason")
-
   def onSetup(sc: Setup): Unit = {
     import csw.trombone.hcd.TromboneHcdState._
     println(s"Trombone process received sc: $sc")
