@@ -4,7 +4,7 @@ import csw.param.Events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.JsonSupport._
 import csw.param.Parameters.{CommandInfo, Observe, Setup, Wait}
 import csw.param.StateVariable.{CurrentState, DemandState}
-import csw.param.parameters.KeyType.IntMatrixKey
+import csw.param.parameters.KeyType.{ByteMatrixKey, IntMatrixKey}
 import csw.param.parameters._
 import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
@@ -340,8 +340,8 @@ class JSONTests extends FunSpec {
 
   describe("Test Byte Matrix items") {
     it("Should allow byte matrix values") {
-      val k1  = ByteMatrixKey("myMatrix")
-      val m1  = ByteMatrix(Array(Array[Byte](1, 2, 3), Array[Byte](4, 5, 6), Array[Byte](7, 8, 9)))
+      val k1  = ByteMatrixKey.make("myMatrix")
+      val m1  = GMatrix.fromArrays(Array[Byte](1, 2, 3), Array[Byte](4, 5, 6), Array[Byte](7, 8, 9))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)

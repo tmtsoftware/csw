@@ -3,7 +3,7 @@ package csw.param
 import csw.param.Events.StatusEvent
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
-import csw.param.parameters.KeyType.IntMatrixKey
+import csw.param.parameters.KeyType.{ByteMatrixKey, IntMatrixKey}
 import csw.param.parameters._
 import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
@@ -579,11 +579,11 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based byte matrix equality") {
-    val k1 = ByteMatrixKey("myMatrix")
-    val m1 = ByteMatrix(Array(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](4, 6, 12)))
-    val m2 = ByteMatrix(Array(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](4, 6, 12)))
-    val m3 = ByteMatrix(Array(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](0, 6, 12))) // Note one value different
-    val m4 = ByteMatrix(Array(Array[Byte](1, 0, 0), Array[Byte](0, 1, 0), Array[Byte](0, 0, 1)))
+    val k1 = ByteMatrixKey.make("myMatrix")
+    val m1 = GMatrix.fromArrays(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](4, 6, 12))
+    val m2 = GMatrix.fromArrays(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](4, 6, 12))
+    val m3 = GMatrix.fromArrays(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](0, 6, 12)) // Note one value different
+    val m4 = GMatrix.fromArrays(Array[Byte](1, 0, 0), Array[Byte](0, 1, 0), Array[Byte](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)
