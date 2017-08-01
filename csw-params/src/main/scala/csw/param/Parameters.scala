@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.parameters.{Key, Parameter}
+import csw.param.parameters.{Key, KeyType, Parameter}
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -132,18 +132,14 @@ object Parameters {
      * @return the parameter for the key, if found
      * @tparam S the Scala value type
      */
-    def get[S](key: Key[S]): Option[Parameter[S]] = getByKeyname[Parameter[S]](paramSet, key.keyName)
+    def get[S](key: Key[S]): Option[Parameter[S]] = get(key.keyName, key.keyType)
 
-    /**
-     * Returns an Option with the parameter for the key if found, otherwise None. Access with keyname rather
-     * than Key
-     *
-     * @param keyName the keyname to be used for the lookup
-     * @tparam P the value type
-     */
-    def getByName[P <: Parameter[_]](keyName: String): Option[P] = getByKeyname[P](paramSet, keyName)
+    def get[S](keyName: String, keyType: KeyType[S]): Option[Parameter[S]] = {
+      paramSet.find(p ⇒ p.keyName == keyName && p.keyType == keyType).asInstanceOf[Option[Parameter[S]]]
+    }
 
-    def find[P <: Parameter[_]](parameter: P): Option[P] = getByKeyname[P](paramSet, parameter.keyName)
+    def find[S](parameter: Parameter[S]): Option[Parameter[S]] =
+      get(parameter.keyName, parameter.keyType)
 
     /**
      * Return the parameter associated with a Key rather than an Option

@@ -70,15 +70,15 @@ class ConfigTests extends FunSpec {
       assert(sc1.size == 2)
       assert(sc1.exists(k1))
       assert(sc1.exists(k2))
-      assert(sc1.exists(k2bad))
+      assert(!sc1.exists(k2bad))
 
       // Validation of the correct type needs to be done with concrete types, outside the generic API!
       assert(Try(sc1(k1)).isSuccess)
       assert(Try(sc1(k2)).isSuccess)
 
 //      FixMe: Along with keyname, type also needs to be compared during lookup. This requires design change which is planned after refactoring.
-//      assert(Try(sc1(k2bad)).isFailure)
-//      assert(Try(sc1.get(k2bad).get).isFailure)
+      assert(Try(sc1(k2bad)).isFailure)
+      assert(Try(sc1.get(k2bad).get).isFailure)
 
       assert(sc1.get(k1).head == i1)
       assert(sc1.get(k2).head == i2)
@@ -766,10 +766,8 @@ class ConfigTests extends FunSpec {
     val m4: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 0, 0), Array[Int](0, 1, 0), Array[Int](0, 0, 1))
     val i1                  = k1.set(m1)
     val i2                  = k1.set(m2)
-    println(i1 == i2)
-    println(m1 == m2)
-    val i3 = k1.set(m3)
-    val i4 = k1.set(m4)
+    val i3                  = k1.set(m3)
+    val i4                  = k1.set(m4)
 
     it("should short circuit with identical same matrices") {
       assert(i1.equals(i1))

@@ -22,7 +22,7 @@ case class DemandMatcher(demand: DemandState, withUnits: Boolean = false) extend
   def check(current: CurrentState): Boolean = {
     demand.paramSet.forall { di =>
       val foundItem: Option[Parameter[_]] = current.find(di)
-      foundItem.fold(false)(if (withUnits) _.equals(di) else _.values.equals(di.values))
+      foundItem.fold(false)(if (withUnits) _.equals(di) else _.values.sameElements(di.values))
     }
   }
 }
