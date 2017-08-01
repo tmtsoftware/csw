@@ -19,7 +19,6 @@ trait JsonSupport extends DefaultJsonProtocol {
 
   // JSON formats
   implicit val floatMatrixParameterFormat = jsonFormat3(FloatMatrixParameter.apply)
-  implicit val shortMatrixParameterFormat = jsonFormat3(ShortMatrixParameter.apply)
   implicit val longMatrixParameterFormat  = jsonFormat3(LongMatrixParameter.apply)
   implicit val choiceFormat               = jsonFormat1(Choice.apply)
   implicit val choicesFormat              = jsonFormat1(Choices.apply)
@@ -88,7 +87,6 @@ trait JsonSupport extends DefaultJsonProtocol {
 
   // JSON type tags
   private val floatMatrixType     = classOf[FloatMatrixParameter].getSimpleName
-  private val shortMatrixType     = classOf[ShortMatrixParameter].getSimpleName
   private val longMatrixType      = classOf[LongMatrixParameter].getSimpleName
   private val choiceType          = classOf[ChoiceParameter].getSimpleName
   private val structParameterType = classOf[StructParameter].getSimpleName
@@ -110,7 +108,6 @@ trait JsonSupport extends DefaultJsonProtocol {
   def writeParameter[S, I /*, J */ ](parameter: Parameter[S /*, J */ ]): JsValue = {
     val result: (JsString, JsValue) = parameter match {
       case i: FloatMatrixParameter => (JsString(floatMatrixType), floatMatrixParameterFormat.write(i))
-      case i: ShortMatrixParameter => (JsString(shortMatrixType), shortMatrixParameterFormat.write(i))
       case i: LongMatrixParameter  => (JsString(longMatrixType), longMatrixParameterFormat.write(i))
       case i: ChoiceParameter      => (JsString(choiceType), choiceParameterFormat.write(i))
       case i: StructParameter      => (JsString(structParameterType), structParameterFormat.write(i))
@@ -123,7 +120,6 @@ trait JsonSupport extends DefaultJsonProtocol {
     case JsObject(fields) =>
       (fields("type"), fields("parameter")) match {
         case (JsString(`floatMatrixType`), parameter)     => floatMatrixParameterFormat.read(parameter)
-        case (JsString(`shortMatrixType`), parameter)     => shortMatrixParameterFormat.read(parameter)
         case (JsString(`longMatrixType`), parameter)      => longMatrixParameterFormat.read(parameter)
         case (JsString(`choiceType`), parameter)          => choiceParameterFormat.read(parameter)
         case (JsString(`structParameterType`), parameter) => structParameterFormat.read(parameter)

@@ -4,7 +4,7 @@ import csw.param.Events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.JsonSupport._
 import csw.param.Parameters.{CommandInfo, Observe, Setup, Wait}
 import csw.param.StateVariable.{CurrentState, DemandState}
-import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, IntMatrixKey}
+import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, IntMatrixKey, ShortMatrixKey}
 import csw.param.parameters._
 import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
@@ -373,8 +373,8 @@ class JSONTests extends FunSpec {
 
   describe("Test Short Matrix items") {
     it("Should allow short matrix values") {
-      val k1  = ShortMatrixKey("myMatrix")
-      val m1  = ShortMatrix(Array.ofDim[Short](3, 3))
+      val k1  = ShortMatrixKey.make("myMatrix")
+      val m1  = GMatrix.fromArrays(Array.ofDim[Short](3, 3))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)

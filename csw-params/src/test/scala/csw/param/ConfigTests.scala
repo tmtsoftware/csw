@@ -3,7 +3,7 @@ package csw.param
 import csw.param.Events.StatusEvent
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
-import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, IntMatrixKey}
+import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, IntMatrixKey, ShortMatrixKey}
 import csw.param.parameters._
 import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
@@ -815,11 +815,11 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based short matrix equality") {
-    val k1 = ShortMatrixKey("myMatrix")
-    val m1 = ShortMatrix(Array(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](4, 6, 12)))
-    val m2 = ShortMatrix(Array(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](4, 6, 12)))
-    val m3 = ShortMatrix(Array(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](0, 6, 12))) // Note one value different
-    val m4 = ShortMatrix(Array(Array[Short](1, 0, 0), Array[Short](0, 1, 0), Array[Short](0, 0, 1)))
+    val k1 = ShortMatrixKey.make("myMatrix")
+    val m1 = GMatrix.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](4, 6, 12))
+    val m2 = GMatrix.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](4, 6, 12))
+    val m3 = GMatrix.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](0, 6, 12)) // Note one value different
+    val m4 = GMatrix.fromArrays(Array[Short](1, 0, 0), Array[Short](0, 1, 0), Array[Short](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)

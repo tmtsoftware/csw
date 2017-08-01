@@ -46,22 +46,6 @@ private[param] object JavaHelpers {
   def jset(key: LongMatrixKey, v: LongMatrix*) =
     LongMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
 
-  // ShortMatrixItem
-  def jvalue(item: ShortMatrixParameter): ShortMatrix = item.values(0)
-
-  def jvalue(item: ShortMatrixParameter, index: Int): ShortMatrix = item.values(index)
-
-  def jvalues(item: ShortMatrixParameter): java.util.List[ShortMatrix] = item.values.asJava
-
-  def jget(item: ShortMatrixParameter, index: Int): java.util.Optional[ShortMatrix] = item.get(index).asJava
-
-  def jset(key: ShortMatrixKey, v: java.util.List[ShortMatrix], units: Units): ShortMatrixParameter =
-    ShortMatrixParameter(key.keyName, v.asScala.toVector, units)
-
-  @varargs
-  def jset(key: ShortMatrixKey, v: ShortMatrix*) =
-    ShortMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
-
   def jadd[I <: Parameter[_], T <: ParameterSetType[T]](sc: T, items: java.util.List[I]): T = {
     val x = items.asScala
     x.foldLeft(sc)((r, i) => r.add(i))
