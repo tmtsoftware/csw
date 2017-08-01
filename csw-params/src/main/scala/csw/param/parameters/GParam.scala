@@ -10,27 +10,26 @@ import language.implicitConversions
 
 object GParam extends DefaultJsonProtocol {
 
-  private[parameters] def apply[S: JsonFormat: ClassTag](typeName: String,
-                                                         keyName: String,
-                                                         items: mutable.WrappedArray[S],
-                                                         units: Units): GParam[S] =
-    new GParam(typeName, keyName, items, units)
+  private[parameters] def apply[S: JsonFormat: ClassTag](
+      key: GKey[S],
+      items: mutable.WrappedArray[S],
+      units: Units
+  ): GParam[S] =
+    new GParam(key, items, units)
 
   implicit def parameterFormat[T: JsonFormat: ClassTag]: RootJsonFormat[GParam[T]] = new RootJsonFormat[GParam[T]] {
     override def write(obj: GParam[T]): JsValue = {
       JsObject(
-        "typeName" -> obj.typeName.toJson,
-        "keyName"  -> obj.keyName.toJson,
-        "items"    -> obj.items.array.toJson,
-        "units"    -> obj.units.toJson
+        "key"   -> obj.key.toJson,
+        "items" -> obj.items.array.toJson,
+        "units" -> obj.units.toJson
       )
     }
 
     override def read(json: JsValue): GParam[T] = {
       val fields = json.asJsObject.fields
       GParam(
-        fields("typeName").convertTo[String],
-        fields("keyName").convertTo[String],
+        fields("key").convertTo[GKey[T]],
         fields("items").convertTo[Array[T]],
         fields("units").convertTo[Units]
       )
@@ -43,15 +42,19 @@ object GParam extends DefaultJsonProtocol {
 /**
  * The type of a value for an GKey
  *
- * @param typeName the name of the type S (for JSON serialization)
- * @param keyName  the name of the key
+ * @param key      the key
  * @param items    the value for the key
  * @param units    the units of the value
  */
-case class GParam[S] private[param] (typeName: String, keyName: String, items: mutable.WrappedArray[S], units: Units)(
+case class GParam[S] private[param] (key: GKey[S], items: mutable.WrappedArray[S], units: Units)(
     implicit @transient jsFormat: JsonFormat[S],
     @transient cTag: ClassTag[S]
 ) extends Parameter[S] {
+
+  /**
+   * @return the name of the key for this parameter
+   */
+  override def keyName: String = key.keyName
 
   /**
    * @return All the values for this parameter
@@ -65,12 +68,29 @@ case class GParam[S] private[param] (typeName: String, keyName: String, items: m
   override def withUnits(unitsIn: Units): GParam[S] = copy(units = unitsIn)
 }
 
-class GKey[S: JsonFormat: ClassTag] private[parameters] (nameIn: String, typeName: String)
-    extends Key[S, GParam[S]](nameIn) {
+case class GKey[S] private[parameters] (name: String, keyType: KeyType[S])(implicit @transient jsFormat: JsonFormat[S],
+                                                                           @transient clsTag: ClassTag[S])
+    extends Key[S, GParam[S]](name) {
 
-  override def set(v: Vector[S], units: Units = NoUnits): GParam[S] = GParam(typeName, keyName, v.toArray[S], units)
+  override def set(v: Vector[S], units: Units = NoUnits): GParam[S] = GParam(this, v.toArray[S], units)
 
-  override def set(xs: S*): GParam[S] = GParam(typeName, keyName, xs.toArray[S], NoUnits)
+  override def set(xs: S*): GParam[S] = GParam(this, xs.toArray[S], NoUnits)
+}
+
+object GKey extends DefaultJsonProtocol {
+  implicit def format[S: JsonFormat: ClassTag]: JsonFormat[GKey[S]] = new JsonFormat[GKey[S]] {
+    override def write(obj: GKey[S]): JsValue = JsObject(
+      "name"    → obj.name.toJson,
+      "keyType" → obj.keyType.toJson
+    )
+    override def read(json: JsValue): GKey[S] = {
+      val fields = json.asJsObject.fields
+      GKey[S](
+        fields("name").convertTo[String],
+        fields("keyType").convertTo[KeyType[S]]
+      )
+    }
+  }
 }
 
 case class GArray[T](data: mutable.WrappedArray[T])

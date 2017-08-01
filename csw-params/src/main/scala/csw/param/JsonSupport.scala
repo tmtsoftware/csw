@@ -123,7 +123,7 @@ trait JsonSupport extends DefaultJsonProtocol {
       case i: LongMatrixParameter   => (JsString(longMatrixType), longMatrixParameterFormat.write(i))
       case i: ChoiceParameter       => (JsString(choiceType), choiceParameterFormat.write(i))
       case i: StructParameter       => (JsString(structParameterType), structParameterFormat.write(i))
-      case i: GParam[_]             => (JsString(i.typeName), i.toJson)
+      case i: GParam[_]             => (JsString(i.key.keyType.entryName), i.toJson)
     }
     JsObject("type" -> result._1, "parameter" -> result._2)
   }
@@ -139,12 +139,8 @@ trait JsonSupport extends DefaultJsonProtocol {
         case (JsString(`longMatrixType`), parameter)      => longMatrixParameterFormat.read(parameter)
         case (JsString(`choiceType`), parameter)          => choiceParameterFormat.read(parameter)
         case (JsString(`structParameterType`), parameter) => structParameterFormat.read(parameter)
-        case (JsString(name), parameter) =>
-          Formats.get(name) match {
-            case None         ⇒ unexpectedJsValueError(parameter)
-            case Some(format) ⇒ format.read(parameter)
-          }
-        case _ => unexpectedJsValueError(json)
+        case (JsString(name), parameter)                  => KeyType.withName(name).paramFormat.read(parameter)
+        case _                                            => unexpectedJsValueError(json)
       }
     case _ => unexpectedJsValueError(json)
   }
