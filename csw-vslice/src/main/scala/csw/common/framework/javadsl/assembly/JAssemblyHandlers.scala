@@ -16,5 +16,5 @@ abstract class JAssemblyHandlers[Msg <: DomainMsg: ClassTag](ctx: ActorContext[A
 
   def jInitialize(): CompletableFuture[Unit]
 
-  override def initialize(): Future[Unit] = jInitialize().toScala.map(_ ⇒ ())
+  override def initialize(): Future[Unit] = jInitialize().toScala
 }

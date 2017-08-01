@@ -16,5 +16,5 @@ abstract class JHcdHandlers[Msg <: DomainMsg](ctx: ActorContext[HcdMsg], hcdInfo
 
   def jInitialize(): CompletableFuture[Unit]
 
-  override def initialize(): Future[Unit] = jInitialize().toScala.map(_ ⇒ ())
+  override def initialize(): Future[Unit] = jInitialize().toScala
 }
