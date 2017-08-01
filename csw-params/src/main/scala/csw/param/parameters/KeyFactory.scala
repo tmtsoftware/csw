@@ -1,52 +1,57 @@
 package csw.param.parameters
 
 import csw.param.{JavaFormats, RaDec}
+import enumeratum.{Enum, EnumEntry}
 import spray.json.{DefaultJsonProtocol, JsonFormat}
 
+import scala.collection.immutable
 import scala.reflect.ClassTag
 
-sealed class KeyFactory[S: JsonFormat: ClassTag](typeName: String) {
-  def make(name: String): GKey[S] = new GKey[S](name, typeName)
-  Formats.register[S](typeName)
+sealed class KeyFactory[S: JsonFormat: ClassTag] extends EnumEntry {
+  def make(name: String): GKey[S] = new GKey[S](name, entryName)
+  Formats.register[S](entryName)
 }
 
-object Keys extends DefaultJsonProtocol with JavaFormats {
-  object RaDecKey  extends KeyFactory[RaDec]("RaDecKey")
-  object StringKey extends KeyFactory[String]("StringKey")
+object Keys extends DefaultJsonProtocol with JavaFormats with Enum[KeyFactory[_]] {
 
-  object IntKey     extends KeyFactory[Int]("IntKey")
-  object BooleanKey extends KeyFactory[Boolean]("JBooleanKey")
-  object CharKey    extends KeyFactory[Char]("CharKey")
-  object ShortKey   extends KeyFactory[Short]("JShortKey")
-  object DoubleKey  extends KeyFactory[Double]("JDoubleKey")
-  object FloatKey   extends KeyFactory[Float]("JFloatKey")
-  object LongKey    extends KeyFactory[Long]("JLongKey")
+  override def values: immutable.IndexedSeq[KeyFactory[_]] = findValues
 
-  object IntArrayKey    extends KeyFactory[GArray[Int]]("IntArrayKey")
-  object ByteArrayKey   extends KeyFactory[GArray[Byte]]("JByteArrayKey")
-  object DoubleArrayKey extends KeyFactory[GArray[Double]]("JDoubleArrayKey")
-  object FloatArrayKey  extends KeyFactory[GArray[Float]]("JFloatArrayKey")
-  object LongArrayKey   extends KeyFactory[GArray[Long]]("JLongArrayKey")
-  object ShortArrayKey  extends KeyFactory[GArray[Short]]("JShortArrayKey")
+  object RaDecKey  extends KeyFactory[RaDec]
+  object StringKey extends KeyFactory[String]
 
-  object IntMatrixKey extends KeyFactory[GArray[Array[Int]]]("IntMatrixKey")
+  object IntKey     extends KeyFactory[Int]
+  object BooleanKey extends KeyFactory[Boolean]
+  object CharKey    extends KeyFactory[Char]
+  object ShortKey   extends KeyFactory[Short]
+  object DoubleKey  extends KeyFactory[Double]
+  object FloatKey   extends KeyFactory[Float]
+  object LongKey    extends KeyFactory[Long]
 
-  object JIntKey     extends KeyFactory[java.lang.Integer]("JIntKey")
-  object JBooleanKey extends KeyFactory[java.lang.Boolean]("JBooleanKey")
-  object JCharKey    extends KeyFactory[java.lang.Character]("JCharacterKey")
-  object JShortKey   extends KeyFactory[java.lang.Short]("JShortKey")
-  object JDoubleKey  extends KeyFactory[java.lang.Double]("JDoubleKey")
-  object JFloatKey   extends KeyFactory[java.lang.Float]("JFloatKey")
-  object JLongKey    extends KeyFactory[java.lang.Long]("JLongKey")
+  object IntArrayKey    extends KeyFactory[GArray[Int]]
+  object ByteArrayKey   extends KeyFactory[GArray[Byte]]
+  object DoubleArrayKey extends KeyFactory[GArray[Double]]
+  object FloatArrayKey  extends KeyFactory[GArray[Float]]
+  object LongArrayKey   extends KeyFactory[GArray[Long]]
+  object ShortArrayKey  extends KeyFactory[GArray[Short]]
 
-  object JIntArrayKey    extends KeyFactory[GArray[java.lang.Integer]]("JIntegerArrayKey")
-  object JByteArrayKey   extends KeyFactory[GArray[java.lang.Byte]]("JByteArrayKey")
-  object JDoubleArrayKey extends KeyFactory[GArray[java.lang.Double]]("JDoubleArrayKey")
-  object JFloatArrayKey  extends KeyFactory[GArray[java.lang.Float]]("JFloatArrayKey")
-  object JLongArrayKey   extends KeyFactory[GArray[java.lang.Long]]("JLongArrayKey")
-  object JShortArrayKey  extends KeyFactory[GArray[java.lang.Short]]("JShortArrayKey")
+  object IntMatrixKey extends KeyFactory[GArray[Array[Int]]]
 
-  object JIntMatrixKey extends KeyFactory[GArray[Array[java.lang.Integer]]]("JIntegerMatrixKey")
+  object JIntKey     extends KeyFactory[java.lang.Integer]
+  object JBooleanKey extends KeyFactory[java.lang.Boolean]
+  object JCharKey    extends KeyFactory[java.lang.Character]
+  object JShortKey   extends KeyFactory[java.lang.Short]
+  object JDoubleKey  extends KeyFactory[java.lang.Double]
+  object JFloatKey   extends KeyFactory[java.lang.Float]
+  object JLongKey    extends KeyFactory[java.lang.Long]
+
+  object JIntArrayKey    extends KeyFactory[GArray[java.lang.Integer]]
+  object JByteArrayKey   extends KeyFactory[GArray[java.lang.Byte]]
+  object JDoubleArrayKey extends KeyFactory[GArray[java.lang.Double]]
+  object JFloatArrayKey  extends KeyFactory[GArray[java.lang.Float]]
+  object JLongArrayKey   extends KeyFactory[GArray[java.lang.Long]]
+  object JShortArrayKey  extends KeyFactory[GArray[java.lang.Short]]
+
+  object JIntMatrixKey extends KeyFactory[GArray[Array[java.lang.Integer]]]
 }
 
 object JKeys {
