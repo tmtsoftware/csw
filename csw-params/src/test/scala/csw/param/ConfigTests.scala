@@ -774,8 +774,6 @@ class ConfigTests extends FunSpec {
     }
 
     it("should be equal with identical different matrices") {
-      println(i1)
-      println(i2)
       assert(i1.equals(i2))
     }
 
