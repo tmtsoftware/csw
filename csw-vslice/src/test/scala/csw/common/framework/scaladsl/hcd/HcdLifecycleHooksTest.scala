@@ -20,7 +20,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.concurrent.{Await, Future}
 
-class LifecycleHooksTest
+class HcdLifecycleHooksTest
     extends FunSuite
     with Matchers
     with BeforeAndAfterEach
