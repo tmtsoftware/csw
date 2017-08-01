@@ -3,7 +3,7 @@ package csw.param
 import csw.param.Events.StatusEvent
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
-import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, IntMatrixKey, ShortMatrixKey}
+import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, FloatMatrixKey, IntMatrixKey, ShortMatrixKey}
 import csw.param.parameters._
 import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
@@ -695,11 +695,11 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based float matrix equality") {
-    val k1 = FloatMatrixKey("myMatrix")
-    val m1 = FloatMatrix(Array(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](4, 6, 12)))
-    val m2 = FloatMatrix(Array(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](4, 6, 12)))
-    val m3 = FloatMatrix(Array(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](0, 6, 12))) // Note one value different
-    val m4 = FloatMatrix(Array(Array[Float](1, 0, 0), Array[Float](0, 1, 0), Array[Float](0, 0, 1)))
+    val k1 = FloatMatrixKey.make("myMatrix")
+    val m1 = GMatrix.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](4, 6, 12))
+    val m2 = GMatrix.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](4, 6, 12))
+    val m3 = GMatrix.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](0, 6, 12)) // Note one value different
+    val m4 = GMatrix.fromArrays(Array[Float](1, 0, 0), Array[Float](0, 1, 0), Array[Float](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)

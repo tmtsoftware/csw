@@ -14,22 +14,6 @@ import scala.compat.java8.OptionConverters._
  */
 private[param] object JavaHelpers {
 
-  // FloatMatrixItem
-  def jvalue(item: FloatMatrixParameter): FloatMatrix = item.values(0)
-
-  def jvalue(item: FloatMatrixParameter, index: Int): FloatMatrix = item.values(index)
-
-  def jvalues(item: FloatMatrixParameter): java.util.List[FloatMatrix] = item.values.asJava
-
-  def jget(item: FloatMatrixParameter, index: Int): java.util.Optional[FloatMatrix] = item.get(index).asJava
-
-  def jset(key: FloatMatrixKey, v: java.util.List[FloatMatrix], units: Units): FloatMatrixParameter =
-    FloatMatrixParameter(key.keyName, v.asScala.toVector, units)
-
-  @varargs
-  def jset(key: FloatMatrixKey, v: FloatMatrix*) =
-    FloatMatrixParameter(key.keyName, v.toVector, units = UnitsOfMeasure.NoUnits)
-
   // LongMatrixItem
   def jvalue(item: LongMatrixParameter): LongMatrix = item.values(0)
 

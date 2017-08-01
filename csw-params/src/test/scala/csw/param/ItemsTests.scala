@@ -1,7 +1,7 @@
 package csw.param
 
 import csw.param.UnitsOfMeasure.{degrees, meters, seconds}
-import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, IntMatrixKey, ShortMatrixKey}
+import csw.param.parameters.KeyType.{ByteMatrixKey, DoubleMatrixKey, FloatMatrixKey, IntMatrixKey, ShortMatrixKey}
 import csw.param.parameters._
 import csw.param.parameters.matrices._
 import org.scalatest.{FunSpec, Matchers}
@@ -416,9 +416,9 @@ class ItemsTests extends FunSpec with Matchers {
     val m1: Array[Array[Float]] = Array(Array(1f, 2f, 3f), Array(4f, 5f, 6f), Array(7f, 8f, 9f))
     val m2: Array[Array[Float]] = Array(Array(1f, 2f, 3f, 4f, 5f), Array(10f, 20f, 30f, 40f, 50f))
 
-    val lm1 = FloatMatrix(m1)
-    val lm2 = FloatMatrix(m2)
-    val dk  = FloatMatrixKey(s1)
+    val lm1 = GMatrix.fromArrays(m1)
+    val lm2 = GMatrix.fromArrays(m2)
+    val dk  = FloatMatrixKey.make(s1)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
