@@ -101,7 +101,7 @@ trait JsonSupport extends DefaultJsonProtocol {
   def writeParameter[S, I /*, J */ ](parameter: Parameter[S /*, J */ ]): JsValue = {
     val result: (JsString, JsValue) = parameter match {
       case i: ChoiceParameter => (JsString(choiceType), choiceParameterFormat.write(i))
-      case i: GParam[_]       => (JsString(i.key.keyType.entryName), i.toJson)
+      case i: GParam[_]       => (JsString(i.keyType.entryName), i.toJson)
     }
     JsObject("type" -> result._1, "parameter" -> result._2)
   }
