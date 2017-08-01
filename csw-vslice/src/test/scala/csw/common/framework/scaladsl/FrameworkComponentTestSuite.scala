@@ -13,6 +13,7 @@ import csw.common.framework.scaladsl.hcd.{HcdHandlers, HcdHandlersFactory}
 import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
+import scala.concurrent.Await
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
 abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with BeforeAndAfterAll {
@@ -21,7 +22,7 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
   implicit val timeout  = Timeout(5.seconds)
 
   override protected def afterAll(): Unit = {
-    system.terminate()
+    Await.result(system.terminate(), 5.seconds)
   }
 
   val assemblyInfo = AssemblyInfo("trombone",

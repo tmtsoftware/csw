@@ -54,7 +54,7 @@ public class JAssemblyBehaviorTest {
 
     @AfterClass
     public static void afterAll() throws Exception {
-        system.terminate();
+        Await.result(system.terminate(), Duration.create(5, "seconds"));
     }
 
     @Test
