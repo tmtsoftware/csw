@@ -1,8 +1,9 @@
 package csw.common.ccs
 
 import akka.typed.ActorRef
-import csw.param.StateVariable.CurrentState
 import csw.common.ccs.CommandStatus.CommandResponse
+import csw.param.StateVariable.CurrentState
+import csw.trombone.assembly.actors.TromboneStateActor.StateWasSet
 
 sealed trait MultiStateMatcherMsgs
 object MultiStateMatcherMsgs {
@@ -16,4 +17,11 @@ object MultiStateMatcherMsgs {
   sealed trait ExecutingMsg                          extends MultiStateMatcherMsgs
   case class StateUpdate(currentState: CurrentState) extends ExecutingMsg
   case object Stop                                   extends ExecutingMsg
+}
+
+sealed trait CommandMsgs
+object CommandMsgs {
+  case class CommandStart(replyTo: ActorRef[CommandResponse]) extends CommandMsgs
+  case object StopCurrentCommand                              extends CommandMsgs
+  case class SetStateResponseE(response: StateWasSet)         extends CommandMsgs
 }

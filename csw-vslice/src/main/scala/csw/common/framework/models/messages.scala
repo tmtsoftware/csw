@@ -6,6 +6,18 @@ import csw.param.Parameters.{ControlCommand, Setup}
 import csw.param.StateVariable.CurrentState
 import csw.trombone.assembly.actors.TromboneStateActor.StateWasSet
 
+/////////////
+
+sealed trait PubSub[T]
+
+object PubSub {
+  case class Subscribe[T](ref: ActorRef[T])   extends PubSub[T]
+  case class Unsubscribe[T](ref: ActorRef[T]) extends PubSub[T]
+  case class Publish[T](data: T)              extends PubSub[T]
+}
+
+/////////////
+
 sealed trait LifecycleState
 
 object LifecycleState {
@@ -31,6 +43,16 @@ object ToComponentLifecycleMessage {
 
 ///////////////
 
+sealed trait FromComponentLifecycleMessage extends HcdResponseMode with AssemblyResponseMode
+
+object FromComponentLifecycleMessage {
+  case class InitializeFailure(reason: String) extends FromComponentLifecycleMessage
+  case class ShutdownFailure(reason: String)   extends FromComponentLifecycleMessage
+  case object ShutdownComplete                 extends FromComponentLifecycleMessage
+}
+
+///////////////
+
 sealed trait HcdResponseMode
 
 object HcdResponseMode {
@@ -40,24 +62,14 @@ object HcdResponseMode {
   case class Running(hcdRef: ActorRef[RunningHcdMsg], pubSubRef: ActorRef[PubSub[CurrentState]]) extends HcdResponseMode
 }
 
-///////////////
+//////////////////////////
 
-sealed trait FromComponentLifecycleMessage extends HcdResponseMode with AssemblyResponseMode
+sealed trait AssemblyResponseMode
 
-object FromComponentLifecycleMessage {
-  case class InitializeFailure(reason: String) extends FromComponentLifecycleMessage
-  case class ShutdownFailure(reason: String)   extends FromComponentLifecycleMessage
-  case object ShutdownComplete                 extends FromComponentLifecycleMessage
-}
-
-/////////////
-
-sealed trait PubSub[T]
-
-object PubSub {
-  case class Subscribe[T](ref: ActorRef[T])   extends PubSub[T]
-  case class Unsubscribe[T](ref: ActorRef[T]) extends PubSub[T]
-  case class Publish[T](data: T)              extends PubSub[T]
+object AssemblyResponseMode {
+  case object Idle                                                  extends AssemblyResponseMode
+  case class Initialized(assemblyRef: ActorRef[InitialAssemblyMsg]) extends AssemblyResponseMode
+  case class Running(assemblyRef: ActorRef[RunningAssemblyMsg])     extends AssemblyResponseMode
 }
 
 ///////////////
@@ -83,16 +95,6 @@ object RunningHcdMsg {
 }
 
 //////////////////////////
-
-sealed trait AssemblyResponseMode
-
-object AssemblyResponseMode {
-  case object Idle                                                  extends AssemblyResponseMode
-  case class Initialized(assemblyRef: ActorRef[InitialAssemblyMsg]) extends AssemblyResponseMode
-  case class Running(assemblyRef: ActorRef[RunningAssemblyMsg])     extends AssemblyResponseMode
-}
-
-//////////////////////////
 sealed trait AssemblyMsg
 
 sealed trait IdleAssemblyMsg extends AssemblyMsg
@@ -115,9 +117,3 @@ object RunningAssemblyMsg {
 }
 
 ///////////////////////
-sealed trait CommandMsgs
-object CommandMsgs {
-  case class CommandStart(replyTo: ActorRef[CommandResponse]) extends CommandMsgs
-  case object StopCurrentCommand                              extends CommandMsgs
-  case class SetStateResponseE(response: StateWasSet)         extends CommandMsgs
-}
