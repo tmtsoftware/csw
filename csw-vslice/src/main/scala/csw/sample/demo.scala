@@ -37,7 +37,7 @@ object Messages {
 }
 
 object Aggregator {
-  def behaviour: Behavior[GetMode] = Actor.mutable[Command](ctx ⇒ new Aggregator(ctx)).narrow
+  def behavior: Behavior[GetMode] = Actor.mutable[Command](ctx ⇒ new Aggregator(ctx)).narrow
 }
 
 class Aggregator(ctx: ActorContext[Command]) extends MutableBehavior[Command] {
@@ -104,7 +104,7 @@ object Client {
 
 object Demo extends App {
   private val wiring = Actor.deferred[NotUsed] { ctx ⇒
-    val aggregator = ctx.spawn(Aggregator.behaviour, "aggregator")
+    val aggregator = ctx.spawn(Aggregator.behavior, "aggregator")
     val client     = ctx.spawn(Client.behavior(0), "client")
     aggregator ! GetMode(client)
     Actor.empty

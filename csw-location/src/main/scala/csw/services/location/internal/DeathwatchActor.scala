@@ -18,7 +18,7 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
   import DeathwatchActor.Msg
 
   /**
-   * Deathwatch behaviour processes `DeathwatchActor.Msg` type events sent by replicator for newly registered Locations.
+   * Deathwatch behavior processes `DeathwatchActor.Msg` type events sent by replicator for newly registered Locations.
    * Terminated signal will be received upon termination of an actor that was being watched.
    *
    * @see [[akka.actor.Terminated]]

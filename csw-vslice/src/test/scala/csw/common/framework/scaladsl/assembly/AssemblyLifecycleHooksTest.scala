@@ -47,7 +47,7 @@ class AssemblyLifecycleHooksTest
                                     Set.empty)
 
     Await.result(
-      system.systemActorOf[Nothing](assemblyHandlersFactory.behaviour(assemblyInfo, supervisorProbe.ref), "Assembly"),
+      system.systemActorOf[Nothing](assemblyHandlersFactory.behavior(assemblyInfo, supervisorProbe.ref), "Assembly"),
       5.seconds
     )
 

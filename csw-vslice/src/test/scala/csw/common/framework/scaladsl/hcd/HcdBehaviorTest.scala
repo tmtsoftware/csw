@@ -50,7 +50,7 @@ class HcdBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
     val hcdRef =
       Await.result(
-        system.systemActorOf[Nothing](getSampleHcdFactory(sampleHcdHandler).behaviour(hcdInfo, supervisorProbe.ref),
+        system.systemActorOf[Nothing](getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref),
                                       "sampleHcd"),
         5.seconds
       )

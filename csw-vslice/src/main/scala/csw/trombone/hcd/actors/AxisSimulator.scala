@@ -12,7 +12,7 @@ import scala.concurrent.duration.DurationInt
 
 object AxisSimulator {
 
-  def behaviour(axisConfig: AxisConfig, replyTo: Option[ActorRef[AxisResponse]]): Behavior[AxisRequest] =
+  def behavior(axisConfig: AxisConfig, replyTo: Option[ActorRef[AxisResponse]]): Behavior[AxisRequest] =
     Actor.mutable[SimulatorCommand](ctx ⇒ new AxisSimulator(ctx, axisConfig: AxisConfig, replyTo)).narrow
 
   def limitMove(ac: AxisConfig, request: Int): Int = Math.max(Math.min(request, ac.highLimit), ac.lowLimit)
@@ -104,7 +104,7 @@ class AxisSimulator(ctx: ActorContext[SimulatorCommand],
       println(s"AxisHome: $axisState")
 
       val workerB =
-        MotionWorker.behaviour(current, axisConfig.home, delayInMS = 100, ctx.self, diagFlag = false)
+        MotionWorker.behavior(current, axisConfig.home, delayInMS = 100, ctx.self, diagFlag = false)
       val worker = ctx.spawnAnonymous(workerB)
 
       worker ! Start(ctx.self)
@@ -116,11 +116,11 @@ class AxisSimulator(ctx: ActorContext[SimulatorCommand],
       update(replyTo, AxisStarted)
       println(s"Move: $position")
 
-      val workerB = MotionWorker.behaviour(current,
-                                           limitMove(axisConfig, position),
-                                           delayInMS = axisConfig.stepDelayMS,
-                                           ctx.self,
-                                           diagFlag)
+      val workerB = MotionWorker.behavior(current,
+                                          limitMove(axisConfig, position),
+                                          delayInMS = axisConfig.stepDelayMS,
+                                          ctx.self,
+                                          diagFlag)
       val worker = ctx.spawn(workerB, s"moveWorker-${System.currentTimeMillis}")
 
       worker ! Start(ctx.self)

@@ -53,7 +53,7 @@ class AssemblyBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll
     val assemblyRef =
       Await.result(
         system.systemActorOf[Nothing](
-          getSampleHcdFactory(sampleAssemblyHandler).behaviour(assemblyInfo, supervisorProbe.ref),
+          getSampleHcdFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref),
           "assembly"
         ),
         5.seconds

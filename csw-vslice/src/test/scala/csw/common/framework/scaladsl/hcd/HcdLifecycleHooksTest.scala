@@ -47,7 +47,7 @@ class HcdLifecycleHooksTest
               FiniteDuration(5, "seconds"))
 
     Await.result(
-      system.systemActorOf[Nothing](hcdHandlersFactory.behaviour(hcdInfo, testProbeSupervisor.ref), "Hcd"),
+      system.systemActorOf[Nothing](hcdHandlersFactory.behavior(hcdInfo, testProbeSupervisor.ref), "Hcd"),
       5.seconds
     )
 

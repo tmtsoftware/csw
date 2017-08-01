@@ -14,7 +14,7 @@ import scala.reflect.ClassTag
 
 abstract class HcdHandlers[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo) {
   val domainAdapter: ActorRef[Msg]              = ctx.spawnAdapter(DomainHcdMsg.apply)
-  val pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.spawnAnonymous(PubSubActor.behaviour[CurrentState])
+  val pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.spawnAnonymous(PubSubActor.behavior[CurrentState])
 
   implicit val ec: ExecutionContext = ctx.executionContext
 

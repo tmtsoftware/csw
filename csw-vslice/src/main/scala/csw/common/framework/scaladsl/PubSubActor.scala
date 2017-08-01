@@ -6,7 +6,7 @@ import csw.common.framework.models.PubSub
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 
 object PubSubActor {
-  def behaviour[T]: Behavior[PubSub[T]] = Actor.mutable(ctx ⇒ new PubSubActor[T](ctx))
+  def behavior[T]: Behavior[PubSub[T]] = Actor.mutable(ctx ⇒ new PubSubActor[T](ctx))
 }
 
 class PubSubActor[T](ctx: ActorContext[PubSub[T]]) extends Actor.MutableBehavior[PubSub[T]] {

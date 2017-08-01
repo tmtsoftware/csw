@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
 abstract class AssemblyHandlersFactory[Msg <: DomainMsg: ClassTag] {
   def make(ctx: ActorContext[AssemblyMsg], assemblyInfo: AssemblyInfo): AssemblyHandlers[Msg]
 
-  def behaviour(assemblyInfo: AssemblyInfo, supervisor: ActorRef[AssemblyResponseMode]): Behavior[Nothing] =
+  def behavior(assemblyInfo: AssemblyInfo, supervisor: ActorRef[AssemblyResponseMode]): Behavior[Nothing] =
     Actor
       .mutable[AssemblyMsg](ctx ⇒ new AssemblyBehavior[Msg](ctx, supervisor, make(ctx, assemblyInfo)))
       .narrow

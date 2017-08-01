@@ -8,7 +8,7 @@ import csw.common.framework.models.RunningHcdMsg.Submit
 import csw.trombone.hcd.TromboneHcdState
 
 object TromboneControl {
-  def behaviour(ac: AssemblyContext, tromboneHcd: Option[ActorRef[Submit]]): Behavior[TromboneControlMsg] =
+  def behavior(ac: AssemblyContext, tromboneHcd: Option[ActorRef[Submit]]): Behavior[TromboneControlMsg] =
     Actor.immutable { (_, msg) ⇒
       msg match {
         case GoToStagePosition(stagePosition) =>
@@ -20,7 +20,7 @@ object TromboneControl {
           tromboneHcd.foreach(_ ! Submit(TromboneHcdState.positionSC(ac.commandInfo, encoderPosition)))
           Actor.same
         case UpdateTromboneHcd(runningIn) =>
-          behaviour(ac, runningIn)
+          behavior(ac, runningIn)
       }
     }
 }

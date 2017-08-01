@@ -32,7 +32,7 @@ class FollowCommand(ac: AssemblyContext,
     extends MutableBehavior[FollowCommandMessages] {
 
   val tromboneControl: ActorRef[TromboneControlMsg] =
-    ctx.spawn(TromboneControl.behaviour(ac, tromboneHCDIn), "TromboneControl")
+    ctx.spawn(TromboneControl.behavior(ac, tromboneHCDIn), "TromboneControl")
 
   var followActor: ActorRef[FollowActorMessages] = ctx.spawn(
     FollowActor.make(ac, initialElevation, nssInUseIn, Some(tromboneControl), eventPublisher, eventPublisher),

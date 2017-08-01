@@ -53,7 +53,7 @@ class AssemblyUniqueActionTest extends FunSuite with Matchers with BeforeAndAfte
 
     Await.result(
       system.systemActorOf[Nothing](
-        getSampleAssemblyFactory(sampleAssemblyHandler).behaviour(assemblyInfo, supervisorProbe.ref),
+        getSampleAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref),
         "sampleAssembly"
       ),
       5.seconds

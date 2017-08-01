@@ -36,7 +36,7 @@ class TromboneHcdHandlers(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo) extends H
 
   override def initialize(): Future[Unit] = async {
     axisConfig = await(getAxisConfig)
-    tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behaviour(axisConfig, Some(domainAdapter)))
+    tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behavior(axisConfig, Some(domainAdapter)))
     current = await(tromboneAxis ? InitialState)
     stats = await(tromboneAxis ? GetStatistics)
   }
