@@ -10,44 +10,43 @@ sealed class KeyFactory[S: JsonFormat: ClassTag](typeName: String) {
   Formats.register[S](typeName)
 }
 
-object Keys extends DefaultJsonProtocol {
-  val RaDecKey   = new KeyFactory[RaDec]("RaDecKey")
+object Keys extends DefaultJsonProtocol with JavaFormats {
+  val RaDecKey  = new KeyFactory[RaDec]("RaDecKey")
+  val StringKey = new KeyFactory[String]("StringKey")
+
+  //Scala types
   val IntKey     = new KeyFactory[Int]("IntKey")
-  val BooleanKey = new KeyFactory[Boolean]("BooleanKey")
+  val BooleanKey = new KeyFactory[Boolean]("JBooleanKey")
   val CharKey    = new KeyFactory[Char]("CharKey")
-  val ShortKey   = new KeyFactory[Short]("ShortKey")
-  val DoubleKey  = new KeyFactory[Double]("DoubleKey")
-  val StringKey  = new KeyFactory[String]("StringKey")
-  val FloatKey   = new KeyFactory[Float]("FloatKey")
-  val LongKey    = new KeyFactory[Long]("LongKey")
+  val ShortKey   = new KeyFactory[Short]("JShortKey")
+  val DoubleKey  = new KeyFactory[Double]("JDoubleKey")
+  val FloatKey   = new KeyFactory[Float]("JFloatKey")
+  val LongKey    = new KeyFactory[Long]("JLongKey")
 
   val IntArrayKey    = new KeyFactory[GArray[Int]]("IntArrayKey")
-  val ByteArrayKey   = new KeyFactory[GArray[Byte]]("ByteArrayKey")
-  val DoubleArrayKey = new KeyFactory[GArray[Double]]("DoubleArrayKey")
-  val FloatArrayKey  = new KeyFactory[GArray[Float]]("FloatArrayKey")
-  val LongArrayKey   = new KeyFactory[GArray[Long]]("LongArrayKey")
-  val ShortArrayKey  = new KeyFactory[GArray[Short]]("ShortArrayKey")
+  val ByteArrayKey   = new KeyFactory[GArray[Byte]]("JByteArrayKey")
+  val DoubleArrayKey = new KeyFactory[GArray[Double]]("JDoubleArrayKey")
+  val FloatArrayKey  = new KeyFactory[GArray[Float]]("JFloatArrayKey")
+  val LongArrayKey   = new KeyFactory[GArray[Long]]("JLongArrayKey")
+  val ShortArrayKey  = new KeyFactory[GArray[Short]]("JShortArrayKey")
 
   val IntMatrixKey = new KeyFactory[GArray[Array[Int]]]("IntMatrixKey")
-}
 
-object JKeys extends JavaFormats {
-  val RaDecKey     = new KeyFactory[RaDec]("JRaDecKey")
-  val IntegerKey   = new KeyFactory[java.lang.Integer]("JIntegerKey")
-  val BooleanKey   = new KeyFactory[java.lang.Boolean]("JBooleanKey")
-  val CharacterKey = new KeyFactory[java.lang.Character]("JCharacterKey")
-  val ShortKey     = new KeyFactory[java.lang.Short]("JShortKey")
-  val DoubleKey    = new KeyFactory[java.lang.Double]("JDoubleKey")
-  val StringKey    = new KeyFactory[java.lang.String]("JStringKey")
-  val FloatKey     = new KeyFactory[java.lang.Float]("JFloatKey")
-  val LongKey      = new KeyFactory[java.lang.Long]("JLongKey")
+  //Java types
+  val JIntKey     = new KeyFactory[java.lang.Integer]("JIntKey")
+  val JBooleanKey = new KeyFactory[java.lang.Boolean]("JBooleanKey")
+  val JCharKey    = new KeyFactory[java.lang.Character]("JCharacterKey")
+  val JShortKey   = new KeyFactory[java.lang.Short]("JShortKey")
+  val JDoubleKey  = new KeyFactory[java.lang.Double]("JDoubleKey")
+  val JFloatKey   = new KeyFactory[java.lang.Float]("JFloatKey")
+  val JLongKey    = new KeyFactory[java.lang.Long]("JLongKey")
 
-  val IntegerArrayKey = new KeyFactory[GArray[java.lang.Integer]]("JIntegerArrayKey")
-  val ByteArrayKey    = new KeyFactory[GArray[java.lang.Byte]]("JByteArrayKey")
-  val DoubleArrayKey  = new KeyFactory[GArray[java.lang.Double]]("JDoubleArrayKey")
-  val FloatArrayKey   = new KeyFactory[GArray[java.lang.Float]]("JFloatArrayKey")
-  val LongArrayKey    = new KeyFactory[GArray[java.lang.Long]]("JLongArrayKey")
-  val ShortArrayKey   = new KeyFactory[GArray[java.lang.Short]]("JShortArrayKey")
+  val JIntArrayKey    = new KeyFactory[GArray[java.lang.Integer]]("JIntegerArrayKey")
+  val JByteArrayKey   = new KeyFactory[GArray[java.lang.Byte]]("JByteArrayKey")
+  val JDoubleArrayKey = new KeyFactory[GArray[java.lang.Double]]("JDoubleArrayKey")
+  val JFloatArrayKey  = new KeyFactory[GArray[java.lang.Float]]("JFloatArrayKey")
+  val JLongArrayKey   = new KeyFactory[GArray[java.lang.Long]]("JLongArrayKey")
+  val JShortArrayKey  = new KeyFactory[GArray[java.lang.Short]]("JShortArrayKey")
 
-  val IntegerMatrixKey = new KeyFactory[GArray[Array[java.lang.Integer]]]("JIntegerMatrixKey")
+  val JIntMatrixKey = new KeyFactory[GArray[Array[java.lang.Integer]]]("JIntegerMatrixKey")
 }

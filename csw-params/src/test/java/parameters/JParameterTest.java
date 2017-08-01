@@ -4,7 +4,7 @@ import csw.param.TestJavaFormats;
 import csw.param.parameters.GArray;
 import csw.param.parameters.GKey;
 import csw.param.parameters.GParam;
-import csw.param.parameters.JKeys;
+import csw.param.parameters.Keys;
 import org.junit.Assert;
 import org.junit.Test;
 import spray.json.JsValue;
@@ -17,7 +17,7 @@ public class JParameterTest {
     public void testBooleanParameter() {
         String encoder = "encoder";
 
-        GKey<Boolean> key = JKeys.BooleanKey().make(encoder);
+        GKey<Boolean> key = Keys.JBooleanKey().make(encoder);
         GParam<Boolean> param = key.set(true, false);
 
         Vector<Boolean> booleanVector = new Vector<Boolean>();
@@ -34,7 +34,7 @@ public class JParameterTest {
         Integer[] array = {1, 2, 3};
 
         GArray<Integer> gArray = GArray.fromArray(array);
-        GKey<GArray<Integer>> arrayKey = JKeys.IntegerArrayKey().make("arrayKey");
+        GKey<GArray<Integer>> arrayKey = Keys.JIntArrayKey().make("arrayKey");
         GParam<GArray<Integer>> arrayGParam = arrayKey.set(gArray);
 
 //        Assert.assertEquals(arrayGParam.values(),

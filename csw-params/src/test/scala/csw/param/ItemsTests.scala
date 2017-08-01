@@ -57,7 +57,7 @@ class ItemsTests extends FunSpec with Matchers {
     }
   }
 
-  describe("test ByteArrayKey") {
+  describe("test JByteArrayKey") {
     val a1: Array[Byte] = Array[Byte](1, 2, 3, 4, 5)
     val a2: Array[Byte] = Array[Byte](10, 20, 30, 40, 50)
 
@@ -629,7 +629,7 @@ class ItemsTests extends FunSpec with Matchers {
     }
   }
 
-  describe("test LongArrayKey") {
+  describe("test JLongArrayKey") {
     val a1: Array[Long] = Array(1, 2, 3, 4, 5)
     val a2: Array[Long] = Array(10, 20, 30, 40, 50)
 
