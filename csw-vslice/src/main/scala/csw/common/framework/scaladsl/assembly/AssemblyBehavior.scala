@@ -7,7 +7,7 @@ import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.models.AssemblyResponseMode.{Idle, Initialized, Running}
-import csw.common.framework.models.FromComponentLifecycleMessage.{InitializeFailure, RestartFailure, ShutdownComplete}
+import csw.common.framework.models.FromComponentLifecycleMessage.{InitializeFailure, ShutdownComplete}
 import csw.common.framework.models.IdleAssemblyMsg.{Initialize, Start}
 import csw.common.framework.models.InitialAssemblyMsg.Run
 import csw.common.framework.models.RunningAssemblyMsg._
@@ -45,26 +45,25 @@ class AssemblyBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[AssemblyMsg
     this
   }
 
-  def initialization(): Future[Unit] = async {
-    await(assemblyHandlers.initialize())
-    mode = Initialized(ctx.self)
-  }
+  def initialization(): Future[Unit] =
+    async {
+      await(assemblyHandlers.initialize())
+      mode = Initialized(ctx.self)
+    } recover {
+      case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
+    }
 
   private def onIdle(x: IdleAssemblyMsg): Unit = x match {
     case Initialize =>
       async {
         await(initialization())
         supervisor ! mode
-      } recover {
-        case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
       }
 
     case Start ⇒
       async {
         await(initialization())
         ctx.self ! Run
-      } recover {
-        case NonFatal(ex) ⇒ supervisor ! RestartFailure(ex.getMessage)
       }
   }
 

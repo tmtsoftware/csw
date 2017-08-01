@@ -2,7 +2,7 @@ package csw.common.framework.scaladsl.hcd
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.common.framework.models.FromComponentLifecycleMessage.{InitializeFailure, RestartFailure, ShutdownComplete}
+import csw.common.framework.models.FromComponentLifecycleMessage.{InitializeFailure, ShutdownComplete}
 import csw.common.framework.models.HcdResponseMode.{Idle, Initialized, Running}
 import csw.common.framework.models.IdleHcdMsg.{Initialize, Start}
 import csw.common.framework.models.InitialHcdMsg.Run
@@ -35,25 +35,24 @@ class HcdBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[HcdMsg],
     this
   }
 
-  def initialization(): Future[Unit] = async {
-    await(hcdHandlers.initialize())
-    mode = Initialized(ctx.self, hcdHandlers.pubSubRef)
-  }
+  def initialization(): Future[Unit] =
+    async {
+      await(hcdHandlers.initialize())
+      mode = Initialized(ctx.self, hcdHandlers.pubSubRef)
+    } recover {
+      case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
+    }
 
   private def onIdle(x: IdleHcdMsg): Unit = x match {
     case Initialize =>
       async {
         await(initialization())
         supervisor ! mode
-      } recover {
-        case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
       }
     case Start ⇒
       async {
         await(initialization())
         ctx.self ! Run
-      } recover {
-        case NonFatal(ex) ⇒ supervisor ! RestartFailure(ex.getMessage)
       }
   }
 
