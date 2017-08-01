@@ -63,11 +63,7 @@ object TromboneStateActor {
               nss: GParam[Boolean],
               replyTo: ActorRef[StateWasSet]): SetState = SetState(TromboneState(cmd, move, sodiumLayer, nss), replyTo)
 
-    def apply(cmd: Choice,
-              move: Choice,
-              sodiumLayer: Boolean,
-              nss: Boolean,
-              replyTo: ActorRef[StateWasSet]): SetState =
+    def apply(cmd: Choice, move: Choice, sodiumLayer: Boolean, nss: Boolean, replyTo: ActorRef[StateWasSet]): SetState =
       SetState(TromboneState(cmdItem(cmd), moveItem(move), sodiumItem(sodiumLayer), nssItem(nss)), replyTo)
   }
 
