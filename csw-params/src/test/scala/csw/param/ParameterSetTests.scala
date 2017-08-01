@@ -1,7 +1,8 @@
 package csw.param
 
 import csw.param.Parameters._
-import csw.param.parameters.{GArray, KeyType}
+import csw.param.models.ArrayData
+import csw.param.parameters.KeyType
 import org.scalatest.FunSpec
 import spray.json.DefaultJsonProtocol
 
@@ -32,7 +33,7 @@ class ParameterSetTests extends FunSpec {
   val i11 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees) // This is here to see if it is checking equality or address
   val i2  = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
   val i3  = k3.set("A", "B", "C")
-  val i4  = k4.set(GArray(Array.fill[Long](100)(10)), GArray(Array.fill[Long](100)(100)))
+  val i4  = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
   val i5  = k1.set(22) // This is not added for testing not present removal
 
   describe("test Configurations3 Setup") {

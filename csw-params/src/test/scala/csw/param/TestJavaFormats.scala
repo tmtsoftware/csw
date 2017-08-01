@@ -1,8 +1,10 @@
 package csw.param
 
-import csw.param.parameters.{JavaFormats, Parameter}
+import csw.param.parameters.Parameter
 import spray.json.JsonFormat
 import java.lang
+
+import csw.param.formats.JavaFormats
 
 import scala.reflect.ClassTag
 

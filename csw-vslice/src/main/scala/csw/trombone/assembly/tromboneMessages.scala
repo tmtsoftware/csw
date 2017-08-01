@@ -8,7 +8,8 @@ import csw.common.framework.models.RunningHcdMsg.Submit
 import csw.param.Events.EventTime
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
-import csw.param.parameters.{Choice, Parameter}
+import csw.param.models.Choice
+import csw.param.parameters.Parameter
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 
 sealed trait FollowCommandMessages

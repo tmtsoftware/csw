@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.parameters.{GArray, GMatrix}
+import csw.param.models.{ArrayData, MatrixData}
 import org.scalatest.FunSpec
 
 /**
@@ -10,9 +10,9 @@ class ArrayAndMatrixEqualityTests extends FunSpec {
   import ArrayAndMatrixEquality._
 
   describe("arraySizeEqual") {
-    val m1: GArray[Long] = GArray(Array(1, 2, 3))
-    val m2: GArray[Long] = GArray(Array(1, 2, 3))
-    val m3: GArray[Long] = GArray(Array(1, 2, 4, 8, 16))
+    val m1: ArrayData[Long] = ArrayData(Array(1, 2, 3))
+    val m2: ArrayData[Long] = ArrayData(Array(1, 2, 3))
+    val m3: ArrayData[Long] = ArrayData(Array(1, 2, 4, 8, 16))
     it("should notice if arrays are equal length") {
       assert(wrappedArraySizeEqual(m1.data, m2.data))
     }
@@ -22,9 +22,9 @@ class ArrayAndMatrixEqualityTests extends FunSpec {
   }
 
   describe("deepArrayValueEquals") {
-    val m1: GArray[Long] = GArray(Array(1, 2, 3))
-    val m2: GArray[Long] = GArray(Array(1, 2, 3))
-    val m3: GArray[Long] = GArray(Array(1, 2, 4))
+    val m1: ArrayData[Long] = ArrayData(Array(1, 2, 3))
+    val m2: ArrayData[Long] = ArrayData(Array(1, 2, 3))
+    val m3: ArrayData[Long] = ArrayData(Array(1, 2, 4))
 
     it("should see two arrays equal") {
       assert(deepWrappedArrayValueEquals(m1.data, m2.data))
@@ -35,10 +35,10 @@ class ArrayAndMatrixEqualityTests extends FunSpec {
   }
 
   describe("deepArrayValueEquals") {
-    val m1: GArray[Long] = GArray(Array(1, 2, 3))
-    val m2: GArray[Long] = GArray(Array(1, 2, 3))
-    val m3: GArray[Long] = GArray(Array(1, 2, 4, 8, 16))
-    val m4: GArray[Long] = GArray(Array(1, 2, 4, 9, 16))
+    val m1: ArrayData[Long] = ArrayData(Array(1, 2, 3))
+    val m2: ArrayData[Long] = ArrayData(Array(1, 2, 3))
+    val m3: ArrayData[Long] = ArrayData(Array(1, 2, 4, 8, 16))
+    val m4: ArrayData[Long] = ArrayData(Array(1, 2, 4, 9, 16))
 
     it("should succeed with equal lengths and values") {
       assert(deepWrappedArrayEquals(m1.data, m2.data))
@@ -52,11 +52,11 @@ class ArrayAndMatrixEqualityTests extends FunSpec {
   }
 
   describe("vectorEquals2") {
-    val m1: GArray[Long] = GArray(Array(1, 2, 3))
-    val m2: GArray[Long] = GArray(Array(1, 2, 3))
-    val m3: GArray[Long] = GArray(Array(1, 2, 4))
+    val m1: ArrayData[Long] = ArrayData(Array(1, 2, 3))
+    val m2: ArrayData[Long] = ArrayData(Array(1, 2, 3))
+    val m3: ArrayData[Long] = ArrayData(Array(1, 2, 4))
 
-    val f = (l: GArray[Long]) => l.data.toArray
+    val f = (l: ArrayData[Long]) => l.data.toArray
     it("should notice equality for single member vectors of arrays") {
       // One member vectors, same values but different vectors, should be true
       assert(vectorEquals2(Vector(m1), Vector(m2), f))
@@ -76,9 +76,9 @@ class ArrayAndMatrixEqualityTests extends FunSpec {
   }
 
   describe("deepMatrixValueEquals") {
-    val m1 = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
-    val m2 = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
-    val m3 = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 0), Array(4, 6, 12))
+    val m1 = MatrixData.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
+    val m2 = MatrixData.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
+    val m3 = MatrixData.fromArrays(Array(1, 2, 3), Array(2, 3, 0), Array(4, 6, 12))
 
     it("should return true for the same matrix") {
       assert(deepMatrixValueEquals(m1.data, m1.data))

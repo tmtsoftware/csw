@@ -1,8 +1,9 @@
-package csw.param.parameters
+package csw.param.formats
 
 import enumeratum.{Enum, EnumEntry}
 import spray.json.{DefaultJsonProtocol, JsString, JsValue, JsonFormat}
-import language.higherKinds
+
+import scala.language.higherKinds
 
 object EnumJsonSupport extends DefaultJsonProtocol {
   def format[E[x] <: EnumEntry, T](enum: Enum[E[_]]): JsonFormat[E[T]] = new JsonFormat[E[T]] {

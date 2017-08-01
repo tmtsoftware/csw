@@ -1,6 +1,7 @@
 package csw.param
 
 import csw.param.UnitsOfMeasure.{degrees, meters, seconds}
+import csw.param.models._
 import csw.param.parameters.KeyType.{
   ByteMatrixKey,
   ChoiceKey,
@@ -70,12 +71,12 @@ class ItemsTests extends FunSpec with Matchers {
     val a1: Array[Byte] = Array[Byte](1, 2, 3, 4, 5)
     val a2: Array[Byte] = Array[Byte](10, 20, 30, 40, 50)
 
-    val la1 = GArray(a1)
-    val la2 = GArray(a2)
+    val la1 = ArrayData(a1)
+    val la2 = ArrayData(a2)
     val lk  = KeyType.ByteArrayKey.make(s1)
 
     it("should test single item") {
-      val di: Parameter[GArray[Byte]] = lk.set(la1)
+      val di: Parameter[ArrayData[Byte]] = lk.set(la1)
       di.values should equal(Vector(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
@@ -84,7 +85,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Vector(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2: Parameter[GArray[Byte]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2: Parameter[ArrayData[Byte]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
@@ -106,7 +107,7 @@ class ItemsTests extends FunSpec with Matchers {
     }
 
     it("should test using var args") {
-      val li3: Parameter[GArray[Byte]] = lk.set(la1, la2)
+      val li3: Parameter[ArrayData[Byte]] = lk.set(la1, la2)
       li3.value(1) should equal(la2)
       li3.values should equal(listIn)
 
@@ -114,9 +115,9 @@ class ItemsTests extends FunSpec with Matchers {
       val b: Array[Byte] = Array[Byte](10, 20, 30)
       val c: Array[Byte] = Array[Byte](100, 101, 102)
 
-      val li4: Parameter[GArray[Byte]] = lk.set(a, b, c).withUnits(meters)
+      val li4: Parameter[ArrayData[Byte]] = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
-      li4.value(2) should equal(GArray(c))
+      li4.value(2) should equal(ArrayData(c))
     }
   }
 
@@ -124,8 +125,8 @@ class ItemsTests extends FunSpec with Matchers {
     val m1: Array[Array[Byte]] = Array(Array[Byte](1, 2, 3), Array[Byte](4, 5, 6), Array[Byte](7, 8, 9))
     val m2: Array[Array[Byte]] = Array(Array[Byte](1, 2, 3, 4, 5), Array[Byte](10, 20, 30, 40, 50))
 
-    val lm1 = GMatrix.fromArrays(m1)
-    val lm2 = GMatrix.fromArrays(m2)
+    val lm1 = MatrixData.fromArrays(m1)
+    val lm2 = MatrixData.fromArrays(m2)
     val dk  = ByteMatrixKey.make(s1)
 
     it("should work with a single item") {
@@ -234,8 +235,8 @@ class ItemsTests extends FunSpec with Matchers {
     val a1 = Array[Double](1.0, 2.0, 3.0, 4.0, 5.0)
     val a2 = Array[Double](10.0, 20.0, 30.0, 40.0, 50.0)
 
-    val la1 = GArray(a1)
-    val la2 = GArray(a2)
+    val la1 = ArrayData(a1)
+    val la2 = ArrayData(a2)
     val lk  = KeyType.DoubleArrayKey.make(s1)
 
     it("should test single item") {
@@ -280,7 +281,7 @@ class ItemsTests extends FunSpec with Matchers {
 
       val li4 = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
-      li4.value(2) should equal(GArray(c))
+      li4.value(2) should equal(ArrayData(c))
     }
   }
 
@@ -288,8 +289,8 @@ class ItemsTests extends FunSpec with Matchers {
     val m1: Array[Array[Double]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
     val m2: Array[Array[Double]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
 
-    val lm1 = GMatrix.fromArrays(m1)
-    val lm2 = GMatrix.fromArrays(m2)
+    val lm1 = MatrixData.fromArrays(m1)
+    val lm2 = MatrixData.fromArrays(m2)
     val dk  = DoubleMatrixKey.make(s1)
 
     it("should work with a single item") {
@@ -370,8 +371,8 @@ class ItemsTests extends FunSpec with Matchers {
     val a1 = Array[Float](1.0f, 2.0f, 3.0f, 4.0f, 5.0f)
     val a2 = Array[Float](10.0f, 20.0f, 30.0f, 40.0f, 50.0f)
 
-    val la1 = GArray(a1)
-    val la2 = GArray(a2)
+    val la1 = ArrayData(a1)
+    val la2 = ArrayData(a2)
     val lk  = KeyType.FloatArrayKey.make(s1)
 
     it("should test single item") {
@@ -416,7 +417,7 @@ class ItemsTests extends FunSpec with Matchers {
 
       val li4 = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
-      li4.value(2) should equal(GArray(c))
+      li4.value(2) should equal(ArrayData(c))
     }
   }
 
@@ -424,8 +425,8 @@ class ItemsTests extends FunSpec with Matchers {
     val m1: Array[Array[Float]] = Array(Array(1f, 2f, 3f), Array(4f, 5f, 6f), Array(7f, 8f, 9f))
     val m2: Array[Array[Float]] = Array(Array(1f, 2f, 3f, 4f, 5f), Array(10f, 20f, 30f, 40f, 50f))
 
-    val lm1 = GMatrix.fromArrays(m1)
-    val lm2 = GMatrix.fromArrays(m2)
+    val lm1 = MatrixData.fromArrays(m1)
+    val lm2 = MatrixData.fromArrays(m2)
     val dk  = FloatMatrixKey.make(s1)
 
     it("should work with a single item") {
@@ -507,8 +508,8 @@ class ItemsTests extends FunSpec with Matchers {
     val a1 = Array[Int](1, 2, 3, 4, 5)
     val a2 = Array[Int](10, 20, 30, 40, 50)
 
-    val la1 = GArray(a1)
-    val la2 = GArray(a2)
+    val la1 = ArrayData(a1)
+    val la2 = ArrayData(a2)
     val lk  = KeyType.IntArrayKey.make(s1)
 
     it("should test single item") {
@@ -553,7 +554,7 @@ class ItemsTests extends FunSpec with Matchers {
 
       val li4 = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
-      li4.value(2) should equal(GArray(c))
+      li4.value(2) should equal(ArrayData(c))
     }
   }
 
@@ -561,8 +562,8 @@ class ItemsTests extends FunSpec with Matchers {
     val m1: Array[Array[Int]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
     val m2: Array[Array[Int]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
 
-    val lm1 = GMatrix.fromArrays(m1)
-    val lm2 = GMatrix.fromArrays(m2)
+    val lm1 = MatrixData.fromArrays(m1)
+    val lm2 = MatrixData.fromArrays(m2)
     val dk  = IntMatrixKey.make(s1)
 
     it("should work with a single item") {
@@ -642,12 +643,12 @@ class ItemsTests extends FunSpec with Matchers {
     val a1: Array[Long] = Array(1, 2, 3, 4, 5)
     val a2: Array[Long] = Array(10, 20, 30, 40, 50)
 
-    val la1: GArray[Long]     = GArray(a1)
-    val la2: GArray[Long]     = GArray(a2)
-    val lk: Key[GArray[Long]] = KeyType.LongArrayKey.make(s1)
+    val la1: ArrayData[Long]     = ArrayData(a1)
+    val la2: ArrayData[Long]     = ArrayData(a2)
+    val lk: Key[ArrayData[Long]] = KeyType.LongArrayKey.make(s1)
 
     it("should test single item") {
-      val di: Parameter[GArray[Long]] = lk.set(la1)
+      val di: Parameter[ArrayData[Long]] = lk.set(la1)
       di.values should equal(Vector(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
@@ -656,7 +657,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Vector(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2: Parameter[GArray[Long]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2: Parameter[ArrayData[Long]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
@@ -678,7 +679,7 @@ class ItemsTests extends FunSpec with Matchers {
     }
 
     it("should test using var args") {
-      val li3: Parameter[GArray[Long]] = lk.set(la1, la2)
+      val li3: Parameter[ArrayData[Long]] = lk.set(la1, la2)
       li3.value(1) should equal(la2)
       li3.values should equal(listIn)
 
@@ -686,9 +687,9 @@ class ItemsTests extends FunSpec with Matchers {
       val b: Array[Long] = Array(10, 20, 30)
       val c: Array[Long] = Array(100, 200, 300)
 
-      val li4: Parameter[GArray[Long]] = lk.set(a, b, c).withUnits(meters)
+      val li4: Parameter[ArrayData[Long]] = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
-      li4.value(2) should equal(GArray(c))
+      li4.value(2) should equal(ArrayData(c))
     }
   }
 
@@ -696,9 +697,9 @@ class ItemsTests extends FunSpec with Matchers {
     val m1: Array[Array[Long]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
     val m2: Array[Array[Long]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
 
-    val lm1: GMatrix[Long]     = GMatrix.fromArrays(m1)
-    val lm2: GMatrix[Long]     = GMatrix.fromArrays(m2)
-    val dk: Key[GMatrix[Long]] = LongMatrixKey.make(s1)
+    val lm1: MatrixData[Long]     = MatrixData.fromArrays(m1)
+    val lm2: MatrixData[Long]     = MatrixData.fromArrays(m2)
+    val dk: Key[MatrixData[Long]] = LongMatrixKey.make(s1)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
@@ -779,8 +780,8 @@ class ItemsTests extends FunSpec with Matchers {
     val a1 = Array[Short](1, 2, 3, 4, 5)
     val a2 = Array[Short](10, 20, 30, 40, 50)
 
-    val la1 = GArray(a1)
-    val la2 = GArray(a2)
+    val la1 = ArrayData(a1)
+    val la2 = ArrayData(a2)
     val lk  = KeyType.ShortArrayKey.make(s1)
 
     it("should test single item") {
@@ -825,7 +826,7 @@ class ItemsTests extends FunSpec with Matchers {
 
       val li4 = lk.set(a, b, c).withUnits(meters)
       li4.values.size should be(3)
-      li4.value(2) should equal(GArray(c))
+      li4.value(2) should equal(ArrayData(c))
     }
   }
 
@@ -833,8 +834,8 @@ class ItemsTests extends FunSpec with Matchers {
     val m1: Array[Array[Short]] = Array(Array[Short](1, 2, 3), Array[Short](4, 5, 6), Array[Short](7, 8, 9))
     val m2: Array[Array[Short]] = Array(Array[Short](1, 2, 3, 4, 5), Array[Short](10, 20, 30, 40, 50))
 
-    val lm1 = GMatrix.fromArrays(m1)
-    val lm2 = GMatrix.fromArrays(m2)
+    val lm1 = MatrixData.fromArrays(m1)
+    val lm2 = MatrixData.fromArrays(m2)
     val dk  = ShortMatrixKey.make(s1)
 
     it("should work with a single item") {

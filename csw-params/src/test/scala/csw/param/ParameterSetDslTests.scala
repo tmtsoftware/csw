@@ -4,8 +4,9 @@ import csw.param.UnitsOfMeasure.{degrees, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 import csw.param.ParameterSetDsl._
 import csw.param.Parameters.{CommandInfo, Setup}
+import csw.param.models.{ArrayData, MatrixData}
 import csw.param.parameters.KeyType.LongMatrixKey
-import csw.param.parameters.{GArray, GMatrix, KeyType, Parameter}
+import csw.param.parameters.{KeyType, Parameter}
 
 /**
  * Tests the config DSL
@@ -77,11 +78,11 @@ class ParameterSetDslTests extends FunSpec with Matchers {
 
       val i1 = k1.set(m1, m2)
       i1.size should be(2)
-      head(i1) should equal(GArray(m1))
+      head(i1) should equal(ArrayData(m1))
       head(i1).data should equal(m1)
-      values(i1) should equal(Vector(GArray(m1), GArray(m2)))
-      values(i1)(0) should equal(GArray(m1))
-      values(i1)(1) should equal(GArray(m2))
+      values(i1) should equal(Vector(ArrayData(m1), ArrayData(m2)))
+      values(i1)(0) should equal(ArrayData(m1))
+      values(i1)(1) should equal(ArrayData(m2))
     }
   }
 
@@ -91,12 +92,12 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     it("should allow setting") {
       val m1: Array[Array[Long]] = Array(Array(1, 2, 4), Array(2, 4, 8), Array(4, 8, 16))
       // Note that LongMatrix implicit doesn't work here?
-      val i1 = set(k1, GMatrix.fromArrays(m1))
+      val i1 = set(k1, MatrixData.fromArrays(m1))
       i1.size should be(1)
-      head(i1) should equal(GMatrix.fromArrays(m1))
+      head(i1) should equal(MatrixData.fromArrays(m1))
       head(i1).data should equal(m1)
-      values(i1) should equal(Vector(GMatrix.fromArrays(m1)))
-      values(i1)(0) should equal(GMatrix.fromArrays(m1))
+      values(i1) should equal(Vector(MatrixData.fromArrays(m1)))
+      values(i1)(0) should equal(MatrixData.fromArrays(m1))
     }
   }
 
@@ -231,7 +232,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     val i1 = set(k1, 1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
     val i3 = set(k3, "A", "B", "C")
-    val i4 = set(k4, GArray(Array.fill[Long](100)(10)), GArray(Array.fill[Long](100)(100)))
+    val i4 = set(k4, ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
 
     it("Should allow removing one at a time") {
       var sc1 = madd(Setup(commandInfo, ck1), i1, i2, i3, i4)
@@ -296,7 +297,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     val i1 = set(k1, 1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
     val i3 = set(k3, "A", "B", "C")
-    val i4 = set(k4, GArray(Array.fill[Long](100)(10)), GArray(Array.fill[Long](100)(100)))
+    val i4 = set(k4, ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
 
     it("Should allow removing one at a time") {
       var sc1 = madd(Setup(commandInfo, ck1), i1, i2, i3, i4)

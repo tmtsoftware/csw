@@ -1,6 +1,7 @@
-package csw.param.parameters
+package csw.param.models
 
 import csw.param.Parameters.{ParameterSet, ParameterSetType}
+import csw.param.parameters.Parameter
 
 case class Struct(paramSet: ParameterSet = Set.empty[Parameter[_]]) extends ParameterSetType[Struct] {
 

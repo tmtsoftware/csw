@@ -1,6 +1,7 @@
 package parameters;
 
 import csw.param.TestJavaFormats;
+import csw.param.models.ArrayData;
 import csw.param.parameters.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,9 +31,9 @@ public class JParameterTest {
     public void testSet() {
         Integer[] array = {1, 2, 3};
 
-        GArray<Integer> gArray = GArray.fromArray(array);
-        Key<GArray<Integer>> arrayKey = JKeyTypes.IntArrayKey().make("arrayKey");
-        Parameter<GArray<Integer>> arrayParameter = arrayKey.set(gArray);
+        ArrayData<Integer> arrayData = ArrayData.fromArray(array);
+        Key<ArrayData<Integer>> arrayKey = JKeyTypes.IntArrayKey().make("arrayKey");
+        Parameter<ArrayData<Integer>> arrayParameter = arrayKey.set(arrayData);
 
 //        Assert.assertEquals(arrayGParam.values(),
     }

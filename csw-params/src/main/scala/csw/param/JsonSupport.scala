@@ -5,6 +5,7 @@ import java.time.Instant
 import csw.param.Events._
 import csw.param.Parameters._
 import csw.param.StateVariable._
+import csw.param.models.{Choice, Choices, Struct}
 import csw.param.parameters._
 import spray.json._
 

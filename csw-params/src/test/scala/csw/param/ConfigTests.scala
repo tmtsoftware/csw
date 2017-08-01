@@ -3,6 +3,7 @@ package csw.param
 import csw.param.Events.StatusEvent
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
+import csw.param.models.{ArrayData, MatrixData}
 import csw.param.parameters.KeyType.{
   ByteMatrixKey,
   DoubleMatrixKey,
@@ -365,7 +366,7 @@ class ConfigTests extends FunSpec {
     val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
     val i3 = k3.set("A", "B", "C")
-    val i4 = k4.set(GArray(Array.fill[Long](100)(10)), GArray(Array.fill[Long](100)(100)))
+    val i4 = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
 
     it("Should allow removing one at a time") {
       var sc1 = Setup(commandInfo, ck1).madd(i1, i2, i3, i4)
@@ -431,7 +432,7 @@ class ConfigTests extends FunSpec {
     val i11 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees) // This is here to see if it is checking equality or address
     val i2  = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
     val i3  = k3.set("A", "B", "C")
-    val i4  = k4.set(GArray(Array.fill[Long](100)(10)), GArray(Array.fill[Long](100)(100)))
+    val i4  = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
     val i5  = k1.set(22) // This is not added for testing not present removal
 
     it("Should allow removing one at a time") {
@@ -498,13 +499,13 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based long array equality") {
-    val k1               = KeyType.LongArrayKey.make("myLongArray")
-    val m1: GArray[Long] = GArray(Array(1, 2, 3))
-    val m2: GArray[Long] = GArray(Array(1, 2, 3))
-    val m3: GArray[Long] = GArray(Array(1, 2, 4))
-    val i1               = k1.set(m1)
-    val i2               = k1.set(m2)
-    val i3               = k1.set(m3)
+    val k1                  = KeyType.LongArrayKey.make("myLongArray")
+    val m1: ArrayData[Long] = ArrayData(Array(1, 2, 3))
+    val m2: ArrayData[Long] = ArrayData(Array(1, 2, 3))
+    val m3: ArrayData[Long] = ArrayData(Array(1, 2, 4))
+    val i1                  = k1.set(m1)
+    val i2                  = k1.set(m2)
+    val i3                  = k1.set(m3)
 
     it("should short circuit with identical same arrays") {
       assert(k1.set(m1).equals(k1.set(m1)))
@@ -527,16 +528,15 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based long matrix equality") {
-    val k1                = LongMatrixKey.make("myMatrix")
-    val m1: GMatrix[Long] = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
-    val m2: GMatrix[Long] = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
-    val m3
-      : GMatrix[Long]     = GMatrix.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(0, 6, 12)) // Note one value different
-    val m4: GMatrix[Long] = GMatrix.fromArrays(Array(1, 0, 0), Array(0, 1, 0), Array(0, 0, 1))
-    val i1                = k1.set(m1)
-    val i2                = k1.set(m2)
-    val i3                = k1.set(m3)
-    val i4                = k1.set(m4)
+    val k1                   = LongMatrixKey.make("myMatrix")
+    val m1: MatrixData[Long] = MatrixData.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
+    val m2: MatrixData[Long] = MatrixData.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(4, 6, 12))
+    val m3: MatrixData[Long] = MatrixData.fromArrays(Array(1, 2, 3), Array(2, 3, 6), Array(0, 6, 12)) // Note one value different
+    val m4: MatrixData[Long] = MatrixData.fromArrays(Array(1, 0, 0), Array(0, 1, 0), Array(0, 0, 1))
+    val i1                   = k1.set(m1)
+    val i2                   = k1.set(m2)
+    val i3                   = k1.set(m3)
+    val i4                   = k1.set(m4)
 
     it("should short circuit with identical same matrices") {
       assert(i1.equals(i1))
@@ -557,9 +557,9 @@ class ConfigTests extends FunSpec {
 
   describe("Array-based byte array equality") {
     val k1 = KeyType.ByteArrayKey.make("myByteArray")
-    val m1 = GArray(Array[Byte](1, 2, 3))
-    val m2 = GArray(Array[Byte](1, 2, 3))
-    val m3 = GArray(Array[Byte](1, 2, 4))
+    val m1 = ArrayData(Array[Byte](1, 2, 3))
+    val m2 = ArrayData(Array[Byte](1, 2, 3))
+    val m3 = ArrayData(Array[Byte](1, 2, 4))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)
@@ -587,10 +587,10 @@ class ConfigTests extends FunSpec {
 
   describe("Array-based byte matrix equality") {
     val k1 = ByteMatrixKey.make("myMatrix")
-    val m1 = GMatrix.fromArrays(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](4, 6, 12))
-    val m2 = GMatrix.fromArrays(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](4, 6, 12))
-    val m3 = GMatrix.fromArrays(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](0, 6, 12)) // Note one value different
-    val m4 = GMatrix.fromArrays(Array[Byte](1, 0, 0), Array[Byte](0, 1, 0), Array[Byte](0, 0, 1))
+    val m1 = MatrixData.fromArrays(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](4, 6, 12))
+    val m2 = MatrixData.fromArrays(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](4, 6, 12))
+    val m3 = MatrixData.fromArrays(Array[Byte](1, 2, 3), Array[Byte](2, 3, 6), Array[Byte](0, 6, 12)) // Note one value different
+    val m4 = MatrixData.fromArrays(Array[Byte](1, 0, 0), Array[Byte](0, 1, 0), Array[Byte](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)
@@ -615,9 +615,9 @@ class ConfigTests extends FunSpec {
 
   describe("Array-based double array equality") {
     val k1 = KeyType.DoubleArrayKey.make("myArray")
-    val m1 = GArray(Array[Double](1, 2, 3))
-    val m2 = GArray(Array[Double](1, 2, 3))
-    val m3 = GArray(Array[Double](1, 2, 4))
+    val m1 = ArrayData(Array[Double](1, 2, 3))
+    val m2 = ArrayData(Array[Double](1, 2, 3))
+    val m3 = ArrayData(Array[Double](1, 2, 4))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)
@@ -645,10 +645,10 @@ class ConfigTests extends FunSpec {
 
   describe("Array-based double matrix equality") {
     val k1 = DoubleMatrixKey.make("myMatrix")
-    val m1 = GMatrix.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12))
-    val m2 = GMatrix.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12))
-    val m3 = GMatrix.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](0, 6, 12)) // Note one value different
-    val m4 = GMatrix.fromArrays(Array[Double](1, 0, 0), Array[Double](0, 1, 0), Array[Double](0, 0, 1))
+    val m1 = MatrixData.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12))
+    val m2 = MatrixData.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12))
+    val m3 = MatrixData.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](0, 6, 12)) // Note one value different
+    val m4 = MatrixData.fromArrays(Array[Double](1, 0, 0), Array[Double](0, 1, 0), Array[Double](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)
@@ -673,9 +673,9 @@ class ConfigTests extends FunSpec {
 
   describe("Array-based float array equality") {
     val k1 = KeyType.FloatArrayKey.make("myArray")
-    val m1 = GArray(Array[Float](1, 2, 3))
-    val m2 = GArray(Array[Float](1, 2, 3))
-    val m3 = GArray(Array[Float](1, 2, 4))
+    val m1 = ArrayData(Array[Float](1, 2, 3))
+    val m2 = ArrayData(Array[Float](1, 2, 3))
+    val m3 = ArrayData(Array[Float](1, 2, 4))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)
@@ -703,10 +703,10 @@ class ConfigTests extends FunSpec {
 
   describe("Array-based float matrix equality") {
     val k1 = FloatMatrixKey.make("myMatrix")
-    val m1 = GMatrix.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](4, 6, 12))
-    val m2 = GMatrix.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](4, 6, 12))
-    val m3 = GMatrix.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](0, 6, 12)) // Note one value different
-    val m4 = GMatrix.fromArrays(Array[Float](1, 0, 0), Array[Float](0, 1, 0), Array[Float](0, 0, 1))
+    val m1 = MatrixData.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](4, 6, 12))
+    val m2 = MatrixData.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](4, 6, 12))
+    val m3 = MatrixData.fromArrays(Array[Float](1, 2, 3), Array[Float](2, 3, 6), Array[Float](0, 6, 12)) // Note one value different
+    val m4 = MatrixData.fromArrays(Array[Float](1, 0, 0), Array[Float](0, 1, 0), Array[Float](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)
@@ -760,13 +760,13 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based int matrix equality") {
-    val k1               = IntMatrixKey.make("myMatrix")
-    val m1: GMatrix[Int] = GMatrix.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12))
-    val m2: GMatrix[Int] = GMatrix.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12))
-    val m3: GMatrix[Int] = GMatrix.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](0, 6, 12)) // Note one value different
-    val m4: GMatrix[Int] = GMatrix.fromArrays(Array[Int](1, 0, 0), Array[Int](0, 1, 0), Array[Int](0, 0, 1))
-    val i1               = k1.set(m1)
-    val i2               = k1.set(m2)
+    val k1                  = IntMatrixKey.make("myMatrix")
+    val m1: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12))
+    val m2: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](4, 6, 12))
+    val m3: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 2, 3), Array[Int](2, 3, 6), Array[Int](0, 6, 12)) // Note one value different
+    val m4: MatrixData[Int] = MatrixData.fromArrays(Array[Int](1, 0, 0), Array[Int](0, 1, 0), Array[Int](0, 0, 1))
+    val i1                  = k1.set(m1)
+    val i2                  = k1.set(m2)
     println(i1 == i2)
     println(m1 == m2)
     val i3 = k1.set(m3)
@@ -793,9 +793,9 @@ class ConfigTests extends FunSpec {
 
   describe("Array-based short array equality") {
     val k1 = KeyType.ShortArrayKey.make("myArray")
-    val m1 = GArray(Array[Short](1, 2, 3))
-    val m2 = GArray(Array[Short](1, 2, 3))
-    val m3 = GArray(Array[Short](1, 2, 4))
+    val m1 = ArrayData(Array[Short](1, 2, 3))
+    val m2 = ArrayData(Array[Short](1, 2, 3))
+    val m3 = ArrayData(Array[Short](1, 2, 4))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)
@@ -823,10 +823,10 @@ class ConfigTests extends FunSpec {
 
   describe("Array-based short matrix equality") {
     val k1 = ShortMatrixKey.make("myMatrix")
-    val m1 = GMatrix.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](4, 6, 12))
-    val m2 = GMatrix.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](4, 6, 12))
-    val m3 = GMatrix.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](0, 6, 12)) // Note one value different
-    val m4 = GMatrix.fromArrays(Array[Short](1, 0, 0), Array[Short](0, 1, 0), Array[Short](0, 0, 1))
+    val m1 = MatrixData.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](4, 6, 12))
+    val m2 = MatrixData.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](4, 6, 12))
+    val m3 = MatrixData.fromArrays(Array[Short](1, 2, 3), Array[Short](2, 3, 6), Array[Short](0, 6, 12)) // Note one value different
+    val m4 = MatrixData.fromArrays(Array[Short](1, 0, 0), Array[Short](0, 1, 0), Array[Short](0, 0, 1))
     val i1 = k1.set(m1)
     val i2 = k1.set(m2)
     val i3 = k1.set(m3)

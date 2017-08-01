@@ -1,4 +1,4 @@
-package csw.param.parameters
+package csw.param.models
 
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 

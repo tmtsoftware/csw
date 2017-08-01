@@ -4,6 +4,7 @@ import csw.param.Events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.JsonSupport._
 import csw.param.Parameters.{CommandInfo, Observe, Setup, Wait}
 import csw.param.StateVariable.{CurrentState, DemandState}
+import csw.param.models._
 import csw.param.parameters.KeyType.{
   ByteMatrixKey,
   ChoiceKey,
@@ -260,7 +261,7 @@ class JSONTests extends FunSpec {
   describe("Test Double Matrix items") {
     it("Should allow double matrix values") {
       val k1  = DoubleMatrixKey.make("myMatrix")
-      val m1  = GMatrix.fromArrays(Array(1.0, 2.0, 3.0), Array(4.1, 5.1, 6.1), Array(7.2, 8.2, 9.2))
+      val m1  = MatrixData.fromArrays(Array(1.0, 2.0, 3.0), Array(4.1, 5.1, 6.1), Array(7.2, 8.2, 9.2))
       val sc1 = Setup(commandInfo, ck).add(k1.set(m1))
       assert(sc1(k1).head == m1)
 
@@ -279,7 +280,7 @@ class JSONTests extends FunSpec {
   describe("Test Double Array items") {
     it("Should allow double array values") {
       val k1  = KeyType.DoubleArrayKey.make("myArray")
-      val m1  = GArray(Array(1.0, 2.0, 3.0))
+      val m1  = ArrayData(Array(1.0, 2.0, 3.0))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
@@ -299,7 +300,7 @@ class JSONTests extends FunSpec {
   describe("Test Int Matrix items") {
     it("Should allow int matrix values") {
       val k1  = IntMatrixKey.make("myMatrix")
-      val m1  = GMatrix.fromArrays(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
+      val m1  = MatrixData.fromArrays(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       println(sc1)
@@ -321,7 +322,7 @@ class JSONTests extends FunSpec {
   describe("Test Int Array items") {
     it("Should allow int array values") {
       val k1  = KeyType.IntArrayKey.make("myArray")
-      val m1  = GArray(Array(1, 2, 3))
+      val m1  = ArrayData(Array(1, 2, 3))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
@@ -341,7 +342,7 @@ class JSONTests extends FunSpec {
   describe("Test Byte Matrix items") {
     it("Should allow byte matrix values") {
       val k1  = ByteMatrixKey.make("myMatrix")
-      val m1  = GMatrix.fromArrays(Array[Byte](1, 2, 3), Array[Byte](4, 5, 6), Array[Byte](7, 8, 9))
+      val m1  = MatrixData.fromArrays(Array[Byte](1, 2, 3), Array[Byte](4, 5, 6), Array[Byte](7, 8, 9))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
@@ -360,7 +361,7 @@ class JSONTests extends FunSpec {
   describe("Test Byte Array items") {
     it("Should allow byte array values") {
       val k1  = KeyType.ByteArrayKey.make("myArray")
-      val m1  = GArray(Array[Byte](1, 2, 3))
+      val m1  = ArrayData(Array[Byte](1, 2, 3))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
@@ -380,7 +381,7 @@ class JSONTests extends FunSpec {
   describe("Test Short Matrix items") {
     it("Should allow short matrix values") {
       val k1  = ShortMatrixKey.make("myMatrix")
-      val m1  = GMatrix.fromArrays(Array.ofDim[Short](3, 3))
+      val m1  = MatrixData.fromArrays(Array.ofDim[Short](3, 3))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
@@ -400,7 +401,7 @@ class JSONTests extends FunSpec {
   describe("Test Short Array items") {
     it("Should allow short array values") {
       val k1  = KeyType.ShortArrayKey.make("myArray")
-      val m1  = GArray(Array[Short](1, 2, 3))
+      val m1  = ArrayData(Array[Short](1, 2, 3))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
@@ -419,10 +420,10 @@ class JSONTests extends FunSpec {
 
   describe("Test Long Matrix items") {
     it("Should allow long matrix values") {
-      val k1                = LongMatrixKey.make("myMatrix")
-      val m1: GMatrix[Long] = GMatrix.fromArrays(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
-      val i1                = k1.set(m1)
-      val sc1               = Setup(commandInfo, ck).add(i1)
+      val k1                   = LongMatrixKey.make("myMatrix")
+      val m1: MatrixData[Long] = MatrixData.fromArrays(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
+      val i1                   = k1.set(m1)
+      val sc1                  = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
 
       val sc1out = JsonSupport.writeSequenceCommand(sc1)
@@ -438,10 +439,10 @@ class JSONTests extends FunSpec {
 
   describe("Test Long Array items") {
     it("Should allow long array values") {
-      val k1: Key[GArray[Long]]       = KeyType.LongArrayKey.make("myArray")
-      val m1: GArray[Long]            = GArray(Array(1, 2, 3))
-      val i1: Parameter[GArray[Long]] = k1.set(m1)
-      val sc1                         = Setup(commandInfo, ck).add(i1)
+      val k1: Key[ArrayData[Long]]       = KeyType.LongArrayKey.make("myArray")
+      val m1: ArrayData[Long]            = ArrayData(Array(1, 2, 3))
+      val i1: Parameter[ArrayData[Long]] = k1.set(m1)
+      val sc1                            = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == m1)
 
       val sc1out = JsonSupport.writeSequenceCommand(sc1)
