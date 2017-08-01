@@ -62,20 +62,4 @@ private[param] object JavaHelpers {
   @varargs
   def jset(key: ChoiceKey, v: Choice*) =
     ChoiceParameter(key.keyName, key.choices, v.map(i => i: Choice).toVector, units = UnitsOfMeasure.NoUnits)
-
-  // StructItem
-  def jvalue(item: StructParameter): Struct = item.values(0)
-
-  def jvalue(item: StructParameter, index: Int): Struct = item.values(index)
-
-  def jvalues(item: StructParameter): java.util.List[Struct] = item.values.map(i => i: Struct).asJava
-
-  def jget(item: StructParameter, index: Int): java.util.Optional[Struct] = item.get(index).map(i => i: Struct).asJava
-
-  def jset(key: StructKey, v: java.util.List[Struct], units: Units): StructParameter =
-    StructParameter(key.keyName, v.asScala.toVector.map(i => i: Struct), units)
-
-  @varargs
-  def jset(key: StructKey, v: Struct*) =
-    StructParameter(key.keyName, v.map(i => i: Struct).toVector, units = UnitsOfMeasure.NoUnits)
 }

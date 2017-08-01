@@ -7,7 +7,8 @@ import csw.param.parameters.KeyType.{
   FloatMatrixKey,
   IntMatrixKey,
   LongMatrixKey,
-  ShortMatrixKey
+  ShortMatrixKey,
+  StructKey
 }
 import csw.param.parameters._
 import org.scalatest.{FunSpec, Matchers}
@@ -927,7 +928,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("testing StructItem") {
     it("should allow creating one of them") {
-      val skey = StructKey("ao.sys.oiwfs")
+      val skey = StructKey.make("ao.sys.oiwfs")
 
       val ra    = KeyType.StringKey.make("ra")
       val dec   = KeyType.StringKey.make("dec")
@@ -943,7 +944,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("testing StructItem") {
     it("should allow creating Struct items") {
-      val skey = StructKey("myStruct")
+      val skey = StructKey.make("myStruct")
 
       val ra    = KeyType.StringKey.make("ra")
       val dec   = KeyType.StringKey.make("dec")

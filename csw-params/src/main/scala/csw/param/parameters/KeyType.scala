@@ -1,8 +1,8 @@
 package csw.param.parameters
 
-import csw.param.{JavaFormats, RaDec}
+import csw.param.{JavaFormats, JsonSupport, RaDec}
 import enumeratum.{Enum, EnumEntry}
-import spray.json.{DefaultJsonProtocol, JsonFormat}
+import spray.json.JsonFormat
 
 import scala.collection.immutable
 import scala.reflect.ClassTag
@@ -15,12 +15,13 @@ sealed class KeyType[S](implicit @transient jsFormat: JsonFormat[S], @transient 
   def paramFormat: JsonFormat[GParam[S]] = GParam[S]
 }
 
-object KeyType extends DefaultJsonProtocol with JavaFormats with Enum[KeyType[_]] {
+object KeyType extends JsonSupport with JavaFormats with Enum[KeyType[_]] {
 
   override def values: immutable.IndexedSeq[KeyType[_]] = findValues
 
   case object RaDecKey  extends KeyType[RaDec]
   case object StringKey extends KeyType[String]
+  case object StructKey extends KeyType[Struct]
 
   //scala
   case object BooleanKey extends KeyType[Boolean]
