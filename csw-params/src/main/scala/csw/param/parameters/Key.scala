@@ -5,27 +5,13 @@ import csw.param.UnitsOfMeasure.{NoUnits, Units}
 import spray.json.JsonFormat
 
 import scala.annotation.varargs
-import scala.collection.immutable.Vector
 import scala.reflect.ClassTag
 
-case class Key[S] private[parameters] (
-    keyName: String,
-    keyType: KeyType[S]
-)(implicit @transient jsFormat: JsonFormat[S], @transient clsTag: ClassTag[S])
-    extends Serializable {
+case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, keyType: KeyType[S]) {
 
   type P = Parameter[S]
 
-  def gset(v: Array[S], units: Units = NoUnits): P = set(v.toVector, units)
-
-  /**
-   * Sets the values for the key as a Scala Vector
-   *
-   * @param v     a vector of values
-   * @param units optional units of the values (defaults to no units)
-   * @return a parameter containing the key name, values and units
-   */
-  def set(v: Vector[S], units: Units = NoUnits): P = Parameter(keyName, keyType, v.toArray[S], units)
+  def set(v: Array[S], units: Units = NoUnits): P = Parameter(keyName, keyType, v, units)
 
   /**
    * Sets the values for the key using a variable number of arguments
@@ -50,7 +36,7 @@ case class Key[S] private[parameters] (
    * @param v the value
    * @return a parameter containing the key name and one value (call withUnits() on the result to gset the units)
    */
-  def ->(v: S): P = set(v)
+  def ->(v: S*): P = set(v: _*)
 
   /**
    * Sets the value and units for the key
@@ -66,7 +52,7 @@ case class Key[S] private[parameters] (
    * @param v a pair containing a single value for the key and the units of the value
    * @return a parameter containing the key name, values and units
    */
-  def ->(v: (S, UnitsOfMeasure.Units)): P = set(Vector(v._1), v._2)
+  def ->(v: (S, UnitsOfMeasure.Units)): P = set(Array(v._1), v._2)
 
   /**
    * Sets the values for the key as a Scala Vector
@@ -81,7 +67,7 @@ case class Key[S] private[parameters] (
    * @param v a vector of values
    * @return a parameter containing the key name and values (call withUnits() on the result to gset the units)
    */
-  def ->(v: Vector[S]): P = set(v)
+  def ->(v: Array[S]): P = set(v)
 
   override def toString: String = keyName
 

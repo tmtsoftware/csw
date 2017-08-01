@@ -22,7 +22,7 @@ object Parameter extends DefaultJsonProtocol {
         JsObject(
           "keyName" -> obj.keyName.toJson,
           "keyType" -> obj.keyType.toJson,
-          "values"  -> obj.values.array.toJson,
+          "values"  -> obj.values.toJson,
           "units"   -> obj.units.toJson
         )
       }
@@ -44,16 +44,18 @@ object Parameter extends DefaultJsonProtocol {
 case class Parameter[S] private[param] (
     keyName: String,
     keyType: KeyType[S],
-    values: mutable.WrappedArray[S],
+    items: mutable.WrappedArray[S],
     units: Units
 )(implicit @transient jsFormat: JsonFormat[S], @transient cTag: ClassTag[S]) {
+
+  def values: Array[S] = items.array
 
   /**
    * The number of values in this parameter (values.size)
    *
    * @return
    */
-  def size: Int = values.size
+  def size: Int = items.size
 
   /**
    * Returns the value at the given index, throwing an exception if the index is out of range
@@ -70,13 +72,13 @@ case class Parameter[S] private[param] (
    * @param index the index of a value
    * @return the value at the given index (may throw an exception if the index is out of range)
    */
-  def value(index: Int): S = values(index)
+  def value(index: Int): S = items(index)
 
   /**
    * @param index the index of a value
    * @return Some value at the given index as an Option, if the index is in range, otherwise None
    */
-  def get(index: Int): Option[S] = values.lift(index)
+  def get(index: Int): Option[S] = items.lift(index)
 
   /**
    * Returns the first value as a convenience when storing a single value
@@ -93,7 +95,7 @@ case class Parameter[S] private[param] (
    */
   def withUnits(unitsIn: Units): Parameter[S] = copy(units = unitsIn)
 
-  def valuesToString: String = values.mkString("(", ",", ")")
+  def valuesToString: String = items.mkString("(", ",", ")")
   override def toString      = s"$keyName($valuesToString$units)"
   def toJson: JsValue        = Parameter.parameterFormat[S].write(this)
 }

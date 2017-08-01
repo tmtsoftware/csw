@@ -83,7 +83,6 @@ object KeyType extends JsonSupport with JavaFormats with Enum[KeyType[_]] {
 }
 
 object JKeyTypes {
-
   val BooleanKey = KeyType.JBooleanKey
   val CharKey    = KeyType.JCharKey
   val ShortKey   = KeyType.JShortKey

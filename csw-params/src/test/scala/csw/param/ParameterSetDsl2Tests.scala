@@ -29,22 +29,22 @@ class ParameterSetDsl2Tests extends FunSpec {
       assert(value(i1, 1) == 2)
       assert(value(i1, 2) == 3)
       assert(get(i1, 3).isEmpty)
-      assert(values(i1) == Vector(1, 2, 3))
-      assert(i1 == vset(k1, Vector(1, 2, 3), UnitsOfMeasure.degrees))
+      assert(values(i1) === Array(1, 2, 3))
+      assert(i1 == vset(k1, Array(1, 2, 3), UnitsOfMeasure.degrees))
 
       assert(head(i2) == 1.0)
       assert(value(i2, 1) == 2.0)
       assert(value(i2, 2) == 3.0)
       assert(get(i2, 3).isEmpty)
-      assert(values(i2) == Vector(1.0, 2.0, 3.0))
-      assert(i2 == vset(k2, Vector(1.0, 2.0, 3.0), UnitsOfMeasure.meters))
+      assert(values(i2) === Array(1.0, 2.0, 3.0))
+      assert(i2 == vset(k2, Array(1.0, 2.0, 3.0), UnitsOfMeasure.meters))
 
       assert(head(i3) == "A")
       assert(value(i3, 1) == "B")
       assert(value(i3, 2) == "C")
       assert(get(i3, 3).isEmpty)
-      assert(values(i3) == Vector("A", "B", "C"))
-      assert(i3 == vset(k3, Vector("A", "B", "C")))
+      assert(values(i3) === Array("A", "B", "C"))
+      assert(i3 == vset(k3, Array("A", "B", "C")))
     }
 
     it("should support key -> value syntax for building configs") {
@@ -52,12 +52,12 @@ class ParameterSetDsl2Tests extends FunSpec {
       val setupConfig1 = setup(
         commandInfo,
         "test",
-        k1 -> Vector(1, 2, 3) withUnits UnitsOfMeasure.degrees,
-        k2 -> Vector(1.0, 2.0, 3.0) withUnits UnitsOfMeasure.meters,
-        k3 -> Vector("A", "B", "C"),
+        k1 -> Array(1, 2, 3) withUnits UnitsOfMeasure.degrees,
+        k2 -> Array(1.0, 2.0, 3.0) withUnits UnitsOfMeasure.meters,
+        k3 -> Array("A", "B", "C"),
         k4 -> dm1 withUnits UnitsOfMeasure.degrees
       )
-      assert(setupConfig1.get(k1).get.values == Vector(1, 2, 3))
+      assert(setupConfig1.get(k1).get.values === Array(1, 2, 3))
       assert(setupConfig1.get(k1).get.units == UnitsOfMeasure.degrees)
       assert(setupConfig1.get(k2).get.head == 1.0)
       assert(setupConfig1.get(k2).get.units == UnitsOfMeasure.meters)

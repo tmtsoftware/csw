@@ -46,11 +46,11 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should allow single val") {
       val ii = bk.set(tval)
-      ii.values should be(Vector(tval))
+      ii.values should be(Array(tval))
       ii.get(0).get should equal(tval)
     }
 
-    val listIn = Vector(false, true)
+    val listIn = Array(false, true)
 
     it("should work with list, withUnits") {
       val ii = bk.set(listIn).withUnits(degrees)
@@ -77,12 +77,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should test single item") {
       val di: Parameter[ArrayData[Byte]] = lk.set(la1)
-      di.values should equal(Vector(la1))
+      di.values should equal(Array(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
     }
 
-    val listIn = Vector(la1, la2)
+    val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
       val li2: Parameter[ArrayData[Byte]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
@@ -131,12 +131,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should work with a single item") {
       val di = dk.set(lm1)
-      di.values should equal(Vector(lm1))
+      di.values should equal(Array(lm1))
       di.head should equal(lm1)
       di.get(0).get should equal(lm1)
     }
 
-    val listIn = Vector(lm1, lm2)
+    val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
       val di = dk.set(listIn).withUnits(degrees)
@@ -181,12 +181,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should allow single val") {
       val li = lk.set(tval)
-      li.values should be(Vector(tval))
+      li.values should be(Array(tval))
       li.head should be(tval)
       li.get(0).get should equal(tval)
     }
 
-    val listIn = Vector[Char]('K', 'G')
+    val listIn = Array[Char]('K', 'G')
 
     it("should work with list, withUnits") {
       val li = lk.set(listIn).withUnits(degrees)
@@ -209,12 +209,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should allow single val") {
       val li = lk.set(tval)
-      li.values should be(Vector(tval))
+      li.values should be(Array(tval))
       li.head should be(tval)
       li.get(0).get should equal(tval)
     }
 
-    val listIn = Vector[Double](123.0, 456.0)
+    val listIn = Array[Double](123.0, 456.0)
 
     it("should work with list, withUnits") {
       val li = lk.set(listIn).withUnits(degrees)
@@ -241,12 +241,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should test single item") {
       val di = lk.set(la1)
-      di.values should equal(Vector(la1))
+      di.values should equal(Array(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
     }
 
-    val listIn = Vector(la1, la2)
+    val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
       val li2 = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
@@ -295,12 +295,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should work with a single item") {
       val di = dk.set(lm1)
-      di.values should equal(Vector(lm1))
+      di.values should equal(Array(lm1))
       di.head should equal(lm1)
       di.get(0).get should equal(lm1)
     }
 
-    val listIn = Vector(lm1, lm2)
+    val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
       val di = dk.set(listIn).withUnits(degrees)
@@ -345,12 +345,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should allow single val") {
       val li = lk.set(tval)
-      li.values should be(Vector(tval))
+      li.values should be(Array(tval))
       li.head should be(tval)
       li.get(0).get should equal(tval)
     }
 
-    val listIn = Vector[Float](123.0f, 456.0f)
+    val listIn = Array[Float](123.0f, 456.0f)
 
     it("should work with list, withUnits") {
       val li = lk.set(listIn).withUnits(degrees)
@@ -377,12 +377,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should test single item") {
       val di = lk.set(la1)
-      di.values should equal(Vector(la1))
+      di.values should equal(Array(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
     }
 
-    val listIn = Vector(la1, la2)
+    val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
       val li2 = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
@@ -431,12 +431,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should work with a single item") {
       val di = dk.set(lm1)
-      di.values should equal(Vector(lm1))
+      di.values should equal(Array(lm1))
       di.head should equal(lm1)
       di.get(0).get should equal(lm1)
     }
 
-    val listIn = Vector(lm1, lm2)
+    val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
       val di = dk.set(listIn).withUnits(degrees)
@@ -481,12 +481,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should allow single val") {
       val li = lk.set(tval)
-      li.values should be(Vector(tval))
+      li.values should be(Array(tval))
       li.head should be(tval)
       li.get(0).get should equal(tval)
     }
 
-    val listIn = Vector[Int](123, 456)
+    val listIn = Array[Int](123, 456)
 
     it("should work with list, withUnits") {
       val li = lk.set(listIn).withUnits(degrees)
@@ -514,12 +514,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should test single item") {
       val di = lk.set(la1)
-      di.values should equal(Vector(la1))
+      di.values should equal(Array(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
     }
 
-    val listIn = Vector(la1, la2)
+    val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
       val li2 = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
@@ -568,12 +568,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should work with a single item") {
       val di = dk.set(lm1)
-      di.values should equal(Vector(lm1))
+      di.values should equal(Array(lm1))
       di.head should equal(lm1)
       di.get(0).get should equal(lm1)
     }
 
-    val listIn = Vector(lm1, lm2)
+    val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
       val di = dk.set(listIn).withUnits(degrees)
@@ -618,11 +618,11 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should allow single val") {
       val li = lk.set(lval)
-      li.values should be(Vector(lval))
+      li.values should be(Array(lval))
       li.get(0).get should equal(lval)
     }
 
-    val listIn = Vector[Long](123L, 456L)
+    val listIn = Array[Long](123L, 456L)
 
     it("should work with list, withUnits") {
       val li = lk.set(listIn).withUnits(degrees)
@@ -649,12 +649,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should test single item") {
       val di: Parameter[ArrayData[Long]] = lk.set(la1)
-      di.values should equal(Vector(la1))
+      di.values should equal(Array(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
     }
 
-    val listIn = Vector(la1, la2)
+    val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
       val li2: Parameter[ArrayData[Long]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
@@ -703,12 +703,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should work with a single item") {
       val di = dk.set(lm1)
-      di.values should equal(Vector(lm1))
+      di.values should equal(Array(lm1))
       di.head should equal(lm1)
       di.get(0).get should equal(lm1)
     }
 
-    val listIn = Vector(lm1, lm2)
+    val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
       val di = dk.set(listIn).withUnits(degrees)
@@ -753,12 +753,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should allow single val") {
       val li = lk.set(tval)
-      li.values should be(Vector(tval))
+      li.values should be(Array(tval))
       li.head should be(tval)
       li.get(0).get should equal(tval)
     }
 
-    val listIn = Vector[Short](123, 456)
+    val listIn = Array[Short](123, 456)
 
     it("should work with list, withUnits") {
       val li = lk.set(listIn).withUnits(degrees)
@@ -786,12 +786,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should test single item") {
       val di = lk.set(la1)
-      di.values should equal(Vector(la1))
+      di.values should equal(Array(la1))
       di.head should be(la1)
       di.get(0).get should equal(la1)
     }
 
-    val listIn = Vector(la1, la2)
+    val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
       val li2 = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
@@ -840,12 +840,12 @@ class ItemsTests extends FunSpec with Matchers {
 
     it("should work with a single item") {
       val di = dk.set(lm1)
-      di.values should equal(Vector(lm1))
+      di.values should equal(Array(lm1))
       di.head should equal(lm1)
       di.get(0).get should equal(lm1)
     }
 
-    val listIn = Vector(lm1, lm2)
+    val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
       val di = dk.set(listIn).withUnits(degrees)

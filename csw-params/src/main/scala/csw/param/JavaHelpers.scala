@@ -22,7 +22,7 @@ private[param] object JavaHelpers {
   def jget[S, I <: Parameter[S], T <: ParameterSetType[T], J](sc: T, key: Key[S], index: Int): java.util.Optional[J] = {
     sc.get(key) match {
       case Some(item) =>
-        (if (index >= 0 && index < item.size) Some(item.values(index).asInstanceOf[J]) else None).asJava
+        (if (index >= 0 && index < item.size) Some(item(index).asInstanceOf[J]) else None).asJava
       case None => None.asJava
     }
   }
@@ -30,7 +30,7 @@ private[param] object JavaHelpers {
   def jvalue[S, T <: ParameterSetType[T], J](sc: T, key: Key[S]): J = {
     val item = sc.get(key)
     item match {
-      case Some(x) => x.values(0).asInstanceOf[J]
+      case Some(x) => x.items(0).asInstanceOf[J]
       case None    => throw new NoSuchElementException(s"Item: $key not found")
     }
   }
@@ -38,7 +38,7 @@ private[param] object JavaHelpers {
   def jvalues[S, T <: ParameterSetType[T], J](sc: T, key: Key[S]): java.util.List[J] = {
     val item = sc.get(key)
     item match {
-      case Some(x) => x.values.map(i => i.asInstanceOf[J]).asJava
+      case Some(x) => x.items.map(i => i.asInstanceOf[J]).asJava
       case None    => throw new NoSuchElementException(s"Item: $key not found")
     }
   }

@@ -15,7 +15,6 @@ import csw.param.parameters.KeyType.{
 import csw.param.parameters._
 import org.scalatest.FunSpec
 
-import scala.collection.immutable.Vector
 import scala.util.Try
 
 //noinspection ComparingUnrelatedTypes,ScalaUnusedSymbol
@@ -41,12 +40,12 @@ class ConfigTests extends FunSpec {
       val i: Parameter[Int] = k1.set(22)
       // Check that name and value are gset
       assert(i.keyName eq s1)
-      assert(i.values == Vector(22))
+      assert(i.values === Array(22))
       assert(i.head == 22)
 
       assert(k2.keyName eq s2)
       val j: Parameter[String] = k2.set("Bob").withUnits(UnitsOfMeasure.meters)
-      assert(j.values == Vector("Bob"))
+      assert(j.values === Array("Bob"))
       assert(j.units == meters)
     }
 
@@ -104,8 +103,8 @@ class ConfigTests extends FunSpec {
       val v2: Parameter[String] = sc1(k2)
       assert(sc1.get(k1).isDefined)
       assert(sc1.get(k2).isDefined)
-      assert(v1.values == Vector(22))
-      assert(v2.values == Vector("C"))
+      assert(v1.values === Array(22))
+      assert(v2.values === Array("C"))
       assert(sc1(k2)(0) == "C")
     }
 
@@ -113,12 +112,12 @@ class ConfigTests extends FunSpec {
       var sc1 = Setup(commandInfo, ck1)
       sc1 = sc1.add(k2.set("D"))
       assert(sc1.exists(k2))
-      assert(sc1(k2).values == Vector("D"))
+      assert(sc1(k2).values === Array("D"))
 
       sc1 = sc1.add(k2.set("E").withUnits(meters))
       assert(sc1.exists(k2))
       assert(sc1(k2).units == meters)
-      assert(sc1(k2).values == Vector("E"))
+      assert(sc1(k2).values === Array("E"))
     }
   }
 
@@ -138,7 +137,7 @@ class ConfigTests extends FunSpec {
       assert(sc.get(k1).get == i1)
       assert(sc.get(k1).get.head == 22)
       // Use direct
-      assert(sc(k1).values == Vector(22))
+      assert(sc(k1).values === Array(22))
       assert(sc(k1).value(0) == 22)
       sc = sc.add(i2)
       assert(sc(k1).head == 33)
@@ -150,14 +149,14 @@ class ConfigTests extends FunSpec {
       val tval = 1234L
       val k1   = KeyType.LongKey.make(s1)
       val i1   = k1.set(tval)
-      assert(i1.values == Vector(tval))
+      assert(i1.values === Array(tval))
       assert(i1.values(0) == tval)
       assert(i1.head == tval)
 
       val tval2 = 4567L
       val k2    = KeyType.LongKey.make(s1)
       val i2    = k2.set(tval2)
-      assert(i2.values == Vector(tval2))
+      assert(i2.values === Array(tval2))
     }
   }
 
@@ -195,7 +194,7 @@ class ConfigTests extends FunSpec {
       val v2 = sc1(k2)
       assert(sc1.get(k1).isDefined)
       assert(sc1.get(k2).isDefined)
-      assert(v1.values == Vector(22))
+      assert(v1.values === Array(22))
       assert(v2.values(0) == 44)
     }
 
@@ -203,12 +202,12 @@ class ConfigTests extends FunSpec {
       var sc1 = StatusEvent(ck1)
       sc1 = sc1.add(k2.set(22))
       assert(sc1.exists(k2))
-      assert(sc1(k2).values == Vector(22))
+      assert(sc1(k2).values === Array(22))
 
       sc1 = sc1.add(k2.set(33).withUnits(meters))
       assert(sc1.exists(k2))
       assert(sc1(k2).units == meters)
-      assert(sc1(k2).values == Vector(33))
+      assert(sc1(k2).values === Array(33))
     }
   }
 
@@ -243,7 +242,7 @@ class ConfigTests extends FunSpec {
       val v2 = oc1(k2)
       assert(oc1.get(k1).isDefined)
       assert(oc1.get(k2).isDefined)
-      assert(v1.values == Vector(22))
+      assert(v1.values === Array(22))
       assert(v2.head == 44)
     }
 
@@ -251,22 +250,22 @@ class ConfigTests extends FunSpec {
       var oc1 = Observe(commandInfo, ck1)
       oc1 = oc1.add(k2.set(22))
       assert(oc1.exists(k2))
-      assert(oc1(k2).values == Vector(22))
+      assert(oc1(k2).values === Array(22))
 
       oc1 = oc1.add(k2.set(33))
       assert(oc1.exists(k2))
-      assert(oc1(k2).values == Vector(33))
+      assert(oc1(k2).values === Array(33))
     }
 
     it("should update for the same key with add") {
       var oc1 = Observe(commandInfo, ck1)
       oc1 = oc1.add(k2.set(22).withUnits(NoUnits))
       assert(oc1.exists(k2))
-      assert(oc1(k2).values == Vector(22))
+      assert(oc1(k2).values === Array(22))
 
       oc1 = oc1.add(k2.set(33).withUnits(NoUnits))
       assert(oc1.exists(k2))
-      assert(oc1(k2).values == Vector(33))
+      assert(oc1(k2).values === Array(33))
     }
   }
 
@@ -274,26 +273,26 @@ class ConfigTests extends FunSpec {
     val t1 = KeyType.IntKey.make("test1")
     it("should allow setting a single value") {
       val i1 = t1.set(1)
-      assert(i1.values == Vector(1))
+      assert(i1.values === Array(1))
       assert(i1.units == NoUnits)
       assert(i1(0) == 1)
     }
     it("should allow setting several") {
       val i1 = t1.set(1, 3, 5, 7)
-      assert(i1.values == Vector(1, 3, 5, 7))
+      assert(i1.values === Array(1, 3, 5, 7))
       assert(i1.units == NoUnits)
       assert(i1(1) == 3)
 
-      val i2 = t1.set(Vector(10, 30, 50, 70)).withUnits(degrees)
-      assert(i2.values == Vector(10, 30, 50, 70))
+      val i2 = t1.set(Array(10, 30, 50, 70)).withUnits(degrees)
+      assert(i2.values === Array(10, 30, 50, 70))
       assert(i2.units == degrees)
       assert(i2(1) == 30)
       assert(i2(3) == 70)
     }
     it("should also allow setting with sequence") {
-      val s1 = Vector(2, 4, 6, 8)
+      val s1 = Array(2, 4, 6, 8)
       val i1 = t1.set(s1).withUnits(meters)
-      assert(i1.values == s1)
+      assert(i1.values === s1)
       assert(i1.values.size == s1.size)
       assert(i1.units == meters)
       assert(i1(2) == 6)
@@ -302,7 +301,7 @@ class ConfigTests extends FunSpec {
 
   describe("testing for getting typed items") {
     val t1  = KeyType.IntKey.make("test1")
-    val sc1 = Setup(commandInfo, ck1).add(t1.set(Vector(22), degrees))
+    val sc1 = Setup(commandInfo, ck1).add(t1.set(Array(22), degrees))
 
     val item: Option[Parameter[Int]] = sc1.get(t1) // Works now!
     val itm: Parameter[Int]          = item.get
@@ -331,9 +330,9 @@ class ConfigTests extends FunSpec {
       val out2: Option[Parameter[Double]] = sc.get(k2)
       val out3: Option[Parameter[String]] = sc.get(k3)
 
-      assert(out1.get.values === Vector(1, 2, 3))
-      assert(out2.get.values === Vector(1.0, 2.0, 3.0))
-      assert(out3.get.values === Vector("A", "B", "C"))
+      assert(out1.get.values === Array(1, 2, 3))
+      assert(out2.get.values === Array(1.0, 2.0, 3.0))
+      assert(out3.get.values === Array("A", "B", "C"))
     }
   }
 

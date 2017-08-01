@@ -144,7 +144,7 @@ object ParameterSetDsl {
    * @param parameter the parameter with the needed values
    * @return all of the values for the parameter as a Vector
    */
-  def values[S](parameter: Parameter[S]): Vector[S] = parameter.values.toVector
+  def values[S](parameter: Parameter[S]): Array[S] = parameter.values
 
   /**
    * Create a parameter by setting a key with a Vector of values associated with the key
@@ -154,7 +154,7 @@ object ParameterSetDsl {
    * @param units optional units for the parameter
    * @return a new parameter of the type associated with the key
    */
-  def vset[S](key: Key[S], v: Vector[S], units: Units = NoUnits): Parameter[S] = key.set(v, units)
+  def vset[S](key: Key[S], v: Array[S], units: Units = NoUnits): Parameter[S] = key.set(v, units)
 
   /**
    * Create a parameter by settign a key with one or more values associated with the key

@@ -36,9 +36,7 @@ sealed trait TrombonePublisherMsg
 object TrombonePublisherMsg {
   case class TrombonePublisherMsgE(tromboneState: TromboneState)                     extends TrombonePublisherMsg
   case class AOESWUpdate(naElevation: Parameter[Double], naRange: Parameter[Double]) extends TrombonePublisherMsg
-  case class EngrUpdate(focusError: Parameter[Double],
-                        stagePosition: Parameter[Double],
-                        zenithAngle: Parameter[Double])
+  case class EngrUpdate(focusError: Parameter[Double], stagePosition: Parameter[Double], zenithAngle: Parameter[Double])
       extends TrombonePublisherMsg
   case class AxisStateUpdate(axisName: Parameter[String],
                              position: Parameter[Int],
