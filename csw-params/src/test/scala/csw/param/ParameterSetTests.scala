@@ -1,7 +1,7 @@
 package csw.param
 
 import csw.param.Parameters._
-import csw.param.parameters.{GArray, Keys}
+import csw.param.parameters.{GArray, KeyType}
 import org.scalatest.FunSpec
 import spray.json.DefaultJsonProtocol
 
@@ -23,10 +23,10 @@ class ParameterSetTests extends FunSpec {
 
   private val ck1 = "wfos.prog.cloudcover"
 
-  val k1 = Keys.IntKey.make("itest")
-  val k2 = Keys.DoubleKey.make("dtest")
-  val k3 = Keys.StringKey.make("stest")
-  val k4 = Keys.LongArrayKey.make("lartest")
+  val k1 = KeyType.IntKey.make("itest")
+  val k2 = KeyType.DoubleKey.make("dtest")
+  val k3 = KeyType.StringKey.make("stest")
+  val k4 = KeyType.LongArrayKey.make("lartest")
 
   val i1  = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
   val i11 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees) // This is here to see if it is checking equality or address
@@ -36,8 +36,8 @@ class ParameterSetTests extends FunSpec {
   val i5  = k1.set(22) // This is not added for testing not present removal
 
   describe("test Configurations3 Setup") {
-    val encoder1 = Keys.IntKey.make("encoder1")
-    val encoder2 = Keys.IntKey.make("encoder2")
+    val encoder1 = KeyType.IntKey.make("encoder1")
+    val encoder2 = KeyType.IntKey.make("encoder2")
 
     val obsId = "Obs001"
 

@@ -4,7 +4,7 @@ import csw.param.UnitsOfMeasure.{degrees, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 import csw.param.ParameterSetDsl._
 import csw.param.Parameters.{CommandInfo, Setup}
-import csw.param.parameters.{GArray, GParam, Keys}
+import csw.param.parameters.{GArray, GParam, KeyType}
 import csw.param.parameters.matrices.{LongMatrix, LongMatrixKey}
 
 /**
@@ -23,8 +23,8 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   describe("creating items") {
     import csw.param.ParameterSetDsl.{size => ssize}
 
-    val k1           = Keys.IntKey.make(s1)
-    val detectorTemp = Keys.DoubleKey.make(s3)
+    val k1           = KeyType.IntKey.make(s1)
+    val detectorTemp = KeyType.DoubleKey.make(s3)
 
     it("should work to gset single items") {
       val i1 = set(k1, 2)
@@ -48,7 +48,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
 
   describe("checking simple values") {
     import csw.param.ParameterSetDsl.{value => svalue}
-    val k1 = Keys.IntKey.make(s1)
+    val k1 = KeyType.IntKey.make(s1)
 
     it("should have value access") {
       val i1 = set(k1, 1, 2, 3, 4, 5)
@@ -69,7 +69,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("work with an array type") {
-    val k1 = Keys.LongArrayKey.make(s2)
+    val k1 = KeyType.LongArrayKey.make(s2)
 
     it("should allow setting") {
       val m1: Array[Long] = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -101,7 +101,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("checking optional get values") {
-    val k1 = Keys.IntKey.make(s1)
+    val k1 = KeyType.IntKey.make(s1)
 
     it("should have value access") {
       val i1 = set(k1, 1, 2, 3, 4, 5)
@@ -116,9 +116,9 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("adding items to sc") {
-    val k1 = Keys.IntKey.make(s1)
-    val k2 = Keys.StringKey.make(s2)
-    val k3 = Keys.DoubleKey.make(s3)
+    val k1 = KeyType.IntKey.make(s1)
+    val k2 = KeyType.StringKey.make(s2)
+    val k3 = KeyType.DoubleKey.make(s3)
 
     it("should allow adding single items") {
       val sc1 = add(Setup(commandInfo, ck1), set(k1, 1000))
@@ -136,9 +136,9 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("accessing items in an sc") {
-    val k1 = Keys.IntKey.make(s1)
-    val k2 = Keys.StringKey.make(s2)
-    val k3 = Keys.DoubleKey.make(s3)
+    val k1 = KeyType.IntKey.make(s1)
+    val k2 = KeyType.StringKey.make(s2)
+    val k3 = KeyType.DoubleKey.make(s3)
 
     val i1 = set(k1, 1000)
     val i2 = set(k2, "1000")
@@ -156,7 +156,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     it("should throw NoSuchElementException if not present") {
       val sc1 = madd(Setup(commandInfo, ck2), i1, i2, i3)
 
-      val k4 = Keys.FloatKey.make("not present")
+      val k4 = KeyType.FloatKey.make("not present")
 
       exists(sc1, k1) shouldBe true
       exists(sc1, k2) shouldBe true
@@ -170,9 +170,9 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("accessing items in an sc as option") {
-    val k1 = Keys.IntKey.make(s1)
-    val k2 = Keys.StringKey.make(s2)
-    val k3 = Keys.DoubleKey.make(s3)
+    val k1 = KeyType.IntKey.make(s1)
+    val k2 = KeyType.StringKey.make(s2)
+    val k3 = KeyType.DoubleKey.make(s3)
 
     val i1 = set(k1, 1000)
     val i2 = set(k2, "1000")
@@ -191,7 +191,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     it("should be None if not present") {
       val sc1 = madd(Setup(commandInfo, ck2), i1, i2, i3)
 
-      val k4 = Keys.FloatKey.make("not present")
+      val k4 = KeyType.FloatKey.make("not present")
       get(sc1, k1) should equal(Option(i1))
       get(sc1, k2) should equal(Option(i2))
       get(sc1, k3) should equal(Option(i3))
@@ -200,10 +200,10 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("should allow option get") {
-    val k1 = Keys.IntKey.make(s1)
-    val k2 = Keys.StringKey.make(s2)
-    val k3 = Keys.DoubleKey.make(s3)
-    val k4 = Keys.StringKey.make("Not Present")
+    val k1 = KeyType.IntKey.make(s1)
+    val k2 = KeyType.StringKey.make(s2)
+    val k3 = KeyType.DoubleKey.make(s3)
+    val k4 = KeyType.StringKey.make("Not Present")
 
     val i1 = set(k1, 1000, 2000)
     val i2 = set(k2, "1000", "2000")
@@ -223,10 +223,10 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("removing items from a configuration by keyname") {
-    val k1 = Keys.IntKey.make("itest")
-    val k2 = Keys.DoubleKey.make("dtest")
-    val k3 = Keys.StringKey.make("stest")
-    val k4 = Keys.LongArrayKey.make("lartest")
+    val k1 = KeyType.IntKey.make("itest")
+    val k2 = KeyType.DoubleKey.make("dtest")
+    val k3 = KeyType.StringKey.make("stest")
+    val k4 = KeyType.LongArrayKey.make("lartest")
 
     val i1 = set(k1, 1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
@@ -288,10 +288,10 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("removing items from a configuration as items") {
-    val k1 = Keys.IntKey.make("itest")
-    val k2 = Keys.DoubleKey.make("dtest")
-    val k3 = Keys.StringKey.make("stest")
-    val k4 = Keys.LongArrayKey.make("lartest")
+    val k1 = KeyType.IntKey.make("itest")
+    val k2 = KeyType.DoubleKey.make("dtest")
+    val k3 = KeyType.StringKey.make("stest")
+    val k4 = KeyType.LongArrayKey.make("lartest")
 
     val i1 = set(k1, 1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
@@ -353,8 +353,8 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("sc tests") {
-    val k1 = Keys.IntKey.make("itest")
-    val k2 = Keys.DoubleKey.make("dtest")
+    val k1 = KeyType.IntKey.make("itest")
+    val k2 = KeyType.DoubleKey.make("dtest")
     //    val k3 = StringKey("stest")
     //    val k4 = LongArrayKey("lartest")
 
@@ -382,9 +382,9 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("config as template tests") {
-    val zeroPoint = Keys.IntKey.make("zeroPoint")
-    val filter    = Keys.StringKey.make("filter")
-    val mode      = Keys.StringKey.make("mode")
+    val zeroPoint = KeyType.IntKey.make("zeroPoint")
+    val filter    = KeyType.StringKey.make("filter")
+    val mode      = KeyType.StringKey.make("mode")
 
     val i1 = set(mode, "Fast")    // default value
     val i2 = set(filter, "home")  // default value

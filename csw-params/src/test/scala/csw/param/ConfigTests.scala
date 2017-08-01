@@ -3,7 +3,7 @@ package csw.param
 import csw.param.Events.StatusEvent
 import csw.param.Parameters._
 import csw.param.UnitsOfMeasure.{degrees, meters, _}
-import csw.param.parameters.{GArray, GKey, GParam, Keys}
+import csw.param.parameters.{GArray, GKey, GParam, KeyType}
 import csw.param.parameters.matrices._
 import org.scalatest.FunSpec
 
@@ -22,8 +22,8 @@ class ConfigTests extends FunSpec {
   private val commandInfo: CommandInfo = "Obs001"
 
   describe("Basic key tests") {
-    val k1 = Keys.IntKey.make(s1)
-    val k2 = Keys.StringKey.make(s2)
+    val k1 = KeyType.IntKey.make(s1)
+    val k2 = KeyType.StringKey.make(s2)
 
     it("Should be constructed properly") {
       assert(k1.keyName eq s1)
@@ -43,7 +43,7 @@ class ConfigTests extends FunSpec {
     }
 
     it("Should support equality of keys") {
-      val k3 = Keys.IntKey.make(s1)
+      val k3 = KeyType.IntKey.make(s1)
       assert(k3 == k1)
       assert(k3 != k2)
       assert(k1 != k2)
@@ -51,10 +51,10 @@ class ConfigTests extends FunSpec {
   }
 
   describe("SC Basic Tests") {
-    val k1    = Keys.IntKey.make("encoder")
-    val k2    = Keys.StringKey.make("stringThing")
-    val k2bad = Keys.IntKey.make("stringThing")
-    val k3    = Keys.IntKey.make("notUsed")
+    val k1    = KeyType.IntKey.make("encoder")
+    val k2    = KeyType.StringKey.make("stringThing")
+    val k2bad = KeyType.IntKey.make("stringThing")
+    val k3    = KeyType.IntKey.make("notUsed")
 
     it("Should allow adding keys using single gset") {
       val i1  = k1.set(22)
@@ -115,7 +115,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Checking key updates") {
-    val k1 = Keys.IntKey.make("atest")
+    val k1 = KeyType.IntKey.make("atest")
 
     it("Should allow updates") {
       val i1 = k1.set(22)
@@ -140,14 +140,14 @@ class ConfigTests extends FunSpec {
   describe("Test Long") {
     it("should allow setting from Long") {
       val tval = 1234L
-      val k1   = Keys.LongKey.make(s1)
+      val k1   = KeyType.LongKey.make(s1)
       val i1   = k1.set(tval)
       assert(i1.values == Vector(tval))
       assert(i1.values(0) == tval)
       assert(i1.head == tval)
 
       val tval2 = 4567L
-      val k2    = Keys.LongKey.make(s1)
+      val k2    = KeyType.LongKey.make(s1)
       val i2    = k2.set(tval2)
       assert(i2.values == Vector(tval2))
     }
@@ -155,9 +155,9 @@ class ConfigTests extends FunSpec {
 
   describe("StatusEvent Test") {
 
-    val k1 = Keys.IntKey.make("encoder")
-    val k2 = Keys.IntKey.make("windspeed")
-    val k3 = Keys.IntKey.make("notUsed")
+    val k1 = KeyType.IntKey.make("encoder")
+    val k2 = KeyType.IntKey.make("windspeed")
+    val k3 = KeyType.IntKey.make("notUsed")
 
     it("Should allow adding keys") {
       val i1  = k1.set(22)
@@ -206,8 +206,8 @@ class ConfigTests extends FunSpec {
 
   describe("OC Test") {
 
-    val k1 = Keys.IntKey.make("repeat")
-    val k2 = Keys.IntKey.make("expTime")
+    val k1 = KeyType.IntKey.make("repeat")
+    val k2 = KeyType.IntKey.make("expTime")
     it("Should allow adding keys") {
       val i1  = k1.set(22)
       val i2  = k2.set(44)
@@ -263,7 +263,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("test setting multiple values") {
-    val t1 = Keys.IntKey.make("test1")
+    val t1 = KeyType.IntKey.make("test1")
     it("should allow setting a single value") {
       val i1 = t1.set(1)
       assert(i1.values == Vector(1))
@@ -293,7 +293,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("testing for getting typed items") {
-    val t1  = Keys.IntKey.make("test1")
+    val t1  = KeyType.IntKey.make("test1")
     val sc1 = Setup(commandInfo, ck1).add(t1.set(Vector(22), degrees))
 
     val item: Option[GParam[Int]] = sc1.get(t1) // Works now!
@@ -308,9 +308,9 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Checking for item types in configs") {
-    val k1: GKey[Int]    = Keys.IntKey.make("itest")
-    val k2: GKey[Double] = Keys.DoubleKey.make("dtest")
-    val k3: GKey[String] = Keys.StringKey.make("stest")
+    val k1: GKey[Int]    = KeyType.IntKey.make("itest")
+    val k2: GKey[Double] = KeyType.DoubleKey.make("dtest")
+    val k3: GKey[String] = KeyType.StringKey.make("stest")
 
     val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
@@ -330,9 +330,9 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Check for multi-add") {
-    val k1: GKey[Int]    = Keys.IntKey.make("itest")
-    val k2: GKey[Double] = Keys.DoubleKey.make("dtest")
-    val k3: GKey[String] = Keys.StringKey.make("stest")
+    val k1: GKey[Int]    = KeyType.IntKey.make("itest")
+    val k2: GKey[Double] = KeyType.DoubleKey.make("dtest")
+    val k3: GKey[String] = KeyType.StringKey.make("stest")
 
     val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
@@ -350,10 +350,10 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Should work with remove") {
-    val k1 = Keys.IntKey.make("itest")
-    val k2 = Keys.DoubleKey.make("dtest")
-    val k3 = Keys.StringKey.make("stest")
-    val k4 = Keys.LongArrayKey.make("lartest")
+    val k1 = KeyType.IntKey.make("itest")
+    val k2 = KeyType.DoubleKey.make("dtest")
+    val k3 = KeyType.StringKey.make("stest")
+    val k4 = KeyType.LongArrayKey.make("lartest")
 
     val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
@@ -415,10 +415,10 @@ class ConfigTests extends FunSpec {
   }
 
   describe("should work with remove by item") {
-    val k1 = Keys.IntKey.make("itest")
-    val k2 = Keys.DoubleKey.make("dtest")
-    val k3 = Keys.StringKey.make("stest")
-    val k4 = Keys.LongArrayKey.make("lartest")
+    val k1 = KeyType.IntKey.make("itest")
+    val k2 = KeyType.DoubleKey.make("dtest")
+    val k3 = KeyType.StringKey.make("stest")
+    val k4 = KeyType.LongArrayKey.make("lartest")
 
     val i1  = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
     val i11 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees) // This is here to see if it is checking equality or address
@@ -491,7 +491,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based long array equality") {
-    val k1               = Keys.LongArrayKey.make("myLongArray")
+    val k1               = KeyType.LongArrayKey.make("myLongArray")
     val m1: GArray[Long] = GArray(Array(1, 2, 3))
     val m2: GArray[Long] = GArray(Array(1, 2, 3))
     val m3: GArray[Long] = GArray(Array(1, 2, 4))
@@ -548,7 +548,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based byte array equality") {
-    val k1 = Keys.ByteArrayKey.make("myByteArray")
+    val k1 = KeyType.ByteArrayKey.make("myByteArray")
     val m1 = GArray(Array[Byte](1, 2, 3))
     val m2 = GArray(Array[Byte](1, 2, 3))
     val m3 = GArray(Array[Byte](1, 2, 4))
@@ -606,7 +606,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based double array equality") {
-    val k1 = Keys.DoubleArrayKey.make("myArray")
+    val k1 = KeyType.DoubleArrayKey.make("myArray")
     val m1 = GArray(Array[Double](1, 2, 3))
     val m2 = GArray(Array[Double](1, 2, 3))
     val m3 = GArray(Array[Double](1, 2, 4))
@@ -664,7 +664,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based float array equality") {
-    val k1 = Keys.FloatArrayKey.make("myArray")
+    val k1 = KeyType.FloatArrayKey.make("myArray")
     val m1 = GArray(Array[Float](1, 2, 3))
     val m2 = GArray(Array[Float](1, 2, 3))
     val m3 = GArray(Array[Float](1, 2, 4))
@@ -722,7 +722,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based int array equality") {
-    val k1 = Keys.IntArrayKey.make("myArray")
+    val k1 = KeyType.IntArrayKey.make("myArray")
     val m1 = Array[Int](1, 2, 3)
     val m2 = Array[Int](1, 2, 3)
     val m3 = Array[Int](1, 2, 4)
@@ -780,7 +780,7 @@ class ConfigTests extends FunSpec {
   }
 
   describe("Array-based short array equality") {
-    val k1 = Keys.ShortArrayKey.make("myArray")
+    val k1 = KeyType.ShortArrayKey.make("myArray")
     val m1 = GArray(Array[Short](1, 2, 3))
     val m2 = GArray(Array[Short](1, 2, 3))
     val m3 = GArray(Array[Short](1, 2, 4))

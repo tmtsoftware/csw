@@ -3,7 +3,7 @@ package csw.param
 import csw.param.Parameters._
 import csw.param.Events.{EventServiceEvent, SystemEvent}
 import csw.param.StateVariable._
-import csw.param.parameters.Keys
+import csw.param.parameters.KeyType
 import org.scalatest.FunSuite
 
 //noinspection TypeAnnotation
@@ -18,12 +18,12 @@ class SerializationTests extends FunSuite {
   val fqn2       = "tcs.base.pos.ra"
   val fqn3       = "tcs.base.pos.dec"
 
-  val exposureTime = Keys.DoubleKey.make("exposureTime")
-  val repeats      = Keys.IntKey.make("repeats")
-  val ra           = Keys.StringKey.make("ra")
-  val dec          = Keys.StringKey.make("dec")
-  val epoch        = Keys.DoubleKey.make("epoch")
-  val test         = Keys.IntKey.make("test")
+  val exposureTime = KeyType.DoubleKey.make("exposureTime")
+  val repeats      = KeyType.IntKey.make("repeats")
+  val ra           = KeyType.StringKey.make("ra")
+  val dec          = KeyType.StringKey.make("dec")
+  val epoch        = KeyType.DoubleKey.make("epoch")
+  val test         = KeyType.IntKey.make("test")
 
   val sc1 = Setup(commandInfo, "tcs.pos").madd(
     ra.set("12:32:11"),
@@ -39,8 +39,8 @@ class SerializationTests extends FunSuite {
     test.set(1)
   ) //.second
 
-  val disperser = Keys.StringKey.make("disperser")
-  val filter1   = Keys.StringKey.make("filter1")
+  val disperser = KeyType.StringKey.make("disperser")
+  val filter1   = KeyType.StringKey.make("filter1")
   val sc2 = Setup(commandInfo, "wfos.blue")
     .add(disperser.set("gr243"))
     .add(filter1.set("GG433"))

@@ -14,13 +14,13 @@ class ItemsTests extends FunSpec with Matchers {
   private val s2: String = "filter"
 
   describe("basic key tests") {
-    val k1: GKey[Int] = Keys.IntKey.make(s1)
-    val k2: GKey[Int] = Keys.IntKey.make(s2)
+    val k1: GKey[Int] = KeyType.IntKey.make(s1)
+    val k2: GKey[Int] = KeyType.IntKey.make(s2)
     it("should have correct name") {
       assert(k1.keyName.equals(s1))
     }
 
-    val k3: GKey[Int] = Keys.IntKey.make(s1)
+    val k3: GKey[Int] = KeyType.IntKey.make(s1)
 
     it("should have equality based on name") {
       assert(k3 == k1)
@@ -32,7 +32,7 @@ class ItemsTests extends FunSpec with Matchers {
   describe("test booleanKey") {
 
     val tval = false
-    val bk   = Keys.BooleanKey.make(s1)
+    val bk   = KeyType.BooleanKey.make(s1)
 
     it("should allow single val") {
       val ii = bk.set(tval)
@@ -63,7 +63,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     val la1 = GArray(a1)
     val la2 = GArray(a2)
-    val lk  = Keys.ByteArrayKey.make(s1)
+    val lk  = KeyType.ByteArrayKey.make(s1)
 
     it("should test single item") {
       val di: GParam[GArray[Byte]] = lk.set(la1)
@@ -167,7 +167,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test charItem") {
     val tval = 'K'
-    val lk   = Keys.CharKey.make(s1)
+    val lk   = KeyType.CharKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -195,7 +195,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test doubleItem") {
     val tval: Double = 123.456
-    val lk           = Keys.DoubleKey.make(s1)
+    val lk           = KeyType.DoubleKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -227,7 +227,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     val la1 = GArray(a1)
     val la2 = GArray(a2)
-    val lk  = Keys.DoubleArrayKey.make(s1)
+    val lk  = KeyType.DoubleArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -331,7 +331,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test floatItem") {
     val tval: Float = 123.456f
-    val lk          = Keys.FloatKey.make(s1)
+    val lk          = KeyType.FloatKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -363,7 +363,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     val la1 = GArray(a1)
     val la2 = GArray(a2)
-    val lk  = Keys.FloatArrayKey.make(s1)
+    val lk  = KeyType.FloatArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -467,7 +467,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test IntItem") {
     val tval: Int = 1234
-    val lk        = Keys.IntKey.make(s1)
+    val lk        = KeyType.IntKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -500,7 +500,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     val la1 = GArray(a1)
     val la2 = GArray(a2)
-    val lk  = Keys.IntArrayKey.make(s1)
+    val lk  = KeyType.IntArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -604,7 +604,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test longKey") {
     val lval           = 1234L
-    val lk: GKey[Long] = Keys.LongKey.make(s1)
+    val lk: GKey[Long] = KeyType.LongKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(lval)
@@ -635,7 +635,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     val la1: GArray[Long]      = GArray(a1)
     val la2: GArray[Long]      = GArray(a2)
-    val lk: GKey[GArray[Long]] = Keys.LongArrayKey.make(s1)
+    val lk: GKey[GArray[Long]] = KeyType.LongArrayKey.make(s1)
 
     it("should test single item") {
       val di: GParam[GArray[Long]] = lk.set(la1)
@@ -739,7 +739,7 @@ class ItemsTests extends FunSpec with Matchers {
 
   describe("test ShortItem") {
     val tval: Short = 1234
-    val lk          = Keys.ShortKey.make(s1)
+    val lk          = KeyType.ShortKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -772,7 +772,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     val la1 = GArray(a1)
     val la2 = GArray(a2)
-    val lk  = Keys.ShortArrayKey.make(s1)
+    val lk  = KeyType.ShortArrayKey.make(s1)
 
     it("should test single item") {
       val di = lk.set(la1)
@@ -922,9 +922,9 @@ class ItemsTests extends FunSpec with Matchers {
     it("should allow creating one of them") {
       val skey = StructKey("ao.sys.oiwfs")
 
-      val ra    = Keys.StringKey.make("ra")
-      val dec   = Keys.StringKey.make("dec")
-      val epoch = Keys.DoubleKey.make("epoch")
+      val ra    = KeyType.StringKey.make("ra")
+      val dec   = KeyType.StringKey.make("dec")
+      val epoch = KeyType.DoubleKey.make("epoch")
       val sc1   = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
 
       val citem = skey.set(sc1)
@@ -938,9 +938,9 @@ class ItemsTests extends FunSpec with Matchers {
     it("should allow creating Struct items") {
       val skey = StructKey("myStruct")
 
-      val ra    = Keys.StringKey.make("ra")
-      val dec   = Keys.StringKey.make("dec")
-      val epoch = Keys.DoubleKey.make("epoch")
+      val ra    = KeyType.StringKey.make("ra")
+      val dec   = KeyType.StringKey.make("dec")
+      val epoch = KeyType.DoubleKey.make("epoch")
       val sc1   = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
 
       val citem = skey.set(sc1)

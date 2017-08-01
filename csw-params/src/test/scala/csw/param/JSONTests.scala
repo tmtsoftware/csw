@@ -34,7 +34,7 @@ class JSONTests extends FunSpec {
   describe("Test concrete items") {
 
     it("char item encode/decode") {
-      val k1 = Keys.CharKey.make(s3)
+      val k1 = KeyType.CharKey.make(s3)
       val i1 = k1.set('d').withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
@@ -43,7 +43,7 @@ class JSONTests extends FunSpec {
     }
 
     it("short item encode/decode") {
-      val k1       = Keys.ShortKey.make(s3)
+      val k1       = KeyType.ShortKey.make(s3)
       val s: Short = -1
       val i1       = k1.set(s).withUnits(UnitsOfMeasure.NoUnits)
 
@@ -53,7 +53,7 @@ class JSONTests extends FunSpec {
     }
 
     it("int item encode/decode") {
-      val k1 = Keys.IntKey.make(s3)
+      val k1 = KeyType.IntKey.make(s3)
       val i1 = k1.set(23).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
@@ -62,7 +62,7 @@ class JSONTests extends FunSpec {
     }
 
     it("long item encode/decode") {
-      val k1 = Keys.LongKey.make(s1)
+      val k1 = KeyType.LongKey.make(s1)
       val i1 = k1.set(123456L).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
@@ -71,7 +71,7 @@ class JSONTests extends FunSpec {
     }
 
     it("float item encode/decode") {
-      val k1 = Keys.FloatKey.make(s1)
+      val k1 = KeyType.FloatKey.make(s1)
       val i1 = k1.set(123.456f).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
@@ -80,7 +80,7 @@ class JSONTests extends FunSpec {
     }
 
     it("double item encode/decode") {
-      val k1 = Keys.DoubleKey.make(s1)
+      val k1 = KeyType.DoubleKey.make(s1)
       val i1 = k1.set(123.456).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
@@ -89,7 +89,7 @@ class JSONTests extends FunSpec {
     }
 
     it("boolean item encode/decode") {
-      val k1 = Keys.BooleanKey.make(s1)
+      val k1 = KeyType.BooleanKey.make(s1)
       val i1 = k1.set(true, false).withUnits(UnitsOfMeasure.NoUnits)
 
       val j1 = i1.toJson
@@ -105,7 +105,7 @@ class JSONTests extends FunSpec {
     }
 
     it("string item encode/decode") {
-      val k1 = Keys.StringKey.make(s2)
+      val k1 = KeyType.StringKey.make(s2)
       val i1 = k1.set("Blue", "Green").withUnits(UnitsOfMeasure.NoUnits)
 
       val j1  = i1.toJson
@@ -116,8 +116,8 @@ class JSONTests extends FunSpec {
 
   describe("Testing Items") {
 
-    val k1 = Keys.IntKey.make(s1)
-    val k2 = Keys.StringKey.make(s2)
+    val k1 = KeyType.IntKey.make(s1)
+    val k2 = KeyType.StringKey.make(s2)
 
     val i1 = k1.set(22, 33, 44)
     val i2 = k2.set("a", "b", "c").withUnits(UnitsOfMeasure.degrees)
@@ -135,13 +135,13 @@ class JSONTests extends FunSpec {
 
   describe("Setup JSON") {
 
-    val k1 = Keys.CharKey.make("a")
-    val k2 = Keys.IntKey.make("b")
-    val k3 = Keys.LongKey.make("c")
-    val k4 = Keys.FloatKey.make("d")
-    val k5 = Keys.DoubleKey.make("e")
-    val k6 = Keys.BooleanKey.make("f")
-    val k7 = Keys.StringKey.make("g")
+    val k1 = KeyType.CharKey.make("a")
+    val k2 = KeyType.IntKey.make("b")
+    val k3 = KeyType.LongKey.make("c")
+    val k4 = KeyType.FloatKey.make("d")
+    val k5 = KeyType.DoubleKey.make("e")
+    val k6 = KeyType.BooleanKey.make("f")
+    val k7 = KeyType.StringKey.make("g")
 
     val i1 = k1.set('d').withUnits(UnitsOfMeasure.NoUnits)
     val i2 = k2.set(22).withUnits(UnitsOfMeasure.NoUnits)
@@ -227,7 +227,7 @@ class JSONTests extends FunSpec {
 
   describe("Test Custom RaDecItem") {
     it("Should allow custom RaDecItem") {
-      val k1  = Keys.RaDecKey.make("coords")
+      val k1  = KeyType.RaDecKey.make("coords")
       val c1  = RaDec(7.3, 12.1)
       val c2  = RaDec(9.1, 2.9)
       val i1  = k1.set(c1, c2)
@@ -277,7 +277,7 @@ class JSONTests extends FunSpec {
 
   describe("Test Double Array items") {
     it("Should allow double array values") {
-      val k1  = Keys.DoubleArrayKey.make("myArray")
+      val k1  = KeyType.DoubleArrayKey.make("myArray")
       val m1  = GArray(Array(1.0, 2.0, 3.0))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
@@ -317,7 +317,7 @@ class JSONTests extends FunSpec {
 
   describe("Test Int Array items") {
     it("Should allow int array values") {
-      val k1  = Keys.IntArrayKey.make("myArray")
+      val k1  = KeyType.IntArrayKey.make("myArray")
       val m1  = GArray(Array(1, 2, 3))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
@@ -356,7 +356,7 @@ class JSONTests extends FunSpec {
 
   describe("Test Byte Array items") {
     it("Should allow byte array values") {
-      val k1  = Keys.ByteArrayKey.make("myArray")
+      val k1  = KeyType.ByteArrayKey.make("myArray")
       val m1  = GArray(Array[Byte](1, 2, 3))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
@@ -396,7 +396,7 @@ class JSONTests extends FunSpec {
 
   describe("Test Short Array items") {
     it("Should allow short array values") {
-      val k1  = Keys.ShortArrayKey.make("myArray")
+      val k1  = KeyType.ShortArrayKey.make("myArray")
       val m1  = GArray(Array[Short](1, 2, 3))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
@@ -435,7 +435,7 @@ class JSONTests extends FunSpec {
 
   describe("Test Long Array items") {
     it("Should allow long array values") {
-      val k1: GKey[GArray[Long]]   = Keys.LongArrayKey.make("myArray")
+      val k1: GKey[GArray[Long]]   = KeyType.LongArrayKey.make("myArray")
       val m1: GArray[Long]         = GArray(Array(1, 2, 3))
       val i1: GParam[GArray[Long]] = k1.set(m1)
       val sc1                      = Setup(commandInfo, ck).add(i1)

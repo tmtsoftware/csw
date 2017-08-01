@@ -32,13 +32,13 @@ object TromboneStateActor {
 
   def moveItem(ch: Choice): ChoiceParameter = moveKey.set(ch)
 
-  def sodiumKey                               = Keys.BooleanKey.make("sodiumLayer")
+  def sodiumKey                               = KeyType.BooleanKey.make("sodiumLayer")
   val sodiumLayerDefault                      = sodiumItem(false)
   def sodiumLayer(ts: TromboneState): Boolean = ts.sodiumLayer.head
 
   def sodiumItem(flag: Boolean): GParam[Boolean] = sodiumKey.set(flag)
 
-  def nssKey                          = Keys.BooleanKey.make("nss")
+  def nssKey                          = KeyType.BooleanKey.make("nss")
   val nssDefault                      = nssItem(false)
   def nss(ts: TromboneState): Boolean = ts.nss.head
 
@@ -63,7 +63,11 @@ object TromboneStateActor {
               nss: GParam[Boolean],
               replyTo: ActorRef[StateWasSet]): SetState = SetState(TromboneState(cmd, move, sodiumLayer, nss), replyTo)
 
-    def apply(cmd: Choice, move: Choice, sodiumLayer: Boolean, nss: Boolean, replyTo: ActorRef[StateWasSet]): SetState =
+    def apply(cmd: Choice,
+              move: Choice,
+              sodiumLayer: Boolean,
+              nss: Boolean,
+              replyTo: ActorRef[StateWasSet]): SetState =
       SetState(TromboneState(cmdItem(cmd), moveItem(move), sodiumItem(sodiumLayer), nssItem(nss)), replyTo)
   }
 
