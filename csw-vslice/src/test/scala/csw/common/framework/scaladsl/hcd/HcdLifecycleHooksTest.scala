@@ -1,50 +1,23 @@
 package csw.common.framework.scaladsl.hcd
 
-import akka.typed.ActorSystem
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
-import akka.util.Timeout
 import csw.common.components.hcd._
-import csw.common.framework.models.Component.{DoNotRegister, HcdInfo}
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
 import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
 import csw.common.framework.models.InitialHcdMsg.Run
 import csw.common.framework.models.RunningHcdMsg.Lifecycle
-import csw.common.framework.models.{HcdMsg, HcdResponseMode, ToComponentLifecycleMessage}
-import csw.services.location.models.ConnectionType.AkkaType
+import csw.common.framework.models.{HcdResponseMode, ToComponentLifecycleMessage}
+import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-class HcdLifecycleHooksTest
-    extends FunSuite
-    with Matchers
-    with BeforeAndAfterEach
-    with BeforeAndAfterAll
-    with MockitoSugar {
-
-  implicit val system   = ActorSystem("testHcd", Actor.empty)
-  implicit val settings = TestKitSettings(system)
-  implicit val timeout  = Timeout(5.seconds)
-
-  class SampleHcdHandlersFactory(sampleHcdHandler: HcdHandlers[HcdDomainMessage])
-      extends HcdHandlersFactory[HcdDomainMessage] {
-    override def make(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo): HcdHandlers[HcdDomainMessage] = sampleHcdHandler
-  }
+class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   def run(hcdHandlersFactory: HcdHandlersFactory[HcdDomainMessage],
           testProbeSupervisor: TestProbe[HcdResponseMode]): Running = {
-    val hcdInfo =
-      HcdInfo("SampleHcd",
-              "wfos",
-              "csw.common.components.assembly.SampleAssembly",
-              DoNotRegister,
-              Set(AkkaType),
-              FiniteDuration(5, "seconds"))
 
     Await.result(
       system.systemActorOf[Nothing](hcdHandlersFactory.behavior(hcdInfo, testProbeSupervisor.ref), "Hcd"),
@@ -65,7 +38,7 @@ class HcdLifecycleHooksTest
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
+    val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
     doNothing().when(sampleHcdHandler).onShutdown()
 
@@ -80,7 +53,7 @@ class HcdLifecycleHooksTest
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
+    val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.Restart)
     Thread.sleep(1000)
@@ -94,7 +67,7 @@ class HcdLifecycleHooksTest
     when(sampleHcdHandler.isOnline).thenReturn(true)
 
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
+    val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
     Thread.sleep(1000)
@@ -108,7 +81,7 @@ class HcdLifecycleHooksTest
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
+    val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
     Thread.sleep(1000)
@@ -122,7 +95,7 @@ class HcdLifecycleHooksTest
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
+    val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
     Thread.sleep(1000)
@@ -136,7 +109,7 @@ class HcdLifecycleHooksTest
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val testProbeSupervisor = TestProbe[HcdResponseMode]
-    val running             = run(new SampleHcdHandlersFactory(sampleHcdHandler), testProbeSupervisor)
+    val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
     running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
     Thread.sleep(1000)

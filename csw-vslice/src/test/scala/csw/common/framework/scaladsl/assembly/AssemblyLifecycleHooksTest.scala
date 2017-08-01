@@ -1,50 +1,23 @@
 package csw.common.framework.scaladsl.assembly
 
-import akka.typed.ActorSystem
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
-import akka.util.Timeout
 import csw.common.components.assembly.AssemblyDomainMessages
 import csw.common.framework.models.AssemblyResponseMode.{Initialized, Running}
-import csw.common.framework.models.Component.{AssemblyInfo, DoNotRegister}
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
 import csw.common.framework.models.InitialAssemblyMsg.Run
 import csw.common.framework.models.RunningAssemblyMsg.Lifecycle
-import csw.common.framework.models.{AssemblyMsg, AssemblyResponseMode, ToComponentLifecycleMessage}
-import csw.services.location.models.ConnectionType.AkkaType
+import csw.common.framework.models.{AssemblyResponseMode, ToComponentLifecycleMessage}
+import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-class AssemblyLifecycleHooksTest
-    extends FunSuite
-    with Matchers
-    with BeforeAndAfterEach
-    with BeforeAndAfterAll
-    with MockitoSugar {
-
-  implicit val system   = ActorSystem("testAssembly", Actor.empty)
-  implicit val settings = TestKitSettings(system)
-  implicit val timeout  = Timeout(5.seconds)
-
-  class SampleAssemblyHandlersFactory(sampleAssemblyHandler: AssemblyHandlers[AssemblyDomainMessages])
-      extends AssemblyHandlersFactory[AssemblyDomainMessages] {
-    override def make(ctx: ActorContext[AssemblyMsg],
-                      assemblyInfo: AssemblyInfo): AssemblyHandlers[AssemblyDomainMessages] = sampleAssemblyHandler
-  }
+class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   def run(assemblyHandlersFactory: AssemblyHandlersFactory[AssemblyDomainMessages],
           supervisorProbe: TestProbe[AssemblyResponseMode]): Running = {
-    val assemblyInfo = AssemblyInfo("trombone",
-                                    "wfos",
-                                    "csw.common.components.assembly.SampleAssembly",
-                                    DoNotRegister,
-                                    Set(AkkaType),
-                                    Set.empty)
 
     Await.result(
       system.systemActorOf[Nothing](assemblyHandlersFactory.behavior(assemblyInfo, supervisorProbe.ref), "Assembly"),
@@ -65,7 +38,7 @@ class AssemblyLifecycleHooksTest
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe = TestProbe[AssemblyResponseMode]
-    val running         = run(new SampleAssemblyHandlersFactory(sampleAssemblyHandler), supervisorProbe)
+    val running         = run(getSampleAssemblyFactory(sampleAssemblyHandler), supervisorProbe)
 
     doNothing().when(sampleAssemblyHandler).onShutdown()
 
@@ -79,7 +52,7 @@ class AssemblyLifecycleHooksTest
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe = TestProbe[AssemblyResponseMode]
-    val running         = run(new SampleAssemblyHandlersFactory(sampleAssemblyHandler), supervisorProbe)
+    val running         = run(getSampleAssemblyFactory(sampleAssemblyHandler), supervisorProbe)
 
     running.assemblyRef ! Lifecycle(ToComponentLifecycleMessage.Restart)
     Thread.sleep(1000)
@@ -93,7 +66,7 @@ class AssemblyLifecycleHooksTest
     when(sampleAssemblyHandler.isOnline).thenReturn(true)
 
     val supervisorProbe = TestProbe[AssemblyResponseMode]
-    val running         = run(new SampleAssemblyHandlersFactory(sampleAssemblyHandler), supervisorProbe)
+    val running         = run(getSampleAssemblyFactory(sampleAssemblyHandler), supervisorProbe)
 
     running.assemblyRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
     Thread.sleep(1000)
@@ -107,7 +80,7 @@ class AssemblyLifecycleHooksTest
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe = TestProbe[AssemblyResponseMode]
-    val running         = run(new SampleAssemblyHandlersFactory(sampleAssemblyHandler), supervisorProbe)
+    val running         = run(getSampleAssemblyFactory(sampleAssemblyHandler), supervisorProbe)
 
     running.assemblyRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
     Thread.sleep(1000)
@@ -121,7 +94,7 @@ class AssemblyLifecycleHooksTest
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe = TestProbe[AssemblyResponseMode]
-    val running         = run(new SampleAssemblyHandlersFactory(sampleAssemblyHandler), supervisorProbe)
+    val running         = run(getSampleAssemblyFactory(sampleAssemblyHandler), supervisorProbe)
 
     running.assemblyRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
     Thread.sleep(1000)
@@ -135,7 +108,7 @@ class AssemblyLifecycleHooksTest
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe = TestProbe[AssemblyResponseMode]
-    val running         = run(new SampleAssemblyHandlersFactory(sampleAssemblyHandler), supervisorProbe)
+    val running         = run(getSampleAssemblyFactory(sampleAssemblyHandler), supervisorProbe)
 
     running.assemblyRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
     Thread.sleep(1000)
