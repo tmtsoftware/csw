@@ -1,6 +1,6 @@
 package csw.param.parameters
 
-import csw.param.{JavaFormats, JsonSupport, RaDec}
+import csw.param.JsonSupport
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
 

@@ -1,4 +1,4 @@
-package csw.param
+package csw.param.parameters
 
 import java.lang
 
