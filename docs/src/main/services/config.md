@@ -58,15 +58,16 @@ gradle
 * **ConfigMetadata** : Represents metadata information about ConfigServer.    
 * **FileType** : Represents the type of storage for a configuration file. Currently two types are supported `Normal`(small, text files) and `Annex`(Large, Binary files).
  
-## API flavours
+## API flavors
 
-The Configuration Service is used to provide the runtime settings for components.  In order to determine the configuration 
-of the system at any given time, a record is kept of the settings of each component each time they are run.  These settings are referred to
-as the "active" configuration for a component, and is explicitly set in the 
-Configuration Service, so that a history of active configurations can be maintained.  To that end, components will
-use a simplified "client API", which limits functionality to obtaining the active configuration.  Creating, updating, 
-and retrieving past configurations will be performed using an administration tool (e.g. CLI) that has access to the full
-administrative API.
+The Configuration Service is used to provide the runtime settings for components.  When a component is started, it will 
+use a limited "clientAPI" to obtain the "active" configuration from the Configuration Service, and use those settings 
+for its execution.  To change the active configuration, an administrative tool with access to the full "admin API" must 
+be used.  These tools would have the ability to create, delete, and update configurations, as well as retrieve past 
+configurations and their history.  Any time a new configuration is to be used by a component, the user must use one of 
+these tools (via CLI, perhaps) to set the active configuration for a component.  Since a history of active configurations 
+is maintained by the service, the settings of each component each time it is run can be retrieved, and the system 
+configuration at any moment can be recreated.
 
 * **clientAPI** : Expected to be consumed by component developers. Available functions are: `{exists | getActive}`    
 * **adminAPI**  : Full functionality exposed by ConfigServer is available with this API. Expected to be used administrators. Available functions are: `{create | update | getById | getLatest | getByTime | delete | list | history | historyActive | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}`
