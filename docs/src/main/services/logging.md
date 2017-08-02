@@ -102,11 +102,6 @@ pretty=false
     ```
     @@@
     
-@@@ note
-
-* Due to lack of macros in Java, file names and line numbers of log statements will not be available for Java code.
-
-@@@
 
 Similarly, turning `oneLine` on will produce log statements in following format:
 
@@ -159,7 +154,7 @@ All messages are logged by default as Json. Logs can contain following fields:
 @@@ note
 
 * `@host`, `@name` and `@version` will appear in log statements only if _fullHeaders_ is set as true in the configuration
-* `file` and `line` will appear only if log statements are being logged from scala classes/actors       
+* `file` and `line` will appear only in log statements from Scala classes/actors.  This is typical for Java logging tools, and is due to the lack of macro support in Java.       
 
 @@@
 
