@@ -4,10 +4,10 @@ import akka.typed.ActorSystem
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.testkit.TestKitSettings
 import akka.util.Timeout
+import csw.common.components.assembly.AssemblyDomainMsg
+import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.Component.{AssemblyInfo, DoNotRegister, HcdInfo}
-import csw.common.framework.models.RunningAssemblyMsg.AssemblyDomainMsg
-import csw.common.framework.models.RunningHcdMsg.HcdDomainMsg
-import csw.common.framework.models.{AssemblyMsg, HcdMsg}
+import csw.common.framework.models.ComponentMsg
 import csw.common.framework.scaladsl.assembly.{AssemblyHandlers, AssemblyHandlersFactory}
 import csw.common.framework.scaladsl.hcd.{HcdHandlers, HcdHandlersFactory}
 import csw.services.location.models.ConnectionType.AkkaType
@@ -41,14 +41,14 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
 
   def getSampleHcdFactory(hcdHandlers: HcdHandlers[HcdDomainMsg]): HcdHandlersFactory[HcdDomainMsg] =
     new HcdHandlersFactory[HcdDomainMsg] {
-      override def make(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo): HcdHandlers[HcdDomainMsg] = hcdHandlers
+      override def make(ctx: ActorContext[ComponentMsg], hcdInfo: HcdInfo): HcdHandlers[HcdDomainMsg] = hcdHandlers
     }
 
   def getSampleAssemblyFactory(
       assemblyHandlers: AssemblyHandlers[AssemblyDomainMsg]
   ): AssemblyHandlersFactory[AssemblyDomainMsg] =
     new AssemblyHandlersFactory[AssemblyDomainMsg] {
-      override def make(ctx: ActorContext[AssemblyMsg],
+      override def make(ctx: ActorContext[ComponentMsg],
                         assemblyInfo: AssemblyInfo): AssemblyHandlers[AssemblyDomainMsg] = assemblyHandlers
     }
 }

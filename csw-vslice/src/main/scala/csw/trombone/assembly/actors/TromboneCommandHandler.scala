@@ -10,7 +10,7 @@ import csw.common.ccs.CommandMsgs
 import csw.common.ccs.CommandMsgs.StopCurrentCommand
 import csw.common.ccs.CommandStatus._
 import csw.common.ccs.Validation.{RequiredHCDUnavailableIssue, UnsupportedCommandInStateIssue, WrongInternalStateIssue}
-import csw.common.framework.models.HcdResponseMode.Running
+import csw.common.framework.models.ComponentResponseMode.Running
 import csw.param.Parameters.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.TromboneCommandHandlerMsgs._
@@ -73,7 +73,7 @@ class TromboneCommandHandler(ctx: ActorContext[TromboneCommandHandlerMsgs],
   private var followCommandActor: ActorRef[FollowCommandMessages] = _
   private var currentCommand: ActorRef[CommandMsgs]               = _
 
-  private def isHCDAvailable: Boolean = tromboneHCD.hcdRef != badHCDReference
+  private def isHCDAvailable: Boolean = tromboneHCD.componentRef != badHCDReference
 
   override def onMessage(msg: TromboneCommandHandlerMsgs): Behavior[TromboneCommandHandlerMsgs] = {
     (mode, msg) match {
@@ -143,7 +143,7 @@ class TromboneCommandHandler(ctx: ActorContext[TromboneCommandHandlerMsgs],
             val nssItem = s(ac.nssInUseKey)
 
             followCommandActor = ctx.spawnAnonymous(
-              FollowCommand.make(ac, setElevationItem, nssItem, Some(tromboneHCD.hcdRef), allEventPublisher)
+              FollowCommand.make(ac, setElevationItem, nssItem, Some(tromboneHCD.componentRef), allEventPublisher)
             )
             mode = Mode.Following
             (tromboneStateActor ? { x: ActorRef[StateWasSet] ⇒

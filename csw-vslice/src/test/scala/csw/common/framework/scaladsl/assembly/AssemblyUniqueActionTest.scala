@@ -1,11 +1,10 @@
 package csw.common.framework.scaladsl.assembly
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.assembly.OperationsMode
-import csw.common.framework.models.AssemblyResponseMode
-import csw.common.framework.models.AssemblyResponseMode.{Initialized, Running}
-import csw.common.framework.models.InitialAssemblyMsg.Run
-import csw.common.framework.models.RunningAssemblyMsg.AssemblyDomainMsg
+import csw.common.components.assembly.{AssemblyDomainMsg, OperationsMode}
+import csw.common.framework.models.ComponentResponseMode
+import csw.common.framework.models.ComponentResponseMode.{Initialized, Running}
+import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
@@ -20,7 +19,7 @@ class AssemblyUniqueActionTest extends FrameworkComponentTestSuite with MockitoS
 
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
-    val supervisorProbe: TestProbe[AssemblyResponseMode] = TestProbe[AssemblyResponseMode]
+    val supervisorProbe: TestProbe[ComponentResponseMode] = TestProbe[ComponentResponseMode]
 
     Await.result(
       system.systemActorOf[Nothing](
@@ -31,10 +30,10 @@ class AssemblyUniqueActionTest extends FrameworkComponentTestSuite with MockitoS
     )
 
     val initialized = supervisorProbe.expectMsgType[Initialized]
-    initialized.assemblyRef ! Run
+    initialized.componentRef ! Run
 
     val running = supervisorProbe.expectMsgType[Running]
-    running.assemblyRef ! OperationsMode
+    running.componentRef ! OperationsMode
 
     Thread.sleep(1000)
     verify(sampleAssemblyHandler).onDomainMsg(OperationsMode)

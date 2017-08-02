@@ -1,5 +1,6 @@
 package csw.common.components.assembly
 
-import csw.common.framework.models.RunningAssemblyMsg.AssemblyDomainMsg
+import csw.common.framework.models.RunningMsg.DomainMsg
 
-case object OperationsMode extends AssemblyDomainMsg
+sealed trait AssemblyDomainMsg extends DomainMsg
+case object OperationsMode     extends AssemblyDomainMsg

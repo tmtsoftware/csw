@@ -1,11 +1,12 @@
 package csw.common.framework.scaladsl.hcd
 
 import akka.typed.testkit.scaladsl.TestProbe
+import csw.common.components.hcd.HcdDomainMsg
+import csw.common.framework.models.ComponentResponseMode.{Initialized, Running}
 import csw.common.framework.models.FromComponentLifecycleMessage.ShutdownComplete
-import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
-import csw.common.framework.models.InitialHcdMsg.Run
-import csw.common.framework.models.RunningHcdMsg.{HcdDomainMsg, Lifecycle}
-import csw.common.framework.models.{HcdResponseMode, ToComponentLifecycleMessage}
+import csw.common.framework.models.InitialMsg.Run
+import csw.common.framework.models.RunningMsg.Lifecycle
+import csw.common.framework.models.{ComponentResponseMode, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -16,7 +17,7 @@ import scala.concurrent.{Await, Future}
 class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   def run(hcdHandlersFactory: HcdHandlersFactory[HcdDomainMsg],
-          testProbeSupervisor: TestProbe[HcdResponseMode]): Running = {
+          testProbeSupervisor: TestProbe[ComponentResponseMode]): Running = {
 
     Await.result(
       system.systemActorOf[Nothing](hcdHandlersFactory.behavior(hcdInfo, testProbeSupervisor.ref), "Hcd"),
@@ -24,7 +25,7 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
     )
 
     val initialized = testProbeSupervisor.expectMsgType[Initialized]
-    initialized.hcdRef ! Run
+    initialized.componentRef ! Run
     testProbeSupervisor.expectMsgType[Running]
   }
 
@@ -36,25 +37,24 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
     val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
-    val testProbeSupervisor = TestProbe[HcdResponseMode]
+    val testProbeSupervisor = TestProbe[ComponentResponseMode]
     val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
     doNothing().when(sampleHcdHandler).onShutdown()
 
-    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
+    running.componentRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
     testProbeSupervisor.expectMsg(ShutdownComplete)
     verify(sampleHcdHandler).onShutdown()
-    verify(sampleHcdHandler).stopChildren()
   }
 
   test("A running Hcd component should accept Restart lifecycle message") {
     val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
-    val testProbeSupervisor = TestProbe[HcdResponseMode]
+    val testProbeSupervisor = TestProbe[ComponentResponseMode]
     val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
-    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.Restart)
+    running.componentRef ! Lifecycle(ToComponentLifecycleMessage.Restart)
     Thread.sleep(1000)
 
     verify(sampleHcdHandler).onRestart()
@@ -65,10 +65,10 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
     when(sampleHcdHandler.isOnline).thenReturn(true)
 
-    val testProbeSupervisor = TestProbe[HcdResponseMode]
+    val testProbeSupervisor = TestProbe[ComponentResponseMode]
     val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
-    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
+    running.componentRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
     Thread.sleep(1000)
 
     verify(sampleHcdHandler).onGoOffline()
@@ -79,10 +79,10 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
     when(sampleHcdHandler.isOnline).thenReturn(false)
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
-    val testProbeSupervisor = TestProbe[HcdResponseMode]
+    val testProbeSupervisor = TestProbe[ComponentResponseMode]
     val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
-    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
+    running.componentRef ! Lifecycle(ToComponentLifecycleMessage.GoOffline)
     Thread.sleep(1000)
 
     verify(sampleHcdHandler, never).onGoOffline()
@@ -93,10 +93,10 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
     when(sampleHcdHandler.isOnline).thenReturn(false)
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
-    val testProbeSupervisor = TestProbe[HcdResponseMode]
+    val testProbeSupervisor = TestProbe[ComponentResponseMode]
     val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
-    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
+    running.componentRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
     Thread.sleep(1000)
 
     verify(sampleHcdHandler).onGoOnline()
@@ -107,10 +107,10 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
     when(sampleHcdHandler.isOnline).thenReturn(true)
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
-    val testProbeSupervisor = TestProbe[HcdResponseMode]
+    val testProbeSupervisor = TestProbe[ComponentResponseMode]
     val running             = run(getSampleHcdFactory(sampleHcdHandler), testProbeSupervisor)
 
-    running.hcdRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
+    running.componentRef ! Lifecycle(ToComponentLifecycleMessage.GoOnline)
     Thread.sleep(1000)
 
     verify(sampleHcdHandler, never).onGoOnline()

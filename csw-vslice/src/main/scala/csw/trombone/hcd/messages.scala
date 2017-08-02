@@ -1,7 +1,7 @@
 package csw.trombone.hcd
 
 import akka.typed.ActorRef
-import csw.common.framework.models.RunningHcdMsg.HcdDomainMsg
+import csw.common.framework.models.RunningMsg.DomainMsg
 import csw.services.location.models.TmtSerializable
 import csw.trombone.hcd.AxisResponse.{AxisStatistics, AxisUpdate}
 
@@ -39,7 +39,7 @@ object MotionWorkerMsgs {
 
 ////////////////
 
-sealed trait TromboneMsg extends HcdDomainMsg
+sealed trait TromboneMsg extends DomainMsg
 
 sealed trait TromboneEngineering extends TromboneMsg
 object TromboneEngineering {

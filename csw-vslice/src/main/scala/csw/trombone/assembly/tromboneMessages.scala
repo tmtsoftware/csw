@@ -2,9 +2,9 @@ package csw.trombone.assembly
 
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.models.HcdResponseMode.Running
-import csw.common.framework.models.RunningAssemblyMsg.AssemblyDomainMsg
-import csw.common.framework.models.RunningHcdMsg.Submit
+import csw.common.framework.models.ComponentResponseMode.Running
+import csw.common.framework.models.HcdMsg.Submit
+import csw.common.framework.models.RunningMsg.DomainMsg
 import csw.param.Events.EventTime
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
@@ -66,7 +66,7 @@ object TromboneControlMsg {
 
 /////////////////////
 
-sealed trait DiagPublisherMessages extends AssemblyDomainMsg
+sealed trait DiagPublisherMessages extends DomainMsg
 object DiagPublisherMessages {
   final case class TimeForAxisStats(periodInseconds: Int)      extends DiagPublisherMessages
   final case object DiagnosticState                            extends DiagPublisherMessages
