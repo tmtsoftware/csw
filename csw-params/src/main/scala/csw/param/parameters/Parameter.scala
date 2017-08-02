@@ -1,8 +1,11 @@
 package csw.param.parameters
 
+import java.util
+
 import csw.param.UnitsOfMeasure.Units
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat, RootJsonFormat}
 
+import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
@@ -49,6 +52,8 @@ case class Parameter[S] private[param] (
 )(implicit @transient jsFormat: JsonFormat[S], @transient cTag: ClassTag[S]) {
 
   def values: Array[S] = items.array
+
+  def jValues: util.List[S] = items.asJava
 
   /**
    * The number of values in this parameter (values.size)

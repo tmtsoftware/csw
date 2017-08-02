@@ -85,6 +85,10 @@ object KeyType extends JsonSupport with JavaFormats with Enum[KeyType[_]] {
 }
 
 object JKeyTypes {
+  val RaDecKey  = KeyType.RaDecKey
+  val StringKey = KeyType.StringKey
+  val StructKey = KeyType.StructKey
+
   val BooleanKey = KeyType.JBooleanKey
   val CharKey    = KeyType.JCharKey
   val ShortKey   = KeyType.JShortKey

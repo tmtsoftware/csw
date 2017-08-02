@@ -122,6 +122,7 @@ object Parameters {
      * @tparam P must be a subclass of Parameter
      * @return a new instance of this parameter gset with the given parameter added
      */
+    @varargs
     def madd[P <: Parameter[_]](parametersToAdd: P*): T =
       parametersToAdd.foldLeft(this)((c, parameter) => doAdd(c, parameter))
 
