@@ -25,7 +25,6 @@ import scala.runtime.Nothing$;
 
 import java.util.concurrent.CompletableFuture;
 
-import static csw.common.framework.models.ComponentResponseMode.*;
 import static csw.common.framework.models.JComponent.DoNotRegister;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,7 +64,7 @@ public class JHcdBehaviorTest {
                 BoxedUnit.UNIT
         ));
 
-        TestProbe<ComponentResponseMode> supervisorProbe = TestProbe.apply(system, settings);
+        TestProbe<FromComponentLifecycleMessage> supervisorProbe = TestProbe.apply(system, settings);
 
         Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
         Behavior<Nothing$> behavior = getSampleJHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref());
@@ -73,12 +72,12 @@ public class JHcdBehaviorTest {
         FiniteDuration seconds1 = Duration.create(5, "seconds");
         ActorRef hcdRef = Await.result(hcd, seconds1);
 
-        Initialized initialized = supervisorProbe.expectMsgType(JClassTag.make(Initialized.class));
+        SupervisorIdleMsg.Initialized initialized = supervisorProbe.expectMsgType(JClassTag.make(SupervisorIdleMsg.Initialized.class));
         Assert.assertEquals(hcdRef, initialized.componentRef());
 
         initialized.componentRef().tell(InitialMsg.Run$.MODULE$);
 
-        Running running = supervisorProbe.expectMsgType(JClassTag.make(Running.class));
+        SupervisorIdleMsg.Running running = supervisorProbe.expectMsgType(JClassTag.make(SupervisorIdleMsg.Running.class));
         verify(sampleHcdHandler).onRun();
         verify(sampleHcdHandler).isOnline_$eq(true);
 

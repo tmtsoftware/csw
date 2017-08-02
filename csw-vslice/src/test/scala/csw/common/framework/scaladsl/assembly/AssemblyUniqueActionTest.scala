@@ -2,9 +2,9 @@ package csw.common.framework.scaladsl.assembly
 
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.assembly.{AssemblyDomainMsg, OperationsMode}
-import csw.common.framework.models.ComponentResponseMode
-import csw.common.framework.models.ComponentResponseMode.{Initialized, Running}
+import csw.common.framework.models.FromComponentLifecycleMessage
 import csw.common.framework.models.InitialMsg.Run
+import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
@@ -19,7 +19,7 @@ class AssemblyUniqueActionTest extends FrameworkComponentTestSuite with MockitoS
 
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
-    val supervisorProbe: TestProbe[ComponentResponseMode] = TestProbe[ComponentResponseMode]
+    val supervisorProbe: TestProbe[FromComponentLifecycleMessage] = TestProbe[FromComponentLifecycleMessage]
 
     Await.result(
       system.systemActorOf[Nothing](

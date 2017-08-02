@@ -10,7 +10,7 @@ import csw.common.framework.scaladsl.ComponentBehavior
 import scala.reflect.ClassTag
 
 class HcdBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[ComponentMsg],
-                                              supervisor: ActorRef[ComponentResponseMode],
+                                              supervisor: ActorRef[FromComponentLifecycleMessage],
                                               hcdHandlers: HcdHandlers[Msg])
     extends ComponentBehavior[Msg, HcdMsg](ctx, supervisor, hcdHandlers) {
 

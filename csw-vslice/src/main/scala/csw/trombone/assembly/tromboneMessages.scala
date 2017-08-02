@@ -2,9 +2,9 @@ package csw.trombone.assembly
 
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.models.ComponentResponseMode.Running
 import csw.common.framework.models.HcdMsg.Submit
 import csw.common.framework.models.RunningMsg.DomainMsg
+import csw.common.framework.models.SupervisorIdleMsg.Running
 import csw.param.Events.EventTime
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState

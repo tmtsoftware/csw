@@ -14,7 +14,7 @@ import csw.param.Parameters.{Observe, Setup}
 import scala.reflect.ClassTag
 
 class AssemblyBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[ComponentMsg],
-                                                   supervisor: ActorRef[ComponentResponseMode],
+                                                   supervisor: ActorRef[FromComponentLifecycleMessage],
                                                    assemblyHandlers: AssemblyHandlers[Msg])
     extends ComponentBehavior[Msg, AssemblyMsg](ctx, supervisor, assemblyHandlers) {
 

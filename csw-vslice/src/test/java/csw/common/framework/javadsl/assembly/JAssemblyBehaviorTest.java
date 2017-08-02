@@ -11,10 +11,7 @@ import akka.typed.testkit.scaladsl.TestProbe;
 import akka.util.Timeout;
 import csw.common.components.assembly.AssemblyDomainMsg;
 import csw.common.framework.javadsl.commons.JClassTag;
-import csw.common.framework.models.Component;
-import csw.common.framework.models.ComponentMsg;
-import csw.common.framework.models.ComponentResponseMode;
-import csw.common.framework.models.InitialMsg;
+import csw.common.framework.models.*;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +25,6 @@ import scala.runtime.Nothing$;
 
 import java.util.concurrent.CompletableFuture;
 
-import static csw.common.framework.models.ComponentResponseMode.*;
 import static csw.common.framework.models.JComponent.DoNotRegister;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,7 +63,7 @@ public class JAssemblyBehaviorTest {
                 BoxedUnit.UNIT
         ));
 
-        TestProbe<ComponentResponseMode> supervisorProbe = TestProbe.apply(system, settings);
+        TestProbe<FromComponentLifecycleMessage> supervisorProbe = TestProbe.apply(system, settings);
 
         Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
         Behavior<Nothing$> behavior = getSampleJAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref());
@@ -75,11 +71,11 @@ public class JAssemblyBehaviorTest {
         FiniteDuration seconds1 = Duration.create(5, "seconds");
         ActorRef assemblyRef = Await.result(assembly, seconds1);
 
-        Initialized initialized = supervisorProbe.expectMsgType(JClassTag.make(Initialized.class));
+        SupervisorIdleMsg.Initialized initialized = supervisorProbe.expectMsgType(JClassTag.make(SupervisorIdleMsg.Initialized.class));
         Assert.assertEquals(assemblyRef, initialized.componentRef());
 
         initialized.componentRef().tell(InitialMsg.Run$.MODULE$);
-        Running running = supervisorProbe.expectMsgType(JClassTag.make(Running.class));
+        SupervisorIdleMsg.Running running = supervisorProbe.expectMsgType(JClassTag.make(SupervisorIdleMsg.Running.class));
         verify(sampleAssemblyHandler).onRun();
         verify(sampleAssemblyHandler).isOnline_$eq(true);
 

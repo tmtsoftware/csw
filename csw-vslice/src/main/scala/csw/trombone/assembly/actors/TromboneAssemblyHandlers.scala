@@ -6,6 +6,7 @@ import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validation
 import csw.common.ccs.Validation.{Valid, Validation}
 import csw.common.framework.models.Component.AssemblyInfo
+import csw.common.framework.models.SupervisorIdleMsg.Running
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.assembly.{AssemblyHandlers, AssemblyHandlersFactory}
 import csw.param.Parameters.{Observe, Setup}
@@ -34,7 +35,7 @@ class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg], info: AssemblyIn
   implicit var ac: AssemblyContext  = _
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  val runningHcd: Option[ComponentResponseMode.Running] = None
+  val runningHcd: Option[Running] = None
 
   def onRun(): Unit = ()
 

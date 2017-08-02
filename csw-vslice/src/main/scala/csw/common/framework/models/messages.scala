@@ -2,8 +2,20 @@ package csw.common.framework.models
 
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
+import csw.common.framework.models.SupervisorExternalMsg.LifecycleStateChanged
 import csw.param.Parameters.{ControlCommand, Setup}
-import csw.trombone.assembly.actors.TromboneStateActor.StateWasSet
+
+/////////////
+
+sealed trait PubSub[T]
+
+object PubSub {
+  case class Subscribe[T](ref: ActorRef[T])   extends PubSub[T]
+  case class Unsubscribe[T](ref: ActorRef[T]) extends PubSub[T]
+  case class Publish[T](data: T)              extends PubSub[T]
+}
+
+/////////////
 
 sealed trait LifecycleState
 
@@ -29,45 +41,15 @@ object ToComponentLifecycleMessage {
 
 ///////////////
 
-sealed trait FromComponentLifecycleMessage extends ComponentResponseMode
-object FromComponentLifecycleMessage {
-  case class InitializeFailure(reason: String) extends FromComponentLifecycleMessage
-  case class ShutdownFailure(reason: String)   extends FromComponentLifecycleMessage
-  case object HaltComponent                    extends FromComponentLifecycleMessage
-  case object ShutdownComplete                 extends FromComponentLifecycleMessage
-}
-
-/////////////
-
-sealed trait PubSub[T]
-
-object PubSub {
-  case class Subscribe[T](ref: ActorRef[T])   extends PubSub[T]
-  case class Unsubscribe[T](ref: ActorRef[T]) extends PubSub[T]
-  case class Publish[T](data: T)              extends PubSub[T]
-}
-
-///////////////
-
-sealed trait CommandMsgs
-object CommandMsgs {
-  case class CommandStart(replyTo: ActorRef[CommandResponse]) extends CommandMsgs
-  case object StopCurrentCommand                              extends CommandMsgs
-  case class SetStateResponseE(response: StateWasSet)         extends CommandMsgs
-}
-
-///////////////
-
-sealed trait ComponentResponseMode
-object ComponentResponseMode {
-  case object Idle                                           extends ComponentResponseMode
-  case class Initialized(componentRef: ActorRef[InitialMsg]) extends ComponentResponseMode
-  case class Running(componentRef: ActorRef[RunningMsg])     extends ComponentResponseMode
-}
+sealed trait FromComponentLifecycleMessage extends SupervisorMsg
 
 ///////////////
 
 sealed trait ComponentMsg
+
+///////////////
+
+sealed trait SupervisorMsg
 
 ///////////////
 
@@ -110,3 +92,34 @@ object AssemblyMsg {
 }
 
 ///////////////////////
+
+sealed trait SupervisorExternalMsg extends SupervisorMsg
+object SupervisorExternalMsg {
+  case class LifecycleStateChanged(state: LifecycleState) extends SupervisorExternalMsg
+  case object ExComponentRestart                          extends SupervisorExternalMsg
+  case object ExComponentShutdown                         extends SupervisorExternalMsg
+  case object ExComponentOnline                           extends SupervisorExternalMsg
+  case object ExComponentOffline                          extends SupervisorExternalMsg
+}
+
+sealed trait CommonSupervisorMsg extends SupervisorMsg
+object CommonSupervisorMsg {
+  case class SubscribeLifecycleCallback(actorRef: ActorRef[LifecycleStateChanged])   extends CommonSupervisorMsg
+  case class UnsubscribeLifecycleCallback(actorRef: ActorRef[LifecycleStateChanged]) extends CommonSupervisorMsg
+  case object HaltComponent                                                          extends CommonSupervisorMsg
+
+}
+
+sealed trait PreparingToShutdownMsg extends SupervisorMsg
+object PreparingToShutdownMsg {
+  case object ShutdownTimeout                extends PreparingToShutdownMsg
+  case class ShutdownFailure(reason: String) extends PreparingToShutdownMsg
+  case object ShutdownComplete               extends PreparingToShutdownMsg with FromComponentLifecycleMessage
+}
+
+sealed trait SupervisorIdleMsg extends FromComponentLifecycleMessage with SupervisorMsg
+object SupervisorIdleMsg {
+  case class Initialized(componentRef: ActorRef[InitialMsg]) extends SupervisorIdleMsg
+  case class InitializeFailure(reason: String)               extends SupervisorIdleMsg
+  case class Running(componentRef: ActorRef[RunningMsg])     extends SupervisorIdleMsg
+}

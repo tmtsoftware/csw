@@ -2,10 +2,9 @@ package csw.common.framework.scaladsl.assembly
 
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.assembly.AssemblyDomainMsg
-import csw.common.framework.models.ComponentResponseMode
-import csw.common.framework.models.ComponentResponseMode.{Initialized, Running}
-import csw.common.framework.models.FromComponentLifecycleMessage.InitializeFailure
+import csw.common.framework.models.FromComponentLifecycleMessage
 import csw.common.framework.models.InitialMsg.Run
+import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
@@ -20,7 +19,7 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
 
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
-    val supervisorProbe = TestProbe[ComponentResponseMode]
+    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
 
     val assemblyRef =
       Await.result(
@@ -48,7 +47,7 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
     val exceptionReason       = "test Exception"
     when(sampleAssemblyHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
 
-    val supervisorProbe: TestProbe[ComponentResponseMode] = TestProbe[ComponentResponseMode]
+    val supervisorProbe: TestProbe[FromComponentLifecycleMessage] = TestProbe[FromComponentLifecycleMessage]
 
     Await.result(
       system.systemActorOf[Nothing](
