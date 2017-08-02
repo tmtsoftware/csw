@@ -60,7 +60,13 @@ gradle
  
 ## API flavours
 
-csw-config-client offers two APIs.
+The Configuration Service is used to provide the runtime settings for components.  In order to determine the configuration 
+of the system at any given time, a record is kept of the settings of each component each time they are run.  These settings are referred to
+as the "active" configuration for a component, and is explicitly set in the 
+Configuration Service, so that a history of active configurations can be maintained.  To that end, components will
+use a simplified "client API", which limits functionality to obtaining the active configuration.  Creating, updating, 
+and retrieving past configurations will be performed using an administration tool (e.g. CLI) that has access to the full
+administrative API.
 
 * **clientAPI** : Expected to be consumed by component developers. Available functions are: `{exists | getActive}`    
 * **adminAPI**  : Full functionality exposed by ConfigServer is available with this API. Expected to be used administrators. Available functions are: `{create | update | getById | getLatest | getByTime | delete | list | history | historyActive | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}`
