@@ -1,11 +1,11 @@
 package csw.common.framework.scaladsl.assembly
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.framework.models.AssemblyResponseMode
-import csw.common.framework.models.AssemblyResponseMode.{Initialized, Running}
+import csw.common.components.assembly.AssemblyDomainMsg
+import csw.common.framework.models.ComponentResponseMode
+import csw.common.framework.models.ComponentResponseMode.{Initialized, Running}
 import csw.common.framework.models.FromComponentLifecycleMessage.InitializeFailure
-import csw.common.framework.models.InitialAssemblyMsg.Run
-import csw.common.framework.models.RunningAssemblyMsg.AssemblyDomainMsg
+import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
@@ -20,7 +20,7 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
 
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
-    val supervisorProbe = TestProbe[AssemblyResponseMode]
+    val supervisorProbe = TestProbe[ComponentResponseMode]
 
     val assemblyRef =
       Await.result(
@@ -32,15 +32,15 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
       )
 
     val initialized = supervisorProbe.expectMsgType[Initialized]
-    initialized.assemblyRef shouldBe assemblyRef
+    initialized.componentRef shouldBe assemblyRef
 
-    initialized.assemblyRef ! Run
+    initialized.componentRef ! Run
 
     val running = supervisorProbe.expectMsgType[Running]
     verify(sampleAssemblyHandler).onRun()
     verify(sampleAssemblyHandler).isOnline_=(true)
 
-    running.assemblyRef shouldBe assemblyRef
+    running.componentRef shouldBe assemblyRef
   }
 
   test("A Assembly component should send InitializationFailure message if it fails in initialization") {
@@ -48,7 +48,7 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
     val exceptionReason       = "test Exception"
     when(sampleAssemblyHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
 
-    val supervisorProbe: TestProbe[AssemblyResponseMode] = TestProbe[AssemblyResponseMode]
+    val supervisorProbe: TestProbe[ComponentResponseMode] = TestProbe[ComponentResponseMode]
 
     Await.result(
       system.systemActorOf[Nothing](

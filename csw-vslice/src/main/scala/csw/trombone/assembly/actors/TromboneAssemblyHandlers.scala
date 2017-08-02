@@ -16,22 +16,25 @@ import csw.trombone.assembly.TromboneCommandHandlerMsgs.NotFollowingMsgs
 import csw.trombone.assembly._
 
 import scala.async.Async.{async, await}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class TromboneAssemblyHandlersFactory extends AssemblyHandlersFactory[DiagPublisherMessages] {
-  override def make(ctx: ActorContext[AssemblyMsg],
+  override def make(ctx: ActorContext[ComponentMsg],
                     assemblyInfo: AssemblyInfo): AssemblyHandlers[DiagPublisherMessages] =
     new TromboneAssemblyHandlers(ctx, assemblyInfo)
 }
 
-class TromboneAssemblyHandlers(ctx: ActorContext[AssemblyMsg], info: AssemblyInfo)
+class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg], info: AssemblyInfo)
     extends AssemblyHandlers[DiagPublisherMessages](ctx, info) {
 
   private var diagPublsher: ActorRef[DiagPublisherMessages] = _
 
   private var commandHandler: ActorRef[NotFollowingMsgs] = _
 
-  implicit var ac: AssemblyContext = _
+  implicit var ac: AssemblyContext  = _
+  implicit val ec: ExecutionContext = ctx.executionContext
+
+  val runningHcd: Option[ComponentResponseMode.Running] = None
 
   def onRun(): Unit = ()
 
@@ -52,13 +55,7 @@ class TromboneAssemblyHandlers(ctx: ActorContext[AssemblyMsg], info: AssemblyInf
 
   override def onGoOffline(): Unit = println("Received running offline")
 
-  override def onGoOnline(): Unit = {
-    println("Received doshutdown")
-    runningHcd.foreach(
-      _.hcdRef ! RunningHcdMsg
-        .Lifecycle(ToComponentLifecycleMessage.Shutdown)
-    )
-  }
+  override def onGoOnline(): Unit = println("Received GoOnline")
 
   def onDomainMsg(mode: DiagPublisherMessages): Unit = mode match {
     case DiagnosticState => diagPublsher ! DiagnosticState

@@ -3,16 +3,16 @@ package csw.common.framework.scaladsl.assembly
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.models.Component.AssemblyInfo
-import csw.common.framework.models.RunningAssemblyMsg.AssemblyDomainMsg
-import csw.common.framework.models.{AssemblyMsg, AssemblyResponseMode}
+import csw.common.framework.models.{ComponentMsg, ComponentResponseMode}
+import csw.common.framework.models.RunningMsg.DomainMsg
 
 import scala.reflect.ClassTag
 
-abstract class AssemblyHandlersFactory[Msg <: AssemblyDomainMsg: ClassTag] {
-  def make(ctx: ActorContext[AssemblyMsg], assemblyInfo: AssemblyInfo): AssemblyHandlers[Msg]
+abstract class AssemblyHandlersFactory[Msg <: DomainMsg: ClassTag] {
+  def make(ctx: ActorContext[ComponentMsg], assemblyInfo: AssemblyInfo): AssemblyHandlers[Msg]
 
-  def behavior(assemblyInfo: AssemblyInfo, supervisor: ActorRef[AssemblyResponseMode]): Behavior[Nothing] =
+  def behavior(assemblyInfo: AssemblyInfo, supervisor: ActorRef[ComponentResponseMode]): Behavior[Nothing] =
     Actor
-      .mutable[AssemblyMsg](ctx ⇒ new AssemblyBehavior[Msg](ctx, supervisor, make(ctx, assemblyInfo)))
+      .mutable[ComponentMsg](ctx ⇒ new AssemblyBehavior[Msg](ctx, supervisor, make(ctx, assemblyInfo)))
       .narrow
 }

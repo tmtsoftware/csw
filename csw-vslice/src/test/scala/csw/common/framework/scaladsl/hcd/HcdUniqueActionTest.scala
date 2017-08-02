@@ -1,11 +1,10 @@
 package csw.common.framework.scaladsl.hcd
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.hcd.AxisStatistics
-import csw.common.framework.models.HcdResponseMode
-import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
-import csw.common.framework.models.InitialHcdMsg.Run
-import csw.common.framework.models.RunningHcdMsg.HcdDomainMsg
+import csw.common.components.hcd.{AxisStatistics, HcdDomainMsg}
+import csw.common.framework.models.ComponentResponseMode
+import csw.common.framework.models.ComponentResponseMode.{Initialized, Running}
+import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
@@ -20,7 +19,7 @@ class HcdUniqueActionTest extends FrameworkComponentTestSuite with MockitoSugar 
 
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
-    val supervisorProbe: TestProbe[HcdResponseMode] = TestProbe[HcdResponseMode]
+    val supervisorProbe: TestProbe[ComponentResponseMode] = TestProbe[ComponentResponseMode]
 
     Await.result(
       system.systemActorOf[Nothing](getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref),
@@ -29,11 +28,11 @@ class HcdUniqueActionTest extends FrameworkComponentTestSuite with MockitoSugar 
     )
 
     val initialized = supervisorProbe.expectMsgType[Initialized]
-    initialized.hcdRef ! Run
+    initialized.componentRef ! Run
 
     val running        = supervisorProbe.expectMsgType[Running]
     val axisStatistics = AxisStatistics(1)
-    running.hcdRef ! axisStatistics
+    running.componentRef ! axisStatistics
 
     Thread.sleep(1000)
     verify(sampleHcdHandler).onDomainMsg(AxisStatistics(1))

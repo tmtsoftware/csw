@@ -9,6 +9,7 @@ import csw.common.framework.models.Component.HcdInfo
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.hcd.{HcdHandlers, HcdHandlersFactory}
 import csw.param.Parameters.Setup
+import csw.param.StateVariable.CurrentState
 import csw.param.UnitsOfMeasure.encoder
 import csw.trombone.hcd.AxisRequest._
 import csw.trombone.hcd.AxisResponse._
@@ -16,23 +17,26 @@ import csw.trombone.hcd.TromboneEngineering.{GetAxisConfig, GetAxisStats, GetAxi
 import csw.trombone.hcd._
 
 import scala.async.Async._
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration.DurationLong
 
 class TromboneHcdHandlersFactory extends HcdHandlersFactory[TromboneMsg] {
-  override def make(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo): HcdHandlers[TromboneMsg] =
+  override def make(ctx: ActorContext[ComponentMsg], hcdInfo: HcdInfo): HcdHandlers[TromboneMsg] =
     new TromboneHcdHandlers(ctx, hcdInfo)
 }
 
-class TromboneHcdHandlers(ctx: ActorContext[HcdMsg], hcdInfo: HcdInfo) extends HcdHandlers[TromboneMsg](ctx, hcdInfo) {
+class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg], hcdInfo: HcdInfo)
+    extends HcdHandlers[TromboneMsg](ctx, hcdInfo) {
 
-  implicit val timeout              = Timeout(2.seconds)
-  implicit val scheduler: Scheduler = ctx.system.scheduler
+  implicit val timeout                      = Timeout(2.seconds)
+  implicit val scheduler: Scheduler         = ctx.system.scheduler
+  implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  var current: AxisUpdate                 = _
-  var stats: AxisStatistics               = _
-  var tromboneAxis: ActorRef[AxisRequest] = _
-  var axisConfig: AxisConfig              = _
+  var current: AxisUpdate                       = _
+  var stats: AxisStatistics                     = _
+  var tromboneAxis: ActorRef[AxisRequest]       = _
+  var axisConfig: AxisConfig                    = _
+  var pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.system.deadLetters
 
   override def initialize(): Future[Unit] = async {
     axisConfig = await(getAxisConfig)

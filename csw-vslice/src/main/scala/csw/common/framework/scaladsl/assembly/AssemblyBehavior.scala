@@ -1,116 +1,34 @@
 package csw.common.framework.scaladsl.assembly
 
-import akka.actor.Scheduler
-import akka.typed.scaladsl.Actor.MutableBehavior
+import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.models.AssemblyResponseMode.{Idle, Initialized, Running}
-import csw.common.framework.models.FromComponentLifecycleMessage.{InitializeFailure, ShutdownComplete}
-import csw.common.framework.models.IdleAssemblyMsg.{Initialize, Start}
-import csw.common.framework.models.InitialAssemblyMsg.Run
-import csw.common.framework.models.RunningAssemblyMsg._
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
+import csw.common.framework.models.AssemblyMsg.{Oneway, Submit}
+import csw.common.framework.models.RunningMsg.DomainMsg
 import csw.common.framework.models._
+import csw.common.framework.scaladsl.ComponentBehavior
 import csw.param.Parameters
 import csw.param.Parameters.{Observe, Setup}
 
-import scala.async.Async.{async, await}
-import scala.concurrent.Future
 import scala.reflect.ClassTag
-import scala.util.control.NonFatal
 
-class AssemblyBehavior[Msg <: AssemblyDomainMsg: ClassTag](ctx: ActorContext[AssemblyMsg],
-                                                           supervisor: ActorRef[AssemblyResponseMode],
-                                                           assemblyHandlers: AssemblyHandlers[Msg])
-    extends MutableBehavior[AssemblyMsg] {
+class AssemblyBehavior[Msg <: DomainMsg: ClassTag](ctx: ActorContext[ComponentMsg],
+                                                   supervisor: ActorRef[ComponentResponseMode],
+                                                   assemblyHandlers: AssemblyHandlers[Msg])
+    extends ComponentBehavior[Msg, AssemblyMsg](ctx, supervisor, assemblyHandlers) {
 
-  implicit val scheduler: Scheduler = ctx.system.scheduler
-  import ctx.executionContext
-
-  val runningHcd: Option[HcdResponseMode.Running] = None
-
-  var mode: AssemblyResponseMode = Idle
-
-  ctx.self ! Initialize
-
-  override def onMessage(msg: AssemblyMsg): Behavior[AssemblyMsg] = {
-    (mode, msg) match {
-      case (Idle, x: IdleAssemblyMsg)              ⇒ onIdle(x)
-      case (_: Initialized, x: InitialAssemblyMsg) ⇒ onInitial(x)
-      case (_: Running, x: RunningAssemblyMsg)     ⇒ onRunning(x)
-      case _                                       ⇒ println(s"current context=$mode does not handle message=$msg")
-    }
-    this
-  }
-
-  def initialization(): Future[Unit] =
-    async {
-      await(assemblyHandlers.initialize())
-      mode = Initialized(ctx.self)
-    } recover {
-      case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
-    }
-
-  private def onIdle(x: IdleAssemblyMsg): Unit = x match {
-    case Initialize =>
-      async {
-        await(initialization())
-        supervisor ! mode
-      }
-
-    case Start ⇒
-      async {
-        await(initialization())
-        ctx.self ! Run
-      }
-  }
-
-  def onInitial(x: InitialAssemblyMsg): Unit = x match {
-    case Run =>
-      assemblyHandlers.onRun()
-      val running = Running(ctx.self)
-      mode = running
-      assemblyHandlers.isOnline = true
-      supervisor ! running
-
-  }
-
-  def onRunning(x: RunningAssemblyMsg): Unit = x match {
-    case Lifecycle(message)       => onLifecycle(message)
-    case Submit(command, replyTo) => onSubmit(command, replyTo)
+  override def onRunningCompCommandMsg(x: AssemblyMsg): Unit = x match {
+    case Submit(command, replyTo) ⇒ onSubmit(command, replyTo)
     case Oneway(command, replyTo) ⇒ onOneWay(command, replyTo)
-    case diagMode: Msg            ⇒ assemblyHandlers.onDomainMsg(diagMode)
-    case y                        ⇒ println(s"unhandled msg: $y")
   }
 
-  private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case Shutdown =>
-      assemblyHandlers.onShutdown()
-      supervisor ! ShutdownComplete
-    case Restart =>
-      assemblyHandlers.onRestart()
-      mode = Idle
-      ctx.self ! Start
-    case GoOnline =>
-      if (!assemblyHandlers.isOnline) {
-        assemblyHandlers.onGoOnline()
-        assemblyHandlers.isOnline = true
-      }
-    case GoOffline =>
-      if (assemblyHandlers.isOnline) {
-        assemblyHandlers.onGoOffline()
-        assemblyHandlers.isOnline = false
-      }
-  }
-
-  def onSubmit(command: Parameters.ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = command match {
+  private def onSubmit(command: Parameters.ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = command match {
     case si: Setup   => setupSubmit(si, oneway = false, replyTo)
     case oi: Observe => observeSubmit(oi, oneway = false, replyTo)
   }
 
-  def onOneWay(command: Parameters.ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = command match {
+  private def onOneWay(command: Parameters.ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = command match {
     case sca: Setup   => setupSubmit(sca, oneway = true, replyTo)
     case oca: Observe => observeSubmit(oca, oneway = true, replyTo)
   }

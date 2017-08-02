@@ -9,6 +9,7 @@ import akka.typed.scaladsl.Actor;
 import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
 import akka.util.Timeout;
+import csw.common.components.hcd.HcdDomainMsg;
 import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.*;
 import org.junit.AfterClass;
@@ -24,6 +25,7 @@ import scala.runtime.Nothing$;
 
 import java.util.concurrent.CompletableFuture;
 
+import static csw.common.framework.models.ComponentResponseMode.*;
 import static csw.common.framework.models.JComponent.DoNotRegister;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,9 +35,9 @@ public class JHcdBehaviorTest {
     private static TestKitSettings settings = TestKitSettings.apply(system);
 
     private JHcdHandlersFactory getSampleJHcdFactory(JHcdHandlers hcdHandlers) {
-        return new JHcdHandlersFactory<RunningHcdMsg.HcdDomainMsg>(RunningHcdMsg.HcdDomainMsg.class) {
+        return new JHcdHandlersFactory<HcdDomainMsg>(HcdDomainMsg.class) {
             @Override
-            public JHcdHandlers<RunningHcdMsg.HcdDomainMsg> make(ActorContext<HcdMsg> ctx, Component.HcdInfo hcdInfo) {
+            public JHcdHandlers<HcdDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.HcdInfo hcdInfo) {
                 return hcdHandlers;
             }
         };
@@ -57,13 +59,13 @@ public class JHcdBehaviorTest {
     @Test
     public void testHcdBehavior() throws Exception {
 
-        JHcdHandlers<RunningHcdMsg.HcdDomainMsg> sampleHcdHandler = Mockito.mock(JHcdHandlers.class);
+        JHcdHandlers<HcdDomainMsg> sampleHcdHandler = Mockito.mock(JHcdHandlers.class);
         when(sampleHcdHandler.initialize()).thenCallRealMethod();
         when(sampleHcdHandler.jInitialize()).thenReturn(CompletableFuture.completedFuture(
                 BoxedUnit.UNIT
         ));
 
-        TestProbe<HcdResponseMode> supervisorProbe = TestProbe.apply(system, settings);
+        TestProbe<ComponentResponseMode> supervisorProbe = TestProbe.apply(system, settings);
 
         Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
         Behavior<Nothing$> behavior = getSampleJHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref());
@@ -71,15 +73,15 @@ public class JHcdBehaviorTest {
         FiniteDuration seconds1 = Duration.create(5, "seconds");
         ActorRef hcdRef = Await.result(hcd, seconds1);
 
-        HcdResponseMode.Initialized initialized = supervisorProbe.expectMsgType(JClassTag.make(HcdResponseMode.Initialized.class));
-        Assert.assertEquals(hcdRef, initialized.hcdRef());
+        Initialized initialized = supervisorProbe.expectMsgType(JClassTag.make(Initialized.class));
+        Assert.assertEquals(hcdRef, initialized.componentRef());
 
-        initialized.hcdRef().tell(InitialHcdMsg.Run$.MODULE$);
+        initialized.componentRef().tell(InitialMsg.Run$.MODULE$);
 
-        HcdResponseMode.Running running = supervisorProbe.expectMsgType(JClassTag.make(HcdResponseMode.Running.class));
+        Running running = supervisorProbe.expectMsgType(JClassTag.make(Running.class));
         verify(sampleHcdHandler).onRun();
         verify(sampleHcdHandler).isOnline_$eq(true);
 
-        Assert.assertEquals(hcdRef, running.hcdRef());
+        Assert.assertEquals(hcdRef, running.componentRef());
     }
 }

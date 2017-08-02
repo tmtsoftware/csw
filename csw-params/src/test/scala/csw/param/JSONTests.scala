@@ -303,14 +303,12 @@ class JSONTests extends FunSpec {
       val m1  = MatrixData.fromArrays(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
       val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, ck).add(i1)
-      println(sc1)
       assert(sc1(k1).head == m1)
 
       val sc1out = JsonSupport.writeSequenceCommand(sc1)
       //info("sc1out: " + sc1out.prettyPrint)
 
       val sc1in = JsonSupport.readSequenceCommand[Setup](sc1out)
-      println(sc1in)
       assert(sc1.equals(sc1in))
       assert(sc1in(k1).head == m1)
 

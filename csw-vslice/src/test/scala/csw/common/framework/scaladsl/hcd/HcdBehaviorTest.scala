@@ -1,11 +1,11 @@
 package csw.common.framework.scaladsl.hcd
 
 import akka.typed.testkit.scaladsl.TestProbe
+import csw.common.components.hcd.HcdDomainMsg
+import csw.common.framework.models.ComponentResponseMode
+import csw.common.framework.models.ComponentResponseMode.{Initialized, Running}
 import csw.common.framework.models.FromComponentLifecycleMessage.InitializeFailure
-import csw.common.framework.models.HcdResponseMode
-import csw.common.framework.models.HcdResponseMode.{Initialized, Running}
-import csw.common.framework.models.InitialHcdMsg.Run
-import csw.common.framework.models.RunningHcdMsg.HcdDomainMsg
+import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -20,7 +20,7 @@ class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
 
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
-    val supervisorProbe: TestProbe[HcdResponseMode] = TestProbe[HcdResponseMode]
+    val supervisorProbe: TestProbe[ComponentResponseMode] = TestProbe[ComponentResponseMode]
 
     val hcdRef =
       Await.result(
@@ -32,16 +32,16 @@ class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
     val initialized = supervisorProbe.expectMsgType[Initialized]
 
     verify(sampleHcdHandler).initialize()
-    initialized.hcdRef shouldBe hcdRef
+    initialized.componentRef shouldBe hcdRef
 
-    initialized.hcdRef ! Run
+    initialized.componentRef ! Run
 
     val running = supervisorProbe.expectMsgType[Running]
 
     verify(sampleHcdHandler).onRun()
     verify(sampleHcdHandler).isOnline_=(true)
 
-    running.hcdRef shouldBe hcdRef
+    running.componentRef shouldBe hcdRef
   }
 
   test("A Hcd component should send InitializationFailure message if it fails in initialization") {
@@ -49,7 +49,7 @@ class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
     val exceptionReason  = "test Exception"
     when(sampleHcdHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
 
-    val supervisorProbe: TestProbe[HcdResponseMode] = TestProbe[HcdResponseMode]
+    val supervisorProbe: TestProbe[ComponentResponseMode] = TestProbe[ComponentResponseMode]
 
     Await.result(
       system.systemActorOf[Nothing](getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref),

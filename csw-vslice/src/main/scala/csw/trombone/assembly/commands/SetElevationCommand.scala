@@ -7,9 +7,9 @@ import csw.common.ccs.CommandMsgs
 import csw.common.ccs.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
 import csw.common.ccs.CommandStatus.{Completed, Error, NoLongerValid}
 import csw.common.ccs.Validation.WrongInternalStateIssue
-import csw.common.framework.models.HcdResponseMode.Running
+import csw.common.framework.models.ComponentResponseMode.Running
+import csw.common.framework.models.HcdMsg.Submit
 import csw.common.framework.models.PubSub
-import csw.common.framework.models.RunningHcdMsg.Submit
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 import csw.param.UnitsOfMeasure.encoder
@@ -69,7 +69,7 @@ class SetElevationCommand(ctx: ActorContext[CommandMsgs],
                    startState.nss,
                    setStateResponseAdapter)
         )
-        tromboneHCD.hcdRef ! Submit(scOut)
+        tromboneHCD.componentRef ! Submit(scOut)
 
         Matchers.executeMatch(ctx, stateMatcher, pubSubRef, Some(replyTo)) {
           case Completed =>
@@ -87,7 +87,7 @@ class SetElevationCommand(ctx: ActorContext[CommandMsgs],
       }
       this
     case StopCurrentCommand =>
-      tromboneHCD.hcdRef ! Submit(cancelSC(s.info))
+      tromboneHCD.componentRef ! Submit(cancelSC(s.info))
       this
     case SetStateResponseE(_) ⇒ this
   }
