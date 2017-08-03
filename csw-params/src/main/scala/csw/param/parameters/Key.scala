@@ -15,7 +15,7 @@ case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, ke
    * Sets the values for the key using a variable number of arguments
    *
    * @param xs one or more values
-   * @return a parameter containing the key name, values (call withUnits() on the result to gset the units)
+   * @return a parameter containing the key name, values (call withUnits() on the result to set the units)
    */
   @varargs
   def set(xs: S*): Parameter[S] = Parameter(keyName, keyType, xs.toArray[S], NoUnits)
@@ -32,7 +32,7 @@ case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, ke
    * }}}
    *
    * @param v the value
-   * @return a parameter containing the key name and one value (call withUnits() on the result to gset the units)
+   * @return a parameter containing the key name and one value (call withUnits() on the result to set the units)
    */
   def ->(v: S*): Parameter[S] = set(v: _*)
 
@@ -63,7 +63,7 @@ case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, ke
    * }}}
    *
    * @param v a vector of values
-   * @return a parameter containing the key name and values (call withUnits() on the result to gset the units)
+   * @return a parameter containing the key name and values (call withUnits() on the result to set the units)
    */
   def ->(v: Array[S]): Parameter[S] = set(v)
 

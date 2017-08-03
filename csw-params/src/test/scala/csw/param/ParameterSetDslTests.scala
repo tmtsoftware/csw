@@ -27,14 +27,14 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     val k1           = KeyType.IntKey.make(s1)
     val detectorTemp = KeyType.DoubleKey.make(s3)
 
-    it("should work to gset single items") {
+    it("should work to set single items") {
       val i1 = set(k1, 2)
       i1 shouldBe an[Parameter[Int]]
       ssize(i1) should equal(1)
       units(i1) should be(NoUnits)
     }
 
-    it("should work to gset multiple items") {
+    it("should work to set multiple items") {
       val i1 = set(k1, 1, 2, 3, 4, 5)
       ssize(i1) should equal(5)
     }

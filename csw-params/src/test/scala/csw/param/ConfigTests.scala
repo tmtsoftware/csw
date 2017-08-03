@@ -36,9 +36,9 @@ class ConfigTests extends FunSpec {
       assert(k1.keyName eq s1)
     }
 
-    it("Should use gset properly") {
+    it("Should use set properly") {
       val i: Parameter[Int] = k1.set(22)
-      // Check that name and value are gset
+      // Check that name and value are set
       assert(i.keyName eq s1)
       assert(i.values === Array(22))
       assert(i.head == 22)
@@ -63,7 +63,7 @@ class ConfigTests extends FunSpec {
     val k2bad = KeyType.IntKey.make("stringThing")
     val k3    = KeyType.IntKey.make("notUsed")
 
-    it("Should allow adding keys using single gset") {
+    it("Should allow adding keys using single set") {
       val i1  = k1.set(22)
       val i2  = k2.set("A")
       val sc1 = Setup(commandInfo, ck3).add(i1).add(i2)
@@ -108,7 +108,7 @@ class ConfigTests extends FunSpec {
       assert(sc1(k2)(0) == "C")
     }
 
-    it("should update for the same key with gset") {
+    it("should update for the same key with set") {
       var sc1 = Setup(commandInfo, ck1)
       sc1 = sc1.add(k2.set("D"))
       assert(sc1.exists(k2))
@@ -198,7 +198,7 @@ class ConfigTests extends FunSpec {
       assert(v2.values(0) == 44)
     }
 
-    it("should update for the same key with gset") {
+    it("should update for the same key with set") {
       var sc1 = StatusEvent(ck1)
       sc1 = sc1.add(k2.set(22))
       assert(sc1.exists(k2))
@@ -246,7 +246,7 @@ class ConfigTests extends FunSpec {
       assert(v2.head == 44)
     }
 
-    it("should update for the same key with gset") {
+    it("should update for the same key with set") {
       var oc1 = Observe(commandInfo, ck1)
       oc1 = oc1.add(k2.set(22))
       assert(oc1.exists(k2))

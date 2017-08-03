@@ -21,7 +21,7 @@ object Choice extends DefaultJsonProtocol {
 }
 
 /**
- * Represents a gset of choices
+ * Represents a set of choices
  */
 case class Choices(values: Set[Choice]) {
   def contains(one: Choice) = values.contains(one)

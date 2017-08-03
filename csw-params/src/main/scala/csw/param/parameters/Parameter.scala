@@ -1,12 +1,14 @@
 package csw.param.parameters
 
 import java.util
+import java.util.Optional
 
 import csw.param.UnitsOfMeasure.Units
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat, RootJsonFormat}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.mutable
+import scala.compat.java8.OptionConverters.RichOptionForJava8
 import scala.reflect.ClassTag
 
 object Parameter extends DefaultJsonProtocol {
@@ -83,7 +85,8 @@ case class Parameter[S] private[param] (
    * @param index the index of a value
    * @return Some value at the given index as an Option, if the index is in range, otherwise None
    */
-  def get(index: Int): Option[S] = items.lift(index)
+  def get(index: Int): Option[S]    = items.lift(index)
+  def jGet(index: Int): Optional[S] = items.lift(index).asJava
 
   /**
    * Returns the first value as a convenience when storing a single value
@@ -96,7 +99,7 @@ case class Parameter[S] private[param] (
    * Sets the units for the values
    *
    * @param unitsIn the units for the values
-   * @return a new instance of this parameter with the units gset
+   * @return a new instance of this parameter with the units set
    */
   def withUnits(unitsIn: Units): Parameter[S] = copy(units = unitsIn)
 

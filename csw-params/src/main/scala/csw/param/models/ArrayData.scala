@@ -13,6 +13,8 @@ import scala.reflect.ClassTag
 case class ArrayData[T](data: mutable.WrappedArray[T]) {
   def values: Array[T]      = data.array
   def jValues: util.List[T] = data.asJava
+
+  override def toString: String = data.mkString("(", ",", ")")
 }
 
 object ArrayData extends JsonSupport {
