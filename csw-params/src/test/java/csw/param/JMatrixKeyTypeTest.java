@@ -59,7 +59,7 @@ public class JMatrixKeyTypeTest {
     @Test
     public void matrixKeyParameterTest() {
         Parameter parameter;
-        MatrixData matrixData = JMatrixData.fromArrays(data);
+        MatrixData matrixData = JMatrixData.fromArrays(Object.class, data);
         MatrixData[] paramValues = {matrixData};
 
         if (units.isPresent()) parameter = matrixKey.make(keyName).set(paramValues, units.get());
