@@ -16,7 +16,7 @@ import scala.concurrent.{Await, Future}
 
 class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSugar {
 
-  def run(assemblyHandlersFactory: AssemblyHandlersFactory[AssemblyDomainMsg],
+  def run(assemblyHandlersFactory: AssemblyBehaviorFactory[AssemblyDomainMsg],
           supervisorProbe: TestProbe[FromComponentLifecycleMessage]): Running = {
 
     Await.result(

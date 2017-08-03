@@ -7,7 +7,7 @@ import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import csw.common.framework.models.Component.HcdInfo
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.hcd.{HcdHandlers, HcdHandlersFactory}
+import csw.common.framework.scaladsl.hcd.{HcdBehaviorFactory, HcdHandlers}
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 import csw.param.UnitsOfMeasure.encoder
@@ -20,7 +20,7 @@ import scala.async.Async._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration.DurationLong
 
-class TromboneHcdHandlersFactory extends HcdHandlersFactory[TromboneMsg] {
+class TromboneHcdBehaviorFactory extends HcdBehaviorFactory[TromboneMsg] {
   override def make(ctx: ActorContext[ComponentMsg], hcdInfo: HcdInfo): HcdHandlers[TromboneMsg] =
     new TromboneHcdHandlers(ctx, hcdInfo)
 }

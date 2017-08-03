@@ -16,7 +16,7 @@ import scala.concurrent.{Await, Future}
 
 class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSugar {
 
-  def run(hcdHandlersFactory: HcdHandlersFactory[HcdDomainMsg],
+  def run(hcdHandlersFactory: HcdBehaviorFactory[HcdDomainMsg],
           testProbeSupervisor: TestProbe[FromComponentLifecycleMessage]): Running = {
 
     Await.result(

@@ -5,11 +5,12 @@ import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.models.Component.AssemblyInfo
 import csw.common.framework.models.RunningMsg.DomainMsg
 import csw.common.framework.models.{ComponentMsg, FromComponentLifecycleMessage}
+import csw.common.framework.scaladsl.ComponentBehaviorFactory
 
 import scala.reflect.ClassTag
 
-abstract class AssemblyHandlersFactory[Msg <: DomainMsg: ClassTag] {
-  def make(ctx: ActorContext[ComponentMsg], assemblyInfo: AssemblyInfo): AssemblyHandlers[Msg]
+abstract class AssemblyBehaviorFactory[Msg <: DomainMsg: ClassTag] extends ComponentBehaviorFactory[AssemblyInfo] {
+  protected def make(ctx: ActorContext[ComponentMsg], assemblyInfo: AssemblyInfo): AssemblyHandlers[Msg]
 
   def behavior(assemblyInfo: AssemblyInfo, supervisor: ActorRef[FromComponentLifecycleMessage]): Behavior[Nothing] =
     Actor

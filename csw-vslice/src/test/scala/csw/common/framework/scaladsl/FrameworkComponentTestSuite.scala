@@ -8,8 +8,8 @@ import csw.common.components.assembly.AssemblyDomainMsg
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.Component.{AssemblyInfo, DoNotRegister, HcdInfo}
 import csw.common.framework.models.ComponentMsg
-import csw.common.framework.scaladsl.assembly.{AssemblyHandlers, AssemblyHandlersFactory}
-import csw.common.framework.scaladsl.hcd.{HcdHandlers, HcdHandlersFactory}
+import csw.common.framework.scaladsl.assembly.{AssemblyBehaviorFactory, AssemblyHandlers}
+import csw.common.framework.scaladsl.hcd.{HcdBehaviorFactory, HcdHandlers}
 import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -39,15 +39,15 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
                         Set(AkkaType),
                         FiniteDuration(5, "seconds"))
 
-  def getSampleHcdFactory(hcdHandlers: HcdHandlers[HcdDomainMsg]): HcdHandlersFactory[HcdDomainMsg] =
-    new HcdHandlersFactory[HcdDomainMsg] {
+  def getSampleHcdFactory(hcdHandlers: HcdHandlers[HcdDomainMsg]): HcdBehaviorFactory[HcdDomainMsg] =
+    new HcdBehaviorFactory[HcdDomainMsg] {
       override def make(ctx: ActorContext[ComponentMsg], hcdInfo: HcdInfo): HcdHandlers[HcdDomainMsg] = hcdHandlers
     }
 
   def getSampleAssemblyFactory(
       assemblyHandlers: AssemblyHandlers[AssemblyDomainMsg]
-  ): AssemblyHandlersFactory[AssemblyDomainMsg] =
-    new AssemblyHandlersFactory[AssemblyDomainMsg] {
+  ): AssemblyBehaviorFactory[AssemblyDomainMsg] =
+    new AssemblyBehaviorFactory[AssemblyDomainMsg] {
       override def make(ctx: ActorContext[ComponentMsg],
                         assemblyInfo: AssemblyInfo): AssemblyHandlers[AssemblyDomainMsg] = assemblyHandlers
     }
