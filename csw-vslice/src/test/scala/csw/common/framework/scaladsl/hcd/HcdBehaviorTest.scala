@@ -4,8 +4,10 @@ import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.FromComponentLifecycleMessage
 import csw.common.framework.models.InitialMsg.Run
+import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
+import csw.param.StateVariable.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
@@ -20,11 +22,14 @@ class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe: TestProbe[FromComponentLifecycleMessage] = TestProbe[FromComponentLifecycleMessage]
+    val publisherProbe                                            = TestProbe[PublisherMsg[CurrentState]]
 
     val hcdRef =
       Await.result(
-        system.systemActorOf[Nothing](getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref),
-                                      "sampleHcd"),
+        system.systemActorOf[Nothing](
+          getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref, publisherProbe.ref),
+          "sampleHcd"
+        ),
         5.seconds
       )
 
@@ -49,10 +54,13 @@ class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
     when(sampleHcdHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
 
     val supervisorProbe: TestProbe[FromComponentLifecycleMessage] = TestProbe[FromComponentLifecycleMessage]
+    val publisherProbe                                            = TestProbe[PublisherMsg[CurrentState]]
 
     Await.result(
-      system.systemActorOf[Nothing](getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref),
-                                    "sampleHcd"),
+      system.systemActorOf[Nothing](
+        getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref, publisherProbe.ref),
+        "sampleHcd"
+      ),
       5.seconds
     )
 

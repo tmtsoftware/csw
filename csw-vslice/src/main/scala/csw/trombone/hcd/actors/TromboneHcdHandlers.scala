@@ -6,6 +6,7 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import csw.common.framework.models.Component.HcdInfo
+import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.hcd.{HcdBehaviorFactory, HcdHandlers}
 import csw.param.Parameters.Setup
@@ -21,7 +22,9 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration.DurationLong
 
 class TromboneHcdBehaviorFactory extends HcdBehaviorFactory[TromboneMsg] {
-  override def make(ctx: ActorContext[ComponentMsg], hcdInfo: HcdInfo): HcdHandlers[TromboneMsg] =
+  override def make(ctx: ActorContext[ComponentMsg],
+                    hcdInfo: HcdInfo,
+                    pubSubRef: ActorRef[PublisherMsg[CurrentState]]): HcdHandlers[TromboneMsg] =
     new TromboneHcdHandlers(ctx, hcdInfo)
 }
 

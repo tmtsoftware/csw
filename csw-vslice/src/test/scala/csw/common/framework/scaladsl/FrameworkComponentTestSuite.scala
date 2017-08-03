@@ -1,6 +1,6 @@
 package csw.common.framework.scaladsl
 
-import akka.typed.ActorSystem
+import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.testkit.TestKitSettings
 import akka.util.Timeout
@@ -8,8 +8,10 @@ import csw.common.components.assembly.AssemblyDomainMsg
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.Component.{AssemblyInfo, DoNotRegister, HcdInfo}
 import csw.common.framework.models.ComponentMsg
+import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.scaladsl.assembly.{AssemblyBehaviorFactory, AssemblyHandlers}
 import csw.common.framework.scaladsl.hcd.{HcdBehaviorFactory, HcdHandlers}
+import csw.param.StateVariable.CurrentState
 import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -41,7 +43,10 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
 
   def getSampleHcdFactory(hcdHandlers: HcdHandlers[HcdDomainMsg]): HcdBehaviorFactory[HcdDomainMsg] =
     new HcdBehaviorFactory[HcdDomainMsg] {
-      override def make(ctx: ActorContext[ComponentMsg], hcdInfo: HcdInfo): HcdHandlers[HcdDomainMsg] = hcdHandlers
+
+      override def make(ctx: ActorContext[ComponentMsg],
+                        hcdInfo: HcdInfo,
+                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): HcdHandlers[HcdDomainMsg] = hcdHandlers
     }
 
   def getSampleAssemblyFactory(
@@ -49,6 +54,8 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
   ): AssemblyBehaviorFactory[AssemblyDomainMsg] =
     new AssemblyBehaviorFactory[AssemblyDomainMsg] {
       override def make(ctx: ActorContext[ComponentMsg],
-                        assemblyInfo: AssemblyInfo): AssemblyHandlers[AssemblyDomainMsg] = assemblyHandlers
+                        assemblyInfo: AssemblyInfo,
+                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): AssemblyHandlers[AssemblyDomainMsg] =
+        assemblyHandlers
     }
 }

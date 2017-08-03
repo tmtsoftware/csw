@@ -4,8 +4,10 @@ import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.hcd.{AxisStatistics, HcdDomainMsg}
 import csw.common.framework.models.FromComponentLifecycleMessage
 import csw.common.framework.models.InitialMsg.Run
+import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
+import csw.param.StateVariable.CurrentState
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
 
@@ -20,10 +22,13 @@ class HcdUniqueActionTest extends FrameworkComponentTestSuite with MockitoSugar 
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe: TestProbe[FromComponentLifecycleMessage] = TestProbe[FromComponentLifecycleMessage]
+    val publisherProbe                                            = TestProbe[PublisherMsg[CurrentState]]
 
     Await.result(
-      system.systemActorOf[Nothing](getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref),
-                                    "sampleHcd"),
+      system.systemActorOf[Nothing](
+        getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref, publisherProbe.ref),
+        "sampleHcd"
+      ),
       5.seconds
     )
 

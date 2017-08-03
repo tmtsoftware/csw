@@ -4,10 +4,12 @@ import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.ShutdownComplete
+import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.models.{FromComponentLifecycleMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
+import csw.param.StateVariable.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
@@ -19,8 +21,11 @@ class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSuga
   def run(hcdHandlersFactory: HcdBehaviorFactory[HcdDomainMsg],
           testProbeSupervisor: TestProbe[FromComponentLifecycleMessage]): Running = {
 
+    val publisherProbe = TestProbe[PublisherMsg[CurrentState]]
+
     Await.result(
-      system.systemActorOf[Nothing](hcdHandlersFactory.behavior(hcdInfo, testProbeSupervisor.ref), "Hcd"),
+      system.systemActorOf[Nothing](hcdHandlersFactory.behavior(hcdInfo, testProbeSupervisor.ref, publisherProbe.ref),
+                                    "Hcd"),
       5.seconds
     )
 

@@ -2,7 +2,7 @@ package csw.common.framework.scaladsl.supervisor
 
 import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.models.CommonSupervisorMsg.{HaltComponent, Wrapper}
 import csw.common.framework.models.Component.ComponentInfo
@@ -22,29 +22,35 @@ import csw.services.location.models.ComponentId
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
+object Supervisor {
+  def behavior[CompInfo <: ComponentInfo](
+      componentInfo: CompInfo,
+      componentBehaviorFactory: ComponentBehaviorFactory[CompInfo]
+  ): Behavior[SupervisorMsg] =
+    Actor.mutable(ctx => new Supervisor(ctx, componentInfo, componentBehaviorFactory))
+}
 class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
                                             componentInfo: CompInfo,
                                             componentBehaviorFactory: ComponentBehaviorFactory[CompInfo])
     extends MutableBehavior[SupervisorMsg] {
 
-  implicit val ec: ExecutionContextExecutor                   = ctx.executionContext
-  private val shutdownTimeout: FiniteDuration                 = 5.seconds
-  private var shutdownTimer: Option[Cancellable]              = None
-  private val name                                            = componentInfo.componentName
-  private val componentId                                     = ComponentId(name, componentInfo.componentType)
-  private var haltingFlag                                     = false
-  var lifecycleState: LifecycleState                          = LifecycleWaitingForInitialized
-  var runningComponent: ActorRef[RunningMsg]                  = _
-  var mode: SupervisorMode                                    = Idle
-  var isOnline: Boolean                                       = false
-  private var listeners: Set[ActorRef[LifecycleStateChanged]] = Set[ActorRef[LifecycleStateChanged]]()
+  implicit val ec: ExecutionContextExecutor      = ctx.executionContext
+  private val shutdownTimeout: FiniteDuration    = 5.seconds
+  private var shutdownTimer: Option[Cancellable] = None
+  private val name                               = componentInfo.componentName
+  private val componentId                        = ComponentId(name, componentInfo.componentType)
+  private var haltingFlag                        = false
+  var lifecycleState: LifecycleState             = LifecycleWaitingForInitialized
+  var runningComponent: ActorRef[RunningMsg]     = _
+  var mode: SupervisorMode                       = Idle
+  var isOnline: Boolean                          = false
 
   val pubSubComponent: ActorRef[PubSub[CurrentState]] = ctx.spawnAnonymous(PubSubActor.behavior[CurrentState])
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
     ctx.spawnAnonymous(PubSubActor.behavior[LifecycleStateChanged])
 
   val component: ActorRef[Nothing] =
-    ctx.spawnAnonymous[Nothing](componentBehaviorFactory.behavior(componentInfo, ctx.self))
+    ctx.spawnAnonymous[Nothing](componentBehaviorFactory.behavior(componentInfo, ctx.self, pubSubComponent))
 
   ctx.watch(component)
 

@@ -6,10 +6,12 @@ import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validation
 import csw.common.ccs.Validation.{Valid, Validation}
 import csw.common.framework.models.Component.AssemblyInfo
+import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.Running
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.assembly.{AssemblyBehaviorFactory, AssemblyHandlers}
 import csw.param.Parameters.{Observe, Setup}
+import csw.param.StateVariable.CurrentState
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}
 import csw.trombone.assembly.ParamValidation._
@@ -21,7 +23,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TromboneAssemblyBehaviorFactory extends AssemblyBehaviorFactory[DiagPublisherMessages] {
   override def make(ctx: ActorContext[ComponentMsg],
-                    assemblyInfo: AssemblyInfo): AssemblyHandlers[DiagPublisherMessages] =
+                    assemblyInfo: AssemblyInfo,
+                    pubSubRef: ActorRef[PublisherMsg[CurrentState]]): AssemblyHandlers[DiagPublisherMessages] =
     new TromboneAssemblyHandlers(ctx, assemblyInfo)
 }
 

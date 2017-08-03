@@ -4,8 +4,10 @@ import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.assembly.AssemblyDomainMsg
 import csw.common.framework.models.FromComponentLifecycleMessage
 import csw.common.framework.models.InitialMsg.Run
+import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
+import csw.param.StateVariable.CurrentState
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
 
@@ -20,11 +22,14 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
+    val publisherProbe  = TestProbe[PublisherMsg[CurrentState]]
 
     val assemblyRef =
       Await.result(
         system.systemActorOf[Nothing](
-          getSampleAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref),
+          getSampleAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo,
+                                                                   supervisorProbe.ref,
+                                                                   publisherProbe.ref),
           "assembly"
         ),
         5.seconds
@@ -48,10 +53,11 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
     when(sampleAssemblyHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
 
     val supervisorProbe: TestProbe[FromComponentLifecycleMessage] = TestProbe[FromComponentLifecycleMessage]
+    val publisherProbe                                            = TestProbe[PublisherMsg[CurrentState]]
 
     Await.result(
       system.systemActorOf[Nothing](
-        getSampleAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref),
+        getSampleAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref, publisherProbe.ref),
         "sampleAssembly"
       ),
       5.seconds

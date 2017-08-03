@@ -4,10 +4,12 @@ import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.assembly.AssemblyDomainMsg
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.ShutdownComplete
+import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.models.{FromComponentLifecycleMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.FrameworkComponentTestSuite
+import csw.param.StateVariable.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
@@ -19,8 +21,13 @@ class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with Mockit
   def run(assemblyHandlersFactory: AssemblyBehaviorFactory[AssemblyDomainMsg],
           supervisorProbe: TestProbe[FromComponentLifecycleMessage]): Running = {
 
+    val publisherProbe = TestProbe[PublisherMsg[CurrentState]]
+
     Await.result(
-      system.systemActorOf[Nothing](assemblyHandlersFactory.behavior(assemblyInfo, supervisorProbe.ref), "Assembly"),
+      system.systemActorOf[Nothing](
+        assemblyHandlersFactory.behavior(assemblyInfo, supervisorProbe.ref, publisherProbe.ref),
+        "Assembly"
+      ),
       5.seconds
     )
 
