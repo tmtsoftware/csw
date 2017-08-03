@@ -2,18 +2,20 @@ package csw.common.framework.models
 
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
+import csw.common.framework.models.PubSub.SubscriberMsg
 import csw.param.Parameters.{ControlCommand, Setup}
 
 /////////////
 
 sealed trait PubSub[T]
 
-/////////////
-
 object PubSub {
-  case class Subscribe[T](ref: ActorRef[T])   extends PubSub[T]
-  case class Unsubscribe[T](ref: ActorRef[T]) extends PubSub[T]
-  case class Publish[T](data: T)              extends PubSub[T]
+  sealed trait SubscriberMsg[T]               extends PubSub[T]
+  case class Subscribe[T](ref: ActorRef[T])   extends SubscriberMsg[T]
+  case class Unsubscribe[T](ref: ActorRef[T]) extends SubscriberMsg[T]
+
+  sealed trait PublisherMsg[T]   extends PubSub[T]
+  case class Publish[T](data: T) extends PublisherMsg[T]
 }
 
 /////////////
@@ -65,7 +67,7 @@ object InitialMsg {
 
 ///////////////
 
-sealed trait RunningMsg extends ComponentMsg
+sealed trait RunningMsg extends ComponentMsg with SupervisorMsg
 object RunningMsg {
   case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMsg
   trait DomainMsg                                            extends RunningMsg
@@ -98,19 +100,10 @@ sealed trait FromComponentLifecycleMessage extends SupervisorMsg
 
 ///////////////
 
-sealed trait SupervisorExternalMsg extends SupervisorMsg
-object SupervisorExternalMsg {
-  case object ExComponentRestart  extends SupervisorExternalMsg
-  case object ExComponentShutdown extends SupervisorExternalMsg
-  case object ExComponentOnline   extends SupervisorExternalMsg
-  case object ExComponentOffline  extends SupervisorExternalMsg
-}
-
 sealed trait CommonSupervisorMsg extends SupervisorMsg
 object CommonSupervisorMsg {
-  case class SubscribeLifecycleCallback(actorRef: ActorRef[LifecycleStateChanged])   extends CommonSupervisorMsg
-  case class UnsubscribeLifecycleCallback(actorRef: ActorRef[LifecycleStateChanged]) extends CommonSupervisorMsg
-  case object HaltComponent                                                          extends CommonSupervisorMsg
+  case class Wrapper(subscriberMsg: SubscriberMsg[LifecycleStateChanged]) extends CommonSupervisorMsg
+  case object HaltComponent                                               extends CommonSupervisorMsg
 
 }
 

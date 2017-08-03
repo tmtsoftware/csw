@@ -4,22 +4,19 @@ import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
-import csw.common.framework.models.CommonSupervisorMsg.{
-  HaltComponent,
-  SubscribeLifecycleCallback,
-  UnsubscribeLifecycleCallback
-}
+import csw.common.framework.models.CommonSupervisorMsg.{HaltComponent, Wrapper}
 import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.LifecycleState._
 import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
-import csw.common.framework.models.RunningMsg.Lifecycle
-import csw.common.framework.models.SupervisorExternalMsg._
+import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.ComponentBehaviorFactory
 import csw.common.framework.scaladsl.supervisor.SupervisorMode.{Idle, PreparingToShutdown}
+import csw.common.framework.scaladsl.{ComponentBehaviorFactory, PubSubActor}
+import csw.param.StateVariable.CurrentState
 import csw.services.location.models.ComponentId
 
 import scala.concurrent.ExecutionContextExecutor
@@ -42,6 +39,10 @@ class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
   var isOnline: Boolean                                       = false
   private var listeners: Set[ActorRef[LifecycleStateChanged]] = Set[ActorRef[LifecycleStateChanged]]()
 
+  val pubSubComponent: ActorRef[PubSub[CurrentState]] = ctx.spawnAnonymous(PubSubActor.behavior[CurrentState])
+  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
+    ctx.spawnAnonymous(PubSubActor.behavior[LifecycleStateChanged])
+
   val component: ActorRef[Nothing] =
     ctx.spawnAnonymous[Nothing](componentBehaviorFactory.behavior(componentInfo, ctx.self))
 
@@ -51,7 +52,7 @@ class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
     (mode, msg) match {
       case (SupervisorMode.Idle, msg: SupervisorIdleMsg)                     => onIdleMessages(msg)
       case (SupervisorMode.Idle, msg: CommonSupervisorMsg)                   => onCommonMessages(msg)
-      case (SupervisorMode.Running, msg: SupervisorExternalMsg)              => onRunning(msg)
+      case (SupervisorMode.Running, msg: RunningMsg)                         => onRunning(msg)
       case (SupervisorMode.Running, msg: CommonSupervisorMsg)                => onCommonMessages(msg)
       case (SupervisorMode.PreparingToShutdown, msg: PreparingToShutdownMsg) => onPreparingToShutdown(msg)
       case (SupervisorMode.Shutdown, msg: CommonSupervisorMsg)               => onCommonMessages(msg)
@@ -69,94 +70,105 @@ class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
   }
 
   def onCommonMessages(msg: CommonSupervisorMsg): Unit = msg match {
-    case SubscribeLifecycleCallback(actorRef)   => addListener(actorRef)
-    case UnsubscribeLifecycleCallback(actorRef) => removeListener(actorRef)
-    case HaltComponent                          => onHalt()
+    case Wrapper(Subscribe(ref))   => pubSubLifecycle ! Subscribe(ref)
+    case Wrapper(Unsubscribe(ref)) => pubSubLifecycle ! Unsubscribe(ref)
+    case HaltComponent             => onHalt()
   }
 
-  def onRunning(msg: SupervisorExternalMsg): Unit = msg match {
-    case ExComponentRestart  => onExComponentRestart()
-    case ExComponentShutdown => onExcomponentShutDown()
-    case ExComponentOnline   => onExcomponentOnline()
-    case ExComponentOffline  => onExcomponentOffline()
+  def onRunning(msg: RunningMsg): Unit = msg match {
+    case Lifecycle(message)   => onLifecycle(message)
+    case msg: DomainMsg       => runningComponent ! msg
+    case msg: CompSpecificMsg => runningComponent ! msg
   }
 
-  def onExComponentRestart(): Unit = {
+  def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
+    case Shutdown  => onComponentShutDown()
+    case Restart   => onComponentRestart()
+    case GoOffline => onComponentOffline()
+    case GoOnline  => onComponentOnline()
+  }
+
+  def onComponentShutDown(): Unit = {
+    shutdownTimer = Some(scheduleTimeout)
+    runningComponent ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
+    unregisterFromLocationService()
+    lifecycleState = LifecyclePreparingToShutdown
+    pubSubLifecycle ! Publish(LifecycleStateChanged(LifecyclePreparingToShutdown))
+    mode = PreparingToShutdown
+  }
+
+  def onComponentRestart(): Unit = {
     runningComponent ! Lifecycle(Restart)
     unregisterFromLocationService()
     lifecycleState = LifecycleWaitingForInitialized
     mode = SupervisorMode.Idle
   }
 
-  private def onExcomponentShutDown(): Unit = {
-    shutdownTimer = Some(scheduleTimeout)
-    runningComponent ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
-    unregisterFromLocationService()
-    lifecycleState = LifecyclePreparingToShutdown
-    notifyListeners(LifecycleStateChanged(LifecyclePreparingToShutdown))
-    mode = PreparingToShutdown
-  }
-
-  def onExcomponentOnline(): Unit = if (!isOnline) {
-    runningComponent ! Lifecycle(GoOnline)
-    lifecycleState = LifecycleRunning
-    isOnline = true
-  }
-
-  def onExcomponentOffline(): Unit = if (isOnline) {
+  def onComponentOffline(): Unit = if (isOnline) {
     runningComponent ! Lifecycle(GoOffline)
     lifecycleState = LifecycleRunningOffline
     isOnline = false
   }
 
-  def onPreparingToShutdown(msg: PreparingToShutdownMsg): Unit = msg match {
-    case ShutdownTimeout         => onShutdownTimeOut()
-    case ShutdownFailure(reason) => onShutdownFailure(reason)
-    case ShutdownComplete        => onShutdownComplete()
+  def onComponentOnline(): Unit = if (!isOnline) {
+    runningComponent ! Lifecycle(GoOnline)
+    lifecycleState = LifecycleRunning
+    isOnline = true
   }
 
-  private def onLifecycleFailure(x: SupervisorMsg): Unit = {
+  def onPreparingToShutdown(msg: PreparingToShutdownMsg): Unit = msg match {
+    case ShutdownTimeout         => onComponentShutdownTimeOut()
+    case ShutdownFailure(reason) => onComponentShutdownFailure(reason)
+    case ShutdownComplete        => onComponentShutdownComplete()
+  }
+
+  def onLifecycleFailure(x: SupervisorMsg): Unit = {
     println(s"Supervisor in Lifecycle Failure received an unexpected message: $x ")
   }
 
-  private def onShutdownfailure(x: SupervisorMsg): Unit = {
+  def onShutdownfailure(x: SupervisorMsg): Unit = {
     println(s"Supervisor in ShutdownFailure received an unexpected message: $x ")
   }
 
-  private def onShutdown(x: SupervisorMsg): Unit = {
+  def onShutdown(x: SupervisorMsg): Unit = {
     println(s"Supervisor in Shutdown received an unexpected message: $x ")
   }
 
-  private def onInitialized(componentRef: ActorRef[InitialMsg]): Unit = {
+  def onInitialized(componentRef: ActorRef[InitialMsg]): Unit = {
     registerWithLocationService()
     componentRef ! Run
   }
 
-  private def onInitializeFailure(msg: String): Unit = {
+  def onInitializeFailure(msg: String): Unit = {
     lifecycleState = LifecycleInitializeFailure
     mode = SupervisorMode.LifecycleFailure
   }
 
-  private def onRunningComponent(componentRef: ActorRef[RunningMsg]): Unit = {
+  def onRunningComponent(componentRef: ActorRef[RunningMsg]): Unit = {
     runningComponent = componentRef
     lifecycleState = LifecycleRunning
     mode = SupervisorMode.Running
-    notifyListeners(LifecycleStateChanged(LifecycleRunning))
+    pubSubLifecycle ! Publish(LifecycleStateChanged(LifecycleRunning))
   }
 
-  def onShutdownTimeOut(): Unit = {
+  def onComponentShutdownTimeOut(): Unit = {
     lifecycleState = LifecycleShutdownFailure
-    notifyListeners(LifecycleStateChanged(LifecycleShutdownFailure))
+    pubSubLifecycle ! Publish(LifecycleStateChanged(LifecycleShutdownFailure))
     if (haltingFlag) haltComponent()
     mode = SupervisorMode.ShutdownFailure
   }
 
-  private def onShutdownFailure(reason: String): Unit = ???
+  def onComponentShutdownFailure(reason: String): Unit = {
+    lifecycleState = LifecycleShutdownFailure
+    pubSubLifecycle ! Publish(LifecycleStateChanged(LifecycleShutdownFailure))
+    if (haltingFlag) haltComponent()
+    mode = SupervisorMode.ShutdownFailure
+  }
 
-  private def onShutdownComplete(): Unit = {
+  def onComponentShutdownComplete(): Unit = {
     shutdownTimer.map(_.cancel())
     lifecycleState = LifecycleShutdown
-    notifyListeners(LifecycleStateChanged(LifecycleShutdown))
+    pubSubLifecycle ! Publish(LifecycleStateChanged(LifecycleShutdown))
     if (haltingFlag) haltComponent()
     mode = SupervisorMode.Shutdown
   }
@@ -167,15 +179,7 @@ class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
 
   private def onHalt(): Unit = {
     haltingFlag = true
-    ctx.self ! ExComponentShutdown
-  }
-
-  private def addListener(l: ActorRef[LifecycleStateChanged]): Unit = listeners = listeners + l
-
-  private def removeListener(l: ActorRef[LifecycleStateChanged]): Unit = listeners = listeners - l
-
-  private def notifyListeners(msg: LifecycleStateChanged): Unit = {
-    listeners.foreach(_ ! msg)
+    ctx.self ! Lifecycle(Shutdown)
   }
 
   private def registerWithLocationService(): Unit = ???
