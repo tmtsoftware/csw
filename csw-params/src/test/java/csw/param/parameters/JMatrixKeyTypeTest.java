@@ -1,5 +1,6 @@
-package csw.param;
+package csw.param.parameters;
 
+import csw.param.UnitsOfMeasure;
 import csw.param.UnitsOfMeasure.Units;
 import csw.param.models.JMatrixData;
 import csw.param.models.MatrixData;

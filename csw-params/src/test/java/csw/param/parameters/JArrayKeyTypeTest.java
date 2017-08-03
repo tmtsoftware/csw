@@ -1,11 +1,8 @@
-package csw.param;
+package csw.param.parameters;
 
+import csw.param.UnitsOfMeasure;
 import csw.param.models.ArrayData;
 import csw.param.models.JArrayData;
-import csw.param.parameters.JKeyTypes;
-import csw.param.parameters.Key;
-import csw.param.parameters.KeyType;
-import csw.param.parameters.Parameter;
 import org.junit.Assert;
 import org.junit.Test;
 

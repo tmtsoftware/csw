@@ -1,5 +1,6 @@
-package csw.param;
+package csw.param.parameters;
 
+import csw.param.UnitsOfMeasure;
 import csw.param.models.RaDec;
 import csw.param.models.Struct;
 import csw.param.parameters.JKeyTypes;
