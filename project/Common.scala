@@ -13,7 +13,7 @@ object Common extends AutoPlugin {
 
   val detectCycles: SettingKey[Boolean] = settingKey[Boolean]("is cyclic check enabled?")
 
-  override lazy val projectSettings: Seq[Setting[_]] = extraSettings ++ scalafmtSettings ++ Seq(
+  override lazy val projectSettings: Seq[Setting[_]] = scalafmtSettings ++ Seq(
     organization := "org.tmt",
     organizationName := "TMT Org",
     scalaVersion := Libs.ScalaVersion,
@@ -55,18 +55,15 @@ object Common extends AutoPlugin {
     isSnapshot := sys.props.get("prod.publish") != Some("true"),
     fork := true,
     detectCycles := true,
-    scalacOptions += { if (detectCycles.value) "-P:acyclic:force" else "" }
+    scalacOptions += { if (cycleCheckEnabled && detectCycles.value) "-P:acyclic:force" else "" },
+    libraryDependencies += `acyclic`,
+    autoCompilerPlugins := true,
+    addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7")
   )
 
-  private def extraSettings = sys.props.get("check.cycles") match {
-    case Some("true") =>
-      Seq(
-        libraryDependencies += `acyclic`,
-        autoCompilerPlugins := true,
-        addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7")
-      )
-    case _ =>
-      List.empty
+  private def cycleCheckEnabled = sys.props.get("check.cycles") match {
+    case Some("true") => true
+    case _            => false
   }
 
   // After upgrading from 0.6.6 to 1.1.0 scalafmt downloads stuff after every change to the project
