@@ -5,6 +5,7 @@ import java.time.Instant
 import csw.param.Events._
 import csw.param.Parameters._
 import csw.param.StateVariable._
+import csw.param.formats.{EnumJsonSupport, JavaFormats, WrappedArrayProtocol}
 import csw.param.models.{Choice, Choices, Struct}
 import csw.param.parameters._
 import spray.json._
@@ -15,7 +16,7 @@ object JsonSupport extends JsonSupport
  * Supports conversion of commands and events to/from JSON
  */
 //noinspection TypeAnnotation
-trait JsonSupport extends DefaultJsonProtocol {
+trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupport with WrappedArrayProtocol {
 
   // JSON formats
   implicit val choiceFormat  = jsonFormat1(Choice.apply)
@@ -94,13 +95,8 @@ trait JsonSupport extends DefaultJsonProtocol {
 
   private def unexpectedJsValueError(x: JsValue) = deserializationError(s"Unexpected JsValue: $x")
 
-  // XXX TODO Use JNumber?
-  def writeParameter[S, I /*, J */ ](parameter: Parameter[S /*, J */ ]): JsValue = {
-    val result: (JsString, JsValue) = parameter match {
-      case i: Parameter[_] => (JsString(i.keyType.entryName), i.toJson)
-    }
-    JsObject("type" -> result._1, "parameter" -> result._2)
-  }
+  def writeParameter(parameter: Parameter[_]): JsValue =
+    JsObject("type" -> JsString(parameter.keyType.entryName), "parameter" -> parameter.toJson)
 
   def readParameterAndType(json: JsValue): Parameter[_ /*, _ */ ] = json match {
     case JsObject(fields) =>

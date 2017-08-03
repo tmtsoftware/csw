@@ -2,8 +2,8 @@ package csw.param.models
 
 import java.util
 
-import csw.param.formats.WrappedArrayProtocol
-import spray.json.{DefaultJsonProtocol, JsonFormat}
+import csw.param.JsonSupport
+import spray.json.JsonFormat
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -15,7 +15,7 @@ case class ArrayData[T](data: mutable.WrappedArray[T]) {
   def jValues: util.List[T] = data.asJava
 }
 
-object ArrayData extends WrappedArrayProtocol with DefaultJsonProtocol {
+object ArrayData extends JsonSupport {
   implicit def format[T: JsonFormat: ClassTag]: JsonFormat[ArrayData[T]] =
     jsonFormat1((xs: mutable.WrappedArray[T]) ⇒ new ArrayData[T](xs))
 

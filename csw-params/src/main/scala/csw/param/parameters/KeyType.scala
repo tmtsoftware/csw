@@ -1,7 +1,6 @@
 package csw.param.parameters
 
 import csw.param.JsonSupport
-import csw.param.formats.{EnumJsonSupport, JavaFormats}
 import csw.param.models._
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
@@ -22,7 +21,9 @@ sealed class SimpleKeyType[S: JsonFormat: ClassTag] extends KeyType[S] {
 sealed class ArrayKeyType[S: JsonFormat: ClassTag]  extends SimpleKeyType[ArrayData[S]]
 sealed class MatrixKeyType[S: JsonFormat: ClassTag] extends SimpleKeyType[MatrixData[S]]
 
-object KeyType extends JsonSupport with JavaFormats with Enum[KeyType[_]] {
+object KeyType extends Enum[KeyType[_]] {
+
+  import JsonSupport._
 
   override def values: immutable.IndexedSeq[KeyType[_]] = findValues
 
@@ -81,7 +82,7 @@ object KeyType extends JsonSupport with JavaFormats with Enum[KeyType[_]] {
   case object JFloatMatrixKey  extends MatrixKeyType[java.lang.Float]
   case object JDoubleMatrixKey extends MatrixKeyType[java.lang.Double]
 
-  implicit def format[T]: JsonFormat[KeyType[T]] = EnumJsonSupport.format[KeyType, T](this)
+  implicit def format[T]: JsonFormat[KeyType[T]] = enumFormat[KeyType, T](this)
 }
 
 object JKeyTypes {

@@ -2,8 +2,7 @@ package csw.param.models
 
 import java.util
 
-import csw.param.formats.WrappedArrayProtocol
-import spray.json.{DefaultJsonProtocol, JsonFormat}
+import spray.json.JsonFormat
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -17,7 +16,9 @@ case class MatrixData[T](data: mutable.WrappedArray[mutable.WrappedArray[T]]) {
   def jValues: util.List[util.List[T]] = data.map(_.asJava).asJava
 }
 
-object MatrixData extends WrappedArrayProtocol with DefaultJsonProtocol {
+object MatrixData {
+  import csw.param.JsonSupport._
+
   implicit def format[T: JsonFormat: ClassTag]: JsonFormat[MatrixData[T]] =
     jsonFormat1((xs: mutable.WrappedArray[mutable.WrappedArray[T]]) => new MatrixData[T](xs))
 
