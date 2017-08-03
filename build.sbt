@@ -42,6 +42,9 @@ lazy val `csw-params` = project
   .settings(
     libraryDependencies ++= Dependencies.Params
   )
+  .settings(
+    Common.detectCycles := false
+  )
 
 lazy val `csw-logging-macros` = project
   .settings(

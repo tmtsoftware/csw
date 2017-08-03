@@ -11,6 +11,8 @@ object Common extends AutoPlugin {
 
   override def requires: Plugins = JvmPlugin
 
+  val detectCycles: SettingKey[Boolean] = settingKey[Boolean]("is cyclic check enabled?")
+
   override lazy val projectSettings: Seq[Setting[_]] = extraSettings ++ scalafmtSettings ++ Seq(
     organization := "org.tmt",
     organizationName := "TMT Org",
@@ -51,7 +53,9 @@ object Common extends AutoPlugin {
       }
     },
     isSnapshot := sys.props.get("prod.publish") != Some("true"),
-    fork := true
+    fork := true,
+    detectCycles := true,
+    scalacOptions += { if (detectCycles.value) "-P:acyclic:force" else "" }
   )
 
   private def extraSettings = sys.props.get("check.cycles") match {
@@ -59,8 +63,7 @@ object Common extends AutoPlugin {
       Seq(
         libraryDependencies += `acyclic`,
         autoCompilerPlugins := true,
-        addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7"),
-        scalacOptions += "-P:acyclic:force"
+        addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7")
       )
     case _ =>
       List.empty
