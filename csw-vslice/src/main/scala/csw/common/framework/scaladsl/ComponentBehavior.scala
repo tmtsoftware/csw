@@ -25,6 +25,8 @@ abstract class ComponentBehavior[Msg <: DomainMsg: ClassTag, RunCompMsg <: CompS
 
   var mode: ComponentMode = ComponentMode.Idle
 
+  ctx.self ! Initialize
+
   def onRunningCompCommandMsg(x: RunCompMsg): Unit
 
   def onMessage(msg: ComponentMsg): Behavior[ComponentMsg] = {

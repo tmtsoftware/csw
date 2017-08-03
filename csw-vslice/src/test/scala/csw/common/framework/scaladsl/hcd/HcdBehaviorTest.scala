@@ -22,7 +22,7 @@ class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe: TestProbe[FromComponentLifecycleMessage] = TestProbe[FromComponentLifecycleMessage]
-    val publisherProbe                                            = TestProbe[PublisherMsg[CurrentState]]
+    val publisherProbe: TestProbe[PublisherMsg[CurrentState]]     = TestProbe[PublisherMsg[CurrentState]]
 
     val hcdRef =
       Await.result(
