@@ -9,7 +9,6 @@ import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
 import csw.common.framework.models.SupervisorIdleMsg.InitializeFailure
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models.{RunningMsg, _}
-import csw.common.framework.scaladsl.ComponentMode.{Idle, Initialized, Running}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,17 +23,16 @@ abstract class ComponentBehavior[Msg <: DomainMsg: ClassTag, RunCompMsg <: CompS
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  var mode: ComponentMode = Idle
-  ctx.self ! Initialize
+  var mode: ComponentMode = ComponentMode.Idle
 
   def onRunningCompCommandMsg(x: RunCompMsg): Unit
 
   def onMessage(msg: ComponentMsg): Behavior[ComponentMsg] = {
     (mode, msg) match {
-      case (Idle, x: IdleMsg)           ⇒ onIdle(x)
-      case (Initialized, x: InitialMsg) ⇒ onInitial(x)
-      case (Running, x: RunningMsg)     ⇒ onRun(x)
-      case _                            ⇒ println(s"current context=$mode does not handle message=$msg")
+      case (ComponentMode.Idle, x: IdleMsg)           ⇒ onIdle(x)
+      case (ComponentMode.Initialized, x: InitialMsg) ⇒ onInitial(x)
+      case (ComponentMode.Running, x: RunningMsg)     ⇒ onRun(x)
+      case _                                          ⇒ println(s"current context=$mode does not handle message=$msg")
     }
     this
   }
@@ -55,7 +53,7 @@ abstract class ComponentBehavior[Msg <: DomainMsg: ClassTag, RunCompMsg <: CompS
   private def initialization(): Future[Unit] =
     async {
       await(lifecycleHandlers.initialize())
-      mode = Initialized
+      mode = ComponentMode.Initialized
     } recover {
       case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
     }
@@ -63,7 +61,7 @@ abstract class ComponentBehavior[Msg <: DomainMsg: ClassTag, RunCompMsg <: CompS
   private def onInitial(x: InitialMsg): Unit = x match {
     case Run =>
       lifecycleHandlers.onRun()
-      mode = Running
+      mode = ComponentMode.Running
       lifecycleHandlers.isOnline = true
       supervisor ! SupervisorIdleMsg.Running(ctx.self)
   }
@@ -81,7 +79,7 @@ abstract class ComponentBehavior[Msg <: DomainMsg: ClassTag, RunCompMsg <: CompS
       supervisor ! ShutdownComplete
     case Restart =>
       lifecycleHandlers.onRestart()
-      mode = Idle
+      mode = ComponentMode.Idle
       ctx.self ! Start
     case GoOnline =>
       if (!lifecycleHandlers.isOnline) {

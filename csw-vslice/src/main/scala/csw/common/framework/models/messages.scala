@@ -2,12 +2,13 @@ package csw.common.framework.models
 
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.models.SupervisorExternalMsg.LifecycleStateChanged
 import csw.param.Parameters.{ControlCommand, Setup}
 
 /////////////
 
 sealed trait PubSub[T]
+
+/////////////
 
 object PubSub {
   case class Subscribe[T](ref: ActorRef[T])   extends PubSub[T]
@@ -31,6 +32,10 @@ object LifecycleState {
 
 ///////////////
 
+case class LifecycleStateChanged(state: LifecycleState)
+
+///////////////
+
 sealed trait ToComponentLifecycleMessage
 object ToComponentLifecycleMessage {
   case object Shutdown  extends ToComponentLifecycleMessage
@@ -41,15 +46,7 @@ object ToComponentLifecycleMessage {
 
 ///////////////
 
-sealed trait FromComponentLifecycleMessage extends SupervisorMsg
-
-///////////////
-
 sealed trait ComponentMsg
-
-///////////////
-
-sealed trait SupervisorMsg
 
 ///////////////
 
@@ -91,15 +88,22 @@ object AssemblyMsg {
   case class Oneway(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends AssemblyMsg
 }
 
-///////////////////////
+///////////////
+
+sealed trait SupervisorMsg
+
+///////////////
+
+sealed trait FromComponentLifecycleMessage extends SupervisorMsg
+
+///////////////
 
 sealed trait SupervisorExternalMsg extends SupervisorMsg
 object SupervisorExternalMsg {
-  case class LifecycleStateChanged(state: LifecycleState) extends SupervisorExternalMsg
-  case object ExComponentRestart                          extends SupervisorExternalMsg
-  case object ExComponentShutdown                         extends SupervisorExternalMsg
-  case object ExComponentOnline                           extends SupervisorExternalMsg
-  case object ExComponentOffline                          extends SupervisorExternalMsg
+  case object ExComponentRestart  extends SupervisorExternalMsg
+  case object ExComponentShutdown extends SupervisorExternalMsg
+  case object ExComponentOnline   extends SupervisorExternalMsg
+  case object ExComponentOffline  extends SupervisorExternalMsg
 }
 
 sealed trait CommonSupervisorMsg extends SupervisorMsg
