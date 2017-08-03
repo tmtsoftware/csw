@@ -86,6 +86,7 @@ object KeyType extends Enum[KeyType[_]] {
 }
 
 object JKeyTypes {
+  val ChoiceKey = KeyType.ChoiceKey
   val RaDecKey  = KeyType.RaDecKey
   val StringKey = KeyType.StringKey
   val StructKey = KeyType.StructKey
