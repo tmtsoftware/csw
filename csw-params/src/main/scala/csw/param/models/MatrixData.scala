@@ -12,8 +12,11 @@ import scala.reflect.ClassTag
 case class MatrixData[T](data: mutable.WrappedArray[mutable.WrappedArray[T]]) {
   def apply(row: Int, col: Int): T = data(row)(col)
 
-  def values: Array[Array[T]]          = data.array.map(_.array).asInstanceOf
-  def jValues: util.List[util.List[T]] = data.map(_.asJava).asJava
+  def values(implicit classTag: ClassTag[T]): Array[Array[T]] = data.array.map(_.array)
+
+  def jValuesArray(klass: Class[T]): Array[Array[T]] = values(ClassTag(klass))
+
+  def jValuesList: util.List[util.List[T]] = data.map(_.asJava).asJava
 }
 
 object MatrixData {

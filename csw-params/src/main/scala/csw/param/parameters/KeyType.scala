@@ -75,10 +75,10 @@ object KeyType extends Enum[KeyType[_]] {
   case object JFloatArrayKey  extends ArrayKeyType[java.lang.Float]
   case object JDoubleArrayKey extends ArrayKeyType[java.lang.Double]
 
-  case object JByteMatrixKey   extends MatrixKeyType[Array[java.lang.Byte]]
+  case object JByteMatrixKey   extends MatrixKeyType[java.lang.Byte]
   case object JShortMatrixKey  extends MatrixKeyType[java.lang.Short]
   case object JLongMatrixKey   extends MatrixKeyType[java.lang.Long]
-  case object JIntMatrixKey    extends MatrixKeyType[Array[java.lang.Integer]]
+  case object JIntMatrixKey    extends MatrixKeyType[java.lang.Integer]
   case object JFloatMatrixKey  extends MatrixKeyType[java.lang.Float]
   case object JDoubleMatrixKey extends MatrixKeyType[java.lang.Double]
 
