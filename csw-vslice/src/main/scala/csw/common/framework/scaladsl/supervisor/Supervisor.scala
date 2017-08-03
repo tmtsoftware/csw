@@ -51,14 +51,11 @@ class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
   override def onMessage(msg: SupervisorMsg): Behavior[SupervisorMsg] = {
     (mode, msg) match {
       case (SupervisorMode.Idle, msg: SupervisorIdleMsg)                     => onIdleMessages(msg)
-      case (SupervisorMode.Idle, msg: CommonSupervisorMsg)                   => onCommonMessages(msg)
       case (SupervisorMode.Running, msg: RunningMsg)                         => onRunning(msg)
-      case (SupervisorMode.Running, msg: CommonSupervisorMsg)                => onCommonMessages(msg)
       case (SupervisorMode.PreparingToShutdown, msg: PreparingToShutdownMsg) => onPreparingToShutdown(msg)
-      case (SupervisorMode.Shutdown, msg: CommonSupervisorMsg)               => onCommonMessages(msg)
-      case (SupervisorMode.Shutdown, x)                                      => onShutdown(x)
-      case (SupervisorMode.ShutdownFailure, x)                               => onShutdownfailure(x)
-      case (SupervisorMode.LifecycleFailure, x)                              => onLifecycleFailure(x)
+      case (SupervisorMode.Shutdown, msg: ShutdownMsg)                       => onShutdown(msg)
+      case (supervisorMode, message) =>
+        println(s"Supervisor in $supervisorMode received an unexpected message: $message")
     }
     this
   }
@@ -67,6 +64,7 @@ class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
     case Initialized(componentRef) => onInitialized(componentRef)
     case InitializeFailure(reason) => onInitializeFailure(reason)
     case Running(componentRef)     => onRunningComponent(componentRef)
+    case msg: CommonSupervisorMsg  ⇒ onCommonMessages(msg)
   }
 
   def onCommonMessages(msg: CommonSupervisorMsg): Unit = msg match {
@@ -76,9 +74,10 @@ class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
   }
 
   def onRunning(msg: RunningMsg): Unit = msg match {
-    case Lifecycle(message)   => onLifecycle(message)
-    case msg: DomainMsg       => runningComponent ! msg
-    case msg: CompSpecificMsg => runningComponent ! msg
+    case Lifecycle(message)       => onLifecycle(message)
+    case msg: DomainMsg           => runningComponent ! msg
+    case msg: CompSpecificMsg     => runningComponent ! msg
+    case msg: CommonSupervisorMsg ⇒ onCommonMessages(msg)
   }
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
@@ -122,16 +121,8 @@ class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
     case ShutdownComplete        => onComponentShutdownComplete()
   }
 
-  def onLifecycleFailure(x: SupervisorMsg): Unit = {
-    println(s"Supervisor in Lifecycle Failure received an unexpected message: $x ")
-  }
-
-  def onShutdownfailure(x: SupervisorMsg): Unit = {
-    println(s"Supervisor in ShutdownFailure received an unexpected message: $x ")
-  }
-
-  def onShutdown(x: SupervisorMsg): Unit = {
-    println(s"Supervisor in Shutdown received an unexpected message: $x ")
+  def onShutdown(msg: ShutdownMsg): Unit = msg match {
+    case msg: CommonSupervisorMsg ⇒ onCommonMessages(msg)
   }
 
   def onInitialized(componentRef: ActorRef[InitialMsg]): Unit = {

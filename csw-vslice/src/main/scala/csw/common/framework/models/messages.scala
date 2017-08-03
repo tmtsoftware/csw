@@ -100,7 +100,11 @@ sealed trait FromComponentLifecycleMessage extends SupervisorMsg
 
 ///////////////
 
-sealed trait CommonSupervisorMsg extends SupervisorMsg
+sealed trait ShutdownMsg extends SupervisorMsg
+
+///////////////
+
+sealed trait CommonSupervisorMsg extends SupervisorIdleMsg with RunningMsg with ShutdownMsg
 object CommonSupervisorMsg {
   case class Wrapper(subscriberMsg: SubscriberMsg[LifecycleStateChanged]) extends CommonSupervisorMsg
   case object HaltComponent                                               extends CommonSupervisorMsg
