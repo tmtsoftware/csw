@@ -1,7 +1,7 @@
 package csw.trombone.assembly.actors
 
+import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validation
 import csw.common.ccs.Validation.{Valid, Validation}
@@ -62,23 +62,24 @@ class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg], info: AssemblyIn
   override def onGoOnline(): Unit = println("Received GoOnline")
 
   def onDomainMsg(mode: DiagPublisherMessages): Unit = mode match {
-    case DiagnosticState => diagPublsher ! DiagnosticState
-    case OperationsState => diagPublsher ! OperationsState
-    case _               ⇒
+    case (DiagnosticState | OperationsState) => diagPublsher ! mode
+    case _                                   ⇒
   }
 
-  private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
+  override def onControlCommand(assemblyMsg: AssemblyMsg): Validation = assemblyMsg.command match {
+    case x: Setup   => setup(x, assemblyMsg.replyTo)
+    case x: Observe => observe(x, assemblyMsg.replyTo)
+  }
 
-  def setup(s: Setup, commandOriginator: Option[ActorRef[CommandResponse]]): Validation = {
+  private def setup(s: Setup, commandOriginator: ActorRef[CommandResponse]): Validation = {
     val validation = validateOneSetup(s)
     if (validation == Valid) {
-      commandHandler ! TromboneCommandHandlerMsgs.Submit(
-        s,
-        commandOriginator.getOrElse(ctx.spawnAnonymous(Behavior.empty))
-      )
+      commandHandler ! TromboneCommandHandlerMsgs.Submit(s, commandOriginator)
     }
     validation
   }
 
-  def observe(o: Observe, replyTo: Option[ActorRef[CommandResponse]]): Validation = Validation.Valid
+  private def observe(o: Observe, replyTo: ActorRef[CommandResponse]): Validation = Validation.Valid
+
+  private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
 }

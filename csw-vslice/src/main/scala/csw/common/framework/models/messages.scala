@@ -8,7 +8,6 @@ import csw.param.Parameters.{ControlCommand, Setup}
 /////////////
 
 sealed trait PubSub[T]
-
 object PubSub {
   sealed trait SubscriberMsg[T]               extends PubSub[T]
   case class Subscribe[T](ref: ActorRef[T])   extends SubscriberMsg[T]
@@ -21,7 +20,6 @@ object PubSub {
 /////////////
 
 sealed trait LifecycleState
-
 object LifecycleState {
   case object LifecycleWaitingForInitialized extends LifecycleState
   case object LifecycleInitializeFailure     extends LifecycleState
@@ -83,7 +81,10 @@ object HcdMsg {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-sealed trait AssemblyMsg extends CompSpecificMsg
+sealed trait AssemblyMsg extends CompSpecificMsg {
+  def command: ControlCommand
+  def replyTo: ActorRef[CommandResponse]
+}
 
 object AssemblyMsg {
   case class Submit(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends AssemblyMsg
