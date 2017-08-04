@@ -4,6 +4,7 @@ import java.util.UUID
 
 import csw.param.models.{ObsId, Prefix}
 import spray.json.RootJsonFormat
+import scala.language.implicitConversions
 
 /**
  * This will include information related to the observation that is related to an event.

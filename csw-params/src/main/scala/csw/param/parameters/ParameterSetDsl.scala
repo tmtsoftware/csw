@@ -5,7 +5,8 @@ import csw.param.StateVariable
 import csw.param.commands.{CommandInfo, Observe, Setup}
 import csw.param.events.EventInfo
 import csw.param.models.Prefix
-import csw.units.UnitsOfMeasure.{NoUnits, Units}
+import csw.units.Units
+import csw.units.Units.NoUnits
 
 /**
  * Defines a Scala DSL for dealing with configurations.

@@ -1,7 +1,6 @@
 package csw.param
 
 import csw.param.events.Events.StatusEvent
-import csw.units.UnitsOfMeasure.{degrees, meters, _}
 import csw.param.commands.{CommandInfo, Observe, Setup}
 import csw.param.models.{ArrayData, MatrixData}
 import csw.param.parameters.KeyType.{
@@ -13,7 +12,7 @@ import csw.param.parameters.KeyType.{
   ShortMatrixKey
 }
 import csw.param.parameters._
-import csw.units.UnitsOfMeasure
+import csw.units.Units.{degrees, meters, NoUnits}
 import org.scalatest.FunSpec
 
 import scala.util.Try
@@ -45,7 +44,7 @@ class ConfigTests extends FunSpec {
       assert(i.head == 22)
 
       assert(k2.keyName eq s2)
-      val j: Parameter[String] = k2.set("Bob").withUnits(UnitsOfMeasure.meters)
+      val j: Parameter[String] = k2.set("Bob").withUnits(meters)
       assert(j.values === Array("Bob"))
       assert(j.units == meters)
     }
@@ -305,7 +304,7 @@ class ConfigTests extends FunSpec {
 
     val item: Option[Parameter[Int]] = sc1.get(t1) // Works now!
     val itm: Parameter[Int]          = item.get
-    assert(itm.units == UnitsOfMeasure.degrees)
+    assert(itm.units == degrees)
     val i: Int = itm(0)
     assert(i == 22)
     val i2: Int = itm.head
@@ -319,8 +318,8 @@ class ConfigTests extends FunSpec {
     val k2: Key[Double] = KeyType.DoubleKey.make("dtest")
     val k3: Key[String] = KeyType.StringKey.make("stest")
 
-    val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
-    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
+    val i1 = k1.set(1, 2, 3).withUnits(degrees)
+    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meters)
     val i3 = k3.set("A", "B", "C")
 
     it("Should get as IntItem") {
@@ -341,8 +340,8 @@ class ConfigTests extends FunSpec {
     val k2: Key[Double] = KeyType.DoubleKey.make("dtest")
     val k3: Key[String] = KeyType.StringKey.make("stest")
 
-    val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
-    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
+    val i1 = k1.set(1, 2, 3).withUnits(degrees)
+    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meters)
     val i3 = k3.set("A", "B", "C")
 
     it("Should allow vararg add") {
@@ -362,8 +361,8 @@ class ConfigTests extends FunSpec {
     val k3 = KeyType.StringKey.make("stest")
     val k4 = KeyType.LongArrayKey.make("lartest")
 
-    val i1 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
-    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
+    val i1 = k1.set(1, 2, 3).withUnits(degrees)
+    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meters)
     val i3 = k3.set("A", "B", "C")
     val i4 = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
 
@@ -427,9 +426,9 @@ class ConfigTests extends FunSpec {
     val k3 = KeyType.StringKey.make("stest")
     val k4 = KeyType.LongArrayKey.make("lartest")
 
-    val i1  = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
-    val i11 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees) // This is here to see if it is checking equality or address
-    val i2  = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
+    val i1  = k1.set(1, 2, 3).withUnits(degrees)
+    val i11 = k1.set(1, 2, 3).withUnits(degrees) // This is here to see if it is checking equality or address
+    val i2  = k2.set(1.0, 2.0, 3.0).withUnits(meters)
     val i3  = k3.set("A", "B", "C")
     val i4  = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
     val i5  = k1.set(22) // This is not added for testing not present removal

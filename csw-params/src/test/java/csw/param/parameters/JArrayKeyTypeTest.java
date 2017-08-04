@@ -2,7 +2,7 @@ package csw.param.parameters;
 
 import csw.param.models.ArrayData;
 import csw.param.models.JArrayData;
-import csw.units.UnitsOfMeasure;
+import csw.units.Units;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -10,9 +10,9 @@ import java.util.List;
 
 public class JArrayKeyTypeTest {
 
-    private UnitsOfMeasure.NoUnits$ NoUnit = UnitsOfMeasure.NoUnits$.MODULE$;
+    private Units NoUnit = Units.NoUnits$.MODULE$;
 
-    void commonAssertions(String keyName, KeyType keyType, ArrayData[] testData, Parameter parameter, UnitsOfMeasure.Units unit) {
+    void commonAssertions(String keyName, KeyType keyType, ArrayData[] testData, Parameter parameter, Units unit) {
         Assert.assertEquals(keyName, keyName);
         Assert.assertEquals(keyType,parameter.keyType());
 
@@ -45,7 +45,7 @@ public class JArrayKeyTypeTest {
         Parameter<ArrayData<Byte>> parameterWithoutUnits = key.set(data1, data2);
         commonAssertions(keyName, JKeyTypes.ByteArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
-        UnitsOfMeasure.milliseconds$ millisecondsUnit = UnitsOfMeasure.milliseconds$.MODULE$;
+        Units.milliseconds$ millisecondsUnit = Units.milliseconds$.MODULE$;
         // key.set with Units
         Parameter<ArrayData<Byte>> parameterWithUnits = key.set(arrayData, millisecondsUnit);
         commonAssertions(keyName, JKeyTypes.ByteArrayKey(), arrayData, parameterWithUnits, millisecondsUnit);
@@ -66,7 +66,7 @@ public class JArrayKeyTypeTest {
         Parameter<ArrayData<Short>> parameterWithoutUnits = key.set(data1, data2);
         commonAssertions(keyName, JKeyTypes.ShortArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
-        UnitsOfMeasure.degrees$ degreesUnit = UnitsOfMeasure.degrees$.MODULE$;
+        Units.degrees$ degreesUnit = Units.degrees$.MODULE$;
         // key.set with Units
         Parameter<ArrayData<Short>> parameterWithUnits = key.set(arrayData, degreesUnit);
         commonAssertions(keyName, JKeyTypes.ShortArrayKey(), arrayData, parameterWithUnits, degreesUnit);
@@ -87,7 +87,7 @@ public class JArrayKeyTypeTest {
         Parameter<ArrayData<Long>> parameterWithoutUnits = key.set(data1, data2);
         commonAssertions(keyName, JKeyTypes.LongArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
-        UnitsOfMeasure.millimeters$ millimetersUnit = UnitsOfMeasure.millimeters$.MODULE$;
+        Units.millimeters$ millimetersUnit = Units.millimeters$.MODULE$;
         // key.set with Units
         Parameter<ArrayData<Long>> parameterWithUnits = key.set(arrayData, millimetersUnit);
         commonAssertions(keyName, JKeyTypes.LongArrayKey(), arrayData, parameterWithUnits, millimetersUnit);
@@ -109,7 +109,7 @@ public class JArrayKeyTypeTest {
 
         commonAssertions(keyName, JKeyTypes.IntArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
-        UnitsOfMeasure.millimeters$ millimetersUnit = UnitsOfMeasure.millimeters$.MODULE$;
+        Units.millimeters$ millimetersUnit = Units.millimeters$.MODULE$;
         // key.set with Units
         Parameter<ArrayData<Integer>> parameterWithUnits = key.set(arrayData, millimetersUnit);
         commonAssertions(keyName, JKeyTypes.IntArrayKey(), arrayData, parameterWithUnits, millimetersUnit);
@@ -130,7 +130,7 @@ public class JArrayKeyTypeTest {
         Parameter<ArrayData<Float>> parameterWithoutUnits = key.set(data1, data2);
         commonAssertions(keyName, JKeyTypes.FloatArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
-        UnitsOfMeasure.millimeters$ millimetersUnit = UnitsOfMeasure.millimeters$.MODULE$;
+        Units.millimeters$ millimetersUnit = Units.millimeters$.MODULE$;
         // key.set with Units
         Parameter<ArrayData<Float>> parameterWithUnits = key.set(arrayData, millimetersUnit);
         commonAssertions(keyName, JKeyTypes.FloatArrayKey(), arrayData, parameterWithUnits, millimetersUnit);
@@ -151,7 +151,7 @@ public class JArrayKeyTypeTest {
         Parameter<ArrayData<Double>> parameterWithoutUnits = key.set(data1, data2);
         commonAssertions(keyName, JKeyTypes.DoubleArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
-        UnitsOfMeasure.millimeters$ millimetersUnit = UnitsOfMeasure.millimeters$.MODULE$;
+        Units.millimeters$ millimetersUnit = Units.millimeters$.MODULE$;
         // key.set with Units
         Parameter<ArrayData<Double>> parameterWithUnits = key.set(arrayData, millimetersUnit);
         commonAssertions(keyName, JKeyTypes.DoubleArrayKey(), arrayData, parameterWithUnits, millimetersUnit);

@@ -3,7 +3,7 @@ package csw.param.parameters
 import java.util
 import java.util.Optional
 
-import csw.units.UnitsOfMeasure.Units
+import csw.units.Units
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter

@@ -1,6 +1,5 @@
 package csw.param
 
-import csw.units.UnitsOfMeasure.{degrees, meters, seconds}
 import csw.param.models._
 import csw.param.parameters.KeyType.{
   ByteMatrixKey,
@@ -13,7 +12,7 @@ import csw.param.parameters.KeyType.{
   StructKey
 }
 import csw.param.parameters._
-import csw.units.UnitsOfMeasure
+import csw.units.Units.{degrees, meters, seconds}
 import org.scalatest.{FunSpec, Matchers}
 
 /**
@@ -86,7 +85,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2: Parameter[ArrayData[Byte]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2: Parameter[ArrayData[Byte]] = lk.set(listIn).withUnits(degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
@@ -250,7 +249,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2 = lk.set(listIn).withUnits(degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
@@ -386,7 +385,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2 = lk.set(listIn).withUnits(degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
@@ -523,7 +522,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2 = lk.set(listIn).withUnits(degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
@@ -658,7 +657,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2: Parameter[ArrayData[Long]] = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2: Parameter[ArrayData[Long]] = lk.set(listIn).withUnits(degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
@@ -795,7 +794,7 @@ class ItemsTests extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(UnitsOfMeasure.degrees)
+      val li2 = lk.set(listIn).withUnits(degrees)
       li2.units should be(degrees)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)

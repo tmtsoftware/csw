@@ -3,7 +3,7 @@ package csw.param.models;
 import csw.param.parameters.JKeyTypes;
 import csw.param.parameters.Key;
 import csw.param.parameters.Parameter;
-import csw.units.UnitsOfMeasure;
+import csw.units.Units;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class JStructTest {
         Struct struct1 = JStruct.create(parameterHashSet1);
         Struct struct2 = JStruct.create(parameterHashSet2);
 
-        Parameter<Struct> structParameter = key.set(new Struct[]{struct1, struct2}, UnitsOfMeasure.NoUnits$.MODULE$);
+        Parameter<Struct> structParameter = key.set(new Struct[]{struct1, struct2}, Units.NoUnits$.MODULE$);
 
         Assert.assertEquals(Arrays.asList(struct1, struct2), structParameter.jValues());
         Assert.assertArrayEquals(new Struct[]{struct1, struct2}, (Struct[])structParameter.values());

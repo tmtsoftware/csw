@@ -3,12 +3,12 @@ package csw.trombone.hcd
 import java.io.File
 
 import csw.param.StateVariable.CurrentState
-import csw.units.UnitsOfMeasure.encoder
 import csw.param._
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.models.{Choice, Prefix}
 import csw.param.parameters.KeyType
 import csw.param.parameters.KeyType.ChoiceKey
+import csw.units.Units.encoder
 
 object TromboneHcdState {
   val tromboneConfigFile = new File("trombone/tromboneHCD.conf")

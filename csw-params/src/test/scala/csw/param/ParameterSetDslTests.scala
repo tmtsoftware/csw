@@ -1,13 +1,12 @@
 package csw.param
 
-import csw.units.UnitsOfMeasure.{degrees, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 import csw.param.parameters.ParameterSetDsl._
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.models.{ArrayData, MatrixData, ObsId}
 import csw.param.parameters.KeyType.LongMatrixKey
 import csw.param.parameters.{KeyType, Parameter}
-import csw.units.UnitsOfMeasure
+import csw.units.Units.{degrees, meters, NoUnits}
 
 /**
  * Tests the config DSL
@@ -230,8 +229,8 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     val k3 = KeyType.StringKey.make("stest")
     val k4 = KeyType.LongArrayKey.make("lartest")
 
-    val i1 = set(k1, 1, 2, 3).withUnits(UnitsOfMeasure.degrees)
-    val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
+    val i1 = set(k1, 1, 2, 3).withUnits(degrees)
+    val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(meters)
     val i3 = set(k3, "A", "B", "C")
     val i4 = set(k4, ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
 
@@ -295,8 +294,8 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     val k3 = KeyType.StringKey.make("stest")
     val k4 = KeyType.LongArrayKey.make("lartest")
 
-    val i1 = set(k1, 1, 2, 3).withUnits(UnitsOfMeasure.degrees)
-    val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
+    val i1 = set(k1, 1, 2, 3).withUnits(degrees)
+    val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(meters)
     val i3 = set(k3, "A", "B", "C")
     val i4 = set(k4, ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
 
@@ -360,8 +359,8 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     //    val k3 = StringKey("stest")
     //    val k4 = LongArrayKey("lartest")
 
-    val i1 = set(k1, 1, 2, 3).withUnits(UnitsOfMeasure.degrees)
-    val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
+    val i1 = set(k1, 1, 2, 3).withUnits(degrees)
+    val i2 = set(k2, 1.0, 2.0, 3.0).withUnits(meters)
 
     it("should allow creation") {
       val sc1 = setup(commandInfo, ck2, i1, i2)
@@ -372,14 +371,14 @@ class ParameterSetDslTests extends FunSpec with Matchers {
       val sc2 = setup(
         commandInfo,
         ck2,
-        k1 -> 3 withUnits UnitsOfMeasure.degrees,
-        k2 -> 44.3 withUnits UnitsOfMeasure.meters
+        k1 -> 3 withUnits degrees,
+        k2 -> 44.3 withUnits meters
       )
       csize(sc2) should be(2)
       exists(sc2, k1) shouldBe true
       exists(sc2, k2) shouldBe true
-      units(parameter(sc2, k1)) shouldBe UnitsOfMeasure.degrees
-      units(parameter(sc2, k2)) shouldBe UnitsOfMeasure.meters
+      units(parameter(sc2, k1)) shouldBe degrees
+      units(parameter(sc2, k2)) shouldBe meters
     }
   }
 

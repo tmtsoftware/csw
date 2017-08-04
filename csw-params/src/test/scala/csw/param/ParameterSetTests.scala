@@ -3,7 +3,7 @@ package csw.param
 import csw.param.commands.Setup
 import csw.param.models.ArrayData
 import csw.param.parameters.KeyType
-import csw.units.UnitsOfMeasure
+import csw.units.Units.{degrees, meters}
 import org.scalatest.FunSpec
 import spray.json.DefaultJsonProtocol
 
@@ -30,9 +30,9 @@ class ParameterSetTests extends FunSpec {
   val k3 = KeyType.StringKey.make("stest")
   val k4 = KeyType.LongArrayKey.make("lartest")
 
-  val i1  = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees)
-  val i11 = k1.set(1, 2, 3).withUnits(UnitsOfMeasure.degrees) // This is here to see if it is checking equality or address
-  val i2  = k2.set(1.0, 2.0, 3.0).withUnits(UnitsOfMeasure.meters)
+  val i1  = k1.set(1, 2, 3).withUnits(degrees)
+  val i11 = k1.set(1, 2, 3).withUnits(degrees) // This is here to see if it is checking equality or address
+  val i2  = k2.set(1.0, 2.0, 3.0).withUnits(meters)
   val i3  = k3.set("A", "B", "C")
   val i4  = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
   val i5  = k1.set(22) // This is not added for testing not present removal
@@ -43,7 +43,7 @@ class ParameterSetTests extends FunSpec {
 
     val obsId = "Obs001"
 
-    val sc1 = Setup(obsId, ck1).madd(encoder1.set(22), encoder2.set(33).withUnits(UnitsOfMeasure.degrees))
+    val sc1 = Setup(obsId, ck1).madd(encoder1.set(22), encoder2.set(33).withUnits(degrees))
 
     println(sc1)
     assert(sc1.info.obsId.obsId == obsId)

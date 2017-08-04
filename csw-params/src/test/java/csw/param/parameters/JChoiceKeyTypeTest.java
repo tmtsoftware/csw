@@ -2,7 +2,7 @@ package csw.param.parameters;
 
 import csw.param.models.Choice;
 import csw.param.models.Choices;
-import csw.units.UnitsOfMeasure;
+import csw.units.Units;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class JChoiceKeyTypeTest {
 
         // set with varargs
         Parameter<Choice> choiceParameter = choiceKey.set(choice1, choice2);
-        Assert.assertEquals(UnitsOfMeasure.NoUnits$.MODULE$, choiceParameter.units());
+        Assert.assertEquals(Units.NoUnits$.MODULE$, choiceParameter.units());
         Assert.assertEquals(choice1, choiceParameter.jGet(0).get());
         Assert.assertEquals(choice2, choiceParameter.jGet(1).get());
         Assert.assertEquals(choice1, choiceParameter.head());
@@ -57,7 +57,7 @@ public class JChoiceKeyTypeTest {
         Choice[] choicesArr = {choice1, choice2};
 
         // set with Array and Units
-        UnitsOfMeasure.kilometers$ kilometers = UnitsOfMeasure.kilometers$.MODULE$;
+        Units.kilometers$ kilometers = Units.kilometers$.MODULE$;
         Parameter<Choice> choiceParameter = choiceKey.set(choicesArr, kilometers);
         Assert.assertEquals(kilometers, choiceParameter.units());
         Assert.assertEquals(choice1, choiceParameter.jGet(0).get());

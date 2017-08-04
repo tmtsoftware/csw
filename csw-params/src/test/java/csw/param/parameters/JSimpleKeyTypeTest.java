@@ -2,7 +2,7 @@ package csw.param.parameters;
 
 import csw.param.models.RaDec;
 import csw.param.models.Struct;
-import csw.units.UnitsOfMeasure;
+import csw.units.Units;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,7 +26,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
-        UnitsOfMeasure.encoder$ EncoderUnit = UnitsOfMeasure.encoder$.MODULE$;
+        Units.encoder$ EncoderUnit = Units.encoder$.MODULE$;
         // key.set with Units
         Parameter<Boolean> parameterWithUnits = key.set(paramData, EncoderUnit);
         Assert.assertEquals(EncoderUnit, parameterWithUnits.units());
@@ -56,7 +56,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
-        UnitsOfMeasure.encoder$ EncoderUnit = UnitsOfMeasure.encoder$.MODULE$;
+        Units.encoder$ EncoderUnit = Units.encoder$.MODULE$;
         // key.set with Units
         Parameter<Character> parameterWithUnits = key.set(paramData, EncoderUnit);
         Assert.assertEquals(EncoderUnit, parameterWithUnits.units());
@@ -86,7 +86,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
-        UnitsOfMeasure.encoder$ EncoderUnit = UnitsOfMeasure.encoder$.MODULE$;
+        Units.encoder$ EncoderUnit = Units.encoder$.MODULE$;
         // key.set with Units
         Parameter<Short> parameterWithUnits = key.set(paramData, EncoderUnit);
         Assert.assertEquals(EncoderUnit, parameterWithUnits.units());
@@ -116,7 +116,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
-        UnitsOfMeasure.encoder$ EncoderUnit = UnitsOfMeasure.encoder$.MODULE$;
+        Units.encoder$ EncoderUnit = Units.encoder$.MODULE$;
         // key.set with Units
         Parameter<Long> parameterWithUnits = key.set(paramData, EncoderUnit);
         Assert.assertEquals(EncoderUnit, parameterWithUnits.units());
@@ -146,7 +146,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
-        UnitsOfMeasure.encoder$ EncoderUnit = UnitsOfMeasure.encoder$.MODULE$;
+        Units.encoder$ EncoderUnit = Units.encoder$.MODULE$;
         // key.set with Units
         Parameter<Integer> parameterWithUnits = key.set(paramData, EncoderUnit);
         Assert.assertEquals(EncoderUnit, parameterWithUnits.units());
@@ -176,7 +176,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
-        UnitsOfMeasure.encoder$ EncoderUnit = UnitsOfMeasure.encoder$.MODULE$;
+        Units.encoder$ EncoderUnit = Units.encoder$.MODULE$;
         // key.set with Units
         Parameter<Float> parameterWithUnits = key.set(paramData, EncoderUnit);
         Assert.assertEquals(EncoderUnit, parameterWithUnits.units());
@@ -206,7 +206,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
-        UnitsOfMeasure.encoder$ EncoderUnit = UnitsOfMeasure.encoder$.MODULE$;
+        Units.encoder$ EncoderUnit = Units.encoder$.MODULE$;
         // key.set with Units
         Parameter<Double> parameterWithUnits = key.set(paramData, EncoderUnit);
         Assert.assertEquals(EncoderUnit, parameterWithUnits.units());
@@ -236,7 +236,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
-        UnitsOfMeasure.encoder$ EncoderUnit = UnitsOfMeasure.encoder$.MODULE$;
+        Units.encoder$ EncoderUnit = Units.encoder$.MODULE$;
         // key.set with Units
         Parameter<RaDec> parameterWithUnits = key.set(paramData, EncoderUnit);
         Assert.assertEquals(EncoderUnit, parameterWithUnits.units());
@@ -266,7 +266,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
-        UnitsOfMeasure.encoder$ EncoderUnit = UnitsOfMeasure.encoder$.MODULE$;
+        Units.encoder$ EncoderUnit = Units.encoder$.MODULE$;
         // key.set with Units
         Parameter<String> parameterWithUnits = key.set(paramData, EncoderUnit);
         Assert.assertEquals(EncoderUnit, parameterWithUnits.units());
@@ -304,7 +304,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
-        UnitsOfMeasure.encoder$ EncoderUnit = UnitsOfMeasure.encoder$.MODULE$;
+        Units.encoder$ EncoderUnit = Units.encoder$.MODULE$;
         // key.set with Units
         Parameter<Struct> parameterWithUnits = key.set(paramData, EncoderUnit);
         Assert.assertEquals(EncoderUnit, parameterWithUnits.units());

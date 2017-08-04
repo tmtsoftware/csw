@@ -1,10 +1,9 @@
 package csw.param.parameters
 
-import csw.units.UnitsOfMeasure.Units
 import csw.param.models.{Choice, Choices}
+import csw.units.Units
 
-private[parameters] class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices)
-    extends Key[Choice](name, keyType) {
+class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) extends Key[Choice](name, keyType) {
   private def validate(xs: Seq[Choice]) =
     assert(xs.forall(choices.contains), s"Bad choice for key: $keyName which must be one of: $choices")
 

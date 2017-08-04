@@ -15,7 +15,7 @@ import csw.param.parameters.KeyType.{
   ShortMatrixKey
 }
 import csw.param.parameters._
-import csw.units.UnitsOfMeasure
+import csw.units.Units.{degrees, meters, NoUnits}
 import org.scalatest.FunSpec
 import spray.json._
 
@@ -45,7 +45,7 @@ class JSONTests extends FunSpec {
 
     it("char item encode/decode") {
       val k1 = KeyType.CharKey.make(s3)
-      val i1 = k1.set('d').withUnits(UnitsOfMeasure.NoUnits)
+      val i1 = k1.set('d').withUnits(NoUnits)
 
       val j1  = i1.toJson
       val in1 = j1.convertTo[Parameter[Char]]
@@ -55,7 +55,7 @@ class JSONTests extends FunSpec {
     it("short item encode/decode") {
       val k1       = KeyType.ShortKey.make(s3)
       val s: Short = -1
-      val i1       = k1.set(s).withUnits(UnitsOfMeasure.NoUnits)
+      val i1       = k1.set(s).withUnits(NoUnits)
 
       val j1  = i1.toJson
       val in1 = j1.convertTo[Parameter[Short]]
@@ -64,7 +64,7 @@ class JSONTests extends FunSpec {
 
     it("int item encode/decode") {
       val k1 = KeyType.IntKey.make(s3)
-      val i1 = k1.set(23).withUnits(UnitsOfMeasure.NoUnits)
+      val i1 = k1.set(23).withUnits(NoUnits)
 
       val j1  = i1.toJson
       val in1 = j1.convertTo[Parameter[Int]]
@@ -73,7 +73,7 @@ class JSONTests extends FunSpec {
 
     it("long item encode/decode") {
       val k1 = KeyType.LongKey.make(s1)
-      val i1 = k1.set(123456L).withUnits(UnitsOfMeasure.NoUnits)
+      val i1 = k1.set(123456L).withUnits(NoUnits)
 
       val j1  = i1.toJson
       val in1 = j1.convertTo[Parameter[Long]]
@@ -82,7 +82,7 @@ class JSONTests extends FunSpec {
 
     it("float item encode/decode") {
       val k1 = KeyType.FloatKey.make(s1)
-      val i1 = k1.set(123.456f).withUnits(UnitsOfMeasure.NoUnits)
+      val i1 = k1.set(123.456f).withUnits(NoUnits)
 
       val j1  = i1.toJson
       val in1 = j1.convertTo[Parameter[Float]]
@@ -91,7 +91,7 @@ class JSONTests extends FunSpec {
 
     it("double item encode/decode") {
       val k1 = KeyType.DoubleKey.make(s1)
-      val i1 = k1.set(123.456).withUnits(UnitsOfMeasure.NoUnits)
+      val i1 = k1.set(123.456).withUnits(NoUnits)
 
       val j1  = i1.toJson
       val in1 = j1.convertTo[Parameter[Double]]
@@ -100,7 +100,7 @@ class JSONTests extends FunSpec {
 
     it("boolean item encode/decode") {
       val k1 = KeyType.BooleanKey.make(s1)
-      val i1 = k1.set(true, false).withUnits(UnitsOfMeasure.NoUnits)
+      val i1 = k1.set(true, false).withUnits(NoUnits)
 
       val j1 = i1.toJson
       //      info("j1: " + j1)
@@ -116,7 +116,7 @@ class JSONTests extends FunSpec {
 
     it("string item encode/decode") {
       val k1 = KeyType.StringKey.make(s2)
-      val i1 = k1.set("Blue", "Green").withUnits(UnitsOfMeasure.NoUnits)
+      val i1 = k1.set("Blue", "Green").withUnits(NoUnits)
 
       val j1  = i1.toJson
       val in1 = j1.convertTo[Parameter[String]]
@@ -130,7 +130,7 @@ class JSONTests extends FunSpec {
     val k2 = KeyType.StringKey.make(s2)
 
     val i1 = k1.set(22, 33, 44)
-    val i2 = k2.set("a", "b", "c").withUnits(UnitsOfMeasure.degrees)
+    val i2 = k2.set("a", "b", "c").withUnits(degrees)
 
     it("should encode and decode items list") {
       // Use this to get a list to test
@@ -153,13 +153,13 @@ class JSONTests extends FunSpec {
     val k6 = KeyType.BooleanKey.make("f")
     val k7 = KeyType.StringKey.make("g")
 
-    val i1 = k1.set('d').withUnits(UnitsOfMeasure.NoUnits)
-    val i2 = k2.set(22).withUnits(UnitsOfMeasure.NoUnits)
-    val i3 = k3.set(1234L).withUnits(UnitsOfMeasure.NoUnits)
-    val i4 = k4.set(123.45f).withUnits(UnitsOfMeasure.degrees)
-    val i5 = k5.set(123.456).withUnits(UnitsOfMeasure.meters)
+    val i1 = k1.set('d').withUnits(NoUnits)
+    val i2 = k2.set(22).withUnits(NoUnits)
+    val i3 = k3.set(1234L).withUnits(NoUnits)
+    val i4 = k4.set(123.45f).withUnits(degrees)
+    val i5 = k5.set(123.456).withUnits(meters)
     val i6 = k6.set(false)
-    val i7 = k7.set("GG495").withUnits(UnitsOfMeasure.degrees)
+    val i7 = k7.set("GG495").withUnits(degrees)
 
     it("Should encode/decode a Setup") {
       val c1 = Setup(commandInfo, ck).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)

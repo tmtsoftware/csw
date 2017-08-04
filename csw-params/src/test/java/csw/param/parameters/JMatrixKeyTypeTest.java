@@ -2,7 +2,7 @@ package csw.param.parameters;
 
 import csw.param.models.JMatrixData;
 import csw.param.models.MatrixData;
-import csw.units.UnitsOfMeasure;
+import csw.units.Units;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,9 +18,9 @@ public class JMatrixKeyTypeTest {
     private String keyName;
     private MatrixKeyType matrixKey;
     private Object[][] data;
-    private Optional<UnitsOfMeasure.Units> units;
+    private Optional<Units> units;
 
-    public JMatrixKeyTypeTest(String keyName, MatrixKeyType keyType, Object[][] data, Optional<UnitsOfMeasure.Units> units) {
+    public JMatrixKeyTypeTest(String keyName, MatrixKeyType keyType, Object[][] data, Optional<Units> units) {
         this.keyName = keyName;
         this.matrixKey = keyType;
         this.data = data;
@@ -38,17 +38,17 @@ public class JMatrixKeyTypeTest {
 
         return Arrays.asList(new Object[][]{
                         {"byteKey1", JKeyTypes.ByteMatrixKey(), byteData, Optional.empty()},
-                        {"byteKey2", JKeyTypes.ByteMatrixKey(), byteData, Optional.of(UnitsOfMeasure.encoder$.MODULE$)},
+                        {"byteKey2", JKeyTypes.ByteMatrixKey(), byteData, Optional.of(Units.encoder$.MODULE$)},
                         {"shortKey1", JKeyTypes.ShortMatrixKey(), shortData, Optional.empty()},
-                        {"shortKey2", JKeyTypes.ShortMatrixKey(), shortData, Optional.of(UnitsOfMeasure.degrees$.MODULE$)},
+                        {"shortKey2", JKeyTypes.ShortMatrixKey(), shortData, Optional.of(Units.degrees$.MODULE$)},
                         {"longKey1", JKeyTypes.LongMatrixKey(), longData, Optional.empty()},
-                        {"longKey2", JKeyTypes.LongMatrixKey(), longData, Optional.of(UnitsOfMeasure.kilometers$.MODULE$)},
+                        {"longKey2", JKeyTypes.LongMatrixKey(), longData, Optional.of(Units.kilometers$.MODULE$)},
                         {"intKey1", JKeyTypes.IntMatrixKey(), intData, Optional.empty()},
-                        {"intKey2", JKeyTypes.IntMatrixKey(), intData, Optional.of(UnitsOfMeasure.meters$.MODULE$)},
+                        {"intKey2", JKeyTypes.IntMatrixKey(), intData, Optional.of(Units.meters$.MODULE$)},
                         {"floatKey1", JKeyTypes.FloatMatrixKey(), floatData, Optional.empty()},
-                        {"floatKey2", JKeyTypes.FloatMatrixKey(), floatData, Optional.of(UnitsOfMeasure.millimeters$.MODULE$)},
+                        {"floatKey2", JKeyTypes.FloatMatrixKey(), floatData, Optional.of(Units.millimeters$.MODULE$)},
                         {"doubleKey1", JKeyTypes.DoubleMatrixKey(), doubleData, Optional.empty()},
-                        {"doubleKey2", JKeyTypes.DoubleMatrixKey(), doubleData, Optional.of(UnitsOfMeasure.milliseconds$.MODULE$)}
+                        {"doubleKey2", JKeyTypes.DoubleMatrixKey(), doubleData, Optional.of(Units.milliseconds$.MODULE$)}
                 }
         );
     }
@@ -63,7 +63,7 @@ public class JMatrixKeyTypeTest {
         else parameter = matrixKey.make(keyName).set((Object[])paramValues);
 
         Assert.assertEquals(keyName, parameter.keyName());
-        Assert.assertEquals(units.orElse(UnitsOfMeasure.NoUnits$.MODULE$), parameter.units());
+        Assert.assertEquals(units.orElse(Units.NoUnits$.MODULE$), parameter.units());
         Assert.assertEquals(paramValues.length, parameter.size());
         Assert.assertEquals(matrixData, parameter.head());
         Assert.assertEquals(matrixData, parameter.get(0).get());

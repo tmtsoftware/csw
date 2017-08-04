@@ -1,7 +1,7 @@
 package csw.param.parameters
 
-import csw.units.UnitsOfMeasure
-import csw.units.UnitsOfMeasure.{NoUnits, Units}
+import csw.units.Units
+import csw.units.Units.NoUnits
 import spray.json.JsonFormat
 
 import scala.annotation.varargs
@@ -50,7 +50,7 @@ case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, ke
    * @param v a pair containing a single value for the key and the units of the value
    * @return a parameter containing the key name, values and units
    */
-  def ->(v: (S, UnitsOfMeasure.Units)): Parameter[S] = set(Array(v._1), v._2)
+  def ->(v: (S, Units)): Parameter[S] = set(Array(v._1), v._2)
 
   /**
    * Sets the values for the key as a Scala Vector
