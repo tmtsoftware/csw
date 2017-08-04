@@ -1,8 +1,11 @@
 package csw.param.models
 
+import java.util
+
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
 import scala.annotation.varargs
+import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.language.implicitConversions
 
 /**
@@ -24,9 +27,11 @@ object Choice extends DefaultJsonProtocol {
  * Represents a set of choices
  */
 case class Choices(values: Set[Choice]) {
-  def contains(one: Choice) = values.contains(one)
+  def contains(one: Choice): Boolean = values.contains(one)
 
-  override def toString = values.mkString("(", ",", ")")
+  override def toString: String = values.mkString("(", ",", ")")
+
+  def jValues(): util.List[Choice] = values.toList.asJava
 }
 
 /**

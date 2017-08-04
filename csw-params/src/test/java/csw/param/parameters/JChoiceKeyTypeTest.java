@@ -9,12 +9,20 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class JChoiceKeyTypeTest {
     private String keyName = " choiceKey";
     private Choices choices = Choices.from("A", "B", "C");
     
     private GChoiceKey choiceKey = JKeyTypes.ChoiceKey().make(keyName, choices);
+
+    @Test
+    public void choicesAPIShouldBeAccessible() {
+        Assert.assertTrue(choices.contains(new Choice("B")));
+        List<Choice> expectedChoiceList = Arrays.asList(new Choice("A"), new Choice("B"), new Choice("C"));
+        Assert.assertEquals(expectedChoiceList, choices.jValues());
+    }
 
     @Test
     public void choiceKeyShouldHaveNameTypeAndChoices() {
