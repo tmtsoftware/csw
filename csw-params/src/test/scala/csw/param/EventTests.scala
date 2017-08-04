@@ -1,7 +1,8 @@
 package csw.param
 
-import csw.param.Events.{EventInfo, EventTime, SystemEvent}
-import csw.param.models.Prefix
+import csw.param.events.{EventInfo, EventTime}
+import csw.param.events.Events.SystemEvent
+import csw.param.models.{ObsId, Prefix}
 import csw.param.parameters.KeyType
 import org.scalatest.{FunSpec, Matchers}
 

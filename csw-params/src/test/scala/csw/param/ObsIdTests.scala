@@ -1,5 +1,6 @@
 package csw.param
 
+import csw.param.models.ObsId2
 import org.scalatest.FunSpec
 
 class ObsIdTests extends FunSpec {
@@ -30,7 +31,7 @@ class ObsIdTests extends FunSpec {
 
   describe("Basdic ObsID Test") {
 
-    val ob1: ObsID2 = obsID1
+    val ob1: ObsId2 = obsID1
 
     println("OB1: " + ob1)
   }

@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.Events.StatusEvent
+import csw.param.events.Events.StatusEvent
 import csw.units.UnitsOfMeasure.{degrees, meters, _}
 import csw.param.commands.{CommandInfo, Observe, Setup}
 import csw.param.models.{ArrayData, MatrixData}

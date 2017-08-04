@@ -1,8 +1,8 @@
 package csw.param
 
-import csw.param.ParameterSetDsl._
+import csw.param.parameters.ParameterSetDsl._
 import csw.param.commands.CommandInfo
-import csw.param.models.MatrixData
+import csw.param.models.{MatrixData, ObsId}
 import csw.param.parameters.KeyType
 import csw.param.parameters.KeyType.DoubleMatrixKey
 import csw.units.UnitsOfMeasure

@@ -1,8 +1,9 @@
 package csw.param
 
-import csw.param.Events.{EventServiceEvent, SystemEvent}
+import csw.param.events.Events.{EventServiceEvent, SystemEvent}
 import csw.param.StateVariable._
 import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
+import csw.param.models.ObsId
 import csw.param.parameters.KeyType
 import org.scalatest.FunSuite
 
@@ -52,7 +53,7 @@ class SerializationTests extends FunSuite {
   val wc1 = Wait(commandInfo, "wfos.blue.camera")
 
   test("ConfigType Java serialization") {
-    import ParamSetSerializer._
+    import csw.param.parameters.ParamSetSerializer._
 
     // Test setup config Java serialization
     val bytes = write(sc1)
@@ -76,7 +77,7 @@ class SerializationTests extends FunSuite {
   }
 
   test("Base trait event Java serialization") {
-    import ParamSetSerializer._
+    import csw.param.parameters.ParamSetSerializer._
     val event = SystemEvent(fqn1prefix)
       .add(ra.set("12:32:11"))
       .add(dec.set("30:22:22"))
@@ -88,7 +89,7 @@ class SerializationTests extends FunSuite {
   }
 
   test("CurrentStates Java serialization") {
-    import ParamSetSerializer._
+    import csw.param.parameters.ParamSetSerializer._
 
     val sca1   = CurrentStates(List(cs1))
     val bytes1 = write(sca1)

@@ -1,7 +1,8 @@
 package csw.param.commands
 
-import csw.param.{ObsId, RunId}
+import csw.param.models.{ObsId, RunId}
 import spray.json.JsonFormat
+import scala.language.implicitConversions
 
 /**
  * This will include information related to the observation that is tied to a parameter set

@@ -22,7 +22,7 @@ case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, ke
 
   /**
    * Sets the values for the key
-   * This definition enables writing code like this (see [[csw.param.ParameterSetDsl]]):
+   * This definition enables writing code like this (see [[csw.param.parameters.ParameterSetDsl]]):
    * {{{
    *   val setup = sc(
    *    prefix,
@@ -38,7 +38,7 @@ case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, ke
 
   /**
    * Sets the value and units for the key
-   * This definition enables writing code like this (see [[csw.param.ParameterSetDsl]]):
+   * This definition enables writing code like this (see [[csw.param.parameters.ParameterSetDsl]]):
    * {{{
    *   val setup = sc(
    *    prefix,
@@ -54,7 +54,7 @@ case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, ke
 
   /**
    * Sets the values for the key as a Scala Vector
-   * This definition enables writing code like this (see [[csw.param.ParameterSetDsl]]):
+   * This definition enables writing code like this (see [[csw.param.parameters.ParameterSetDsl]]):
    * {{{
    *   val setup = sc(prefix,
    *     key1 -> Vector(...),

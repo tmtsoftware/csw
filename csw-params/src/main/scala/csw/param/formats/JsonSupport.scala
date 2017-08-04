@@ -1,8 +1,9 @@
 package csw.param.formats
 
-import csw.param.Events._
+import csw.param.events.Events._
 import csw.param.StateVariable._
 import csw.param.commands._
+import csw.param.events.EventInfo
 import csw.param.models.Prefix
 import csw.param.parameters.Parameter
 import spray.json._

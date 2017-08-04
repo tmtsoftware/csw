@@ -2,6 +2,7 @@ package csw.param.models
 
 import csw.param.Subsystem
 import spray.json.RootJsonFormat
+import scala.language.implicitConversions
 
 /**
  * Combines subsystem and the subsystem's prefix

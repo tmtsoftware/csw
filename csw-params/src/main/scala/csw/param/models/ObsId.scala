@@ -1,4 +1,4 @@
-package csw.param
+package csw.param.models
 
 import spray.json.{JsString, JsValue, JsonFormat}
 
@@ -25,7 +25,7 @@ object ObsId {
 
 case class ObsId(obsId: String)
 
-case class ObsID2(year: String, sem: String, kind: String, prog: String, obs: String, file: Option[String]) {
+case class ObsId2(year: String, sem: String, kind: String, prog: String, obs: String, file: Option[String]) {
   // private final val PROG_KIND_INDEX = 6
 
   //def isQueue = obsId.charAt(PROG_KIND_INDEX) == PreProgrammedQueueKindLetter
@@ -39,19 +39,19 @@ case class ObsID2(year: String, sem: String, kind: String, prog: String, obs: St
  */
 }
 
-object ObsID2 {
-  val BAD_OBSID = ObsID2("bad", "obs", "id", "bad", "obs", Some("id"))
+object ObsId2 {
+  val BAD_OBSID = ObsId2("bad", "obs", "id", "bad", "obs", Some("id"))
 
   //YYYY(A|B|E)-(Q|C)-PXXX-OXXX-XXXX
   val reg = """(\d{4})(A|B|E)-(C|Q)-P(\d{1,3})-O(\d{1,3})(?:-)?(\d+)?""".r
 
-  implicit def create(obsId: String): ObsID2 = obsId match {
+  implicit def create(obsId: String): ObsId2 = obsId match {
     case reg(year, sem, kind, prog, obs, null) =>
       //      println(s"Its: $year $sem with $kind and prog $prog, obs $obs")
-      ObsID2(year, sem, kind, prog, obs, None)
+      ObsId2(year, sem, kind, prog, obs, None)
     case reg(year, sem, kind, prog, obs, file) =>
       //      println(s"Its: $year $sem with $kind and prog $prog, obs $obs, file $file")
-      ObsID2(year, sem, kind, prog, obs, Some(file))
+      ObsId2(year, sem, kind, prog, obs, Some(file))
     case _ =>
       println("Fail")
       BAD_OBSID
