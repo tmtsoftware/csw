@@ -4,6 +4,7 @@ import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.models.PubSub.SubscriberMsg
 import csw.param.Parameters.ControlCommand
+import csw.param.StateVariable.CurrentState
 
 /////////////
 
@@ -97,8 +98,9 @@ sealed trait ShutdownMsg extends SupervisorMsg
 
 sealed trait CommonSupervisorMsg extends SupervisorIdleMsg with RunningMsg with ShutdownMsg
 object CommonSupervisorMsg {
-  case class Wrapper(subscriberMsg: SubscriberMsg[LifecycleStateChanged]) extends CommonSupervisorMsg
-  case object HaltComponent                                               extends CommonSupervisorMsg
+  case class LifecycleStateSubscription(subscriberMsg: SubscriberMsg[LifecycleStateChanged]) extends CommonSupervisorMsg
+  case class ComponentStateSubscription(subscriberMsg: SubscriberMsg[CurrentState])          extends CommonSupervisorMsg
+  case object HaltComponent                                                                  extends CommonSupervisorMsg
 
 }
 

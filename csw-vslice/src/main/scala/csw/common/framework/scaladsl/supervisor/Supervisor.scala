@@ -4,7 +4,11 @@ import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.common.framework.models.CommonSupervisorMsg.{HaltComponent, Wrapper}
+import csw.common.framework.models.CommonSupervisorMsg.{
+  ComponentStateSubscription,
+  HaltComponent,
+  LifecycleStateSubscription
+}
 import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.LifecycleState._
@@ -17,23 +21,21 @@ import csw.common.framework.models._
 import csw.common.framework.scaladsl.supervisor.SupervisorMode.{Idle, PreparingToShutdown}
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, PubSubActor}
 import csw.param.StateVariable.CurrentState
-import csw.services.location.internal.DeathwatchActor.Msg
 import csw.services.location.models.ComponentId
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
-import scala.reflect.ClassTag
 
 object Supervisor {
-  def behavior[Msg <: DomainMsg: ClassTag](
+  def behavior[Msg <: DomainMsg](
       componentInfo: ComponentInfo,
       componentBehaviorFactory: ComponentBehaviorFactory[Msg]
   ): Behavior[SupervisorMsg] =
     Actor.mutable(ctx => new Supervisor(ctx, componentInfo, componentBehaviorFactory))
 }
-class Supervisor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[SupervisorMsg],
-                                             componentInfo: ComponentInfo,
-                                             componentBehaviorFactory: ComponentBehaviorFactory[Msg])
+class Supervisor[Msg <: DomainMsg](ctx: ActorContext[SupervisorMsg],
+                                   componentInfo: ComponentInfo,
+                                   componentBehaviorFactory: ComponentBehaviorFactory[Msg])
     extends MutableBehavior[SupervisorMsg] {
 
   implicit val ec: ExecutionContextExecutor      = ctx.executionContext
@@ -76,9 +78,11 @@ class Supervisor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[SupervisorMsg],
   }
 
   def onCommonMessages(msg: CommonSupervisorMsg): Unit = msg match {
-    case Wrapper(Subscribe(ref))   => pubSubLifecycle ! Subscribe(ref)
-    case Wrapper(Unsubscribe(ref)) => pubSubLifecycle ! Unsubscribe(ref)
-    case HaltComponent             => onHalt()
+    case LifecycleStateSubscription(Subscribe(ref))   => pubSubLifecycle ! Subscribe(ref)
+    case LifecycleStateSubscription(Unsubscribe(ref)) => pubSubLifecycle ! Unsubscribe(ref)
+    case ComponentStateSubscription(Subscribe(ref))   => pubSubComponent ! Subscribe(ref)
+    case ComponentStateSubscription(Unsubscribe(ref)) => pubSubComponent ! Unsubscribe(ref)
+    case HaltComponent                                => onHalt()
   }
 
   def onRunning(msg: RunningMsg): Unit = msg match {
