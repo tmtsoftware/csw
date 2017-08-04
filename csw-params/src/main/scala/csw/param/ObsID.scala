@@ -1,5 +1,7 @@
 package csw.param
 
+import spray.json.{JsString, JsValue, JsonFormat}
+
 import scala.language.implicitConversions
 
 /**
@@ -11,6 +13,15 @@ import scala.language.implicitConversions
 sealed trait ProgramKind
 case object Classical          extends ProgramKind
 case object PreProgrammedQueue extends ProgramKind
+
+object ObsId {
+  import JsonSupport._
+
+  implicit val format: JsonFormat[ObsId] = new JsonFormat[ObsId] {
+    override def write(obj: ObsId): JsValue = JsString(obj.obsId)
+    override def read(json: JsValue): ObsId = ObsId(json.convertTo[String])
+  }
+}
 
 case class ObsId(obsId: String)
 

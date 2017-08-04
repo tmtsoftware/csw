@@ -18,34 +18,10 @@ object JsonSupport extends JsonSupport
 trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupport with WrappedArrayProtocol {
 
   // JSON formats
-  implicit val choiceFormat   = jsonFormat1(Choice.apply)
-  implicit val choicesFormat  = jsonFormat1(Choices.apply)
-  implicit val paramSetFormat = implicitly[JsonFormat[ParameterSet]]
-
-  implicit def subsystemFormat: JsonFormat[Subsystem] = new JsonFormat[Subsystem] {
-    def write(obj: Subsystem) = JsString(obj.name)
-
-    def read(value: JsValue): Subsystem = {
-      value match {
-        case JsString(subsystemStr) =>
-          Subsystem.lookup(subsystemStr) match {
-            case Some(subsystem) => subsystem
-            case None            => Subsystem.BAD
-          }
-        // With malformed JSON, return BAD
-        case _ => Subsystem.BAD
-      }
-    }
-  }
-
-//  implicit def paramSetFormat: JsonFormat[ParameterSet] = new JsonFormat[ParameterSet] {
-//    def write(parameters: ParameterSet) = JsArray(parameters.map(writeParameter(_)).toList: _*)
-//
-//    def read(json: JsValue) = json match {
-//      case a: JsArray => a.elements.map((el: JsValue) => readParameterAndType(el)).toSet
-//      case _          => unexpectedJsValueError(json)
-//    }
-//  }
+  implicit val choiceFormat      = jsonFormat1(Choice.apply)
+  implicit val choicesFormat     = jsonFormat1(Choices.apply)
+  implicit val paramSetFormat    = implicitly[JsonFormat[ParameterSet]]
+  implicit val commandInfoFormat = implicitly[JsonFormat[CommandInfo]]
 
   implicit def eventTimeFormat: JsonFormat[EventTime] = new JsonFormat[EventTime] {
     def write(et: EventTime): JsValue = JsString(et.toString)
@@ -57,7 +33,6 @@ trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupp
   }
 
   implicit val parameterSetKeyFormat = jsonFormat2(Prefix.apply)
-  implicit val obsIdFormat           = jsonFormat1(ObsId.apply)
   implicit val eventInfoFormat       = jsonFormat4(EventInfo.apply)
 
   // config and event type JSON tags
@@ -73,21 +48,6 @@ trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupp
   private def unexpectedJsValueError(x: JsValue) = deserializationError(s"Unexpected JsValue: $x")
 
   /**
-   * Handles conversion of ParameterSetInfo to/from JSON
-   */
-  implicit def CommandInfoFormat: RootJsonFormat[CommandInfo] = new RootJsonFormat[CommandInfo] {
-    override def read(json: JsValue): CommandInfo = json.asJsObject.getFields("obsId", "runId") match {
-      case Seq(JsString(obsId), JsString(runId)) =>
-        CommandInfo(ObsId(obsId), RunId(runId))
-    }
-
-    override def write(obj: CommandInfo): JsValue = JsObject(
-      "obsId" -> JsString(obj.obsId.obsId),
-      "runId" -> JsString(obj.runId.id)
-    )
-  }
-
-  /**
    * Writes a SequenceParameterSet to JSON
    *
    * @param sequenceCommand any instance of SequenceCommand
@@ -97,7 +57,7 @@ trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupp
   def writeSequenceCommand[A <: SequenceCommand](sequenceCommand: A): JsValue = {
     JsObject(
       "type"     -> JsString(sequenceCommand.typeName),
-      "info"     -> CommandInfoFormat.write(sequenceCommand.info),
+      "info"     -> commandInfoFormat.write(sequenceCommand.info),
       "prefix"   -> parameterSetKeyFormat.write(sequenceCommand.prefix),
       "paramSet" -> sequenceCommand.paramSet.toJson
     )

@@ -1,6 +1,7 @@
 package csw.param
 
 import csw.param.parameters.{Key, KeyType, Parameter}
+import spray.json.JsonFormat
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -46,7 +47,7 @@ object Parameters {
 
     private def subsystem(keyText: String): Subsystem = {
       assert(keyText != null)
-      Subsystem.lookup(keyText.splitAt(keyText.indexOf(SEPARATOR))._1).getOrElse(Subsystem.BAD)
+      Subsystem.withNameOption(keyText.splitAt(keyText.indexOf(SEPARATOR))._1).getOrElse(Subsystem.BAD)
     }
   }
 
@@ -285,6 +286,8 @@ object Parameters {
   }
 
   object CommandInfo {
+    import JsonSupport._
+    implicit val format: JsonFormat[CommandInfo]               = jsonFormat2(CommandInfo.apply)
     implicit def strToParamSetInfo(obsId: String): CommandInfo = CommandInfo(ObsId(obsId))
   }
 
