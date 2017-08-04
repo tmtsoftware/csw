@@ -2,6 +2,8 @@ package csw.common.framework.scaladsl
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
+import csw.common.ccs.CommandStatus
+import csw.common.framework.models.CommandMsg.{Oneway, Submit}
 import csw.common.framework.models.IdleMsg.{Initialize, Start}
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.ShutdownComplete
@@ -15,10 +17,10 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
-abstract class ComponentBehavior[Msg <: DomainMsg: ClassTag, RunCompMsg <: CompSpecificMsg: ClassTag](
+class ComponentBehavior[Msg <: DomainMsg: ClassTag](
     ctx: ActorContext[ComponentMsg],
     supervisor: ActorRef[FromComponentLifecycleMessage],
-    lifecycleHandlers: LifecycleHandlers[Msg]
+    lifecycleHandlers: ComponentHandlers[Msg]
 ) extends Actor.MutableBehavior[ComponentMsg] {
 
   implicit val ec: ExecutionContext = ctx.executionContext
@@ -26,8 +28,6 @@ abstract class ComponentBehavior[Msg <: DomainMsg: ClassTag, RunCompMsg <: CompS
   var mode: ComponentMode = ComponentMode.Idle
 
   ctx.self ! Initialize
-
-  def onRunningCompCommandMsg(x: RunCompMsg): Unit
 
   def onMessage(msg: ComponentMsg): Behavior[ComponentMsg] = {
     (mode, msg) match {
@@ -71,7 +71,7 @@ abstract class ComponentBehavior[Msg <: DomainMsg: ClassTag, RunCompMsg <: CompS
   private def onRun(runningMsg: RunningMsg): Unit = runningMsg match {
     case Lifecycle(message) => onLifecycle(message)
     case x: Msg             => lifecycleHandlers.onDomainMsg(x)
-    case x: RunCompMsg      => onRunningCompCommandMsg(x)
+    case x: CommandMsg      => onRunningCompCommandMsg(x)
     case _                  ⇒ println("wrong msg")
   }
 
@@ -94,4 +94,15 @@ abstract class ComponentBehavior[Msg <: DomainMsg: ClassTag, RunCompMsg <: CompS
         lifecycleHandlers.isOnline = false
       }
   }
+
+  def onRunningCompCommandMsg(msg: CommandMsg): Unit = {
+    val newMsg: CommandMsg = msg match {
+      case x: Oneway ⇒ x.copy(replyTo = ctx.spawnAnonymous(Actor.ignore))
+      case x: Submit ⇒ x
+    }
+    val validation              = lifecycleHandlers.onControlCommand(newMsg)
+    val validationCommandResult = CommandStatus.validationAsCommandStatus(validation)
+    msg.replyTo ! validationCommandResult
+  }
+
 }

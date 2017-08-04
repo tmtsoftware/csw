@@ -10,6 +10,8 @@ import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
 import akka.util.Timeout;
 import csw.common.components.assembly.AssemblyDomainMsg;
+import csw.common.framework.javadsl.JComponentBehaviorFactory;
+import csw.common.framework.javadsl.JComponentHandlers;
 import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.*;
 import org.junit.AfterClass;
@@ -33,10 +35,11 @@ public class JAssemblyBehaviorTest {
     private static ActorSystem system = ActorSystem.create("Assembly", Actor.empty());
     private static TestKitSettings settings = TestKitSettings.apply(system);
 
-    private JAssemblyHandlersFactory getSampleJAssemblyFactory(JAssemblyHandlers assemblyHandlers) {
-        return new JAssemblyHandlersFactory<AssemblyDomainMsg>(AssemblyDomainMsg.class) {
+    private JComponentBehaviorFactory getSampleJAssemblyFactory(JComponentHandlers assemblyHandlers) {
+        return new JComponentBehaviorFactory<AssemblyDomainMsg>(AssemblyDomainMsg.class) {
+
             @Override
-            public JAssemblyHandlers<AssemblyDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.AssemblyInfo assemblyInfo) {
+            public JComponentHandlers<AssemblyDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.ComponentInfo componentInfo) {
                 return assemblyHandlers;
             }
         };
@@ -57,7 +60,7 @@ public class JAssemblyBehaviorTest {
     @Test
     public void testAssemblyBehavior() throws Exception {
 
-        JAssemblyHandlers<AssemblyDomainMsg> sampleAssemblyHandler = Mockito.mock(JAssemblyHandlers.class);
+        JComponentHandlers<AssemblyDomainMsg> sampleAssemblyHandler = Mockito.mock(JComponentHandlers.class);
         when(sampleAssemblyHandler.initialize()).thenCallRealMethod();
         when(sampleAssemblyHandler.jInitialize()).thenReturn(CompletableFuture.completedFuture(
                 BoxedUnit.UNIT

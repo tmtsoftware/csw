@@ -2,14 +2,14 @@ package csw.trombone.assembly.actors
 
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
-import csw.common.framework.models.HcdMsg.Submit
+import csw.common.framework.models.CommandMsg.Submit
 import csw.trombone.assembly.TromboneControlMsg.{GoToStagePosition, UpdateTromboneHcd}
 import csw.trombone.assembly.{Algorithms, AssemblyContext, TromboneControlMsg}
 import csw.trombone.hcd.TromboneHcdState
 
 object TromboneControl {
   def behavior(ac: AssemblyContext, tromboneHcd: Option[ActorRef[Submit]]): Behavior[TromboneControlMsg] =
-    Actor.immutable { (_, msg) ⇒
+    Actor.immutable { (ctx, msg) ⇒
       msg match {
         case GoToStagePosition(stagePosition) =>
           assert(stagePosition.units == ac.stagePositionUnits)
@@ -17,7 +17,9 @@ object TromboneControl {
           assert(
             encoderPosition > ac.controlConfig.minEncoderLimit && encoderPosition < ac.controlConfig.maxEncoderLimit
           )
-          tromboneHcd.foreach(_ ! Submit(TromboneHcdState.positionSC(ac.commandInfo, encoderPosition)))
+          tromboneHcd.foreach(
+            _ ! Submit(TromboneHcdState.positionSC(ac.commandInfo, encoderPosition), ctx.spawnAnonymous(Actor.ignore))
+          )
           Actor.same
         case UpdateTromboneHcd(runningIn) =>
           behavior(ac, runningIn)

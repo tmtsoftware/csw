@@ -7,7 +7,7 @@ import csw.common.ccs.CommandMsgs
 import csw.common.ccs.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
 import csw.common.ccs.CommandStatus.{Completed, Error, NoLongerValid}
 import csw.common.ccs.Validation.WrongInternalStateIssue
-import csw.common.framework.models.HcdMsg.Submit
+import csw.common.framework.models.CommandMsg.Submit
 import csw.common.framework.models.PubSub
 import csw.common.framework.models.SupervisorIdleMsg.Running
 import csw.param.Parameters.Setup
@@ -50,7 +50,7 @@ class DatumCommand(ctx: ActorContext[CommandMsgs],
                        startState.nss,
                        setStateResponseAdapter)
         )
-        tromboneHCD.componentRef ! Submit(Setup(s.info, TromboneHcdState.axisDatumCK))
+        tromboneHCD.componentRef ! Submit(Setup(s.info, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore))
         Matchers.executeMatch(ctx, Matchers.idleMatcher, pubSubRef, Some(replyTo)) {
           case Completed =>
             stateActor.foreach(
@@ -62,7 +62,7 @@ class DatumCommand(ctx: ActorContext[CommandMsgs],
       }
       this
     case StopCurrentCommand =>
-      tromboneHCD.componentRef ! Submit(TromboneHcdState.cancelSC(s.info))
+      tromboneHCD.componentRef ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
       this
 
     case SetStateResponseE(response: StateWasSet) => // ignore confirmation

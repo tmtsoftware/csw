@@ -3,7 +3,7 @@ package csw.common.framework.models
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.models.PubSub.SubscriberMsg
-import csw.param.Parameters.{ControlCommand, Setup}
+import csw.param.Parameters.ControlCommand
 
 /////////////
 
@@ -72,23 +72,13 @@ object RunningMsg {
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-sealed trait CompSpecificMsg extends RunningMsg
-
-sealed trait HcdMsg extends CompSpecificMsg
-object HcdMsg {
-  case class Submit(command: Setup) extends HcdMsg
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-sealed trait AssemblyMsg extends CompSpecificMsg {
+sealed trait CommandMsg extends RunningMsg {
   def command: ControlCommand
   def replyTo: ActorRef[CommandResponse]
 }
-
-object AssemblyMsg {
-  case class Submit(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends AssemblyMsg
-  case class Oneway(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends AssemblyMsg
+object CommandMsg {
+  case class Submit(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends CommandMsg
+  case class Oneway(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends CommandMsg
 }
 
 ///////////////

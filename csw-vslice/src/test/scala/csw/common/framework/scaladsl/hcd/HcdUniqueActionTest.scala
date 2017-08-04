@@ -6,7 +6,7 @@ import csw.common.framework.models.FromComponentLifecycleMessage
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
-import csw.common.framework.scaladsl.FrameworkComponentTestSuite
+import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
 import csw.param.StateVariable.CurrentState
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
@@ -17,7 +17,7 @@ import scala.concurrent.{Await, Future}
 class HcdUniqueActionTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   test("hcd component should be able to handle Domain specific messages") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
+    val sampleHcdHandler = mock[ComponentHandlers[HcdDomainMsg]]
 
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 

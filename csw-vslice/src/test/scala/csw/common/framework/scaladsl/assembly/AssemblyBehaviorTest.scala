@@ -6,7 +6,7 @@ import csw.common.framework.models.FromComponentLifecycleMessage
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
-import csw.common.framework.scaladsl.FrameworkComponentTestSuite
+import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
 import csw.param.StateVariable.CurrentState
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
@@ -17,7 +17,7 @@ import scala.concurrent.{Await, Future}
 class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   test("Assembly actor sends Initialized and Running message to Supervisor") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
+    val sampleAssemblyHandler = mock[ComponentHandlers[AssemblyDomainMsg]]
 
     when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
 
@@ -48,7 +48,7 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
   }
 
   test("A Assembly component should send InitializationFailure message if it fails in initialization") {
-    val sampleAssemblyHandler = mock[AssemblyHandlers[AssemblyDomainMsg]]
+    val sampleAssemblyHandler = mock[ComponentHandlers[AssemblyDomainMsg]]
     val exceptionReason       = "test Exception"
     when(sampleAssemblyHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
 

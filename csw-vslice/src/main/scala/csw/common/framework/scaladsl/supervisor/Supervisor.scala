@@ -17,21 +17,23 @@ import csw.common.framework.models._
 import csw.common.framework.scaladsl.supervisor.SupervisorMode.{Idle, PreparingToShutdown}
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, PubSubActor}
 import csw.param.StateVariable.CurrentState
+import csw.services.location.internal.DeathwatchActor.Msg
 import csw.services.location.models.ComponentId
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
+import scala.reflect.ClassTag
 
 object Supervisor {
-  def behavior[CompInfo <: ComponentInfo](
-      componentInfo: CompInfo,
-      componentBehaviorFactory: ComponentBehaviorFactory[CompInfo]
+  def behavior[Msg <: DomainMsg: ClassTag](
+      componentInfo: ComponentInfo,
+      componentBehaviorFactory: ComponentBehaviorFactory[Msg]
   ): Behavior[SupervisorMsg] =
     Actor.mutable(ctx => new Supervisor(ctx, componentInfo, componentBehaviorFactory))
 }
-class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
-                                            componentInfo: CompInfo,
-                                            componentBehaviorFactory: ComponentBehaviorFactory[CompInfo])
+class Supervisor[Msg <: DomainMsg: ClassTag](ctx: ActorContext[SupervisorMsg],
+                                             componentInfo: ComponentInfo,
+                                             componentBehaviorFactory: ComponentBehaviorFactory[Msg])
     extends MutableBehavior[SupervisorMsg] {
 
   implicit val ec: ExecutionContextExecutor      = ctx.executionContext
@@ -82,7 +84,7 @@ class Supervisor[CompInfo <: ComponentInfo](ctx: ActorContext[SupervisorMsg],
   def onRunning(msg: RunningMsg): Unit = msg match {
     case Lifecycle(message)       => onLifecycle(message)
     case msg: DomainMsg           => runningComponent ! msg
-    case msg: CompSpecificMsg     => runningComponent ! msg
+    case msg: CommandMsg          => runningComponent ! msg
     case msg: CommonSupervisorMsg ⇒ onCommonMessages(msg)
   }
 

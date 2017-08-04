@@ -1,16 +1,14 @@
 package csw.common.framework.scaladsl
 
-import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.testkit.TestKitSettings
+import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.common.components.assembly.AssemblyDomainMsg
 import csw.common.components.hcd.HcdDomainMsg
-import csw.common.framework.models.Component.{AssemblyInfo, DoNotRegister, HcdInfo}
+import csw.common.framework.models.Component.{AssemblyInfo, ComponentInfo, DoNotRegister, HcdInfo}
 import csw.common.framework.models.ComponentMsg
 import csw.common.framework.models.PubSub.PublisherMsg
-import csw.common.framework.scaladsl.assembly.{AssemblyBehaviorFactory, AssemblyHandlers}
-import csw.common.framework.scaladsl.hcd.{HcdBehaviorFactory, HcdHandlers}
 import csw.param.StateVariable.CurrentState
 import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -41,21 +39,23 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
                         Set(AkkaType),
                         FiniteDuration(5, "seconds"))
 
-  def getSampleHcdFactory(hcdHandlers: HcdHandlers[HcdDomainMsg]): HcdBehaviorFactory[HcdDomainMsg] =
-    new HcdBehaviorFactory[HcdDomainMsg] {
+  def getSampleHcdFactory(componentHandlers: ComponentHandlers[HcdDomainMsg]): ComponentBehaviorFactory[HcdDomainMsg] =
+    new ComponentBehaviorFactory[HcdDomainMsg] {
 
       override def make(ctx: ActorContext[ComponentMsg],
-                        hcdInfo: HcdInfo,
-                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): HcdHandlers[HcdDomainMsg] = hcdHandlers
+                        componentInfo: ComponentInfo,
+                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[HcdDomainMsg] =
+        componentHandlers
     }
 
   def getSampleAssemblyFactory(
-      assemblyHandlers: AssemblyHandlers[AssemblyDomainMsg]
-  ): AssemblyBehaviorFactory[AssemblyDomainMsg] =
-    new AssemblyBehaviorFactory[AssemblyDomainMsg] {
+      assemblyHandlers: ComponentHandlers[AssemblyDomainMsg]
+  ): ComponentBehaviorFactory[AssemblyDomainMsg] =
+    new ComponentBehaviorFactory[AssemblyDomainMsg] {
       override def make(ctx: ActorContext[ComponentMsg],
-                        assemblyInfo: AssemblyInfo,
-                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): AssemblyHandlers[AssemblyDomainMsg] =
+                        componentInfo: ComponentInfo,
+                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[AssemblyDomainMsg] =
         assemblyHandlers
     }
+
 }

@@ -6,7 +6,7 @@ import csw.common.framework.models.FromComponentLifecycleMessage
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
-import csw.common.framework.scaladsl.FrameworkComponentTestSuite
+import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
 import csw.param.StateVariable.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -17,7 +17,7 @@ import scala.concurrent.{Await, Future}
 class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   test("hcd component should send initialize and running message to supervisor") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
+    val sampleHcdHandler = mock[ComponentHandlers[HcdDomainMsg]]
 
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
@@ -49,7 +49,7 @@ class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
   }
 
   test("A Hcd component should send InitializationFailure message if it fails in initialization") {
-    val sampleHcdHandler = mock[HcdHandlers[HcdDomainMsg]]
+    val sampleHcdHandler = mock[ComponentHandlers[HcdDomainMsg]]
     val exceptionReason  = "test Exception"
     when(sampleHcdHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
 

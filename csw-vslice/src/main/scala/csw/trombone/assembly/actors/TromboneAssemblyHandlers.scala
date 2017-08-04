@@ -5,11 +5,11 @@ import akka.typed.scaladsl.ActorContext
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validation
 import csw.common.ccs.Validation.{Valid, Validation}
-import csw.common.framework.models.Component.AssemblyInfo
+import csw.common.framework.models.Component.{AssemblyInfo, ComponentInfo}
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.Running
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.assembly.{AssemblyBehaviorFactory, AssemblyHandlers}
+import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.Parameters.{Observe, Setup}
 import csw.param.StateVariable.CurrentState
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
@@ -21,15 +21,15 @@ import csw.trombone.assembly._
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 
-class TromboneAssemblyBehaviorFactory extends AssemblyBehaviorFactory[DiagPublisherMessages] {
+class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPublisherMessages] {
   override def make(ctx: ActorContext[ComponentMsg],
-                    assemblyInfo: AssemblyInfo,
-                    pubSubRef: ActorRef[PublisherMsg[CurrentState]]): AssemblyHandlers[DiagPublisherMessages] =
-    new TromboneAssemblyHandlers(ctx, assemblyInfo)
+                    componentInfo: ComponentInfo,
+                    pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[DiagPublisherMessages] =
+    new TromboneAssemblyHandlers(ctx, componentInfo)
 }
 
-class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg], info: AssemblyInfo)
-    extends AssemblyHandlers[DiagPublisherMessages](ctx, info) {
+class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
+    extends ComponentHandlers[DiagPublisherMessages](ctx, componentInfo) {
 
   private var diagPublsher: ActorRef[DiagPublisherMessages] = _
 
@@ -44,7 +44,7 @@ class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg], info: AssemblyIn
 
   def initialize(): Future[Unit] = async {
     val (calculationConfig, controlConfig) = await(getAssemblyConfigs)
-    ac = AssemblyContext(info, calculationConfig, controlConfig)
+    ac = AssemblyContext(componentInfo.asInstanceOf[AssemblyInfo], calculationConfig, controlConfig)
 
     val eventPublisher = ctx.spawnAnonymous(TrombonePublisher.make(ac))
 
@@ -66,9 +66,9 @@ class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg], info: AssemblyIn
     case _                                   ⇒
   }
 
-  override def onControlCommand(assemblyMsg: AssemblyMsg): Validation = assemblyMsg.command match {
-    case x: Setup   => setup(x, assemblyMsg.replyTo)
-    case x: Observe => observe(x, assemblyMsg.replyTo)
+  override def onControlCommand(commandMsg: CommandMsg): Validation = commandMsg.command match {
+    case x: Setup   => setup(x, commandMsg.replyTo)
+    case x: Observe => observe(x, commandMsg.replyTo)
   }
 
   private def setup(s: Setup, commandOriginator: ActorRef[CommandResponse]): Validation = {

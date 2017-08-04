@@ -5,10 +5,11 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
-import csw.common.framework.models.Component.HcdInfo
+import csw.common.ccs.Validation
+import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.hcd.{HcdBehaviorFactory, HcdHandlers}
+import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
 import csw.param.UnitsOfMeasure.encoder
@@ -18,18 +19,18 @@ import csw.trombone.hcd.TromboneEngineering.{GetAxisConfig, GetAxisStats, GetAxi
 import csw.trombone.hcd._
 
 import scala.async.Async._
-import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration.DurationLong
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class TromboneHcdBehaviorFactory extends HcdBehaviorFactory[TromboneMsg] {
+class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMsg] {
   override def make(ctx: ActorContext[ComponentMsg],
-                    hcdInfo: HcdInfo,
-                    pubSubRef: ActorRef[PublisherMsg[CurrentState]]): HcdHandlers[TromboneMsg] =
-    new TromboneHcdHandlers(ctx, hcdInfo)
+                    componentInfo: ComponentInfo,
+                    pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[TromboneMsg] =
+    new TromboneHcdHandlers(ctx, componentInfo)
 }
 
-class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg], hcdInfo: HcdInfo)
-    extends HcdHandlers[TromboneMsg](ctx, hcdInfo) {
+class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
+    extends ComponentHandlers[TromboneMsg](ctx, componentInfo) {
 
   implicit val timeout                      = Timeout(2.seconds)
   implicit val scheduler: Scheduler         = ctx.system.scheduler
@@ -130,4 +131,6 @@ class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg], hcdInfo: HcdInfo)
   }
 
   private def getAxisConfig: Future[AxisConfig] = ???
+
+  override def onControlCommand(commandMsg: CommandMsg): Validation.Validation = ???
 }
