@@ -1,10 +1,17 @@
 package csw.param.models
 
+import csw.param.JsonSupport
 import csw.param.Parameters.{ParameterSet, ParameterSetType}
 import csw.param.parameters.Parameter
+import spray.json.JsonFormat
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
+
+object Struct {
+  import JsonSupport._
+  implicit val format: JsonFormat[Struct] = jsonFormat1(Struct.apply)
+}
 
 case class Struct(paramSet: ParameterSet = Set.empty[Parameter[_]]) extends ParameterSetType[Struct] {
 

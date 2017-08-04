@@ -82,7 +82,9 @@ object KeyType extends Enum[KeyType[_]] {
   case object JFloatMatrixKey  extends MatrixKeyType[java.lang.Float]
   case object JDoubleMatrixKey extends MatrixKeyType[java.lang.Double]
 
-  implicit def format[T]: JsonFormat[KeyType[T]] = enumFormat[KeyType, T](this)
+  implicit def format[T]: JsonFormat[KeyType[T]] = enumFormat(this).asInstanceOf[JsonFormat[KeyType[T]]]
+
+  implicit def format2: JsonFormat[KeyType[_]] = enumFormat(this)
 }
 
 object JKeyTypes {

@@ -6,8 +6,7 @@ import csw.param.Events._
 import csw.param.Parameters._
 import csw.param.StateVariable._
 import csw.param.formats.{EnumJsonSupport, JavaFormats, WrappedArrayProtocol}
-import csw.param.models.{Choice, Choices, Struct}
-import csw.param.parameters._
+import csw.param.models.{Choice, Choices}
 import spray.json._
 
 object JsonSupport extends JsonSupport
@@ -19,30 +18,9 @@ object JsonSupport extends JsonSupport
 trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupport with WrappedArrayProtocol {
 
   // JSON formats
-  implicit val choiceFormat  = jsonFormat1(Choice.apply)
-  implicit val choicesFormat = jsonFormat1(Choices.apply)
-
-  implicit def structFormat: JsonFormat[Struct] = new JsonFormat[Struct] {
-    def write(s: Struct): JsValue = JsObject(
-      "type"     -> JsString(s.typeName),
-      "paramSet" -> s.paramSet.toJson
-    )
-
-    def read(json: JsValue): Struct = {
-      json match {
-        case JsObject(fields) =>
-          (fields("type"), fields("name"), fields("paramSet")) match {
-            case (JsString(typeName), JsString(name), paramSet) =>
-              typeName match {
-                case `structType` => Struct(paramSetFormat.read(paramSet))
-                case _            => unexpectedJsValueError(json)
-              }
-            case _ => unexpectedJsValueError(json)
-          }
-        case _ => unexpectedJsValueError(json)
-      }
-    }
-  }
+  implicit val choiceFormat   = jsonFormat1(Choice.apply)
+  implicit val choicesFormat  = jsonFormat1(Choices.apply)
+  implicit val paramSetFormat = implicitly[JsonFormat[ParameterSet]]
 
   implicit def subsystemFormat: JsonFormat[Subsystem] = new JsonFormat[Subsystem] {
     def write(obj: Subsystem) = JsString(obj.name)
@@ -60,14 +38,14 @@ trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupp
     }
   }
 
-  implicit def paramSetFormat: JsonFormat[ParameterSet] = new JsonFormat[ParameterSet] {
-    def write(parameters: ParameterSet) = JsArray(parameters.map(writeParameter(_)).toList: _*)
-
-    def read(json: JsValue) = json match {
-      case a: JsArray => a.elements.map((el: JsValue) => readParameterAndType(el)).toSet
-      case _          => unexpectedJsValueError(json)
-    }
-  }
+//  implicit def paramSetFormat: JsonFormat[ParameterSet] = new JsonFormat[ParameterSet] {
+//    def write(parameters: ParameterSet) = JsArray(parameters.map(writeParameter(_)).toList: _*)
+//
+//    def read(json: JsValue) = json match {
+//      case a: JsArray => a.elements.map((el: JsValue) => readParameterAndType(el)).toSet
+//      case _          => unexpectedJsValueError(json)
+//    }
+//  }
 
   implicit def eventTimeFormat: JsonFormat[EventTime] = new JsonFormat[EventTime] {
     def write(et: EventTime): JsValue = JsString(et.toString)
@@ -91,21 +69,8 @@ trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupp
   private val systemEventType  = classOf[SystemEvent].getSimpleName
   private val curentStateType  = classOf[CurrentState].getSimpleName
   private val demandStateType  = classOf[DemandState].getSimpleName
-  private val structType       = classOf[Struct].getSimpleName
 
   private def unexpectedJsValueError(x: JsValue) = deserializationError(s"Unexpected JsValue: $x")
-
-  def writeParameter(parameter: Parameter[_]): JsValue =
-    JsObject("type" -> JsString(parameter.keyType.entryName), "parameter" -> parameter.toJson)
-
-  def readParameterAndType(json: JsValue): Parameter[_ /*, _ */ ] = json match {
-    case JsObject(fields) =>
-      (fields("type"), fields("parameter")) match {
-        case (JsString(name), parameter) => KeyType.withName(name).paramFormat.read(parameter)
-        case _                           => unexpectedJsValueError(json)
-      }
-    case _ => unexpectedJsValueError(json)
-  }
 
   /**
    * Handles conversion of ParameterSetInfo to/from JSON

@@ -4,7 +4,7 @@ import java.util
 import java.util.Optional
 
 import csw.param.UnitsOfMeasure.Units
-import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat, RootJsonFormat}
+import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.mutable
@@ -21,8 +21,17 @@ object Parameter extends DefaultJsonProtocol {
   ): Parameter[S] =
     new Parameter(keyName, keyType, items, units)
 
-  implicit def parameterFormat[T: JsonFormat: ClassTag]: RootJsonFormat[Parameter[T]] =
-    new RootJsonFormat[Parameter[T]] {
+  implicit def parameterFormat2: JsonFormat[Parameter[_]] = new JsonFormat[Parameter[_]] {
+    override def write(obj: Parameter[_]): JsValue = obj.toJson
+
+    override def read(json: JsValue): Parameter[_] = {
+      val value = json.asJsObject.fields("keyType").convertTo[KeyType[_]]
+      value.paramFormat.read(json)
+    }
+  }
+
+  implicit def parameterFormat[T: JsonFormat: ClassTag]: JsonFormat[Parameter[T]] =
+    new JsonFormat[Parameter[T]] {
       override def write(obj: Parameter[T]): JsValue = {
         JsObject(
           "keyName" -> obj.keyName.toJson,
@@ -105,5 +114,5 @@ case class Parameter[S] private[param] (
 
   def valuesToString: String = items.mkString("(", ",", ")")
   override def toString      = s"$keyName($valuesToString$units)"
-  def toJson: JsValue        = Parameter.parameterFormat[S].write(this)
+  def toJson: JsValue        = Parameter[S].write(this)
 }
