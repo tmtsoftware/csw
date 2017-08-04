@@ -1,4 +1,4 @@
-package csw.param
+package csw.units
 
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 

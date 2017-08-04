@@ -3,8 +3,8 @@ package csw.param
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
 
 import csw.param.Events._
-import csw.param.Parameters._
 import csw.param.StateVariable._
+import csw.param.commands._
 
 /**
  * Defines methods for serializing parameter sets

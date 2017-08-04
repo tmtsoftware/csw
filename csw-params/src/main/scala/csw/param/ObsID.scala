@@ -15,7 +15,7 @@ case object Classical          extends ProgramKind
 case object PreProgrammedQueue extends ProgramKind
 
 object ObsId {
-  import JsonSupport._
+  import csw.param.formats.JsonSupport._
 
   implicit val format: JsonFormat[ObsId] = new JsonFormat[ObsId] {
     override def write(obj: ObsId): JsValue = JsString(obj.obsId)

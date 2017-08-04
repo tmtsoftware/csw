@@ -1,10 +1,11 @@
 package csw.param
 
 import csw.param.ParameterSetDsl._
-import csw.param.Parameters.CommandInfo
+import csw.param.commands.CommandInfo
 import csw.param.models.MatrixData
 import csw.param.parameters.KeyType
 import csw.param.parameters.KeyType.DoubleMatrixKey
+import csw.units.UnitsOfMeasure
 import org.scalatest.FunSpec
 
 /**

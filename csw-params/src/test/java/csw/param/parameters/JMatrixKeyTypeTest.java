@@ -1,9 +1,8 @@
 package csw.param.parameters;
 
-import csw.param.UnitsOfMeasure;
-import csw.param.UnitsOfMeasure.Units;
 import csw.param.models.JMatrixData;
 import csw.param.models.MatrixData;
+import csw.units.UnitsOfMeasure;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,9 +18,9 @@ public class JMatrixKeyTypeTest {
     private String keyName;
     private MatrixKeyType matrixKey;
     private Object[][] data;
-    private Optional<Units> units;
+    private Optional<UnitsOfMeasure.Units> units;
 
-    public JMatrixKeyTypeTest(String keyName, MatrixKeyType keyType, Object[][] data, Optional<Units> units) {
+    public JMatrixKeyTypeTest(String keyName, MatrixKeyType keyType, Object[][] data, Optional<UnitsOfMeasure.Units> units) {
         this.keyName = keyName;
         this.matrixKey = keyType;
         this.data = data;

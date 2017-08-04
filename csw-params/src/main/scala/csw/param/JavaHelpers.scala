@@ -1,7 +1,6 @@
 package csw.param
 
-import csw.param.Parameters.ParameterSetType
-import csw.param.parameters._
+import csw.param.parameters.{Key, ParameterSetType, _}
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.OptionConverters._

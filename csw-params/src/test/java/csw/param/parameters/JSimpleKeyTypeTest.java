@@ -1,11 +1,8 @@
 package csw.param.parameters;
 
-import csw.param.UnitsOfMeasure;
 import csw.param.models.RaDec;
 import csw.param.models.Struct;
-import csw.param.parameters.JKeyTypes;
-import csw.param.parameters.Key;
-import csw.param.parameters.Parameter;
+import csw.units.UnitsOfMeasure;
 import org.junit.Assert;
 import org.junit.Test;
 

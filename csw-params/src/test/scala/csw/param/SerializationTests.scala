@@ -1,8 +1,8 @@
 package csw.param
 
-import csw.param.Parameters._
 import csw.param.Events.{EventServiceEvent, SystemEvent}
 import csw.param.StateVariable._
+import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
 import csw.param.parameters.KeyType
 import org.scalatest.FunSuite
 

@@ -10,9 +10,9 @@ import csw.common.ccs.Validation.WrongInternalStateIssue
 import csw.common.framework.models.CommandMsg.Submit
 import csw.common.framework.models.PubSub
 import csw.common.framework.models.SupervisorIdleMsg.Running
-import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
-import csw.param.UnitsOfMeasure.encoder
+import csw.units.UnitsOfMeasure.encoder
+import csw.param.commands.Setup
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.trombone.hcd.TromboneHcdState

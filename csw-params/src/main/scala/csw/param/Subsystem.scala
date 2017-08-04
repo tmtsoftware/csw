@@ -18,7 +18,7 @@ sealed abstract class Subsystem(description: String) extends EnumEntry with Lowe
  */
 object Subsystem extends Enum[Subsystem] {
 
-  import JsonSupport._
+  import csw.param.formats.JsonSupport._
 
   override def values: immutable.IndexedSeq[Subsystem] = findValues
   implicit val format: JsonFormat[Subsystem]           = enumFormat(this)

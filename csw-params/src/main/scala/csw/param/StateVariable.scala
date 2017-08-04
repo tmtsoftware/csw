@@ -1,7 +1,8 @@
 package csw.param
 
-import csw.param.Parameters._
-import csw.param.parameters.Parameter
+import csw.param.commands.Setup
+import csw.param.models.Prefix
+import csw.param.parameters.{Parameter, ParameterSetKeyData, ParameterSetType}
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -28,7 +29,7 @@ object StateVariable {
     /**
      * an optional initial set of items (keys with values)
      */
-    val paramSet: ParameterSet
+    val paramSet: Set[Parameter[_]]
   }
 
   /**
@@ -53,12 +54,12 @@ object StateVariable {
    * @param prefix identifies the target subsystem
    * @param paramSet     an optional initial set of items (keys with values)
    */
-  case class DemandState(prefix: Prefix, paramSet: ParameterSet = Set.empty[Parameter[_]])
+  case class DemandState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
       extends ParameterSetType[DemandState]
       with ParameterSetKeyData
       with StateVariable {
 
-    override def create(data: ParameterSet) = DemandState(prefix, data)
+    override def create(data: Set[Parameter[_]]) = DemandState(prefix, data)
 
     /**
      * This is here for Java to construct with String
@@ -85,12 +86,12 @@ object StateVariable {
    * @param prefix identifies the target subsystem
    * @param paramSet     an optional initial set of items (keys with values)
    */
-  case class CurrentState(prefix: Prefix, paramSet: ParameterSet = Set.empty[Parameter[_]])
+  case class CurrentState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
       extends ParameterSetType[CurrentState]
       with ParameterSetKeyData
       with StateVariable {
 
-    override def create(data: ParameterSet) = CurrentState(prefix, data)
+    override def create(data: Set[Parameter[_]]) = CurrentState(prefix, data)
 
     /**
      * This is here for Java to construct with String

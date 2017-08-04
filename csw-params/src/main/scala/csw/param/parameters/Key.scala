@@ -1,7 +1,7 @@
 package csw.param.parameters
 
-import csw.param.UnitsOfMeasure
-import csw.param.UnitsOfMeasure.{NoUnits, Units}
+import csw.units.UnitsOfMeasure
+import csw.units.UnitsOfMeasure.{NoUnits, Units}
 import spray.json.JsonFormat
 
 import scala.annotation.varargs

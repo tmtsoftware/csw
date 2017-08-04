@@ -1,8 +1,9 @@
 package csw.param
 
-import csw.param.Parameters._
+import csw.param.commands.Setup
 import csw.param.models.ArrayData
 import csw.param.parameters.KeyType
+import csw.units.UnitsOfMeasure
 import org.scalatest.FunSpec
 import spray.json.DefaultJsonProtocol
 

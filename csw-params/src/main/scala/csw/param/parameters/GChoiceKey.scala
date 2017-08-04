@@ -1,6 +1,6 @@
 package csw.param.parameters
 
-import csw.param.UnitsOfMeasure.Units
+import csw.units.UnitsOfMeasure.Units
 import csw.param.models.{Choice, Choices}
 
 private[parameters] class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices)

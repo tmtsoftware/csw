@@ -1,8 +1,8 @@
 package csw.param.parameters;
 
-import csw.param.UnitsOfMeasure;
 import csw.param.models.ArrayData;
 import csw.param.models.JArrayData;
+import csw.units.UnitsOfMeasure;
 import org.junit.Assert;
 import org.junit.Test;
 

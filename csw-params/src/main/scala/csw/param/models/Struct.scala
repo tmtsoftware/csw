@@ -1,8 +1,7 @@
 package csw.param.models
 
-import csw.param.JsonSupport
-import csw.param.Parameters.{ParameterSet, ParameterSetType}
-import csw.param.parameters.Parameter
+import csw.param.formats.JsonSupport
+import csw.param.parameters.{Parameter, ParameterSetType}
 import spray.json.JsonFormat
 
 import scala.annotation.varargs
@@ -13,14 +12,14 @@ object Struct {
   implicit val format: JsonFormat[Struct] = jsonFormat1(Struct.apply)
 }
 
-case class Struct(paramSet: ParameterSet = Set.empty[Parameter[_]]) extends ParameterSetType[Struct] {
+case class Struct(paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]) extends ParameterSetType[Struct] {
 
   /**
    * This is here for Java to construct with String
    */
   def this() = this(Set.empty[Parameter[_]])
 
-  override def create(data: ParameterSet) = Struct(data)
+  override def create(data: Set[Parameter[_]]) = Struct(data)
 
   def dataToString1 = paramSet.mkString(", ")
 

@@ -2,7 +2,7 @@ package csw.param.models
 
 import java.util
 
-import csw.param.JsonSupport
+import csw.param.formats.JsonSupport
 import spray.json.JsonFormat
 
 import scala.collection.JavaConverters._

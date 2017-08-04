@@ -19,7 +19,7 @@ case class MatrixData[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])(im
 }
 
 object MatrixData {
-  import csw.param.JsonSupport._
+  import csw.param.formats.JsonSupport._
 
   implicit def format[T: JsonFormat: ClassTag]: JsonFormat[MatrixData[T]] =
     jsonFormat1((xs: mutable.WrappedArray[mutable.WrappedArray[T]]) => new MatrixData[T](xs))

@@ -19,7 +19,7 @@ case class Choice(name: String) {
  * Provides implicit conversion from String to Choice
  */
 object Choice {
-  import csw.param.JsonSupport._
+  import csw.param.formats.JsonSupport._
   implicit def toChoice(name: String): Choice       = new Choice(name)
   implicit val choiceFormat: RootJsonFormat[Choice] = jsonFormat1(Choice.apply)
 }
@@ -39,7 +39,7 @@ case class Choices(values: Set[Choice]) {
  * Provides a varargs constructor for Choices
  */
 object Choices {
-  import csw.param.JsonSupport._
+  import csw.param.formats.JsonSupport._
   @varargs
   def from(choicesIn: String*): Choices = Choices(choicesIn.map(Choice(_)).toSet)
 

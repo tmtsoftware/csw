@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.UnitsOfMeasure.{degrees, meters, seconds}
+import csw.units.UnitsOfMeasure.{degrees, meters, seconds}
 import csw.param.models._
 import csw.param.parameters.KeyType.{
   ByteMatrixKey,
@@ -13,6 +13,7 @@ import csw.param.parameters.KeyType.{
   StructKey
 }
 import csw.param.parameters._
+import csw.units.UnitsOfMeasure
 import org.scalatest.{FunSpec, Matchers}
 
 /**

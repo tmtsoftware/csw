@@ -1,12 +1,13 @@
 package csw.param
 
-import csw.param.UnitsOfMeasure.{degrees, NoUnits}
+import csw.units.UnitsOfMeasure.{degrees, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 import csw.param.ParameterSetDsl._
-import csw.param.Parameters.{CommandInfo, Setup}
+import csw.param.commands.{CommandInfo, Setup}
 import csw.param.models.{ArrayData, MatrixData}
 import csw.param.parameters.KeyType.LongMatrixKey
 import csw.param.parameters.{KeyType, Parameter}
+import csw.units.UnitsOfMeasure
 
 /**
  * Tests the config DSL

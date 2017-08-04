@@ -1,8 +1,8 @@
 package csw.param.parameters;
 
-import csw.param.UnitsOfMeasure;
 import csw.param.models.Choice;
 import csw.param.models.Choices;
+import csw.units.UnitsOfMeasure;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

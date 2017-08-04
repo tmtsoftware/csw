@@ -1,7 +1,7 @@
 package csw.trombone.assembly
 
-import csw.param.Parameters.Setup
 import csw.common.ccs.Validation._
+import csw.param.commands.Setup
 
 import scala.util.Try
 

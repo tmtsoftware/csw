@@ -10,9 +10,9 @@ import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.param.Parameters.Setup
 import csw.param.StateVariable.CurrentState
-import csw.param.UnitsOfMeasure.encoder
+import csw.units.UnitsOfMeasure.encoder
+import csw.param.commands.Setup
 import csw.trombone.hcd.AxisRequest._
 import csw.trombone.hcd.AxisResponse._
 import csw.trombone.hcd.TromboneEngineering.{GetAxisConfig, GetAxisStats, GetAxisUpdate, GetAxisUpdateNow}

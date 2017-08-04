@@ -4,7 +4,8 @@ import java.time.{Clock, Instant}
 import java.util.UUID
 
 import csw.param
-import csw.param.parameters.{Key, Parameter}
+import csw.param.models.Prefix
+import csw.param.parameters.{Key, Parameter, ParameterSetKeyData, ParameterSetType}
 import spray.json.{JsString, JsValue, JsonFormat, RootJsonFormat}
 
 import scala.language.implicitConversions
@@ -13,14 +14,13 @@ import scala.language.implicitConversions
  * Defines events used by the event and telemetry services
  */
 object Events {
-  import Parameters._
 
   case class EventTime(time: Instant = Instant.now(Clock.systemUTC)) {
     override def toString: String = time.toString
   }
 
   object EventTime {
-    import JsonSupport._
+    import csw.param.formats.JsonSupport._
     implicit def toEventTime(time: Instant): EventTime = EventTime(time)
 
     implicit def toCurrent = EventTime()
@@ -63,7 +63,7 @@ object Events {
   }
 
   object EventInfo {
-    import JsonSupport._
+    import csw.param.formats.JsonSupport._
     implicit def apply(prefixStr: String): EventInfo = {
       val prefix: Prefix = prefixStr
       EventInfo(prefix, EventTime.toCurrent, None)
@@ -142,14 +142,14 @@ object Events {
    * @param info event related information
    * @param paramSet an optional initial set of parameters (keys with values)
    */
-  case class StatusEvent(info: EventInfo, paramSet: ParameterSet = Set.empty[Parameter[_]])
+  case class StatusEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
       extends EventType[StatusEvent]
       with EventServiceEvent {
 
     // Java API
     def this(prefix: String) = this(EventInfo(prefix))
 
-    override def create(data: ParameterSet) = StatusEvent(info, data)
+    override def create(data: Set[Parameter[_]]) = StatusEvent(info, data)
 
     // The following overrides are needed for the Java API and javadocs
     // (Using a Java interface caused various Java compiler errors)
@@ -171,14 +171,14 @@ object Events {
    * @param info event related information
    * @param paramSet an optional initial set of parameters (keys with values)
    */
-  case class ObserveEvent(info: EventInfo, paramSet: ParameterSet = Set.empty[Parameter[_]])
+  case class ObserveEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
       extends EventType[ObserveEvent]
       with EventServiceEvent {
 
     // Java API
     def this(prefix: String) = this(EventInfo(prefix))
 
-    override def create(data: ParameterSet) = ObserveEvent(info, data)
+    override def create(data: Set[Parameter[_]]) = ObserveEvent(info, data)
 
     // The following overrides are needed for the Java API and javadocs
     // (Using a Java interface caused various Java compiler errors)
@@ -200,14 +200,14 @@ object Events {
    * @param info event related information
    * @param paramSet an optional initial set of parameters (keys with values)
    */
-  case class SystemEvent(info: EventInfo, paramSet: ParameterSet = Set.empty[Parameter[_]])
+  case class SystemEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
       extends EventType[SystemEvent]
       with EventServiceEvent {
 
     // Java API
     def this(prefix: String) = this(EventInfo(prefix))
 
-    override def create(data: ParameterSet) = SystemEvent(info, data)
+    override def create(data: Set[Parameter[_]]) = SystemEvent(info, data)
 
     // The following overrides are needed for the Java API and javadocs
     // (Using a Java interface caused various Java compiler errors)

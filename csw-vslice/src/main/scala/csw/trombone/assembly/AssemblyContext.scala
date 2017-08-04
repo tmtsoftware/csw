@@ -1,11 +1,12 @@
 package csw.trombone.assembly
 
 import com.typesafe.config.Config
-import csw.param.Parameters.{CommandInfo, Prefix, Setup}
-import csw.param.UnitsOfMeasure.{degrees, kilometers, micrometers, millimeters}
+import csw.units.UnitsOfMeasure.{degrees, kilometers, micrometers, millimeters}
 import csw.services.location.models.ComponentId
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.common.framework.models.Component.AssemblyInfo
+import csw.param.commands.{CommandInfo, Setup}
+import csw.param.models.Prefix
 import csw.param.parameters.{KeyType, Parameter}
 
 /**

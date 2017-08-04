@@ -3,8 +3,8 @@ package csw.common.framework.models
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.models.PubSub.SubscriberMsg
-import csw.param.Parameters.ControlCommand
 import csw.param.StateVariable.CurrentState
+import csw.param.commands.ControlCommand
 
 /////////////
 

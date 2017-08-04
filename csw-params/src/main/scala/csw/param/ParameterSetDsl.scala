@@ -1,9 +1,10 @@
 package csw.param
 
 import csw.param.Events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
-import csw.param.Parameters._
-import csw.param.UnitsOfMeasure.{NoUnits, Units}
-import csw.param.parameters.{Key, Parameter}
+import csw.units.UnitsOfMeasure.{NoUnits, Units}
+import csw.param.commands.{CommandInfo, Observe, Setup}
+import csw.param.models.Prefix
+import csw.param.parameters.{Key, Parameter, ParameterSetType}
 
 /**
  * Defines a Scala DSL for dealing with configurations.

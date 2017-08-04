@@ -1,9 +1,10 @@
-package csw.param
+package csw.param.formats
 
 import csw.param.Events._
-import csw.param.Parameters._
 import csw.param.StateVariable._
-import csw.param.formats.{EnumJsonSupport, JavaFormats, WrappedArrayProtocol}
+import csw.param.commands._
+import csw.param.models.Prefix
+import csw.param.parameters.Parameter
 import spray.json._
 
 object JsonSupport extends JsonSupport
@@ -15,7 +16,7 @@ object JsonSupport extends JsonSupport
 trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupport with WrappedArrayProtocol {
 
   // JSON formats
-  val paramSetFormat    = implicitly[JsonFormat[ParameterSet]]
+  val paramSetFormat    = implicitly[JsonFormat[Set[Parameter[_]]]]
   val commandInfoFormat = implicitly[JsonFormat[CommandInfo]]
   val prefixFormat      = implicitly[JsonFormat[Prefix]]
   val eventInfoFormat   = implicitly[JsonFormat[EventInfo]]

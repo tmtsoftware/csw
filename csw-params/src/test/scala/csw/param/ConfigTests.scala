@@ -1,8 +1,8 @@
 package csw.param
 
 import csw.param.Events.StatusEvent
-import csw.param.Parameters._
-import csw.param.UnitsOfMeasure.{degrees, meters, _}
+import csw.units.UnitsOfMeasure.{degrees, meters, _}
+import csw.param.commands.{CommandInfo, Observe, Setup}
 import csw.param.models.{ArrayData, MatrixData}
 import csw.param.parameters.KeyType.{
   ByteMatrixKey,
@@ -13,6 +13,7 @@ import csw.param.parameters.KeyType.{
   ShortMatrixKey
 }
 import csw.param.parameters._
+import csw.units.UnitsOfMeasure
 import org.scalatest.FunSpec
 
 import scala.util.Try
@@ -76,7 +77,6 @@ class ConfigTests extends FunSpec {
       assert(Try(sc1(k1)).isSuccess)
       assert(Try(sc1(k2)).isSuccess)
 
-//      FixMe: Along with keyname, type also needs to be compared during lookup. This requires design change which is planned after refactoring.
       assert(Try(sc1(k2bad)).isFailure)
       assert(Try(sc1.get(k2bad).get).isFailure)
 

@@ -4,6 +4,8 @@ import csw.param.parameters.Parameter
 import spray.json.JsonFormat
 import java.lang
 
+import csw.param.formats.JsonSupport
+
 import scala.reflect.ClassTag
 
 object TestJavaFormats extends JsonSupport {
