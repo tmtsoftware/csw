@@ -28,16 +28,17 @@ import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 object Supervisor {
-  def behavior[Msg <: DomainMsg](
+  def behavior(
       componentInfo: ComponentInfo,
-      componentBehaviorFactory: ComponentBehaviorFactory[Msg]
-  ): Behavior[SupervisorMsg] =
-    Actor.mutable(ctx => new Supervisor(ctx, componentInfo, componentBehaviorFactory))
+      componentBehaviorFactory: ComponentBehaviorFactory[_]
+  ): Behavior[SupervisorMsg] = Actor.mutable(ctx => new Supervisor(ctx, componentInfo, componentBehaviorFactory))
 }
-class Supervisor[Msg <: DomainMsg](ctx: ActorContext[SupervisorMsg],
-                                   componentInfo: ComponentInfo,
-                                   componentBehaviorFactory: ComponentBehaviorFactory[Msg])
-    extends MutableBehavior[SupervisorMsg] {
+
+class Supervisor(
+    ctx: ActorContext[SupervisorMsg],
+    componentInfo: ComponentInfo,
+    componentBehaviorFactory: ComponentBehaviorFactory[_]
+) extends MutableBehavior[SupervisorMsg] {
 
   implicit val ec: ExecutionContextExecutor      = ctx.executionContext
   private val shutdownTimeout: FiniteDuration    = 5.seconds
