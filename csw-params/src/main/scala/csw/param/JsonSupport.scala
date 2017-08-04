@@ -1,12 +1,9 @@
 package csw.param
 
-import java.time.Instant
-
 import csw.param.Events._
 import csw.param.Parameters._
 import csw.param.StateVariable._
 import csw.param.formats.{EnumJsonSupport, JavaFormats, WrappedArrayProtocol}
-import csw.param.models.{Choice, Choices}
 import spray.json._
 
 object JsonSupport extends JsonSupport
@@ -18,22 +15,10 @@ object JsonSupport extends JsonSupport
 trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupport with WrappedArrayProtocol {
 
   // JSON formats
-  implicit val choiceFormat      = jsonFormat1(Choice.apply)
-  implicit val choicesFormat     = jsonFormat1(Choices.apply)
-  implicit val paramSetFormat    = implicitly[JsonFormat[ParameterSet]]
-  implicit val commandInfoFormat = implicitly[JsonFormat[CommandInfo]]
-
-  implicit def eventTimeFormat: JsonFormat[EventTime] = new JsonFormat[EventTime] {
-    def write(et: EventTime): JsValue = JsString(et.toString)
-
-    def read(json: JsValue): EventTime = json match {
-      case JsString(s) => Instant.parse(s)
-      case _           => unexpectedJsValueError(json)
-    }
-  }
-
-  implicit val parameterSetKeyFormat = jsonFormat2(Prefix.apply)
-  implicit val eventInfoFormat       = jsonFormat4(EventInfo.apply)
+  val paramSetFormat    = implicitly[JsonFormat[ParameterSet]]
+  val commandInfoFormat = implicitly[JsonFormat[CommandInfo]]
+  val prefixFormat      = implicitly[JsonFormat[Prefix]]
+  val eventInfoFormat   = implicitly[JsonFormat[EventInfo]]
 
   // config and event type JSON tags
   private val setupType        = classOf[Setup].getSimpleName
@@ -42,7 +27,7 @@ trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupp
   private val statusEventType  = classOf[StatusEvent].getSimpleName
   private val observeEventType = classOf[ObserveEvent].getSimpleName
   private val systemEventType  = classOf[SystemEvent].getSimpleName
-  private val curentStateType  = classOf[CurrentState].getSimpleName
+  private val currentStateType = classOf[CurrentState].getSimpleName
   private val demandStateType  = classOf[DemandState].getSimpleName
 
   private def unexpectedJsValueError(x: JsValue) = deserializationError(s"Unexpected JsValue: $x")
@@ -58,7 +43,7 @@ trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupp
     JsObject(
       "type"     -> JsString(sequenceCommand.typeName),
       "info"     -> commandInfoFormat.write(sequenceCommand.info),
-      "prefix"   -> parameterSetKeyFormat.write(sequenceCommand.prefix),
+      "prefix"   -> prefixFormat.write(sequenceCommand.prefix),
       "paramSet" -> sequenceCommand.paramSet.toJson
     )
   }
@@ -98,7 +83,7 @@ trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupp
   def writeStateVariable[A <: StateVariable](stateVariable: A): JsValue = {
     JsObject(
       "type"     -> JsString(stateVariable.typeName),
-      "prefix"   -> parameterSetKeyFormat.write(stateVariable.prefix),
+      "prefix"   -> prefixFormat.write(stateVariable.prefix),
       "paramSet" -> stateVariable.paramSet.toJson
     )
   }
@@ -116,9 +101,9 @@ trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupp
           case (JsString(typeName), prefix, paramSet) =>
             val ck = prefix.convertTo[Prefix]
             typeName match {
-              case `curentStateType` => CurrentState(ck, paramSetFormat.read(paramSet)).asInstanceOf[A]
-              case `demandStateType` => DemandState(ck, paramSetFormat.read(paramSet)).asInstanceOf[A]
-              case _                 => unexpectedJsValueError(json)
+              case `currentStateType` => CurrentState(ck, paramSetFormat.read(paramSet)).asInstanceOf[A]
+              case `demandStateType`  => DemandState(ck, paramSetFormat.read(paramSet)).asInstanceOf[A]
+              case _                  => unexpectedJsValueError(json)
             }
           case _ => unexpectedJsValueError(json)
         }

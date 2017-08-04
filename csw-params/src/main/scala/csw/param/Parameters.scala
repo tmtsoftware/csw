@@ -1,7 +1,7 @@
 package csw.param
 
 import csw.param.parameters.{Key, KeyType, Parameter}
-import spray.json.JsonFormat
+import spray.json.{JsonFormat, RootJsonFormat}
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -36,6 +36,7 @@ object Parameters {
    * A top level key for a parameter set: combines subsystem and the subsystem's prefix
    */
   object Prefix {
+    import JsonSupport._
     private val SEPARATOR = '.'
 
     /**
@@ -49,6 +50,8 @@ object Parameters {
       assert(keyText != null)
       Subsystem.withNameOption(keyText.splitAt(keyText.indexOf(SEPARATOR))._1).getOrElse(Subsystem.BAD)
     }
+
+    implicit val parameterSetKeyFormat: RootJsonFormat[Prefix] = jsonFormat2(Prefix.apply)
   }
 
   type ParameterSet = Set[Parameter[_]]

@@ -5,6 +5,7 @@ import java.util.UUID
 
 import csw.param
 import csw.param.parameters.{Key, Parameter}
+import spray.json.{JsString, JsValue, JsonFormat, RootJsonFormat}
 
 import scala.language.implicitConversions
 
@@ -19,9 +20,16 @@ object Events {
   }
 
   object EventTime {
+    import JsonSupport._
     implicit def toEventTime(time: Instant): EventTime = EventTime(time)
 
     implicit def toCurrent = EventTime()
+
+    implicit val format: JsonFormat[EventTime] = new JsonFormat[EventTime] {
+      def write(et: EventTime): JsValue  = JsString(et.toString)
+      def read(json: JsValue): EventTime = Instant.parse(json.convertTo[String])
+    }
+
   }
 
   /**
@@ -55,6 +63,7 @@ object Events {
   }
 
   object EventInfo {
+    import JsonSupport._
     implicit def apply(prefixStr: String): EventInfo = {
       val prefix: Prefix = prefixStr
       EventInfo(prefix, EventTime.toCurrent, None)
@@ -72,6 +81,8 @@ object Events {
 
     // Java APIs
     def create(prefix: String): EventInfo = EventInfo(prefix)
+
+    implicit val eventInfoFormat: RootJsonFormat[EventInfo] = jsonFormat4(EventInfo.apply)
   }
 
   /**

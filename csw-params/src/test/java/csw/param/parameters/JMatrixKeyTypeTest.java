@@ -61,7 +61,7 @@ public class JMatrixKeyTypeTest {
         MatrixData[] paramValues = {matrixData};
 
         if (units.isPresent()) parameter = matrixKey.make(keyName).set(paramValues, units.get());
-        else parameter = matrixKey.make(keyName).set(paramValues);
+        else parameter = matrixKey.make(keyName).set((Object[])paramValues);
 
         Assert.assertEquals(keyName, parameter.keyName());
         Assert.assertEquals(units.orElse(UnitsOfMeasure.NoUnits$.MODULE$), parameter.units());
