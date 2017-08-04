@@ -39,13 +39,13 @@ class BehaviorFactoryCreationTest extends FrameworkComponentTestSuite with Match
 
   override val hcdInfo = HcdInfo("SampleHcd",
                                  "wfos",
-                                 "csw.common.framework.internal.supervisor.SampleHcdBehavior",
+                                 "csw.common.framework.scaladsl.SampleHcdBehaviorFactory",
                                  DoNotRegister,
                                  Set(AkkaType),
                                  FiniteDuration(5, "seconds"))
 
   private def hcdBehaviorFactory(componentInfo: ComponentInfo): ComponentBehaviorFactory[_] = {
-    val componentFactoryClass = Class.forName(componentInfo.componentClassName + "Factory")
+    val componentFactoryClass = Class.forName(componentInfo.componentClassName)
     componentFactoryClass.newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
   }
 
