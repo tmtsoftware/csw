@@ -1,4 +1,4 @@
-package csw.common.framework.scaladsl
+package csw.common.framework.internal
 
 sealed trait ComponentMode
 object ComponentMode {

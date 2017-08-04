@@ -1,4 +1,4 @@
-package csw.common.framework.scaladsl
+package csw.common.framework.internal
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
@@ -11,6 +11,7 @@ import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
 import csw.common.framework.models.SupervisorIdleMsg.InitializeFailure
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models.{RunningMsg, _}
+import csw.common.framework.scaladsl.ComponentHandlers
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}

@@ -3,10 +3,10 @@ package csw.common.framework.javadsl
 import akka.typed.javadsl.ActorContext
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
+import csw.common.framework.internal.ComponentBehavior
 import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.RunningMsg.DomainMsg
 import csw.common.framework.models.{ComponentMsg, FromComponentLifecycleMessage}
-import csw.common.framework.scaladsl.ComponentBehavior
 
 import scala.reflect.ClassTag
 

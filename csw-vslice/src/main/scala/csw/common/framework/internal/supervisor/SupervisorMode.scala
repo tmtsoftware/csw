@@ -1,4 +1,4 @@
-package csw.common.framework.scaladsl.supervisor
+package csw.common.framework.internal.supervisor
 
 /**
  * Base trait of supervisor actor messages
