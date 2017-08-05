@@ -1,7 +1,11 @@
 package csw.param.events
 
+import java.util.Optional
+
 import csw.param.models.{ObsId, Prefix}
 import csw.param.parameters.{Key, Parameter, ParameterSetKeyData, ParameterSetType}
+
+import scala.compat.java8.OptionConverters.RichOptionForJava8
 
 /**
  * Base trait for events
@@ -35,7 +39,8 @@ sealed trait EventType[T <: EventType[T]] extends ParameterSetType[T] with Param
   /**
    * The observation ID
    */
-  def obsIdOption: Option[ObsId] = info.obsId
+  def obsIdOption: Option[ObsId]     = info.obsId
+  def obsIdOptional: Optional[ObsId] = info.obsId.asJava
 }
 
 /**
@@ -66,6 +71,7 @@ case class StatusEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[
 
   // Java API
   def this(prefix: String) = this(EventInfo(prefix))
+  def this(prefix: String, time: EventTime, obsId: ObsId) = this(EventInfo(prefix, time, obsId))
 
   override def create(data: Set[Parameter[_]]) = StatusEvent(info, data)
 
