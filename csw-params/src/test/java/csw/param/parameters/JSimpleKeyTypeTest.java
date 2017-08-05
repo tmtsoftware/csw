@@ -5,7 +5,7 @@ import csw.param.models.Struct;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static csw.param.units.JUnits.*;
+import static csw.param.javadsl.JUnits.*;
 
 public class JSimpleKeyTypeTest {
 

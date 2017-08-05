@@ -12,10 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class JChoiceKeyTypeTest {
-    private String keyName = " choiceKey";
-    private Choices choices = Choices.from("A", "B", "C");
+    private final String keyName = " choiceKey";
+    private final Choices choices = Choices.from("A", "B", "C");
     
-    private GChoiceKey choiceKey = JKeyTypes.ChoiceKey().make(keyName, choices);
+    private final GChoiceKey choiceKey = JKeyTypes.ChoiceKey().make(keyName, choices);
 
     @Test
     public void choicesAPIShouldBeAccessible() {

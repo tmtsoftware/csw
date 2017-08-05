@@ -1,6 +1,5 @@
 package csw.param.commands;
 
-import csw.param.Subsystem;
 import csw.param.models.Prefix;
 import csw.param.parameters.JKeyTypes;
 import csw.param.parameters.Key;
@@ -11,6 +10,8 @@ import org.junit.Test;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static csw.param.javadsl.JSubsystem.WFOS;
 
 public class CommandTest {
 
@@ -78,7 +79,7 @@ public class CommandTest {
         Assert.assertEquals(commandInfo, setup.info());
         Assert.assertEquals(prefix, setup.prefixStr());
         Assert.assertEquals(new Prefix(prefix), setup.prefix());
-        Assert.assertEquals(Subsystem.WFOS$.MODULE$, setup.subsystem());
+        Assert.assertEquals(WFOS, setup.subsystem());
 
         // complete API
         assertOnCommandAPI(setup);
@@ -92,7 +93,7 @@ public class CommandTest {
         Assert.assertEquals(commandInfo, observe.info());
         Assert.assertEquals(prefix, observe.prefixStr());
         Assert.assertEquals(new Prefix(prefix), observe.prefix());
-        Assert.assertEquals(Subsystem.WFOS$.MODULE$, observe.subsystem());
+        Assert.assertEquals(WFOS, observe.subsystem());
 
         // complete API
         assertOnCommandAPI(observe);
@@ -106,7 +107,7 @@ public class CommandTest {
         Assert.assertEquals(commandInfo, wait.info());
         Assert.assertEquals(prefix, wait.prefixStr());
         Assert.assertEquals(new Prefix(prefix), wait.prefix());
-        Assert.assertEquals(Subsystem.WFOS$.MODULE$, wait.subsystem());
+        Assert.assertEquals(WFOS, wait.subsystem());
 
         // complete API
         assertOnCommandAPI(wait);

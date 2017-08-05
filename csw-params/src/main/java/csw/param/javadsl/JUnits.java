@@ -1,4 +1,4 @@
-package csw.param.units;
+package csw.param.javadsl;
 
 import csw.units.Units;
 

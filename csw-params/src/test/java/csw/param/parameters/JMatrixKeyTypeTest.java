@@ -12,15 +12,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-import static csw.param.units.JUnits.*;
+import static csw.param.javadsl.JUnits.*;
 
 @RunWith(value = Parameterized.class)
 public class JMatrixKeyTypeTest {
 
-    private String keyName;
-    private MatrixKeyType matrixKey;
-    private Object[][] data;
-    private Optional<Units> units;
+    private final String keyName;
+    private final MatrixKeyType matrixKey;
+    private final Object[][] data;
+    private final Optional<Units> units;
 
     public JMatrixKeyTypeTest(String keyName, MatrixKeyType keyType, Object[][] data, Optional<Units> units) {
         this.keyName = keyName;
