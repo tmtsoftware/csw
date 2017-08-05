@@ -51,10 +51,9 @@ class Supervisor(
   var mode: SupervisorMode                       = Idle
   var isOnline: Boolean                          = false
 
-  val pubSubComponent: ActorRef[PubSub[CurrentState]] = ctx.spawnAnonymous(PubSubActor.behavior[CurrentState])
+  val pubSubComponent: ActorRef[PubSub[CurrentState]] = ctx.spawn(PubSubActor.behavior[CurrentState], "asads")
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
     ctx.spawnAnonymous(PubSubActor.behavior[LifecycleStateChanged])
-
   val component: ActorRef[Nothing] =
     ctx.spawnAnonymous[Nothing](componentBehaviorFactory.behavior(componentInfo, ctx.self, pubSubComponent))
 
@@ -187,9 +186,9 @@ class Supervisor(
     ctx.self ! Lifecycle(Shutdown)
   }
 
-  private def registerWithLocationService(): Unit = ???
+  private def registerWithLocationService(): Unit = ()
 
-  private def unregisterFromLocationService(): Unit = ???
+  private def unregisterFromLocationService(): Unit = ()
 
-  private def haltComponent(): Unit = ???
+  private def haltComponent(): Unit = ()
 }

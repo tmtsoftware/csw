@@ -12,9 +12,9 @@ import csw.param.StateVariable.CurrentState
 import scala.reflect.ClassTag
 
 abstract class ComponentBehaviorFactory[Msg <: DomainMsg: ClassTag] {
-  protected def make(ctx: ActorContext[ComponentMsg],
-                     componentInfo: ComponentInfo,
-                     pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[Msg]
+  def make(ctx: ActorContext[ComponentMsg],
+           componentInfo: ComponentInfo,
+           pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[Msg]
 
   def behavior(compInfo: ComponentInfo,
                supervisor: ActorRef[FromComponentLifecycleMessage],

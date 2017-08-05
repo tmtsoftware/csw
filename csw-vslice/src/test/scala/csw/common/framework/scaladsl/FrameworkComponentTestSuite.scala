@@ -7,7 +7,7 @@ import akka.util.Timeout
 import csw.common.components.assembly.AssemblyDomainMsg
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.Component.{AssemblyInfo, ComponentInfo, DoNotRegister, HcdInfo}
-import csw.common.framework.models.ComponentMsg
+import csw.common.framework.models.{ComponentMsg, SupervisorMsg}
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.param.StateVariable.CurrentState
 import csw.services.location.models.ConnectionType.AkkaType
