@@ -1,7 +1,11 @@
 package csw.param.parameters
 
+import java.util
+
 import scala.annotation.varargs
 import scala.collection.JavaConverters.setAsJavaSetConverter
+import scala.collection.JavaConverters.mapAsJavaMapConverter
+import scala.compat.java8.OptionConverters.RichOptionForJava8
 
 /**
  * The base trait for various parameter set types (commands or events)
@@ -20,6 +24,7 @@ trait ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * Holds the parameters for this parameter set
    */
   def paramSet: Set[Parameter[_]]
+  def jParamSet: util.Set[Parameter[_]] = paramSet.asJava
 
   /**
    * The number of parameters in this parameter set
@@ -60,14 +65,17 @@ trait ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    * @return the parameter for the key, if found
    * @tparam S the Scala value type
    */
-  def get[S](key: Key[S]): Option[Parameter[S]] = get(key.keyName, key.keyType)
+  def get[S](key: Key[S]): Option[Parameter[S]]         = get(key.keyName, key.keyType)
+  def jGet[S](key: Key[S]): util.Optional[Parameter[S]] = get(key).asJava
 
   def get[S](keyName: String, keyType: KeyType[S]): Option[Parameter[S]] = {
     paramSet.find(p ⇒ p.keyName == keyName && p.keyType == keyType).asInstanceOf[Option[Parameter[S]]]
   }
+  def jGet[S](keyName: String, keyType: KeyType[S]): util.Optional[Parameter[S]] = get(keyName, keyType).asJava
 
   def find[S](parameter: Parameter[S]): Option[Parameter[S]] =
     get(parameter.keyName, parameter.keyType)
+  def jFind[S](parameter: Parameter[S]): util.Optional[Parameter[S]] = find(parameter).asJava
 
   /**
    * Return the parameter associated with a Key rather than an Option
@@ -194,4 +202,6 @@ trait ParameterSetType[T <: ParameterSetType[T]] { self: T =>
    */
   def getStringMap: Map[String, String] =
     paramSet.map(i => i.keyName -> i.values.map(_.toString).mkString(",")).toMap
+  def jGetStringMap: util.Map[String, String] = getStringMap.asJava
+
 }
