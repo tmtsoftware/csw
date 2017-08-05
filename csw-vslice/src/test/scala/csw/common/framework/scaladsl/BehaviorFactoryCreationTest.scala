@@ -19,7 +19,7 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{Await, Future}
 
 class SampleHcdBehaviorFactory extends ComponentBehaviorFactory[HcdDomainMsg] {
-  override protected def make(
+  override def make(
       ctx: ActorContext[ComponentMsg],
       componentInfo: ComponentInfo,
       pubSubRef: ActorRef[PubSub.PublisherMsg[StateVariable.CurrentState]]
@@ -52,8 +52,6 @@ class BehaviorFactoryCreationTest extends FrameworkComponentTestSuite with Match
   test(
     "supervisor should be able to get component behavior factory after it's instance is created using reflection from the component info name"
   ) {
-    val sampleHcdHandler = mock[ComponentHandlers[HcdDomainMsg]]
-
     val testSupervisor = TestProbe[FromComponentLifecycleMessage]
     val testPubSub     = TestProbe[PublisherMsg[CurrentState]]
 
