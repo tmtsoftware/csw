@@ -14,19 +14,19 @@ import java.util.stream.Collectors;
 
 public class CommandTest {
 
-    Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
-    Key<String> epochStringKey = JKeyTypes.StringKey().make("epoch");
-    Key<Integer> epochIntKey = JKeyTypes.IntKey().make("epoch");
-    Key<Integer> notUsedKey = JKeyTypes.IntKey().make("notUsed");
+    private final Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
+    private final Key<String> epochStringKey = JKeyTypes.StringKey().make("epoch");
+    private final Key<Integer> epochIntKey = JKeyTypes.IntKey().make("epoch");
+    private final Key<Integer> notUsedKey = JKeyTypes.IntKey().make("notUsed");
 
-    Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
-    Parameter<String> epochStringParam = epochStringKey.set("A");
-    Parameter<Integer> epochIntParam = epochIntKey.set(44,55);
+    private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
+    private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
+    private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
 
-    CommandInfo commandInfo = new CommandInfo("obsId");
-    String prefix = "wfos.red.detector";
+    private final CommandInfo commandInfo = new CommandInfo("obsId");
+    private final String prefix = "wfos.red.detector";
     
-    public void assertOnCommandAPI(ParameterSetType<?> command) {
+    private void assertOnCommandAPI(ParameterSetType<?> command) {
         // contains and exists
         Assert.assertFalse(command.contains(notUsedKey));
         Assert.assertTrue(command.contains(encoderIntKey));
