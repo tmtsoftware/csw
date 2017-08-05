@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.events.Events.{ObserveEvent, StatusEvent, SystemEvent}
+import csw.param.events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.formats.JsonSupport._
 import csw.param.StateVariable.{CurrentState, DemandState}
 import csw.param.commands.{CommandInfo, Observe, Setup, Wait}

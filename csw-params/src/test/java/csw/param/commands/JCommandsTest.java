@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import static csw.param.javadsl.JSubsystem.WFOS;
 
-public class CommandTest {
+public class JCommandsTest {
 
     private final Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
     private final Key<String> epochStringKey = JKeyTypes.StringKey().make("epoch");

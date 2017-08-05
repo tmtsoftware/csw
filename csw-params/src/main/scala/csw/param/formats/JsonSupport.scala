@@ -1,6 +1,6 @@
 package csw.param.formats
 
-import csw.param.events.Events._
+import csw.param.events._
 import csw.param.StateVariable._
 import csw.param.commands._
 import csw.param.events.EventInfo

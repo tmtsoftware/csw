@@ -2,7 +2,7 @@ package csw.param.parameters
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
 
-import csw.param.events.Events._
+import csw.param.events._
 import csw.param.StateVariable._
 import csw.param.commands._
 

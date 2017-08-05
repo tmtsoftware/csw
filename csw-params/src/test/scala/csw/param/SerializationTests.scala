@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.events.Events.{EventServiceEvent, SystemEvent}
+import csw.param.events.{EventServiceEvent, SystemEvent}
 import csw.param.StateVariable._
 import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
 import csw.param.models.ObsId

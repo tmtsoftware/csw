@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.events.Events.StatusEvent
+import csw.param.events.StatusEvent
 import csw.param.commands.{CommandInfo, Observe, Setup}
 import csw.param.models.{ArrayData, MatrixData}
 import csw.param.parameters.KeyType.{
