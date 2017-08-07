@@ -1,4 +1,4 @@
-package csw.param
+package csw.param.javadsl
 
 import csw.param.parameters.{Key, ParameterSetType, _}
 
