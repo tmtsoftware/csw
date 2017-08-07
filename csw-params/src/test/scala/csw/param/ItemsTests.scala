@@ -15,9 +15,6 @@ import csw.param.parameters._
 import csw.units.Units.{degrees, meters, seconds}
 import org.scalatest.{FunSpec, Matchers}
 
-/**
- * TMT Source Code: 7/7/16.
- */
 class ItemsTests extends FunSpec with Matchers {
 
   private val s1: String = "encoder"
@@ -52,6 +49,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     val listIn = Array(false, true)
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should work with list, withUnits") {
       val ii = bk.set(listIn).withUnits(degrees)
       ii.units should be(degrees)
@@ -59,6 +57,7 @@ class ItemsTests extends FunSpec with Matchers {
       ii.values should equal(listIn)
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should work with list, units") {
       val ii = bk.set(listIn, degrees)
       ii.units should be(degrees)
@@ -84,6 +83,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     val listIn = Array(la1, la2)
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should test with list, withUnits") {
       val li2: Parameter[ArrayData[Byte]] = lk.set(listIn).withUnits(degrees)
       li2.units should be(degrees)
@@ -91,6 +91,7 @@ class ItemsTests extends FunSpec with Matchers {
       li2.values should equal(listIn)
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should test with list, units") {
       val li2 = lk.set(listIn, degrees)
       li2.units should be theSameInstanceAs degrees
@@ -98,6 +99,7 @@ class ItemsTests extends FunSpec with Matchers {
       li2.values should equal(listIn)
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should test using one array with and without units") {
       var li2 = lk.set(a1) // Uses implicit to create from long array
       li2.head should equal(la1)
@@ -138,6 +140,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     val listIn = Array(lm1, lm2)
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should work with list and withUnits") {
       val di = dk.set(listIn).withUnits(degrees)
       di.units should be theSameInstanceAs degrees
@@ -145,6 +148,7 @@ class ItemsTests extends FunSpec with Matchers {
       di.values should equal(listIn)
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should work with list and units") {
       val di = dk.set(listIn, degrees)
       di.units should be theSameInstanceAs degrees
@@ -152,6 +156,7 @@ class ItemsTests extends FunSpec with Matchers {
       di.values should equal(listIn)
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("work with one matrix without and with units") {
       var di = dk.set(m1) // This is an implicit
       di.head should equal(lm1)
@@ -160,6 +165,7 @@ class ItemsTests extends FunSpec with Matchers {
       di.head should equal(lm1)
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("work with varargs") {
       val di = dk.set(lm1, lm2).withUnits(seconds)
       di.units should be theSameInstanceAs seconds
@@ -167,6 +173,7 @@ class ItemsTests extends FunSpec with Matchers {
       di.values should equal(listIn)
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("work with varargs as arrays") {
       val di = dk.set(m1, m2).withUnits(meters)
       di.units should be theSameInstanceAs meters
@@ -188,6 +195,7 @@ class ItemsTests extends FunSpec with Matchers {
 
     val listIn = Array[Char]('K', 'G')
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should work with list, withUnits") {
       val li = lk.set(listIn).withUnits(degrees)
       li.units should be(degrees)

@@ -5,9 +5,6 @@ import csw.param.models.{ObsId, Prefix}
 import csw.param.parameters.KeyType
 import org.scalatest.{FunSpec, Matchers}
 
-/**
- * TMT Source Code: 8/17/16.
- */
 class EventTests extends FunSpec with Matchers {
   private val s1: String = "encoder"
 

@@ -48,6 +48,7 @@ class ParameterSetDsl2Tests extends FunSpec {
       assert(i3 == vset(k3, Array("A", "B", "C")))
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should support key -> value syntax for building configs") {
       val dm1 = MatrixData.fromArrays(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12))
       val setupConfig1 = setup(

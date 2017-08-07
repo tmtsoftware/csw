@@ -27,6 +27,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     val k1           = KeyType.IntKey.make(s1)
     val detectorTemp = KeyType.DoubleKey.make(s3)
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should work to set single items") {
       val i1 = set(k1, 2)
       i1 shouldBe an[Parameter[Int]]
@@ -39,6 +40,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
       ssize(i1) should equal(5)
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should work with units too") {
       val i1 = set(detectorTemp, 100.0).withUnits(degrees)
       i1 shouldBe an[Parameter[Double]]
@@ -353,6 +355,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
     }
   }
 
+  // DEOPSCSW-190: Implement Unit Support
   describe("sc tests") {
     val k1 = KeyType.IntKey.make("itest")
     val k2 = KeyType.DoubleKey.make("dtest")

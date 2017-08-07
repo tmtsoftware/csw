@@ -2,7 +2,6 @@ package csw.param.parameters;
 
 import csw.param.models.Choice;
 import csw.param.models.Choices;
-import csw.units.Units;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,6 +10,10 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 import java.util.List;
 
+import static csw.param.javadsl.JUnits.NoUnits;
+import static csw.param.javadsl.JUnits.kilometers;
+
+// DEOPSCSW-190: Implement Unit Support
 public class JChoiceKeyTypeTest {
     private final String keyName = " choiceKey";
     private final Choices choices = Choices.from("A", "B", "C");
@@ -39,7 +42,7 @@ public class JChoiceKeyTypeTest {
 
         // set with varargs
         Parameter<Choice> choiceParameter = choiceKey.set(choice1, choice2);
-        Assert.assertEquals(Units.NoUnits$.MODULE$, choiceParameter.units());
+        Assert.assertEquals(NoUnits, choiceParameter.units());
         Assert.assertEquals(choice1, choiceParameter.jGet(0).get());
         Assert.assertEquals(choice2, choiceParameter.jGet(1).get());
         Assert.assertEquals(choice1, choiceParameter.head());
@@ -57,7 +60,6 @@ public class JChoiceKeyTypeTest {
         Choice[] choicesArr = {choice1, choice2};
 
         // set with Array and Units
-        Units.kilometers$ kilometers = Units.kilometers$.MODULE$;
         Parameter<Choice> choiceParameter = choiceKey.set(choicesArr, kilometers);
         Assert.assertEquals(kilometers, choiceParameter.units());
         Assert.assertEquals(choice1, choiceParameter.jGet(0).get());

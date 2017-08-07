@@ -12,11 +12,6 @@ sealed abstract class Units(name: String) extends EnumEntry with Serializable {
 
 }
 
-/**
- * This Units stuff is just for play
- * although something should be developed or borrowed
- * for use.
- */
 object Units extends Enum[Units] {
 
   import csw.param.formats.JsonSupport._

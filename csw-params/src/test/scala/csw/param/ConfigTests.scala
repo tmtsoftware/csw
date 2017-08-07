@@ -84,6 +84,7 @@ class ConfigTests extends FunSpec {
       assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("Should allow setting with units") {
       var sc1 = Setup(commandInfo, ck1)
       sc1 = sc1.madd(k1.set(22).withUnits(degrees), k2.set("B"))
@@ -107,6 +108,7 @@ class ConfigTests extends FunSpec {
       assert(sc1(k2)(0) == "C")
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should update for the same key with set") {
       var sc1 = Setup(commandInfo, ck1)
       sc1 = sc1.add(k2.set("D"))
@@ -123,6 +125,7 @@ class ConfigTests extends FunSpec {
   describe("Checking key updates") {
     val k1 = KeyType.IntKey.make("atest")
 
+    // DEOPSCSW-190: Implement Unit Support
     it("Should allow updates") {
       val i1 = k1.set(22)
       assert(i1.head == 22)
@@ -197,6 +200,7 @@ class ConfigTests extends FunSpec {
       assert(v2.values(0) == 44)
     }
 
+    // DEOPSCSW-190: Implement Unit Support
     it("should update for the same key with set") {
       var sc1 = StatusEvent(ck1)
       sc1 = sc1.add(k2.set(22))
@@ -268,6 +272,7 @@ class ConfigTests extends FunSpec {
     }
   }
 
+  // DEOPSCSW-190: Implement Unit Support
   describe("test setting multiple values") {
     val t1 = KeyType.IntKey.make("test1")
     it("should allow setting a single value") {
