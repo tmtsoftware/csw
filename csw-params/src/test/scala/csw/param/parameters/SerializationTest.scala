@@ -1,15 +1,14 @@
-package csw.param
+package csw.param.parameters
 
-import csw.param.events.{EventServiceEvent, SystemEvent}
 import csw.param.StateVariable._
 import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
+import csw.param.events.{EventServiceEvent, SystemEvent}
 import csw.param.models.ObsId
-import csw.param.parameters.KeyType
 import org.scalatest.FunSuite
 
 //DEOPSCSW-187: Efficient serialization to/from binary
 //noinspection TypeAnnotation
-class SerializationTests extends FunSuite {
+class SerializationTest extends FunSuite {
 
   val obsId       = ObsId("2023-Q22-4-33")
   val commandInfo = CommandInfo(obsId)

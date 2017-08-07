@@ -1,4 +1,4 @@
-package csw.param
+package csw.param.parameters
 
 import csw.param.models._
 import csw.param.parameters.KeyType.{
@@ -11,11 +11,10 @@ import csw.param.parameters.KeyType.{
   ShortMatrixKey,
   StructKey
 }
-import csw.param.parameters._
 import csw.units.Units.{degrees, meters, seconds}
 import org.scalatest.{FunSpec, Matchers}
 
-class ItemsTests extends FunSpec with Matchers {
+class KeyParameterTest extends FunSpec with Matchers {
 
   private val s1: String = "encoder"
   private val s2: String = "filter"

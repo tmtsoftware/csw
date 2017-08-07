@@ -1,7 +1,7 @@
-package csw.param
+package csw.param.models
 
-import enumeratum.{Enum, EnumEntry}
 import enumeratum.EnumEntry.Lowercase
+import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
 
 import scala.collection.immutable

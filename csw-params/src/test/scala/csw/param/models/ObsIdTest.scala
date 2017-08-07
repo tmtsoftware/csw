@@ -1,9 +1,8 @@
-package csw.param
+package csw.param.models
 
-import csw.param.models.ObsId2
 import org.scalatest.FunSpec
 
-class ObsIdTests extends FunSpec {
+class ObsIdTest extends FunSpec {
 
   val obsID1 = "2022A-Q-P012-O123"     // without file
   val obsID2 = "2022A-Q-P012-O123-234" // with file

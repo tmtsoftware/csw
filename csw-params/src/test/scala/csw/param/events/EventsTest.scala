@@ -1,11 +1,10 @@
-package csw.param
+package csw.param.events
 
-import csw.param.events.{EventInfo, EventTime, SystemEvent}
 import csw.param.models.{ObsId, Prefix}
 import csw.param.parameters.KeyType
 import org.scalatest.{FunSpec, Matchers}
 
-class EventTests extends FunSpec with Matchers {
+class EventsTest extends FunSpec with Matchers {
   private val s1: String = "encoder"
 
   private val s1Key = KeyType.IntKey.make(s1)

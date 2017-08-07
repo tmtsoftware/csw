@@ -1,17 +1,16 @@
-package csw.param
+package csw.param.parameters
 
-import org.scalatest.{FunSpec, Matchers}
-import csw.param.parameters.ParameterSetDsl._
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.models.{ArrayData, MatrixData, ObsId}
 import csw.param.parameters.KeyType.LongMatrixKey
-import csw.param.parameters.{KeyType, Parameter}
+import csw.param.parameters.ParameterSetDsl._
 import csw.units.Units.{degrees, meters, NoUnits}
+import org.scalatest.{FunSpec, Matchers}
 
 /**
  * Tests the config DSL
  */
-class ParameterSetDslTests extends FunSpec with Matchers {
+class ParameterSetDslTest extends FunSpec with Matchers {
   private val s1: String = "encoder"
   private val s2: String = "filter"
   private val s3: String = "detectorTemp"
@@ -22,7 +21,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   private val commandInfo = CommandInfo(ObsId("Obs001"))
 
   describe("creating items") {
-    import csw.param.parameters.ParameterSetDsl.{size => ssize}
+    import csw.param.parameters.ParameterSetDsl.{size ⇒ ssize}
 
     val k1           = KeyType.IntKey.make(s1)
     val detectorTemp = KeyType.DoubleKey.make(s3)
@@ -50,7 +49,7 @@ class ParameterSetDslTests extends FunSpec with Matchers {
   }
 
   describe("checking simple values") {
-    import csw.param.parameters.ParameterSetDsl.{value => svalue}
+    import csw.param.parameters.ParameterSetDsl.{value ⇒ svalue}
     val k1 = KeyType.IntKey.make(s1)
 
     it("should have value access") {

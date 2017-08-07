@@ -1,7 +1,6 @@
-package csw.param
+package csw.param.commands
 
 import csw.param.events.StatusEvent
-import csw.param.commands.{CommandInfo, Observe, Setup}
 import csw.param.models.{ArrayData, MatrixData}
 import csw.param.parameters.KeyType.{
   ByteMatrixKey,
@@ -18,7 +17,7 @@ import org.scalatest.FunSpec
 import scala.util.Try
 
 //noinspection ComparingUnrelatedTypes,ScalaUnusedSymbol
-class ConfigTests extends FunSpec {
+class ConfigsTest extends FunSpec {
 
   private val s1: String = "encoder"
   private val s2: String = "filter"

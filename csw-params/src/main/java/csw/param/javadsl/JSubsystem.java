@@ -1,6 +1,6 @@
 package csw.param.javadsl;
 
-import csw.param.Subsystem;
+import csw.param.models.Subsystem;
 
 @SuppressWarnings("unused")
 public class JSubsystem {
