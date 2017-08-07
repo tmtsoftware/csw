@@ -9,16 +9,20 @@ import csw.param.models._
 import csw.param.parameters.KeyType.{
   ByteMatrixKey,
   ChoiceKey,
+  DoubleKey,
   DoubleMatrixKey,
   IntMatrixKey,
   LongMatrixKey,
-  ShortMatrixKey
+  ShortMatrixKey,
+  StringKey,
+  StructKey
 }
 import csw.param.parameters._
 import csw.units.Units.{degrees, meters, NoUnits}
 import org.scalatest.FunSpec
 import spray.json._
 
+//DEOPSCSW-188: Efficient Serialization to/from JSON
 //noinspection ScalaUnusedSymbol
 class JSONTests extends FunSpec {
 
@@ -477,17 +481,16 @@ class JSONTests extends FunSpec {
     }
   }
 
-  /*describe("testing StructItem JSON support") {
+  describe("testing StructItem JSON support") {
     it("should allow Struct values") {
-      val k1 = StructKey("myStruct")
-
-      val ra    = StringKey("ra")
-      val dec   = StringKey("dec")
-      val epoch = DoubleKey("epoch")
+      val k1    = StructKey.make("myStruct")
+      val ra    = StringKey.make("ra")
+      val dec   = StringKey.make("dec")
+      val epoch = DoubleKey.make("epoch")
       val c1    = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
       val c2    = Struct().madd(ra.set("12:13:15.2"), dec.set("32:33:35.5"), epoch.set(1950.0))
 
-      val i1: StructParameter = k1.set(c1, c2)
+      val i1: Parameter[Struct] = k1.set(c1, c2)
 
       val sc1 = Setup(commandInfo, ck).add(i1)
       assert(sc1(k1).head == c1)
@@ -495,10 +498,7 @@ class JSONTests extends FunSpec {
 
       val sc1out = JsonSupport.writeSequenceCommand(sc1)
 
-      val s = sc1out.prettyPrint
-      println(s) // XXX
-
-      val sc1in: Parameters.Setup = JsonSupport.readSequenceCommand[Setup](sc1out)
+      val sc1in: Setup = JsonSupport.readSequenceCommand[Setup](sc1out)
       assert(sc1.equals(sc1in))
       assert(sc1in(k1).head == c1)
       //      val x = sc1in.get(k1).flatMap(_.head.get(ra))
@@ -506,9 +506,8 @@ class JSONTests extends FunSpec {
 
       //assert(sc1in(k1).value(1).name == "probe2")
 
-      val sc2 = Setup(commandInfo, ck).add(k1.set(c1))
+      val sc2 = Setup(commandInfo, ck).add(k1.set(c1, c2))
       assert(sc2 == sc1)
     }
   }
- */
 }

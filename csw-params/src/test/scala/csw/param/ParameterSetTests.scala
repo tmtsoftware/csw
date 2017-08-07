@@ -45,13 +45,9 @@ class ParameterSetTests extends FunSpec {
 
     val sc1 = Setup(obsId, ck1).madd(encoder1.set(22), encoder2.set(33).withUnits(degrees))
 
-    println(sc1)
     assert(sc1.info.obsId.obsId == obsId)
     assert(sc1.subsystem == Subsystem.WFOS)
     assert(sc1.prefixStr == ck1)
-    println(s"configkey: ${sc1.prefix}")
-    println(s"runId: + ${sc1.info.runId}")
-
   }
 
 }

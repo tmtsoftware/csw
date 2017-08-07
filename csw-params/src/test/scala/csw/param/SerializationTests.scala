@@ -7,6 +7,7 @@ import csw.param.models.ObsId
 import csw.param.parameters.KeyType
 import org.scalatest.FunSuite
 
+//DEOPSCSW-187: Efficient serialization to/from binary
 //noinspection TypeAnnotation
 class SerializationTests extends FunSuite {
 
