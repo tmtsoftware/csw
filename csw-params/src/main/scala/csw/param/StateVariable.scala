@@ -8,29 +8,29 @@ import scala.annotation.varargs
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
-object StateVariable {
+/**
+ * Base trait for state variables
+ */
+sealed trait StateVariable extends Serializable {
 
   /**
-   * Base trait for state variables
+   * A name identifying the type of command, such as "setup", "observe".
+   * This is used in the JSON and toString output.
    */
-  sealed trait StateVariable extends Serializable {
+  def typeName: String
 
-    /**
-     * A name identifying the type of command, such as "setup", "observe".
-     * This is used in the JSON and toString output.
-     */
-    def typeName: String
+  /**
+   * identifies the target subsystem
+   */
+  val prefix: Prefix
 
-    /**
-     * identifies the target subsystem
-     */
-    val prefix: Prefix
+  /**
+   * an optional initial set of items (keys with values)
+   */
+  val paramSet: Set[Parameter[_]]
+}
 
-    /**
-     * an optional initial set of items (keys with values)
-     */
-    val paramSet: Set[Parameter[_]]
-  }
+object StateVariable {
 
   /**
    * Type of a function that returns true if two state variables (demand and current)
@@ -49,89 +49,6 @@ object StateVariable {
     demand.prefixStr == current.prefixStr && demand.paramSet == current.paramSet
 
   /**
-   * A state variable that indicates the ''demand'' or requested state.
-   *
-   * @param prefix identifies the target subsystem
-   * @param paramSet     an optional initial set of items (keys with values)
-   */
-  case class DemandState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
-      extends ParameterSetType[DemandState]
-      with ParameterSetKeyData
-      with StateVariable {
-
-    override def create(data: Set[Parameter[_]]) = DemandState(prefix, data)
-
-    /**
-     * This is here for Java to construct with String
-     */
-    def this(prefix: String) = this(Prefix.stringToPrefix(prefix))
-
-    /**
-     * Java API to create a DemandState from a Setup
-     */
-    def this(command: Setup) = this(command.prefixStr, command.paramSet)
-  }
-
-  object DemandState {
-
-    /**
-     * Converts a Setup to a DemandState
-     */
-    implicit def apply(command: Setup): DemandState = DemandState(command.prefixStr, command.paramSet)
-  }
-
-  /**
-   * A state variable that indicates the ''current'' or actual state.
-   *
-   * @param prefix identifies the target subsystem
-   * @param paramSet     an optional initial set of items (keys with values)
-   */
-  case class CurrentState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
-      extends ParameterSetType[CurrentState]
-      with ParameterSetKeyData
-      with StateVariable {
-
-    override def create(data: Set[Parameter[_]]) = CurrentState(prefix, data)
-
-    /**
-     * This is here for Java to construct with String
-     */
-    def this(prefix: String) = this(Prefix.stringToPrefix(prefix))
-
-    /**
-     * Java API to create a DemandState from a Setup
-     */
-    def this(command: Setup) = this(command.prefixStr, command.paramSet)
-
-  }
-
-  object eCurrentState {
-
-    /**
-     * Converts a Setup to a CurrentState
-     */
-    implicit def apply(command: Setup): CurrentState = CurrentState(command.prefixStr, command.paramSet)
-
-    /**
-     * Java API to create a CurrentState from a Setup
-     */
-    def fromSetupCommand(command: Setup): CurrentState = CurrentState(command.prefixStr, command.paramSet)
-  }
-
-  /**
-   * Combines multiple CurrentState objects together
-   *
-   * @param states one or more CurrentStates
-   */
-  final case class CurrentStates(states: Seq[CurrentState]) {
-
-    /**
-     * Java API: Returns the list of CurrentState objects
-     */
-    def jstates: java.util.List[CurrentState] = states.asJava
-  }
-
-  /**
    * For the Java API
    *
    * @param states one or more CurrentState objects
@@ -147,4 +64,87 @@ object StateVariable {
    * @return a new CurrentStates object containing all the given CurrentState objects
    */
   def createCurrentStates(states: java.util.List[CurrentState]): CurrentStates = CurrentStates(states.asScala)
+}
+
+/**
+ * A state variable that indicates the ''demand'' or requested state.
+ *
+ * @param prefix identifies the target subsystem
+ * @param paramSet     an optional initial set of items (keys with values)
+ */
+case class DemandState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+    extends ParameterSetType[DemandState]
+    with ParameterSetKeyData
+    with StateVariable {
+
+  override def create(data: Set[Parameter[_]]) = DemandState(prefix, data)
+
+  /**
+   * This is here for Java to construct with String
+   */
+  def this(prefix: String) = this(Prefix.stringToPrefix(prefix))
+
+  /**
+   * Java API to create a DemandState from a Setup
+   */
+  def this(command: Setup) = this(command.prefixStr, command.paramSet)
+}
+
+object DemandState {
+
+  /**
+   * Converts a Setup to a DemandState
+   */
+  implicit def apply(command: Setup): DemandState = DemandState(command.prefixStr, command.paramSet)
+}
+
+/**
+ * A state variable that indicates the ''current'' or actual state.
+ *
+ * @param prefix identifies the target subsystem
+ * @param paramSet     an optional initial set of items (keys with values)
+ */
+case class CurrentState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+    extends ParameterSetType[CurrentState]
+    with ParameterSetKeyData
+    with StateVariable {
+
+  override def create(data: Set[Parameter[_]]) = CurrentState(prefix, data)
+
+  /**
+   * This is here for Java to construct with String
+   */
+  def this(prefix: String) = this(Prefix.stringToPrefix(prefix))
+
+  /**
+   * Java API to create a DemandState from a Setup
+   */
+  def this(command: Setup) = this(command.prefixStr, command.paramSet)
+
+}
+
+object eCurrentState {
+
+  /**
+   * Converts a Setup to a CurrentState
+   */
+  implicit def apply(command: Setup): CurrentState = CurrentState(command.prefixStr, command.paramSet)
+
+  /**
+   * Java API to create a CurrentState from a Setup
+   */
+  def fromSetupCommand(command: Setup): CurrentState = CurrentState(command.prefixStr, command.paramSet)
+}
+
+/**
+ * Combines multiple CurrentState objects together
+ *
+ * @param states one or more CurrentStates
+ */
+final case class CurrentStates(states: Seq[CurrentState]) {
+
+  /**
+   * Java API: Returns the list of CurrentState objects
+   */
+  def jstates: java.util.List[CurrentState] = states.asJava
 }

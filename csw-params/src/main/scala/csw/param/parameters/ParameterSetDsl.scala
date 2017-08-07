@@ -1,10 +1,9 @@
 package csw.param.parameters
 
-import csw.param.events.{ObserveEvent, StatusEvent, SystemEvent}
-import csw.param.StateVariable
 import csw.param.commands.{CommandInfo, Observe, Setup}
-import csw.param.events.EventInfo
+import csw.param.events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.models.Prefix
+import csw.param.{CurrentState, DemandState}
 import csw.units.Units
 import csw.units.Units.NoUnits
 
@@ -197,8 +196,8 @@ object ParameterSetDsl {
    * @param parameters     0 or more parameters to be added during creation
    * @return a new CurrentState with the parameters added
    */
-  def cs(prefix: Prefix, parameters: Parameter[_]*): StateVariable.CurrentState =
-    StateVariable.CurrentState(prefix).madd(parameters: _*)
+  def cs(prefix: Prefix, parameters: Parameter[_]*): CurrentState =
+    CurrentState(prefix).madd(parameters: _*)
 
   /**
    * Create a DemandState with a number of parameters
@@ -207,8 +206,8 @@ object ParameterSetDsl {
    * @param parameters     0 or more parameters to be added during creation
    * @return a new DemandState with the parameters added
    */
-  def ds(prefix: Prefix, parameters: Parameter[_]*): StateVariable.DemandState =
-    StateVariable.DemandState(prefix).madd(parameters: _*)
+  def ds(prefix: Prefix, parameters: Parameter[_]*): DemandState =
+    DemandState(prefix).madd(parameters: _*)
 
   /**
    * Create an ObserveEvent with a number of parameters

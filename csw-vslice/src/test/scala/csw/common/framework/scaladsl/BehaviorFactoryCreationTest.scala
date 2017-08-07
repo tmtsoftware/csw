@@ -1,19 +1,15 @@
 package csw.common.framework.scaladsl
 
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.testkit.StubbedActorContext
+import akka.typed.ActorRef
+import akka.typed.scaladsl.ActorContext
 import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{ActorRef, ActorSystem}
 import csw.common.ccs.Validation
 import csw.common.components.hcd.HcdDomainMsg
-import csw.common.framework.internal.supervisor.Supervisor
 import csw.common.framework.models.Component.{ComponentInfo, DoNotRegister, HcdInfo}
-import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.Initialized
 import csw.common.framework.models._
-import csw.param.StateVariable
-import csw.param.StateVariable.CurrentState
+import csw.param.CurrentState
 import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.Matchers
 import org.scalatest.mockito.MockitoSugar
@@ -25,7 +21,7 @@ class SampleHcdBehaviorFactory extends ComponentBehaviorFactory[HcdDomainMsg] {
   override def make(
       ctx: ActorContext[ComponentMsg],
       componentInfo: ComponentInfo,
-      pubSubRef: ActorRef[PubSub.PublisherMsg[StateVariable.CurrentState]]
+      pubSubRef: ActorRef[PubSub.PublisherMsg[CurrentState]]
   ): ComponentHandlers[HcdDomainMsg] = new ComponentHandlers[HcdDomainMsg](ctx, componentInfo) {
     override def onRestart(): Unit                                               = println(componentInfo.componentName)
     override def onRun(): Unit                                                   = println(componentInfo.componentName)

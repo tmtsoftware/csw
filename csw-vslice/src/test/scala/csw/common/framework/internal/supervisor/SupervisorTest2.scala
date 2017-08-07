@@ -9,7 +9,7 @@ import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.SupervisorIdleMsg.Initialized
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
-import csw.param.StateVariable.CurrentState
+import csw.param.CurrentState
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

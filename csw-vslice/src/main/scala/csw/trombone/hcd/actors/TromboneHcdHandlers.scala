@@ -10,7 +10,7 @@ import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.param.StateVariable.CurrentState
+import csw.param.CurrentState
 import csw.param.commands.Setup
 import csw.trombone.hcd.AxisRequest._
 import csw.trombone.hcd.AxisResponse._

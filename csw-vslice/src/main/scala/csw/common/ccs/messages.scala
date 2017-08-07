@@ -2,7 +2,7 @@ package csw.common.ccs
 
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.param.StateVariable.CurrentState
+import csw.param.CurrentState
 import csw.trombone.assembly.actors.TromboneStateActor.StateWasSet
 
 sealed trait MultiStateMatcherMsgs

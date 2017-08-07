@@ -1,6 +1,6 @@
 package csw.common.ccs
 
-import csw.param.StateVariable.{CurrentState, DemandState}
+import csw.param.{CurrentState, DemandState}
 import csw.param.parameters.Parameter
 
 trait StateMatcher {

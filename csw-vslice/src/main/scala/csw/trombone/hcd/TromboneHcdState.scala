@@ -2,7 +2,6 @@ package csw.trombone.hcd
 
 import java.io.File
 
-import csw.param.StateVariable.CurrentState
 import csw.param._
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.models.{Choice, Prefix}
@@ -35,7 +34,7 @@ object TromboneHcdState {
   val inHighLimitKey              = KeyType.BooleanKey.make("highLimit")
   val inHomeKey                   = KeyType.BooleanKey.make("homed")
 
-  val defaultAxisState: StateVariable.CurrentState = CurrentState(axisStateCK).madd(
+  val defaultAxisState: CurrentState = CurrentState(axisStateCK).madd(
     axisNameKey    -> tromboneAxisName,
     stateKey       -> AXIS_IDLE,
     positionKey    -> 0 withUnits encoder,
@@ -53,7 +52,7 @@ object TromboneHcdState {
   val successCountKey     = KeyType.IntKey.make("successCount")
   val failureCountKey     = KeyType.IntKey.make("failureCount")
   val cancelCountKey      = KeyType.IntKey.make("cancelCount")
-  val defaultStatsState: StateVariable.CurrentState = CurrentState(axisStatsCK).madd(
+  val defaultStatsState: CurrentState = CurrentState(axisStatsCK).madd(
     axisNameKey     -> tromboneAxisName,
     datumCountKey   -> 0,
     moveCountKey    -> 0,
@@ -75,7 +74,7 @@ object TromboneHcdState {
   val startValueKey  = KeyType.IntKey.make("startValue")
   val stepDelayMSKey = KeyType.IntKey.make("stepDelayMS")
   // No full default current state because it is determined at runtime
-  val defaultConfigState: StateVariable.CurrentState = CurrentState(axisConfigCK).madd(
+  val defaultConfigState: CurrentState = CurrentState(axisConfigCK).madd(
     axisNameKey -> tromboneAxisName
   )
 

@@ -10,7 +10,7 @@ import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.Running
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.param.StateVariable.CurrentState
+import csw.param.CurrentState
 import csw.param.commands.{Observe, Setup}
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}

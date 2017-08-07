@@ -5,6 +5,7 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.internal.PubSubActor
+import csw.common.framework.internal.supervisor.SupervisorMode.PreparingToShutdown
 import csw.common.framework.models.CommonSupervisorMsg.{
   ComponentStateSubscription,
   HaltComponent,
@@ -19,9 +20,8 @@ import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
-import csw.common.framework.internal.supervisor.SupervisorMode.{Idle, PreparingToShutdown}
 import csw.common.framework.scaladsl.ComponentBehaviorFactory
-import csw.param.StateVariable.CurrentState
+import csw.param.CurrentState
 import csw.services.location.models.ComponentId
 
 import scala.concurrent.ExecutionContextExecutor

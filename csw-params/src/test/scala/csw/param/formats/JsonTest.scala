@@ -1,6 +1,6 @@
 package csw.param.formats
 
-import csw.param.StateVariable.{CurrentState, DemandState}
+import csw.param.{CurrentState, DemandState}
 import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
 import csw.param.events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.formats.JsonSupport._
@@ -23,7 +23,7 @@ import spray.json._
 
 //DEOPSCSW-188: Efficient Serialization to/from JSON
 //noinspection ScalaUnusedSymbol
-class JSONTest extends FunSpec {
+class JsonTest extends FunSpec {
 
   private val s1: String = "encoder"
   private val s2: String = "filter"

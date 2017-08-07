@@ -5,11 +5,11 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import akka.util.Timeout
-import csw.param.StateVariable.CurrentState
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.MultiStateMatcherMsgs._
 import csw.common.framework.models.PubSub
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
+import csw.param.CurrentState
 
 object MultiStateMatcherActor {
 

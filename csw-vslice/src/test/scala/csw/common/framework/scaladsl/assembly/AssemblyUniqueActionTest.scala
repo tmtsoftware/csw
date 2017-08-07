@@ -7,7 +7,7 @@ import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
-import csw.param.StateVariable.CurrentState
+import csw.param.CurrentState
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
 

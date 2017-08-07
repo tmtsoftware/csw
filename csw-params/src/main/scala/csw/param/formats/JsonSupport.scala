@@ -1,7 +1,7 @@
 package csw.param.formats
 
+import csw.param.{CurrentState, DemandState, StateVariable}
 import csw.param.events._
-import csw.param.StateVariable._
 import csw.param.commands._
 import csw.param.events.EventInfo
 import csw.param.models.Prefix
