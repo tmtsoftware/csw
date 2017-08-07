@@ -1,15 +1,16 @@
 package csw.common.framework.scaladsl
 
-import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
+import akka.typed.{ActorRef, ActorSystem}
 import csw.common.ccs.Validation
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.internal.supervisor.Supervisor
 import csw.common.framework.models.Component.{ComponentInfo, DoNotRegister, HcdInfo}
+import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PubSub.PublisherMsg
-import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized}
+import csw.common.framework.models.SupervisorIdleMsg.Initialized
 import csw.common.framework.models._
 import csw.param.StateVariable
 import csw.param.StateVariable.CurrentState
@@ -67,29 +68,4 @@ class BehaviorFactoryCreationTest extends FrameworkComponentTestSuite with Match
     testSupervisor.expectMsgType[Initialized]
 
   }
-
-  ignore("effectful test for supervisor") {
-
-    val system = ActorSystem("test-system", Actor.empty)
-    val ctx    = new StubbedActorContext[SupervisorMsg]("test-supervisor", 100, system)
-
-    val supervisor = new Supervisor(ctx, hcdInfo, hcdBehaviorFactory(hcdInfo))
-
-    ctx.self ! InitializeFailure("testing supervisor message")
-    Thread.sleep(2000)
-
-    ctx.selfInbox.receiveAll()
-    ctx.selfInbox.hasMessages shouldBe true
-
-    ctx.children.toList.length shouldBe 3
-
-    val value1 = ctx.childInbox(ctx.children.head.upcast[ComponentMsg])
-
-    value1.hasMessages shouldBe true
-
-    println(value1)
-    println(value1.receiveMsg())
-
-  }
-
 }

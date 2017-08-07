@@ -48,16 +48,17 @@ class Supervisor(
   private var haltingFlag                        = false
   var lifecycleState: LifecycleState             = LifecycleWaitingForInitialized
   var runningComponent: ActorRef[RunningMsg]     = _
-  var mode: SupervisorMode                       = Idle
+  var mode: SupervisorMode                       = SupervisorMode.Idle
   var isOnline: Boolean                          = false
 
-  val pubSubComponent: ActorRef[PubSub[CurrentState]] = ctx.spawnAnonymous(PubSubActor.behavior[CurrentState])
+  val pubSubComponent: ActorRef[PubSub[CurrentState]] =
+    ctx.spawn(PubSubActor.behavior[CurrentState], "pub-sub-component")
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
-    ctx.spawnAnonymous(PubSubActor.behavior[LifecycleStateChanged])
+    ctx.spawn(PubSubActor.behavior[LifecycleStateChanged], "pub-sub-lifecycle")
   val component: ActorRef[Nothing] =
-    ctx.spawnAnonymous[Nothing](componentBehaviorFactory.behavior(componentInfo, ctx.self, pubSubComponent))
+    ctx.spawn[Nothing](componentBehaviorFactory.behavior(componentInfo, ctx.self, pubSubComponent), "component")
 
-//  ctx.watch(component)
+  ctx.watch(component)
 
   override def onMessage(msg: SupervisorMsg): Behavior[SupervisorMsg] = {
     (mode, msg) match {
@@ -144,7 +145,6 @@ class Supervisor(
   }
 
   def onInitializeFailure(msg: String): Unit = {
-    println(msg)
     lifecycleState = LifecycleInitializeFailure
     mode = SupervisorMode.LifecycleFailure
   }

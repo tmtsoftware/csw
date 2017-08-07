@@ -5,6 +5,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{Behavior, Props}
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.internal.PubSubActor
+import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.SupervisorIdleMsg.Initialized
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
@@ -36,7 +37,12 @@ class SupervisorTest2 extends FrameworkComponentTestSuite with FunSuiteLike with
 
     new Supervisor(context, hcdInfo, getSampleHcdFactory(sampleHcdHandler))
 
-    val i = testSupervisor.expectMsgType[Initialized]
+    context.self ! Initialized(testComponent.ref)
+
+    val initializedComponent = testSupervisor.expectMsgType[Initialized]
+    initializedComponent.componentRef shouldBe testComponent.ref
+
+    testComponent.expectMsgType[Run.type]
   }
 
 }
