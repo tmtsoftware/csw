@@ -24,6 +24,8 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
     lifecycleHandlers: ComponentHandlers[Msg]
 ) extends Actor.MutableBehavior[ComponentMsg] {
 
+  println("Component Behavior")
+
   implicit val ec: ExecutionContext = ctx.executionContext
 
   var mode: ComponentMode = ComponentMode.Idle

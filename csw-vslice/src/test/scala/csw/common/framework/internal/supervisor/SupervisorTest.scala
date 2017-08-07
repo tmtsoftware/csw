@@ -1,40 +1,25 @@
 package csw.common.framework.internal.supervisor
 
-import akka.typed.{Behavior, Props}
-import akka.typed.scaladsl.ActorContext
-import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.hcd.HcdDomainMsg
-import csw.common.framework.internal.PubSubActor
-import csw.common.framework.models.{ComponentMsg, IdleMsg, LifecycleStateChanged, PubSub, SupervisorMsg}
-import csw.common.framework.scaladsl.{ComponentBehaviorFactory, FrameworkComponentTestSuite}
-import csw.param.StateVariable.CurrentState
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
-import org.mockito.ArgumentMatchers._
+import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuiteLike, Matchers}
 
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationDouble
+
 class SupervisorTest extends FrameworkComponentTestSuite with FunSuiteLike with Matchers with MockitoSugar {
 
-  ignore("effects") {
+  ignore("Supervisor") {
 
-    val testComponent            = TestProbe[ComponentMsg]
-    val testPubSubCompState      = TestProbe[PubSub[CurrentState]]
-    val testPubSubLifecycle      = TestProbe[PubSub[LifecycleStateChanged]]
-    val context                  = mock[ActorContext[SupervisorMsg]]
-    val componentBehaviorFactory = mock[ComponentBehaviorFactory[HcdDomainMsg]]
+    val sampleHcdHandler = mock[ComponentHandlers[HcdDomainMsg]]
 
-    when(componentBehaviorFactory.behavior(hcdInfo, context.self, testPubSubCompState.ref)).thenCallRealMethod()
+    val supervisor =
+      Await.result(
+        system.systemActorOf(Supervisor.behavior(hcdInfo, getSampleHcdFactory(sampleHcdHandler)), "sampleSupervisor"),
+        5.seconds
+      )
 
-    when(context.spawnAnonymous(PubSubActor.behavior[CurrentState], Props.empty)).thenReturn(testPubSubCompState.ref)
-    when(context.spawnAnonymous(PubSubActor.behavior[LifecycleStateChanged], Props.empty))
-      .thenReturn(testPubSubLifecycle.ref)
-
-    when(context.spawnAnonymous[Nothing](notNull[Behavior[Nothing]], ArgumentMatchers.eq(Props.empty)))
-      .thenReturn(testComponent.ref)
-
-    new Supervisor(context, hcdInfo, componentBehaviorFactory)
-
-    val i = testComponent.expectMsgType[IdleMsg.Initialize.type]
   }
+
 }
