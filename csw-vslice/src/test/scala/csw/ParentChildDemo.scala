@@ -90,7 +90,7 @@ class TestSupervisor extends FunSuite with Matchers with MockitoSugar {
     val system = ActorSystem("test-system", Actor.empty)
     val ctx    = new StubbedActorContext[SupervisorMsg]("test-supervisor", 100, system)
 
-    val supervisor = new Supervisor(ctx, workerInfo, new SampleWorkerFactory)
+    new Supervisor(ctx, workerInfo, new SampleWorkerFactory)
     ctx.children.toList.length shouldBe 1
 
     ctx.childInbox(ctx.children.head.upcast[WorkerMsg]).receiveMsg() shouldBe InitializeWorker

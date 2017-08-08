@@ -54,12 +54,13 @@ class BehaviorFactoryCreationTest extends FrameworkComponentTestSuite with Match
     val testSupervisor = TestProbe[FromComponentLifecycleMessage]
     val testPubSub     = TestProbe[PublisherMsg[CurrentState]]
 
-    val component =
-      Await.result(
-        system.systemActorOf[Nothing](hcdBehaviorFactory(hcdInfo).behavior(hcdInfo, testSupervisor.ref, testPubSub.ref),
-                                      "sampleHcd"),
-        5.seconds
-      )
+    Await.result(
+      system.systemActorOf[Nothing](
+        hcdBehaviorFactory(hcdInfo).behavior(hcdInfo, testSupervisor.ref, testPubSub.ref),
+        "sampleHcd"
+      ),
+      5.seconds
+    )
 
     testSupervisor.expectMsgType[Initialized]
 

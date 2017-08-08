@@ -24,7 +24,6 @@ import csw.common.framework.scaladsl.ComponentBehaviorFactory
 import csw.param.states.CurrentState
 import csw.services.location.models.ComponentId
 
-import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 object Supervisor {
@@ -40,16 +39,15 @@ class Supervisor(
     componentBehaviorFactory: ComponentBehaviorFactory[_]
 ) extends MutableBehavior[SupervisorMsg] {
 
-  implicit private val ec: ExecutionContextExecutor = ctx.executionContext
-  private val shutdownTimeout: FiniteDuration       = 5.seconds
-  private var shutdownTimer: Option[Cancellable]    = None
-  val name: String                                  = componentInfo.componentName
-  val componentId                                   = ComponentId(name, componentInfo.componentType)
-  var haltingFlag                                   = false
-  var lifecycleState: LifecycleState                = LifecycleWaitingForInitialized
-  var runningComponent: ActorRef[RunningMsg]        = _
-  var mode: SupervisorMode                          = SupervisorMode.Idle
-  var isOnline: Boolean                             = false
+  private val shutdownTimeout: FiniteDuration    = 5.seconds
+  private var shutdownTimer: Option[Cancellable] = None
+  val name: String                               = componentInfo.componentName
+  val componentId                                = ComponentId(name, componentInfo.componentType)
+  var haltingFlag                                = false
+  var lifecycleState: LifecycleState             = LifecycleWaitingForInitialized
+  var runningComponent: ActorRef[RunningMsg]     = _
+  var mode: SupervisorMode                       = SupervisorMode.Idle
+  var isOnline: Boolean                          = false
 
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
     ctx.spawn(PubSubActor.behavior[LifecycleStateChanged], "pub-sub-lifecycle")
