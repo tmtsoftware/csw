@@ -16,7 +16,7 @@ import org.scalatest.FunSpec
 import scala.util.Try
 
 //noinspection ComparingUnrelatedTypes,ScalaUnusedSymbol
-class ConfigsTest extends FunSpec {
+class CommandsTest extends FunSpec {
 
   private val ck1 = "wfos.prog.cloudcover"
   private val ck3 = "wfos.red.detector"
@@ -238,7 +238,7 @@ class ConfigsTest extends FunSpec {
     val i3 = k3.set("A", "B", "C")
     val i4 = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
 
-    it("Should allow removing one at a time") {
+    it("Setup command should allow removing one at a time") {
       var sc1 = Setup(commandInfo, ck1).madd(i1, i2, i3, i4)
       assert(sc1.size == 4)
       assert(sc1.get(k1).isDefined)
@@ -288,6 +288,70 @@ class ConfigsTest extends FunSpec {
       assert(sc1.get(k1).isEmpty)
       assert(sc1.get(k2).isEmpty)
       assert(sc1.get(k3).isEmpty)
+      assert(sc1.get(k4).isDefined)
+    }
+
+    it("Observe command should allow removing one at a time") {
+      var sc1 = Observe(commandInfo, ck1).madd(i1, i2, i3, i4)
+      assert(sc1.size == 4)
+      assert(sc1.get(k1).isDefined)
+      assert(sc1.get(k2).isDefined)
+      assert(sc1.get(k3).isDefined)
+      assert(sc1.get(k4).isDefined)
+
+      sc1 = sc1.remove(k1)
+      assert(sc1.size == 3)
+      assert(sc1.get(k1).isEmpty)
+      assert(sc1.get(k2).isDefined)
+      assert(sc1.get(k3).isDefined)
+      assert(sc1.get(k4).isDefined)
+
+      // Should allow removing non-existent
+      sc1 = sc1.remove(k1)
+      assert(sc1.size == 3)
+      assert(sc1.get(k1).isEmpty)
+      assert(sc1.get(k2).isDefined)
+      assert(sc1.get(k3).isDefined)
+      assert(sc1.get(k4).isDefined)
+
+      // Add allows re-adding
+      sc1 = sc1.add(i1)
+      assert(sc1.size == 4)
+      assert(sc1.get(k1).isDefined)
+      assert(sc1.get(k2).isDefined)
+      assert(sc1.get(k3).isDefined)
+      assert(sc1.get(k4).isDefined)
+    }
+
+    it("Wait command should allow removing one at a time") {
+      var sc1 = Wait(commandInfo, ck1).madd(i1, i2, i3, i4)
+      assert(sc1.size == 4)
+      assert(sc1.get(k1).isDefined)
+      assert(sc1.get(k2).isDefined)
+      assert(sc1.get(k3).isDefined)
+      assert(sc1.get(k4).isDefined)
+
+      sc1 = sc1.remove(k1)
+      assert(sc1.size == 3)
+      assert(sc1.get(k1).isEmpty)
+      assert(sc1.get(k2).isDefined)
+      assert(sc1.get(k3).isDefined)
+      assert(sc1.get(k4).isDefined)
+
+      // Should allow removing non-existent
+      sc1 = sc1.remove(k1)
+      assert(sc1.size == 3)
+      assert(sc1.get(k1).isEmpty)
+      assert(sc1.get(k2).isDefined)
+      assert(sc1.get(k3).isDefined)
+      assert(sc1.get(k4).isDefined)
+
+      // Add allows re-adding
+      sc1 = sc1.add(i1)
+      assert(sc1.size == 4)
+      assert(sc1.get(k1).isDefined)
+      assert(sc1.get(k2).isDefined)
+      assert(sc1.get(k3).isDefined)
       assert(sc1.get(k4).isDefined)
     }
   }

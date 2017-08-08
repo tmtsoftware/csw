@@ -2,9 +2,10 @@ package csw.param.generics
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
 
-import csw.param.events._
 import csw.param.commands._
-import csw.param.states.{CurrentState, CurrentStates, DemandState, StateVariable}
+import csw.param.events._
+import csw.param.states.StateVariable.StateVariable
+import csw.param.states.{CurrentState, CurrentStates, DemandState}
 
 /**
  * Defines methods for serializing parameter sets

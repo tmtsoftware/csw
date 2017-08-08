@@ -3,34 +3,35 @@ package csw.param.states
 import csw.param.commands.Setup
 import csw.param.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.param.models.Prefix
+import csw.param.states.StateVariable.StateVariable
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
-/**
- * Base trait for state variables
- */
-sealed trait StateVariable extends Serializable {
-
-  /**
-   * A name identifying the type of command, such as "setup", "observe".
-   * This is used in the JSON and toString output.
-   */
-  def typeName: String
-
-  /**
-   * identifies the target subsystem
-   */
-  val prefix: Prefix
-
-  /**
-   * an optional initial set of items (keys with values)
-   */
-  val paramSet: Set[Parameter[_]]
-}
-
 object StateVariable {
+
+  /**
+   * Base trait for state variables
+   */
+  sealed trait StateVariable extends Serializable {
+
+    /**
+     * A name identifying the type of command, such as "setup", "observe".
+     * This is used in the JSON and toString output.
+     */
+    def typeName: String
+
+    /**
+     * identifies the target subsystem
+     */
+    val prefix: Prefix
+
+    /**
+     * an optional initial set of items (keys with values)
+     */
+    val paramSet: Set[Parameter[_]]
+  }
 
   /**
    * Type of a function that returns true if two state variables (demand and current)
@@ -88,6 +89,10 @@ case class DemandState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[P
    * Java API to create a DemandState from a Setup
    */
   def this(command: Setup) = this(command.prefixStr, command.paramSet)
+
+  // The following overrides are needed for the Java API and javadocs
+  // (Using a Java interface caused various Java compiler errors)
+  override def add[P <: Parameter[_]](parameter: P): DemandState = super.add(parameter)
 }
 
 object DemandState {
@@ -120,5 +125,9 @@ case class CurrentState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[
    * Java API to create a DemandState from a Setup
    */
   def this(command: Setup) = this(command.prefixStr, command.paramSet)
+
+  // The following overrides are needed for the Java API and javadocs
+  // (Using a Java interface caused various Java compiler errors)
+  override def add[P <: Parameter[_]](parameter: P): CurrentState = super.add(parameter)
 
 }

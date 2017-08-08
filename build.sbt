@@ -39,6 +39,7 @@ lazy val `csw-prod` = project
   .settings(Settings.docExclusions(unidocExclusions))
 
 lazy val `csw-params` = project
+  .enablePlugins(PublishBintray, MaybeCoverage, AutoMultiJvm)
   .settings(
     libraryDependencies ++= Dependencies.Params
   )
@@ -53,7 +54,7 @@ lazy val `csw-logging-macros` = project
 
 //Logging service
 lazy val `csw-logging` = project
-  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .dependsOn(`csw-logging-macros`)
   .settings(
     libraryDependencies ++= Dependencies.Logging
