@@ -10,7 +10,7 @@ import csw.common.ccs._
 import csw.common.framework.models.PubSub
 import csw.trombone.hcd.TromboneHcdState
 import akka.typed.scaladsl.AskPattern._
-import csw.param.{CurrentState, DemandState}
+import csw.param.commons.{CurrentState, DemandState}
 
 import scala.concurrent.duration.DurationLong
 

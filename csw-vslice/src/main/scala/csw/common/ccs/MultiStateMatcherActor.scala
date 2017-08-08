@@ -9,7 +9,7 @@ import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.MultiStateMatcherMsgs._
 import csw.common.framework.models.PubSub
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
-import csw.param.CurrentState
+import csw.param.commons.CurrentState
 
 object MultiStateMatcherActor {
 

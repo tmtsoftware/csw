@@ -1,11 +1,11 @@
 package csw.param.formats
 
-import csw.param.{CurrentState, DemandState, StateVariable}
 import csw.param.events._
 import csw.param.commands._
+import csw.param.commons.{CurrentState, DemandState, StateVariable}
 import csw.param.events.EventInfo
 import csw.param.models.Prefix
-import csw.param.parameters.Parameter
+import csw.param.generics.Parameter
 import spray.json._
 
 object JsonSupport extends JsonSupport

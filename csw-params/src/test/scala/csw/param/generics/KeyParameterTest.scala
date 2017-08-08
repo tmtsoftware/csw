@@ -1,7 +1,7 @@
-package csw.param.parameters
+package csw.param.generics
 
 import csw.param.models._
-import csw.param.parameters.KeyType.{
+import csw.param.generics.KeyType.{
   ByteMatrixKey,
   ChoiceKey,
   DoubleMatrixKey,
@@ -11,7 +11,7 @@ import csw.param.parameters.KeyType.{
   ShortMatrixKey,
   StructKey
 }
-import csw.units.Units.{degrees, meters, seconds}
+import csw.units.Units.{degrees, meters, seconds, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 
 class KeyParameterTest extends FunSpec with Matchers {
@@ -952,6 +952,37 @@ class KeyParameterTest extends FunSpec with Matchers {
       assert(citem.head.get(dec).head.head == "32:33:34.4")
       assert(citem.head.get(epoch).head.head == 1950.0)
 
+    }
+  }
+
+  // DEOPSCSW-190: Implement Unit Support
+  describe("test setting multiple values") {
+    val t1 = KeyType.IntKey.make("test1")
+    it("should allow setting a single value") {
+      val i1 = t1.set(1)
+      assert(i1.values === Array(1))
+      assert(i1.units == NoUnits)
+      assert(i1(0) == 1)
+    }
+    it("should allow setting several") {
+      val i1 = t1.set(1, 3, 5, 7)
+      assert(i1.values === Array(1, 3, 5, 7))
+      assert(i1.units == NoUnits)
+      assert(i1(1) == 3)
+
+      val i2 = t1.set(Array(10, 30, 50, 70)).withUnits(degrees)
+      assert(i2.values === Array(10, 30, 50, 70))
+      assert(i2.units == degrees)
+      assert(i2(1) == 30)
+      assert(i2(3) == 70)
+    }
+    it("should also allow setting with sequence") {
+      val s1 = Array(2, 4, 6, 8)
+      val i1 = t1.set(s1).withUnits(meters)
+      assert(i1.values === s1)
+      assert(i1.values.length == s1.length)
+      assert(i1.units == meters)
+      assert(i1(2) == 6)
     }
   }
 }

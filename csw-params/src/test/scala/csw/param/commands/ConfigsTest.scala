@@ -1,8 +1,7 @@
 package csw.param.commands
 
-import csw.param.events.StatusEvent
 import csw.param.models.{ArrayData, MatrixData}
-import csw.param.parameters.KeyType.{
+import csw.param.generics.KeyType.{
   ByteMatrixKey,
   DoubleMatrixKey,
   FloatMatrixKey,
@@ -10,7 +9,7 @@ import csw.param.parameters.KeyType.{
   LongMatrixKey,
   ShortMatrixKey
 }
-import csw.param.parameters._
+import csw.param.generics._
 import csw.units.Units.{degrees, meters, NoUnits}
 import org.scalatest.FunSpec
 
@@ -19,44 +18,12 @@ import scala.util.Try
 //noinspection ComparingUnrelatedTypes,ScalaUnusedSymbol
 class ConfigsTest extends FunSpec {
 
-  private val s1: String = "encoder"
-  private val s2: String = "filter"
-
   private val ck1 = "wfos.prog.cloudcover"
   private val ck3 = "wfos.red.detector"
 
   private val commandInfo: CommandInfo = "Obs001"
 
-  describe("Basic key tests") {
-    val k1 = KeyType.IntKey.make(s1)
-    val k2 = KeyType.StringKey.make(s2)
-
-    it("Should be constructed properly") {
-      assert(k1.keyName eq s1)
-    }
-
-    it("Should use set properly") {
-      val i: Parameter[Int] = k1.set(22)
-      // Check that name and value are set
-      assert(i.keyName eq s1)
-      assert(i.values === Array(22))
-      assert(i.head == 22)
-
-      assert(k2.keyName eq s2)
-      val j: Parameter[String] = k2.set("Bob").withUnits(meters)
-      assert(j.values === Array("Bob"))
-      assert(j.units == meters)
-    }
-
-    it("Should support equality of keys") {
-      val k3 = KeyType.IntKey.make(s1)
-      assert(k3 == k1)
-      assert(k3 != k2)
-      assert(k1 != k2)
-    }
-  }
-
-  describe("SC Basic Tests") {
+  describe("Setup config tests") {
     val k1    = KeyType.IntKey.make("encoder")
     val k2    = KeyType.StringKey.make("stringThing")
     val k2bad = KeyType.IntKey.make("stringThing")
@@ -145,75 +112,7 @@ class ConfigsTest extends FunSpec {
     }
   }
 
-  describe("Test Long") {
-    it("should allow setting from Long") {
-      val tval = 1234L
-      val k1   = KeyType.LongKey.make(s1)
-      val i1   = k1.set(tval)
-      assert(i1.values === Array(tval))
-      assert(i1.values(0) == tval)
-      assert(i1.head == tval)
-
-      val tval2 = 4567L
-      val k2    = KeyType.LongKey.make(s1)
-      val i2    = k2.set(tval2)
-      assert(i2.values === Array(tval2))
-    }
-  }
-
-  describe("StatusEvent Test") {
-
-    val k1 = KeyType.IntKey.make("encoder")
-    val k2 = KeyType.IntKey.make("windspeed")
-    val k3 = KeyType.IntKey.make("notUsed")
-
-    it("Should allow adding keys") {
-      val i1  = k1.set(22)
-      val i2  = k2.set(44)
-      val sc1 = StatusEvent(ck3).madd(i1, i2)
-      assert(sc1.size == 2)
-      assert(sc1.exists(k1))
-      assert(sc1.exists(k2))
-      assert(sc1(k1).head == 22)
-      assert(sc1(k2).head == 44)
-      assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
-    }
-
-    it("Should allow setting") {
-      var sc1 = StatusEvent(ck1)
-      sc1 = sc1.add(k1.set(22)).add(k2.set(44))
-      assert(sc1.size == 2)
-      assert(sc1.exists(k1))
-      assert(sc1.exists(k2))
-    }
-
-    it("Should allow apply") {
-      var sc1 = StatusEvent(ck1)
-      sc1 = sc1.add(k1.set(22)).add(k2.set(44))
-
-      val v1 = sc1(k1)
-      val v2 = sc1(k2)
-      assert(sc1.get(k1).isDefined)
-      assert(sc1.get(k2).isDefined)
-      assert(v1.values === Array(22))
-      assert(v2.values(0) == 44)
-    }
-
-    // DEOPSCSW-190: Implement Unit Support
-    it("should update for the same key with set") {
-      var sc1 = StatusEvent(ck1)
-      sc1 = sc1.add(k2.set(22))
-      assert(sc1.exists(k2))
-      assert(sc1(k2).values === Array(22))
-
-      sc1 = sc1.add(k2.set(33).withUnits(meters))
-      assert(sc1.exists(k2))
-      assert(sc1(k2).units == meters)
-      assert(sc1(k2).values === Array(33))
-    }
-  }
-
-  describe("OC Test") {
+  describe("Observe config tests") {
 
     val k1 = KeyType.IntKey.make("repeat")
     val k2 = KeyType.IntKey.make("expTime")
@@ -268,37 +167,6 @@ class ConfigsTest extends FunSpec {
       oc1 = oc1.add(k2.set(33).withUnits(NoUnits))
       assert(oc1.exists(k2))
       assert(oc1(k2).values === Array(33))
-    }
-  }
-
-  // DEOPSCSW-190: Implement Unit Support
-  describe("test setting multiple values") {
-    val t1 = KeyType.IntKey.make("test1")
-    it("should allow setting a single value") {
-      val i1 = t1.set(1)
-      assert(i1.values === Array(1))
-      assert(i1.units == NoUnits)
-      assert(i1(0) == 1)
-    }
-    it("should allow setting several") {
-      val i1 = t1.set(1, 3, 5, 7)
-      assert(i1.values === Array(1, 3, 5, 7))
-      assert(i1.units == NoUnits)
-      assert(i1(1) == 3)
-
-      val i2 = t1.set(Array(10, 30, 50, 70)).withUnits(degrees)
-      assert(i2.values === Array(10, 30, 50, 70))
-      assert(i2.units == degrees)
-      assert(i2(1) == 30)
-      assert(i2(3) == 70)
-    }
-    it("should also allow setting with sequence") {
-      val s1 = Array(2, 4, 6, 8)
-      val i1 = t1.set(s1).withUnits(meters)
-      assert(i1.values === s1)
-      assert(i1.values.size == s1.size)
-      assert(i1.units == meters)
-      assert(i1(2) == 6)
     }
   }
 

@@ -1,7 +1,7 @@
 package csw.param.models
 
 import csw.param.formats.JsonSupport
-import csw.param.parameters.{Parameter, ParameterSetType}
+import csw.param.generics.{Parameter, ParameterSetType}
 import spray.json.JsonFormat
 
 import scala.annotation.varargs

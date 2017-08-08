@@ -6,7 +6,7 @@ import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, Trombon
 import csw.common.framework.models.Component.AssemblyInfo
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.models.Prefix
-import csw.param.parameters.{KeyType, Parameter}
+import csw.param.generics.{KeyType, Parameter}
 import csw.units.Units.{degrees, kilometers, micrometers, millimeters}
 
 /**

@@ -1,4 +1,4 @@
-package csw.param.parameters
+package csw.param.generics
 
 import csw.param.commands.{Observe, SequenceCommand, Setup, Wait}
 import csw.param.models.Subsystem

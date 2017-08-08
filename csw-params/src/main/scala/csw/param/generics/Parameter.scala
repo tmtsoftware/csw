@@ -1,4 +1,4 @@
-package csw.param.parameters
+package csw.param.generics
 
 import java.util
 import java.util.Optional
@@ -13,7 +13,7 @@ import scala.reflect.ClassTag
 
 object Parameter extends DefaultJsonProtocol {
 
-  private[parameters] def apply[S: JsonFormat: ClassTag](
+  private[generics] def apply[S: JsonFormat: ClassTag](
       keyName: String,
       keyType: KeyType[S],
       items: mutable.WrappedArray[S],

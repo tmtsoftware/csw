@@ -5,11 +5,11 @@ import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.models.CommandMsg.Submit
 import csw.common.framework.models.RunningMsg.DomainMsg
 import csw.common.framework.models.SupervisorIdleMsg.Running
-import csw.param.CurrentState
 import csw.param.commands.Setup
+import csw.param.commons.CurrentState
 import csw.param.events.EventTime
 import csw.param.models.Choice
-import csw.param.parameters.Parameter
+import csw.param.generics.Parameter
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 
 sealed trait FollowCommandMessages

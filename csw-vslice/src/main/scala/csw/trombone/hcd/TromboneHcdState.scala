@@ -4,9 +4,10 @@ import java.io.File
 
 import csw.param._
 import csw.param.commands.{CommandInfo, Setup}
+import csw.param.commons.CurrentState
 import csw.param.models.{Choice, Prefix}
-import csw.param.parameters.KeyType
-import csw.param.parameters.KeyType.ChoiceKey
+import csw.param.generics.KeyType
+import csw.param.generics.KeyType.ChoiceKey
 import csw.units.Units.encoder
 
 object TromboneHcdState {

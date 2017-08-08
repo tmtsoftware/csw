@@ -1,11 +1,11 @@
 package csw.param.formats
 
-import csw.param.{CurrentState, DemandState}
 import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
+import csw.param.commons.{CurrentState, DemandState}
 import csw.param.events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.formats.JsonSupport._
 import csw.param.models.{Subsystem, _}
-import csw.param.parameters.KeyType.{
+import csw.param.generics.KeyType.{
   ByteMatrixKey,
   ChoiceKey,
   DoubleKey,
@@ -16,7 +16,7 @@ import csw.param.parameters.KeyType.{
   StringKey,
   StructKey
 }
-import csw.param.parameters._
+import csw.param.generics._
 import csw.units.Units.{degrees, meters, NoUnits}
 import org.scalatest.FunSpec
 import spray.json._

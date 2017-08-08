@@ -21,7 +21,7 @@ import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initial
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.ComponentBehaviorFactory
-import csw.param.CurrentState
+import csw.param.commons.CurrentState
 import csw.services.location.models.ComponentId
 
 import scala.concurrent.ExecutionContextExecutor

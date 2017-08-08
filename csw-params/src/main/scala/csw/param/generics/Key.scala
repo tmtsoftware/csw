@@ -1,4 +1,4 @@
-package csw.param.parameters
+package csw.param.generics
 
 import csw.units.Units
 import csw.units.Units.NoUnits
@@ -7,7 +7,7 @@ import spray.json.JsonFormat
 import scala.annotation.varargs
 import scala.reflect.ClassTag
 
-case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, keyType: KeyType[S]) {
+case class Key[S: JsonFormat: ClassTag] private[generics] (keyName: String, keyType: KeyType[S]) {
 
   def set(v: Array[S], units: Units = NoUnits): Parameter[S] = Parameter(keyName, keyType, v, units)
 
@@ -22,7 +22,7 @@ case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, ke
 
   /**
    * Sets the values for the key
-   * This definition enables writing code like this (see [[csw.param.parameters.ParameterSetDsl]]):
+   * This definition enables writing code like this (see [[csw.param.generics.ParameterSetDsl]]):
    * {{{
    *   val setup = sc(
    *    prefix,
@@ -38,7 +38,7 @@ case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, ke
 
   /**
    * Sets the value and units for the key
-   * This definition enables writing code like this (see [[csw.param.parameters.ParameterSetDsl]]):
+   * This definition enables writing code like this (see [[csw.param.generics.ParameterSetDsl]]):
    * {{{
    *   val setup = sc(
    *    prefix,
@@ -54,7 +54,7 @@ case class Key[S: JsonFormat: ClassTag] private[parameters] (keyName: String, ke
 
   /**
    * Sets the values for the key as a Scala Vector
-   * This definition enables writing code like this (see [[csw.param.parameters.ParameterSetDsl]]):
+   * This definition enables writing code like this (see [[csw.param.generics.ParameterSetDsl]]):
    * {{{
    *   val setup = sc(prefix,
    *     key1 -> Vector(...),

@@ -1,6 +1,6 @@
 package csw.param
 
-import csw.param.parameters.Parameter
+import csw.param.generics.Parameter
 import spray.json.JsonFormat
 import java.lang
 

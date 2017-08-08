@@ -21,6 +21,6 @@ case class CommandInfo(obsId: ObsId, runId: RunId = RunId()) {
 
 object CommandInfo {
   import csw.param.formats.JsonSupport._
-  implicit def format: JsonFormat[CommandInfo]               = jsonFormat2(CommandInfo.apply)
+  implicit val format: JsonFormat[CommandInfo]               = jsonFormat2(CommandInfo.apply)
   implicit def strToParamSetInfo(obsId: String): CommandInfo = CommandInfo(ObsId(obsId))
 }

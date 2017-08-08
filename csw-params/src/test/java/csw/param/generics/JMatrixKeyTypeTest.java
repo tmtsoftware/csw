@@ -1,4 +1,4 @@
-package csw.param.parameters;
+package csw.param.generics;
 
 import csw.param.models.JMatrixData;
 import csw.param.models.MatrixData;

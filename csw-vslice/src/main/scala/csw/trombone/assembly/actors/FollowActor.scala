@@ -4,7 +4,7 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.param.events.EventTime
-import csw.param.parameters.Parameter
+import csw.param.generics.Parameter
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.FollowActorMessages.{SetElevation, SetZenithAngle, StopFollowing, UpdatedEventData}
 import csw.trombone.assembly.TromboneControlMsg.GoToStagePosition

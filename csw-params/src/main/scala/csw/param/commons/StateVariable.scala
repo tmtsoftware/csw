@@ -1,8 +1,8 @@
-package csw.param
+package csw.param.commons
 
 import csw.param.commands.Setup
+import csw.param.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.param.models.Prefix
-import csw.param.parameters.{Parameter, ParameterSetKeyData, ParameterSetType}
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -121,30 +121,4 @@ case class CurrentState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[
    */
   def this(command: Setup) = this(command.prefixStr, command.paramSet)
 
-}
-
-object eCurrentState {
-
-  /**
-   * Converts a Setup to a CurrentState
-   */
-  implicit def apply(command: Setup): CurrentState = CurrentState(command.prefixStr, command.paramSet)
-
-  /**
-   * Java API to create a CurrentState from a Setup
-   */
-  def fromSetupCommand(command: Setup): CurrentState = CurrentState(command.prefixStr, command.paramSet)
-}
-
-/**
- * Combines multiple CurrentState objects together
- *
- * @param states one or more CurrentStates
- */
-final case class CurrentStates(states: Seq[CurrentState]) {
-
-  /**
-   * Java API: Returns the list of CurrentState objects
-   */
-  def jstates: java.util.List[CurrentState] = states.asJava
 }

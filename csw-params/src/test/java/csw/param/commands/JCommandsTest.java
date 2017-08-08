@@ -1,10 +1,10 @@
 package csw.param.commands;
 
 import csw.param.models.Prefix;
-import csw.param.parameters.JKeyTypes;
-import csw.param.parameters.Key;
-import csw.param.parameters.Parameter;
-import csw.param.parameters.ParameterSetType;
+import csw.param.generics.JKeyTypes;
+import csw.param.generics.Key;
+import csw.param.generics.Parameter;
+import csw.param.generics.ParameterSetType;
 import org.junit.Assert;
 import org.junit.Test;
 

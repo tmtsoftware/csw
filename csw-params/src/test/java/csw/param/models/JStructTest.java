@@ -1,8 +1,8 @@
 package csw.param.models;
 
-import csw.param.parameters.JKeyTypes;
-import csw.param.parameters.Key;
-import csw.param.parameters.Parameter;
+import csw.param.generics.JKeyTypes;
+import csw.param.generics.Key;
+import csw.param.generics.Parameter;
 import org.junit.Assert;
 import org.junit.Test;
 
