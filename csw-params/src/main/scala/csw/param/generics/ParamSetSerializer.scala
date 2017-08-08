@@ -4,7 +4,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, 
 
 import csw.param.events._
 import csw.param.commands._
-import csw.param.commons.{CurrentState, CurrentStates, DemandState, StateVariable}
+import csw.param.states.{CurrentState, CurrentStates, DemandState, StateVariable}
 
 /**
  * Defines methods for serializing parameter sets

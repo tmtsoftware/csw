@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.models.PubSub.SubscriberMsg
 import csw.param.commands.ControlCommand
-import csw.param.commons.CurrentState
+import csw.param.states.CurrentState
 
 /////////////
 

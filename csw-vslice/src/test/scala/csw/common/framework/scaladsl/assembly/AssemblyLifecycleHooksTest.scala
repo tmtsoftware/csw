@@ -9,7 +9,7 @@ import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.models.{FromComponentLifecycleMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, FrameworkComponentTestSuite}
-import csw.param.commons.CurrentState
+import csw.param.states.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 

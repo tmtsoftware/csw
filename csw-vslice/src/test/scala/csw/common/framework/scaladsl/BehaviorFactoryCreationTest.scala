@@ -9,7 +9,7 @@ import csw.common.framework.models.Component.{ComponentInfo, DoNotRegister, HcdI
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.Initialized
 import csw.common.framework.models._
-import csw.param.commons.CurrentState
+import csw.param.states.CurrentState
 import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.Matchers
 import org.scalatest.mockito.MockitoSugar

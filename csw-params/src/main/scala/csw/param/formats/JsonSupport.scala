@@ -2,7 +2,7 @@ package csw.param.formats
 
 import csw.param.events._
 import csw.param.commands._
-import csw.param.commons.{CurrentState, DemandState, StateVariable}
+import csw.param.states.{CurrentState, DemandState, StateVariable}
 import csw.param.events.EventInfo
 import csw.param.models.Prefix
 import csw.param.generics.Parameter

@@ -7,7 +7,7 @@ import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.RunningMsg.DomainMsg
 import csw.common.framework.models.{ComponentMsg, FromComponentLifecycleMessage}
-import csw.param.commons.CurrentState
+import csw.param.states.CurrentState
 
 import scala.reflect.ClassTag
 

@@ -10,11 +10,10 @@ case class EventTime(time: Instant = Instant.now(Clock.systemUTC)) {
 }
 
 object EventTime {
-  import csw.param.formats.JsonSupport._
+  import spray.json.DefaultJsonProtocol._
+
   implicit def toEventTime(time: Instant): EventTime = EventTime(time)
-
-  implicit def toCurrent = EventTime()
-
+  implicit def toCurrent: EventTime                  = EventTime()
   implicit val format: JsonFormat[EventTime] = new JsonFormat[EventTime] {
     def write(et: EventTime): JsValue  = JsString(et.toString)
     def read(json: JsValue): EventTime = Instant.parse(json.convertTo[String])

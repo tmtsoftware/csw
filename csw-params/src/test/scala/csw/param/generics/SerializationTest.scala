@@ -1,7 +1,7 @@
 package csw.param.generics
 
 import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
-import csw.param.commons.{CurrentState, CurrentStates}
+import csw.param.states.{CurrentState, CurrentStates}
 import csw.param.events.{EventServiceEvent, SystemEvent}
 import csw.param.models.ObsId
 import org.scalatest.FunSuite

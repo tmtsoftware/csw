@@ -12,14 +12,14 @@ import scala.language.implicitConversions
  * Represents a single choice
  */
 case class Choice(name: String) {
-  override def toString = name
+  override def toString: String = name
 }
 
 /**
  * Provides implicit conversion from String to Choice
  */
 object Choice {
-  import csw.param.formats.JsonSupport._
+  import spray.json.DefaultJsonProtocol._
   implicit def toChoice(name: String): Choice       = new Choice(name)
   implicit val choiceFormat: RootJsonFormat[Choice] = jsonFormat1(Choice.apply)
 }

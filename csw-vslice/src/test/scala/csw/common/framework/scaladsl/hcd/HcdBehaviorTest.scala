@@ -7,7 +7,7 @@ import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
-import csw.param.commons.CurrentState
+import csw.param.states.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 

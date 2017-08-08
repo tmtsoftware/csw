@@ -169,7 +169,7 @@ trait ParameterSetType[T <: ParameterSetType[T]] { self: T =>
 
   protected def dataToString: String = paramSet.mkString("(", ", ", ")")
 
-  override def toString = s"$typeName$dataToString"
+  override def toString: String = s"$typeName$dataToString"
 
   /**
    * Returns true if the data contains the given key

@@ -1,7 +1,7 @@
 package csw.param.formats
 
-import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
-import csw.param.commons.{CurrentState, DemandState}
+import csw.param.commands._
+import csw.param.states.{CurrentState, DemandState}
 import csw.param.events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.formats.JsonSupport._
 import csw.param.models.{Subsystem, _}

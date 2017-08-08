@@ -2,7 +2,6 @@ package csw.param.models
 
 import java.util
 
-import csw.param.formats.JsonSupport
 import spray.json.JsonFormat
 
 import scala.collection.JavaConverters._
@@ -17,7 +16,8 @@ case class ArrayData[T](data: mutable.WrappedArray[T]) {
   override def toString: String = data.mkString("(", ",", ")")
 }
 
-object ArrayData extends JsonSupport {
+object ArrayData {
+  import csw.param.formats.JsonSupport._
   implicit def format[T: JsonFormat: ClassTag]: JsonFormat[ArrayData[T]] =
     jsonFormat1((xs: mutable.WrappedArray[T]) ⇒ new ArrayData[T](xs))
 

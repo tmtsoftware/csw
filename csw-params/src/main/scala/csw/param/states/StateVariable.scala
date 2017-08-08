@@ -1,4 +1,4 @@
-package csw.param.commons
+package csw.param.states
 
 import csw.param.commands.Setup
 import csw.param.generics.{Parameter, ParameterSetKeyData, ParameterSetType}

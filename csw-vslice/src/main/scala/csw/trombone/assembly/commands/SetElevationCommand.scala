@@ -11,7 +11,7 @@ import csw.common.framework.models.CommandMsg.Submit
 import csw.common.framework.models.PubSub
 import csw.common.framework.models.SupervisorIdleMsg.Running
 import csw.param.commands.Setup
-import csw.param.commons.CurrentState
+import csw.param.states.CurrentState
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.trombone.hcd.TromboneHcdState

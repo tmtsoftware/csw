@@ -9,7 +9,7 @@ import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.Component.{AssemblyInfo, ComponentInfo, DoNotRegister, HcdInfo}
 import csw.common.framework.models.ComponentMsg
 import csw.common.framework.models.PubSub.PublisherMsg
-import csw.param.commons.CurrentState
+import csw.param.states.CurrentState
 import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 

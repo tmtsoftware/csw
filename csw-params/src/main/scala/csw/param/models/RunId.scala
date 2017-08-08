@@ -8,7 +8,7 @@ import spray.json.{JsString, JsValue, JsonFormat}
  * Implementation of unique id for each running command (returned from a queue submit).
  */
 object RunId {
-  import csw.param.formats.JsonSupport._
+  import spray.json.DefaultJsonProtocol._
 
   implicit val format: JsonFormat[RunId] = new JsonFormat[RunId] {
     override def write(obj: RunId): JsValue = JsString(obj.id)

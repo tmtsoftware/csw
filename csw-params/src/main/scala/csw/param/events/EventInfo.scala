@@ -19,7 +19,7 @@ case class EventInfo(source: Prefix,
                      eventTime: EventTime,
                      obsId: Option[ObsId],
                      eventId: String = UUID.randomUUID().toString) {
-  override def toString = s"$source: eId: $eventId, time: $eventTime, obsId: $obsId"
+  override def toString: String = s"$source: eId: $eventId, time: $eventTime, obsId: $obsId"
 
   override def equals(that: Any): Boolean = {
     that match {
@@ -32,7 +32,7 @@ case class EventInfo(source: Prefix,
 }
 
 object EventInfo {
-  import csw.param.formats.JsonSupport._
+  import spray.json.DefaultJsonProtocol._
   implicit def apply(prefixStr: String): EventInfo = {
     val prefix: Prefix = prefixStr
     EventInfo(prefix, EventTime.toCurrent, None)

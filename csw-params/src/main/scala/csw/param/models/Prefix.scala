@@ -11,7 +11,7 @@ import scala.language.implicitConversions
  * @param prefix    the subsystem's prefix
  */
 case class Prefix(subsystem: Subsystem, prefix: String) {
-  override def toString = s"[$subsystem, $prefix]"
+  override def toString: String = s"[$subsystem, $prefix]"
 
   /**
    * Creates a Prefix from the given string
@@ -27,7 +27,7 @@ case class Prefix(subsystem: Subsystem, prefix: String) {
  * A top level key for a parameter set: combines subsystem and the subsystem's prefix
  */
 object Prefix {
-  import csw.param.formats.JsonSupport._
+  import spray.json.DefaultJsonProtocol._
   private val SEPARATOR = '.'
 
   /**

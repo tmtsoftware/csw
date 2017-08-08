@@ -3,7 +3,7 @@ package csw.param.generics
 import csw.param.commands.{CommandInfo, Observe, Setup}
 import csw.param.events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.models.Prefix
-import csw.param.commons.{CurrentState, DemandState}
+import csw.param.states.{CurrentState, DemandState}
 import csw.units.Units
 import csw.units.Units.NoUnits
 
