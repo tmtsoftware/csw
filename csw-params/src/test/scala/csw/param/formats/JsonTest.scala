@@ -1,10 +1,8 @@
 package csw.param.formats
 
 import csw.param.commands._
-import csw.param.states.{CurrentState, DemandState}
 import csw.param.events.{ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.formats.JsonSupport._
-import csw.param.models.{Subsystem, _}
 import csw.param.generics.KeyType.{
   ByteMatrixKey,
   ChoiceKey,
@@ -17,12 +15,14 @@ import csw.param.generics.KeyType.{
   StructKey
 }
 import csw.param.generics._
-import csw.units.Units.{degrees, meters, NoUnits}
+import csw.param.models.{Subsystem, _}
+import csw.param.states.{CurrentState, DemandState}
+import csw.units.Units
+import csw.units.Units.{degrees, encoder, meters, NoUnits}
 import org.scalatest.FunSpec
 import spray.json._
 
 //DEOPSCSW-188: Efficient Serialization to/from JSON
-//noinspection ScalaUnusedSymbol
 class JsonTest extends FunSpec {
 
   private val s1: String = "encoder"
@@ -38,21 +38,43 @@ class JsonTest extends FunSpec {
 
     it("should encode and decode properly") {
       val json = wfos.toJson
-      //info("wfos: " + json)
-      val sub = json.convertTo[Subsystem]
+      val sub  = json.convertTo[Subsystem]
       assert(sub == wfos)
+    }
+  }
+
+  describe("Test Units JSON") {
+    val encoderUnit: Units = encoder
+
+    it("should encode and decode properly") {
+      val json                 = encoderUnit.toJson
+      val encoderUnitsFromJson = json.convertTo[Units]
+      assert(encoderUnit == encoderUnitsFromJson)
     }
   }
 
   describe("Test concrete items") {
 
-    it("char item encode/decode") {
+    it("char item encode/decode without units") {
       val k1 = KeyType.CharKey.make(s3)
       val i1 = k1.set('d').withUnits(NoUnits)
 
       val j1  = i1.toJson
       val in1 = j1.convertTo[Parameter[Char]]
       assert(in1 == i1)
+      assert(in1.units == i1.units)
+      assert(in1.units == NoUnits)
+    }
+
+    it("char item encode/decode with units") {
+      val k1 = KeyType.CharKey.make(s3)
+      val i1 = k1.set('d').withUnits(encoder)
+
+      val j1  = i1.toJson
+      val in1 = j1.convertTo[Parameter[Char]]
+      assert(in1 == i1)
+      assert(in1.units == i1.units)
+      assert(in1.units == encoder)
     }
 
     it("short item encode/decode") {
@@ -146,7 +168,7 @@ class JsonTest extends FunSpec {
     }
   }
 
-  describe("Setup JSON") {
+  describe("Commands and Events JSON") {
 
     val k1 = KeyType.CharKey.make("a")
     val k2 = KeyType.IntKey.make("b")
@@ -178,6 +200,15 @@ class JsonTest extends FunSpec {
       assert(c1.size == 7)
       val c1out = JsonSupport.writeSequenceCommand(c1)
       val c1in  = JsonSupport.readSequenceCommand[Observe](c1out)
+      assert(c1in(k3).head == 1234L)
+      assert(c1in == c1)
+    }
+
+    it("Should encode/decode an Wait") {
+      val c1 = Wait(commandInfo, ck).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
+      assert(c1.size == 7)
+      val c1out = JsonSupport.writeSequenceCommand(c1)
+      val c1in  = JsonSupport.readSequenceCommand[Wait](c1out)
       assert(c1in(k3).head == 1234L)
       assert(c1in == c1)
     }
@@ -224,15 +255,6 @@ class JsonTest extends FunSpec {
       assert(c1.size == 7)
       val c1out = JsonSupport.writeStateVariable(c1)
       val c1in  = JsonSupport.readStateVariable[DemandState](c1out)
-      assert(c1in(k3).head == 1234L)
-      assert(c1in == c1)
-    }
-
-    it("Should encode/decode an Wait") {
-      val c1 = Wait(commandInfo, ck).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
-      assert(c1.size == 7)
-      val c1out = JsonSupport.writeSequenceCommand(c1)
-      val c1in  = JsonSupport.readSequenceCommand[Wait](c1out)
       assert(c1in(k3).head == 1234L)
       assert(c1in == c1)
     }
@@ -449,7 +471,6 @@ class JsonTest extends FunSpec {
       assert(sc1(k1).head == m1)
 
       val sc1out = JsonSupport.writeSequenceCommand(sc1)
-      //      info("sc1out: " + sc1out.prettyPrint)
 
       val sc1in = JsonSupport.readSequenceCommand[Setup](sc1out)
       assert(sc1.equals(sc1in))
@@ -500,10 +521,7 @@ class JsonTest extends FunSpec {
       val sc1in: Setup = JsonSupport.readSequenceCommand[Setup](sc1out)
       assert(sc1.equals(sc1in))
       assert(sc1in(k1).head == c1)
-      //      val x = sc1in.get(k1).flatMap(_.head.get(ra))
       assert(sc1in(k1).head.get(ra).head.head == "12:13:14.1")
-
-      //assert(sc1in(k1).value(1).name == "probe2")
 
       val sc2 = Setup(commandInfo, ck).add(k1.set(c1, c2))
       assert(sc2 == sc1)
