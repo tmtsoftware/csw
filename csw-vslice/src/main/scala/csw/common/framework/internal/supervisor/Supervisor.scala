@@ -40,21 +40,21 @@ class Supervisor(
     componentBehaviorFactory: ComponentBehaviorFactory[_]
 ) extends MutableBehavior[SupervisorMsg] {
 
-  implicit val ec: ExecutionContextExecutor      = ctx.executionContext
-  private val shutdownTimeout: FiniteDuration    = 5.seconds
-  private var shutdownTimer: Option[Cancellable] = None
-  private val name                               = componentInfo.componentName
-  private val componentId                        = ComponentId(name, componentInfo.componentType)
-  private var haltingFlag                        = false
-  var lifecycleState: LifecycleState             = LifecycleWaitingForInitialized
-  var runningComponent: ActorRef[RunningMsg]     = _
-  var mode: SupervisorMode                       = SupervisorMode.Idle
-  var isOnline: Boolean                          = false
+  implicit private val ec: ExecutionContextExecutor = ctx.executionContext
+  private val shutdownTimeout: FiniteDuration       = 5.seconds
+  private var shutdownTimer: Option[Cancellable]    = None
+  val name: String                                  = componentInfo.componentName
+  val componentId                                   = ComponentId(name, componentInfo.componentType)
+  var haltingFlag                                   = false
+  var lifecycleState: LifecycleState                = LifecycleWaitingForInitialized
+  var runningComponent: ActorRef[RunningMsg]        = _
+  var mode: SupervisorMode                          = SupervisorMode.Idle
+  var isOnline: Boolean                             = false
 
-  val pubSubComponent: ActorRef[PubSub[CurrentState]] =
-    ctx.spawn(PubSubActor.behavior[CurrentState], "pub-sub-component")
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
     ctx.spawn(PubSubActor.behavior[LifecycleStateChanged], "pub-sub-lifecycle")
+  val pubSubComponent: ActorRef[PubSub[CurrentState]] =
+    ctx.spawn(PubSubActor.behavior[CurrentState], "pub-sub-component")
   val component: ActorRef[Nothing] =
     ctx.spawn[Nothing](componentBehaviorFactory.behavior(componentInfo, ctx.self, pubSubComponent), "component")
 
