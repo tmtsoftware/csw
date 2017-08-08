@@ -14,6 +14,7 @@ import csw.common.framework.javadsl.JComponentBehaviorFactory;
 import csw.common.framework.javadsl.JComponentHandlers;
 import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.*;
+import csw.param.states.CurrentState;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class JHcdBehaviorTest {
     private JComponentBehaviorFactory getSampleJHcdFactory(JComponentHandlers hcdHandlers) {
         return new JComponentBehaviorFactory<HcdDomainMsg>(HcdDomainMsg.class) {
             @Override
-            public JComponentHandlers<HcdDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.ComponentInfo componentInfo) {
+            public JComponentHandlers<HcdDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
                 return hcdHandlers;
             }
         };
@@ -69,7 +70,7 @@ public class JHcdBehaviorTest {
         TestProbe<FromComponentLifecycleMessage> supervisorProbe = TestProbe.apply(system, settings);
 
         Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-        Behavior<Nothing$> behavior = getSampleJHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref());
+        Behavior<Nothing$> behavior = getSampleJHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref(), null);
         Future<ActorRef> hcd = system.<Nothing$>systemActorOf(behavior, "hcd", Props.empty(), seconds);
         FiniteDuration seconds1 = Duration.create(5, "seconds");
         ActorRef hcdRef = Await.result(hcd, seconds1);

@@ -14,6 +14,7 @@ import csw.common.framework.javadsl.JComponentBehaviorFactory;
 import csw.common.framework.javadsl.JComponentHandlers;
 import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.*;
+import csw.param.states.CurrentState;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class JAssemblyBehaviorTest {
         return new JComponentBehaviorFactory<AssemblyDomainMsg>(AssemblyDomainMsg.class) {
 
             @Override
-            public JComponentHandlers<AssemblyDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.ComponentInfo componentInfo) {
+            public JComponentHandlers<AssemblyDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
                 return assemblyHandlers;
             }
         };
@@ -69,7 +70,7 @@ public class JAssemblyBehaviorTest {
         TestProbe<FromComponentLifecycleMessage> supervisorProbe = TestProbe.apply(system, settings);
 
         Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-        Behavior<Nothing$> behavior = getSampleJAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref());
+        Behavior<Nothing$> behavior = getSampleJAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref(), null);
         Future<ActorRef> assembly = system.<Nothing$>systemActorOf(behavior, "assembly", Props.empty(), seconds);
         FiniteDuration seconds1 = Duration.create(5, "seconds");
         ActorRef assemblyRef = Await.result(assembly, seconds1);
