@@ -86,22 +86,20 @@ object CommandMsg {
 
 sealed trait SupervisorMsg
 
-///////////////
-
 sealed trait FromComponentLifecycleMessage extends SupervisorMsg
 
-///////////////
-
-sealed trait ShutdownMsg extends SupervisorMsg
-
-///////////////
-
-sealed trait CommonSupervisorMsg extends SupervisorIdleMsg with RunningMsg with ShutdownMsg
+sealed trait CommonSupervisorMsg extends SupervisorMsg
 object CommonSupervisorMsg {
   case class LifecycleStateSubscription(subscriberMsg: SubscriberMsg[LifecycleStateChanged]) extends CommonSupervisorMsg
   case class ComponentStateSubscription(subscriberMsg: SubscriberMsg[CurrentState])          extends CommonSupervisorMsg
   case object HaltComponent                                                                  extends CommonSupervisorMsg
+}
 
+sealed trait SupervisorIdleMsg extends FromComponentLifecycleMessage
+object SupervisorIdleMsg {
+  case class Initialized(componentRef: ActorRef[InitialMsg]) extends SupervisorIdleMsg
+  case class InitializeFailure(reason: String)               extends SupervisorIdleMsg
+  case class Running(componentRef: ActorRef[RunningMsg])     extends SupervisorIdleMsg
 }
 
 sealed trait PreparingToShutdownMsg extends SupervisorMsg
@@ -109,11 +107,4 @@ object PreparingToShutdownMsg {
   case object ShutdownTimeout                extends PreparingToShutdownMsg
   case class ShutdownFailure(reason: String) extends PreparingToShutdownMsg
   case object ShutdownComplete               extends PreparingToShutdownMsg with FromComponentLifecycleMessage
-}
-
-sealed trait SupervisorIdleMsg extends FromComponentLifecycleMessage with SupervisorMsg
-object SupervisorIdleMsg {
-  case class Initialized(componentRef: ActorRef[InitialMsg]) extends SupervisorIdleMsg
-  case class InitializeFailure(reason: String)               extends SupervisorIdleMsg
-  case class Running(componentRef: ActorRef[RunningMsg])     extends SupervisorIdleMsg
 }

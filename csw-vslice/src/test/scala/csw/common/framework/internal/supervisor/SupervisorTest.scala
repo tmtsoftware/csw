@@ -6,7 +6,7 @@ import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.CommonSupervisorMsg.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.LifecycleState.LifecycleRunning
-import csw.common.framework.models.PubSub.{Publish, Subscribe}
+import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
@@ -76,8 +76,15 @@ class SupervisorTest
 
     supervisor.mode shouldBe previousSupervisorMode
 
-    val message = childPubSubLifecycleInbox.receiveMsg()
-    message shouldBe Subscribe[LifecycleStateChanged](subscriberProbe.ref)
+    val subscribeMessage = childPubSubLifecycleInbox.receiveMsg()
+    subscribeMessage shouldBe Subscribe[LifecycleStateChanged](subscriberProbe.ref)
+
+    supervisor.onMessage(LifecycleStateSubscription(Unsubscribe[LifecycleStateChanged](subscriberProbe.ref)))
+
+    supervisor.mode shouldBe previousSupervisorMode
+
+    val unsubscribeMessage = childPubSubLifecycleInbox.receiveMsg()
+    unsubscribeMessage shouldBe Unsubscribe[LifecycleStateChanged](subscriberProbe.ref)
   }
 
   test("supervisor should handle ComponentStateSubscription message by coordinating with pub sub actor") {
@@ -91,8 +98,15 @@ class SupervisorTest
 
     supervisor.mode shouldBe previousSupervisorMode
 
-    val message = childPubSubCompStateInbox.receiveMsg()
-    message shouldBe Subscribe[CurrentState](subscriberProbe.ref)
+    val subscribeMessage = childPubSubCompStateInbox.receiveMsg()
+    subscribeMessage shouldBe Subscribe[CurrentState](subscriberProbe.ref)
+
+    supervisor.onMessage(ComponentStateSubscription(Unsubscribe[CurrentState](subscriberProbe.ref)))
+
+    supervisor.mode shouldBe previousSupervisorMode
+
+    val unsubscribeMessage = childPubSubCompStateInbox.receiveMsg()
+    unsubscribeMessage shouldBe Unsubscribe[CurrentState](subscriberProbe.ref)
   }
 
 }
