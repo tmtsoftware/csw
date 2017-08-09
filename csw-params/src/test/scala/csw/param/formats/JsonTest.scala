@@ -41,7 +41,7 @@ class JsonTest extends FunSpec {
       val json = wfos.toJson
       val sub  = json.convertTo[Subsystem]
       assert(sub == wfos)
-      assert(json.prettyPrint.equals(expectedJson))
+      assert(json.compactPrint.equals(expectedJson))
     }
   }
 
