@@ -38,8 +38,8 @@ class JsonTest extends FunSpec {
 
     it("should encode and decode properly") {
       val expectedJson = "\"wfos\""
-      val json = wfos.toJson
-      val sub  = json.convertTo[Subsystem]
+      val json         = wfos.toJson
+      val sub          = json.convertTo[Subsystem]
       assert(sub == wfos)
       assert(json.compactPrint.equals(expectedJson))
     }
