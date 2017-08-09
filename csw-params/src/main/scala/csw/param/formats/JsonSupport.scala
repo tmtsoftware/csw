@@ -8,18 +8,23 @@ import csw.param.states.StateVariable.StateVariable
 import csw.param.states.{CurrentState, DemandState}
 import spray.json._
 
-object JsonSupport extends JsonSupport
+object JsonSupport
+    extends JsonSupport
+    with DefaultJsonProtocol
+    with JavaFormats
+    with EnumJsonSupport
+    with WrappedArrayProtocol
 
 /**
  * Supports conversion of commands and events to/from JSON
  */
 //noinspection TypeAnnotation
-trait JsonSupport extends DefaultJsonProtocol with JavaFormats with EnumJsonSupport with WrappedArrayProtocol {
+trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupport with WrappedArrayProtocol ⇒
 
   // JSON formats
   val paramSetFormat    = implicitly[JsonFormat[Set[Parameter[_]]]]
   val commandInfoFormat = implicitly[JsonFormat[CommandInfo]]
-  val prefixFormat      = implicitly[JsonFormat[Prefix]]
+  lazy val prefixFormat = implicitly[JsonFormat[Prefix]]
   val eventInfoFormat   = implicitly[JsonFormat[EventInfo]]
 
   // config and event type JSON tags

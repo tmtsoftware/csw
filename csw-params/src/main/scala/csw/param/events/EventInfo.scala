@@ -34,17 +34,17 @@ case class EventInfo(source: Prefix,
 object EventInfo {
   import spray.json.DefaultJsonProtocol._
   implicit def apply(prefixStr: String): EventInfo = {
-    val prefix: Prefix = prefixStr
+    val prefix: Prefix = Prefix(prefixStr)
     EventInfo(prefix, EventTime.toCurrent, None)
   }
 
   implicit def apply(prefixStr: String, time: EventTime): EventInfo = {
-    val prefix: Prefix = prefixStr
+    val prefix: Prefix = Prefix(prefixStr)
     EventInfo(prefix, time, None)
   }
 
   implicit def apply(prefixStr: String, time: EventTime, obsId: ObsId): EventInfo = {
-    val prefix: Prefix = prefixStr
+    val prefix: Prefix = Prefix(prefixStr)
     EventInfo(prefix, time, Some(obsId))
   }
 

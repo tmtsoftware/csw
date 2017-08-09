@@ -83,12 +83,12 @@ case class DemandState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[P
   /**
    * This is here for Java to construct with String
    */
-  def this(prefix: String) = this(Prefix.stringToPrefix(prefix))
+  def this(prefix: String) = this(Prefix(prefix))
 
   /**
    * Java API to create a DemandState from a Setup
    */
-  def this(command: Setup) = this(command.prefixStr, command.paramSet)
+  def this(command: Setup) = this(command.prefix, command.paramSet)
 
   // The following overrides are needed for the Java API and javadocs
   // (Using a Java interface caused various Java compiler errors)
@@ -100,7 +100,7 @@ object DemandState {
   /**
    * Converts a Setup to a DemandState
    */
-  implicit def apply(command: Setup): DemandState = DemandState(command.prefixStr, command.paramSet)
+  implicit def apply(command: Setup): DemandState = DemandState(command.prefix, command.paramSet)
 }
 
 /**
@@ -119,12 +119,12 @@ case class CurrentState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[
   /**
    * This is here for Java to construct with String
    */
-  def this(prefix: String) = this(Prefix.stringToPrefix(prefix))
+  def this(prefix: String) = this(Prefix(prefix))
 
   /**
    * Java API to create a DemandState from a Setup
    */
-  def this(command: Setup) = this(command.prefixStr, command.paramSet)
+  def this(command: Setup) = this(command.prefix, command.paramSet)
 
   // The following overrides are needed for the Java API and javadocs
   // (Using a Java interface caused various Java compiler errors)

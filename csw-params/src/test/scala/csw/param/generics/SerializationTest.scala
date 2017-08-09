@@ -3,7 +3,7 @@ package csw.param.generics
 import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
 import csw.param.states.{CurrentState, CurrentStates}
 import csw.param.events.{EventServiceEvent, SystemEvent}
-import csw.param.models.ObsId
+import csw.param.models.{ObsId, Prefix}
 import org.scalatest.FunSuite
 
 //DEOPSCSW-187: Efficient serialization to/from binary
@@ -26,14 +26,14 @@ class SerializationTest extends FunSuite {
   val epoch        = KeyType.DoubleKey.make("epoch")
   val test         = KeyType.IntKey.make("test")
 
-  val sc1 = Setup(commandInfo, "tcs.pos").madd(
+  val sc1 = Setup(commandInfo, Prefix("tcs.pos")).madd(
     ra.set("12:32:11"),
     dec.set("30:22:22"),
     epoch.set(1950.0),
     test.set(1)
   ) //.second
 
-  val cs1 = CurrentState("tcs.pos").madd(
+  val cs1 = CurrentState(Prefix("tcs.pos")).madd(
     ra.set("12:32:11"),
     dec.set("30:22:22"),
     epoch.set(1950.0),
@@ -42,15 +42,15 @@ class SerializationTest extends FunSuite {
 
   val disperser = KeyType.StringKey.make("disperser")
   val filter1   = KeyType.StringKey.make("filter1")
-  val sc2 = Setup(commandInfo, "wfos.blue")
+  val sc2 = Setup(commandInfo, Prefix("wfos.blue"))
     .add(disperser.set("gr243"))
     .add(filter1.set("GG433"))
 
-  val ob1 = Observe(commandInfo, "wfos.blue.camera")
+  val ob1 = Observe(commandInfo, Prefix("wfos.blue.camera"))
     .add(exposureTime.set(22.3)) // .sec,
     .add(repeats.set(3))
 
-  val wc1 = Wait(commandInfo, "wfos.blue.camera")
+  val wc1 = Wait(commandInfo, Prefix("wfos.blue.camera"))
 
   test("ConfigType Java serialization") {
     import csw.param.generics.ParamSetSerializer._

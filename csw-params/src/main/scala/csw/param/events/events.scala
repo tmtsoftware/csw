@@ -86,7 +86,7 @@ object StatusEvent {
   def apply(prefix: String, time: EventTime): StatusEvent = StatusEvent(EventInfo(prefix, time))
 
   def apply(prefix: String, time: EventTime, obsId: ObsId): StatusEvent =
-    StatusEvent(EventInfo(prefix, time, Some(obsId)))
+    StatusEvent(EventInfo(Prefix(prefix), time, Some(obsId)))
 }
 
 /**
@@ -115,7 +115,7 @@ object ObserveEvent {
   def apply(prefix: String, time: EventTime): ObserveEvent = ObserveEvent(EventInfo(prefix, time))
 
   def apply(prefix: String, time: EventTime, obsId: ObsId): ObserveEvent =
-    ObserveEvent(EventInfo(prefix, time, Some(obsId)))
+    ObserveEvent(EventInfo(Prefix(prefix), time, Some(obsId)))
 }
 
 /**
@@ -144,5 +144,5 @@ object SystemEvent {
   def apply(prefix: String, time: EventTime): SystemEvent = SystemEvent(EventInfo(prefix, time))
 
   def apply(prefix: String, time: EventTime, obsId: ObsId): SystemEvent =
-    SystemEvent(EventInfo(prefix, time, Some(obsId)))
+    SystemEvent(EventInfo(Prefix(prefix), time, Some(obsId)))
 }

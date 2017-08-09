@@ -56,7 +56,7 @@ case class Setup(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] 
   override def create(data: Set[Parameter[_]]) = Setup(info, prefix, data)
 
   // This is here for Java to construct with String
-  def this(info: CommandInfo, prefix: String) = this(info, Prefix.stringToPrefix(prefix))
+  def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
 
   // The following overrides are needed for the Java API and javadocs
   // (Using a Java interface caused various Java compiler errors)
@@ -80,7 +80,7 @@ case class Wait(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] =
   override def create(data: Set[Parameter[_]]) = Wait(info, prefix, data)
 
   // This is here for Java to construct with String
-  def this(info: CommandInfo, prefix: String) = this(info, Prefix.stringToPrefix(prefix))
+  def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
 
   // The following overrides are needed for the Java API and javadocs
   // (Using a Java interface caused various Java compiler errors)
@@ -105,7 +105,7 @@ case class Observe(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]
   override def create(data: Set[Parameter[_]]) = Observe(info, prefix, data)
 
   // This is here for Java to construct with String
-  def this(info: CommandInfo, prefix: String) = this(info, Prefix.stringToPrefix(prefix))
+  def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
 
   // The following overrides are needed for the Java API and javadocs
   // (Using a Java interface caused various Java compiler errors)

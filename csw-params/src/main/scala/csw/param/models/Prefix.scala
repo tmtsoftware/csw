@@ -2,8 +2,6 @@ package csw.param.models
 
 import spray.json.RootJsonFormat
 
-import scala.language.implicitConversions
-
 /**
  * Combines subsystem and the subsystem's prefix
  *
@@ -30,17 +28,12 @@ object Prefix {
   import spray.json.DefaultJsonProtocol._
   private val SEPARATOR = '.'
 
-  /**
-   * Creates a Prefix from the given string
-   *
-   * @return an Prefix object parsed for the subsystem and prefix
-   */
-  implicit def stringToPrefix(prefix: String): Prefix = Prefix(subsystem(prefix), prefix)
+  def apply(prefix: String): Prefix = Prefix(subsystem(prefix), prefix)
 
   private def subsystem(keyText: String): Subsystem = {
     assert(keyText != null)
     Subsystem.withNameOption(keyText.splitAt(keyText.indexOf(SEPARATOR))._1).getOrElse(Subsystem.BAD)
   }
 
-  implicit val parameterSetKeyFormat: RootJsonFormat[Prefix] = jsonFormat2(Prefix.apply)
+  implicit val format: RootJsonFormat[Prefix] = jsonFormat2(Prefix.apply)
 }

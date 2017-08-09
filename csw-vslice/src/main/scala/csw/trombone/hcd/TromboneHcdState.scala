@@ -22,7 +22,7 @@ object TromboneHcdState {
   val tromboneAxisName = "tromboneAxis"
 
   val axisStatePrefix             = s"$trombonePrefix.axis1State"
-  val axisStateCK: Prefix         = axisStatePrefix
+  val axisStateCK: Prefix         = Prefix(axisStatePrefix)
   val axisNameKey                 = KeyType.StringKey.make("axisName")
   val AXIS_IDLE                   = Choice(AxisState.AXIS_IDLE.toString)
   val AXIS_MOVING                 = Choice(AxisState.AXIS_MOVING.toString)
@@ -44,7 +44,7 @@ object TromboneHcdState {
   )
 
   val axisStatsPrefix     = s"$trombonePrefix.axisStats"
-  val axisStatsCK: Prefix = axisStatsPrefix
+  val axisStatsCK: Prefix = Prefix(axisStatsPrefix)
   val datumCountKey       = KeyType.IntKey.make("initCount")
   val moveCountKey        = KeyType.IntKey.make("moveCount")
   val homeCountKey        = KeyType.IntKey.make("homeCount")
@@ -64,7 +64,7 @@ object TromboneHcdState {
   )
 
   val axisConfigPrefix     = s"$trombonePrefix.axisConfig"
-  val axisConfigCK: Prefix = axisConfigPrefix
+  val axisConfigCK: Prefix = Prefix(axisConfigPrefix)
   // axisNameKey
   val lowLimitKey    = KeyType.IntKey.make("lowLimit")
   val lowUserKey     = KeyType.IntKey.make("lowUser")
@@ -79,20 +79,20 @@ object TromboneHcdState {
   )
 
   val axisMovePrefix     = s"$trombonePrefix.move"
-  val axisMoveCK: Prefix = axisMovePrefix
+  val axisMoveCK: Prefix = Prefix(axisMovePrefix)
 
   def positionSC(commandInfo: CommandInfo, value: Int): Setup =
     Setup(commandInfo, axisMoveCK).add(positionKey -> value withUnits encoder)
 
   val axisDatumPrefix                   = s"$trombonePrefix.datum"
-  val axisDatumCK: Prefix               = axisDatumPrefix
+  val axisDatumCK: Prefix               = Prefix(axisDatumPrefix)
   def datumSC(commandInfo: CommandInfo) = Setup(commandInfo, axisDatumCK)
 
   val axisHomePrefix                   = s"$trombonePrefix.home"
-  val axisHomeCK: Prefix               = axisHomePrefix
+  val axisHomeCK: Prefix               = Prefix(axisHomePrefix)
   def homeSC(commandInfo: CommandInfo) = Setup(commandInfo, axisHomeCK)
 
   val axisCancelPrefix                   = s"$trombonePrefix.cancel"
-  val axisCancelCK: Prefix               = axisCancelPrefix
+  val axisCancelCK: Prefix               = Prefix(axisCancelPrefix)
   def cancelSC(commandInfo: CommandInfo) = Setup(commandInfo, axisCancelCK)
 }

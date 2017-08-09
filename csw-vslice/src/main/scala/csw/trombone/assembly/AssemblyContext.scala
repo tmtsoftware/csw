@@ -29,43 +29,43 @@ case class AssemblyContext(info: AssemblyInfo,
   // Public command configurations
   // Init submit command
   val initPrefix     = s"$componentPrefix.init"
-  val initCK: Prefix = initPrefix
+  val initCK: Prefix = Prefix(initPrefix)
 
   // Dataum submit command
   val datumPrefix     = s"$componentPrefix.datum"
-  val datumCK: Prefix = datumPrefix
+  val datumCK: Prefix = Prefix(datumPrefix)
 
   // Stop submit command
   val stopPrefix     = s"$componentPrefix.stop"
-  val stopCK: Prefix = stopPrefix
+  val stopCK: Prefix = Prefix(stopPrefix)
 
   // Move submit command
   val movePrefix     = s"$componentPrefix.move"
-  val moveCK: Prefix = movePrefix
+  val moveCK: Prefix = Prefix(movePrefix)
 
   def moveSC(position: Double): Setup =
     Setup(commandInfo, moveCK).add(stagePositionKey -> position withUnits stagePositionUnits)
 
   // Position submit command
   val positionPrefix     = s"$componentPrefix.position"
-  val positionCK: Prefix = positionPrefix
+  val positionCK: Prefix = Prefix(positionPrefix)
 
   def positionSC(rangeDistance: Double): Setup =
     Setup(commandInfo, positionCK).add(naRangeDistanceKey -> rangeDistance withUnits naRangeDistanceUnits)
 
   // setElevation submit command
   val setElevationPrefix                       = s"$componentPrefix.setElevation"
-  val setElevationCK: Prefix                   = setElevationPrefix
+  val setElevationCK: Prefix                   = Prefix(setElevationPrefix)
   def setElevationSC(elevation: Double): Setup = Setup(commandInfo, setElevationCK).add(naElevation(elevation))
 
   // setAngle submit command
   val setAnglePrefx                          = s"$componentPrefix.setAngle"
-  val setAngleCK: Prefix                     = setAnglePrefx
+  val setAngleCK: Prefix                     = Prefix(setAnglePrefx)
   def setAngleSC(zenithAngle: Double): Setup = Setup(commandInfo, setAngleCK).add(za(zenithAngle))
 
   // Follow submit command
   val followPrefix     = s"$componentPrefix.follow"
-  val followCK: Prefix = followPrefix
+  val followCK: Prefix = Prefix(followPrefix)
   val nssInUseKey      = KeyType.BooleanKey.make("nssInUse")
 
   def setNssInUse(value: Boolean) = nssInUseKey -> value
@@ -113,11 +113,11 @@ case class AssemblyContext(info: AssemblyInfo,
   // ---------- Keys used by TromboneEventSubscriber and Others
   // This is the zenith angle from TCS
   val zenithAnglePrefix = "TCS.tcsPk.zenithAngle"
-  val zaPrefix: Prefix  = zenithAnglePrefix
+  val zaPrefix: Prefix  = Prefix(zenithAnglePrefix)
 
   // This is the focus error from RTC
   val focusErrorPrefix = "RTC.focusError"
-  val fePrefix: Prefix = focusErrorPrefix
+  val fePrefix: Prefix = Prefix(focusErrorPrefix)
 
   // ----------- Keys, etc. used by trombonePublisher, calculator, comamnds
   val aoSystemEventPrefix            = s"$componentPrefix.sodiumLayer"
