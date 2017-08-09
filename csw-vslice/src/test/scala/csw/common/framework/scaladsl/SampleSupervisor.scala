@@ -48,7 +48,7 @@ object SampleSupervisor extends App {
   val system = ActorSystem("test")
   import akka.typed.scaladsl.adapter._
 
-  val supervisor = system.spawn(ComponentWiring.supervisorBehavior(hcdInfo), hcdInfo.componentClassName)
+  val supervisor = system.spawn(SupervisorBehaviorFactory.make(hcdInfo), hcdInfo.componentClassName)
 
   supervisor ! Lifecycle(Shutdown)
 }

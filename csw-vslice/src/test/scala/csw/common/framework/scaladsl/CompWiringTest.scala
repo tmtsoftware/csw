@@ -1,8 +1,8 @@
 package csw.common.framework.scaladsl
 
+import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.Validation
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.Component.{ComponentInfo, DoNotRegister, HcdInfo}
@@ -52,7 +52,7 @@ class CompWiringTest extends FrameworkComponentTestSuite with Matchers with Mock
     val testSupervisor = TestProbe[FromComponentLifecycleMessage]
 
     val supervisor =
-      Await.result(system.systemActorOf(ComponentWiring.supervisorBehavior(hcdInfo), "sampleHcd"), 5.seconds)
+      Await.result(system.systemActorOf(SupervisorBehaviorFactory.make(hcdInfo), "sampleHcd"), 5.seconds)
 
     Thread.sleep(1000)
     supervisor ! Lifecycle(Shutdown)
