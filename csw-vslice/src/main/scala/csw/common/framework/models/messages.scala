@@ -86,14 +86,14 @@ object CommandMsg {
 
 sealed trait SupervisorMsg
 
-sealed trait FromComponentLifecycleMessage extends SupervisorMsg
-
 sealed trait CommonSupervisorMsg extends SupervisorMsg
 object CommonSupervisorMsg {
   case class LifecycleStateSubscription(subscriberMsg: SubscriberMsg[LifecycleStateChanged]) extends CommonSupervisorMsg
   case class ComponentStateSubscription(subscriberMsg: SubscriberMsg[CurrentState])          extends CommonSupervisorMsg
   case object HaltComponent                                                                  extends CommonSupervisorMsg
 }
+
+sealed trait FromComponentLifecycleMessage extends SupervisorMsg
 
 sealed trait SupervisorIdleMsg extends FromComponentLifecycleMessage
 object SupervisorIdleMsg {

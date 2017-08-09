@@ -3,9 +3,15 @@ package csw.common.framework.internal.supervisor
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.hcd.HcdDomainMsg
-import csw.common.framework.models.CommonSupervisorMsg.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.common.framework.models.CommonSupervisorMsg.{
+  ComponentStateSubscription,
+  HaltComponent,
+  LifecycleStateSubscription
+}
 import csw.common.framework.models.InitialMsg.Run
+import csw.common.framework.models.PreparingToShutdownMsg.ShutdownComplete
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
@@ -106,6 +112,93 @@ class SupervisorTest
 
     val unsubscribeMessage = childPubSubCompStateInbox.receiveMsg()
     unsubscribeMessage shouldBe Unsubscribe[CurrentState](subscriberProbe.ref)
+  }
+
+  test("supervisor should handle HaltComponent message by shutting down all child actors") {
+    val testData = new TestData
+    import testData._
+
+    val subscriberProbe        = TestProbe[CurrentState]
+    val previousSupervisorMode = testData.supervisor.mode
+
+    supervisor.onMessage(HaltComponent)
+
+    supervisor.haltingFlag shouldBe true
+    ctx.selfInbox.receiveMsg() shouldBe Lifecycle(ToComponentLifecycleMessage.Shutdown)
+    supervisor.haltComponent() shouldBe true
+  }
+
+  test("supervisor should handle lifecycle Shutdown message") {
+    val testData = new TestData
+    import testData._
+
+    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
+    childPubSubLifecycleInbox.receiveAll() should contain(
+      Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown))
+    )
+    supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
+    childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.Shutdown))
+  }
+
+  test("supervisor should handle lifecycle Restart message") {
+    val testData = new TestData
+    import testData._
+
+    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
+    supervisor.mode shouldBe SupervisorMode.Idle
+    childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.Restart))
+  }
+
+  test("supervisor should handle lifecycle GoOffline message") {
+    val testData = new TestData
+    import testData._
+
+    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
+    supervisor.mode shouldBe SupervisorMode.RunningOffline
+    childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.GoOffline))
+  }
+
+  test("supervisor should handle lifecycle GoOnline message") {
+    val testData = new TestData
+    import testData._
+
+    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
+    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
+    supervisor.mode shouldBe SupervisorMode.Running
+    childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.GoOnline))
+  }
+
+  test("supervisor should accept and forward Domain message to a TLA ") {
+    val testData = new TestData
+    import testData._
+
+    sealed trait TestDomainMsg extends DomainMsg
+    case object TestCompMsg    extends TestDomainMsg
+
+    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.onMessage(TestCompMsg)
+    childComponentInbox.receiveMsg() shouldBe TestCompMsg
+  }
+
+  test("supervisor should handle ShutdownComplete message from TLA ") {
+    val testData = new TestData
+    import testData._
+
+    supervisor.onMessage(Running(childComponentInbox.ref))
+
+    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
+    supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
+    childPubSubLifecycleInbox.receiveAll() should contain(
+      Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown))
+    )
+
+    supervisor.onMessage(ShutdownComplete)
+    supervisor.mode shouldBe SupervisorMode.Shutdown
+    childPubSubLifecycleInbox.receiveAll() should contain(Publish(LifecycleStateChanged(SupervisorMode.Shutdown)))
   }
 
 }

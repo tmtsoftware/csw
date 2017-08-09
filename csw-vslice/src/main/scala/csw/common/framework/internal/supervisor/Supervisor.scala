@@ -13,7 +13,7 @@ import csw.common.framework.models.CommonSupervisorMsg.{
 import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
-import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models.SupervisorMode._
@@ -31,13 +31,13 @@ class Supervisor(
     componentBehaviorFactory: ComponentWiring[_]
 ) extends MutableBehavior[SupervisorMsg] {
 
-  private val shutdownTimeout: FiniteDuration    = 5.seconds
-  private var shutdownTimer: Option[Cancellable] = None
-  val name: String                               = componentInfo.componentName
-  val componentId                                = ComponentId(name, componentInfo.componentType)
-  var haltingFlag                                = false
-  var mode: SupervisorMode                       = Idle
-  var runningComponent: ActorRef[RunningMsg]     = _
+  private val shutdownTimeout: FiniteDuration        = 5.seconds
+  private var shutdownTimer: Option[Cancellable]     = None
+  val name: String                                   = componentInfo.componentName
+  val componentId                                    = ComponentId(name, componentInfo.componentType)
+  var haltingFlag                                    = false
+  var mode: SupervisorMode                           = Idle
+  var runningComponent: Option[ActorRef[RunningMsg]] = None
 
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
     ctx.spawn(PubSubActor.behavior[LifecycleStateChanged], "pub-sub-lifecycle")
@@ -61,11 +61,9 @@ class Supervisor(
   }
 
   def onCommonMessages(msg: CommonSupervisorMsg): Unit = msg match {
-    case LifecycleStateSubscription(Subscribe(ref))   => pubSubLifecycle ! Subscribe(ref)
-    case LifecycleStateSubscription(Unsubscribe(ref)) => pubSubLifecycle ! Unsubscribe(ref)
-    case ComponentStateSubscription(Subscribe(ref))   => pubSubComponent ! Subscribe(ref)
-    case ComponentStateSubscription(Unsubscribe(ref)) => pubSubComponent ! Unsubscribe(ref)
-    case HaltComponent                                => haltingFlag = true; ctx.self ! Lifecycle(Shutdown)
+    case LifecycleStateSubscription(subscriberMsg) => pubSubLifecycle ! subscriberMsg
+    case ComponentStateSubscription(subscriberMsg) => pubSubComponent ! subscriberMsg
+    case HaltComponent                             => haltingFlag = true; ctx.self ! Lifecycle(Shutdown)
   }
 
   def onIdleMessages(msg: SupervisorIdleMsg): Unit = msg match {
@@ -75,7 +73,7 @@ class Supervisor(
     case InitializeFailure(reason) =>
       mode = SupervisorMode.InitializeFailure
     case Running(componentRef) =>
-      runningComponent = componentRef
+      runningComponent = Some(componentRef)
       mode = SupervisorMode.Running
       pubSubLifecycle ! Publish(LifecycleStateChanged(SupervisorMode.Running))
   }
@@ -85,22 +83,22 @@ class Supervisor(
       case Lifecycle(message) => onLifecycle(message)
       case _                  =>
     }
-    runningComponent ! msg
+    runningComponent.get ! msg
   }
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case Shutdown =>
       shutdownTimer = Some(ctx.schedule(shutdownTimeout, ctx.self, ShutdownTimeout))
       unregisterFromLocationService()
-      pubSubLifecycle ! Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown))
       mode = SupervisorMode.PreparingToShutdown
+      pubSubLifecycle ! Publish(LifecycleStateChanged(mode))
     case Restart =>
       unregisterFromLocationService()
       mode = SupervisorMode.Idle
     case GoOffline =>
-      mode = SupervisorMode.RunningOffline
+      if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
     case GoOnline =>
-      mode = SupervisorMode.Running
+      if (mode == SupervisorMode.RunningOffline) mode = SupervisorMode.Running
   }
 
   def onPreparingToShutdown(msg: PreparingToShutdownMsg): Unit = {
@@ -117,9 +115,11 @@ class Supervisor(
     if (haltingFlag) haltComponent()
   }
 
-  private def registerWithLocationService(): Unit = ()
+  def registerWithLocationService(): Unit = ()
 
-  private def unregisterFromLocationService(): Unit = ()
+  def unregisterFromLocationService(): Unit = ()
 
-  private def haltComponent(): Unit = ()
+  def haltComponent(): Boolean = {
+    ctx.stop(component) && ctx.stop(pubSubComponent) && ctx.stop(pubSubLifecycle)
+  }
 }
