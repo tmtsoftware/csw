@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+// DEOPSCSW-183: Configure attributes and values
 public class JSateVariableTest {
 
     private final Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");

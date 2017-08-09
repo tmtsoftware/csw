@@ -3,6 +3,7 @@ package csw.param.models;
 import org.junit.Assert;
 import org.junit.Test;
 
+// DEOPSCSW-183: Configure attributes and values
 public class JArrayDataTest {
 
     @Test

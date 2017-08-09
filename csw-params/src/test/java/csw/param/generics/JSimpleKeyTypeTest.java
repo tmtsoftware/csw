@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import static csw.param.javadsl.JUnits.*;
 
+// DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-190: Implement Unit Support
 public class JSimpleKeyTypeTest {
 

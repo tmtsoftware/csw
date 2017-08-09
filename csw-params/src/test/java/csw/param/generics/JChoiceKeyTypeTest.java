@@ -13,6 +13,7 @@ import java.util.List;
 import static csw.param.javadsl.JUnits.NoUnits;
 import static csw.param.javadsl.JUnits.kilometers;
 
+// DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-190: Implement Unit Support
 public class JChoiceKeyTypeTest {
     private final String keyName = " choiceKey";

@@ -15,7 +15,7 @@ import org.scalatest.FunSpec
 
 import scala.util.Try
 
-//noinspection ComparingUnrelatedTypes,ScalaUnusedSymbol
+// DEOPSCSW-183: Configure attributes and values
 class CommandsTest extends FunSpec {
 
   private val ck1 = "wfos.prog.cloudcover"

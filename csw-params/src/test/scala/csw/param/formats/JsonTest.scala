@@ -22,7 +22,8 @@ import csw.units.Units.{degrees, encoder, meters, NoUnits}
 import org.scalatest.FunSpec
 import spray.json._
 
-//DEOPSCSW-188: Efficient Serialization to/from JSON
+// DEOPSCSW-183: Configure attributes and values
+// DEOPSCSW-188: Efficient Serialization to/from JSON
 class JsonTest extends FunSpec {
 
   private val s1: String = "encoder"

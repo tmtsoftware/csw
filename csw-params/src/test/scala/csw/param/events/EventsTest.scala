@@ -7,6 +7,7 @@ import csw.param.generics.KeyType
 import csw.units.Units.meters
 import org.scalatest.{FunSpec, Matchers}
 
+// DEOPSCSW-183: Configure attributes and values
 class EventsTest extends FunSpec with Matchers {
   private val s1: String = "encoder"
 

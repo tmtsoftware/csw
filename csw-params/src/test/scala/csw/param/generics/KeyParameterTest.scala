@@ -14,6 +14,8 @@ import csw.param.generics.KeyType.{
 import csw.units.Units.{degrees, meters, seconds, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 
+// DEOPSCSW-183: Configure attributes and values
+// DEOPSCSW-188: Efficient Serialization to/from JSON
 class KeyParameterTest extends FunSpec with Matchers {
 
   private val s1: String = "encoder"

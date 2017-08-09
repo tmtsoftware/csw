@@ -6,8 +6,8 @@ import csw.param.events.{EventServiceEvent, SystemEvent}
 import csw.param.models.{ObsId, Prefix}
 import org.scalatest.FunSuite
 
-//DEOPSCSW-187: Efficient serialization to/from binary
-//noinspection TypeAnnotation
+// DEOPSCSW-183: Configure attributes and values
+// DEOPSCSW-187: Efficient serialization to/from binary
 class SerializationTest extends FunSuite {
 
   val obsId       = ObsId("2023-Q22-4-33")

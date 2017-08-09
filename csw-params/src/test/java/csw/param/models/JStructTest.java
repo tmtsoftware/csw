@@ -11,6 +11,7 @@ import java.util.HashSet;
 
 import static csw.param.javadsl.JUnits.NoUnits;
 
+// DEOPSCSW-183: Configure attributes and values
 public class JStructTest {
 
     private final String keyName = "StructKey";

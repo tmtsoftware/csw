@@ -12,6 +12,8 @@ import csw.units.Units.{encoder, meters, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 import spray.json.pimpString
 
+// DEOPSCSW-183: Configure attributes and values
+// DEOPSCSW-188: Efficient Serialization to/from JSON
 class JsonContractTest extends FunSpec with Matchers {
 
   private val prefixStr: String        = "wfos.blue.filter"
