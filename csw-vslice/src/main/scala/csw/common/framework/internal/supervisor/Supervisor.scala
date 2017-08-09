@@ -38,7 +38,6 @@ class Supervisor(
   var haltingFlag                                = false
   var mode: SupervisorMode                       = Idle
   var runningComponent: ActorRef[RunningMsg]     = _
-  var isOnline: Boolean                          = false
 
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
     ctx.spawn(PubSubActor.behavior[LifecycleStateChanged], "pub-sub-lifecycle")
@@ -51,10 +50,10 @@ class Supervisor(
 
   override def onMessage(msg: SupervisorMsg): Behavior[SupervisorMsg] = {
     (mode, msg) match {
-      case (_, msg: CommonSupervisorMsg)                                     => onCommonMessages(msg)
-      case (SupervisorMode.Idle, msg: SupervisorIdleMsg)                     => onIdleMessages(msg)
-      case (SupervisorMode.Running, msg: RunningMsg)                         => onRunning(msg)
-      case (SupervisorMode.PreparingToShutdown, msg: PreparingToShutdownMsg) => onPreparingToShutdown(msg)
+      case (_, msg: CommonSupervisorMsg)                                             => onCommonMessages(msg)
+      case (SupervisorMode.Idle, msg: SupervisorIdleMsg)                             => onIdleMessages(msg)
+      case (SupervisorMode.Running | SupervisorMode.RunningOffline, msg: RunningMsg) => onRunning(msg)
+      case (SupervisorMode.PreparingToShutdown, msg: PreparingToShutdownMsg)         => onPreparingToShutdown(msg)
       case (supervisorMode, message) =>
         println(s"Supervisor in $supervisorMode received an unexpected message: $message")
     }
@@ -100,10 +99,8 @@ class Supervisor(
       mode = SupervisorMode.Idle
     case GoOffline =>
       mode = SupervisorMode.RunningOffline
-      isOnline = false
     case GoOnline =>
       mode = SupervisorMode.Running
-      isOnline = true
   }
 
   def onPreparingToShutdown(msg: PreparingToShutdownMsg): Unit = {
