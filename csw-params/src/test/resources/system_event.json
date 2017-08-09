@@ -1,0 +1,39 @@
+{
+  "type": "SystemEvent",
+  "info": {
+    "source": {
+      "subsystem": "wfos",
+      "prefix": "wfos.blue.filter"
+    },
+    "eventTime": "2017-08-09T06:40:00.898Z",
+    "obsId": "Obs001",
+    "eventId": "7a4cd6ab-6077-476d-a035-6f83be1de42c"
+  },
+  "paramSet": [
+    {
+      "keyName": "arrayDataKey",
+      "keyType": "ByteArrayKey",
+      "values": [
+        {
+          "data": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "data": [
+            10,
+            20,
+            30,
+            40,
+            50
+          ]
+        }
+      ],
+      "units": "[none]"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "type": "ObserveEvent",
+  "info": {
+    "source": {
+      "subsystem": "wfos",
+      "prefix": "wfos.blue.filter"
+    },
+    "eventTime": "2017-08-09T06:40:00.898Z",
+    "obsId": "Obs001",
+    "eventId": "7a4cd6ab-6077-476d-a035-6f83be1de42c"
+  },
+  "paramSet": [
+    {
+      "keyName": "myStruct",
+      "keyType": "StructKey",
+      "values": [
+        {
+          "paramSet": [
+            {
+              "keyName": "ra",
+              "keyType": "StringKey",
+              "values": [
+                "12:13:14.1"
+              ],
+              "units": "[none]"
+            },
+            {
+              "keyName": "dec",
+              "keyType": "StringKey",
+              "values": [
+                "32:33:34.4"
+              ],
+              "units": "[none]"
+            },
+            {
+              "keyName": "epoch",
+              "keyType": "DoubleKey",
+              "values": [
+                1950.0
+              ],
+              "units": "[none]"
+            }
+          ]
+        }
+      ],
+      "units": "[none]"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "type": "Setup",
+  "info": {
+    "obsId": "Obs001",
+    "runId": "f22dc990-a02c-4d7e-b719-50b167cb7a1e"
+  },
+  "prefix": {
+    "subsystem": "wfos",
+    "prefix": "wfos.blue.filter"
+  },
+  "paramSet": [{
+    "keyName": "coords",
+    "keyType": "RaDecKey",
+    "values": [{
+      "ra": 7.3,
+      "dec": 12.1
+    }, {
+      "ra": 9.1,
+      "dec": 2.9
+    }],
+    "units": "[none]"
+  }]
+}

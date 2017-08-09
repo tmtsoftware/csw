@@ -1,0 +1,58 @@
+{
+  "type": "Wait",
+  "info": {
+    "obsId": "Obs001",
+    "runId": "f22dc990-a02c-4d7e-b719-50b167cb7a1e"
+  },
+  "prefix": {
+    "subsystem": "wfos",
+    "prefix": "wfos.blue.filter"
+  },
+  "paramSet": [
+    {
+      "keyName": "myMatrix",
+      "keyType": "LongMatrixKey",
+      "values": [
+        {
+          "data": [
+            [
+              1,
+              2,
+              3
+            ],
+            [
+              2,
+              3,
+              6
+            ],
+            [
+              4,
+              6,
+              12
+            ]
+          ]
+        },
+        {
+          "data": [
+            [
+              2,
+              3,
+              4
+            ],
+            [
+              5,
+              6,
+              7
+            ],
+            [
+              8,
+              9,
+              10
+            ]
+          ]
+        }
+      ],
+      "units": "[none]"
+    }
+  ]
+}

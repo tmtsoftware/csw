@@ -1,0 +1,38 @@
+{
+  "type": "DemandState",
+  "prefix": {
+    "subsystem": "wfos",
+    "prefix": "wfos.blue.filter"
+  },
+  "paramSet": [
+    {
+      "keyName": "charKey",
+      "keyType": "CharKey",
+      "values": [
+        "A",
+        "B",
+        "C"
+      ],
+      "units": "[none]"
+    },
+    {
+      "keyName": "intKey",
+      "keyType": "IntKey",
+      "values": [
+        1,
+        2,
+        3
+      ],
+      "units": "[m]"
+    },
+    {
+      "keyName": "booleanKey",
+      "keyType": "BooleanKey",
+      "values": [
+        true,
+        false
+      ],
+      "units": "[none]"
+    }
+  ]
+}

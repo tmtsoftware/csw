@@ -7,6 +7,8 @@ import csw.param.events._
 import csw.param.generics.KeyType
 import csw.param.generics.KeyType.{LongMatrixKey, StructKey}
 import csw.param.models._
+import csw.param.states.{CurrentState, DemandState}
+import csw.units.Units.{encoder, meters, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 import spray.json.pimpString
 
@@ -22,159 +24,6 @@ class JsonContractTest extends FunSpec with Matchers {
   private val eventTime: EventTime     = EventTime(Instant.parse(instantStr))
   private val eventInfo: EventInfo     = EventInfo(prefix, eventTime, Some(obsId), eventId)
 
-  private val setupJsonExample = """{
-                                   |  "type": "Setup",
-                                   |  "info": {
-                                   |    "obsId": "Obs001",
-                                   |    "runId": "f22dc990-a02c-4d7e-b719-50b167cb7a1e"
-                                   |  },
-                                   |  "prefix": {
-                                   |    "subsystem": "wfos",
-                                   |    "prefix": "wfos.blue.filter"
-                                   |  },
-                                   |  "paramSet": [{
-                                   |    "keyName": "coords",
-                                   |    "keyType": "RaDecKey",
-                                   |    "values": [{
-                                   |      "ra": 7.3,
-                                   |      "dec": 12.1
-                                   |    }, {
-                                   |      "ra": 9.1,
-                                   |      "dec": 2.9
-                                   |    }],
-                                   |    "units": "[none]"
-                                   |  }]
-                                   |}
-                                   |""".stripMargin
-
-  val observeJsonExample = """{
-                             |  "type": "Observe",
-                             |  "info": {
-                             |    "obsId": "Obs001",
-                             |    "runId": "f22dc990-a02c-4d7e-b719-50b167cb7a1e"
-                             |  },
-                             |  "prefix": {
-                             |    "subsystem": "wfos",
-                             |    "prefix": "wfos.blue.filter"
-                             |  },
-                             |  "paramSet": [{
-                             |    "keyName": "repeat",
-                             |    "keyType": "IntKey",
-                             |    "values": [22],
-                             |    "units": "[none]"
-                             |  }, {
-                             |    "keyName": "expTime",
-                             |    "keyType": "StringKey",
-                             |    "values": ["11:10"],
-                             |    "units": "[none]"
-                             |  }]
-                             |}""".stripMargin
-
-  val waitJsonExample = """{
-                          |  "type": "Wait",
-                          |  "info": {
-                          |    "obsId": "Obs001",
-                          |    "runId": "f22dc990-a02c-4d7e-b719-50b167cb7a1e"
-                          |  },
-                          |  "prefix": {
-                          |    "subsystem": "wfos",
-                          |    "prefix": "wfos.blue.filter"
-                          |  },
-                          |  "paramSet": [{
-                          |    "keyName": "myMatrix",
-                          |    "keyType": "LongMatrixKey",
-                          |    "values": [{
-                          |      "data": [[1, 2, 3], [2, 3, 6], [4, 6, 12]]
-                          |    }, {
-                          |      "data": [[2, 3, 4], [5, 6, 7], [8, 9, 10]]
-                          |    }],
-                          |    "units": "[none]"
-                          |  }]
-                          |}""".stripMargin
-
-  val statusEventJsonExample = s"""{
-                                 |  "type": "StatusEvent",
-                                 |  "info": {
-                                 |    "source": {
-                                 |      "subsystem": "wfos",
-                                 |      "prefix": "${prefix.prefix}"
-                                 |    },
-                                 |    "eventTime": "$instantStr",
-                                 |    "obsId":"${obsId.obsId}",
-                                 |    "eventId": "$eventId"
-                                 |  },
-                                 |  "paramSet": [{
-                                 |    "keyName": "encoder",
-                                 |    "keyType": "IntKey",
-                                 |    "values": [22],
-                                 |    "units": "[none]"
-                                 |  }, {
-                                 |    "keyName": "windspeed",
-                                 |    "keyType": "IntKey",
-                                 |    "values": [44],
-                                 |    "units": "[none]"
-                                 |  }]
-                                 |}""".stripMargin
-
-  val observeEventJsonExample = """{
-                                  |  "type": "ObserveEvent",
-                                  |  "info": {
-                                  |    "source": {
-                                  |      "subsystem": "wfos",
-                                  |      "prefix": "wfos.blue.filter"
-                                  |    },
-                                  |    "eventTime": "2017-08-09T06:40:00.898Z",
-                                  |    "obsId": "Obs001",
-                                  |    "eventId": "7a4cd6ab-6077-476d-a035-6f83be1de42c"
-                                  |  },
-                                  |  "paramSet": [{
-                                  |    "keyName": "myStruct",
-                                  |    "keyType": "StructKey",
-                                  |    "values": [{
-                                  |      "paramSet": [{
-                                  |        "keyName": "ra",
-                                  |        "keyType": "StringKey",
-                                  |        "values": ["12:13:14.1"],
-                                  |        "units": "[none]"
-                                  |      }, {
-                                  |        "keyName": "dec",
-                                  |        "keyType": "StringKey",
-                                  |        "values": ["32:33:34.4"],
-                                  |        "units": "[none]"
-                                  |      }, {
-                                  |        "keyName": "epoch",
-                                  |        "keyType": "DoubleKey",
-                                  |        "values": [1950.0],
-                                  |        "units": "[none]"
-                                  |      }]
-                                  |    }],
-                                  |    "units": "[none]"
-                                  |  }]
-                                  |}""".stripMargin
-
-  val systemEventJsonExample = s"""{
-                                 |  "type": "SystemEvent",
-                                 |  "info": {
-                                 |    "source": {
-                                 |      "subsystem": "wfos",
-                                 |      "prefix": "${prefix.prefix}"
-                                 |    },
-                                 |    "eventTime": "$instantStr",
-                                 |    "obsId": "${obsId.obsId}",
-                                 |    "eventId": "$eventId"
-                                 |  },
-                                 |  "paramSet": [{
-                                 |    "keyName": "arrayDataKey",
-                                 |    "keyType": "ByteArrayKey",
-                                 |    "values": [{
-                                 |      "data": [1, 2, 3, 4, 5]
-                                 |    }, {
-                                 |      "data": [10, 20, 30, 40, 50]
-                                 |    }],
-                                 |    "units": "[none]"
-                                 |  }]
-                                 |}""".stripMargin
-
   describe("Test Sequence Commands") {
 
     it("Should adhere to specified standard Setup json format") {
@@ -186,7 +35,8 @@ class JsonContractTest extends FunSpec with Matchers {
       val setup       = Setup(commandInfo, prefix).add(raDecParam)
       val setupToJson = JsonSupport.writeSequenceCommand(setup)
 
-      assert(setupToJson.equals(setupJsonExample.parseJson))
+      val expectedSetupJson = scala.io.Source.fromResource("setup_command.json").mkString
+      assert(setupToJson.equals(expectedSetupJson.parseJson))
     }
 
     it("Should adhere to specified standard Observe json format") {
@@ -198,7 +48,8 @@ class JsonContractTest extends FunSpec with Matchers {
 
       val observeToJson = JsonSupport.writeSequenceCommand(observe)
 
-      assert(observeToJson.equals(observeJsonExample.parseJson))
+      val expectedObserveJson = scala.io.Source.fromResource("observe_command.json").mkString
+      assert(observeToJson.equals(expectedObserveJson.parseJson))
     }
 
     it("Should adhere to specified standard Wait json format") {
@@ -210,7 +61,8 @@ class JsonContractTest extends FunSpec with Matchers {
       val wait       = Wait(commandInfo, prefix).add(matrixParam)
       val waitToJson = JsonSupport.writeSequenceCommand(wait)
 
-      assert(waitToJson.equals(waitJsonExample.parseJson))
+      val expectedWaitJson = scala.io.Source.fromResource("wait_command.json").mkString
+      assert(waitToJson.equals(expectedWaitJson.parseJson))
     }
   }
 
@@ -225,7 +77,8 @@ class JsonContractTest extends FunSpec with Matchers {
       val statusEvent       = StatusEvent(eventInfo).madd(i1, i2)
       val statusEventToJson = JsonSupport.writeEvent(statusEvent)
 
-      statusEventToJson shouldEqual statusEventJsonExample.parseJson
+      val expectedStatusEventJson = scala.io.Source.fromResource("status_event.json").mkString
+      statusEventToJson shouldEqual expectedStatusEventJson.parseJson
     }
 
     it("Should adhere to specified standard ObserveEvent json format") {
@@ -240,7 +93,8 @@ class JsonContractTest extends FunSpec with Matchers {
       val observeEvent       = ObserveEvent(eventInfo).add(structParam)
       val observeEventToJson = JsonSupport.writeEvent(observeEvent)
 
-      observeEventToJson shouldEqual observeEventJsonExample.parseJson
+      val expectedObserveEventJson = scala.io.Source.fromResource("observe_event.json").mkString
+      observeEventToJson shouldEqual expectedObserveEventJson.parseJson
     }
 
     it("Should adhere to specified standard SystemEvent json format") {
@@ -253,7 +107,43 @@ class JsonContractTest extends FunSpec with Matchers {
       val systemEvent       = SystemEvent(eventInfo).add(arrayDataParam)
       val systemEventToJson = JsonSupport.writeEvent(systemEvent)
 
-      systemEventToJson shouldEqual systemEventJsonExample.parseJson
+      val expectedSystemEventJson = scala.io.Source.fromResource("system_event.json").mkString
+      systemEventToJson shouldEqual expectedSystemEventJson.parseJson
+    }
+  }
+
+  describe("Test State Variables") {
+
+    it("Should adhere to specified standard CurrentState json format") {
+      val charKey        = KeyType.CharKey.make("charKey")
+      val intArrayKey    = KeyType.IntArrayKey.make("intArrayKey")
+      val a1: Array[Int] = Array(1, 2, 3, 4, 5)
+      val a2: Array[Int] = Array(10, 20, 30, 40, 50)
+
+      val charParam     = charKey.set('A', 'B', 'C').withUnits(encoder)
+      val intArrayParam = intArrayKey.set(a1, a2).withUnits(meters)
+
+      val currentState       = CurrentState(prefix).madd(charParam, intArrayParam)
+      val currentStateToJson = JsonSupport.writeStateVariable(currentState)
+
+      val expectedCurrentStateJson = scala.io.Source.fromResource("current_State.json").mkString
+      currentStateToJson shouldBe expectedCurrentStateJson.parseJson
+    }
+
+    it("Should adhere to specified standard DemandState json format") {
+      val charKey    = KeyType.CharKey.make("charKey")
+      val intKey     = KeyType.IntKey.make("intKey")
+      val booleanKey = KeyType.BooleanKey.make("booleanKey")
+
+      val charParam    = charKey.set('A', 'B', 'C').withUnits(NoUnits)
+      val intParam     = intKey.set(1, 2, 3).withUnits(meters)
+      val booleanParam = booleanKey.set(true, false)
+
+      val demandState       = DemandState(prefix).madd(charParam, intParam, booleanParam)
+      val demandStateToJson = JsonSupport.writeStateVariable(demandState)
+
+      val expectedDemandStateJson = scala.io.Source.fromResource("demand_state.json").mkString
+      demandStateToJson shouldBe expectedDemandStateJson.parseJson
     }
   }
 
