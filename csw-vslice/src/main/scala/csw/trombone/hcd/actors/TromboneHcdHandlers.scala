@@ -9,7 +9,7 @@ import csw.common.ccs.Validation
 import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.commands.Setup
 import csw.param.states.CurrentState
 import csw.trombone.hcd.AxisRequest._
@@ -22,10 +22,10 @@ import scala.async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMsg] {
-  override def make(ctx: ActorContext[ComponentMsg],
-                    componentInfo: ComponentInfo,
-                    pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[TromboneMsg] =
+class TromboneHcdWiring extends ComponentWiring[TromboneMsg] {
+  override def handlers(ctx: ActorContext[ComponentMsg],
+                        componentInfo: ComponentInfo,
+                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[TromboneMsg] =
     new TromboneHcdHandlers(ctx, componentInfo)
 }
 

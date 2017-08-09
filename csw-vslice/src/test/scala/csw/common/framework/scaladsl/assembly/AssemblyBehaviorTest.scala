@@ -27,9 +27,9 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
     val assemblyRef =
       Await.result(
         system.systemActorOf[Nothing](
-          getSampleAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo,
-                                                                   supervisorProbe.ref,
-                                                                   publisherProbe.ref),
+          getSampleAssemblyFactory(sampleAssemblyHandler).compBehavior(assemblyInfo,
+                                                                       supervisorProbe.ref,
+                                                                       publisherProbe.ref),
           "assembly"
         ),
         5.seconds
@@ -57,7 +57,9 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
 
     Await.result(
       system.systemActorOf[Nothing](
-        getSampleAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref, publisherProbe.ref),
+        getSampleAssemblyFactory(sampleAssemblyHandler).compBehavior(assemblyInfo,
+                                                                     supervisorProbe.ref,
+                                                                     publisherProbe.ref),
         "sampleAssembly"
       ),
       5.seconds

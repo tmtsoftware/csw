@@ -8,7 +8,7 @@ import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.models.{FromComponentLifecycleMessage, ToComponentLifecycleMessage}
-import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, FrameworkComponentTestSuite}
+import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring, FrameworkComponentTestSuite}
 import csw.param.states.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -18,14 +18,14 @@ import scala.concurrent.{Await, Future}
 
 class AssemblyLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSugar {
 
-  def run(assemblyHandlersFactory: ComponentBehaviorFactory[AssemblyDomainMsg],
+  def run(assemblyHandlersFactory: ComponentWiring[AssemblyDomainMsg],
           supervisorProbe: TestProbe[FromComponentLifecycleMessage]): Running = {
 
     val publisherProbe = TestProbe[PublisherMsg[CurrentState]]
 
     Await.result(
       system.systemActorOf[Nothing](
-        assemblyHandlersFactory.behavior(assemblyInfo, supervisorProbe.ref, publisherProbe.ref),
+        assemblyHandlersFactory.compBehavior(assemblyInfo, supervisorProbe.ref, publisherProbe.ref),
         "Assembly"
       ),
       5.seconds

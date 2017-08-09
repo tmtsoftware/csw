@@ -26,7 +26,9 @@ class AssemblyUniqueActionTest extends FrameworkComponentTestSuite with MockitoS
 
     Await.result(
       system.systemActorOf[Nothing](
-        getSampleAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref, publisherProbe.ref),
+        getSampleAssemblyFactory(sampleAssemblyHandler).compBehavior(assemblyInfo,
+                                                                     supervisorProbe.ref,
+                                                                     publisherProbe.ref),
         "sampleAssembly"
       ),
       5.seconds

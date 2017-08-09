@@ -39,22 +39,22 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
                         Set(AkkaType),
                         FiniteDuration(5, "seconds"))
 
-  def getSampleHcdFactory(componentHandlers: ComponentHandlers[HcdDomainMsg]): ComponentBehaviorFactory[HcdDomainMsg] =
-    new ComponentBehaviorFactory[HcdDomainMsg] {
+  def getSampleHcdFactory(componentHandlers: ComponentHandlers[HcdDomainMsg]): ComponentWiring[HcdDomainMsg] =
+    new ComponentWiring[HcdDomainMsg] {
 
-      override def make(ctx: ActorContext[ComponentMsg],
-                        componentInfo: ComponentInfo,
-                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[HcdDomainMsg] =
+      override def handlers(ctx: ActorContext[ComponentMsg],
+                            componentInfo: ComponentInfo,
+                            pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[HcdDomainMsg] =
         componentHandlers
     }
 
   def getSampleAssemblyFactory(
       assemblyHandlers: ComponentHandlers[AssemblyDomainMsg]
-  ): ComponentBehaviorFactory[AssemblyDomainMsg] =
-    new ComponentBehaviorFactory[AssemblyDomainMsg] {
-      override def make(ctx: ActorContext[ComponentMsg],
-                        componentInfo: ComponentInfo,
-                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[AssemblyDomainMsg] =
+  ): ComponentWiring[AssemblyDomainMsg] =
+    new ComponentWiring[AssemblyDomainMsg] {
+      override def handlers(ctx: ActorContext[ComponentMsg],
+                            componentInfo: ComponentInfo,
+                            pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[AssemblyDomainMsg] =
         assemblyHandlers
     }
 

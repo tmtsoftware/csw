@@ -10,7 +10,7 @@ import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
 import akka.util.Timeout;
 import csw.common.components.assembly.AssemblyDomainMsg;
-import csw.common.framework.javadsl.JComponentBehaviorFactory;
+import csw.common.framework.javadsl.JComponentWiring;
 import csw.common.framework.javadsl.JComponentHandlers;
 import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.*;
@@ -36,8 +36,8 @@ public class JAssemblyBehaviorTest {
     private static ActorSystem system = ActorSystem.create("Assembly", Actor.empty());
     private static TestKitSettings settings = TestKitSettings.apply(system);
 
-    private JComponentBehaviorFactory getSampleJAssemblyFactory(JComponentHandlers assemblyHandlers) {
-        return new JComponentBehaviorFactory<AssemblyDomainMsg>(AssemblyDomainMsg.class) {
+    private JComponentWiring getSampleJAssemblyFactory(JComponentHandlers assemblyHandlers) {
+        return new JComponentWiring<AssemblyDomainMsg>(AssemblyDomainMsg.class) {
 
             @Override
             public JComponentHandlers<AssemblyDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
@@ -70,7 +70,7 @@ public class JAssemblyBehaviorTest {
         TestProbe<FromComponentLifecycleMessage> supervisorProbe = TestProbe.apply(system, settings);
 
         Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-        Behavior<Nothing$> behavior = getSampleJAssemblyFactory(sampleAssemblyHandler).behavior(assemblyInfo, supervisorProbe.ref(), null);
+        Behavior<Nothing$> behavior = getSampleJAssemblyFactory(sampleAssemblyHandler).compBehavior(assemblyInfo, supervisorProbe.ref(), null);
         Future<ActorRef> assembly = system.<Nothing$>systemActorOf(behavior, "assembly", Props.empty(), seconds);
         FiniteDuration seconds1 = Duration.create(5, "seconds");
         ActorRef assemblyRef = Await.result(assembly, seconds1);

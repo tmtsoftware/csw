@@ -27,7 +27,7 @@ class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
     val hcdRef =
       Await.result(
         system.systemActorOf[Nothing](
-          getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref, publisherProbe.ref),
+          getSampleHcdFactory(sampleHcdHandler).compBehavior(hcdInfo, supervisorProbe.ref, publisherProbe.ref),
           "sampleHcd"
         ),
         5.seconds
@@ -58,7 +58,7 @@ class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
 
     Await.result(
       system.systemActorOf[Nothing](
-        getSampleHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref, publisherProbe.ref),
+        getSampleHcdFactory(sampleHcdHandler).compBehavior(hcdInfo, supervisorProbe.ref, publisherProbe.ref),
         "sampleHcd"
       ),
       5.seconds

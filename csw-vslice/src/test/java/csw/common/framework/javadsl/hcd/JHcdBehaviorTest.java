@@ -10,7 +10,7 @@ import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
 import akka.util.Timeout;
 import csw.common.components.hcd.HcdDomainMsg;
-import csw.common.framework.javadsl.JComponentBehaviorFactory;
+import csw.common.framework.javadsl.JComponentWiring;
 import csw.common.framework.javadsl.JComponentHandlers;
 import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.*;
@@ -36,8 +36,8 @@ public class JHcdBehaviorTest {
     private static ActorSystem system = ActorSystem.create("Hcd", Actor.empty());
     private static TestKitSettings settings = TestKitSettings.apply(system);
 
-    private JComponentBehaviorFactory getSampleJHcdFactory(JComponentHandlers hcdHandlers) {
-        return new JComponentBehaviorFactory<HcdDomainMsg>(HcdDomainMsg.class) {
+    private JComponentWiring getSampleJHcdFactory(JComponentHandlers hcdHandlers) {
+        return new JComponentWiring<HcdDomainMsg>(HcdDomainMsg.class) {
             @Override
             public JComponentHandlers<HcdDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
                 return hcdHandlers;
@@ -70,7 +70,7 @@ public class JHcdBehaviorTest {
         TestProbe<FromComponentLifecycleMessage> supervisorProbe = TestProbe.apply(system, settings);
 
         Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-        Behavior<Nothing$> behavior = getSampleJHcdFactory(sampleHcdHandler).behavior(hcdInfo, supervisorProbe.ref(), null);
+        Behavior<Nothing$> behavior = getSampleJHcdFactory(sampleHcdHandler).compBehavior(hcdInfo, supervisorProbe.ref(), null);
         Future<ActorRef> hcd = system.<Nothing$>systemActorOf(behavior, "hcd", Props.empty(), seconds);
         FiniteDuration seconds1 = Duration.create(5, "seconds");
         ActorRef hcdRef = Await.result(hcd, seconds1);

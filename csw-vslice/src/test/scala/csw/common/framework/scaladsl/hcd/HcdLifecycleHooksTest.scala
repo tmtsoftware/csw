@@ -8,7 +8,7 @@ import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.models.{FromComponentLifecycleMessage, ToComponentLifecycleMessage}
-import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, FrameworkComponentTestSuite}
+import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring, FrameworkComponentTestSuite}
 import csw.param.states.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -18,14 +18,16 @@ import scala.concurrent.{Await, Future}
 
 class HcdLifecycleHooksTest extends FrameworkComponentTestSuite with MockitoSugar {
 
-  def run(hcdHandlersFactory: ComponentBehaviorFactory[HcdDomainMsg],
+  def run(hcdHandlersFactory: ComponentWiring[HcdDomainMsg],
           testProbeSupervisor: TestProbe[FromComponentLifecycleMessage]): Running = {
 
     val publisherProbe = TestProbe[PublisherMsg[CurrentState]]
 
     Await.result(
-      system.systemActorOf[Nothing](hcdHandlersFactory.behavior(hcdInfo, testProbeSupervisor.ref, publisherProbe.ref),
-                                    "Hcd"),
+      system.systemActorOf[Nothing](
+        hcdHandlersFactory.compBehavior(hcdInfo, testProbeSupervisor.ref, publisherProbe.ref),
+        "Hcd"
+      ),
       5.seconds
     )
 

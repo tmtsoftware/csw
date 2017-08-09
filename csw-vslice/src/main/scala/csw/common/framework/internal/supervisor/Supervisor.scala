@@ -2,7 +2,7 @@ package csw.common.framework.internal.supervisor
 
 import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.internal.PubSubActor
 import csw.common.framework.internal.supervisor.SupervisorMode.PreparingToShutdown
@@ -20,23 +20,16 @@ import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.ComponentBehaviorFactory
+import csw.common.framework.scaladsl.ComponentWiring
 import csw.param.states.CurrentState
 import csw.services.location.models.ComponentId
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
-object Supervisor {
-  def behavior(
-      componentInfo: ComponentInfo,
-      componentBehaviorFactory: ComponentBehaviorFactory[_]
-  ): Behavior[SupervisorMsg] = Actor.mutable(ctx => new Supervisor(ctx, componentInfo, componentBehaviorFactory))
-}
-
 class Supervisor(
     ctx: ActorContext[SupervisorMsg],
     componentInfo: ComponentInfo,
-    componentBehaviorFactory: ComponentBehaviorFactory[_]
+    componentBehaviorFactory: ComponentWiring[_]
 ) extends MutableBehavior[SupervisorMsg] {
 
   private val shutdownTimeout: FiniteDuration    = 5.seconds
@@ -54,7 +47,7 @@ class Supervisor(
   val pubSubComponent: ActorRef[PubSub[CurrentState]] =
     ctx.spawn(PubSubActor.behavior[CurrentState], "pub-sub-component")
   val component: ActorRef[Nothing] =
-    ctx.spawn[Nothing](componentBehaviorFactory.behavior(componentInfo, ctx.self, pubSubComponent), "component")
+    ctx.spawn[Nothing](componentBehaviorFactory.compBehavior(componentInfo, ctx.self, pubSubComponent), "component")
 
   ctx.watch(component)
 
