@@ -39,7 +39,7 @@ case class Choices(values: Set[Choice]) {
  * Provides a varargs constructor for Choices
  */
 object Choices {
-  import csw.param.formats.JsonSupport._
+  import spray.json.DefaultJsonProtocol._
   @varargs
   def from(choicesIn: String*): Choices = Choices(choicesIn.map(Choice(_)).toSet)
 

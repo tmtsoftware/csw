@@ -22,10 +22,10 @@ object JsonSupport
 trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupport with WrappedArrayProtocol ⇒
 
   // JSON formats
-  val paramSetFormat    = implicitly[JsonFormat[Set[Parameter[_]]]]
-  val commandInfoFormat = implicitly[JsonFormat[CommandInfo]]
-  lazy val prefixFormat = implicitly[JsonFormat[Prefix]]
-  val eventInfoFormat   = implicitly[JsonFormat[EventInfo]]
+  lazy val paramSetFormat    = implicitly[JsonFormat[Set[Parameter[_]]]]
+  lazy val commandInfoFormat = implicitly[JsonFormat[CommandInfo]]
+  lazy val prefixFormat      = implicitly[JsonFormat[Prefix]]
+  lazy val eventInfoFormat   = implicitly[JsonFormat[EventInfo]]
 
   // config and event type JSON tags
   private val setupType        = classOf[Setup].getSimpleName
