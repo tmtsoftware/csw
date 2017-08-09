@@ -5,7 +5,6 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.internal.PubSubActor
-import csw.common.framework.internal.supervisor.SupervisorMode.PreparingToShutdown
 import csw.common.framework.models.CommonSupervisorMsg.{
   ComponentStateSubscription,
   HaltComponent,
@@ -13,11 +12,11 @@ import csw.common.framework.models.CommonSupervisorMsg.{
 }
 import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.InitialMsg.Run
-import csw.common.framework.models.LifecycleState._
 import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
+import csw.common.framework.models.SupervisorMode._
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.ComponentWiring
@@ -37,9 +36,8 @@ class Supervisor(
   val name: String                               = componentInfo.componentName
   val componentId                                = ComponentId(name, componentInfo.componentType)
   var haltingFlag                                = false
-  var lifecycleState: LifecycleState             = LifecycleWaitingForInitialized
+  var mode: SupervisorMode                       = Idle
   var runningComponent: ActorRef[RunningMsg]     = _
-  var mode: SupervisorMode                       = SupervisorMode.Idle
   var isOnline: Boolean                          = false
 
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
@@ -76,13 +74,11 @@ class Supervisor(
       registerWithLocationService()
       componentRef ! Run
     case InitializeFailure(reason) =>
-      lifecycleState = LifecycleInitializeFailure
-      mode = SupervisorMode.LifecycleFailure
+      mode = SupervisorMode.InitializeFailure
     case Running(componentRef) =>
       runningComponent = componentRef
-      lifecycleState = LifecycleRunning
       mode = SupervisorMode.Running
-      pubSubLifecycle ! Publish(LifecycleStateChanged(LifecycleRunning))
+      pubSubLifecycle ! Publish(LifecycleStateChanged(SupervisorMode.Running))
   }
 
   def onRunning(msg: RunningMsg): Unit = {
@@ -97,35 +93,30 @@ class Supervisor(
     case Shutdown =>
       shutdownTimer = Some(ctx.schedule(shutdownTimeout, ctx.self, ShutdownTimeout))
       unregisterFromLocationService()
-      lifecycleState = LifecyclePreparingToShutdown
-      pubSubLifecycle ! Publish(LifecycleStateChanged(LifecyclePreparingToShutdown))
-      mode = PreparingToShutdown
+      pubSubLifecycle ! Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown))
+      mode = SupervisorMode.PreparingToShutdown
     case Restart =>
       unregisterFromLocationService()
-      lifecycleState = LifecycleWaitingForInitialized
       mode = SupervisorMode.Idle
     case GoOffline =>
-      lifecycleState = LifecycleRunningOffline
+      mode = SupervisorMode.RunningOffline
       isOnline = false
     case GoOnline =>
-      lifecycleState = LifecycleRunning
+      mode = SupervisorMode.Running
       isOnline = true
   }
 
   def onPreparingToShutdown(msg: PreparingToShutdownMsg): Unit = {
     msg match {
       case ShutdownTimeout =>
-        lifecycleState = LifecycleShutdownFailure
         mode = SupervisorMode.ShutdownFailure
       case ShutdownFailure(reason) =>
-        lifecycleState = LifecycleShutdownFailure
         mode = SupervisorMode.ShutdownFailure
       case ShutdownComplete =>
         shutdownTimer.map(_.cancel())
-        lifecycleState = LifecycleShutdown
         mode = SupervisorMode.Shutdown
     }
-    pubSubLifecycle ! Publish(LifecycleStateChanged(lifecycleState))
+    pubSubLifecycle ! Publish(LifecycleStateChanged(mode))
     if (haltingFlag) haltComponent()
   }
 

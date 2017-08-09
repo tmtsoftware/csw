@@ -20,20 +20,20 @@ object PubSub {
 
 /////////////
 
-sealed trait LifecycleState
-object LifecycleState {
-  case object LifecycleWaitingForInitialized extends LifecycleState
-  case object LifecycleInitializeFailure     extends LifecycleState
-  case object LifecycleRunning               extends LifecycleState
-  case object LifecycleRunningOffline        extends LifecycleState
-  case object LifecyclePreparingToShutdown   extends LifecycleState
-  case object LifecycleShutdown              extends LifecycleState
-  case object LifecycleShutdownFailure       extends LifecycleState
+sealed trait SupervisorMode
+object SupervisorMode {
+  case object Idle                extends SupervisorMode
+  case object InitializeFailure   extends SupervisorMode
+  case object Running             extends SupervisorMode
+  case object RunningOffline      extends SupervisorMode
+  case object PreparingToShutdown extends SupervisorMode
+  case object Shutdown            extends SupervisorMode
+  case object ShutdownFailure     extends SupervisorMode
 }
 
 ///////////////
 
-case class LifecycleStateChanged(state: LifecycleState)
+case class LifecycleStateChanged(state: SupervisorMode)
 
 ///////////////
 

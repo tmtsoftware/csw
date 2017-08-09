@@ -5,7 +5,6 @@ import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.CommonSupervisorMsg.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.InitialMsg.Run
-import csw.common.framework.models.LifecycleState.LifecycleRunning
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models._
@@ -52,7 +51,7 @@ class SupervisorTest
     import testData._
 
     supervisor.onMessage(InitializeFailure("test messge for initialization failure"))
-    supervisor.mode shouldBe SupervisorMode.LifecycleFailure
+    supervisor.mode shouldBe SupervisorMode.InitializeFailure
   }
 
   test("supervisor should accept Running message from component and change its mode and publish state change") {
@@ -62,7 +61,7 @@ class SupervisorTest
     supervisor.onMessage(Running(childComponentInbox.ref))
 
     supervisor.mode shouldBe SupervisorMode.Running
-    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(LifecycleStateChanged(LifecycleRunning))
+    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(LifecycleStateChanged(SupervisorMode.Running))
   }
 
   test("supervisor should handle LifecycleStateSubscription message by coordinating with pub sub actor") {
