@@ -1,22 +1,19 @@
-package csw.common.framework.scaladsl
+package csw.common.framework.scaladsl.testdata
 
-import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.ccs.Validation
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.Component.{ComponentInfo, DoNotRegister, HcdInfo}
-import csw.common.framework.models.RunningMsg.Lifecycle
-import csw.common.framework.models.ToComponentLifecycleMessage.Shutdown
-import csw.common.framework.models._
-import csw.common.framework.scaladsl.testdata.SampleHcdHandlers
+import csw.common.framework.models.{CommandMsg, ComponentMsg, PubSub}
+import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.states.CurrentState
 import csw.services.location.models.ConnectionType.AkkaType
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-class SampleCompHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
+class SampleHcdHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
     extends ComponentHandlers[HcdDomainMsg](ctx, componentInfo) {
   override def onRestart(): Unit                                               = println(s"${componentInfo.componentName} restarting")
   override def onRun(): Unit                                                   = println(s"${componentInfo.componentName} running")
@@ -28,7 +25,7 @@ class SampleCompHandlers(ctx: ActorContext[ComponentMsg], componentInfo: Compone
   override def onGoOffline(): Unit                                             = println(s"${componentInfo.componentName} going offline")
 }
 
-class SampleCompWiring extends ComponentWiring[HcdDomainMsg] {
+class SampleHcdWiring extends ComponentWiring[HcdDomainMsg] {
   override def handlers(
       ctx: ActorContext[ComponentMsg],
       componentInfo: ComponentInfo,
@@ -36,20 +33,11 @@ class SampleCompWiring extends ComponentWiring[HcdDomainMsg] {
   ): ComponentHandlers[HcdDomainMsg] = new SampleHcdHandlers(ctx, componentInfo)
 }
 
-object SampleSupervisor extends App {
-
+object FrameworkTestData {
   val hcdInfo = HcdInfo("SampleHcd",
                         "wfos",
-                        "csw.common.framework.scaladsl.SampleHcdWiring",
+                        "csw.common.framework.scaladsl.testdata.SampleHcdWiring",
                         DoNotRegister,
                         Set(AkkaType),
                         FiniteDuration(5, "seconds"))
-
-  // The top level actor system has to be untyped so that it can co-host both typed and untyped actors
-  val system = ActorSystem("test")
-  import akka.typed.scaladsl.adapter._
-
-  val supervisor = system.spawn(SupervisorBehaviorFactory.make(hcdInfo), hcdInfo.componentClassName)
-
-  supervisor ! Lifecycle(Shutdown)
 }

@@ -2,7 +2,7 @@ package csw
 
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.testkit.{EffectfulActorContext, StubbedActorContext}
+import akka.typed.testkit.StubbedActorContext
 import akka.typed.{ActorRef, ActorSystem, Behavior}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}

@@ -2,8 +2,8 @@ package csw.common.framework.internal.supervisor
 
 import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.ActorContext
-import akka.typed.{ActorRef, Behavior}
+import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.typed.{ActorRef, Behavior, Signal, Terminated}
 import csw.common.framework.internal.PubSubActor
 import csw.common.framework.models.CommonSupervisorMsg.{
   ComponentStateSubscription,
@@ -25,11 +25,19 @@ import csw.services.location.models.ComponentId
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
+object Supervisor {
+  val PubSubComponentActor = "pub-sub-component"
+  val ComponentActor       = "component"
+  val PubSubLifecycleActor = "pub-sub-lifecycle"
+}
+
 class Supervisor(
     ctx: ActorContext[SupervisorMsg],
     componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentWiring[_]
 ) extends MutableBehavior[SupervisorMsg] {
+
+  import Supervisor._
 
   private val shutdownTimeout: FiniteDuration        = 5.seconds
   private var shutdownTimer: Option[Cancellable]     = None
@@ -40,11 +48,11 @@ class Supervisor(
   var runningComponent: Option[ActorRef[RunningMsg]] = None
 
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
-    ctx.spawn(PubSubActor.behavior[LifecycleStateChanged], "pub-sub-lifecycle")
+    ctx.spawn(PubSubActor.behavior[LifecycleStateChanged], PubSubLifecycleActor)
   val pubSubComponent: ActorRef[PubSub[CurrentState]] =
-    ctx.spawn(PubSubActor.behavior[CurrentState], "pub-sub-component")
+    ctx.spawn(PubSubActor.behavior[CurrentState], PubSubComponentActor)
   val component: ActorRef[Nothing] =
-    ctx.spawn[Nothing](componentBehaviorFactory.compBehavior(componentInfo, ctx.self, pubSubComponent), "component")
+    ctx.spawn[Nothing](componentBehaviorFactory.compBehavior(componentInfo, ctx.self, pubSubComponent), ComponentActor)
 
   ctx.watch(component)
 
@@ -58,6 +66,15 @@ class Supervisor(
         println(s"Supervisor in $supervisorMode received an unexpected message: $message")
     }
     this
+  }
+
+  override def onSignal: PartialFunction[Signal, Behavior[SupervisorMsg]] = {
+    case Terminated(componentRef) ⇒
+      println()
+      unregisterFromLocationService()
+      ctx.stop(pubSubComponent)
+      ctx.stop(pubSubLifecycle)
+      Behavior.stopped
   }
 
   def onCommonMessages(msg: CommonSupervisorMsg): Unit = msg match {

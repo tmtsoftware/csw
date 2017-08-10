@@ -118,9 +118,6 @@ class SupervisorTest
     val testData = new TestData
     import testData._
 
-    val subscriberProbe        = TestProbe[CurrentState]
-    val previousSupervisorMode = testData.supervisor.mode
-
     supervisor.onMessage(HaltComponent)
 
     supervisor.haltingFlag shouldBe true
@@ -200,5 +197,4 @@ class SupervisorTest
     supervisor.mode shouldBe SupervisorMode.Shutdown
     childPubSubLifecycleInbox.receiveAll() should contain(Publish(LifecycleStateChanged(SupervisorMode.Shutdown)))
   }
-
 }
