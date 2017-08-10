@@ -34,6 +34,7 @@ public class JArrayKeyTypeTest {
         Assert.assertEquals(testData[1], paramValuesAsArray[1]);
     }
 
+    // DEOPSCSW-186: Binary value payload
     @Test
     public void testByteArrayKeyParameter() {
         String keyName = "ByteKey";

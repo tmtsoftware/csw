@@ -1,7 +1,9 @@
 package csw.param.generics
 
-import csw.param.models._
+import java.nio.file.{Files, Paths}
+
 import csw.param.generics.KeyType.{
+  ByteArrayKey,
   ByteMatrixKey,
   ChoiceKey,
   DoubleMatrixKey,
@@ -11,7 +13,8 @@ import csw.param.generics.KeyType.{
   ShortMatrixKey,
   StructKey
 }
-import csw.units.Units.{degrees, meters, seconds, NoUnits}
+import csw.param.models._
+import csw.units.Units.{degrees, encoder, meters, seconds, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 
 // DEOPSCSW-183: Configure attributes and values
@@ -68,7 +71,8 @@ class KeyParameterTest extends FunSpec with Matchers {
     }
   }
 
-  describe("test JByteArrayKey") {
+  // DEOPSCSW-186: Binary value payload
+  describe("test ByteArrayKey") {
     val a1: Array[Byte] = Array[Byte](1, 2, 3, 4, 5)
     val a2: Array[Byte] = Array[Byte](10, 20, 30, 40, 50)
 
@@ -123,8 +127,30 @@ class KeyParameterTest extends FunSpec with Matchers {
       li4.values.size should be(3)
       li4.value(2) should equal(ArrayData(c))
     }
+
+    // DEOPSCSW-186: Binary value payload
+    it("should able to create parameter representing binary image") {
+      val keyName                        = "imageKey"
+      val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make(keyName)
+
+      val imgPath  = Paths.get(getClass.getResource("/smallBinary.bin").getPath)
+      val imgBytes = Files.readAllBytes(imgPath)
+
+      val binaryImgData: ArrayData[Byte]          = ArrayData.fromArray(imgBytes)
+      val binaryParam: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits encoder
+
+      binaryParam.head shouldBe binaryImgData
+      binaryParam.value(0) shouldBe binaryImgData
+      binaryParam.units shouldBe encoder
+      binaryParam.keyName shouldBe keyName
+      binaryParam.size shouldBe 1
+      binaryParam.keyType shouldBe KeyType.ByteArrayKey
+
+    }
+
   }
 
+  // DEOPSCSW-186: Binary value payload
   describe("test byteMatrixKey") {
     val m1: Array[Array[Byte]] = Array(Array[Byte](1, 2, 3), Array[Byte](4, 5, 6), Array[Byte](7, 8, 9))
     val m2: Array[Array[Byte]] = Array(Array[Byte](1, 2, 3, 4, 5), Array[Byte](10, 20, 30, 40, 50))

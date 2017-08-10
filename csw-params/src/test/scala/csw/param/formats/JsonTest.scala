@@ -367,6 +367,7 @@ class JsonTest extends FunSpec {
     }
   }
 
+  // DEOPSCSW-186: Binary value payload
   describe("Test Byte Matrix items") {
     it("Should allow byte matrix values") {
       val k1  = ByteMatrixKey.make("myMatrix")
@@ -386,6 +387,7 @@ class JsonTest extends FunSpec {
     }
   }
 
+  // DEOPSCSW-186: Binary value payload
   describe("Test Byte Array items") {
     it("Should allow byte array values") {
       val k1  = KeyType.ByteArrayKey.make("myArray")
