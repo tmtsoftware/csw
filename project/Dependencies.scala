@@ -7,6 +7,8 @@ object Dependencies {
     Libs.`scala-java8-compat`,
     Libs.`enumeratum`,
     Chill.`chill-bijection`,
+    Akka.`akka-actor`      % Test,
+    Chill.`chill-akka`     % Test,
     Libs.`scalatest`       % Test,
     Libs.`junit`           % Test,
     Libs.`junit-interface` % Test
