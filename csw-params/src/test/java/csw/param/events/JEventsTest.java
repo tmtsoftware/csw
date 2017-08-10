@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import static csw.param.javadsl.JSubsystem.WFOS;
 
 // DEOPSCSW-183: Configure attributes and values
+// DEOPSCSW-185: Easy to Use Syntax/Api
 public class JEventsTest {
     private final Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
     private final Key<String> epochStringKey = JKeyTypes.StringKey().make("epoch");

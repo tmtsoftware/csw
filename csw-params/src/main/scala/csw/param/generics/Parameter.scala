@@ -3,6 +3,7 @@ package csw.param.generics
 import java.util
 import java.util.Optional
 
+import csw.param.ParamSerializable
 import csw.units.Units
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
@@ -55,12 +56,12 @@ object Parameter extends DefaultJsonProtocol {
   def apply[T](implicit x: JsonFormat[Parameter[T]]): JsonFormat[Parameter[T]] = x
 }
 
-case class Parameter[S] private[param] (
+case class Parameter[S: JsonFormat: ClassTag] private[param] (
     keyName: String,
     keyType: KeyType[S],
     items: mutable.WrappedArray[S],
     units: Units
-)(implicit @transient jsFormat: JsonFormat[S], @transient cTag: ClassTag[S]) {
+) extends ParamSerializable {
 
   def values: Array[S] = items.array
 

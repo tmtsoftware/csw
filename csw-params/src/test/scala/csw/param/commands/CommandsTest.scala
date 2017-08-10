@@ -16,6 +16,7 @@ import org.scalatest.FunSpec
 import scala.util.Try
 
 // DEOPSCSW-183: Configure attributes and values
+// DEOPSCSW-185: Easy to Use Syntax/Api
 class CommandsTest extends FunSpec {
 
   private val ck1 = "wfos.prog.cloudcover"

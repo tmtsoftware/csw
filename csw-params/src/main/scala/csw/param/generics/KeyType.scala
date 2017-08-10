@@ -8,9 +8,7 @@ import spray.json.JsonFormat
 import scala.collection.immutable
 import scala.reflect.ClassTag
 
-sealed class KeyType[S](implicit @transient val jsFormat: JsonFormat[S], @transient val clsTag: ClassTag[S])
-    extends EnumEntry
-    with Serializable {
+sealed class KeyType[S: JsonFormat: ClassTag] extends EnumEntry with Serializable {
   def paramFormat: JsonFormat[Parameter[S]] = Parameter[S]
 }
 
