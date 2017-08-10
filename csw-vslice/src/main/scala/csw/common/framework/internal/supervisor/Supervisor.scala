@@ -40,7 +40,7 @@ class Supervisor(
 
   import Supervisor._
 
-  private var shutdownTimer: Option[Cancellable]     = None
+  var shutdownTimer: Option[Cancellable]             = None
   val name: String                                   = componentInfo.componentName
   val componentId                                    = ComponentId(name, componentInfo.componentType)
   var haltingFlag                                    = false

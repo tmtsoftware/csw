@@ -187,13 +187,19 @@ class SupervisorTest
 
     supervisor.onMessage(Running(childComponentInbox.ref))
 
+    supervisor.shutdownTimer.isDefined shouldBe false
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
+
+    supervisor.shutdownTimer.isDefined shouldBe true
+
     supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     childPubSubLifecycleInbox.receiveAll() should contain(
       Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown))
     )
 
     supervisor.onMessage(ShutdownComplete)
+    supervisor.shutdownTimer.get.isCancelled shouldBe true
+
     supervisor.mode shouldBe SupervisorMode.Shutdown
     childPubSubLifecycleInbox.receiveAll() should contain(Publish(LifecycleStateChanged(SupervisorMode.Shutdown)))
   }
