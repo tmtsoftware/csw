@@ -36,6 +36,7 @@ object KeyType extends Enum[KeyType[_]] {
 
   //scala
   case object BooleanKey extends SimpleKeyType[Boolean]
+  case object ByteKey    extends SimpleKeyType[Byte]
   case object CharKey    extends SimpleKeyType[Char]
   case object ShortKey   extends SimpleKeyType[Short]
   case object LongKey    extends SimpleKeyType[Long]
@@ -60,6 +61,7 @@ object KeyType extends Enum[KeyType[_]] {
   //java
   case object JBooleanKey extends SimpleKeyType[java.lang.Boolean]
   case object JCharKey    extends SimpleKeyType[java.lang.Character]
+  case object JByteKey    extends SimpleKeyType[java.lang.Byte]
   case object JShortKey   extends SimpleKeyType[java.lang.Short]
   case object JLongKey    extends SimpleKeyType[java.lang.Long]
   case object JIntKey     extends SimpleKeyType[java.lang.Integer]
@@ -93,6 +95,7 @@ object JKeyTypes {
 
   val BooleanKey = KeyType.JBooleanKey
   val CharKey    = KeyType.JCharKey
+  val ByteKey    = KeyType.JByteKey
   val ShortKey   = KeyType.JShortKey
   val LongKey    = KeyType.JLongKey
   val IntKey     = KeyType.JIntKey

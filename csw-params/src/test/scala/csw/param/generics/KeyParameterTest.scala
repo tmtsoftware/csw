@@ -485,6 +485,35 @@ class KeyParameterTest extends FunSpec with Matchers {
     }
   }
 
+  describe("test ByteItem") {
+    val tval: Byte = 123
+    val lk         = KeyType.ByteKey.make(s1)
+
+    it("should allow single val") {
+      val li = lk.set(tval)
+      li.values should be(Array(tval))
+      li.head should be(tval)
+      li.get(0).get should equal(tval)
+    }
+
+    val byteIn = Array[Byte](121, 122)
+
+    it("should work with list, withUnits") {
+      val li = lk.set(byteIn).withUnits(degrees)
+      li.units should be(degrees)
+      li.value(0) should equal(byteIn(0))
+      li.value(1) should equal(byteIn(1))
+      li.values should equal(byteIn)
+    }
+
+    it("should work with list, units") {
+      val li = lk.set(byteIn, degrees)
+      li.units should be(degrees)
+      li.value(1) should equal(byteIn(1))
+      li.values should equal(byteIn)
+    }
+  }
+
   describe("test IntItem") {
     val tval: Int = 1234
     val lk        = KeyType.IntKey.make(s1)

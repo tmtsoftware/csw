@@ -71,6 +71,35 @@ public class JSimpleKeyTypeTest {
     }
 
     @Test
+    public void testByteKeyParameter() {
+        String keyName = "ByteKey";
+        Key<Byte> key = JKeyTypes.ByteKey().make(keyName);
+        Byte[] paramData = {-127, 100, 127};
+        Assert.assertEquals(keyName, key.keyName());
+        Assert.assertEquals(JKeyTypes.ByteKey(),key.keyType());
+
+        // key.set without Units
+        Parameter<Byte> parameterWithoutUnits = key.set(paramData);
+
+        Assert.assertArrayEquals(paramData, (Byte[])parameterWithoutUnits.values());
+
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
+        Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
+        Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
+
+        // key.set with Units
+        Parameter<Byte> parameterWithUnits = key.set(paramData, encoder);
+        Assert.assertEquals(encoder, parameterWithUnits.units());
+
+        Assert.assertArrayEquals(paramData, (Byte[])parameterWithUnits.values());
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
+        Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
+        Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
+    }
+
+    @Test
     public void testShortKeyParameter() {
         String keyName = "ShortKey";
         Key<Short> key = JKeyTypes.ShortKey().make(keyName);
