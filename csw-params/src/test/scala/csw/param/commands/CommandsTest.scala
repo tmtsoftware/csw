@@ -1,5 +1,6 @@
 package csw.param.commands
 
+import csw.param.generics.KeyType.ByteKey
 import csw.param.generics._
 import csw.param.models.{ArrayData, Prefix}
 import csw.units.Units.{degrees, meters, NoUnits}
@@ -78,6 +79,27 @@ class CommandsTest extends FunSpec {
       assert(sc1.exists(k2))
       assert(sc1(k2).units == meters)
       assert(sc1(k2).values === Array("E"))
+    }
+
+    // DEOPSCSW-186: Binary value payload
+    it("Should able to create with Byte ParameterSet") {
+      val byteKey1 = ByteKey.make("byteKey1")
+      val byteKey2 = ByteKey.make("byteKey2")
+      val bytes1   = Array[Byte](10, 20)
+      val bytes2   = Array[Byte](30, 40)
+
+      val i1 = byteKey1.set(bytes1)
+      val i2 = byteKey2.set(bytes2)
+
+      val sc1 = Setup(commandInfo, Prefix(ck3), Set(i1, i2))
+      assert(sc1.size == 2)
+      assert(sc1.exists(byteKey1))
+      assert(sc1.exists(byteKey2))
+      assert(!sc1.exists(k2bad))
+
+      assert(sc1.get(byteKey1).head == i1)
+      assert(sc1.get(byteKey2).head == i2)
+      assert(sc1.missingKeys(byteKey1, byteKey2, k3) == Set(k3.keyName))
     }
   }
 
