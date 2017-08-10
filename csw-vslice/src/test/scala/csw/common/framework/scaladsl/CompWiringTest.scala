@@ -2,7 +2,6 @@ package csw.common.framework.scaladsl
 
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.Shutdown
-import csw.common.framework.scaladsl.testdata.FrameworkTestData
 import org.scalatest.Matchers
 import org.scalatest.mockito.MockitoSugar
 
@@ -16,8 +15,7 @@ class CompWiringTest extends FrameworkComponentTestSuite with Matchers with Mock
   ) {
 
     val supervisor =
-      Await.result(system.systemActorOf(SupervisorBehaviorFactory.make(FrameworkTestData.hcdInfo), "sampleHcd"),
-                   5.seconds)
+      Await.result(system.systemActorOf(SupervisorBehaviorFactory.make(hcdInfo), "sampleHcd"), 5.seconds)
 
     Thread.sleep(1000)
     supervisor ! Lifecycle(Shutdown)

@@ -9,7 +9,6 @@ import csw.common.framework.models.Component.{ComponentInfo, DoNotRegister, HcdI
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.Shutdown
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.testdata.SampleHcdHandlers
 import csw.param.states.CurrentState
 import csw.services.location.models.ConnectionType.AkkaType
 

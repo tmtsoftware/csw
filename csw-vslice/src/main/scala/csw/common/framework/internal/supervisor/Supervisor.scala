@@ -2,7 +2,7 @@ package csw.common.framework.internal.supervisor
 
 import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, Signal, Terminated}
 import csw.common.framework.internal.PubSubActor
 import csw.common.framework.models.CommonSupervisorMsg.{
@@ -26,9 +26,10 @@ import csw.services.location.models.ComponentId
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 object Supervisor {
-  val PubSubComponentActor = "pub-sub-component"
-  val ComponentActor       = "component"
-  val PubSubLifecycleActor = "pub-sub-lifecycle"
+  val PubSubComponentActor            = "pub-sub-component"
+  val ComponentActor                  = "component"
+  val PubSubLifecycleActor            = "pub-sub-lifecycle"
+  val shutdownTimeout: FiniteDuration = 5.seconds
 }
 
 class Supervisor(
@@ -39,7 +40,6 @@ class Supervisor(
 
   import Supervisor._
 
-  private val shutdownTimeout: FiniteDuration        = 5.seconds
   private var shutdownTimer: Option[Cancellable]     = None
   val name: String                                   = componentInfo.componentName
   val componentId                                    = ComponentId(name, componentInfo.componentType)
@@ -70,10 +70,9 @@ class Supervisor(
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMsg]] = {
     case Terminated(componentRef) ⇒
-      println()
+      ctx.unwatch(component)
       unregisterFromLocationService()
-      ctx.stop(pubSubComponent)
-      ctx.stop(pubSubLifecycle)
+      haltComponent()
       Behavior.stopped
   }
 
@@ -137,6 +136,6 @@ class Supervisor(
   def unregisterFromLocationService(): Unit = ()
 
   def haltComponent(): Boolean = {
-    ctx.stop(component) && ctx.stop(pubSubComponent) && ctx.stop(pubSubLifecycle)
+    ctx.stop(pubSubComponent) & ctx.stop(pubSubLifecycle) & ctx.stop(component)
   }
 }
