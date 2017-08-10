@@ -70,6 +70,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
     }
 
+    // DEOPSCSW-186: Binary value payload
     @Test
     public void testByteKeyParameter() {
         String keyName = "ByteKey";

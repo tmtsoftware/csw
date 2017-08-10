@@ -511,6 +511,7 @@ class KeyParameterTest extends FunSpec with Matchers {
     }
   }
 
+  // DEOPSCSW-186: Binary value payload
   describe("test ByteItem") {
     val tval: Byte = 123
     val lk         = KeyType.ByteKey.make(s1)
