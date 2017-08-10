@@ -3,6 +3,7 @@ package csw.common.framework.internal.supervisor
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.hcd.HcdDomainMsg
+import csw.common.framework.internal.Supervisor
 import csw.common.framework.models.CommonSupervisorMsg.{
   ComponentStateSubscription,
   HaltComponent,

@@ -4,6 +4,7 @@ import akka.typed.{Behavior, Props, Terminated}
 import csw.Effect._
 import csw.EffectfulActorContext
 import csw.common.components.hcd.HcdDomainMsg
+import csw.common.framework.internal.Supervisor
 import csw.common.framework.models.PreparingToShutdownMsg.ShutdownTimeout
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}

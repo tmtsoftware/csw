@@ -1,10 +1,9 @@
-package csw.common.framework.internal.supervisor
+package csw.common.framework.internal
 
 import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, Signal, Terminated}
-import csw.common.framework.internal.PubSubActor
 import csw.common.framework.models.CommonSupervisorMsg.{
   ComponentStateSubscription,
   HaltComponent,
