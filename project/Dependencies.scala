@@ -6,6 +6,7 @@ object Dependencies {
     Libs.`spray-json`,
     Libs.`scala-java8-compat`,
     Libs.`enumeratum`,
+    Chill.`chill-bijection`,
     Libs.`scalatest`       % Test,
     Libs.`junit`           % Test,
     Libs.`junit-interface` % Test
@@ -43,9 +44,9 @@ object Dependencies {
     Libs.`scala-java8-compat`,
     Libs.`scala-async`,
     Libs.`enumeratum`,
-    Libs.`chill-akka`,
     Libs.`akka-management-cluster-http`,
     Libs.`spray-json`,
+    Chill.`chill-akka`,
     AkkaHttp.`akka-http`,
     Libs.`scalatest`               % Test,
     Libs.`junit`                   % Test,
