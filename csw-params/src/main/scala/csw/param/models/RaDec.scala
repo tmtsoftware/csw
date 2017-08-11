@@ -1,9 +1,8 @@
 package csw.param.models
 
-import csw.param.ParamSerializable
 import spray.json.RootJsonFormat
 
-case class RaDec(ra: Double, dec: Double) extends ParamSerializable
+case class RaDec(ra: Double, dec: Double)
 
 case object RaDec {
   import spray.json.DefaultJsonProtocol._

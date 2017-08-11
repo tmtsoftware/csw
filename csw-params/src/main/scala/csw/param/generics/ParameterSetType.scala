@@ -2,6 +2,8 @@ package csw.param.generics
 
 import java.util
 
+import csw.param.ParamSerializable
+
 import scala.annotation.varargs
 import scala.collection.JavaConverters.setAsJavaSetConverter
 import scala.collection.JavaConverters.mapAsJavaMapConverter
@@ -12,7 +14,7 @@ import scala.compat.java8.OptionConverters.RichOptionForJava8
  *
  * @tparam T the subclass of ParameterSetType
  */
-trait ParameterSetType[T <: ParameterSetType[T]] { self: T =>
+trait ParameterSetType[T <: ParameterSetType[T]] extends ParamSerializable { self: T =>
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".

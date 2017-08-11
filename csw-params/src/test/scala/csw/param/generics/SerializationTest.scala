@@ -26,7 +26,7 @@ class SerializationTest extends FunSuite {
   val epoch: Key[Double]        = KeyType.DoubleKey.make("epoch")
   val test: Key[Int]            = KeyType.IntKey.make("test")
 
-  val sc1 = Setup(commandInfo, Prefix("tcs.pos")).madd(
+  val sc1: Setup = Setup(commandInfo, Prefix("tcs.pos")).madd(
     ra.set("12:32:11"),
     dec.set("30:22:22"),
     epoch.set(1950.0),
@@ -50,7 +50,7 @@ class SerializationTest extends FunSuite {
     .add(exposureTime.set(22.3)) // .sec,
     .add(repeats.set(3))
 
-  val wc1 = Wait(commandInfo, Prefix("wfos.blue.camera"))
+  val wc1: Wait = Wait(commandInfo, Prefix("wfos.blue.camera"))
 
   test("ConfigType kryo serialization") {
     import csw.param.generics.ParamSetSerializer._
