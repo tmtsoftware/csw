@@ -17,14 +17,14 @@ import scala.concurrent.duration.FiniteDuration
 
 class SampleCompHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
     extends ComponentHandlers[HcdDomainMsg](ctx, componentInfo) {
-  override def onRestart(): Unit                                               = println(s"${componentInfo.componentName} restarting")
-  override def onRun(): Unit                                                   = println(s"${componentInfo.componentName} running")
-  override def onGoOnline(): Unit                                              = println(s"${componentInfo.componentName} going online")
-  override def onDomainMsg(msg: HcdDomainMsg): Unit                            = println(s"${componentInfo.componentName} going offline")
-  override def onShutdown(): Unit                                              = println(s"${componentInfo.componentName} shutting down")
-  override def onControlCommand(commandMsg: CommandMsg): Validation.Validation = Validation.Valid
-  override def initialize(): Future[Unit]                                      = Future.unit
-  override def onGoOffline(): Unit                                             = println(s"${componentInfo.componentName} going offline")
+  override def onRestart(): Unit                                    = println(s"${componentInfo.componentName} restarting")
+  override def onRun(): Unit                                        = println(s"${componentInfo.componentName} running")
+  override def onGoOnline(): Unit                                   = println(s"${componentInfo.componentName} going online")
+  override def onDomainMsg(msg: HcdDomainMsg): Unit                 = println(s"${componentInfo.componentName} going offline")
+  override def onShutdown(): Unit                                   = println(s"${componentInfo.componentName} shutting down")
+  override def onControlCommand(commandMsg: CommandMsg): Validation = Validation.Valid
+  override def initialize(): Future[Unit]                           = Future.unit
+  override def onGoOffline(): Unit                                  = println(s"${componentInfo.componentName} going offline")
 }
 
 class SampleCompWiring extends ComponentWiring[HcdDomainMsg] {

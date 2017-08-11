@@ -132,5 +132,5 @@ class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg], componentInfo: Compon
 
   private def getAxisConfig: Future[AxisConfig] = ???
 
-  override def onControlCommand(commandMsg: CommandMsg): Validation.Validation = ???
+  override def onControlCommand(commandMsg: CommandMsg): Validation = ???
 }

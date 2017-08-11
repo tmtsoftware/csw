@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validation
-import csw.common.ccs.Validation.{Valid, Validation}
+import csw.common.ccs.Validation.Valid
 import csw.common.framework.models.Component.{AssemblyInfo, ComponentInfo}
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.Running

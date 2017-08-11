@@ -1,10 +1,10 @@
 package csw.common.framework.scaladsl
 
 import akka.typed.scaladsl.ActorContext
-import csw.common.ccs.Validation.Validation
+import csw.common.ccs.Validation
 import csw.common.framework.models.Component.ComponentInfo
-import csw.common.framework.models.{CommandMsg, ComponentMsg}
 import csw.common.framework.models.RunningMsg.DomainMsg
+import csw.common.framework.models.{CommandMsg, ComponentMsg}
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag

@@ -1,7 +1,6 @@
 package csw.common.ccs
 
 import akka.typed.ActorRef
-import csw.common.ccs.Validation.{Validation, ValidationIssue}
 import csw.param.commands.Result
 
 object CommandStatus {

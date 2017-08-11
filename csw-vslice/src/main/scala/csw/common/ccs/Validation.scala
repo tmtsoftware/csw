@@ -3,10 +3,9 @@ package csw.common.ccs
 /**
  * Describes the reason for a setup validation failure
  */
-object Validation {
+sealed trait ValidationIssue { def reason: String }
 
-  sealed trait ValidationIssue { def reason: String }
-
+object ValidationIssue {
   // Returned when a command is missing a required key/parameter
   final case class MissingKeyIssue(reason: String) extends ValidationIssue
 
@@ -57,11 +56,15 @@ object Validation {
   // Some other issue!
   final case class OtherIssue(reason: String) extends ValidationIssue
 
-  /**
-   * Base trait for the results of validating incoming commands
-   * Only a subset of CommandStatus entries are also Validation (Valid, Invalid)
-   */
-  sealed trait Validation
+}
+
+/**
+ * Base trait for the results of validating incoming commands
+ * Only a subset of CommandStatus entries are also Validation (Valid, Invalid)
+ */
+sealed trait Validation
+
+object Validation {
 
   /**
    * The command was not valid before starting
