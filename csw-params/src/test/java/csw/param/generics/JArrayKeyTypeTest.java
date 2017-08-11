@@ -51,8 +51,8 @@ public class JArrayKeyTypeTest {
         commonAssertions(keyName, JKeyTypes.ByteArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Byte>> parameterWithUnits = key.set(arrayData, milliseconds);
-        commonAssertions(keyName, JKeyTypes.ByteArrayKey(), arrayData, parameterWithUnits, milliseconds);
+        Parameter<ArrayData<Byte>> parameterWithUnits = key.set(arrayData, millisecond);
+        commonAssertions(keyName, JKeyTypes.ByteArrayKey(), arrayData, parameterWithUnits, millisecond);
     }
     
     @Test
@@ -71,8 +71,8 @@ public class JArrayKeyTypeTest {
         commonAssertions(keyName, JKeyTypes.ShortArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Short>> parameterWithUnits = key.set(arrayData, degrees);
-        commonAssertions(keyName, JKeyTypes.ShortArrayKey(), arrayData, parameterWithUnits, degrees);
+        Parameter<ArrayData<Short>> parameterWithUnits = key.set(arrayData, degree);
+        commonAssertions(keyName, JKeyTypes.ShortArrayKey(), arrayData, parameterWithUnits, degree);
     }
 
     @Test
@@ -91,8 +91,8 @@ public class JArrayKeyTypeTest {
         commonAssertions(keyName, JKeyTypes.LongArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Long>> parameterWithUnits = key.set(arrayData, millimeters);
-        commonAssertions(keyName, JKeyTypes.LongArrayKey(), arrayData, parameterWithUnits, millimeters);
+        Parameter<ArrayData<Long>> parameterWithUnits = key.set(arrayData, millimeter);
+        commonAssertions(keyName, JKeyTypes.LongArrayKey(), arrayData, parameterWithUnits, millimeter);
     }
     
     @Test
@@ -112,8 +112,8 @@ public class JArrayKeyTypeTest {
         commonAssertions(keyName, JKeyTypes.IntArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Integer>> parameterWithUnits = key.set(arrayData, kilometers);
-        commonAssertions(keyName, JKeyTypes.IntArrayKey(), arrayData, parameterWithUnits, kilometers);
+        Parameter<ArrayData<Integer>> parameterWithUnits = key.set(arrayData, kilometer);
+        commonAssertions(keyName, JKeyTypes.IntArrayKey(), arrayData, parameterWithUnits, kilometer);
     }
 
     @Test
@@ -132,8 +132,8 @@ public class JArrayKeyTypeTest {
         commonAssertions(keyName, JKeyTypes.FloatArrayKey(), arrayData, parameterWithoutUnits, NoUnit);
 
         // key.set with Units
-        Parameter<ArrayData<Float>> parameterWithUnits = key.set(arrayData, meters);
-        commonAssertions(keyName, JKeyTypes.FloatArrayKey(), arrayData, parameterWithUnits, meters);
+        Parameter<ArrayData<Float>> parameterWithUnits = key.set(arrayData, meter);
+        commonAssertions(keyName, JKeyTypes.FloatArrayKey(), arrayData, parameterWithUnits, meter);
     }
 
     @Test

@@ -4,7 +4,7 @@ import java.time.Instant
 
 import csw.param.models.{ObsId, Prefix}
 import csw.param.generics.KeyType
-import csw.units.Units.meters
+import csw.units.Units.meter
 import org.scalatest.{FunSpec, Matchers}
 
 // DEOPSCSW-183: Configure attributes and values
@@ -100,9 +100,9 @@ class EventsTest extends FunSpec with Matchers {
       assert(sc1.exists(k2))
       assert(sc1(k2).values === Array(22))
 
-      sc1 = sc1.add(k2.set(33).withUnits(meters))
+      sc1 = sc1.add(k2.set(33).withUnits(meter))
       assert(sc1.exists(k2))
-      assert(sc1(k2).units == meters)
+      assert(sc1(k2).units == meter)
       assert(sc1(k2).values === Array(33))
     }
   }
@@ -255,7 +255,7 @@ class EventsTest extends FunSpec with Matchers {
       ev1.info should equal(ev2.info)
 
       ev1 should equal(ev2)
-      ev1 should not equal (ev3)
+      ev1 should not equal ev3
     }
   }
 

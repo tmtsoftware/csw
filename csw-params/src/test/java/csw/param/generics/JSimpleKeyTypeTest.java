@@ -148,8 +148,8 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Long> parameterWithUnits = key.set(paramData, micrometers);
-        Assert.assertEquals(micrometers, parameterWithUnits.units());
+        Parameter<Long> parameterWithUnits = key.set(paramData, micrometer);
+        Assert.assertEquals(micrometer, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Long[])parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
@@ -177,8 +177,8 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Integer> parameterWithUnits = key.set(paramData, milliseconds);
-        Assert.assertEquals(milliseconds, parameterWithUnits.units());
+        Parameter<Integer> parameterWithUnits = key.set(paramData, millisecond);
+        Assert.assertEquals(millisecond, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Integer[])parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
@@ -206,8 +206,8 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Float> parameterWithUnits = key.set(paramData, millimeters);
-        Assert.assertEquals(millimeters, parameterWithUnits.units());
+        Parameter<Float> parameterWithUnits = key.set(paramData, millimeter);
+        Assert.assertEquals(millimeter, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Float[])parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
@@ -235,8 +235,8 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Double> parameterWithUnits = key.set(paramData, kilometers);
-        Assert.assertEquals(kilometers, parameterWithUnits.units());
+        Parameter<Double> parameterWithUnits = key.set(paramData, kilometer);
+        Assert.assertEquals(kilometer, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Double[])parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
@@ -264,8 +264,8 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<RaDec> parameterWithUnits = key.set(paramData, meters);
-        Assert.assertEquals(meters, parameterWithUnits.units());
+        Parameter<RaDec> parameterWithUnits = key.set(paramData, meter);
+        Assert.assertEquals(meter, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (RaDec[])parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
@@ -293,8 +293,8 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<String> parameterWithUnits = key.set(paramData, degrees);
-        Assert.assertEquals(degrees, parameterWithUnits.units());
+        Parameter<String> parameterWithUnits = key.set(paramData, degree);
+        Assert.assertEquals(degree, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (String[])parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
@@ -330,8 +330,8 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
 
         // key.set with Units
-        Parameter<Struct> parameterWithUnits = key.set(paramData, seconds);
-        Assert.assertEquals(seconds, parameterWithUnits.units());
+        Parameter<Struct> parameterWithUnits = key.set(paramData, second);
+        Assert.assertEquals(second, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Struct[])parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());

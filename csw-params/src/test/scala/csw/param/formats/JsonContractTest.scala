@@ -8,7 +8,7 @@ import csw.param.generics.KeyType
 import csw.param.generics.KeyType.{LongMatrixKey, StructKey}
 import csw.param.models._
 import csw.param.states.{CurrentState, DemandState}
-import csw.units.Units.{encoder, meters, NoUnits}
+import csw.units.Units.{encoder, meter, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 import spray.json.pimpString
 
@@ -123,7 +123,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val a2: Array[Int] = Array(10, 20, 30, 40, 50)
 
       val charParam     = charKey.set('A', 'B', 'C').withUnits(encoder)
-      val intArrayParam = intArrayKey.set(a1, a2).withUnits(meters)
+      val intArrayParam = intArrayKey.set(a1, a2).withUnits(meter)
 
       val currentState       = CurrentState(prefix).madd(charParam, intArrayParam)
       val currentStateToJson = JsonSupport.writeStateVariable(currentState)
@@ -138,7 +138,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val booleanKey = KeyType.BooleanKey.make("booleanKey")
 
       val charParam    = charKey.set('A', 'B', 'C').withUnits(NoUnits)
-      val intParam     = intKey.set(1, 2, 3).withUnits(meters)
+      val intParam     = intKey.set(1, 2, 3).withUnits(meter)
       val booleanParam = booleanKey.set(true, false)
 
       val demandState       = DemandState(prefix).madd(charParam, intParam, booleanParam)

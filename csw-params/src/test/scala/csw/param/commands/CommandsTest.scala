@@ -3,7 +3,7 @@ package csw.param.commands
 import csw.param.generics.KeyType.ByteKey
 import csw.param.generics._
 import csw.param.models.{ArrayData, Prefix}
-import csw.units.Units.{degrees, meters, NoUnits}
+import csw.units.Units.{degree, meter, NoUnits}
 import org.scalatest.FunSpec
 
 import scala.util.Try
@@ -47,17 +47,17 @@ class CommandsTest extends FunSpec {
     // DEOPSCSW-190: Implement Unit Support
     it("Should allow setting with units") {
       var sc1 = Setup(commandInfo, Prefix(ck1))
-      sc1 = sc1.madd(k1.set(22).withUnits(degrees), k2.set("B"))
+      sc1 = sc1.madd(k1.set(22).withUnits(degree), k2.set("B"))
       assert(sc1.size == 2)
       assert(sc1.exists(k1))
       assert(sc1.exists(k2))
-      assert(sc1.get(k1).map(_.units == degrees).get)
+      assert(sc1.get(k1).map(_.units == degree).get)
       assert(sc1.get(k2).get.units == NoUnits)
     }
 
     it("Should allow apply which returns values") {
       var sc1 = Setup(commandInfo, Prefix(ck1))
-      sc1 = sc1.madd(k1.set(22).withUnits(degrees), k2.set("C"))
+      sc1 = sc1.madd(k1.set(22).withUnits(degree), k2.set("C"))
 
       val v1: Parameter[Int]    = sc1(k1)
       val v2: Parameter[String] = sc1(k2)
@@ -75,14 +75,14 @@ class CommandsTest extends FunSpec {
       assert(sc1.exists(k2))
       assert(sc1(k2).values === Array("D"))
 
-      sc1 = sc1.add(k2.set("E").withUnits(meters))
+      sc1 = sc1.add(k2.set("E").withUnits(meter))
       assert(sc1.exists(k2))
-      assert(sc1(k2).units == meters)
+      assert(sc1(k2).units == meter)
       assert(sc1(k2).values === Array("E"))
     }
 
     // DEOPSCSW-186: Binary value payload
-    it("Should able to create with Byte ParameterSet") {
+    it("Should able to create with Byte Parameteret") {
       val byteKey1 = ByteKey.make("byteKey1")
       val byteKey2 = ByteKey.make("byteKey2")
       val bytes1   = Array[Byte](10, 20)
@@ -187,11 +187,11 @@ class CommandsTest extends FunSpec {
 
   describe("testing for getting typed items") {
     val t1  = KeyType.IntKey.make("test1")
-    val sc1 = Setup(commandInfo, Prefix(ck1)).add(t1.set(Array(22), degrees))
+    val sc1 = Setup(commandInfo, Prefix(ck1)).add(t1.set(Array(22), degree))
 
     val item: Option[Parameter[Int]] = sc1.get(t1) // Works now!
     val itm: Parameter[Int]          = item.get
-    assert(itm.units == degrees)
+    assert(itm.units == degree)
     val i: Int = itm(0)
     assert(i == 22)
     val i2: Int = itm.head
@@ -205,8 +205,8 @@ class CommandsTest extends FunSpec {
     val k2: Key[Double] = KeyType.DoubleKey.make("dtest")
     val k3: Key[String] = KeyType.StringKey.make("stest")
 
-    val i1 = k1.set(1, 2, 3).withUnits(degrees)
-    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meters)
+    val i1 = k1.set(1, 2, 3).withUnits(degree)
+    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meter)
     val i3 = k3.set("A", "B", "C")
 
     it("Should get as IntItem") {
@@ -227,8 +227,8 @@ class CommandsTest extends FunSpec {
     val k2: Key[Double] = KeyType.DoubleKey.make("dtest")
     val k3: Key[String] = KeyType.StringKey.make("stest")
 
-    val i1 = k1.set(1, 2, 3).withUnits(degrees)
-    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meters)
+    val i1 = k1.set(1, 2, 3).withUnits(degree)
+    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meter)
     val i3 = k3.set("A", "B", "C")
 
     it("Should allow vararg add") {
@@ -248,8 +248,8 @@ class CommandsTest extends FunSpec {
     val k3 = KeyType.StringKey.make("stest")
     val k4 = KeyType.LongArrayKey.make("lartest")
 
-    val i1 = k1.set(1, 2, 3).withUnits(degrees)
-    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meters)
+    val i1 = k1.set(1, 2, 3).withUnits(degree)
+    val i2 = k2.set(1.0, 2.0, 3.0).withUnits(meter)
     val i3 = k3.set("A", "B", "C")
     val i4 = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
 
@@ -377,9 +377,9 @@ class CommandsTest extends FunSpec {
     val k3 = KeyType.StringKey.make("stest")
     val k4 = KeyType.LongArrayKey.make("lartest")
 
-    val i1  = k1.set(1, 2, 3).withUnits(degrees)
-    val i11 = k1.set(1, 2, 3).withUnits(degrees) // This is here to see if it is checking equality or address
-    val i2  = k2.set(1.0, 2.0, 3.0).withUnits(meters)
+    val i1  = k1.set(1, 2, 3).withUnits(degree)
+    val i11 = k1.set(1, 2, 3).withUnits(degree) // This is here to see if it is checking equality or address
+    val i2  = k2.set(1.0, 2.0, 3.0).withUnits(meter)
     val i3  = k3.set("A", "B", "C")
     val i4  = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
     val i5  = k1.set(22) // This is not added for testing not present removal

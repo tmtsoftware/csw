@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static csw.param.javadsl.JUnits.NoUnits;
-import static csw.param.javadsl.JUnits.kilometers;
+import static csw.param.javadsl.JUnits.kilometer;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-190: Implement Unit Support
@@ -61,8 +61,8 @@ public class JChoiceKeyTypeTest {
         Choice[] choicesArr = {choice1, choice2};
 
         // set with Array and Units
-        Parameter<Choice> choiceParameter = choiceKey.set(choicesArr, kilometers);
-        Assert.assertEquals(kilometers, choiceParameter.units());
+        Parameter<Choice> choiceParameter = choiceKey.set(choicesArr, kilometer);
+        Assert.assertEquals(kilometer, choiceParameter.units());
         Assert.assertEquals(choice1, choiceParameter.jGet(0).get());
         Assert.assertEquals(choice2, choiceParameter.jGet(1).get());
         Assert.assertEquals(choice1, choiceParameter.head());

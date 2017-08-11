@@ -14,7 +14,7 @@ import csw.param.generics.KeyType.{
   StructKey
 }
 import csw.param.models._
-import csw.units.Units.{degrees, encoder, meters, seconds, NoUnits}
+import csw.units.Units.{degree, encoder, meter, second, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 
 // DEOPSCSW-183: Configure attributes and values
@@ -56,16 +56,16 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     // DEOPSCSW-190: Implement Unit Support
     it("should work with list, withUnits") {
-      val ii = bk.set(listIn).withUnits(degrees)
-      ii.units should be(degrees)
+      val ii = bk.set(listIn).withUnits(degree)
+      ii.units should be(degree)
       ii.value(1) should equal(listIn(1))
       ii.values should equal(listIn)
     }
 
     // DEOPSCSW-190: Implement Unit Support
     it("should work with list, units") {
-      val ii = bk.set(listIn, degrees)
-      ii.units should be(degrees)
+      val ii = bk.set(listIn, degree)
+      ii.units should be(degree)
       ii.value(1) should equal(listIn(1))
       ii.values should equal(listIn)
     }
@@ -91,16 +91,16 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     // DEOPSCSW-190: Implement Unit Support
     it("should test with list, withUnits") {
-      val li2: Parameter[ArrayData[Byte]] = lk.set(listIn).withUnits(degrees)
-      li2.units should be(degrees)
+      val li2: Parameter[ArrayData[Byte]] = lk.set(listIn).withUnits(degree)
+      li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
     // DEOPSCSW-190: Implement Unit Support
     it("should test with list, units") {
-      val li2 = lk.set(listIn, degrees)
-      li2.units should be theSameInstanceAs degrees
+      val li2 = lk.set(listIn, degree)
+      li2.units should be theSameInstanceAs degree
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -109,8 +109,8 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("should test using one array with and without units") {
       var li2 = lk.set(a1) // Uses implicit to create from long array
       li2.head should equal(la1)
-      li2 = lk.set(a2).withUnits(degrees)
-      li2.units should be theSameInstanceAs degrees
+      li2 = lk.set(a2).withUnits(degree)
+      li2.units should be theSameInstanceAs degree
       li2.head should equal(la2)
     }
 
@@ -123,8 +123,8 @@ class KeyParameterTest extends FunSpec with Matchers {
       val b: Array[Byte] = Array[Byte](10, 20, 30)
       val c: Array[Byte] = Array[Byte](100, 101, 102)
 
-      val li4: Parameter[ArrayData[Byte]] = lk.set(a, b, c).withUnits(meters)
-      li4.values.size should be(3)
+      val li4: Parameter[ArrayData[Byte]] = lk.set(a, b, c).withUnits(meter)
+      li4.values.length should be(3)
       li4.value(2) should equal(ArrayData(c))
     }
 
@@ -170,16 +170,16 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     // DEOPSCSW-190: Implement Unit Support
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
     // DEOPSCSW-190: Implement Unit Support
     it("should work with list and units") {
-      val di = dk.set(listIn, degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn, degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -188,23 +188,23 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("work with one matrix without and with units") {
       var di = dk.set(m1) // This is an implicit
       di.head should equal(lm1)
-      di = dk.set(m1).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      di = dk.set(m1).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.head should equal(lm1)
     }
 
     // DEOPSCSW-190: Implement Unit Support
     it("work with varargs") {
-      val di = dk.set(lm1, lm2).withUnits(seconds)
-      di.units should be theSameInstanceAs seconds
+      val di = dk.set(lm1, lm2).withUnits(second)
+      di.units should be theSameInstanceAs second
       di.value(1) should equal(lm2)
       di.values should equal(listIn)
     }
 
     // DEOPSCSW-190: Implement Unit Support
     it("work with varargs as arrays") {
-      val di = dk.set(m1, m2).withUnits(meters)
-      di.units should be theSameInstanceAs meters
+      val di = dk.set(m1, m2).withUnits(meter)
+      di.units should be theSameInstanceAs meter
       di.value(0) should equal(lm1)
       di.values should equal(listIn)
     }
@@ -225,15 +225,15 @@ class KeyParameterTest extends FunSpec with Matchers {
 
     // DEOPSCSW-190: Implement Unit Support
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn).withUnits(degree)
+      li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
     it("should work with list, units") {
-      val li = lk.set(listIn, degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn, degree)
+      li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -253,15 +253,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array[Double](123.0, 456.0)
 
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn).withUnits(degree)
+      li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
     it("should work with list, units") {
-      val li = lk.set(listIn, degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn, degree)
+      li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -285,15 +285,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(degrees)
-      li2.units should be(degrees)
+      val li2 = lk.set(listIn).withUnits(degree)
+      li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
     it("should test with list, units") {
-      val li2 = lk.set(listIn, degrees)
-      li2.units should be theSameInstanceAs degrees
+      val li2 = lk.set(listIn, degree)
+      li2.units should be theSameInstanceAs degree
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -301,8 +301,8 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("should test using one array with and without units") {
       var li2 = lk.set(a1) // Uses implicit to create from long array
       li2.head should equal(la1)
-      li2 = lk.set(a2).withUnits(degrees)
-      li2.units should be theSameInstanceAs degrees
+      li2 = lk.set(a2).withUnits(degree)
+      li2.units should be theSameInstanceAs degree
       li2.head should equal(la2)
     }
 
@@ -315,8 +315,8 @@ class KeyParameterTest extends FunSpec with Matchers {
       val b: Array[Double] = Array(10, 20, 30)
       val c: Array[Double] = Array(100, 200, 300)
 
-      val li4 = lk.set(a, b, c).withUnits(meters)
-      li4.values.size should be(3)
+      val li4 = lk.set(a, b, c).withUnits(meter)
+      li4.values.length should be(3)
       li4.value(2) should equal(ArrayData(c))
     }
   }
@@ -339,15 +339,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
     it("should work with list and units") {
-      val di = dk.set(listIn, degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn, degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -355,21 +355,21 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("work with one matrix without and with units") {
       var di = dk.set(m1) // This is an implicit
       di.head should equal(lm1)
-      di = dk.set(m1).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      di = dk.set(m1).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.head should equal(lm1)
     }
 
     it("work with varargs") {
-      val di = dk.set(lm1, lm2).withUnits(seconds)
-      di.units should be theSameInstanceAs seconds
+      val di = dk.set(lm1, lm2).withUnits(second)
+      di.units should be theSameInstanceAs second
       di.value(1) should equal(lm2)
       di.values should equal(listIn)
     }
 
     it("work with varargs as arrays") {
-      val di = dk.set(m1, m2).withUnits(meters)
-      di.units should be theSameInstanceAs meters
+      val di = dk.set(m1, m2).withUnits(meter)
+      di.units should be theSameInstanceAs meter
       di.value(0) should equal(lm1)
       di.values should equal(listIn)
     }
@@ -389,15 +389,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array[Float](123.0f, 456.0f)
 
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn).withUnits(degree)
+      li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
     it("should work with list, units") {
-      val li = lk.set(listIn, degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn, degree)
+      li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -421,15 +421,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(degrees)
-      li2.units should be(degrees)
+      val li2 = lk.set(listIn).withUnits(degree)
+      li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
     it("should test with list, units") {
-      val li2 = lk.set(listIn, degrees)
-      li2.units should be theSameInstanceAs degrees
+      val li2 = lk.set(listIn, degree)
+      li2.units should be theSameInstanceAs degree
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -437,8 +437,8 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("should test using one array with and without units") {
       var li2 = lk.set(a1) // Uses implicit to create from long array
       li2.head should equal(la1)
-      li2 = lk.set(a2).withUnits(degrees)
-      li2.units should be theSameInstanceAs degrees
+      li2 = lk.set(a2).withUnits(degree)
+      li2.units should be theSameInstanceAs degree
       li2.head should equal(la2)
     }
 
@@ -451,8 +451,8 @@ class KeyParameterTest extends FunSpec with Matchers {
       val b: Array[Float] = Array(10f, 20f, 30f)
       val c: Array[Float] = Array(100f, 200f, 300f)
 
-      val li4 = lk.set(a, b, c).withUnits(meters)
-      li4.values.size should be(3)
+      val li4 = lk.set(a, b, c).withUnits(meter)
+      li4.values.length should be(3)
       li4.value(2) should equal(ArrayData(c))
     }
   }
@@ -475,15 +475,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
     it("should work with list and units") {
-      val di = dk.set(listIn, degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn, degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -491,21 +491,21 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("work with one matrix without and with units") {
       var di = dk.set(m1) // This is an implicit
       di.head should equal(lm1)
-      di = dk.set(m1).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      di = dk.set(m1).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.head should equal(lm1)
     }
 
     it("work with varargs") {
-      val di = dk.set(lm1, lm2).withUnits(seconds)
-      di.units should be theSameInstanceAs seconds
+      val di = dk.set(lm1, lm2).withUnits(second)
+      di.units should be theSameInstanceAs second
       di.value(1) should equal(lm2)
       di.values should equal(listIn)
     }
 
     it("work with varargs as arrays") {
-      val di = dk.set(m1, m2).withUnits(meters)
-      di.units should be theSameInstanceAs meters
+      val di = dk.set(m1, m2).withUnits(meter)
+      di.units should be theSameInstanceAs meter
       di.value(0) should equal(lm1)
       di.values should equal(listIn)
     }
@@ -526,16 +526,16 @@ class KeyParameterTest extends FunSpec with Matchers {
     val byteIn = Array[Byte](121, 122)
 
     it("should work with list, withUnits") {
-      val li = lk.set(byteIn).withUnits(degrees)
-      li.units should be(degrees)
+      val li = lk.set(byteIn).withUnits(degree)
+      li.units should be(degree)
       li.value(0) should equal(byteIn(0))
       li.value(1) should equal(byteIn(1))
       li.values should equal(byteIn)
     }
 
     it("should work with list, units") {
-      val li = lk.set(byteIn, degrees)
-      li.units should be(degrees)
+      val li = lk.set(byteIn, degree)
+      li.units should be(degree)
       li.value(1) should equal(byteIn(1))
       li.values should equal(byteIn)
     }
@@ -555,16 +555,16 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array[Int](123, 456)
 
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn).withUnits(degree)
+      li.units should be(degree)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
     it("should work with list, units") {
-      val li = lk.set(listIn, degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn, degree)
+      li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -588,15 +588,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(degrees)
-      li2.units should be(degrees)
+      val li2 = lk.set(listIn).withUnits(degree)
+      li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
     it("should test with list, units") {
-      val li2 = lk.set(listIn, degrees)
-      li2.units should be theSameInstanceAs degrees
+      val li2 = lk.set(listIn, degree)
+      li2.units should be theSameInstanceAs degree
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -604,8 +604,8 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("should test using one array with and without units") {
       var li2 = lk.set(a1) // Uses implicit to create from int array
       li2.head should equal(la1)
-      li2 = lk.set(a2).withUnits(degrees)
-      li2.units should be theSameInstanceAs degrees
+      li2 = lk.set(a2).withUnits(degree)
+      li2.units should be theSameInstanceAs degree
       li2.head should equal(la2)
     }
 
@@ -618,8 +618,8 @@ class KeyParameterTest extends FunSpec with Matchers {
       val b: Array[Int] = Array(10, 20, 30)
       val c: Array[Int] = Array(100, 200, 300)
 
-      val li4 = lk.set(a, b, c).withUnits(meters)
-      li4.values.size should be(3)
+      val li4 = lk.set(a, b, c).withUnits(meter)
+      li4.values.length should be(3)
       li4.value(2) should equal(ArrayData(c))
     }
   }
@@ -642,15 +642,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
     it("should work with list and units") {
-      val di = dk.set(listIn, degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn, degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -658,21 +658,21 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("work with one matrix without and with units") {
       var di = dk.set(m1) // This is an implicit
       di.head should equal(lm1)
-      di = dk.set(m1).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      di = dk.set(m1).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.head should equal(lm1)
     }
 
     it("work with varargs") {
-      val di = dk.set(lm1, lm2).withUnits(seconds)
-      di.units should be theSameInstanceAs seconds
+      val di = dk.set(lm1, lm2).withUnits(second)
+      di.units should be theSameInstanceAs second
       di.value(1) should equal(lm2)
       di.values should equal(listIn)
     }
 
     it("work with varargs as arrays") {
-      val di = dk.set(m1, m2).withUnits(meters)
-      di.units should be theSameInstanceAs meters
+      val di = dk.set(m1, m2).withUnits(meter)
+      di.units should be theSameInstanceAs meter
       di.value(0) should equal(lm1)
       di.values should equal(listIn)
     }
@@ -691,15 +691,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array[Long](123L, 456L)
 
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn).withUnits(degree)
+      li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
     it("should work with list, units") {
-      val li = lk.set(listIn, degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn, degree)
+      li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -723,15 +723,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2: Parameter[ArrayData[Long]] = lk.set(listIn).withUnits(degrees)
-      li2.units should be(degrees)
+      val li2: Parameter[ArrayData[Long]] = lk.set(listIn).withUnits(degree)
+      li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
     it("should test with list, units") {
-      val li2 = lk.set(listIn, degrees)
-      li2.units should be theSameInstanceAs degrees
+      val li2 = lk.set(listIn, degree)
+      li2.units should be theSameInstanceAs degree
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -739,8 +739,8 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("should test using one array with and without units") {
       var li2 = lk.set(a1) // Uses implicit to create from long array
       li2.head should equal(la1)
-      li2 = lk.set(a2).withUnits(degrees)
-      li2.units should be theSameInstanceAs degrees
+      li2 = lk.set(a2).withUnits(degree)
+      li2.units should be theSameInstanceAs degree
       li2.head should equal(la2)
     }
 
@@ -753,8 +753,8 @@ class KeyParameterTest extends FunSpec with Matchers {
       val b: Array[Long] = Array(10, 20, 30)
       val c: Array[Long] = Array(100, 200, 300)
 
-      val li4: Parameter[ArrayData[Long]] = lk.set(a, b, c).withUnits(meters)
-      li4.values.size should be(3)
+      val li4: Parameter[ArrayData[Long]] = lk.set(a, b, c).withUnits(meter)
+      li4.values.length should be(3)
       li4.value(2) should equal(ArrayData(c))
     }
   }
@@ -777,15 +777,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
     it("should work with list and units") {
-      val di = dk.set(listIn, degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn, degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -793,21 +793,21 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("work with one matrix without and with units") {
       var di = dk.set(m1) // This is an implicit
       di.head should equal(lm1)
-      di = dk.set(m1).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      di = dk.set(m1).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.head should equal(lm1)
     }
 
     it("work with varargs") {
-      val di = dk.set(lm1, lm2).withUnits(seconds)
-      di.units should be theSameInstanceAs seconds
+      val di = dk.set(lm1, lm2).withUnits(second)
+      di.units should be theSameInstanceAs second
       di.value(1) should equal(lm2)
       di.values should equal(listIn)
     }
 
     it("work with varargs as arrays") {
-      val di = dk.set(m1, m2).withUnits(meters)
-      di.units should be theSameInstanceAs meters
+      val di = dk.set(m1, m2).withUnits(meter)
+      di.units should be theSameInstanceAs meter
       di.value(0) should equal(lm1)
       di.values should equal(listIn)
     }
@@ -827,16 +827,16 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array[Short](123, 456)
 
     it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn).withUnits(degree)
+      li.units should be(degree)
       li.value(0) should equal(listIn(0))
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
 
     it("should work with list, units") {
-      val li = lk.set(listIn, degrees)
-      li.units should be(degrees)
+      val li = lk.set(listIn, degree)
+      li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
     }
@@ -860,15 +860,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array(la1, la2)
 
     it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(degrees)
-      li2.units should be(degrees)
+      val li2 = lk.set(listIn).withUnits(degree)
+      li2.units should be(degree)
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
 
     it("should test with list, units") {
-      val li2 = lk.set(listIn, degrees)
-      li2.units should be theSameInstanceAs degrees
+      val li2 = lk.set(listIn, degree)
+      li2.units should be theSameInstanceAs degree
       li2.value(1) should equal(listIn(1))
       li2.values should equal(listIn)
     }
@@ -876,8 +876,8 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("should test using one array with and without units") {
       var li2 = lk.set(a1) // Uses implicit to create from int array
       li2.head should equal(la1)
-      li2 = lk.set(a2).withUnits(degrees)
-      li2.units should be theSameInstanceAs degrees
+      li2 = lk.set(a2).withUnits(degree)
+      li2.units should be theSameInstanceAs degree
       li2.head should equal(la2)
     }
 
@@ -890,8 +890,8 @@ class KeyParameterTest extends FunSpec with Matchers {
       val b: Array[Short] = Array[Short](10, 20, 30)
       val c: Array[Short] = Array[Short](100, 200, 300)
 
-      val li4 = lk.set(a, b, c).withUnits(meters)
-      li4.values.size should be(3)
+      val li4 = lk.set(a, b, c).withUnits(meter)
+      li4.values.length should be(3)
       li4.value(2) should equal(ArrayData(c))
     }
   }
@@ -914,15 +914,15 @@ class KeyParameterTest extends FunSpec with Matchers {
     val listIn = Array(lm1, lm2)
 
     it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
 
     it("should work with list and units") {
-      val di = dk.set(listIn, degrees)
-      di.units should be theSameInstanceAs degrees
+      val di = dk.set(listIn, degree)
+      di.units should be theSameInstanceAs degree
       di.value(1) should equal(listIn(1))
       di.values should equal(listIn)
     }
@@ -930,21 +930,21 @@ class KeyParameterTest extends FunSpec with Matchers {
     it("work with one matrix without and with units") {
       var di = dk.set(m1) // This is an implicit
       di.head should equal(lm1)
-      di = dk.set(m1).withUnits(degrees)
-      di.units should be theSameInstanceAs degrees
+      di = dk.set(m1).withUnits(degree)
+      di.units should be theSameInstanceAs degree
       di.head should equal(lm1)
     }
 
     it("work with varargs") {
-      val di = dk.set(lm1, lm2).withUnits(seconds)
-      di.units should be theSameInstanceAs seconds
+      val di = dk.set(lm1, lm2).withUnits(second)
+      di.units should be theSameInstanceAs second
       di.value(1) should equal(lm2)
       di.values should equal(listIn)
     }
 
     it("work with varargs as arrays") {
-      val di = dk.set(m1, m2).withUnits(meters)
-      di.units should be theSameInstanceAs meters
+      val di = dk.set(m1, m2).withUnits(meter)
+      di.units should be theSameInstanceAs meter
       di.value(0) should equal(lm1)
       di.values should equal(listIn)
     }
@@ -962,7 +962,7 @@ class KeyParameterTest extends FunSpec with Matchers {
       val ci = ci1.set("A")
       ci.head should equal(Choice("A"))
       // Check that non-choice fails
-      an[AssertionError] should be thrownBy (ci1.set("D"))
+      an[AssertionError] should be thrownBy ci1.set("D")
     }
 
     it("should allow creating with varargs of Strings") {
@@ -974,7 +974,7 @@ class KeyParameterTest extends FunSpec with Matchers {
       val ci = ci2.set("A")
       ci.head should equal(Choice("A"))
       // Check that non-choice fails
-      an[AssertionError] should be thrownBy (ci2.set("C"))
+      an[AssertionError] should be thrownBy ci2.set("C")
     }
 
     it("should allow creation with individual Choice items") {
@@ -1029,18 +1029,18 @@ class KeyParameterTest extends FunSpec with Matchers {
       assert(i1.units == NoUnits)
       assert(i1(1) == 3)
 
-      val i2 = t1.set(Array(10, 30, 50, 70)).withUnits(degrees)
+      val i2 = t1.set(Array(10, 30, 50, 70)).withUnits(degree)
       assert(i2.values === Array(10, 30, 50, 70))
-      assert(i2.units == degrees)
+      assert(i2.units == degree)
       assert(i2(1) == 30)
       assert(i2(3) == 70)
     }
     it("should also allow setting with sequence") {
       val s1 = Array(2, 4, 6, 8)
-      val i1 = t1.set(s1).withUnits(meters)
+      val i1 = t1.set(s1).withUnits(meter)
       assert(i1.values === s1)
       assert(i1.values.length == s1.length)
-      assert(i1.units == meters)
+      assert(i1.units == meter)
       assert(i1(2) == 6)
     }
   }

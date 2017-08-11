@@ -18,7 +18,7 @@ import csw.param.generics._
 import csw.param.models.{Subsystem, _}
 import csw.param.states.{CurrentState, DemandState}
 import csw.units.Units
-import csw.units.Units.{degrees, encoder, meters, NoUnits}
+import csw.units.Units.{degree, encoder, meter, NoUnits}
 import org.scalatest.FunSpec
 import spray.json._
 
@@ -158,7 +158,7 @@ class JsonTest extends FunSpec {
     val k2 = KeyType.StringKey.make(s2)
 
     val i1 = k1.set(22, 33, 44)
-    val i2 = k2.set("a", "b", "c").withUnits(degrees)
+    val i2 = k2.set("a", "b", "c").withUnits(degree)
 
     it("should encode and decode items list") {
       // Use this to get a list to test
@@ -184,10 +184,10 @@ class JsonTest extends FunSpec {
     val i1 = k1.set('d').withUnits(NoUnits)
     val i2 = k2.set(22).withUnits(NoUnits)
     val i3 = k3.set(1234L).withUnits(NoUnits)
-    val i4 = k4.set(123.45f).withUnits(degrees)
-    val i5 = k5.set(123.456).withUnits(meters)
+    val i4 = k4.set(123.45f).withUnits(degree)
+    val i5 = k5.set(123.456).withUnits(meter)
     val i6 = k6.set(false)
-    val i7 = k7.set("GG495").withUnits(degrees)
+    val i7 = k7.set("GG495").withUnits(degree)
 
     it("Should encode/decode a Setup") {
       val c1 = Setup(commandInfo, Prefix(ck)).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)

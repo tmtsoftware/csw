@@ -44,15 +44,15 @@ public class JMatrixKeyTypeTest {
                         {"byteKey1", JKeyTypes.ByteMatrixKey(), byteData, Optional.empty()},
                         {"byteKey2", JKeyTypes.ByteMatrixKey(), byteData, Optional.of(encoder)},
                         {"shortKey1", JKeyTypes.ShortMatrixKey(), shortData, Optional.empty()},
-                        {"shortKey2", JKeyTypes.ShortMatrixKey(), shortData, Optional.of(degrees)},
+                        {"shortKey2", JKeyTypes.ShortMatrixKey(), shortData, Optional.of(degree)},
                         {"longKey1", JKeyTypes.LongMatrixKey(), longData, Optional.empty()},
-                        {"longKey2", JKeyTypes.LongMatrixKey(), longData, Optional.of(kilometers)},
+                        {"longKey2", JKeyTypes.LongMatrixKey(), longData, Optional.of(kilometer)},
                         {"intKey1", JKeyTypes.IntMatrixKey(), intData, Optional.empty()},
-                        {"intKey2", JKeyTypes.IntMatrixKey(), intData, Optional.of(meters)},
+                        {"intKey2", JKeyTypes.IntMatrixKey(), intData, Optional.of(meter)},
                         {"floatKey1", JKeyTypes.FloatMatrixKey(), floatData, Optional.empty()},
-                        {"floatKey2", JKeyTypes.FloatMatrixKey(), floatData, Optional.of(millimeters)},
+                        {"floatKey2", JKeyTypes.FloatMatrixKey(), floatData, Optional.of(millimeter)},
                         {"doubleKey1", JKeyTypes.DoubleMatrixKey(), doubleData, Optional.empty()},
-                        {"doubleKey2", JKeyTypes.DoubleMatrixKey(), doubleData, Optional.of(milliseconds)}
+                        {"doubleKey2", JKeyTypes.DoubleMatrixKey(), doubleData, Optional.of(millisecond)}
                 }
         );
     }

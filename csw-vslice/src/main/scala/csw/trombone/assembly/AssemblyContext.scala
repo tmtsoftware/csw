@@ -7,7 +7,7 @@ import csw.common.framework.models.Component.AssemblyInfo
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.models.Prefix
 import csw.param.generics.{KeyType, Parameter}
-import csw.units.Units.{degrees, kilometers, micrometers, millimeters}
+import csw.units.Units.{degree, kilometer, micrometer, millimeter}
 
 /**
  * TMT Source Code: 10/4/16.
@@ -82,31 +82,31 @@ case class AssemblyContext(info: AssemblyInfo,
   val configurationVersionKey = KeyType.StringKey.make("initConfigurationVersion")
 
   val focusErrorKey   = KeyType.DoubleKey.make("focus")
-  val focusErrorUnits = micrometers
+  val focusErrorUnits = micrometer
 
   def fe(error: Double): Parameter[Double] = focusErrorKey -> error withUnits focusErrorUnits
 
   val zenithAngleKey   = KeyType.DoubleKey.make("zenithAngle")
-  val zenithAngleUnits = degrees
+  val zenithAngleUnits = degree
 
   def za(angle: Double): Parameter[Double] = zenithAngleKey -> angle withUnits zenithAngleUnits
 
   val naRangeDistanceKey   = KeyType.DoubleKey.make("rangeDistance")
-  val naRangeDistanceUnits = kilometers
+  val naRangeDistanceUnits = kilometer
 
   def rd(rangedistance: Double): Parameter[Double] = naRangeDistanceKey -> rangedistance withUnits naRangeDistanceUnits
 
   val naElevationKey                                    = KeyType.DoubleKey.make("elevation")
-  val naElevationUnits                                  = kilometers
+  val naElevationUnits                                  = kilometer
   def naElevation(elevation: Double): Parameter[Double] = naElevationKey -> elevation withUnits naElevationUnits
 
   val initialElevationKey   = KeyType.DoubleKey.make("initialElevation")
-  val initialElevationUnits = kilometers
+  val initialElevationUnits = kilometer
   def iElevation(elevation: Double): Parameter[Double] =
     initialElevationKey -> elevation withUnits initialElevationUnits
 
   val stagePositionKey   = KeyType.DoubleKey.make("stagePosition")
-  val stagePositionUnits = millimeters
+  val stagePositionUnits = millimeter
 
   def spos(pos: Double): Parameter[Double] = stagePositionKey -> pos withUnits stagePositionUnits
 
