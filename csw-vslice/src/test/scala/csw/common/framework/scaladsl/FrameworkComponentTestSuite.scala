@@ -38,7 +38,7 @@ class SampleHcdWiring extends ComponentWiring[HcdDomainMsg] {
 }
 
 abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with BeforeAndAfterAll {
-  implicit val system   = ActorSystem("testHcd", Actor.empty)
+  implicit val system   = ActorSystem(Actor.empty, "testHcd")
   implicit val settings = TestKitSettings(system)
   implicit val timeout  = Timeout(5.seconds)
 

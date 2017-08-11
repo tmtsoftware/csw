@@ -2,7 +2,7 @@ package csw
 
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.testkit.StubbedActorContext
+import akka.typed.testkit.{EffectfulActorContext, StubbedActorContext}
 import akka.typed.{ActorRef, ActorSystem, Behavior}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
@@ -73,7 +73,7 @@ class TestSupervisor extends FunSuite with Matchers with MockitoSugar {
     }
     val mockFactory = mock[WorkerFactory]
 
-    val system = ActorSystem("test-system", Supervisor.behavior(workerInfo, mockFactory))
+    val system = ActorSystem(Supervisor.behavior(workerInfo, mockFactory), "test-system")
     val ctx = new EffectfulActorContext[SupervisorMsg]("test-supervisor",
                                                        Supervisor.behavior(workerInfo, mockFactory),
                                                        100,
@@ -87,7 +87,7 @@ class TestSupervisor extends FunSuite with Matchers with MockitoSugar {
       override val someState: Int = 0
       override val name: String   = "test"
     }
-    val system = ActorSystem("test-system", Actor.empty)
+    val system = ActorSystem(Actor.empty, "test-system")
     val ctx    = new StubbedActorContext[SupervisorMsg]("test-supervisor", 100, system)
 
     new Supervisor(ctx, workerInfo, new SampleWorkerFactory)

@@ -110,5 +110,5 @@ object Demo extends App {
     Actor.empty
   }
 
-  ActorSystem("demo", wiring)
+  ActorSystem(wiring, "demo")
 }

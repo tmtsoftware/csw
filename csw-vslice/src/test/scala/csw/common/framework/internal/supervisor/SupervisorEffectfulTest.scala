@@ -1,8 +1,8 @@
 package csw.common.framework.internal.supervisor
 
+import akka.typed.testkit.Effect._
+import akka.typed.testkit.EffectfulActorContext
 import akka.typed.{Behavior, Props, Terminated}
-import csw.Effect._
-import csw.EffectfulActorContext
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.internal.Supervisor
 import csw.common.framework.models.PreparingToShutdownMsg.ShutdownTimeout

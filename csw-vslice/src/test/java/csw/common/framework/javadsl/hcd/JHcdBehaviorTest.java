@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class JHcdBehaviorTest {
-    private static ActorSystem system = ActorSystem.create("Hcd", Actor.empty());
+    private static ActorSystem system = ActorSystem.create(Actor.empty(), "Hcd");
     private static TestKitSettings settings = TestKitSettings.apply(system);
 
     private JComponentWiring getSampleJHcdFactory(JComponentHandlers hcdHandlers) {

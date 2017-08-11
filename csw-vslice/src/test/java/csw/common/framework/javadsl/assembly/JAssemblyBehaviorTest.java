@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class JAssemblyBehaviorTest {
-    private static ActorSystem system = ActorSystem.create("Assembly", Actor.empty());
+    private static ActorSystem system = ActorSystem.create(Actor.empty(), "Assembly");
     private static TestKitSettings settings = TestKitSettings.apply(system);
 
     private JComponentWiring getSampleJAssemblyFactory(JComponentHandlers assemblyHandlers) {
