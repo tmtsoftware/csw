@@ -28,7 +28,6 @@ import scala.runtime.Nothing$;
 
 import java.util.concurrent.CompletableFuture;
 
-import static csw.common.framework.models.JComponent.DoNotRegister;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +47,7 @@ public class JHcdBehaviorTest {
     private ComponentInfo.HcdInfo hcdInfo = new ComponentInfo.HcdInfo("trombone",
             "wfos",
             "csw.common.components.hcd.SampleHcd",
-            DoNotRegister,
+            LocationServiceUsages.JDoNotRegister(),
             null,
             null);
 

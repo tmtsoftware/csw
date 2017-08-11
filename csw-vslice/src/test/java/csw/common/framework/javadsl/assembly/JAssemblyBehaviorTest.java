@@ -28,7 +28,6 @@ import scala.runtime.Nothing$;
 
 import java.util.concurrent.CompletableFuture;
 
-import static csw.common.framework.models.JComponent.DoNotRegister;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +48,7 @@ public class JAssemblyBehaviorTest {
     private ComponentInfo.AssemblyInfo assemblyInfo = new ComponentInfo.AssemblyInfo("trombone",
             "wfos",
             "csw.common.components.assembly.SampleAssembly",
-            DoNotRegister,
+            LocationServiceUsages.JDoNotRegister(),
             null,
             null);
 

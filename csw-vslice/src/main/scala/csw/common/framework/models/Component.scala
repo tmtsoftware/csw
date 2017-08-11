@@ -11,10 +11,14 @@ import scala.concurrent.duration._
  */
 sealed trait LocationServiceUsage
 
-object LocationServiceUsage {
+object LocationServiceUsages {
   case object DoNotRegister            extends LocationServiceUsage
   case object RegisterOnly             extends LocationServiceUsage
   case object RegisterAndTrackServices extends LocationServiceUsage
+
+  val JDoNotRegister: LocationServiceUsage            = DoNotRegister
+  val JRegisterOnly: LocationServiceUsage             = RegisterOnly
+  val JRegisterAndTrackServices: LocationServiceUsage = RegisterAndTrackServices
 }
 
 /**

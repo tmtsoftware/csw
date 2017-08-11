@@ -8,7 +8,7 @@ import csw.common.ccs.{Validation, Validations}
 import csw.common.components.assembly.AssemblyDomainMsg
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.ComponentInfo.{AssemblyInfo, HcdInfo}
-import csw.common.framework.models.LocationServiceUsage.DoNotRegister
+import csw.common.framework.models.LocationServiceUsages.DoNotRegister
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.{CommandMsg, ComponentInfo, ComponentMsg, PubSub}
 import csw.param.states.CurrentState
