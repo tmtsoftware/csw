@@ -11,10 +11,11 @@ import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.reflect.ClassTag
 
-abstract class JComponentHandlers[Msg <: DomainMsg: ClassTag](
+abstract class JComponentHandlers[Msg <: DomainMsg](
     ctx: ActorContext[ComponentMsg],
     componentInfo: ComponentInfo
-) extends ComponentHandlers[Msg](ctx.asScala, componentInfo) {
+)(klass: Class[Msg])
+    extends ComponentHandlers[Msg](ctx.asScala, componentInfo)(ClassTag(klass)) {
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
 
