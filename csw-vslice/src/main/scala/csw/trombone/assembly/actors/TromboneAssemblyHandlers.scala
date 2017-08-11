@@ -3,9 +3,9 @@ package csw.trombone.assembly.actors
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.ccs.{Validation, Validations}
 import csw.common.ccs.Validations.Valid
-import csw.common.framework.models.Component.{AssemblyInfo, ComponentInfo}
+import csw.common.ccs.{Validation, Validations}
+import csw.common.framework.models.ComponentInfo.AssemblyInfo
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.Running
 import csw.common.framework.models._

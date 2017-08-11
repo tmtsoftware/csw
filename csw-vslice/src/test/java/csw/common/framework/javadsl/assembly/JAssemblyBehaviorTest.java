@@ -10,8 +10,8 @@ import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
 import akka.util.Timeout;
 import csw.common.components.assembly.AssemblyDomainMsg;
-import csw.common.framework.javadsl.JComponentWiring;
 import csw.common.framework.javadsl.JComponentHandlers;
+import csw.common.framework.javadsl.JComponentWiring;
 import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.*;
 import csw.param.states.CurrentState;
@@ -40,13 +40,13 @@ public class JAssemblyBehaviorTest {
         return new JComponentWiring<AssemblyDomainMsg>(AssemblyDomainMsg.class) {
 
             @Override
-            public JComponentHandlers<AssemblyDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
+            public JComponentHandlers<AssemblyDomainMsg> make(ActorContext<ComponentMsg> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
                 return assemblyHandlers;
             }
         };
     }
 
-    private Component.AssemblyInfo assemblyInfo = new Component.AssemblyInfo("trombone",
+    private ComponentInfo.AssemblyInfo assemblyInfo = new ComponentInfo.AssemblyInfo("trombone",
             "wfos",
             "csw.common.components.assembly.SampleAssembly",
             DoNotRegister,

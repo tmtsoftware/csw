@@ -1,7 +1,9 @@
 package csw.common.framework.javadsl
 
-import csw.common.framework.models.Component.{HcdInfo, LocationServiceUsage}
+import csw.common.framework.models.ComponentInfo.HcdInfo
+import csw.common.framework.models.LocationServiceUsage
 import csw.services.location.models.ConnectionType
+
 import scala.collection.JavaConverters.asScalaSetConverter
 import scala.concurrent.duration.FiniteDuration
 

@@ -1,6 +1,7 @@
 package csw.common.framework.javadsl
 
-import csw.common.framework.models.Component.{AssemblyInfo, LocationServiceUsage}
+import csw.common.framework.models.ComponentInfo.AssemblyInfo
+import csw.common.framework.models.LocationServiceUsage
 import csw.services.location.models.{Connection, ConnectionType}
 
 import scala.collection.JavaConverters.asScalaSetConverter

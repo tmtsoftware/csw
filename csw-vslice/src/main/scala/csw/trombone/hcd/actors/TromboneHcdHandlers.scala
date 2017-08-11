@@ -6,7 +6,6 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import csw.common.ccs.Validation
-import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}

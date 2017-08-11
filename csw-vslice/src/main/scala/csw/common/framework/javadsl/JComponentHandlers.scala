@@ -3,7 +3,6 @@ package csw.common.framework.javadsl
 import java.util.concurrent.CompletableFuture
 
 import akka.typed.javadsl.ActorContext
-import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.RunningMsg.DomainMsg
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.ComponentHandlers

@@ -39,13 +39,13 @@ public class JHcdBehaviorTest {
     private JComponentWiring getSampleJHcdFactory(JComponentHandlers hcdHandlers) {
         return new JComponentWiring<HcdDomainMsg>(HcdDomainMsg.class) {
             @Override
-            public JComponentHandlers<HcdDomainMsg> make(ActorContext<ComponentMsg> ctx, Component.ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
+            public JComponentHandlers<HcdDomainMsg> make(ActorContext<ComponentMsg> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
                 return hcdHandlers;
             }
         };
     }
 
-    private Component.HcdInfo hcdInfo = new Component.HcdInfo("trombone",
+    private ComponentInfo.HcdInfo hcdInfo = new ComponentInfo.HcdInfo("trombone",
             "wfos",
             "csw.common.components.hcd.SampleHcd",
             DoNotRegister,

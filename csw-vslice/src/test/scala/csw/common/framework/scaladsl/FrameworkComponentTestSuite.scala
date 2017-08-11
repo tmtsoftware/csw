@@ -7,15 +7,16 @@ import akka.util.Timeout
 import csw.common.ccs.{Validation, Validations}
 import csw.common.components.assembly.AssemblyDomainMsg
 import csw.common.components.hcd.HcdDomainMsg
-import csw.common.framework.models.Component.{AssemblyInfo, ComponentInfo, DoNotRegister, HcdInfo}
-import csw.common.framework.models.{CommandMsg, ComponentMsg, PubSub}
+import csw.common.framework.models.ComponentInfo.{AssemblyInfo, HcdInfo}
+import csw.common.framework.models.LocationServiceUsage.DoNotRegister
 import csw.common.framework.models.PubSub.PublisherMsg
+import csw.common.framework.models.{CommandMsg, ComponentInfo, ComponentMsg, PubSub}
 import csw.param.states.CurrentState
 import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
+import scala.concurrent.{Await, Future}
 
 class SampleHcdHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
     extends ComponentHandlers[HcdDomainMsg](ctx, componentInfo) {

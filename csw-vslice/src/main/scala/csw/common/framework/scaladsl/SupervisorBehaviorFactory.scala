@@ -3,8 +3,7 @@ package csw.common.framework.scaladsl
 import akka.typed.Behavior
 import akka.typed.scaladsl.Actor
 import csw.common.framework.internal.Supervisor
-import csw.common.framework.models.Component.ComponentInfo
-import csw.common.framework.models.SupervisorMsg
+import csw.common.framework.models.{ComponentInfo, SupervisorMsg}
 
 object SupervisorBehaviorFactory {
   def make(componentInfo: ComponentInfo): Behavior[SupervisorMsg] = {

@@ -5,7 +5,8 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.ccs.{Validation, Validations}
 import csw.common.components.hcd.HcdDomainMsg
-import csw.common.framework.models.Component.{ComponentInfo, DoNotRegister, HcdInfo}
+import csw.common.framework.models.ComponentInfo.HcdInfo
+import csw.common.framework.models.LocationServiceUsage.DoNotRegister
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.Shutdown
 import csw.common.framework.models._

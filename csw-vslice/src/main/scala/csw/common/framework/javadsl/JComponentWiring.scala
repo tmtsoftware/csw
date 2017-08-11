@@ -2,9 +2,8 @@ package csw.common.framework.javadsl
 
 import akka.typed.javadsl.ActorContext
 import akka.typed.{scaladsl, ActorRef}
-import csw.common.framework.models.Component.ComponentInfo
 import csw.common.framework.models.RunningMsg.DomainMsg
-import csw.common.framework.models.{ComponentMsg, PubSub}
+import csw.common.framework.models.{ComponentInfo, ComponentMsg, PubSub}
 import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.states.CurrentState
 

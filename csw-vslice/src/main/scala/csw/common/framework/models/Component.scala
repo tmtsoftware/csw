@@ -1,6 +1,5 @@
 package csw.common.framework.models
 
-import csw.common.framework.models.Component.ComponentInfo
 import csw.services.location.models.ComponentType.{Assembly, Container, HCD}
 import csw.services.location.models.{ComponentType, Connection, ConnectionType}
 
@@ -8,51 +7,51 @@ import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 /**
+ * Describes how a component uses the location service
+ */
+sealed trait LocationServiceUsage
+
+object LocationServiceUsage {
+  case object DoNotRegister            extends LocationServiceUsage
+  case object RegisterOnly             extends LocationServiceUsage
+  case object RegisterAndTrackServices extends LocationServiceUsage
+}
+
+/**
+ * The information needed to create a component
+ */
+sealed trait ComponentInfo {
+
+  /**
+   * A unique name for the component
+   */
+  val componentName: String
+
+  /**
+   * The component type (HCD, Assembly, etc.)
+   */
+  val componentType: ComponentType
+
+  /**
+   * The name of the class that implements the component (used to create the class via reflection)
+   */
+  val componentClassName: String
+
+  /**
+   * Indicates if the component needs to be registered with the location service or lookup other services
+   */
+  val locationServiceUsage: LocationServiceUsage
+
+  /**
+   * A dot separated prefix (for example tcs.ao.mycomp) that applies to this component
+   */
+  val prefix: String
+}
+
+/**
  * Represents a Component, such as an assembly, HCD (Hardware Control Daemon) or SC (Sequence Component).
  */
-object Component {
-
-  /**
-   * Describes how a component uses the location service
-   */
-  sealed trait LocationServiceUsage
-
-  case object DoNotRegister extends LocationServiceUsage
-
-  case object RegisterOnly extends LocationServiceUsage
-
-  case object RegisterAndTrackServices extends LocationServiceUsage
-
-  /**
-   * The information needed to create a component
-   */
-  sealed trait ComponentInfo {
-
-    /**
-     * A unique name for the component
-     */
-    val componentName: String
-
-    /**
-     * The component type (HCD, Assembly, etc.)
-     */
-    val componentType: ComponentType
-
-    /**
-     * The name of the class that implements the component (used to create the class via reflection)
-     */
-    val componentClassName: String
-
-    /**
-     * Indicates if the component needs to be registered with the location service or lookup other services
-     */
-    val locationServiceUsage: LocationServiceUsage
-
-    /**
-     * A dot separated prefix (for example tcs.ao.mycomp) that applies to this component
-     */
-    val prefix: String
-  }
+object ComponentInfo {
 
   /**
    * Describes an HCD component
