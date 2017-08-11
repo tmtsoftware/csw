@@ -4,7 +4,7 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.testkit.TestKitSettings
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.common.ccs.Validation
+import csw.common.ccs.{Validation, Validations}
 import csw.common.components.assembly.AssemblyDomainMsg
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.Component.{AssemblyInfo, ComponentInfo, DoNotRegister, HcdInfo}
@@ -24,7 +24,7 @@ class SampleHcdHandlers(ctx: ActorContext[ComponentMsg], componentInfo: Componen
   override def onGoOnline(): Unit                                   = println(s"${componentInfo.componentName} going online")
   override def onDomainMsg(msg: HcdDomainMsg): Unit                 = println(s"${componentInfo.componentName} going offline")
   override def onShutdown(): Unit                                   = println(s"${componentInfo.componentName} shutting down")
-  override def onControlCommand(commandMsg: CommandMsg): Validation = Validation.Valid
+  override def onControlCommand(commandMsg: CommandMsg): Validation = Validations.Valid
   override def initialize(): Future[Unit]                           = Future.unit
   override def onGoOffline(): Unit                                  = println(s"${componentInfo.componentName} going offline")
 }

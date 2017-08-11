@@ -64,7 +64,7 @@ object ValidationIssue {
  */
 sealed trait Validation
 
-object Validation {
+object Validations {
 
   /**
    * The command was not valid before starting
@@ -76,4 +76,6 @@ object Validation {
    * The command was valid and started
    */
   case object Valid extends Validation
+
+  val JValid: Validation = Valid
 }

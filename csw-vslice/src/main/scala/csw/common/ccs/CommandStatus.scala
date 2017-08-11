@@ -23,13 +23,13 @@ object CommandStatus {
 
   object Invalid {
     // This is present to support returning a Validation as a CommandStatus
-    def apply(in: Validation.Invalid): CommandStatus.Invalid = new CommandStatus.Invalid(in.issue)
+    def apply(in: Validations.Invalid): CommandStatus.Invalid = new CommandStatus.Invalid(in.issue)
   }
 
   /**
    * Java API: This is present to support returning a Validation as a CommandStatus
    */
-  def createInvalid(in: Validation.Invalid): CommandStatus.Invalid = Invalid(in)
+  def createInvalid(in: Validations.Invalid): CommandStatus.Invalid = Invalid(in)
 
   /**
    * Converts a validation result to a CommandStatus result
@@ -38,8 +38,8 @@ object CommandStatus {
    */
   def validationAsCommandStatus(validation: Validation): CommandResponse = {
     validation match {
-      case Validation.Valid        => CommandStatus.Accepted
-      case inv: Validation.Invalid => CommandStatus.Invalid(inv.issue)
+      case Validations.Valid        => CommandStatus.Accepted
+      case inv: Validations.Invalid => CommandStatus.Invalid(inv.issue)
     }
   }
 
