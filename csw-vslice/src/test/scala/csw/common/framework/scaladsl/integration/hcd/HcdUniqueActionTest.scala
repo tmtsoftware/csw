@@ -1,7 +1,7 @@
-package csw.common.framework.scaladsl.assembly
+package csw.common.framework.scaladsl.integration.hcd
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.assembly.{AssemblyDomainMsg, OperationsMode}
+import csw.common.components.hcd.{AxisStatistics, HcdDomainMsg}
 import csw.common.framework.models.FromComponentLifecycleMessage
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PubSub.PublisherMsg
@@ -14,22 +14,20 @@ import org.scalatest.mockito.MockitoSugar
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-class AssemblyUniqueActionTest extends FrameworkComponentTestSuite with MockitoSugar {
+class HcdUniqueActionTest extends FrameworkComponentTestSuite with MockitoSugar {
 
-  test("assembly component should be able to handle Domain specific messages") {
-    val sampleAssemblyHandler = mock[ComponentHandlers[AssemblyDomainMsg]]
+  test("hcd component should be able to handle Domain specific messages") {
+    val sampleHcdHandler = mock[ComponentHandlers[HcdDomainMsg]]
 
-    when(sampleAssemblyHandler.initialize()).thenReturn(Future.unit)
+    when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe: TestProbe[FromComponentLifecycleMessage] = TestProbe[FromComponentLifecycleMessage]
     val publisherProbe                                            = TestProbe[PublisherMsg[CurrentState]]
 
     Await.result(
       system.systemActorOf[Nothing](
-        getSampleAssemblyFactory(sampleAssemblyHandler).compBehavior(assemblyInfo,
-                                                                     supervisorProbe.ref,
-                                                                     publisherProbe.ref),
-        "sampleAssembly"
+        getSampleHcdWiring(sampleHcdHandler).compBehavior(hcdInfo, supervisorProbe.ref, publisherProbe.ref),
+        "sampleHcd"
       ),
       5.seconds
     )
@@ -37,10 +35,11 @@ class AssemblyUniqueActionTest extends FrameworkComponentTestSuite with MockitoS
     val initialized = supervisorProbe.expectMsgType[Initialized]
     initialized.componentRef ! Run
 
-    val running = supervisorProbe.expectMsgType[Running]
-    running.componentRef ! OperationsMode
+    val running        = supervisorProbe.expectMsgType[Running]
+    val axisStatistics = AxisStatistics(1)
+    running.componentRef ! axisStatistics
 
     Thread.sleep(1000)
-    verify(sampleAssemblyHandler).onDomainMsg(OperationsMode)
+    verify(sampleHcdHandler).onDomainMsg(AxisStatistics(1))
   }
 }

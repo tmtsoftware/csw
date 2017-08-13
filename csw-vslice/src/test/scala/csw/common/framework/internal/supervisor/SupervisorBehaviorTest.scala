@@ -13,7 +13,7 @@ import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestS
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuiteLike, Matchers}
 
-class SupervisorEffectfulTest extends FrameworkComponentTestSuite with FunSuiteLike with Matchers with MockitoSugar {
+class SupervisorBehaviorTest extends FrameworkComponentTestSuite with FunSuiteLike with Matchers with MockitoSugar {
 
   class TestData {
     val sampleHcdHandler: ComponentHandlers[HcdDomainMsg] = mock[ComponentHandlers[HcdDomainMsg]]

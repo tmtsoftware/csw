@@ -1,4 +1,4 @@
-package csw.common.framework.scaladsl.assembly
+package csw.common.framework.scaladsl.integration.assembly
 
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.assembly.AssemblyDomainMsg
@@ -27,9 +27,9 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
     val assemblyRef =
       Await.result(
         system.systemActorOf[Nothing](
-          getSampleAssemblyFactory(sampleAssemblyHandler).compBehavior(assemblyInfo,
-                                                                       supervisorProbe.ref,
-                                                                       publisherProbe.ref),
+          getSampleAssemblyWiring(sampleAssemblyHandler).compBehavior(assemblyInfo,
+                                                                      supervisorProbe.ref,
+                                                                      publisherProbe.ref),
           "assembly"
         ),
         5.seconds
@@ -57,9 +57,9 @@ class AssemblyBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar
 
     Await.result(
       system.systemActorOf[Nothing](
-        getSampleAssemblyFactory(sampleAssemblyHandler).compBehavior(assemblyInfo,
-                                                                     supervisorProbe.ref,
-                                                                     publisherProbe.ref),
+        getSampleAssemblyWiring(sampleAssemblyHandler).compBehavior(assemblyInfo,
+                                                                    supervisorProbe.ref,
+                                                                    publisherProbe.ref),
         "sampleAssembly"
       ),
       5.seconds

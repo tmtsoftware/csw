@@ -1,20 +1,21 @@
-package csw.common.framework.scaladsl.hcd
+package csw.common.framework.scaladsl.integration.hcd
 
-import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.hcd.HcdDomainMsg
-import csw.common.framework.internal.ComponentBehavior
+import csw.common.framework.models.FromComponentLifecycleMessage
 import csw.common.framework.models.IdleMsg.Initialize
 import csw.common.framework.models.InitialMsg.Run
+import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
-import csw.common.framework.models.{ComponentMsg, FromComponentLifecycleMessage}
 import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
+import csw.param.states.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
-import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, Future}
 
-class StubbedHcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
+class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   test("hcd component should send initialize and running message to supervisor") {
     val sampleHcdHandler = mock[ComponentHandlers[HcdDomainMsg]]
@@ -22,24 +23,30 @@ class StubbedHcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSug
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
 
     val supervisorProbe: TestProbe[FromComponentLifecycleMessage] = TestProbe[FromComponentLifecycleMessage]
-    val ctx                                                       = new StubbedActorContext[ComponentMsg]("test-component", 100, system)
-    val componentBehavior                                         = new ComponentBehavior[HcdDomainMsg](ctx, supervisorProbe.ref, sampleHcdHandler)
+    val publisherProbe: TestProbe[PublisherMsg[CurrentState]]     = TestProbe[PublisherMsg[CurrentState]]
 
-    ctx.selfInbox.receiveMsg() shouldBe Initialize
+    val hcdRef =
+      Await.result(
+        system.systemActorOf[Nothing](
+          getSampleHcdWiring(sampleHcdHandler).compBehavior(hcdInfo, supervisorProbe.ref, publisherProbe.ref),
+          "sampleHcd"
+        ),
+        5.seconds
+      )
 
-    componentBehavior.onMessage(Initialize)
+    val initialized = supervisorProbe.expectMsgType[Initialized]
 
-    Thread.sleep(100)
-
-    supervisorProbe.expectMsgType[Initialized]
     verify(sampleHcdHandler).initialize()
+    initialized.componentRef shouldBe hcdRef
 
-    componentBehavior.onMessage(Run)
+    initialized.componentRef ! Run
 
-    supervisorProbe.expectMsgType[Running]
+    val running = supervisorProbe.expectMsgType[Running]
 
     verify(sampleHcdHandler).onRun()
     verify(sampleHcdHandler).isOnline_=(true)
+
+    running.componentRef shouldBe hcdRef
   }
 
   test("A Hcd component should send InitializationFailure message if it fails in initialization") {
@@ -48,12 +55,16 @@ class StubbedHcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSug
     when(sampleHcdHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
 
     val supervisorProbe: TestProbe[FromComponentLifecycleMessage] = TestProbe[FromComponentLifecycleMessage]
-    val ctx                                                       = new StubbedActorContext[ComponentMsg]("test-component", 100, system)
-    val componentBehavior                                         = new ComponentBehavior[HcdDomainMsg](ctx, supervisorProbe.ref, sampleHcdHandler)
+    val publisherProbe                                            = TestProbe[PublisherMsg[CurrentState]]
 
-    ctx.selfInbox.receiveMsg() shouldBe Initialize
+    Await.result(
+      system.systemActorOf[Nothing](
+        getSampleHcdWiring(sampleHcdHandler).compBehavior(hcdInfo, supervisorProbe.ref, publisherProbe.ref),
+        "sampleHcd"
+      ),
+      5.seconds
+    )
 
-    componentBehavior.onMessage(Initialize)
     val initializationFailure = supervisorProbe.expectMsgType[InitializeFailure]
     initializationFailure.reason shouldBe exceptionReason
   }

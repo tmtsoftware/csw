@@ -61,7 +61,7 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
                         Set(AkkaType),
                         FiniteDuration(5, "seconds"))
 
-  def getSampleHcdFactory(componentHandlers: ComponentHandlers[HcdDomainMsg]): ComponentWiring[HcdDomainMsg] =
+  def getSampleHcdWiring(componentHandlers: ComponentHandlers[HcdDomainMsg]): ComponentWiring[HcdDomainMsg] =
     new ComponentWiring[HcdDomainMsg] {
 
       override def handlers(ctx: ActorContext[ComponentMsg],
@@ -70,7 +70,7 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
         componentHandlers
     }
 
-  def getSampleAssemblyFactory(
+  def getSampleAssemblyWiring(
       assemblyHandlers: ComponentHandlers[AssemblyDomainMsg]
   ): ComponentWiring[AssemblyDomainMsg] =
     new ComponentWiring[AssemblyDomainMsg] {

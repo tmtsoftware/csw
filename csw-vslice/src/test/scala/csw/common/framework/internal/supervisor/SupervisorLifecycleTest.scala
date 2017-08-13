@@ -20,7 +20,7 @@ import csw.param.states.CurrentState
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, FunSuiteLike, Matchers}
 
-class SupervisorTest
+class SupervisorLifecycleTest
     extends FrameworkComponentTestSuite
     with FunSuiteLike
     with Matchers
@@ -30,7 +30,7 @@ class SupervisorTest
   class TestData {
     val sampleHcdHandler: ComponentHandlers[HcdDomainMsg]               = mock[ComponentHandlers[HcdDomainMsg]]
     val ctx                                                             = new StubbedActorContext[SupervisorMsg]("test-supervisor", 100, system)
-    val supervisor                                                      = new Supervisor(ctx, hcdInfo, getSampleHcdFactory(sampleHcdHandler))
+    val supervisor                                                      = new Supervisor(ctx, hcdInfo, getSampleHcdWiring(sampleHcdHandler))
     val childComponentInbox: Inbox[ComponentMsg]                        = ctx.childInbox(supervisor.component.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)
