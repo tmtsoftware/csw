@@ -10,8 +10,8 @@ import csw.common.framework.models.PubSub;
 import csw.param.states.CurrentState;
 
 public class JSampleHcdWiring extends JComponentWiring<HcdDomainMsg> {
-    public JSampleHcdWiring(Class<HcdDomainMsg> klass) {
-        super(klass);
+    public JSampleHcdWiring() {
+        super(HcdDomainMsg.class);
     }
 
     @Override

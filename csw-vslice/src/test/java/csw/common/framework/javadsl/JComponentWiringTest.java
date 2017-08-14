@@ -18,6 +18,7 @@ import csw.param.states.CurrentState;
 import csw.services.location.javadsl.JConnectionType;
 import csw.services.location.models.ConnectionType;
 import org.junit.AfterClass;
+import org.junit.Test;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -57,7 +58,7 @@ public class JComponentWiringTest {
         Await.result(system.terminate(), Duration.create(5, "seconds"));
     }
 
-    @org.scalatest.Ignore
+    @Test
     public void testComponentWiring() throws Exception {
 
         Timeout timeout = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
