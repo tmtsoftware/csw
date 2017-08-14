@@ -17,7 +17,7 @@ import csw.common.framework.models.*;
 import csw.param.states.CurrentState;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Test;
 import org.mockito.Mockito;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
@@ -57,7 +57,7 @@ public class JHcdBehaviorTest {
         Await.result(system.terminate(), Duration.create(5, "seconds"));
     }
 
-    @Ignore
+    @Test
     public void testHcdBehavior() throws Exception {
 
         JComponentHandlers<HcdDomainMsg> sampleHcdHandler = Mockito.mock(JComponentHandlers.class);

@@ -3,7 +3,6 @@ package csw.common.framework.scaladsl.integration.hcd
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.FromComponentLifecycleMessage
-import csw.common.framework.models.IdleMsg.Initialize
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
