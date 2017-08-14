@@ -16,6 +16,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
+// DEOPSCSW-187: Efficient serialization to/from binary
 class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfterAll {
   private final val system        = ActorSystem("example")
   private final val serialization = SerializationExtension(system)

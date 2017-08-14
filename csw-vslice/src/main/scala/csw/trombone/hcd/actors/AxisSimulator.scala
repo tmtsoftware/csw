@@ -210,7 +210,7 @@ class AxisSimulator(ctx: ActorContext[SimulatorCommand],
     inHome = isHomed(axisConfig, current)
   }
 
-  private def update(replyTo: Option[ActorRef[AxisResponse]], msg: AxisResponse) = replyTo.foreach(_ ! msg)
+  private def update(replyTo: Option[ActorRef[AxisResponse]], msg: AxisResponse): Unit = replyTo.foreach(_ ! msg)
 
   private def getState = AxisUpdate(axisConfig.axisName, axisState, current, inLowLimit, inHighLimit, inHome)
 }

@@ -31,7 +31,7 @@ class TromboneHcdWiring extends ComponentWiring[TromboneMsg] {
 class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
     extends ComponentHandlers[TromboneMsg](ctx, componentInfo) {
 
-  implicit val timeout                      = Timeout(2.seconds)
+  implicit val timeout: Timeout             = Timeout(2.seconds)
   implicit val scheduler: Scheduler         = ctx.system.scheduler
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 

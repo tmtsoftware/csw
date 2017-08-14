@@ -14,6 +14,7 @@ import org.scalatest.mockito.MockitoSugar
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
+// DEOPSCSW-166: CSW HCD Creation
 class HcdBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   test("hcd component should send initialize and running message to supervisor") {
