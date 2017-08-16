@@ -54,7 +54,7 @@ public class JComponentIntegrationTest {
         systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
         supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         CurrentState initCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> initParam = SampleComponentState.choiceKey().set(SampleComponentState.initChoice());

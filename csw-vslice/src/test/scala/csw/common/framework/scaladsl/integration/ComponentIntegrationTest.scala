@@ -38,6 +38,7 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
     supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
 
+    Thread.sleep(200)
     val initCurrentState = compStateProbe.expectMsgType[CurrentState]
     val initDemandState  = DemandState(prefix, Set(choiceKey.set(initChoice)))
     DemandMatcher(initDemandState).check(initCurrentState) shouldBe true

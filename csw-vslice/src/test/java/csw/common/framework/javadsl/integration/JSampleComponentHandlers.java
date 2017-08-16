@@ -28,11 +28,13 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
     @Override
     public CompletableFuture<BoxedUnit> jInitialize() {
-        CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
-        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(initState);
+        return CompletableFuture.supplyAsync(() -> {
+            CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
+            PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(initState);
 
-        pubSubRef.tell(publish);
-        return CompletableFuture.completedFuture(BoxedUnit.UNIT);
+            pubSubRef.tell(publish);
+            return BoxedUnit.UNIT;
+        });
     }
 
     @Override
