@@ -2,7 +2,8 @@ package csw.common.framework.internal.supervisor
 
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
-import csw.common.components.hcd.HcdDomainMsg
+import csw.common.components.ComponentDomainMsg
+import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.Supervisor
 import csw.common.framework.models.CommonSupervisorMsg.{
   ComponentStateSubscription,
@@ -15,7 +16,7 @@ import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
+import csw.common.framework.scaladsl.ComponentHandlers
 import csw.param.states.CurrentState
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, FunSuiteLike, Matchers}
@@ -28,7 +29,7 @@ class SupervisorLifecycleTest
     with BeforeAndAfterEach {
 
   class TestData {
-    val sampleHcdHandler: ComponentHandlers[HcdDomainMsg]               = mock[ComponentHandlers[HcdDomainMsg]]
+    val sampleHcdHandler: ComponentHandlers[ComponentDomainMsg]         = mock[ComponentHandlers[ComponentDomainMsg]]
     val ctx                                                             = new StubbedActorContext[SupervisorMsg]("test-supervisor", 100, system)
     val supervisor                                                      = new Supervisor(ctx, hcdInfo, getSampleHcdWiring(sampleHcdHandler))
     val childComponentInbox: Inbox[ComponentMsg]                        = ctx.childInbox(supervisor.component.upcast)

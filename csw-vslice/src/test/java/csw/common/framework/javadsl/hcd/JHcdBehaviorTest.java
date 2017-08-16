@@ -9,7 +9,7 @@ import akka.typed.scaladsl.Actor;
 import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
 import akka.util.Timeout;
-import csw.common.components.hcd.HcdDomainMsg;
+import csw.common.components.ComponentDomainMsg;
 import csw.common.framework.javadsl.JComponentHandlers;
 import csw.common.framework.javadsl.JComponentWiring;
 import csw.common.framework.javadsl.commons.JClassTag;
@@ -36,9 +36,9 @@ public class JHcdBehaviorTest {
     private static TestKitSettings settings = TestKitSettings.apply(system);
 
     private JComponentWiring getSampleJHcdFactory(JComponentHandlers hcdHandlers) {
-        return new JComponentWiring<HcdDomainMsg>(HcdDomainMsg.class) {
+        return new JComponentWiring<ComponentDomainMsg>(ComponentDomainMsg.class) {
             @Override
-            public JComponentHandlers<HcdDomainMsg> make(ActorContext<ComponentMsg> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
+            public JComponentHandlers<ComponentDomainMsg> make(ActorContext<ComponentMsg> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
                 return hcdHandlers;
             }
         };
@@ -60,7 +60,7 @@ public class JHcdBehaviorTest {
     @Test
     public void testHcdBehavior() throws Exception {
 
-        JComponentHandlers<HcdDomainMsg> sampleHcdHandler = Mockito.mock(JComponentHandlers.class);
+        JComponentHandlers<ComponentDomainMsg> sampleHcdHandler = Mockito.mock(JComponentHandlers.class);
         when(sampleHcdHandler.initialize()).thenCallRealMethod();
         when(sampleHcdHandler.jInitialize()).thenReturn(CompletableFuture.completedFuture(
                 BoxedUnit.UNIT

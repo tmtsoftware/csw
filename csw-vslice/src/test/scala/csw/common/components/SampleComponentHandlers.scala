@@ -1,4 +1,4 @@
-package csw.common.components.hcd
+package csw.common.components
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
@@ -13,7 +13,7 @@ import csw.param.states.CurrentState
 
 import scala.concurrent.Future
 
-object SampleHcdHandlers {
+object SampleComponentHandlers {
   val restartChoice  = Choice("Restart")
   val runChoice      = Choice("Run")
   val onlineChoice   = Choice("Online")
@@ -36,16 +36,16 @@ object SampleHcdHandlers {
   val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", choices)
 }
 
-class SampleHcdHandlers(ctx: ActorContext[ComponentMsg],
-                        componentInfo: ComponentInfo,
-                        pubSubRef: ActorRef[PublisherMsg[CurrentState]])
-    extends ComponentHandlers[HcdDomainMsg](ctx, componentInfo, pubSubRef) {
-  import SampleHcdHandlers._
+class SampleComponentHandlers(ctx: ActorContext[ComponentMsg],
+                              componentInfo: ComponentInfo,
+                              pubSubRef: ActorRef[PublisherMsg[CurrentState]])
+    extends ComponentHandlers[ComponentDomainMsg](ctx, componentInfo, pubSubRef) {
+  import SampleComponentHandlers._
 
   override def onRestart(): Unit  = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
   override def onRun(): Unit      = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice))))
   override def onGoOnline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
-  override def onDomainMsg(msg: HcdDomainMsg): Unit =
+  override def onDomainMsg(msg: ComponentDomainMsg): Unit =
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
   override def onShutdown(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
   override def onControlCommand(commandMsg: CommandMsg): Validation = {

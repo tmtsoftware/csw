@@ -2,6 +2,7 @@ package csw.common.framework.scaladsl.component
 
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
+import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.{ComponentBehavior, ComponentMode}
 import csw.common.framework.models.IdleMsg.Initialize
 import csw.common.framework.models.InitialMsg.Run
@@ -9,7 +10,7 @@ import csw.common.framework.models.PreparingToShutdownMsg.ShutdownComplete
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.models.{ComponentMsg, FromComponentLifecycleMessage, ToComponentLifecycleMessage}
-import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite}
+import csw.common.framework.scaladsl.ComponentHandlers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 

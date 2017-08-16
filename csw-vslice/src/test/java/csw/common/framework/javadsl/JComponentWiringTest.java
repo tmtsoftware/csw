@@ -7,7 +7,7 @@ import akka.typed.javadsl.ActorContext;
 import akka.typed.scaladsl.Actor;
 import akka.typed.testkit.TestKitSettings;
 import akka.util.Timeout;
-import csw.common.components.hcd.HcdDomainMsg;
+import csw.common.components.ComponentDomainMsg;
 import csw.common.framework.models.*;
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory;
 import csw.param.states.CurrentState;
@@ -30,9 +30,9 @@ public class JComponentWiringTest {
     private static TestKitSettings settings = TestKitSettings.apply(system);
 
     private JComponentWiring getSampleJHcdFactory(JComponentHandlers hcdHandlers) {
-        return new JComponentWiring<HcdDomainMsg>(HcdDomainMsg.class) {
+        return new JComponentWiring<ComponentDomainMsg>(ComponentDomainMsg.class) {
             @Override
-            public JComponentHandlers<HcdDomainMsg> make(ActorContext<ComponentMsg> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
+            public JComponentHandlers<ComponentDomainMsg> make(ActorContext<ComponentMsg> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
                 return hcdHandlers;
             }
         };

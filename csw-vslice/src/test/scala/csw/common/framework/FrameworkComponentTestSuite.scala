@@ -1,15 +1,16 @@
-package csw.common.framework.scaladsl
+package csw.common.framework
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.testkit.TestKitSettings
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
+import csw.common.components.ComponentDomainMsg
 import csw.common.components.assembly.AssemblyDomainMsg
-import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.ComponentInfo.{AssemblyInfo, HcdInfo}
 import csw.common.framework.models.LocationServiceUsages.DoNotRegister
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.{ComponentInfo, ComponentMsg}
+import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.states.CurrentState
 import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -35,17 +36,19 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
 
   val hcdInfo = HcdInfo("SampleHcd",
                         "wfos",
-                        "csw.common.components.hcd.SampleHcdWiring",
+                        "csw.common.components.SampleComponentWiring",
                         DoNotRegister,
                         Set(AkkaType),
                         FiniteDuration(5, "seconds"))
 
-  def getSampleHcdWiring(componentHandlers: ComponentHandlers[HcdDomainMsg]): ComponentWiring[HcdDomainMsg] =
-    new ComponentWiring[HcdDomainMsg] {
+  def getSampleHcdWiring(
+      componentHandlers: ComponentHandlers[ComponentDomainMsg]
+  ): ComponentWiring[ComponentDomainMsg] =
+    new ComponentWiring[ComponentDomainMsg] {
 
       override def handlers(ctx: ActorContext[ComponentMsg],
                             componentInfo: ComponentInfo,
-                            pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[HcdDomainMsg] =
+                            pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[ComponentDomainMsg] =
         componentHandlers
     }
 

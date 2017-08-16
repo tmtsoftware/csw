@@ -3,21 +3,22 @@ package csw.common.framework.internal.supervisor
 import akka.typed.testkit.Effect._
 import akka.typed.testkit.EffectfulActorContext
 import akka.typed.{Behavior, Props, Terminated}
-import csw.common.components.hcd.HcdDomainMsg
+import csw.common.components.ComponentDomainMsg
+import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.Supervisor
 import csw.common.framework.models.PreparingToShutdownMsg.ShutdownTimeout
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.models.{SupervisorMsg, ToComponentLifecycleMessage}
-import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkComponentTestSuite, SupervisorBehaviorFactory}
+import csw.common.framework.scaladsl.{ComponentHandlers, SupervisorBehaviorFactory}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuiteLike, Matchers}
 
 class SupervisorBehaviorTest extends FrameworkComponentTestSuite with FunSuiteLike with Matchers with MockitoSugar {
 
   class TestData {
-    val sampleHcdHandler: ComponentHandlers[HcdDomainMsg] = mock[ComponentHandlers[HcdDomainMsg]]
-    val supervisorBehavior: Behavior[SupervisorMsg]       = SupervisorBehaviorFactory.make(hcdInfo)
+    val sampleHcdHandler: ComponentHandlers[ComponentDomainMsg] = mock[ComponentHandlers[ComponentDomainMsg]]
+    val supervisorBehavior: Behavior[SupervisorMsg]             = SupervisorBehaviorFactory.make(hcdInfo)
     val ctx =
       new EffectfulActorContext[SupervisorMsg]("supervisor-test", supervisorBehavior, 100, system)
   }
