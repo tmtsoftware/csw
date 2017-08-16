@@ -1,4 +1,4 @@
-package csw.common.framework.scaladsl.integration.assembly
+package csw.common.framework.scaladsl.assembly
 
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.assembly.{AssemblyDomainMsg, OperationsMode}

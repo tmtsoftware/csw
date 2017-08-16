@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.ccs.{Validation, Validations}
-import csw.common.components.hcd.HcdDomainMsg
+import csw.common.components.hcd.{HcdDomainMsg, SampleHcdHandlers}
 import csw.common.framework.models.ComponentInfo.HcdInfo
 import csw.common.framework.models.LocationServiceUsages.DoNotRegister
 import csw.common.framework.models.PubSub.PublisherMsg
@@ -43,7 +43,7 @@ object SampleSupervisor extends App {
 
   val hcdInfo = HcdInfo("SampleHcd",
                         "wfos",
-                        "csw.common.framework.scaladsl.SampleHcdWiring",
+                        "csw.common.components.hcd.SampleHcdWiring",
                         DoNotRegister,
                         Set(AkkaType),
                         FiniteDuration(5, "seconds"))
