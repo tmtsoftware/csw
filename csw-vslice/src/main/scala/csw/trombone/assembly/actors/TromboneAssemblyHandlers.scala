@@ -25,11 +25,13 @@ class TromboneAssemblyWiring extends ComponentWiring[DiagPublisherMessages] {
   override def handlers(ctx: ActorContext[ComponentMsg],
                         componentInfo: ComponentInfo,
                         pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[DiagPublisherMessages] =
-    new TromboneAssemblyHandlers(ctx, componentInfo)
+    new TromboneAssemblyHandlers(ctx, componentInfo, pubSubRef)
 }
 
-class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
-    extends ComponentHandlers[DiagPublisherMessages](ctx, componentInfo) {
+class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg],
+                               componentInfo: ComponentInfo,
+                               pubSubRef: ActorRef[PublisherMsg[CurrentState]])
+    extends ComponentHandlers[DiagPublisherMessages](ctx, componentInfo, pubSubRef) {
 
   private var diagPublsher: ActorRef[DiagPublisherMessages] = _
 

@@ -7,6 +7,7 @@ import csw.common.ccs.{Validation, Validations}
 import csw.common.components.hcd.HcdDomainMsg
 import csw.common.framework.models.ComponentInfo.HcdInfo
 import csw.common.framework.models.LocationServiceUsages.DoNotRegister
+import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.Shutdown
 import csw.common.framework.models._
@@ -16,8 +17,10 @@ import csw.services.location.models.ConnectionType.AkkaType
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-class SampleCompHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
-    extends ComponentHandlers[HcdDomainMsg](ctx, componentInfo) {
+class SampleCompHandlers(ctx: ActorContext[ComponentMsg],
+                         componentInfo: ComponentInfo,
+                         pubSubRef: ActorRef[PublisherMsg[CurrentState]])
+    extends ComponentHandlers[HcdDomainMsg](ctx, componentInfo, pubSubRef) {
   override def onRestart(): Unit                                    = println(s"${componentInfo.componentName} restarting")
   override def onRun(): Unit                                        = println(s"${componentInfo.componentName} running")
   override def onGoOnline(): Unit                                   = println(s"${componentInfo.componentName} going online")
@@ -33,7 +36,7 @@ class SampleCompWiring extends ComponentWiring[HcdDomainMsg] {
       ctx: ActorContext[ComponentMsg],
       componentInfo: ComponentInfo,
       pubSubRef: ActorRef[PubSub.PublisherMsg[CurrentState]]
-  ): ComponentHandlers[HcdDomainMsg] = new SampleHcdHandlers(ctx, componentInfo)
+  ): ComponentHandlers[HcdDomainMsg] = new SampleHcdHandlers(ctx, componentInfo, pubSubRef)
 }
 
 object SampleSupervisor extends App {

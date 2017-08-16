@@ -19,6 +19,6 @@ public class JSampleHcdWiring extends JComponentWiring<HcdDomainMsg> {
             ActorContext<ComponentMsg> ctx,
             ComponentInfo componentInfo,
             ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
-        return new JSampleHcdHandlers(ctx, componentInfo, HcdDomainMsg.class);
+        return new JSampleHcdHandlers(ctx, componentInfo, pubSubRef, HcdDomainMsg.class);
     }
 }

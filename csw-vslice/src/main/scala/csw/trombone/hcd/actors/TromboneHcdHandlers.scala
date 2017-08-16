@@ -25,21 +25,22 @@ class TromboneHcdWiring extends ComponentWiring[TromboneMsg] {
   override def handlers(ctx: ActorContext[ComponentMsg],
                         componentInfo: ComponentInfo,
                         pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[TromboneMsg] =
-    new TromboneHcdHandlers(ctx, componentInfo)
+    new TromboneHcdHandlers(ctx, componentInfo, pubSubRef)
 }
 
-class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
-    extends ComponentHandlers[TromboneMsg](ctx, componentInfo) {
+class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg],
+                          componentInfo: ComponentInfo,
+                          pubSubRef: ActorRef[PublisherMsg[CurrentState]])
+    extends ComponentHandlers[TromboneMsg](ctx, componentInfo, pubSubRef) {
 
   implicit val timeout: Timeout             = Timeout(2.seconds)
   implicit val scheduler: Scheduler         = ctx.system.scheduler
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  var current: AxisUpdate                       = _
-  var stats: AxisStatistics                     = _
-  var tromboneAxis: ActorRef[AxisRequest]       = _
-  var axisConfig: AxisConfig                    = _
-  var pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.system.deadLetters
+  var current: AxisUpdate                 = _
+  var stats: AxisStatistics               = _
+  var tromboneAxis: ActorRef[AxisRequest] = _
+  var axisConfig: AxisConfig              = _
 
   override def initialize(): Future[Unit] = async {
     axisConfig = await(getAxisConfig)

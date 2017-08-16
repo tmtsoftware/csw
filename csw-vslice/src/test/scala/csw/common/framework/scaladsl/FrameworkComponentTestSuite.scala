@@ -18,8 +18,10 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 import scala.concurrent.{Await, Future}
 
-class SampleHcdHandlers(ctx: ActorContext[ComponentMsg], componentInfo: ComponentInfo)
-    extends ComponentHandlers[HcdDomainMsg](ctx, componentInfo) {
+class SampleHcdHandlers(ctx: ActorContext[ComponentMsg],
+                        componentInfo: ComponentInfo,
+                        pubSubRef: ActorRef[PublisherMsg[CurrentState]])
+    extends ComponentHandlers[HcdDomainMsg](ctx, componentInfo, pubSubRef) {
   override def onRestart(): Unit                                    = println(s"${componentInfo.componentName} restarting")
   override def onRun(): Unit                                        = println(s"${componentInfo.componentName} running")
   override def onGoOnline(): Unit                                   = println(s"${componentInfo.componentName} going online")
@@ -35,7 +37,7 @@ class SampleHcdWiring extends ComponentWiring[HcdDomainMsg] {
       ctx: ActorContext[ComponentMsg],
       componentInfo: ComponentInfo,
       pubSubRef: ActorRef[PubSub.PublisherMsg[CurrentState]]
-  ): ComponentHandlers[HcdDomainMsg] = new SampleHcdHandlers(ctx, componentInfo)
+  ): ComponentHandlers[HcdDomainMsg] = new SampleHcdHandlers(ctx, componentInfo, pubSubRef)
 }
 
 abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with BeforeAndAfterAll {
