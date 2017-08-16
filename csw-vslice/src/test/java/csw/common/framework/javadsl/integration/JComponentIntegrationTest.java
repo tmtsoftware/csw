@@ -22,10 +22,7 @@ import csw.param.generics.Parameter;
 import csw.param.models.Choice;
 import csw.param.states.CurrentState;
 import csw.param.states.DemandState;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -36,43 +33,31 @@ import scala.concurrent.duration.FiniteDuration;
 // DEOPSCSW-177: Hooks for lifecycle management
 public class JComponentIntegrationTest {
     private static ActorSystem system = ActorSystem.create(Actor.empty(), "Hcd");
-    private TestKitSettings settings = TestKitSettings.apply(system);
+    private static TestKitSettings settings = TestKitSettings.apply(system);
 
-    private ComponentInfo.HcdInfo hcdInfo = new ComponentInfo.HcdInfo("trombone",
+    private static ComponentInfo.HcdInfo hcdInfo = new ComponentInfo.HcdInfo("trombone",
             "wfos",
             "csw.common.framework.javadsl.integration.JSampleComponentWiring",
             LocationServiceUsages.JDoNotRegister(),
             null,
             null);
 
-    private Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-    private Behavior<SupervisorMsg> supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo);
-    private FiniteDuration duration = Duration.create(5, "seconds");
+    private static Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
+    private static Behavior<SupervisorMsg> supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo);
+    private static FiniteDuration duration = Duration.create(5, "seconds");
+    private static Future<ActorRef<SupervisorMsg>> systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
+    private static ActorRef<SupervisorMsg> supervisorRef;
+    private static TestProbe<CurrentState> compStateProbe  = TestProbe.apply(system, settings);
 
-    private ActorRef<SupervisorMsg> supervisorRef;
-    private TestProbe<CurrentState> compStateProbe  = TestProbe.apply(system, settings);
-
-    public JComponentIntegrationTest() throws Exception {
+    @BeforeClass
+    public static void beforeAll() throws Exception {
+        supervisorRef = Await.result(systemActorOf, duration);
+        supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
     }
 
     @AfterClass
     public static void afterAll() throws Exception {
         Await.result(system.terminate(), Duration.create(5, "seconds"));
-    }
-
-    @Before
-    public void setup() throws Exception {
-        Future<ActorRef<SupervisorMsg>> systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
-        supervisorRef =  Await.result(systemActorOf, duration);
-        supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
-    }
-
-    private void consumeMsgsTillRunningState() throws InterruptedException {
-        Thread.sleep(200);
-        // Consume current state from onInitialized
-        compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
-        // Consume current state from onRun
-        compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
     }
 
     @Test
@@ -91,7 +76,6 @@ public class JComponentIntegrationTest {
     // DEOPSCSW-179: Unique Action for a component
     @Test
     public void shouldInvokeOnDomainMsg() throws Exception {
-        consumeMsgsTillRunningState();
 
         JComponentDomainMsg myDomainSpecificMsg = new JComponentDomainMsg();
         supervisorRef.tell(myDomainSpecificMsg);
@@ -104,7 +88,6 @@ public class JComponentIntegrationTest {
 
     @Test
     public void shouldInvokeOnControlCommand() throws Exception {
-        consumeMsgsTillRunningState();
 
         String prefix = "wfos.red.detector";
         Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");

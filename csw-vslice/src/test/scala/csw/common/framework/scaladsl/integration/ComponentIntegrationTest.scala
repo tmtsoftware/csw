@@ -32,17 +32,9 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   val supervisorBehavior: Behavior[SupervisorMsg] = SupervisorBehaviorFactory.make(hcdInfo)
   var supervisorRef: ActorRef[SupervisorMsg]      = _
 
-  override protected def beforeEach(): Unit = {
-    Thread.sleep(200)
-    // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
-    supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
-    supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
-  }
-
-  def consumeMsgsTillRunningState(): Unit = {
-    compStateProbe.expectMsgType[CurrentState]
-    compStateProbe.expectMsgType[CurrentState]
-  }
+  // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
+  supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
+  supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
 
   test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
 
@@ -58,8 +50,6 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   // DEOPSCSW-179: Unique Action for a component
   test("onDomainMsg hook of comp handlers should be invoked when supervisor receives Domain message") {
 
-    consumeMsgsTillRunningState()
-
     supervisorRef ! ComponentStatistics(1)
 
     val domainCurrentState = compStateProbe.expectMsgType[CurrentState]
@@ -72,8 +62,6 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
     val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
     val setup: Setup             = Setup(commandInfo, prefix, Set(param))
 
-    consumeMsgsTillRunningState()
-
     supervisorRef ! Oneway(setup, TestProbe[CommandResponse].ref)
 
     val commandCurrentState = compStateProbe.expectMsgType[CurrentState]
@@ -82,8 +70,6 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   }
 
   test("onGoOffline and goOnline hooks of comp handlers should be invoked when supervisor receives Lifecycle messages") {
-
-    consumeMsgsTillRunningState()
 
     supervisorRef ! Lifecycle(GoOffline)
 
@@ -99,42 +85,47 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   }
 
   test("running component should ignore RunOnline lifecycle message when it is already online") {
-    consumeMsgsTillRunningState()
 
     supervisorRef ! Lifecycle(GoOnline)
     compStateProbe.expectNoMsg(1.seconds)
   }
 
   test("running component should ignore RunOffline lifecycle message when it is already offline") {
-    consumeMsgsTillRunningState()
 
     supervisorRef ! Lifecycle(GoOffline)
     compStateProbe.expectMsgType[CurrentState]
 
     supervisorRef ! Lifecycle(GoOffline)
     compStateProbe.expectNoMsg(1.seconds)
-  }
 
-  test("onShutdown hook of comp handlers should be invoked when supervisor receives Shutdown message") {
-
-    consumeMsgsTillRunningState()
-
-    supervisorRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
-
-    val shutdownCurrentState = compStateProbe.expectMsgType[CurrentState]
-    val shutdownDemandState  = DemandState(prefix, Set(choiceKey.set(shutdownChoice)))
-    DemandMatcher(shutdownDemandState).check(shutdownCurrentState) shouldBe true
+    supervisorRef ! Lifecycle(GoOnline)
+    compStateProbe.expectMsgType[CurrentState]
   }
 
   test("onRestart hook of comp handlers should be invoked when supervisor receives Restart message") {
-
-    consumeMsgsTillRunningState()
 
     supervisorRef ! Lifecycle(Restart)
 
     val restartCurrentState = compStateProbe.expectMsgType[CurrentState]
     val restartDemandState  = DemandState(prefix, Set(choiceKey.set(restartChoice)))
     DemandMatcher(restartDemandState).check(restartCurrentState) shouldBe true
+
+    val initCurrentState = compStateProbe.expectMsgType[CurrentState]
+    val initDemandState  = DemandState(prefix, Set(choiceKey.set(initChoice)))
+    DemandMatcher(initDemandState).check(initCurrentState) shouldBe true
+
+    val runCurrentState = compStateProbe.expectMsgType[CurrentState]
+    val runDemandState  = DemandState(prefix, Set(choiceKey.set(runChoice)))
+    DemandMatcher(runDemandState).check(runCurrentState) shouldBe true
+  }
+
+  test("onShutdown hook of comp handlers should be invoked when supervisor receives Shutdown message") {
+
+    supervisorRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
+
+    val shutdownCurrentState = compStateProbe.expectMsgType[CurrentState]
+    val shutdownDemandState  = DemandState(prefix, Set(choiceKey.set(shutdownChoice)))
+    DemandMatcher(shutdownDemandState).check(shutdownCurrentState) shouldBe true
   }
 
 }
