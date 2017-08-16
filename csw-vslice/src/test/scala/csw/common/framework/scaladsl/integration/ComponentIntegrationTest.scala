@@ -26,16 +26,17 @@ import scala.concurrent.duration.DurationInt
 // DEOPSCSW-166: CSW HCD Creation
 // DEOPSCSW-177: Hooks for lifecycle management
 class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoSugar with BeforeAndAfterEach {
-  import csw.common.components.SampleComponentHandlers._
+  import csw.common.components.SampleComponentState._
 
   val compStateProbe: TestProbe[CurrentState]     = TestProbe[CurrentState]
   val supervisorBehavior: Behavior[SupervisorMsg] = SupervisorBehaviorFactory.make(hcdInfo)
   var supervisorRef: ActorRef[SupervisorMsg]      = _
 
   override protected def beforeEach(): Unit = {
+    Thread.sleep(200)
+    // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
     supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
-    Thread.sleep(100)
   }
 
   def consumeMsgsTillRunningState(): Unit = {

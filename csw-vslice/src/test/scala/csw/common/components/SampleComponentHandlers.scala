@@ -13,7 +13,7 @@ import csw.param.states.CurrentState
 
 import scala.concurrent.Future
 
-object SampleComponentHandlers {
+object SampleComponentState {
   val restartChoice  = Choice("Restart")
   val runChoice      = Choice("Run")
   val onlineChoice   = Choice("Online")
@@ -40,7 +40,7 @@ class SampleComponentHandlers(ctx: ActorContext[ComponentMsg],
                               componentInfo: ComponentInfo,
                               pubSubRef: ActorRef[PublisherMsg[CurrentState]])
     extends ComponentHandlers[ComponentDomainMsg](ctx, componentInfo, pubSubRef) {
-  import SampleComponentHandlers._
+  import SampleComponentState._
 
   override def onRestart(): Unit  = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
   override def onRun(): Unit      = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice))))
