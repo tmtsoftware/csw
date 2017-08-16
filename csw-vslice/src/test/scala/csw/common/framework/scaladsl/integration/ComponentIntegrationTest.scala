@@ -28,15 +28,15 @@ import scala.concurrent.duration.DurationInt
 class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoSugar with BeforeAndAfterEach {
   import csw.common.components.SampleComponentState._
 
-  val compStateProbe: TestProbe[CurrentState]     = TestProbe[CurrentState]
+  var compStateProbe: TestProbe[CurrentState]     = _
   val supervisorBehavior: Behavior[SupervisorMsg] = SupervisorBehaviorFactory.make(hcdInfo)
   var supervisorRef: ActorRef[SupervisorMsg]      = _
 
-  // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
-  supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
-  supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
-
-  test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
+  def createSupervisorAndStartTLA(): Unit = {
+    compStateProbe = TestProbe[CurrentState]
+    // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
+    supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
+    supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
 
     val initCurrentState = compStateProbe.expectMsgType[CurrentState]
     val initDemandState  = DemandState(prefix, Set(choiceKey.set(initChoice)))
@@ -47,8 +47,13 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
     DemandMatcher(runDemandState).check(runCurrentState) shouldBe true
   }
 
+  test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
+    createSupervisorAndStartTLA()
+  }
+
   // DEOPSCSW-179: Unique Action for a component
   test("onDomainMsg hook of comp handlers should be invoked when supervisor receives Domain message") {
+    createSupervisorAndStartTLA()
 
     supervisorRef ! ComponentStatistics(1)
 
@@ -58,6 +63,8 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   }
 
   test("onControlCommand hook of comp handlers should be invoked when supervisor receives Control command") {
+    createSupervisorAndStartTLA()
+
     val commandInfo: CommandInfo = "Obs001"
     val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
     val setup: Setup             = Setup(commandInfo, prefix, Set(param))
@@ -70,6 +77,7 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   }
 
   test("onGoOffline and goOnline hooks of comp handlers should be invoked when supervisor receives Lifecycle messages") {
+    createSupervisorAndStartTLA()
 
     supervisorRef ! Lifecycle(GoOffline)
 
@@ -85,12 +93,14 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   }
 
   test("running component should ignore RunOnline lifecycle message when it is already online") {
+    createSupervisorAndStartTLA()
 
     supervisorRef ! Lifecycle(GoOnline)
     compStateProbe.expectNoMsg(1.seconds)
   }
 
   test("running component should ignore RunOffline lifecycle message when it is already offline") {
+    createSupervisorAndStartTLA()
 
     supervisorRef ! Lifecycle(GoOffline)
     compStateProbe.expectMsgType[CurrentState]
@@ -103,6 +113,7 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   }
 
   test("onRestart hook of comp handlers should be invoked when supervisor receives Restart message") {
+    createSupervisorAndStartTLA()
 
     supervisorRef ! Lifecycle(Restart)
 
@@ -120,6 +131,7 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   }
 
   test("onShutdown hook of comp handlers should be invoked when supervisor receives Shutdown message") {
+    createSupervisorAndStartTLA()
 
     supervisorRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
 

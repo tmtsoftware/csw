@@ -33,35 +33,29 @@ import scala.concurrent.duration.FiniteDuration;
 // DEOPSCSW-177: Hooks for lifecycle management
 public class JComponentIntegrationTest {
     private static ActorSystem system = ActorSystem.create(Actor.empty(), "Hcd");
-    private static TestKitSettings settings = TestKitSettings.apply(system);
+    private TestKitSettings settings = TestKitSettings.apply(system);
 
-    private static ComponentInfo.HcdInfo hcdInfo = new ComponentInfo.HcdInfo("trombone",
+    private ComponentInfo.HcdInfo hcdInfo = new ComponentInfo.HcdInfo("trombone",
             "wfos",
             "csw.common.framework.javadsl.integration.JSampleComponentWiring",
             LocationServiceUsages.JDoNotRegister(),
             null,
             null);
 
-    private static Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-    private static Behavior<SupervisorMsg> supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo);
-    private static FiniteDuration duration = Duration.create(5, "seconds");
-    private static Future<ActorRef<SupervisorMsg>> systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
-    private static ActorRef<SupervisorMsg> supervisorRef;
-    private static TestProbe<CurrentState> compStateProbe  = TestProbe.apply(system, settings);
+    private Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
+    private Behavior<SupervisorMsg> supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo);
+    private FiniteDuration duration = Duration.create(5, "seconds");
+    private Future<ActorRef<SupervisorMsg>> systemActorOf;
+    private ActorRef<SupervisorMsg> supervisorRef;
+    private TestProbe<CurrentState> compStateProbe;
 
-    @BeforeClass
-    public static void beforeAll() throws Exception {
+    public void createSupervisorAndStartTLA() throws Exception {
+        compStateProbe  = TestProbe.apply(system, settings);
+        systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
         supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
-    }
+        Thread.sleep(100);
 
-    @AfterClass
-    public static void afterAll() throws Exception {
-        Await.result(system.terminate(), Duration.create(5, "seconds"));
-    }
-
-    @Test
-    public void shouldInvokeOnInitializeAndOnRun() throws Exception {
         CurrentState initCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> initParam = SampleComponentState.choiceKey().set(SampleComponentState.initChoice());
         DemandState initDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(initParam);
@@ -73,9 +67,21 @@ public class JComponentIntegrationTest {
         Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
     }
 
+
+    @AfterClass
+    public static void afterAll() throws Exception {
+        Await.result(system.terminate(), Duration.create(5, "seconds"));
+    }
+
+    @Test
+    public void shouldInvokeOnInitializeAndOnRun() throws Exception {
+        createSupervisorAndStartTLA();
+    }
+
     // DEOPSCSW-179: Unique Action for a component
     @Test
     public void shouldInvokeOnDomainMsg() throws Exception {
+        createSupervisorAndStartTLA();
 
         JComponentDomainMsg myDomainSpecificMsg = new JComponentDomainMsg();
         supervisorRef.tell(myDomainSpecificMsg);
@@ -88,6 +94,7 @@ public class JComponentIntegrationTest {
 
     @Test
     public void shouldInvokeOnControlCommand() throws Exception {
+        createSupervisorAndStartTLA();
 
         String prefix = "wfos.red.detector";
         Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
@@ -104,4 +111,56 @@ public class JComponentIntegrationTest {
         Assert.assertTrue(new DemandMatcher(commandDemandState, false).check(commandCurrentState));
     }
 
+    @Test
+    public void shouldInvokeOnGoOfflineAndOnGoOnline() throws Exception {
+        createSupervisorAndStartTLA();
+
+        supervisorRef.tell(new RunningMsg.Lifecycle(ToComponentLifecycleMessage.GoOffline$.MODULE$));
+
+        CurrentState offlineCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
+        Parameter<Choice> offlineParam = SampleComponentState.choiceKey().set(SampleComponentState.offlineChoice());
+        DemandState offlineDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(offlineParam);
+        Assert.assertTrue(new DemandMatcher(offlineDemandState, false).check(offlineCurrentState));
+
+        supervisorRef.tell(new RunningMsg.Lifecycle(ToComponentLifecycleMessage.GoOnline$.MODULE$));
+
+        CurrentState onlineCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
+        Parameter<Choice> onlineParam = SampleComponentState.choiceKey().set(SampleComponentState.onlineChoice());
+        DemandState onlineDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(onlineParam);
+        Assert.assertTrue(new DemandMatcher(onlineDemandState, false).check(onlineCurrentState));
+    }
+
+    @Test
+    public void shouldInvokeOnRestart() throws Exception {
+        createSupervisorAndStartTLA();
+
+        supervisorRef.tell(new RunningMsg.Lifecycle(ToComponentLifecycleMessage.Restart$.MODULE$));
+
+        CurrentState restartCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
+        Parameter<Choice> restartParam = SampleComponentState.choiceKey().set(SampleComponentState.restartChoice());
+        DemandState restartDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(restartParam);
+        Assert.assertTrue(new DemandMatcher(restartDemandState, false).check(restartCurrentState));
+
+        CurrentState initCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
+        Parameter<Choice> initParam = SampleComponentState.choiceKey().set(SampleComponentState.initChoice());
+        DemandState initDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(initParam);
+        Assert.assertTrue(new DemandMatcher(initDemandState, false).check(initCurrentState));
+
+        CurrentState runCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
+        Parameter<Choice> runParam = SampleComponentState.choiceKey().set(SampleComponentState.runChoice());
+        DemandState runDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(runParam);
+        Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
+    }
+
+    @Test
+    public void shouldInvokeOnShutdown() throws Exception {
+        createSupervisorAndStartTLA();
+
+        supervisorRef.tell(new RunningMsg.Lifecycle(ToComponentLifecycleMessage.Shutdown$.MODULE$));
+
+        CurrentState shutdownCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
+        Parameter<Choice> shutdownParam = SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice());
+        DemandState shutdownDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(shutdownParam);
+        Assert.assertTrue(new DemandMatcher(shutdownDemandState, false).check(shutdownCurrentState));
+    }
 }
