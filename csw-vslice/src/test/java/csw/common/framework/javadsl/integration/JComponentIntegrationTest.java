@@ -53,18 +53,8 @@ public class JComponentIntegrationTest {
         compStateProbe  = TestProbe.apply(system, settings);
         systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
-        supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
         Thread.sleep(200);
-
-        CurrentState initCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
-        Parameter<Choice> initParam = SampleComponentState.choiceKey().set(SampleComponentState.initChoice());
-        DemandState initDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(initParam);
-        Assert.assertTrue(new DemandMatcher(initDemandState, false).check(initCurrentState));
-
-        CurrentState runCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
-        Parameter<Choice> runParam = SampleComponentState.choiceKey().set(SampleComponentState.runChoice());
-        DemandState runDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(runParam);
-        Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
+        supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
     }
 
 
@@ -75,7 +65,20 @@ public class JComponentIntegrationTest {
 
     @Test
     public void shouldInvokeOnInitializeAndOnRun() throws Exception {
-        createSupervisorAndStartTLA();
+        compStateProbe  = TestProbe.apply(system, settings);
+        systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
+        supervisorRef = Await.result(systemActorOf, duration);
+        supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
+
+        CurrentState initCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
+        Parameter<Choice> initParam = SampleComponentState.choiceKey().set(SampleComponentState.initChoice());
+        DemandState initDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(initParam);
+        Assert.assertTrue(new DemandMatcher(initDemandState, false).check(initCurrentState));
+
+        CurrentState runCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
+        Parameter<Choice> runParam = SampleComponentState.choiceKey().set(SampleComponentState.runChoice());
+        DemandState runDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(runParam);
+        Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
     }
 
     // DEOPSCSW-179: Unique Action for a component

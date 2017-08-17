@@ -29,16 +29,25 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   import csw.common.components.SampleComponentState._
 
   var compStateProbe: TestProbe[CurrentState]     = _
-  val supervisorBehavior: Behavior[SupervisorMsg] = SupervisorBehaviorFactory.make(hcdInfo)
+  var supervisorBehavior: Behavior[SupervisorMsg] = _
   var supervisorRef: ActorRef[SupervisorMsg]      = _
 
   def createSupervisorAndStartTLA(): Unit = {
     compStateProbe = TestProbe[CurrentState]
+    supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo)
+    // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
+    supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
+    Thread.sleep(100)
+    supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
+  }
+
+  test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
+    compStateProbe = TestProbe[CurrentState]
+    supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo)
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
     supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
 
-    Thread.sleep(200)
     val initCurrentState = compStateProbe.expectMsgType[CurrentState]
     val initDemandState  = DemandState(prefix, Set(choiceKey.set(initChoice)))
     DemandMatcher(initDemandState).check(initCurrentState) shouldBe true
@@ -46,10 +55,6 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
     val runCurrentState = compStateProbe.expectMsgType[CurrentState]
     val runDemandState  = DemandState(prefix, Set(choiceKey.set(runChoice)))
     DemandMatcher(runDemandState).check(runCurrentState) shouldBe true
-  }
-
-  test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
-    createSupervisorAndStartTLA()
   }
 
   // DEOPSCSW-179: Unique Action for a component
