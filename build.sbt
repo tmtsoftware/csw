@@ -39,7 +39,7 @@ lazy val `csw-prod` = project
   .settings(Settings.docExclusions(unidocExclusions))
 
 lazy val `csw-params` = project
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage, AutoMultiJvm)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Params
   )
