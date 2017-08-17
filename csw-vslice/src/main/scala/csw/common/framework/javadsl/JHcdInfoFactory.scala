@@ -15,6 +15,6 @@ object JHcdInfoFactory {
            locationServiceUsage: LocationServiceUsage,
            registerAs: java.util.Set[ConnectionType],
            rate: FiniteDuration): HcdInfo = {
-    HcdInfo(componentName, prefix, componentClassName, locationServiceUsage, registerAs.asScala.toSet, rate)
+    HcdInfo(componentName, prefix, componentClassName, locationServiceUsage, registerAs.asScala.toSet)
   }
 }

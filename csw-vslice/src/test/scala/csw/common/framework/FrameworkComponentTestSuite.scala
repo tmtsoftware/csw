@@ -16,7 +16,7 @@ import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{DurationLong, FiniteDuration}
+import scala.concurrent.duration.DurationLong
 
 abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with BeforeAndAfterAll {
   implicit val system: ActorSystem[Nothing] = ActorSystem(Actor.empty, "testHcd")
@@ -34,12 +34,8 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
                                   Set(AkkaType),
                                   Set.empty)
 
-  val hcdInfo = HcdInfo("SampleHcd",
-                        "wfos",
-                        "csw.common.components.SampleComponentWiring",
-                        DoNotRegister,
-                        Set(AkkaType),
-                        FiniteDuration(5, "seconds"))
+  val hcdInfo =
+    HcdInfo("SampleHcd", "wfos", "csw.common.components.SampleComponentWiring", DoNotRegister, Set(AkkaType))
 
   def getSampleHcdWiring(
       componentHandlers: ComponentHandlers[ComponentDomainMsg]

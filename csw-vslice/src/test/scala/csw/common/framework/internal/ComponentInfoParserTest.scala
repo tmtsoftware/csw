@@ -3,6 +3,7 @@ package csw.common.framework.internal
 import java.io.File
 
 import com.typesafe.config.ConfigFactory
+import csw.common.framework.internal.configparser.ComponentInfoParser
 import csw.common.framework.models.ComponentInfo.ContainerInfo
 import csw.services.location.models.ComponentType
 import org.scalatest.{FunSuite, Matchers}

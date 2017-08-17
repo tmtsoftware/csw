@@ -39,7 +39,6 @@ public class JComponentIntegrationTest {
             "wfos",
             "csw.common.framework.javadsl.integration.JSampleComponentWiring",
             LocationServiceUsages.JDoNotRegister(),
-            null,
             null);
 
     private Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));

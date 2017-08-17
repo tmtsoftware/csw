@@ -65,15 +65,13 @@ object ComponentInfo {
    * @param componentClassName   The name of the class that implements the component (used to create the class via reflection)
    * @param locationServiceUsage how the component plans to use the location service
    * @param registerAs           register as an akka or http component or both
-   * @param rate                 the HCD's refresh rate
    */
   final case class HcdInfo(
       componentName: String,
       prefix: String,
       componentClassName: String,
       locationServiceUsage: LocationServiceUsage,
-      registerAs: Set[ConnectionType],
-      rate: FiniteDuration
+      registerAs: Set[ConnectionType]
   ) extends ComponentInfo {
     val componentType = HCD
   }
