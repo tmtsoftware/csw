@@ -3,6 +3,7 @@ package csw.common.framework.internal.configparser
 import java.util.NoSuchElementException
 import java.util.concurrent.TimeUnit
 
+import com.typesafe.config.ConfigException.WrongType
 import com.typesafe.config.{Config, ConfigException}
 import csw.common.framework.internal.configparser.Constants._
 import csw.common.framework.models.ComponentInfo
@@ -20,7 +21,7 @@ object ComponentInfoParser {
     try {
       val containerConfig = config.getConfig(CONTAINER)
       val containerName   = parseComponentName(CONTAINER, containerConfig)
-      val componentInfoes = parseComponents(containerConfig)
+      val componentInfoes = parseComponents(containerName.get, containerConfig)
       val registerAs      = parseRegisterAs(containerName.get, containerConfig) // registerAs is mandatory field
       val initialDelay    = parseDuration(containerName.get, INITIAL_DELAY, containerConfig, 0.seconds)
       val creationDelay   = parseDuration(containerName.get, CREATION_DELAY, containerConfig, 0.seconds)
@@ -62,11 +63,13 @@ object ComponentInfoParser {
         None
       case ex: ConfigException.WrongType ⇒
         println(
-          s"Expected an array of connection types for configuration field: >$REGISTER_AS< for component: $name. e.g. [akka, http, tcp]"
+          s"Expected an array of connection types for configuration field: >$REGISTER_AS< for component: $name. e.g. [${ConnectionType.values
+            .map(_.name)
+            .mkString(",")}]"
         )
         None
       case ex: NoSuchElementException ⇒
-        println(s"Error converting connection type for component: $name")
+        println(s"Invalid connection type for component: $name - ${ex.getMessage}")
         None
     }
 
@@ -82,7 +85,7 @@ object ComponentInfoParser {
         defaultDuration //logger.debug(Container $delayType for $containerName is missing or not valid, returning: $defaultDuration.)
     }
 
-  private def parseComponents(config: Config): Option[Set[ComponentInfo]] = {
+  private def parseComponents(containerName: String, config: Config) = {
 
     // Parse the "components" section of the config file
     def parseComponent(name: String, conf: Config): Option[ComponentInfo] =
@@ -98,25 +101,36 @@ object ComponentInfoParser {
         case ex: ConfigException.Missing ⇒
           println(s"Missing configuration field: >$COMPONENT_TYPE< for component: $name")
           None
+        case ex: NoSuchElementException ⇒
+          println(s"Invalid $COMPONENT_TYPE for component: $name - ${ex.getMessage}")
+          None
       }
 
-    val conf  = config.getConfig(COMPONENTS)
-    val names = conf.root.keySet().asScala.toList
+    try {
+      val conf  = config.getConfig(COMPONENTS)
+      val names = conf.root.keySet().asScala.toSet
 
-    val entries = names.flatMap { key ⇒
-      parseComponent(key, conf.getConfig(key))
+      val entries = names.flatMap { key ⇒
+        parseComponent(key, conf.getConfig(key))
+      }
+
+      //validation check!!
+      if (names.size == entries.size)
+        Some(entries)
+      else //one of component failed to parse
+        None
+    } catch {
+      case ex: ConfigException.Missing ⇒
+        println(s"Missing configuration field: >$COMPONENTS< for component: $containerName")
+        None
+      case ex: ConfigException.WrongType ⇒
+        println(s"Expected config object for configuration field >$COMPONENTS< for component: $containerName ")
+        None
     }
-
-    //validation check!!
-    if (names.length == entries.length)
-      Some(entries.toSet)
-    else //one of component failed to parse
-      None
   }
 
   // Parse the "services" section of the component config
   private def parseAssembly(assemblyName: String, conf: Config): Option[AssemblyInfo] = {
-
     def parseConnections(assemblyName: String, assemblyConfig: Config): Option[Set[Connection]] =
       try {
         Some(assemblyConfig.getStringList(CONNECTIONS).asScala.toSet.map(connection ⇒ Connection.from(connection)))
@@ -129,8 +143,8 @@ object ComponentInfoParser {
             s"Expected an array of connections for configuration field >$CONNECTIONS< for Assembly: $assemblyName. e.g. [HCD2A-hcd-akka, HCD2A-hcd-http, HCD2B-hcd-tcp]"
           )
           None
-        case ex: NoSuchElementException ⇒
-          println(s"Error converting connection for Assembly: $assemblyName")
+        case ex: IllegalArgumentException ⇒
+          println(s"Invalid connection for Assembly: $assemblyName - ${ex.getMessage}")
           None
       }
 
