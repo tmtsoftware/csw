@@ -7,28 +7,25 @@ import csw.common.framework.models.ComponentInfo
 import csw.common.framework.models.ComponentInfo.{AssemblyInfo, ContainerInfo, HcdInfo}
 import csw.common.framework.models.LocationServiceUsages.{RegisterAndTrackServices, RegisterOnly}
 import csw.services.location.models.ComponentType.{Assembly, HCD}
-import csw.services.location.models.{ComponentId, ComponentType, Connection, ConnectionType}
 import csw.services.location.models.ConnectionType.AkkaType
+import csw.services.location.models.{ComponentId, ComponentType, Connection, ConnectionType}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
-import scala.concurrent.duration.{DurationLong, FiniteDuration}
+import scala.concurrent.duration.FiniteDuration
 import scala.util.{Failure, Success, Try}
 
 object ComponentInfoParser {
-  private val CONTAINER       = "container"
-  private val COMPONENT_NAME  = "componentName"
-  private val COMPONENT_TYPE  = "componentType"
-  private val REGISTER_AS     = "registerAs"
-  private val COMPONENTS      = "components"
-  private val CLASS           = "class"
-  private val PREFIX          = "prefix"
-  private val CONNECTIONS     = "connections"
-  private val RATE            = "rate"
-  private val INITIAL_DELAY   = "initialDelay"
-  private val CREATION_DELAY  = "creationDelay"
-  private val LIFECYCLE_DELAY = "lifecycleDelay"
+  private val CONTAINER      = "container"
+  private val COMPONENT_NAME = "componentName"
+  private val COMPONENT_TYPE = "componentType"
+  private val REGISTER_AS    = "registerAs"
+  private val COMPONENTS     = "components"
+  private val CLASS          = "class"
+  private val PREFIX         = "prefix"
+  private val CONNECTIONS    = "connections"
+  private val RATE           = "rate"
 
-  def parse(config: Config): ContainerInfo =
+  def parse(config: Config): ComponentInfo =
     (for {
       containerConfig ← Try(config.getConfig(CONTAINER))
       containerName   ← parseComponentName(CONTAINER, containerConfig)
@@ -37,17 +34,7 @@ object ComponentInfoParser {
       // For container, if no connectionType, set to Akka
       val registerAs: Set[ConnectionType] = parseRegisterAs(containerName, containerConfig).getOrElse(Set(AkkaType))
 
-      val initialDelay   = parseDuration(containerName, INITIAL_DELAY, containerConfig, 0.seconds)
-      val creationDelay  = parseDuration(containerName, CREATION_DELAY, containerConfig, 0.seconds)
-      val lifecycleDelay = parseDuration(containerName, LIFECYCLE_DELAY, containerConfig, 0.seconds)
-
-      ContainerInfo(containerName,
-                    RegisterOnly,
-                    registerAs,
-                    componentInfoes,
-                    initialDelay,
-                    creationDelay,
-                    lifecycleDelay)
+      ContainerInfo(containerName, RegisterOnly, registerAs, componentInfoes)
     }).get
 
   private def parseComponentName(name: String, containerConfig: Config): Try[String] = {
@@ -67,19 +54,6 @@ object ComponentInfoParser {
         val set = config.getStringList(REGISTER_AS).asScala.map(ctype => ConnectionType.withName(ctype)).toSet
         set
       }
-  }
-
-  private def parseDuration(name: String,
-                            configName: String,
-                            conf: Config,
-                            defaultDuration: FiniteDuration): FiniteDuration = {
-    import scala.concurrent.duration._
-    val t = Try(FiniteDuration(conf.getDuration(configName).getSeconds, TimeUnit.SECONDS))
-    if (t.isFailure)
-      println(
-        s"logger.debug(Container $configName for $name is missing or not valid, returning: $defaultDuration.)"
-      )
-    t.getOrElse(defaultDuration)
   }
 
   private def parseComponents(config: Config): Try[Set[ComponentInfo]] = {

@@ -14,7 +14,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val file   = new File(path)
     val config = ConfigFactory.parseFile(file)
 
-    val componentInfo: ContainerInfo = ComponentInfoParser.parse(config)
+    val componentInfo: ContainerInfo = ComponentInfoParser.parse(config).asInstanceOf[ContainerInfo]
 
     componentInfo.componentName shouldBe "Container-2"
     componentInfo.componentType shouldBe ComponentType.Container
