@@ -13,7 +13,8 @@ import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.Future
-
+//DEOPSCSW-165-CSW Assembly Creation
+//DEOPSCSW-166-CSW HCD Creation
 class ComponentBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
   class TestData(
       supervisorProbe: TestProbe[FromComponentLifecycleMessage]

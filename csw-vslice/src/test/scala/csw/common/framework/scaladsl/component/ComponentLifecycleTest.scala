@@ -15,7 +15,8 @@ import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.Future
-
+//DEOPSCSW-177-Hooks for lifecycle management
+//DEOPSCSW-179-Unique Action for a component
 class ComponentLifecycleTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   class TestData(
