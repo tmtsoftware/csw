@@ -36,7 +36,6 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
 
       val newSystem = startNewSystem()
 
-      enterBarrier("location-removed")
       val freshLocationService = LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
       Thread.sleep(2000)
 
@@ -57,8 +56,6 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
       }
 
       testProbe.expectMsgType[LocationRemoved](5.seconds)
-      enterBarrier("location-removed")
-
       enterBarrier("member-re-registered")
       testProbe.expectMsgType[LocationUpdated](5.seconds)
     }
