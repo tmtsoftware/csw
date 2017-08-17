@@ -22,7 +22,9 @@ import csw.param.generics.Parameter;
 import csw.param.models.Choice;
 import csw.param.states.CurrentState;
 import csw.param.states.DemandState;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Test;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -48,7 +50,7 @@ public class JComponentIntegrationTest {
     private ActorRef<SupervisorMsg> supervisorRef;
     private TestProbe<CurrentState> compStateProbe;
 
-    public void createSupervisorAndStartTLA() throws Exception {
+    private void createSupervisorAndStartTLA() throws Exception {
         compStateProbe  = TestProbe.apply(system, settings);
         systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);

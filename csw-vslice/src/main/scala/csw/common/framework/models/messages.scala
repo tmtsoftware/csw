@@ -105,6 +105,6 @@ object SupervisorIdleMsg {
 sealed trait PreparingToShutdownMsg extends SupervisorMsg
 object PreparingToShutdownMsg {
   case object ShutdownTimeout                extends PreparingToShutdownMsg
-  case class ShutdownFailure(reason: String) extends PreparingToShutdownMsg
+  case class ShutdownFailure(reason: String) extends PreparingToShutdownMsg with FromComponentLifecycleMessage
   case object ShutdownComplete               extends PreparingToShutdownMsg with FromComponentLifecycleMessage
 }

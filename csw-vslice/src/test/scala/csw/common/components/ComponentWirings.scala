@@ -13,3 +13,11 @@ class SampleComponentWiring extends ComponentWiring[ComponentDomainMsg] {
       pubSubRef: ActorRef[PubSub.PublisherMsg[CurrentState]]
   ): ComponentHandlers[ComponentDomainMsg] = new SampleComponentHandlers(ctx, componentInfo, pubSubRef)
 }
+
+class ComponentWiringToSimulateFailure extends ComponentWiring[ComponentDomainMsg] {
+  override def handlers(
+      ctx: ActorContext[ComponentMsg],
+      componentInfo: ComponentInfo,
+      pubSubRef: ActorRef[PubSub.PublisherMsg[CurrentState]]
+  ): ComponentHandlers[ComponentDomainMsg] = new ComponentHandlerToSimulateFailure(ctx, componentInfo, pubSubRef)
+}

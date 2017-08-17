@@ -7,11 +7,11 @@ import csw.common.ccs.DemandMatcher
 import csw.common.components.ComponentStatistics
 import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.models.CommandMsg.Oneway
-import csw.common.framework.models.CommonSupervisorMsg.ComponentStateSubscription
+import csw.common.framework.models.CommonSupervisorMsg.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
-import csw.common.framework.models.{SupervisorMsg, ToComponentLifecycleMessage}
+import csw.common.framework.models.{LifecycleStateChanged, SupervisorMode, SupervisorMsg, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
@@ -144,6 +144,27 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
     val shutdownCurrentState = compStateProbe.expectMsgType[CurrentState]
     val shutdownDemandState  = DemandState(prefix, Set(choiceKey.set(shutdownChoice)))
     DemandMatcher(shutdownDemandState).check(shutdownCurrentState) shouldBe true
+  }
+
+  // DEOPSCSW-179: Unique Action for a component
+  test("supervisor should receive ShutdownFailure message when component fails to shutdown") {
+    val stateChangedProbe = TestProbe[LifecycleStateChanged]
+    supervisorBehavior = SupervisorBehaviorFactory.make(assemblyInfoToSimulateFailure)
+    // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
+    supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
+    Thread.sleep(200)
+    // Registering probe to receive Lifecycle state changed events
+    supervisorRef ! LifecycleStateSubscription(Subscribe(stateChangedProbe.ref))
+
+    supervisorRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
+
+    // On receiving Shutdown message, Supervisor changes its mode to PreparingToShutdown
+    val initialLifecycleState = stateChangedProbe.expectMsgType[LifecycleStateChanged]
+    initialLifecycleState.state shouldBe SupervisorMode.PreparingToShutdown
+
+    // On shutdown failure, Supervisor changes its mode to ShutdownFailure
+    val currentLifecycleState = stateChangedProbe.expectMsgType[LifecycleStateChanged]
+    currentLifecycleState.state shouldBe SupervisorMode.ShutdownFailure
   }
 
 }

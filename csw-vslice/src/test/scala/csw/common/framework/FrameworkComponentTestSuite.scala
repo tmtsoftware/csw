@@ -33,6 +33,13 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
                                   Set(AkkaType),
                                   Set.empty)
 
+  val assemblyInfoToSimulateFailure = AssemblyInfo("trombone",
+                                                   "wfos",
+                                                   "csw.common.components.ComponentWiringToSimulateFailure",
+                                                   DoNotRegister,
+                                                   Set(AkkaType),
+                                                   Set.empty)
+
   val hcdInfo =
     HcdInfo("SampleHcd", "wfos", "csw.common.components.SampleComponentWiring", DoNotRegister, Set(AkkaType))
 

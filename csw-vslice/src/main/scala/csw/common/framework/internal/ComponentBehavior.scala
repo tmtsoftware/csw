@@ -6,7 +6,7 @@ import csw.common.ccs.CommandStatus
 import csw.common.framework.models.CommandMsg.{Oneway, Submit}
 import csw.common.framework.models.IdleMsg.{Initialize, Start}
 import csw.common.framework.models.InitialMsg.Run
-import csw.common.framework.models.PreparingToShutdownMsg.ShutdownComplete
+import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure}
 import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
 import csw.common.framework.models.SupervisorIdleMsg.InitializeFailure
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
@@ -78,8 +78,12 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case Shutdown =>
-      lifecycleHandlers.onShutdown()
-      supervisor ! ShutdownComplete
+      try {
+        lifecycleHandlers.onShutdown()
+        supervisor ! ShutdownComplete
+      } catch {
+        case ex: Exception ⇒ supervisor ! ShutdownFailure(ex.getMessage)
+      }
     case Restart =>
       lifecycleHandlers.onRestart()
       mode = ComponentMode.Idle
