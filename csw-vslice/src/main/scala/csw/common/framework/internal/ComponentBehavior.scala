@@ -44,7 +44,6 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
     case Initialize =>
       async {
         await(initialization())
-        supervisor ! SupervisorIdleMsg.Initialized(ctx.self)
       }
     case Start ⇒
       async {
@@ -57,6 +56,7 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
     async {
       await(lifecycleHandlers.initialize())
       mode = ComponentMode.Initialized
+      supervisor ! SupervisorIdleMsg.Initialized(ctx.self)
     } recover {
       case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
     }

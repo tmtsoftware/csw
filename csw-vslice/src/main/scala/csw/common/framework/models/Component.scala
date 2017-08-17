@@ -73,7 +73,7 @@ object ComponentInfo {
       locationServiceUsage: LocationServiceUsage,
       registerAs: Set[ConnectionType]
   ) extends ComponentInfo {
-    val componentType = HCD
+    val componentType: ComponentType = HCD
   }
 
   /**
@@ -94,7 +94,7 @@ object ComponentInfo {
       registerAs: Set[ConnectionType],
       connections: Set[Connection]
   ) extends ComponentInfo {
-    val componentType = Assembly
+    val componentType: ComponentType = Assembly
 
     /**
      * Java API to get the list of connections for the assembly
@@ -122,9 +122,9 @@ object ComponentInfo {
       creationDelay: FiniteDuration = 0.seconds,
       lifecycleDelay: FiniteDuration = 0.seconds
   ) extends ComponentInfo {
-    val componentType      = Container
-    val componentClassName = "csw.services.pkg.ContainerComponent"
-    val prefix             = ""
+    val componentType: ComponentType = Container
+    val componentClassName           = "csw.services.pkg.ContainerComponent"
+    val prefix                       = ""
   }
 
 //  private def createHCD(context: ActorContext, cinfo: ComponentInfo, supervisorIn: Option[ActorRef]): ActorRef = {

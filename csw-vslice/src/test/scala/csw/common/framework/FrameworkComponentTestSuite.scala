@@ -5,7 +5,6 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.common.components.ComponentDomainMsg
-import csw.common.components.assembly.AssemblyDomainMsg
 import csw.common.framework.models.ComponentInfo.{AssemblyInfo, HcdInfo}
 import csw.common.framework.models.LocationServiceUsages.DoNotRegister
 import csw.common.framework.models.PubSub.PublisherMsg
@@ -29,7 +28,7 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
 
   val assemblyInfo = AssemblyInfo("trombone",
                                   "wfos",
-                                  "csw.common.components.assembly.SampleAssembly",
+                                  "csw.common.components.SampleComponentWiring",
                                   DoNotRegister,
                                   Set(AkkaType),
                                   Set.empty)
@@ -49,12 +48,12 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
     }
 
   def getSampleAssemblyWiring(
-      assemblyHandlers: ComponentHandlers[AssemblyDomainMsg]
-  ): ComponentWiring[AssemblyDomainMsg] =
-    new ComponentWiring[AssemblyDomainMsg] {
+      assemblyHandlers: ComponentHandlers[ComponentDomainMsg]
+  ): ComponentWiring[ComponentDomainMsg] =
+    new ComponentWiring[ComponentDomainMsg] {
       override def handlers(ctx: ActorContext[ComponentMsg],
                             componentInfo: ComponentInfo,
-                            pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[AssemblyDomainMsg] =
+                            pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[ComponentDomainMsg] =
         assemblyHandlers
     }
 

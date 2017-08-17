@@ -36,8 +36,8 @@ class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoS
     compStateProbe = TestProbe[CurrentState]
     supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo)
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
-    supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
-    Thread.sleep(100)
+    supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
+    Thread.sleep(200)
     supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
   }
 

@@ -69,6 +69,7 @@ class ComponentBehaviorTest extends FrameworkComponentTestSuite with MockitoSuga
     verify(sampleComponentHandler).isOnline_=(true)
   }
 
+  // DEOPSCSW-179: Unique Action for a component
   test("component should send InitializationFailure message if it fails in initialization") {
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
     val testData        = new TestData(supervisorProbe)
