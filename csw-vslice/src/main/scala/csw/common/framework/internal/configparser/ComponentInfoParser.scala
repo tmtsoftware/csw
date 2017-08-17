@@ -1,146 +1,183 @@
 package csw.common.framework.internal.configparser
 
-import com.typesafe.config.Config
+import java.util.NoSuchElementException
+import java.util.concurrent.TimeUnit
+
+import com.typesafe.config.{Config, ConfigException}
 import csw.common.framework.internal.configparser.Constants._
 import csw.common.framework.models.ComponentInfo
 import csw.common.framework.models.ComponentInfo.{AssemblyInfo, ContainerInfo, HcdInfo}
 import csw.common.framework.models.LocationServiceUsages.{RegisterAndTrackServices, RegisterOnly}
 import csw.services.location.models.ComponentType.{Assembly, HCD}
-import csw.services.location.models.ConnectionType.AkkaType
-import csw.services.location.models.{ComponentId, ComponentType, Connection, ConnectionType}
+import csw.services.location.models.{ComponentType, Connection, ConnectionType}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
-import scala.util.{Failure, Success, Try}
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 object ComponentInfoParser {
 
-  def parse(config: Config): ComponentInfo =
-    (for {
-      containerConfig ← Try(config.getConfig(CONTAINER))
-      containerName   ← parseComponentName(CONTAINER, containerConfig)
-      componentInfoes ← parseComponents(containerConfig)
-    } yield {
-      // For container, if no connectionType, set to Akka
-      val registerAs: Set[ConnectionType] = parseRegisterAs(containerName, containerConfig).getOrElse(Set(AkkaType))
+  def parse(config: Config): Option[ContainerInfo] =
+    try {
+      val containerConfig = config.getConfig(CONTAINER)
+      val containerName   = parseComponentName(CONTAINER, containerConfig)
+      val componentInfoes = parseComponents(containerConfig)
+      val registerAs      = parseRegisterAs(containerName.get, containerConfig) // registerAs is mandatory field
+      val initialDelay    = parseDuration(containerName.get, INITIAL_DELAY, containerConfig, 0.seconds)
+      val creationDelay   = parseDuration(containerName.get, CREATION_DELAY, containerConfig, 0.seconds)
+      val lifecycleDelay  = parseDuration(containerName.get, LIFECYCLE_DELAY, containerConfig, 0.seconds)
 
-      ContainerInfo(containerName, RegisterOnly, registerAs, componentInfoes)
-    }).get
-
-  private def parseComponentName(name: String, containerConfig: Config): Try[String] = {
-    if (!containerConfig.hasPath(COMPONENT_NAME))
-      Failure(
-        new RuntimeException(s"Missing configuration field: >$COMPONENT_NAME< in connections for component: $name")
+      Some(
+        ContainerInfo(containerName.get,
+                      RegisterOnly,
+                      registerAs.get,
+                      componentInfoes.get,
+                      initialDelay,
+                      creationDelay,
+                      lifecycleDelay)
       )
-    else Success(containerConfig.getString(COMPONENT_NAME))
-  }
+    } catch {
+      case ex: ConfigException.Missing ⇒
+        println(s"Missing configuration field >$CONTAINER<")
+        None
+      case ex: NoSuchElementException ⇒
+        None
+    }
+
+  private def parseComponentName(name: String, containerConfig: Config): Option[String] =
+    try {
+      Some(containerConfig.getString(COMPONENT_NAME))
+    } catch {
+      case ex: ConfigException ⇒
+        println(s"Missing configuration field: >$COMPONENT_NAME< in connections for component: $name")
+        None
+    }
 
   // Parse the "registerAs" section of the component config
-  private def parseRegisterAs(name: String, config: Config): Try[Set[ConnectionType]] = {
-    if (!config.hasPath(REGISTER_AS))
-      Failure(new RuntimeException(s"Missing configuration field: >$REGISTER_AS< for component: $name"))
-    else
-      Try {
-        val set = config.getStringList(REGISTER_AS).asScala.map(ctype => ConnectionType.withName(ctype)).toSet
-        set
-      }
-  }
+  private def parseRegisterAs(name: String, config: Config): Option[Set[ConnectionType]] =
+    try {
+      Some(config.getStringList(REGISTER_AS).asScala.map(ctype => ConnectionType.withName(ctype)).toSet)
+    } catch {
+      case ex: ConfigException.Missing ⇒
+        println(s"Missing configuration field: >$REGISTER_AS< for component: $name")
+        None
+      case ex: ConfigException.WrongType ⇒
+        println(
+          s"Expected an array of connection types for configuration field: >$REGISTER_AS< for component: $name. e.g. [akka, http, tcp]"
+        )
+        None
+      case ex: NoSuchElementException ⇒
+        println(s"Error converting connection type for component: $name")
+        None
+    }
 
-  private def parseComponents(config: Config): Try[Set[ComponentInfo]] = {
+  private def parseDuration(containerName: String,
+                            delayType: String,
+                            containerConfig: Config,
+                            defaultDuration: FiniteDuration): FiniteDuration =
+    try {
+      import scala.concurrent.duration._
+      FiniteDuration(containerConfig.getDuration(delayType).getSeconds, TimeUnit.SECONDS)
+    } catch {
+      case ex: Throwable ⇒
+        defaultDuration //logger.debug(Container $delayType for $containerName is missing or not valid, returning: $defaultDuration.)
+    }
+
+  private def parseComponents(config: Config): Option[Set[ComponentInfo]] = {
 
     // Parse the "components" section of the config file
-    def parseComponent(name: String, conf: Config): Option[ComponentInfo] = {
-      val componentType = conf.getString(COMPONENT_TYPE)
-      val componentInfo = ComponentType.withName(componentType) match {
-        case Assembly => parseAssembly(name, conf)
-        case HCD      => parseHcd(name, conf)
-        case _        => None
+    def parseComponent(name: String, conf: Config): Option[ComponentInfo] =
+      try {
+        val componentType = conf.getString(COMPONENT_TYPE)
+        val componentInfo = ComponentType.withName(componentType) match {
+          case Assembly => parseAssembly(name, conf)
+          case HCD      => parseHcd(name, conf)
+          case _        => None
+        }
+        componentInfo
+      } catch {
+        case ex: ConfigException.Missing ⇒
+          println(s"Missing configuration field: >$COMPONENT_TYPE< for component: $name")
+          None
       }
-      componentInfo
+
+    val conf  = config.getConfig(COMPONENTS)
+    val names = conf.root.keySet().asScala.toList
+
+    val entries = names.flatMap { key ⇒
+      parseComponent(key, conf.getConfig(key))
     }
 
-    Try {
-      val conf  = config.getConfig(COMPONENTS)
-      val names = conf.root.keySet().asScala.toList
-      val entries = for {
-        key   <- names
-        value <- parseComponent(key, conf.getConfig(key))
-      } yield value
-      entries.toSet
-    }
-
+    //validation check!!
+    if (names.length == entries.length)
+      Some(entries.toSet)
+    else //one of component failed to parse
+      None
   }
 
   // Parse the "services" section of the component config
   private def parseAssembly(assemblyName: String, conf: Config): Option[AssemblyInfo] = {
 
-    def parseComponentId(name: String, connectionConfig: Config): Try[ComponentId] = {
-      if (!connectionConfig.hasPath(COMPONENT_TYPE))
-        Failure(new RuntimeException(s"Missing configuration field: >$COMPONENT_TYPE< for component: $name"))
-      else {
-        val componentType = ComponentType.withName(connectionConfig.getString(COMPONENT_TYPE))
-        Success(ComponentId(name, componentType))
+    def parseConnections(assemblyName: String, assemblyConfig: Config): Option[Set[Connection]] =
+      try {
+        Some(assemblyConfig.getStringList(CONNECTIONS).asScala.toSet.map(connection ⇒ Connection.from(connection)))
+      } catch {
+        case ex: ConfigException.Missing ⇒
+          println(s"Missing configuration field: >$CONNECTIONS< for Assembly: $assemblyName")
+          None
+        case ex: ConfigException.WrongType ⇒
+          println(
+            s"Expected an array of connections for configuration field >$CONNECTIONS< for Assembly: $assemblyName. e.g. [HCD2A-hcd-akka, HCD2A-hcd-http, HCD2B-hcd-tcp]"
+          )
+          None
+        case ex: NoSuchElementException ⇒
+          println(s"Error converting connection for Assembly: $assemblyName")
+          None
       }
-    }
 
-    def parseConnections(assemblyName: String, assemblyConfig: Config): Try[Set[Connection]] = {
-      if (!assemblyConfig.hasPath(CONNECTIONS))
-        Failure(new RuntimeException(s"Missing configuration field: >$CONNECTIONS< for Assembly: $assemblyName"))
-      else
-        Try {
-          // Note: config.getConfigList could throw an exception...
-          val list = assemblyConfig.getConfigList(CONNECTIONS).asScala.toList.map { connectionConfig: Config =>
-            for {
-              connectionName  <- parseComponentName(assemblyName, connectionConfig)
-              componentId     <- parseComponentId(connectionName, connectionConfig)
-              connectionTypes <- parseRegisterAs(connectionName, connectionConfig)
-            } yield
-              connectionTypes.map(connectionType ⇒ Connection.from(s"${componentId.fullName}-${connectionType.name}"))
-          }
-          val failed = list.find(_.isFailure).map(_.asInstanceOf[Failure[_]].exception)
-          if (failed.nonEmpty)
-            throw failed.get
-          else
-            list.flatMap(_.get).toSet
-        }
-    }
+    try {
+      val componentClassName = parseClassName(assemblyName, conf)
+      val prefix             = parsePrefix(assemblyName, conf)
+      val registerAs         = parseRegisterAs(assemblyName, conf)
+      val connections        = parseConnections(assemblyName, conf)
 
-    val assemblyInfo = for {
-      componentClassName <- parseClassName(assemblyName, conf)
-      prefix             <- parsePrefix(assemblyName, conf)
-      registerAs         <- parseRegisterAs(assemblyName, conf)
-      connections        <- parseConnections(assemblyName, conf)
-    } yield AssemblyInfo(assemblyName, prefix, componentClassName, RegisterAndTrackServices, registerAs, connections)
-    if (assemblyInfo.isFailure) {
-      println(s"An error occurred while parsing Assembly info for: $assemblyName")
-      println(assemblyInfo.asInstanceOf[Failure[_]].exception)
+      val assemblyInfo = AssemblyInfo(assemblyName,
+                                      prefix.get,
+                                      componentClassName.get,
+                                      RegisterAndTrackServices,
+                                      registerAs.get,
+                                      connections.get)
+      Some(assemblyInfo)
+    } catch {
+      case ex: NoSuchElementException ⇒ None
     }
-    assemblyInfo.toOption
   }
 
   // Parse the "services" section of the component config
-  private def parseHcd(name: String, conf: Config): Option[HcdInfo] = {
-
-    val x = for {
-      componentClassName <- parseClassName(name, conf)
-      prefix             <- parsePrefix(name, conf)
-      registerAs         <- parseRegisterAs(name, conf)
-    } yield HcdInfo(name, prefix, componentClassName, RegisterOnly, registerAs)
-    if (x.isFailure) {
-      println(s"An error occurred while parsing HCD info for: $name")
-      println(x.asInstanceOf[Failure[_]].exception)
+  private def parseHcd(name: String, conf: Config): Option[HcdInfo] =
+    try {
+      val componentClassName = parseClassName(name, conf)
+      val prefix             = parsePrefix(name, conf)
+      val registerAs         = parseRegisterAs(name, conf)
+      Some(HcdInfo(name, prefix.get, componentClassName.get, RegisterOnly, registerAs.get))
+    } catch {
+      case ex: NoSuchElementException ⇒ None
     }
-    x.toOption
-  }
 
-  private def parseClassName(name: String, config: Config): Try[String] = {
-    if (!config.hasPath(CLASS))
-      Failure(new RuntimeException(s"Missing configuration field: >$CLASS< for component: $name"))
-    else Success(config.getString(CLASS))
-  }
+  private def parseClassName(name: String, config: Config): Option[String] =
+    try {
+      Some(config.getString(CLASS))
+    } catch {
+      case ex: ConfigException ⇒
+        println(s"Missing configuration field: >$CLASS< for component: $name")
+        None
+    }
 
-  private def parsePrefix(name: String, config: Config): Try[String] = {
-    if (!config.hasPath(PREFIX))
-      Failure(new RuntimeException(s"Missing configuration field: >$PREFIX< for component: $name"))
-    else Success(config.getString(PREFIX))
-  }
+  private def parsePrefix(name: String, config: Config): Option[String] =
+    try {
+      Some(config.getString(PREFIX))
+    } catch {
+      case ex: ConfigException ⇒
+        println(s"Missing configuration field: >$PREFIX< for component: $name")
+        None
+    }
 }
