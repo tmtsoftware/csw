@@ -1,9 +1,8 @@
-package csw.common.framework.internal
+package csw.common.framework.internal.configparser
 
 import java.io.File
 
 import com.typesafe.config.ConfigFactory
-import csw.common.framework.internal.configparser.ComponentInfoParser
 import csw.common.framework.models.ComponentInfo
 import csw.common.framework.models.LocationServiceUsages.{RegisterAndTrackServices, RegisterOnly}
 import csw.services.location.models.ComponentType.{Assembly, HCD}
@@ -11,7 +10,6 @@ import csw.services.location.models.{ComponentType, Connection}
 import org.scalatest.{FunSuite, Matchers}
 
 class ComponentInfoParserTest extends FunSuite with Matchers {
-
   private val assemblyInfo = ComponentInfo(
     "Assembly-1",
     Assembly,

@@ -8,10 +8,11 @@ import csw.common.framework.models.ComponentInfo
 import csw.common.framework.models.LocationServiceUsages.{RegisterAndTrackServices, RegisterOnly}
 import csw.services.location.models.ComponentType.{Assembly, Container, HCD}
 import csw.services.location.models.{ComponentType, Connection}
+import csw.services.logging.scaladsl.GenericLogger
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
 
-object ComponentInfoParser {
+object ComponentInfoParser extends GenericLogger.Simple {
 
   def parse(config: Config): Option[ComponentInfo] =
     try {
@@ -19,12 +20,12 @@ object ComponentInfoParser {
       val containerName   = parseContainerName(containerConfig)
       val componentInfoes = parseComponents(containerName.get, containerConfig)
 
-      Some(
+      val componentInfo =
         ComponentInfo(containerName.get, Container, "", "", RegisterOnly, maybeComponentInfoes = componentInfoes)
-      )
+      Some(componentInfo)
     } catch {
       case _: ConfigException.Missing ⇒
-        println(s"Missing configuration field '$CONTAINER'")
+        log.error(s"Missing configuration field '$CONTAINER'")
         None
       case _: Throwable ⇒
         None
@@ -37,7 +38,7 @@ object ComponentInfoParser {
       val names           = componentConfig.root.keySet().asScala.toList
 
       if (names.length > 1) {
-        println(s"Expected single component in Standalone mode. Found [${names.mkString(",")}].")
+        log.error(s"Expected single component in Standalone mode. Found [${names.mkString(",")}].")
         None
       } else {
         parseComponent(names.head, componentConfig.getConfig(names.head))
@@ -45,10 +46,10 @@ object ComponentInfoParser {
 
     } catch {
       case _: ConfigException.Missing ⇒
-        println(s"Missing configuration field '$CONTAINER.$COMPONENTS'")
+        log.error(s"Missing configuration field '$CONTAINER.$COMPONENTS'")
         None
       case _: ConfigException.WrongType ⇒
-        println(s"Expected config object for configuration field '$CONTAINER.$COMPONENTS'")
+        log.error(s"Expected config object for configuration field '$CONTAINER.$COMPONENTS'")
         None
     }
 
@@ -57,25 +58,7 @@ object ComponentInfoParser {
       Some(containerConfig.getString(CONTAINER_NAME))
     } catch {
       case _: ConfigException ⇒
-        println(s"Missing configuration field: '$CONTAINER_NAME'")
-        None
-    }
-
-  def parseComponent(componentName: String, componentConfig: Config): Option[ComponentInfo] =
-    try {
-      val componentType = componentConfig.getString(COMPONENT_TYPE)
-      val componentInfo = ComponentType.withName(componentType) match {
-        case Assembly => parseAssembly(componentName, componentConfig)
-        case HCD      => parseHcd(componentName, componentConfig)
-        case _        => None
-      }
-      componentInfo
-    } catch {
-      case _: ConfigException.Missing ⇒
-        println(s"Missing configuration field: '$COMPONENT_TYPE' for component '$componentName'")
-        None
-      case ex: NoSuchElementException ⇒
-        println(s"Invalid $COMPONENT_TYPE for component '$componentName' - ${ex.getMessage}")
+        log.error(s"Missing configuration field: '$CONTAINER_NAME'")
         None
     }
 
@@ -95,13 +78,31 @@ object ComponentInfoParser {
         None
     } catch {
       case _: ConfigException.Missing ⇒
-        println(s"Missing configuration field '$COMPONENTS' for component '$containerName'")
+        log.error(s"Missing configuration field '$COMPONENTS' for component '$containerName'")
         None
       case _: ConfigException.WrongType ⇒
-        println(s"Expected config object for configuration field '$COMPONENTS' for component '$containerName'")
+        log.error(s"Expected config object for configuration field '$COMPONENTS' for component '$containerName'")
         None
     }
   }
+
+  private def parseComponent(componentName: String, componentConfig: Config): Option[ComponentInfo] =
+    try {
+      val componentType = componentConfig.getString(COMPONENT_TYPE)
+      val componentInfo = ComponentType.withName(componentType) match {
+        case Assembly => parseAssembly(componentName, componentConfig)
+        case HCD      => parseHcd(componentName, componentConfig)
+        case _        => None
+      }
+      componentInfo
+    } catch {
+      case _: ConfigException.Missing ⇒
+        log.error(s"Missing configuration field: '$COMPONENT_TYPE' for component '$componentName'")
+        None
+      case ex: NoSuchElementException ⇒
+        log.error(s"Invalid $COMPONENT_TYPE for component '$componentName' - ${ex.getMessage}")
+        None
+    }
 
   // Parse the "services" section of the component config
   private def parseAssembly(assemblyName: String, conf: Config): Option[ComponentInfo] = {
@@ -110,15 +111,15 @@ object ComponentInfoParser {
         Some(assemblyConfig.getStringList(CONNECTIONS).asScala.toSet.map(connection ⇒ Connection.from(connection)))
       } catch {
         case _: ConfigException.Missing ⇒
-          println(s"Missing configuration field '$CONNECTIONS' for component '$assemblyName'")
+          log.error(s"Missing configuration field '$CONNECTIONS' for component '$assemblyName'")
           None
         case _: ConfigException.WrongType ⇒
-          println(
+          log.error(
             s"Expected an array of connections for configuration field '$CONNECTIONS' for component '$assemblyName'. e.g. [HCD2A-hcd-akka, HCD2A-hcd-http, HCD2B-hcd-tcp]"
           )
           None
         case ex: IllegalArgumentException ⇒
-          println(s"Invalid connection for component '$assemblyName' - ${ex.getMessage}")
+          log.error(s"Invalid connection for component '$assemblyName' - ${ex.getMessage}")
           None
       }
 
@@ -150,7 +151,7 @@ object ComponentInfoParser {
       Some(config.getString(CLASS))
     } catch {
       case _: ConfigException ⇒
-        println(s"Missing configuration field '$CLASS' for component '$name'")
+        log.error(s"Missing configuration field '$CLASS' for component '$name'")
         None
     }
 
@@ -159,7 +160,7 @@ object ComponentInfoParser {
       Some(config.getString(PREFIX))
     } catch {
       case _: ConfigException ⇒
-        println(s"Missing configuration field '$PREFIX' for component '$name'")
+        log.error(s"Missing configuration field '$PREFIX' for component '$name'")
         None
     }
 }
