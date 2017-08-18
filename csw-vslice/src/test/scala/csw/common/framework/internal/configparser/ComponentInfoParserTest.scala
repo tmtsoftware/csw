@@ -30,7 +30,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
 
     componentInfo.componentName shouldBe "Container-2"
     componentInfo.componentType shouldBe ComponentType.Container
-    componentInfo.maybeComponentInfoes.get shouldEqual Set(assemblyInfo, hcd2AInfo, hcd2BInfo)
+    componentInfo.maybeComponentInfos.get shouldEqual Set(assemblyInfo, hcd2AInfo, hcd2BInfo)
   }
 
   test("Should able to log error when 'componentName' is missing") {

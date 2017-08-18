@@ -4,7 +4,6 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
-import csw.common.framework.models.ComponentInfo.ContainerInfo
 import csw.common.framework.models.ContainerMsg.{CreateComponents, GetComponents, LifecycleStateChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.Lifecycle
@@ -13,7 +12,7 @@ import csw.common.framework.models._
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 import csw.services.location.models.{ComponentId, RegistrationResult}
 
-class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) extends MutableBehavior[ContainerMsg] {
+class Container(ctx: ActorContext[ContainerMsg], containerInfo: ComponentInfo) extends MutableBehavior[ContainerMsg] {
   val componentId                                 = ComponentId(containerInfo.componentName, containerInfo.componentType)
   var supervisors: List[SupervisorInfo]           = List.empty
   var restarted: List[SupervisorInfo]             = List.empty
@@ -22,7 +21,7 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
 
   registerWithLocationService()
 
-  ctx.self ! CreateComponents(containerInfo.componentInfos)
+  ctx.self ! CreateComponents(containerInfo.maybeComponentInfos.get)
 
   def onRestart(): Unit = {
     mode = ContainerMode.Restart

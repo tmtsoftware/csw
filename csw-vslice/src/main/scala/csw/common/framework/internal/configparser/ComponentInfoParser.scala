@@ -18,10 +18,9 @@ object ComponentInfoParser extends GenericLogger.Simple {
     try {
       val containerConfig = config.getConfig(CONTAINER)
       val containerName   = parseContainerName(containerConfig)
-      val componentInfoes = parseComponents(containerName.get, containerConfig)
-
+      val componentInfos  = parseComponents(containerName.get, containerConfig)
       val componentInfo =
-        ComponentInfo(containerName.get, Container, "", "", RegisterOnly, maybeComponentInfoes = componentInfoes)
+        ComponentInfo(containerName.get, Container, "", "", RegisterOnly, maybeComponentInfos = componentInfos)
       Some(componentInfo)
     } catch {
       case _: ConfigException.Missing ⇒

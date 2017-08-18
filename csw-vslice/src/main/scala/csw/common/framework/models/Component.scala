@@ -32,11 +32,11 @@ case class ComponentInfo(componentName: String,
                          componentClassName: String,
                          locationServiceUsage: LocationServiceUsage,
                          maybeConnections: Option[Set[Connection]] = None,
-                         maybeComponentInfoes: Option[Set[ComponentInfo]] = None) {
+                         maybeComponentInfos: Option[Set[ComponentInfo]] = None) {
 
   require(!componentName.isEmpty)
   require(if (Assembly == componentType) maybeConnections.isDefined else true)
-  require(if (Container == componentType) maybeComponentInfoes.isDefined else true)
+  require(if (Container == componentType) maybeComponentInfos.isDefined else true)
 
   /**
    * Java API to get the list of connections for the assembly
