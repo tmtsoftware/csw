@@ -24,7 +24,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
   private val hcd2BInfo =
     ComponentInfo("HCD-2B", HCD, "tcs.mobie.blue.disperser", "csw.pkgDemo.hcd2.Hcd2", RegisterOnly)
 
-  test("Should able to parse config file to ContainerInfo") {
+  test("Should able to parse valid config file to ComponentInfo") {
     val path   = getClass.getResource("/conf/SampleContainer.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
@@ -103,5 +103,19 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseFile(new File(path))
 
     ComponentInfoParser.parse(config) shouldEqual None
+  }
+
+  test("Should able to parse valid config file to ComponentInfo for standalone mode") {
+    val path   = getClass.getResource("/conf/standalone/SampleStandalone.conf").getPath
+    val config = ConfigFactory.parseFile(new File(path))
+
+    ComponentInfoParser.parseStandaloneConfig(config).get shouldEqual assemblyInfo
+  }
+
+  test("Should able to log error when 'components' contains more than one entry for standalone mode") {
+    val path   = getClass.getResource("/conf/standalone/invalid_standalone.conf").getPath
+    val config = ConfigFactory.parseFile(new File(path))
+
+    ComponentInfoParser.parseStandaloneConfig(config) shouldEqual None
   }
 }
