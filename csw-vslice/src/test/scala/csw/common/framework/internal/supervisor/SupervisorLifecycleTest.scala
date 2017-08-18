@@ -10,6 +10,7 @@ import csw.common.framework.models.CommonSupervisorMsg.{
   HaltComponent,
   LifecycleStateSubscription
 }
+import csw.common.framework.models.ContainerMsg.LifecycleStateChanged
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.ShutdownComplete
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
@@ -69,7 +70,7 @@ class SupervisorLifecycleTest
     supervisor.onMessage(Running(childComponentInbox.ref))
 
     supervisor.mode shouldBe SupervisorMode.Running
-    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(LifecycleStateChanged(SupervisorMode.Running))
+    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(LifecycleStateChanged(SupervisorMode.Running, ctx.self))
   }
 
   test("supervisor should handle LifecycleStateSubscription message by coordinating with pub sub actor") {
@@ -134,7 +135,7 @@ class SupervisorLifecycleTest
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
     childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown))
+      Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown, ctx.self))
     )
     supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.Shutdown))
@@ -196,13 +197,15 @@ class SupervisorLifecycleTest
 
     supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown))
+      Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown, ctx.self))
     )
 
     supervisor.onMessage(ShutdownComplete)
     supervisor.shutdownTimer.get.isCancelled shouldBe true
 
     supervisor.mode shouldBe SupervisorMode.Shutdown
-    childPubSubLifecycleInbox.receiveAll() should contain(Publish(LifecycleStateChanged(SupervisorMode.Shutdown)))
+    childPubSubLifecycleInbox.receiveAll() should contain(
+      Publish(LifecycleStateChanged(SupervisorMode.Shutdown, ctx.self))
+    )
   }
 }

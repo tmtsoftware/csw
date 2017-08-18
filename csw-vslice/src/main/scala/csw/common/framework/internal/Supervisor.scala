@@ -9,6 +9,7 @@ import csw.common.framework.models.CommonSupervisorMsg.{
   HaltComponent,
   LifecycleStateSubscription
 }
+import csw.common.framework.models.ContainerMsg.LifecycleStateChanged
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.Publish
@@ -89,7 +90,7 @@ class Supervisor(
     case Running(componentRef) =>
       runningComponent = Some(componentRef)
       mode = SupervisorMode.Running
-      pubSubLifecycle ! Publish(LifecycleStateChanged(SupervisorMode.Running))
+      pubSubLifecycle ! Publish(LifecycleStateChanged(SupervisorMode.Running, ctx.self))
   }
 
   def onRunning(msg: RunningMsg): Unit = {
@@ -105,7 +106,7 @@ class Supervisor(
       shutdownTimer = Some(ctx.schedule(shutdownTimeout, ctx.self, ShutdownTimeout))
       unregisterFromLocationService()
       mode = SupervisorMode.PreparingToShutdown
-      pubSubLifecycle ! Publish(LifecycleStateChanged(mode))
+      pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
     case Restart =>
       unregisterFromLocationService()
       mode = SupervisorMode.Idle
@@ -125,7 +126,7 @@ class Supervisor(
         shutdownTimer.map(_.cancel())
         mode = SupervisorMode.Shutdown
     }
-    pubSubLifecycle ! Publish(LifecycleStateChanged(mode))
+    pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
     if (haltingFlag) haltComponent()
   }
 

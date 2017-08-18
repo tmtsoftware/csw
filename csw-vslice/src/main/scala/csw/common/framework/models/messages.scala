@@ -2,6 +2,7 @@ package csw.common.framework.models
 
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
+import csw.common.framework.models.ContainerMsg.LifecycleStateChanged
 import csw.common.framework.models.PubSub.SubscriberMsg
 import csw.param.commands.ControlCommand
 import csw.param.states.CurrentState
@@ -33,10 +34,6 @@ object SupervisorMode {
 
 ///////////////
 
-case class LifecycleStateChanged(state: SupervisorMode)
-
-///////////////
-
 sealed trait ToComponentLifecycleMessage
 object ToComponentLifecycleMessage {
   case object Shutdown  extends ToComponentLifecycleMessage
@@ -49,29 +46,16 @@ object ToComponentLifecycleMessage {
 
 sealed trait ComponentMsg
 
-///////////////
-
 sealed trait IdleMsg extends ComponentMsg
 object IdleMsg {
   case object Initialize extends IdleMsg
   case object Start      extends IdleMsg
 }
 
-///////////////
-
 sealed trait InitialMsg extends ComponentMsg
 object InitialMsg {
   case object Run extends InitialMsg
 }
-
-///////////////
-
-sealed trait RunningMsg extends ComponentMsg with SupervisorMsg
-object RunningMsg {
-  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMsg
-  trait DomainMsg                                            extends RunningMsg
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 sealed trait CommandMsg extends RunningMsg {
   def command: ControlCommand
@@ -82,11 +66,17 @@ object CommandMsg {
   case class Oneway(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends CommandMsg
 }
 
+sealed trait RunningMsg extends ComponentMsg with SupervisorExternalMessage
+object RunningMsg {
+  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMsg
+  trait DomainMsg                                            extends RunningMsg
+}
+
 ///////////////
 
 sealed trait SupervisorMsg
 
-sealed trait CommonSupervisorMsg extends SupervisorMsg
+sealed trait CommonSupervisorMsg extends SupervisorExternalMessage
 object CommonSupervisorMsg {
   case class LifecycleStateSubscription(subscriberMsg: SubscriberMsg[LifecycleStateChanged]) extends CommonSupervisorMsg
   case class ComponentStateSubscription(subscriberMsg: SubscriberMsg[CurrentState])          extends CommonSupervisorMsg
@@ -108,3 +98,25 @@ object PreparingToShutdownMsg {
   case class ShutdownFailure(reason: String) extends PreparingToShutdownMsg with FromComponentLifecycleMessage
   case object ShutdownComplete               extends PreparingToShutdownMsg with FromComponentLifecycleMessage
 }
+
+///////////////
+
+sealed trait ContainerMsg
+object ContainerMsg {
+  case class GetComponents(replyTo: ActorRef[ContainerReplyMessage])                        extends ContainerMsg
+  case object Shutdown                                                                      extends ContainerMsg
+  case object GoOnline                                                                      extends ContainerMsg
+  case object GoOffline                                                                     extends ContainerMsg
+  case object Restart                                                                       extends ContainerMsg
+  case class CreateComponents(infos: Set[ComponentInfo])                                    extends ContainerMsg
+  case class LifecycleToAll(cmd: SupervisorExternalMessage)                                 extends ContainerMsg
+  case object CreationDelayCompleted                                                        extends ContainerMsg
+  case class LifecycleStateChanged(state: SupervisorMode, replyTo: ActorRef[SupervisorMsg]) extends ContainerMsg
+}
+
+sealed trait ContainerReplyMessage
+case class Components(components: List[SupervisorInfo]) extends ContainerReplyMessage
+
+case class SupervisorInfo(supervisor: ActorRef[SupervisorMsg], componentInfo: ComponentInfo)
+
+sealed trait SupervisorExternalMessage extends SupervisorMsg
