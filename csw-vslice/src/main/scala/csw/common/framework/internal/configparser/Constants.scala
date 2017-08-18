@@ -2,7 +2,7 @@ package csw.common.framework.internal.configparser
 
 object Constants {
   val CONTAINER       = "container"
-  val COMPONENT_NAME  = "componentName"
+  val CONTAINER_NAME  = "containerName"
   val COMPONENT_TYPE  = "componentType"
   val REGISTER_AS     = "registerAs"
   val COMPONENTS      = "components"

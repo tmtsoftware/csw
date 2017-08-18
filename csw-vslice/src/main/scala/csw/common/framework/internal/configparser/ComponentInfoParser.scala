@@ -16,7 +16,7 @@ object ComponentInfoParser {
   def parse(config: Config): Option[ComponentInfo] =
     try {
       val containerConfig = config.getConfig(CONTAINER)
-      val containerName   = parseComponentName(containerConfig)
+      val containerName   = parseContainerName(containerConfig)
       val componentInfoes = parseComponents(containerName.get, containerConfig)
 
       Some(
@@ -30,12 +30,12 @@ object ComponentInfoParser {
         None
     }
 
-  private def parseComponentName(containerConfig: Config) =
+  private def parseContainerName(containerConfig: Config) =
     try {
-      Some(containerConfig.getString(COMPONENT_NAME))
+      Some(containerConfig.getString(CONTAINER_NAME))
     } catch {
       case ex: ConfigException ⇒
-        println(s"Missing configuration field: '$COMPONENT_NAME' for container")
+        println(s"Missing configuration field: '$CONTAINER_NAME'")
         None
     }
 
