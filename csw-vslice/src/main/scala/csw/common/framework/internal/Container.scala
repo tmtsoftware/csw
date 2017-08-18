@@ -21,7 +21,7 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ComponentInfo) e
 
   registerWithLocationService()
 
-  ctx.self ! CreateComponents(containerInfo.maybeComponentInfos.get)
+  ctx.self ! CreateComponents(containerInfo.maybeComponentInfoes.get)
 
   def onRestart(): Unit = {
     mode = ContainerMode.Restart

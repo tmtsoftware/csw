@@ -26,81 +26,81 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val path   = getClass.getResource("/conf/SampleContainer.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    val componentInfo: ComponentInfo = ComponentInfoParser.parse(config).get
+    val componentInfo: ComponentInfo = ComponentInfoParser.parseContainerConfig(config).get
 
     componentInfo.componentName shouldBe "Container-2"
     componentInfo.componentType shouldBe ComponentType.Container
-    componentInfo.maybeComponentInfos.get shouldEqual Set(assemblyInfo, hcd2AInfo, hcd2BInfo)
+    componentInfo.maybeComponentInfoes.get shouldEqual Set(assemblyInfo, hcd2AInfo, hcd2BInfo)
   }
 
   test("Should able to log error when 'componentName' is missing") {
     val path   = getClass.getResource("/conf/container/missing_componentname.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    ComponentInfoParser.parse(config) shouldEqual None
+    ComponentInfoParser.parseContainerConfig(config) shouldEqual None
   }
 
   test("Should able to log error when 'components' is missing") {
     val path   = getClass.getResource("/conf/container/missing_components.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    ComponentInfoParser.parse(config) shouldEqual None
+    ComponentInfoParser.parseContainerConfig(config) shouldEqual None
   }
 
   test("Should able to log error when 'components' is not a config object") {
     val path   = getClass.getResource("/conf/container/invalid_components.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    ComponentInfoParser.parse(config) shouldEqual None
+    ComponentInfoParser.parseContainerConfig(config) shouldEqual None
   }
 
   test("Should able to log error when 'class', 'prefix' are missing for assembly") {
     val path   = getClass.getResource("/conf/assembly/missing_class_prefix.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    ComponentInfoParser.parse(config) shouldEqual None
+    ComponentInfoParser.parseContainerConfig(config) shouldEqual None
   }
 
   test("Should able to log error when 'connections' are missing for assembly") {
     val path   = getClass.getResource("/conf/assembly/missing_connections.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    ComponentInfoParser.parse(config) shouldEqual None
+    ComponentInfoParser.parseContainerConfig(config) shouldEqual None
   }
 
   test("Should able to log error when 'connections' is not an array for assembly") {
     val path   = getClass.getResource("/conf/assembly/invalid_connections.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    ComponentInfoParser.parse(config) shouldEqual None
+    ComponentInfoParser.parseContainerConfig(config) shouldEqual None
   }
 
   test("Should able to log error when any one entry in 'connections' is having a typo for assembly") {
     val path   = getClass.getResource("/conf/assembly/connection_entry_typo.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    ComponentInfoParser.parse(config) shouldEqual None
+    ComponentInfoParser.parseContainerConfig(config) shouldEqual None
   }
 
   test("Should able to log error when 'componentType' is missing for assembly") {
     val path   = getClass.getResource("/conf/assembly/missing_componenttype.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    ComponentInfoParser.parse(config) shouldEqual None
+    ComponentInfoParser.parseContainerConfig(config) shouldEqual None
   }
 
   test("Should able to log error when 'class', 'prefix' are missing for hcd") {
     val path   = getClass.getResource("/conf/hcd/missing_class_prefix.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    ComponentInfoParser.parse(config) shouldEqual None
+    ComponentInfoParser.parseContainerConfig(config) shouldEqual None
   }
 
   test("Should able to log error when 'componentType' is missing for hcd") {
     val path   = getClass.getResource("/conf/hcd/missing_componenttype.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    ComponentInfoParser.parse(config) shouldEqual None
+    ComponentInfoParser.parseContainerConfig(config) shouldEqual None
   }
 
   test("Should able to parse valid config file to ComponentInfo for standalone mode") {

@@ -22,26 +22,26 @@ class ContainerTest extends FunSuite with Matchers {
     val container = new Container(ctx, containerInfo)
 
     container.mode shouldBe ContainerMode.Idle
-    ctx.selfInbox.receiveMsg() shouldBe ContainerMsg.CreateComponents(containerInfo.maybeComponentInfos.get)
+    ctx.selfInbox.receiveMsg() shouldBe ContainerMsg.CreateComponents(containerInfo.maybeComponentInfoes.get)
   }
 
   test("container should change its mode to running after creating all components") {
     val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
     val container = new Container(ctx, containerInfo)
 
-    container.onMessage(CreateComponents(containerInfo.maybeComponentInfos.get))
+    container.onMessage(CreateComponents(containerInfo.maybeComponentInfoes.get))
     container.mode shouldBe ContainerMode.Running
 
-    ctx.children.size shouldBe containerInfo.maybeComponentInfos.get.size
+    ctx.children.size shouldBe containerInfo.maybeComponentInfoes.get.size
     container.supervisors.size shouldBe 2
-    container.supervisors.map(_.componentInfo).toSet shouldBe containerInfo.maybeComponentInfos.get
+    container.supervisors.map(_.componentInfo).toSet shouldBe containerInfo.maybeComponentInfoes.get
   }
 
   test("container should handle Lifecycle messages by forwarding to all components") {
     val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
     val container = new Container(ctx, containerInfo)
 
-    container.onMessage(CreateComponents(containerInfo.maybeComponentInfos.get))
+    container.onMessage(CreateComponents(containerInfo.maybeComponentInfoes.get))
 
     container.onMessage(Lifecycle(GoOnline))
     ctx.children.map(child ⇒ ctx.childInbox(child.upcast)).map(_.receiveMsg()) should contain only Lifecycle(GoOnline)
@@ -61,7 +61,7 @@ class ContainerTest extends FunSuite with Matchers {
     val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
     val container = new Container(ctx, containerInfo)
 
-    container.onMessage(CreateComponents(containerInfo.maybeComponentInfos.get))
+    container.onMessage(CreateComponents(containerInfo.maybeComponentInfoes.get))
 
     container.restarted shouldBe List.empty
     container.onMessage(Lifecycle(Restart))
@@ -78,7 +78,7 @@ class ContainerTest extends FunSuite with Matchers {
     val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
     val container = new Container(ctx, containerInfo)
 
-    container.onMessage(CreateComponents(containerInfo.maybeComponentInfos.get))
+    container.onMessage(CreateComponents(containerInfo.maybeComponentInfoes.get))
 
     container.onMessage(Lifecycle(Restart))
 
@@ -101,7 +101,7 @@ class ContainerTest extends FunSuite with Matchers {
     val container = new Container(ctx, containerInfo)
     val probe     = TestProbe[Components]
 
-    container.onMessage(CreateComponents(containerInfo.maybeComponentInfos.get))
+    container.onMessage(CreateComponents(containerInfo.maybeComponentInfoes.get))
 
     container.onMessage(GetComponents(probe.ref))
 
