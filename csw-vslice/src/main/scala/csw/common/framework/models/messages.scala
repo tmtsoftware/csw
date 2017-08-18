@@ -68,13 +68,11 @@ object CommandMsg {
 
 sealed trait RunningMsg extends ComponentMsg with SupervisorExternalMessage
 object RunningMsg {
-  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMsg
+  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMsg with ContainerMsg
   trait DomainMsg                                            extends RunningMsg
 }
 
 ///////////////
-
-sealed trait SupervisorMsg
 
 sealed trait CommonSupervisorMsg extends SupervisorExternalMessage
 object CommonSupervisorMsg {
@@ -82,8 +80,6 @@ object CommonSupervisorMsg {
   case class ComponentStateSubscription(subscriberMsg: SubscriberMsg[CurrentState])          extends CommonSupervisorMsg
   case object HaltComponent                                                                  extends CommonSupervisorMsg
 }
-
-sealed trait FromComponentLifecycleMessage extends SupervisorMsg
 
 sealed trait SupervisorIdleMsg extends FromComponentLifecycleMessage
 object SupervisorIdleMsg {
@@ -99,24 +95,19 @@ object PreparingToShutdownMsg {
   case object ShutdownComplete               extends PreparingToShutdownMsg with FromComponentLifecycleMessage
 }
 
+sealed trait SupervisorExternalMessage     extends SupervisorMsg
+sealed trait FromComponentLifecycleMessage extends SupervisorMsg
+sealed trait SupervisorMsg
+
 ///////////////
 
 sealed trait ContainerMsg
+
 object ContainerMsg {
-  case class GetComponents(replyTo: ActorRef[ContainerReplyMessage])                        extends ContainerMsg
-  case object Shutdown                                                                      extends ContainerMsg
-  case object GoOnline                                                                      extends ContainerMsg
-  case object GoOffline                                                                     extends ContainerMsg
-  case object Restart                                                                       extends ContainerMsg
+  case class GetComponents(replyTo: ActorRef[Components])                                   extends ContainerMsg
   case class CreateComponents(infos: Set[ComponentInfo])                                    extends ContainerMsg
-  case class LifecycleToAll(cmd: SupervisorExternalMessage)                                 extends ContainerMsg
-  case object CreationDelayCompleted                                                        extends ContainerMsg
   case class LifecycleStateChanged(state: SupervisorMode, replyTo: ActorRef[SupervisorMsg]) extends ContainerMsg
 }
 
-sealed trait ContainerReplyMessage
-case class Components(components: List[SupervisorInfo]) extends ContainerReplyMessage
-
+case class Components(components: List[SupervisorInfo])
 case class SupervisorInfo(supervisor: ActorRef[SupervisorMsg], componentInfo: ComponentInfo)
-
-sealed trait SupervisorExternalMessage extends SupervisorMsg

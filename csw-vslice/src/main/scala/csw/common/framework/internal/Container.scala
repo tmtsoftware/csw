@@ -1,32 +1,20 @@
 package csw.common.framework.internal
 
-import akka.typed.{ActorRef, Behavior}
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
+import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
 import csw.common.framework.models.ComponentInfo.ContainerInfo
-import csw.common.framework.models.ContainerMsg.{
-  CreateComponents,
-  CreationDelayCompleted,
-  GetComponents,
-  GoOffline,
-  GoOnline,
-  LifecycleStateChanged,
-  LifecycleToAll,
-  Restart,
-  Shutdown
-}
+import csw.common.framework.models.ContainerMsg.{CreateComponents, GetComponents, LifecycleStateChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.Lifecycle
+import csw.common.framework.models.ToComponentLifecycleMessage.Restart
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 import csw.services.location.models.{ComponentId, RegistrationResult}
 
 class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) extends MutableBehavior[ContainerMsg] {
-  val componentInfos: Set[ComponentInfo] = containerInfo.componentInfos
-  val name: String                       = containerInfo.componentName
-  val componentId                        = ComponentId(name, containerInfo.componentType)
-
+  val componentId                                 = ComponentId(containerInfo.componentName, containerInfo.componentType)
   var supervisors: List[SupervisorInfo]           = List.empty
   var restarted: List[SupervisorInfo]             = List.empty
   var registrationOpt: Option[RegistrationResult] = None
@@ -39,7 +27,7 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
   def onRestart(): Unit = {
     mode = ContainerMode.Restart
     supervisors.foreach(_.supervisor ! LifecycleStateSubscription(Subscribe[LifecycleStateChanged](ctx.self)))
-    sendAllComponents(Lifecycle(ToComponentLifecycleMessage.Restart))
+    sendAllComponents(Restart)
   }
 
   def onLifecycleStateChanged(publisher: ActorRef[SupervisorMsg]): Any = {
@@ -54,12 +42,8 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
   override def onMessage(msg: ContainerMsg): Behavior[ContainerMsg] = {
     (mode, msg) match {
       case (ContainerMode.Running, GetComponents(replyTo))  ⇒ replyTo ! Components(supervisors)
-      case (ContainerMode.Running, Shutdown)                ⇒ sendAllComponents(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-      case (ContainerMode.Running, GoOnline)                ⇒ sendAllComponents(Lifecycle(ToComponentLifecycleMessage.GoOnline))
-      case (ContainerMode.Running, GoOffline)               ⇒ sendAllComponents(Lifecycle(ToComponentLifecycleMessage.GoOffline))
-      case (ContainerMode.Running, Restart)                 ⇒ onRestart()
+      case (ContainerMode.Running, Lifecycle(lifecycleMsg)) ⇒ sendAllComponents(lifecycleMsg)
       case (ContainerMode.Running, CreateComponents(infos)) ⇒ createComponents(infos)
-      case (ContainerMode.Running, LifecycleToAll(cmd))     ⇒ sendAllComponents(cmd)
       case (ContainerMode.Restart, LifecycleStateChanged(SupervisorMode.Running, publisher)) ⇒
         onLifecycleStateChanged(publisher)
       case (containerMode, message) ⇒ println(s"Container in $containerMode received an unexpected message: $message")
@@ -67,30 +51,31 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
     this
   }
 
-  private def sendAllComponents(cmd: SupervisorExternalMessage): Unit = {
-    supervisors.foreach { info ⇒
-      info.supervisor ! cmd
-      ctx.schedule(containerInfo.creationDelay, ctx.self, CreationDelayCompleted)
-    }
+  override def onSignal: PartialFunction[Signal, Behavior[ContainerMsg]] = {
+    case PostStop ⇒
+      unregisterFromLocationService()
+      this
   }
 
-  private def createComponents(cinfos: Set[ComponentInfo]): Unit = {
-    supervisors = supervisors ::: cinfos.flatMap(createComponent(_, supervisors)).toList
+  private def sendAllComponents(lifecycleMsg: ToComponentLifecycleMessage): Unit = {
+    supervisors.foreach { _.supervisor ! Lifecycle(lifecycleMsg) }
+  }
+
+  private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
+    supervisors = supervisors ::: componentInfos.flatMap(createComponent).toList
     mode = ContainerMode.Running
   }
 
-  private def createComponent(componentInfo: ComponentInfo,
-                              supervisors: List[SupervisorInfo]): Option[SupervisorInfo] = {
+  private def createComponent(componentInfo: ComponentInfo): Option[SupervisorInfo] = {
     supervisors.find(_.componentInfo == componentInfo) match {
-      case Some(existingComponentInfo) =>
-        None
+      case Some(_) => None
       case None =>
         val supervisor = ctx.spawn(SupervisorBehaviorFactory.make(componentInfo), componentInfo.componentName)
         Some(SupervisorInfo(supervisor, componentInfo))
     }
   }
 
-  def registerWithLocationService(): Unit = ???
+  def registerWithLocationService(): Unit = {}
 
-  private def unregisterFromLocationService(): Unit = ???
+  def unregisterFromLocationService(): Unit = {}
 }
