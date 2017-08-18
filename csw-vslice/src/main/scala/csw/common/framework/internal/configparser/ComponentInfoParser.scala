@@ -17,7 +17,7 @@ object ComponentInfoParser {
   def parse(config: Config): Option[ContainerInfo] =
     try {
       val containerConfig = config.getConfig(CONTAINER)
-      val containerName   = parseComponentName(CONTAINER, containerConfig)
+      val containerName   = parseComponentName(containerConfig)
       val componentInfoes = parseComponents(containerName.get, containerConfig)
 
       Some(
@@ -25,18 +25,18 @@ object ComponentInfoParser {
       )
     } catch {
       case ex: ConfigException.Missing ⇒
-        println(s"Missing configuration field >$CONTAINER<")
+        println(s"Missing configuration field '$CONTAINER'")
         None
       case ex: NoSuchElementException ⇒
         None
     }
 
-  private def parseComponentName(name: String, containerConfig: Config): Option[String] =
+  private def parseComponentName(containerConfig: Config) =
     try {
       Some(containerConfig.getString(COMPONENT_NAME))
     } catch {
       case ex: ConfigException ⇒
-        println(s"Missing configuration field: >$COMPONENT_NAME< in connections for component: $name")
+        println(s"Missing configuration field: '$COMPONENT_NAME' for container")
         None
     }
 
@@ -54,10 +54,10 @@ object ComponentInfoParser {
         componentInfo
       } catch {
         case ex: ConfigException.Missing ⇒
-          println(s"Missing configuration field: >$COMPONENT_TYPE< for component: $name")
+          println(s"Missing configuration field: '$COMPONENT_TYPE' for component '$name'")
           None
         case ex: NoSuchElementException ⇒
-          println(s"Invalid $COMPONENT_TYPE for component: $name - ${ex.getMessage}")
+          println(s"Invalid $COMPONENT_TYPE for component '$name' - ${ex.getMessage}")
           None
       }
 
@@ -76,10 +76,10 @@ object ComponentInfoParser {
         None
     } catch {
       case ex: ConfigException.Missing ⇒
-        println(s"Missing configuration field: >$COMPONENTS< for component: $containerName")
+        println(s"Missing configuration field '$COMPONENTS' for component '$containerName'")
         None
       case ex: ConfigException.WrongType ⇒
-        println(s"Expected config object for configuration field >$COMPONENTS< for component: $containerName ")
+        println(s"Expected config object for configuration field '$COMPONENTS' for component '$containerName'")
         None
     }
   }
@@ -91,15 +91,15 @@ object ComponentInfoParser {
         Some(assemblyConfig.getStringList(CONNECTIONS).asScala.toSet.map(connection ⇒ Connection.from(connection)))
       } catch {
         case ex: ConfigException.Missing ⇒
-          println(s"Missing configuration field: >$CONNECTIONS< for Assembly: $assemblyName")
+          println(s"Missing configuration field '$CONNECTIONS' for component '$assemblyName'")
           None
         case ex: ConfigException.WrongType ⇒
           println(
-            s"Expected an array of connections for configuration field >$CONNECTIONS< for Assembly: $assemblyName. e.g. [HCD2A-hcd-akka, HCD2A-hcd-http, HCD2B-hcd-tcp]"
+            s"Expected an array of connections for configuration field '$CONNECTIONS' for component '$assemblyName'. e.g. [HCD2A-hcd-akka, HCD2A-hcd-http, HCD2B-hcd-tcp]"
           )
           None
         case ex: IllegalArgumentException ⇒
-          println(s"Invalid connection for Assembly: $assemblyName - ${ex.getMessage}")
+          println(s"Invalid connection for component '$assemblyName' - ${ex.getMessage}")
           None
       }
 
@@ -131,7 +131,7 @@ object ComponentInfoParser {
       Some(config.getString(CLASS))
     } catch {
       case ex: ConfigException ⇒
-        println(s"Missing configuration field: >$CLASS< for component: $name")
+        println(s"Missing configuration field '$CLASS' for component '$name'")
         None
     }
 
@@ -140,7 +140,7 @@ object ComponentInfoParser {
       Some(config.getString(PREFIX))
     } catch {
       case ex: ConfigException ⇒
-        println(s"Missing configuration field: >$PREFIX< for component: $name")
+        println(s"Missing configuration field '$PREFIX' for component '$name'")
         None
     }
 }
