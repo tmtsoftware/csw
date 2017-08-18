@@ -11,7 +11,6 @@ import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.{ComponentInfo, ComponentMsg}
 import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.states.CurrentState
-import csw.services.location.models.ConnectionType.AkkaType
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -26,22 +25,14 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
     Await.result(system.terminate(), 5.seconds)
   }
 
-  val assemblyInfo = AssemblyInfo("trombone",
-                                  "wfos",
-                                  "csw.common.components.SampleComponentWiring",
-                                  DoNotRegister,
-                                  Set(AkkaType),
-                                  Set.empty)
+  val assemblyInfo =
+    AssemblyInfo("trombone", "wfos", "csw.common.components.SampleComponentWiring", DoNotRegister, Set.empty)
 
-  val assemblyInfoToSimulateFailure = AssemblyInfo("trombone",
-                                                   "wfos",
-                                                   "csw.common.components.ComponentWiringToSimulateFailure",
-                                                   DoNotRegister,
-                                                   Set(AkkaType),
-                                                   Set.empty)
+  val assemblyInfoToSimulateFailure =
+    AssemblyInfo("trombone", "wfos", "csw.common.components.ComponentWiringToSimulateFailure", DoNotRegister, Set.empty)
 
   val hcdInfo =
-    HcdInfo("SampleHcd", "wfos", "csw.common.components.SampleComponentWiring", DoNotRegister, Set(AkkaType))
+    HcdInfo("SampleHcd", "wfos", "csw.common.components.SampleComponentWiring", DoNotRegister)
 
   def getSampleHcdWiring(
       componentHandlers: ComponentHandlers[ComponentDomainMsg]

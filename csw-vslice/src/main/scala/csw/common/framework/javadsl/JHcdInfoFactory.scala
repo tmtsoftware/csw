@@ -2,9 +2,7 @@ package csw.common.framework.javadsl
 
 import csw.common.framework.models.ComponentInfo.HcdInfo
 import csw.common.framework.models.LocationServiceUsage
-import csw.services.location.models.ConnectionType
 
-import scala.collection.JavaConverters.asScalaSetConverter
 import scala.concurrent.duration.FiniteDuration
 
 object JHcdInfoFactory {
@@ -13,8 +11,7 @@ object JHcdInfoFactory {
            prefix: String,
            componentClassName: String,
            locationServiceUsage: LocationServiceUsage,
-           registerAs: java.util.Set[ConnectionType],
            rate: FiniteDuration): HcdInfo = {
-    HcdInfo(componentName, prefix, componentClassName, locationServiceUsage, registerAs.asScala.toSet)
+    HcdInfo(componentName, prefix, componentClassName, locationServiceUsage)
   }
 }

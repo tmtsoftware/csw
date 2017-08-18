@@ -1,19 +1,16 @@
 package csw.common.framework.internal.configparser
 
 import java.util.NoSuchElementException
-import java.util.concurrent.TimeUnit
 
-import com.typesafe.config.ConfigException.WrongType
 import com.typesafe.config.{Config, ConfigException}
 import csw.common.framework.internal.configparser.Constants._
 import csw.common.framework.models.ComponentInfo
 import csw.common.framework.models.ComponentInfo.{AssemblyInfo, ContainerInfo, HcdInfo}
 import csw.common.framework.models.LocationServiceUsages.{RegisterAndTrackServices, RegisterOnly}
 import csw.services.location.models.ComponentType.{Assembly, HCD}
-import csw.services.location.models.{ComponentType, Connection, ConnectionType}
+import csw.services.location.models.{ComponentType, Connection}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 object ComponentInfoParser {
 
@@ -22,19 +19,9 @@ object ComponentInfoParser {
       val containerConfig = config.getConfig(CONTAINER)
       val containerName   = parseComponentName(CONTAINER, containerConfig)
       val componentInfoes = parseComponents(containerName.get, containerConfig)
-      val registerAs      = parseRegisterAs(containerName.get, containerConfig) // registerAs is mandatory field
-      val initialDelay    = parseDuration(containerName.get, INITIAL_DELAY, containerConfig, 0.seconds)
-      val creationDelay   = parseDuration(containerName.get, CREATION_DELAY, containerConfig, 0.seconds)
-      val lifecycleDelay  = parseDuration(containerName.get, LIFECYCLE_DELAY, containerConfig, 0.seconds)
 
       Some(
-        ContainerInfo(containerName.get,
-                      RegisterOnly,
-                      registerAs.get,
-                      componentInfoes.get,
-                      initialDelay,
-                      creationDelay,
-                      lifecycleDelay)
+        ContainerInfo(containerName.get, RegisterOnly, componentInfoes.get)
       )
     } catch {
       case ex: ConfigException.Missing ⇒
@@ -51,38 +38,6 @@ object ComponentInfoParser {
       case ex: ConfigException ⇒
         println(s"Missing configuration field: >$COMPONENT_NAME< in connections for component: $name")
         None
-    }
-
-  // Parse the "registerAs" section of the component config
-  private def parseRegisterAs(name: String, config: Config): Option[Set[ConnectionType]] =
-    try {
-      Some(config.getStringList(REGISTER_AS).asScala.map(ctype => ConnectionType.withName(ctype)).toSet)
-    } catch {
-      case ex: ConfigException.Missing ⇒
-        println(s"Missing configuration field: >$REGISTER_AS< for component: $name")
-        None
-      case ex: ConfigException.WrongType ⇒
-        println(
-          s"Expected an array of connection types for configuration field: >$REGISTER_AS< for component: $name. e.g. [${ConnectionType.values
-            .map(_.name)
-            .mkString(",")}]"
-        )
-        None
-      case ex: NoSuchElementException ⇒
-        println(s"Invalid connection type for component: $name - ${ex.getMessage}")
-        None
-    }
-
-  private def parseDuration(containerName: String,
-                            delayType: String,
-                            containerConfig: Config,
-                            defaultDuration: FiniteDuration): FiniteDuration =
-    try {
-      import scala.concurrent.duration._
-      FiniteDuration(containerConfig.getDuration(delayType).getSeconds, TimeUnit.SECONDS)
-    } catch {
-      case ex: Throwable ⇒
-        defaultDuration //logger.debug(Container $delayType for $containerName is missing or not valid, returning: $defaultDuration.)
     }
 
   private def parseComponents(containerName: String, config: Config) = {
@@ -151,15 +106,10 @@ object ComponentInfoParser {
     try {
       val componentClassName = parseClassName(assemblyName, conf)
       val prefix             = parsePrefix(assemblyName, conf)
-      val registerAs         = parseRegisterAs(assemblyName, conf)
       val connections        = parseConnections(assemblyName, conf)
 
-      val assemblyInfo = AssemblyInfo(assemblyName,
-                                      prefix.get,
-                                      componentClassName.get,
-                                      RegisterAndTrackServices,
-                                      registerAs.get,
-                                      connections.get)
+      val assemblyInfo =
+        AssemblyInfo(assemblyName, prefix.get, componentClassName.get, RegisterAndTrackServices, connections.get)
       Some(assemblyInfo)
     } catch {
       case ex: NoSuchElementException ⇒ None
@@ -171,8 +121,7 @@ object ComponentInfoParser {
     try {
       val componentClassName = parseClassName(name, conf)
       val prefix             = parsePrefix(name, conf)
-      val registerAs         = parseRegisterAs(name, conf)
-      Some(HcdInfo(name, prefix.get, componentClassName.get, RegisterOnly, registerAs.get))
+      Some(HcdInfo(name, prefix.get, componentClassName.get, RegisterOnly))
     } catch {
       case ex: NoSuchElementException ⇒ None
     }

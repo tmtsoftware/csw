@@ -40,8 +40,7 @@ public class JComponentIntegrationTest {
     private ComponentInfo.HcdInfo hcdInfo = new ComponentInfo.HcdInfo("trombone",
             "wfos",
             "csw.common.framework.javadsl.integration.JSampleComponentWiring",
-            LocationServiceUsages.JDoNotRegister(),
-            null);
+            LocationServiceUsages.JDoNotRegister());
 
     private Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
     private Behavior<SupervisorMsg> supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo);

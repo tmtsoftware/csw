@@ -1,10 +1,9 @@
 package csw.common.framework.models
 
 import csw.services.location.models.ComponentType.{Assembly, Container, HCD}
-import csw.services.location.models.{ComponentType, Connection, ConnectionType}
+import csw.services.location.models.{ComponentType, Connection}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.duration._
 
 /**
  * Describes how a component uses the location service
@@ -64,14 +63,12 @@ object ComponentInfo {
    * @param prefix               the configuration prefix (part of configs that component should receive)
    * @param componentClassName   The name of the class that implements the component (used to create the class via reflection)
    * @param locationServiceUsage how the component plans to use the location service
-   * @param registerAs           register as an akka or http component or both
    */
   final case class HcdInfo(
       componentName: String,
       prefix: String,
       componentClassName: String,
       locationServiceUsage: LocationServiceUsage,
-      registerAs: Set[ConnectionType]
   ) extends ComponentInfo {
     val componentType: ComponentType = HCD
   }
@@ -83,7 +80,6 @@ object ComponentInfo {
    * @param prefix               the configuration prefix (part of configs that component should receive)
    * @param componentClassName   The name of the class that implements the component (used to create the class via reflection)
    * @param locationServiceUsage how the component plans to use the location service
-   * @param registerAs           register as an akka or http component or both
    * @param connections          a list of connections that includes componentIds and connection Types
    */
   final case class AssemblyInfo(
@@ -91,7 +87,6 @@ object ComponentInfo {
       prefix: String,
       componentClassName: String,
       locationServiceUsage: LocationServiceUsage,
-      registerAs: Set[ConnectionType],
       connections: Set[Connection]
   ) extends ComponentInfo {
     val componentType: ComponentType = Assembly
@@ -107,20 +102,12 @@ object ComponentInfo {
    *
    * @param componentName        name used to register the component with the location service
    * @param locationServiceUsage how the component plans to use the location service
-   * @param registerAs           register as an akka or http component or both
    * @param componentInfos       information about the components contained in the container
-   * @param initialDelay         only for testing
-   * @param creationDelay        only for testing
-   * @param lifecycleDelay       only for testing
    */
   final case class ContainerInfo(
       componentName: String,
       locationServiceUsage: LocationServiceUsage,
-      registerAs: Set[ConnectionType],
       componentInfos: Set[ComponentInfo],
-      initialDelay: FiniteDuration = 0.seconds,
-      creationDelay: FiniteDuration = 0.seconds,
-      lifecycleDelay: FiniteDuration = 0.seconds
   ) extends ComponentInfo {
     val componentType: ComponentType = Container
     val componentClassName           = "csw.services.pkg.ContainerComponent"
