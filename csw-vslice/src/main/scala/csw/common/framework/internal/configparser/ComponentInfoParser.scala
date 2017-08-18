@@ -5,29 +5,28 @@ import java.util.NoSuchElementException
 import com.typesafe.config.{Config, ConfigException}
 import csw.common.framework.internal.configparser.Constants._
 import csw.common.framework.models.ComponentInfo
-import csw.common.framework.models.ComponentInfo.{AssemblyInfo, ContainerInfo, HcdInfo}
 import csw.common.framework.models.LocationServiceUsages.{RegisterAndTrackServices, RegisterOnly}
-import csw.services.location.models.ComponentType.{Assembly, HCD}
+import csw.services.location.models.ComponentType.{Assembly, Container, HCD}
 import csw.services.location.models.{ComponentType, Connection}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
 
 object ComponentInfoParser {
 
-  def parse(config: Config): Option[ContainerInfo] =
+  def parse(config: Config): Option[ComponentInfo] =
     try {
       val containerConfig = config.getConfig(CONTAINER)
       val containerName   = parseComponentName(containerConfig)
       val componentInfoes = parseComponents(containerName.get, containerConfig)
 
       Some(
-        ContainerInfo(containerName.get, RegisterOnly, componentInfoes.get)
+        ComponentInfo(containerName.get, Container, "", "", RegisterOnly, maybeComponentInfoes = componentInfoes)
       )
     } catch {
       case ex: ConfigException.Missing ⇒
         println(s"Missing configuration field '$CONTAINER'")
         None
-      case ex: NoSuchElementException ⇒
+      case ex: Throwable ⇒
         None
     }
 
@@ -85,7 +84,7 @@ object ComponentInfoParser {
   }
 
   // Parse the "services" section of the component config
-  private def parseAssembly(assemblyName: String, conf: Config): Option[AssemblyInfo] = {
+  private def parseAssembly(assemblyName: String, conf: Config): Option[ComponentInfo] = {
     def parseConnections(assemblyName: String, assemblyConfig: Config): Option[Set[Connection]] =
       try {
         Some(assemblyConfig.getStringList(CONNECTIONS).asScala.toSet.map(connection ⇒ Connection.from(connection)))
@@ -108,20 +107,20 @@ object ComponentInfoParser {
       val prefix             = parsePrefix(assemblyName, conf)
       val connections        = parseConnections(assemblyName, conf)
 
-      val assemblyInfo =
-        AssemblyInfo(assemblyName, prefix.get, componentClassName.get, RegisterAndTrackServices, connections.get)
-      Some(assemblyInfo)
+      Some(
+        ComponentInfo(assemblyName, Assembly, prefix.get, componentClassName.get, RegisterAndTrackServices, connections)
+      )
     } catch {
-      case ex: NoSuchElementException ⇒ None
+      case ex: Throwable ⇒ None
     }
   }
 
   // Parse the "services" section of the component config
-  private def parseHcd(name: String, conf: Config): Option[HcdInfo] =
+  private def parseHcd(name: String, conf: Config): Option[ComponentInfo] =
     try {
       val componentClassName = parseClassName(name, conf)
       val prefix             = parsePrefix(name, conf)
-      Some(HcdInfo(name, prefix.get, componentClassName.get, RegisterOnly))
+      Some(ComponentInfo(name, HCD, prefix.get, componentClassName.get, RegisterOnly))
     } catch {
       case ex: NoSuchElementException ⇒ None
     }

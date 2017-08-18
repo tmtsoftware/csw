@@ -11,6 +11,7 @@ import akka.util.Timeout;
 import csw.common.ccs.CommandStatus;
 import csw.common.ccs.DemandMatcher;
 import csw.common.components.SampleComponentState;
+import csw.common.framework.javadsl.JComponentInfoFactory;
 import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.*;
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory;
@@ -30,6 +31,8 @@ import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
+import static csw.services.location.javadsl.JComponentType.HCD;
+
 // DEOPSCSW-165: CSW Assembly Creation
 // DEOPSCSW-166: CSW HCD Creation
 // DEOPSCSW-177: Hooks for lifecycle management
@@ -37,7 +40,8 @@ public class JComponentIntegrationTest {
     private static ActorSystem system = ActorSystem.create(Actor.empty(), "Hcd");
     private TestKitSettings settings = TestKitSettings.apply(system);
 
-    private ComponentInfo.HcdInfo hcdInfo = new ComponentInfo.HcdInfo("trombone",
+    private ComponentInfo hcdInfo = JComponentInfoFactory.makeHcd(
+            "trombone",
             "wfos",
             "csw.common.framework.javadsl.integration.JSampleComponentWiring",
             LocationServiceUsages.JDoNotRegister());

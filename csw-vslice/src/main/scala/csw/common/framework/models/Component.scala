@@ -1,9 +1,12 @@
 package csw.common.framework.models
 
-import csw.services.location.models.ComponentType.{Assembly, Container, HCD}
+import java.util.Optional
+
+import csw.services.location.models.ComponentType.{Assembly, Container}
 import csw.services.location.models.{ComponentType, Connection}
 
 import scala.collection.JavaConverters._
+import scala.compat.java8.OptionConverters.RichOptionForJava8
 
 /**
  * Describes how a component uses the location service
@@ -23,96 +26,28 @@ object LocationServiceUsages {
 /**
  * The information needed to create a component
  */
-sealed trait ComponentInfo {
+case class ComponentInfo(componentName: String,
+                         componentType: ComponentType,
+                         prefix: String,
+                         componentClassName: String,
+                         locationServiceUsage: LocationServiceUsage,
+                         maybeConnections: Option[Set[Connection]] = None,
+                         maybeComponentInfoes: Option[Set[ComponentInfo]] = None) {
+
+  require(!componentName.isEmpty)
+  require(if (Assembly == componentType) maybeConnections.isDefined else true)
+  require(if (Container == componentType) maybeComponentInfoes.isDefined else true)
 
   /**
-   * A unique name for the component
+   * Java API to get the list of connections for the assembly
    */
-  val componentName: String
-
-  /**
-   * The component type (HCD, Assembly, etc.)
-   */
-  val componentType: ComponentType
-
-  /**
-   * The name of the class that implements the component (used to create the class via reflection)
-   */
-  val componentClassName: String
-
-  /**
-   * Indicates if the component needs to be registered with the location service or lookup other services
-   */
-  val locationServiceUsage: LocationServiceUsage
-
-  /**
-   * A dot separated prefix (for example tcs.ao.mycomp) that applies to this component
-   */
-  val prefix: String
+  def getConnections: Optional[java.util.List[Connection]] = maybeConnections.map(_.toList.asJava).asJava
 }
 
 /**
  * Represents a Component, such as an assembly, HCD (Hardware Control Daemon) or SC (Sequence Component).
  */
 object ComponentInfo {
-
-  /**
-   * Describes an HCD component
-   *
-   * @param componentName        name used to register the component with the location service
-   * @param prefix               the configuration prefix (part of configs that component should receive)
-   * @param componentClassName   The name of the class that implements the component (used to create the class via reflection)
-   * @param locationServiceUsage how the component plans to use the location service
-   */
-  final case class HcdInfo(
-      componentName: String,
-      prefix: String,
-      componentClassName: String,
-      locationServiceUsage: LocationServiceUsage,
-  ) extends ComponentInfo {
-    val componentType: ComponentType = HCD
-  }
-
-  /**
-   * Describes an Assembly component
-   *
-   * @param componentName        name used to register the component with the location service
-   * @param prefix               the configuration prefix (part of configs that component should receive)
-   * @param componentClassName   The name of the class that implements the component (used to create the class via reflection)
-   * @param locationServiceUsage how the component plans to use the location service
-   * @param connections          a list of connections that includes componentIds and connection Types
-   */
-  final case class AssemblyInfo(
-      componentName: String,
-      prefix: String,
-      componentClassName: String,
-      locationServiceUsage: LocationServiceUsage,
-      connections: Set[Connection]
-  ) extends ComponentInfo {
-    val componentType: ComponentType = Assembly
-
-    /**
-     * Java API to get the list of connections for the assembly
-     */
-    def getConnections: java.util.List[Connection] = connections.toList.asJava
-  }
-
-  /**
-   * Describes a container component.
-   *
-   * @param componentName        name used to register the component with the location service
-   * @param locationServiceUsage how the component plans to use the location service
-   * @param componentInfos       information about the components contained in the container
-   */
-  final case class ContainerInfo(
-      componentName: String,
-      locationServiceUsage: LocationServiceUsage,
-      componentInfos: Set[ComponentInfo],
-  ) extends ComponentInfo {
-    val componentType: ComponentType = Container
-    val componentClassName           = "csw.services.pkg.ContainerComponent"
-    val prefix                       = ""
-  }
 
 //  private def createHCD(context: ActorContext, cinfo: ComponentInfo, supervisorIn: Option[ActorRef]): ActorRef = {
 //

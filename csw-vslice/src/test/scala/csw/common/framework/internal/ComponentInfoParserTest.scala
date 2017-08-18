@@ -4,32 +4,35 @@ import java.io.File
 
 import com.typesafe.config.ConfigFactory
 import csw.common.framework.internal.configparser.ComponentInfoParser
-import csw.common.framework.models.ComponentInfo.{AssemblyInfo, ContainerInfo, HcdInfo}
+import csw.common.framework.models.ComponentInfo
 import csw.common.framework.models.LocationServiceUsages.{RegisterAndTrackServices, RegisterOnly}
+import csw.services.location.models.ComponentType.{Assembly, HCD}
 import csw.services.location.models.{ComponentType, Connection}
 import org.scalatest.{FunSuite, Matchers}
 
 class ComponentInfoParserTest extends FunSuite with Matchers {
 
-  private val assemblyInfo = AssemblyInfo(
+  private val assemblyInfo = ComponentInfo(
     "Assembly-1",
+    Assembly,
     "tcs.mobie.blue.filter",
     "csw.pkgDemo.assembly1.Assembly1",
     RegisterAndTrackServices,
-    Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka"))
+    Some(Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka")))
   )
-  private val hcd2AInfo = HcdInfo("HCD-2A", "tcs.mobie.blue.filter", "csw.pkgDemo.hcd2.Hcd2", RegisterOnly)
-  private val hcd2BInfo = HcdInfo("HCD-2B", "tcs.mobie.blue.disperser", "csw.pkgDemo.hcd2.Hcd2", RegisterOnly)
+  private val hcd2AInfo = ComponentInfo("HCD-2A", HCD, "tcs.mobie.blue.filter", "csw.pkgDemo.hcd2.Hcd2", RegisterOnly)
+  private val hcd2BInfo =
+    ComponentInfo("HCD-2B", HCD, "tcs.mobie.blue.disperser", "csw.pkgDemo.hcd2.Hcd2", RegisterOnly)
 
   test("Should able to parse config file to ContainerInfo") {
     val path   = getClass.getResource("/conf/SampleContainer.conf").getPath
     val config = ConfigFactory.parseFile(new File(path))
 
-    val componentInfo: ContainerInfo = ComponentInfoParser.parse(config).get
+    val componentInfo: ComponentInfo = ComponentInfoParser.parse(config).get
 
     componentInfo.componentName shouldBe "Container-2"
     componentInfo.componentType shouldBe ComponentType.Container
-    componentInfo.componentInfos shouldEqual Set(assemblyInfo, hcd2AInfo, hcd2BInfo)
+    componentInfo.maybeComponentInfoes.get shouldEqual Set(assemblyInfo, hcd2AInfo, hcd2BInfo)
   }
 
   test("Should able to log error when 'componentName' is missing") {

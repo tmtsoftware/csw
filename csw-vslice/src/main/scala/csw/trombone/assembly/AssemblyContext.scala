@@ -1,7 +1,7 @@
 package csw.trombone.assembly
 
 import com.typesafe.config.Config
-import csw.common.framework.models.ComponentInfo.AssemblyInfo
+import csw.common.framework.models.ComponentInfo
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
 import csw.param.models.Prefix
@@ -12,7 +12,7 @@ import csw.units.Units.{degree, kilometer, micrometer, millimeter}
 /**
  * TMT Source Code: 10/4/16.
  */
-case class AssemblyContext(info: AssemblyInfo,
+case class AssemblyContext(info: ComponentInfo,
                            calculationConfig: TromboneCalculationConfig,
                            controlConfig: TromboneControlConfig) {
   // Assembly Info
@@ -24,7 +24,7 @@ case class AssemblyContext(info: AssemblyInfo,
   val fullName                   = s"$componentPrefix.$componentName"
 
   val assemblyComponentId = ComponentId(componentName, componentType)
-  val hcdComponentId      = info.connections.head.componentId // There is only one
+  val hcdComponentId      = info.maybeConnections.get.head.componentId // There is only one
 
   // Public command configurations
   // Init submit command
