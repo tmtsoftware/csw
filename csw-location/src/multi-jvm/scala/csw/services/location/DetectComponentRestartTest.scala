@@ -56,6 +56,7 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
       }
 
       testProbe.expectMsgType[LocationRemoved](5.seconds)
+      Thread.sleep(2000)
       enterBarrier("member-re-registered")
       testProbe.expectMsgType[LocationUpdated](5.seconds)
     }
