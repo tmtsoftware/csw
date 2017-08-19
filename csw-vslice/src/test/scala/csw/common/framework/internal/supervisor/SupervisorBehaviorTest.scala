@@ -4,6 +4,7 @@ import akka.typed.testkit.Effect._
 import akka.typed.testkit.EffectfulActorContext
 import akka.typed.{Behavior, Props, Terminated}
 import csw.common.components.ComponentDomainMsg
+import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.Supervisor
 import csw.common.framework.models.PreparingToShutdownMsg.ShutdownTimeout

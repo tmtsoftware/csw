@@ -31,8 +31,8 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ComponentInfo) e
 
   def onLifecycleStateChanged(publisher: ActorRef[SupervisorMsg]): Any = {
     publisher ! LifecycleStateSubscription(Unsubscribe[LifecycleStateChanged](ctx.self))
-    val reloaded: List[SupervisorInfo] = (supervisors.find(_.supervisor == publisher) ++ restarted).toList
-    if (reloaded.size == supervisors.size) {
+    restarted = (supervisors.find(_.supervisor == publisher) ++ restarted).toList
+    if (restarted.size == supervisors.size) {
       mode = ContainerMode.Running
       restarted = List.empty
     }
@@ -40,9 +40,10 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ComponentInfo) e
 
   override def onMessage(msg: ContainerMsg): Behavior[ContainerMsg] = {
     (mode, msg) match {
+      case (ContainerMode.Idle, CreateComponents(infos))    ⇒ createComponents(infos)
       case (ContainerMode.Running, GetComponents(replyTo))  ⇒ replyTo ! Components(supervisors)
+      case (ContainerMode.Running, Lifecycle(Restart))      ⇒ onRestart()
       case (ContainerMode.Running, Lifecycle(lifecycleMsg)) ⇒ sendAllComponents(lifecycleMsg)
-      case (ContainerMode.Running, CreateComponents(infos)) ⇒ createComponents(infos)
       case (ContainerMode.Restart, LifecycleStateChanged(SupervisorMode.Running, publisher)) ⇒
         onLifecycleStateChanged(publisher)
       case (containerMode, message) ⇒ println(s"Container in $containerMode received an unexpected message: $message")

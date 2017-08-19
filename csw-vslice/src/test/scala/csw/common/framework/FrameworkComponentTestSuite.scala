@@ -5,12 +5,10 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.common.components.ComponentDomainMsg
-import csw.common.framework.models.LocationServiceUsages.DoNotRegister
 import csw.common.framework.models.PubSub.PublisherMsg
 import csw.common.framework.models.{ComponentInfo, ComponentMsg}
 import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.states.CurrentState
-import csw.services.location.models.ComponentType.{Assembly, HCD}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -24,25 +22,6 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
   override protected def afterAll(): Unit = {
     Await.result(system.terminate(), 5.seconds)
   }
-
-  val assemblyInfo =
-    ComponentInfo("trombone",
-                  Assembly,
-                  "wfos",
-                  "csw.common.components.SampleComponentWiring",
-                  DoNotRegister,
-                  Some(Set.empty))
-
-  val assemblyInfoToSimulateFailure =
-    ComponentInfo("trombone",
-                  Assembly,
-                  "wfos",
-                  "csw.common.components.ComponentWiringToSimulateFailure",
-                  DoNotRegister,
-                  Some(Set.empty))
-
-  val hcdInfo =
-    ComponentInfo("SampleHcd", HCD, "wfos", "csw.common.components.SampleComponentWiring", DoNotRegister)
 
   def getSampleHcdWiring(
       componentHandlers: ComponentHandlers[ComponentDomainMsg]

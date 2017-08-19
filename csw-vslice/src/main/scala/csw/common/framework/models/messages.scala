@@ -102,7 +102,6 @@ sealed trait SupervisorMsg
 ///////////////
 
 sealed trait ContainerMsg
-
 object ContainerMsg {
   case class GetComponents(replyTo: ActorRef[Components])                                   extends ContainerMsg
   case class CreateComponents(infos: Set[ComponentInfo])                                    extends ContainerMsg
