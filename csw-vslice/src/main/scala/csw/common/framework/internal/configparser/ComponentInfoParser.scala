@@ -133,7 +133,9 @@ object ComponentInfoParser extends GenericLogger.Simple {
       val componentClassName = parseClassName(assemblyName, conf)
       val prefix             = parsePrefix(assemblyName, conf)
       val connections        = parseConnections(assemblyName, conf)
-      Some(ComponentInfo(assemblyName, Assembly, prefix.get, componentClassName.get, RegisterAndTrackServices, connections))
+      Some(
+        ComponentInfo(assemblyName, Assembly, prefix.get, componentClassName.get, RegisterAndTrackServices, connections)
+      )
     } catch {
       case _: NoSuchElementException ⇒ None
     }
