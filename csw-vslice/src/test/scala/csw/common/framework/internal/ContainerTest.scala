@@ -13,6 +13,7 @@ import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnl
 import csw.common.framework.models.{Components, ContainerMsg, ToComponentLifecycleMessage}
 import org.scalatest.{FunSuite, Matchers}
 
+//DEOPSCSW-182-Control Life Cycle of Components
 class ContainerTest extends FunSuite with Matchers {
   implicit val system: ActorSystem[Nothing] = ActorSystem(Actor.empty, "container-system")
   implicit val settings: TestKitSettings    = TestKitSettings(system)

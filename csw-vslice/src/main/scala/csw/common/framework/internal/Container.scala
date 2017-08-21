@@ -25,7 +25,7 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ComponentInfo) e
 
   override def onMessage(msg: ContainerMsg): Behavior[ContainerMsg] = {
     (mode, msg) match {
-      case (ContainerMode.Running, GetComponents(replyTo))  ⇒ replyTo ! Components(supervisors)
+      case (_, GetComponents(replyTo))                      ⇒ replyTo ! Components(supervisors)
       case (ContainerMode.Running, Lifecycle(Restart))      ⇒ onRestart()
       case (ContainerMode.Running, Lifecycle(lifecycleMsg)) ⇒ sendAllComponents(lifecycleMsg)
       case (ContainerMode.Initialize, LifecycleStateChanged(SupervisorMode.Running, publisher)) ⇒
