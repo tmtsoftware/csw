@@ -10,10 +10,11 @@ import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.Restart
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
+import csw.services.location.models.ComponentType.Container
 import csw.services.location.models.{ComponentId, RegistrationResult}
 
-class Container(ctx: ActorContext[ContainerMsg], containerInfo: ComponentInfo) extends MutableBehavior[ContainerMsg] {
-  val componentId                                 = ComponentId(containerInfo.componentName, containerInfo.componentType)
+class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) extends MutableBehavior[ContainerMsg] {
+  val componentId                                 = ComponentId(containerInfo.name, Container)
   var supervisors: List[SupervisorInfo]           = List.empty
   var runningComponents: List[SupervisorInfo]     = List.empty
   var mode: ContainerMode                         = ContainerMode.Initialize
@@ -21,7 +22,7 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ComponentInfo) e
 
   registerWithLocationService()
 
-  createComponents(containerInfo.maybeComponentInfoes.get)
+  createComponents(containerInfo.components)
 
   override def onMessage(msg: ContainerMsg): Behavior[ContainerMsg] = {
     (mode, msg) match {
@@ -54,7 +55,7 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ComponentInfo) e
     supervisors.find(_.componentInfo == componentInfo) match {
       case Some(_) => None
       case None =>
-        val supervisor = ctx.spawn(SupervisorBehaviorFactory.make(componentInfo), componentInfo.componentName)
+        val supervisor = ctx.spawn(SupervisorBehaviorFactory.make(componentInfo), componentInfo.name)
         Some(SupervisorInfo(supervisor, componentInfo))
     }
   }

@@ -40,7 +40,7 @@ class Supervisor(
 
   import Supervisor._
 
-  val name: String                                   = componentInfo.componentName
+  val name: String                                   = componentInfo.name
   val componentId                                    = ComponentId(name, componentInfo.componentType)
   var haltingFlag                                    = false
   var mode: SupervisorMode                           = Idle

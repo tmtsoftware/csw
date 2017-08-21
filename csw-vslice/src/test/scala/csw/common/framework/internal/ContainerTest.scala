@@ -40,9 +40,9 @@ class ContainerTest extends FunSuite with Matchers {
     val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
     val container = new Container(ctx, containerInfo)
 
-    ctx.children.size shouldBe containerInfo.maybeComponentInfoes.get.size
+    ctx.children.size shouldBe containerInfo.components.size
     container.supervisors.size shouldBe 2
-    container.supervisors.map(_.componentInfo).toSet shouldBe containerInfo.maybeComponentInfoes.get
+    container.supervisors.map(_.componentInfo).toSet shouldBe containerInfo.components
 
     ctx.children
       .map(child ⇒ ctx.childInbox(child.upcast))

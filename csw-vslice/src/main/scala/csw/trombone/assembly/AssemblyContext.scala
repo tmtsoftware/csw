@@ -17,14 +17,14 @@ case class AssemblyContext(info: ComponentInfo,
                            controlConfig: TromboneControlConfig) {
   // Assembly Info
   // These first three are set from the config file
-  val componentName: String      = info.componentName
-  val componentClassName: String = info.componentClassName
+  val componentName: String      = info.name
+  val componentClassName: String = info.className
   val componentPrefix: String    = info.prefix
   val componentType              = info.componentType
   val fullName                   = s"$componentPrefix.$componentName"
 
   val assemblyComponentId = ComponentId(componentName, componentType)
-  val hcdComponentId      = info.maybeConnections.get.head.componentId // There is only one
+  val hcdComponentId      = info.connections.head.componentId // There is only one
 
   // Public command configurations
   // Init submit command

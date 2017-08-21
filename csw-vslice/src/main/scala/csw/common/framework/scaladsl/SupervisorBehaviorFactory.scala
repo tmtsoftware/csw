@@ -8,7 +8,7 @@ import csw.common.framework.models.{ComponentInfo, SupervisorMsg}
 object SupervisorBehaviorFactory {
 
   def make(componentInfo: ComponentInfo): Behavior[SupervisorMsg] = {
-    val componentWiringClass = Class.forName(componentInfo.componentClassName)
+    val componentWiringClass = Class.forName(componentInfo.className)
     val compWring            = componentWiringClass.newInstance().asInstanceOf[ComponentWiring[_]]
     Actor.withTimers[SupervisorMsg](
       timerScheduler ⇒

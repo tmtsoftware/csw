@@ -1,6 +1,7 @@
 package csw.services.location.models
 
 import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
+import spray.json.{JsString, JsValue, JsonFormat}
 
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component
@@ -20,6 +21,8 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends Tmt
 
 object Connection {
 
+  import csw.services.location.internal.JsonSupport._
+
   def from(input: String): Connection =
     input.split("-") match {
       case Array(component, componentType, AkkaType.entryName) ⇒
@@ -30,6 +33,11 @@ object Connection {
         HttpConnection(ComponentId(component, ComponentType.withName(componentType)))
       case _ ⇒ throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
     }
+
+  implicit val format: JsonFormat[Connection] = new JsonFormat[Connection] {
+    override def read(json: JsValue): Connection = Connection.from(json.convertTo[String])
+    override def write(obj: Connection): JsValue = JsString(obj.name)
+  }
 
   /**
    * Represents a connection offered by remote Actors
