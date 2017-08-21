@@ -20,16 +20,11 @@ import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initial
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.param.states.CurrentState
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterEach, FunSuiteLike, Matchers}
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
-class SupervisorLifecycleTest
-    extends FrameworkComponentTestSuite
-    with FunSuiteLike
-    with Matchers
-    with MockitoSugar
-    with BeforeAndAfterEach {
+class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSugar with BeforeAndAfterEach {
 
   class TestData {
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMsg]         = mock[ComponentHandlers[ComponentDomainMsg]]
@@ -197,7 +192,7 @@ class SupervisorLifecycleTest
     childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.GoOnline))
   }
 
-  test("supervisor should accept and forward Domain message to a TLA ") {
+  test("supervisor should accept and forward Domain message to a TLA") {
     val testData = new TestData
     import testData._
 
@@ -211,7 +206,7 @@ class SupervisorLifecycleTest
   // *************** End of testing onRunning Messages ***************
 
   // *************** Begin testing of onPreparingToShutdown Messages ***************
-  test("supervisor should handle ShutdownTimeout message from TLA ") {
+  test("supervisor should handle ShutdownTimeout message from TLA") {
     val testData = new TestData
     import testData._
 
@@ -236,7 +231,7 @@ class SupervisorLifecycleTest
     )
   }
 
-  test("supervisor should handle ShutdownFailure message from TLA ") {
+  test("supervisor should handle ShutdownFailure message from TLA") {
     val testData = new TestData
     import testData._
 
@@ -261,7 +256,7 @@ class SupervisorLifecycleTest
     )
   }
 
-  test("supervisor should handle ShutdownComplete message from TLA ") {
+  test("supervisor should handle ShutdownComplete message from TLA") {
     val testData = new TestData
     import testData._
 

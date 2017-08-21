@@ -11,11 +11,9 @@ import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
 import csw.common.framework.models.{SupervisorMsg, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSuiteLike, Matchers}
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
-class SupervisorBehaviorTest extends FrameworkComponentTestSuite with FunSuiteLike with Matchers with MockitoSugar {
+class SupervisorBehaviorTest extends FrameworkComponentTestSuite {
 
   val supervisorBehavior: Behavior[SupervisorMsg] = SupervisorBehaviorFactory.make(hcdInfo)
 

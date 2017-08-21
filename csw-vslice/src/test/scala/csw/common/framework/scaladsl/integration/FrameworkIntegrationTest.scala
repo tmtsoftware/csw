@@ -67,8 +67,7 @@ class FrameworkIntegrationTest extends FrameworkComponentTestSuite with MockitoS
     val runDemandState  = DemandState(prefix, Set(choiceKey.set(runChoice)))
     DemandMatcher(runDemandState).check(runCurrentState) shouldBe true
 
-    val lifecycleStateChangedMsg = lifecycleStateProbe.expectMsgType[LifecycleStateChanged]
-    lifecycleStateChangedMsg shouldBe LifecycleStateChanged(SupervisorMode.Running, supervisorRef)
+    lifecycleStateProbe.expectMsg(LifecycleStateChanged(SupervisorMode.Running, supervisorRef))
   }
 
   // DEOPSCSW-179: Unique Action for a component
@@ -159,8 +158,7 @@ class FrameworkIntegrationTest extends FrameworkComponentTestSuite with MockitoS
     val shutdownDemandState  = DemandState(prefix, Set(choiceKey.set(shutdownChoice)))
     DemandMatcher(shutdownDemandState).check(shutdownCurrentState) shouldBe true
 
-    val lifecycleStateChangedMsg = lifecycleStateProbe.expectMsgType[LifecycleStateChanged]
-    lifecycleStateChangedMsg shouldBe LifecycleStateChanged(SupervisorMode.PreparingToShutdown, supervisorRef)
+    lifecycleStateProbe.expectMsg(LifecycleStateChanged(SupervisorMode.PreparingToShutdown, supervisorRef))
   }
 
   // DEOPSCSW-179: Unique Action for a component
@@ -175,13 +173,10 @@ class FrameworkIntegrationTest extends FrameworkComponentTestSuite with MockitoS
 
     supervisorRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
 
-    // On receiving Shutdown message, Supervisor changes its mode to PreparingToShutdown
-    val initialLifecycleState = stateChangedProbe.expectMsgType[LifecycleStateChanged]
-    initialLifecycleState.state shouldBe SupervisorMode.PreparingToShutdown
-
-    // On shutdown failure, Supervisor changes its mode to ShutdownFailure
-    val currentLifecycleState = stateChangedProbe.expectMsgType[LifecycleStateChanged]
-    currentLifecycleState shouldBe LifecycleStateChanged(SupervisorMode.ShutdownFailure, supervisorRef)
+    // On receiving Shutdown message, Supervisor publishes its state -> PreparingToShutdown
+    stateChangedProbe.expectMsg(LifecycleStateChanged(SupervisorMode.PreparingToShutdown, supervisorRef))
+    // On shutdown failure, Supervisor publishes its state -> ShutdownFailure
+    stateChangedProbe.expectMsg(LifecycleStateChanged(SupervisorMode.ShutdownFailure, supervisorRef))
   }
 
 }
