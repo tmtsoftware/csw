@@ -72,7 +72,7 @@ class SerializationTest extends FunSuite {
     assert(csout == cs1)
   }
 
-  test("Base trait event kryo serialization") {
+  test("System event kryo serialization") {
     import csw.param.generics.ParamSetSerializer._
     val event = SystemEvent(fqn1prefix)
       .add(ra.set("12:32:11"))

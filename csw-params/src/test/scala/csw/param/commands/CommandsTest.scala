@@ -101,10 +101,6 @@ class CommandsTest extends FunSpec {
       assert(sc1.get(byteKey2).head == i2)
       assert(sc1.missingKeys(byteKey1, byteKey2, k3) == Set(k3.keyName))
     }
-  }
-
-  describe("Checking key updates") {
-    val k1 = KeyType.IntKey.make("atest")
 
     // DEOPSCSW-190: Implement Unit Support
     it("Should allow updates") {

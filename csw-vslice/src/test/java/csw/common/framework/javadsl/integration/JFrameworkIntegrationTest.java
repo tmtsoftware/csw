@@ -11,6 +11,7 @@ import akka.util.Timeout;
 import csw.common.ccs.CommandStatus;
 import csw.common.ccs.DemandMatcher;
 import csw.common.components.SampleComponentState;
+import csw.common.framework.internal.SupervisorMode;
 import csw.common.framework.javadsl.JComponentInfoFactory;
 import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.*;
@@ -31,12 +32,12 @@ import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import static csw.services.location.javadsl.JComponentType.HCD;
-
+// DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 // DEOPSCSW-165: CSW Assembly Creation
 // DEOPSCSW-166: CSW HCD Creation
+// DEOPSCSW-176: Provide Infrastructure to manage TMT lifecycle
 // DEOPSCSW-177: Hooks for lifecycle management
-public class JComponentIntegrationTest {
+public class JFrameworkIntegrationTest {
     private static ActorSystem system = ActorSystem.create(Actor.empty(), "Hcd");
     private TestKitSettings settings = TestKitSettings.apply(system);
 
@@ -52,15 +53,17 @@ public class JComponentIntegrationTest {
     private Future<ActorRef<SupervisorMsg>> systemActorOf;
     private ActorRef<SupervisorMsg> supervisorRef;
     private TestProbe<CurrentState> compStateProbe;
+    private TestProbe<ContainerMsg.LifecycleStateChanged> lifecycleStateChangedProbe;
 
     private void createSupervisorAndStartTLA() throws Exception {
         compStateProbe  = TestProbe.apply(system, settings);
+        lifecycleStateChangedProbe  = TestProbe.apply(system, settings);
         systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
         Thread.sleep(200);
         supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
+        supervisorRef.tell(new CommonSupervisorMsg.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
     }
-
 
     @AfterClass
     public static void afterAll() throws Exception {
@@ -70,9 +73,11 @@ public class JComponentIntegrationTest {
     @Test
     public void shouldInvokeOnInitializeAndOnRun() throws Exception {
         compStateProbe  = TestProbe.apply(system, settings);
+        lifecycleStateChangedProbe  = TestProbe.apply(system, settings);
         systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
         supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
+        supervisorRef.tell(new CommonSupervisorMsg.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
 
         CurrentState initCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> initParam = SampleComponentState.choiceKey().set(SampleComponentState.initChoice());
@@ -83,6 +88,8 @@ public class JComponentIntegrationTest {
         Parameter<Choice> runParam = SampleComponentState.choiceKey().set(SampleComponentState.runChoice());
         DemandState runDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(runParam);
         Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
+
+        lifecycleStateChangedProbe.expectMsg(new ContainerMsg.LifecycleStateChanged(SupervisorMode.Running$.MODULE$, supervisorRef));
     }
 
     // DEOPSCSW-179: Unique Action for a component
@@ -157,6 +164,8 @@ public class JComponentIntegrationTest {
         Parameter<Choice> runParam = SampleComponentState.choiceKey().set(SampleComponentState.runChoice());
         DemandState runDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(runParam);
         Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
+
+        lifecycleStateChangedProbe.expectMsg(new ContainerMsg.LifecycleStateChanged(SupervisorMode.Running$.MODULE$, supervisorRef));
     }
 
     @Test
@@ -169,5 +178,7 @@ public class JComponentIntegrationTest {
         Parameter<Choice> shutdownParam = SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice());
         DemandState shutdownDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(shutdownParam);
         Assert.assertTrue(new DemandMatcher(shutdownDemandState, false).check(shutdownCurrentState));
+
+        lifecycleStateChangedProbe.expectMsg(new ContainerMsg.LifecycleStateChanged(SupervisorMode.PreparingToShutdown$.MODULE$, supervisorRef));
     }
 }
