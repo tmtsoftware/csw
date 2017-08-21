@@ -6,10 +6,7 @@ import akka.typed.{Behavior, Props, Terminated}
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.Supervisor
-import csw.common.framework.models.PreparingToShutdownMsg.ShutdownTimeout
-import csw.common.framework.models.RunningMsg.Lifecycle
-import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
-import csw.common.framework.models.{SupervisorMsg, ToComponentLifecycleMessage}
+import csw.common.framework.models.SupervisorMsg
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
@@ -37,18 +34,6 @@ class SupervisorBehaviorTest extends FrameworkComponentTestSuite {
     ctx.getAllEffects() should contain(Watched(componentActor))
     ctx.getAllEffects() should not contain Watched(pubSubLifecycleActor)
     ctx.getAllEffects() should not contain Watched(pubSubComponentActor)
-  }
-
-  test("Supervisor should handle Shutdown message by scheduling a timer") {
-    val ctx = new EffectfulActorContext[SupervisorMsg]("supervisor", supervisorBehavior, 100, system)
-
-    val componentActor = ctx.childInbox(Supervisor.ComponentActor).ref
-
-    ctx.run(Initialized(componentActor))
-    ctx.run(Running(componentActor))
-    ctx.run(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-
-    ctx.getAllEffects() should contain(Scheduled(Supervisor.shutdownTimeout, ctx.self, ShutdownTimeout))
   }
 
   test("Supervisor should handle Terminated signal by unwatching component actor and stopping other child actors") {

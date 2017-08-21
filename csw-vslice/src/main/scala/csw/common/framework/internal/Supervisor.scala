@@ -1,8 +1,7 @@
 package csw.common.framework.internal
 
-import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.{ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, Signal, Terminated}
 import csw.common.framework.internal.SupervisorMode.Idle
 import csw.common.framework.models.CommonSupervisorMsg.{
@@ -28,18 +27,19 @@ object Supervisor {
   val PubSubComponentActor            = "pub-sub-component"
   val ComponentActor                  = "component"
   val PubSubLifecycleActor            = "pub-sub-lifecycle"
+  val TimerKey                        = "shutdown-timer"
   val shutdownTimeout: FiniteDuration = 5.seconds
 }
 
 class Supervisor(
     ctx: ActorContext[SupervisorMsg],
+    timerScheduler: TimerScheduler[SupervisorMsg],
     componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentWiring[_]
 ) extends MutableBehavior[SupervisorMsg] {
 
   import Supervisor._
 
-  var shutdownTimer: Option[Cancellable]             = None
   val name: String                                   = componentInfo.componentName
   val componentId                                    = ComponentId(name, componentInfo.componentType)
   var haltingFlag                                    = false
@@ -103,8 +103,9 @@ class Supervisor(
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case Shutdown =>
-      shutdownTimer = Some(ctx.schedule(shutdownTimeout, ctx.self, ShutdownTimeout))
+      timerScheduler.startSingleTimer(TimerKey, ShutdownTimeout, shutdownTimeout)
       unregisterFromLocationService()
+
       mode = SupervisorMode.PreparingToShutdown
       pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
     case Restart =>
@@ -122,8 +123,9 @@ class Supervisor(
         mode = SupervisorMode.ShutdownFailure
       case ShutdownFailure(reason) =>
         mode = SupervisorMode.ShutdownFailure
+        timerScheduler.cancel(TimerKey)
       case ShutdownComplete =>
-        shutdownTimer.map(_.cancel())
+        timerScheduler.cancel(TimerKey)
         mode = SupervisorMode.Shutdown
     }
     pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
