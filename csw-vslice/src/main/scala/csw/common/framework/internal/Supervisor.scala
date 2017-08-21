@@ -4,6 +4,7 @@ import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, Signal, Terminated}
+import csw.common.framework.internal.SupervisorMode.Idle
 import csw.common.framework.models.CommonSupervisorMsg.{
   ComponentStateSubscription,
   HaltComponent,
@@ -15,7 +16,6 @@ import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, Shu
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
-import csw.common.framework.models.SupervisorMode._
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.ComponentWiring
