@@ -23,6 +23,7 @@ import csw.param.states.CurrentState
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, FunSuiteLike, Matchers}
 
+// DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 class SupervisorLifecycleTest
     extends FrameworkComponentTestSuite
     with FunSuiteLike
@@ -48,7 +49,7 @@ class SupervisorLifecycleTest
   }
 
   // *************** Begin testing of onIdleMessages ***************
-  test("supervisor should accept Initialized message and send message to TLA") {
+  test("supervisor should accept Initialized message and send Run message to TLA") {
     val testData = new TestData
     import testData._
 
@@ -147,6 +148,10 @@ class SupervisorLifecycleTest
   }
   // *************** End of testing onCommonMessages ***************
 
+  /**
+   * Below Tests show that all external messages for the TLA are received by the Supervisor
+   * which passes them to TLA (depending on lifecycle)
+  **/
   // *************** Begin testing of onRunning Messages ***************
   test("supervisor should handle lifecycle Shutdown message") {
     val testData = new TestData

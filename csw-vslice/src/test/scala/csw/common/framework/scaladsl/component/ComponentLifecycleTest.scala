@@ -15,26 +15,17 @@ import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.Future
+
 //DEOPSCSW-177-Hooks for lifecycle management
 //DEOPSCSW-179-Unique Action for a component
 class ComponentLifecycleTest extends FrameworkComponentTestSuite with MockitoSugar {
 
-  class TestData(
-      supervisorProbe: TestProbe[FromComponentLifecycleMessage]
-  ) {
-    private val ctx = new StubbedActorContext[ComponentMsg](
-      "test-component",
-      100,
-      system
-    )
+  class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
+    private val ctx = new StubbedActorContext[ComponentMsg]("test-component", 100, system)
 
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMsg] = mock[ComponentHandlers[ComponentDomainMsg]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
-    private val componentBehavior = new ComponentBehavior[ComponentDomainMsg](
-      ctx,
-      supervisorProbe.ref,
-      sampleHcdHandler
-    )
+    val componentBehavior = new ComponentBehavior[ComponentDomainMsg](ctx, supervisorProbe.ref, sampleHcdHandler)
 
     val runningComponent: ComponentBehavior[ComponentDomainMsg] = {
       componentBehavior.onMessage(Initialize)

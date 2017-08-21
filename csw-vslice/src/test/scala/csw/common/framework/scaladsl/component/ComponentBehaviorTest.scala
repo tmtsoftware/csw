@@ -16,18 +16,12 @@ import scala.concurrent.Future
 //DEOPSCSW-165-CSW Assembly Creation
 //DEOPSCSW-166-CSW HCD Creation
 class ComponentBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
-  class TestData(
-      supervisorProbe: TestProbe[FromComponentLifecycleMessage]
-  ) {
+
+  class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
     val sampleComponentHandler: ComponentHandlers[ComponentDomainMsg] = mock[ComponentHandlers[ComponentDomainMsg]]
-    val ctx                                                           = new StubbedActorContext[ComponentMsg]("test-component", 100, system)
 
-    val componentBehavior = new ComponentBehavior[ComponentDomainMsg](
-      ctx,
-      supervisorProbe.ref,
-      sampleComponentHandler
-    )
-
+    val ctx               = new StubbedActorContext[ComponentMsg]("test-component", 100, system)
+    val componentBehavior = new ComponentBehavior[ComponentDomainMsg](ctx, supervisorProbe.ref, sampleComponentHandler)
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
   }
 

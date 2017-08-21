@@ -24,10 +24,11 @@ import org.scalatest.mockito.MockitoSugar
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
+// DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 // DEOPSCSW-165: CSW Assembly Creation
 // DEOPSCSW-166: CSW HCD Creation
 // DEOPSCSW-177: Hooks for lifecycle management
-class ComponentIntegrationTest extends FrameworkComponentTestSuite with MockitoSugar with BeforeAndAfterEach {
+class FrameworkIntegrationTest extends FrameworkComponentTestSuite with MockitoSugar with BeforeAndAfterEach {
   import csw.common.components.SampleComponentState._
 
   var compStateProbe: TestProbe[CurrentState]     = _

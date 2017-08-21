@@ -14,6 +14,7 @@ import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuiteLike, Matchers}
 
+// DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 class SupervisorBehaviorTest extends FrameworkComponentTestSuite with FunSuiteLike with Matchers with MockitoSugar {
 
   val supervisorBehavior: Behavior[SupervisorMsg] = SupervisorBehaviorFactory.make(hcdInfo)
