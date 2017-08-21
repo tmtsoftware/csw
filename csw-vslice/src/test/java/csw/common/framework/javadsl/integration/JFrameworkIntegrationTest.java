@@ -52,7 +52,7 @@ public class JFrameworkIntegrationTest {
     private Future<ActorRef<SupervisorMsg>> systemActorOf;
     private ActorRef<SupervisorMsg> supervisorRef;
     private TestProbe<CurrentState> compStateProbe;
-    private TestProbe<ContainerMsg.LifecycleStateChanged> lifecycleStateChangedProbe;
+    private TestProbe<LifecycleStateChanged> lifecycleStateChangedProbe;
 
     private void createSupervisorAndStartTLA() throws Exception {
         compStateProbe  = TestProbe.apply(system, settings);
@@ -88,7 +88,7 @@ public class JFrameworkIntegrationTest {
         DemandState runDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(runParam);
         Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
 
-        lifecycleStateChangedProbe.expectMsg(new ContainerMsg.LifecycleStateChanged(SupervisorMode.Running$.MODULE$, supervisorRef));
+        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(SupervisorMode.Running$.MODULE$, supervisorRef));
     }
 
     // DEOPSCSW-179: Unique Action for a component
@@ -164,7 +164,7 @@ public class JFrameworkIntegrationTest {
         DemandState runDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(runParam);
         Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
 
-        lifecycleStateChangedProbe.expectMsg(new ContainerMsg.LifecycleStateChanged(SupervisorMode.Running$.MODULE$, supervisorRef));
+        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(SupervisorMode.Running$.MODULE$, supervisorRef));
     }
 
     @Test
@@ -178,6 +178,6 @@ public class JFrameworkIntegrationTest {
         DemandState shutdownDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(shutdownParam);
         Assert.assertTrue(new DemandMatcher(shutdownDemandState, false).check(shutdownCurrentState));
 
-        lifecycleStateChangedProbe.expectMsg(new ContainerMsg.LifecycleStateChanged(SupervisorMode.PreparingToShutdown$.MODULE$, supervisorRef));
+        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(SupervisorMode.PreparingToShutdown$.MODULE$, supervisorRef));
     }
 }

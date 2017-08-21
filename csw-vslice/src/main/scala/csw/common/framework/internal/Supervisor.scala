@@ -9,7 +9,6 @@ import csw.common.framework.models.CommonSupervisorMsg.{
   HaltComponent,
   LifecycleStateSubscription
 }
-import csw.common.framework.models.ContainerMsg.LifecycleStateChanged
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.Publish

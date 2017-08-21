@@ -6,11 +6,11 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
-import csw.common.framework.models.ContainerMsg.{GetComponents, LifecycleStateChanged}
+import csw.common.framework.models.ContainerMsg.{GetComponents, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
-import csw.common.framework.models.{Components, ContainerMsg, ToComponentLifecycleMessage}
+import csw.common.framework.models._
 import org.scalatest.{FunSuite, Matchers}
 
 //DEOPSCSW-182-Control Life Cycle of Components
@@ -22,7 +22,9 @@ class ContainerTest extends FunSuite with Matchers {
     val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
     val container = new Container(ctx, containerInfo)
 
-    ctx.children.map(child ⇒ container.onMessage(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+    ctx.children.map(
+      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+    )
 
     ctx.children
       .map(child ⇒ ctx.childInbox(child.upcast))
@@ -40,19 +42,25 @@ class ContainerTest extends FunSuite with Matchers {
     val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
     val container = new Container(ctx, containerInfo)
 
-    ctx.children.size shouldBe containerInfo.components.size
+    ctx.children.size shouldBe (containerInfo.components.size + 1)
     container.supervisors.size shouldBe 2
     container.supervisors.map(_.componentInfo).toSet shouldBe containerInfo.components
 
-    ctx.children
-      .map(child ⇒ ctx.childInbox(child.upcast))
-      .map(_.receiveMsg()) should contain only LifecycleStateSubscription(Subscribe[LifecycleStateChanged](ctx.self))
+    containerInfo.components.toList
+      .map(component ⇒ ctx.childInbox[CommonSupervisorMsg](component.name))
+      .map(_.receiveMsg()) should contain only LifecycleStateSubscription(
+      Subscribe[LifecycleStateChanged](container.lifecycleChangeAdapterActor)
+    )
 
-    ctx.children.map(child ⇒ container.onMessage(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+    ctx.children.map(
+      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+    )
 
-    ctx.children
-      .map(child ⇒ ctx.childInbox(child.upcast))
-      .map(_.receiveMsg()) should contain only LifecycleStateSubscription(Unsubscribe[LifecycleStateChanged](ctx.self))
+    containerInfo.components.toList
+      .map(component ⇒ ctx.childInbox[CommonSupervisorMsg](component.name))
+      .map(_.receiveMsg()) should contain only LifecycleStateSubscription(
+      Unsubscribe[LifecycleStateChanged](container.lifecycleChangeAdapterActor)
+    )
 
     container.mode shouldBe ContainerMode.Running
   }
@@ -62,19 +70,23 @@ class ContainerTest extends FunSuite with Matchers {
     import runningContainer._
 
     container.onMessage(Lifecycle(GoOnline))
-    ctx.children.map(child ⇒ ctx.childInbox(child.upcast)).map(_.receiveMsg()) should contain only Lifecycle(GoOnline)
+    containerInfo.components.toList
+      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
+      .map(_.receiveMsg()) should contain only Lifecycle(GoOnline)
 
     container.onMessage(Lifecycle(GoOffline))
-    ctx.children.map(child ⇒ ctx.childInbox(child.upcast)).map(_.receiveMsg()) should contain only Lifecycle(GoOffline)
+    containerInfo.components.toList
+      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
+      .map(_.receiveMsg()) should contain only Lifecycle(GoOffline)
 
     container.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-    ctx.children.map(child ⇒ ctx.childInbox(child.upcast)).map(_.receiveMsg()) should contain only Lifecycle(
-      ToComponentLifecycleMessage.Shutdown
-    )
+    containerInfo.components.toList
+      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
+      .map(_.receiveMsg()) should contain only Lifecycle(ToComponentLifecycleMessage.Shutdown)
   }
 
   test(
-    "container should handle restart message by changing its mode to restart and subscribing to all components for their running state"
+    "container should handle restart message by changing its mode to initialize and subscribing to all components for their running state"
   ) {
     val runningContainer = new RunningContainer
     import runningContainer._
@@ -83,11 +95,15 @@ class ContainerTest extends FunSuite with Matchers {
     container.onMessage(Lifecycle(Restart))
     container.mode shouldBe ContainerMode.Initialize
 
-    ctx.children
-      .map(child ⇒ ctx.childInbox(child.upcast))
-      .map(_.receiveMsg()) should contain only LifecycleStateSubscription(Subscribe[LifecycleStateChanged](ctx.self))
+    containerInfo.components.toList
+      .map(component ⇒ ctx.childInbox[CommonSupervisorMsg](component.name))
+      .map(_.receiveMsg()) should contain only LifecycleStateSubscription(
+      Subscribe[LifecycleStateChanged](container.lifecycleChangeAdapterActor)
+    )
 
-    ctx.children.map(child ⇒ ctx.childInbox(child.upcast)).map(_.receiveMsg()) should contain only Lifecycle(Restart)
+    containerInfo.components.toList
+      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
+      .map(_.receiveMsg()) should contain only Lifecycle(Restart)
   }
 
   test("container should change its mode from restarting to running after all components have restarted") {
@@ -96,15 +112,19 @@ class ContainerTest extends FunSuite with Matchers {
 
     container.onMessage(Lifecycle(Restart))
 
-    ctx.children
-      .map(child ⇒ ctx.childInbox(child.upcast))
+    containerInfo.components.toList
+      .map(component ⇒ ctx.childInbox(component.name))
       .map(_.receiveAll())
 
-    ctx.children.map(child ⇒ container.onMessage(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+    ctx.children.map(
+      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+    )
 
     ctx.children
       .map(child ⇒ ctx.childInbox(child.upcast))
-      .map(_.receiveMsg()) should contain only LifecycleStateSubscription(Unsubscribe[LifecycleStateChanged](ctx.self))
+      .map(_.receiveMsg()) should contain only LifecycleStateSubscription(
+      Unsubscribe[LifecycleStateChanged](container.lifecycleChangeAdapterActor)
+    )
 
     container.mode shouldBe ContainerMode.Running
   }

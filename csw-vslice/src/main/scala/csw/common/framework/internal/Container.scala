@@ -4,21 +4,26 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
-import csw.common.framework.models.ContainerMsg.{GetComponents, LifecycleStateChanged}
+import csw.common.framework.models.ContainerMsg.{GetComponents, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.Restart
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
-import csw.services.location.models.ComponentType.Container
-import csw.services.location.models.{ComponentId, RegistrationResult}
+import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult}
+
+object Container {
+  val lifecycleChangeAdapter = "LifecycleChangeAdapter"
+}
 
 class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) extends MutableBehavior[ContainerMsg] {
-  val componentId                                 = ComponentId(containerInfo.name, Container)
+  val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
   var supervisors: List[SupervisorInfo]           = List.empty
   var runningComponents: List[SupervisorInfo]     = List.empty
   var mode: ContainerMode                         = ContainerMode.Initialize
   var registrationOpt: Option[RegistrationResult] = None
+  val lifecycleChangeAdapterActor: ActorRef[LifecycleStateChanged] =
+    ctx.spawnAdapter(SupervisorModeChanged, "LifecycleChangeAdapter")
 
   registerWithLocationService()
 
@@ -29,8 +34,8 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
       case (_, GetComponents(replyTo))                      ⇒ replyTo ! Components(supervisors)
       case (ContainerMode.Running, Lifecycle(Restart))      ⇒ onRestart()
       case (ContainerMode.Running, Lifecycle(lifecycleMsg)) ⇒ sendAllComponents(lifecycleMsg)
-      case (ContainerMode.Initialize, LifecycleStateChanged(SupervisorMode.Running, publisher)) ⇒
-        onLifecycleStateChanged(publisher)
+      case (ContainerMode.Initialize, SupervisorModeChanged(lifecycleStateChanged)) ⇒
+        onLifecycleStateChanged(lifecycleStateChanged)
       case (containerMode, message) ⇒ println(s"Container in $containerMode received an unexpected message: $message")
     }
     this
@@ -62,12 +67,16 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
 
   def waitForRunningComponents(): Unit = {
     mode = ContainerMode.Initialize
-    supervisors.foreach(_.supervisor ! LifecycleStateSubscription(Subscribe[LifecycleStateChanged](ctx.self)))
+    supervisors.foreach(
+      _.supervisor ! LifecycleStateSubscription(Subscribe[LifecycleStateChanged](lifecycleChangeAdapterActor))
+    )
   }
 
-  def onLifecycleStateChanged(publisher: ActorRef[SupervisorMsg]): Any = {
-    publisher ! LifecycleStateSubscription(Unsubscribe[LifecycleStateChanged](ctx.self))
-    runningComponents = (supervisors.find(_.supervisor == publisher) ++ runningComponents).toList
+  def onLifecycleStateChanged(lifecycleStateChanged: LifecycleStateChanged): Any = {
+    lifecycleStateChanged.publisher ! LifecycleStateSubscription(
+      Unsubscribe[LifecycleStateChanged](lifecycleChangeAdapterActor)
+    )
+    runningComponents = (supervisors.find(_.supervisor == lifecycleStateChanged.publisher) ++ runningComponents).toList
     if (runningComponents.size == supervisors.size) {
       mode = ContainerMode.Running
       runningComponents = List.empty

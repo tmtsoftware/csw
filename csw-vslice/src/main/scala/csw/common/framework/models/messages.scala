@@ -3,7 +3,6 @@ package csw.common.framework.models
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.internal.SupervisorMode
-import csw.common.framework.models.ContainerMsg.LifecycleStateChanged
 import csw.common.framework.models.PubSub.SubscriberMsg
 import csw.param.commands.ControlCommand
 import csw.param.states.CurrentState
@@ -91,9 +90,12 @@ sealed trait SupervisorMsg
 
 sealed trait ContainerMsg
 object ContainerMsg {
-  case class GetComponents(replyTo: ActorRef[Components])                                   extends ContainerMsg
-  case class LifecycleStateChanged(state: SupervisorMode, replyTo: ActorRef[SupervisorMsg]) extends ContainerMsg
+  case class GetComponents(replyTo: ActorRef[Components])                        extends ContainerMsg
+  case class SupervisorModeChanged(lifecycleStateChanged: LifecycleStateChanged) extends ContainerMsg
 }
 
+case class LifecycleStateChanged(state: SupervisorMode, publisher: ActorRef[SupervisorMsg])
+
 case class Components(components: List[SupervisorInfo])
+
 case class SupervisorInfo(supervisor: ActorRef[SupervisorMsg], componentInfo: ComponentInfo)

@@ -12,7 +12,6 @@ import csw.common.framework.models.CommonSupervisorMsg.{
   HaltComponent,
   LifecycleStateSubscription
 }
-import csw.common.framework.models.ContainerMsg.LifecycleStateChanged
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
@@ -21,8 +20,8 @@ import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initial
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.param.states.CurrentState
-import org.scalatest.BeforeAndAfterEach
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
