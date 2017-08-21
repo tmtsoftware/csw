@@ -88,8 +88,8 @@ class Supervisor(
     case InitializeFailure(reason) =>
       mode = SupervisorMode.InitializeFailure
     case Running(componentRef) =>
-      runningComponent = Some(componentRef)
       mode = SupervisorMode.Running
+      runningComponent = Some(componentRef)
       pubSubLifecycle ! Publish(LifecycleStateChanged(SupervisorMode.Running, ctx.self))
   }
 
@@ -103,14 +103,13 @@ class Supervisor(
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case Shutdown =>
+      mode = SupervisorMode.PreparingToShutdown
       timerScheduler.startSingleTimer(TimerKey, ShutdownTimeout, shutdownTimeout)
       unregisterFromLocationService()
-
-      mode = SupervisorMode.PreparingToShutdown
       pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
     case Restart =>
-      unregisterFromLocationService()
       mode = SupervisorMode.Idle
+      unregisterFromLocationService()
     case GoOffline =>
       if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
     case GoOnline =>
@@ -125,8 +124,8 @@ class Supervisor(
         mode = SupervisorMode.ShutdownFailure
         timerScheduler.cancel(TimerKey)
       case ShutdownComplete =>
-        timerScheduler.cancel(TimerKey)
         mode = SupervisorMode.Shutdown
+        timerScheduler.cancel(TimerKey)
     }
     pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
     if (haltingFlag) haltComponent()

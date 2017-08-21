@@ -59,14 +59,14 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
 
   private def initialization(): Future[Unit] =
     async {
-      await(lifecycleHandlers.initialize())
       mode = ComponentMode.Initialized
+      await(lifecycleHandlers.initialize())
     }
 
   private def onInitial(x: InitialMsg): Unit = x match {
     case Run =>
-      lifecycleHandlers.onRun()
       mode = ComponentMode.Running
+      lifecycleHandlers.onRun()
       lifecycleHandlers.isOnline = true
       supervisor ! SupervisorIdleMsg.Running(ctx.self)
   }
@@ -87,8 +87,8 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
         case ex: Exception ⇒ supervisor ! ShutdownFailure(ex.getMessage)
       }
     case Restart =>
-      lifecycleHandlers.onRestart()
       mode = ComponentMode.Idle
+      lifecycleHandlers.onRestart()
       ctx.self ! Start
     case GoOnline =>
       if (!lifecycleHandlers.isOnline) {
