@@ -78,7 +78,7 @@ class Supervisor(
   def onCommonMessages(msg: CommonSupervisorMsg): Unit = msg match {
     case LifecycleStateSubscription(subscriberMsg) => pubSubLifecycle ! subscriberMsg
     case ComponentStateSubscription(subscriberMsg) => pubSubComponent ! subscriberMsg
-    case HaltComponent                             => haltingFlag = true; ctx.self ! Lifecycle(Shutdown)
+    case HaltComponent                             => haltingFlag = true; handleShutdown()
   }
 
   def onIdleMessages(msg: SupervisorIdleMsg): Unit = msg match {
@@ -102,11 +102,7 @@ class Supervisor(
   }
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case Shutdown =>
-      mode = SupervisorMode.PreparingToShutdown
-      timerScheduler.startSingleTimer(TimerKey, ShutdownTimeout, shutdownTimeout)
-      unregisterFromLocationService()
-      pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
+    case Shutdown => handleShutdown()
     case Restart =>
       mode = SupervisorMode.Idle
       unregisterFromLocationService()
@@ -129,6 +125,13 @@ class Supervisor(
     }
     pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
     if (haltingFlag) haltComponent()
+  }
+
+  private def handleShutdown(): Unit = {
+    mode = SupervisorMode.PreparingToShutdown
+    timerScheduler.startSingleTimer(TimerKey, ShutdownTimeout, shutdownTimeout)
+    unregisterFromLocationService()
+    pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
   }
 
   def registerWithLocationService(): Unit = ()

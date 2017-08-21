@@ -116,8 +116,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     unsubscribeMessage shouldBe Unsubscribe[CurrentState](subscriberProbe.ref)
   }
 
-  // Fixme
-  ignore("supervisor should handle HaltComponent message by shutting down all child actors in all the mode") {
+  test("supervisor should handle HaltComponent message by shutting down all child actors in all the mode") {
     val testData = new TestData
     import testData._
 
@@ -128,21 +127,13 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
 
     // HaltComponent
     supervisor.onMessage(HaltComponent)
-    supervisor.mode shouldBe initialMode
+    supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     supervisor.haltingFlag shouldBe true
-    ctx.selfInbox.receiveMsg() shouldBe Lifecycle(ToComponentLifecycleMessage.Shutdown)
-
-    ctx.watch(supervisor.component)
-    ctx.watch(supervisor.pubSubComponent)
-    ctx.watch(supervisor.pubSubLifecycle)
 
     // HaltComponent schedules Shutdown message to self
-    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-    supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
-
     supervisor.onMessage(ShutdownComplete)
+    supervisor.haltingFlag shouldBe true
     supervisor.mode shouldBe SupervisorMode.Shutdown
-
   }
   // *************** End of testing onCommonMessages ***************
 
