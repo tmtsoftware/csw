@@ -2,7 +2,7 @@ package csw.common.framework.internal
 
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
-import akka.typed.{ActorRef, Behavior, PostStop, Signal}
+import akka.typed.{ActorRef, ActorSystem, Behavior, PostStop, Signal}
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
 import csw.common.framework.models.ContainerMsg.{GetComponents, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
@@ -77,8 +77,9 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
     supervisors.find(_.componentInfo == componentInfo) match {
       case Some(_) => None
       case None =>
-        val supervisor = ctx.spawn(SupervisorBehaviorFactory.make(componentInfo), componentInfo.name)
-        Some(SupervisorInfo(supervisor, componentInfo))
+        val supervisorBehavior = SupervisorBehaviorFactory.behavior(componentInfo)
+        val system             = ActorSystem(supervisorBehavior, s"${componentInfo.name}-system")
+        Some(SupervisorInfo(system, componentInfo))
     }
   }
 
