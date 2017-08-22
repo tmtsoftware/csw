@@ -87,11 +87,11 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
     supervisors.foreach(_.supervisor ! LifecycleStateSubscription(Subscribe(lifecycleStateTrackerRef)))
   }
 
-  private def unsubscribeLifecycleTracker(componentSupervisor: ActorRef[SupervisorMsg]): Unit = {
+  private def unsubscribeLifecycleTracker(componentSupervisor: ActorRef[SupervisorExternalMessage]): Unit = {
     componentSupervisor ! LifecycleStateSubscription(Unsubscribe(lifecycleStateTrackerRef))
   }
 
-  private def updateRunningComponents(componentSupervisor: ActorRef[SupervisorMsg]): Unit = {
+  private def updateRunningComponents(componentSupervisor: ActorRef[SupervisorExternalMessage]): Unit = {
     runningComponents = (supervisors.find(_.supervisor == componentSupervisor) ++ runningComponents).toList
     if (runningComponents.size == supervisors.size) {
       mode = ContainerMode.Running
