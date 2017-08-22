@@ -119,6 +119,11 @@ object Dependencies {
     Libs.`scalatest` % Test
   )
 
+  val CswFrameworkApps = Seq(
+    Libs.`scopt`,
+    Libs.`scalatest` % Test
+  )
+
   val CswProdExamples = Seq(
     AkkaHttp.`akka-http`,
     Libs.`scalatest`       % Test,
