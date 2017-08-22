@@ -12,17 +12,13 @@ import csw.common.framework.models._
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult}
 
-object Container {
-  val lifecycleChangeAdapter = "LifecycleChangeAdapter"
-}
-
 class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) extends MutableBehavior[ContainerMsg] {
   val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
   var supervisors: List[SupervisorInfo]           = List.empty
   var runningComponents: List[SupervisorInfo]     = List.empty
   var mode: ContainerMode                         = ContainerMode.Idle
   var registrationOpt: Option[RegistrationResult] = None
-  val lifecycleChangeAdapterActor: ActorRef[LifecycleStateChanged] =
+  val lifecycleStateTrackerRef: ActorRef[LifecycleStateChanged] =
     ctx.spawnAdapter(SupervisorModeChanged, "LifecycleChangeAdapter")
 
   registerWithLocationService()
@@ -34,7 +30,7 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
       case (_, GetComponents(replyTo))                      ⇒ replyTo ! Components(supervisors)
       case (ContainerMode.Running, Lifecycle(Restart))      ⇒ onRestart()
       case (ContainerMode.Running, Lifecycle(Shutdown))     ⇒ onShutdown()
-      case (ContainerMode.Running, Lifecycle(lifecycleMsg)) ⇒ sendAllComponents(lifecycleMsg)
+      case (ContainerMode.Running, Lifecycle(lifecycleMsg)) ⇒ sendLifecycleMsgToAllComponents(lifecycleMsg)
       case (ContainerMode.Idle, SupervisorModeChanged(lifecycleStateChanged)) ⇒
         onLifecycleStateChanged(lifecycleStateChanged)
       case (containerMode, message) ⇒ println(s"Container in $containerMode received an unexpected message: $message")
@@ -48,13 +44,33 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
       this
   }
 
-  private def sendAllComponents(lifecycleMsg: ToComponentLifecycleMessage): Unit = {
+  def onRestart(): Unit = {
+    mode = ContainerMode.Idle
+    subscribeLifecycleTrackerWithAllSupervisors()
+    sendLifecycleMsgToAllComponents(Restart)
+  }
+
+  def onShutdown(): Unit = {
+    mode = ContainerMode.Idle
+    unregisterFromLocationService()
+    sendLifecycleMsgToAllComponents(Shutdown)
+  }
+
+  def sendLifecycleMsgToAllComponents(lifecycleMsg: ToComponentLifecycleMessage): Unit = {
     supervisors.foreach { _.supervisor ! Lifecycle(lifecycleMsg) }
+  }
+
+  def onLifecycleStateChanged(lifecycleStateChanged: LifecycleStateChanged): Unit = {
+    if (lifecycleStateChanged.state == SupervisorMode.Running) {
+      val componentSupervisor = lifecycleStateChanged.publisher
+      unsubscribeLifecycleTracker(componentSupervisor)
+      updateRunningComponents(componentSupervisor)
+    }
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
     supervisors = supervisors ::: componentInfos.flatMap(createComponent).toList
-    waitForRunningComponents()
+    subscribeLifecycleTrackerWithAllSupervisors()
   }
 
   private def createComponent(componentInfo: ComponentInfo): Option[SupervisorInfo] = {
@@ -66,33 +82,20 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
     }
   }
 
-  def waitForRunningComponents(): Unit = {
-    mode = ContainerMode.Idle
-    supervisors.foreach(
-      _.supervisor ! LifecycleStateSubscription(Subscribe[LifecycleStateChanged](lifecycleChangeAdapterActor))
-    )
+  private def subscribeLifecycleTrackerWithAllSupervisors(): Unit = {
+    supervisors.foreach(_.supervisor ! LifecycleStateSubscription(Subscribe(lifecycleStateTrackerRef)))
   }
 
-  def onLifecycleStateChanged(lifecycleStateChanged: LifecycleStateChanged): Any = {
-    lifecycleStateChanged.publisher ! LifecycleStateSubscription(
-      Unsubscribe[LifecycleStateChanged](lifecycleChangeAdapterActor)
-    )
-    runningComponents = (supervisors.find(_.supervisor == lifecycleStateChanged.publisher) ++ runningComponents).toList
+  private def unsubscribeLifecycleTracker(componentSupervisor: ActorRef[SupervisorMsg]): Unit = {
+    componentSupervisor ! LifecycleStateSubscription(Unsubscribe(lifecycleStateTrackerRef))
+  }
+
+  private def updateRunningComponents(componentSupervisor: ActorRef[SupervisorMsg]): Unit = {
+    runningComponents = (supervisors.find(_.supervisor == componentSupervisor) ++ runningComponents).toList
     if (runningComponents.size == supervisors.size) {
       mode = ContainerMode.Running
       runningComponents = List.empty
     }
-  }
-
-  def onRestart(): Unit = {
-    waitForRunningComponents()
-    sendAllComponents(Restart)
-  }
-
-  def onShutdown(): Unit = {
-    mode = ContainerMode.Idle
-    unregisterFromLocationService()
-    sendAllComponents(Shutdown)
   }
 
   def registerWithLocationService(): Unit = {}
