@@ -6,7 +6,7 @@ object Libs {
   val `scalatest`                    = "org.scalatest"                %% "scalatest"                    % "3.0.3" //Apache License 2.0
   val `scala-java8-compat`           = "org.scala-lang.modules"       %% "scala-java8-compat"           % "0.8.0" //BSD 3-clause "New" or "Revised" License
   val `scala-async`                  = "org.scala-lang.modules"       %% "scala-async"                  % "0.9.6" //BSD 3-clause "New" or "Revised" License
-  val `scopt`                        = "com.github.scopt"             %% "scopt"                        % "3.5.0" //MIT License
+  val `scopt`                        = "com.github.scopt"             %% "scopt"                        % "3.6.0" //MIT License
   val `acyclic`                      = "com.lihaoyi"                  %% "acyclic"                      % "0.1.7" % Provided //MIT License
   val `enumeratum`                   = "com.beachape"                 %% "enumeratum"                   % "1.5.12" //MIT License
   val `junit`                        = "junit"                        % "junit"                         % "4.12" //Eclipse Public License 1.0
