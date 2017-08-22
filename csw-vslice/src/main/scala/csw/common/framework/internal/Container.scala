@@ -7,7 +7,7 @@ import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscriptio
 import csw.common.framework.models.ContainerMsg.{GetComponents, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.Lifecycle
-import csw.common.framework.models.ToComponentLifecycleMessage.Restart
+import csw.common.framework.models.ToComponentLifecycleMessage._
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult}
@@ -20,7 +20,7 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
   val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
   var supervisors: List[SupervisorInfo]           = List.empty
   var runningComponents: List[SupervisorInfo]     = List.empty
-  var mode: ContainerMode                         = ContainerMode.Initialize
+  var mode: ContainerMode                         = ContainerMode.Idle
   var registrationOpt: Option[RegistrationResult] = None
   val lifecycleChangeAdapterActor: ActorRef[LifecycleStateChanged] =
     ctx.spawnAdapter(SupervisorModeChanged, "LifecycleChangeAdapter")
@@ -33,8 +33,9 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
     (mode, msg) match {
       case (_, GetComponents(replyTo))                      ⇒ replyTo ! Components(supervisors)
       case (ContainerMode.Running, Lifecycle(Restart))      ⇒ onRestart()
+      case (ContainerMode.Running, Lifecycle(Shutdown))     ⇒ onShutdown()
       case (ContainerMode.Running, Lifecycle(lifecycleMsg)) ⇒ sendAllComponents(lifecycleMsg)
-      case (ContainerMode.Initialize, SupervisorModeChanged(lifecycleStateChanged)) ⇒
+      case (ContainerMode.Idle, SupervisorModeChanged(lifecycleStateChanged)) ⇒
         onLifecycleStateChanged(lifecycleStateChanged)
       case (containerMode, message) ⇒ println(s"Container in $containerMode received an unexpected message: $message")
     }
@@ -66,7 +67,7 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
   }
 
   def waitForRunningComponents(): Unit = {
-    mode = ContainerMode.Initialize
+    mode = ContainerMode.Idle
     supervisors.foreach(
       _.supervisor ! LifecycleStateSubscription(Subscribe[LifecycleStateChanged](lifecycleChangeAdapterActor))
     )
@@ -86,6 +87,12 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
   def onRestart(): Unit = {
     waitForRunningComponents()
     sendAllComponents(Restart)
+  }
+
+  def onShutdown(): Unit = {
+    mode = ContainerMode.Idle
+    unregisterFromLocationService()
+    sendAllComponents(Shutdown)
   }
 
   def registerWithLocationService(): Unit = {}

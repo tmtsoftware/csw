@@ -35,7 +35,7 @@ class ContainerTest extends FunSuite with Matchers {
     val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
     val container = new Container(ctx, containerInfo)
 
-    container.mode shouldBe ContainerMode.Initialize
+    container.mode shouldBe ContainerMode.Idle
   }
 
   test("container should change its mode to running after all components move to running mode") {
@@ -65,24 +65,18 @@ class ContainerTest extends FunSuite with Matchers {
     container.mode shouldBe ContainerMode.Running
   }
 
-  test("container should handle Lifecycle messages by forwarding to all components") {
+  test(
+    "container should handle Shutdown Lifecycle message by changing it's mode to Idle and forwarding the message to all components"
+  ) {
     val runningContainer = new RunningContainer
     import runningContainer._
-
-    container.onMessage(Lifecycle(GoOnline))
-    containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
-      .map(_.receiveMsg()) should contain only Lifecycle(GoOnline)
-
-    container.onMessage(Lifecycle(GoOffline))
-    containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
-      .map(_.receiveMsg()) should contain only Lifecycle(GoOffline)
 
     container.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
       .map(_.receiveMsg()) should contain only Lifecycle(ToComponentLifecycleMessage.Shutdown)
+
+    container.mode shouldBe ContainerMode.Idle
   }
 
   test(
@@ -93,7 +87,7 @@ class ContainerTest extends FunSuite with Matchers {
 
     container.runningComponents shouldBe List.empty
     container.onMessage(Lifecycle(Restart))
-    container.mode shouldBe ContainerMode.Initialize
+    container.mode shouldBe ContainerMode.Idle
 
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox[CommonSupervisorMsg](component.name))
@@ -129,15 +123,52 @@ class ContainerTest extends FunSuite with Matchers {
     container.mode shouldBe ContainerMode.Running
   }
 
-  test("container should be able to handle GetAllComponents message by responding with list of all components") {
+  test("container should handle GoOnline and GoOffline Lifecycle messages by forwarding to all components") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
+    val initialMode = container.mode
+
+    container.onMessage(Lifecycle(GoOnline))
+    containerInfo.components.toList
+      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
+      .map(_.receiveMsg()) should contain only Lifecycle(GoOnline)
+
+    initialMode shouldBe container.mode
+
+    container.onMessage(Lifecycle(GoOffline))
+    containerInfo.components.toList
+      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
+      .map(_.receiveMsg()) should contain only Lifecycle(GoOffline)
+
+    initialMode shouldBe container.mode
+  }
+
+  test("container should be able to handle GetAllComponents message by responding with list of all components") {
+    val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
+    val container = new Container(ctx, containerInfo)
+
+    // Container should handle GetComponents message in Idle mode
+    container.mode shouldBe ContainerMode.Idle
     val probe = TestProbe[Components]
 
     container.onMessage(GetComponents(probe.ref))
 
     probe.expectMsg(Components(container.supervisors))
-  }
 
+    // Container should handle GetComponents message in Running mode
+    ctx.children.map(
+      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+    )
+
+    ctx.children
+      .map(child ⇒ ctx.childInbox(child.upcast))
+      .map(_.receiveAll())
+
+    container.mode shouldBe ContainerMode.Running
+
+    container.onMessage(GetComponents(probe.ref))
+
+    probe.expectMsg(Components(container.supervisors))
+  }
 }

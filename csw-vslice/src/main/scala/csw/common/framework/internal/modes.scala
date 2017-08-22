@@ -20,6 +20,6 @@ object SupervisorMode {
 
 sealed trait ContainerMode
 object ContainerMode {
-  case object Initialize extends ContainerMode
-  case object Running    extends ContainerMode
+  case object Idle    extends ContainerMode
+  case object Running extends ContainerMode
 }
