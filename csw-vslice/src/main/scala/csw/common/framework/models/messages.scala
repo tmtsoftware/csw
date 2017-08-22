@@ -94,8 +94,8 @@ object ContainerMsg {
   case class SupervisorModeChanged(lifecycleStateChanged: LifecycleStateChanged) extends ContainerMsg
 }
 
-case class LifecycleStateChanged(state: SupervisorMode, publisher: ActorRef[SupervisorMsg])
+case class LifecycleStateChanged(state: SupervisorMode, publisher: ActorRef[SupervisorExternalMessage])
 
 case class Components(components: List[SupervisorInfo])
 
-case class SupervisorInfo(supervisor: ActorRef[SupervisorMsg], componentInfo: ComponentInfo)
+case class SupervisorInfo(supervisor: ActorRef[SupervisorExternalMessage], componentInfo: ComponentInfo)

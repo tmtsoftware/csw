@@ -13,7 +13,7 @@ import csw.common.framework.models.CommonSupervisorMsg.{ComponentStateSubscripti
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
-import csw.common.framework.models.{LifecycleStateChanged, SupervisorMsg, ToComponentLifecycleMessage}
+import csw.common.framework.models.{LifecycleStateChanged, SupervisorExternalMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
@@ -32,15 +32,15 @@ import scala.concurrent.duration.DurationInt
 class FrameworkIntegrationTest extends FrameworkComponentTestSuite with MockitoSugar with BeforeAndAfterEach {
   import csw.common.components.SampleComponentState._
 
-  var compStateProbe: TestProbe[CurrentState]               = _
-  var lifecycleStateProbe: TestProbe[LifecycleStateChanged] = _
-  var supervisorBehavior: Behavior[SupervisorMsg]           = _
-  var supervisorRef: ActorRef[SupervisorMsg]                = _
+  var compStateProbe: TestProbe[CurrentState]                 = _
+  var lifecycleStateProbe: TestProbe[LifecycleStateChanged]   = _
+  var supervisorBehavior: Behavior[SupervisorExternalMessage] = _
+  var supervisorRef: ActorRef[SupervisorExternalMessage]      = _
 
   def createSupervisorAndStartTLA(): Unit = {
     compStateProbe = TestProbe[CurrentState]
     lifecycleStateProbe = TestProbe[LifecycleStateChanged]
-    supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo)
+    supervisorBehavior = SupervisorBehaviorFactory.behavior(hcdInfo)
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
     Thread.sleep(200)
@@ -51,7 +51,7 @@ class FrameworkIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
     compStateProbe = TestProbe[CurrentState]
     lifecycleStateProbe = TestProbe[LifecycleStateChanged]
-    supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo)
+    supervisorBehavior = SupervisorBehaviorFactory.behavior(hcdInfo)
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
@@ -163,7 +163,7 @@ class FrameworkIntegrationTest extends FrameworkComponentTestSuite with MockitoS
   // DEOPSCSW-179: Unique Action for a component
   test("supervisor should receive ShutdownFailure message when component fails to shutdown") {
     val stateChangedProbe = TestProbe[LifecycleStateChanged]
-    supervisorBehavior = SupervisorBehaviorFactory.make(assemblyInfoToSimulateFailure)
+    supervisorBehavior = SupervisorBehaviorFactory.behavior(assemblyInfoToSimulateFailure)
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
     Thread.sleep(200)

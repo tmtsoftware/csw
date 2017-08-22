@@ -47,10 +47,10 @@ public class JFrameworkIntegrationTest {
             "csw.common.framework.javadsl.integration.JSampleComponentWiring");
 
     private Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-    private Behavior<SupervisorMsg> supervisorBehavior = SupervisorBehaviorFactory.make(hcdInfo);
+    private Behavior<SupervisorExternalMessage> supervisorBehavior = SupervisorBehaviorFactory.behavior(hcdInfo);
     private FiniteDuration duration = Duration.create(5, "seconds");
-    private Future<ActorRef<SupervisorMsg>> systemActorOf;
-    private ActorRef<SupervisorMsg> supervisorRef;
+    private Future<ActorRef<SupervisorExternalMessage>> systemActorOf;
+    private ActorRef<SupervisorExternalMessage> supervisorRef;
     private TestProbe<CurrentState> compStateProbe;
     private TestProbe<LifecycleStateChanged> lifecycleStateChangedProbe;
 

@@ -6,16 +6,16 @@ import akka.typed.{Behavior, Props, Terminated}
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.Supervisor
-import csw.common.framework.models.SupervisorMsg
+import csw.common.framework.models.SupervisorExternalMessage
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 class SupervisorBehaviorTest extends FrameworkComponentTestSuite {
 
-  val supervisorBehavior: Behavior[SupervisorMsg] = SupervisorBehaviorFactory.make(hcdInfo)
+  val supervisorBehavior: Behavior[SupervisorExternalMessage] = SupervisorBehaviorFactory.behavior(hcdInfo)
 
   test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state") {
-    val ctx = new EffectfulActorContext[SupervisorMsg]("supervisor", supervisorBehavior, 100, system)
+    val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
 
     ctx.getAllEffects() should contain allOf (
       Spawned(Supervisor.ComponentActor, Props.empty),
@@ -25,7 +25,7 @@ class SupervisorBehaviorTest extends FrameworkComponentTestSuite {
   }
 
   test("Supervisor should watch child component actor [TLA]") {
-    val ctx = new EffectfulActorContext[SupervisorMsg]("supervisor", supervisorBehavior, 100, system)
+    val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
 
     val componentActor       = ctx.childInbox(Supervisor.ComponentActor).ref
     val pubSubLifecycleActor = ctx.childInbox(Supervisor.PubSubLifecycleActor).ref
@@ -37,7 +37,7 @@ class SupervisorBehaviorTest extends FrameworkComponentTestSuite {
   }
 
   test("Supervisor should handle Terminated signal by unwatching component actor and stopping other child actors") {
-    val ctx = new EffectfulActorContext[SupervisorMsg]("supervisor", supervisorBehavior, 100, system)
+    val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
 
     val componentActor = ctx.childInbox(Supervisor.ComponentActor).ref
 
