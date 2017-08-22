@@ -6,6 +6,8 @@ import csw.services.location.models.ComponentType.{Assembly, HCD}
 import csw.services.location.models.Connection
 import org.scalatest.{FunSuite, Matchers}
 
+//DEOPSCSW-283: Parsing HOCON conf file
+//DEOPSCSW-170: Starting component using a file format
 class ComponentInfoParserTest extends FunSuite with Matchers {
 
   private val assemblyInfo = ComponentInfo(
