@@ -1,4 +1,4 @@
-val enableCoverage = sys.props.get("enableCoverage") == Some("true")
+val enableCoverage         = sys.props.get("enableCoverage") == Some("true")
 val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
@@ -109,7 +109,7 @@ lazy val `csw-config-client` = project
   .dependsOn(
     `csw-config-api`,
     `csw-config-server` % "test->test",
-    `csw-location` % "compile->compile;multi-jvm->multi-jvm"
+    `csw-location`      % "compile->compile;multi-jvm->multi-jvm"
   )
   .settings(
     libraryDependencies ++= Dependencies.ConfigClient
@@ -120,7 +120,7 @@ lazy val `csw-config-client-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-config-server` % "test->test",
-    `csw-location` % "multi-jvm->multi-jvm"
+    `csw-location`      % "multi-jvm->multi-jvm"
   )
   .settings(
     libraryDependencies ++= Dependencies.CswConfigClientCli
@@ -139,7 +139,6 @@ lazy val `csw-framework-apps` = project
   .settings(
     libraryDependencies ++= Dependencies.CswFrameworkApps
   )
-
 
 //Integration test project
 lazy val integration = project
