@@ -1,9 +1,9 @@
 package csw.common.framework.internal
 
-import akka.typed.ActorSystem
 import akka.typed.scaladsl.Actor
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
+import akka.typed.{ActorRef, ActorSystem}
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
 import csw.common.framework.models.ContainerMsg.{GetComponents, SupervisorModeChanged}
@@ -11,7 +11,11 @@ import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.SupervisorFactory
+import csw.common.framework.scaladsl.{SupervisorBehaviorFactory, SupervisorFactory}
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito._
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
@@ -19,12 +23,22 @@ import org.scalatest.{FunSuite, Matchers}
 class ContainerTest extends FunSuite with Matchers with MockitoSugar {
   implicit val system: ActorSystem[Nothing] = ActorSystem(Actor.empty, "container-system")
   implicit val settings: TestKitSettings    = TestKitSettings(system)
-  val supervisorFactory: SupervisorFactory  = mock[SupervisorFactory]
 
-  class RunningContainer() {
-    val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
+  class IdleContainer() {
+    val ctx                                  = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
+    val supervisorFactory: SupervisorFactory = mock[SupervisorFactory]
+    val answer = new Answer[ActorRef[SupervisorExternalMessage]] {
+      override def answer(invocation: InvocationOnMock): ActorRef[SupervisorExternalMessage] =
+        ctx.spawn(SupervisorBehaviorFactory.behavior(invocation.getArgument(0)),
+                  invocation.getArgument(0).asInstanceOf[ComponentInfo].name)
+    }
+
+    when(supervisorFactory.make(ArgumentMatchers.any[ComponentInfo]())).thenAnswer(answer)
+
     val container = new Container(ctx, containerInfo, supervisorFactory)
+  }
 
+  class RunningContainer() extends IdleContainer {
     ctx.children.map(
       child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
     )
@@ -34,16 +48,16 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
       .map(_.receiveAll())
   }
 
-  ignore("should start in initialize mode and should not accept any outside messages") {
-    val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
-    val container = new Container(ctx, containerInfo, supervisorFactory)
+  test("should start in initialize mode and should not accept any outside messages") {
+    val idleContainer = new IdleContainer
+    import idleContainer._
 
     container.mode shouldBe ContainerMode.Idle
   }
 
-  ignore("should change its mode to running after all components move to running mode") {
-    val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
-    val container = new Container(ctx, containerInfo, supervisorFactory)
+  test("should change its mode to running after all components move to running mode") {
+    val idleContainer = new IdleContainer
+    import idleContainer._
 
     // supervisor per component + lifecycleStateTrackerRef
     ctx.children.size shouldBe (containerInfo.components.size + 1)
@@ -70,7 +84,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     container.mode shouldBe ContainerMode.Running
   }
 
-  ignore("should handle Shutdown message by changing it's mode to Idle and forwarding the message to all components") {
+  test("should handle Shutdown message by changing it's mode to Idle and forwarding the message to all components") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
@@ -82,7 +96,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     container.mode shouldBe ContainerMode.Idle
   }
 
-  ignore("should handle restart message by changing its mode to initialize and subscribes to all components") {
+  test("should handle restart message by changing its mode to initialize and subscribes to all components") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
@@ -99,7 +113,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
       .map(_.receiveMsg()) should contain only Lifecycle(Restart)
   }
 
-  ignore("should change its mode from restarting to running after all components have restarted") {
+  test("should change its mode from restarting to running after all components have restarted") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
@@ -122,7 +136,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     container.mode shouldBe ContainerMode.Running
   }
 
-  ignore("should handle GoOnline and GoOffline Lifecycle messages by forwarding to all components") {
+  test("should handle GoOnline and GoOffline Lifecycle messages by forwarding to all components") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
@@ -143,9 +157,9 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     initialMode shouldBe container.mode
   }
 
-  ignore("container should be able to handle GetAllComponents message by responding with list of all components") {
-    val ctx       = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
-    val container = new Container(ctx, containerInfo, supervisorFactory)
+  test("container should be able to handle GetAllComponents message by responding with list of all components") {
+    val idleContainer = new IdleContainer
+    import idleContainer._
 
     // Container should handle GetComponents message in Idle mode
     container.mode shouldBe ContainerMode.Idle
