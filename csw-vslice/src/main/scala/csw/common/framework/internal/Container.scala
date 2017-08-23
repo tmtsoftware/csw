@@ -2,17 +2,22 @@ package csw.common.framework.internal
 
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
-import akka.typed.{ActorRef, ActorSystem, Behavior, PostStop, Signal}
+import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
 import csw.common.framework.models.ContainerMsg.{GetComponents, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage._
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.SupervisorBehaviorFactory
+import csw.common.framework.scaladsl.SupervisorFactory
 import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult}
 
-class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) extends MutableBehavior[ContainerMsg] {
+class Container(
+    ctx: ActorContext[ContainerMsg],
+    containerInfo: ContainerInfo,
+    supervisorFactory: SupervisorFactory
+) extends MutableBehavior[ContainerMsg] {
+
   val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
   var supervisors: List[SupervisorInfo]           = List.empty
   var runningComponents: List[SupervisorInfo]     = List.empty
@@ -76,10 +81,7 @@ class Container(ctx: ActorContext[ContainerMsg], containerInfo: ContainerInfo) e
   private def createComponent(componentInfo: ComponentInfo): Option[SupervisorInfo] = {
     supervisors.find(_.componentInfo == componentInfo) match {
       case Some(_) => None
-      case None =>
-        val supervisorBehavior = SupervisorBehaviorFactory.behavior(componentInfo)
-        val system             = ActorSystem(supervisorBehavior, s"${componentInfo.name}-system")
-        Some(SupervisorInfo(system, componentInfo))
+      case None    => Some(SupervisorInfo(supervisorFactory.make(componentInfo), componentInfo))
     }
   }
 

@@ -5,7 +5,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter._
 import csw.common.framework.internal.configparser.ComponentInfoParser
 import csw.common.framework.models.{ComponentInfo, ContainerInfo, ContainerMsg, SupervisorExternalMessage}
-import csw.common.framework.scaladsl.{ContainerBehaviorFactory, SupervisorBehaviorFactory}
+import csw.common.framework.scaladsl.{ContainerBehaviorFactory, SupervisorBehaviorFactory, SupervisorFactory}
 
 object Component {
   def create(
@@ -27,7 +27,8 @@ object Component {
 
   private def createContainer(containerInfo: ContainerInfo): ActorRef[ContainerMsg] = {
     val system            = ActorSystem(s"${containerInfo.name}-system")
-    val containerBehavior = ContainerBehaviorFactory.behavior(containerInfo)
+    val supervisorFactory = new SupervisorFactory
+    val containerBehavior = ContainerBehaviorFactory.behavior(containerInfo, supervisorFactory)
     system.spawn(containerBehavior, containerInfo.name)
   }
 }

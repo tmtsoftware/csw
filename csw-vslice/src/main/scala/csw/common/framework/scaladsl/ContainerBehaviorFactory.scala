@@ -6,6 +6,6 @@ import csw.common.framework.internal.Container
 import csw.common.framework.models.{ContainerInfo, ContainerMsg}
 
 object ContainerBehaviorFactory {
-  def behavior(containerInfo: ContainerInfo): Behavior[ContainerMsg] =
-    Actor.mutable(ctx ⇒ new Container(ctx, containerInfo))
+  def behavior(containerInfo: ContainerInfo, supervisorFactory: SupervisorFactory): Behavior[ContainerMsg] =
+    Actor.mutable(ctx ⇒ new Container(ctx, containerInfo, supervisorFactory))
 }
