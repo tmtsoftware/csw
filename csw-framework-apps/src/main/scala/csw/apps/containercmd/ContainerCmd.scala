@@ -2,6 +2,7 @@ package csw.apps.containercmd
 
 import com.typesafe.config.ConfigFactory
 import csw.apps.containercmd.cli.ArgsParser
+import csw.common.framework.scaladsl.Component
 
 class ContainerCmd {
   def run(args: Array[String], resources: Map[String, String] = Map.empty): Unit = {
@@ -11,7 +12,8 @@ class ContainerCmd {
       case Some(options) =>
         if (options.local) {
           val config = ConfigFactory.parseFile(options.inputFilePath.get.toFile)
-          Component.create(options.standalone, config)
+          if (options.standalone) Component.createStandalone(config)
+          else Component.createContainer(config)
         } else {
           //fetch from Config service
         }
