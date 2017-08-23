@@ -6,6 +6,7 @@ import csw.common.framework.internal.SupervisorMode
 import csw.common.framework.models.PubSub.SubscriberMsg
 import csw.param.commands.ControlCommand
 import csw.param.states.CurrentState
+import csw.services.location.models.RegistrationResult
 
 /////////////
 
@@ -90,8 +91,13 @@ sealed trait SupervisorMsg
 
 sealed trait ContainerMsg
 object ContainerMsg {
-  case class GetComponents(replyTo: ActorRef[Components])                        extends ContainerMsg
-  case class SupervisorModeChanged(lifecycleStateChanged: LifecycleStateChanged) extends ContainerMsg
+  case class GetComponents(replyTo: ActorRef[Components]) extends ContainerMsg
+}
+
+sealed trait IdleContainerMsg extends ContainerMsg
+object IdleContainerMsg {
+  case class SupervisorModeChanged(lifecycleStateChanged: LifecycleStateChanged) extends IdleContainerMsg
+  case class RegistrationComplete(registrationResult: RegistrationResult)        extends IdleContainerMsg
 }
 
 case class LifecycleStateChanged(state: SupervisorMode, publisher: ActorRef[SupervisorExternalMessage])

@@ -4,6 +4,8 @@ import java.net.URI
 
 import akka.actor.{ActorPath, ActorRef, Address}
 import akka.serialization.Serialization
+import akka.typed
+import akka.typed.scaladsl.adapter.TypedActorRefOps
 import csw.services.location.commons.LocationServiceLogger
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -20,6 +22,11 @@ sealed abstract class Registration {
    * @param hostname Provide a hostname where the connection endpoint is available
    */
   def location(hostname: String): Location
+}
+
+object Registration {
+  def akkaTyped(akkaConnection: AkkaConnection, actorRef: typed.ActorRef[_]): AkkaRegistration =
+    AkkaRegistration(akkaConnection, actorRef.toUntyped)
 }
 
 /**

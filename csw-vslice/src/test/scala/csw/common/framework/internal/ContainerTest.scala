@@ -6,12 +6,14 @@ import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.typed.{ActorRef, ActorSystem}
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
-import csw.common.framework.models.ContainerMsg.{GetComponents, SupervisorModeChanged}
+import csw.common.framework.models.ContainerMsg.GetComponents
+import csw.common.framework.models.IdleContainerMsg.SupervisorModeChanged
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{SupervisorBehaviorFactory, SupervisorFactory}
+import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
@@ -21,8 +23,9 @@ import org.scalatest.{FunSuite, Matchers}
 
 //DEOPSCSW-182-Control Life Cycle of Components
 class ContainerTest extends FunSuite with Matchers with MockitoSugar {
-  implicit val system: ActorSystem[Nothing] = ActorSystem(Actor.empty, "container-system")
-  implicit val settings: TestKitSettings    = TestKitSettings(system)
+  implicit val system: ActorSystem[Nothing]    = ActorSystem(Actor.empty, "container-system")
+  implicit val settings: TestKitSettings       = TestKitSettings(system)
+  private val locationService: LocationService = mock[LocationService]
 
   class IdleContainer() {
     val ctx                                  = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
@@ -35,7 +38,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
     when(supervisorFactory.make(ArgumentMatchers.any[ComponentInfo]())).thenAnswer(answer)
 
-    val container = new Container(ctx, containerInfo, supervisorFactory)
+    val container = new Container(ctx, containerInfo, supervisorFactory, locationService)
   }
 
   class RunningContainer() extends IdleContainer {

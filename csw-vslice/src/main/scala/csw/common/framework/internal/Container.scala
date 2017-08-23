@@ -4,18 +4,26 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
-import csw.common.framework.models.ContainerMsg.{GetComponents, SupervisorModeChanged}
+import csw.common.framework.models.ContainerMsg.GetComponents
+import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage._
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.SupervisorFactory
-import csw.services.location.models.{ComponentId, ComponentType, RegistrationResult}
+import csw.services.location.models.Connection.AkkaConnection
+import csw.services.location.models._
+import csw.services.location.scaladsl.LocationService
+
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationDouble
+import scala.util.{Failure, Success}
 
 class Container(
     ctx: ActorContext[ContainerMsg],
     containerInfo: ContainerInfo,
-    supervisorFactory: SupervisorFactory
+    supervisorFactory: SupervisorFactory,
+    locationService: LocationService
 ) extends MutableBehavior[ContainerMsg] {
 
   val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
@@ -96,12 +104,31 @@ class Container(
   private def updateRunningComponents(componentSupervisor: ActorRef[SupervisorExternalMessage]): Unit = {
     runningComponents = (supervisors.find(_.supervisor == componentSupervisor) ++ runningComponents).toList
     if (runningComponents.size == supervisors.size) {
-      mode = ContainerMode.Running
-      runningComponents = List.empty
+      registerWithLocationService()
     }
   }
 
-  def registerWithLocationService(): Unit = {}
+  private def registerWithLocationService(): Unit = {
+    import scala.concurrent.ExecutionContext.Implicits.global
+    val registrationResultF = locationService.register(Registration.akkaTyped(AkkaConnection(componentId), ctx.self))
+    registrationResultF.onComplete {
+      case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
+      case Failure(ex)                 ⇒ println("log.error()")
+    }
+  }
 
-  def unregisterFromLocationService(): Unit = {}
+  private def onRegistrationComplete(registrationResult: RegistrationResult): Unit = {
+    registrationOpt = Some(registrationResult)
+    mode = ContainerMode.Running
+    runningComponents = List.empty
+  }
+
+  private def unregisterFromLocationService(): Any = {
+    registrationOpt match {
+      case Some(registrationResult) ⇒
+        Await.result(registrationResult.unregister(), 10.seconds)
+      //TODO: change this to logging
+      case None ⇒ println("No valid RegistrationResult found; can't unregister.")
+    }
+  }
 }
