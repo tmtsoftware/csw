@@ -100,6 +100,11 @@ object IdleContainerMsg {
   case class RegistrationComplete(registrationResult: RegistrationResult)        extends IdleContainerMsg
 }
 
+sealed trait RunningContainerMsg extends ContainerMsg
+object RunningContainerMsg {
+  case object UnRegistrationComplete extends RunningContainerMsg
+}
+
 case class LifecycleStateChanged(state: SupervisorMode, publisher: ActorRef[SupervisorExternalMessage])
 
 case class Components(components: List[SupervisorInfo])

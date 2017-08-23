@@ -5,13 +5,15 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter._
 import csw.common.framework.internal.configparser.ComponentInfoParser
 import csw.common.framework.models.{ContainerMsg, SupervisorExternalMessage}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 object Component {
 
   def createContainer(config: com.typesafe.config.Config): ActorRef[ContainerMsg] = {
     val containerInfo     = ComponentInfoParser.parse(config)
     val system            = ActorSystem(s"${containerInfo.name}-system")
-    val containerBehavior = ContainerBehaviorFactory.behavior(containerInfo)
+    val locationService   = LocationServiceFactory.withSystem(system)
+    val containerBehavior = ContainerBehaviorFactory.behavior(containerInfo, locationService)
     system.spawn(containerBehavior, containerInfo.name)
   }
 
