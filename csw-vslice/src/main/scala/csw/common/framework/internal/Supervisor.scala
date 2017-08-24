@@ -56,12 +56,12 @@ class Supervisor(
 
   override def onMessage(msg: SupervisorMsg): Behavior[SupervisorMsg] = {
     (mode, msg) match {
-      case (_, msg: CommonSupervisorMsg)                                             => onCommonMessages(msg)
-      case (SupervisorMode.Idle, msg: SupervisorIdleMsg)                             => onIdleMessages(msg)
+      case (_, msg: CommonSupervisorMsg)                                             => onCommon(msg)
+      case (SupervisorMode.Idle, msg: SupervisorIdleMsg)                             => onIdle(msg)
       case (SupervisorMode.Running | SupervisorMode.RunningOffline, msg: RunningMsg) => onRunning(msg)
       case (SupervisorMode.PreparingToShutdown, msg: PreparingToShutdownMsg)         => onPreparingToShutdown(msg)
-      case (supervisorMode, message) =>
-        println(s"Supervisor in $supervisorMode received an unexpected message: $message")
+      case (_, message) =>
+        println(s"Supervisor in $mode received an unexpected message: $message")
     }
     this
   }
@@ -74,13 +74,13 @@ class Supervisor(
       Behavior.stopped
   }
 
-  def onCommonMessages(msg: CommonSupervisorMsg): Unit = msg match {
+  def onCommon(msg: CommonSupervisorMsg): Unit = msg match {
     case LifecycleStateSubscription(subscriberMsg) => pubSubLifecycle ! subscriberMsg
     case ComponentStateSubscription(subscriberMsg) => pubSubComponent ! subscriberMsg
     case HaltComponent                             => haltingFlag = true; handleShutdown()
   }
 
-  def onIdleMessages(msg: SupervisorIdleMsg): Unit = msg match {
+  def onIdle(msg: SupervisorIdleMsg): Unit = msg match {
     case Initialized(componentRef) =>
       registerWithLocationService()
       componentRef ! Run

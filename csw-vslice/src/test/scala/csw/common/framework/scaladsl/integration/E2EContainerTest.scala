@@ -8,9 +8,9 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.components.SampleComponentState._
 import csw.common.framework.internal.{ContainerMode, SupervisorMode}
+import csw.common.framework.models.CommonContainerMsg.{GetComponents, GetContainerMode}
 import csw.common.framework.models.CommonSupervisorMsg.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.{Components, LifecycleStateChanged}
-import csw.common.framework.models.ContainerMsg.{GetComponents, GetContainerMode}
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
@@ -66,7 +66,7 @@ class E2EContainerTest extends FunSuite with Matchers {
     filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(SupervisorMode.Running, filterSupervisor))
     disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(SupervisorMode.Running, disperserSupervisor))
 
-    Thread.sleep(50)
+    Thread.sleep(100)
 
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Running)
@@ -102,7 +102,7 @@ class E2EContainerTest extends FunSuite with Matchers {
     filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(SupervisorMode.Running, filterSupervisor))
     disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(SupervisorMode.Running, disperserSupervisor))
 
-    Thread.sleep(50)
+    Thread.sleep(100)
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Running)
   }

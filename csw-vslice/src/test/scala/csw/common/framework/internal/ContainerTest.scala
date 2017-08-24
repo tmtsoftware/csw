@@ -1,13 +1,13 @@
 package csw.common.framework.internal
 
-import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
+import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.common.framework.FrameworkComponentTestInfos._
+import csw.common.framework.models.CommonContainerMsg.GetComponents
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
-import csw.common.framework.models.ContainerMsg.GetComponents
 import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningContainerMsg.{UnRegistrationComplete, UnRegistrationFailed}

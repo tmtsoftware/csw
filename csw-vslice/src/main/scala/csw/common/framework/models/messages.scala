@@ -57,7 +57,7 @@ object CommandMsg {
 
 sealed trait RunningMsg extends ComponentMsg with SupervisorExternalMessage
 object RunningMsg {
-  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMsg with ContainerMsg
+  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMsg with RunningContainerMsg
   trait DomainMsg                                            extends RunningMsg
 }
 
@@ -91,9 +91,10 @@ sealed trait SupervisorMsg
 ///////////////
 
 sealed trait ContainerMsg
-object ContainerMsg {
-  case class GetComponents(replyTo: ActorRef[Components])       extends ContainerMsg
-  case class GetContainerMode(replyTo: ActorRef[ContainerMode]) extends ContainerMsg
+sealed trait CommonContainerMsg extends ContainerMsg
+object CommonContainerMsg {
+  case class GetComponents(replyTo: ActorRef[Components])       extends CommonContainerMsg
+  case class GetContainerMode(replyTo: ActorRef[ContainerMode]) extends CommonContainerMsg
 }
 
 sealed trait IdleContainerMsg extends ContainerMsg

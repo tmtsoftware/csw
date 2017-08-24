@@ -3,8 +3,8 @@ package csw.common.framework.internal
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
+import csw.common.framework.models.CommonContainerMsg.{GetComponents, GetContainerMode}
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
-import csw.common.framework.models.ContainerMsg.{GetComponents, GetContainerMode}
 import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningContainerMsg.{UnRegistrationComplete, UnRegistrationFailed}
@@ -35,31 +35,42 @@ class Container(
   var registrationOpt: Option[RegistrationResult] = None
   val akkaRegistration: AkkaRegistration          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   val lifecycleStateTrackerRef: ActorRef[LifecycleStateChanged] =
-    ctx.spawnAdapter(SupervisorModeChanged, "LifecycleChangeAdapter")
+    ctx.spawnAdapter(SupervisorModeChanged, "LifecycleStateTracker")
 
   createComponents(containerInfo.components)
 
   override def onMessage(msg: ContainerMsg): Behavior[ContainerMsg] = {
     (mode, msg) match {
-      case (_, GetComponents(replyTo))                              ⇒ replyTo ! Components(supervisors)
-      case (_, GetContainerMode(replyTo))                           ⇒ replyTo ! mode
-      case (ContainerMode.Running, Lifecycle(Restart))              ⇒ onRestart()
-      case (ContainerMode.Running, Lifecycle(Shutdown))             ⇒ onShutdown()
-      case (ContainerMode.Running, Lifecycle(lifecycleMsg))         ⇒ sendLifecycleMsgToAllComponents(lifecycleMsg)
-      case (ContainerMode.Running, UnRegistrationComplete)          ⇒ onUnRegistrationComplete()
-      case (ContainerMode.Running, UnRegistrationFailed(throwable)) ⇒ onUnRegistrationFailed(throwable)
-      case (ContainerMode.Idle, SupervisorModeChanged(lifecycleStateChanged)) ⇒
-        onLifecycleStateChanged(lifecycleStateChanged)
-      case (ContainerMode.Idle, RegistrationComplete(registrationResult)) ⇒ onRegistrationComplete(registrationResult)
-      case (ContainerMode.Idle, RegistrationFailed(throwable))            ⇒ onRegistrationFailure(throwable)
-      case (containerMode, message)                                       ⇒ println(s"Container in $containerMode received an unexpected message: $message")
+      case (_, msg: CommonContainerMsg)                      ⇒ onCommon(msg)
+      case (ContainerMode.Idle, msg: IdleContainerMsg)       ⇒ onIdle(msg)
+      case (ContainerMode.Running, msg: RunningContainerMsg) ⇒ onRunning(msg)
+      case (_, message)                                      ⇒ println(s"Container in $mode received an unexpected message: $message")
     }
     this
   }
 
+  def onCommon(commonContainerMsg: CommonContainerMsg): Unit = commonContainerMsg match {
+    case GetComponents(replyTo)    => replyTo ! Components(supervisors)
+    case GetContainerMode(replyTo) => replyTo ! mode
+  }
+
+  def onIdle(idleContainerMsg: IdleContainerMsg): Unit = idleContainerMsg match {
+    case SupervisorModeChanged(lifecycleStateChanged) ⇒ onLifecycleStateChanged(lifecycleStateChanged)
+    case RegistrationComplete(registrationResult)     ⇒ onRegistrationComplete(registrationResult)
+    case RegistrationFailed(throwable)                ⇒ onRegistrationFailure(throwable)
+  }
+
+  def onRunning(runningContainerMsg: RunningContainerMsg): Unit = runningContainerMsg match {
+    case Lifecycle(Restart)              ⇒ onRestart()
+    case Lifecycle(Shutdown)             ⇒ onShutdown()
+    case Lifecycle(lifecycleMsg)         ⇒ sendLifecycleMsgToAllComponents(lifecycleMsg)
+    case UnRegistrationComplete          ⇒ onUnRegistrationComplete()
+    case UnRegistrationFailed(throwable) ⇒ onUnRegistrationFailed(throwable)
+  }
+
   def onRestart(): Unit = {
     mode = ContainerMode.Idle
-    subscribeLifecycleTrackerWithAllSupervisors()
+    subscribeToSupervisorsLifecycle()
     sendLifecycleMsgToAllComponents(Restart)
   }
 
@@ -72,30 +83,26 @@ class Container(
   def onLifecycleStateChanged(lifecycleStateChanged: LifecycleStateChanged): Unit = {
     if (lifecycleStateChanged.state == SupervisorMode.Running) {
       val componentSupervisor = lifecycleStateChanged.publisher
-      unsubscribeLifecycleTracker(componentSupervisor)
+      unSubscribeFromSupervisorsLifecycle(componentSupervisor)
       updateRunningComponents(componentSupervisor)
     }
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
     supervisors = supervisors ::: componentInfos.flatMap(createComponent).toList
-    subscribeLifecycleTrackerWithAllSupervisors()
+    subscribeToSupervisorsLifecycle()
   }
 
   private def createComponent(componentInfo: ComponentInfo): Option[SupervisorInfo] = {
-    supervisors.find(_.componentInfo == componentInfo) match {
-      case Some(_) => None
-      case None    => Some(supervisorFactory.make(componentInfo))
-    }
+    if (supervisors.exists(_.componentInfo == componentInfo)) None
+    else Some(supervisorFactory.make(componentInfo))
   }
 
-  private def subscribeLifecycleTrackerWithAllSupervisors(): Unit = {
+  private def subscribeToSupervisorsLifecycle(): Unit =
     supervisors.foreach(_.supervisor ! LifecycleStateSubscription(Subscribe(lifecycleStateTrackerRef)))
-  }
 
-  private def unsubscribeLifecycleTracker(componentSupervisor: ActorRef[SupervisorExternalMessage]): Unit = {
+  private def unSubscribeFromSupervisorsLifecycle(componentSupervisor: ActorRef[SupervisorExternalMessage]): Unit =
     componentSupervisor ! LifecycleStateSubscription(Unsubscribe(lifecycleStateTrackerRef))
-  }
 
   private def updateRunningComponents(componentSupervisor: ActorRef[SupervisorExternalMessage]): Unit = {
     runningComponents = (supervisors.find(_.supervisor == componentSupervisor) ++ runningComponents).toList
@@ -108,10 +115,26 @@ class Container(
     pipeRegistrationToSelf(registrationResultF)
   }
 
+  private def unregisterFromLocationService(): Any = {
+    registrationOpt match {
+      case Some(registrationResult) ⇒
+        pipeUnRegistrationToSelf(registrationResult.unregister())
+      case None ⇒
+        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
+    }
+  }
+
   private def pipeRegistrationToSelf(registrationResultF: Future[RegistrationResult]): Unit = {
     registrationResultF.onComplete {
       case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
       case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
+    }
+  }
+
+  private def pipeUnRegistrationToSelf(registrationResultF: Future[_]): Unit = {
+    registrationResultF.onComplete {
+      case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
+      case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
     }
   }
 
@@ -123,22 +146,6 @@ class Container(
 
   private def onRegistrationFailure(throwable: Throwable): Unit =
     println(s"log.error($throwable)") //FIXME use log statement
-
-  private def unregisterFromLocationService(): Any = {
-    registrationOpt match {
-      case Some(registrationResult) ⇒
-        pipeUnregisterationToSelf(registrationResult.unregister())
-      case None ⇒
-        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
-    }
-  }
-
-  private def pipeUnregisterationToSelf(registrationResultF: Future[_]): Unit = {
-    registrationResultF.onComplete {
-      case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
-      case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
-    }
-  }
 
   private def onUnRegistrationComplete(): Unit = {
     mode = ContainerMode.Idle
