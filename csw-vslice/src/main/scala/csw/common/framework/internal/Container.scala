@@ -2,35 +2,37 @@ package csw.common.framework.internal
 
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
-import akka.typed.scaladsl.adapter.TypedActorRefOps
-import akka.typed.{ActorRef, Behavior, PostStop, Signal}
+import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
 import csw.common.framework.models.ContainerMsg.GetComponents
-import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, SupervisorModeChanged}
+import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
-import csw.common.framework.models.RunningContainerMsg.UnRegistrationComplete
+import csw.common.framework.models.RunningContainerMsg.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage._
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.SupervisorFactory
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class Container(
-    ctx: ActorContext[ContainerMsg],
-    containerInfo: ContainerInfo,
-    supervisorFactory: SupervisorFactory,
-    locationService: LocationService
-) extends MutableBehavior[ContainerMsg] {
+class Container(ctx: ActorContext[ContainerMsg],
+                containerInfo: ContainerInfo,
+                locationService: LocationService,
+                supervisorFactory: SupervisorFactory,
+                registrationFactory: RegistrationFactory)
+    extends MutableBehavior[ContainerMsg] {
 
   val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
   var supervisors: List[SupervisorInfo]           = List.empty
   var runningComponents: List[SupervisorInfo]     = List.empty
   var mode: ContainerMode                         = ContainerMode.Idle
   var registrationOpt: Option[RegistrationResult] = None
+  val akkaRegistration: AkkaRegistration          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   val lifecycleStateTrackerRef: ActorRef[LifecycleStateChanged] =
     ctx.spawnAdapter(SupervisorModeChanged, "LifecycleChangeAdapter")
 
@@ -38,22 +40,19 @@ class Container(
 
   override def onMessage(msg: ContainerMsg): Behavior[ContainerMsg] = {
     (mode, msg) match {
-      case (_, GetComponents(replyTo))                      ⇒ replyTo ! Components(supervisors)
-      case (ContainerMode.Running, Lifecycle(Restart))      ⇒ onRestart()
-      case (ContainerMode.Running, Lifecycle(Shutdown))     ⇒ onShutdown()
-      case (ContainerMode.Running, Lifecycle(lifecycleMsg)) ⇒ sendLifecycleMsgToAllComponents(lifecycleMsg)
-      case (ContainerMode.Running, UnRegistrationComplete)  ⇒ onUnRegistrationComplete()
+      case (_, GetComponents(replyTo))                              ⇒ replyTo ! Components(supervisors)
+      case (ContainerMode.Running, Lifecycle(Restart))              ⇒ onRestart()
+      case (ContainerMode.Running, Lifecycle(Shutdown))             ⇒ onShutdown()
+      case (ContainerMode.Running, Lifecycle(lifecycleMsg))         ⇒ sendLifecycleMsgToAllComponents(lifecycleMsg)
+      case (ContainerMode.Running, UnRegistrationComplete)          ⇒ onUnRegistrationComplete()
+      case (ContainerMode.Running, UnRegistrationFailed(throwable)) ⇒ onUnRegistrationFailed(throwable)
       case (ContainerMode.Idle, SupervisorModeChanged(lifecycleStateChanged)) ⇒
         onLifecycleStateChanged(lifecycleStateChanged)
       case (ContainerMode.Idle, RegistrationComplete(registrationResult)) ⇒ onRegistrationComplete(registrationResult)
+      case (ContainerMode.Idle, RegistrationFailed(throwable))            ⇒ onRegistrationFailure(throwable)
       case (containerMode, message)                                       ⇒ println(s"Container in $containerMode received an unexpected message: $message")
     }
     this
-  }
-
-  //FIXME Do I need this?
-  override def onSignal: PartialFunction[Signal, Behavior[ContainerMsg]] = {
-    case PostStop ⇒ this
   }
 
   def onRestart(): Unit = {
@@ -103,11 +102,14 @@ class Container(
   }
 
   private def registerWithLocationService(): Unit = {
-    val akkaRegistration    = AkkaRegistration(AkkaConnection(componentId), ctx.self.toUntyped)
     val registrationResultF = locationService.register(akkaRegistration)
+    pipeRegistrationToSelf(registrationResultF)
+  }
+
+  private def pipeRegistrationToSelf(registrationResultF: Future[RegistrationResult]): Unit = {
     registrationResultF.onComplete {
       case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
-      case Failure(ex)                 ⇒ println("log.error(ex.getMessage, ex)") //FIXME to log error
+      case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
     }
   }
 
@@ -117,23 +119,30 @@ class Container(
     runningComponents = List.empty
   }
 
+  private def onRegistrationFailure(throwable: Throwable): Unit = println("log.error(") //FIXME use log statement
+
   private def unregisterFromLocationService(): Any = {
     registrationOpt match {
       case Some(registrationResult) ⇒
-        registrationResult.unregister().onComplete {
-          case Success(_)  ⇒ ctx.self ! UnRegistrationComplete
-          case Failure(ex) ⇒ println("log.error(ex.getMessage, ex)") //FIXME to log error
-        }
+        pipeUnregisterationToSelf(registrationResult.unregister())
       case None ⇒
-        println(
-          "log.warn(No valid RegistrationResult found to unregister. Considering unregistration to be completed.)"
-        ) //FIXME to log error
-        ctx.self ! UnRegistrationComplete
+        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
+    }
+  }
+
+  private def pipeUnregisterationToSelf(registrationResultF: Future[_]): Unit = {
+    registrationResultF.onComplete {
+      case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
+      case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
     }
   }
 
   private def onUnRegistrationComplete(): Unit = {
     mode = ContainerMode.Idle
+    registrationOpt = None
     sendLifecycleMsgToAllComponents(Shutdown)
   }
+
+  private def onUnRegistrationFailed(throwable: Throwable): Unit =
+    println(s"log.error() with $throwable") //FIXME use log statement
 }

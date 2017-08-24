@@ -1,34 +1,45 @@
 package csw.common.framework.internal
 
-import akka.typed.scaladsl.Actor
+import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.typed.{ActorRef, ActorSystem}
+import akka.{actor, testkit, Done}
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
 import csw.common.framework.models.ContainerMsg.GetComponents
-import csw.common.framework.models.IdleContainerMsg.SupervisorModeChanged
+import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
+import csw.common.framework.models.RunningContainerMsg.UnRegistrationComplete
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{SupervisorBehaviorFactory, SupervisorFactory}
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.models.Connection.AkkaConnection
+import csw.services.location.models.{AkkaRegistration, RegistrationResult}
+import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
+import org.mockito.internal.verification.AtLeast
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.concurrent.{Future, Promise}
+import scala.util.Success
+
 //DEOPSCSW-182-Control Life Cycle of Components
 class ContainerTest extends FunSuite with Matchers with MockitoSugar {
-  implicit val system: ActorSystem[Nothing]    = ActorSystem(Actor.empty, "container-system")
-  implicit val settings: TestKitSettings       = TestKitSettings(system)
-  private val locationService: LocationService = mock[LocationService]
+  implicit val untypedSystem: actor.ActorSystem      = ActorSystemFactory.remote()
+  implicit val typedSystem: ActorSystem[Nothing]     = untypedSystem.toTyped
+  implicit val settings: TestKitSettings             = TestKitSettings(typedSystem)
+  private val akkaRegistration                       = AkkaRegistration(mock[AkkaConnection], testkit.TestProbe("test-probe").testActor)
+  private val locationService: LocationService       = mock[LocationService]
+  private val registrationResult: RegistrationResult = mock[RegistrationResult]
 
   class IdleContainer() {
-    val ctx                                  = new StubbedActorContext[ContainerMsg]("test-container", 100, system)
+    val ctx                                  = new StubbedActorContext[ContainerMsg]("test-container", 100, typedSystem)
     val supervisorFactory: SupervisorFactory = mock[SupervisorFactory]
     val answer = new Answer[ActorRef[SupervisorExternalMessage]] {
       override def answer(invocation: InvocationOnMock): ActorRef[SupervisorExternalMessage] =
@@ -38,13 +49,26 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
     when(supervisorFactory.make(ArgumentMatchers.any[ComponentInfo]())).thenAnswer(answer)
 
-    val container = new Container(ctx, containerInfo, supervisorFactory, locationService)
+    private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
+    when(registrationFactory.akkaTyped(ArgumentMatchers.any[AkkaConnection], ArgumentMatchers.any[ActorRef[_]]))
+      .thenReturn(akkaRegistration)
+
+    private val eventualRegistrationResult: Future[RegistrationResult] =
+      Promise[RegistrationResult].complete(Success(registrationResult)).future
+    private val eventualDone: Future[Done] = Promise[Done].complete(Success(Done)).future
+
+    when(locationService.register(akkaRegistration)).thenReturn(eventualRegistrationResult)
+    when(registrationResult.unregister()).thenReturn(eventualDone)
+
+    val container = new Container(ctx, containerInfo, locationService, supervisorFactory, registrationFactory)
   }
 
   class RunningContainer() extends IdleContainer {
     ctx.children.map(
       child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
     )
+
+    container.onMessage(RegistrationComplete(registrationResult))
 
     ctx.children
       .map(child ⇒ ctx.childInbox(child.upcast))
@@ -84,7 +108,13 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
       Unsubscribe(container.lifecycleStateTrackerRef)
     )
 
+    verify(locationService).register(akkaRegistration)
+
+    container.onMessage(RegistrationComplete(registrationResult))
+
     container.mode shouldBe ContainerMode.Running
+    container.registrationOpt.get shouldBe registrationResult
+    container.runningComponents shouldBe List.empty
   }
 
   test("should handle Shutdown message by changing it's mode to Idle and forwarding the message to all components") {
@@ -92,6 +122,9 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     import runningContainer._
 
     container.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
+    verify(registrationResult).unregister()
+    container.onMessage(UnRegistrationComplete)
+
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
       .map(_.receiveMsg()) should contain only Lifecycle(ToComponentLifecycleMessage.Shutdown)
@@ -135,6 +168,10 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
       .map(_.receiveMsg()) should contain only LifecycleStateSubscription(
       Unsubscribe(container.lifecycleStateTrackerRef)
     )
+
+    verify(locationService, atLeastOnce()).register(akkaRegistration)
+
+    container.onMessage(RegistrationComplete(registrationResult))
 
     container.mode shouldBe ContainerMode.Running
   }
@@ -180,6 +217,10 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     ctx.children
       .map(child ⇒ ctx.childInbox(child.upcast))
       .map(_.receiveAll())
+
+    verify(locationService, atLeastOnce()).register(akkaRegistration)
+
+    container.onMessage(RegistrationComplete(registrationResult))
 
     container.mode shouldBe ContainerMode.Running
 

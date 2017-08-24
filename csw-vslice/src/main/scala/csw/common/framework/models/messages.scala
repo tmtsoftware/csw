@@ -98,11 +98,13 @@ sealed trait IdleContainerMsg extends ContainerMsg
 object IdleContainerMsg {
   case class SupervisorModeChanged(lifecycleStateChanged: LifecycleStateChanged) extends IdleContainerMsg
   case class RegistrationComplete(registrationResult: RegistrationResult)        extends IdleContainerMsg
+  case class RegistrationFailed(throwable: Throwable)                            extends IdleContainerMsg
 }
 
 sealed trait RunningContainerMsg extends ContainerMsg
 object RunningContainerMsg {
-  case object UnRegistrationComplete extends RunningContainerMsg
+  case object UnRegistrationComplete                    extends RunningContainerMsg
+  case class UnRegistrationFailed(throwable: Throwable) extends RunningContainerMsg
 }
 
 case class LifecycleStateChanged(state: SupervisorMode, publisher: ActorRef[SupervisorExternalMessage])
