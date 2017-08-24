@@ -28,7 +28,7 @@ sealed abstract class Registration {
  * @param actorRef Provide a remote actor that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
  */
-case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef)
+final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef)
     extends Registration
     with LocationServiceLogger.Simple {
 

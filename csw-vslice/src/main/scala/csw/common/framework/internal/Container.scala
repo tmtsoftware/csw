@@ -20,12 +20,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class Container(ctx: ActorContext[ContainerMsg],
-                containerInfo: ContainerInfo,
-                locationService: LocationService,
-                supervisorFactory: SupervisorFactory,
-                registrationFactory: RegistrationFactory)
-    extends MutableBehavior[ContainerMsg] {
+class Container(
+    ctx: ActorContext[ContainerMsg],
+    containerInfo: ContainerInfo,
+    locationService: LocationService,
+    supervisorFactory: SupervisorFactory,
+    registrationFactory: RegistrationFactory
+) extends MutableBehavior[ContainerMsg] {
 
   val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
   var supervisors: List[SupervisorInfo]           = List.empty
