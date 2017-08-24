@@ -1,13 +1,14 @@
 package csw.common.framework.scaladsl
 
 import akka.actor.ActorSystem
-import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import csw.common.framework.models.{ComponentInfo, SupervisorExternalMessage}
+import csw.common.framework.models.{ComponentInfo, SupervisorInfo}
 
 class SupervisorFactory {
-  def make(componentInfo: ComponentInfo): ActorRef[SupervisorExternalMessage] = {
-    val system = ActorSystem(s"${componentInfo.name}-system")
-    system.spawn(SupervisorBehaviorFactory.behavior(componentInfo), componentInfo.name)
+  def make(componentInfo: ComponentInfo): SupervisorInfo = {
+    val system             = ActorSystem(s"${componentInfo.name}-system")
+    val supervisorBehavior = SupervisorBehaviorFactory.behavior(componentInfo)
+    val supervisorRef      = system.spawn(supervisorBehavior, componentInfo.name)
+    SupervisorInfo(system, supervisorRef, componentInfo)
   }
 }

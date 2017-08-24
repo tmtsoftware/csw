@@ -4,7 +4,7 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
-import csw.common.framework.models.ContainerMsg.GetComponents
+import csw.common.framework.models.ContainerMsg.{GetComponents, GetContainerMode}
 import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningContainerMsg.{UnRegistrationComplete, UnRegistrationFailed}
@@ -41,6 +41,7 @@ class Container(ctx: ActorContext[ContainerMsg],
   override def onMessage(msg: ContainerMsg): Behavior[ContainerMsg] = {
     (mode, msg) match {
       case (_, GetComponents(replyTo))                              ⇒ replyTo ! Components(supervisors)
+      case (_, GetContainerMode(replyTo))                           ⇒ replyTo ! mode
       case (ContainerMode.Running, Lifecycle(Restart))              ⇒ onRestart()
       case (ContainerMode.Running, Lifecycle(Shutdown))             ⇒ onShutdown()
       case (ContainerMode.Running, Lifecycle(lifecycleMsg))         ⇒ sendLifecycleMsgToAllComponents(lifecycleMsg)
@@ -83,7 +84,7 @@ class Container(ctx: ActorContext[ContainerMsg],
   private def createComponent(componentInfo: ComponentInfo): Option[SupervisorInfo] = {
     supervisors.find(_.componentInfo == componentInfo) match {
       case Some(_) => None
-      case None    => Some(SupervisorInfo(supervisorFactory.make(componentInfo), componentInfo))
+      case None    => Some(supervisorFactory.make(componentInfo))
     }
   }
 

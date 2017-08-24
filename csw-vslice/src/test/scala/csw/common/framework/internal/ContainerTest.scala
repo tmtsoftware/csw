@@ -1,9 +1,9 @@
 package csw.common.framework.internal
 
+import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
-import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
@@ -20,7 +20,6 @@ import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
-import org.mockito.internal.verification.AtLeast
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.mockito.MockitoSugar
@@ -41,10 +40,13 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
   class IdleContainer() {
     val ctx                                  = new StubbedActorContext[ContainerMsg]("test-container", 100, typedSystem)
     val supervisorFactory: SupervisorFactory = mock[SupervisorFactory]
-    val answer = new Answer[ActorRef[SupervisorExternalMessage]] {
-      override def answer(invocation: InvocationOnMock): ActorRef[SupervisorExternalMessage] =
-        ctx.spawn(SupervisorBehaviorFactory.behavior(invocation.getArgument(0)),
-                  invocation.getArgument(0).asInstanceOf[ComponentInfo].name)
+    val answer = new Answer[SupervisorInfo] {
+      override def answer(invocation: InvocationOnMock): SupervisorInfo = {
+        val componentInfo = invocation.getArgument(0).asInstanceOf[ComponentInfo]
+        SupervisorInfo(untypedSystem,
+                       ctx.spawn(SupervisorBehaviorFactory.behavior(componentInfo), componentInfo.name),
+                       componentInfo)
+      }
     }
 
     when(supervisorFactory.make(ArgumentMatchers.any[ComponentInfo]())).thenAnswer(answer)
