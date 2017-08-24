@@ -17,7 +17,6 @@ import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 class Container(
@@ -112,29 +111,21 @@ class Container(
 
   private def registerWithLocationService(): Unit = {
     val registrationResultF = locationService.register(akkaRegistration)
-    pipeRegistrationToSelf(registrationResultF)
-  }
-
-  private def unregisterFromLocationService(): Any = {
-    registrationOpt match {
-      case Some(registrationResult) ⇒
-        pipeUnRegistrationToSelf(registrationResult.unregister())
-      case None ⇒
-        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
-    }
-  }
-
-  private def pipeRegistrationToSelf(registrationResultF: Future[RegistrationResult]): Unit = {
     registrationResultF.onComplete {
       case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
       case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
     }
   }
 
-  private def pipeUnRegistrationToSelf(registrationResultF: Future[_]): Unit = {
-    registrationResultF.onComplete {
-      case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
-      case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
+  private def unregisterFromLocationService(): Any = {
+    registrationOpt match {
+      case Some(registrationResult) ⇒
+        registrationResult.unregister().onComplete {
+          case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
+          case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
+        }
+      case None ⇒
+        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
     }
   }
 

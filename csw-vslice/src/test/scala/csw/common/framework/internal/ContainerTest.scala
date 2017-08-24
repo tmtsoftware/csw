@@ -246,7 +246,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
       child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
     )
 
-    verify(locationService).register(akkaRegistration)
+    verify(locationService, atLeastOnce()).register(akkaRegistration)
     container.onMessage(RegistrationFailed(runtimeException))
     container.mode shouldBe ContainerMode.Idle
     container.registrationOpt shouldBe None
@@ -265,7 +265,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
     container.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
 
-    verify(registrationResult).unregister()
+    verify(registrationResult, atLeastOnce()).unregister()
     container.onMessage(UnRegistrationFailed(runtimeException))
     container.mode shouldBe ContainerMode.Running
     container.registrationOpt should not be None
