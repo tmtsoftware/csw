@@ -9,6 +9,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-config-client`,
   `csw-config-client-cli`,
   `csw-config-server`,
+  `csw-framework-apps`,
   `csw-location`,
   `csw-location-agent`,
   `csw-benchmark`,
