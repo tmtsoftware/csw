@@ -8,9 +8,9 @@ import akka.{actor, testkit, Done}
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
 import csw.common.framework.models.ContainerMsg.GetComponents
-import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, SupervisorModeChanged}
+import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
-import csw.common.framework.models.RunningContainerMsg.UnRegistrationComplete
+import csw.common.framework.models.RunningContainerMsg.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models._
@@ -26,7 +26,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.{Future, Promise}
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 //DEOPSCSW-182-Control Life Cycle of Components
 class ContainerTest extends FunSuite with Matchers with MockitoSugar {
@@ -229,5 +229,45 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     container.onMessage(GetComponents(probe.ref))
 
     probe.expectMsg(Components(container.supervisors))
+  }
+
+  test("container should retain mode if registration with location service fails") {
+    val idleContainer = new IdleContainer
+    import idleContainer._
+
+    val runtimeException = mock[RuntimeException]
+    val failedResult     = Promise[RegistrationResult].complete(Failure(runtimeException)).future
+    when(locationService.register(akkaRegistration)).thenReturn(failedResult)
+
+    container.mode shouldBe ContainerMode.Idle
+
+    // simulate that container receives LifecycleStateChanged to Running message from all components
+    ctx.children.map(
+      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+    )
+
+    verify(locationService).register(akkaRegistration)
+    container.onMessage(RegistrationFailed(runtimeException))
+    container.mode shouldBe ContainerMode.Idle
+    container.registrationOpt shouldBe None
+    container.runningComponents should not be List.empty
+  }
+
+  test("container should retain mode if un-registration with location service fails") {
+    val runningContainer = new RunningContainer
+    import runningContainer._
+
+    val runtimeException = mock[RuntimeException]
+    val failedResult     = Promise[Done].complete(Failure(runtimeException)).future
+    when(registrationResult.unregister()).thenReturn(failedResult)
+
+    container.mode shouldBe ContainerMode.Running
+
+    container.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
+
+    verify(registrationResult).unregister()
+    container.onMessage(UnRegistrationFailed(runtimeException))
+    container.mode shouldBe ContainerMode.Running
+    container.registrationOpt should not be None
   }
 }

@@ -121,7 +121,8 @@ class Container(
     runningComponents = List.empty
   }
 
-  private def onRegistrationFailure(throwable: Throwable): Unit = println("log.error(") //FIXME use log statement
+  private def onRegistrationFailure(throwable: Throwable): Unit =
+    println(s"log.error($throwable)") //FIXME use log statement
 
   private def unregisterFromLocationService(): Any = {
     registrationOpt match {
