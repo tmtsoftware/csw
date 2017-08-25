@@ -29,6 +29,7 @@ import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success}
 
 //DEOPSCSW-182-Control Life Cycle of Components
+//DEOPSCSW-216-Locate and connect components to send AKKA commands
 class ContainerTest extends FunSuite with Matchers with MockitoSugar {
   implicit val untypedSystem: actor.ActorSystem      = ActorSystemFactory.remote()
   implicit val typedSystem: ActorSystem[Nothing]     = untypedSystem.toTyped

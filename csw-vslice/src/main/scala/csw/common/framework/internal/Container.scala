@@ -16,7 +16,7 @@ import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 class Container(
@@ -35,6 +35,8 @@ class Container(
   val akkaRegistration: AkkaRegistration          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   val lifecycleStateTrackerRef: ActorRef[LifecycleStateChanged] =
     ctx.spawnAdapter(SupervisorModeChanged, "LifecycleStateTracker")
+
+  implicit val ec: ExecutionContext = ctx.executionContext
 
   createComponents(containerInfo.components)
 
@@ -110,8 +112,7 @@ class Container(
   }
 
   private def registerWithLocationService(): Unit = {
-    val registrationResultF = locationService.register(akkaRegistration)
-    registrationResultF.onComplete {
+    locationService.register(akkaRegistration).onComplete {
       case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
       case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
     }
