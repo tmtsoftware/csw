@@ -8,11 +8,15 @@ import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.Supervisor
 import csw.common.framework.models.SupervisorExternalMessage
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
+import csw.services.location.scaladsl.LocationService
+import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
-class SupervisorBehaviorTest extends FrameworkComponentTestSuite {
+class SupervisorBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
 
-  val supervisorBehavior: Behavior[SupervisorExternalMessage] = SupervisorBehaviorFactory.behavior(hcdInfo)
+  private val locationService: LocationService = mock[LocationService]
+  val supervisorBehavior: Behavior[SupervisorExternalMessage] =
+    SupervisorBehaviorFactory.behavior(hcdInfo, locationService)
 
   test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state") {
     val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)

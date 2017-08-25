@@ -8,7 +8,7 @@ import csw.common.framework.models.IdleMsg.Initialize
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.ShutdownComplete
 import csw.common.framework.models.RunningMsg.Lifecycle
-import csw.common.framework.models.SupervisorIdleMsg.{Initialized, Running}
+import csw.common.framework.models.SupervisorIdleComponentMsg.{Initialized, Running}
 import csw.common.framework.models.{ComponentMsg, FromComponentLifecycleMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
 import org.mockito.Mockito._

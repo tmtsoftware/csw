@@ -44,9 +44,11 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     val answer = new Answer[SupervisorInfo] {
       override def answer(invocation: InvocationOnMock): SupervisorInfo = {
         val componentInfo = invocation.getArgument(0).asInstanceOf[ComponentInfo]
-        SupervisorInfo(untypedSystem,
-                       ctx.spawn(SupervisorBehaviorFactory.behavior(componentInfo), componentInfo.name),
-                       componentInfo)
+        SupervisorInfo(
+          untypedSystem,
+          ctx.spawn(SupervisorBehaviorFactory.behavior(componentInfo, locationService), componentInfo.name),
+          componentInfo
+        )
       }
     }
 
@@ -63,7 +65,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     when(locationService.register(akkaRegistration)).thenReturn(eventualRegistrationResult)
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
-    val container = new Container(ctx, containerInfo, locationService, supervisorFactory, registrationFactory)
+    val container = new Container(ctx, containerInfo, supervisorFactory, registrationFactory, locationService)
   }
 
   class RunningContainer() extends IdleContainer {

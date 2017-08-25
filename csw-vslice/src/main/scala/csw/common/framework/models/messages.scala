@@ -55,7 +55,7 @@ object CommandMsg {
   case class Oneway(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends CommandMsg
 }
 
-sealed trait RunningMsg extends ComponentMsg with SupervisorExternalMessage
+sealed trait RunningMsg extends ComponentMsg with SupervisorExternalMessage with SupervisorRunningMessage
 object RunningMsg {
   case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMsg with RunningContainerMsg
   trait DomainMsg                                            extends RunningMsg
@@ -70,11 +70,11 @@ object CommonSupervisorMsg {
   case object HaltComponent                                                                  extends CommonSupervisorMsg
 }
 
-sealed trait SupervisorIdleMsg extends FromComponentLifecycleMessage
-object SupervisorIdleMsg {
-  case class Initialized(componentRef: ActorRef[InitialMsg]) extends SupervisorIdleMsg
-  case class InitializeFailure(reason: String)               extends SupervisorIdleMsg
-  case class Running(componentRef: ActorRef[RunningMsg])     extends SupervisorIdleMsg
+sealed trait SupervisorIdleComponentMsg extends FromComponentLifecycleMessage with SupervisorIdleMessage
+object SupervisorIdleComponentMsg {
+  case class Initialized(componentRef: ActorRef[InitialMsg]) extends SupervisorIdleComponentMsg
+  case class InitializeFailure(reason: String)               extends SupervisorIdleComponentMsg
+  case class Running(componentRef: ActorRef[RunningMsg])     extends SupervisorIdleComponentMsg
 }
 
 sealed trait PreparingToShutdownMsg extends SupervisorMsg
@@ -84,8 +84,20 @@ object PreparingToShutdownMsg {
   case object ShutdownComplete               extends PreparingToShutdownMsg with FromComponentLifecycleMessage
 }
 
-sealed trait SupervisorExternalMessage     extends SupervisorMsg
+object SupervisorIdleMessage {
+  case class RegistrationComplete(registrationResult: RegistrationResult, componentRef: ActorRef[InitialMsg])
+      extends SupervisorIdleMessage
+  case class RegistrationFailed(throwable: Throwable) extends SupervisorIdleMessage
+}
+
+object SupervisorRunningMessage {
+  case object UnRegistrationComplete                    extends SupervisorRunningMessage
+  case class UnRegistrationFailed(throwable: Throwable) extends SupervisorRunningMessage
+}
 sealed trait FromComponentLifecycleMessage extends SupervisorMsg
+sealed trait SupervisorExternalMessage     extends SupervisorMsg
+sealed trait SupervisorIdleMessage         extends SupervisorMsg
+sealed trait SupervisorRunningMessage      extends SupervisorMsg
 sealed trait SupervisorMsg
 
 ///////////////

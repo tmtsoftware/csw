@@ -14,7 +14,7 @@ import csw.common.ccs.ValidationIssue.{
   UnsupportedCommandInStateIssue,
   WrongInternalStateIssue
 }
-import csw.common.framework.models.SupervisorIdleMsg.Running
+import csw.common.framework.models.SupervisorIdleComponentMsg.Running
 import csw.param.commands.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.TromboneCommandHandlerMsgs._

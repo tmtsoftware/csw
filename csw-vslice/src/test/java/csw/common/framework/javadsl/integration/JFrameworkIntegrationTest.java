@@ -24,9 +24,12 @@ import csw.param.generics.Parameter;
 import csw.param.models.Choice;
 import csw.param.states.CurrentState;
 import csw.param.states.DemandState;
+import csw.services.location.scaladsl.LocationService;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -37,7 +40,7 @@ import scala.concurrent.duration.FiniteDuration;
 // DEOPSCSW-166: CSW HCD Creation
 // DEOPSCSW-176: Provide Infrastructure to manage TMT lifecycle
 // DEOPSCSW-177: Hooks for lifecycle management
-public class JFrameworkIntegrationTest {
+public class JFrameworkIntegrationTest extends Mockito {
     private static ActorSystem system = ActorSystem.create(Actor.empty(), "Hcd");
     private TestKitSettings settings = TestKitSettings.apply(system);
 
@@ -47,7 +50,7 @@ public class JFrameworkIntegrationTest {
             "csw.common.framework.javadsl.integration.JSampleComponentWiring");
 
     private Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-    private Behavior<SupervisorExternalMessage> supervisorBehavior = SupervisorBehaviorFactory.behavior(hcdInfo);
+    private Behavior<SupervisorExternalMessage> supervisorBehavior = SupervisorBehaviorFactory.behavior(hcdInfo, mock(LocationService.class));
     private FiniteDuration duration = Duration.create(5, "seconds");
     private Future<ActorRef<SupervisorExternalMessage>> systemActorOf;
     private ActorRef<SupervisorExternalMessage> supervisorRef;

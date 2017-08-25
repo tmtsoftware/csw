@@ -13,14 +13,20 @@ import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMsg.Lifecycle
-import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
+import csw.common.framework.models.SupervisorIdleComponentMsg.{InitializeFailure, Initialized, Running}
+import csw.common.framework.models.SupervisorIdleMessage.{RegistrationComplete, RegistrationFailed}
+import csw.common.framework.models.SupervisorRunningMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.ComponentWiring
 import csw.param.states.CurrentState
-import csw.services.location.models.ComponentId
+import csw.services.location.models.Connection.AkkaConnection
+import csw.services.location.models.{AkkaRegistration, ComponentId, RegistrationResult}
+import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
+import scala.util.{Failure, Success}
 
 object Supervisor {
   val PubSubComponentActor            = "pub-sub-component"
@@ -34,16 +40,22 @@ class Supervisor(
     ctx: ActorContext[SupervisorMsg],
     timerScheduler: TimerScheduler[SupervisorMsg],
     componentInfo: ComponentInfo,
-    componentBehaviorFactory: ComponentWiring[_]
+    componentBehaviorFactory: ComponentWiring[_],
+    registrationFactory: RegistrationFactory,
+    locationService: LocationService
 ) extends MutableBehavior[SupervisorMsg] {
 
   import Supervisor._
 
+  implicit val ec: ExecutionContext = ctx.executionContext
+
   val name: String                                   = componentInfo.name
   val componentId                                    = ComponentId(name, componentInfo.componentType)
+  val akkaRegistration: AkkaRegistration             = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   var haltingFlag                                    = false
   var mode: SupervisorMode                           = Idle
   var runningComponent: Option[ActorRef[RunningMsg]] = None
+  var registrationOpt: Option[RegistrationResult]    = None
 
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
     ctx.spawn(PubSubActor.behavior[LifecycleStateChanged], PubSubLifecycleActor)
@@ -56,10 +68,10 @@ class Supervisor(
 
   override def onMessage(msg: SupervisorMsg): Behavior[SupervisorMsg] = {
     (mode, msg) match {
-      case (_, msg: CommonSupervisorMsg)                                             => onCommon(msg)
-      case (SupervisorMode.Idle, msg: SupervisorIdleMsg)                             => onIdle(msg)
-      case (SupervisorMode.Running | SupervisorMode.RunningOffline, msg: RunningMsg) => onRunning(msg)
-      case (SupervisorMode.PreparingToShutdown, msg: PreparingToShutdownMsg)         => onPreparingToShutdown(msg)
+      case (_, msg: CommonSupervisorMsg)                                                           ⇒ onCommon(msg)
+      case (SupervisorMode.Idle, msg: SupervisorIdleMessage)                                       ⇒ onIdle(msg)
+      case (SupervisorMode.Running | SupervisorMode.RunningOffline, msg: SupervisorRunningMessage) ⇒ onRunning(msg)
+      case (SupervisorMode.PreparingToShutdown, msg: PreparingToShutdownMsg)                       ⇒ onPreparingToShutdown(msg)
       case (_, message) =>
         println(s"Supervisor in $mode received an unexpected message: $message")
     }
@@ -80,24 +92,27 @@ class Supervisor(
     case HaltComponent                             => haltingFlag = true; handleShutdown()
   }
 
-  def onIdle(msg: SupervisorIdleMsg): Unit = msg match {
-    case Initialized(componentRef) =>
-      registerWithLocationService()
-      componentRef ! Run
-    case InitializeFailure(reason) =>
+  def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
+    case Initialized(componentRef) ⇒
+      registerWithLocationService(componentRef)
+    case InitializeFailure(reason) ⇒
       mode = SupervisorMode.InitializeFailure
-    case Running(componentRef) =>
+    case RegistrationComplete(registrationResult, componentRef) ⇒
+      onRegistrationComplete(registrationResult, componentRef)
+    case RegistrationFailed(throwable) ⇒
+      onRegistrationFailed(throwable)
+    case Running(componentRef) ⇒
       mode = SupervisorMode.Running
       runningComponent = Some(componentRef)
       pubSubLifecycle ! Publish(LifecycleStateChanged(SupervisorMode.Running, ctx.self))
   }
 
-  def onRunning(msg: RunningMsg): Unit = {
+  def onRunning(msg: SupervisorRunningMessage): Unit = {
     msg match {
-      case Lifecycle(message) => onLifecycle(message)
-      case _                  =>
+      case runningMsg: RunningMsg          ⇒ handleRunningMsg(runningMsg)
+      case UnRegistrationComplete          ⇒ onUnRegistrationComplete()
+      case UnRegistrationFailed(throwable) ⇒ onUnRegistrationFailed(throwable)
     }
-    runningComponent.get ! msg
   }
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
@@ -126,18 +141,56 @@ class Supervisor(
     if (haltingFlag) haltComponent()
   }
 
-  private def handleShutdown(): Unit = {
-    mode = SupervisorMode.PreparingToShutdown
-    timerScheduler.startSingleTimer(TimerKey, ShutdownTimeout, shutdownTimeout)
-    unregisterFromLocationService()
-    pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
-  }
-
-  def registerWithLocationService(): Unit = ()
-
-  def unregisterFromLocationService(): Unit = ()
-
   def haltComponent(): Boolean = {
     ctx.stop(pubSubComponent) & ctx.stop(pubSubLifecycle) & ctx.stop(component)
   }
+
+  private def handleRunningMsg(runningMsg: RunningMsg): Unit = {
+    runningMsg match {
+      case Lifecycle(message) ⇒ onLifecycle(message)
+      case _                  ⇒
+    }
+    runningComponent.get ! runningMsg
+  }
+
+  private def handleShutdown(): Unit = {
+    unregisterFromLocationService()
+    mode = SupervisorMode.PreparingToShutdown
+    timerScheduler.startSingleTimer(TimerKey, ShutdownTimeout, shutdownTimeout)
+    pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
+  }
+
+  private def registerWithLocationService(componentRef: ActorRef[InitialMsg]): Unit = {
+    locationService.register(akkaRegistration).onComplete {
+      case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult, componentRef)
+      case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
+    }
+  }
+
+  private def onRegistrationComplete(
+      registrationResult: RegistrationResult,
+      componentRef: ActorRef[InitialMsg]
+  ): Unit = {
+    registrationOpt = Some(registrationResult)
+    componentRef ! Run
+  }
+
+  private def onRegistrationFailed(throwable: Throwable): Unit =
+    println(s"log.error($throwable)") //FIXME use log statement
+
+  private def unregisterFromLocationService(): Unit = {
+    registrationOpt match {
+      case Some(registrationResult) ⇒
+        registrationResult.unregister().onComplete {
+          case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
+          case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
+        }
+      case None ⇒
+        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
+    }
+  }
+
+  private def onUnRegistrationComplete(): Unit = ???
+
+  private def onUnRegistrationFailed(throwable: Throwable): Unit = ???
 }

@@ -7,7 +7,7 @@ import csw.common.framework.internal.{ComponentBehavior, ComponentMode}
 import csw.common.framework.models.{ComponentMsg, FromComponentLifecycleMessage}
 import csw.common.framework.models.IdleMsg.Initialize
 import csw.common.framework.models.InitialMsg.Run
-import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
+import csw.common.framework.models.SupervisorIdleComponentMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.scaladsl.ComponentHandlers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

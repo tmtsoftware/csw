@@ -10,6 +10,6 @@ object ContainerBehaviorFactory {
   def behavior(containerInfo: ContainerInfo, locationService: LocationService): Behavior[ContainerMsg] = {
     val supervisorFactory   = new SupervisorFactory()
     val registrationFactory = new RegistrationFactory
-    Actor.mutable(ctx ⇒ new Container(ctx, containerInfo, locationService, supervisorFactory, registrationFactory))
+    Actor.mutable(ctx ⇒ new Container(ctx, containerInfo, supervisorFactory, registrationFactory, locationService))
   }
 }

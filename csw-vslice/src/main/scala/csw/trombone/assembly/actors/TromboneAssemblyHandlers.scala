@@ -6,7 +6,7 @@ import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validations.Valid
 import csw.common.ccs.{Validation, Validations}
 import csw.common.framework.models.PubSub.PublisherMsg
-import csw.common.framework.models.SupervisorIdleMsg.Running
+import csw.common.framework.models.SupervisorIdleComponentMsg.Running
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.commands.{Observe, Setup}

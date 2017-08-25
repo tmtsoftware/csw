@@ -22,21 +22,21 @@ import scala.util.{Failure, Success}
 class Container(
     ctx: ActorContext[ContainerMsg],
     containerInfo: ContainerInfo,
-    locationService: LocationService,
     supervisorFactory: SupervisorFactory,
-    registrationFactory: RegistrationFactory
+    registrationFactory: RegistrationFactory,
+    locationService: LocationService
 ) extends MutableBehavior[ContainerMsg] {
 
+  implicit val ec: ExecutionContext = ctx.executionContext
+
   val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
+  val akkaRegistration: AkkaRegistration          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   var supervisors: List[SupervisorInfo]           = List.empty
   var runningComponents: List[SupervisorInfo]     = List.empty
   var mode: ContainerMode                         = ContainerMode.Idle
   var registrationOpt: Option[RegistrationResult] = None
-  val akkaRegistration: AkkaRegistration          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   val lifecycleStateTrackerRef: ActorRef[LifecycleStateChanged] =
     ctx.spawnAdapter(SupervisorModeChanged, "LifecycleStateTracker")
-
-  implicit val ec: ExecutionContext = ctx.executionContext
 
   createComponents(containerInfo.components)
 
@@ -118,6 +118,15 @@ class Container(
     }
   }
 
+  private def onRegistrationComplete(registrationResult: RegistrationResult): Unit = {
+    registrationOpt = Some(registrationResult)
+    mode = ContainerMode.Running
+    runningComponents = List.empty
+  }
+
+  private def onRegistrationFailure(throwable: Throwable): Unit =
+    println(s"log.error($throwable)") //FIXME use log statement
+
   private def unregisterFromLocationService(): Any = {
     registrationOpt match {
       case Some(registrationResult) ⇒
@@ -129,15 +138,6 @@ class Container(
         println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
     }
   }
-
-  private def onRegistrationComplete(registrationResult: RegistrationResult): Unit = {
-    registrationOpt = Some(registrationResult)
-    mode = ContainerMode.Running
-    runningComponents = List.empty
-  }
-
-  private def onRegistrationFailure(throwable: Throwable): Unit =
-    println(s"log.error($throwable)") //FIXME use log statement
 
   private def onUnRegistrationComplete(): Unit = {
     mode = ContainerMode.Idle

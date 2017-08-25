@@ -20,7 +20,8 @@ object Component {
   def createStandalone(config: com.typesafe.config.Config): ActorRef[SupervisorExternalMessage] = {
     val componentInfo      = ComponentInfoParser.parseStandalone(config)
     val system             = ClusterAwareSettings.system
-    val supervisorBehavior = SupervisorBehaviorFactory.behavior(componentInfo)
+    val locationService    = LocationServiceFactory.withSystem(system)
+    val supervisorBehavior = SupervisorBehaviorFactory.behavior(componentInfo, locationService)
     system.spawn(supervisorBehavior, componentInfo.name)
   }
 

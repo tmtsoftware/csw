@@ -4,16 +4,20 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.Actor
 import csw.common.framework.internal.Supervisor
 import csw.common.framework.models.{ComponentInfo, SupervisorExternalMessage, SupervisorMsg}
+import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 
 object SupervisorBehaviorFactory {
 
-  def behavior(componentInfo: ComponentInfo): Behavior[SupervisorExternalMessage] = {
+  def behavior(componentInfo: ComponentInfo, locationService: LocationService): Behavior[SupervisorExternalMessage] = {
     val componentWiringClass = Class.forName(componentInfo.className)
     val compWring            = componentWiringClass.newInstance().asInstanceOf[ComponentWiring[_]]
+    val registrationFactory  = new RegistrationFactory
     Actor
       .withTimers[SupervisorMsg](
         timerScheduler ⇒
-          Actor.mutable[SupervisorMsg](ctx => new Supervisor(ctx, timerScheduler, componentInfo, compWring))
+          Actor.mutable[SupervisorMsg](
+            ctx => new Supervisor(ctx, timerScheduler, componentInfo, compWring, registrationFactory, locationService)
+        )
       )
       .narrow
   }

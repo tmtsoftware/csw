@@ -8,7 +8,7 @@ import csw.common.framework.models.IdleMsg.{Initialize, Start}
 import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure}
 import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
-import csw.common.framework.models.SupervisorIdleMsg.InitializeFailure
+import csw.common.framework.models.SupervisorIdleComponentMsg.InitializeFailure
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models.{RunningMsg, _}
 import csw.common.framework.scaladsl.ComponentHandlers
@@ -44,7 +44,7 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
     case Initialize =>
       async {
         await(initialization())
-        supervisor ! SupervisorIdleMsg.Initialized(ctx.self)
+        supervisor ! SupervisorIdleComponentMsg.Initialized(ctx.self)
       } recover {
         case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
       }
@@ -68,7 +68,7 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
       mode = ComponentMode.Running
       lifecycleHandlers.onRun()
       lifecycleHandlers.isOnline = true
-      supervisor ! SupervisorIdleMsg.Running(ctx.self)
+      supervisor ! SupervisorIdleComponentMsg.Running(ctx.self)
   }
 
   private def onRun(runningMsg: RunningMsg): Unit = runningMsg match {

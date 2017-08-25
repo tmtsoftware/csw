@@ -16,10 +16,11 @@ import csw.common.framework.models.InitialMsg.Run
 import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
-import csw.common.framework.models.SupervisorIdleMsg.{InitializeFailure, Initialized, Running}
+import csw.common.framework.models.SupervisorIdleComponentMsg.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.param.states.CurrentState
+import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
@@ -28,10 +29,13 @@ import org.scalatest.mockito.MockitoSugar
 class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSugar with BeforeAndAfterEach {
 
   class TestData {
-    val sampleHcdHandler: ComponentHandlers[ComponentDomainMsg]         = mock[ComponentHandlers[ComponentDomainMsg]]
-    val ctx                                                             = new StubbedActorContext[SupervisorMsg]("test-supervisor", 100, system)
-    val timer: TimerScheduler[SupervisorMsg]                            = mock[TimerScheduler[SupervisorMsg]]
-    val supervisor                                                      = new Supervisor(ctx, timer, hcdInfo, getSampleHcdWiring(sampleHcdHandler))
+    val sampleHcdHandler: ComponentHandlers[ComponentDomainMsg] = mock[ComponentHandlers[ComponentDomainMsg]]
+    val ctx                                                     = new StubbedActorContext[SupervisorMsg]("test-supervisor", 100, system)
+    val timer: TimerScheduler[SupervisorMsg]                    = mock[TimerScheduler[SupervisorMsg]]
+    val locationService: LocationService                        = mock[LocationService]
+    val registrationFactory                                     = mock[RegistrationFactory]
+    val supervisor =
+      new Supervisor(ctx, timer, hcdInfo, getSampleHcdWiring(sampleHcdHandler), registrationFactory, locationService)
     val childComponentInbox: Inbox[ComponentMsg]                        = ctx.childInbox(supervisor.component.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)

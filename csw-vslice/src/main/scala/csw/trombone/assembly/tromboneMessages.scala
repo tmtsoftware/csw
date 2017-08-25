@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.framework.models.CommandMsg.Submit
 import csw.common.framework.models.RunningMsg.DomainMsg
-import csw.common.framework.models.SupervisorIdleMsg.Running
+import csw.common.framework.models.SupervisorIdleComponentMsg.Running
 import csw.param.commands.Setup
 import csw.param.states.CurrentState
 import csw.param.events.EventTime
