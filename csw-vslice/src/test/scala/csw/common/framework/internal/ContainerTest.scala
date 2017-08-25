@@ -6,11 +6,11 @@ import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.common.framework.FrameworkComponentTestInfos._
-import csw.common.framework.models.CommonContainerMsg.GetComponents
-import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
-import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
+import csw.common.framework.models.ContainerCommonMsg.GetComponents
+import csw.common.framework.models.SupervisorCommonMsg.LifecycleStateSubscription
+import csw.common.framework.models.ContainerIdleMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
-import csw.common.framework.models.RunningContainerMsg.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.common.framework.models.ContainerRunningMsg.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models._
@@ -98,7 +98,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
     // check that all components received LifecycleStateSubscription message
     containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[CommonSupervisorMsg](component.name))
+      .map(component ⇒ ctx.childInbox[SupervisorCommonMsg](component.name))
       .map(_.receiveMsg()) should contain only LifecycleStateSubscription(Subscribe(container.lifecycleStateTrackerRef))
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
@@ -108,7 +108,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
     // check that lifecycleStateTrackerRef gets un-subscribed from all components
     containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[CommonSupervisorMsg](component.name))
+      .map(component ⇒ ctx.childInbox[SupervisorCommonMsg](component.name))
       .map(_.receiveMsg()) should contain only LifecycleStateSubscription(
       Unsubscribe(container.lifecycleStateTrackerRef)
     )
@@ -146,7 +146,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     container.mode shouldBe ContainerMode.Idle
 
     containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[CommonSupervisorMsg](component.name))
+      .map(component ⇒ ctx.childInbox[SupervisorCommonMsg](component.name))
       .map(_.receiveMsg()) should contain only LifecycleStateSubscription(Subscribe(container.lifecycleStateTrackerRef))
 
     containerInfo.components.toList

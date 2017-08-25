@@ -8,8 +8,8 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.components.SampleComponentState._
 import csw.common.framework.internal.{ContainerMode, SupervisorMode}
-import csw.common.framework.models.CommonContainerMsg.{GetComponents, GetContainerMode}
-import csw.common.framework.models.CommonSupervisorMsg.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.common.framework.models.ContainerCommonMsg.{GetComponents, GetContainerMode}
+import csw.common.framework.models.SupervisorCommonMsg.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.{Components, LifecycleStateChanged}
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMsg.Lifecycle

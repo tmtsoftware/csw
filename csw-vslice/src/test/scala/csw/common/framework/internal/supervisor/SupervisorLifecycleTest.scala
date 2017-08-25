@@ -7,7 +7,7 @@ import csw.common.components.ComponentDomainMsg
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.{Supervisor, SupervisorMode}
-import csw.common.framework.models.CommonSupervisorMsg.{
+import csw.common.framework.models.SupervisorCommonMsg.{
   ComponentStateSubscription,
   HaltComponent,
   LifecycleStateSubscription

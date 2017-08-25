@@ -28,7 +28,6 @@ import csw.services.location.scaladsl.LocationService;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
@@ -63,8 +62,8 @@ public class JFrameworkIntegrationTest extends Mockito {
         systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
         Thread.sleep(200);
-        supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
-        supervisorRef.tell(new CommonSupervisorMsg.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
+        supervisorRef.tell(new SupervisorCommonMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
+        supervisorRef.tell(new SupervisorCommonMsg.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
     }
 
     @AfterClass
@@ -78,8 +77,8 @@ public class JFrameworkIntegrationTest extends Mockito {
         lifecycleStateChangedProbe  = TestProbe.apply(system, settings);
         systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
-        supervisorRef.tell(new CommonSupervisorMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
-        supervisorRef.tell(new CommonSupervisorMsg.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
+        supervisorRef.tell(new SupervisorCommonMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
+        supervisorRef.tell(new SupervisorCommonMsg.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
 
         CurrentState initCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> initParam = SampleComponentState.choiceKey().set(SampleComponentState.initChoice());

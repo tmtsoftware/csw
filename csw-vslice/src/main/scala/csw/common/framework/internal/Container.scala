@@ -3,11 +3,11 @@ package csw.common.framework.internal
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
-import csw.common.framework.models.CommonContainerMsg.{GetComponents, GetContainerMode}
-import csw.common.framework.models.CommonSupervisorMsg.LifecycleStateSubscription
-import csw.common.framework.models.IdleContainerMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
+import csw.common.framework.models.ContainerCommonMsg.{GetComponents, GetContainerMode}
+import csw.common.framework.models.SupervisorCommonMsg.LifecycleStateSubscription
+import csw.common.framework.models.ContainerIdleMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
-import csw.common.framework.models.RunningContainerMsg.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.common.framework.models.ContainerRunningMsg.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage._
 import csw.common.framework.models._
@@ -42,26 +42,26 @@ class Container(
 
   override def onMessage(msg: ContainerMsg): Behavior[ContainerMsg] = {
     (mode, msg) match {
-      case (_, msg: CommonContainerMsg)                      ⇒ onCommon(msg)
-      case (ContainerMode.Idle, msg: IdleContainerMsg)       ⇒ onIdle(msg)
-      case (ContainerMode.Running, msg: RunningContainerMsg) ⇒ onRunning(msg)
+      case (_, msg: ContainerCommonMsg)                      ⇒ onCommon(msg)
+      case (ContainerMode.Idle, msg: ContainerIdleMsg)       ⇒ onIdle(msg)
+      case (ContainerMode.Running, msg: ContainerRunningMsg) ⇒ onRunning(msg)
       case (_, message)                                      ⇒ println(s"Container in $mode received an unexpected message: $message")
     }
     this
   }
 
-  def onCommon(commonContainerMsg: CommonContainerMsg): Unit = commonContainerMsg match {
+  def onCommon(commonContainerMsg: ContainerCommonMsg): Unit = commonContainerMsg match {
     case GetComponents(replyTo)    => replyTo ! Components(supervisors)
     case GetContainerMode(replyTo) => replyTo ! mode
   }
 
-  def onIdle(idleContainerMsg: IdleContainerMsg): Unit = idleContainerMsg match {
+  def onIdle(idleContainerMsg: ContainerIdleMsg): Unit = idleContainerMsg match {
     case SupervisorModeChanged(lifecycleStateChanged) ⇒ onLifecycleStateChanged(lifecycleStateChanged)
     case RegistrationComplete(registrationResult)     ⇒ onRegistrationComplete(registrationResult)
     case RegistrationFailed(throwable)                ⇒ onRegistrationFailure(throwable)
   }
 
-  def onRunning(runningContainerMsg: RunningContainerMsg): Unit = runningContainerMsg match {
+  def onRunning(runningContainerMsg: ContainerRunningMsg): Unit = runningContainerMsg match {
     case Lifecycle(Restart)              ⇒ onRestart()
     case Lifecycle(Shutdown)             ⇒ onShutdown()
     case Lifecycle(lifecycleMsg)         ⇒ sendLifecycleMsgToAllComponents(lifecycleMsg)

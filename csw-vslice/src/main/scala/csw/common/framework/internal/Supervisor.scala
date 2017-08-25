@@ -4,7 +4,7 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, Signal, Terminated}
 import csw.common.framework.internal.SupervisorMode.Idle
-import csw.common.framework.models.CommonSupervisorMsg.{
+import csw.common.framework.models.SupervisorCommonMsg.{
   ComponentStateSubscription,
   HaltComponent,
   LifecycleStateSubscription
@@ -68,7 +68,7 @@ class Supervisor(
 
   override def onMessage(msg: SupervisorMsg): Behavior[SupervisorMsg] = {
     (mode, msg) match {
-      case (_, msg: CommonSupervisorMsg)                                                           ⇒ onCommon(msg)
+      case (_, msg: SupervisorCommonMsg)                                                           ⇒ onCommon(msg)
       case (SupervisorMode.Idle, msg: SupervisorIdleMessage)                                       ⇒ onIdle(msg)
       case (SupervisorMode.Running | SupervisorMode.RunningOffline, msg: SupervisorRunningMessage) ⇒ onRunning(msg)
       case (SupervisorMode.PreparingToShutdown, msg: PreparingToShutdownMsg)                       ⇒ onPreparingToShutdown(msg)
@@ -86,7 +86,7 @@ class Supervisor(
       Behavior.stopped
   }
 
-  def onCommon(msg: CommonSupervisorMsg): Unit = msg match {
+  def onCommon(msg: SupervisorCommonMsg): Unit = msg match {
     case LifecycleStateSubscription(subscriberMsg) => pubSubLifecycle ! subscriberMsg
     case ComponentStateSubscription(subscriberMsg) => pubSubComponent ! subscriberMsg
     case HaltComponent                             => haltingFlag = true; handleShutdown()
