@@ -67,7 +67,7 @@ class E2EContainerTest extends FunSuite with Matchers {
     disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(disperserSupervisor, SupervisorMode.Running))
     filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorMode.Running))*/
 
-    Thread.sleep(200)
+    Thread.sleep(1000)
 
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerModeMsg(ContainerMode.Running))
