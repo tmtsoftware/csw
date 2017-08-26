@@ -67,17 +67,19 @@ class E2EContainerTest extends FunSuite with Matchers {
     disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(disperserSupervisor, SupervisorMode.Running))
     filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorMode.Running))*/
 
-    Thread.sleep(1000)
+    Thread.sleep(500)
 
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Running))
 
     containerRef ! Lifecycle(GoOffline)
+    Thread.sleep(500)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
 
     containerRef ! Lifecycle(GoOnline)
+    Thread.sleep(500)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
@@ -87,6 +89,7 @@ class E2EContainerTest extends FunSuite with Matchers {
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Idle))
 
+    Thread.sleep(500)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
