@@ -170,8 +170,7 @@ class Supervisor(
     }
   }
 
-  private def onRegistrationComplete(registrationResult: RegistrationResult,
-                                     componentRef: ActorRef[InitialMsg]): Unit = {
+  private def onRegistrationComplete(registrationResult: RegistrationResult, componentRef: ActorRef[InitialMsg]): Unit = {
     registrationOpt = Some(registrationResult)
     componentRef ! Run
   }
