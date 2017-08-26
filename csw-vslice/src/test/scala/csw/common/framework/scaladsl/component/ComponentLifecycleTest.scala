@@ -4,12 +4,12 @@ import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.{ComponentBehavior, ComponentMode}
-import csw.common.framework.models.IdleMsg.Initialize
-import csw.common.framework.models.InitialMsg.Run
-import csw.common.framework.models.PreparingToShutdownMsg.ShutdownComplete
-import csw.common.framework.models.RunningMsg.Lifecycle
-import csw.common.framework.models.SupervisorIdleComponentMsg.{Initialized, Running}
-import csw.common.framework.models.{ComponentMsg, FromComponentLifecycleMessage, ToComponentLifecycleMessage}
+import csw.common.framework.models.IdleMessage.Initialize
+import csw.common.framework.models.InitialMessage.Run
+import csw.common.framework.models.PreparingToShutdownMessage.ShutdownComplete
+import csw.common.framework.models.RunningMessage.Lifecycle
+import csw.common.framework.models.SupervisorIdleComponentMessage.{Initialized, Running}
+import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -21,13 +21,13 @@ import scala.concurrent.Future
 class ComponentLifecycleTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
-    private val ctx = new StubbedActorContext[ComponentMsg]("test-component", 100, system)
+    private val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
 
-    val sampleHcdHandler: ComponentHandlers[ComponentDomainMsg] = mock[ComponentHandlers[ComponentDomainMsg]]
+    val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
-    val componentBehavior = new ComponentBehavior[ComponentDomainMsg](ctx, supervisorProbe.ref, sampleHcdHandler)
+    val componentBehavior = new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleHcdHandler)
 
-    val runningComponent: ComponentBehavior[ComponentDomainMsg] = {
+    val runningComponent: ComponentBehavior[ComponentDomainMessage] = {
       componentBehavior.onMessage(Initialize)
       supervisorProbe.expectMsgType[Initialized]
       Thread.sleep(100)

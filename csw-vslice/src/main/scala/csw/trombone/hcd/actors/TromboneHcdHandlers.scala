@@ -6,7 +6,7 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import csw.common.ccs.Validation
-import csw.common.framework.models.PubSub.PublisherMsg
+import csw.common.framework.models.PubSub.PublisherMessage
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.commands.Setup
@@ -21,17 +21,17 @@ import scala.async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class TromboneHcdWiring extends ComponentWiring[TromboneMsg] {
-  override def handlers(ctx: ActorContext[ComponentMsg],
+class TromboneHcdWiring extends ComponentWiring[TromboneMessage] {
+  override def handlers(ctx: ActorContext[ComponentMessage],
                         componentInfo: ComponentInfo,
-                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[TromboneMsg] =
+                        pubSubRef: ActorRef[PublisherMessage[CurrentState]]): ComponentHandlers[TromboneMessage] =
     new TromboneHcdHandlers(ctx, componentInfo, pubSubRef)
 }
 
-class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg],
+class TromboneHcdHandlers(ctx: ActorContext[ComponentMessage],
                           componentInfo: ComponentInfo,
-                          pubSubRef: ActorRef[PublisherMsg[CurrentState]])
-    extends ComponentHandlers[TromboneMsg](ctx, componentInfo, pubSubRef) {
+                          pubSubRef: ActorRef[PublisherMessage[CurrentState]])
+    extends ComponentHandlers[TromboneMessage](ctx, componentInfo, pubSubRef) {
 
   implicit val timeout: Timeout             = Timeout(2.seconds)
   implicit val scheduler: Scheduler         = ctx.system.scheduler
@@ -77,7 +77,7 @@ class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg],
     }
   }
 
-  def onDomainMsg(tromboneMsg: TromboneMsg): Unit = tromboneMsg match {
+  def onDomainMsg(tromboneMsg: TromboneMessage): Unit = tromboneMsg match {
     case x: TromboneEngineering => onEngMsg(x)
     case x: AxisResponse        => onAxisResponse(x)
   }
@@ -132,5 +132,5 @@ class TromboneHcdHandlers(ctx: ActorContext[ComponentMsg],
 
   private def getAxisConfig: Future[AxisConfig] = ???
 
-  override def onControlCommand(commandMsg: CommandMsg): Validation = ???
+  override def onControlCommand(commandMsg: CommandMessage): Validation = ???
 }

@@ -2,21 +2,22 @@ package csw.common.framework.javadsl
 
 import akka.typed.javadsl.ActorContext
 import akka.typed.{scaladsl, ActorRef}
-import csw.common.framework.models.RunningMsg.DomainMsg
-import csw.common.framework.models.{ComponentInfo, ComponentMsg, PubSub}
+import csw.common.framework.models.RunningMessage.DomainMessage
+import csw.common.framework.models.{ComponentInfo, ComponentMessage, PubSub}
 import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.states.CurrentState
 
 import scala.reflect.ClassTag
 
-abstract class JComponentWiring[Msg <: DomainMsg](klass: Class[Msg]) extends ComponentWiring[Msg]()(ClassTag(klass)) {
+abstract class JComponentWiring[Msg <: DomainMessage](klass: Class[Msg])
+    extends ComponentWiring[Msg]()(ClassTag(klass)) {
 
-  def make(ctx: ActorContext[ComponentMsg],
+  def make(ctx: ActorContext[ComponentMessage],
            componentInfo: ComponentInfo,
-           pubSubRef: ActorRef[PubSub.PublisherMsg[CurrentState]]): JComponentHandlers[Msg]
+           pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]]): JComponentHandlers[Msg]
 
-  def handlers(ctx: scaladsl.ActorContext[ComponentMsg],
+  def handlers(ctx: scaladsl.ActorContext[ComponentMessage],
                componentInfo: ComponentInfo,
-               pubSubRef: ActorRef[PubSub.PublisherMsg[CurrentState]]): ComponentHandlers[Msg] =
+               pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]]): ComponentHandlers[Msg] =
     make(ctx.asJava, componentInfo, pubSubRef)
 }

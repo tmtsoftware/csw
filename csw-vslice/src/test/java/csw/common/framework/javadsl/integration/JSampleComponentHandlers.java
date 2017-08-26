@@ -7,21 +7,21 @@ import csw.common.ccs.Validation;
 import csw.common.ccs.Validations;
 import csw.common.components.SampleComponentState;
 import csw.common.framework.javadsl.JComponentHandlers;
-import csw.common.framework.models.CommandMsg;
+import csw.common.framework.models.CommandMessage;
 import csw.common.framework.models.ComponentInfo;
-import csw.common.framework.models.ComponentMsg;
+import csw.common.framework.models.ComponentMessage;
 import csw.common.framework.models.PubSub;
 import csw.param.states.CurrentState;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
 
-public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMsg> {
-    private ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef;
+public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> {
+    private ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef;
 
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
 
-    JSampleComponentHandlers(ActorContext<ComponentMsg> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef, Class<JComponentDomainMsg> klass) {
+    JSampleComponentHandlers(ActorContext<ComponentMessage> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef, Class<JComponentDomainMessage> klass) {
         super(ctx, componentInfo, pubSubRef, klass);
         this.pubSubRef = pubSubRef;
     }
@@ -46,7 +46,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public void onDomainMsg(JComponentDomainMsg hcdDomainMsg) {
+    public void onDomainMsg(JComponentDomainMessage hcdDomainMsg) {
         CurrentState domainState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.domainChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(domainState);
 
@@ -54,7 +54,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public Validation onControlCommand(CommandMsg commandMsg) {
+    public Validation onControlCommand(CommandMessage commandMsg) {
 
         CurrentState commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(commandState);

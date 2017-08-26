@@ -3,20 +3,20 @@ package csw.common.framework.internal.supervisor
 import akka.typed.scaladsl.TimerScheduler
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
-import csw.common.components.ComponentDomainMsg
+import csw.common.components.ComponentDomainMessage
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.{Supervisor, SupervisorMode}
-import csw.common.framework.models.InitialMsg.Run
-import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
+import csw.common.framework.models.InitialMessage.Run
+import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
-import csw.common.framework.models.SupervisorCommonMsg.{
+import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
+import csw.common.framework.models.SupervisorCommonMessage.{
   ComponentStateSubscription,
   HaltComponent,
   LifecycleStateSubscription
 }
-import csw.common.framework.models.SupervisorIdleComponentMsg.{InitializeFailure, Initialized, Running}
+import csw.common.framework.models.SupervisorIdleComponentMessage.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models.SupervisorIdleMessage.RegistrationComplete
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
@@ -29,12 +29,12 @@ import org.scalatest.mockito.MockitoSugar
 class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSugar with BeforeAndAfterEach {
 
   class TestData {
-    val sampleHcdHandler: ComponentHandlers[ComponentDomainMsg] = mock[ComponentHandlers[ComponentDomainMsg]]
-    val ctx                                                     = new StubbedActorContext[SupervisorMsg]("test-supervisor", 100, system)
-    val timer: TimerScheduler[SupervisorMsg]                    = mock[TimerScheduler[SupervisorMsg]]
+    val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
+    val ctx                                                         = new StubbedActorContext[SupervisorMessage]("test-supervisor", 100, system)
+    val timer: TimerScheduler[SupervisorMessage]                    = mock[TimerScheduler[SupervisorMessage]]
     val supervisor =
       new Supervisor(ctx, timer, hcdInfo, getSampleHcdWiring(sampleHcdHandler), registrationFactory, locationService)
-    val childComponentInbox: Inbox[ComponentMsg]                        = ctx.childInbox(supervisor.component.upcast)
+    val childComponentInbox: Inbox[ComponentMessage]                    = ctx.childInbox(supervisor.component.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)
   }
@@ -200,12 +200,12 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     val testData = new TestData
     import testData._
 
-    sealed trait TestDomainMsg extends DomainMsg
-    case object TestCompMsg    extends TestDomainMsg
+    sealed trait TestDomainMessage extends DomainMessage
+    case object TestCompMessage$   extends TestDomainMessage
 
     supervisor.onMessage(Running(childComponentInbox.ref))
-    supervisor.onMessage(TestCompMsg)
-    childComponentInbox.receiveMsg() shouldBe TestCompMsg
+    supervisor.onMessage(TestCompMessage$)
+    childComponentInbox.receiveMsg() shouldBe TestCompMessage$
   }
   // *************** End of testing onRunning Messages ***************
 

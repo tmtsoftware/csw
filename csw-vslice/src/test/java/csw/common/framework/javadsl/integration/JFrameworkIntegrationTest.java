@@ -73,11 +73,11 @@ public class JFrameworkIntegrationTest extends Mockito {
     private void createSupervisorAndStartTLA() throws Exception {
         compStateProbe  = TestProbe.apply(system, settings);
         lifecycleStateChangedProbe  = TestProbe.apply(system, settings);
-        systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
+        systemActorOf = system.<SupervisorMessage>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
         Thread.sleep(200);
-        supervisorRef.tell(new SupervisorCommonMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
-        supervisorRef.tell(new SupervisorCommonMsg.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
+        supervisorRef.tell(new SupervisorCommonMessage.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
+        supervisorRef.tell(new SupervisorCommonMessage.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
     }
 
     @BeforeClass
@@ -101,10 +101,10 @@ public class JFrameworkIntegrationTest extends Mockito {
     public void shouldInvokeOnInitializeAndOnRun() throws Exception {
         compStateProbe  = TestProbe.apply(system, settings);
         lifecycleStateChangedProbe  = TestProbe.apply(system, settings);
-        systemActorOf = system.<SupervisorMsg>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
+        systemActorOf = system.<SupervisorMessage>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
-        supervisorRef.tell(new SupervisorCommonMsg.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
-        supervisorRef.tell(new SupervisorCommonMsg.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
+        supervisorRef.tell(new SupervisorCommonMessage.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
+        supervisorRef.tell(new SupervisorCommonMessage.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
 
         CurrentState initCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> initParam = SampleComponentState.choiceKey().set(SampleComponentState.initChoice());
@@ -124,7 +124,7 @@ public class JFrameworkIntegrationTest extends Mockito {
     public void shouldInvokeOnDomainMsg() throws Exception {
         createSupervisorAndStartTLA();
 
-        JComponentDomainMsg myDomainSpecificMsg = new JComponentDomainMsg();
+        JComponentDomainMessage myDomainSpecificMsg = new JComponentDomainMessage();
         supervisorRef.tell(myDomainSpecificMsg);
 
         CurrentState domainCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
@@ -144,7 +144,7 @@ public class JFrameworkIntegrationTest extends Mockito {
         Setup setup = new Setup(commandInfo, prefix).add(encoderParam);
 
         ActorRef<CommandStatus.CommandResponse> testRef = TestProbe.<CommandStatus.CommandResponse>apply(system, settings).ref();
-        supervisorRef.tell(new CommandMsg.Oneway(setup, testRef));
+        supervisorRef.tell(new CommandMessage.Oneway(setup, testRef));
 
         CurrentState commandCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> commandParam = SampleComponentState.choiceKey().set(SampleComponentState.commandChoice());
@@ -156,14 +156,14 @@ public class JFrameworkIntegrationTest extends Mockito {
     public void shouldInvokeOnGoOfflineAndOnGoOnline() throws Exception {
         createSupervisorAndStartTLA();
 
-        supervisorRef.tell(new RunningMsg.Lifecycle(ToComponentLifecycleMessage.GoOffline$.MODULE$));
+        supervisorRef.tell(new RunningMessage.Lifecycle(ToComponentLifecycleMessage.GoOffline$.MODULE$));
 
         CurrentState offlineCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> offlineParam = SampleComponentState.choiceKey().set(SampleComponentState.offlineChoice());
         DemandState offlineDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(offlineParam);
         Assert.assertTrue(new DemandMatcher(offlineDemandState, false).check(offlineCurrentState));
 
-        supervisorRef.tell(new RunningMsg.Lifecycle(ToComponentLifecycleMessage.GoOnline$.MODULE$));
+        supervisorRef.tell(new RunningMessage.Lifecycle(ToComponentLifecycleMessage.GoOnline$.MODULE$));
 
         CurrentState onlineCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> onlineParam = SampleComponentState.choiceKey().set(SampleComponentState.onlineChoice());
@@ -175,7 +175,7 @@ public class JFrameworkIntegrationTest extends Mockito {
     public void shouldInvokeOnRestart() throws Exception {
         createSupervisorAndStartTLA();
 
-        supervisorRef.tell(new RunningMsg.Lifecycle(ToComponentLifecycleMessage.Restart$.MODULE$));
+        supervisorRef.tell(new RunningMessage.Lifecycle(ToComponentLifecycleMessage.Restart$.MODULE$));
 
         CurrentState restartCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> restartParam = SampleComponentState.choiceKey().set(SampleComponentState.restartChoice());
@@ -199,7 +199,7 @@ public class JFrameworkIntegrationTest extends Mockito {
     public void shouldInvokeOnShutdown() throws Exception {
         createSupervisorAndStartTLA();
 
-        supervisorRef.tell(new RunningMsg.Lifecycle(ToComponentLifecycleMessage.Shutdown$.MODULE$));
+        supervisorRef.tell(new RunningMessage.Lifecycle(ToComponentLifecycleMessage.Shutdown$.MODULE$));
 
         CurrentState shutdownCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> shutdownParam = SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice());

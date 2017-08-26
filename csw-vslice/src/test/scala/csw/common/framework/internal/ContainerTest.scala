@@ -6,12 +6,16 @@ import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.common.framework.FrameworkComponentTestInfos._
-import csw.common.framework.models.ContainerCommonMsg.GetComponents
-import csw.common.framework.models.SupervisorCommonMsg.{GetSupervisorMode, LifecycleStateSubscription}
-import csw.common.framework.models.ContainerIdleMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
+import csw.common.framework.models.ContainerCommonMessage.GetComponents
+import csw.common.framework.models.SupervisorCommonMessage.{GetSupervisorMode, LifecycleStateSubscription}
+import csw.common.framework.models.ContainerIdleMessage.{
+  RegistrationComplete,
+  RegistrationFailed,
+  SupervisorModeChanged
+}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
-import csw.common.framework.models.ContainerRunningMsg.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.common.framework.models.RunningMsg.Lifecycle
+import csw.common.framework.models.ContainerRunningMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{SupervisorBehaviorFactory, SupervisorFactory}
@@ -39,7 +43,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
   private val registrationResult: RegistrationResult = mock[RegistrationResult]
 
   class IdleContainer() {
-    val ctx                                  = new StubbedActorContext[ContainerMsg]("test-container", 100, typedSystem)
+    val ctx                                  = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
     val supervisorFactory: SupervisorFactory = mock[SupervisorFactory]
     val answer = new Answer[SupervisorInfo] {
       override def answer(invocation: InvocationOnMock): SupervisorInfo = {
@@ -99,7 +103,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
     // check that all components received LifecycleStateSubscription message and GetSupervisorMode message
     val supervisorInboxes =
-      containerInfo.components.toList.map(componentInfo ⇒ ctx.childInbox[SupervisorCommonMsg](componentInfo.name))
+      containerInfo.components.toList.map(componentInfo ⇒ ctx.childInbox[SupervisorCommonMessage](componentInfo.name))
 
     supervisorInboxes.map(_.receiveMsg()) should contain only LifecycleStateSubscription(
       Subscribe(container.lifecycleStateTrackerRef)
@@ -114,7 +118,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
     // check that lifecycleStateTrackerRef gets un-subscribed from all components
     containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[SupervisorCommonMsg](component.name))
+      .map(component ⇒ ctx.childInbox[SupervisorCommonMessage](component.name))
       .map(_.receiveMsg()) should contain only LifecycleStateSubscription(
       Unsubscribe(container.lifecycleStateTrackerRef)
     )
@@ -152,7 +156,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     container.mode shouldBe ContainerMode.Idle
 
     containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[SupervisorCommonMsg](component.name))
+      .map(component ⇒ ctx.childInbox[SupervisorCommonMessage](component.name))
       .map(_.receiveMsg()) should contain only LifecycleStateSubscription(Subscribe(container.lifecycleStateTrackerRef))
 
     containerInfo.components.toList

@@ -4,10 +4,10 @@ import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.{ComponentBehavior, ComponentMode}
-import csw.common.framework.models.{ComponentMsg, FromComponentLifecycleMessage}
-import csw.common.framework.models.IdleMsg.Initialize
-import csw.common.framework.models.InitialMsg.Run
-import csw.common.framework.models.SupervisorIdleComponentMsg.{InitializeFailure, Initialized, Running}
+import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage}
+import csw.common.framework.models.IdleMessage.Initialize
+import csw.common.framework.models.InitialMessage.Run
+import csw.common.framework.models.SupervisorIdleComponentMessage.{InitializeFailure, Initialized, Running}
 import csw.common.framework.scaladsl.ComponentHandlers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -18,10 +18,12 @@ import scala.concurrent.Future
 class ComponentBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
 
   class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
-    val sampleComponentHandler: ComponentHandlers[ComponentDomainMsg] = mock[ComponentHandlers[ComponentDomainMsg]]
+    val sampleComponentHandler: ComponentHandlers[ComponentDomainMessage] =
+      mock[ComponentHandlers[ComponentDomainMessage]]
 
-    val ctx               = new StubbedActorContext[ComponentMsg]("test-component", 100, system)
-    val componentBehavior = new ComponentBehavior[ComponentDomainMsg](ctx, supervisorProbe.ref, sampleComponentHandler)
+    val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
+    val componentBehavior =
+      new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleComponentHandler)
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
   }
 

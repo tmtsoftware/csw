@@ -3,14 +3,14 @@ package csw.common.framework.internal
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus
-import csw.common.framework.models.CommandMsg.{Oneway, Submit}
-import csw.common.framework.models.IdleMsg.{Initialize, Start}
-import csw.common.framework.models.InitialMsg.Run
-import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure}
-import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
-import csw.common.framework.models.SupervisorIdleComponentMsg.InitializeFailure
+import csw.common.framework.models.CommandMessage.{Oneway, Submit}
+import csw.common.framework.models.IdleMessage.{Initialize, Start}
+import csw.common.framework.models.InitialMessage.Run
+import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure}
+import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
+import csw.common.framework.models.SupervisorIdleComponentMessage.InitializeFailure
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
-import csw.common.framework.models.{RunningMsg, _}
+import csw.common.framework.models.{RunningMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 
 import scala.async.Async.{async, await}
@@ -18,11 +18,11 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
-class ComponentBehavior[Msg <: DomainMsg: ClassTag](
-    ctx: ActorContext[ComponentMsg],
+class ComponentBehavior[Msg <: DomainMessage: ClassTag](
+    ctx: ActorContext[ComponentMessage],
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers[Msg]
-) extends Actor.MutableBehavior[ComponentMsg] {
+) extends Actor.MutableBehavior[ComponentMessage] {
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
@@ -30,21 +30,21 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
 
   ctx.self ! Initialize
 
-  def onMessage(msg: ComponentMsg): Behavior[ComponentMsg] = {
+  def onMessage(msg: ComponentMessage): Behavior[ComponentMessage] = {
     (mode, msg) match {
-      case (ComponentMode.Idle, x: IdleMsg)           ⇒ onIdle(x)
-      case (ComponentMode.Initialized, x: InitialMsg) ⇒ onInitial(x)
-      case (ComponentMode.Running, x: RunningMsg)     ⇒ onRun(x)
-      case _                                          ⇒ println(s"current context=$mode does not handle message=$msg")
+      case (ComponentMode.Idle, x: IdleMessage)           ⇒ onIdle(x)
+      case (ComponentMode.Initialized, x: InitialMessage) ⇒ onInitial(x)
+      case (ComponentMode.Running, x: RunningMessage)     ⇒ onRun(x)
+      case _                                              ⇒ println(s"current context=$mode does not handle message=$msg")
     }
     this
   }
 
-  private def onIdle(x: IdleMsg): Unit = x match {
+  private def onIdle(x: IdleMessage): Unit = x match {
     case Initialize =>
       async {
         await(initialization())
-        supervisor ! SupervisorIdleComponentMsg.Initialized(ctx.self)
+        supervisor ! SupervisorIdleComponentMessage.Initialized(ctx.self)
       } recover {
         case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
       }
@@ -63,18 +63,18 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
       await(lifecycleHandlers.initialize())
     }
 
-  private def onInitial(x: InitialMsg): Unit = x match {
+  private def onInitial(x: InitialMessage): Unit = x match {
     case Run =>
       mode = ComponentMode.Running
       lifecycleHandlers.onRun()
       lifecycleHandlers.isOnline = true
-      supervisor ! SupervisorIdleComponentMsg.Running(ctx.self)
+      supervisor ! SupervisorIdleComponentMessage.Running(ctx.self)
   }
 
-  private def onRun(runningMsg: RunningMsg): Unit = runningMsg match {
+  private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
     case Lifecycle(message) => onLifecycle(message)
     case x: Msg             => lifecycleHandlers.onDomainMsg(x)
-    case x: CommandMsg      => onRunningCompCommandMsg(x)
+    case x: CommandMessage  => onRunningCompCommandMessage(x)
     case _                  ⇒ println("wrong msg")
   }
 
@@ -102,14 +102,14 @@ class ComponentBehavior[Msg <: DomainMsg: ClassTag](
       }
   }
 
-  def onRunningCompCommandMsg(msg: CommandMsg): Unit = {
-    val newMsg: CommandMsg = msg match {
+  def onRunningCompCommandMessage(message: CommandMessage): Unit = {
+    val newMessage: CommandMessage = message match {
       case x: Oneway ⇒ x.copy(replyTo = ctx.spawnAnonymous(Actor.ignore))
       case x: Submit ⇒ x
     }
-    val validation              = lifecycleHandlers.onControlCommand(newMsg)
+    val validation              = lifecycleHandlers.onControlCommand(newMessage)
     val validationCommandResult = CommandStatus.validationAsCommandStatus(validation)
-    msg.replyTo ! validationCommandResult
+    message.replyTo ! validationCommandResult
   }
 
 }

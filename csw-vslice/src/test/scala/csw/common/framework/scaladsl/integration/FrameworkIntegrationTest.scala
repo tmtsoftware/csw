@@ -8,10 +8,10 @@ import csw.common.components.ComponentStatistics
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.SupervisorMode
-import csw.common.framework.models.CommandMsg.Oneway
+import csw.common.framework.models.CommandMessage.Oneway
 import csw.common.framework.models.PubSub.Subscribe
-import csw.common.framework.models.RunningMsg.Lifecycle
-import csw.common.framework.models.SupervisorCommonMsg.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.common.framework.models.RunningMessage.Lifecycle
+import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models.{LifecycleStateChanged, SupervisorExternalMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory

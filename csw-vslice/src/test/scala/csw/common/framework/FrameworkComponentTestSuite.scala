@@ -5,9 +5,9 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import akka.{actor, testkit, Done}
-import csw.common.components.ComponentDomainMsg
-import csw.common.framework.models.PubSub.PublisherMsg
-import csw.common.framework.models.{ComponentInfo, ComponentMsg}
+import csw.common.components.ComponentDomainMessage
+import csw.common.framework.models.PubSub.PublisherMessage
+import csw.common.framework.models.{ComponentInfo, ComponentMessage}
 import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.states.CurrentState
 import csw.services.location.models.Connection.AkkaConnection
@@ -45,23 +45,27 @@ abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with B
   }
 
   def getSampleHcdWiring(
-      componentHandlers: ComponentHandlers[ComponentDomainMsg]
-  ): ComponentWiring[ComponentDomainMsg] =
-    new ComponentWiring[ComponentDomainMsg] {
+      componentHandlers: ComponentHandlers[ComponentDomainMessage]
+  ): ComponentWiring[ComponentDomainMessage] =
+    new ComponentWiring[ComponentDomainMessage] {
 
-      override def handlers(ctx: ActorContext[ComponentMsg],
-                            componentInfo: ComponentInfo,
-                            pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[ComponentDomainMsg] =
+      override def handlers(
+          ctx: ActorContext[ComponentMessage],
+          componentInfo: ComponentInfo,
+          pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+      ): ComponentHandlers[ComponentDomainMessage] =
         componentHandlers
     }
 
   def getSampleAssemblyWiring(
-      assemblyHandlers: ComponentHandlers[ComponentDomainMsg]
-  ): ComponentWiring[ComponentDomainMsg] =
-    new ComponentWiring[ComponentDomainMsg] {
-      override def handlers(ctx: ActorContext[ComponentMsg],
-                            componentInfo: ComponentInfo,
-                            pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[ComponentDomainMsg] =
+      assemblyHandlers: ComponentHandlers[ComponentDomainMessage]
+  ): ComponentWiring[ComponentDomainMessage] =
+    new ComponentWiring[ComponentDomainMessage] {
+      override def handlers(
+          ctx: ActorContext[ComponentMessage],
+          componentInfo: ComponentInfo,
+          pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+      ): ComponentHandlers[ComponentDomainMessage] =
         assemblyHandlers
     }
 

@@ -3,8 +3,8 @@ package csw.common.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.ccs.{Validation, Validations}
-import csw.common.framework.models.PubSub.{Publish, PublisherMsg}
-import csw.common.framework.models.{CommandMsg, ComponentInfo, ComponentMsg}
+import csw.common.framework.models.PubSub.{Publish, PublisherMessage}
+import csw.common.framework.models.{CommandMessage, ComponentInfo, ComponentMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.param.generics.GChoiceKey
 import csw.param.generics.KeyType.ChoiceKey
@@ -36,19 +36,19 @@ object SampleComponentState {
   val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", choices)
 }
 
-class SampleComponentHandlers(ctx: ActorContext[ComponentMsg],
+class SampleComponentHandlers(ctx: ActorContext[ComponentMessage],
                               componentInfo: ComponentInfo,
-                              pubSubRef: ActorRef[PublisherMsg[CurrentState]])
-    extends ComponentHandlers[ComponentDomainMsg](ctx, componentInfo, pubSubRef) {
+                              pubSubRef: ActorRef[PublisherMessage[CurrentState]])
+    extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, pubSubRef) {
   import SampleComponentState._
 
   override def onRestart(): Unit  = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
   override def onRun(): Unit      = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice))))
   override def onGoOnline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
-  override def onDomainMsg(msg: ComponentDomainMsg): Unit =
+  override def onDomainMsg(msg: ComponentDomainMessage): Unit =
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
   override def onShutdown(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
-  override def onControlCommand(commandMsg: CommandMsg): Validation = {
+  override def onControlCommand(commandMsg: CommandMessage): Validation = {
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(commandChoice))))
     Validations.Valid
   }

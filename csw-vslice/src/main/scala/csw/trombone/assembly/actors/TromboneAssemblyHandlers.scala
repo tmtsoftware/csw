@@ -5,8 +5,8 @@ import akka.typed.scaladsl.ActorContext
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validations.Valid
 import csw.common.ccs.{Validation, Validations}
-import csw.common.framework.models.PubSub.PublisherMsg
-import csw.common.framework.models.SupervisorIdleComponentMsg.Running
+import csw.common.framework.models.PubSub.PublisherMessage
+import csw.common.framework.models.SupervisorIdleComponentMessage.Running
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
 import csw.param.commands.{Observe, Setup}
@@ -21,15 +21,15 @@ import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 
 class TromboneAssemblyWiring extends ComponentWiring[DiagPublisherMessages] {
-  override def handlers(ctx: ActorContext[ComponentMsg],
+  override def handlers(ctx: ActorContext[ComponentMessage],
                         componentInfo: ComponentInfo,
-                        pubSubRef: ActorRef[PublisherMsg[CurrentState]]): ComponentHandlers[DiagPublisherMessages] =
+                        pubSubRef: ActorRef[PublisherMessage[CurrentState]]): ComponentHandlers[DiagPublisherMessages] =
     new TromboneAssemblyHandlers(ctx, componentInfo, pubSubRef)
 }
 
-class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg],
+class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMessage],
                                componentInfo: ComponentInfo,
-                               pubSubRef: ActorRef[PublisherMsg[CurrentState]])
+                               pubSubRef: ActorRef[PublisherMessage[CurrentState]])
     extends ComponentHandlers[DiagPublisherMessages](ctx, componentInfo, pubSubRef) {
 
   private var diagPublsher: ActorRef[DiagPublisherMessages] = _
@@ -67,7 +67,7 @@ class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMsg],
     case _                                   ⇒
   }
 
-  override def onControlCommand(commandMsg: CommandMsg): Validation = commandMsg.command match {
+  override def onControlCommand(commandMsg: CommandMessage): Validation = commandMsg.command match {
     case x: Setup   => setup(x, commandMsg.replyTo)
     case x: Observe => observe(x, commandMsg.replyTo)
   }

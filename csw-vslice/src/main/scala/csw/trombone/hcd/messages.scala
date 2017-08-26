@@ -1,7 +1,7 @@
 package csw.trombone.hcd
 
 import akka.typed.ActorRef
-import csw.common.framework.models.RunningMsg.DomainMsg
+import csw.common.framework.models.RunningMessage.DomainMessage
 import csw.services.location.models.TmtSerializable
 import csw.trombone.hcd.AxisResponse.{AxisStatistics, AxisUpdate}
 
@@ -39,9 +39,9 @@ object MotionWorkerMsgs {
 
 ////////////////
 
-sealed trait TromboneMsg extends DomainMsg
+sealed trait TromboneMessage extends DomainMessage
 
-sealed trait TromboneEngineering extends TromboneMsg
+sealed trait TromboneEngineering extends TromboneMessage
 object TromboneEngineering {
   case object GetAxisStats                                     extends TromboneEngineering
   case object GetAxisUpdate                                    extends TromboneEngineering
@@ -49,7 +49,7 @@ object TromboneEngineering {
   case object GetAxisConfig                                    extends TromboneEngineering
 }
 
-sealed trait AxisResponse extends TromboneMsg
+sealed trait AxisResponse extends TromboneMessage
 object AxisResponse {
   case object AxisStarted                                extends AxisResponse
   case class AxisFinished(newRef: ActorRef[AxisRequest]) extends AxisResponse

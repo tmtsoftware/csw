@@ -5,20 +5,20 @@ import akka.typed.javadsl.ActorContext;
 import csw.common.framework.javadsl.JComponentHandlers;
 import csw.common.framework.javadsl.JComponentWiring;
 import csw.common.framework.models.ComponentInfo;
-import csw.common.framework.models.ComponentMsg;
+import csw.common.framework.models.ComponentMessage;
 import csw.common.framework.models.PubSub;
 import csw.param.states.CurrentState;
 
-public class JSampleComponentWiring extends JComponentWiring<JComponentDomainMsg> {
+public class JSampleComponentWiring extends JComponentWiring<JComponentDomainMessage> {
     public JSampleComponentWiring() {
-        super(JComponentDomainMsg.class);
+        super(JComponentDomainMessage.class);
     }
 
     @Override
-    public JComponentHandlers<JComponentDomainMsg> make(
-            ActorContext<ComponentMsg> ctx,
+    public JComponentHandlers<JComponentDomainMessage> make(
+            ActorContext<ComponentMessage> ctx,
             ComponentInfo componentInfo,
-            ActorRef<PubSub.PublisherMsg<CurrentState>> pubSubRef) {
-        return new JSampleComponentHandlers(ctx, componentInfo, pubSubRef, JComponentDomainMsg.class);
+            ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef) {
+        return new JSampleComponentHandlers(ctx, componentInfo, pubSubRef, JComponentDomainMessage.class);
     }
 }

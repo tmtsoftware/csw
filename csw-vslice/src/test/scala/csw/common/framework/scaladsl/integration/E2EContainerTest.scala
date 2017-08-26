@@ -8,12 +8,12 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.components.SampleComponentState._
 import csw.common.framework.internal.{ContainerMode, SupervisorMode}
-import csw.common.framework.models.ContainerCommonMsg.{GetComponents, GetContainerMode}
-import csw.common.framework.models.ModeMsg.ContainerModeMsg
-import csw.common.framework.models.SupervisorCommonMsg.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
+import csw.common.framework.models.ComponentModeMessage.ContainerModeMessage
+import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.{Components, LifecycleStateChanged}
 import csw.common.framework.models.PubSub.Subscribe
-import csw.common.framework.models.RunningMsg.Lifecycle
+import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.scaladsl.Component
 import csw.param.states.CurrentState
@@ -26,7 +26,7 @@ class E2EContainerTest extends FunSuite with Matchers {
     val containerRef = Component.createContainer(ConfigFactory.load("container.conf"))
 
     val componentsProbe    = TestProbe[Components]
-    val containerModeProbe = TestProbe[ContainerModeMsg]
+    val containerModeProbe = TestProbe[ContainerModeMessage]
     val assemblyProbe      = TestProbe[CurrentState]
     val filterProbe        = TestProbe[CurrentState]
     val disperserProbe     = TestProbe[CurrentState]
@@ -36,7 +36,7 @@ class E2EContainerTest extends FunSuite with Matchers {
     val disperserLifecycleStateProbe = TestProbe[LifecycleStateChanged]
 
     containerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerModeMsg(ContainerMode.Idle))
+    containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Idle))
 
     containerRef ! GetComponents(componentsProbe.ref)
     val components = componentsProbe.expectMsgType[Components].components
@@ -70,7 +70,7 @@ class E2EContainerTest extends FunSuite with Matchers {
     Thread.sleep(1000)
 
     containerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerModeMsg(ContainerMode.Running))
+    containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Running))
 
     containerRef ! Lifecycle(GoOffline)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
@@ -85,7 +85,7 @@ class E2EContainerTest extends FunSuite with Matchers {
     containerRef ! Lifecycle(Restart)
 
     containerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerModeMsg(ContainerMode.Idle))
+    containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Idle))
 
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
@@ -105,7 +105,7 @@ class E2EContainerTest extends FunSuite with Matchers {
 
     Thread.sleep(100)
     containerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerModeMsg(ContainerMode.Running))
+    containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Running))
   }
 
 }

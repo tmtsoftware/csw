@@ -3,13 +3,17 @@ package csw.common.framework.internal
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
-import csw.common.framework.models.ContainerCommonMsg.{GetComponents, GetContainerMode}
-import csw.common.framework.models.SupervisorCommonMsg.{GetSupervisorMode, LifecycleStateSubscription}
-import csw.common.framework.models.ContainerIdleMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
+import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
+import csw.common.framework.models.SupervisorCommonMessage.{GetSupervisorMode, LifecycleStateSubscription}
+import csw.common.framework.models.ContainerIdleMessage.{
+  RegistrationComplete,
+  RegistrationFailed,
+  SupervisorModeChanged
+}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
-import csw.common.framework.models.ContainerRunningMsg.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.common.framework.models.ModeMsg.{ContainerModeMsg, SupervisorModeMsg}
-import csw.common.framework.models.RunningMsg.Lifecycle
+import csw.common.framework.models.ContainerRunningMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.common.framework.models.ComponentModeMessage.{ContainerModeMessage, SupervisorModeMessage}
+import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage._
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.SupervisorFactory
@@ -21,12 +25,12 @@ import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 class Container(
-    ctx: ActorContext[ContainerMsg],
+    ctx: ActorContext[ContainerMessage],
     containerInfo: ContainerInfo,
     supervisorFactory: SupervisorFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
-) extends MutableBehavior[ContainerMsg] {
+) extends MutableBehavior[ContainerMessage] {
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
@@ -41,33 +45,33 @@ class Container(
 
   createComponents(containerInfo.components)
 
-  override def onMessage(msg: ContainerMsg): Behavior[ContainerMsg] = {
+  override def onMessage(msg: ContainerMessage): Behavior[ContainerMessage] = {
     (mode, msg) match {
-      case (_, msg: ContainerCommonMsg)                      ⇒ onCommon(msg)
-      case (ContainerMode.Idle, msg: ContainerIdleMsg)       ⇒ onIdle(msg)
-      case (ContainerMode.Running, msg: ContainerRunningMsg) ⇒ onRunning(msg)
-      case (_, message)                                      ⇒ println(s"Container in $mode received an unexpected message: $message")
+      case (_, msg: ContainerCommonMessage)                      ⇒ onCommon(msg)
+      case (ContainerMode.Idle, msg: ContainerIdleMessage)       ⇒ onIdle(msg)
+      case (ContainerMode.Running, msg: ContainerRunningMessage) ⇒ onRunning(msg)
+      case (_, message)                                          ⇒ println(s"Container in $mode received an unexpected message: $message")
     }
     this
   }
 
-  def onCommon(commonContainerMsg: ContainerCommonMsg): Unit = commonContainerMsg match {
+  def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
     case GetComponents(replyTo)    ⇒ replyTo ! Components(supervisors)
-    case GetContainerMode(replyTo) ⇒ replyTo ! ContainerModeMsg(mode)
+    case GetContainerMode(replyTo) ⇒ replyTo ! ContainerModeMessage(mode)
   }
 
-  def onIdle(idleContainerMsg: ContainerIdleMsg): Unit = idleContainerMsg match {
+  def onIdle(idleContainerMessage: ContainerIdleMessage): Unit = idleContainerMessage match {
     case SupervisorModeChanged(LifecycleStateChanged(publisher, lifecycleState)) ⇒
       onSupervisorModeChange(publisher, lifecycleState)
-    case SupervisorModeMsg(supervisor, supervisorMode) ⇒ onSupervisorModeChange(supervisor, supervisorMode)
-    case RegistrationComplete(registrationResult)      ⇒ onRegistrationComplete(registrationResult)
-    case RegistrationFailed(throwable)                 ⇒ onRegistrationFailure(throwable)
+    case SupervisorModeMessage(supervisor, supervisorMode) ⇒ onSupervisorModeChange(supervisor, supervisorMode)
+    case RegistrationComplete(registrationResult)          ⇒ onRegistrationComplete(registrationResult)
+    case RegistrationFailed(throwable)                     ⇒ onRegistrationFailure(throwable)
   }
 
-  def onRunning(runningContainerMsg: ContainerRunningMsg): Unit = runningContainerMsg match {
+  def onRunning(runningContainerMessage: ContainerRunningMessage): Unit = runningContainerMessage match {
     case Lifecycle(Restart)              ⇒ onRestart()
     case Lifecycle(Shutdown)             ⇒ onShutdown()
-    case Lifecycle(lifecycleMsg)         ⇒ sendLifecycleMsgToAllComponents(lifecycleMsg)
+    case Lifecycle(lifecycleMessage)     ⇒ sendLifecycleMessageToAllComponents(lifecycleMessage)
     case UnRegistrationComplete          ⇒ onUnRegistrationComplete()
     case UnRegistrationFailed(throwable) ⇒ onUnRegistrationFailed(throwable)
   }
@@ -75,13 +79,13 @@ class Container(
   def onRestart(): Unit = {
     mode = ContainerMode.Idle
     subscribeToSupervisorsLifecycle()
-    sendLifecycleMsgToAllComponents(Restart)
+    sendLifecycleMessageToAllComponents(Restart)
   }
 
   def onShutdown(): Unit = unregisterFromLocationService()
 
-  def sendLifecycleMsgToAllComponents(lifecycleMsg: ToComponentLifecycleMessage): Unit = {
-    supervisors.foreach { _.supervisor ! Lifecycle(lifecycleMsg) }
+  def sendLifecycleMessageToAllComponents(lifecycleMessage: ToComponentLifecycleMessage): Unit = {
+    supervisors.foreach { _.supervisor ! Lifecycle(lifecycleMessage) }
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
@@ -151,7 +155,7 @@ class Container(
   private def onUnRegistrationComplete(): Unit = {
     mode = ContainerMode.Idle
     registrationOpt = None
-    sendLifecycleMsgToAllComponents(Shutdown)
+    sendLifecycleMessageToAllComponents(Shutdown)
   }
 
   private def onUnRegistrationFailed(throwable: Throwable): Unit =

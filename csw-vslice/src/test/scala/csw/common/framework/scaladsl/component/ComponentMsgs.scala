@@ -1,6 +1,6 @@
 package csw.common.framework.scaladsl.component
 
-import csw.common.framework.models.RunningMsg.DomainMsg
+import csw.common.framework.models.RunningMessage.DomainMessage
 
-sealed trait ComponentDomainMsg       extends DomainMsg
-case class ComponentStats(value: Int) extends ComponentDomainMsg
+sealed trait ComponentDomainMessage   extends DomainMessage
+case class ComponentStats(value: Int) extends ComponentDomainMessage

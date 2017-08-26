@@ -7,9 +7,9 @@ import csw.common.ccs.CommandMsgs
 import csw.common.ccs.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
 import csw.common.ccs.CommandStatus.{Completed, Error, NoLongerValid}
 import csw.common.ccs.ValidationIssue.WrongInternalStateIssue
-import csw.common.framework.models.CommandMsg.Submit
+import csw.common.framework.models.CommandMessage.Submit
 import csw.common.framework.models.PubSub
-import csw.common.framework.models.SupervisorIdleComponentMsg.Running
+import csw.common.framework.models.SupervisorIdleComponentMessage.Running
 import csw.param.commands.Setup
 import csw.param.states.CurrentState
 import csw.trombone.assembly.Matchers
