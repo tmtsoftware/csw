@@ -75,6 +75,7 @@ object SupervisorCommonMsg {
   case class LifecycleStateSubscription(subscriberMsg: SubscriberMsg[LifecycleStateChanged]) extends SupervisorCommonMsg
   case class ComponentStateSubscription(subscriberMsg: SubscriberMsg[CurrentState])          extends SupervisorCommonMsg
   case object HaltComponent                                                                  extends SupervisorCommonMsg
+  case class GetSupervisorMode(replyTo: ActorRef[ContainerMsg])                              extends SupervisorCommonMsg
 }
 
 sealed trait SupervisorIdleMessage extends SupervisorMsg
@@ -111,8 +112,8 @@ sealed trait ContainerExternalMessage extends ContainerMsg
 
 sealed trait ContainerCommonMsg extends ContainerExternalMessage
 object ContainerCommonMsg {
-  case class GetComponents(replyTo: ActorRef[Components])       extends ContainerCommonMsg
-  case class GetContainerMode(replyTo: ActorRef[ContainerMode]) extends ContainerCommonMsg
+  case class GetComponents(replyTo: ActorRef[Components])                  extends ContainerCommonMsg
+  case class GetContainerMode(replyTo: ActorRef[ModeMsg.ContainerModeMsg]) extends ContainerCommonMsg
 }
 
 sealed trait ContainerIdleMsg extends ContainerMsg
@@ -128,7 +129,15 @@ object ContainerRunningMsg {
   case class UnRegistrationFailed(throwable: Throwable) extends ContainerRunningMsg
 }
 
-case class LifecycleStateChanged(state: SupervisorMode, publisher: ActorRef[SupervisorExternalMessage])
+sealed trait ModeMsg
+object ModeMsg {
+  case class ContainerModeMsg(containerMode: ContainerMode) extends ModeMsg
+  case class SupervisorModeMsg(supervisor: ActorRef[SupervisorExternalMessage], supervisorMode: SupervisorMode)
+      extends ModeMsg
+      with ContainerIdleMsg
+}
+
+case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage], state: SupervisorMode)
 
 case class Components(components: List[SupervisorInfo])
 

@@ -4,10 +4,11 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.models.ContainerCommonMsg.{GetComponents, GetContainerMode}
-import csw.common.framework.models.SupervisorCommonMsg.LifecycleStateSubscription
+import csw.common.framework.models.SupervisorCommonMsg.{GetSupervisorMode, LifecycleStateSubscription}
 import csw.common.framework.models.ContainerIdleMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.ContainerRunningMsg.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.common.framework.models.ModeMsg.{ContainerModeMsg, SupervisorModeMsg}
 import csw.common.framework.models.RunningMsg.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage._
 import csw.common.framework.models._
@@ -32,7 +33,7 @@ class Container(
   val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
   val akkaRegistration: AkkaRegistration          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   var supervisors: List[SupervisorInfo]           = List.empty
-  var runningComponents: List[SupervisorInfo]     = List.empty
+  var runningComponents: Set[SupervisorInfo]      = Set.empty
   var mode: ContainerMode                         = ContainerMode.Idle
   var registrationOpt: Option[RegistrationResult] = None
   val lifecycleStateTrackerRef: ActorRef[LifecycleStateChanged] =
@@ -51,14 +52,16 @@ class Container(
   }
 
   def onCommon(commonContainerMsg: ContainerCommonMsg): Unit = commonContainerMsg match {
-    case GetComponents(replyTo)    => replyTo ! Components(supervisors)
-    case GetContainerMode(replyTo) => replyTo ! mode
+    case GetComponents(replyTo)    ⇒ replyTo ! Components(supervisors)
+    case GetContainerMode(replyTo) ⇒ replyTo ! ContainerModeMsg(mode)
   }
 
   def onIdle(idleContainerMsg: ContainerIdleMsg): Unit = idleContainerMsg match {
-    case SupervisorModeChanged(lifecycleStateChanged) ⇒ onLifecycleStateChanged(lifecycleStateChanged)
-    case RegistrationComplete(registrationResult)     ⇒ onRegistrationComplete(registrationResult)
-    case RegistrationFailed(throwable)                ⇒ onRegistrationFailure(throwable)
+    case SupervisorModeChanged(LifecycleStateChanged(publisher, lifecycleState)) ⇒
+      onSupervisorModeChange(publisher, lifecycleState)
+    case SupervisorModeMsg(supervisor, supervisorMode) ⇒ onSupervisorModeChange(supervisor, supervisorMode)
+    case RegistrationComplete(registrationResult)      ⇒ onRegistrationComplete(registrationResult)
+    case RegistrationFailed(throwable)                 ⇒ onRegistrationFailure(throwable)
   }
 
   def onRunning(runningContainerMsg: ContainerRunningMsg): Unit = runningContainerMsg match {
@@ -81,17 +84,11 @@ class Container(
     supervisors.foreach { _.supervisor ! Lifecycle(lifecycleMsg) }
   }
 
-  def onLifecycleStateChanged(lifecycleStateChanged: LifecycleStateChanged): Unit = {
-    if (lifecycleStateChanged.state == SupervisorMode.Running) {
-      val componentSupervisor = lifecycleStateChanged.publisher
-      unSubscribeFromSupervisorsLifecycle(componentSupervisor)
-      updateRunningComponents(componentSupervisor)
-    }
-  }
-
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
     supervisors = supervisors ::: componentInfos.flatMap(createComponent).toList
     subscribeToSupervisorsLifecycle()
+    requestSupervisorMode() // Get all supervisors' mode so that if any supervisor got changed to 'running' mode before this container could subscribe to it's lifecycle changes then it gets handled
+
   }
 
   private def createComponent(componentInfo: ComponentInfo): Option[SupervisorInfo] = {
@@ -102,11 +99,22 @@ class Container(
   private def subscribeToSupervisorsLifecycle(): Unit =
     supervisors.foreach(_.supervisor ! LifecycleStateSubscription(Subscribe(lifecycleStateTrackerRef)))
 
+  private def requestSupervisorMode(): Unit =
+    supervisors.foreach(_.supervisor ! GetSupervisorMode(ctx.self))
+
+  private def onSupervisorModeChange(supervisor: ActorRef[SupervisorExternalMessage],
+                                     supervisorMode: SupervisorMode): Unit = {
+    if (supervisorMode == SupervisorMode.Running) {
+      unSubscribeFromSupervisorsLifecycle(supervisor)
+      updateRunningComponents(supervisor)
+    }
+  }
+
   private def unSubscribeFromSupervisorsLifecycle(componentSupervisor: ActorRef[SupervisorExternalMessage]): Unit =
     componentSupervisor ! LifecycleStateSubscription(Unsubscribe(lifecycleStateTrackerRef))
 
   private def updateRunningComponents(componentSupervisor: ActorRef[SupervisorExternalMessage]): Unit = {
-    runningComponents = (supervisors.find(_.supervisor == componentSupervisor) ++ runningComponents).toList
+    runningComponents = (supervisors.find(_.supervisor == componentSupervisor) ++ runningComponents).toSet
     if (runningComponents.size == supervisors.size)
       registerWithLocationService()
   }
@@ -121,7 +129,7 @@ class Container(
   private def onRegistrationComplete(registrationResult: RegistrationResult): Unit = {
     registrationOpt = Some(registrationResult)
     mode = ContainerMode.Running
-    runningComponents = List.empty
+    runningComponents = Set.empty
   }
 
   private def onRegistrationFailure(throwable: Throwable): Unit =

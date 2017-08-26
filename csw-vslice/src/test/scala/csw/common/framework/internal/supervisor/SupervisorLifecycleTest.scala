@@ -7,20 +7,20 @@ import csw.common.components.ComponentDomainMsg
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.FrameworkComponentTestSuite
 import csw.common.framework.internal.{Supervisor, SupervisorMode}
+import csw.common.framework.models.InitialMsg.Run
+import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
+import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
 import csw.common.framework.models.SupervisorCommonMsg.{
   ComponentStateSubscription,
   HaltComponent,
   LifecycleStateSubscription
 }
-import csw.common.framework.models.InitialMsg.Run
-import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
-import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.common.framework.models.RunningMsg.{DomainMsg, Lifecycle}
 import csw.common.framework.models.SupervisorIdleComponentMsg.{InitializeFailure, Initialized, Running}
+import csw.common.framework.models.SupervisorIdleMessage.RegistrationComplete
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.param.states.CurrentState
-import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
@@ -32,8 +32,6 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMsg] = mock[ComponentHandlers[ComponentDomainMsg]]
     val ctx                                                     = new StubbedActorContext[SupervisorMsg]("test-supervisor", 100, system)
     val timer: TimerScheduler[SupervisorMsg]                    = mock[TimerScheduler[SupervisorMsg]]
-    val locationService: LocationService                        = mock[LocationService]
-    val registrationFactory                                     = mock[RegistrationFactory]
     val supervisor =
       new Supervisor(ctx, timer, hcdInfo, getSampleHcdWiring(sampleHcdHandler), registrationFactory, locationService)
     val childComponentInbox: Inbox[ComponentMsg]                        = ctx.childInbox(supervisor.component.upcast)
@@ -54,7 +52,12 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     val testData = new TestData
     import testData._
 
-    supervisor.onMessage(Initialized(childComponentInbox.ref.upcast))
+    val childRef = childComponentInbox.ref.upcast
+    supervisor.onMessage(Initialized(childRef))
+
+    verify(locationService).register(akkaRegistration)
+    supervisor.onMessage(RegistrationComplete(registrationResult, childRef))
+
     childComponentInbox.receiveMsg() shouldBe Run
     supervisor.mode shouldBe SupervisorMode.Idle
   }
@@ -74,7 +77,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     supervisor.onMessage(Running(childComponentInbox.ref))
 
     supervisor.mode shouldBe SupervisorMode.Running
-    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(LifecycleStateChanged(SupervisorMode.Running, ctx.self))
+    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
   }
   // *************** End of testing onIdleMessages ***************
 
@@ -149,10 +152,11 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     val testData = new TestData
     import testData._
 
+    supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
     childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown, ctx.self))
+      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.PreparingToShutdown))
     )
     supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.Shutdown))
@@ -162,6 +166,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     val testData = new TestData
     import testData._
 
+    supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
     supervisor.mode shouldBe SupervisorMode.Idle
@@ -172,6 +177,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     val testData = new TestData
     import testData._
 
+    supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     supervisor.mode shouldBe SupervisorMode.RunningOffline
@@ -182,6 +188,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     val testData = new TestData
     import testData._
 
+    supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
@@ -207,6 +214,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     val testData = new TestData
     import testData._
 
+    supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
 
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
@@ -215,7 +223,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
 
     supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown, ctx.self))
+      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.PreparingToShutdown))
     )
 
     supervisor.onMessage(ShutdownTimeout)
@@ -223,7 +231,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
 
     supervisor.mode shouldBe SupervisorMode.ShutdownFailure
     childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(SupervisorMode.ShutdownFailure, ctx.self))
+      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.ShutdownFailure))
     )
   }
 
@@ -231,6 +239,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     val testData = new TestData
     import testData._
 
+    supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
 
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
@@ -239,7 +248,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
 
     supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown, ctx.self))
+      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.PreparingToShutdown))
     )
 
     supervisor.onMessage(ShutdownFailure("Exception occurred"))
@@ -247,7 +256,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
 
     supervisor.mode shouldBe SupervisorMode.ShutdownFailure
     childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(SupervisorMode.ShutdownFailure, ctx.self))
+      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.ShutdownFailure))
     )
   }
 
@@ -255,6 +264,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
     val testData = new TestData
     import testData._
 
+    supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
 
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
@@ -263,7 +273,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
 
     supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(SupervisorMode.PreparingToShutdown, ctx.self))
+      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.PreparingToShutdown))
     )
 
     supervisor.onMessage(ShutdownComplete)
@@ -271,7 +281,7 @@ class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSu
 
     supervisor.mode shouldBe SupervisorMode.Shutdown
     childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(SupervisorMode.Shutdown, ctx.self))
+      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Shutdown))
     )
   }
   // *************** End of testing onPreparingToShutdown Messages ***************

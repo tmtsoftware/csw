@@ -1,5 +1,6 @@
 package csw.common.framework.javadsl.integration;
 
+import akka.Done;
 import akka.typed.ActorRef;
 import akka.typed.ActorSystem;
 import akka.typed.Behavior;
@@ -24,13 +25,21 @@ import csw.param.generics.Parameter;
 import csw.param.models.Choice;
 import csw.param.states.CurrentState;
 import csw.param.states.DemandState;
+import csw.services.location.models.AkkaRegistration;
+import csw.services.location.models.Connection;
+import csw.services.location.models.RegistrationResult;
+import csw.services.location.scaladsl.ActorSystemFactory;
 import csw.services.location.scaladsl.LocationService;
+import csw.services.location.scaladsl.RegistrationFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
+import scala.concurrent.Promise$;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -42,14 +51,19 @@ import scala.concurrent.duration.FiniteDuration;
 public class JFrameworkIntegrationTest extends Mockito {
     private static ActorSystem system = ActorSystem.create(Actor.empty(), "Hcd");
     private TestKitSettings settings = TestKitSettings.apply(system);
-
     private ComponentInfo hcdInfo = JComponentInfoFactory.makeHcd(
             "trombone",
             "wfos",
             "csw.common.framework.javadsl.integration.JSampleComponentWiring");
 
+    private static akka.actor.ActorSystem untypedSystem = ActorSystemFactory.remote();
+    private static AkkaRegistration akkaRegistration = AkkaRegistration.apply(mock(Connection.AkkaConnection.class), akka.testkit.TestProbe.apply(untypedSystem).ref());
+    private static RegistrationResult registrationResult = mock(RegistrationResult.class);
+    private static LocationService locationService = mock(LocationService.class);
+    private static RegistrationFactory registrationFactory = mock(RegistrationFactory.class);
+
     private Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-    private Behavior<SupervisorExternalMessage> supervisorBehavior = SupervisorBehaviorFactory.behavior(hcdInfo, mock(LocationService.class));
+    private Behavior<SupervisorExternalMessage> supervisorBehavior = SupervisorBehaviorFactory.behavior(hcdInfo, locationService, registrationFactory);
     private FiniteDuration duration = Duration.create(5, "seconds");
     private Future<ActorRef<SupervisorExternalMessage>> systemActorOf;
     private ActorRef<SupervisorExternalMessage> supervisorRef;
@@ -66,9 +80,21 @@ public class JFrameworkIntegrationTest extends Mockito {
         supervisorRef.tell(new SupervisorCommonMsg.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
     }
 
+    @BeforeClass
+    public static void beforeAll() {
+        when(registrationFactory.akkaTyped(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(akkaRegistration);
+
+        Future<RegistrationResult> eventualRegistrationResult = Promise$.MODULE$.successful(registrationResult).future();
+        when(locationService.register(akkaRegistration)).thenReturn(eventualRegistrationResult);
+
+        Future<Done> eventualDone = Promise$.MODULE$.successful(Done.getInstance()).future();
+        when(registrationResult.unregister()).thenReturn(eventualDone);
+    }
+
     @AfterClass
     public static void afterAll() throws Exception {
         Await.result(system.terminate(), Duration.create(5, "seconds"));
+        Await.result(untypedSystem.terminate(), Duration.create(5, "seconds"));
     }
 
     @Test
@@ -90,7 +116,7 @@ public class JFrameworkIntegrationTest extends Mockito {
         DemandState runDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(runParam);
         Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
 
-        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(SupervisorMode.Running$.MODULE$, supervisorRef));
+        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(supervisorRef, SupervisorMode.Running$.MODULE$));
     }
 
     // DEOPSCSW-179: Unique Action for a component
@@ -166,7 +192,7 @@ public class JFrameworkIntegrationTest extends Mockito {
         DemandState runDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(runParam);
         Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
 
-        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(SupervisorMode.Running$.MODULE$, supervisorRef));
+        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(supervisorRef, SupervisorMode.Running$.MODULE$));
     }
 
     @Test
@@ -180,6 +206,6 @@ public class JFrameworkIntegrationTest extends Mockito {
         DemandState shutdownDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(shutdownParam);
         Assert.assertTrue(new DemandMatcher(shutdownDemandState, false).check(shutdownCurrentState));
 
-        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(SupervisorMode.PreparingToShutdown$.MODULE$, supervisorRef));
+        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(supervisorRef, SupervisorMode.PreparingToShutdown$.MODULE$));
     }
 }

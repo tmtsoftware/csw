@@ -8,10 +8,11 @@ import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 
 object SupervisorBehaviorFactory {
 
-  def behavior(componentInfo: ComponentInfo, locationService: LocationService): Behavior[SupervisorExternalMessage] = {
+  def behavior(componentInfo: ComponentInfo,
+               locationService: LocationService,
+               registrationFactory: RegistrationFactory): Behavior[SupervisorExternalMessage] = {
     val componentWiringClass = Class.forName(componentInfo.className)
     val compWring            = componentWiringClass.newInstance().asInstanceOf[ComponentWiring[_]]
-    val registrationFactory  = new RegistrationFactory
     Actor
       .withTimers[SupervisorMsg](
         timerScheduler ⇒

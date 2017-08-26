@@ -7,7 +7,7 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.common.framework.FrameworkComponentTestInfos._
 import csw.common.framework.models.ContainerCommonMsg.GetComponents
-import csw.common.framework.models.SupervisorCommonMsg.LifecycleStateSubscription
+import csw.common.framework.models.SupervisorCommonMsg.{GetSupervisorMode, LifecycleStateSubscription}
 import csw.common.framework.models.ContainerIdleMsg.{RegistrationComplete, RegistrationFailed, SupervisorModeChanged}
 import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.ContainerRunningMsg.{UnRegistrationComplete, UnRegistrationFailed}
@@ -46,7 +46,8 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
         val componentInfo = invocation.getArgument(0).asInstanceOf[ComponentInfo]
         SupervisorInfo(
           untypedSystem,
-          ctx.spawn(SupervisorBehaviorFactory.behavior(componentInfo, locationService), componentInfo.name),
+          ctx.spawn(SupervisorBehaviorFactory.behavior(componentInfo, locationService, registrationFactory),
+                    componentInfo.name),
           componentInfo
         )
       }
@@ -70,7 +71,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
   class RunningContainer() extends IdleContainer {
     ctx.children.map(
-      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(child.upcast, SupervisorMode.Running)))
     )
 
     container.onMessage(RegistrationComplete(registrationResult))
@@ -96,14 +97,19 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     container.supervisors.size shouldBe 2
     container.supervisors.map(_.componentInfo).toSet shouldBe containerInfo.components
 
-    // check that all components received LifecycleStateSubscription message
-    containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[SupervisorCommonMsg](component.name))
-      .map(_.receiveMsg()) should contain only LifecycleStateSubscription(Subscribe(container.lifecycleStateTrackerRef))
+    // check that all components received LifecycleStateSubscription message and GetSupervisorMode message
+    val supervisorInboxes =
+      containerInfo.components.toList.map(componentInfo ⇒ ctx.childInbox[SupervisorCommonMsg](componentInfo.name))
+
+    supervisorInboxes.map(_.receiveMsg()) should contain only LifecycleStateSubscription(
+      Subscribe(container.lifecycleStateTrackerRef)
+    )
+
+    supervisorInboxes.map(_.receiveMsg()) should contain only GetSupervisorMode(ctx.self)
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     ctx.children.map(
-      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(child.upcast, SupervisorMode.Running)))
     )
 
     // check that lifecycleStateTrackerRef gets un-subscribed from all components
@@ -119,7 +125,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
     container.mode shouldBe ContainerMode.Running
     container.registrationOpt.get shouldBe registrationResult
-    container.runningComponents shouldBe List.empty
+    container.runningComponents shouldBe Set.empty
   }
 
   test("should handle Shutdown message by changing it's mode to Idle and forwarding the message to all components") {
@@ -141,7 +147,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
     val runningContainer = new RunningContainer
     import runningContainer._
 
-    container.runningComponents shouldBe List.empty
+    container.runningComponents shouldBe Set.empty
     container.onMessage(Lifecycle(Restart))
     container.mode shouldBe ContainerMode.Idle
 
@@ -165,7 +171,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
       .map(_.receiveAll())
 
     ctx.children.map(
-      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(child.upcast, SupervisorMode.Running)))
     )
 
     ctx.children
@@ -216,7 +222,7 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
     // Container should handle GetComponents message in Running mode
     ctx.children.map(
-      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(child.upcast, SupervisorMode.Running)))
     )
 
     ctx.children
@@ -246,14 +252,14 @@ class ContainerTest extends FunSuite with Matchers with MockitoSugar {
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     ctx.children.map(
-      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(SupervisorMode.Running, child.upcast)))
+      child ⇒ container.onMessage(SupervisorModeChanged(LifecycleStateChanged(child.upcast, SupervisorMode.Running)))
     )
 
     verify(locationService, atLeastOnce()).register(akkaRegistration)
     container.onMessage(RegistrationFailed(runtimeException))
     container.mode shouldBe ContainerMode.Idle
     container.registrationOpt shouldBe None
-    container.runningComponents should not be List.empty
+    container.runningComponents should not be Set.empty
   }
 
   test("container should retain mode if un-registration with location service fails") {

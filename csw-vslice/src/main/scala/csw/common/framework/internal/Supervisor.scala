@@ -6,10 +6,12 @@ import akka.typed.{ActorRef, Behavior, Signal, Terminated}
 import csw.common.framework.internal.SupervisorMode.Idle
 import csw.common.framework.models.SupervisorCommonMsg.{
   ComponentStateSubscription,
+  GetSupervisorMode,
   HaltComponent,
   LifecycleStateSubscription
 }
 import csw.common.framework.models.InitialMsg.Run
+import csw.common.framework.models.ModeMsg.SupervisorModeMsg
 import csw.common.framework.models.PreparingToShutdownMsg.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMsg.Lifecycle
@@ -87,9 +89,10 @@ class Supervisor(
   }
 
   def onCommon(msg: SupervisorCommonMsg): Unit = msg match {
-    case LifecycleStateSubscription(subscriberMsg) => pubSubLifecycle ! subscriberMsg
-    case ComponentStateSubscription(subscriberMsg) => pubSubComponent ! subscriberMsg
-    case HaltComponent                             => haltingFlag = true; handleShutdown()
+    case LifecycleStateSubscription(subscriberMsg) ⇒ pubSubLifecycle ! subscriberMsg
+    case ComponentStateSubscription(subscriberMsg) ⇒ pubSubComponent ! subscriberMsg
+    case HaltComponent                             ⇒ haltingFlag = true; handleShutdown()
+    case GetSupervisorMode(replyTo)                ⇒ replyTo ! SupervisorModeMsg(ctx.self, mode)
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
@@ -104,7 +107,7 @@ class Supervisor(
     case Running(componentRef) ⇒
       mode = SupervisorMode.Running
       runningComponent = Some(componentRef)
-      pubSubLifecycle ! Publish(LifecycleStateChanged(SupervisorMode.Running, ctx.self))
+      pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
   }
 
   def onRunning(msg: SupervisorRunningMessage): Unit = {
@@ -116,28 +119,28 @@ class Supervisor(
   }
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case Shutdown => handleShutdown()
-    case Restart =>
+    case Shutdown ⇒ handleShutdown()
+    case Restart ⇒
       mode = SupervisorMode.Idle
       unregisterFromLocationService()
-    case GoOffline =>
+    case GoOffline ⇒
       if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
-    case GoOnline =>
+    case GoOnline ⇒
       if (mode == SupervisorMode.RunningOffline) mode = SupervisorMode.Running
   }
 
   def onPreparingToShutdown(msg: PreparingToShutdownMsg): Unit = {
     msg match {
-      case ShutdownTimeout =>
+      case ShutdownTimeout ⇒
         mode = SupervisorMode.ShutdownFailure
-      case ShutdownFailure(reason) =>
+      case ShutdownFailure(reason) ⇒
         mode = SupervisorMode.ShutdownFailure
         timerScheduler.cancel(TimerKey)
-      case ShutdownComplete =>
+      case ShutdownComplete ⇒
         mode = SupervisorMode.Shutdown
         timerScheduler.cancel(TimerKey)
     }
-    pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
+    pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, mode))
     if (haltingFlag) haltComponent()
   }
 
@@ -157,7 +160,7 @@ class Supervisor(
     unregisterFromLocationService()
     mode = SupervisorMode.PreparingToShutdown
     timerScheduler.startSingleTimer(TimerKey, ShutdownTimeout, shutdownTimeout)
-    pubSubLifecycle ! Publish(LifecycleStateChanged(mode, ctx.self))
+    pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, mode))
   }
 
   private def registerWithLocationService(componentRef: ActorRef[InitialMsg]): Unit = {
@@ -167,10 +170,8 @@ class Supervisor(
     }
   }
 
-  private def onRegistrationComplete(
-      registrationResult: RegistrationResult,
-      componentRef: ActorRef[InitialMsg]
-  ): Unit = {
+  private def onRegistrationComplete(registrationResult: RegistrationResult,
+                                     componentRef: ActorRef[InitialMsg]): Unit = {
     registrationOpt = Some(registrationResult)
     componentRef ! Run
   }
