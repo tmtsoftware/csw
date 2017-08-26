@@ -87,8 +87,9 @@ class Container(
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
     supervisors = supervisors ::: componentInfos.flatMap(createComponent).toList
     subscribeToSupervisorsLifecycle()
-    requestSupervisorMode() // Get all supervisors' mode so that if any supervisor got changed to 'running' mode before this container could subscribe to it's lifecycle changes then it gets handled
-
+    // Get all supervisors' mode so that if any supervisor got changed to 'running' mode before this container could subscribe
+    // to it's lifecycle changes then it could be handled
+    requestSupervisorMode()
   }
 
   private def createComponent(componentInfo: ComponentInfo): Option[SupervisorInfo] = {

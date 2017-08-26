@@ -136,7 +136,7 @@ lazy val `csw-vslice` = project
 
 lazy val `csw-framework-apps` = project
   .dependsOn(`csw-vslice`)
-  .enablePlugins(DeployApp, MaybeCoverage)
+  .enablePlugins(DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.CswFrameworkApps
   )
