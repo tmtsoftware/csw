@@ -128,8 +128,8 @@ lazy val `csw-config-client-cli` = project
   )
 
 lazy val `csw-vslice` = project
-  .dependsOn(`csw-params`, `csw-location`)
-  .enablePlugins(GenJavadocPlugin)
+  .enablePlugins(AutoMultiJvm, GenJavadocPlugin)
+  .dependsOn(`csw-params`, `csw-location` % "compile->compile;multi-jvm->multi-jvm")
   .settings(
     libraryDependencies ++= Dependencies.Vslice
   )
