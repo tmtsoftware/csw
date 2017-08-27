@@ -21,7 +21,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future, Promise}
 
-abstract class FrameworkComponentTestSuite extends FunSuite with Matchers with BeforeAndAfterAll with MockitoSugar {
+abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndAfterAll with MockitoSugar {
   implicit val untypedSystem: actor.ActorSystem          = ActorSystemFactory.remote()
   implicit val system: ActorSystem[Nothing]              = ActorSystem(Actor.empty, "testHcd")
   implicit val settings: TestKitSettings                 = TestKitSettings(system)

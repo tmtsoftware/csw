@@ -1,4 +1,4 @@
-package csw.common.framework.scaladsl.integration
+package csw.common.framework.integration
 
 import akka.actor
 import akka.typed.ActorSystem
@@ -19,7 +19,7 @@ import csw.common.framework.scaladsl.Component
 import csw.param.states.CurrentState
 import org.scalatest.{FunSuite, Matchers}
 
-class E2EContainerTest extends FunSuite with Matchers {
+class ContainerIntegrationTest extends FunSuite with Matchers {
 
   implicit val system: ActorSystem[_]           = actor.ActorSystem("system").toTyped
   implicit val testKitSettings: TestKitSettings = TestKitSettings(system)

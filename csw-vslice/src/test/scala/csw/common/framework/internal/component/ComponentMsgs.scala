@@ -1,4 +1,4 @@
-package csw.common.framework.scaladsl.component
+package csw.common.framework.internal.component
 
 import csw.common.framework.models.RunningMessage.DomainMessage
 

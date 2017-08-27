@@ -1,8 +1,8 @@
-package csw.common.framework.scaladsl.component
+package csw.common.framework.internal.component
 
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.framework.FrameworkComponentTestSuite
+import csw.common.framework.FrameworkTestSuite
 import csw.common.framework.internal.{ComponentBehavior, ComponentMode}
 import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage}
 import csw.common.framework.models.IdleMessage.Initialize
@@ -15,7 +15,7 @@ import org.scalatest.mockito.MockitoSugar
 import scala.concurrent.Future
 //DEOPSCSW-165-CSW Assembly Creation
 //DEOPSCSW-166-CSW HCD Creation
-class ComponentBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
+class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
   class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
     val sampleComponentHandler: ComponentHandlers[ComponentDomainMessage] =

@@ -3,15 +3,15 @@ package csw.common.framework.internal.supervisor
 import akka.typed.testkit.Effect._
 import akka.typed.testkit.EffectfulActorContext
 import akka.typed.{Behavior, Props, Terminated}
-import csw.common.framework.FrameworkComponentTestInfos._
-import csw.common.framework.FrameworkComponentTestSuite
+import csw.common.framework.ComponentInfos._
+import csw.common.framework.FrameworkTestSuite
 import csw.common.framework.internal.Supervisor
 import csw.common.framework.models.SupervisorExternalMessage
 import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
-class SupervisorBehaviorTest extends FrameworkComponentTestSuite with MockitoSugar {
+class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
   val supervisorBehavior: Behavior[SupervisorExternalMessage] =
     SupervisorBehaviorFactory.behavior(hcdInfo, locationService, registrationFactory)

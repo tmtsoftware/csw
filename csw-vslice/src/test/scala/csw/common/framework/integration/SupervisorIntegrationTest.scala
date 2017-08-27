@@ -1,12 +1,12 @@
-package csw.common.framework.scaladsl.integration
+package csw.common.framework.integration
 
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.DemandMatcher
 import csw.common.components.ComponentStatistics
-import csw.common.framework.FrameworkComponentTestInfos._
-import csw.common.framework.FrameworkComponentTestSuite
+import csw.common.framework.ComponentInfos._
+import csw.common.framework.FrameworkTestSuite
 import csw.common.framework.internal.SupervisorMode
 import csw.common.framework.models.CommandMessage.Oneway
 import csw.common.framework.models.PubSub.Subscribe
@@ -29,7 +29,7 @@ import scala.concurrent.duration.DurationInt
 // DEOPSCSW-166: CSW HCD Creation
 // DEOPSCSW-176: Provide Infrastructure to manage TMT lifecycle
 // DEOPSCSW-177: Hooks for lifecycle management
-class FrameworkIntegrationTest extends FrameworkComponentTestSuite with MockitoSugar with BeforeAndAfterEach {
+class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar with BeforeAndAfterEach {
   import csw.common.components.SampleComponentState._
 
   var compStateProbe: TestProbe[CurrentState]                 = _

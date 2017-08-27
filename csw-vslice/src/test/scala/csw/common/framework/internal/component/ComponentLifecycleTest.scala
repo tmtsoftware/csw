@@ -1,8 +1,8 @@
-package csw.common.framework.scaladsl.component
+package csw.common.framework.internal.component
 
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.framework.FrameworkComponentTestSuite
+import csw.common.framework.FrameworkTestSuite
 import csw.common.framework.internal.{ComponentBehavior, ComponentMode}
 import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.InitialMessage.Run
@@ -18,7 +18,7 @@ import scala.concurrent.Future
 
 //DEOPSCSW-177-Hooks for lifecycle management
 //DEOPSCSW-179-Unique Action for a component
-class ComponentLifecycleTest extends FrameworkComponentTestSuite with MockitoSugar {
+class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
   class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
     private val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)

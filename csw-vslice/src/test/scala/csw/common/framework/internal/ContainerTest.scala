@@ -5,7 +5,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
-import csw.common.framework.FrameworkComponentTestInfos._
+import csw.common.framework.ComponentInfos._
 import csw.common.framework.models.ContainerCommonMessage.GetComponents
 import csw.common.framework.models.SupervisorCommonMessage.{GetSupervisorMode, LifecycleStateSubscription}
 import csw.common.framework.models.ContainerIdleMessage.{

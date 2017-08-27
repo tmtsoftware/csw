@@ -4,8 +4,8 @@ import akka.typed.scaladsl.TimerScheduler
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
-import csw.common.framework.FrameworkComponentTestInfos._
-import csw.common.framework.FrameworkComponentTestSuite
+import csw.common.framework.ComponentInfos._
+import csw.common.framework.FrameworkTestSuite
 import csw.common.framework.internal.{Supervisor, SupervisorMode}
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
@@ -26,7 +26,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
-class SupervisorLifecycleTest extends FrameworkComponentTestSuite with MockitoSugar with BeforeAndAfterEach {
+class SupervisorLifecycleTest extends FrameworkTestSuite with MockitoSugar with BeforeAndAfterEach {
 
   class TestData {
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
