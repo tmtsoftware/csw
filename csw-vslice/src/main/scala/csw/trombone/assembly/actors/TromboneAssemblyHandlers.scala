@@ -8,7 +8,7 @@ import csw.common.ccs.{Validation, Validations}
 import csw.common.framework.models.PubSub.PublisherMessage
 import csw.common.framework.models.SupervisorIdleComponentMessage.Running
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
+import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.commands.{Observe, Setup}
 import csw.param.states.CurrentState
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
@@ -20,7 +20,7 @@ import csw.trombone.assembly._
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 
-class TromboneAssemblyWiring extends ComponentWiring[DiagPublisherMessages] {
+class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPublisherMessages] {
   override def handlers(ctx: ActorContext[ComponentMessage],
                         componentInfo: ComponentInfo,
                         pubSubRef: ActorRef[PublisherMessage[CurrentState]]): ComponentHandlers[DiagPublisherMessages] =

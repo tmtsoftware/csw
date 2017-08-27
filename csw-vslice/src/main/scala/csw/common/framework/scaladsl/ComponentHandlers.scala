@@ -11,9 +11,11 @@ import csw.param.states.CurrentState
 import scala.concurrent.Future
 import scala.reflect.ClassTag
 
-abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](ctx: ActorContext[ComponentMessage],
-                                                                 componentInfo: ComponentInfo,
-                                                                 pubSubRef: ActorRef[PublisherMessage[CurrentState]]) {
+abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
+    ctx: ActorContext[ComponentMessage],
+    componentInfo: ComponentInfo,
+    pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+) {
   var isOnline: Boolean = false
 
   def initialize(): Future[Unit]

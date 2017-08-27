@@ -8,7 +8,7 @@ import akka.util.Timeout
 import csw.common.ccs.Validation
 import csw.common.framework.models.PubSub.PublisherMessage
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
+import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.commands.Setup
 import csw.param.states.CurrentState
 import csw.trombone.hcd.AxisRequest._
@@ -21,7 +21,7 @@ import scala.async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class TromboneHcdWiring extends ComponentWiring[TromboneMessage] {
+class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessage] {
   override def handlers(ctx: ActorContext[ComponentMessage],
                         componentInfo: ComponentInfo,
                         pubSubRef: ActorRef[PublisherMessage[CurrentState]]): ComponentHandlers[TromboneMessage] =

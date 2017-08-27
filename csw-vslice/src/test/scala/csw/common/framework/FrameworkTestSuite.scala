@@ -8,7 +8,7 @@ import akka.{actor, testkit, Done}
 import csw.common.components.ComponentDomainMessage
 import csw.common.framework.models.PubSub.PublisherMessage
 import csw.common.framework.models.{ComponentInfo, ComponentMessage}
-import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
+import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.states.CurrentState
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
@@ -46,8 +46,8 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
 
   def getSampleHcdWiring(
       componentHandlers: ComponentHandlers[ComponentDomainMessage]
-  ): ComponentWiring[ComponentDomainMessage] =
-    new ComponentWiring[ComponentDomainMessage] {
+  ): ComponentBehaviorFactory[ComponentDomainMessage] =
+    new ComponentBehaviorFactory[ComponentDomainMessage] {
 
       override def handlers(
           ctx: ActorContext[ComponentMessage],
@@ -59,8 +59,8 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
 
   def getSampleAssemblyWiring(
       assemblyHandlers: ComponentHandlers[ComponentDomainMessage]
-  ): ComponentWiring[ComponentDomainMessage] =
-    new ComponentWiring[ComponentDomainMessage] {
+  ): ComponentBehaviorFactory[ComponentDomainMessage] =
+    new ComponentBehaviorFactory[ComponentDomainMessage] {
       override def handlers(
           ctx: ActorContext[ComponentMessage],
           componentInfo: ComponentInfo,

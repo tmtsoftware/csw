@@ -5,9 +5,7 @@ import akka.typed.testkit.EffectfulActorContext
 import akka.typed.{Behavior, Props, Terminated}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.internal.Supervisor
 import csw.common.framework.models.SupervisorExternalMessage
-import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
@@ -20,18 +18,18 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
 
     ctx.getAllEffects() should contain allOf (
-      Spawned(Supervisor.ComponentActor, Props.empty),
-      Spawned(Supervisor.PubSubLifecycleActor, Props.empty),
-      Spawned(Supervisor.PubSubComponentActor, Props.empty)
+      Spawned(SupervisorBehavior.ComponentActor, Props.empty),
+      Spawned(SupervisorBehavior.PubSubLifecycleActor, Props.empty),
+      Spawned(SupervisorBehavior.PubSubComponentActor, Props.empty)
     )
   }
 
   test("Supervisor should watch child component actor [TLA]") {
     val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
 
-    val componentActor       = ctx.childInbox(Supervisor.ComponentActor).ref
-    val pubSubLifecycleActor = ctx.childInbox(Supervisor.PubSubLifecycleActor).ref
-    val pubSubComponentActor = ctx.childInbox(Supervisor.PubSubComponentActor).ref
+    val componentActor       = ctx.childInbox(SupervisorBehavior.ComponentActor).ref
+    val pubSubLifecycleActor = ctx.childInbox(SupervisorBehavior.PubSubLifecycleActor).ref
+    val pubSubComponentActor = ctx.childInbox(SupervisorBehavior.PubSubComponentActor).ref
 
     ctx.getAllEffects() should contain(Watched(componentActor))
     ctx.getAllEffects() should not contain Watched(pubSubLifecycleActor)
@@ -41,14 +39,14 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   test("Supervisor should handle Terminated signal by unwatching component actor and stopping other child actors") {
     val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
 
-    val componentActor = ctx.childInbox(Supervisor.ComponentActor).ref
+    val componentActor = ctx.childInbox(SupervisorBehavior.ComponentActor).ref
 
     ctx.signal(Terminated(ctx.getChildren.get(0).ref)(null))
 
     ctx.getAllEffects() should contain allOf (
       Unwatched(componentActor),
-      Stopped(Supervisor.PubSubLifecycleActor),
-      Stopped(Supervisor.PubSubComponentActor)
+      Stopped(SupervisorBehavior.PubSubLifecycleActor),
+      Stopped(SupervisorBehavior.PubSubComponentActor)
     )
   }
 }

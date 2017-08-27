@@ -25,20 +25,3 @@ case object ComponentInfo {
   import csw.services.location.internal.JsonSupport._
   implicit val componentInfoFormat: JsonFormat[ComponentInfo] = jsonFormat5(ComponentInfo.apply)
 }
-
-final case class ContainerInfo(name: String, components: Set[ComponentInfo])
-
-case object ContainerInfo {
-  import spray.json.DefaultJsonProtocol._
-  implicit val format: JsonFormat[ContainerInfo] = jsonFormat2(ContainerInfo.apply)
-}
-
-trait Component {
-  def info: ComponentInfo
-}
-
-trait Assembly extends Component
-
-trait Hcd extends Component
-
-trait Container extends Component

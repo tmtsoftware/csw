@@ -3,10 +3,10 @@ package csw.common.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.framework.models.{ComponentInfo, ComponentMessage, PubSub}
-import csw.common.framework.scaladsl.{ComponentHandlers, ComponentWiring}
+import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.states.CurrentState
 
-class SampleComponentWiring extends ComponentWiring[ComponentDomainMessage] {
+class SampleComponentBehaviorFactory extends ComponentBehaviorFactory[ComponentDomainMessage] {
   override def handlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
@@ -14,7 +14,7 @@ class SampleComponentWiring extends ComponentWiring[ComponentDomainMessage] {
   ): ComponentHandlers[ComponentDomainMessage] = new SampleComponentHandlers(ctx, componentInfo, pubSubRef)
 }
 
-class ComponentWiringToSimulateFailure extends ComponentWiring[ComponentDomainMessage] {
+class ComponentBehaviorFactoryToSimulateFailure extends ComponentBehaviorFactory[ComponentDomainMessage] {
   override def handlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,

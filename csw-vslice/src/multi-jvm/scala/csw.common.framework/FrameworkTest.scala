@@ -6,11 +6,12 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
-import csw.common.framework.internal.ContainerMode
+import csw.common.framework.internal.container
+import csw.common.framework.internal.container.ContainerMode
+import csw.common.framework.internal.wiring.Container
 import csw.common.framework.models.ComponentModeMessage.ContainerModeMessage
 import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
 import csw.common.framework.models.{Components, ContainerMessage}
-import csw.common.framework.scaladsl.Component
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaLocation, ComponentId, ComponentType}
@@ -36,7 +37,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
 
     runOn(seed) {
 
-      val containerRef = Component.createContainer(ConfigFactory.load("laser_container.conf"))
+      val containerRef = Container.spawn(ConfigFactory.load("laser_container.conf"))
 
       val containerModeProbe = TestProbe[ContainerModeMessage]
       val componentsProbe    = TestProbe[Components]
@@ -65,7 +66,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
     }
 
     runOn(member) {
-      val containerRef = Component.createContainer(ConfigFactory.load("wfs_container.conf"))
+      val containerRef = Container.spawn(ConfigFactory.load("wfs_container.conf"))
 
       val containerModeProbe = TestProbe[ContainerModeMessage]
       val componentsProbe    = TestProbe[Components]

@@ -12,11 +12,11 @@ import akka.util.Timeout;
 import csw.common.ccs.CommandStatus;
 import csw.common.ccs.DemandMatcher;
 import csw.common.components.SampleComponentState;
-import csw.common.framework.internal.SupervisorMode;
-import csw.common.framework.javadsl.JComponentInfoFactory;
+import csw.common.framework.internal.supervisor.SupervisorBehaviorFactory;
+import csw.common.framework.internal.supervisor.SupervisorMode;
+import csw.common.framework.javadsl.JComponentInfo;
 import csw.common.framework.javadsl.commons.JClassTag;
 import csw.common.framework.models.*;
-import csw.common.framework.scaladsl.SupervisorBehaviorFactory;
 import csw.param.commands.CommandInfo;
 import csw.param.commands.Setup;
 import csw.param.generics.JKeyTypes;
@@ -25,6 +25,7 @@ import csw.param.generics.Parameter;
 import csw.param.models.Choice;
 import csw.param.states.CurrentState;
 import csw.param.states.DemandState;
+import csw.services.location.javadsl.JComponentType;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.Connection;
 import csw.services.location.models.RegistrationResult;
@@ -43,6 +44,8 @@ import scala.concurrent.Promise$;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.util.Collections;
+
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 // DEOPSCSW-165: CSW Assembly Creation
 // DEOPSCSW-166: CSW HCD Creation
@@ -51,10 +54,12 @@ import scala.concurrent.duration.FiniteDuration;
 public class JFrameworkIntegrationTest extends Mockito {
     private static ActorSystem system = ActorSystem.create(Actor.empty(), "Hcd");
     private TestKitSettings settings = TestKitSettings.apply(system);
-    private ComponentInfo hcdInfo = JComponentInfoFactory.makeHcd(
+    private ComponentInfo hcdInfo = JComponentInfo.from(
             "trombone",
+            JComponentType.HCD,
             "wfos",
-            "csw.common.framework.javadsl.integration.JSampleComponentWiring");
+            "csw.common.framework.javadsl.integration.JSampleComponentBehaviorFactory",
+            Collections.emptySet());
 
     private static akka.actor.ActorSystem untypedSystem = ActorSystemFactory.remote();
     private static AkkaRegistration akkaRegistration = AkkaRegistration.apply(mock(Connection.AkkaConnection.class), akka.testkit.TestProbe.apply(untypedSystem).ref());

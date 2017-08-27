@@ -3,7 +3,6 @@ package csw.common.framework.internal.component
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.internal.{ComponentBehavior, ComponentMode}
 import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage}
 import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.InitialMessage.Run

@@ -1,26 +1,27 @@
-package csw.common.framework.internal
+package csw.common.framework.internal.supervisor
 
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, Signal, Terminated}
-import csw.common.framework.internal.SupervisorMode.Idle
+import csw.common.framework.internal.PubSubActor
+import csw.common.framework.internal.supervisor.SupervisorMode.Idle
+import csw.common.framework.models.ComponentModeMessage.SupervisorModeMessage
+import csw.common.framework.models.InitialMessage.Run
+import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
+import csw.common.framework.models.PubSub.Publish
+import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorMode,
   HaltComponent,
   LifecycleStateSubscription
 }
-import csw.common.framework.models.InitialMessage.Run
-import csw.common.framework.models.ComponentModeMessage.SupervisorModeMessage
-import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
-import csw.common.framework.models.PubSub.Publish
-import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorIdleComponentMessage.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models.SupervisorIdleMessage.{RegistrationComplete, RegistrationFailed}
 import csw.common.framework.models.SupervisorRunningMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.ComponentWiring
+import csw.common.framework.scaladsl.ComponentBehaviorFactory
 import csw.param.states.CurrentState
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, RegistrationResult}
@@ -30,7 +31,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
-object Supervisor {
+object SupervisorBehavior {
   val PubSubComponentActor            = "pub-sub-component"
   val ComponentActor                  = "component"
   val PubSubLifecycleActor            = "pub-sub-lifecycle"
@@ -38,16 +39,16 @@ object Supervisor {
   val shutdownTimeout: FiniteDuration = 5.seconds
 }
 
-class Supervisor(
+class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
     timerScheduler: TimerScheduler[SupervisorMessage],
     componentInfo: ComponentInfo,
-    componentBehaviorFactory: ComponentWiring[_],
+    componentBehaviorFactory: ComponentBehaviorFactory[_],
     registrationFactory: RegistrationFactory,
     locationService: LocationService
 ) extends MutableBehavior[SupervisorMessage] {
 
-  import Supervisor._
+  import SupervisorBehavior._
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
@@ -64,7 +65,7 @@ class Supervisor(
   val pubSubComponent: ActorRef[PubSub[CurrentState]] =
     ctx.spawn(PubSubActor.behavior[CurrentState], PubSubComponentActor)
   val component: ActorRef[Nothing] =
-    ctx.spawn[Nothing](componentBehaviorFactory.compBehavior(componentInfo, ctx.self, pubSubComponent), ComponentActor)
+    ctx.spawn[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent), ComponentActor)
 
   ctx.watch(component)
 

@@ -1,9 +1,9 @@
 package csw.common.framework.models
 
-import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.internal.{ContainerMode, SupervisorMode}
+import csw.common.framework.internal.container.ContainerMode
+import csw.common.framework.internal.supervisor.{SupervisorInfo, SupervisorMode}
 import csw.common.framework.models.PubSub.SubscriberMessage
 import csw.param.commands.ControlCommand
 import csw.param.states.CurrentState
@@ -143,7 +143,3 @@ object ComponentModeMessage {
 case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage], state: SupervisorMode)
 
 case class Components(components: List[SupervisorInfo])
-
-case class SupervisorInfo(system: ActorSystem,
-                          supervisor: ActorRef[SupervisorExternalMessage],
-                          componentInfo: ComponentInfo)

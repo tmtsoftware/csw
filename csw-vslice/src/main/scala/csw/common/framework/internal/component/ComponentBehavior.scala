@@ -1,4 +1,4 @@
-package csw.common.framework.internal
+package csw.common.framework.internal.component
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}

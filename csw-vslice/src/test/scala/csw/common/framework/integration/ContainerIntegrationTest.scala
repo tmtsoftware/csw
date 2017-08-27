@@ -7,15 +7,16 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.components.SampleComponentState._
-import csw.common.framework.internal.{ContainerMode, SupervisorMode}
-import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
+import csw.common.framework.internal.container.ContainerMode
+import csw.common.framework.internal.supervisor.SupervisorMode
+import csw.common.framework.internal.wiring.Container
 import csw.common.framework.models.ComponentModeMessage.ContainerModeMessage
-import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.common.framework.models.{Components, LifecycleStateChanged}
+import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
+import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
-import csw.common.framework.scaladsl.Component
+import csw.common.framework.models.{Components, LifecycleStateChanged}
 import csw.param.states.CurrentState
 import org.scalatest.{FunSuite, Matchers}
 
@@ -27,7 +28,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers {
   test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
     // start a container and verify it moves to running mode
-    val containerRef = Component.createContainer(ConfigFactory.load("container.conf"))
+    val containerRef = Container.spawn(ConfigFactory.load("container.conf"))
 
     val componentsProbe    = TestProbe[Components]
     val containerModeProbe = TestProbe[ContainerModeMessage]

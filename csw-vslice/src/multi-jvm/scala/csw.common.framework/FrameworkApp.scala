@@ -1,10 +1,12 @@
 package csw.common.framework
 
 import com.typesafe.config.ConfigFactory
-import csw.common.framework.scaladsl.Component
+
+import csw.common.framework.internal.container
+import csw.common.framework.internal.wiring.Container
 
 object FrameworkApp extends App {
 
-  Component.createContainer(ConfigFactory.load("wfs_container.conf"))
+  Container.spawn(ConfigFactory.load("wfs_container.conf"))
 
 }

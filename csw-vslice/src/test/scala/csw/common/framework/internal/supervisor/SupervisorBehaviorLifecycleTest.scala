@@ -6,7 +6,6 @@ import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.internal.{Supervisor, SupervisorMode}
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
@@ -26,14 +25,19 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
-class SupervisorLifecycleTest extends FrameworkTestSuite with MockitoSugar with BeforeAndAfterEach {
+class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSugar with BeforeAndAfterEach {
 
   class TestData {
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     val ctx                                                         = new StubbedActorContext[SupervisorMessage]("test-supervisor", 100, system)
     val timer: TimerScheduler[SupervisorMessage]                    = mock[TimerScheduler[SupervisorMessage]]
     val supervisor =
-      new Supervisor(ctx, timer, hcdInfo, getSampleHcdWiring(sampleHcdHandler), registrationFactory, locationService)
+      new SupervisorBehavior(ctx,
+                             timer,
+                             hcdInfo,
+                             getSampleHcdWiring(sampleHcdHandler),
+                             registrationFactory,
+                             locationService)
     val childComponentInbox: Inbox[ComponentMessage]                    = ctx.childInbox(supervisor.component.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)
@@ -219,7 +223,7 @@ class SupervisorLifecycleTest extends FrameworkTestSuite with MockitoSugar with 
 
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
 
-    verify(timer).startSingleTimer(Supervisor.TimerKey, ShutdownTimeout, Supervisor.shutdownTimeout)
+    verify(timer).startSingleTimer(SupervisorBehavior.TimerKey, ShutdownTimeout, SupervisorBehavior.shutdownTimeout)
 
     supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     childPubSubLifecycleInbox.receiveAll() should contain(
@@ -227,7 +231,7 @@ class SupervisorLifecycleTest extends FrameworkTestSuite with MockitoSugar with 
     )
 
     supervisor.onMessage(ShutdownTimeout)
-    verify(timer, never).cancel(Supervisor.TimerKey)
+    verify(timer, never).cancel(SupervisorBehavior.TimerKey)
 
     supervisor.mode shouldBe SupervisorMode.ShutdownFailure
     childPubSubLifecycleInbox.receiveAll() should contain(
@@ -244,7 +248,7 @@ class SupervisorLifecycleTest extends FrameworkTestSuite with MockitoSugar with 
 
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
 
-    verify(timer).startSingleTimer(Supervisor.TimerKey, ShutdownTimeout, Supervisor.shutdownTimeout)
+    verify(timer).startSingleTimer(SupervisorBehavior.TimerKey, ShutdownTimeout, SupervisorBehavior.shutdownTimeout)
 
     supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     childPubSubLifecycleInbox.receiveAll() should contain(
@@ -252,7 +256,7 @@ class SupervisorLifecycleTest extends FrameworkTestSuite with MockitoSugar with 
     )
 
     supervisor.onMessage(ShutdownFailure("Exception occurred"))
-    verify(timer).cancel(Supervisor.TimerKey)
+    verify(timer).cancel(SupervisorBehavior.TimerKey)
 
     supervisor.mode shouldBe SupervisorMode.ShutdownFailure
     childPubSubLifecycleInbox.receiveAll() should contain(
@@ -269,7 +273,7 @@ class SupervisorLifecycleTest extends FrameworkTestSuite with MockitoSugar with 
 
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
 
-    verify(timer).startSingleTimer(Supervisor.TimerKey, ShutdownTimeout, Supervisor.shutdownTimeout)
+    verify(timer).startSingleTimer(SupervisorBehavior.TimerKey, ShutdownTimeout, SupervisorBehavior.shutdownTimeout)
 
     supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
     childPubSubLifecycleInbox.receiveAll() should contain(
@@ -277,7 +281,7 @@ class SupervisorLifecycleTest extends FrameworkTestSuite with MockitoSugar with 
     )
 
     supervisor.onMessage(ShutdownComplete)
-    verify(timer).cancel(Supervisor.TimerKey)
+    verify(timer).cancel(SupervisorBehavior.TimerKey)
 
     supervisor.mode shouldBe SupervisorMode.Shutdown
     childPubSubLifecycleInbox.receiveAll() should contain(

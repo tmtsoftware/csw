@@ -7,14 +7,13 @@ import csw.common.ccs.DemandMatcher
 import csw.common.components.ComponentStatistics
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.internal.SupervisorMode
+import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorMode}
 import csw.common.framework.models.CommandMessage.Oneway
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models.{LifecycleStateChanged, SupervisorExternalMessage, ToComponentLifecycleMessage}
-import csw.common.framework.scaladsl.SupervisorBehaviorFactory
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
 import csw.param.states.{CurrentState, DemandState}

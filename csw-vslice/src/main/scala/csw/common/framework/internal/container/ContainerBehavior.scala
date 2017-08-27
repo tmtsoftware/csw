@@ -1,22 +1,22 @@
-package csw.common.framework.internal
+package csw.common.framework.internal.container
 
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
+import csw.common.framework.internal.supervisor.{SupervisorInfo, SupervisorInfoFactory, SupervisorMode}
+import csw.common.framework.models.ComponentModeMessage.{ContainerModeMessage, SupervisorModeMessage}
 import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
-import csw.common.framework.models.SupervisorCommonMessage.{GetSupervisorMode, LifecycleStateSubscription}
 import csw.common.framework.models.ContainerIdleMessage.{
   RegistrationComplete,
   RegistrationFailed,
   SupervisorModeChanged
 }
-import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.ContainerRunningMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.common.framework.models.ComponentModeMessage.{ContainerModeMessage, SupervisorModeMessage}
+import csw.common.framework.models.PubSub.{Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.Lifecycle
+import csw.common.framework.models.SupervisorCommonMessage.{GetSupervisorMode, LifecycleStateSubscription}
 import csw.common.framework.models.ToComponentLifecycleMessage._
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.SupervisorFactory
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -24,10 +24,10 @@ import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-class Container(
+class ContainerBehavior(
     ctx: ActorContext[ContainerMessage],
     containerInfo: ContainerInfo,
-    supervisorFactory: SupervisorFactory,
+    supervisorFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
 ) extends MutableBehavior[ContainerMessage] {
