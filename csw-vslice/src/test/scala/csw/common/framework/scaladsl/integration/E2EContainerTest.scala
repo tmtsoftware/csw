@@ -18,11 +18,15 @@ import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnl
 import csw.common.framework.scaladsl.Component
 import csw.param.states.CurrentState
 import org.scalatest.{FunSuite, Matchers}
+
 class E2EContainerTest extends FunSuite with Matchers {
+
   implicit val system: ActorSystem[_]           = actor.ActorSystem("system").toTyped
   implicit val testKitSettings: TestKitSettings = TestKitSettings(system)
 
-  test("should start multiple components withing a single container") {
+  test("should start multiple components withing a single container and able to accept lifecycle messages") {
+
+    // start a container and verify it moves to running mode
     val containerRef = Component.createContainer(ConfigFactory.load("container.conf"))
 
     val componentsProbe    = TestProbe[Components]
@@ -35,6 +39,7 @@ class E2EContainerTest extends FunSuite with Matchers {
     val filterLifecycleStateProbe    = TestProbe[LifecycleStateChanged]
     val disperserLifecycleStateProbe = TestProbe[LifecycleStateChanged]
 
+    // initially container is put in Idle state and wait for all the components to move into Running mode
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Idle))
 
@@ -46,6 +51,13 @@ class E2EContainerTest extends FunSuite with Matchers {
     val filterSupervisor    = components(1).supervisor
     val disperserSupervisor = components(2).supervisor
 
+    Thread.sleep(500)
+
+    // once all components from container moves to Running mode,
+    // container moves to Running mode and ready to accept external lifecycle messages
+    containerRef ! GetContainerMode(containerModeProbe.ref)
+    containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Running))
+
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))
     filterSupervisor ! ComponentStateSubscription(Subscribe(filterProbe.ref))
     disperserSupervisor ! ComponentStateSubscription(Subscribe(disperserProbe.ref))
@@ -54,24 +66,7 @@ class E2EContainerTest extends FunSuite with Matchers {
     filterSupervisor ! LifecycleStateSubscription(Subscribe(filterLifecycleStateProbe.ref))
     disperserSupervisor ! LifecycleStateSubscription(Subscribe(disperserLifecycleStateProbe.ref))
 
-    /*assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
-
-    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
-
-    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
-
-    assemblyLifecycleStateProbe.expectMsg(LifecycleStateChanged(assemblySupervisor, SupervisorMode.Running))
-    disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(disperserSupervisor, SupervisorMode.Running))
-    filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorMode.Running))*/
-
-    Thread.sleep(500)
-
-    containerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Running))
-
+    // lifecycle messages gets forwarded to all components and their corresponding handlers gets invoked
     containerRef ! Lifecycle(GoOffline)
     Thread.sleep(500)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
@@ -84,6 +79,8 @@ class E2EContainerTest extends FunSuite with Matchers {
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
 
+    // on Restart message, container falls back to Idle mode and wait for all the components to get restarted
+    // and moves to Running mode
     containerRef ! Lifecycle(Restart)
 
     containerRef ! GetContainerMode(containerModeProbe.ref)

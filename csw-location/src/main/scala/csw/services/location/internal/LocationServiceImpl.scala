@@ -71,7 +71,12 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     val registrationResultF = (replicator ? updateValue).flatMap {
       case _: UpdateSuccess[_] ⇒
         (replicator ? updateRegistry).map {
-          case _: UpdateSuccess[_] ⇒ registrationResult(location)
+          case _: UpdateSuccess[_] ⇒ {
+            log.info(
+              s"Successfully registered connection: ${registration.connection.name} with location ${location.uri}"
+            )
+            registrationResult(location)
+          }
           case _ ⇒
             val registrationFailed = RegistrationFailed(registration.connection)
             log.error(registrationFailed.getMessage, ex = registrationFailed)
