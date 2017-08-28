@@ -42,7 +42,7 @@ trait LocationService {
    * @param connection A connection to resolve to with its registered location
    * @return A Future which completes with the resolved location if found or None otherwise.
    */
-  def find(connection: Connection): Future[Option[Location]]
+  def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]]
 
   /**
    * Resolves the location for a connection from the local cache, if not found waits for the event to arrive
@@ -52,7 +52,7 @@ trait LocationService {
    * @param within Max wait time for event to arrive
    * @return A Future which completes with the resolved location if found or None otherwise.
    */
-  def resolve(connection: Connection, within: FiniteDuration): Future[Option[Location]]
+  def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): Future[Option[L]]
 
   /**
    * Lists all locations registered

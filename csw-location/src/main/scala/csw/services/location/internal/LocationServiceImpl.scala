@@ -136,15 +136,15 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
   /**
    * Resolves the location for a connection from the local cache
    */
-  def find(connection: Connection): Future[Option[Location]] = async {
+  def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]] = async {
     log.info(s"Finding location for connection ${connection.name}")
-    await(list).find(_.connection == connection)
+    await(list).find(_.connection == connection).asInstanceOf[Option[L]]
   }
 
   /**
    * Resolve a location for the given connection
    */
-  override def resolve(connection: Connection, within: FiniteDuration): Future[Option[Location]] = async {
+  def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): Future[Option[L]] = async {
     log.info(s"Resolving location for connection ${connection.name} within ${within.toString()}")
     val foundInLocalCache = await(find(connection))
     if (foundInLocalCache.isDefined) foundInLocalCache else await(resolveWithin(connection, within))
@@ -230,10 +230,11 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     override def unregister(): Future[Done] = outer.unregister(location.connection)
   }
 
-  private def resolveWithin(connection: Connection, waitTime: FiniteDuration): Future[Option[Location]] =
+  private def resolveWithin[L <: Location](connection: TypedConnection[L],
+                                           waitTime: FiniteDuration): Future[Option[L]] =
     track(connection)
       .collect {
-        case LocationUpdated(location) ⇒ location
+        case LocationUpdated(location) ⇒ location.asInstanceOf[L]
       }
       .takeWithin(waitTime)
       .runWith(Sink.headOption)

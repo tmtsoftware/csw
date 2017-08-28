@@ -5,6 +5,7 @@ import akka.util.Timeout
 import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaLocationException}
 import csw.apps.clusterseed.admin.internal.ActorRuntime
 import csw.apps.clusterseed.commons.ClusterSeedLogger
+import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaLocation, Connection, Location}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.Level
@@ -48,8 +49,8 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
   private def getLocation(componentName: String): Future[Option[Location]] =
     async {
       Connection.from(componentName) match {
-        case connection: Connection ⇒ await(locationService.find(connection))
-        case _                      ⇒ throw InvalidComponentNameException(componentName)
+        case connection: AkkaConnection ⇒ await(locationService.find(connection))
+        case _                          ⇒ throw InvalidComponentNameException(componentName)
       }
     }
 }

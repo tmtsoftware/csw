@@ -47,14 +47,14 @@ trait ILocationService {
    * @param connection A connection to resolve to with its registered location
    * @return A CompletableFuture which completes with the resolved location if found or Empty otherwise.
    */
-  def find(connection: Connection): CompletableFuture[Optional[Location]]
+  def find[L <: Location](connection: TypedConnection[L]): CompletableFuture[Optional[L]]
 
   /**
    * Resolves the location based on the given connection
    *
    * @return A CompletableFuture which completes with the resolved location if found or None otherwise.
    */
-  def resolve(connection: Connection, within: FiniteDuration): CompletableFuture[Optional[Location]]
+  def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): CompletableFuture[Optional[L]]
 
   /**
    * Lists all locations registered

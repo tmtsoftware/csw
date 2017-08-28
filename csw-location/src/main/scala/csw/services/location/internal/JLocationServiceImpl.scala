@@ -32,10 +32,11 @@ private[location] class JLocationServiceImpl(locationService: LocationService, c
   override def unregisterAll(): CompletableFuture[Done] =
     locationService.unregisterAll().toJava.toCompletableFuture
 
-  override def find(connection: Connection): CompletableFuture[Optional[Location]] =
+  override def find[L <: Location](connection: TypedConnection[L]): CompletableFuture[Optional[L]] =
     locationService.find(connection).map(_.asJava).toJava.toCompletableFuture
 
-  override def resolve(connection: Connection, within: FiniteDuration): CompletableFuture[Optional[Location]] =
+  override def resolve[L <: Location](connection: TypedConnection[L],
+                                      within: FiniteDuration): CompletableFuture[Optional[L]] =
     locationService.resolve(connection, within).map(_.asJava).toJava.toCompletableFuture
 
   override def list: CompletableFuture[util.List[Location]] =

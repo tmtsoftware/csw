@@ -42,7 +42,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
     private ILocationService locationService = JLocationServiceFactory.make();
     //#create-location-service
 
-    private Connection exampleConnection = LocationServiceExampleComponent.connection();
+    private AkkaConnection exampleConnection = LocationServiceExampleComponent.connection();
 
     private IRegistrationResult httpRegResult;
     private IRegistrationResult hcdRegResult;
@@ -112,7 +112,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
                 }});
         //#log-info-map
 
-        Optional<Location> findResult = locationService.find(exampleConnection).get();
+        Optional<AkkaLocation> findResult = locationService.find(exampleConnection).get();
         if (findResult.isPresent()) {
             //#log-info
             log.info("Find result: " + connectionInfo(findResult.get().connection()));
@@ -136,7 +136,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         });
         //#log-info-map-supplier
 
-        Optional<Location> resolveResult = locationService.resolve(exampleConnection, waitForResolveLimit).get();
+        Optional<AkkaLocation> resolveResult = locationService.resolve(exampleConnection, waitForResolveLimit).get();
         if (resolveResult.isPresent()) {
             //#log-info-supplier
             log.info(() -> "Resolve result: " + connectionInfo(resolveResult.get().connection()));
