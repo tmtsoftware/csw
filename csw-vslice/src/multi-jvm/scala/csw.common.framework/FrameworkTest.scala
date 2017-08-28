@@ -7,9 +7,9 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.wiring.Container
-import csw.common.framework.models.ComponentModeMessage.ContainerModeMessage
 import csw.common.framework.models.Components
-import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
+import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
+import csw.common.framework.models.ContainerExternalMessage.GetComponents
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType}
@@ -37,16 +37,16 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
 
       val containerRef = Container.spawn(ConfigFactory.load("laser_container.conf"))
 
-      val containerModeProbe = TestProbe[ContainerModeMessage]
+      val containerModeProbe = TestProbe[ContainerMode]
       val componentsProbe    = TestProbe[Components]
 
       containerRef ! GetContainerMode(containerModeProbe.ref)
-      containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Idle))
+      containerModeProbe.expectMsg(ContainerMode.Idle)
 
       Thread.sleep(500)
 
       containerRef ! GetContainerMode(containerModeProbe.ref)
-      containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Running))
+      containerModeProbe.expectMsg(ContainerMode.Running)
       enterBarrier("container-running")
 
       val wfsContainerLocationF =
@@ -65,16 +65,16 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
     runOn(member) {
       val containerRef = Container.spawn(ConfigFactory.load("wfs_container.conf"))
 
-      val containerModeProbe = TestProbe[ContainerModeMessage]
+      val containerModeProbe = TestProbe[ContainerMode]
       val componentsProbe    = TestProbe[Components]
 
       containerRef ! GetContainerMode(containerModeProbe.ref)
-      containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Idle))
+      containerModeProbe.expectMsg(ContainerMode.Idle)
 
       Thread.sleep(500)
 
       containerRef ! GetContainerMode(containerModeProbe.ref)
-      containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Running))
+      containerModeProbe.expectMsg(ContainerMode.Running)
       enterBarrier("container-running")
 
       val laserContainerLocationF =

@@ -8,9 +8,12 @@ import akka.{actor, Done}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.container.{ContainerBehavior, ContainerMode}
 import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorMode}
-import csw.common.framework.models.ComponentModeMessage.SupervisorModeMessage
-import csw.common.framework.models.ContainerCommonMessage.GetComponents
-import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed}
+import csw.common.framework.models.ContainerExternalMessage.GetComponents
+import csw.common.framework.models.ContainerIdleMessage.{
+  RegistrationComplete,
+  RegistrationFailed,
+  SupervisorModeChanged
+}
 import csw.common.framework.models.ContainerRunningMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
@@ -74,7 +77,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   }
 
   class RunningContainer() extends IdleContainer {
-    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeMessage(child.upcast, SupervisorMode.Running)))
+    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
 
     containerBehavior.onMessage(RegistrationComplete(registrationResult))
 
@@ -101,7 +104,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     ctx.children.map(
-      child ⇒ containerBehavior.onMessage(SupervisorModeMessage(child.upcast, SupervisorMode.Running))
+      child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running))
     )
 
     verify(locationService).register(akkaRegistration)
@@ -151,7 +154,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
       .map(component ⇒ ctx.childInbox(component.name))
       .map(_.receiveAll())
 
-    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeMessage(child.upcast, SupervisorMode.Running)))
+    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
 
     verify(locationService, atLeastOnce()).register(akkaRegistration)
 
@@ -194,7 +197,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     probe.expectMsg(Components(containerBehavior.supervisors))
 
     // Container should handle GetComponents message in Running mode
-    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeMessage(child.upcast, SupervisorMode.Running)))
+    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
 
     ctx.children
       .map(child ⇒ ctx.childInbox(child.upcast))
@@ -222,7 +225,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     containerBehavior.mode shouldBe ContainerMode.Idle
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
-    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeMessage(child.upcast, SupervisorMode.Running)))
+    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
 
     verify(locationService, atLeastOnce()).register(akkaRegistration)
     containerBehavior.onMessage(RegistrationFailed(runtimeException))

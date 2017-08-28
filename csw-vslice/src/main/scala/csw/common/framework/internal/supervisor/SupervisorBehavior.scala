@@ -5,14 +5,13 @@ import akka.typed.scaladsl.{ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, Signal, Terminated}
 import csw.common.framework.internal.PubSubActor
 import csw.common.framework.internal.supervisor.SupervisorMode.Idle
-import csw.common.framework.models.ComponentModeMessage.SupervisorModeMessage
+import csw.common.framework.models.ContainerIdleMessage.SupervisorModeChanged
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{
   ComponentStateSubscription,
-  GetSupervisorMode,
   HaltComponent,
   LifecycleStateSubscription
 }
@@ -94,7 +93,6 @@ class SupervisorBehavior(
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
     case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
     case HaltComponent                                 ⇒ haltingFlag = true; handleShutdown()
-    case GetSupervisorMode(replyTo)                    ⇒ replyTo ! SupervisorModeMessage(ctx.self, mode)
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
@@ -110,7 +108,7 @@ class SupervisorBehavior(
       mode = SupervisorMode.Running
       runningComponent = Some(componentRef)
       maybeContainerRef match {
-        case Some(containerRef) ⇒ containerRef ! SupervisorModeMessage(ctx.self, mode)
+        case Some(containerRef) ⇒ containerRef ! SupervisorModeChanged(ctx.self, mode)
         case None               ⇒
       }
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))

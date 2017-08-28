@@ -4,9 +4,13 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
 import csw.common.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorMode}
-import csw.common.framework.models.ComponentModeMessage.{ContainerModeMessage, SupervisorModeMessage}
-import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
-import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed}
+import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
+import csw.common.framework.models.ContainerExternalMessage.GetComponents
+import csw.common.framework.models.ContainerIdleMessage.{
+  RegistrationComplete,
+  RegistrationFailed,
+  SupervisorModeChanged
+}
 import csw.common.framework.models.ContainerRunningMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage._
@@ -49,11 +53,11 @@ class ContainerBehavior(
 
   def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
     case GetComponents(replyTo)    ⇒ replyTo ! Components(supervisors)
-    case GetContainerMode(replyTo) ⇒ replyTo ! ContainerModeMessage(mode)
+    case GetContainerMode(replyTo) ⇒ replyTo ! mode
   }
 
   def onIdle(idleContainerMessage: ContainerIdleMessage): Unit = idleContainerMessage match {
-    case SupervisorModeMessage(supervisor, supervisorMode) ⇒ onSupervisorModeChange(supervisor, supervisorMode)
+    case SupervisorModeChanged(supervisor, supervisorMode) ⇒ onSupervisorModeChange(supervisor, supervisorMode)
     case RegistrationComplete(registrationResult)          ⇒ onRegistrationComplete(registrationResult)
     case RegistrationFailed(throwable)                     ⇒ onRegistrationFailure(throwable)
   }

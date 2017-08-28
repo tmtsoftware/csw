@@ -10,8 +10,8 @@ import csw.common.components.SampleComponentState._
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.internal.wiring.Container
-import csw.common.framework.models.ComponentModeMessage.ContainerModeMessage
-import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
+import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
+import csw.common.framework.models.ContainerExternalMessage.GetComponents
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
@@ -31,7 +31,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers {
     val containerRef = Container.spawn(ConfigFactory.load("container.conf"))
 
     val componentsProbe    = TestProbe[Components]
-    val containerModeProbe = TestProbe[ContainerModeMessage]
+    val containerModeProbe = TestProbe[ContainerMode]
     val assemblyProbe      = TestProbe[CurrentState]
     val filterProbe        = TestProbe[CurrentState]
     val disperserProbe     = TestProbe[CurrentState]
@@ -42,7 +42,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers {
 
     // initially container is put in Idle state and wait for all the components to move into Running mode
     containerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Idle))
+    containerModeProbe.expectMsg(ContainerMode.Idle)
 
     containerRef ! GetComponents(componentsProbe.ref)
     val components = componentsProbe.expectMsgType[Components].components
@@ -57,7 +57,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers {
     // once all components from container moves to Running mode,
     // container moves to Running mode and ready to accept external lifecycle messages
     containerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Running))
+    containerModeProbe.expectMsg(ContainerMode.Running)
 
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))
     filterSupervisor ! ComponentStateSubscription(Subscribe(filterProbe.ref))
@@ -85,7 +85,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers {
     containerRef ! Lifecycle(Restart)
 
     containerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Idle))
+    containerModeProbe.expectMsg(ContainerMode.Idle)
 
     Thread.sleep(500)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
@@ -106,7 +106,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers {
 
     Thread.sleep(100)
     containerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerModeMessage(ContainerMode.Running))
+    containerModeProbe.expectMsg(ContainerMode.Running)
   }
 
 }

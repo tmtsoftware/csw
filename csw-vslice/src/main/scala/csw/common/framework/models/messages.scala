@@ -77,8 +77,7 @@ object SupervisorCommonMessage {
       extends SupervisorCommonMessage
   case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState])
       extends SupervisorCommonMessage
-  case object HaltComponent                                         extends SupervisorCommonMessage
-  case class GetSupervisorMode(replyTo: ActorRef[ContainerMessage]) extends SupervisorCommonMessage
+  case object HaltComponent extends SupervisorCommonMessage
 }
 
 sealed trait SupervisorIdleMessage extends SupervisorMessage
@@ -111,34 +110,29 @@ object PreparingToShutdownMessage {
 ///////////////
 
 sealed trait ContainerMessage
-sealed trait ContainerExternalMessage extends ContainerMessage
 
-sealed trait ContainerCommonMessage extends ContainerExternalMessage
+sealed trait ContainerCommonMessage extends ContainerMessage
 object ContainerCommonMessage {
-  case class GetComponents(replyTo: ActorRef[Components]) extends ContainerCommonMessage
-  case class GetContainerMode(replyTo: ActorRef[ComponentModeMessage.ContainerModeMessage])
-      extends ContainerCommonMessage
+  case class GetContainerMode(replyTo: ActorRef[ContainerMode]) extends ContainerCommonMessage
+}
+
+sealed trait ContainerExternalMessage extends ContainerMessage
+object ContainerExternalMessage {
+  case class GetComponents(replyTo: ActorRef[Components]) extends ContainerExternalMessage with ContainerCommonMessage
 }
 
 sealed trait ContainerIdleMessage extends ContainerMessage
 object ContainerIdleMessage {
-//  case class SupervisorModeChanged(lifecycleStateChanged: LifecycleStateChanged) extends ContainerIdleMessage
   case class RegistrationComplete(registrationResult: RegistrationResult) extends ContainerIdleMessage
   case class RegistrationFailed(throwable: Throwable)                     extends ContainerIdleMessage
+  case class SupervisorModeChanged(supervisor: ActorRef[SupervisorExternalMessage], supervisorMode: SupervisorMode)
+      extends ContainerIdleMessage
 }
 
 sealed trait ContainerRunningMessage extends ContainerMessage
 object ContainerRunningMessage {
   case object UnRegistrationComplete                    extends ContainerRunningMessage
   case class UnRegistrationFailed(throwable: Throwable) extends ContainerRunningMessage
-}
-
-sealed trait ComponentModeMessage
-object ComponentModeMessage {
-  case class ContainerModeMessage(containerMode: ContainerMode) extends ComponentModeMessage
-  case class SupervisorModeMessage(supervisor: ActorRef[SupervisorExternalMessage], supervisorMode: SupervisorMode)
-      extends ComponentModeMessage
-      with ContainerIdleMessage
 }
 
 case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage], state: SupervisorMode)
