@@ -7,6 +7,7 @@ import scala.concurrent.Future
 
 class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val actorSystem: ActorSystem = _actorSystem
-  val coordinatedShutdown               = CoordinatedShutdown(actorSystem)
-  def shutdown(): Future[Done]          = coordinatedShutdown.run()
+
+  val coordinatedShutdown      = CoordinatedShutdown(actorSystem)
+  def shutdown(): Future[Done] = coordinatedShutdown.run()
 }

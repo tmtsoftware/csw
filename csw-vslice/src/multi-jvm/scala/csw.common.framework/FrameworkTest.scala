@@ -7,7 +7,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.common.framework.models.Components
+import csw.common.framework.models.{Components, ContainerMessage}
 import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
 import csw.common.framework.models.ContainerExternalMessage.GetComponents
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
@@ -21,7 +21,7 @@ import scala.concurrent.duration.DurationInt
 class FrameworkTestMultiJvmNode1 extends FrameworkTest(0)
 class FrameworkTestMultiJvmNode2 extends FrameworkTest(0)
 
-// WIP
+// Fixme
 class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) {
 
   import config._
@@ -31,11 +31,10 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
 
   LoggingSystemFactory.start("framework", "1.0", "localhost", system)
 
-  ignore("should able to create multiple containers across jvm's") {
+  test("should able to create multiple containers across jvm's") {
 
     runOn(seed) {
-
-      val wiring       = FrameworkWiring.make(settings)
+      val wiring       = FrameworkWiring.make(system, locationService)
       val containerRef = Container.spawn(ConfigFactory.load("laser_container.conf"), wiring)
 
       val containerModeProbe = TestProbe[ContainerMode]
@@ -54,7 +53,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
         locationService.find(AkkaConnection(ComponentId("WFS_Container", ComponentType.Container)))
       val wfsContainerLocation = Await.result(wfsContainerLocationF, 5.seconds).get
 
-      val efsContainerTypedRef = wfsContainerLocation.typedRef[Any]
+      val efsContainerTypedRef = wfsContainerLocation.typedRef[ContainerMessage]
 
       efsContainerTypedRef ! GetComponents(componentsProbe.ref)
 
@@ -64,7 +63,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
     }
 
     runOn(member) {
-      val wiring       = FrameworkWiring.make(settings)
+      val wiring       = FrameworkWiring.make(system, locationService)
       val containerRef = Container.spawn(ConfigFactory.load("wfs_container.conf"), wiring)
 
       val containerModeProbe = TestProbe[ContainerMode]
@@ -80,10 +79,10 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
       enterBarrier("container-running")
 
       val laserContainerLocationF =
-        locationService.find(AkkaConnection(ComponentId("Laser_Container", ComponentType.Container)))
+        locationService.find(AkkaConnection(ComponentId("LGSF_Container", ComponentType.Container)))
       val laserContainerLocation = Await.result(laserContainerLocationF, 5.seconds).get
 
-      val laserContainerTypedRef = laserContainerLocation.typedRef[Any]
+      val laserContainerTypedRef = laserContainerLocation.typedRef[ContainerMessage]
 
       laserContainerTypedRef ! GetComponents(componentsProbe.ref)
 
