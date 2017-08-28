@@ -2,6 +2,7 @@ package csw.services.integtration.apps
 
 import akka.actor.{Actor, ActorPath, Props}
 import akka.serialization.Serialization
+import akka.typed.scaladsl.adapter._
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.models.Connection.AkkaConnection

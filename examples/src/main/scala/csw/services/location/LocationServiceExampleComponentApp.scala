@@ -12,6 +12,7 @@ import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import akka.typed.scaladsl.adapter._
 
 /**
  * An example that shows how to register a component actor with the location service.

@@ -9,6 +9,7 @@ import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.javadsl.TestSink;
 import akka.testkit.TestProbe;
+import akka.typed.ActorRef;
 import csw.services.location.internal.Networks;
 import csw.services.location.models.*;
 import csw.services.location.models.Connection.AkkaConnection;
@@ -23,6 +24,8 @@ import org.junit.Test;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import akka.typed.javadsl.Adapter;
+
 
 @SuppressWarnings("ConstantConditions")
 public class JLocationServiceImplTest implements JLocationServiceLogger {
@@ -39,7 +42,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     private TcpConnection tcpServiceConnection = new Connection.TcpConnection(tcpServiceComponentId);
 
     private TestProbe actorTestProbe = new TestProbe(actorSystem, "test-actor");
-    private ActorRef actorRef = actorTestProbe.ref();
+    private ActorRef<Object> actorRef = Adapter.toTyped(actorTestProbe.ref());
 
     private ComponentId httpServiceComponentId = new ComponentId("exampleHTTPService", JComponentType.Service);
     private HttpConnection httpServiceConnection = new Connection.HttpConnection(httpServiceComponentId);
@@ -304,7 +307,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         //Test probe actor to receive the TrackingEvent notifications
         TestProbe probe = new TestProbe(actorSystem);
 
-        KillSwitch killSwitch = locationService.subscribe(redis1Connection, trackingEvent -> probe.ref().tell(trackingEvent, ActorRef.noSender()));
+        KillSwitch killSwitch = locationService.subscribe(redis1Connection, trackingEvent -> probe.ref().tell(trackingEvent, akka.actor.ActorRef.noSender()));
 
         locationService.register(redis1Registration).toCompletableFuture().get();
         probe.expectMsg(new LocationUpdated(redis1Registration.location(new Networks().hostname())));
@@ -331,7 +334,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         ComponentId componentId = new ComponentId("hcd1", JComponentType.HCD);
         AkkaConnection connection = new AkkaConnection(componentId);
 
-        ActorRef actorRef = actorSystem.actorOf(Props.create(AbstractActor.class, TestActor::new),"my-actor-to-die");
+        ActorRef<Object> actorRef = Adapter.toTyped(actorSystem.actorOf(Props.create(AbstractActor.class, TestActor::new),"my-actor-to-die"));
 
         Assert.assertEquals(connection, locationService.register(new AkkaRegistration(connection, actorRef)).get().location().connection());
 
@@ -342,7 +345,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         locations.add(location);
         Assert.assertEquals(locations, locationService.list().get());
 
-        actorRef.tell(PoisonPill.getInstance(), ActorRef.noSender());
+        actorRef.tell(PoisonPill.getInstance());
 
         Thread.sleep(2000);
 

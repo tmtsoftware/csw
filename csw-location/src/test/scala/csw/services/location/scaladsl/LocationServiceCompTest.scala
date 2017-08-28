@@ -1,10 +1,12 @@
 package csw.services.location.scaladsl
 
-import akka.actor.{Actor, ActorSystem, PoisonPill, Props}
+import akka.actor.{ActorSystem, PoisonPill}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
+import akka.typed.Behavior
+import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
@@ -87,14 +89,9 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
   }
 
   test("should able to register, resolve, list and unregister akka location") {
-    val componentId = ComponentId("hcd1", ComponentType.HCD)
-    val connection  = AkkaConnection(componentId)
-    val actorRef = actorSystem.actorOf(
-      Props(new Actor {
-        override def receive: Receive = Actor.emptyBehavior
-      }),
-      "my-actor-1"
-    )
+    val componentId      = ComponentId("hcd1", ComponentType.HCD)
+    val connection       = AkkaConnection(componentId)
+    val actorRef         = actorSystem.spawn(Behavior.empty, "my-actor-1")
     val akkaRegistration = AkkaRegistration(connection, actorRef)
 
     // register, resolve & list akka connection for the first time
@@ -121,12 +118,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection  = AkkaConnection(componentId)
 
-    val actorRef = actorSystem.actorOf(
-      Props(new Actor {
-        override def receive: Receive = Actor.emptyBehavior
-      }),
-      "my-actor-to-die"
-    )
+    val actorRef = actorSystem.spawn(Behavior.empty[Any], "my-actor-to-die")
 
     locationService.register(AkkaRegistration(connection, actorRef)).await.location.connection shouldBe connection
 
@@ -196,18 +188,13 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     //create http registration
     val port             = 9595
     val prefix           = "/trombone/hcd"
-    val httpConnection   = HttpConnection(new ComponentId("Assembly1", ComponentType.Assembly))
+    val httpConnection   = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
     val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 
     //create akka registration
-    val akkaComponentId = ComponentId("container1", ComponentType.Container)
-    val akkaConnection  = AkkaConnection(akkaComponentId)
-    val actorRef = actorSystem.actorOf(
-      Props(new Actor {
-        override def receive: Receive = Actor.emptyBehavior
-      }),
-      "container1-actor"
-    )
+    val akkaComponentId  = ComponentId("container1", ComponentType.Container)
+    val akkaConnection   = AkkaConnection(akkaComponentId)
+    val actorRef         = actorSystem.spawn(Behavior.empty, "container1-actor")
     val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
@@ -331,12 +318,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
 
   test("should filter components with component type") {
     val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorRef = actorSystem.actorOf(
-      Props(new Actor {
-        override def receive: Receive = Actor.emptyBehavior
-      }),
-      "my-actor-2"
-    )
+    val actorRef      = actorSystem.spawn(Behavior.empty, "my-actor-2")
 
     locationService.register(AkkaRegistration(hcdConnection, actorRef)).await
 
@@ -355,10 +337,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
 
   test("should filter connections based on Connection type") {
     val hcdAkkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorRef = actorSystem.actorOf(
-      Props(new Actor {
-        override def receive: Receive = Actor.emptyBehavior
-      }),
+    val actorRef = actorSystem.spawn(
+      Behavior.empty,
       "my-actor-3"
     )
 
@@ -391,10 +371,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     locationService.register(HttpRegistration(httpConnection, 1234, "path123")).await
 
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorRef = actorSystem.actorOf(
-      Props(new Actor {
-        override def receive: Receive = Actor.emptyBehavior
-      }),
+    val actorRef = actorSystem.spawn(
+      Behavior.empty,
       "my-actor-4"
     )
     locationService.register(AkkaRegistration(akkaConnection, actorRef)).await

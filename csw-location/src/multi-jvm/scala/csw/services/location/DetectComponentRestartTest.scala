@@ -1,7 +1,8 @@
 package csw.services.location
 
-import akka.actor.Props
 import akka.testkit.TestProbe
+import akka.typed.Behavior
+import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.services.location.commons.CswCluster
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
@@ -28,7 +29,7 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
     val akkaConnection = AkkaConnection(ComponentId("TromboneHcd", ComponentType.HCD))
 
     runOn(member1) {
-      locationService.register(AkkaRegistration(akkaConnection, system.actorOf(Props.empty))).await
+      locationService.register(AkkaRegistration(akkaConnection, system.spawnAnonymous(Behavior.empty))).await
       enterBarrier("location-registered")
       enterBarrier("location-updated")
 
@@ -39,7 +40,7 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
       val freshLocationService = LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
       Thread.sleep(2000)
 
-      freshLocationService.register(AkkaRegistration(akkaConnection, newSystem.actorOf(Props.empty))).await
+      freshLocationService.register(AkkaRegistration(akkaConnection, newSystem.spawnAnonymous(Behavior.empty))).await
       enterBarrier("member-re-registered")
     }
 

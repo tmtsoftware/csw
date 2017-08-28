@@ -19,6 +19,7 @@ import csw.services.logging.scaladsl.ComponentLogger
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
+import akka.typed.scaladsl.adapter._
 
 object TromboneHcdLogger extends ComponentLogger("tromboneHcd")
 

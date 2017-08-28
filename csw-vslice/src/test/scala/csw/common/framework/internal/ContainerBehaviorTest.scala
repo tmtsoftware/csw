@@ -4,7 +4,7 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.typed.{ActorRef, ActorSystem}
-import akka.{actor, testkit, Done}
+import akka.{actor, Done}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.container.{ContainerBehavior, ContainerMode}
 import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorMode}
@@ -39,7 +39,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   implicit val untypedSystem: actor.ActorSystem      = ActorSystemFactory.remote()
   implicit val typedSystem: ActorSystem[Nothing]     = untypedSystem.toTyped
   implicit val settings: TestKitSettings             = TestKitSettings(typedSystem)
-  private val akkaRegistration                       = AkkaRegistration(mock[AkkaConnection], testkit.TestProbe("test-probe").testActor)
+  private val akkaRegistration                       = AkkaRegistration(mock[AkkaConnection], TestProbe("test-probe").testActor)
   private val locationService: LocationService       = mock[LocationService]
   private val registrationResult: RegistrationResult = mock[RegistrationResult]
 

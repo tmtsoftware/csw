@@ -29,6 +29,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import akka.typed.javadsl.Adapter;
 
 /**
  * An example location service client application.
@@ -81,19 +82,20 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
 
         // dummy HCD connection
         AkkaConnection hcdConnection = new AkkaConnection(new ComponentId("hcd1", JComponentType.HCD));
-        AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
+        ActorRef actorRef = getContext().actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                     @Override
                     public Receive createReceive() {
                         return ReceiveBuilder.create().build();
                     }
                 }),
                 "my-actor-1"
-        ));
+        );
+        AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, Adapter.toTyped(actorRef));
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         //. register the client "assembly" created in this example
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
-        AkkaRegistration assemblyRegistration = new AkkaRegistration(assemblyConnection, getSelf());
+        AkkaRegistration assemblyRegistration = new AkkaRegistration(assemblyConnection, Adapter.toTyped(getSelf()));
         assemblyRegResult = locationService.register(assemblyRegistration).get();
         //#Components-Connections-Registrations
     }
@@ -148,13 +150,9 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
 
        // example code showing how to get the actorRef for remote component and send it a message
          if (resolveResult.isPresent()) {
-            Location loc = resolveResult.get();
-            if (loc instanceof AkkaLocation) {
-                ActorRef actorRef = ((AkkaLocation)loc).actorRef();
+            AkkaLocation loc = resolveResult.get();
+                ActorRef actorRef = Adapter.toUntyped(loc.actorRef());
                 actorRef.tell(LocationServiceExampleComponent.ClientMessage$.MODULE$, getSelf());
-            } else {
-                log.error("Received unexpected location type: " + loc.getClass());
-            }
         }
     }
 

@@ -1,6 +1,7 @@
 package csw.apps.clusterseed.admin
 
 import akka.pattern.ask
+import akka.typed.scaladsl.adapter.TypedActorRefOps
 import akka.util.Timeout
 import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaLocationException}
 import csw.apps.clusterseed.admin.internal.ActorRuntime
@@ -27,7 +28,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
       case Some(AkkaLocation(connection, _, actorRef)) ⇒
         log.info("Getting log information from logging system",
                  Map("componentName" → componentName, "actorRef" → actorRef.toString))
-        await((actorRef ? GetComponentLogMetadata(connection.componentId.name)).mapTo[LogMetadata])
+        await((actorRef.toUntyped ? GetComponentLogMetadata(connection.componentId.name)).mapTo[LogMetadata])
 
       case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
     }
@@ -37,10 +38,10 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
     async {
       await(getLocation(componentName)) match {
 
-        case Some(AkkaLocation(connection, _, actorRef)) ⇒
+        case Some(loc @ AkkaLocation(connection, _, _)) ⇒
           log.info(s"Setting log level to $logLevel",
-                   Map("componentName" → componentName, "actorRef" → actorRef.toString))
-          actorRef ! SetComponentLogLevel(connection.componentId.name, logLevel)
+                   Map("componentName" → componentName, "actorRef" → loc.typedRef.toString))
+          loc.typedRef ! SetComponentLogLevel(connection.componentId.name, logLevel)
 
         case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
       }

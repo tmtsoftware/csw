@@ -3,6 +3,8 @@ package csw.services.location
 import akka.actor.{Actor, ActorSystem, Props}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
+import akka.typed.Behavior
+import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -75,12 +77,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     val akkaConnection = AkkaConnection(componentId)
 
     runOn(seed) {
-      val actorRef = cswCluster.actorSystem.actorOf(
-        Props(new Actor {
-          override def receive: Receive = Actor.emptyBehavior
-        }),
-        "trombone-hcd"
-      )
+      val actorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
       locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
@@ -128,9 +125,9 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       locationService.register(tcpRegistration).await
       enterBarrier("Registration")
 
-      val resolvedLocation: Location = Await.result(locationService.resolve(akkaConnection, 5.seconds), 5.seconds).get
+      val resolvedLocation = Await.result(locationService.resolve(akkaConnection, 5.seconds), 5.seconds).get
 
-      val assemblyActorRef = resolvedLocation.asInstanceOf[AkkaLocation].actorRef
+      val assemblyActorRef = resolvedLocation.typedRef
 
       assemblyActorRef ! UnregisterConnection(akkaConnection)
       Thread.sleep(2000)
@@ -145,7 +142,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
     runOn(member) {
       val actorRef = assemblyActorSystem.actorOf(AssemblyActor.props(locationService), "assembly-actor")
-
+      import akka.typed.scaladsl.adapter._
       locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
 
       enterBarrier("Registration")

@@ -22,10 +22,10 @@ object App1 extends App {
     .find(akkaConnection)
     .foreach(mayBeLocation ⇒ {
       val loc: AkkaLocation = mayBeLocation.get.asInstanceOf[AkkaLocation]
-      val beh               = MotionWorker.behavior(0, 10, 1000, loc.actorRef, true)
+      val beh               = MotionWorker.behavior(0, 10, 1000, loc.typedRef, true)
 
       val actorRef = actorSystem.spawn(beh, "test1")
-      actorRef ! Start(loc.actorRef)
+      actorRef ! Start(loc.typedRef)
     })
 
 }

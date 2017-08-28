@@ -10,6 +10,7 @@ import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest._
+import akka.typed.scaladsl.adapter._
 
 class LocationServiceIntegrationTest
     extends TestKit(ActorSystem("location-testkit"))
@@ -48,7 +49,7 @@ class LocationServiceIntegrationTest
 
     val hcdAkkaLocation = hcdLocation.asInstanceOf[AkkaLocation]
 
-    hcdAkkaLocation.actorRef ! Unregister
+    hcdAkkaLocation.typedRef ! Unregister
 
     Thread.sleep(3000)
 

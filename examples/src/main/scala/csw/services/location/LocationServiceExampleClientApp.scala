@@ -16,6 +16,7 @@ import scala.async.Async._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
+import akka.typed.scaladsl.adapter._
 
 /**
  * An example location service client application.
@@ -55,9 +56,9 @@ object LocationServiceExampleClient {
  * A test client actor that uses the location service to resolve services
  */
 //#actor-mixin
-class LocationServiceExampleClient(locationService: LocationService,
-                                   loggingSystem: LoggingSystem)(implicit mat: Materializer)
-    extends ExampleLogger.Actor
+class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(
+    implicit mat: Materializer
+) extends ExampleLogger.Actor
     //#actor-mixin
     {
   import LocationServiceExampleClient._
@@ -135,8 +136,8 @@ class LocationServiceExampleClient(locationService: LocationService,
   // example code showing how to get the actorReg for remote component and send it a message
   if (resolveResult.isDefined) {
     resolveResult.get match {
-      case AkkaLocation(_, _, actorRef) =>
-        actorRef ! LocationServiceExampleComponent.ClientMessage
+      case c: AkkaLocation =>
+        c.typedRef ! LocationServiceExampleComponent.ClientMessage
       case x => log.error(s"Received unexpected location type: $x")
     }
   }

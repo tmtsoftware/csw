@@ -20,6 +20,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future, Promise}
+import akka.typed.scaladsl.adapter._
 
 abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndAfterAll with MockitoSugar {
   implicit val untypedSystem: actor.ActorSystem          = ActorSystemFactory.remote()

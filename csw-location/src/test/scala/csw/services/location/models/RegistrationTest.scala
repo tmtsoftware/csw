@@ -2,8 +2,10 @@ package csw.services.location.models
 
 import java.net.URI
 
-import akka.actor.{Actor, ActorPath, ActorSystem, Props}
+import akka.actor.{ActorPath, ActorSystem}
 import akka.serialization.Serialization
+import akka.typed.Behavior
+import akka.typed.scaladsl.adapter.{TypedActorRefOps, UntypedActorSystemOps}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.internal.Networks
@@ -20,15 +22,10 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val hostname = new Networks().hostname()
 
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-    val actorSystem    = ActorSystemFactory.remote
-    val actorRef = actorSystem.actorOf(
-      Props(new Actor {
-        override def receive: Receive = Actor.emptyBehavior
-      }),
-      "my-actor-1"
-    )
+    val actorSystem    = ActorSystemFactory.remote()
+    val actorRef       = actorSystem.spawn(Behavior.empty, "my-actor-1")
 
-    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef))
+    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef.toUntyped))
     val akkaUri   = new URI(actorPath.toString)
 
     val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
@@ -70,13 +67,8 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
         akka.actor.provider = local
       """)
 
-    val actorSystem = ActorSystem("local-actor-system", config)
-    val actorRef = actorSystem.actorOf(
-      Props(new Actor {
-        override def receive: Receive = Actor.emptyBehavior
-      }),
-      "my-actor-2"
-    )
+    val actorSystem    = ActorSystem("local-actor-system", config)
+    val actorRef       = actorSystem.spawn(Behavior.empty, "my-actor-2")
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {

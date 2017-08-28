@@ -10,6 +10,7 @@ import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import akka.typed.scaladsl.adapter._
 
 object AppLogger extends ComponentLogger("app")
 

@@ -2,7 +2,6 @@ package csw.services.location.internal
 
 import akka.cluster.ddata.Replicator.{Changed, Subscribe}
 import akka.typed.scaladsl.Actor
-import akka.typed.scaladsl.adapter._
 import akka.typed.{ActorRef, Behavior, Terminated}
 import csw.services.location.commons.{CswCluster, LocationServiceLogger}
 import csw.services.location.internal.Registry.AllServices
@@ -31,7 +30,7 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
       //find out the ones that are not being watched and watch them
       val unwatchedLocations = akkaLocations diff watchedLocations
       unwatchedLocations.foreach(loc ⇒ {
-        log.debug(s"Started watching actor", Map("actorRef" → loc.actorRef.toString()))
+        log.debug(s"Started watching actor", Map("actorRef" → loc.actorRef.toString))
         context.watch(loc.actorRef)
       })
       //all akka locations are now watched
@@ -42,7 +41,7 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
         //stop watching the terminated actor
         ctx.unwatch(deadActorRef)
         //Unregister the dead akka location and remove it from the list of watched locations
-        val maybeLocation = watchedLocations.find(_.actorRef == deadActorRef.toUntyped)
+        val maybeLocation = watchedLocations.find(_.actorRef == deadActorRef)
         maybeLocation match {
           case Some(location) =>
             //if deadActorRef is mapped to a location, unregister it and remove it from watched locations
@@ -56,6 +55,7 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
 }
 
 object DeathwatchActor extends LocationServiceLogger.Simple {
+  import akka.typed.scaladsl.adapter._
   //message type handled by the for the typed deathwatch actor
   type Msg = Changed[AllServices.Value]
 

@@ -1,8 +1,9 @@
 package csw.services.location
 
-import akka.actor.{Actor, Props}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
+import akka.typed.Behavior
+import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
@@ -66,12 +67,7 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
     runOn(member1) {
       val actorRef = ActorSystemFactory
         .remote()
-        .actorOf(
-          Props(new Actor {
-            override def receive: Receive = Actor.emptyBehavior
-          }),
-          "trombone-hcd-1"
-        )
+        .spawn(Behavior.empty, "trombone-hcd-1")
       locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 

@@ -6,6 +6,7 @@ import csw.services.location.commons.CswCluster
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.services.location.scaladsl.LocationServiceFactory
+import akka.typed.scaladsl.adapter._
 
 object TromboneHCD {
   private val cswCluster = CswCluster.make()

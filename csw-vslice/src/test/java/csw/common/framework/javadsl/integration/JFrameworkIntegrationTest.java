@@ -43,6 +43,7 @@ import scala.concurrent.Future;
 import scala.concurrent.Promise$;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
+import akka.typed.javadsl.Adapter;
 
 import java.util.Collections;
 
@@ -53,7 +54,7 @@ import java.util.Collections;
 // DEOPSCSW-177: Hooks for lifecycle management
 public class JFrameworkIntegrationTest extends Mockito {
     private static ActorSystem system = ActorSystem.create(Actor.empty(), "Hcd");
-    private TestKitSettings settings = TestKitSettings.apply(system);
+    private static TestKitSettings settings = TestKitSettings.apply(system);
     private ComponentInfo hcdInfo = JComponentInfo.from(
             "trombone",
             JComponentType.HCD,
@@ -62,7 +63,11 @@ public class JFrameworkIntegrationTest extends Mockito {
             Collections.emptySet());
 
     private static akka.actor.ActorSystem untypedSystem = ActorSystemFactory.remote();
-    private static AkkaRegistration akkaRegistration = AkkaRegistration.apply(mock(Connection.AkkaConnection.class), akka.testkit.TestProbe.apply(untypedSystem).ref());
+
+    private static AkkaRegistration akkaRegistration = AkkaRegistration.apply(
+            mock(Connection.AkkaConnection.class),
+            TestProbe.apply(Adapter.toTyped(untypedSystem), settings).ref()
+    );
     private static RegistrationResult registrationResult = mock(RegistrationResult.class);
     private static LocationService locationService = mock(LocationService.class);
     private static RegistrationFactory registrationFactory = mock(RegistrationFactory.class);

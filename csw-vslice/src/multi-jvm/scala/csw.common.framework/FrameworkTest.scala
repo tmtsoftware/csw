@@ -1,20 +1,18 @@
 package csw.common.framework
 
 import akka.typed.ActorSystem
-import akka.typed.scaladsl.adapter
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
-import csw.common.framework.internal.container
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.wiring.Container
 import csw.common.framework.models.ComponentModeMessage.ContainerModeMessage
+import csw.common.framework.models.Components
 import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
-import csw.common.framework.models.{Components, ContainerMessage}
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.services.location.models.{ComponentId, ComponentType}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.Await
@@ -55,8 +53,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
         locationService.find(AkkaConnection(ComponentId("WFS_Container", ComponentType.Container)))
       val wfsContainerLocation = Await.result(wfsContainerLocationF, 5.seconds).get
 
-      val wfsContainerUntypedRef = wfsContainerLocation.asInstanceOf[AkkaLocation].actorRef
-      val efsContainerTypedRef   = adapter.actorRefAdapter[ContainerMessage](wfsContainerUntypedRef)
+      val efsContainerTypedRef = wfsContainerLocation.typedRef[Any]
 
       efsContainerTypedRef ! GetComponents(componentsProbe.ref)
 
@@ -84,8 +81,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
         locationService.find(AkkaConnection(ComponentId("Laser_Container", ComponentType.Container)))
       val laserContainerLocation = Await.result(laserContainerLocationF, 5.seconds).get
 
-      val laserContainerUntypedRef = laserContainerLocation.asInstanceOf[AkkaLocation].actorRef
-      val laserContainerTypedRef   = adapter.actorRefAdapter[ContainerMessage](laserContainerUntypedRef)
+      val laserContainerTypedRef = laserContainerLocation.typedRef[Any]
 
       laserContainerTypedRef ! GetComponents(componentsProbe.ref)
 
