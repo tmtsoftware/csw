@@ -3,7 +3,7 @@ package csw.common.framework.internal.container
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
-import csw.common.framework.internal.supervisor.{SupervisorInfo, SupervisorInfoFactory, SupervisorMode}
+import csw.common.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorMode}
 import csw.common.framework.models.ComponentModeMessage.{ContainerModeMessage, SupervisorModeMessage}
 import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
 import csw.common.framework.models.ContainerIdleMessage.{
@@ -89,7 +89,7 @@ class ContainerBehavior(
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
-    supervisors = supervisors ::: componentInfos.flatMap(createComponent).toList
+    supervisors = componentInfos.flatMap(createComponent).toList
     subscribeToSupervisorsLifecycle()
     // Get all supervisors' mode so that if any supervisor got changed to 'running' mode before this container could subscribe
     // to it's lifecycle changes then it could be handled

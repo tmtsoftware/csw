@@ -7,12 +7,7 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.container.{ContainerBehavior, ContainerMode}
-import csw.common.framework.internal.supervisor.{
-  SupervisorBehaviorFactory,
-  SupervisorInfo,
-  SupervisorInfoFactory,
-  SupervisorMode
-}
+import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorMode}
 import csw.common.framework.models.ContainerCommonMessage.GetComponents
 import csw.common.framework.models.ContainerIdleMessage.{
   RegistrationComplete,

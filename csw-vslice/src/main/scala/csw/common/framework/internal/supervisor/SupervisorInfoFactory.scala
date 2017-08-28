@@ -1,16 +1,8 @@
 package csw.common.framework.internal.supervisor
 
-import akka.actor.ActorSystem
-import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import csw.common.framework.models.{ComponentInfo, SupervisorExternalMessage}
+import csw.common.framework.models.{ComponentInfo, SupervisorInfo}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationServiceFactory, RegistrationFactory}
-
-case class SupervisorInfo(
-    system: ActorSystem,
-    supervisor: ActorRef[SupervisorExternalMessage],
-    componentInfo: ComponentInfo
-)
 
 class SupervisorInfoFactory {
   def make(componentInfo: ComponentInfo): SupervisorInfo = {
