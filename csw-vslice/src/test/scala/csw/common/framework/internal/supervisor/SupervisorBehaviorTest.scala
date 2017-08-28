@@ -2,17 +2,24 @@ package csw.common.framework.internal.supervisor
 
 import akka.typed.testkit.Effect._
 import akka.typed.testkit.EffectfulActorContext
+import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{Behavior, Props, Terminated}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.models.SupervisorExternalMessage
+import csw.common.framework.models.{ContainerIdleMessage, SupervisorExternalMessage}
 import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
+  val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
   val supervisorBehavior: Behavior[SupervisorExternalMessage] =
-    SupervisorBehaviorFactory.behavior(hcdInfo, locationService, registrationFactory)
+    SupervisorBehaviorFactory.behavior(
+      Some(containerIdleMessageProbe.testActor),
+      hcdInfo,
+      locationService,
+      registrationFactory
+    )
 
   test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state") {
     val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)

@@ -31,13 +31,17 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     val ctx                                                         = new StubbedActorContext[SupervisorMessage]("test-supervisor", 100, system)
     val timer: TimerScheduler[SupervisorMessage]                    = mock[TimerScheduler[SupervisorMessage]]
+    val containerIdleMessageProbe: TestProbe[ContainerIdleMessage]  = TestProbe[ContainerIdleMessage]
     val supervisor =
-      new SupervisorBehavior(ctx,
-                             timer,
-                             hcdInfo,
-                             getSampleHcdWiring(sampleHcdHandler),
-                             registrationFactory,
-                             locationService)
+      new SupervisorBehavior(
+        ctx,
+        Some(containerIdleMessageProbe.testActor),
+        timer,
+        hcdInfo,
+        getSampleHcdWiring(sampleHcdHandler),
+        registrationFactory,
+        locationService
+      )
     val childComponentInbox: Inbox[ComponentMessage]                    = ctx.childInbox(supervisor.component.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)

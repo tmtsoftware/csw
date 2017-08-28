@@ -14,7 +14,8 @@ object Standalone {
     val system              = ClusterAwareSettings.system
     val locationService     = LocationServiceFactory.make()
     val registrationFactory = new RegistrationFactory
-    val supervisorBehavior  = SupervisorBehaviorFactory.behavior(componentInfo, locationService, registrationFactory)
+    val supervisorBehavior =
+      SupervisorBehaviorFactory.behavior(None, componentInfo, locationService, registrationFactory)
     system.spawn(supervisorBehavior, componentInfo.name)
   }
 }

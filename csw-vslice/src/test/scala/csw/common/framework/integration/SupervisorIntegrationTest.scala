@@ -13,7 +13,12 @@ import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
-import csw.common.framework.models.{LifecycleStateChanged, SupervisorExternalMessage, ToComponentLifecycleMessage}
+import csw.common.framework.models.{
+  ContainerIdleMessage,
+  LifecycleStateChanged,
+  SupervisorExternalMessage,
+  ToComponentLifecycleMessage
+}
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
 import csw.param.states.{CurrentState, DemandState}
@@ -31,15 +36,23 @@ import scala.concurrent.duration.DurationInt
 class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar with BeforeAndAfterEach {
   import csw.common.components.SampleComponentState._
 
-  var compStateProbe: TestProbe[CurrentState]                 = _
-  var lifecycleStateProbe: TestProbe[LifecycleStateChanged]   = _
-  var supervisorBehavior: Behavior[SupervisorExternalMessage] = _
-  var supervisorRef: ActorRef[SupervisorExternalMessage]      = _
+  var compStateProbe: TestProbe[CurrentState]                    = _
+  var lifecycleStateProbe: TestProbe[LifecycleStateChanged]      = _
+  var supervisorBehavior: Behavior[SupervisorExternalMessage]    = _
+  var supervisorRef: ActorRef[SupervisorExternalMessage]         = _
+  var containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = _
 
   def createSupervisorAndStartTLA(): Unit = {
     compStateProbe = TestProbe[CurrentState]
     lifecycleStateProbe = TestProbe[LifecycleStateChanged]
-    supervisorBehavior = SupervisorBehaviorFactory.behavior(hcdInfo, locationService, registrationFactory)
+    containerIdleMessageProbe = TestProbe[ContainerIdleMessage]
+
+    supervisorBehavior = SupervisorBehaviorFactory.behavior(
+      Some(containerIdleMessageProbe.testActor),
+      hcdInfo,
+      locationService,
+      registrationFactory
+    )
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
     Thread.sleep(200)
@@ -50,7 +63,13 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar wit
   test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
     compStateProbe = TestProbe[CurrentState]
     lifecycleStateProbe = TestProbe[LifecycleStateChanged]
-    supervisorBehavior = SupervisorBehaviorFactory.behavior(hcdInfo, locationService, registrationFactory)
+    containerIdleMessageProbe = TestProbe[ContainerIdleMessage]
+    supervisorBehavior = SupervisorBehaviorFactory.behavior(
+      Some(containerIdleMessageProbe.testActor),
+      hcdInfo,
+      locationService,
+      registrationFactory
+    )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
@@ -162,8 +181,12 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar wit
   // DEOPSCSW-179: Unique Action for a component
   test("supervisor should receive ShutdownFailure message when component fails to shutdown") {
     val stateChangedProbe = TestProbe[LifecycleStateChanged]
-    supervisorBehavior =
-      SupervisorBehaviorFactory.behavior(assemblyInfoToSimulateFailure, locationService, registrationFactory)
+    supervisorBehavior = SupervisorBehaviorFactory.behavior(
+      Some(containerIdleMessageProbe.testActor),
+      assemblyInfoToSimulateFailure,
+      locationService,
+      registrationFactory
+    )
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
     Thread.sleep(200)

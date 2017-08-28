@@ -122,9 +122,9 @@ object ContainerCommonMessage {
 
 sealed trait ContainerIdleMessage extends ContainerMessage
 object ContainerIdleMessage {
-  case class SupervisorModeChanged(lifecycleStateChanged: LifecycleStateChanged) extends ContainerIdleMessage
-  case class RegistrationComplete(registrationResult: RegistrationResult)        extends ContainerIdleMessage
-  case class RegistrationFailed(throwable: Throwable)                            extends ContainerIdleMessage
+//  case class SupervisorModeChanged(lifecycleStateChanged: LifecycleStateChanged) extends ContainerIdleMessage
+  case class RegistrationComplete(registrationResult: RegistrationResult) extends ContainerIdleMessage
+  case class RegistrationFailed(throwable: Throwable)                     extends ContainerIdleMessage
 }
 
 sealed trait ContainerRunningMessage extends ContainerMessage

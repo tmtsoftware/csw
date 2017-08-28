@@ -41,6 +41,7 @@ object SupervisorBehavior {
 
 class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
+    maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
     timerScheduler: TimerScheduler[SupervisorMessage],
     componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentBehaviorFactory[_],
@@ -108,6 +109,10 @@ class SupervisorBehavior(
     case Running(componentRef) ⇒
       mode = SupervisorMode.Running
       runningComponent = Some(componentRef)
+      maybeContainerRef match {
+        case Some(containerRef) ⇒ containerRef ! SupervisorModeMessage(ctx.self, mode)
+        case None               ⇒
+      }
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
   }
 

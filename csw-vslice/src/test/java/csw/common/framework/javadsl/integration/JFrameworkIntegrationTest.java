@@ -1,6 +1,7 @@
 package csw.common.framework.javadsl.integration;
 
 import akka.Done;
+import akka.japi.Option;
 import akka.typed.ActorRef;
 import akka.typed.ActorSystem;
 import akka.typed.Behavior;
@@ -8,6 +9,7 @@ import akka.typed.Props;
 import akka.typed.scaladsl.Actor;
 import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
+import akka.typed.testkit.scaladsl.TestProbe$;
 import akka.util.Timeout;
 import csw.common.ccs.CommandStatus;
 import csw.common.ccs.DemandMatcher;
@@ -38,6 +40,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+import scala.Some$;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.Promise$;
@@ -73,7 +76,10 @@ public class JFrameworkIntegrationTest extends Mockito {
     private static RegistrationFactory registrationFactory = mock(RegistrationFactory.class);
 
     private Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-    private Behavior<SupervisorExternalMessage> supervisorBehavior = SupervisorBehaviorFactory.behavior(hcdInfo, locationService, registrationFactory);
+
+
+    private TestProbe<ContainerIdleMessage> containerIdleMessageProbe = TestProbe.apply(system, settings);
+    private Behavior<SupervisorExternalMessage> supervisorBehavior = SupervisorBehaviorFactory.behavior(Some$.MODULE$.apply(containerIdleMessageProbe.ref()), hcdInfo, locationService, registrationFactory);
     private FiniteDuration duration = Duration.create(5, "seconds");
     private Future<ActorRef<SupervisorExternalMessage>> systemActorOf;
     private ActorRef<SupervisorExternalMessage> supervisorRef;
