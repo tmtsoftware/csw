@@ -47,12 +47,13 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar wit
     lifecycleStateProbe = TestProbe[LifecycleStateChanged]
     containerIdleMessageProbe = TestProbe[ContainerIdleMessage]
 
-    supervisorBehavior = SupervisorBehaviorFactory.behavior(
+    supervisorBehavior = SupervisorBehaviorFactory.make(
       Some(containerIdleMessageProbe.testActor),
       hcdInfo,
       locationService,
       registrationFactory
     )
+
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
     Thread.sleep(200)
@@ -64,7 +65,7 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar wit
     compStateProbe = TestProbe[CurrentState]
     lifecycleStateProbe = TestProbe[LifecycleStateChanged]
     containerIdleMessageProbe = TestProbe[ContainerIdleMessage]
-    supervisorBehavior = SupervisorBehaviorFactory.behavior(
+    supervisorBehavior = SupervisorBehaviorFactory.make(
       Some(containerIdleMessageProbe.testActor),
       hcdInfo,
       locationService,
@@ -181,7 +182,7 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar wit
   // DEOPSCSW-179: Unique Action for a component
   test("supervisor should receive ShutdownFailure message when component fails to shutdown") {
     val stateChangedProbe = TestProbe[LifecycleStateChanged]
-    supervisorBehavior = SupervisorBehaviorFactory.behavior(
+    supervisorBehavior = SupervisorBehaviorFactory.make(
       Some(containerIdleMessageProbe.testActor),
       assemblyInfoToSimulateFailure,
       locationService,

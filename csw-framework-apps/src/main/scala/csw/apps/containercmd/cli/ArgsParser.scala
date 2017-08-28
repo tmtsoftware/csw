@@ -13,7 +13,7 @@ class ArgsParser() {
 
     opt[Unit]("standalone") action { (_, c) =>
       c.copy(standalone = true)
-    } text "run component(s) standalone, without a container"
+    } text "run component in standalone mode, without a container"
 
     opt[String]("local") action { (x, c) =>
       c.copy(local = true)

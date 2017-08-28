@@ -5,17 +5,13 @@ import akka.typed.scaladsl.adapter._
 import csw.common.framework.internal.configparser.ComponentInfoParser
 import csw.common.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.common.framework.models.SupervisorExternalMessage
-import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.scaladsl.{LocationServiceFactory, RegistrationFactory}
 
 object Standalone {
-  def spawn(config: com.typesafe.config.Config): ActorRef[SupervisorExternalMessage] = {
-    val componentInfo       = ComponentInfoParser.parseStandalone(config)
-    val system              = ClusterAwareSettings.system
-    val locationService     = LocationServiceFactory.make()
-    val registrationFactory = new RegistrationFactory
-    val supervisorBehavior =
-      SupervisorBehaviorFactory.behavior(None, componentInfo, locationService, registrationFactory)
-    system.spawn(supervisorBehavior, componentInfo.name)
+
+  def spawn(config: com.typesafe.config.Config, wiring: FrameworkWiring): ActorRef[SupervisorExternalMessage] = {
+    import wiring._
+    val componentInfo      = ComponentInfoParser.parseStandalone(config)
+    val supervisorBehavior = SupervisorBehaviorFactory.make(None, componentInfo, locationService, registrationFactory)
+    actorSystem.spawn(supervisorBehavior, componentInfo.name)
   }
 }

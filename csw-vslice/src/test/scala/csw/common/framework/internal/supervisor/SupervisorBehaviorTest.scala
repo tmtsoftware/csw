@@ -14,7 +14,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
   val supervisorBehavior: Behavior[SupervisorExternalMessage] =
-    SupervisorBehaviorFactory.behavior(
+    SupervisorBehaviorFactory.make(
       Some(containerIdleMessageProbe.testActor),
       hcdInfo,
       locationService,

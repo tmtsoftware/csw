@@ -50,7 +50,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
         SupervisorInfo(
           untypedSystem,
           ctx.spawn(
-            SupervisorBehaviorFactory.behavior(Some(ctx.self), componentInfo, locationService, registrationFactory),
+            SupervisorBehaviorFactory.make(Some(ctx.self), componentInfo, locationService, registrationFactory),
             componentInfo.name
           ),
           componentInfo

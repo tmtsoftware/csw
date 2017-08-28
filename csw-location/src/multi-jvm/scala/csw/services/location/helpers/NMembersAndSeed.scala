@@ -9,7 +9,7 @@ import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 class NMembersAndSeed(n: Int) extends MultiNodeConfig {
 
-  private val settings = ClusterAwareSettings
+  val settings = ClusterAwareSettings
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)

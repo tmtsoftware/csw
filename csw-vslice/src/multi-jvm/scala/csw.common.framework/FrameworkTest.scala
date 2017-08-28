@@ -6,7 +6,7 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.framework.internal.container.ContainerMode
-import csw.common.framework.internal.wiring.Container
+import csw.common.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.common.framework.models.Components
 import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
 import csw.common.framework.models.ContainerExternalMessage.GetComponents
@@ -35,7 +35,8 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
 
     runOn(seed) {
 
-      val containerRef = Container.spawn(ConfigFactory.load("laser_container.conf"))
+      val wiring       = FrameworkWiring.make(settings)
+      val containerRef = Container.spawn(ConfigFactory.load("laser_container.conf"), wiring)
 
       val containerModeProbe = TestProbe[ContainerMode]
       val componentsProbe    = TestProbe[Components]
@@ -63,7 +64,8 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
     }
 
     runOn(member) {
-      val containerRef = Container.spawn(ConfigFactory.load("wfs_container.conf"))
+      val wiring       = FrameworkWiring.make(settings)
+      val containerRef = Container.spawn(ConfigFactory.load("wfs_container.conf"), wiring)
 
       val containerModeProbe = TestProbe[ContainerMode]
       val componentsProbe    = TestProbe[Components]

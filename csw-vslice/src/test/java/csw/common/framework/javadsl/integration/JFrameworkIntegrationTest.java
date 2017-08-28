@@ -76,10 +76,8 @@ public class JFrameworkIntegrationTest extends Mockito {
     private static RegistrationFactory registrationFactory = mock(RegistrationFactory.class);
 
     private Timeout seconds = Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds"));
-
-
     private TestProbe<ContainerIdleMessage> containerIdleMessageProbe = TestProbe.apply(system, settings);
-    private Behavior<SupervisorExternalMessage> supervisorBehavior = SupervisorBehaviorFactory.behavior(Some$.MODULE$.apply(containerIdleMessageProbe.ref()), hcdInfo, locationService, registrationFactory);
+    private Behavior<SupervisorExternalMessage> supervisorBehavior = SupervisorBehaviorFactory.make(Some$.MODULE$.apply(containerIdleMessageProbe.ref()), hcdInfo, locationService, registrationFactory);
     private FiniteDuration duration = Duration.create(5, "seconds");
     private Future<ActorRef<SupervisorExternalMessage>> systemActorOf;
     private ActorRef<SupervisorExternalMessage> supervisorRef;

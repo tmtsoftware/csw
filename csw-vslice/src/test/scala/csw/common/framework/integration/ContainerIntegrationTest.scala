@@ -9,7 +9,7 @@ import com.typesafe.config.ConfigFactory
 import csw.common.components.SampleComponentState._
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
-import csw.common.framework.internal.wiring.Container
+import csw.common.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
 import csw.common.framework.models.ContainerExternalMessage.GetComponents
 import csw.common.framework.models.PubSub.Subscribe
@@ -18,17 +18,25 @@ import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscr
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models.{Components, LifecycleStateChanged}
 import csw.param.states.CurrentState
-import org.scalatest.{FunSuite, Matchers}
+import csw.services.location.commons.ClusterAwareSettings
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-class ContainerIntegrationTest extends FunSuite with Matchers {
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationLong
 
-  implicit val system: ActorSystem[_]           = actor.ActorSystem("system").toTyped
-  implicit val testKitSettings: TestKitSettings = TestKitSettings(system)
+class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
+
+  private val untypedSystem: actor.ActorSystem  = ClusterAwareSettings.system
+  implicit val typedSystem: ActorSystem[_]      = untypedSystem.toTyped
+  implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
+
+  override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
 
   test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
+    val wiring = FrameworkWiring.make(untypedSystem)
     // start a container and verify it moves to running mode
-    val containerRef = Container.spawn(ConfigFactory.load("container.conf"))
+    val containerRef = Container.spawn(ConfigFactory.load("container.conf"), wiring)
 
     val componentsProbe    = TestProbe[Components]
     val containerModeProbe = TestProbe[ContainerMode]

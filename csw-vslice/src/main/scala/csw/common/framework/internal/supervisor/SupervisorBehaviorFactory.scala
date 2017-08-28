@@ -8,7 +8,7 @@ import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 
 object SupervisorBehaviorFactory {
 
-  def behavior(
+  def make(
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       componentInfo: ComponentInfo,
       locationService: LocationService,
