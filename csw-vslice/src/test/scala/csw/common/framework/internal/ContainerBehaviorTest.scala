@@ -49,11 +49,13 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
         val componentInfo = invocation.getArgument(1).asInstanceOf[ComponentInfo]
         SupervisorInfo(
           untypedSystem,
-          ctx.spawn(
-            SupervisorBehaviorFactory.make(Some(ctx.self), componentInfo, locationService, registrationFactory),
-            componentInfo.name
-          ),
-          componentInfo
+          Component(
+            ctx.spawn(
+              SupervisorBehaviorFactory.make(Some(ctx.self), componentInfo, locationService, registrationFactory),
+              componentInfo.name
+            ),
+            componentInfo
+          )
         )
       }
     }
@@ -100,7 +102,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     // supervisor per component
     ctx.children.size shouldBe containerInfo.components.size
     containerBehavior.supervisors.size shouldBe 2
-    containerBehavior.supervisors.map(_.componentInfo).toSet shouldBe containerInfo.components
+    containerBehavior.supervisors.map(_.component.info).toSet shouldBe containerInfo.components
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     ctx.children.map(
@@ -194,7 +196,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     containerBehavior.onMessage(GetComponents(probe.ref))
 
-    probe.expectMsg(Components(containerBehavior.supervisors))
+    probe.expectMsg(Components(containerBehavior.supervisors.map(_.component)))
 
     // Container should handle GetComponents message in Running mode
     ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
@@ -211,7 +213,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     containerBehavior.onMessage(GetComponents(probe.ref))
 
-    probe.expectMsg(Components(containerBehavior.supervisors))
+    probe.expectMsg(Components(containerBehavior.supervisors.map(_.component)))
   }
 
   test("container should retain mode if registration with location service fails") {

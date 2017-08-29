@@ -7,13 +7,12 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.common.framework.models.{Components, ContainerMessage}
 import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
 import csw.common.framework.models.ContainerExternalMessage.GetComponents
+import csw.common.framework.models.{Components, ContainerMessage}
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType}
-import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -21,7 +20,6 @@ import scala.concurrent.duration.DurationInt
 class FrameworkTestMultiJvmNode1 extends FrameworkTest(0)
 class FrameworkTestMultiJvmNode2 extends FrameworkTest(0)
 
-// Fixme
 class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) {
 
   import config._
@@ -29,7 +27,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
   implicit val actorSystem: ActorSystem[_] = system.toTyped
   implicit val testkit: TestKitSettings    = TestKitSettings(actorSystem)
 
-  LoggingSystemFactory.start("framework", "1.0", "localhost", system)
+//  LoggingSystemFactory.start("framework", "1.0", "localhost", system)
 
   test("should able to create multiple containers across jvm's") {
 
@@ -55,10 +53,11 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
 
       val efsContainerTypedRef = wfsContainerLocation.typedRef[ContainerMessage]
 
+      efsContainerTypedRef ! GetContainerMode(containerModeProbe.ref)
+      containerModeProbe.expectMsg(ContainerMode.Running)
+
       efsContainerTypedRef ! GetComponents(componentsProbe.ref)
-
       val components = componentsProbe.expectMsgType[Components].components
-
       components.size shouldBe 3
     }
 
@@ -84,13 +83,13 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSee
 
       val laserContainerTypedRef = laserContainerLocation.typedRef[ContainerMessage]
 
+      laserContainerTypedRef ! GetContainerMode(containerModeProbe.ref)
+      containerModeProbe.expectMsg(ContainerMode.Running)
+
       laserContainerTypedRef ! GetComponents(componentsProbe.ref)
-
       val components = componentsProbe.expectMsgType[Components].components
-
       components.size shouldBe 3
     }
-
     enterBarrier("end")
   }
 }

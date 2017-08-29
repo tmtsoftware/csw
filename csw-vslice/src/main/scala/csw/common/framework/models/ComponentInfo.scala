@@ -1,6 +1,6 @@
 package csw.common.framework.models
 
-import csw.services.location.models.{ComponentType, Connection}
+import csw.services.location.models.{ComponentType, Connection, TmtSerializable}
 import spray.json.JsonFormat
 
 import scala.collection.JavaConverters._
@@ -12,7 +12,8 @@ final case class ComponentInfo(name: String,
                                componentType: ComponentType,
                                prefix: String,
                                className: String,
-                               connections: Set[Connection] = Set.empty) {
+                               connections: Set[Connection] = Set.empty)
+    extends TmtSerializable {
 
   /**
    * Java API to get the list of connections for the assembly

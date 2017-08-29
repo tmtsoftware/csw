@@ -8,7 +8,7 @@ import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.models.PubSub.SubscriberMessage
 import csw.param.commands.ControlCommand
 import csw.param.states.CurrentState
-import csw.services.location.models.RegistrationResult
+import csw.services.location.models.{RegistrationResult, TmtSerializable}
 
 /////////////
 
@@ -68,7 +68,7 @@ object RunningMessage {
 ///////////////
 
 sealed trait SupervisorMessage
-sealed trait SupervisorExternalMessage     extends SupervisorMessage
+sealed trait SupervisorExternalMessage     extends SupervisorMessage with TmtSerializable
 sealed trait FromComponentLifecycleMessage extends SupervisorMessage
 
 sealed trait SupervisorCommonMessage extends SupervisorExternalMessage
@@ -109,7 +109,7 @@ object PreparingToShutdownMessage {
 
 ///////////////
 
-sealed trait ContainerMessage
+sealed trait ContainerMessage extends TmtSerializable
 
 sealed trait ContainerCommonMessage extends ContainerMessage
 object ContainerCommonMessage {
@@ -137,10 +137,8 @@ object ContainerRunningMessage {
 
 case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage], state: SupervisorMode)
 
-case class Components(components: List[SupervisorInfo])
+case class Components(components: List[Component]) extends TmtSerializable
 
-case class SupervisorInfo(
-    system: ActorSystem,
-    supervisor: ActorRef[SupervisorExternalMessage],
-    componentInfo: ComponentInfo
-)
+case class Component(supervisor: ActorRef[SupervisorExternalMessage], info: ComponentInfo)
+
+case class SupervisorInfo(system: ActorSystem, component: Component)

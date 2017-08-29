@@ -52,7 +52,7 @@ class ContainerBehavior(
   }
 
   def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
-    case GetComponents(replyTo)    ⇒ replyTo ! Components(supervisors)
+    case GetComponents(replyTo)    ⇒ replyTo ! Components(supervisors.map(_.component))
     case GetContainerMode(replyTo) ⇒ replyTo ! mode
   }
 
@@ -79,14 +79,14 @@ class ContainerBehavior(
     unregisterFromLocationService() //FIXME: Decision pending - whether to unregister in shutdown or poststop?
 
   def sendLifecycleMessageToAllComponents(lifecycleMessage: ToComponentLifecycleMessage): Unit = {
-    supervisors.foreach { _.supervisor ! Lifecycle(lifecycleMessage) }
+    supervisors.foreach { _.component.supervisor ! Lifecycle(lifecycleMessage) }
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit =
     supervisors = componentInfos.flatMap(createComponent).toList
 
   private def createComponent(componentInfo: ComponentInfo): Option[SupervisorInfo] = {
-    if (supervisors.exists(_.componentInfo == componentInfo)) None
+    if (supervisors.exists(_.component.info == componentInfo)) None
     else Some(supervisorInfoFactory.make(ctx.self, componentInfo))
   }
 
@@ -98,7 +98,7 @@ class ContainerBehavior(
   }
 
   private def updateRunningComponents(componentSupervisor: ActorRef[SupervisorExternalMessage]): Unit = {
-    runningComponents = (supervisors.find(_.supervisor == componentSupervisor) ++ runningComponents).toSet
+    runningComponents = (supervisors.find(_.component.supervisor == componentSupervisor) ++ runningComponents).toSet
     if (runningComponents.size == supervisors.size)
       registerWithLocationService()
   }
