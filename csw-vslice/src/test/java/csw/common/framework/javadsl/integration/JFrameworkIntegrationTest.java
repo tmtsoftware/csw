@@ -1,15 +1,14 @@
 package csw.common.framework.javadsl.integration;
 
 import akka.Done;
-import akka.japi.Option;
 import akka.typed.ActorRef;
 import akka.typed.ActorSystem;
 import akka.typed.Behavior;
 import akka.typed.Props;
+import akka.typed.javadsl.Adapter;
 import akka.typed.scaladsl.Actor;
 import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.scaladsl.TestProbe;
-import akka.typed.testkit.scaladsl.TestProbe$;
 import akka.util.Timeout;
 import csw.common.ccs.CommandStatus;
 import csw.common.ccs.DemandMatcher;
@@ -46,7 +45,6 @@ import scala.concurrent.Future;
 import scala.concurrent.Promise$;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
-import akka.typed.javadsl.Adapter;
 
 import java.util.Collections;
 

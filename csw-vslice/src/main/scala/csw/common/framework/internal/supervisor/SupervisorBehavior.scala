@@ -107,10 +107,7 @@ class SupervisorBehavior(
     case Running(componentRef) ⇒
       mode = SupervisorMode.Running
       runningComponent = Some(componentRef)
-      maybeContainerRef match {
-        case Some(containerRef) ⇒ containerRef ! SupervisorModeChanged(ctx.self, mode)
-        case None               ⇒
-      }
+      maybeContainerRef foreach (_ ! SupervisorModeChanged(ctx.self, mode))
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
   }
 
@@ -126,7 +123,7 @@ class SupervisorBehavior(
     case Shutdown ⇒ handleShutdown()
     case Restart ⇒
       mode = SupervisorMode.Idle
-      unregisterFromLocationService()
+//      unregisterFromLocationService()
     case GoOffline ⇒
       if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
     case GoOnline ⇒
@@ -161,10 +158,10 @@ class SupervisorBehavior(
   }
 
   private def handleShutdown(): Unit = {
-    unregisterFromLocationService()
     mode = SupervisorMode.PreparingToShutdown
-    timerScheduler.startSingleTimer(TimerKey, ShutdownTimeout, shutdownTimeout)
     pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, mode))
+//    unregisterFromLocationService()
+    timerScheduler.startSingleTimer(TimerKey, ShutdownTimeout, shutdownTimeout)
   }
 
   private def registerWithLocationService(componentRef: ActorRef[InitialMessage]): Unit = {

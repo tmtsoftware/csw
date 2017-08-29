@@ -75,7 +75,8 @@ class ContainerBehavior(
     sendLifecycleMessageToAllComponents(Restart)
   }
 
-  def onShutdown(): Unit = unregisterFromLocationService()
+  def onShutdown(): Unit =
+    unregisterFromLocationService() //FIXME: Decision pending - whether to unregister in shutdown or poststop?
 
   def sendLifecycleMessageToAllComponents(lifecycleMessage: ToComponentLifecycleMessage): Unit = {
     supervisors.foreach { _.supervisor ! Lifecycle(lifecycleMessage) }
