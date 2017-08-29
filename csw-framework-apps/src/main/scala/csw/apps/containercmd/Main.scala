@@ -13,33 +13,36 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
 
   def start(args: Array[String]): Any = {
     new ArgsParser().parse(args).map {
-      case Options(standalone, local, inputFilePath) =>
+      case Options(standalone, isLocal, inputFilePath) =>
         val actorSystem = clusterSettings.system
         if (startLogging) {
-          LoggingSystemFactory
-            .start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
+          LoggingSystemFactory.start(
+            BuildInfo.name,
+            BuildInfo.version,
+            clusterSettings.hostname,
+            actorSystem
+          )
         }
 
         val wiring = FrameworkWiring.make(actorSystem)
         try {
-          val config = getConfig(local, inputFilePath.get)
-          if (standalone) {
-            Standalone.spawn(config, wiring)
-          } else {
-            Container.spawn(config, wiring)
-          }
+          createComponent(standalone, wiring, getConfig(isLocal, inputFilePath.get))
         } catch {
           case ex: Exception ⇒ {
             wiring.actorRuntime.shutdown()
             println("log.error(ex.getMessage, ex = ex)")
           }
-
         }
     }
   }
 
-  private def getConfig(local: Boolean, inputFilePath: Path): Config = {
-    if (local) {
+  private def createComponent(standalone: Boolean, wiring: FrameworkWiring, config: Config) = {
+    if (standalone) Standalone.spawn(config, wiring)
+    else Container.spawn(config, wiring)
+  }
+
+  private def getConfig(isLocal: Boolean, inputFilePath: Path): Config = {
+    if (isLocal) {
       ConfigFactory.parseFile(inputFilePath.toFile)
     } else {
       // Fixme : change when integrated with ConfigService

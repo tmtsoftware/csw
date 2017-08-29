@@ -14,10 +14,6 @@ class FrameworkWiring {
 
 object FrameworkWiring {
 
-  def make(_clusterSettings: ClusterSettings): FrameworkWiring = new FrameworkWiring {
-    override lazy val clusterSettings: ClusterSettings = _clusterSettings
-  }
-
   def make(_actorSystem: ActorSystem): FrameworkWiring = new FrameworkWiring {
     override lazy val actorSystem: ActorSystem = _actorSystem
   }

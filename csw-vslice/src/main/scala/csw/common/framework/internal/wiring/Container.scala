@@ -9,9 +9,10 @@ import csw.common.framework.models.ContainerMessage
 
 object Container {
   def spawn(config: Config, wiring: FrameworkWiring): ActorRef[ContainerMessage] = {
+    import wiring._
     val containerInfo = ComponentInfoParser.parse(config)
     val containerBehavior: Behavior[ContainerMessage] =
-      ContainerBehaviorFactory.behavior(containerInfo, wiring.locationService)
-    wiring.actorSystem.spawn(containerBehavior, containerInfo.name)
+      ContainerBehaviorFactory.behavior(containerInfo, locationService)
+    actorSystem.spawn(containerBehavior, containerInfo.name)
   }
 }
