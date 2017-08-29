@@ -1,7 +1,8 @@
 package csw.services.location.models
 
+import csw.services.location.internal.ConnectionInfo
 import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
-import spray.json.{JsString, JsValue, JsonFormat}
+import spray.json.{pimpAny, JsValue, JsonFormat}
 
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component
@@ -15,10 +16,13 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends Tmt
    */
   def componentId: ComponentId
 
+  def connectionInfo: ConnectionInfo =
+    ConnectionInfo(componentId.name, componentId.componentType.name, connectionType.name)
+
   /**
    * Creates a unique name for Connection based on Component name, ComponentType and ConnectionType
    */
-  def name: String = s"${componentId.name}-${componentId.componentType.name}-${connectionType.name}"
+  def name: String = connectionInfo.toString
 }
 
 abstract class TypedConnection[T <: Location](connectionType: ConnectionType) extends Connection(connectionType) {
@@ -27,22 +31,25 @@ abstract class TypedConnection[T <: Location](connectionType: ConnectionType) ex
 
 object Connection {
 
-  import csw.services.location.internal.JsonSupport._
+  def from(input: String): Connection = input.split("-") match {
+    case Array(name, componentType, connectionType) ⇒ from(ConnectionInfo(name, componentType, connectionType))
+    case _                                          ⇒ throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
+  }
 
-  def from(input: String): Connection =
-    input.split("-") match {
-      case Array(component, componentType, AkkaType.entryName) ⇒
-        AkkaConnection(ComponentId(component, ComponentType.withName(componentType)))
-      case Array(component, componentType, TcpType.entryName) ⇒
-        TcpConnection(ComponentId(component, ComponentType.withName(componentType)))
-      case Array(component, componentType, HttpType.entryName) ⇒
-        HttpConnection(ComponentId(component, ComponentType.withName(componentType)))
-      case _ ⇒ throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
-    }
+  def from(connectionInfo: ConnectionInfo): Connection = from(
+    ComponentId(connectionInfo.name, ComponentType.withName(connectionInfo.componentType)),
+    ConnectionType.withName(connectionInfo.connectionType)
+  )
+
+  private def from(componentId: ComponentId, connectionType: ConnectionType): Connection = connectionType match {
+    case AkkaType ⇒ AkkaConnection(componentId)
+    case TcpType  ⇒ TcpConnection(componentId)
+    case HttpType ⇒ HttpConnection(componentId)
+  }
 
   implicit val format: JsonFormat[Connection] = new JsonFormat[Connection] {
-    override def read(json: JsValue): Connection = Connection.from(json.convertTo[String])
-    override def write(obj: Connection): JsValue = JsString(obj.name)
+    override def read(json: JsValue): Connection = Connection.from(json.convertTo[ConnectionInfo])
+    override def write(obj: Connection): JsValue = obj.connectionInfo.toJson
   }
 
   /**

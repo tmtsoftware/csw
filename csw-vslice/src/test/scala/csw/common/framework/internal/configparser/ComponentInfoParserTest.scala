@@ -87,10 +87,10 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when any one entry in 'connections' is having a typo for assembly") {
+  test("should able to throw error when 'connectionType' is missing for 'connections' in assembly") {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/connection_entry_typo.conf")
 
-    intercept[IllegalArgumentException] {
+    intercept[spray.json.DeserializationException] {
       ComponentInfoParser.parse(config)
     }
   }
