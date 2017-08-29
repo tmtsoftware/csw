@@ -1,5 +1,6 @@
 package csw.services.location.models
 
+import acyclic.skipped
 import csw.services.location.internal.ConnectionInfo
 import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
 import spray.json.{pimpAny, JsValue, JsonFormat}
