@@ -2,6 +2,8 @@ package csw.apps.containercmd
 
 import java.nio.file.{Files, Path, Paths}
 
+import akka.Done
+import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
@@ -11,12 +13,16 @@ import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
+import scala.concurrent.Future
+
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
+
+  lazy val actorSystem: ActorSystem = clusterSettings.system
+  lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
 
   def start(args: Array[String]): Option[Any] = {
     new ArgsParser().parse(args).map {
       case Options(standalone, isLocal, inputFilePath) =>
-        val actorSystem = clusterSettings.system
         if (startLogging) {
           LoggingSystemFactory.start(
             BuildInfo.name,
@@ -26,16 +32,19 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
           )
         }
 
-        val wiring = FrameworkWiring.make(actorSystem)
         try {
           createComponent(standalone, wiring, getConfig(isLocal, inputFilePath.get))
         } catch {
           case ex: Exception ⇒ {
-            wiring.actorRuntime.shutdown()
+            shutdown
             println(s"log.error(${ex.getMessage}, ex)")
           }
         }
     }
+  }
+
+  def shutdown: Future[Done] = {
+    wiring.actorRuntime.shutdown()
   }
 
   private def createComponent(standalone: Boolean,
