@@ -12,6 +12,7 @@ import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{
   ComponentStateSubscription,
+  GetSupervisorMode,
   HaltComponent,
   LifecycleStateSubscription
 }
@@ -93,6 +94,7 @@ class SupervisorBehavior(
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
     case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
     case HaltComponent                                 ⇒ haltingFlag = true; handleShutdown()
+    case GetSupervisorMode(replyTo)                    ⇒ replyTo ! mode
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
@@ -123,7 +125,7 @@ class SupervisorBehavior(
     case Shutdown ⇒ handleShutdown()
     case Restart ⇒
       mode = SupervisorMode.Idle
-//      unregisterFromLocationService()
+      unregisterFromLocationService()
     case GoOffline ⇒
       if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
     case GoOnline ⇒
@@ -160,7 +162,7 @@ class SupervisorBehavior(
   private def handleShutdown(): Unit = {
     mode = SupervisorMode.PreparingToShutdown
     pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, mode))
-//    unregisterFromLocationService()
+    unregisterFromLocationService()
     timerScheduler.startSingleTimer(TimerKey, ShutdownTimeout, shutdownTimeout)
   }
 

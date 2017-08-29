@@ -77,7 +77,8 @@ object SupervisorCommonMessage {
       extends SupervisorCommonMessage
   case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState])
       extends SupervisorCommonMessage
-  case object HaltComponent extends SupervisorCommonMessage
+  case object HaltComponent                                       extends SupervisorCommonMessage
+  case class GetSupervisorMode(replyTo: ActorRef[SupervisorMode]) extends SupervisorCommonMessage
 }
 
 sealed trait SupervisorIdleMessage extends SupervisorMessage

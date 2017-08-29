@@ -1,17 +1,19 @@
 package csw.apps.containercmd
 
-import java.nio.file.Path
+import java.nio.file.{Files, Path, Paths}
 
+import akka.typed.ActorRef
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+import csw.common.framework.models.{ContainerMessage, SupervisorExternalMessage}
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
 
-  def start(args: Array[String]): Any = {
+  def start(args: Array[String]): Option[Any] = {
     new ArgsParser().parse(args).map {
       case Options(standalone, isLocal, inputFilePath) =>
         val actorSystem = clusterSettings.system
@@ -30,20 +32,23 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
         } catch {
           case ex: Exception ⇒ {
             wiring.actorRuntime.shutdown()
-            println("log.error(ex.getMessage, ex = ex)")
+            println(s"log.error(${ex.getMessage}, ex)")
           }
         }
     }
   }
 
-  private def createComponent(standalone: Boolean, wiring: FrameworkWiring, config: Config) = {
+  private def createComponent(standalone: Boolean,
+                              wiring: FrameworkWiring,
+                              config: Config): ActorRef[SupervisorExternalMessage with ContainerMessage] = {
     if (standalone) Standalone.spawn(config, wiring)
     else Container.spawn(config, wiring)
   }
 
   private def getConfig(isLocal: Boolean, inputFilePath: Path): Config = {
     if (isLocal) {
-      ConfigFactory.parseFile(inputFilePath.toFile)
+      if (Files.exists(inputFilePath)) ConfigFactory.parseFile(inputFilePath.toFile)
+      else throw new RuntimeException("Config file does not exist")
     } else {
       // Fixme : change when integrated with ConfigService
       ConfigFactory.parseFile(inputFilePath.toFile)
