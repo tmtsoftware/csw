@@ -3,9 +3,8 @@ package csw.services.location.models
 import java.net.URI
 
 import akka.typed
-import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import acyclic.skipped
 import akka.typed.ActorRef
+import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 /**
  * Location represents a live Connection along with its URI

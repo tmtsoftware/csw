@@ -2,7 +2,6 @@ package csw.services.location.models
 
 import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
 import spray.json.{JsString, JsValue, JsonFormat}
-import acyclic.skipped
 
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component

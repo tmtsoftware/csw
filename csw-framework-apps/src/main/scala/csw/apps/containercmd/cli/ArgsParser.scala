@@ -15,7 +15,7 @@ class ArgsParser() {
       c.copy(standalone = true)
     } text "run component in standalone mode, without a container"
 
-    opt[String]("local") action { (x, c) =>
+    opt[Unit]("local") action { (_, c) =>
       c.copy(local = true)
     } text s"run using the file on local file system without fetching file from config service"
 
