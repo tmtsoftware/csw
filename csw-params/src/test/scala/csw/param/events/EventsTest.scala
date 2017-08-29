@@ -17,7 +17,7 @@ class EventsTest extends FunSpec with Matchers {
   private val ck = "wfos.blue.filter"
 
   describe("Check equal for EventInfo") {
-    val ck1: Prefix = Prefix(ck)
+    val ck1: Prefix = ck
     val testtime    = EventTime()
 
     it("should be equals since case class") {

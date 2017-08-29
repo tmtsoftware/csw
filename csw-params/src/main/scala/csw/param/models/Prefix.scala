@@ -28,7 +28,7 @@ object Prefix {
   import spray.json.DefaultJsonProtocol._
   private val SEPARATOR = '.'
 
-  def apply(prefix: String): Prefix = Prefix(subsystem(prefix), prefix)
+  implicit def apply(prefix: String): Prefix = Prefix(subsystem(prefix), prefix)
 
   private def subsystem(keyText: String): Subsystem = {
     assert(keyText != null)

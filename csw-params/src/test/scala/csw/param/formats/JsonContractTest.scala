@@ -16,8 +16,7 @@ import spray.json.pimpString
 // DEOPSCSW-188: Efficient Serialization to/from JSON
 class JsonContractTest extends FunSpec with Matchers {
 
-  private val prefixStr: String        = "wfos.blue.filter"
-  private val prefix: Prefix           = Prefix(prefixStr)
+  private val prefix: Prefix           = "wfos.blue.filter"
   private val runId: RunId             = RunId("f22dc990-a02c-4d7e-b719-50b167cb7a1e")
   private val obsId: ObsId             = ObsId("Obs001")
   private val commandInfo: CommandInfo = CommandInfo(obsId, runId)
