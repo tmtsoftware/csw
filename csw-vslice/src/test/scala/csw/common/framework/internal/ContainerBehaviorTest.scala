@@ -60,8 +60,10 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
       }
     }
 
-    when(supervisorFactory.make(ArgumentMatchers.any(), ArgumentMatchers.any[ComponentInfo]()))
-      .thenAnswer(answer)
+    when(
+      supervisorFactory
+        .make(ArgumentMatchers.any(), ArgumentMatchers.any[ComponentInfo](), ArgumentMatchers.any[LocationService]())
+    ).thenAnswer(answer)
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
     when(registrationFactory.akkaTyped(ArgumentMatchers.any[AkkaConnection], ArgumentMatchers.any[ActorRef[_]]))

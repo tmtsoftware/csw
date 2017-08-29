@@ -87,7 +87,7 @@ class ContainerBehavior(
 
   private def createComponent(componentInfo: ComponentInfo): Option[SupervisorInfo] = {
     if (supervisors.exists(_.component.info == componentInfo)) None
-    else Some(supervisorInfoFactory.make(ctx.self, componentInfo))
+    else Some(supervisorInfoFactory.make(ctx.self, componentInfo, locationService))
   }
 
   private def onSupervisorModeChange(supervisor: ActorRef[SupervisorExternalMessage],
