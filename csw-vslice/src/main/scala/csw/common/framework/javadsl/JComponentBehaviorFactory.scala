@@ -9,8 +9,9 @@ import csw.param.states.CurrentState
 
 import scala.reflect.ClassTag
 
-abstract class JComponentBehaviorFactory[Msg <: DomainMessage](klass: Class[Msg])
-    extends ComponentBehaviorFactory[Msg]()(ClassTag(klass)) {
+abstract class JComponentBehaviorFactory[Msg <: DomainMessage](
+    klass: Class[Msg]
+) extends ComponentBehaviorFactory[Msg]()(ClassTag(klass)) {
 
   protected def handlers(
       ctx: scaladsl.ActorContext[ComponentMessage],

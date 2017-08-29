@@ -13,23 +13,26 @@ import csw.trombone.assembly.actors.{FollowActor, TromboneControl}
 
 object FollowCommand {
 
-  def make(assemblyContext: AssemblyContext,
-           initialElevation: Parameter[Double],
-           nssInUse: Parameter[Boolean],
-           tromboneHCD: Option[ActorRef[Submit]],
-           eventPublisher: Option[ActorRef[TrombonePublisherMsg]]): Behavior[FollowCommandMessages] =
+  def make(
+      assemblyContext: AssemblyContext,
+      initialElevation: Parameter[Double],
+      nssInUse: Parameter[Boolean],
+      tromboneHCD: Option[ActorRef[Submit]],
+      eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
+  ): Behavior[FollowCommandMessages] =
     Actor.mutable(
       ctx ⇒ new FollowCommand(assemblyContext, initialElevation, nssInUse, tromboneHCD, eventPublisher, ctx)
     )
 }
 
-class FollowCommand(ac: AssemblyContext,
-                    initialElevation: Parameter[Double],
-                    val nssInUseIn: Parameter[Boolean],
-                    val tromboneHCDIn: Option[ActorRef[Submit]],
-                    eventPublisher: Option[ActorRef[TrombonePublisherMsg]],
-                    ctx: ActorContext[FollowCommandMessages])
-    extends MutableBehavior[FollowCommandMessages] {
+class FollowCommand(
+    ac: AssemblyContext,
+    initialElevation: Parameter[Double],
+    val nssInUseIn: Parameter[Boolean],
+    val tromboneHCDIn: Option[ActorRef[Submit]],
+    eventPublisher: Option[ActorRef[TrombonePublisherMsg]],
+    ctx: ActorContext[FollowCommandMessages]
+) extends MutableBehavior[FollowCommandMessages] {
 
   val tromboneControl: ActorRef[TromboneControlMsg] =
     ctx.spawn(TromboneControl.behavior(ac, tromboneHCDIn), "TromboneControl")

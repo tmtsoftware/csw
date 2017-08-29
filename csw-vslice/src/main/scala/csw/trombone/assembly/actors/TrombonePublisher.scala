@@ -13,8 +13,10 @@ object TrombonePublisher {
     Actor.mutable(ctx ⇒ new TrombonePublisher(assemblyContext, ctx))
 }
 
-class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[TrombonePublisherMsg])
-    extends MutableBehavior[TrombonePublisherMsg] {
+class TrombonePublisher(
+    assemblyContext: AssemblyContext,
+    ctx: ActorContext[TrombonePublisherMsg]
+) extends MutableBehavior[TrombonePublisherMsg] {
   import TromboneStateActor._
 
   override def onMessage(msg: TrombonePublisherMsg): Behavior[TrombonePublisherMsg] = msg match {
@@ -34,14 +36,16 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
       publishAxisState(axisName, position, state, inLowLimit, inHighLimit, inHome)
       this
 
-    case AxisStatsUpdate(axisName,
-                         datumCount,
-                         moveCount,
-                         homeCount,
-                         limitCount,
-                         successCount,
-                         failureCount,
-                         cancelCount) =>
+    case AxisStatsUpdate(
+        axisName,
+        datumCount,
+        moveCount,
+        homeCount,
+        limitCount,
+        successCount,
+        failureCount,
+        cancelCount
+        ) =>
       publishAxisStats(axisName, datumCount, moveCount, homeCount, limitCount, successCount, failureCount, cancelCount)
       this
 
@@ -55,9 +59,11 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 //    })
   }
 
-  private def publishEngr(rtcFocusError: Parameter[Double],
-                          stagePosition: Parameter[Double],
-                          zenithAngle: Parameter[Double]) = {
+  private def publishEngr(
+      rtcFocusError: Parameter[Double],
+      stagePosition: Parameter[Double],
+      zenithAngle: Parameter[Double]
+  ) = {
 //    val ste = StatusEvent(engStatusEventPrefix).madd(rtcFocusError, stagePosition, zenithAngle)
 //    telemetryService.foreach(_.publish(ste).onComplete {
 //      case Failure(ex) => log.error(s"TrombonePublisher failed to publish engr event: $ste", ex)
@@ -74,12 +80,14 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 //    })
   }
 
-  private def publishAxisState(axisName: Parameter[String],
-                               position: Parameter[Int],
-                               state: Parameter[Choice],
-                               inLowLimit: Parameter[Boolean],
-                               inHighLimit: Parameter[Boolean],
-                               inHome: Parameter[Boolean]) = {
+  private def publishAxisState(
+      axisName: Parameter[String],
+      position: Parameter[Int],
+      state: Parameter[Choice],
+      inLowLimit: Parameter[Boolean],
+      inHighLimit: Parameter[Boolean],
+      inHome: Parameter[Boolean]
+  ) = {
 //    val ste = StatusEvent(axisStateEventPrefix).madd(axisName, position, state, inLowLimit, inHighLimit, inHome)
 //    log.debug(s"Axis state publish of $axisStateEventPrefix: $ste")
 //    telemetryService.foreach(_.publish(ste).onComplete {
@@ -88,14 +96,16 @@ class TrombonePublisher(assemblyContext: AssemblyContext, ctx: ActorContext[Trom
 //    })
   }
 
-  def publishAxisStats(axisName: Parameter[String],
-                       datumCount: Parameter[Int],
-                       moveCount: Parameter[Int],
-                       homeCount: Parameter[Int],
-                       limitCount: Parameter[Int],
-                       successCount: Parameter[Int],
-                       failureCount: Parameter[Int],
-                       cancelCount: Parameter[Int]): Unit = {
+  def publishAxisStats(
+      axisName: Parameter[String],
+      datumCount: Parameter[Int],
+      moveCount: Parameter[Int],
+      homeCount: Parameter[Int],
+      limitCount: Parameter[Int],
+      successCount: Parameter[Int],
+      failureCount: Parameter[Int],
+      cancelCount: Parameter[Int]
+  ): Unit = {
 //    val ste = StatusEvent(axisStatsEventPrefix).madd(axisName,
 //                                                     datumCount,
 //                                                     moveCount,

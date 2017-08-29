@@ -20,9 +20,11 @@ import scala.concurrent.duration.DurationDouble
 
 object DiagPublisher {
 
-  def make(assemblyContext: AssemblyContext,
-           runningIn: Option[Running],
-           eventPublisher: Option[ActorRef[TrombonePublisherMsg]]): Behavior[DiagPublisherMessages] =
+  def make(
+      assemblyContext: AssemblyContext,
+      runningIn: Option[Running],
+      eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
+  ): Behavior[DiagPublisherMessages] =
     Actor.mutable(ctx ⇒ new DiagPublisher(ctx, assemblyContext, runningIn, eventPublisher))
 
   sealed trait Mode
@@ -36,11 +38,12 @@ object DiagPublisher {
   val diagnosticAxisStatsPeriod = 1
 }
 
-class DiagPublisher(ctx: ActorContext[DiagPublisherMessages],
-                    assemblyContext: AssemblyContext,
-                    runningIn: Option[Running],
-                    eventPublisher: Option[ActorRef[TrombonePublisherMsg]])
-    extends MutableBehavior[DiagPublisherMessages] {
+class DiagPublisher(
+    ctx: ActorContext[DiagPublisherMessages],
+    assemblyContext: AssemblyContext,
+    runningIn: Option[Running],
+    eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
+) extends MutableBehavior[DiagPublisherMessages] {
 
   val currentStateAdapter: ActorRef[CurrentState] = ctx.spawnAdapter(CurrentStateE)
 

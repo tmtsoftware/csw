@@ -25,11 +25,13 @@ object AxisConfig {
 /**
  * Axis configuration
  */
-case class AxisConfig(axisName: String,
-                      lowLimit: Int,
-                      lowUser: Int,
-                      highUser: Int,
-                      highLimit: Int,
-                      home: Int,
-                      startPosition: Int,
-                      stepDelayMS: Int)
+case class AxisConfig(
+    axisName: String,
+    lowLimit: Int,
+    lowUser: Int,
+    highUser: Int,
+    highLimit: Int,
+    home: Int,
+    startPosition: Int,
+    stepDelayMS: Int
+)

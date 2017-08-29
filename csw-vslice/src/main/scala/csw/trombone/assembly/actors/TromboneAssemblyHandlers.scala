@@ -21,16 +21,19 @@ import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 
 class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPublisherMessages] {
-  override def handlers(ctx: ActorContext[ComponentMessage],
-                        componentInfo: ComponentInfo,
-                        pubSubRef: ActorRef[PublisherMessage[CurrentState]]): ComponentHandlers[DiagPublisherMessages] =
+  override def handlers(
+      ctx: ActorContext[ComponentMessage],
+      componentInfo: ComponentInfo,
+      pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+  ): ComponentHandlers[DiagPublisherMessages] =
     new TromboneAssemblyHandlers(ctx, componentInfo, pubSubRef)
 }
 
-class TromboneAssemblyHandlers(ctx: ActorContext[ComponentMessage],
-                               componentInfo: ComponentInfo,
-                               pubSubRef: ActorRef[PublisherMessage[CurrentState]])
-    extends ComponentHandlers[DiagPublisherMessages](ctx, componentInfo, pubSubRef) {
+class TromboneAssemblyHandlers(
+    ctx: ActorContext[ComponentMessage],
+    componentInfo: ComponentInfo,
+    pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+) extends ComponentHandlers[DiagPublisherMessages](ctx, componentInfo, pubSubRef) {
 
   private var diagPublsher: ActorRef[DiagPublisherMessages] = _
 

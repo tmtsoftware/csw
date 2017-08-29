@@ -48,10 +48,12 @@ object TromboneStateActor {
 
   val defaultTromboneState = TromboneState(cmdDefault, moveDefault, sodiumLayerDefault, nssDefault)
 
-  case class TromboneState(cmd: Parameter[Choice],
-                           move: Parameter[Choice],
-                           sodiumLayer: Parameter[Boolean],
-                           nss: Parameter[Boolean])
+  case class TromboneState(
+      cmd: Parameter[Choice],
+      move: Parameter[Choice],
+      sodiumLayer: Parameter[Boolean],
+      nss: Parameter[Boolean]
+  )
 
   sealed trait TromboneStateMsg
 
@@ -59,11 +61,13 @@ object TromboneStateActor {
 
   object SetState {
 
-    def apply(cmd: Parameter[Choice],
-              move: Parameter[Choice],
-              sodiumLayer: Parameter[Boolean],
-              nss: Parameter[Boolean],
-              replyTo: ActorRef[StateWasSet]): SetState = SetState(TromboneState(cmd, move, sodiumLayer, nss), replyTo)
+    def apply(
+        cmd: Parameter[Choice],
+        move: Parameter[Choice],
+        sodiumLayer: Parameter[Boolean],
+        nss: Parameter[Boolean],
+        replyTo: ActorRef[StateWasSet]
+    ): SetState = SetState(TromboneState(cmd, move, sodiumLayer, nss), replyTo)
 
     def apply(cmd: Choice, move: Choice, sodiumLayer: Boolean, nss: Boolean, replyTo: ActorRef[StateWasSet]): SetState =
       SetState(TromboneState(cmdItem(cmd), moveItem(move), sodiumItem(sodiumLayer), nssItem(nss)), replyTo)

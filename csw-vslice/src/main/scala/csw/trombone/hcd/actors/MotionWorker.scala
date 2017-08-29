@@ -8,11 +8,13 @@ import csw.trombone.hcd.MotionWorkerMsgs._
 import scala.concurrent.duration.DurationLong
 
 object MotionWorker {
-  def behavior(start: Int,
-               destinationIn: Int,
-               delayInMS: Int,
-               replyTo: ActorRef[MotionWorkerMsgs],
-               diagFlag: Boolean): Behavior[MotionWorkerMsgs] =
+  def behavior(
+      start: Int,
+      destinationIn: Int,
+      delayInMS: Int,
+      replyTo: ActorRef[MotionWorkerMsgs],
+      diagFlag: Boolean
+  ): Behavior[MotionWorkerMsgs] =
     Actor.mutable(ctx ⇒ new MotionWorker(ctx, start, destinationIn, delayInMS, replyTo, diagFlag))
 
   def calcNumSteps(start: Int, end: Int): Int = {
@@ -30,13 +32,14 @@ object MotionWorker {
     calcDistance(current, destination) <= Math.abs(stepSize)
 }
 
-class MotionWorker(ctx: ActorContext[MotionWorkerMsgs],
-                   start: Int,
-                   destinationIn: Int,
-                   delayInMS: Int,
-                   replyTo: ActorRef[MotionWorkerMsgs],
-                   diagFlag: Boolean)
-    extends Actor.MutableBehavior[MotionWorkerMsgs] {
+class MotionWorker(
+    ctx: ActorContext[MotionWorkerMsgs],
+    start: Int,
+    destinationIn: Int,
+    delayInMS: Int,
+    replyTo: ActorRef[MotionWorkerMsgs],
+    diagFlag: Boolean
+) extends Actor.MutableBehavior[MotionWorkerMsgs] {
 
   import MotionWorker._
 

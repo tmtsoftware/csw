@@ -18,21 +18,24 @@ import csw.trombone.hcd.TromboneHcdState
 import csw.units.Units.encoder
 
 object MoveCommand {
-  def make(ac: AssemblyContext,
-           s: Setup,
-           tromboneHCD: Running,
-           startState: TromboneState,
-           stateActor: Option[ActorRef[TromboneStateMsg]]): Behavior[CommandMsgs] =
+  def make(
+      ac: AssemblyContext,
+      s: Setup,
+      tromboneHCD: Running,
+      startState: TromboneState,
+      stateActor: Option[ActorRef[TromboneStateMsg]]
+  ): Behavior[CommandMsgs] =
     Actor.mutable(ctx ⇒ new MoveCommand(ctx, ac, s, tromboneHCD, startState, stateActor))
 }
 
-class MoveCommand(ctx: ActorContext[CommandMsgs],
-                  ac: AssemblyContext,
-                  s: Setup,
-                  tromboneHCD: Running,
-                  startState: TromboneState,
-                  stateActor: Option[ActorRef[TromboneStateMsg]])
-    extends MutableBehavior[CommandMsgs] {
+class MoveCommand(
+    ctx: ActorContext[CommandMsgs],
+    ac: AssemblyContext,
+    s: Setup,
+    tromboneHCD: Running,
+    startState: TromboneState,
+    stateActor: Option[ActorRef[TromboneStateMsg]]
+) extends MutableBehavior[CommandMsgs] {
 
   import csw.trombone.assembly.actors.TromboneStateActor._
 

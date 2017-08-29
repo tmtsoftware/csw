@@ -38,22 +38,24 @@ object TrombonePublisherMsg {
   case class AOESWUpdate(naElevation: Parameter[Double], naRange: Parameter[Double]) extends TrombonePublisherMsg
   case class EngrUpdate(focusError: Parameter[Double], stagePosition: Parameter[Double], zenithAngle: Parameter[Double])
       extends TrombonePublisherMsg
-  case class AxisStateUpdate(axisName: Parameter[String],
-                             position: Parameter[Int],
-                             state: Parameter[Choice],
-                             inLowLimit: Parameter[Boolean],
-                             inHighLimit: Parameter[Boolean],
-                             inHome: Parameter[Boolean])
-      extends TrombonePublisherMsg
-  case class AxisStatsUpdate(axisName: Parameter[String],
-                             initCount: Parameter[Int],
-                             moveCount: Parameter[Int],
-                             homeCount: Parameter[Int],
-                             limitCount: Parameter[Int],
-                             successCount: Parameter[Int],
-                             failCount: Parameter[Int],
-                             cancelCount: Parameter[Int])
-      extends TrombonePublisherMsg
+  case class AxisStateUpdate(
+      axisName: Parameter[String],
+      position: Parameter[Int],
+      state: Parameter[Choice],
+      inLowLimit: Parameter[Boolean],
+      inHighLimit: Parameter[Boolean],
+      inHome: Parameter[Boolean]
+  ) extends TrombonePublisherMsg
+  case class AxisStatsUpdate(
+      axisName: Parameter[String],
+      initCount: Parameter[Int],
+      moveCount: Parameter[Int],
+      homeCount: Parameter[Int],
+      limitCount: Parameter[Int],
+      successCount: Parameter[Int],
+      failCount: Parameter[Int],
+      cancelCount: Parameter[Int]
+  ) extends TrombonePublisherMsg
 }
 
 ///////////////////

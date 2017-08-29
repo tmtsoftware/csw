@@ -24,10 +24,11 @@ object MultiStateMatcherActor {
 
 }
 
-class MultiStateMatcherActor(ctx: ActorContext[MultiStateMatcherMsgs],
-                             currentStateReceiver: ActorRef[PubSub[CurrentState]],
-                             timeout: Timeout)
-    extends MutableBehavior[MultiStateMatcherMsgs] {
+class MultiStateMatcherActor(
+    ctx: ActorContext[MultiStateMatcherMsgs],
+    currentStateReceiver: ActorRef[PubSub[CurrentState]],
+    timeout: Timeout
+) extends MutableBehavior[MultiStateMatcherMsgs] {
 
   import MultiStateMatcherActor._
 

@@ -27,11 +27,13 @@ object Matchers {
         .madd(TromboneHcdState.stateKey -> TromboneHcdState.AXIS_IDLE, TromboneHcdState.positionKey -> position)
     )
 
-  def executeMatch(ctx: ActorContext[_],
-                   stateMatcher: StateMatcher,
-                   currentStateSource: ActorRef[PubSub[CurrentState]],
-                   replyTo: Option[ActorRef[CommandResponse]] = None,
-                   timeout: Timeout = Timeout(5.seconds))(codeBlock: PartialFunction[CommandResponse, Unit]): Unit = {
+  def executeMatch(
+      ctx: ActorContext[_],
+      stateMatcher: StateMatcher,
+      currentStateSource: ActorRef[PubSub[CurrentState]],
+      replyTo: Option[ActorRef[CommandResponse]] = None,
+      timeout: Timeout = Timeout(5.seconds)
+  )(codeBlock: PartialFunction[CommandResponse, Unit]): Unit = {
     implicit val t                    = Timeout(timeout.duration + 1.seconds)
     implicit val scheduler: Scheduler = ctx.system.scheduler
     import ctx.executionContext

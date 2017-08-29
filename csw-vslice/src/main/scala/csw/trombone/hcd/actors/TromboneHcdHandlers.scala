@@ -22,16 +22,19 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessage] {
-  override def handlers(ctx: ActorContext[ComponentMessage],
-                        componentInfo: ComponentInfo,
-                        pubSubRef: ActorRef[PublisherMessage[CurrentState]]): ComponentHandlers[TromboneMessage] =
+  override def handlers(
+      ctx: ActorContext[ComponentMessage],
+      componentInfo: ComponentInfo,
+      pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+  ): ComponentHandlers[TromboneMessage] =
     new TromboneHcdHandlers(ctx, componentInfo, pubSubRef)
 }
 
-class TromboneHcdHandlers(ctx: ActorContext[ComponentMessage],
-                          componentInfo: ComponentInfo,
-                          pubSubRef: ActorRef[PublisherMessage[CurrentState]])
-    extends ComponentHandlers[TromboneMessage](ctx, componentInfo, pubSubRef) {
+class TromboneHcdHandlers(
+    ctx: ActorContext[ComponentMessage],
+    componentInfo: ComponentInfo,
+    pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+) extends ComponentHandlers[TromboneMessage](ctx, componentInfo, pubSubRef) {
 
   implicit val timeout: Timeout             = Timeout(2.seconds)
   implicit val scheduler: Scheduler         = ctx.system.scheduler

@@ -53,23 +53,25 @@ sealed trait AxisResponse extends TromboneMessage
 object AxisResponse {
   case object AxisStarted                                extends AxisResponse
   case class AxisFinished(newRef: ActorRef[AxisRequest]) extends AxisResponse
-  case class AxisUpdate(axisName: String,
-                        state: AxisState,
-                        current: Int,
-                        inLowLimit: Boolean,
-                        inHighLimit: Boolean,
-                        inHomed: Boolean)
-      extends AxisResponse
+  case class AxisUpdate(
+      axisName: String,
+      state: AxisState,
+      current: Int,
+      inLowLimit: Boolean,
+      inHighLimit: Boolean,
+      inHomed: Boolean
+  ) extends AxisResponse
   case class AxisFailure(reason: String) extends AxisResponse
-  case class AxisStatistics(axisName: String,
-                            initCount: Int,
-                            moveCount: Int,
-                            homeCount: Int,
-                            limitCount: Int,
-                            successCount: Int,
-                            failureCount: Int,
-                            cancelCount: Int)
-      extends AxisResponse {
+  case class AxisStatistics(
+      axisName: String,
+      initCount: Int,
+      moveCount: Int,
+      homeCount: Int,
+      limitCount: Int,
+      successCount: Int,
+      failureCount: Int,
+      cancelCount: Int
+  ) extends AxisResponse {
     override def toString =
       s"name: $axisName, inits: $initCount, moves: $moveCount, homes: $homeCount, limits: $limitCount, success: $successCount, fails: $failureCount, cancels: $cancelCount"
   }

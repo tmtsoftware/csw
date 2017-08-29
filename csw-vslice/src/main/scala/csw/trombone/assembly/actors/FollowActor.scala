@@ -92,10 +92,12 @@ class FollowActor(
       this
   }
 
-  def calculateNewTrombonePosition(calculationConfig: TromboneCalculationConfig,
-                                   elevationIn: Parameter[Double],
-                                   focusErrorIn: Parameter[Double],
-                                   zenithAngleIn: Parameter[Double]): Parameter[Double] = {
+  def calculateNewTrombonePosition(
+      calculationConfig: TromboneCalculationConfig,
+      elevationIn: Parameter[Double],
+      focusErrorIn: Parameter[Double],
+      zenithAngleIn: Parameter[Double]
+  ): Parameter[Double] = {
     val totalRangeDistance =
       focusZenithAngleToRangeDistance(calculationConfig, elevationIn.head, focusErrorIn.head, zenithAngleIn.head)
 
@@ -111,9 +113,11 @@ class FollowActor(
     aoPublisher.foreach(_ ! AOESWUpdate(elevationItem, rangeItem))
   }
 
-  def sendEngrUpdate(focusError: Parameter[Double],
-                     trombonePosition: Parameter[Double],
-                     zenithAngle: Parameter[Double]): Unit = {
+  def sendEngrUpdate(
+      focusError: Parameter[Double],
+      trombonePosition: Parameter[Double],
+      zenithAngle: Parameter[Double]
+  ): Unit = {
     engPublisher.foreach(_ ! EngrUpdate(focusError, trombonePosition, zenithAngle))
   }
 }

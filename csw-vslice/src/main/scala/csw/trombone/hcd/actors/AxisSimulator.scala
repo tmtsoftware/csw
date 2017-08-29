@@ -31,10 +31,11 @@ object AxisSimulator {
   }
 }
 
-class AxisSimulator(ctx: ActorContext[SimulatorCommand],
-                    axisConfig: AxisConfig,
-                    replyTo: Option[ActorRef[AxisResponse]])
-    extends Actor.MutableBehavior[SimulatorCommand] {
+class AxisSimulator(
+    ctx: ActorContext[SimulatorCommand],
+    axisConfig: AxisConfig,
+    replyTo: Option[ActorRef[AxisResponse]]
+) extends Actor.MutableBehavior[SimulatorCommand] {
 
   import AxisSimulator._
 

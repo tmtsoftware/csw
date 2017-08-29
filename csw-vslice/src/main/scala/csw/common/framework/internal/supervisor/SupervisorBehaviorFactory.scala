@@ -14,8 +14,10 @@ object SupervisorBehaviorFactory {
       locationService: LocationService,
       registrationFactory: RegistrationFactory
   ): Behavior[SupervisorExternalMessage] = {
+
     val componentWiringClass = Class.forName(componentInfo.className)
     val compWring            = componentWiringClass.newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
+
     Actor
       .withTimers[SupervisorMessage](
         timerScheduler ⇒

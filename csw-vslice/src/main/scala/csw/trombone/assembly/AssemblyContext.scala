@@ -12,9 +12,11 @@ import csw.units.Units.{degree, kilometer, micrometer, millimeter}
 /**
  * TMT Source Code: 10/4/16.
  */
-case class AssemblyContext(info: ComponentInfo,
-                           calculationConfig: TromboneCalculationConfig,
-                           controlConfig: TromboneControlConfig) {
+case class AssemblyContext(
+    info: ComponentInfo,
+    calculationConfig: TromboneCalculationConfig,
+    controlConfig: TromboneControlConfig
+) {
   // Assembly Info
   // These first three are set from the config file
   val componentName: String      = info.name
@@ -172,11 +174,13 @@ object AssemblyContext {
    * @param lowerFocusLimit         check for minimum focus error
    * @param zenithFactor            an algorithm value for scaling zenith angle term
    */
-  case class TromboneCalculationConfig(defaultInitialElevation: Double,
-                                       focusErrorGain: Double,
-                                       upperFocusLimit: Double,
-                                       lowerFocusLimit: Double,
-                                       zenithFactor: Double)
+  case class TromboneCalculationConfig(
+      defaultInitialElevation: Double,
+      focusErrorGain: Double,
+      upperFocusLimit: Double,
+      lowerFocusLimit: Double,
+      zenithFactor: Double
+  )
 
   object TromboneCalculationConfig {
     def apply(config: Config): TromboneCalculationConfig = {

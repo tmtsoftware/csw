@@ -90,8 +90,10 @@ class ContainerBehavior(
     else Some(supervisorInfoFactory.make(ctx.self, componentInfo, locationService))
   }
 
-  private def onSupervisorModeChange(supervisor: ActorRef[SupervisorExternalMessage],
-                                     supervisorMode: SupervisorMode): Unit = {
+  private def onSupervisorModeChange(
+      supervisor: ActorRef[SupervisorExternalMessage],
+      supervisorMode: SupervisorMode
+  ): Unit = {
     if (supervisorMode == SupervisorMode.Running) {
       updateRunningComponents(supervisor)
     }

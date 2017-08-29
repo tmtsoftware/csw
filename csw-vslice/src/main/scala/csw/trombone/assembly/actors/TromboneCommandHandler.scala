@@ -27,9 +27,11 @@ import scala.concurrent.duration.DurationInt
 
 object TromboneCommandHandler {
 
-  def make(assemblyContext: AssemblyContext,
-           tromboneHCDIn: Option[Running],
-           allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]): Behavior[NotFollowingMsgs] =
+  def make(
+      assemblyContext: AssemblyContext,
+      tromboneHCDIn: Option[Running],
+      allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
+  ): Behavior[NotFollowingMsgs] =
     Actor
       .mutable[TromboneCommandHandlerMsgs](
         ctx ⇒ new TromboneCommandHandler(ctx, assemblyContext, tromboneHCDIn, allEventPublisher)
@@ -44,11 +46,12 @@ object TromboneCommandHandler {
   }
 }
 
-class TromboneCommandHandler(ctx: ActorContext[TromboneCommandHandlerMsgs],
-                             ac: AssemblyContext,
-                             tromboneHCDIn: Option[Running],
-                             allEventPublisher: Option[ActorRef[TrombonePublisherMsg]])
-    extends MutableBehavior[TromboneCommandHandlerMsgs] {
+class TromboneCommandHandler(
+    ctx: ActorContext[TromboneCommandHandlerMsgs],
+    ac: AssemblyContext,
+    tromboneHCDIn: Option[Running],
+    allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
+) extends MutableBehavior[TromboneCommandHandlerMsgs] {
 
   implicit val scheduler: Scheduler = ctx.system.scheduler
   import ctx.executionContext

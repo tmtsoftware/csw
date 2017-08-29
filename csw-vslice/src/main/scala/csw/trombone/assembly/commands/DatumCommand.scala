@@ -17,19 +17,22 @@ import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneS
 import csw.trombone.hcd.TromboneHcdState
 
 object DatumCommand {
-  def make(s: Setup,
-           tromboneHCD: Running,
-           startState: TromboneState,
-           stateActor: Option[ActorRef[TromboneStateMsg]]): Behavior[CommandMsgs] =
+  def make(
+      s: Setup,
+      tromboneHCD: Running,
+      startState: TromboneState,
+      stateActor: Option[ActorRef[TromboneStateMsg]]
+  ): Behavior[CommandMsgs] =
     Actor.mutable(ctx ⇒ new DatumCommand(ctx, s, tromboneHCD, startState, stateActor))
 }
 
-class DatumCommand(ctx: ActorContext[CommandMsgs],
-                   s: Setup,
-                   tromboneHCD: Running,
-                   startState: TromboneState,
-                   stateActor: Option[ActorRef[TromboneStateMsg]])
-    extends MutableBehavior[CommandMsgs] {
+class DatumCommand(
+    ctx: ActorContext[CommandMsgs],
+    s: Setup,
+    tromboneHCD: Running,
+    startState: TromboneState,
+    stateActor: Option[ActorRef[TromboneStateMsg]]
+) extends MutableBehavior[CommandMsgs] {
 
   import csw.trombone.assembly.actors.TromboneStateActor._
 

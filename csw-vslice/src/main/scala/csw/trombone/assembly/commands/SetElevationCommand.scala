@@ -19,21 +19,24 @@ import csw.units.Units.encoder
 
 object SetElevationCommand {
 
-  def make(ac: AssemblyContext,
-           s: Setup,
-           tromboneHCD: Running,
-           startState: TromboneState,
-           stateActor: Option[ActorRef[TromboneStateMsg]]): Behavior[CommandMsgs] =
+  def make(
+      ac: AssemblyContext,
+      s: Setup,
+      tromboneHCD: Running,
+      startState: TromboneState,
+      stateActor: Option[ActorRef[TromboneStateMsg]]
+  ): Behavior[CommandMsgs] =
     Actor.mutable(ctx ⇒ new SetElevationCommand(ctx, ac, s, tromboneHCD, startState, stateActor))
 }
 
-class SetElevationCommand(ctx: ActorContext[CommandMsgs],
-                          ac: AssemblyContext,
-                          s: Setup,
-                          tromboneHCD: Running,
-                          startState: TromboneState,
-                          stateActor: Option[ActorRef[TromboneStateMsg]])
-    extends MutableBehavior[CommandMsgs] {
+class SetElevationCommand(
+    ctx: ActorContext[CommandMsgs],
+    ac: AssemblyContext,
+    s: Setup,
+    tromboneHCD: Running,
+    startState: TromboneState,
+    stateActor: Option[ActorRef[TromboneStateMsg]]
+) extends MutableBehavior[CommandMsgs] {
 
   import TromboneHcdState._
   import csw.trombone.assembly.actors.TromboneStateActor._
