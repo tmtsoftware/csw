@@ -63,7 +63,7 @@ lazy val `csw-logging` = project
 
 lazy val `csw-benchmark` = project
   .enablePlugins(JmhPlugin)
-  .dependsOn(`csw-logging`)
+  .dependsOn(`csw-logging`, `csw-params`)
   .settings(
     libraryDependencies ++= Dependencies.Benchmark
   )

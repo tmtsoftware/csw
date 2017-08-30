@@ -33,7 +33,8 @@ object Dependencies {
     Libs.`persist-json`,
     Libs.`gson`,
     Libs.`jackson-core`,
-    Libs.`jackson-databind`
+    Libs.`jackson-databind`,
+    Chill.`chill-akka`
   )
 
   val Location = Seq(
