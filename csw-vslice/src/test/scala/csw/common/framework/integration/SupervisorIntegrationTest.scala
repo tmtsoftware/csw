@@ -1,27 +1,28 @@
 package csw.common.framework.integration
 
+import akka.typed.scaladsl.Actor
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.DemandMatcher
-import csw.common.components.ComponentStatistics
+import csw.common.components.{ComponentDomainMessage, ComponentStatistics, SampleComponentHandlers}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorMode}
+import csw.common.framework.internal.component.ComponentBehavior
+import csw.common.framework.internal.supervisor.{SupervisorBehavior, SupervisorBehaviorFactory, SupervisorMode}
 import csw.common.framework.models.CommandMessage.Oneway
-import csw.common.framework.models.PubSub.Subscribe
+import csw.common.framework.models.PubSub.{Publish, PublisherMessage, Subscribe}
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
-import csw.common.framework.models.{
-  ContainerIdleMessage,
-  LifecycleStateChanged,
-  SupervisorExternalMessage,
-  ToComponentLifecycleMessage
-}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.common.framework.models._
+import csw.common.framework.scaladsl.ComponentBehaviorFactory
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
 import csw.param.states.{CurrentState, DemandState}
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 
@@ -61,29 +62,69 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar wit
     supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
   }
 
+  // Mostly, onInitialized and onRun hooks of components gets invoked by the time we subscribe for ComponentState
+  // Hence by just subscribing to ComponentState does not always guarantees that
+  // subscriber receives onInitialized and onRun hooks CurrentState like other tests from this file.
+  // Hence this particular test mocks componentBehaviorFactory to just provide pubSubRef test probe,
+  // so that we can expect CurrentState message from onInitialized and onRun hooks
   test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
     compStateProbe = TestProbe[CurrentState]
     lifecycleStateProbe = TestProbe[LifecycleStateChanged]
     containerIdleMessageProbe = TestProbe[ContainerIdleMessage]
-    supervisorBehavior = SupervisorBehaviorFactory.make(
-      Some(containerIdleMessageProbe.testActor),
-      hcdInfo,
-      locationService,
-      registrationFactory
-    )
+    val pubSubRefProbe = TestProbe[PubSub[CurrentState]]
+
+    // This code is here because of the reason explained above test.
+    val componentTLA = new Answer[Behavior[Nothing]] {
+      override def answer(invocation: InvocationOnMock): Behavior[Nothing] = {
+        val compInfo   = invocation.getArgument[ComponentInfo](0)
+        val supervisor = invocation.getArgument[ActorRef[FromComponentLifecycleMessage]](1)
+
+        Actor
+          .mutable[ComponentMessage](
+            ctx ⇒
+              new ComponentBehavior[ComponentDomainMessage](
+                ctx,
+                supervisor,
+                new SampleComponentHandlers(ctx, compInfo, pubSubRefProbe.ref)
+            )
+          )
+          .narrow
+      }
+    }
+    val compWring = mock[ComponentBehaviorFactory[_]]
+    import ArgumentMatchers._
+    Mockito
+      .when(
+        compWring.make(any[ComponentInfo],
+                       any[ActorRef[FromComponentLifecycleMessage]],
+                       any[ActorRef[PublisherMessage[CurrentState]]])
+      )
+      .thenAnswer(componentTLA)
+
+    supervisorBehavior = Actor
+      .withTimers[SupervisorMessage](
+        timerScheduler ⇒
+          Actor.mutable[SupervisorMessage](
+            ctx =>
+              new SupervisorBehavior(
+                ctx,
+                Some(containerIdleMessageProbe.testActor),
+                timerScheduler,
+                hcdInfo,
+                compWring,
+                registrationFactory,
+                locationService
+            )
+        )
+      )
+      .narrow
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "hcd-supervisor"), 5.seconds)
-    supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
     supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
-    val initCurrentState = compStateProbe.expectMsgType[CurrentState]
-    val initDemandState  = DemandState(prefix, Set(choiceKey.set(initChoice)))
-    DemandMatcher(initDemandState).check(initCurrentState) shouldBe true
-
-    val runCurrentState = compStateProbe.expectMsgType[CurrentState]
-    val runDemandState  = DemandState(prefix, Set(choiceKey.set(runChoice)))
-    DemandMatcher(runDemandState).check(runCurrentState) shouldBe true
+    pubSubRefProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    pubSubRefProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
 
     lifecycleStateProbe.expectMsg(LifecycleStateChanged(supervisorRef, SupervisorMode.Running))
   }

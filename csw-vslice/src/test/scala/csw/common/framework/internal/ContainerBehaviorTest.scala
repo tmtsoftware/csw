@@ -46,7 +46,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     val supervisorFactory: SupervisorInfoFactory = mock[SupervisorInfoFactory]
     val answer = new Answer[SupervisorInfo] {
       override def answer(invocation: InvocationOnMock): SupervisorInfo = {
-        val componentInfo = invocation.getArgument(1).asInstanceOf[ComponentInfo]
+        val componentInfo = invocation.getArgument[ComponentInfo](1)
         SupervisorInfo(
           untypedSystem,
           Component(
@@ -62,7 +62,9 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     when(
       supervisorFactory
-        .make(ArgumentMatchers.any(), ArgumentMatchers.any[ComponentInfo](), ArgumentMatchers.any[LocationService]())
+        .make(ArgumentMatchers.any[ActorRef[ContainerIdleMessage]],
+              ArgumentMatchers.any[ComponentInfo],
+              ArgumentMatchers.any[LocationService])
     ).thenAnswer(answer)
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]

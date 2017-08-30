@@ -77,13 +77,11 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
 
     // lifecycle messages gets forwarded to all components and their corresponding handlers gets invoked
     containerRef ! Lifecycle(GoOffline)
-    Thread.sleep(500)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
 
     containerRef ! Lifecycle(GoOnline)
-    Thread.sleep(500)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
@@ -95,11 +93,13 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Idle)
 
-    Thread.sleep(500)
-
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+
+    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
 
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
