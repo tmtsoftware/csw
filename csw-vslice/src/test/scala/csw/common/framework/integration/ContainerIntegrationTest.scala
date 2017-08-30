@@ -93,17 +93,37 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Idle)
 
-    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    val initState      = CurrentState(prefix, Set(choiceKey.set(initChoice)))
+    val runState       = CurrentState(prefix, Set(choiceKey.set(runChoice)))
+    val shutdownState  = CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))
+    val expectedStates = Set(initState, runState, shutdownState)
 
-    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
-    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
-    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    // on restart, new TLA gets created which means TLA's onInitialize and onRun hooks gets invoked
+    // also old TLA gets killed which triggers old TLA's onShutdown handler
+    // hence, subscriber receives three events :
+    // 1. onInitialized -> CurrentState(InitialChoice) (This is from new TLA)
+    // 2. onRun -> CurrentState(RunChoice) (This is from new TLA)
+    // 3. onShutdown -> CurrentState(ShutdownChoice) (This is from old TLA)
+    // But the order in which onShutdown event will be received by subscribers is not guaranteed,
+    // that is the reason why we are collecting all the events and then asserting on all of them together in Set
+    val assemblyActualState1 = assemblyProbe.expectMsgType[CurrentState]
+    val assemblyActualState2 = assemblyProbe.expectMsgType[CurrentState]
+    val assemblyActualState3 = assemblyProbe.expectMsgType[CurrentState]
+    val assemblyActualStates = Set(assemblyActualState1, assemblyActualState2, assemblyActualState3)
 
-    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
-    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
-    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
+    val filterActualState1 = filterProbe.expectMsgType[CurrentState]
+    val filterActualState2 = filterProbe.expectMsgType[CurrentState]
+    val filterActualState3 = filterProbe.expectMsgType[CurrentState]
+    val filterActualStates = Set(filterActualState1, filterActualState2, filterActualState3)
+
+    val disperserActualState1 = disperserProbe.expectMsgType[CurrentState]
+    val disperserActualState2 = disperserProbe.expectMsgType[CurrentState]
+    val disperserActualState3 = disperserProbe.expectMsgType[CurrentState]
+    val disperserActualStates = Set(disperserActualState1, disperserActualState2, disperserActualState3)
+
+    assemblyActualStates shouldBe expectedStates
+    filterActualStates shouldBe expectedStates
+    disperserActualStates shouldBe expectedStates
 
     assemblyLifecycleStateProbe.expectMsg(LifecycleStateChanged(assemblySupervisor, SupervisorMode.Running))
     filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorMode.Running))
