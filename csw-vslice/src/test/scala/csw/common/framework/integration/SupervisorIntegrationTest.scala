@@ -149,24 +149,6 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar wit
     compStateProbe.expectMsgType[CurrentState]
   }
 
-  test("onRestart hook of comp handlers should be invoked when supervisor receives Restart message") {
-    createSupervisorAndStartTLA()
-
-    supervisorRef ! Lifecycle(Restart)
-
-    val restartCurrentState = compStateProbe.expectMsgType[CurrentState]
-    val restartDemandState  = DemandState(prefix, Set(choiceKey.set(restartChoice)))
-    DemandMatcher(restartDemandState).check(restartCurrentState) shouldBe true
-
-    val initCurrentState = compStateProbe.expectMsgType[CurrentState]
-    val initDemandState  = DemandState(prefix, Set(choiceKey.set(initChoice)))
-    DemandMatcher(initDemandState).check(initCurrentState) shouldBe true
-
-    val runCurrentState = compStateProbe.expectMsgType[CurrentState]
-    val runDemandState  = DemandState(prefix, Set(choiceKey.set(runChoice)))
-    DemandMatcher(runDemandState).check(runCurrentState) shouldBe true
-  }
-
   test("onShutdown hook of comp handlers should be invoked when supervisor receives Shutdown message") {
     createSupervisorAndStartTLA()
 

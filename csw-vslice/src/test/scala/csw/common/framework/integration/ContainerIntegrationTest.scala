@@ -96,9 +96,6 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     containerModeProbe.expectMsg(ContainerMode.Idle)
 
     Thread.sleep(500)
-    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
-    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
-    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(restartChoice))))
 
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))

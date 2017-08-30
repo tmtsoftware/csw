@@ -9,7 +9,7 @@ import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.SupervisorIdleComponentMessage.InitializeFailure
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Shutdown}
 import csw.common.framework.models.{RunningMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 
@@ -92,10 +92,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       } catch {
         case ex: Exception ⇒ supervisor ! ShutdownFailure(ex.getMessage)
       }
-    case Restart =>
-      mode = ComponentMode.Idle
-      lifecycleHandlers.onRestart()
-      ctx.self ! Start
+//    case Restart =>
+//      mode = ComponentMode.Idle
+//      lifecycleHandlers.onRestart()
+//      ctx.self ! Start
     case GoOnline =>
       if (!lifecycleHandlers.isOnline) {
         lifecycleHandlers.onGoOnline()

@@ -186,30 +186,6 @@ public class JFrameworkIntegrationTest extends Mockito {
     }
 
     @Test
-    public void shouldInvokeOnRestart() throws Exception {
-        createSupervisorAndStartTLA();
-
-        supervisorRef.tell(new RunningMessage.Lifecycle(ToComponentLifecycleMessage.Restart$.MODULE$));
-
-        CurrentState restartCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
-        Parameter<Choice> restartParam = SampleComponentState.choiceKey().set(SampleComponentState.restartChoice());
-        DemandState restartDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(restartParam);
-        Assert.assertTrue(new DemandMatcher(restartDemandState, false).check(restartCurrentState));
-
-        CurrentState initCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
-        Parameter<Choice> initParam = SampleComponentState.choiceKey().set(SampleComponentState.initChoice());
-        DemandState initDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(initParam);
-        Assert.assertTrue(new DemandMatcher(initDemandState, false).check(initCurrentState));
-
-        CurrentState runCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
-        Parameter<Choice> runParam = SampleComponentState.choiceKey().set(SampleComponentState.runChoice());
-        DemandState runDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(runParam);
-        Assert.assertTrue(new DemandMatcher(runDemandState, false).check(runCurrentState));
-
-        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(supervisorRef, SupervisorMode.Running$.MODULE$));
-    }
-
-    @Test
     public void shouldInvokeOnShutdown() throws Exception {
         createSupervisorAndStartTLA();
 

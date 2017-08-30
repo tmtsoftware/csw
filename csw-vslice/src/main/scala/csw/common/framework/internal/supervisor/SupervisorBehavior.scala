@@ -2,7 +2,7 @@ package csw.common.framework.internal.supervisor
 
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{ActorContext, TimerScheduler}
-import akka.typed.{ActorRef, Behavior, Signal, Terminated}
+import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.common.framework.internal.PubSubActor
 import csw.common.framework.internal.supervisor.SupervisorMode.Idle
 import csw.common.framework.models.ContainerIdleMessage.SupervisorModeChanged
@@ -18,7 +18,6 @@ import csw.common.framework.models.SupervisorCommonMessage.{
 }
 import csw.common.framework.models.SupervisorIdleComponentMessage.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models.SupervisorIdleMessage.{RegistrationComplete, RegistrationFailed}
-import csw.common.framework.models.SupervisorRunningMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart, Shutdown}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.ComponentBehaviorFactory
@@ -65,17 +64,17 @@ class SupervisorBehavior(
     ctx.spawn(PubSubActor.behavior[LifecycleStateChanged], PubSubLifecycleActor)
   val pubSubComponent: ActorRef[PubSub[CurrentState]] =
     ctx.spawn(PubSubActor.behavior[CurrentState], PubSubComponentActor)
-  val component: ActorRef[Nothing] =
+  var component: ActorRef[Nothing] =
     ctx.spawn[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent), ComponentActor)
 
   ctx.watch(component)
 
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     (mode, msg) match {
-      case (_, msg: SupervisorCommonMessage)                                                       ⇒ onCommon(msg)
-      case (SupervisorMode.Idle, msg: SupervisorIdleMessage)                                       ⇒ onIdle(msg)
-      case (SupervisorMode.Running | SupervisorMode.RunningOffline, msg: SupervisorRunningMessage) ⇒ onRunning(msg)
-      case (SupervisorMode.PreparingToShutdown, msg: PreparingToShutdownMessage)                   ⇒ onPreparingToShutdown(msg)
+      case (_, msg: SupervisorCommonMessage)                                             ⇒ onCommon(msg)
+      case (SupervisorMode.Idle, msg: SupervisorIdleMessage)                             ⇒ onIdle(msg)
+      case (SupervisorMode.Running | SupervisorMode.RunningOffline, msg: RunningMessage) ⇒ onRunning(msg)
+      case (SupervisorMode.PreparingToShutdown, msg: PreparingToShutdownMessage)         ⇒ onPreparingToShutdown(msg)
       case (_, message) =>
         println(s"Supervisor in $mode received an unexpected message: $message")
     }
@@ -84,10 +83,10 @@ class SupervisorBehavior(
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
-      ctx.unwatch(component)
-      unregisterFromLocationService()
-      haltComponent()
       Behavior.stopped
+    case PostStop ⇒
+      unregisterFromLocationService()
+      this
   }
 
   def onCommon(msg: SupervisorCommonMessage): Unit = msg match {
@@ -113,19 +112,15 @@ class SupervisorBehavior(
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
   }
 
-  def onRunning(msg: SupervisorRunningMessage): Unit = {
+  def onRunning(msg: RunningMessage): Unit = {
     msg match {
-      case runningMessage: RunningMessage  ⇒ handleRunningMessage(runningMessage)
-      case UnRegistrationComplete          ⇒ onUnRegistrationComplete()
-      case UnRegistrationFailed(throwable) ⇒ onUnRegistrationFailed(throwable)
+      case runningMessage: RunningMessage ⇒ handleRunningMessage(runningMessage)
     }
   }
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case Shutdown ⇒ handleShutdown()
-    case Restart ⇒
-      mode = SupervisorMode.Idle
-      unregisterFromLocationService()
+    case Restart  ⇒ handleRestart()
     case GoOffline ⇒
       if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
     case GoOnline ⇒
@@ -149,6 +144,15 @@ class SupervisorBehavior(
 
   def haltComponent(): Boolean = {
     ctx.stop(pubSubComponent) & ctx.stop(pubSubLifecycle) & ctx.stop(component)
+  }
+
+  private def handleRestart(): Unit = {
+    mode = SupervisorMode.Idle
+    ctx.unwatch(component)
+    ctx.stop(component)
+    component =
+      ctx.spawn[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent), ComponentActor + "1")
+    ctx.watch(component)
   }
 
   private def handleRunningMessage(runningMessage: RunningMessage): Unit = {
@@ -186,17 +190,8 @@ class SupervisorBehavior(
 
   private def unregisterFromLocationService(): Unit = {
     registrationOpt match {
-      case Some(registrationResult) ⇒
-        registrationResult.unregister().onComplete {
-          case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
-          case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
-        }
-      case None ⇒
-        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
+      case Some(registrationResult) ⇒ registrationResult.unregister()
+      case None                     ⇒ println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
     }
   }
-
-  private def onUnRegistrationComplete(): Unit = ???
-
-  private def onUnRegistrationFailed(throwable: Throwable): Unit = ???
 }

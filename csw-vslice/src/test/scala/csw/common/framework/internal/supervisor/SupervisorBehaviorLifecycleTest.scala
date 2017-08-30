@@ -10,11 +10,7 @@ import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
-import csw.common.framework.models.SupervisorCommonMessage.{
-  ComponentStateSubscription,
-  HaltComponent,
-  LifecycleStateSubscription
-}
+import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.SupervisorIdleComponentMessage.{InitializeFailure, Initialized, Running}
 import csw.common.framework.models.SupervisorIdleMessage.RegistrationComplete
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
@@ -130,25 +126,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
     unsubscribeMessage shouldBe Unsubscribe[CurrentState](subscriberProbe.ref)
   }
 
-  test("supervisor should handle HaltComponent message by shutting down all child actors in all the mode") {
-    val testData = new TestData
-    import testData._
-
-    // put supervisor in InitializeFailure mode
-    val initialMode = SupervisorMode.InitializeFailure
-    supervisor.onMessage(InitializeFailure("Unexpected error"))
-    supervisor.mode shouldBe initialMode
-
-    // HaltComponent
-    supervisor.onMessage(HaltComponent)
-    supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
-    supervisor.haltingFlag shouldBe true
-
-    // HaltComponent schedules Shutdown message to self
-    supervisor.onMessage(ShutdownComplete)
-    supervisor.haltingFlag shouldBe true
-    supervisor.mode shouldBe SupervisorMode.Shutdown
-  }
   // *************** End of testing onCommonMessages ***************
 
   /**
@@ -177,8 +154,13 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
     supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
+
     supervisor.mode shouldBe SupervisorMode.Idle
-    childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.Restart))
+
+    supervisor.onMessage(Initialized(childComponentInbox.ref))
+    verify(locationService, atLeastOnce()).register(akkaRegistration)
+    supervisor.onMessage(RegistrationComplete(registrationResult, childComponentInbox.ref))
+    supervisor.onMessage(Running(childComponentInbox.ref))
   }
 
   test("supervisor should handle lifecycle GoOffline message") {

@@ -56,7 +56,7 @@ object CommandMessage {
   case class Oneway(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends CommandMessage
 }
 
-sealed trait RunningMessage extends ComponentMessage with SupervisorExternalMessage with SupervisorRunningMessage
+sealed trait RunningMessage extends ComponentMessage with SupervisorExternalMessage
 object RunningMessage {
   case class Lifecycle(message: ToComponentLifecycleMessage)
       extends RunningMessage
@@ -93,12 +93,6 @@ object SupervisorIdleComponentMessage {
   case class Initialized(componentRef: ActorRef[InitialMessage]) extends SupervisorIdleComponentMessage
   case class InitializeFailure(reason: String)                   extends SupervisorIdleComponentMessage
   case class Running(componentRef: ActorRef[RunningMessage])     extends SupervisorIdleComponentMessage
-}
-
-sealed trait SupervisorRunningMessage extends SupervisorMessage
-object SupervisorRunningMessage {
-  case object UnRegistrationComplete                    extends SupervisorRunningMessage
-  case class UnRegistrationFailed(throwable: Throwable) extends SupervisorRunningMessage
 }
 
 sealed trait PreparingToShutdownMessage extends SupervisorMessage

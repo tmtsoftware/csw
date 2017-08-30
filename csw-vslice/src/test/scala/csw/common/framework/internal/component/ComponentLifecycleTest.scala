@@ -52,20 +52,6 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     previousComponentMode shouldBe runningComponent.mode
   }
 
-  test("A running Hcd component should accept Restart lifecycle message") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
-    val testData        = new TestData(supervisorProbe)
-    import testData._
-
-    val previousComponentMode = runningComponent.mode
-
-    runningComponent.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
-
-    verify(sampleHcdHandler).onRestart()
-    previousComponentMode should not be runningComponent.mode
-    runningComponent.mode shouldBe ComponentMode.Idle
-  }
-
   test("A running Hcd component should accept RunOffline lifecycle message") {
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
     val testData        = new TestData(supervisorProbe)

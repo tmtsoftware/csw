@@ -3,7 +3,7 @@ package csw.common.framework.internal.supervisor
 import akka.typed.testkit.Effect._
 import akka.typed.testkit.EffectfulActorContext
 import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{Behavior, Props, Terminated}
+import akka.typed.{Behavior, Props}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.FrameworkTestSuite
 import csw.common.framework.models.{ContainerIdleMessage, SupervisorExternalMessage}
@@ -41,19 +41,5 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     ctx.getAllEffects() should contain(Watched(componentActor))
     ctx.getAllEffects() should not contain Watched(pubSubLifecycleActor)
     ctx.getAllEffects() should not contain Watched(pubSubComponentActor)
-  }
-
-  test("Supervisor should handle Terminated signal by unwatching component actor and stopping other child actors") {
-    val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
-
-    val componentActor = ctx.childInbox(SupervisorBehavior.ComponentActor).ref
-
-    ctx.signal(Terminated(ctx.getChildren.get(0).ref)(null))
-
-    ctx.getAllEffects() should contain allOf (
-      Unwatched(componentActor),
-      Stopped(SupervisorBehavior.PubSubLifecycleActor),
-      Stopped(SupervisorBehavior.PubSubComponentActor)
-    )
   }
 }
