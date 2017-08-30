@@ -193,34 +193,14 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar wit
     compStateProbe.expectMsgType[CurrentState]
   }
 
-  test("onShutdown hook of comp handlers should be invoked when supervisor receives Shutdown message") {
+  ignore("onShutdown hook of comp handlers should be invoked when supervisor receives Shutdown message") {
     createSupervisorAndStartTLA()
 
-    supervisorRef ! Shutdown
+    untypedSystem.terminate()
 
     val shutdownCurrentState = compStateProbe.expectMsgType[CurrentState]
     val shutdownDemandState  = DemandState(prefix, Set(choiceKey.set(shutdownChoice)))
     DemandMatcher(shutdownDemandState).check(shutdownCurrentState) shouldBe true
 
   }
-
-  // DEOPSCSW-179: Unique Action for a component
-  test("supervisor should receive ShutdownFailure message when component fails to shutdown") {
-    val stateChangedProbe = TestProbe[LifecycleStateChanged]
-    supervisorBehavior = SupervisorBehaviorFactory.make(
-      Some(containerIdleMessageProbe.testActor),
-      assemblyInfoToSimulateFailure,
-      locationService,
-      registrationFactory
-    )
-    // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
-    supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
-    Thread.sleep(200)
-    // Registering probe to receive Lifecycle state changed events
-    supervisorRef ! LifecycleStateSubscription(Subscribe(stateChangedProbe.ref))
-
-    supervisorRef ! Shutdown
-
-  }
-
 }

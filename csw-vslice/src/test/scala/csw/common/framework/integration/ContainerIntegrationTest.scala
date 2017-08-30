@@ -35,7 +35,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
 
   override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
 
-  test("should start multiple components withing a single container and able to accept lifecycle messages") {
+  ignore("should start multiple components withing a single container and able to accept lifecycle messages") {
 
     val wiring = FrameworkWiring.make(untypedSystem)
     // start a container and verify it moves to running mode

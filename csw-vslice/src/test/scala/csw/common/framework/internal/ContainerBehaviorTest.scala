@@ -118,20 +118,6 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     containerBehavior.runningComponents shouldBe Set.empty
   }
 
-  test("should handle Shutdown message by changing it's mode to Idle and forwarding the message to all components") {
-    val runningContainer = new RunningContainer
-    import runningContainer._
-
-    containerBehavior.onMessage(Shutdown)
-    verify(registrationResult).unregister()
-
-    containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
-      .map(_.receiveMsg()) should contain only Shutdown
-
-    containerBehavior.mode shouldBe ContainerMode.Idle
-  }
-
   test("should handle restart message by changing its mode to initialize") {
     val runningContainer = new RunningContainer
     import runningContainer._
