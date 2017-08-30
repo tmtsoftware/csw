@@ -13,9 +13,12 @@ import csw.common.framework.internal.supervisor.{SupervisorBehavior, SupervisorB
 import csw.common.framework.models.CommandMessage.Oneway
 import csw.common.framework.models.PubSub.{Publish, PublisherMessage, Subscribe}
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.common.framework.models.SupervisorCommonExternalMessage.{
+  ComponentStateSubscription,
+  LifecycleStateSubscription
+}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.common.framework.models._
+import csw.common.framework.models.{ContainerIdleMessage, LifecycleStateChanged, Shutdown, SupervisorExternalMessage, _}
 import csw.common.framework.scaladsl.ComponentBehaviorFactory
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
@@ -193,13 +196,12 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar wit
   test("onShutdown hook of comp handlers should be invoked when supervisor receives Shutdown message") {
     createSupervisorAndStartTLA()
 
-    supervisorRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
+    supervisorRef ! Shutdown
 
     val shutdownCurrentState = compStateProbe.expectMsgType[CurrentState]
     val shutdownDemandState  = DemandState(prefix, Set(choiceKey.set(shutdownChoice)))
     DemandMatcher(shutdownDemandState).check(shutdownCurrentState) shouldBe true
 
-    lifecycleStateProbe.expectMsg(LifecycleStateChanged(supervisorRef, SupervisorMode.PreparingToShutdown))
   }
 
   // DEOPSCSW-179: Unique Action for a component
@@ -217,12 +219,8 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with MockitoSugar wit
     // Registering probe to receive Lifecycle state changed events
     supervisorRef ! LifecycleStateSubscription(Subscribe(stateChangedProbe.ref))
 
-    supervisorRef ! Lifecycle(ToComponentLifecycleMessage.Shutdown)
+    supervisorRef ! Shutdown
 
-    // On receiving Shutdown message, Supervisor publishes its state -> PreparingToShutdown
-    stateChangedProbe.expectMsg(LifecycleStateChanged(supervisorRef, SupervisorMode.PreparingToShutdown))
-    // On shutdown failure, Supervisor publishes its state -> ShutdownFailure
-    stateChangedProbe.expectMsg(LifecycleStateChanged(supervisorRef, SupervisorMode.ShutdownFailure))
   }
 
 }

@@ -2,18 +2,13 @@ package csw.common.framework.internal.container
 
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
-import akka.typed.{ActorRef, Behavior}
+import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.common.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorMode}
+import csw.common.framework.models.ContainerCommonExternalMessage.GetComponents
 import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
-import csw.common.framework.models.ContainerExternalMessage.GetComponents
-import csw.common.framework.models.ContainerIdleMessage.{
-  RegistrationComplete,
-  RegistrationFailed,
-  SupervisorModeChanged
-}
-import csw.common.framework.models.ContainerRunningMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed}
+import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.ToComponentLifecycleMessage._
 import csw.common.framework.models._
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
@@ -40,6 +35,7 @@ class ContainerBehavior(
   var registrationOpt: Option[RegistrationResult] = None
 
   createComponents(containerInfo.components)
+  supervisors.foreach(supervisor ⇒ ctx.watch(supervisor.component.supervisor))
 
   override def onMessage(msg: ContainerMessage): Behavior[ContainerMessage] = {
     (mode, msg) match {
@@ -51,9 +47,21 @@ class ContainerBehavior(
     this
   }
 
+  override def onSignal: PartialFunction[Signal, Behavior[ContainerMessage]] = {
+    case Terminated(supervisor) ⇒
+      supervisors = supervisors.filterNot(_.component.supervisor == supervisor.upcast)
+      if (supervisors.isEmpty) ctx.system.terminate()
+      this
+    case PostStop ⇒
+      registrationOpt.foreach(_.unregister())
+      Behavior.stopped
+  }
+
   def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
     case GetComponents(replyTo)    ⇒ replyTo ! Components(supervisors.map(_.component))
+    case Shutdown                  ⇒ supervisors.foreach(_.system.terminate())
     case GetContainerMode(replyTo) ⇒ replyTo ! mode
+
   }
 
   def onIdle(idleContainerMessage: ContainerIdleMessage): Unit = idleContainerMessage match {
@@ -63,20 +71,12 @@ class ContainerBehavior(
   }
 
   def onRunning(runningContainerMessage: ContainerRunningMessage): Unit = runningContainerMessage match {
-    case Lifecycle(Restart)              ⇒ onRestart()
-    case Lifecycle(Shutdown)             ⇒ onShutdown()
-    case Lifecycle(lifecycleMessage)     ⇒ sendLifecycleMessageToAllComponents(lifecycleMessage)
-    case UnRegistrationComplete          ⇒ onUnRegistrationComplete()
-    case UnRegistrationFailed(throwable) ⇒ onUnRegistrationFailed(throwable)
+    case Restart ⇒
+      mode = ContainerMode.Idle
+      supervisors.foreach { _.component.supervisor ! Restart }
+    case Lifecycle(lifecycleMessage) ⇒
+      sendLifecycleMessageToAllComponents(lifecycleMessage)
   }
-
-  def onRestart(): Unit = {
-    mode = ContainerMode.Idle
-    sendLifecycleMessageToAllComponents(Restart)
-  }
-
-  def onShutdown(): Unit =
-    unregisterFromLocationService() //FIXME: Decision pending - whether to unregister in shutdown or poststop?
 
   def sendLifecycleMessageToAllComponents(lifecycleMessage: ToComponentLifecycleMessage): Unit = {
     supervisors.foreach { _.component.supervisor ! Lifecycle(lifecycleMessage) }
@@ -121,24 +121,4 @@ class ContainerBehavior(
   private def onRegistrationFailure(throwable: Throwable): Unit =
     println(s"log.error($throwable)") //FIXME use log statement
 
-  private def unregisterFromLocationService(): Any = {
-    registrationOpt match {
-      case Some(registrationResult) ⇒
-        registrationResult.unregister().onComplete {
-          case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
-          case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
-        }
-      case None ⇒
-        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
-    }
-  }
-
-  private def onUnRegistrationComplete(): Unit = {
-    mode = ContainerMode.Idle
-    registrationOpt = None
-    sendLifecycleMessageToAllComponents(Shutdown)
-  }
-
-  private def onUnRegistrationFailed(throwable: Throwable): Unit =
-    println(s"log.error() with $throwable") //FIXME use log statement
 }

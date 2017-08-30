@@ -5,8 +5,8 @@ import akka.typed.scaladsl.ActorContext
 import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.Validations.Valid
 import csw.common.ccs.{Validation, Validations}
+import csw.common.framework.models.FromComponentLifecycleMessage.Running
 import csw.common.framework.models.PubSub.PublisherMessage
-import csw.common.framework.models.SupervisorIdleComponentMessage.Running
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.commands.{Observe, Setup}

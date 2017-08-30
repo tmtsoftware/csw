@@ -3,10 +3,10 @@ package csw.common.framework.internal.component
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage}
+import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.InitialMessage.Run
-import csw.common.framework.models.SupervisorIdleComponentMessage.{InitializeFailure, Initialized, Running}
+import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -62,20 +62,5 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
     verify(sampleComponentHandler).onRun()
     verify(sampleComponentHandler).isOnline_=(true)
-  }
-
-  // DEOPSCSW-179: Unique Action for a component
-  test("component should send InitializationFailure message if it fails in initialization") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
-    val testData        = new TestData(supervisorProbe)
-    import testData._
-
-    val exceptionReason = "test Exception"
-    when(sampleComponentHandler.initialize()).thenThrow(new RuntimeException(exceptionReason))
-    ctx.selfInbox.receiveMsg() shouldBe Initialize
-
-    componentBehavior.onMessage(Initialize)
-    val initializationFailure = supervisorProbe.expectMsgType[InitializeFailure]
-    initializationFailure.reason shouldBe exceptionReason
   }
 }

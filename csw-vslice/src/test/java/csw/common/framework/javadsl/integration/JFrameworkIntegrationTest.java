@@ -45,9 +45,11 @@ import scala.concurrent.Future;
 import scala.concurrent.Promise$;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
-import csw.common.framework.models.LocationServiceUsage;
 
 import java.util.Collections;
+
+import static csw.common.framework.models.SupervisorCommonExternalMessage.ComponentStateSubscription;
+import static csw.common.framework.models.SupervisorCommonExternalMessage.LifecycleStateSubscription;
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 // DEOPSCSW-165: CSW Assembly Creation
@@ -90,8 +92,8 @@ public class JFrameworkIntegrationTest extends Mockito {
         systemActorOf = system.<SupervisorMessage>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
         Thread.sleep(200);
-        supervisorRef.tell(new SupervisorCommonMessage.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
-        supervisorRef.tell(new SupervisorCommonMessage.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
+        supervisorRef.tell(new ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
+        supervisorRef.tell(new LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
     }
 
     @BeforeClass
@@ -117,8 +119,8 @@ public class JFrameworkIntegrationTest extends Mockito {
         lifecycleStateChangedProbe  = TestProbe.apply(system, settings);
         systemActorOf = system.<SupervisorMessage>systemActorOf(supervisorBehavior, "hcd", Props.empty(), seconds);
         supervisorRef = Await.result(systemActorOf, duration);
-        supervisorRef.tell(new SupervisorCommonMessage.ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
-        supervisorRef.tell(new SupervisorCommonMessage.LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
+        supervisorRef.tell(new ComponentStateSubscription(new PubSub.Subscribe<>(compStateProbe.ref())));
+        supervisorRef.tell(new LifecycleStateSubscription(new PubSub.Subscribe<>(lifecycleStateChangedProbe.ref())));
 
         CurrentState initCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> initParam = SampleComponentState.choiceKey().set(SampleComponentState.initChoice());
@@ -189,13 +191,11 @@ public class JFrameworkIntegrationTest extends Mockito {
     public void shouldInvokeOnShutdown() throws Exception {
         createSupervisorAndStartTLA();
 
-        supervisorRef.tell(new RunningMessage.Lifecycle(ToComponentLifecycleMessage.Shutdown$.MODULE$));
+        supervisorRef.tell(Shutdown$.MODULE$);
 
         CurrentState shutdownCurrentState = compStateProbe.expectMsgType(JClassTag.make(CurrentState.class));
         Parameter<Choice> shutdownParam = SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice());
         DemandState shutdownDemandState  = new DemandState(SampleComponentState.prefix().prefix()).add(shutdownParam);
         Assert.assertTrue(new DemandMatcher(shutdownDemandState, false).check(shutdownCurrentState));
-
-        lifecycleStateChangedProbe.expectMsg(new LifecycleStateChanged(supervisorRef, SupervisorMode.PreparingToShutdown$.MODULE$));
     }
 }

@@ -4,19 +4,17 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.ccs.CommandStatus
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
+import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.{Initialize, Start}
 import csw.common.framework.models.InitialMessage.Run
-import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
-import csw.common.framework.models.SupervisorIdleComponentMessage.InitializeFailure
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Shutdown}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models.{RunningMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
-import scala.util.control.NonFatal
 
 class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     ctx: ActorContext[ComponentMessage],
@@ -50,16 +48,12 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case Initialize =>
       async {
         await(initialization())
-        supervisor ! SupervisorIdleComponentMessage.Initialized(ctx.self)
-      } recover {
-        case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
+        supervisor ! Initialized(ctx.self)
       }
     case Start ⇒
       async {
         await(initialization())
         ctx.self ! Run
-      } recover {
-        case NonFatal(ex) ⇒ supervisor ! InitializeFailure(ex.getMessage)
       }
   }
 
@@ -74,7 +68,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       mode = ComponentMode.Running
       lifecycleHandlers.onRun()
       lifecycleHandlers.isOnline = true
-      supervisor ! SupervisorIdleComponentMessage.Running(ctx.self)
+      supervisor ! Running(ctx.self)
   }
 
   private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
@@ -85,17 +79,6 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case Shutdown =>
-      try {
-        lifecycleHandlers.onShutdown()
-        supervisor ! ShutdownComplete
-      } catch {
-        case ex: Exception ⇒ supervisor ! ShutdownFailure(ex.getMessage)
-      }
-//    case Restart =>
-//      mode = ComponentMode.Idle
-//      lifecycleHandlers.onRestart()
-//      ctx.self ! Start
     case GoOnline =>
       if (!lifecycleHandlers.isOnline) {
         lifecycleHandlers.onGoOnline()

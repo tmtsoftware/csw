@@ -8,15 +8,11 @@ import akka.{actor, Done}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.container.{ContainerBehavior, ContainerMode}
 import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorMode}
-import csw.common.framework.models.ContainerExternalMessage.GetComponents
-import csw.common.framework.models.ContainerIdleMessage.{
-  RegistrationComplete,
-  RegistrationFailed,
-  SupervisorModeChanged
-}
-import csw.common.framework.models.ContainerRunningMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.common.framework.models.ContainerCommonExternalMessage.GetComponents
+import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed}
+import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models._
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
@@ -126,13 +122,12 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     val runningContainer = new RunningContainer
     import runningContainer._
 
-    containerBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
+    containerBehavior.onMessage(Shutdown)
     verify(registrationResult).unregister()
-    containerBehavior.onMessage(UnRegistrationComplete)
 
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
-      .map(_.receiveMsg()) should contain only Lifecycle(ToComponentLifecycleMessage.Shutdown)
+      .map(_.receiveMsg()) should contain only Shutdown
 
     containerBehavior.mode shouldBe ContainerMode.Idle
   }
@@ -142,19 +137,19 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     import runningContainer._
 
     containerBehavior.runningComponents shouldBe Set.empty
-    containerBehavior.onMessage(Lifecycle(Restart))
+    containerBehavior.onMessage(Restart)
     containerBehavior.mode shouldBe ContainerMode.Idle
 
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
-      .map(_.receiveMsg()) should contain only Lifecycle(Restart)
+      .map(_.receiveMsg()) should contain only Restart
   }
 
   test("should change its mode from restarting to running after all components have restarted") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
-    containerBehavior.onMessage(Lifecycle(Restart))
+    containerBehavior.onMessage(Restart)
 
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox(component.name))
@@ -238,23 +233,5 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     containerBehavior.mode shouldBe ContainerMode.Idle
     containerBehavior.registrationOpt shouldBe None
     containerBehavior.runningComponents should not be Set.empty
-  }
-
-  test("container should retain mode if un-registration with location service fails") {
-    val runningContainer = new RunningContainer
-    import runningContainer._
-
-    val runtimeException = mock[RuntimeException]
-    val failedResult     = Promise[Done].complete(Failure(runtimeException)).future
-    when(registrationResult.unregister()).thenReturn(failedResult)
-
-    containerBehavior.mode shouldBe ContainerMode.Running
-
-    containerBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-
-    verify(registrationResult, atLeastOnce()).unregister()
-    containerBehavior.onMessage(UnRegistrationFailed(runtimeException))
-    containerBehavior.mode shouldBe ContainerMode.Running
-    containerBehavior.registrationOpt should not be None
   }
 }

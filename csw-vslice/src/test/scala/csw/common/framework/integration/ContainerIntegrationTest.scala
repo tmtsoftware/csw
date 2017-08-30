@@ -10,13 +10,16 @@ import csw.common.components.SampleComponentState._
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.common.framework.models.ContainerCommonExternalMessage.GetComponents
 import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
-import csw.common.framework.models.ContainerExternalMessage.GetComponents
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
-import csw.common.framework.models.{Components, LifecycleStateChanged}
+import csw.common.framework.models.SupervisorCommonExternalMessage.{
+  ComponentStateSubscription,
+  LifecycleStateSubscription
+}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.common.framework.models.{Components, LifecycleStateChanged, Restart}
 import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterAwareSettings
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -88,7 +91,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
 
     // on Restart message, container falls back to Idle mode and wait for all the components to get restarted
     // and moves to Running mode
-    containerRef ! Lifecycle(Restart)
+    containerRef ! Restart
 
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Idle)

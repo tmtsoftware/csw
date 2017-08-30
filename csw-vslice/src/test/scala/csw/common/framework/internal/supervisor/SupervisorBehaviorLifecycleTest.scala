@@ -6,12 +6,14 @@ import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.FrameworkTestSuite
+import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.InitialMessage.Run
-import csw.common.framework.models.PreparingToShutdownMessage.{ShutdownComplete, ShutdownFailure, ShutdownTimeout}
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
-import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.common.framework.models.SupervisorIdleComponentMessage.{InitializeFailure, Initialized, Running}
+import csw.common.framework.models.SupervisorCommonExternalMessage.{
+  ComponentStateSubscription,
+  LifecycleStateSubscription
+}
 import csw.common.framework.models.SupervisorIdleMessage.RegistrationComplete
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
@@ -64,14 +66,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
 
     childComponentInbox.receiveMsg() shouldBe Run
     supervisor.mode shouldBe SupervisorMode.Idle
-  }
-
-  test("supervisor should accept InitializeFailure message and change its mode") {
-    val testData = new TestData
-    import testData._
-
-    supervisor.onMessage(InitializeFailure("test message for initialization failure"))
-    supervisor.mode shouldBe SupervisorMode.InitializeFailure
   }
 
   test("supervisor should accept Running message from component and change its mode and publish state change") {
@@ -133,19 +127,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
    * which passes them to TLA (depending on lifecycle)
   **/
   // *************** Begin testing of onRunning Messages ***************
-  test("supervisor should handle lifecycle Shutdown message") {
-    val testData = new TestData
-    import testData._
-
-    supervisor.registrationOpt = Some(registrationResult)
-    supervisor.onMessage(Running(childComponentInbox.ref))
-    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-    childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.PreparingToShutdown))
-    )
-    supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
-    childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-  }
 
   test("supervisor should handle lifecycle Restart message") {
     val testData = new TestData
@@ -153,7 +134,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
 
     supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
-    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
+    supervisor.onMessage(Restart)
 
     supervisor.mode shouldBe SupervisorMode.Idle
 
@@ -198,81 +179,4 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
     childComponentInbox.receiveMsg() shouldBe TestCompMessage$
   }
   // *************** End of testing onRunning Messages ***************
-
-  // *************** Begin testing of onPreparingToShutdown Messages ***************
-  test("supervisor should handle ShutdownTimeout message from TLA") {
-    val testData = new TestData
-    import testData._
-
-    supervisor.registrationOpt = Some(registrationResult)
-    supervisor.onMessage(Running(childComponentInbox.ref))
-
-    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-
-    verify(timer).startSingleTimer(SupervisorBehavior.TimerKey, ShutdownTimeout, SupervisorBehavior.shutdownTimeout)
-
-    supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
-    childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.PreparingToShutdown))
-    )
-
-    supervisor.onMessage(ShutdownTimeout)
-    verify(timer, never).cancel(SupervisorBehavior.TimerKey)
-
-    supervisor.mode shouldBe SupervisorMode.ShutdownFailure
-    childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.ShutdownFailure))
-    )
-  }
-
-  test("supervisor should handle ShutdownFailure message from TLA") {
-    val testData = new TestData
-    import testData._
-
-    supervisor.registrationOpt = Some(registrationResult)
-    supervisor.onMessage(Running(childComponentInbox.ref))
-
-    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-
-    verify(timer).startSingleTimer(SupervisorBehavior.TimerKey, ShutdownTimeout, SupervisorBehavior.shutdownTimeout)
-
-    supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
-    childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.PreparingToShutdown))
-    )
-
-    supervisor.onMessage(ShutdownFailure("Exception occurred"))
-    verify(timer).cancel(SupervisorBehavior.TimerKey)
-
-    supervisor.mode shouldBe SupervisorMode.ShutdownFailure
-    childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.ShutdownFailure))
-    )
-  }
-
-  test("supervisor should handle ShutdownComplete message from TLA") {
-    val testData = new TestData
-    import testData._
-
-    supervisor.registrationOpt = Some(registrationResult)
-    supervisor.onMessage(Running(childComponentInbox.ref))
-
-    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-
-    verify(timer).startSingleTimer(SupervisorBehavior.TimerKey, ShutdownTimeout, SupervisorBehavior.shutdownTimeout)
-
-    supervisor.mode shouldBe SupervisorMode.PreparingToShutdown
-    childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.PreparingToShutdown))
-    )
-
-    supervisor.onMessage(ShutdownComplete)
-    verify(timer).cancel(SupervisorBehavior.TimerKey)
-
-    supervisor.mode shouldBe SupervisorMode.Shutdown
-    childPubSubLifecycleInbox.receiveAll() should contain(
-      Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Shutdown))
-    )
-  }
-  // *************** End of testing onPreparingToShutdown Messages ***************
 }

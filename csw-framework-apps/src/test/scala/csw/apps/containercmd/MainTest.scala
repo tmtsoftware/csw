@@ -10,7 +10,7 @@ import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
 import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
-import csw.common.framework.models.{ContainerMessage, SupervisorExternalMessage}
+import csw.common.framework.models.{ContainerMessage, SupervisorCommonMessage}
 import csw.services.location.commons.ClusterAwareSettings
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -58,11 +58,11 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     val config    = getClass.getResource("/test_standalone.conf").getPath
     val args      = Array("--standalone", "--local", config)
     val testProbe = TestProbe[SupervisorMode]
-    val maybeSupervisorRef: ActorRef[SupervisorExternalMessage] =
+    val maybeSupervisorRef: ActorRef[SupervisorCommonMessage] =
       main
         .start(args)
         .get
-        .asInstanceOf[ActorRef[SupervisorExternalMessage]]
+        .asInstanceOf[ActorRef[SupervisorCommonMessage]]
 
     maybeSupervisorRef ! GetSupervisorMode(testProbe.ref)
     testProbe.expectMsg(SupervisorMode.Idle)

@@ -3,11 +3,10 @@ package csw.common.framework.internal.component
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkTestSuite
+import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.InitialMessage.Run
-import csw.common.framework.models.PreparingToShutdownMessage.ShutdownComplete
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.SupervisorIdleComponentMessage.{Initialized, Running}
 import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
 import org.mockito.Mockito._
@@ -34,22 +33,6 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
       supervisorProbe.expectMsgType[Running]
       componentBehavior
     }
-  }
-
-  test("A running Hcd component should accept Shutdown lifecycle message") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
-    val testData        = new TestData(supervisorProbe)
-    import testData._
-
-    doNothing().when(sampleHcdHandler).onShutdown()
-
-    val previousComponentMode = runningComponent.mode
-
-    runningComponent.onMessage(Lifecycle(ToComponentLifecycleMessage.Shutdown))
-
-    supervisorProbe.expectMsg(ShutdownComplete)
-    verify(sampleHcdHandler).onShutdown()
-    previousComponentMode shouldBe runningComponent.mode
   }
 
   test("A running Hcd component should accept RunOffline lifecycle message") {

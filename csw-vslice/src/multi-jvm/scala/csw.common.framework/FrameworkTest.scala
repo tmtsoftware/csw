@@ -9,17 +9,17 @@ import csw.common.components.{ComponentStatistics, SampleComponentState}
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+import csw.common.framework.models.ContainerCommonExternalMessage.GetComponents
 import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
-import csw.common.framework.models.ContainerExternalMessage.GetComponents
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.SupervisorCommonMessage.{
+import csw.common.framework.models.SupervisorCommonExternalMessage.{
   ComponentStateSubscription,
-  GetSupervisorMode,
   LifecycleStateSubscription
 }
+import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
 import csw.common.framework.models.ToComponentLifecycleMessage.GoOffline
-import csw.common.framework.models.{Components, ContainerMessage, LifecycleStateChanged, SupervisorExternalMessage}
+import csw.common.framework.models._
 import csw.param.states.CurrentState
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
@@ -133,7 +133,6 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       val supervisorStateProbe = TestProbe[LifecycleStateChanged]
       val wiring               = FrameworkWiring.make(system, locationService)
       val supervisorRef        = Standalone.spawn(ConfigFactory.load("eaton_hcd_standalone.conf"), wiring)
-
       supervisorRef ! LifecycleStateSubscription(Subscribe(supervisorStateProbe.ref))
       supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
       enterBarrier("running")
