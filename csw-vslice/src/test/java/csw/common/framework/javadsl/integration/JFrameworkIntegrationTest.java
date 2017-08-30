@@ -45,6 +45,7 @@ import scala.concurrent.Future;
 import scala.concurrent.Promise$;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
+import csw.common.framework.models.LocationServiceUsage;
 
 import java.util.Collections;
 
@@ -61,7 +62,7 @@ public class JFrameworkIntegrationTest extends Mockito {
             JComponentType.HCD,
             "wfos",
             "csw.common.framework.javadsl.integration.JSampleComponentBehaviorFactory",
-            LocationServiceUsage.DoNotRegister$.MODULE$,
+            LocationServiceUsage.JDoNotRegister(),
             Collections.emptySet());
 
     private static akka.actor.ActorSystem untypedSystem = ActorSystemFactory.remote();

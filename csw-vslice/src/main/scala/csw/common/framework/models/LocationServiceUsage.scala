@@ -25,4 +25,8 @@ object LocationServiceUsage extends Enum[LocationServiceUsage] {
   case object DoNotRegister            extends LocationServiceUsage
   case object RegisterOnly             extends LocationServiceUsage
   case object RegisterAndTrackServices extends LocationServiceUsage
+
+  val JDoNotRegister: LocationServiceUsage            = DoNotRegister
+  val JRegisterOnly: LocationServiceUsage             = RegisterOnly
+  val JRegisterAndTrackServices: LocationServiceUsage = RegisterAndTrackServices
 }
