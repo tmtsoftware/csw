@@ -1,7 +1,7 @@
 package csw.common.framework.internal.component
 
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior}
+import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.ccs.CommandStatus
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.IdleMessage.{Initialize, Start}
@@ -38,6 +38,12 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       case _                                              ⇒ println(s"current context=$mode does not handle message=$msg")
     }
     this
+  }
+
+  override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
+    case PostStop ⇒
+      lifecycleHandlers.onShutdown()
+      this
   }
 
   private def onIdle(x: IdleMessage): Unit = x match {

@@ -20,7 +20,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
   lazy val actorSystem: ActorSystem = clusterSettings.system
   lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
 
-  def start(args: Array[String]): Option[Any] = {
+  def start(args: Array[String]): Option[ActorRef[SupervisorExternalMessage with ContainerMessage]] = {
     new ArgsParser().parse(args).map {
       case Options(standalone, isLocal, inputFilePath) =>
         if (startLogging) {
@@ -38,6 +38,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
           case ex: Exception ⇒ {
             shutdown
             println(s"log.error(${ex.getMessage}, ex)")
+            throw ex
           }
         }
     }
