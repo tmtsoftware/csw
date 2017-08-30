@@ -1,0 +1,175 @@
+{
+  "type": "Setup",
+  "info": {
+    "obsId": "Obs001",
+    "runId": "f22dc990-a02c-4d7e-b719-50b167cb7a1e"
+  },
+  "prefix": {
+    "subsystem": "wfos",
+    "prefix": "wfos.blue.filter"
+  },
+  "paramSet": [{
+    "keyName": "ShortMatrix",
+    "keyType": "ShortMatrixKey",
+    "values": [{
+      "data": [[4, 5], [6, 7]]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "ByteArrayKey",
+    "keyType": "ByteArrayKey",
+    "values": [{
+      "data": [1, 2]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "ChoiceKey",
+    "keyType": "ChoiceKey",
+    "values": [{
+      "name": "First"
+    }, {
+      "name": "Second"
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "RaDecKey",
+    "keyType": "RaDecKey",
+    "values": [{
+      "ra": 7.3,
+      "dec": 12.1
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "CharKey",
+    "keyType": "CharKey",
+    "values": ["A", "B"],
+    "units": "[none]"
+  }, {
+    "keyName": "StructKey",
+    "keyType": "StructKey",
+    "values": [{
+      "paramSet": [{
+        "keyName": "BooleanKey",
+        "keyType": "BooleanKey",
+        "values": [true, false],
+        "units": "[none]"
+      }, {
+        "keyName": "ByteKey",
+        "keyType": "ByteKey",
+        "values": [10, 20],
+        "units": "[none]"
+      }]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "IntKey",
+    "keyType": "IntKey",
+    "values": [70, 80],
+    "units": "[none]"
+  }, {
+    "keyName": "DoubleArrayKey",
+    "keyType": "DoubleArrayKey",
+    "values": [{
+      "data": [11.0, 12.0]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "ShortArrayKey",
+    "keyType": "ShortArrayKey",
+    "values": [{
+      "data": [3, 4]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "FloatKey",
+    "keyType": "FloatKey",
+    "values": [90.0, 100.0],
+    "units": "[none]"
+  }, {
+    "keyName": "ByteKey",
+    "keyType": "ByteKey",
+    "values": [10, 20],
+    "units": "[none]"
+  }, {
+    "keyName": "BooleanKey",
+    "keyType": "BooleanKey",
+    "values": [true, false],
+    "units": "[none]"
+  }, {
+    "keyName": "LongKey",
+    "keyType": "LongKey",
+    "values": [50, 60],
+    "units": "[none]"
+  }, {
+    "keyName": "FloatMatrix",
+    "keyType": "FloatMatrixKey",
+    "values": [{
+      "data": [[16.0, 17.0], [18.0, 19.0]]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "LongArrayKey",
+    "keyType": "LongArrayKey",
+    "values": [{
+      "data": [5, 6]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "IntArrayKey",
+    "keyType": "IntArrayKey",
+    "values": [{
+      "data": [7, 8]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "ShortKey",
+    "keyType": "ShortKey",
+    "values": [30, 40],
+    "units": "[none]"
+  }, {
+    "keyName": "ByteMatrix",
+    "keyType": "ByteMatrixKey",
+    "values": [{
+      "data": [[1, 2], [3, 4]]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "DoubleMatrix",
+    "keyType": "DoubleMatrixKey",
+    "values": [{
+      "data": [[20.0, 21.0], [22.0, 23.0]]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "IntMatrix",
+    "keyType": "IntMatrixKey",
+    "values": [{
+      "data": [[12, 13], [14, 15]]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "DoubleKey",
+    "keyType": "DoubleKey",
+    "values": [110.0, 120.0],
+    "units": "[none]"
+  }, {
+    "keyName": "StringKey",
+    "keyType": "StringKey",
+    "values": ["Str1", "Str2"],
+    "units": "[none]"
+  }, {
+    "keyName": "LongMatrix",
+    "keyType": "LongMatrixKey",
+    "values": [{
+      "data": [[8, 9], [10, 11]]
+    }],
+    "units": "[none]"
+  }, {
+    "keyName": "FloatArrayKey",
+    "keyType": "FloatArrayKey",
+    "values": [{
+      "data": [9.0, 10.0]
+    }],
+    "units": "[none]"
+  }]
+}
