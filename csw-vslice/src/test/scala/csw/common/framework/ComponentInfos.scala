@@ -1,6 +1,6 @@
 package csw.common.framework
 
-import csw.common.framework.models.LocationServiceUsage.DoNotRegister
+import csw.common.framework.models.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.common.framework.models.{ComponentInfo, ContainerInfo}
 import csw.services.location.models.ComponentType.{Assembly, HCD}
 
@@ -35,5 +35,5 @@ object ComponentInfos {
       Set.empty
     )
 
-  val containerInfo: ContainerInfo = ContainerInfo("container", Set(hcdInfo, assemblyInfo))
+  val containerInfo: ContainerInfo = ContainerInfo("container", RegisterOnly, Set(hcdInfo, assemblyInfo))
 }
