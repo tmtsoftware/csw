@@ -43,6 +43,14 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     }
   }
 
+  test("should able to throw error when 'locationServiceUsage' is missing") {
+    val config = ConfigFactory.parseResources(getClass, "/conf/container/missing_location_seervice_usage.conf")
+
+    intercept[spray.json.DeserializationException] {
+      ComponentInfoParser.parse(config)
+    }
+  }
+
   test("should able to throw error when 'components' is missing") {
     val config = ConfigFactory.parseResources(getClass, "/conf/container/missing_components.conf")
 
@@ -69,6 +77,14 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
 
   test("should able to throw error when 'prefix' is missing for assembly") {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/missing_prefix.conf")
+
+    intercept[spray.json.DeserializationException] {
+      ComponentInfoParser.parse(config)
+    }
+  }
+
+  test("should able to throw error when 'locationServiceUsage' is missing for assembly") {
+    val config = ConfigFactory.parseResources(getClass, "/conf/assembly/missing_location_service_usage.conf")
 
     intercept[spray.json.DeserializationException] {
       ComponentInfoParser.parse(config)
@@ -117,6 +133,14 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
 
   test("should able to throw error when 'prefix' is missing for hcd") {
     val config = ConfigFactory.parseResources(getClass, "/conf/hcd/missing_prefix.conf")
+
+    intercept[spray.json.DeserializationException] {
+      ComponentInfoParser.parse(config)
+    }
+  }
+
+  test("should able to throw error when 'locationServiceUsage' is missing for hcd") {
+    val config = ConfigFactory.parseResources(getClass, "/conf/hcd/missing_location_service_usage.conf")
 
     intercept[spray.json.DeserializationException] {
       ComponentInfoParser.parse(config)
