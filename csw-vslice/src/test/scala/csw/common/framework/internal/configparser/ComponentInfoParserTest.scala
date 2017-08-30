@@ -1,6 +1,7 @@
 package csw.common.framework.internal.configparser
 
 import com.typesafe.config.ConfigFactory
+import csw.common.framework.models.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.common.framework.models.{ComponentInfo, ContainerInfo}
 import csw.services.location.models.ComponentType.{Assembly, HCD}
 import csw.services.location.models.Connection
@@ -15,10 +16,13 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     Assembly,
     "tcs.mobie.blue.filter",
     "csw.pkgDemo.assembly1.Assembly1",
+    DoNotRegister,
     Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka"))
   )
-  private val hcd2AInfo     = ComponentInfo("HCD-2A", HCD, "tcs.mobie.blue.filter", "csw.pkgDemo.hcd2.Hcd2", Set.empty)
-  private val hcd2BInfo     = ComponentInfo("HCD-2B", HCD, "tcs.mobie.blue.disperser", "csw.pkgDemo.hcd2.Hcd2", Set.empty)
+  private val hcd2AInfo =
+    ComponentInfo("HCD-2A", HCD, "tcs.mobie.blue.filter", "csw.pkgDemo.hcd2.Hcd2", RegisterOnly, Set.empty)
+  private val hcd2BInfo =
+    ComponentInfo("HCD-2B", HCD, "tcs.mobie.blue.disperser", "csw.pkgDemo.hcd2.Hcd2", DoNotRegister, Set.empty)
   private val containerInfo = ContainerInfo("Container-1", Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
 
   test("should able to parse container config") {

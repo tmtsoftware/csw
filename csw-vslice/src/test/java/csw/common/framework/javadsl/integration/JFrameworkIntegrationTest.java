@@ -61,6 +61,7 @@ public class JFrameworkIntegrationTest extends Mockito {
             JComponentType.HCD,
             "wfos",
             "csw.common.framework.javadsl.integration.JSampleComponentBehaviorFactory",
+            LocationServiceUsage.DoNotRegister$.MODULE$,
             Collections.emptySet());
 
     private static akka.actor.ActorSystem untypedSystem = ActorSystemFactory.remote();

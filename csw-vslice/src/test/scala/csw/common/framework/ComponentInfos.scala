@@ -1,5 +1,6 @@
 package csw.common.framework
 
+import csw.common.framework.models.LocationServiceUsage.DoNotRegister
 import csw.common.framework.models.{ComponentInfo, ContainerInfo}
 import csw.services.location.models.ComponentType.{Assembly, HCD}
 
@@ -10,6 +11,7 @@ object ComponentInfos {
       Assembly,
       "wfos",
       "csw.common.components.SampleComponentBehaviorFactory",
+      DoNotRegister,
       Set.empty
     )
 
@@ -19,6 +21,7 @@ object ComponentInfos {
       Assembly,
       "wfos",
       "csw.common.components.ComponentBehaviorFactoryToSimulateFailure",
+      DoNotRegister,
       Set.empty
     )
 
@@ -28,6 +31,7 @@ object ComponentInfos {
       HCD,
       "wfos",
       "csw.common.components.SampleComponentBehaviorFactory",
+      DoNotRegister,
       Set.empty
     )
 

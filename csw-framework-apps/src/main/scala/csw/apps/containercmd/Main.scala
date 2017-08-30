@@ -1,6 +1,6 @@
 package csw.apps.containercmd
 
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Path}
 
 import akka.Done
 import akka.actor.ActorSystem

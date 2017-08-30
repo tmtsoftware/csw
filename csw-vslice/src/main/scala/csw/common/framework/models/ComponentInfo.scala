@@ -13,6 +13,7 @@ final case class ComponentInfo(
     componentType: ComponentType,
     prefix: String,
     className: String,
+    locationServiceUsage: LocationServiceUsage,
     connections: Set[Connection] = Set.empty
 ) extends TmtSerializable {
 
@@ -25,5 +26,5 @@ final case class ComponentInfo(
 
 case object ComponentInfo {
   import csw.services.location.internal.JsonSupport._
-  implicit val componentInfoFormat: JsonFormat[ComponentInfo] = jsonFormat5(ComponentInfo.apply)
+  implicit val componentInfoFormat: JsonFormat[ComponentInfo] = jsonFormat6(ComponentInfo.apply)
 }
