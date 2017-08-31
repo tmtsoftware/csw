@@ -61,7 +61,7 @@ object RunningMessage {
 }
 
 case object Restart  extends SupervisorRunningMessage with ContainerRunningMessage
-case object Shutdown extends SupervisorCommonExternalMessage with ContainerCommonExternalMessage
+case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage
 
 ///////////////
 
@@ -72,15 +72,11 @@ sealed trait SupervisorRunningMessage  extends SupervisorExternalMessage
 
 sealed trait SupervisorCommonMessage extends SupervisorExternalMessage
 object SupervisorCommonMessage {
-  case class GetSupervisorMode(replyTo: ActorRef[SupervisorMode]) extends SupervisorCommonMessage
-}
-
-sealed trait SupervisorCommonExternalMessage extends SupervisorExternalMessage with SupervisorCommonMessage
-object SupervisorCommonExternalMessage {
   case class LifecycleStateSubscription(subscriberMessage: SubscriberMessage[LifecycleStateChanged])
-      extends SupervisorCommonExternalMessage
+      extends SupervisorCommonMessage
   case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState])
-      extends SupervisorCommonExternalMessage
+      extends SupervisorCommonMessage
+  case class GetSupervisorMode(replyTo: ActorRef[SupervisorMode]) extends SupervisorCommonMessage
 }
 
 sealed trait SupervisorIdleMessage extends SupervisorMessage
@@ -106,11 +102,7 @@ sealed trait ContainerRunningMessage  extends ContainerExternalMessage
 sealed trait ContainerCommonMessage extends ContainerExternalMessage
 object ContainerCommonMessage {
   case class GetContainerMode(replyTo: ActorRef[ContainerMode]) extends ContainerCommonMessage
-}
-
-sealed trait ContainerCommonExternalMessage extends ContainerExternalMessage with ContainerCommonMessage
-object ContainerCommonExternalMessage {
-  case class GetComponents(replyTo: ActorRef[Components]) extends ContainerCommonExternalMessage
+  case class GetComponents(replyTo: ActorRef[Components])       extends ContainerCommonMessage
 }
 
 sealed trait ContainerIdleMessage extends ContainerMessage

@@ -4,8 +4,7 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.common.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorMode}
-import csw.common.framework.models.ContainerCommonExternalMessage.GetComponents
-import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
+import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
 import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.RunningMessage.Lifecycle

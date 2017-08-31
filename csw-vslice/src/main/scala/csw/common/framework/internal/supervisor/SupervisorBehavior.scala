@@ -10,11 +10,11 @@ import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.SupervisorCommonExternalMessage.{
+import csw.common.framework.models.SupervisorCommonMessage.{
   ComponentStateSubscription,
+  GetSupervisorMode,
   LifecycleStateSubscription
 }
-import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
 import csw.common.framework.models.SupervisorIdleMessage.{RegistrationComplete, RegistrationFailed}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models._

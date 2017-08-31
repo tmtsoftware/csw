@@ -10,10 +10,7 @@ import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, R
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
-import csw.common.framework.models.SupervisorCommonExternalMessage.{
-  ComponentStateSubscription,
-  LifecycleStateSubscription
-}
+import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.SupervisorIdleMessage.RegistrationComplete
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers

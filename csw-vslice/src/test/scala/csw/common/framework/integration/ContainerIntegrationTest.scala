@@ -10,14 +10,10 @@ import csw.common.components.SampleComponentState._
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.common.framework.models.ContainerCommonExternalMessage.GetComponents
-import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
+import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.SupervisorCommonExternalMessage.{
-  ComponentStateSubscription,
-  LifecycleStateSubscription
-}
+import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models.{Components, LifecycleStateChanged, Restart}
 import csw.param.states.CurrentState

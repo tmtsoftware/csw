@@ -13,12 +13,9 @@ import csw.common.framework.internal.supervisor.{SupervisorBehavior, SupervisorB
 import csw.common.framework.models.CommandMessage.Oneway
 import csw.common.framework.models.PubSub.{Publish, PublisherMessage, Subscribe}
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.SupervisorCommonExternalMessage.{
-  ComponentStateSubscription,
-  LifecycleStateSubscription
-}
+import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.common.framework.models.{ContainerIdleMessage, LifecycleStateChanged, Shutdown, SupervisorExternalMessage, _}
+import csw.common.framework.models.{ContainerIdleMessage, LifecycleStateChanged, SupervisorExternalMessage, _}
 import csw.common.framework.scaladsl.ComponentBehaviorFactory
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}

@@ -49,8 +49,7 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.util.Collections;
 
-import static csw.common.framework.models.SupervisorCommonExternalMessage.ComponentStateSubscription;
-import static csw.common.framework.models.SupervisorCommonExternalMessage.LifecycleStateSubscription;
+import static csw.common.framework.models.SupervisorCommonMessage.*;
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 // DEOPSCSW-165: CSW Assembly Creation
