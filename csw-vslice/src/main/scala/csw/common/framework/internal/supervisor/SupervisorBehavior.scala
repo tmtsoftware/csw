@@ -4,7 +4,7 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.common.framework.exceptions.TriggerRestartException
-import csw.common.framework.internal.PubSubActor
+import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.SupervisorMode.Idle
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
@@ -42,6 +42,7 @@ class SupervisorBehavior(
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
     componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentBehaviorFactory[_],
+    pubSubBehaviorFactory: PubSubBehaviorFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
 ) extends MutableBehavior[SupervisorMessage] {
@@ -58,10 +59,9 @@ class SupervisorBehavior(
   var runningComponent: Option[ActorRef[RunningMessage]] = None
   var registrationOpt: Option[RegistrationResult]        = None
 
-  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
-    ctx.spawn(PubSubActor.behavior[LifecycleStateChanged], PubSubLifecycleActor)
-  val pubSubComponent: ActorRef[PubSub[CurrentState]] =
-    ctx.spawn(PubSubActor.behavior[CurrentState], PubSubComponentActor)
+  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor)
+  val pubSubComponent: ActorRef[PubSub[CurrentState]]          = pubSubBehaviorFactory.make(ctx, PubSubComponentActor)
+
   var component: ActorRef[Nothing] =
     ctx.spawn[Nothing](
       Actor

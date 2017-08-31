@@ -2,6 +2,7 @@ package csw.common.framework.internal.supervisor
 
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
+import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.models.{ComponentInfo, ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
 import csw.common.framework.scaladsl.ComponentBehaviorFactory
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -12,7 +13,8 @@ object SupervisorBehaviorFactory {
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       componentInfo: ComponentInfo,
       locationService: LocationService,
-      registrationFactory: RegistrationFactory
+      registrationFactory: RegistrationFactory,
+      pubSubBehaviorFactory: PubSubBehaviorFactory
   ): Behavior[SupervisorExternalMessage] = {
 
     val componentWiringClass = Class.forName(componentInfo.className)
@@ -20,7 +22,16 @@ object SupervisorBehaviorFactory {
 
     Actor
       .mutable[SupervisorMessage](
-        ctx => new SupervisorBehavior(ctx, containerRef, componentInfo, compWring, registrationFactory, locationService)
+        ctx =>
+          new SupervisorBehavior(
+            ctx,
+            containerRef,
+            componentInfo,
+            compWring,
+            pubSubBehaviorFactory,
+            registrationFactory,
+            locationService
+        )
       )
       .narrow
   }

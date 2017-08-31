@@ -10,8 +10,14 @@ object Standalone {
 
   def spawn(config: com.typesafe.config.Config, wiring: FrameworkWiring): ActorRef[SupervisorExternalMessage] = {
     import wiring._
-    val componentInfo      = ComponentInfoParser.parseStandalone(config)
-    val supervisorBehavior = SupervisorBehaviorFactory.make(None, componentInfo, locationService, registrationFactory)
+    val componentInfo = ComponentInfoParser.parseStandalone(config)
+    val supervisorBehavior = SupervisorBehaviorFactory.make(
+      None,
+      componentInfo,
+      locationService,
+      registrationFactory,
+      pubSubBehaviorFactory
+    )
     actorSystem.spawn(supervisorBehavior, componentInfo.name)
   }
 }

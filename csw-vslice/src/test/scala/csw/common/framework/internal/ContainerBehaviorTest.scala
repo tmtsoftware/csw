@@ -7,6 +7,7 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, Done}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.container.{ContainerBehavior, ContainerMode}
+import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorMode}
 import csw.common.framework.models.ContainerCommonMessage.GetComponents
 import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed}
@@ -35,11 +36,12 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   implicit val settings: TestKitSettings         = TestKitSettings(typedSystem)
 
   class IdleContainer() {
-    val ctx                                      = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
-    val supervisorFactory: SupervisorInfoFactory = mock[SupervisorInfoFactory]
-    val akkaRegistration                         = AkkaRegistration(mock[AkkaConnection], TestProbe("test-probe").testActor)
-    val locationService: LocationService         = mock[LocationService]
-    val registrationResult: RegistrationResult   = mock[RegistrationResult]
+    val ctx                                                  = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
+    val supervisorFactory: SupervisorInfoFactory             = mock[SupervisorInfoFactory]
+    val akkaRegistration                                     = AkkaRegistration(mock[AkkaConnection], TestProbe("test-probe").testActor)
+    val locationService: LocationService                     = mock[LocationService]
+    val registrationResult: RegistrationResult               = mock[RegistrationResult]
+    private val pubSubBehaviorFactory: PubSubBehaviorFactory = mock[PubSubBehaviorFactory]
     val answer = new Answer[SupervisorInfo] {
       override def answer(invocation: InvocationOnMock): SupervisorInfo = {
         val componentInfo = invocation.getArgument[ComponentInfo](1)
@@ -47,7 +49,13 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
           untypedSystem,
           Component(
             ctx.spawn(
-              SupervisorBehaviorFactory.make(Some(ctx.self), componentInfo, locationService, registrationFactory),
+              SupervisorBehaviorFactory.make(
+                Some(ctx.self),
+                componentInfo,
+                locationService,
+                registrationFactory,
+                pubSubBehaviorFactory
+              ),
               componentInfo.name
             ),
             componentInfo

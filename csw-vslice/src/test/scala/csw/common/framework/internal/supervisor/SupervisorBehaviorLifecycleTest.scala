@@ -5,6 +5,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
 import csw.common.framework.ComponentInfos._
+import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
@@ -32,9 +33,10 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val supervisor =
       new SupervisorBehavior(
         ctx,
-        Some(containerIdleMessageProbe.testActor),
+        Some(containerIdleMessageProbe.ref),
         hcdInfo,
         getSampleHcdWiring(sampleHcdHandler),
+        new PubSubBehaviorFactory,
         registrationFactory,
         locationService
       )
