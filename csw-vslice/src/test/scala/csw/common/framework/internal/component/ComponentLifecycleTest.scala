@@ -1,5 +1,6 @@
 package csw.common.framework.internal.component
 
+import akka.typed.PostStop
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkTestSuite
@@ -19,78 +20,102 @@ import scala.concurrent.Future
 //DEOPSCSW-179-Unique Action for a component
 class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
-  class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
+  class IdleComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
     private val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
 
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
-    val componentBehavior = new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleHcdHandler)
+    val behavior = new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleHcdHandler)
 
-    val runningComponent: ComponentBehavior[ComponentDomainMessage] = {
-      componentBehavior.onMessage(Initialize)
+    val idleComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
+      behavior.onMessage(Initialize)
       supervisorProbe.expectMsgType[Initialized]
-      Thread.sleep(100)
-      componentBehavior.onMessage(Run)
-      supervisorProbe.expectMsgType[Running]
-      componentBehavior
+      behavior
     }
   }
 
-  test("A running Hcd component should handle RunOffline lifecycle message") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
-    val testData        = new TestData(supervisorProbe)
-    import testData._
+  class RunningComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage])
+      extends IdleComponent(supervisorProbe) {
+    val runningComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
+      idleComponentBehavior.onMessage(Run)
+      supervisorProbe.expectMsgType[Running]
+      idleComponentBehavior
+    }
+  }
+
+  test("A running component should handle RunOffline lifecycle message") {
+    val supervisorProbe  = TestProbe[FromComponentLifecycleMessage]
+    val runningComponent = new RunningComponent(supervisorProbe)
+    import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(true)
 
-    val previousComponentMode = runningComponent.mode
-    runningComponent.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
+    val previousComponentMode = runningComponentBehavior.mode
+    runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     verify(sampleHcdHandler).onGoOffline()
     verify(sampleHcdHandler).isOnline
-    previousComponentMode shouldBe runningComponent.mode
+    previousComponentMode shouldBe runningComponentBehavior.mode
   }
 
-  test("A running Hcd component should not accept RunOffline lifecycle message when it is already offline") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
-    val testData        = new TestData(supervisorProbe)
-    import testData._
+  test("A running component should not accept RunOffline lifecycle message when it is already offline") {
+    val supervisorProbe  = TestProbe[FromComponentLifecycleMessage]
+    val runningComponent = new RunningComponent(supervisorProbe)
+    import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(false)
 
-    val previousComponentMode = runningComponent.mode
-    runningComponent.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
+    val previousComponentMode = runningComponentBehavior.mode
+    runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     verify(sampleHcdHandler, never).onGoOffline()
-    previousComponentMode shouldBe runningComponent.mode
+    previousComponentMode shouldBe runningComponentBehavior.mode
   }
 
-  test("A running Hcd component should handle RunOnline lifecycle message when it is Offline") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
-    val testData        = new TestData(supervisorProbe)
-    import testData._
+  test("A running component should handle RunOnline lifecycle message when it is Offline") {
+    val supervisorProbe  = TestProbe[FromComponentLifecycleMessage]
+    val runningComponent = new RunningComponent(supervisorProbe)
+    import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(false)
 
-    val previousComponentMode = runningComponent.mode
-    runningComponent.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
+    val previousComponentMode = runningComponentBehavior.mode
+    runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
     verify(sampleHcdHandler).onGoOnline()
-    previousComponentMode shouldBe runningComponent.mode
+    previousComponentMode shouldBe runningComponentBehavior.mode
   }
 
-  test("A running Hcd component should not accept RunOnline lifecycle message when it is already Online") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
-    val testData        = new TestData(supervisorProbe)
-    import testData._
+  test("A running component should not accept RunOnline lifecycle message when it is already Online") {
+    val supervisorProbe  = TestProbe[FromComponentLifecycleMessage]
+    val runningComponent = new RunningComponent(supervisorProbe)
+    import runningComponent._
 
     when(sampleHcdHandler.isOnline).thenReturn(true)
 
-    runningComponent.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
+    runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
     verify(sampleHcdHandler, never).onGoOnline()
   }
 
-  test("A running Hcd component should handle Restart lifecycle message when it is Running") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
-    val testData        = new TestData(supervisorProbe)
-    import testData._
+  test("A running component should handle Restart lifecycle message") {
+    val supervisorProbe  = TestProbe[FromComponentLifecycleMessage]
+    val runningComponent = new RunningComponent(supervisorProbe)
+    import runningComponent._
 
     intercept[TriggerRestartException] {
-      runningComponent.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
+      runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
     }
+  }
+
+  test("A running component should handle shutdown lifecycle message") {
+    val supervisorProbe  = TestProbe[FromComponentLifecycleMessage]
+    val runningComponent = new RunningComponent(supervisorProbe)
+    import runningComponent._
+
+    runningComponentBehavior.onSignal(PostStop)
+    verify(sampleHcdHandler).onShutdown()
+  }
+
+  test("An idle component should handle shutdown lifecycle message") {
+    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
+    val idleComponent   = new IdleComponent(supervisorProbe)
+    import idleComponent._
+
+    idleComponentBehavior.onSignal(PostStop)
+    verify(sampleHcdHandler).onShutdown()
   }
 }
