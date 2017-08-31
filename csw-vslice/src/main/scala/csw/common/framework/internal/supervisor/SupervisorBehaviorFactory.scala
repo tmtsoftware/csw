@@ -19,20 +19,8 @@ object SupervisorBehaviorFactory {
     val compWring            = componentWiringClass.newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
 
     Actor
-      .withTimers[SupervisorMessage](
-        timerScheduler ⇒
-          Actor.mutable[SupervisorMessage](
-            ctx =>
-              new SupervisorBehavior(
-                ctx,
-                containerRef,
-                timerScheduler,
-                componentInfo,
-                compWring,
-                registrationFactory,
-                locationService
-            )
-        )
+      .mutable[SupervisorMessage](
+        ctx => new SupervisorBehavior(ctx, containerRef, componentInfo, compWring, registrationFactory, locationService)
       )
       .narrow
   }

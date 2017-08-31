@@ -1,7 +1,7 @@
 package csw.common.framework.internal.supervisor
 
 import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
+import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.common.framework.exceptions.TriggerRestartException
 import csw.common.framework.internal.PubSubActor
@@ -40,7 +40,6 @@ object SupervisorBehavior {
 class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
-    timerScheduler: TimerScheduler[SupervisorMessage],
     componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentBehaviorFactory[_],
     registrationFactory: RegistrationFactory,

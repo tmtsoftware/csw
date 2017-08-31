@@ -225,19 +225,15 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with BeforeAndAfterEa
       .thenAnswer(componentTLA)
 
     Actor
-      .withTimers[SupervisorMessage](
-        timerScheduler ⇒
-          Actor.mutable[SupervisorMessage](
-            ctx =>
-              new SupervisorBehavior(
-                ctx,
-                Some(containerIdleMessageProbe.testActor),
-                timerScheduler,
-                hcdInfo,
-                compWring,
-                registrationFactory,
-                locationService
-            )
+      .mutable[SupervisorMessage](
+        ctx =>
+          new SupervisorBehavior(
+            ctx,
+            Some(containerIdleMessageProbe.testActor),
+            hcdInfo,
+            compWring,
+            registrationFactory,
+            locationService
         )
       )
       .narrow

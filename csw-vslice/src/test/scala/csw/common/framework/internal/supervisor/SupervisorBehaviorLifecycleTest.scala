@@ -33,7 +33,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
       new SupervisorBehavior(
         ctx,
         Some(containerIdleMessageProbe.testActor),
-        timer,
         hcdInfo,
         getSampleHcdWiring(sampleHcdHandler),
         registrationFactory,
@@ -131,9 +130,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   test("supervisor should handle lifecycle Restart message") {
     val testData = new TestData
     import testData._
-    import testData.testMockData._
 
-    supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
     supervisor.mode shouldBe SupervisorMode.Idle
@@ -143,9 +140,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   test("supervisor should handle lifecycle GoOffline message") {
     val testData = new TestData
     import testData._
-    import testData.testMockData._
 
-    supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     supervisor.mode shouldBe SupervisorMode.RunningOffline
@@ -155,9 +150,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   test("supervisor should handle lifecycle GoOnline message") {
     val testData = new TestData
     import testData._
-    import testData.testMockData._
 
-    supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
