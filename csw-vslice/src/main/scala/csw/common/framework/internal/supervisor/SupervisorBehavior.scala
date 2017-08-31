@@ -1,8 +1,9 @@
 package csw.common.framework.internal.supervisor
 
 import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.{ActorContext, TimerScheduler}
-import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
+import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
+import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
+import csw.common.framework.exceptions.TriggerRestartException
 import csw.common.framework.internal.PubSubActor
 import csw.common.framework.internal.supervisor.SupervisorMode.Idle
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
@@ -16,7 +17,7 @@ import csw.common.framework.models.SupervisorCommonMessage.{
   LifecycleStateSubscription
 }
 import csw.common.framework.models.SupervisorIdleMessage.{RegistrationComplete, RegistrationFailed}
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.ComponentBehaviorFactory
 import csw.param.states.CurrentState
@@ -63,7 +64,12 @@ class SupervisorBehavior(
   val pubSubComponent: ActorRef[PubSub[CurrentState]] =
     ctx.spawn(PubSubActor.behavior[CurrentState], PubSubComponentActor)
   var component: ActorRef[Nothing] =
-    ctx.spawn[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent), ComponentActor)
+    ctx.spawn[Nothing](
+      Actor
+        .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))
+        .onFailure[TriggerRestartException](SupervisorStrategy.restart),
+      ComponentActor
+    )
 
   ctx.watch(component)
 
@@ -115,24 +121,16 @@ class SupervisorBehavior(
           case _                  ⇒
         }
         runningComponent.get ! runningMessage
-      case Restart ⇒ handleRestart()
     }
   }
 
   def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
+    case Restart ⇒
+      mode = SupervisorMode.Idle
     case GoOffline ⇒
       if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
     case GoOnline ⇒
       if (mode == SupervisorMode.RunningOffline) mode = SupervisorMode.Running
-  }
-
-  private def handleRestart(): Unit = {
-    mode = SupervisorMode.Idle
-    ctx.unwatch(component)
-    ctx.stop(component)
-    component =
-      ctx.spawn[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent), ComponentActor + "1")
-    ctx.watch(component)
   }
 
   private def registerWithLocationService(componentRef: ActorRef[InitialMessage]): Unit = {

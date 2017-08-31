@@ -8,6 +8,7 @@ import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetCon
 import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
+import csw.common.framework.models.ToComponentLifecycleMessage.Restart
 import csw.common.framework.models._
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
@@ -69,12 +70,15 @@ class ContainerBehavior(
     case RegistrationFailed(throwable)                     ⇒ onRegistrationFailure(throwable)
   }
 
-  def onRunning(runningContainerMessage: ContainerRunningMessage): Unit = runningContainerMessage match {
-    case Restart ⇒
-      mode = ContainerMode.Idle
-      supervisors.foreach { _.component.supervisor ! Restart }
-    case Lifecycle(lifecycleMessage) ⇒
-      sendLifecycleMessageToAllComponents(lifecycleMessage)
+  def onRunning(containerRunningMessage: ContainerRunningMessage): Unit = {
+    containerRunningMessage match {
+      case lifecycle: Lifecycle ⇒
+        lifecycle match {
+          case Lifecycle(Restart) ⇒ mode = ContainerMode.Idle
+          case _                  ⇒
+        }
+        supervisors.foreach { _.component.supervisor ! lifecycle }
+    }
   }
 
   def sendLifecycleMessageToAllComponents(lifecycleMessage: ToComponentLifecycleMessage): Unit = {

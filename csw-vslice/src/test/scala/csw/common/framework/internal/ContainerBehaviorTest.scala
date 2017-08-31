@@ -12,7 +12,7 @@ import csw.common.framework.models.ContainerCommonMessage.GetComponents
 import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models._
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
@@ -123,19 +123,19 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     import runningContainer._
 
     containerBehavior.runningComponents shouldBe Set.empty
-    containerBehavior.onMessage(Restart)
+    containerBehavior.onMessage(Lifecycle(Restart))
     containerBehavior.mode shouldBe ContainerMode.Idle
 
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
-      .map(_.receiveMsg()) should contain only Restart
+      .map(_.receiveMsg()) should contain only Lifecycle(Restart)
   }
 
   test("should change its mode from restarting to running after all components have restarted") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
-    containerBehavior.onMessage(Restart)
+    containerBehavior.onMessage(Lifecycle(Restart))
 
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox(component.name))

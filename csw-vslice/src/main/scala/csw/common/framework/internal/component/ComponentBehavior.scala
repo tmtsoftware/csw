@@ -3,12 +3,13 @@ package csw.common.framework.internal.component
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.ccs.CommandStatus
+import csw.common.framework.exceptions.TriggerRestartException
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.{Initialize, Start}
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models.{RunningMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 
@@ -79,6 +80,8 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
+    case Restart ⇒
+      throw new TriggerRestartException
     case GoOnline =>
       if (!lifecycleHandlers.isOnline) {
         lifecycleHandlers.onGoOnline()

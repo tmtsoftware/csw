@@ -26,6 +26,7 @@ object PubSub {
 
 sealed trait ToComponentLifecycleMessage
 object ToComponentLifecycleMessage {
+  case object Restart   extends ToComponentLifecycleMessage
   case object GoOffline extends ToComponentLifecycleMessage
   case object GoOnline  extends ToComponentLifecycleMessage
 }
@@ -60,7 +61,6 @@ object RunningMessage {
   trait DomainMessage                                        extends RunningMessage
 }
 
-case object Restart  extends SupervisorRunningMessage with ContainerRunningMessage
 case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage
 
 ///////////////

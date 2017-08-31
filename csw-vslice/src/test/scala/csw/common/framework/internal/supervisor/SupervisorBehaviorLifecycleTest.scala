@@ -12,6 +12,7 @@ import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.SupervisorIdleMessage.RegistrationComplete
+import csw.common.framework.models.ToComponentLifecycleMessage.Restart
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.param.states.CurrentState
@@ -131,7 +132,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
 
     supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
-    supervisor.onMessage(Restart)
+    supervisor.onMessage(Lifecycle(Restart))
 
     supervisor.mode shouldBe SupervisorMode.Idle
 
