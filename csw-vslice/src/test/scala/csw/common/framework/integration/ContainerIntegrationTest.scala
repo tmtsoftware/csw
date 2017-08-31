@@ -23,6 +23,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
+// DEOPSCSW-169: Creation of Multiple Components
 class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   private val untypedSystem: actor.ActorSystem  = ClusterAwareSettings.system

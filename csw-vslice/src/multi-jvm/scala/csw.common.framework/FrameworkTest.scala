@@ -31,6 +31,7 @@ class FrameworkTestMultiJvmNode1 extends FrameworkTest(0)
 class FrameworkTestMultiJvmNode2 extends FrameworkTest(0)
 class FrameworkTestMultiJvmNode3 extends FrameworkTest(0)
 
+// DEOPSCSW-169: Creation of Multiple Components
 class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._

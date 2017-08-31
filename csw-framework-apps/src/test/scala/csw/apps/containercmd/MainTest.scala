@@ -10,13 +10,14 @@ import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
 import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
-import csw.common.framework.models.{ContainerMessage, SupervisorCommonMessage}
+import csw.common.framework.models.{ContainerMessage, SupervisorExternalMessage}
 import csw.services.location.commons.ClusterAwareSettings
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
+// DEOPSCSW-171: Starting component from command line
 class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   implicit val actorSystem: typed.ActorSystem[Nothing] = ActorSystem("test").toTyped
   implicit val testKitSettings: TestKitSettings        = TestKitSettings(actorSystem)
@@ -39,11 +40,8 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     val config    = getClass.getResource("/test_container.conf").getPath
     val args      = Array("--local", config)
     val testProbe = TestProbe[ContainerMode]
-    val maybeContainerRef: ActorRef[ContainerMessage] =
-      main
-        .start(args)
-        .get
-        .asInstanceOf[ActorRef[ContainerMessage]]
+
+    val maybeContainerRef = main.start(args).get.asInstanceOf[ActorRef[ContainerMessage]]
 
     maybeContainerRef ! GetContainerMode(testProbe.ref)
     testProbe.expectMsg(ContainerMode.Idle)
@@ -58,11 +56,8 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     val config    = getClass.getResource("/test_standalone.conf").getPath
     val args      = Array("--standalone", "--local", config)
     val testProbe = TestProbe[SupervisorMode]
-    val maybeSupervisorRef: ActorRef[SupervisorCommonMessage] =
-      main
-        .start(args)
-        .get
-        .asInstanceOf[ActorRef[SupervisorCommonMessage]]
+
+    val maybeSupervisorRef = main.start(args).get.asInstanceOf[ActorRef[SupervisorExternalMessage]]
 
     maybeSupervisorRef ! GetSupervisorMode(testProbe.ref)
     testProbe.expectMsg(SupervisorMode.Idle)

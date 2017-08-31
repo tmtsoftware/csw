@@ -24,12 +24,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
     new ArgsParser().parse(args).map {
       case Options(standalone, isLocal, inputFilePath) =>
         if (startLogging) {
-          LoggingSystemFactory.start(
-            BuildInfo.name,
-            BuildInfo.version,
-            clusterSettings.hostname,
-            actorSystem
-          )
+          LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
         }
 
         try {
