@@ -3,7 +3,9 @@ package csw.services.location.models
 import acyclic.skipped
 import csw.services.location.internal.ConnectionInfo
 import csw.services.location.models.ConnectionType.{AkkaType, HttpType, TcpType}
-import spray.json.{pimpAny, JsValue, JsonFormat}
+import play.api.libs.json._
+import play.api.libs.json.Reads._
+import play.api.libs.functional.syntax._
 
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component
@@ -26,7 +28,8 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends Tmt
   def name: String = connectionInfo.toString
 }
 
-abstract class TypedConnection[T <: Location](connectionType: ConnectionType) extends Connection(connectionType) {
+abstract sealed class TypedConnection[T <: Location](connectionType: ConnectionType)
+    extends Connection(connectionType) {
   override type L = T
 }
 
@@ -48,10 +51,15 @@ object Connection {
     case HttpType ⇒ HttpConnection(componentId)
   }
 
-  implicit val format: JsonFormat[Connection] = new JsonFormat[Connection] {
-    override def read(json: JsValue): Connection = Connection.from(json.convertTo[ConnectionInfo])
-    override def write(obj: Connection): JsValue = obj.connectionInfo.toJson
-  }
+  implicit val connectionReads: Reads[Connection] = ({
+    (JsPath \ "name").read[String] and
+    (JsPath \ "componentType").read[String] and
+    (JsPath \ "connectionType").read[String]
+  })((a, b, c) ⇒ ConnectionInfo.apply(a, b, c)).map(info ⇒ Connection.from(info))
+
+  implicit val connectionWrites: Writes[Connection] = Writes(
+    c ⇒ Json.obj("name" → c.name, "componentType" → c.componentId.componentType, "connectionType" → c.connectionType)
+  )
 
   /**
    * Represents a connection offered by remote Actors
@@ -67,5 +75,4 @@ object Connection {
    * represents a tcp connection provided by the component
    */
   case class TcpConnection(componentId: ComponentId) extends TypedConnection[TcpLocation](TcpType)
-
 }

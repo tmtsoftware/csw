@@ -1,10 +1,9 @@
 package csw.common.framework.models
 
-import spray.json.JsonFormat
+import play.api.libs.json._
 
 final case class ContainerInfo(name: String, locationServiceUsage: LocationServiceUsage, components: Set[ComponentInfo])
 
 case object ContainerInfo {
-  import spray.json.DefaultJsonProtocol._
-  implicit val format: JsonFormat[ContainerInfo] = jsonFormat3(ContainerInfo.apply)
+  implicit val format: OFormat[ContainerInfo] = Json.format[ContainerInfo]
 }

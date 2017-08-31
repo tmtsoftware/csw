@@ -1,8 +1,7 @@
 package csw.services.location.models
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum.{Enum, EnumEntry}
-import spray.json.JsonFormat
+import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
 import scala.collection.immutable.IndexedSeq
 
@@ -18,12 +17,9 @@ sealed abstract class ComponentType extends EnumEntry with Lowercase with TmtSer
   def name: String = entryName
 }
 
-object ComponentType extends Enum[ComponentType] {
+object ComponentType extends Enum[ComponentType] with PlayJsonEnum[ComponentType] {
 
-  import csw.services.location.internal.JsonSupport._
-
-  def values: IndexedSeq[ComponentType]          = findValues
-  implicit val format: JsonFormat[ComponentType] = enumFormat(ComponentType)
+  def values: IndexedSeq[ComponentType] = findValues
 
   /**
    * Represents a container for components e.g assemblies and HCDs

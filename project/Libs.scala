@@ -8,7 +8,6 @@ object Libs {
   val `scala-async`                  = "org.scala-lang.modules"       %% "scala-async"                  % "0.9.6" //BSD 3-clause "New" or "Revised" License
   val `scopt`                        = "com.github.scopt"             %% "scopt"                        % "3.6.0" //MIT License
   val `acyclic`                      = "com.lihaoyi"                  %% "acyclic"                      % "0.1.7" % Provided //MIT License
-  val `enumeratum`                   = "com.beachape"                 %% "enumeratum"                   % "1.5.12" //MIT License
   val `junit`                        = "junit"                        % "junit"                         % "4.12" //Eclipse Public License 1.0
   val `junit-interface`              = "com.novocode"                 % "junit-interface"               % "0.11" //BSD 2-clause "Simplified" License
   val `mockito-core`                 = "org.mockito"                  % "mockito-core"                  % "2.7.22" //MIT License
@@ -24,6 +23,14 @@ object Libs {
   val `jackson-core`                 = "com.fasterxml.jackson.core"   % "jackson-core"                  % "2.8.9"
   val `jackson-databind`             = "com.fasterxml.jackson.core"   % "jackson-databind"              % "2.8.9"
   val `jackson-module-scala`         = "com.fasterxml.jackson.module" %% "jackson-module-scala"         % "2.8.9"
+  val `play-json`                    = "com.typesafe.play"            %% "play-json"                    % "2.6.3" //Apache 2.0
+  val `play-json-extensions`         = "ai.x"                         %% "play-json-extensions"         % "0.10.0"
+}
+
+object Enumeratum {
+  val version           = "1.5.12"
+  val `enumeratum`      = "com.beachape" %% "enumeratum" % version //MIT License
+  val `enumeratum-play` = "com.beachape" %% "enumeratum-play" % version //MIT License
 }
 
 object Chill {

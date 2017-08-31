@@ -1,7 +1,8 @@
 package csw.common.framework.models
 
-import csw.services.location.models.{ComponentType, Connection, TmtSerializable}
-import spray.json.JsonFormat
+import ai.x.play.json.Jsonx
+import csw.services.location.models.{ComponentType, Connection}
+import play.api.libs.json._
 
 import scala.collection.JavaConverters._
 
@@ -15,16 +16,14 @@ final case class ComponentInfo(
     className: String,
     locationServiceUsage: LocationServiceUsage,
     connections: Set[Connection] = Set.empty
-) extends TmtSerializable {
+) {
 
   /**
    * Java API to get the list of connections for the assembly
    */
   def getConnections: java.util.List[Connection] = connections.toList.asJava
-
 }
 
 case object ComponentInfo {
-  import csw.services.location.internal.JsonSupport._
-  implicit val componentInfoFormat: JsonFormat[ComponentInfo] = jsonFormat6(ComponentInfo.apply)
+  implicit val componentInfoFormat: OFormat[ComponentInfo] = Jsonx.formatCaseClassUseDefaults[ComponentInfo]
 }

@@ -5,7 +5,7 @@ object Dependencies {
   val Params = Seq(
     Libs.`spray-json`,
     Libs.`scala-java8-compat`,
-    Libs.`enumeratum`,
+    Enumeratum.`enumeratum`,
     Chill.`chill-bijection`,
     Akka.`akka-actor`      % Test,
     Chill.`chill-akka`     % Test,
@@ -18,7 +18,7 @@ object Dependencies {
     Libs.`logback-classic`,
     Libs.`persist-json`,
     Libs.`joda-time`,
-    Libs.`enumeratum`,
+    Enumeratum.`enumeratum`,
     Akka.`akka-actor`,
     Akka.`akka-slf4j`,
     Akka.`akka-remote`,
@@ -46,9 +46,11 @@ object Dependencies {
     Akka.`akka-cluster-tools`,
     Libs.`scala-java8-compat`,
     Libs.`scala-async`,
-    Libs.`enumeratum`,
+    Enumeratum.`enumeratum`,
     Libs.`akka-management-cluster-http`,
-    Libs.`spray-json`,
+    Libs.`play-json`,
+    Libs.`play-json-extensions`,
+    Enumeratum.`enumeratum-play`,
     Chill.`chill-akka`,
     AkkaHttp.`akka-http`,
     Libs.`scalatest`               % Test,
@@ -78,7 +80,7 @@ object Dependencies {
   )
 
   val ConfigApi = Seq(
-    Libs.`enumeratum`,
+    Enumeratum.`enumeratum`,
     Akka.`akka-stream`,
     AkkaHttp.`akka-http-spray-json`,
     Libs.`scalatest`           % Test,
@@ -106,6 +108,8 @@ object Dependencies {
 
   val Vslice = Seq(
     Libs.`scala-async`,
+    Libs.`play-json`,
+    Enumeratum.`enumeratum-play`,
     Akka.`akka-typed`,
     Akka.`akka-typed-testkit` % Test,
     Libs.`scalatest`          % Test,
