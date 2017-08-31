@@ -72,14 +72,6 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public void onRestart() {
-        CurrentState restartState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.restartChoice()));
-        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(restartState);
-
-        pubSubRef.tell(publish);
-    }
-
-    @Override
     public void onGoOffline() {
         CurrentState offlineState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.offlineChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(offlineState);

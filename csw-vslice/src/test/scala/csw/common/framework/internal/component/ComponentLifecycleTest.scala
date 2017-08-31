@@ -3,6 +3,7 @@ package csw.common.framework.internal.component
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkTestSuite
+import csw.common.framework.exceptions.TriggerRestartException
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.InitialMessage.Run
@@ -35,7 +36,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     }
   }
 
-  test("A running Hcd component should accept RunOffline lifecycle message") {
+  test("A running Hcd component should handle RunOffline lifecycle message") {
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
     val testData        = new TestData(supervisorProbe)
     import testData._
@@ -60,7 +61,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     previousComponentMode shouldBe runningComponent.mode
   }
 
-  test("A running Hcd component should accept RunOnline lifecycle message when it is Offline") {
+  test("A running Hcd component should handle RunOnline lifecycle message when it is Offline") {
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
     val testData        = new TestData(supervisorProbe)
     import testData._
@@ -81,5 +82,15 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     runningComponent.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
     verify(sampleHcdHandler, never).onGoOnline()
+  }
+
+  test("A running Hcd component should handle Restart lifecycle message when it is Running") {
+    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
+    val testData        = new TestData(supervisorProbe)
+    import testData._
+
+    intercept[TriggerRestartException] {
+      runningComponent.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
+    }
   }
 }

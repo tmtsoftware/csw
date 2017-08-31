@@ -67,7 +67,7 @@ class SupervisorBehavior(
     ctx.spawn[Nothing](
       Actor
         .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))
-        .onFailure[TriggerRestartException](SupervisorStrategy.restart),
+        .onFailure[TriggerRestartException](SupervisorStrategy.restart.withLoggingEnabled(false)),
       ComponentActor
     )
 

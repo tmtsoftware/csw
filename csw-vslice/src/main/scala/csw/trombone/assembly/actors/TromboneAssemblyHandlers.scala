@@ -59,8 +59,6 @@ class TromboneAssemblyHandlers(
 
   override def onShutdown(): Unit = println("Received Shutdown")
 
-  override def onRestart(): Unit = println("Received dorestart")
-
   override def onGoOffline(): Unit = println("Received running offline")
 
   override def onGoOnline(): Unit = println("Received GoOnline")

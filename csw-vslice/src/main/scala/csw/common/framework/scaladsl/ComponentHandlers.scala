@@ -23,7 +23,6 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
   def onDomainMsg(msg: Msg): Unit
   def onControlCommand(commandMessage: CommandMessage): Validation
   def onShutdown(): Unit
-  def onRestart(): Unit
   def onGoOffline(): Unit
   def onGoOnline(): Unit
 }

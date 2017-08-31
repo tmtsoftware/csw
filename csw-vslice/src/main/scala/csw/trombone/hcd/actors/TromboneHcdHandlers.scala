@@ -56,8 +56,6 @@ class TromboneHcdHandlers(
 
   override def onShutdown(): Unit = println("shutdown complete during Running context")
 
-  override def onRestart(): Unit = println("Received do restart")
-
   override def onGoOffline(): Unit = println("Received running offline")
 
   override def onGoOnline(): Unit = println("Received running offline")

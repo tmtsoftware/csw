@@ -5,25 +5,26 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
 import csw.common.framework.ComponentInfos._
-import csw.common.framework.FrameworkTestSuite
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.SupervisorIdleMessage.RegistrationComplete
-import csw.common.framework.models.ToComponentLifecycleMessage.Restart
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
+import csw.common.framework.{FrameworkTestSuite, TestMocks}
 import csw.param.states.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
-class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSugar with BeforeAndAfterEach {
+class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   class TestData {
+    val testMockData: TestMocks = testMocks
+    import testMockData._
+
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     val ctx                                                         = new StubbedActorContext[SupervisorMessage]("test-supervisor", 100, system)
     val timer: TimerScheduler[SupervisorMessage]                    = mock[TimerScheduler[SupervisorMessage]]
@@ -55,6 +56,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
   test("supervisor should accept Initialized message and send Run message to TLA") {
     val testData = new TestData
     import testData._
+    import testData.testMockData._
 
     val childRef = childComponentInbox.ref.upcast
     supervisor.onMessage(Initialized(childRef))
@@ -129,22 +131,19 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
   test("supervisor should handle lifecycle Restart message") {
     val testData = new TestData
     import testData._
+    import testData.testMockData._
 
     supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
-    supervisor.onMessage(Lifecycle(Restart))
-
+    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
     supervisor.mode shouldBe SupervisorMode.Idle
-
-    supervisor.onMessage(Initialized(childComponentInbox.ref))
-    verify(locationService, atLeastOnce()).register(akkaRegistration)
-    supervisor.onMessage(RegistrationComplete(registrationResult, childComponentInbox.ref))
-    supervisor.onMessage(Running(childComponentInbox.ref))
+    childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.Restart))
   }
 
   test("supervisor should handle lifecycle GoOffline message") {
     val testData = new TestData
     import testData._
+    import testData.testMockData._
 
     supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))
@@ -156,6 +155,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with MockitoSug
   test("supervisor should handle lifecycle GoOnline message") {
     val testData = new TestData
     import testData._
+    import testData.testMockData._
 
     supervisor.registrationOpt = Some(registrationResult)
     supervisor.onMessage(Running(childComponentInbox.ref))

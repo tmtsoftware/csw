@@ -30,16 +30,16 @@ import scala.util.{Failure, Success}
 //DEOPSCSW-182-Control Life Cycle of Components
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
 class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
-  implicit val untypedSystem: actor.ActorSystem      = ActorSystemFactory.remote()
-  implicit val typedSystem: ActorSystem[Nothing]     = untypedSystem.toTyped
-  implicit val settings: TestKitSettings             = TestKitSettings(typedSystem)
-  private val akkaRegistration                       = AkkaRegistration(mock[AkkaConnection], TestProbe("test-probe").testActor)
-  private val locationService: LocationService       = mock[LocationService]
-  private val registrationResult: RegistrationResult = mock[RegistrationResult]
+  implicit val untypedSystem: actor.ActorSystem  = ActorSystemFactory.remote()
+  implicit val typedSystem: ActorSystem[Nothing] = untypedSystem.toTyped
+  implicit val settings: TestKitSettings         = TestKitSettings(typedSystem)
 
   class IdleContainer() {
     val ctx                                      = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
     val supervisorFactory: SupervisorInfoFactory = mock[SupervisorInfoFactory]
+    val akkaRegistration                         = AkkaRegistration(mock[AkkaConnection], TestProbe("test-probe").testActor)
+    val locationService: LocationService         = mock[LocationService]
+    val registrationResult: RegistrationResult   = mock[RegistrationResult]
     val answer = new Answer[SupervisorInfo] {
       override def answer(invocation: InvocationOnMock): SupervisorInfo = {
         val componentInfo = invocation.getArgument[ComponentInfo](1)
@@ -143,7 +143,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
 
-    verify(locationService, atLeastOnce()).register(akkaRegistration)
+    verify(locationService, times(2)).register(akkaRegistration)
 
     containerBehavior.onMessage(RegistrationComplete(registrationResult))
 
@@ -190,7 +190,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
       .map(child ⇒ ctx.childInbox(child.upcast))
       .map(_.receiveAll())
 
-    verify(locationService, atLeastOnce()).register(akkaRegistration)
+    verify(locationService).register(akkaRegistration)
 
     containerBehavior.onMessage(RegistrationComplete(registrationResult))
 
@@ -214,7 +214,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     // simulate that container receives LifecycleStateChanged to Running message from all components
     ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
 
-    verify(locationService, atLeastOnce()).register(akkaRegistration)
+    verify(locationService).register(akkaRegistration)
     containerBehavior.onMessage(RegistrationFailed(runtimeException))
     containerBehavior.mode shouldBe ContainerMode.Idle
     containerBehavior.registrationOpt shouldBe None
