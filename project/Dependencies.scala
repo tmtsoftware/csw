@@ -83,12 +83,14 @@ object Dependencies {
     Enumeratum.`enumeratum`,
     Akka.`akka-stream`,
     AkkaHttp.`akka-http-spray-json`,
+    Libs.`spray-json`,
     Libs.`scalatest`           % Test,
     Akka.`akka-stream-testkit` % Test
   )
 
   val ConfigServer = Seq(
     AkkaHttp.`akka-http`,
+    Libs.`spray-json`,
     Libs.svnkit,
     Libs.`scopt`,
     Libs.`scalatest`             % Test,
@@ -120,6 +122,7 @@ object Dependencies {
 
   val CswClusterSeed = Seq(
     AkkaHttp.`akka-http`,
+    Libs.`spray-json`,
     Libs.`scopt`,
     Libs.`scalatest` % Test
   )
@@ -131,6 +134,7 @@ object Dependencies {
 
   val CswProdExamples = Seq(
     AkkaHttp.`akka-http`,
+    Libs.`spray-json`,
     Libs.`scalatest`       % Test,
     Libs.`junit`           % Test,
     Libs.`junit-interface` % Test
