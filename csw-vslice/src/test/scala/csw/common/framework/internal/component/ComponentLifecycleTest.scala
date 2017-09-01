@@ -1,6 +1,6 @@
 package csw.common.framework.internal.component
 
-import akka.typed.PostStop
+import akka.typed.{PostStop, PreRestart}
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkTestSuite
@@ -101,7 +101,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     }
   }
 
-  test("A running component should handle shutdown lifecycle message") {
+  test("A running component should clean up using onShutdown handler before stopping") {
     val supervisorProbe  = TestProbe[FromComponentLifecycleMessage]
     val runningComponent = new RunningComponent(supervisorProbe)
     import runningComponent._
@@ -110,12 +110,12 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     verify(sampleHcdHandler).onShutdown()
   }
 
-  test("An idle component should handle shutdown lifecycle message") {
+  test("A component should clean up using onShutdown handler before re starting") {
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
     val idleComponent   = new IdleComponent(supervisorProbe)
     import idleComponent._
 
-    idleComponentBehavior.onSignal(PostStop)
+    idleComponentBehavior.onSignal(PreRestart)
     verify(sampleHcdHandler).onShutdown()
   }
 }

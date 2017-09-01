@@ -28,8 +28,8 @@ class TestMocks(
   val locationService: LocationService                              = mock[LocationService]
   val registrationResult: RegistrationResult                        = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory                      = mock[RegistrationFactory]
-  val eventualDone: Future[Done]                                    = Promise[Done].success(Done).future
   val pubSubBehaviorFactory: PubSubBehaviorFactory                  = mock[PubSubBehaviorFactory]
+  val eventualDone: Future[Done]                                    = Promise[Done].success(Done).future
   val lifecycleStateProbe: TestProbe[PubSub[LifecycleStateChanged]] = TestProbe[PubSub[LifecycleStateChanged]]
   val compStateProbe: TestProbe[PubSub[CurrentState]]               = TestProbe[PubSub[CurrentState]]
   val eventualRegistrationResult: Future[RegistrationResult] =

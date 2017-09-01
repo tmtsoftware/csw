@@ -140,6 +140,7 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with BeforeAndAfterEa
 
     supervisorRef ! Lifecycle(Restart)
 
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
     verify(locationService, times(2)).register(akkaRegistration)
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))

@@ -14,7 +14,7 @@ import csw.common.framework.models.{RunningMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 
 import scala.async.Async.{async, await}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
 
 class ComponentBehavior[Msg <: DomainMessage: ClassTag](
@@ -51,16 +51,16 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   private def onIdle(x: IdleMessage): Unit = x match {
     case Initialize =>
       async {
-        mode = ComponentMode.Initialized
         await(lifecycleHandlers.initialize())
+        mode = ComponentMode.Initialized
+        supervisor ! Initialized(ctx.self)
       }
-      supervisor ! Initialized(ctx.self)
   }
 
   private def onInitial(x: InitialMessage): Unit = x match {
     case Run =>
-      mode = ComponentMode.Running
       lifecycleHandlers.onRun()
+      mode = ComponentMode.Running
       lifecycleHandlers.isOnline = true
       supervisor ! Running(ctx.self)
   }
