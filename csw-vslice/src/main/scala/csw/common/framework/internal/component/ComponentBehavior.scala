@@ -6,7 +6,7 @@ import csw.common.ccs.CommandStatus
 import csw.common.framework.exceptions.TriggerRestartException
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.common.framework.models.IdleMessage.{Initialize, Start}
+import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
@@ -48,21 +48,11 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   private def onIdle(x: IdleMessage): Unit = x match {
     case Initialize =>
       async {
-        await(initialization())
-        supervisor ! Initialized(ctx.self)
+        mode = ComponentMode.Initialized
+        await(lifecycleHandlers.initialize())
       }
-    case Start ⇒
-      async {
-        await(initialization())
-        ctx.self ! Run
-      }
+      supervisor ! Initialized(ctx.self)
   }
-
-  private def initialization(): Future[Unit] =
-    async {
-      mode = ComponentMode.Initialized
-      await(lifecycleHandlers.initialize())
-    }
 
   private def onInitial(x: InitialMessage): Unit = x match {
     case Run =>

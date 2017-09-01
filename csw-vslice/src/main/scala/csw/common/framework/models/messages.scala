@@ -38,7 +38,6 @@ sealed trait ComponentMessage
 sealed trait IdleMessage extends ComponentMessage
 object IdleMessage {
   case object Initialize extends IdleMessage
-  case object Start      extends IdleMessage
 }
 
 sealed trait InitialMessage extends ComponentMessage
