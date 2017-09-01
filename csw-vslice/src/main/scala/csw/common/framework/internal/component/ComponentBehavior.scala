@@ -1,7 +1,7 @@
 package csw.common.framework.internal.component
 
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior, PostStop, Signal}
+import akka.typed.{ActorRef, Behavior, PostStop, PreRestart, Signal}
 import csw.common.ccs.CommandStatus
 import csw.common.framework.exceptions.TriggerRestartException
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
@@ -40,6 +40,9 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
+    case PreRestart ⇒
+      lifecycleHandlers.onShutdown()
+      this
     case PostStop ⇒
       lifecycleHandlers.onShutdown()
       this

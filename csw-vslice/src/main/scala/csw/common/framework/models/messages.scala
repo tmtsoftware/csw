@@ -83,6 +83,7 @@ object SupervisorIdleMessage {
   case class RegistrationComplete(registrationResult: RegistrationResult, componentRef: ActorRef[InitialMessage])
       extends SupervisorIdleMessage
   case class RegistrationFailed(throwable: Throwable) extends SupervisorIdleMessage
+  case object InitializeTimeout                       extends SupervisorIdleMessage
 }
 
 sealed trait FromComponentLifecycleMessage extends SupervisorIdleMessage

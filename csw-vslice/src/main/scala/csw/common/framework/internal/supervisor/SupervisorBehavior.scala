@@ -1,9 +1,9 @@
 package csw.common.framework.internal.supervisor
 
 import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.common.framework.exceptions.TriggerRestartException
+import csw.common.framework.exceptions.{InitializeFailureRestart, TriggerRestartException}
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.SupervisorMode.Idle
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
@@ -16,7 +16,7 @@ import csw.common.framework.models.SupervisorCommonMessage.{
   GetSupervisorMode,
   LifecycleStateSubscription
 }
-import csw.common.framework.models.SupervisorIdleMessage.{RegistrationComplete, RegistrationFailed}
+import csw.common.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationComplete, RegistrationFailed}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.ComponentBehaviorFactory
@@ -30,15 +30,16 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
 object SupervisorBehavior {
-  val PubSubComponentActor            = "pub-sub-component"
-  val ComponentActor                  = "component"
-  val PubSubLifecycleActor            = "pub-sub-lifecycle"
-  val TimerKey                        = "shutdown-timer"
-  val shutdownTimeout: FiniteDuration = 5.seconds
+  val PubSubComponentActor              = "pub-sub-component"
+  val ComponentActor                    = "component"
+  val PubSubLifecycleActor              = "pub-sub-lifecycle"
+  val InitializeTimerKey                = "initialize-timer"
+  val initializeTimeout: FiniteDuration = 5.seconds
 }
 
 class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
+    timerScheduler: TimerScheduler[SupervisorMessage],
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
     componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentBehaviorFactory[_],
@@ -62,15 +63,21 @@ class SupervisorBehavior(
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor)
   val pubSubComponent: ActorRef[PubSub[CurrentState]]          = pubSubBehaviorFactory.make(ctx, PubSubComponentActor)
 
+  private val triggeredRestartBehavior: Behavior[Nothing] =
+    Actor
+      .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))
+      .onFailure[TriggerRestartException](SupervisorStrategy.restart.withLoggingEnabled(false))
+
   var component: ActorRef[Nothing] =
     ctx.spawn[Nothing](
       Actor
-        .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))
-        .onFailure[TriggerRestartException](SupervisorStrategy.restart.withLoggingEnabled(false)),
+        .supervise[Nothing](triggeredRestartBehavior)
+        .onFailure[InitializeFailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)),
       ComponentActor
     )
 
   ctx.watch(component)
+  timerScheduler.startSingleTimer(InitializeTimerKey, InitializeTimeout, initializeTimeout)
 
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     (mode, msg) match {
@@ -100,6 +107,7 @@ class SupervisorBehavior(
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
     case Initialized(componentRef) ⇒
+      timerScheduler.cancel(InitializeTimerKey)
       registerWithLocationService(componentRef)
     case RegistrationComplete(registrationResult, componentRef) ⇒
       onRegistrationComplete(registrationResult, componentRef)
@@ -110,6 +118,8 @@ class SupervisorBehavior(
       runningComponent = Some(componentRef)
       maybeContainerRef foreach (_ ! SupervisorModeChanged(ctx.self, mode))
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
+    case InitializeTimeout ⇒
+      println("TLA initialization timed out") //FIXME use log statement
   }
 
   private def onRunning(supervisorRunningMessage: SupervisorRunningMessage): Unit = {

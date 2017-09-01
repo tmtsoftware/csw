@@ -33,6 +33,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val supervisor =
       new SupervisorBehavior(
         ctx,
+        timer,
         Some(containerIdleMessageProbe.ref),
         hcdInfo,
         getSampleHcdWiring(sampleHcdHandler),
