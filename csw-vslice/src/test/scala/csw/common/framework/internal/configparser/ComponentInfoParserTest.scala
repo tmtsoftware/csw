@@ -27,7 +27,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
 
   test("should able to parse container config") {
     val config = ConfigFactory.parseResources(getClass, "/conf/SampleContainer.conf")
-    ComponentInfoParser.parse(config) shouldEqual containerInfo
+    ComponentInfoParser.parseContainer(config) shouldEqual containerInfo
   }
 
   test("should able to parse standalone assembly config") {
@@ -39,7 +39,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/container/missing_componentname.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseContainer(config)
     }
   }
 
@@ -47,7 +47,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/container/missing_location_seervice_usage.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseContainer(config)
     }
   }
 
@@ -55,7 +55,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/container/missing_components.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseContainer(config)
     }
   }
 
@@ -63,7 +63,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/container/invalid_components.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseContainer(config)
     }
   }
 
@@ -71,7 +71,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/missing_classname.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseComponent(config)
     }
   }
 
@@ -79,7 +79,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/missing_prefix.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseComponent(config)
     }
   }
 
@@ -87,7 +87,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/missing_location_service_usage.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseComponent(config)
     }
   }
 
@@ -95,7 +95,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/missing_connections.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseComponent(config)
     }
   }
 
@@ -103,7 +103,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/invalid_connections.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseComponent(config)
     }
   }
 
@@ -111,7 +111,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/connection_entry_typo.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseComponent(config)
     }
   }
 
@@ -119,7 +119,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/missing_componenttype.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseComponent(config)
     }
   }
 
@@ -127,7 +127,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/hcd/missing_classname.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseComponent(config)
     }
   }
 
@@ -135,7 +135,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/hcd/missing_prefix.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseStandalone(config)
     }
   }
 
@@ -143,7 +143,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/hcd/missing_location_service_usage.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseStandalone(config)
     }
   }
 
@@ -151,7 +151,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, "/conf/hcd/missing_componenttype.conf")
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseStandalone(config)
     }
   }
 
@@ -160,7 +160,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources(getClass, path)
 
     intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parse(config)
+      ComponentInfoParser.parseStandalone(config)
     }
   }
 }
