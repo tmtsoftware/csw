@@ -1,6 +1,7 @@
 package csw.param.generics
 
 import java.nio.file.{Files, Paths}
+import java.time.Instant
 
 import akka.actor.ActorSystem
 import akka.serialization.SerializationExtension
@@ -157,15 +158,17 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     }
 
     it("should serialize DemandState") {
-      val charKey    = KeyType.CharKey.make("charKey")
-      val intKey     = KeyType.IntKey.make("intKey")
-      val booleanKey = KeyType.BooleanKey.make("booleanKey")
+      val charKey      = KeyType.CharKey.make("charKey")
+      val intKey       = KeyType.IntKey.make("intKey")
+      val booleanKey   = KeyType.BooleanKey.make("booleanKey")
+      val timestampKey = KeyType.TimestampKey.make("timestampKey")
 
       val charParam    = charKey.set('A', 'B', 'C').withUnits(NoUnits)
       val intParam     = intKey.set(1, 2, 3).withUnits(meter)
       val booleanParam = booleanKey.set(true, false)
+      val timestamp    = timestampKey.set(Instant.now)
 
-      val demandState           = DemandState(prefix).madd(charParam, intParam, booleanParam)
+      val demandState           = DemandState(prefix).madd(charParam, intParam, booleanParam, timestamp)
       val demandStateSerializer = serialization.findSerializerFor(demandState)
 
       demandStateSerializer.getClass shouldBe classOf[AkkaSerializer]

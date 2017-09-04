@@ -1,5 +1,7 @@
 package csw.param.generics
 
+import java.time.Instant
+
 import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
 import csw.param.events.{EventServiceEvent, SystemEvent}
 import csw.param.models.{ObsId, Prefix}
@@ -8,6 +10,7 @@ import org.scalatest.FunSuite
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-187: Efficient serialization to/from binary
+//DEOPSCSW-282: Add a timestamp Key and Parameter
 class SerializationTest extends FunSuite {
 
   val obsId       = ObsId("2023-Q22-4-33")
@@ -25,19 +28,22 @@ class SerializationTest extends FunSuite {
   val dec: Key[String]          = KeyType.StringKey.make("dec")
   val epoch: Key[Double]        = KeyType.DoubleKey.make("epoch")
   val test: Key[Int]            = KeyType.IntKey.make("test")
+  val timestamp: Key[Instant]   = KeyType.TimestampKey.make("ts")
 
   val sc1: Setup = Setup(commandInfo, Prefix("tcs.pos")).madd(
     ra.set("12:32:11"),
     dec.set("30:22:22"),
     epoch.set(1950.0),
-    test.set(1)
+    test.set(1),
+    timestamp.set(Instant.now)
   ) //.second
 
   val cs1: CurrentState = CurrentState(Prefix("tcs.pos")).madd(
     ra.set("12:32:11"),
     dec.set("30:22:22"),
     epoch.set(1950.0),
-    test.set(1)
+    test.set(1),
+    timestamp.set(Instant.now)
   ) //.second
 
   val disperser: Key[String] = KeyType.StringKey.make("disperser")

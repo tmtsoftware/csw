@@ -1,5 +1,7 @@
 package csw.param.generics
 
+import java.time.Instant
+
 import csw.param.formats.JsonSupport
 import csw.param.models._
 import enumeratum.{Enum, EnumEntry}
@@ -36,14 +38,15 @@ object KeyType extends Enum[KeyType[_]] {
   case object StructKey extends SimpleKeyType[Struct]
 
   //scala
-  case object BooleanKey extends SimpleKeyType[Boolean]
-  case object ByteKey    extends SimpleKeyType[Byte]
-  case object CharKey    extends SimpleKeyType[Char]
-  case object ShortKey   extends SimpleKeyType[Short]
-  case object LongKey    extends SimpleKeyType[Long]
-  case object IntKey     extends SimpleKeyType[Int]
-  case object FloatKey   extends SimpleKeyType[Float]
-  case object DoubleKey  extends SimpleKeyType[Double]
+  case object BooleanKey   extends SimpleKeyType[Boolean]
+  case object ByteKey      extends SimpleKeyType[Byte]
+  case object CharKey      extends SimpleKeyType[Char]
+  case object ShortKey     extends SimpleKeyType[Short]
+  case object LongKey      extends SimpleKeyType[Long]
+  case object IntKey       extends SimpleKeyType[Int]
+  case object FloatKey     extends SimpleKeyType[Float]
+  case object DoubleKey    extends SimpleKeyType[Double]
+  case object TimestampKey extends SimpleKeyType[Instant]
 
   case object ByteArrayKey   extends ArrayKeyType[Byte]
   case object ShortArrayKey  extends ArrayKeyType[Short]
@@ -60,14 +63,15 @@ object KeyType extends Enum[KeyType[_]] {
   case object DoubleMatrixKey extends MatrixKeyType[Double]
 
   //java
-  case object JBooleanKey extends SimpleKeyType[java.lang.Boolean]
-  case object JCharKey    extends SimpleKeyType[java.lang.Character]
-  case object JByteKey    extends SimpleKeyType[java.lang.Byte]
-  case object JShortKey   extends SimpleKeyType[java.lang.Short]
-  case object JLongKey    extends SimpleKeyType[java.lang.Long]
-  case object JIntKey     extends SimpleKeyType[java.lang.Integer]
-  case object JFloatKey   extends SimpleKeyType[java.lang.Float]
-  case object JDoubleKey  extends SimpleKeyType[java.lang.Double]
+  case object JBooleanKey   extends SimpleKeyType[java.lang.Boolean]
+  case object JCharKey      extends SimpleKeyType[java.lang.Character]
+  case object JByteKey      extends SimpleKeyType[java.lang.Byte]
+  case object JShortKey     extends SimpleKeyType[java.lang.Short]
+  case object JLongKey      extends SimpleKeyType[java.lang.Long]
+  case object JIntKey       extends SimpleKeyType[java.lang.Integer]
+  case object JFloatKey     extends SimpleKeyType[java.lang.Float]
+  case object JDoubleKey    extends SimpleKeyType[java.lang.Double]
+  case object JTimestampKey extends SimpleKeyType[java.time.Instant]
 
   case object JByteArrayKey   extends ArrayKeyType[java.lang.Byte]
   case object JShortArrayKey  extends ArrayKeyType[java.lang.Short]
@@ -94,14 +98,15 @@ object JKeyTypes {
   val StringKey = KeyType.StringKey
   val StructKey = KeyType.StructKey
 
-  val BooleanKey = KeyType.JBooleanKey
-  val CharKey    = KeyType.JCharKey
-  val ByteKey    = KeyType.JByteKey
-  val ShortKey   = KeyType.JShortKey
-  val LongKey    = KeyType.JLongKey
-  val IntKey     = KeyType.JIntKey
-  val FloatKey   = KeyType.JFloatKey
-  val DoubleKey  = KeyType.JDoubleKey
+  val BooleanKey   = KeyType.JBooleanKey
+  val CharKey      = KeyType.JCharKey
+  val ByteKey      = KeyType.JByteKey
+  val ShortKey     = KeyType.JShortKey
+  val LongKey      = KeyType.JLongKey
+  val IntKey       = KeyType.JIntKey
+  val FloatKey     = KeyType.JFloatKey
+  val DoubleKey    = KeyType.JDoubleKey
+  val TimestampKey = KeyType.JTimestampKey
 
   val ByteArrayKey   = KeyType.JByteArrayKey
   val ShortArrayKey  = KeyType.JShortArrayKey

@@ -1,8 +1,9 @@
 package csw.param.formats
 
 import java.lang
+import java.time.Instant
 
-import spray.json.{DefaultJsonProtocol, JsonFormat}
+import spray.json.{DefaultJsonProtocol, JsString, JsValue, JsonFormat}
 
 trait JavaFormats { self: DefaultJsonProtocol ⇒
   //JSON Formats for Java by converting scala types to java types.
@@ -15,4 +16,8 @@ trait JavaFormats { self: DefaultJsonProtocol ⇒
   implicit val integerFormat: JsonFormat[Integer]    = IntJsonFormat.asInstanceOf[JsonFormat[java.lang.Integer]]
   implicit val floatFormat: JsonFormat[lang.Float]   = FloatJsonFormat.asInstanceOf[JsonFormat[java.lang.Float]]
   implicit val doubleFormat: JsonFormat[lang.Double] = DoubleJsonFormat.asInstanceOf[JsonFormat[java.lang.Double]]
+  implicit val timestampFormat: JsonFormat[java.time.Instant] = new JsonFormat[Instant] {
+    override def write(obj: Instant): JsValue = JsString(obj.toString)
+    override def read(json: JsValue): Instant = Instant.parse(json.convertTo[String])
+  }
 }

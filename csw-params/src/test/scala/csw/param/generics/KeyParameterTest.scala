@@ -1,6 +1,7 @@
 package csw.param.generics
 
 import java.nio.file.{Files, Paths}
+import java.time.Instant
 
 import csw.param.generics.KeyType.{
   ByteArrayKey,
@@ -947,6 +948,39 @@ class KeyParameterTest extends FunSpec with Matchers {
       di.units should be theSameInstanceAs meter
       di.value(0) should equal(lm1)
       di.values should equal(listIn)
+    }
+  }
+
+  //DEOPSCSW-282: Add a timestamp Key and Parameter
+  describe("test TimestampItem") {
+    val tsval: Instant      = Instant.now()
+    val tskey: Key[Instant] = KeyType.TimestampKey.make(s1)
+
+    it("should allow create a Timestamp parameter from a timestamp key") {
+      val li: Parameter[Instant] = tskey.set(tsval)
+      li.values should be(Array(tsval))
+      li.head should be(tsval)
+      li.get(0).get should equal(tsval)
+    }
+
+    val listIn = Array[Instant](Instant.now().minusSeconds(3600), Instant.now(), Instant.now().plusMillis(3600000))
+
+    it("should work with list, withUnits") {
+      val li = tskey.set(listIn).withUnits(second)
+      li.units should be(second)
+      li.value(0) should equal(listIn(0))
+      li.value(1) should equal(listIn(1))
+      li.value(2) should equal(listIn(2))
+      li.values should equal(listIn)
+    }
+
+    it("should work with list, units") {
+      val li: Parameter[Instant] = tskey.set(listIn, second)
+      li.units should be(second)
+      li.value(0) should equal(listIn(0))
+      li.value(1) should equal(listIn(1))
+      li.value(2) should equal(listIn(2))
+      li.values should equal(listIn)
     }
   }
 
