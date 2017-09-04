@@ -99,7 +99,7 @@ class SupervisorBehavior(
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
-      println(s"log.error($mode $componentRef)") //FIXME use log statement
+      println(s"log.error(mode is $mode and actor is $componentRef)") //FIXME use log statement
       if (mode == SupervisorMode.Restart) {
         spawnAndWatchComponent()
       }

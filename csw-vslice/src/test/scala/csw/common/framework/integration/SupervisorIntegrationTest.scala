@@ -11,8 +11,9 @@ import csw.common.framework.models.CommandMessage.Oneway
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.Lifecycle
+import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.common.framework.models.{ContainerIdleMessage, LifecycleStateChanged, Restart, SupervisorExternalMessage}
+import csw.common.framework.models._
 import csw.common.framework.{FrameworkTestSuite, TestMocks}
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
@@ -31,6 +32,7 @@ import scala.concurrent.duration.DurationInt
 class SupervisorIntegrationTest extends FrameworkTestSuite with BeforeAndAfterEach {
   import csw.common.components.SampleComponentState._
 
+  val supervisorModeProbe: TestProbe[SupervisorMode]             = TestProbe[SupervisorMode]
   var supervisorBehavior: Behavior[SupervisorExternalMessage]    = _
   var supervisorRef: ActorRef[SupervisorExternalMessage]         = _
   var containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = _
@@ -140,6 +142,10 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with BeforeAndAfterEa
 
     supervisorRef ! Restart
 
+    supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
+    supervisorModeProbe.expectMsg(SupervisorMode.Restart)
+
+    verify(registrationResult).unregister()
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
     verify(locationService, times(2)).register(akkaRegistration)
