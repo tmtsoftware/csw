@@ -26,9 +26,11 @@ import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import akka.pattern.after
+import csw.common.framework.internal.extensions.RichFutureExtension.RichFuture
 
 object SupervisorBehavior {
   val PubSubComponentActor              = "pub-sub-component"
@@ -36,6 +38,7 @@ object SupervisorBehavior {
   val PubSubLifecycleActor              = "pub-sub-lifecycle"
   val InitializeTimerKey                = "initialize-timer"
   val initializeTimeout: FiniteDuration = 5.seconds
+  val shutdownTimeout: FiniteDuration   = 10.seconds
 }
 
 class SupervisorBehavior(
@@ -64,6 +67,9 @@ class SupervisorBehavior(
 
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor)
   val pubSubComponent: ActorRef[PubSub[CurrentState]]          = pubSubBehaviorFactory.make(ctx, PubSubComponentActor)
+  val delayedShutdown: Future[Unit] = after(10.seconds, using = ctx.system.scheduler)(
+    Future.successful(println("shutdown took more time than anticipated"))
+  )
 
   private def spawnAndWatchComponent(): Unit = {
     mode = Idle
@@ -108,8 +114,15 @@ class SupervisorBehavior(
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
     case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
     case GetSupervisorMode(replyTo)                    ⇒ replyTo ! mode
-    case Shutdown                                      ⇒ ctx.system.terminate()
-    case Restart                                       ⇒ onRestart()
+    case Shutdown ⇒
+      ctx.system
+        .terminate()
+        .within(
+          shutdownTimeout,
+          ctx.system.scheduler,
+          Future.failed(new IllegalStateException("Shutdown timed out"))
+        )
+    case Restart ⇒ onRestart()
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
