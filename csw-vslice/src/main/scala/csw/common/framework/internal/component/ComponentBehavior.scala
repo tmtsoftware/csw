@@ -1,15 +1,14 @@
 package csw.common.framework.internal.component
 
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior, PostStop, PreRestart, Signal}
+import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.ccs.CommandStatus
-import csw.common.framework.exceptions.TriggerRestartException
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models.{RunningMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 
@@ -40,16 +39,13 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
-    case PreRestart ⇒
-      lifecycleHandlers.onShutdown()
-      this
     case PostStop ⇒
       lifecycleHandlers.onShutdown()
       this
   }
 
   private def onIdle(x: IdleMessage): Unit = x match {
-    case Initialize =>
+    case Initialize ⇒
       async {
         await(lifecycleHandlers.initialize())
         mode = ComponentMode.Initialized
@@ -58,7 +54,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   private def onInitial(x: InitialMessage): Unit = x match {
-    case Run =>
+    case Run ⇒
       lifecycleHandlers.onRun()
       mode = ComponentMode.Running
       lifecycleHandlers.isOnline = true
@@ -66,21 +62,19 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
-    case Lifecycle(message) => onLifecycle(message)
-    case x: Msg             => lifecycleHandlers.onDomainMsg(x)
-    case x: CommandMessage  => onRunningCompCommandMessage(x)
+    case Lifecycle(message) ⇒ onLifecycle(message)
+    case x: Msg             ⇒ lifecycleHandlers.onDomainMsg(x)
+    case x: CommandMessage  ⇒ onRunningCompCommandMessage(x)
     case _                  ⇒ println("wrong msg")
   }
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case Restart ⇒
-      throw new TriggerRestartException
-    case GoOnline =>
+    case GoOnline ⇒
       if (!lifecycleHandlers.isOnline) {
         lifecycleHandlers.onGoOnline()
         lifecycleHandlers.isOnline = true
       }
-    case GoOffline =>
+    case GoOffline ⇒
       if (lifecycleHandlers.isOnline) {
         lifecycleHandlers.onGoOffline()
         lifecycleHandlers.isOnline = false

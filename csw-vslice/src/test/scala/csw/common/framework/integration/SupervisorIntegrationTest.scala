@@ -11,8 +11,8 @@ import csw.common.framework.models.CommandMessage.Oneway
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
-import csw.common.framework.models.{ContainerIdleMessage, LifecycleStateChanged, SupervisorExternalMessage}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.common.framework.models.{ContainerIdleMessage, LifecycleStateChanged, Restart, SupervisorExternalMessage}
 import csw.common.framework.{FrameworkTestSuite, TestMocks}
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
@@ -126,7 +126,7 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with BeforeAndAfterEa
   }
 
   test(
-    "running component should throw TriggerRestartException on Restart lifecycle message using which supervisor uses supervision strategy to restart it"
+    "running component should invoke onShutdown hook when supervisor restarts component using Restart external message"
   ) {
     val testMockData = testMocks
     import testMockData._
@@ -138,7 +138,7 @@ class SupervisorIntegrationTest extends FrameworkTestSuite with BeforeAndAfterEa
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
     containerIdleMessageProbe.expectMsg(SupervisorModeChanged(supervisorRef, SupervisorMode.Running))
 
-    supervisorRef ! Lifecycle(Restart)
+    supervisorRef ! Restart
 
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))

@@ -3,7 +3,7 @@ package csw.common.framework.internal.supervisor
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.common.framework.exceptions.{InitializeFailureRestart, TriggerRestartException}
+import csw.common.framework.exceptions.InitializeFailureRestart
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.SupervisorMode.Idle
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
@@ -16,8 +16,8 @@ import csw.common.framework.models.SupervisorCommonMessage.{
   GetSupervisorMode,
   LifecycleStateSubscription
 }
-import csw.common.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationComplete, RegistrationFailed}
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
+import csw.common.framework.models.SupervisorIdleMessage._
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.ComponentBehaviorFactory
 import csw.param.states.CurrentState
@@ -59,24 +59,22 @@ class SupervisorBehavior(
   var mode: SupervisorMode                               = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
   var registrationOpt: Option[RegistrationResult]        = None
+  var component: ActorRef[Nothing]                       = _
 
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor)
   val pubSubComponent: ActorRef[PubSub[CurrentState]]          = pubSubBehaviorFactory.make(ctx, PubSubComponentActor)
 
-  private val triggeredRestartBehavior: Behavior[Nothing] =
-    Actor
-      .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))
-      .onFailure[TriggerRestartException](SupervisorStrategy.restart.withLoggingEnabled(false))
-
-  var component: ActorRef[Nothing] =
-    ctx.spawn[Nothing](
+  private def spawnAndWatchComponent(): Unit = {
+    component = ctx.spawn[Nothing](
       Actor
-        .supervise[Nothing](triggeredRestartBehavior)
+        .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))
         .onFailure[InitializeFailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)),
       ComponentActor
     )
+    ctx.watch(component)
+  }
 
-  ctx.watch(component)
+  spawnAndWatchComponent()
   timerScheduler.startSingleTimer(InitializeTimerKey, InitializeTimeout, initializeTimeout)
 
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
@@ -92,9 +90,10 @@ class SupervisorBehavior(
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
-      Behavior.stopped
+      spawnAndWatchComponent()
+      this
     case PostStop ⇒
-      unregisterFromLocationService()
+      registrationOpt.foreach(registrationResult ⇒ registrationResult.unregister())
       this
   }
 
@@ -103,6 +102,7 @@ class SupervisorBehavior(
     case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
     case GetSupervisorMode(replyTo)                    ⇒ replyTo ! mode
     case Shutdown                                      ⇒ ctx.system.terminate()
+    case Restart                                       ⇒ onRestart()
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
@@ -113,6 +113,11 @@ class SupervisorBehavior(
       onRegistrationComplete(registrationResult, componentRef)
     case RegistrationFailed(throwable) ⇒
       onRegistrationFailed(throwable)
+    case UnRegistrationComplete ⇒
+      respawnComponent()
+    case UnRegistrationFailed(throwable) ⇒
+      println(s"log.error($throwable)") //FIXME use log statement
+      respawnComponent()
     case Running(componentRef) ⇒
       mode = SupervisorMode.Running
       runningComponent = Some(componentRef)
@@ -126,20 +131,18 @@ class SupervisorBehavior(
     supervisorRunningMessage match {
       case runningMessage: RunningMessage ⇒
         runningMessage match {
-          case Lifecycle(message) ⇒ onLifecycle(message)
+          case Lifecycle(message) ⇒ onLifeCycle(message)
           case _                  ⇒
         }
         runningComponent.get ! runningMessage
     }
   }
 
-  def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case Restart ⇒
-      mode = SupervisorMode.Idle
-    case GoOffline ⇒
-      if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
-    case GoOnline ⇒
-      if (mode == SupervisorMode.RunningOffline) mode = SupervisorMode.Running
+  private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = {
+    message match {
+      case GoOffline ⇒ if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
+      case GoOnline  ⇒ if (mode == SupervisorMode.RunningOffline) mode = SupervisorMode.Running
+    }
   }
 
   private def registerWithLocationService(componentRef: ActorRef[InitialMessage]): Unit = {
@@ -160,10 +163,26 @@ class SupervisorBehavior(
   private def onRegistrationFailed(throwable: Throwable): Unit =
     println(s"log.error($throwable)") //FIXME use log statement
 
-  private def unregisterFromLocationService(): Unit = {
+  private def onRestart(): Unit = {
+    mode = SupervisorMode.Idle
     registrationOpt match {
-      case Some(registrationResult) ⇒ registrationResult.unregister()
-      case None                     ⇒ println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
+      case Some(registrationResult) ⇒
+        unRegisterFromLocationService(registrationResult)
+      case None ⇒
+        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
+        ctx.stop(component)
     }
+  }
+
+  private def unRegisterFromLocationService(registrationResult: RegistrationResult): Unit = {
+    registrationResult.unregister().onComplete {
+      case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
+      case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
+    }
+  }
+
+  private def respawnComponent(): Unit = {
+    registrationOpt = None
+    ctx.stop(component)
   }
 }

@@ -1,10 +1,9 @@
 package csw.common.framework.internal.component
 
-import akka.typed.{PostStop, PreRestart}
+import akka.typed.PostStop
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.exceptions.TriggerRestartException
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.InitialMessage.Run
@@ -91,31 +90,12 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     verify(sampleHcdHandler, never).onGoOnline()
   }
 
-  test("A running component should handle Restart lifecycle message") {
-    val supervisorProbe  = TestProbe[FromComponentLifecycleMessage]
-    val runningComponent = new RunningComponent(supervisorProbe)
-    import runningComponent._
-
-    intercept[TriggerRestartException] {
-      runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.Restart))
-    }
-  }
-
   test("A running component should clean up using onShutdown handler before stopping") {
     val supervisorProbe  = TestProbe[FromComponentLifecycleMessage]
     val runningComponent = new RunningComponent(supervisorProbe)
     import runningComponent._
 
     runningComponentBehavior.onSignal(PostStop)
-    verify(sampleHcdHandler).onShutdown()
-  }
-
-  test("A component should clean up using onShutdown handler before re starting") {
-    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
-    val idleComponent   = new IdleComponent(supervisorProbe)
-    import idleComponent._
-
-    idleComponentBehavior.onSignal(PreRestart)
     verify(sampleHcdHandler).onShutdown()
   }
 }

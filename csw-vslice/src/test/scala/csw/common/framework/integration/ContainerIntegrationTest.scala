@@ -14,8 +14,8 @@ import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetCon
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline, Restart}
-import csw.common.framework.models.{Components, LifecycleStateChanged}
+import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.common.framework.models.{Components, LifecycleStateChanged, Restart}
 import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterAwareSettings
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -32,7 +32,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
 
   override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
 
-  ignore("should start multiple components withing a single container and able to accept lifecycle messages") {
+  test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
     val wiring = FrameworkWiring.make(untypedSystem)
     // start a container and verify it moves to running mode
@@ -88,7 +88,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
 
     // on Restart message, container falls back to Idle mode and wait for all the components to get restarted
     // and moves to Running mode
-    containerRef ! Lifecycle(Restart)
+    containerRef ! Restart
 
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Idle)

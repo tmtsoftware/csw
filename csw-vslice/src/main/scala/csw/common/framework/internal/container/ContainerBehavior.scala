@@ -8,7 +8,6 @@ import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetCon
 import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.ToComponentLifecycleMessage.Restart
 import csw.common.framework.models._
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
@@ -39,10 +38,10 @@ class ContainerBehavior(
 
   override def onMessage(msg: ContainerMessage): Behavior[ContainerMessage] = {
     (mode, msg) match {
-      case (_, msg: ContainerCommonMessage)                      ⇒ onCommon(msg)
-      case (ContainerMode.Idle, msg: ContainerIdleMessage)       ⇒ onIdle(msg)
-      case (ContainerMode.Running, msg: ContainerRunningMessage) ⇒ onRunning(msg)
-      case (_, message)                                          ⇒ println(s"Container in $mode received an unexpected message: $message")
+      case (_, msg: ContainerCommonMessage)                ⇒ onCommon(msg)
+      case (ContainerMode.Idle, msg: ContainerIdleMessage) ⇒ onIdle(msg)
+      case (ContainerMode.Running, msg: Lifecycle)         ⇒ supervisors.foreach(_.component.supervisor ! msg)
+      case (_, message)                                    ⇒ println(s"Container in $mode received an unexpected message: $message")
     }
     this
   }
@@ -59,30 +58,15 @@ class ContainerBehavior(
 
   def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
     case GetComponents(replyTo)    ⇒ replyTo ! Components(supervisors.map(_.component))
-    case Shutdown                  ⇒ supervisors.foreach(_.system.terminate())
     case GetContainerMode(replyTo) ⇒ replyTo ! mode
-
+    case Shutdown                  ⇒ supervisors.foreach(_.system.terminate())
+    case Restart                   ⇒ mode = ContainerMode.Idle; supervisors.foreach(_.component.supervisor ! Restart)
   }
 
   def onIdle(idleContainerMessage: ContainerIdleMessage): Unit = idleContainerMessage match {
     case SupervisorModeChanged(supervisor, supervisorMode) ⇒ onSupervisorModeChange(supervisor, supervisorMode)
     case RegistrationComplete(registrationResult)          ⇒ onRegistrationComplete(registrationResult)
     case RegistrationFailed(throwable)                     ⇒ onRegistrationFailure(throwable)
-  }
-
-  def onRunning(containerRunningMessage: ContainerRunningMessage): Unit = {
-    containerRunningMessage match {
-      case lifecycle: Lifecycle ⇒
-        lifecycle match {
-          case Lifecycle(Restart) ⇒ mode = ContainerMode.Idle
-          case _                  ⇒
-        }
-        supervisors.foreach { _.component.supervisor ! lifecycle }
-    }
-  }
-
-  def sendLifecycleMessageToAllComponents(lifecycleMessage: ToComponentLifecycleMessage): Unit = {
-    supervisors.foreach { _.component.supervisor ! Lifecycle(lifecycleMessage) }
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit =

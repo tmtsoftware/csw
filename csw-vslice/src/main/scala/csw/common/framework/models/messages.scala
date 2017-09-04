@@ -26,7 +26,6 @@ object PubSub {
 
 sealed trait ToComponentLifecycleMessage
 object ToComponentLifecycleMessage {
-  case object Restart   extends ToComponentLifecycleMessage
   case object GoOffline extends ToComponentLifecycleMessage
   case object GoOnline  extends ToComponentLifecycleMessage
 }
@@ -56,11 +55,12 @@ object CommandMessage {
 
 sealed trait RunningMessage extends ComponentMessage with SupervisorRunningMessage
 object RunningMessage {
-  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerRunningMessage
+  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerExternalMessage
   trait DomainMessage                                        extends RunningMessage
 }
 
 case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage
+case object Restart  extends SupervisorCommonMessage with ContainerCommonMessage
 
 ///////////////
 
@@ -82,8 +82,10 @@ sealed trait SupervisorIdleMessage extends SupervisorMessage
 object SupervisorIdleMessage {
   case class RegistrationComplete(registrationResult: RegistrationResult, componentRef: ActorRef[InitialMessage])
       extends SupervisorIdleMessage
-  case class RegistrationFailed(throwable: Throwable) extends SupervisorIdleMessage
-  case object InitializeTimeout                       extends SupervisorIdleMessage
+  case class RegistrationFailed(throwable: Throwable)   extends SupervisorIdleMessage
+  case object UnRegistrationComplete                    extends SupervisorIdleMessage
+  case class UnRegistrationFailed(throwable: Throwable) extends SupervisorIdleMessage
+  case object InitializeTimeout                         extends SupervisorIdleMessage
 }
 
 sealed trait FromComponentLifecycleMessage extends SupervisorIdleMessage
@@ -97,7 +99,6 @@ object FromComponentLifecycleMessage {
 sealed trait ContainerMessage
 
 sealed trait ContainerExternalMessage extends ContainerMessage with TmtSerializable
-sealed trait ContainerRunningMessage  extends ContainerExternalMessage
 
 sealed trait ContainerCommonMessage extends ContainerExternalMessage
 object ContainerCommonMessage {
