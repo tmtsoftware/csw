@@ -68,6 +68,11 @@ sealed trait SupervisorMessage
 
 sealed trait SupervisorExternalMessage extends SupervisorMessage with TmtSerializable
 sealed trait SupervisorRunningMessage  extends SupervisorExternalMessage
+sealed trait SupervisorRestartMessage  extends SupervisorMessage
+object SupervisorRestartMessage {
+  case object UnRegistrationComplete                    extends SupervisorRestartMessage
+  case class UnRegistrationFailed(throwable: Throwable) extends SupervisorRestartMessage
+}
 
 sealed trait SupervisorCommonMessage extends SupervisorExternalMessage
 object SupervisorCommonMessage {
@@ -82,10 +87,8 @@ sealed trait SupervisorIdleMessage extends SupervisorMessage
 object SupervisorIdleMessage {
   case class RegistrationComplete(registrationResult: RegistrationResult, componentRef: ActorRef[InitialMessage])
       extends SupervisorIdleMessage
-  case class RegistrationFailed(throwable: Throwable)   extends SupervisorIdleMessage
-  case object UnRegistrationComplete                    extends SupervisorIdleMessage
-  case class UnRegistrationFailed(throwable: Throwable) extends SupervisorIdleMessage
-  case object InitializeTimeout                         extends SupervisorIdleMessage
+  case class RegistrationFailed(throwable: Throwable) extends SupervisorIdleMessage
+  case object InitializeTimeout                       extends SupervisorIdleMessage
 }
 
 sealed trait FromComponentLifecycleMessage extends SupervisorIdleMessage

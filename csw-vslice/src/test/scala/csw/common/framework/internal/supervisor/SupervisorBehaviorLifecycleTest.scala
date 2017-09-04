@@ -136,7 +136,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Restart)
-    supervisor.mode shouldBe SupervisorMode.Idle
+    supervisor.mode shouldBe SupervisorMode.Restart
   }
 
   test("supervisor should handle lifecycle GoOffline message") {
