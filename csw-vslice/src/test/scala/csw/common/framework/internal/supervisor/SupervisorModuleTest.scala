@@ -1,4 +1,4 @@
-package csw.common.framework.integration
+package csw.common.framework.internal.supervisor
 
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
@@ -6,7 +6,6 @@ import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.DemandMatcher
 import csw.common.components.ComponentStatistics
 import csw.common.framework.ComponentInfos._
-import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorMode}
 import csw.common.framework.models.CommandMessage.Oneway
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.PubSub.Publish
@@ -29,7 +28,7 @@ import scala.concurrent.duration.DurationInt
 // DEOPSCSW-166: CSW HCD Creation
 // DEOPSCSW-176: Provide Infrastructure to manage TMT lifecycle
 // DEOPSCSW-177: Hooks for lifecycle management
-class SupervisorIntegrationTest extends FrameworkTestSuite with BeforeAndAfterEach {
+class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   import csw.common.components.SampleComponentState._
 
   val supervisorModeProbe: TestProbe[SupervisorMode]             = TestProbe[SupervisorMode]
