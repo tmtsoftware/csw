@@ -71,6 +71,65 @@ class KeyParameterTest extends FunSpec with Matchers {
     }
   }
 
+  describe("test charItem") {
+    val tval = 'K'
+    val lk   = KeyType.CharKey.make(s1)
+
+    it("should allow single val") {
+      val li = lk.set(tval)
+      li.values should be(Array(tval))
+      li.head should be(tval)
+      li.get(0).get should equal(tval)
+    }
+
+    val listIn = Array[Char]('K', 'G')
+
+    // DEOPSCSW-190: Implement Unit Support
+    it("should work with list, withUnits") {
+      val li = lk.set(listIn).withUnits(degree)
+      li.units should be(degree)
+      li.value(1) should equal(listIn(1))
+      li.values should equal(listIn)
+    }
+
+    it("should work with list, units") {
+      val li = lk.set(listIn, degree)
+      li.units should be(degree)
+      li.value(1) should equal(listIn(1))
+      li.values should equal(listIn)
+    }
+  }
+
+  // DEOPSCSW-186: Binary value payload
+  describe("test ByteItem") {
+    val tval: Byte = 123
+    val lk         = KeyType.ByteKey.make(s1)
+
+    it("should allow single val") {
+      val li = lk.set(tval)
+      li.values should be(Array(tval))
+      li.head should be(tval)
+      li.get(0).get should equal(tval)
+    }
+
+    val byteIn = Array[Byte](121, 122)
+
+    it("should work with list, withUnits") {
+      val li = lk.set(byteIn).withUnits(degree)
+      li.units should be(degree)
+      li.value(0) should equal(byteIn(0))
+      li.value(1) should equal(byteIn(1))
+      li.values should equal(byteIn)
+    }
+
+    it("should work with list, units") {
+      val li = lk.set(byteIn, degree)
+      li.units should be(degree)
+      li.value(1) should equal(byteIn(1))
+      li.values should equal(byteIn)
+    }
+  }
+
   // DEOPSCSW-186: Binary value payload
   describe("test ByteArrayKey") {
     val a1: Array[Byte] = Array[Byte](1, 2, 3, 4, 5)
@@ -210,9 +269,9 @@ class KeyParameterTest extends FunSpec with Matchers {
     }
   }
 
-  describe("test charItem") {
-    val tval = 'K'
-    val lk   = KeyType.CharKey.make(s1)
+  describe("test ShortItem") {
+    val tval: Short = 1234
+    val lk          = KeyType.ShortKey.make(s1)
 
     it("should allow single val") {
       val li = lk.set(tval)
@@ -221,9 +280,281 @@ class KeyParameterTest extends FunSpec with Matchers {
       li.get(0).get should equal(tval)
     }
 
-    val listIn = Array[Char]('K', 'G')
+    val listIn = Array[Short](123, 456)
 
-    // DEOPSCSW-190: Implement Unit Support
+    it("should work with list, withUnits") {
+      val li = lk.set(listIn).withUnits(degree)
+      li.units should be(degree)
+      li.value(0) should equal(listIn(0))
+      li.value(1) should equal(listIn(1))
+      li.values should equal(listIn)
+    }
+
+    it("should work with list, units") {
+      val li = lk.set(listIn, degree)
+      li.units should be(degree)
+      li.value(1) should equal(listIn(1))
+      li.values should equal(listIn)
+    }
+  }
+
+  describe("test shortArrayKey") {
+    val a1 = Array[Short](1, 2, 3, 4, 5)
+    val a2 = Array[Short](10, 20, 30, 40, 50)
+
+    val la1 = ArrayData(a1)
+    val la2 = ArrayData(a2)
+    val lk  = KeyType.ShortArrayKey.make(s1)
+
+    it("should test single item") {
+      val di = lk.set(la1)
+      di.values should equal(Array(la1))
+      di.head should be(la1)
+      di.get(0).get should equal(la1)
+    }
+
+    val listIn = Array(la1, la2)
+
+    it("should test with list, withUnits") {
+      val li2 = lk.set(listIn).withUnits(degree)
+      li2.units should be(degree)
+      li2.value(1) should equal(listIn(1))
+      li2.values should equal(listIn)
+    }
+
+    it("should test with list, units") {
+      val li2 = lk.set(listIn, degree)
+      li2.units should be theSameInstanceAs degree
+      li2.value(1) should equal(listIn(1))
+      li2.values should equal(listIn)
+    }
+
+    it("should test using one array with and without units") {
+      var li2 = lk.set(a1) // Uses implicit to create from int array
+      li2.head should equal(la1)
+      li2 = lk.set(a2).withUnits(degree)
+      li2.units should be theSameInstanceAs degree
+      li2.head should equal(la2)
+    }
+
+    it("should test using var args") {
+      val li3 = lk.set(la1, la2)
+      li3.value(1) should equal(la2)
+      li3.values should equal(listIn)
+
+      val a: Array[Short] = Array[Short](1, 2, 3)
+      val b: Array[Short] = Array[Short](10, 20, 30)
+      val c: Array[Short] = Array[Short](100, 200, 300)
+
+      val li4 = lk.set(a, b, c).withUnits(meter)
+      li4.values.length should be(3)
+      li4.value(2) should equal(ArrayData(c))
+    }
+  }
+
+  describe("test shortMatrixKey") {
+    val m1: Array[Array[Short]] = Array(Array[Short](1, 2, 3), Array[Short](4, 5, 6), Array[Short](7, 8, 9))
+    val m2: Array[Array[Short]] = Array(Array[Short](1, 2, 3, 4, 5), Array[Short](10, 20, 30, 40, 50))
+
+    val lm1 = MatrixData.fromArrays(m1)
+    val lm2 = MatrixData.fromArrays(m2)
+    val dk  = ShortMatrixKey.make(s1)
+
+    it("should work with a single item") {
+      val di = dk.set(lm1)
+      di.values should equal(Array(lm1))
+      di.head should equal(lm1)
+      di.get(0).get should equal(lm1)
+    }
+
+    val listIn = Array(lm1, lm2)
+
+    it("should work with list and withUnits") {
+      val di = dk.set(listIn).withUnits(degree)
+      di.units should be theSameInstanceAs degree
+      di.value(1) should equal(listIn(1))
+      di.values should equal(listIn)
+    }
+
+    it("should work with list and units") {
+      val di = dk.set(listIn, degree)
+      di.units should be theSameInstanceAs degree
+      di.value(1) should equal(listIn(1))
+      di.values should equal(listIn)
+    }
+
+    it("work with one matrix without and with units") {
+      var di = dk.set(m1) // This is an implicit
+      di.head should equal(lm1)
+      di = dk.set(m1).withUnits(degree)
+      di.units should be theSameInstanceAs degree
+      di.head should equal(lm1)
+    }
+
+    it("work with varargs") {
+      val di = dk.set(lm1, lm2).withUnits(second)
+      di.units should be theSameInstanceAs second
+      di.value(1) should equal(lm2)
+      di.values should equal(listIn)
+    }
+
+    it("work with varargs as arrays") {
+      val di = dk.set(m1, m2).withUnits(meter)
+      di.units should be theSameInstanceAs meter
+      di.value(0) should equal(lm1)
+      di.values should equal(listIn)
+    }
+  }
+
+  describe("test IntItem") {
+    val tval: Int = 1234
+    val lk        = KeyType.IntKey.make(s1)
+
+    it("should allow single val") {
+      val li = lk.set(tval)
+      li.values should be(Array(tval))
+      li.head should be(tval)
+      li.get(0).get should equal(tval)
+    }
+
+    val listIn = Array[Int](123, 456)
+
+    it("should work with list, withUnits") {
+      val li = lk.set(listIn).withUnits(degree)
+      li.units should be(degree)
+      li.value(0) should equal(listIn(0))
+      li.value(1) should equal(listIn(1))
+      li.values should equal(listIn)
+    }
+
+    it("should work with list, units") {
+      val li = lk.set(listIn, degree)
+      li.units should be(degree)
+      li.value(1) should equal(listIn(1))
+      li.values should equal(listIn)
+    }
+  }
+
+  describe("test intArrayKey") {
+    val a1 = Array[Int](1, 2, 3, 4, 5)
+    val a2 = Array[Int](10, 20, 30, 40, 50)
+
+    val la1 = ArrayData(a1)
+    val la2 = ArrayData(a2)
+    val lk  = KeyType.IntArrayKey.make(s1)
+
+    it("should test single item") {
+      val di = lk.set(la1)
+      di.values should equal(Array(la1))
+      di.head should be(la1)
+      di.get(0).get should equal(la1)
+    }
+
+    val listIn = Array(la1, la2)
+
+    it("should test with list, withUnits") {
+      val li2 = lk.set(listIn).withUnits(degree)
+      li2.units should be(degree)
+      li2.value(1) should equal(listIn(1))
+      li2.values should equal(listIn)
+    }
+
+    it("should test with list, units") {
+      val li2 = lk.set(listIn, degree)
+      li2.units should be theSameInstanceAs degree
+      li2.value(1) should equal(listIn(1))
+      li2.values should equal(listIn)
+    }
+
+    it("should test using one array with and without units") {
+      var li2 = lk.set(a1) // Uses implicit to create from int array
+      li2.head should equal(la1)
+      li2 = lk.set(a2).withUnits(degree)
+      li2.units should be theSameInstanceAs degree
+      li2.head should equal(la2)
+    }
+
+    it("should test using var args") {
+      val li3 = lk.set(la1, la2)
+      li3.value(1) should equal(la2)
+      li3.values should equal(listIn)
+
+      val a: Array[Int] = Array(1, 2, 3)
+      val b: Array[Int] = Array(10, 20, 30)
+      val c: Array[Int] = Array(100, 200, 300)
+
+      val li4 = lk.set(a, b, c).withUnits(meter)
+      li4.values.length should be(3)
+      li4.value(2) should equal(ArrayData(c))
+    }
+  }
+
+  describe("test intMatrixKey") {
+    val m1: Array[Array[Int]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
+    val m2: Array[Array[Int]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
+
+    val lm1 = MatrixData.fromArrays(m1)
+    val lm2 = MatrixData.fromArrays(m2)
+    val dk  = IntMatrixKey.make(s1)
+
+    it("should work with a single item") {
+      val di = dk.set(lm1)
+      di.values should equal(Array(lm1))
+      di.head should equal(lm1)
+      di.get(0).get should equal(lm1)
+    }
+
+    val listIn = Array(lm1, lm2)
+
+    it("should work with list and withUnits") {
+      val di = dk.set(listIn).withUnits(degree)
+      di.units should be theSameInstanceAs degree
+      di.value(1) should equal(listIn(1))
+      di.values should equal(listIn)
+    }
+
+    it("should work with list and units") {
+      val di = dk.set(listIn, degree)
+      di.units should be theSameInstanceAs degree
+      di.value(1) should equal(listIn(1))
+      di.values should equal(listIn)
+    }
+
+    it("work with one matrix without and with units") {
+      var di = dk.set(m1) // This is an implicit
+      di.head should equal(lm1)
+      di = dk.set(m1).withUnits(degree)
+      di.units should be theSameInstanceAs degree
+      di.head should equal(lm1)
+    }
+
+    it("work with varargs") {
+      val di = dk.set(lm1, lm2).withUnits(second)
+      di.units should be theSameInstanceAs second
+      di.value(1) should equal(lm2)
+      di.values should equal(listIn)
+    }
+
+    it("work with varargs as arrays") {
+      val di = dk.set(m1, m2).withUnits(meter)
+      di.units should be theSameInstanceAs meter
+      di.value(0) should equal(lm1)
+      di.values should equal(listIn)
+    }
+  }
+
+  describe("test longKey") {
+    val lval          = 1234L
+    val lk: Key[Long] = KeyType.LongKey.make(s1)
+
+    it("should allow single val") {
+      val li = lk.set(lval)
+      li.values should be(Array(lval))
+      li.get(0).get should equal(lval)
+    }
+
+    val listIn = Array[Long](123L, 456L)
+
     it("should work with list, withUnits") {
       val li = lk.set(listIn).withUnits(degree)
       li.units should be(degree)
@@ -236,6 +567,114 @@ class KeyParameterTest extends FunSpec with Matchers {
       li.units should be(degree)
       li.value(1) should equal(listIn(1))
       li.values should equal(listIn)
+    }
+  }
+
+  describe("test LongArrayKey") {
+    val a1: Array[Long] = Array(1, 2, 3, 4, 5)
+    val a2: Array[Long] = Array(10, 20, 30, 40, 50)
+
+    val la1: ArrayData[Long]     = ArrayData(a1)
+    val la2: ArrayData[Long]     = ArrayData(a2)
+    val lk: Key[ArrayData[Long]] = KeyType.LongArrayKey.make(s1)
+
+    it("should test single item") {
+      val di: Parameter[ArrayData[Long]] = lk.set(la1)
+      di.values should equal(Array(la1))
+      di.head should be(la1)
+      di.get(0).get should equal(la1)
+    }
+
+    val listIn = Array(la1, la2)
+
+    it("should test with list, withUnits") {
+      val li2: Parameter[ArrayData[Long]] = lk.set(listIn).withUnits(degree)
+      li2.units should be(degree)
+      li2.value(1) should equal(listIn(1))
+      li2.values should equal(listIn)
+    }
+
+    it("should test with list, units") {
+      val li2 = lk.set(listIn, degree)
+      li2.units should be theSameInstanceAs degree
+      li2.value(1) should equal(listIn(1))
+      li2.values should equal(listIn)
+    }
+
+    it("should test using one array with and without units") {
+      var li2 = lk.set(a1) // Uses implicit to create from long array
+      li2.head should equal(la1)
+      li2 = lk.set(a2).withUnits(degree)
+      li2.units should be theSameInstanceAs degree
+      li2.head should equal(la2)
+    }
+
+    it("should test using var args") {
+      val li3: Parameter[ArrayData[Long]] = lk.set(la1, la2)
+      li3.value(1) should equal(la2)
+      li3.values should equal(listIn)
+
+      val a: Array[Long] = Array(1, 2, 3)
+      val b: Array[Long] = Array(10, 20, 30)
+      val c: Array[Long] = Array(100, 200, 300)
+
+      val li4: Parameter[ArrayData[Long]] = lk.set(a, b, c).withUnits(meter)
+      li4.values.length should be(3)
+      li4.value(2) should equal(ArrayData(c))
+    }
+  }
+
+  describe("test longMatrixKey") {
+    val m1: Array[Array[Long]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
+    val m2: Array[Array[Long]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
+
+    val lm1: MatrixData[Long]     = MatrixData.fromArrays(m1)
+    val lm2: MatrixData[Long]     = MatrixData.fromArrays(m2)
+    val dk: Key[MatrixData[Long]] = LongMatrixKey.make(s1)
+
+    it("should work with a single item") {
+      val di = dk.set(lm1)
+      di.values should equal(Array(lm1))
+      di.head should equal(lm1)
+      di.get(0).get should equal(lm1)
+    }
+
+    val listIn = Array(lm1, lm2)
+
+    it("should work with list and withUnits") {
+      val di = dk.set(listIn).withUnits(degree)
+      di.units should be theSameInstanceAs degree
+      di.value(1) should equal(listIn(1))
+      di.values should equal(listIn)
+    }
+
+    it("should work with list and units") {
+      val di = dk.set(listIn, degree)
+      di.units should be theSameInstanceAs degree
+      di.value(1) should equal(listIn(1))
+      di.values should equal(listIn)
+    }
+
+    it("work with one matrix without and with units") {
+      var di = dk.set(m1) // This is an implicit
+      di.head should equal(lm1)
+      di = dk.set(m1).withUnits(degree)
+      di.units should be theSameInstanceAs degree
+      di.head should equal(lm1)
+    }
+
+    it("work with varargs") {
+      val di = dk.set(lm1, lm2).withUnits(second)
+      di.units should be theSameInstanceAs second
+      di.value(1) should equal(lm2)
+      di.values should equal(listIn)
+    }
+
+    it("work with varargs as arrays") {
+      val di = dk.set(m1, m2).withUnits(meter)
+      di.units should be theSameInstanceAs meter
+      di.value(0) should equal(lm1)
+      di.values should equal(listIn)
     }
   }
 
@@ -464,445 +903,6 @@ class KeyParameterTest extends FunSpec with Matchers {
     val lm1 = MatrixData.fromArrays(m1)
     val lm2 = MatrixData.fromArrays(m2)
     val dk  = FloatMatrixKey.make(s1)
-
-    it("should work with a single item") {
-      val di = dk.set(lm1)
-      di.values should equal(Array(lm1))
-      di.head should equal(lm1)
-      di.get(0).get should equal(lm1)
-    }
-
-    val listIn = Array(lm1, lm2)
-
-    it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degree)
-      di.units should be theSameInstanceAs degree
-      di.value(1) should equal(listIn(1))
-      di.values should equal(listIn)
-    }
-
-    it("should work with list and units") {
-      val di = dk.set(listIn, degree)
-      di.units should be theSameInstanceAs degree
-      di.value(1) should equal(listIn(1))
-      di.values should equal(listIn)
-    }
-
-    it("work with one matrix without and with units") {
-      var di = dk.set(m1) // This is an implicit
-      di.head should equal(lm1)
-      di = dk.set(m1).withUnits(degree)
-      di.units should be theSameInstanceAs degree
-      di.head should equal(lm1)
-    }
-
-    it("work with varargs") {
-      val di = dk.set(lm1, lm2).withUnits(second)
-      di.units should be theSameInstanceAs second
-      di.value(1) should equal(lm2)
-      di.values should equal(listIn)
-    }
-
-    it("work with varargs as arrays") {
-      val di = dk.set(m1, m2).withUnits(meter)
-      di.units should be theSameInstanceAs meter
-      di.value(0) should equal(lm1)
-      di.values should equal(listIn)
-    }
-  }
-
-  // DEOPSCSW-186: Binary value payload
-  describe("test ByteItem") {
-    val tval: Byte = 123
-    val lk         = KeyType.ByteKey.make(s1)
-
-    it("should allow single val") {
-      val li = lk.set(tval)
-      li.values should be(Array(tval))
-      li.head should be(tval)
-      li.get(0).get should equal(tval)
-    }
-
-    val byteIn = Array[Byte](121, 122)
-
-    it("should work with list, withUnits") {
-      val li = lk.set(byteIn).withUnits(degree)
-      li.units should be(degree)
-      li.value(0) should equal(byteIn(0))
-      li.value(1) should equal(byteIn(1))
-      li.values should equal(byteIn)
-    }
-
-    it("should work with list, units") {
-      val li = lk.set(byteIn, degree)
-      li.units should be(degree)
-      li.value(1) should equal(byteIn(1))
-      li.values should equal(byteIn)
-    }
-  }
-
-  describe("test IntItem") {
-    val tval: Int = 1234
-    val lk        = KeyType.IntKey.make(s1)
-
-    it("should allow single val") {
-      val li = lk.set(tval)
-      li.values should be(Array(tval))
-      li.head should be(tval)
-      li.get(0).get should equal(tval)
-    }
-
-    val listIn = Array[Int](123, 456)
-
-    it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degree)
-      li.units should be(degree)
-      li.value(0) should equal(listIn(0))
-      li.value(1) should equal(listIn(1))
-      li.values should equal(listIn)
-    }
-
-    it("should work with list, units") {
-      val li = lk.set(listIn, degree)
-      li.units should be(degree)
-      li.value(1) should equal(listIn(1))
-      li.values should equal(listIn)
-    }
-  }
-
-  describe("test intArrayKey") {
-    val a1 = Array[Int](1, 2, 3, 4, 5)
-    val a2 = Array[Int](10, 20, 30, 40, 50)
-
-    val la1 = ArrayData(a1)
-    val la2 = ArrayData(a2)
-    val lk  = KeyType.IntArrayKey.make(s1)
-
-    it("should test single item") {
-      val di = lk.set(la1)
-      di.values should equal(Array(la1))
-      di.head should be(la1)
-      di.get(0).get should equal(la1)
-    }
-
-    val listIn = Array(la1, la2)
-
-    it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(degree)
-      li2.units should be(degree)
-      li2.value(1) should equal(listIn(1))
-      li2.values should equal(listIn)
-    }
-
-    it("should test with list, units") {
-      val li2 = lk.set(listIn, degree)
-      li2.units should be theSameInstanceAs degree
-      li2.value(1) should equal(listIn(1))
-      li2.values should equal(listIn)
-    }
-
-    it("should test using one array with and without units") {
-      var li2 = lk.set(a1) // Uses implicit to create from int array
-      li2.head should equal(la1)
-      li2 = lk.set(a2).withUnits(degree)
-      li2.units should be theSameInstanceAs degree
-      li2.head should equal(la2)
-    }
-
-    it("should test using var args") {
-      val li3 = lk.set(la1, la2)
-      li3.value(1) should equal(la2)
-      li3.values should equal(listIn)
-
-      val a: Array[Int] = Array(1, 2, 3)
-      val b: Array[Int] = Array(10, 20, 30)
-      val c: Array[Int] = Array(100, 200, 300)
-
-      val li4 = lk.set(a, b, c).withUnits(meter)
-      li4.values.length should be(3)
-      li4.value(2) should equal(ArrayData(c))
-    }
-  }
-
-  describe("test intMatrixKey") {
-    val m1: Array[Array[Int]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
-    val m2: Array[Array[Int]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
-
-    val lm1 = MatrixData.fromArrays(m1)
-    val lm2 = MatrixData.fromArrays(m2)
-    val dk  = IntMatrixKey.make(s1)
-
-    it("should work with a single item") {
-      val di = dk.set(lm1)
-      di.values should equal(Array(lm1))
-      di.head should equal(lm1)
-      di.get(0).get should equal(lm1)
-    }
-
-    val listIn = Array(lm1, lm2)
-
-    it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degree)
-      di.units should be theSameInstanceAs degree
-      di.value(1) should equal(listIn(1))
-      di.values should equal(listIn)
-    }
-
-    it("should work with list and units") {
-      val di = dk.set(listIn, degree)
-      di.units should be theSameInstanceAs degree
-      di.value(1) should equal(listIn(1))
-      di.values should equal(listIn)
-    }
-
-    it("work with one matrix without and with units") {
-      var di = dk.set(m1) // This is an implicit
-      di.head should equal(lm1)
-      di = dk.set(m1).withUnits(degree)
-      di.units should be theSameInstanceAs degree
-      di.head should equal(lm1)
-    }
-
-    it("work with varargs") {
-      val di = dk.set(lm1, lm2).withUnits(second)
-      di.units should be theSameInstanceAs second
-      di.value(1) should equal(lm2)
-      di.values should equal(listIn)
-    }
-
-    it("work with varargs as arrays") {
-      val di = dk.set(m1, m2).withUnits(meter)
-      di.units should be theSameInstanceAs meter
-      di.value(0) should equal(lm1)
-      di.values should equal(listIn)
-    }
-  }
-
-  describe("test longKey") {
-    val lval          = 1234L
-    val lk: Key[Long] = KeyType.LongKey.make(s1)
-
-    it("should allow single val") {
-      val li = lk.set(lval)
-      li.values should be(Array(lval))
-      li.get(0).get should equal(lval)
-    }
-
-    val listIn = Array[Long](123L, 456L)
-
-    it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degree)
-      li.units should be(degree)
-      li.value(1) should equal(listIn(1))
-      li.values should equal(listIn)
-    }
-
-    it("should work with list, units") {
-      val li = lk.set(listIn, degree)
-      li.units should be(degree)
-      li.value(1) should equal(listIn(1))
-      li.values should equal(listIn)
-    }
-  }
-
-  describe("test JLongArrayKey") {
-    val a1: Array[Long] = Array(1, 2, 3, 4, 5)
-    val a2: Array[Long] = Array(10, 20, 30, 40, 50)
-
-    val la1: ArrayData[Long]     = ArrayData(a1)
-    val la2: ArrayData[Long]     = ArrayData(a2)
-    val lk: Key[ArrayData[Long]] = KeyType.LongArrayKey.make(s1)
-
-    it("should test single item") {
-      val di: Parameter[ArrayData[Long]] = lk.set(la1)
-      di.values should equal(Array(la1))
-      di.head should be(la1)
-      di.get(0).get should equal(la1)
-    }
-
-    val listIn = Array(la1, la2)
-
-    it("should test with list, withUnits") {
-      val li2: Parameter[ArrayData[Long]] = lk.set(listIn).withUnits(degree)
-      li2.units should be(degree)
-      li2.value(1) should equal(listIn(1))
-      li2.values should equal(listIn)
-    }
-
-    it("should test with list, units") {
-      val li2 = lk.set(listIn, degree)
-      li2.units should be theSameInstanceAs degree
-      li2.value(1) should equal(listIn(1))
-      li2.values should equal(listIn)
-    }
-
-    it("should test using one array with and without units") {
-      var li2 = lk.set(a1) // Uses implicit to create from long array
-      li2.head should equal(la1)
-      li2 = lk.set(a2).withUnits(degree)
-      li2.units should be theSameInstanceAs degree
-      li2.head should equal(la2)
-    }
-
-    it("should test using var args") {
-      val li3: Parameter[ArrayData[Long]] = lk.set(la1, la2)
-      li3.value(1) should equal(la2)
-      li3.values should equal(listIn)
-
-      val a: Array[Long] = Array(1, 2, 3)
-      val b: Array[Long] = Array(10, 20, 30)
-      val c: Array[Long] = Array(100, 200, 300)
-
-      val li4: Parameter[ArrayData[Long]] = lk.set(a, b, c).withUnits(meter)
-      li4.values.length should be(3)
-      li4.value(2) should equal(ArrayData(c))
-    }
-  }
-
-  describe("test longMatrixKey") {
-    val m1: Array[Array[Long]] = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
-    val m2: Array[Array[Long]] = Array(Array(1, 2, 3, 4, 5), Array(10, 20, 30, 40, 50))
-
-    val lm1: MatrixData[Long]     = MatrixData.fromArrays(m1)
-    val lm2: MatrixData[Long]     = MatrixData.fromArrays(m2)
-    val dk: Key[MatrixData[Long]] = LongMatrixKey.make(s1)
-
-    it("should work with a single item") {
-      val di = dk.set(lm1)
-      di.values should equal(Array(lm1))
-      di.head should equal(lm1)
-      di.get(0).get should equal(lm1)
-    }
-
-    val listIn = Array(lm1, lm2)
-
-    it("should work with list and withUnits") {
-      val di = dk.set(listIn).withUnits(degree)
-      di.units should be theSameInstanceAs degree
-      di.value(1) should equal(listIn(1))
-      di.values should equal(listIn)
-    }
-
-    it("should work with list and units") {
-      val di = dk.set(listIn, degree)
-      di.units should be theSameInstanceAs degree
-      di.value(1) should equal(listIn(1))
-      di.values should equal(listIn)
-    }
-
-    it("work with one matrix without and with units") {
-      var di = dk.set(m1) // This is an implicit
-      di.head should equal(lm1)
-      di = dk.set(m1).withUnits(degree)
-      di.units should be theSameInstanceAs degree
-      di.head should equal(lm1)
-    }
-
-    it("work with varargs") {
-      val di = dk.set(lm1, lm2).withUnits(second)
-      di.units should be theSameInstanceAs second
-      di.value(1) should equal(lm2)
-      di.values should equal(listIn)
-    }
-
-    it("work with varargs as arrays") {
-      val di = dk.set(m1, m2).withUnits(meter)
-      di.units should be theSameInstanceAs meter
-      di.value(0) should equal(lm1)
-      di.values should equal(listIn)
-    }
-  }
-
-  describe("test ShortItem") {
-    val tval: Short = 1234
-    val lk          = KeyType.ShortKey.make(s1)
-
-    it("should allow single val") {
-      val li = lk.set(tval)
-      li.values should be(Array(tval))
-      li.head should be(tval)
-      li.get(0).get should equal(tval)
-    }
-
-    val listIn = Array[Short](123, 456)
-
-    it("should work with list, withUnits") {
-      val li = lk.set(listIn).withUnits(degree)
-      li.units should be(degree)
-      li.value(0) should equal(listIn(0))
-      li.value(1) should equal(listIn(1))
-      li.values should equal(listIn)
-    }
-
-    it("should work with list, units") {
-      val li = lk.set(listIn, degree)
-      li.units should be(degree)
-      li.value(1) should equal(listIn(1))
-      li.values should equal(listIn)
-    }
-  }
-
-  describe("test shortArrayKey") {
-    val a1 = Array[Short](1, 2, 3, 4, 5)
-    val a2 = Array[Short](10, 20, 30, 40, 50)
-
-    val la1 = ArrayData(a1)
-    val la2 = ArrayData(a2)
-    val lk  = KeyType.ShortArrayKey.make(s1)
-
-    it("should test single item") {
-      val di = lk.set(la1)
-      di.values should equal(Array(la1))
-      di.head should be(la1)
-      di.get(0).get should equal(la1)
-    }
-
-    val listIn = Array(la1, la2)
-
-    it("should test with list, withUnits") {
-      val li2 = lk.set(listIn).withUnits(degree)
-      li2.units should be(degree)
-      li2.value(1) should equal(listIn(1))
-      li2.values should equal(listIn)
-    }
-
-    it("should test with list, units") {
-      val li2 = lk.set(listIn, degree)
-      li2.units should be theSameInstanceAs degree
-      li2.value(1) should equal(listIn(1))
-      li2.values should equal(listIn)
-    }
-
-    it("should test using one array with and without units") {
-      var li2 = lk.set(a1) // Uses implicit to create from int array
-      li2.head should equal(la1)
-      li2 = lk.set(a2).withUnits(degree)
-      li2.units should be theSameInstanceAs degree
-      li2.head should equal(la2)
-    }
-
-    it("should test using var args") {
-      val li3 = lk.set(la1, la2)
-      li3.value(1) should equal(la2)
-      li3.values should equal(listIn)
-
-      val a: Array[Short] = Array[Short](1, 2, 3)
-      val b: Array[Short] = Array[Short](10, 20, 30)
-      val c: Array[Short] = Array[Short](100, 200, 300)
-
-      val li4 = lk.set(a, b, c).withUnits(meter)
-      li4.values.length should be(3)
-      li4.value(2) should equal(ArrayData(c))
-    }
-  }
-
-  describe("test shortMatrixKey") {
-    val m1: Array[Array[Short]] = Array(Array[Short](1, 2, 3), Array[Short](4, 5, 6), Array[Short](7, 8, 9))
-    val m2: Array[Array[Short]] = Array(Array[Short](1, 2, 3, 4, 5), Array[Short](10, 20, 30, 40, 50))
-
-    val lm1 = MatrixData.fromArrays(m1)
-    val lm2 = MatrixData.fromArrays(m2)
-    val dk  = ShortMatrixKey.make(s1)
 
     it("should work with a single item") {
       val di = dk.set(lm1)
