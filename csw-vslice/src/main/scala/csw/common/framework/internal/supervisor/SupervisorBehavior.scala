@@ -93,6 +93,7 @@ class SupervisorBehavior(
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
+      println(s"log.error($mode $componentRef)") //FIXME use log statement
       if (mode == SupervisorMode.Restart) {
         spawnAndWatchComponent()
       }
@@ -147,6 +148,11 @@ class SupervisorBehavior(
       respawnComponent()
   }
 
+  private def respawnComponent(): Unit = {
+    registrationOpt = None
+    ctx.stop(component)
+  }
+
   private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = {
     message match {
       case GoOffline ⇒ if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
@@ -178,7 +184,7 @@ class SupervisorBehavior(
       case Some(registrationResult) ⇒
         unRegisterFromLocationService(registrationResult)
       case None ⇒
-        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME to log error
+        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME use log statement
         ctx.stop(component)
     }
   }
@@ -188,10 +194,5 @@ class SupervisorBehavior(
       case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
       case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
     }
-  }
-
-  private def respawnComponent(): Unit = {
-    registrationOpt = None
-    ctx.stop(component)
   }
 }
