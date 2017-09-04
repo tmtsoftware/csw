@@ -93,7 +93,10 @@ class SupervisorBehavior(
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
-      if (mode == SupervisorMode.Restart) spawnAndWatchComponent()
+      if (mode == SupervisorMode.Restart) {
+        spawnAndWatchComponent()
+      }
+      mode = SupervisorMode.Idle
       this
     case PostStop ⇒
       registrationOpt.foreach(registrationResult ⇒ registrationResult.unregister())
