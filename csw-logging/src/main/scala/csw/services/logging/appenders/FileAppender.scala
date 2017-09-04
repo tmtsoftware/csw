@@ -11,7 +11,7 @@ import csw.services.logging.commons.{Category, Constants, LoggingKeys, TMTDateTi
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.scaladsl.{Logger, LoggerImpl}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
 
 /**
  * Responsible for writing log messages to a file
@@ -42,7 +42,7 @@ private[logging] class FileAppenderHelper(path: String, category: String) {
     maybePrintWriter = Some(printWriter)
   }
 
-  def appendAdd(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean) = {
+  def appendAdd(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean): Unit = {
     maybePrintWriter match {
       case Some(w) =>
         if (rotateFlag && maybeTimestamp.get
@@ -66,7 +66,7 @@ private[logging] class FileAppenderHelper(path: String, category: String) {
     }
   }
 
-  def appendClose(p: Promise[Unit]) = {
+  def appendClose(p: Promise[Unit]): Unit = {
     maybePrintWriter match {
       case Some(w) =>
         w.close()
@@ -146,7 +146,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
     case context: ActorContext => context.system
     case s: ActorSystem        => s
   }
-  private[this] implicit val executionContext = factory.dispatcher
+  private[this] implicit val executionContext: ExecutionContextExecutor = factory.dispatcher
   private[this] val config =
     system.settings.config.getConfig("csw-logging.appender-config.file")
   private[this] val fullHeaders   = config.getBoolean("fullHeaders")
