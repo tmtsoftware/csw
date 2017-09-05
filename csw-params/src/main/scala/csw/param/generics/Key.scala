@@ -7,7 +7,9 @@ import spray.json.JsonFormat
 import scala.annotation.varargs
 import scala.reflect.ClassTag
 
-case class Key[S: JsonFormat: ClassTag] private[generics] (keyName: String, keyType: KeyType[S]) {
+case class Key[S: JsonFormat: ClassTag] private[generics] (keyName: String, keyType: KeyType[S], units: Units) {
+
+  def this(keyName: String, keyType: KeyType[S]) = this(keyName, keyType, NoUnits)
 
   def set(v: Array[S], units: Units = NoUnits): Parameter[S] = Parameter(keyName, keyType, v, units)
 
@@ -18,7 +20,7 @@ case class Key[S: JsonFormat: ClassTag] private[generics] (keyName: String, keyT
    * @return a parameter containing the key name, values (call withUnits() on the result to set the units)
    */
   @varargs
-  def set(xs: S*): Parameter[S] = Parameter(keyName, keyType, xs.toArray[S], NoUnits)
+  def set(xs: S*): Parameter[S] = Parameter(keyName, keyType, xs.toArray[S], units)
 
   /**
    * Sets the values for the key

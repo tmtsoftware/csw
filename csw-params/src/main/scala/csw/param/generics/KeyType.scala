@@ -4,6 +4,8 @@ import java.time.Instant
 
 import csw.param.formats.JsonSupport
 import csw.param.models._
+import csw.units.Units
+import csw.units.Units.second
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
 
@@ -16,6 +18,10 @@ sealed class KeyType[S: JsonFormat: ClassTag] extends EnumEntry with Serializabl
 
 sealed class SimpleKeyType[S: JsonFormat: ClassTag] extends KeyType[S] {
   def make(name: String): Key[S] = new Key[S](name, this)
+}
+
+sealed class SimpleKeyTypeWithUnits[S: JsonFormat: ClassTag](defaultUnits: Units) extends KeyType[S] {
+  def make(name: String): Key[S] = new Key[S](name, this, defaultUnits)
 }
 
 sealed class ArrayKeyType[S: JsonFormat: ClassTag]  extends SimpleKeyType[ArrayData[S]]
@@ -46,7 +52,7 @@ object KeyType extends Enum[KeyType[_]] {
   case object IntKey       extends SimpleKeyType[Int]
   case object FloatKey     extends SimpleKeyType[Float]
   case object DoubleKey    extends SimpleKeyType[Double]
-  case object TimestampKey extends SimpleKeyType[Instant]
+  case object TimestampKey extends SimpleKeyTypeWithUnits[Instant](second)
 
   case object ByteArrayKey   extends ArrayKeyType[Byte]
   case object ShortArrayKey  extends ArrayKeyType[Short]
