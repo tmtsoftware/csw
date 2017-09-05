@@ -11,7 +11,7 @@ import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.common.framework.models.SupervisorIdleMessage.RegistrationComplete
+import csw.common.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationComplete}
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.common.framework.{FrameworkTestSuite, TestMocks}
@@ -52,6 +52,11 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisor.mode shouldBe SupervisorMode.Idle
     ctx.children.size shouldBe 3
+    verify(timer).startSingleTimer(
+      SupervisorBehavior.InitializeTimerKey,
+      InitializeTimeout,
+      SupervisorBehavior.initializeTimeout
+    )
   }
 
   // *************** Begin testing of onIdleMessages ***************
@@ -64,6 +69,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisor.onMessage(Initialized(childRef))
 
     verify(locationService).register(akkaRegistration)
+    verify(timer).cancel(SupervisorBehavior.InitializeTimerKey)
     supervisor.onMessage(RegistrationComplete(registrationResult, childRef))
 
     childComponentInbox.receiveMsg() shouldBe Run
