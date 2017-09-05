@@ -5,6 +5,8 @@ import csw.param.models.Struct;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.Instant;
+
 import static csw.param.javadsl.JUnits.*;
 
 // DEOPSCSW-183: Configure attributes and values
@@ -239,6 +241,36 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(kilometer, parameterWithUnits.units());
 
         Assert.assertArrayEquals(paramData, (Double[])parameterWithUnits.values());
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
+        Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
+        Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
+    }
+
+    //DEOPSCSW-282: Add a timestamp Key and Parameter
+    @Test
+    public void testTimestampKeyParameter() {
+        String keyName = "TimestampKey";
+        Key<Instant> key = JKeyTypes.TimestampKey().make(keyName);
+        Instant[] paramData = {Instant.now(), Instant.ofEpochSecond(3600)};
+        Assert.assertEquals(keyName, key.keyName());
+        Assert.assertEquals(JKeyTypes.TimestampKey(),key.keyType());
+
+        // key.set without Units
+        Parameter<Instant> parameterWithoutUnits = key.set(paramData);
+
+        Assert.assertArrayEquals(paramData, (Instant[])parameterWithoutUnits.values());
+
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
+        Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
+        Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
+        Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
+
+        // key.set with Units
+        Parameter<Instant> parameterWithUnits = key.set(paramData, millisecond);
+        Assert.assertEquals(millisecond, parameterWithUnits.units());
+
+        Assert.assertArrayEquals(paramData, (Instant[])parameterWithUnits.values());
         Assert.assertEquals(paramData[0], parameterWithoutUnits.get(0).get());
         Assert.assertEquals(paramData[1], parameterWithoutUnits.value(1));
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
