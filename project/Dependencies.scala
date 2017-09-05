@@ -112,11 +112,12 @@ object Dependencies {
     Libs.`play-json`,
     Enumeratum.`enumeratum-play`,
     Akka.`akka-typed`,
-    Akka.`akka-typed-testkit` % Test,
-    Libs.`scalatest`          % Test,
-    Libs.`junit`              % Test,
-    Libs.`junit-interface`    % Test,
-    Libs.`mockito-core`       % Test
+    Akka.`akka-typed-testkit`  % Test,
+    Akka.`akka-stream-testkit` % Test,
+    Libs.`scalatest`           % Test,
+    Libs.`junit`               % Test,
+    Libs.`junit-interface`     % Test,
+    Libs.`mockito-core`        % Test
   )
 
   val CswClusterSeed = Seq(

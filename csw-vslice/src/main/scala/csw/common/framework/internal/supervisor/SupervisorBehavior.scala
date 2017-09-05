@@ -4,6 +4,7 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.common.framework.exceptions.InitializeFailureRestart
+import csw.common.framework.internal.extensions.RichFutureExtension.RichFuture
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.SupervisorMode.Idle
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
@@ -29,8 +30,6 @@ import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
-import akka.pattern.after
-import csw.common.framework.internal.extensions.RichFutureExtension.RichFuture
 
 object SupervisorBehavior {
   val PubSubComponentActor              = "pub-sub-component"
