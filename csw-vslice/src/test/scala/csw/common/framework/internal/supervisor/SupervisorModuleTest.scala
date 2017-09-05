@@ -147,8 +147,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     verify(registrationResult).unregister()
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    verify(locationService, times(2)).register(akkaRegistration)
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
+    verify(locationService, times(2)).register(akkaRegistration)
 
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
     containerIdleMessageProbe.expectMsg(SupervisorModeChanged(supervisorRef, SupervisorMode.Running))

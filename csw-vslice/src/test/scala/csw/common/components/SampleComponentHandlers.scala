@@ -53,6 +53,7 @@ class SampleComponentHandlers(ctx: ActorContext[ComponentMessage],
   }
   override def initialize(): Future[Unit] = {
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    Thread.sleep(100)
     Future.unit
   }
   override def onGoOffline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
