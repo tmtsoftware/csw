@@ -6,7 +6,7 @@ import akka.typed.{ActorRef, Behavior}
 import csw.common.components.SampleComponentState._
 import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
 import csw.common.framework.ComponentInfos._
-import csw.common.framework.exceptions.InitializeFailureStop
+import csw.common.framework.exceptions.{InitializeFailureRestart, InitializeFailureStop}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.PubSub.{Publish, PublisherMessage}
 import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
@@ -29,7 +29,7 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
   var supervisorBehavior: Behavior[SupervisorExternalMessage]    = _
   var supervisorRef: ActorRef[SupervisorExternalMessage]         = _
 
-  test("should restart TLA when it throws InitializeFailureStop exception") {
+  test("handle external restart when TLA InitializeFailureStop exception") {
     val testMockData = testMocks
     import testMockData._
 
@@ -44,6 +44,27 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     verify(locationService, never()).register(akkaRegistration)
 
     supervisorRef ! Restart
+
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
+
+    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
+    containerIdleMessageProbe.expectMsg(SupervisorModeChanged(supervisorRef, SupervisorMode.Running))
+
+    verify(registrationResult, never()).unregister()
+  }
+
+  test("handle TLA failure with InitializeFailureRestart exception") {
+    val testMockData = testMocks
+    import testMockData._
+
+    val componentHandlers = createComponentHandlers(testMockData, InitializeFailureRestart.apply())
+    createSupervisorAndStartTLA(testMockData, componentHandlers)
+
+    supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
+    supervisorModeProbe.expectMsg(SupervisorMode.Idle)
+
+    verify(locationService, never()).register(akkaRegistration)
 
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
