@@ -5,7 +5,7 @@ import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.ccs.CommandStatus
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.common.framework.models.IdleMessage.Initialize
+import csw.common.framework.models.IdleMessage.{InitializationFailed, Initialize}
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
@@ -50,7 +50,8 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
         await(lifecycleHandlers.initialize())
         mode = ComponentMode.Initialized
         supervisor ! Initialized(ctx.self)
-      }
+      }.failed.foreach(throwable ⇒ ctx.self ! InitializationFailed(throwable))
+    case InitializationFailed(throwable) ⇒ throw throwable
   }
 
   private def onInitial(x: InitialMessage): Unit = x match {

@@ -159,7 +159,10 @@ class SupervisorBehavior(
 
   private def respawnComponent(): Unit = {
     registrationOpt = None
-    ctx.stop(component)
+    ctx.child(ComponentActor) match {
+      case Some(componentRef) ⇒ ctx.stop(component)
+      case None               ⇒ spawnAndWatchComponent()
+    }
   }
 
   private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = {
@@ -194,7 +197,11 @@ class SupervisorBehavior(
         unRegisterFromLocationService(registrationResult)
       case None ⇒
         println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME use log statement
-        ctx.stop(component)
+        ctx.child(ComponentActor) match {
+          case Some(componentRef) ⇒ ctx.stop(component)
+          case None               ⇒ spawnAndWatchComponent()
+        }
+
     }
   }
 
