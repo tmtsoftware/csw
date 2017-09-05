@@ -90,7 +90,6 @@ object Dependencies {
 
   val ConfigServer = Seq(
     AkkaHttp.`akka-http`,
-    Libs.`spray-json`,
     Libs.svnkit,
     Libs.`scopt`,
     Libs.`scalatest`             % Test,
@@ -134,7 +133,6 @@ object Dependencies {
 
   val CswProdExamples = Seq(
     AkkaHttp.`akka-http`,
-    Libs.`spray-json`,
     Libs.`scalatest`       % Test,
     Libs.`junit`           % Test,
     Libs.`junit-interface` % Test

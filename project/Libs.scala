@@ -12,10 +12,10 @@ object Libs {
   val `junit-interface`              = "com.novocode"                 % "junit-interface"               % "0.11" //BSD 2-clause "Simplified" License
   val `mockito-core`                 = "org.mockito"                  % "mockito-core"                  % "2.7.22" //MIT License
   val `logback-classic`              = "ch.qos.logback"               % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
-  val `akka-management-cluster-http` = "com.lightbend.akka"           %% "akka-management-cluster-http" % "0.3" //N/A at the moment
+  val `akka-management-cluster-http` = "com.lightbend.akka"           %% "akka-management-cluster-http" % "0.4" //N/A at the moment
   val svnkit                         = "org.tmatesoft.svnkit"         % "svnkit"                        % "1.8.11" //TMate Open Source License
   val `commons-codec`                = "commons-codec"                % "commons-codec"                 % "1.10" //Apache 2.0
-  val `spray-json`                   = "io.spray"                     %% "spray-json"                   % "1.3.3" force () //Apache 2.0
+  val `spray-json`                   = "io.spray"                     %% "spray-json"                   % "1.3.3" //Apache 2.0
   val `persist-json`                 = "com.persist"                  %% "persist-json"                 % "1.2.0" //Apache 2.0
   val `joda-time`                    = "joda-time"                    % "joda-time"                     % "2.9.9" //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"               % "scala-reflect"                 % ScalaVersion //BSD-3
