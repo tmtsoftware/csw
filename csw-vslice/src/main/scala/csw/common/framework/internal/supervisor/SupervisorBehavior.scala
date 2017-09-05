@@ -67,9 +67,6 @@ class SupervisorBehavior(
 
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor)
   val pubSubComponent: ActorRef[PubSub[CurrentState]]          = pubSubBehaviorFactory.make(ctx, PubSubComponentActor)
-  val delayedShutdown: Future[Unit] = after(10.seconds, using = ctx.system.scheduler)(
-    Future.successful(println("shutdown took more time than anticipated"))
-  )
 
   private def spawnAndWatchComponent(): Unit = {
     mode = Idle

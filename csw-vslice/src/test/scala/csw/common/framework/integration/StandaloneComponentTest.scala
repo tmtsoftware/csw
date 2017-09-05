@@ -20,6 +20,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
+// DEOPSCSW-167: Creation and Deployment of Standalone Components
 class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   private val untypedSystem: actor.ActorSystem  = ClusterAwareSettings.system
@@ -27,23 +28,25 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
   private val locationService: LocationService = LocationServiceFactory.withSystem(untypedSystem)
-  override protected def afterAll(): Unit      = Await.result(untypedSystem.terminate(), 5.seconds)
 
-  test("should start multiple components withing a single container and able to accept lifecycle messages") {
+  override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
+
+  test("should start a component in standalone mode and register with location service") {
+
+    val wiring: FrameworkWiring = FrameworkWiring.make(untypedSystem, locationService)
+    Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorModeProbe = TestProbe[SupervisorMode]
-    val wiring              = FrameworkWiring.make(untypedSystem, locationService)
-    // start a container and verify it moves to running mode
-    val hcdRef = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
+    val akkaConnection      = AkkaConnection(ComponentId("IFS_Detector", HCD))
 
-    hcdRef ! GetSupervisorMode(supervisorModeProbe.ref)
-    supervisorModeProbe.expectMsg(SupervisorMode.Idle)
-
-    val eventualLocation = locationService.resolve(AkkaConnection(ComponentId("IFS_Detector", HCD)), 5.seconds)
+    val eventualLocation = locationService.resolve(akkaConnection, 5.seconds)
     val maybeLocation    = Await.result(eventualLocation, 5.seconds)
 
     maybeLocation.isDefined shouldBe true
-    val supervisorRef = maybeLocation.get.typedRef[SupervisorExternalMessage]
+    val resolvedAkkaLocation = maybeLocation.get
+    resolvedAkkaLocation.connection shouldBe akkaConnection
+
+    val supervisorRef = resolvedAkkaLocation.typedRef[SupervisorExternalMessage]
 
     supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
     supervisorModeProbe.expectMsg(SupervisorMode.Running)
