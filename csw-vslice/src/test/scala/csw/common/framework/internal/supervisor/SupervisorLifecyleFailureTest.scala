@@ -28,12 +28,16 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
   var supervisorBehavior: Behavior[SupervisorExternalMessage]    = _
   var supervisorRef: ActorRef[SupervisorExternalMessage]         = _
+  var initializeAnswer: Answer[Future[Unit]]                     = _
+  var shutdownAnswer: Answer[Future[Unit]]                       = _
+  var runAnswer: Answer[Future[Unit]]                            = _
 
   test("handle external restart when TLA throws FailureStop exception in initialize") {
     val testMockData = testMocks
     import testMockData._
 
-    val componentHandlers = createComponentHandlers(testMockData, FailureStop.apply())
+    val componentHandlers = createComponentHandlers(testMockData)
+    doThrow(FailureStop.apply()).doAnswer(initializeAnswer).when(componentHandlers).initialize()
     createSupervisorAndStartTLA(testMockData, componentHandlers)
 
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
@@ -57,7 +61,8 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     val testMockData = testMocks
     import testMockData._
 
-    val componentHandlers = createComponentHandlers(testMockData, FailureRestart.apply())
+    val componentHandlers = createComponentHandlers(testMockData)
+    doThrow(FailureRestart.apply()).doAnswer(initializeAnswer).when(componentHandlers).initialize()
     createSupervisorAndStartTLA(testMockData, componentHandlers)
 
     supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
@@ -78,7 +83,9 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     val testMockData = testMocks
     import testMockData._
 
-    val componentHandlers = createComponentHandlersForRunning(testMockData, FailureStop.apply())
+    val componentHandlers = createComponentHandlers(testMockData)
+    doThrow(FailureStop.apply()).doAnswer(runAnswer).when(componentHandlers).onRun()
+
     createSupervisorAndStartTLA(testMockData, componentHandlers)
 
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
@@ -144,43 +151,27 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
   }
 
-  private def createComponentHandlers(testMocks: FrameworkTestMocks, initializeFailureException: RuntimeException) = {
+  private def createComponentHandlers(testMocks: FrameworkTestMocks) = {
     import testMocks._
 
-    val initializeAnswer: Answer[Future[Unit]] = (_) ⇒
-      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-
-    val shutdownAnswer: Answer[Future[Unit]] = (_) ⇒
-      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
-
-    val runAnswer: Answer[Future[Unit]] = (_) ⇒
-      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
+    createAnswers(compStateProbe)
 
     val componentHandlers = mock[SampleComponentHandlers]
-    when(componentHandlers.initialize()).thenThrow(initializeFailureException).thenAnswer(initializeAnswer)
+    when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
     when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
     when(componentHandlers.onRun()).thenAnswer(runAnswer)
     componentHandlers
   }
 
-  private def createComponentHandlersForRunning(testMocks: FrameworkTestMocks,
-                                                initializeFailureException: RuntimeException) = {
-    import testMocks._
-
-    val initializeAnswer: Answer[Future[Unit]] = (_) ⇒
+  private def createAnswers(compStateProbe: TestProbe[PubSub[CurrentState]]): Unit = {
+    initializeAnswer = (_) ⇒
       Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
-    val shutdownAnswer: Answer[Future[Unit]] = (_) ⇒
+    shutdownAnswer = (_) ⇒
       Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
 
-    val runAnswer: Answer[Future[Unit]] = (_) ⇒
+    runAnswer = (_) ⇒
       Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
-
-    val componentHandlers = mock[SampleComponentHandlers]
-    when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
-    when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
-    when(componentHandlers.onRun()).thenThrow(initializeFailureException).thenAnswer(runAnswer)
-    componentHandlers
   }
 
 }

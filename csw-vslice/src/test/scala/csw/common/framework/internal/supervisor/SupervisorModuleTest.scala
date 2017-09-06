@@ -11,7 +11,6 @@ import csw.common.framework.models.CommandMessage.Oneway
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
-import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models._
 import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -174,9 +173,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         containerIdleMessageProbe.expectMsg(SupervisorModeChanged(supervisorRef, SupervisorMode.Running))
 
         supervisorRef ! Restart
-
-        supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
-        supervisorModeProbe.expectMsg(SupervisorMode.Restart)
 
         verify(registrationResult).unregister()
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
