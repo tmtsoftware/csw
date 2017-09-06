@@ -129,9 +129,10 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
       compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
       Future.unit
     }
-    val shutdownAnswer: Answer[Unit] = (_) ⇒
+    val shutdownAnswer: Answer[Future[Unit]] = (_) ⇒ {
       compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
-
+      Future.unit
+    }
     val runAnswer: Answer[Unit] = (_) ⇒
       compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice))))
 

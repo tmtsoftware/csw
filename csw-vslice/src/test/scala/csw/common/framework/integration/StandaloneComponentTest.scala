@@ -57,6 +57,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
 
     val supervisorRef = resolvedAkkaLocation.typedRef[SupervisorExternalMessage]
 
+    Thread.sleep(500)
     supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
     supervisorModeProbe.expectMsg(SupervisorMode.Running)
 

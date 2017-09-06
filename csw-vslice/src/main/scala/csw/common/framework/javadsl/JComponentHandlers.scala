@@ -24,6 +24,8 @@ abstract class JComponentHandlers[Msg <: DomainMessage](
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
 
   def jInitialize(): CompletableFuture[Unit]
+  def jOnShutdown(): CompletableFuture[Unit]
 
   override def initialize(): Future[Unit] = jInitialize().toScala
+  override def onShutdown(): Future[Unit] = jOnShutdown().toScala
 }

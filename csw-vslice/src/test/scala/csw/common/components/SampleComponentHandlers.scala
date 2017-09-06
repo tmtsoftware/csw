@@ -46,7 +46,10 @@ class SampleComponentHandlers(ctx: ActorContext[ComponentMessage],
   override def onGoOnline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
   override def onDomainMsg(msg: ComponentDomainMessage): Unit =
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
-  override def onShutdown(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+  override def onShutdown(): Future[Unit] = {
+    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    Future.unit
+  }
   override def onControlCommand(commandMsg: CommandMessage): Validation = {
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(commandChoice))))
     Validations.Valid

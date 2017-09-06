@@ -3,6 +3,8 @@ package csw.common.framework.internal.component
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.ccs.CommandStatus
+import csw.common.framework.exceptions.InitializeTimeOut
+import csw.common.framework.internal.extensions.RichFutureExtension.RichFuture
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.{InitializationFailed, Initialize}
@@ -13,8 +15,13 @@ import csw.common.framework.models.{RunningMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 
 import scala.async.Async.{async, await}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.reflect.ClassTag
+
+object ComponentBehavior {
+  val shutdownTimeout: FiniteDuration = 10.seconds
+}
 
 class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     ctx: ActorContext[ComponentMessage],
@@ -40,7 +47,13 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
     case PostStop ⇒
-      lifecycleHandlers.onShutdown()
+      lifecycleHandlers
+        .onShutdown()
+        .within(
+          ComponentBehavior.shutdownTimeout,
+          ctx.system.scheduler,
+          Future.failed(new InitializeTimeOut)
+        )
       this
   }
 
@@ -72,13 +85,13 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case GoOnline ⇒
       if (!lifecycleHandlers.isOnline) {
-        lifecycleHandlers.onGoOnline()
         lifecycleHandlers.isOnline = true
+        lifecycleHandlers.onGoOnline()
       }
     case GoOffline ⇒
       if (lifecycleHandlers.isOnline) {
-        lifecycleHandlers.onGoOffline()
         lifecycleHandlers.isOnline = false
+        lifecycleHandlers.onGoOffline()
       }
   }
 

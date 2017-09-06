@@ -54,7 +54,9 @@ class TromboneHcdHandlers(
 
   override def onRun(): Unit = println("received Running")
 
-  override def onShutdown(): Unit = println("shutdown complete during Running context")
+  override def onShutdown(): Future[Unit] = {
+    Future.successful(println("shutdown complete during Running context"))
+  }
 
   override def onGoOffline(): Unit = println("Received running offline")
 

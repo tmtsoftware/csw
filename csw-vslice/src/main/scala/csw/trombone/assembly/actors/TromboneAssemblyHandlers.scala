@@ -57,7 +57,9 @@ class TromboneAssemblyHandlers(
     diagPublsher = ctx.spawnAnonymous(DiagPublisher.make(ac, runningHcd, Some(eventPublisher)))
   }
 
-  override def onShutdown(): Unit = println("Received Shutdown")
+  override def onShutdown(): Future[Unit] = {
+    Future.successful(println("Received Shutdown"))
+  }
 
   override def onGoOffline(): Unit = println("Received running offline")
 

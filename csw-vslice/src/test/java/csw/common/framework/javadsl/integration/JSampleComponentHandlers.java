@@ -12,6 +12,7 @@ import csw.common.framework.models.ComponentInfo;
 import csw.common.framework.models.ComponentMessage;
 import csw.common.framework.models.PubSub;
 import csw.param.states.CurrentState;
+import scala.concurrent.Future;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
@@ -64,11 +65,14 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public void onShutdown() {
+    public CompletableFuture<BoxedUnit> jOnShutdown() {
+        return CompletableFuture.supplyAsync(() -> {
         CurrentState shutdownState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(shutdownState);
 
         pubSubRef.tell(publish);
+            return BoxedUnit.UNIT;
+        });
     }
 
     @Override
