@@ -964,8 +964,12 @@ class KeyParameterTest extends FunSpec with Matchers {
     }
 
     it("and second must be default Unit") {
-      val li: Parameter[Instant] = tskey.set(tsval)
-      li.units should be(second)
+      val li1: Parameter[Instant] = tskey.set(tsval)
+      li1.units should be(second)
+
+      //must respect overriding also
+      val li2: Parameter[Instant] = tskey.set(tsval).withUnits(NoUnits)
+      li2.units should be(NoUnits)
     }
 
     val listIn = Array[Instant](Instant.now().minusSeconds(3600), Instant.now(), Instant.now().plusMillis(3600000))
