@@ -24,6 +24,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
+// DEOPSCSW-216: Locate and connect components to send AKKA commands
 class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // ActorSystem for testing. This acts as a seed node
