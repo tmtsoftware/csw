@@ -7,7 +7,6 @@ import csw.common.components.SampleComponentState._
 import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.exceptions.{FailureRestart, FailureStop}
-import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.PubSub.{Publish, PublisherMessage}
 import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
 import csw.common.framework.models._

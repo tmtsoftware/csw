@@ -3,8 +3,6 @@ package csw.common.framework.internal.component
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.ccs.CommandStatus
-import csw.common.framework.exceptions.InitializeTimeOut
-import csw.common.framework.internal.extensions.RichFutureExtension.RichFuture
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.CommonMessage.UnderlyingHookFailed
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
@@ -17,8 +15,9 @@ import csw.common.framework.scaladsl.ComponentHandlers
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
 import scala.reflect.ClassTag
+import scala.util.Try
 
 object ComponentBehavior {
   val shutdownTimeout: FiniteDuration = 10.seconds
@@ -49,13 +48,11 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
     case PostStop ⇒
-      lifecycleHandlers
-        .onShutdown()
-        .within(
-          ComponentBehavior.shutdownTimeout,
-          ctx.system.scheduler,
-          Future.failed(new InitializeTimeOut)
-        )
+      val shutdownResult = Try {
+        Await.result(lifecycleHandlers.onShutdown(), ComponentBehavior.shutdownTimeout)
+      }
+      //log exception if onShutdown fails and proceed with `Shutdown` or `Restart`
+      shutdownResult.failed.foreach(throwable ⇒ println(s"log.error($throwable)")) //FIXME use log statement
       this
   }
 
