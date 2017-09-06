@@ -9,10 +9,13 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
+import csw.common.components.SampleComponentState._
+import csw.common.components.UpdateTestProbe
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
 import csw.common.framework.models.{Shutdown, SupervisorExternalMessage}
+import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.ComponentType.HCD
 import csw.services.location.models.Connection.AkkaConnection
@@ -45,8 +48,9 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
     val wiring: FrameworkWiring = FrameworkWiring.make(hcdActorSystem)
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
-    val supervisorModeProbe = TestProbe[SupervisorMode]("supervisor-probe")
-    val akkaConnection      = AkkaConnection(ComponentId("IFS_Detector", HCD))
+    val supervisorModeProbe  = TestProbe[SupervisorMode]("supervisor-probe")
+    val supervisorStateProbe = TestProbe[CurrentState]("supervisor-state-probe")
+    val akkaConnection       = AkkaConnection(ComponentId("IFS_Detector", HCD))
 
     // verify component gets registered with location service
     val eventualLocation = locationService.resolve(akkaConnection, 5.seconds)
@@ -66,7 +70,10 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
       locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
     // on shutdown, component unregisters from location service
+    supervisorRef ! UpdateTestProbe(supervisorStateProbe.ref)
+
     supervisorRef ! Shutdown
+    supervisorStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
     akkaProbe.requestNext(LocationRemoved(akkaConnection))
   }
 }

@@ -9,6 +9,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.{actor, testkit}
 import com.typesafe.config.ConfigFactory
 import csw.common.components.SampleComponentState._
+import csw.common.components.UpdateTestProbe
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring}
@@ -182,6 +183,15 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
       .run()
 
     // ********** Message: Shutdown **********
+    assemblySupervisor ! UpdateTestProbe(assemblyProbe.ref)
+    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
+
+    filterSupervisor ! UpdateTestProbe(filterProbe.ref)
+    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
+
+    disperserSupervisor ! UpdateTestProbe(disperserProbe.ref)
+    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
+
     resolvedContainerRef ! Shutdown
 
     val filterAssemblyRemoved = filterAssemblyTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved ⇒ x }
@@ -194,6 +204,9 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     disperserHcdRemoved.connection shouldBe disperserHcdConnection
     containerRemoved.connection shouldBe irisContainerConnection
 
+    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
   }
 
 }

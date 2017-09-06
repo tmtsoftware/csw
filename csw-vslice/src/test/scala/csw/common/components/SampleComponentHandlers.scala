@@ -41,14 +41,21 @@ class SampleComponentHandlers(ctx: ActorContext[ComponentMessage],
                               pubSubRef: ActorRef[PublisherMessage[CurrentState]])
     extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, pubSubRef) {
   import SampleComponentState._
+  var testProbe: Option[ActorRef[CurrentState]] = None
 
   override def onRun(): Future[Unit] =
     Future.successful(pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
   override def onGoOnline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
-  override def onDomainMsg(msg: ComponentDomainMessage): Unit =
+  override def onDomainMsg(msg: ComponentDomainMessage): Unit = {
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
+    msg match {
+      case UpdateTestProbe(replyTo) => testProbe = Some(replyTo)
+      case ComponentStatistics(_)   =>
+    }
+  }
   override def onShutdown(): Future[Unit] = {
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    testProbe.foreach(_ ! CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
     Future.unit
   }
   override def onControlCommand(commandMsg: CommandMessage): Validation = {
