@@ -67,19 +67,7 @@ class SupervisorBehavior(
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor)
   val pubSubComponent: ActorRef[PubSub[CurrentState]]          = pubSubBehaviorFactory.make(ctx, PubSubComponentActor)
 
-  private def spawnAndWatchComponent(): Unit = {
-    mode = Idle
-    component = ctx.spawn[Nothing](
-      Actor
-        .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))
-        .onFailure[FailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)),
-      ComponentActor
-    )
-    ctx.watch(component)
-  }
-
   spawnAndWatchComponent()
-  timerScheduler.startSingleTimer(InitializeTimerKey, InitializeTimeout, initializeTimeout)
 
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     (mode, msg) match {
@@ -195,5 +183,17 @@ class SupervisorBehavior(
       case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
       case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
     }
+  }
+
+  private def spawnAndWatchComponent(): Unit = {
+    mode = Idle
+    component = ctx.spawn[Nothing](
+      Actor
+        .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))
+        .onFailure[FailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)),
+      ComponentActor
+    )
+    ctx.watch(component)
+    timerScheduler.startSingleTimer(InitializeTimerKey, InitializeTimeout, initializeTimeout)
   }
 }

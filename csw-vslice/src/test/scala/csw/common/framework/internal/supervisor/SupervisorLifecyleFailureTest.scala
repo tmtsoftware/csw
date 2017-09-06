@@ -37,7 +37,7 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     import testMockData._
 
     val componentHandlers = createComponentHandlers(testMockData)
-    doThrow(FailureStop.apply()).doAnswer(initializeAnswer).when(componentHandlers).initialize()
+    doThrow(FailureStop()).doAnswer(initializeAnswer).when(componentHandlers).initialize()
     createSupervisorAndStartTLA(testMockData, componentHandlers)
 
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
@@ -62,7 +62,7 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     import testMockData._
 
     val componentHandlers = createComponentHandlers(testMockData)
-    doThrow(FailureRestart.apply()).doAnswer(initializeAnswer).when(componentHandlers).initialize()
+    doThrow(FailureRestart()).doAnswer(initializeAnswer).when(componentHandlers).initialize()
     createSupervisorAndStartTLA(testMockData, componentHandlers)
 
     supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
@@ -84,7 +84,7 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     import testMockData._
 
     val componentHandlers = createComponentHandlers(testMockData)
-    doThrow(FailureStop.apply()).doAnswer(runAnswer).when(componentHandlers).onRun()
+    doThrow(FailureStop()).doAnswer(runAnswer).when(componentHandlers).onRun()
 
     createSupervisorAndStartTLA(testMockData, componentHandlers)
 
