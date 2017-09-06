@@ -3,7 +3,7 @@ package csw.common.framework.internal.supervisor
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.common.framework.exceptions.InitializeFailureRestart
+import csw.common.framework.exceptions.FailureRestart
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.SupervisorMode.Idle
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
@@ -72,7 +72,7 @@ class SupervisorBehavior(
     component = ctx.spawn[Nothing](
       Actor
         .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))
-        .onFailure[InitializeFailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)),
+        .onFailure[FailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)),
       ComponentActor
     )
     ctx.watch(component)

@@ -6,8 +6,9 @@ import csw.common.ccs.CommandStatus
 import csw.common.framework.exceptions.InitializeTimeOut
 import csw.common.framework.internal.extensions.RichFutureExtension.RichFuture
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
+import csw.common.framework.models.CommonMessage.UnderlyingHookFailed
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.common.framework.models.IdleMessage.{InitializationFailed, Initialize}
+import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
@@ -15,8 +16,8 @@ import csw.common.framework.models.{RunningMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 
 import scala.async.Async.{async, await}
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 
 object ComponentBehavior {
@@ -37,10 +38,11 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   def onMessage(msg: ComponentMessage): Behavior[ComponentMessage] = {
     (mode, msg) match {
-      case (ComponentMode.Idle, x: IdleMessage)           ⇒ onIdle(x)
-      case (ComponentMode.Initialized, x: InitialMessage) ⇒ onInitial(x)
-      case (ComponentMode.Running, x: RunningMessage)     ⇒ onRun(x)
-      case _                                              ⇒ println(s"current context=$mode does not handle message=$msg")
+      case (_, msg: CommonMessage)                          ⇒ onCommon(msg)
+      case (ComponentMode.Idle, msg: IdleMessage)           ⇒ onIdle(msg)
+      case (ComponentMode.Initialized, msg: InitialMessage) ⇒ onInitial(msg)
+      case (ComponentMode.Running, msg: RunningMessage)     ⇒ onRun(msg)
+      case _                                                ⇒ println(s"current context=$mode does not handle message=$msg")
     }
     this
   }
@@ -57,14 +59,19 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       this
   }
 
+  private def onCommon(msg: CommonMessage): Unit = {
+    msg match {
+      case UnderlyingHookFailed(exception) ⇒ throw exception
+    }
+  }
+
   private def onIdle(x: IdleMessage): Unit = x match {
     case Initialize ⇒
       async {
         await(lifecycleHandlers.initialize())
         mode = ComponentMode.Initialized
         supervisor ! Initialized(ctx.self)
-      }.failed.foreach(throwable ⇒ ctx.self ! InitializationFailed(throwable))
-    case InitializationFailed(throwable) ⇒ throw throwable
+      }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))
   }
 
   private def onInitial(x: InitialMessage): Unit = x match {
@@ -74,7 +81,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
         mode = ComponentMode.Running
         lifecycleHandlers.isOnline = true
         supervisor ! Running(ctx.self)
-      }
+      }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))
   }
 
   private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {

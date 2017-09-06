@@ -6,7 +6,7 @@ import akka.typed.{ActorRef, Behavior}
 import csw.common.components.SampleComponentState._
 import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
 import csw.common.framework.ComponentInfos._
-import csw.common.framework.exceptions.{InitializeFailureRestart, InitializeFailureStop}
+import csw.common.framework.exceptions.{FailureRestart, FailureStop}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.PubSub.{Publish, PublisherMessage}
 import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
@@ -29,19 +29,17 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
   var supervisorBehavior: Behavior[SupervisorExternalMessage]    = _
   var supervisorRef: ActorRef[SupervisorExternalMessage]         = _
 
-  test("handle external restart when TLA InitializeFailureStop exception") {
+  test("handle external restart when TLA throws FailureStop exception in initialize") {
     val testMockData = testMocks
     import testMockData._
 
-    val componentHandlers = createComponentHandlers(testMockData, InitializeFailureStop.apply())
+    val componentHandlers = createComponentHandlers(testMockData, FailureStop.apply())
     createSupervisorAndStartTLA(testMockData, componentHandlers)
 
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
 
     supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
     supervisorModeProbe.expectMsg(SupervisorMode.Idle)
-
-    verify(locationService, never()).register(akkaRegistration)
 
     supervisorRef ! Restart
 
@@ -51,20 +49,19 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
     containerIdleMessageProbe.expectMsg(SupervisorModeChanged(supervisorRef, SupervisorMode.Running))
 
+    verify(locationService).register(akkaRegistration)
     verify(registrationResult, never()).unregister()
   }
 
-  test("handle TLA failure with InitializeFailureRestart exception") {
+  test("handle TLA failure with FailureRestart exception in initialize") {
     val testMockData = testMocks
     import testMockData._
 
-    val componentHandlers = createComponentHandlers(testMockData, InitializeFailureRestart.apply())
+    val componentHandlers = createComponentHandlers(testMockData, FailureRestart.apply())
     createSupervisorAndStartTLA(testMockData, componentHandlers)
 
     supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
     supervisorModeProbe.expectMsg(SupervisorMode.Idle)
-
-    verify(locationService, never()).register(akkaRegistration)
 
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
@@ -72,7 +69,32 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
     containerIdleMessageProbe.expectMsg(SupervisorModeChanged(supervisorRef, SupervisorMode.Running))
 
+    verify(locationService).register(akkaRegistration)
     verify(registrationResult, never()).unregister()
+
+  }
+
+  test("handle external restart when TLA throws FailureStop exception in onRun") {
+    val testMockData = testMocks
+    import testMockData._
+
+    val componentHandlers = createComponentHandlersForRunning(testMockData, FailureStop.apply())
+    createSupervisorAndStartTLA(testMockData, componentHandlers)
+
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
+
+    supervisorRef ! Restart
+
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
+
+    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
+    containerIdleMessageProbe.expectMsg(SupervisorModeChanged(supervisorRef, SupervisorMode.Running))
+
+    verify(locationService, times(2)).register(akkaRegistration)
+    verify(registrationResult).unregister()
   }
 
   private def createSupervisorAndStartTLA(
@@ -140,4 +162,25 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     when(componentHandlers.onRun()).thenAnswer(runAnswer)
     componentHandlers
   }
+
+  private def createComponentHandlersForRunning(testMocks: FrameworkTestMocks,
+                                                initializeFailureException: RuntimeException) = {
+    import testMocks._
+
+    val initializeAnswer: Answer[Future[Unit]] = (_) ⇒
+      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+
+    val shutdownAnswer: Answer[Future[Unit]] = (_) ⇒
+      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
+
+    val runAnswer: Answer[Future[Unit]] = (_) ⇒
+      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
+
+    val componentHandlers = mock[SampleComponentHandlers]
+    when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
+    when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
+    when(componentHandlers.onRun()).thenThrow(initializeFailureException).thenAnswer(runAnswer)
+    componentHandlers
+  }
+
 }

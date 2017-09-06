@@ -34,10 +34,14 @@ object ToComponentLifecycleMessage {
 
 sealed trait ComponentMessage
 
+sealed trait CommonMessage extends ComponentMessage
+object CommonMessage {
+  case class UnderlyingHookFailed(throwable: Throwable) extends CommonMessage
+}
+
 sealed trait IdleMessage extends ComponentMessage
 object IdleMessage {
-  case object Initialize                                extends IdleMessage
-  case class InitializationFailed(throwable: Throwable) extends IdleMessage
+  case object Initialize extends IdleMessage
 }
 
 sealed trait InitialMessage extends ComponentMessage
