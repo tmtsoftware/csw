@@ -1,6 +1,6 @@
 package csw.common.framework
 
-import akka.typed.ActorSystem
+import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
@@ -20,6 +20,7 @@ import csw.common.framework.models.SupervisorCommonMessage.{
 import csw.common.framework.models.ToComponentLifecycleMessage.GoOffline
 import csw.common.framework.models._
 import csw.param.states.CurrentState
+import csw.services.location.commons.BlockingUtils
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType}
@@ -43,6 +44,19 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
 
 //  LoggingSystemFactory.start("framework", "1.0", "localhost", system)
 
+  def waitForContainerToMoveIntoRunningMode(
+      containerRef: ActorRef[ContainerExternalMessage],
+      probe: TestProbe[ContainerMode]
+  ): Boolean = {
+
+    def getContainerMode: ContainerMode = {
+      containerRef ! GetContainerMode(probe.ref)
+      probe.expectMsgType[ContainerMode]
+    }
+
+    BlockingUtils.poll(getContainerMode == ContainerMode.Running, 2.seconds)
+  }
+
   test("should able to create multiple containers across jvm's and start component in standalone mode") {
 
     runOn(seed) {
@@ -65,10 +79,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
       supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
 
-      Thread.sleep(100)
-
-      containerRef ! GetContainerMode(containerModeProbe.ref)
-      containerModeProbe.expectMsg(ContainerMode.Running)
+      waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe) shouldBe true
       enterBarrier("running")
 
       // resolve and send message to container running in different jvm or on different physical machine
@@ -107,10 +118,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
       supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
 
-      Thread.sleep(100)
-
-      containerRef ! GetContainerMode(containerModeProbe.ref)
-      containerModeProbe.expectMsg(ContainerMode.Running)
+      waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe) shouldBe true
       enterBarrier("running")
 
       // resolve and send message to component running in different jvm or on different physical machine
