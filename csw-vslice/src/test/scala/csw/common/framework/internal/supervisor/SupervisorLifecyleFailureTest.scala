@@ -51,7 +51,6 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
 
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
-    containerIdleMessageProbe.expectMsg(SupervisorModeChanged(supervisorRef, SupervisorMode.Running))
 
     verify(locationService).register(akkaRegistration)
     verify(registrationResult, never()).unregister()
@@ -72,7 +71,6 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
 
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
-    containerIdleMessageProbe.expectMsg(SupervisorModeChanged(supervisorRef, SupervisorMode.Running))
 
     verify(locationService).register(akkaRegistration)
     verify(registrationResult, never()).unregister()
@@ -98,7 +96,6 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
 
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
-    containerIdleMessageProbe.expectMsg(SupervisorModeChanged(supervisorRef, SupervisorMode.Running))
 
     verify(locationService, times(2)).register(akkaRegistration)
     verify(registrationResult).unregister()
