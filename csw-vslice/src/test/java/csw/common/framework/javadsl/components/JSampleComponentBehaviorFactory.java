@@ -1,4 +1,4 @@
-package csw.common.framework.javadsl.integration;
+package csw.common.framework.javadsl.components;
 
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;

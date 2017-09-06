@@ -12,7 +12,7 @@ import csw.common.framework.models.PubSub.{Publish, PublisherMessage}
 import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.common.framework.{FrameworkTestSuite, TestMocks}
+import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.states.CurrentState
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
@@ -76,7 +76,7 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
   }
 
   private def createSupervisorAndStartTLA(
-      testMocks: TestMocks,
+      testMocks: FrameworkTestMocks,
       componentHandlers: ComponentHandlers[ComponentDomainMessage]
   ): Unit = {
     import testMocks._
@@ -122,7 +122,7 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
   }
 
-  private def createComponentHandlers(testMocks: TestMocks, initializeFailureException: RuntimeException) = {
+  private def createComponentHandlers(testMocks: FrameworkTestMocks, initializeFailureException: RuntimeException) = {
     import testMocks._
 
     val initializeAnswer: Answer[Future[Unit]] = (_) ⇒ {

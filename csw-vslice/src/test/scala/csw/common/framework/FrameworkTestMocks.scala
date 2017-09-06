@@ -19,7 +19,7 @@ import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.{Future, Promise}
 
-class TestMocks(
+class FrameworkTestMocks(
     implicit untypedSystem: actor.ActorSystem,
     system: ActorSystem[Nothing],
     settings: TestKitSettings

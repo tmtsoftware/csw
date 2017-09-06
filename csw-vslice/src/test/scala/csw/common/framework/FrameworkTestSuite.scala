@@ -21,7 +21,7 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
   implicit val system: ActorSystem[Nothing]     = ActorSystem(Actor.empty, "testHcd")
   implicit val settings: TestKitSettings        = TestKitSettings(system)
   implicit val timeout: Timeout                 = Timeout(5.seconds)
-  def testMocks: TestMocks                      = new TestMocks
+  def testMocks: FrameworkTestMocks             = new FrameworkTestMocks
 
   override protected def afterAll(): Unit = {
     Await.result(untypedSystem.terminate(), 5.seconds)

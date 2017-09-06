@@ -7,12 +7,12 @@ import akka.typed.{Behavior, Props}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.models.{ContainerIdleMessage, SupervisorExternalMessage}
-import csw.common.framework.{FrameworkTestSuite, TestMocks}
+import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
-  val testMockData: TestMocks = testMocks
+  val testMockData: FrameworkTestMocks = testMocks
   import testMockData._
 
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]

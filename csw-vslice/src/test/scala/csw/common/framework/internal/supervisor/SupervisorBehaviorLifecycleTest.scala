@@ -14,7 +14,7 @@ import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscr
 import csw.common.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationComplete}
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
-import csw.common.framework.{FrameworkTestSuite, TestMocks}
+import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.states.CurrentState
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -23,7 +23,7 @@ import org.scalatest.BeforeAndAfterEach
 class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   class TestData {
-    val testMockData: TestMocks = testMocks
+    val testMockData: FrameworkTestMocks = testMocks
     import testMockData._
 
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
