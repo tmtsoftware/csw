@@ -63,9 +63,6 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
     doThrow(FailureRestart()).doAnswer(initializeAnswer).when(componentHandlers).initialize()
     createSupervisorAndStartTLA(testMockData, componentHandlers)
 
-    supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
-    supervisorModeProbe.expectMsg(SupervisorMode.Idle)
-
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
 
