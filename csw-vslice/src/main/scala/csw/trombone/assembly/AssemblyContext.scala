@@ -20,7 +20,7 @@ case class AssemblyContext(
   // Assembly Info
   // These first three are set from the config file
   val componentName: String      = info.name
-  val componentClassName: String = info.className
+  val componentClassName: String = info.behaviorFactoryClassName
   val componentPrefix: String    = info.prefix
   val componentType              = info.componentType
   val fullName                   = s"$componentPrefix.$componentName"

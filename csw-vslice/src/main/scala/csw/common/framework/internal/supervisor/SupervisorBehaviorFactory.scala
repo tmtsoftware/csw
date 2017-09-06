@@ -17,7 +17,7 @@ object SupervisorBehaviorFactory {
       pubSubBehaviorFactory: PubSubBehaviorFactory
   ): Behavior[SupervisorExternalMessage] = {
 
-    val componentWiringClass = Class.forName(componentInfo.className)
+    val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
     val compWring            = componentWiringClass.newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
 
     Actor

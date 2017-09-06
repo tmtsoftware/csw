@@ -13,7 +13,7 @@ final case class ComponentInfo(
     name: String,
     componentType: ComponentType,
     prefix: String,
-    className: String,
+    behaviorFactoryClassName: String,
     locationServiceUsage: LocationServiceUsage,
     connections: Set[Connection] = Set.empty
 ) {
