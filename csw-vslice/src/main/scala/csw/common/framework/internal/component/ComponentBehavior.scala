@@ -69,10 +69,12 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   private def onInitial(x: InitialMessage): Unit = x match {
     case Run ⇒
-      lifecycleHandlers.onRun()
-      mode = ComponentMode.Running
-      lifecycleHandlers.isOnline = true
-      supervisor ! Running(ctx.self)
+      async {
+        await(lifecycleHandlers.onRun())
+        mode = ComponentMode.Running
+        lifecycleHandlers.isOnline = true
+        supervisor ! Running(ctx.self)
+      }
   }
 
   private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {

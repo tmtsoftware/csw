@@ -44,7 +44,7 @@ class TromboneAssemblyHandlers(
 
   val runningHcd: Option[Running] = None
 
-  def onRun(): Unit = ()
+  def onRun(): Future[Unit] = Future.unit
 
   def initialize(): Future[Unit] = async {
     val (calculationConfig, controlConfig) = await(getAssemblyConfigs)

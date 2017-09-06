@@ -35,7 +35,9 @@ object SupervisorBehavior {
   val ComponentActor                    = "component"
   val PubSubLifecycleActor              = "pub-sub-lifecycle"
   val InitializeTimerKey                = "initialize-timer"
+  val RunTimerKey                       = "run-timer"
   val initializeTimeout: FiniteDuration = 5.seconds
+  val runTimeout: FiniteDuration        = 5.seconds
 }
 
 class SupervisorBehavior(
@@ -117,9 +119,11 @@ class SupervisorBehavior(
       timerScheduler.cancel(InitializeTimerKey)
       registerWithLocationService(componentRef)
     case RegistrationComplete(registrationResult, componentRef) ⇒
-      onRegistrationComplete(registrationResult, componentRef)
+      registrationOpt = Some(registrationResult)
+      timerScheduler.startSingleTimer(RunTimerKey, InitializeTimeout, runTimeout)
+      componentRef ! Run
     case RegistrationFailed(throwable) ⇒
-      onRegistrationFailed(throwable)
+      println(s"log.error($throwable)") //FIXME use log statement
     case Running(componentRef) ⇒
       mode = SupervisorMode.Running
       runningComponent = Some(componentRef)
@@ -127,6 +131,8 @@ class SupervisorBehavior(
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
     case InitializeTimeout ⇒
       println("TLA initialization timed out") //FIXME use log statement
+    case RunTimeout ⇒
+      println("TLA onRun timed out") //FIXME use log statement
   }
 
   private def onRunning(supervisorRunningMessage: SupervisorRunningMessage): Unit = {
@@ -169,17 +175,6 @@ class SupervisorBehavior(
       case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
     }
   }
-
-  private def onRegistrationComplete(
-      registrationResult: RegistrationResult,
-      componentRef: ActorRef[InitialMessage]
-  ): Unit = {
-    registrationOpt = Some(registrationResult)
-    componentRef ! Run
-  }
-
-  private def onRegistrationFailed(throwable: Throwable): Unit =
-    println(s"log.error($throwable)") //FIXME use log statement
 
   private def onRestart(): Unit = {
     mode = SupervisorMode.Restart

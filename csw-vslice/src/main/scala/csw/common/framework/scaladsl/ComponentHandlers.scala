@@ -19,7 +19,7 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
   var isOnline: Boolean = false
 
   def initialize(): Future[Unit]
-  def onRun(): Unit
+  def onRun(): Future[Unit]
   def onDomainMsg(msg: Msg): Unit
   def onControlCommand(commandMessage: CommandMessage): Validation
   def onShutdown(): Future[Unit]

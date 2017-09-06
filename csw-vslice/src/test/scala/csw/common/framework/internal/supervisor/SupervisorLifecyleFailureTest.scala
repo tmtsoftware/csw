@@ -125,16 +125,14 @@ class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
   private def createComponentHandlers(testMocks: FrameworkTestMocks, initializeFailureException: RuntimeException) = {
     import testMocks._
 
-    val initializeAnswer: Answer[Future[Unit]] = (_) ⇒ {
-      compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-      Future.unit
-    }
-    val shutdownAnswer: Answer[Future[Unit]] = (_) ⇒ {
-      compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
-      Future.unit
-    }
-    val runAnswer: Answer[Unit] = (_) ⇒
-      compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice))))
+    val initializeAnswer: Answer[Future[Unit]] = (_) ⇒
+      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+
+    val shutdownAnswer: Answer[Future[Unit]] = (_) ⇒
+      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
+
+    val runAnswer: Answer[Future[Unit]] = (_) ⇒
+      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
 
     val componentHandlers = mock[SampleComponentHandlers]
     when(componentHandlers.initialize()).thenThrow(initializeFailureException).thenAnswer(initializeAnswer)

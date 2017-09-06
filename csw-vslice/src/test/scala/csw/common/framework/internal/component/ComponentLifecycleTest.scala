@@ -24,6 +24,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+    when(sampleHcdHandler.onRun()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
     val behavior = new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleHcdHandler)
 

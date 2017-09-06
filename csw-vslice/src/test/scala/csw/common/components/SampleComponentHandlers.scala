@@ -42,7 +42,8 @@ class SampleComponentHandlers(ctx: ActorContext[ComponentMessage],
     extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, pubSubRef) {
   import SampleComponentState._
 
-  override def onRun(): Unit      = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice))))
+  override def onRun(): Future[Unit] =
+    Future.successful(pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
   override def onGoOnline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
   override def onDomainMsg(msg: ComponentDomainMessage): Unit =
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))

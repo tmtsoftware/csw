@@ -24,6 +24,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     val componentBehavior =
       new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleComponentHandler)
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
+    when(sampleComponentHandler.onRun()).thenReturn(Future.unit)
   }
 
   test("component should start in idle mode") {
