@@ -15,56 +15,83 @@ import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.common.framework.models.{Components, LifecycleStateChanged, Restart}
+import csw.common.framework.models._
 import csw.param.states.CurrentState
-import csw.services.location.commons.ClusterAwareSettings
+import csw.services.location.commons.ClusterSettings
+import csw.services.location.models.ComponentType.{Assembly, HCD}
+import csw.services.location.models.Connection.AkkaConnection
+import csw.services.location.models.{ComponentId, ComponentType}
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-169: Creation of Multiple Components
+// DEOPSCSW-216: Locate and connect components to send AKKA commands
 class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  private val untypedSystem: actor.ActorSystem  = ClusterAwareSettings.system
-  implicit val typedSystem: ActorSystem[_]      = untypedSystem.toTyped
+  private val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(3552).system
+  private val locationService: LocationService   = LocationServiceFactory.withSystem(seedActorSystem)
+
+  private val containerActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3552).system
+
+  implicit val typedSystem: ActorSystem[_]      = seedActorSystem.toTyped
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
 
-  override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
+  override protected def afterAll(): Unit = Await.result(containerActorSystem.terminate(), 5.seconds)
 
   test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
-    val wiring = FrameworkWiring.make(untypedSystem)
+    val wiring = FrameworkWiring.make(containerActorSystem)
     // start a container and verify it moves to running mode
     val containerRef = Container.spawn(ConfigFactory.load("container.conf"), wiring)
 
-    val componentsProbe    = TestProbe[Components]
-    val containerModeProbe = TestProbe[ContainerMode]
-    val assemblyProbe      = TestProbe[CurrentState]
-    val filterProbe        = TestProbe[CurrentState]
-    val disperserProbe     = TestProbe[CurrentState]
+    val componentsProbe    = TestProbe[Components]("comp-probe")
+    val containerModeProbe = TestProbe[ContainerMode]("container-mode-probe")
+    val assemblyProbe      = TestProbe[CurrentState]("assembly-state-probe")
+    val filterProbe        = TestProbe[CurrentState]("filter-state-probe")
+    val disperserProbe     = TestProbe[CurrentState]("disperser-state-probe")
 
-    val assemblyLifecycleStateProbe  = TestProbe[LifecycleStateChanged]
-    val filterLifecycleStateProbe    = TestProbe[LifecycleStateChanged]
-    val disperserLifecycleStateProbe = TestProbe[LifecycleStateChanged]
+    val assemblyLifecycleStateProbe  = TestProbe[LifecycleStateChanged]("assembly-lifecycle-probe")
+    val filterLifecycleStateProbe    = TestProbe[LifecycleStateChanged]("filter-lifecycle-probe")
+    val disperserLifecycleStateProbe = TestProbe[LifecycleStateChanged]("disperser-lifecycle-probe")
 
     // initially container is put in Idle state and wait for all the components to move into Running mode
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Idle)
 
-    containerRef ! GetComponents(componentsProbe.ref)
+    val containerLocation =
+      Await.result(
+        locationService.resolve(AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container)), 5.seconds),
+        5.seconds
+      )
+
+    containerLocation.isDefined shouldBe true
+    val resolvedContainerRef = containerLocation.get.typedRef[ContainerExternalMessage]
+
+    resolvedContainerRef ! GetComponents(componentsProbe.ref)
     val components = componentsProbe.expectMsgType[Components].components
     components.size shouldBe 3
 
-    val assemblySupervisor  = components(0).supervisor
-    val filterSupervisor    = components(1).supervisor
-    val disperserSupervisor = components(2).supervisor
+    val filterAssemblyLocation =
+      Await.result(locationService.find(AkkaConnection(ComponentId("Filter", Assembly))), 5.seconds)
+    val instrumentHcdLocation =
+      Await.result(locationService.find(AkkaConnection(ComponentId("Instrument_Filter", HCD))), 5.seconds)
+    val disperserHcdLocation =
+      Await.result(locationService.find(AkkaConnection(ComponentId("Disperser", HCD))), 5.seconds)
 
-    Thread.sleep(500)
+    filterAssemblyLocation.isDefined shouldBe true
+    instrumentHcdLocation.isDefined shouldBe true
+    disperserHcdLocation.isDefined shouldBe true
+
+    val assemblySupervisor  = filterAssemblyLocation.get.typedRef[SupervisorExternalMessage]
+    val filterSupervisor    = instrumentHcdLocation.get.typedRef[SupervisorExternalMessage]
+    val disperserSupervisor = disperserHcdLocation.get.typedRef[SupervisorExternalMessage]
 
     // once all components from container moves to Running mode,
     // container moves to Running mode and ready to accept external lifecycle messages
-    containerRef ! GetContainerMode(containerModeProbe.ref)
+    resolvedContainerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Running)
 
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))
@@ -75,62 +102,43 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     filterSupervisor ! LifecycleStateSubscription(Subscribe(filterLifecycleStateProbe.ref))
     disperserSupervisor ! LifecycleStateSubscription(Subscribe(disperserLifecycleStateProbe.ref))
 
+    Thread.sleep(50)
     // lifecycle messages gets forwarded to all components and their corresponding handlers gets invoked
-    containerRef ! Lifecycle(GoOffline)
+    resolvedContainerRef ! Lifecycle(GoOffline)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
 
-    containerRef ! Lifecycle(GoOnline)
+    resolvedContainerRef ! Lifecycle(GoOnline)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
 
     // on Restart message, container falls back to Idle mode and wait for all the components to get restarted
     // and moves to Running mode
-    containerRef ! Restart
+    resolvedContainerRef ! Restart
 
-    containerRef ! GetContainerMode(containerModeProbe.ref)
+    resolvedContainerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Idle)
 
-    val initState      = CurrentState(prefix, Set(choiceKey.set(initChoice)))
-    val runState       = CurrentState(prefix, Set(choiceKey.set(runChoice)))
-    val shutdownState  = CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))
-    val expectedStates = Set(initState, runState, shutdownState)
+    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
 
-    // on restart, new TLA gets created which means TLA's onInitialize and onRun hooks gets invoked
-    // also old TLA gets killed which triggers old TLA's onShutdown handler
-    // hence, subscriber receives three events :
-    // 1. onInitialized -> CurrentState(InitialChoice) (This is from new TLA)
-    // 2. onRun -> CurrentState(RunChoice) (This is from new TLA)
-    // 3. onShutdown -> CurrentState(ShutdownChoice) (This is from old TLA)
-    // But the order in which onShutdown event will be received by subscribers is not guaranteed,
-    // that is the reason why we are collecting all the events and then asserting on all of them together in Set
-    val assemblyActualState1 = assemblyProbe.expectMsgType[CurrentState]
-    val assemblyActualState2 = assemblyProbe.expectMsgType[CurrentState]
-    val assemblyActualState3 = assemblyProbe.expectMsgType[CurrentState]
-    val assemblyActualStates = Set(assemblyActualState1, assemblyActualState2, assemblyActualState3)
+    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
-    val filterActualState1 = filterProbe.expectMsgType[CurrentState]
-    val filterActualState2 = filterProbe.expectMsgType[CurrentState]
-    val filterActualState3 = filterProbe.expectMsgType[CurrentState]
-    val filterActualStates = Set(filterActualState1, filterActualState2, filterActualState3)
-
-    val disperserActualState1 = disperserProbe.expectMsgType[CurrentState]
-    val disperserActualState2 = disperserProbe.expectMsgType[CurrentState]
-    val disperserActualState3 = disperserProbe.expectMsgType[CurrentState]
-    val disperserActualStates = Set(disperserActualState1, disperserActualState2, disperserActualState3)
-
-    assemblyActualStates shouldBe expectedStates
-    filterActualStates shouldBe expectedStates
-    disperserActualStates shouldBe expectedStates
+    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
+    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
+    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
 
     assemblyLifecycleStateProbe.expectMsg(LifecycleStateChanged(assemblySupervisor, SupervisorMode.Running))
     filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorMode.Running))
     disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(disperserSupervisor, SupervisorMode.Running))
 
     Thread.sleep(100)
-    containerRef ! GetContainerMode(containerModeProbe.ref)
+    resolvedContainerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Running)
   }
 

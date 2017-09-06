@@ -124,6 +124,7 @@ object FromSupervisorMessage {
 }
 
 case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage], state: SupervisorMode)
+    extends TmtSerializable
 
 case class Components(components: List[Component]) extends TmtSerializable
 
