@@ -2,8 +2,8 @@ package csw.param.events
 
 import java.time.Instant
 
-import csw.param.models.{ObsId, Prefix}
 import csw.param.generics.KeyType
+import csw.param.models.{ObsId, Prefix}
 import csw.units.Units.meter
 import org.scalatest.{FunSpec, Matchers}
 
@@ -118,7 +118,7 @@ class EventsTest extends FunSpec with Matchers {
       val i2        = k2.set(44)
       val eventTime = Instant.now()
 
-      val sc1 = ObserveEvent(prefix, eventTime).madd(i1, i2)
+      val sc1 = ObserveEvent(prefix, eventTime, ObsId.empty).madd(i1, i2)
       assert(sc1.size == 2)
       assert(sc1.exists(k1))
       assert(sc1.exists(k2))
@@ -187,7 +187,7 @@ class EventsTest extends FunSpec with Matchers {
       val i2        = k2.set(44)
       val eventTime = Instant.now()
 
-      val sc1 = SystemEvent(prefix, eventTime).madd(i1, i2)
+      val sc1 = SystemEvent(prefix, eventTime, ObsId.empty).madd(i1, i2)
       assert(sc1.size == 2)
       assert(sc1.exists(k1))
       assert(sc1.exists(k2))

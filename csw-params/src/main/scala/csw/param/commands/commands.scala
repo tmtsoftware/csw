@@ -1,7 +1,7 @@
 package csw.param.commands
 
-import csw.param.models.Prefix
 import csw.param.generics.{Key, Parameter, ParameterSetKeyData, ParameterSetType}
+import csw.param.models.Prefix
 
 /**
  * Common trait for Setup, Observe and Wait commands
@@ -47,13 +47,13 @@ sealed trait ControlCommand extends Command
  * @param prefix   identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Setup(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class Setup private (info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends ParameterSetType[Setup]
     with ParameterSetKeyData
     with SequenceCommand
     with ControlCommand {
 
-  override def create(data: Set[Parameter[_]]) = Setup(info, prefix, data)
+  override protected def create(data: Set[Parameter[_]]): Setup = new Setup(info, prefix, data)
 
   // This is here for Java to construct with String
   def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
@@ -65,6 +65,11 @@ case class Setup(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] 
   override def remove[S](key: Key[S]): Setup = super.remove(key)
 }
 
+object Setup {
+  def apply(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Setup =
+    new Setup(info, prefix).madd(paramSet)
+}
+
 /**
  * a parameter set indicating a pause in processing
  *
@@ -72,12 +77,12 @@ case class Setup(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] 
  * @param prefix   identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Wait(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class Wait private (info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends ParameterSetType[Wait]
     with ParameterSetKeyData
     with SequenceCommand {
 
-  override def create(data: Set[Parameter[_]]) = Wait(info, prefix, data)
+  override protected def create(data: Set[Parameter[_]]) = new Wait(info, prefix, data)
 
   // This is here for Java to construct with String
   def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
@@ -89,6 +94,11 @@ case class Wait(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] =
   override def remove[S](key: Key[S]): Wait = super.remove(key)
 }
 
+object Wait {
+  def apply(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Wait =
+    new Wait(info, prefix).madd(paramSet)
+}
+
 /**
  * a parameter set for setting observation parameters
  *
@@ -96,13 +106,13 @@ case class Wait(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] =
  * @param prefix   identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Observe(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class Observe private (info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends ParameterSetType[Observe]
     with ParameterSetKeyData
     with SequenceCommand
     with ControlCommand {
 
-  override def create(data: Set[Parameter[_]]) = Observe(info, prefix, data)
+  override protected def create(data: Set[Parameter[_]]) = new Observe(info, prefix, data)
 
   // This is here for Java to construct with String
   def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
@@ -112,4 +122,9 @@ case class Observe(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]
   override def add[P <: Parameter[_]](parameter: P): Observe = super.add(parameter)
 
   override def remove[S](key: Key[S]): Observe = super.remove(key)
+}
+
+object Observe {
+  def apply(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Observe =
+    new Observe(info, prefix).madd(paramSet)
 }

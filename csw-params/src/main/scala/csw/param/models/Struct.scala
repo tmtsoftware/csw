@@ -6,23 +6,24 @@ import spray.json.JsonFormat
 import scala.annotation.varargs
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 
-object Struct {
-  import spray.json.DefaultJsonProtocol._
-  implicit val format: JsonFormat[Struct] = jsonFormat1(Struct.apply)
-}
-
-case class Struct(paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]) extends ParameterSetType[Struct] {
+case class Struct private (paramSet: Set[Parameter[_]]) extends ParameterSetType[Struct] {
 
   /**
    * This is here for Java to construct with String
    */
   def this() = this(Set.empty[Parameter[_]])
 
-  override def create(data: Set[Parameter[_]]) = Struct(data)
+  override protected def create(data: Set[Parameter[_]]) = new Struct(data)
 
-  def dataToString1 = paramSet.mkString(", ")
+  override def toString = paramSet.mkString(", ")
+}
 
-  override def toString = dataToString1
+object Struct {
+
+  import spray.json.DefaultJsonProtocol._
+  implicit val format: JsonFormat[Struct] = jsonFormat1(Struct.apply)
+
+  def apply(paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Struct = new Struct().madd(paramSet)
 }
 
 object JStruct {

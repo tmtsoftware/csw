@@ -22,6 +22,8 @@ object ObsId {
     override def write(obj: ObsId): JsValue = JsString(obj.obsId)
     override def read(json: JsValue): ObsId = ObsId(json.convertTo[String])
   }
+
+  def empty: ObsId = ObsId("")
 }
 
 case class ObsId(obsId: String)

@@ -65,7 +65,7 @@ sealed trait EventServiceEvent {
  * @param info event related information
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class StatusEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class StatusEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends EventType[StatusEvent]
     with EventServiceEvent {
 
@@ -73,7 +73,7 @@ case class StatusEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[
   def this(prefix: String) = this(EventInfo(prefix))
   def this(prefix: String, time: EventTime, obsId: ObsId) = this(EventInfo(prefix, time, obsId))
 
-  override def create(data: Set[Parameter[_]]) = StatusEvent(info, data)
+  override protected def create(data: Set[Parameter[_]]) = new StatusEvent(info, data)
 
   // The following overrides are needed for the Java API and javadocs
   // (Using a Java interface caused various Java compiler errors)
@@ -83,10 +83,11 @@ case class StatusEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[
 }
 
 object StatusEvent {
-  def apply(prefix: String, time: EventTime): StatusEvent = StatusEvent(EventInfo(prefix, time))
-
   def apply(prefix: String, time: EventTime, obsId: ObsId): StatusEvent =
-    StatusEvent(EventInfo(Prefix(prefix), time, Some(obsId)))
+    new StatusEvent(EventInfo(Prefix(prefix), time, Some(obsId)))
+
+  def apply(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): StatusEvent =
+    new StatusEvent(info).madd(paramSet)
 }
 
 /**
@@ -95,14 +96,14 @@ object StatusEvent {
  * @param info event related information
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class ObserveEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class ObserveEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends EventType[ObserveEvent]
     with EventServiceEvent {
 
   // Java API
   def this(prefix: String) = this(EventInfo(prefix))
 
-  override def create(data: Set[Parameter[_]]) = ObserveEvent(info, data)
+  override protected def create(data: Set[Parameter[_]]) = new ObserveEvent(info, data)
 
   // The following overrides are needed for the Java API and javadocs
   // (Using a Java interface caused various Java compiler errors)
@@ -112,10 +113,11 @@ case class ObserveEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty
 }
 
 object ObserveEvent {
-  def apply(prefix: String, time: EventTime): ObserveEvent = ObserveEvent(EventInfo(prefix, time))
-
   def apply(prefix: String, time: EventTime, obsId: ObsId): ObserveEvent =
-    ObserveEvent(EventInfo(Prefix(prefix), time, Some(obsId)))
+    new ObserveEvent(EventInfo(Prefix(prefix), time, Some(obsId)))
+
+  def apply(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): ObserveEvent =
+    new ObserveEvent(info).madd(paramSet)
 }
 
 /**
@@ -124,14 +126,14 @@ object ObserveEvent {
  * @param info event related information
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class SystemEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class SystemEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends EventType[SystemEvent]
     with EventServiceEvent {
 
   // Java API
   def this(prefix: String) = this(EventInfo(prefix))
 
-  override def create(data: Set[Parameter[_]]) = SystemEvent(info, data)
+  override protected def create(data: Set[Parameter[_]]) = new SystemEvent(info, data)
 
   // The following overrides are needed for the Java API and javadocs
   // (Using a Java interface caused various Java compiler errors)
@@ -141,8 +143,9 @@ case class SystemEvent(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[
 }
 
 object SystemEvent {
-  def apply(prefix: String, time: EventTime): SystemEvent = SystemEvent(EventInfo(prefix, time))
-
   def apply(prefix: String, time: EventTime, obsId: ObsId): SystemEvent =
-    SystemEvent(EventInfo(Prefix(prefix), time, Some(obsId)))
+    new SystemEvent(EventInfo(Prefix(prefix), time, Some(obsId)))
+
+  def apply(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): SystemEvent =
+    new SystemEvent(info).madd(paramSet)
 }

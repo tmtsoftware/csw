@@ -57,7 +57,9 @@ trait ParameterSetType[T <: ParameterSetType[T]] extends ParamSerializable { sel
    * @return a new instance of this parameter set with the given parameter added
    */
   @varargs
-  def madd[P <: Parameter[_]](parametersToAdd: P*): T =
+  def madd[P <: Parameter[_]](parametersToAdd: P*): T = madd(parametersToAdd.toSet)
+
+  def madd[P <: Parameter[_]](parametersToAdd: Set[P]): T =
     parametersToAdd.foldLeft(this)((c, parameter) => doAdd(c, parameter))
 
   /**
@@ -135,7 +137,7 @@ trait ParameterSetType[T <: ParameterSetType[T]] extends ParamSerializable { sel
   private def removeByKeyname[P <: Parameter[_]](c: ParameterSetType[T], keyname: String): T = {
     val f: Option[P] = getByKeyname(c.paramSet, keyname)
     f match {
-      case Some(parameter) => create(c.paramSet.-(parameter))
+      case Some(parameter) => create(c.paramSet - parameter)
       case None            => c.asInstanceOf[T] //create(c.parameters) also works
     }
   }
@@ -165,7 +167,8 @@ trait ParameterSetType[T <: ParameterSetType[T]] extends ParamSerializable { sel
     parametersIn.find(_.equals(parameter)).asInstanceOf[Option[P]]
 
   /**
-   * Method called by subclass to create a copy with the same key (or other fields) and new parameters
+   * Method called by subclass to create a copy with the same key (or other fields) and new parameters. It is protected and
+   * sublclasses should also keep it as protected to avoid receiving duplicate keys.
    */
   protected def create(data: Set[Parameter[_]]): T
 

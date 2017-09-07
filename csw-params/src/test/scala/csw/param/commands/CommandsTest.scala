@@ -233,8 +233,6 @@ class CommandsTest extends FunSpec {
       assert(sc.exists(k1))
       assert(sc.exists(k2))
       assert(sc.exists(k3))
-      info("SC: " + sc)
-
     }
   }
 

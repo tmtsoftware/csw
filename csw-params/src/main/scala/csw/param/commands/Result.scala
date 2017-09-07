@@ -10,11 +10,11 @@ import csw.param.generics.{Key, Parameter, ParameterSetKeyData, ParameterSetType
  * @param prefix   identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Result(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class Result private (info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends ParameterSetType[Result]
     with ParameterSetKeyData {
 
-  override def create(data: Set[Parameter[_]]) = Result(info, prefix, data)
+  override protected def create(data: Set[Parameter[_]]) = new Result(info, prefix, data)
 
   // This is here for Java to construct with String
   def this(info: CommandInfo, prefix: String) = this(info, new Prefix(prefix))
@@ -24,4 +24,9 @@ case class Result(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]]
   override def add[P <: Parameter[_]](parameter: P): Result = super.add(parameter)
 
   override def remove[S](key: Key[S]): Result = super.remove(key)
+}
+
+object Result {
+  def apply(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Result =
+    new Result(info, prefix).madd(paramSet)
 }

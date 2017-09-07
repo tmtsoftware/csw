@@ -73,12 +73,12 @@ object StateVariable {
  * @param prefix identifies the target subsystem
  * @param paramSet     an optional initial set of items (keys with values)
  */
-case class DemandState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class DemandState private (prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends ParameterSetType[DemandState]
     with ParameterSetKeyData
     with StateVariable {
 
-  override def create(data: Set[Parameter[_]]) = DemandState(prefix, data)
+  override protected def create(data: Set[Parameter[_]]) = new DemandState(prefix, data)
 
   /**
    * This is here for Java to construct with String
@@ -101,6 +101,9 @@ object DemandState {
    * Converts a Setup to a DemandState
    */
   implicit def apply(command: Setup): DemandState = DemandState(command.prefix, command.paramSet)
+
+  def apply(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): DemandState =
+    new DemandState(prefix).madd(paramSet)
 }
 
 /**
@@ -109,12 +112,12 @@ object DemandState {
  * @param prefix identifies the target subsystem
  * @param paramSet     an optional initial set of items (keys with values)
  */
-case class CurrentState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
+case class CurrentState private (prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends ParameterSetType[CurrentState]
     with ParameterSetKeyData
     with StateVariable {
 
-  override def create(data: Set[Parameter[_]]) = CurrentState(prefix, data)
+  override protected def create(data: Set[Parameter[_]]) = new CurrentState(prefix, data)
 
   /**
    * This is here for Java to construct with String
@@ -129,5 +132,9 @@ case class CurrentState(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[
   // The following overrides are needed for the Java API and javadocs
   // (Using a Java interface caused various Java compiler errors)
   override def add[P <: Parameter[_]](parameter: P): CurrentState = super.add(parameter)
+}
 
+object CurrentState {
+  def apply(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): CurrentState =
+    new CurrentState(prefix).madd(paramSet)
 }

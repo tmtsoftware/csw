@@ -4,7 +4,9 @@ import java.util.UUID
 
 import csw.param.models.{ObsId, Prefix}
 import spray.json.RootJsonFormat
+
 import scala.language.implicitConversions
+import scala.runtime.ScalaRunTime._
 
 /**
  * This will include information related to the observation that is related to an event.
@@ -29,6 +31,8 @@ case class EventInfo(source: Prefix,
       case _ => false
     }
   }
+
+  override def hashCode(): Int = _hashCode(this)
 }
 
 object EventInfo {
@@ -38,12 +42,12 @@ object EventInfo {
     EventInfo(prefix, EventTime.toCurrent, None)
   }
 
-  implicit def apply(prefixStr: String, time: EventTime): EventInfo = {
+  def apply(prefixStr: String, time: EventTime): EventInfo = {
     val prefix: Prefix = Prefix(prefixStr)
     EventInfo(prefix, time, None)
   }
 
-  implicit def apply(prefixStr: String, time: EventTime, obsId: ObsId): EventInfo = {
+  def apply(prefixStr: String, time: EventTime, obsId: ObsId): EventInfo = {
     val prefix: Prefix = Prefix(prefixStr)
     EventInfo(prefix, time, Some(obsId))
   }

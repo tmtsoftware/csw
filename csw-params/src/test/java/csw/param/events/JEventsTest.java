@@ -1,10 +1,11 @@
 package csw.param.events;
 
-import csw.param.models.ObsId;
-import csw.param.models.Prefix;
 import csw.param.generics.JKeyTypes;
 import csw.param.generics.Key;
 import csw.param.generics.Parameter;
+import csw.param.generics.ParameterSetType;
+import csw.param.models.ObsId;
+import csw.param.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,7 +29,7 @@ public class JEventsTest {
 
     private final String prefix = "wfos.red.detector";
 
-    private void assertOnEventsAPI(EventType<?> event) {
+    private<T extends ParameterSetType & EventType> void assertOnEventsAPI(T event) {
         // eventInfo, prefix, subsystem, source
         Assert.assertEquals(EventInfo.create(prefix), event.info());
         Assert.assertEquals(prefix, event.prefixStr());

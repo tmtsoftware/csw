@@ -3,6 +3,7 @@ package csw.param.generics
 import csw.units.Units
 import csw.units.Units.NoUnits
 import spray.json.JsonFormat
+import scala.runtime.ScalaRunTime._
 
 import scala.annotation.varargs
 import scala.reflect.ClassTag
@@ -78,5 +79,5 @@ case class Key[S: JsonFormat: ClassTag] private[generics] (keyName: String, keyT
     }
   }
 
-  override def hashCode: Int = 41 * keyName.hashCode
+  override def hashCode: Int = _hashCode(this)
 }
