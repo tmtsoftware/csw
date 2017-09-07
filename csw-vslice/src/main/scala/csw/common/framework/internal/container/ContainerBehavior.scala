@@ -59,8 +59,9 @@ class ContainerBehavior(
   def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
     case GetComponents(replyTo)    ⇒ replyTo ! Components(supervisors.map(_.component))
     case GetContainerMode(replyTo) ⇒ replyTo ! mode
-    case Shutdown                  ⇒ supervisors.foreach(_.system.terminate())
-    case Restart                   ⇒ mode = ContainerMode.Idle; supervisors.foreach(_.component.supervisor ! Restart)
+    case msg @ (Shutdown | Restart) ⇒
+      mode = ContainerMode.Idle
+      supervisors.foreach(_.component.supervisor ! msg.asInstanceOf[SupervisorExternalMessage])
   }
 
   def onIdle(idleContainerMessage: ContainerIdleMessage): Unit = idleContainerMessage match {

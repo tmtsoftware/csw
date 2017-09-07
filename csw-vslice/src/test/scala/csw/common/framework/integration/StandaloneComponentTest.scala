@@ -10,10 +10,14 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.components.SampleComponentState._
-import csw.common.components.UpdateTestProbe
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
+import csw.common.framework.models.PubSub.Subscribe
+import csw.common.framework.models.SupervisorCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorMode,
+  LifecycleStateSubscription
+}
 import csw.common.framework.models.{Shutdown, SupervisorExternalMessage}
 import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterSettings
@@ -70,8 +74,8 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
       locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
     // on shutdown, component unregisters from location service
-    supervisorRef ! UpdateTestProbe(supervisorStateProbe.ref)
 
+    supervisorRef ! ComponentStateSubscription(Subscribe(supervisorStateProbe.ref))
     supervisorRef ! Shutdown
     supervisorStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
     akkaProbe.requestNext(LocationRemoved(akkaConnection))

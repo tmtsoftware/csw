@@ -7,4 +7,5 @@ object SupervisorMode {
   case object Running        extends SupervisorMode
   case object RunningOffline extends SupervisorMode
   case object Restart        extends SupervisorMode
+  case object Shutdown       extends SupervisorMode
 }

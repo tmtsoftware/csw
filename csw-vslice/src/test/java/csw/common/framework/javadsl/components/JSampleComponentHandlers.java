@@ -74,7 +74,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(shutdownState);
 
         pubSubRef.tell(publish);
-            return BoxedUnit.UNIT;
+        return BoxedUnit.UNIT;
         });
     }
 

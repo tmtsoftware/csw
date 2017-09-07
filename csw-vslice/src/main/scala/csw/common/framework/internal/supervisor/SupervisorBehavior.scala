@@ -84,10 +84,14 @@ class SupervisorBehavior(
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
       println(s"log.error(mode is $mode and actor is $componentRef)") //FIXME use log statement
-      if (mode == SupervisorMode.Restart) {
-        spawnAndWatchComponent()
+      mode match {
+        case SupervisorMode.Restart ⇒
+          spawnAndWatchComponent()
+          mode = SupervisorMode.Idle
+        case SupervisorMode.Shutdown ⇒
+          ctx.system.terminate()
+        case _ ⇒
       }
-      mode = SupervisorMode.Idle
       this
     case PostStop ⇒
       registrationOpt.foreach(registrationResult ⇒ registrationResult.unregister())
@@ -98,7 +102,7 @@ class SupervisorBehavior(
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
     case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
     case GetSupervisorMode(replyTo)                    ⇒ replyTo ! mode
-    case Shutdown                                      ⇒ ctx.system.terminate()
+    case Shutdown                                      ⇒ mode = SupervisorMode.Shutdown; ctx.stop(component);
     case Restart                                       ⇒ onRestart()
   }
 

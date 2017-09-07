@@ -226,24 +226,4 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       }
     }
   }
-
-  ignore("onShutdown hook of comp handlers should be invoked when supervisor receives Shutdown message") {
-    forAll(testData) { (info: ComponentInfo) =>
-      {
-        val mocks = testMocks
-        import mocks._
-        createSupervisorAndStartTLA(info, mocks)
-
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
-        lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
-
-        untypedSystem.terminate()
-
-        val shutdownCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val shutdownDemandState  = DemandState(prefix, Set(choiceKey.set(shutdownChoice)))
-        DemandMatcher(shutdownDemandState).check(shutdownCurrentState.data) shouldBe true
-      }
-    }
-  }
 }
