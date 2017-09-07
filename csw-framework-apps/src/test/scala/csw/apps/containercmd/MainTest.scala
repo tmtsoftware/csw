@@ -10,12 +10,12 @@ import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
 import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
-import csw.common.framework.models.{ContainerMessage, SupervisorExternalMessage}
-import csw.services.location.commons.ClusterAwareSettings
+import csw.common.framework.models.{ContainerExternalMessage, ContainerMessage, SupervisorExternalMessage}
+import csw.services.location.commons.{BlockingUtils, ClusterAwareSettings}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.DurationDouble
+import scala.concurrent.duration.{Duration, DurationDouble}
 
 // DEOPSCSW-171: Starting component from command line
 class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
@@ -41,15 +41,12 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     val args      = Array("--local", config)
     val testProbe = TestProbe[ContainerMode]
 
-    val maybeContainerRef = main.start(args).get.asInstanceOf[ActorRef[ContainerMessage]]
+    val containerRef = main.start(args).get.asInstanceOf[ActorRef[ContainerMessage]]
 
-    maybeContainerRef ! GetContainerMode(testProbe.ref)
+    containerRef ! GetContainerMode(testProbe.ref)
     testProbe.expectMsg(ContainerMode.Idle)
 
-    Thread.sleep(500)
-
-    maybeContainerRef ! GetContainerMode(testProbe.ref)
-    testProbe.expectMsg(ContainerMode.Running)
+    waitForContainerToMoveIntoRunningMode(containerRef, testProbe, 2.seconds) shouldBe true
   }
 
   test("should start component in standalone mode") {
@@ -57,15 +54,39 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     val args      = Array("--standalone", "--local", config)
     val testProbe = TestProbe[SupervisorMode]
 
-    val maybeSupervisorRef = main.start(args).get.asInstanceOf[ActorRef[SupervisorExternalMessage]]
+    val supervisorRef = main.start(args).get.asInstanceOf[ActorRef[SupervisorExternalMessage]]
 
-    maybeSupervisorRef ! GetSupervisorMode(testProbe.ref)
+    supervisorRef ! GetSupervisorMode(testProbe.ref)
     testProbe.expectMsg(SupervisorMode.Idle)
 
-    Thread.sleep(500)
-
-    maybeSupervisorRef ! GetSupervisorMode(testProbe.ref)
-    testProbe.expectMsg(SupervisorMode.Running)
+    waitForSupervisorToMoveIntoRunningMode(supervisorRef, testProbe, 2.seconds) shouldBe true
   }
 
+  def waitForContainerToMoveIntoRunningMode(
+      actorRef: ActorRef[ContainerExternalMessage],
+      probe: TestProbe[ContainerMode],
+      duration: Duration
+  ): Boolean = {
+
+    def getContainerMode: ContainerMode = {
+      actorRef ! GetContainerMode(probe.ref)
+      probe.expectMsgType[ContainerMode]
+    }
+
+    BlockingUtils.poll(getContainerMode == ContainerMode.Running, duration)
+  }
+
+  def waitForSupervisorToMoveIntoRunningMode(
+      actorRef: ActorRef[SupervisorExternalMessage],
+      probe: TestProbe[SupervisorMode],
+      duration: Duration
+  ): Boolean = {
+
+    def getSupervisorMode: SupervisorMode = {
+      actorRef ! GetSupervisorMode(probe.ref)
+      probe.expectMsgType[SupervisorMode]
+    }
+
+    BlockingUtils.poll(getSupervisorMode == SupervisorMode.Running, duration)
+  }
 }
