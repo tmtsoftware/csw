@@ -114,6 +114,7 @@ class SupervisorBehavior(
       println(s"log.error($throwable)") //FIXME use log statement
     case Running(componentRef) ⇒
       mode = SupervisorMode.Running
+      timerScheduler.cancel(RunTimerKey)
       runningComponent = Some(componentRef)
       maybeContainerRef foreach (_ ! SupervisorModeChanged(ctx.self, mode))
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))

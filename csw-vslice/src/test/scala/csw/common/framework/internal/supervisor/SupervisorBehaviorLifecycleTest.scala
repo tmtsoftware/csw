@@ -89,6 +89,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisor.onMessage(Running(childComponentInbox.ref))
 
+    verify(timer).cancel(SupervisorBehavior.RunTimerKey)
     supervisor.mode shouldBe SupervisorMode.Running
     childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
   }
