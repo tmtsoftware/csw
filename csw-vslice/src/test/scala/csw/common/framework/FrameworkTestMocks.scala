@@ -14,10 +14,11 @@ import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
 
 class FrameworkTestMocks(
     implicit untypedSystem: actor.ActorSystem,
@@ -29,25 +30,21 @@ class FrameworkTestMocks(
   val registrationResult: RegistrationResult                        = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory                      = mock[RegistrationFactory]
   val pubSubBehaviorFactory: PubSubBehaviorFactory                  = mock[PubSubBehaviorFactory]
-  val eventualDone: Future[Done]                                    = Promise[Done].success(Done).future
   val lifecycleStateProbe: TestProbe[PubSub[LifecycleStateChanged]] = TestProbe[PubSub[LifecycleStateChanged]]
   val compStateProbe: TestProbe[PubSub[CurrentState]]               = TestProbe[PubSub[CurrentState]]
-  val eventualRegistrationResult: Future[RegistrationResult] =
-    Promise[RegistrationResult].success(registrationResult).future
 
-  when(registrationFactory.akkaTyped(ArgumentMatchers.any[AkkaConnection], ArgumentMatchers.any[ActorRef[_]]))
-    .thenReturn(akkaRegistration)
-  when(locationService.register(akkaRegistration)).thenReturn(eventualRegistrationResult)
-  when(registrationResult.unregister()).thenReturn(eventualDone)
+  when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]])).thenReturn(akkaRegistration)
+  when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
+  when(registrationResult.unregister()).thenReturn(Future.successful(Done))
   when(
     pubSubBehaviorFactory.make[LifecycleStateChanged](
-      ArgumentMatchers.any[ActorContext[SupervisorMessage]],
+      any[ActorContext[SupervisorMessage]],
       ArgumentMatchers.eq(SupervisorBehavior.PubSubLifecycleActor)
     )
   ).thenReturn(lifecycleStateProbe.ref)
   when(
     pubSubBehaviorFactory.make[CurrentState](
-      ArgumentMatchers.any[ActorContext[SupervisorMessage]],
+      any[ActorContext[SupervisorMessage]],
       ArgumentMatchers.eq(SupervisorBehavior.PubSubComponentActor)
     )
   ).thenReturn(compStateProbe.ref)

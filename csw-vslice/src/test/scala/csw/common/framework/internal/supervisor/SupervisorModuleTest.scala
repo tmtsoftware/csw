@@ -68,7 +68,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     forAll(testData) { (info: ComponentInfo) =>
       {
-        val mocks = testMocks
+        val mocks = frameworkTestMocks()
         import mocks._
         createSupervisorAndStartTLA(info, mocks)
 
@@ -91,7 +91,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     forAll(testData) { (info: ComponentInfo, domainMessage: DomainMessage) =>
       {
-        val mocks = testMocks
+        val mocks = frameworkTestMocks()
         import mocks._
         createSupervisorAndStartTLA(info, mocks)
 
@@ -111,7 +111,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   test("onControlCommand hook of comp handlers should be invoked when supervisor receives Control command") {
     forAll(testData) { (info: ComponentInfo) =>
       {
-        val mocks = testMocks
+        val mocks = frameworkTestMocks()
         import mocks._
         createSupervisorAndStartTLA(info, mocks)
 
@@ -135,7 +135,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   test("onGoOffline and goOnline hooks of comp handlers should be invoked when supervisor receives Lifecycle messages") {
     forAll(testData) { (info: ComponentInfo) =>
       {
-        val mocks = testMocks
+        val mocks = frameworkTestMocks()
         import mocks._
         createSupervisorAndStartTLA(info, mocks)
 
@@ -163,7 +163,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   ) {
     forAll(testData) { (info: ComponentInfo) =>
       {
-        val mocks = testMocks
+        val mocks = frameworkTestMocks()
         import mocks._
         createSupervisorAndStartTLA(info, mocks)
 
@@ -190,7 +190,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   test("running component should ignore RunOnline lifecycle message when it is already online") {
     forAll(testData) { (info: ComponentInfo) =>
       {
-        val mocks = testMocks
+        val mocks = frameworkTestMocks()
         import mocks._
         createSupervisorAndStartTLA(info, mocks)
 
@@ -207,7 +207,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   test("running component should ignore RunOffline lifecycle message when it is already offline") {
     forAll(testData) { (info: ComponentInfo) =>
       {
-        val mocks = testMocks
+        val mocks = frameworkTestMocks()
         import mocks._
         createSupervisorAndStartTLA(info, mocks)
 

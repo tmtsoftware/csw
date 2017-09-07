@@ -22,9 +22,9 @@ import org.scalatest.BeforeAndAfterEach
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
-  class TestData {
-    val testMockData: FrameworkTestMocks = testMocks
-    import testMockData._
+  class TestData() {
+    val testMocks: FrameworkTestMocks = frameworkTestMocks()
+    import testMocks._
 
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     val ctx                                                         = new StubbedActorContext[SupervisorMessage]("test-supervisor", 100, system)
@@ -47,7 +47,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should start in Idle mode and spawn three actors") {
-    val testData = new TestData
+    val testData = new TestData()
     import testData._
 
     supervisor.mode shouldBe SupervisorMode.Idle
@@ -61,9 +61,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   // *************** Begin testing of onIdleMessages ***************
   test("supervisor should accept Initialized message and send Run message to TLA") {
-    val testData = new TestData
+    val testData = new TestData()
     import testData._
-    import testData.testMockData._
+    import testData.testMocks._
 
     val childRef = childComponentInbox.ref.upcast
 
@@ -84,7 +84,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should accept Running message from component and change its mode and publish state change") {
-    val testData = new TestData
+    val testData = new TestData()
     import testData._
 
     supervisor.onMessage(Running(childComponentInbox.ref))
@@ -97,7 +97,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   // *************** Begin testing of onCommonMessages ***************
   test("supervisor should handle LifecycleStateSubscription message by coordinating with pub sub actor") {
-    val testData = new TestData
+    val testData = new TestData()
     import testData._
 
     val previousSupervisorMode = supervisor.mode
@@ -117,7 +117,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should handle ComponentStateSubscription message by coordinating with pub sub actor") {
-    val testData = new TestData
+    val testData = new TestData()
     import testData._
 
     val subscriberProbe        = TestProbe[CurrentState]
@@ -145,7 +145,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   // *************** Begin testing of onRunning Messages ***************
 
   test("supervisor should handle lifecycle Restart message") {
-    val testData = new TestData
+    val testData = new TestData()
     import testData._
 
     supervisor.onMessage(Running(childComponentInbox.ref))
@@ -154,7 +154,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should handle lifecycle GoOffline message") {
-    val testData = new TestData
+    val testData = new TestData()
     import testData._
 
     supervisor.onMessage(Running(childComponentInbox.ref))
@@ -164,7 +164,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should handle lifecycle GoOnline message") {
-    val testData = new TestData
+    val testData = new TestData()
     import testData._
 
     supervisor.onMessage(Running(childComponentInbox.ref))
@@ -175,7 +175,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should accept and forward Domain message to a TLA") {
-    val testData = new TestData
+    val testData = new TestData()
     import testData._
 
     sealed trait TestDomainMessage extends DomainMessage

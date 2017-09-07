@@ -17,9 +17,27 @@ object SupervisorBehaviorFactory {
       pubSubBehaviorFactory: PubSubBehaviorFactory
   ): Behavior[SupervisorExternalMessage] = {
 
-    val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
-    val compWring            = componentWiringClass.newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
+    val componentWiringClass     = Class.forName(componentInfo.behaviorFactoryClassName)
+    val componentBehaviorFactory = componentWiringClass.newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
 
+    make(
+      containerRef,
+      componentInfo,
+      locationService,
+      registrationFactory,
+      pubSubBehaviorFactory,
+      componentBehaviorFactory
+    )
+  }
+
+  private[supervisor] def make(
+      containerRef: Option[ActorRef[ContainerIdleMessage]],
+      componentInfo: ComponentInfo,
+      locationService: LocationService,
+      registrationFactory: RegistrationFactory,
+      pubSubBehaviorFactory: PubSubBehaviorFactory,
+      componentBehaviorFactory: ComponentBehaviorFactory[_]
+  ): Behavior[SupervisorExternalMessage] = {
     Actor
       .withTimers[SupervisorMessage](
         timerScheduler ⇒
@@ -31,7 +49,7 @@ object SupervisorBehaviorFactory {
                   timerScheduler,
                   containerRef,
                   componentInfo,
-                  compWring,
+                  componentBehaviorFactory,
                   pubSubBehaviorFactory,
                   registrationFactory,
                   locationService

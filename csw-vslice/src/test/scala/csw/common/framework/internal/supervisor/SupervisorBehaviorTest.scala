@@ -12,8 +12,8 @@ import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
-  val testMockData: FrameworkTestMocks = testMocks
-  import testMockData._
+  val testMocks: FrameworkTestMocks = frameworkTestMocks()
+  import testMocks._
 
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
   val supervisorBehavior: Behavior[SupervisorExternalMessage] =
