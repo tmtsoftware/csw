@@ -41,6 +41,16 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
 
     supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
     supervisorModeProbe.expectMsg(SupervisorMode.Idle)
+
+    supervisorRef ! Restart
+
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
+
+    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
+
+    verify(locationService).register(akkaRegistration)
+    verify(registrationResult, never()).unregister()
   }
 
   test("handle TLA failure with FailureRestart exception in initialize") {

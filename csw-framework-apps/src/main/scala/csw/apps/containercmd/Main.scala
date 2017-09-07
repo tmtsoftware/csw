@@ -14,6 +14,7 @@ import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
 
@@ -55,9 +56,29 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
       if (Files.exists(inputFilePath)) ConfigFactory.parseFile(inputFilePath.toFile)
       else throw new RuntimeException("Config file does not exist")
     } else {
-      // Fixme : change when integrated with ConfigService
-      ConfigFactory.parseFile(inputFilePath.toFile)
-      //fetch from Config service
+      import wiring.actorRuntime.{ec, mat}
+
+      var config: Config = ConfigFactory.empty()
+
+      //FIXME to use log statements in below code block
+      wiring.configService.exists(inputFilePath).onComplete {
+        case Success(fileExists) ⇒
+          if (fileExists) {
+            wiring.configService.getActive(inputFilePath).onComplete {
+              case Success(Some(configData)) ⇒
+                configData.toConfigObject.onComplete {
+                  case Success(configObject) ⇒ config = configObject
+                  case Failure(exception)    ⇒ println(s"$exception")
+                }
+              case Success(None)      ⇒ println(s"Could not load data for file at path $inputFilePath")
+              case Failure(exception) ⇒ println(s"$exception")
+            }
+          } else println(s"File at path $inputFilePath does not exist in config service")
+        case Failure(exception) ⇒ println(s"$exception")
+      }
+
+      if (!config.isEmpty) config
+      else throw new RuntimeException("Could not create config object from Configuration service")
     }
   }
 }
