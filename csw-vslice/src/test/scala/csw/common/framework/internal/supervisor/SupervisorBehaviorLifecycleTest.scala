@@ -11,7 +11,7 @@ import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.common.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationComplete}
+import csw.common.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationComplete, RunTimeout}
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -66,11 +66,18 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     import testData.testMockData._
 
     val childRef = childComponentInbox.ref.upcast
+
     supervisor.onMessage(Initialized(childRef))
 
     verify(locationService).register(akkaRegistration)
     verify(timer).cancel(SupervisorBehavior.InitializeTimerKey)
     supervisor.onMessage(RegistrationComplete(registrationResult, childRef))
+
+    verify(timer).startSingleTimer(
+      SupervisorBehavior.RunTimerKey,
+      RunTimeout,
+      SupervisorBehavior.runTimeout
+    )
 
     childComponentInbox.receiveMsg() shouldBe Run
     supervisor.mode shouldBe SupervisorMode.Idle

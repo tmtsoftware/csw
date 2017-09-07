@@ -108,7 +108,7 @@ class SupervisorBehavior(
       registerWithLocationService(componentRef)
     case RegistrationComplete(registrationResult, componentRef) ⇒
       registrationOpt = Some(registrationResult)
-      timerScheduler.startSingleTimer(RunTimerKey, InitializeTimeout, runTimeout)
+      timerScheduler.startSingleTimer(RunTimerKey, RunTimeout, runTimeout)
       componentRef ! Run
     case RegistrationFailed(throwable) ⇒
       println(s"log.error($throwable)") //FIXME use log statement
