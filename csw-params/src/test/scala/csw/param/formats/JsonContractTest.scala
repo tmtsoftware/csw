@@ -15,6 +15,7 @@ import spray.json.pimpString
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-188: Efficient Serialization to/from JSON
 //DEOPSCSW-282: Add a timestamp Key and Parameter
+//DEOPSCSW-184: Change configurations - attributes and values
 class JsonContractTest extends FunSpec with Matchers {
 
   private val prefix: Prefix           = "wfos.blue.filter"

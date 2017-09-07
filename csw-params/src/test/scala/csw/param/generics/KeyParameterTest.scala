@@ -21,6 +21,7 @@ import org.scalatest.{FunSpec, Matchers}
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
 // DEOPSCSW-188: Efficient Serialization to/from JSON
+//DEOPSCSW-184: Change configurations - attributes and values
 class KeyParameterTest extends FunSpec with Matchers {
 
   private val s1: String = "encoder"
