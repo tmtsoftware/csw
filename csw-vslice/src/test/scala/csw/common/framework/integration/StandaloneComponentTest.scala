@@ -13,11 +13,7 @@ import csw.common.components.SampleComponentState._
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.common.framework.models.PubSub.Subscribe
-import csw.common.framework.models.SupervisorCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorMode,
-  LifecycleStateSubscription
-}
+import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorMode}
 import csw.common.framework.models.{Shutdown, SupervisorExternalMessage}
 import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterSettings
