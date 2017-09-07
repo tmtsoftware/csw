@@ -10,11 +10,11 @@ import csw.common.framework.internal.container.{ContainerBehavior, ContainerMode
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorMode}
 import csw.common.framework.models.ContainerCommonMessage.GetComponents
-import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed}
+import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed, SupervisorsCreated}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.common.framework.models._
+import csw.common.framework.models.{SupervisorInfo, _}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
@@ -42,25 +42,29 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     val locationService: LocationService                     = mock[LocationService]
     val registrationResult: RegistrationResult               = mock[RegistrationResult]
     private val pubSubBehaviorFactory: PubSubBehaviorFactory = mock[PubSubBehaviorFactory]
-    val answer = new Answer[SupervisorInfo] {
-      override def answer(invocation: InvocationOnMock): SupervisorInfo = {
+    var supervisorInfos: Set[SupervisorInfo]                 = Set.empty
+    val answer = new Answer[Future[Option[SupervisorInfo]]] {
+      override def answer(invocation: InvocationOnMock): Future[Option[SupervisorInfo]] = {
         val componentInfo = invocation.getArgument[ComponentInfo](1)
-        SupervisorInfo(
+        val supervisorBehaviorFactory = SupervisorBehaviorFactory.make(
+          Some(ctx.self),
+          componentInfo,
+          locationService,
+          registrationFactory,
+          pubSubBehaviorFactory
+        )
+        val supervisorInfo = SupervisorInfo(
           untypedSystem,
           Component(
             ctx.spawn(
-              SupervisorBehaviorFactory.make(
-                Some(ctx.self),
-                componentInfo,
-                locationService,
-                registrationFactory,
-                pubSubBehaviorFactory
-              ),
+              supervisorBehaviorFactory,
               componentInfo.name
             ),
             componentInfo
           )
         )
+        supervisorInfos += supervisorInfo
+        Future.successful(Some(supervisorInfo))
       }
     }
 
@@ -87,6 +91,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   }
 
   class RunningContainer() extends IdleContainer {
+    containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
     ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
 
     containerBehavior.onMessage(RegistrationComplete(registrationResult))
@@ -109,8 +114,10 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     // supervisor per component
     ctx.children.size shouldBe containerInfo.components.size
+    ctx.selfInbox.receiveMsg() shouldBe a[SupervisorsCreated]
+    containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
     containerBehavior.supervisors.size shouldBe 2
-    containerBehavior.supervisors.map(_.component.info).toSet shouldBe containerInfo.components
+    containerBehavior.supervisors.map(_.component.info) shouldBe containerInfo.components
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     ctx.children.map(
@@ -123,15 +130,14 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     containerBehavior.mode shouldBe ContainerMode.Running
     containerBehavior.registrationOpt.get shouldBe registrationResult
-    containerBehavior.runningComponents shouldBe Set.empty
   }
 
   test("should handle restart message by changing its mode to initialize") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
-    containerBehavior.runningComponents shouldBe Set.empty
     containerBehavior.onMessage(Restart)
+    containerBehavior.runningComponents shouldBe Set.empty
     containerBehavior.mode shouldBe ContainerMode.Idle
 
     containerInfo.components.toList
@@ -192,6 +198,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     probe.expectMsg(Components(containerBehavior.supervisors.map(_.component)))
 
     // Container should handle GetComponents message in Running mode
+    containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
     ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
 
     ctx.children
@@ -220,6 +227,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     containerBehavior.mode shouldBe ContainerMode.Idle
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
+    containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
     ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
 
     verify(locationService).register(akkaRegistration)

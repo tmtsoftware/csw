@@ -119,6 +119,7 @@ sealed trait ContainerIdleMessage extends ContainerMessage
 object ContainerIdleMessage {
   case class RegistrationComplete(registrationResult: RegistrationResult) extends ContainerIdleMessage
   case class RegistrationFailed(throwable: Throwable)                     extends ContainerIdleMessage
+  case class SupervisorsCreated(supervisors: Set[SupervisorInfo])         extends ContainerIdleMessage
 }
 
 sealed trait FromSupervisorMessage extends ContainerIdleMessage
@@ -130,7 +131,7 @@ object FromSupervisorMessage {
 case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage], state: SupervisorMode)
     extends TmtSerializable
 
-case class Components(components: List[Component]) extends TmtSerializable
+case class Components(components: Set[Component]) extends TmtSerializable
 
 case class Component(supervisor: ActorRef[SupervisorExternalMessage], info: ComponentInfo)
 
