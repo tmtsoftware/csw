@@ -21,7 +21,7 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
 // DEOPSCSW-178: Lifecycle success/failure notification
-class SupervisorLifecyleFailureTest extends FrameworkTestSuite {
+class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
 
   val supervisorModeProbe: TestProbe[SupervisorMode]     = TestProbe[SupervisorMode]
   var supervisorRef: ActorRef[SupervisorExternalMessage] = _

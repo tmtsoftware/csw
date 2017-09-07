@@ -7,7 +7,7 @@ import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 
 class PubSubBehavior[T](ctx: ActorContext[PubSub[T]]) extends Actor.MutableBehavior[PubSub[T]] {
 
-  private var subscribers: Set[ActorRef[T]] = Set.empty
+  var subscribers: Set[ActorRef[T]] = Set.empty
 
   override def onMessage(msg: PubSub[T]): Behavior[PubSub[T]] = {
     msg match {
