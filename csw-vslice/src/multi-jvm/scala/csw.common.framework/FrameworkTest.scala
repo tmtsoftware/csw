@@ -42,7 +42,8 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
 
   def waitForContainerToMoveIntoRunningMode(
       containerRef: ActorRef[ContainerExternalMessage],
-      probe: TestProbe[ContainerMode]
+      probe: TestProbe[ContainerMode],
+      duration: Duration
   ): Boolean = {
 
     def getContainerMode: ContainerMode = {
@@ -50,7 +51,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       probe.expectMsgType[ContainerMode]
     }
 
-    BlockingUtils.poll(getContainerMode == ContainerMode.Running, 2.seconds)
+    BlockingUtils.poll(getContainerMode == ContainerMode.Running, duration)
   }
 
   def waitForSupervisorToMoveIntoRunningMode(
@@ -80,6 +81,8 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       containerRef ! GetContainerMode(containerModeProbe.ref)
       containerModeProbe.expectMsg(ContainerMode.Idle)
 
+      waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe, 5.seconds) shouldBe true
+
       containerRef ! GetComponents(componentsProbe.ref)
       val laserContainerComponents = componentsProbe.expectMsgType[Components].components
       laserContainerComponents.size shouldBe 3
@@ -87,10 +90,9 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       // check that all the components within supervisor moves to Running mode
       laserContainerComponents
         .foreach { component ⇒
-          waitForSupervisorToMoveIntoRunningMode(component.supervisor, supervisorStateProbe, 2.seconds) shouldBe true
+          component.supervisor ! GetSupervisorMode(supervisorStateProbe.ref)
+          supervisorStateProbe.expectMsg(SupervisorMode.Running)
         }
-
-      waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe) shouldBe true
       enterBarrier("running")
 
       // resolve and send message to container running in different jvm or on different physical machine
@@ -120,6 +122,8 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       containerRef ! GetContainerMode(containerModeProbe.ref)
       containerModeProbe.expectMsg(ContainerMode.Idle)
 
+      waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe, 5.seconds) shouldBe true
+
       containerRef ! GetComponents(componentsProbe.ref)
       val wfsContainerComponents = componentsProbe.expectMsgType[Components].components
       wfsContainerComponents.size shouldBe 3
@@ -127,10 +131,9 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       // check that all the components within supervisor moves to Running mode
       wfsContainerComponents
         .foreach { component ⇒
-          waitForSupervisorToMoveIntoRunningMode(component.supervisor, supervisorStateProbe, 2.seconds) shouldBe true
+          component.supervisor ! GetSupervisorMode(supervisorStateProbe.ref)
+          supervisorStateProbe.expectMsg(SupervisorMode.Running)
         }
-
-      waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe) shouldBe true
       enterBarrier("running")
 
       // resolve and send message to component running in different jvm or on different physical machine
