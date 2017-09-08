@@ -7,6 +7,7 @@ import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
+import csw.apps.containercmd.exceptions.Exceptions.{FileDataNotFound, FileNotFound}
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.common.framework.models.{ContainerMessage, SupervisorExternalMessage}
 import csw.services.BuildInfo
@@ -58,9 +59,8 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
     } else {
       import wiring.actorRuntime.{ec, mat}
 
-      var config: Config = ConfigFactory.empty()
-
-      //FIXME to use log statements in below code block
+      var config: Config                    = ConfigFactory.empty()
+      var maybeException: Option[Throwable] = None
       wiring.configService.exists(inputFilePath).onComplete {
         case Success(fileExists) ⇒
           if (fileExists) {
@@ -68,17 +68,19 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
               case Success(Some(configData)) ⇒
                 configData.toConfigObject.onComplete {
                   case Success(configObject) ⇒ config = configObject
-                  case Failure(exception)    ⇒ println(s"$exception")
+                  case Failure(exception)    ⇒ maybeException = Some(exception)
                 }
-              case Success(None)      ⇒ println(s"Could not load data for file at path $inputFilePath")
-              case Failure(exception) ⇒ println(s"$exception")
+              case Success(None) ⇒
+                maybeException = Some(FileDataNotFound(inputFilePath))
+              case Failure(exception) ⇒ maybeException = Some(exception)
             }
-          } else println(s"File at path $inputFilePath does not exist in config service")
-        case Failure(exception) ⇒ println(s"$exception")
+          } else
+            maybeException = Some(FileNotFound(inputFilePath))
+        case Failure(exception) ⇒ maybeException = Some(exception)
       }
 
       if (!config.isEmpty) config
-      else throw new RuntimeException("Could not create config object from Configuration service")
+      else throw maybeException.get
     }
   }
 }
