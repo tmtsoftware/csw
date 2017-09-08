@@ -30,6 +30,7 @@ class FrameworkTestMultiJvmNode3 extends FrameworkTest(0)
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-169: Creation of Multiple Components
+// DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
@@ -71,9 +72,9 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
   test("should able to create multiple containers across jvm's and start component in standalone mode") {
 
     runOn(seed) {
-      val containerModeProbe   = TestProbe[ContainerMode]
-      val componentsProbe      = TestProbe[Components]
-      val supervisorStateProbe = TestProbe[SupervisorMode]
+      val containerModeProbe  = TestProbe[ContainerMode]
+      val componentsProbe     = TestProbe[Components]
+      val supervisorModeProbe = TestProbe[SupervisorMode]
 
       val wiring       = FrameworkWiring.make(system, locationService)
       val containerRef = Container.spawn(ConfigFactory.load("laser_container.conf"), wiring)
@@ -90,8 +91,8 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       // check that all the components within supervisor moves to Running mode
       laserContainerComponents
         .foreach { component ⇒
-          component.supervisor ! GetSupervisorMode(supervisorStateProbe.ref)
-          supervisorStateProbe.expectMsg(SupervisorMode.Running)
+          component.supervisor ! GetSupervisorMode(supervisorModeProbe.ref)
+          supervisorModeProbe.expectMsg(SupervisorMode.Running)
         }
       enterBarrier("running")
 
@@ -112,9 +113,9 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
     }
 
     runOn(member1) {
-      val containerModeProbe   = TestProbe[ContainerMode]
-      val componentsProbe      = TestProbe[Components]
-      val supervisorStateProbe = TestProbe[SupervisorMode]
+      val containerModeProbe  = TestProbe[ContainerMode]
+      val componentsProbe     = TestProbe[Components]
+      val supervisorModeProbe = TestProbe[SupervisorMode]
 
       val wiring       = FrameworkWiring.make(system, locationService)
       val containerRef = Container.spawn(ConfigFactory.load("wfs_container.conf"), wiring)
@@ -131,8 +132,8 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       // check that all the components within supervisor moves to Running mode
       wfsContainerComponents
         .foreach { component ⇒
-          component.supervisor ! GetSupervisorMode(supervisorStateProbe.ref)
-          supervisorStateProbe.expectMsg(SupervisorMode.Running)
+          component.supervisor ! GetSupervisorMode(supervisorModeProbe.ref)
+          supervisorModeProbe.expectMsg(SupervisorMode.Running)
         }
       enterBarrier("running")
 
@@ -155,15 +156,14 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
     }
 
     runOn(member2) {
-      val supervisorStateProbe = TestProbe[SupervisorMode]
-      val wiring               = FrameworkWiring.make(system, locationService)
-      val supervisorRef        = Standalone.spawn(ConfigFactory.load("eaton_hcd_standalone.conf"), wiring)
-      waitForSupervisorToMoveIntoRunningMode(supervisorRef, supervisorStateProbe, 2.seconds) shouldBe true
+      val supervisorModeProbe = TestProbe[SupervisorMode]
+      val wiring              = FrameworkWiring.make(system, locationService)
+      val supervisorRef       = Standalone.spawn(ConfigFactory.load("eaton_hcd_standalone.conf"), wiring)
+      waitForSupervisorToMoveIntoRunningMode(supervisorRef, supervisorModeProbe, 5.seconds) shouldBe true
       enterBarrier("running")
 
       enterBarrier("offline")
       Thread.sleep(50)
-      val supervisorModeProbe = TestProbe[SupervisorMode]
       supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
       supervisorModeProbe.expectMsg(SupervisorMode.RunningOffline)
     }

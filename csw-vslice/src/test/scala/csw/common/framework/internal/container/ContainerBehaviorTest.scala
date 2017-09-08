@@ -1,4 +1,4 @@
-package csw.common.framework.internal
+package csw.common.framework.internal.container
 
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
@@ -6,7 +6,6 @@ import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, Done}
 import csw.common.framework.ComponentInfos._
-import csw.common.framework.internal.container.{ContainerBehavior, ContainerMode}
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorMode}
 import csw.common.framework.models.ContainerCommonMessage.GetComponents

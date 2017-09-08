@@ -30,6 +30,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-169: Creation of Multiple Components
+// DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
