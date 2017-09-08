@@ -154,11 +154,10 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
     }
 
     runOn(member2) {
-      val supervisorStateProbe = TestProbe[LifecycleStateChanged]
+      val supervisorStateProbe = TestProbe[SupervisorMode]
       val wiring               = FrameworkWiring.make(system, locationService)
       val supervisorRef        = Standalone.spawn(ConfigFactory.load("eaton_hcd_standalone.conf"), wiring)
-      supervisorRef ! LifecycleStateSubscription(Subscribe(supervisorStateProbe.ref))
-      supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
+      waitForSupervisorToMoveIntoRunningMode(supervisorRef, supervisorStateProbe, 2.seconds) shouldBe true
       enterBarrier("running")
 
       enterBarrier("offline")
