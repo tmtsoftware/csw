@@ -1,9 +1,9 @@
 package csw.common.framework
 
-import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
+import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.common.components.{ComponentStatistics, SampleComponentState}
 import csw.common.framework.internal.container.ContainerMode
@@ -12,11 +12,7 @@ import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standal
 import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.SupervisorCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorMode,
-  LifecycleStateSubscription
-}
+import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorMode}
 import csw.common.framework.models.ToComponentLifecycleMessage.GoOffline
 import csw.common.framework.models._
 import csw.param.states.CurrentState
@@ -86,12 +82,13 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
 
       containerRef ! GetComponents(componentsProbe.ref)
       val laserContainerComponents = componentsProbe.expectMsgType[Components].components
+      laserContainerComponents.size shouldBe 3
 
       // check that all the components within supervisor moves to Running mode
       laserContainerComponents
-        .map(
-          comp ⇒ waitForSupervisorToMoveIntoRunningMode(comp.supervisor, supervisorStateProbe, 2.seconds)
-        ) should contain only true
+        .foreach { component ⇒
+          waitForSupervisorToMoveIntoRunningMode(component.supervisor, supervisorStateProbe, 2.seconds) shouldBe true
+        }
 
       waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe) shouldBe true
       enterBarrier("running")
@@ -124,13 +121,14 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       containerModeProbe.expectMsg(ContainerMode.Idle)
 
       containerRef ! GetComponents(componentsProbe.ref)
-      val laserContainerComponents = componentsProbe.expectMsgType[Components].components
+      val wfsContainerComponents = componentsProbe.expectMsgType[Components].components
+      wfsContainerComponents.size shouldBe 3
 
       // check that all the components within supervisor moves to Running mode
-      laserContainerComponents
-        .map(
-          comp ⇒ waitForSupervisorToMoveIntoRunningMode(comp.supervisor, supervisorStateProbe, 2.seconds)
-        ) should contain only true
+      wfsContainerComponents
+        .foreach { component ⇒
+          waitForSupervisorToMoveIntoRunningMode(component.supervisor, supervisorStateProbe, 2.seconds) shouldBe true
+        }
 
       waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe) shouldBe true
       enterBarrier("running")
