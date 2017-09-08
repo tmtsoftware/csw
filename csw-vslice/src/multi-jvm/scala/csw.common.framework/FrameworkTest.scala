@@ -26,7 +26,7 @@ import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.{Duration, DurationInt}
 
 class FrameworkTestMultiJvmNode1 extends FrameworkTest(0)
 class FrameworkTestMultiJvmNode2 extends FrameworkTest(0)
@@ -57,12 +57,26 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
     BlockingUtils.poll(getContainerMode == ContainerMode.Running, 2.seconds)
   }
 
+  def waitForSupervisorToMoveIntoRunningMode(
+      actorRef: ActorRef[SupervisorExternalMessage],
+      probe: TestProbe[SupervisorMode],
+      duration: Duration
+  ): Boolean = {
+
+    def getSupervisorMode: SupervisorMode = {
+      actorRef ! GetSupervisorMode(probe.ref)
+      probe.expectMsgType[SupervisorMode]
+    }
+
+    BlockingUtils.poll(getSupervisorMode == SupervisorMode.Running, duration)
+  }
+
   test("should able to create multiple containers across jvm's and start component in standalone mode") {
 
     runOn(seed) {
       val containerModeProbe   = TestProbe[ContainerMode]
       val componentsProbe      = TestProbe[Components]
-      val supervisorStateProbe = TestProbe[LifecycleStateChanged]
+      val supervisorStateProbe = TestProbe[SupervisorMode]
 
       val wiring       = FrameworkWiring.make(system, locationService)
       val containerRef = Container.spawn(ConfigFactory.load("laser_container.conf"), wiring)
@@ -74,10 +88,10 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       val laserContainerComponents = componentsProbe.expectMsgType[Components].components
 
       // check that all the components within supervisor moves to Running mode
-      laserContainerComponents.foreach(_.supervisor ! LifecycleStateSubscription(Subscribe(supervisorStateProbe.ref)))
-      supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
-      supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
-      supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
+      laserContainerComponents
+        .map(
+          comp ⇒ waitForSupervisorToMoveIntoRunningMode(comp.supervisor, supervisorStateProbe, 2.seconds)
+        ) should contain only true
 
       waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe) shouldBe true
       enterBarrier("running")
@@ -101,7 +115,7 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
     runOn(member1) {
       val containerModeProbe   = TestProbe[ContainerMode]
       val componentsProbe      = TestProbe[Components]
-      val supervisorStateProbe = TestProbe[LifecycleStateChanged]
+      val supervisorStateProbe = TestProbe[SupervisorMode]
 
       val wiring       = FrameworkWiring.make(system, locationService)
       val containerRef = Container.spawn(ConfigFactory.load("wfs_container.conf"), wiring)
@@ -113,10 +127,10 @@ class FrameworkTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSe
       val laserContainerComponents = componentsProbe.expectMsgType[Components].components
 
       // check that all the components within supervisor moves to Running mode
-      laserContainerComponents.foreach(_.supervisor ! LifecycleStateSubscription(Subscribe(supervisorStateProbe.ref)))
-      supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
-      supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
-      supervisorStateProbe.expectMsgType[LifecycleStateChanged].state shouldBe SupervisorMode.Running
+      laserContainerComponents
+        .map(
+          comp ⇒ waitForSupervisorToMoveIntoRunningMode(comp.supervisor, supervisorStateProbe, 2.seconds)
+        ) should contain only true
 
       waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe) shouldBe true
       enterBarrier("running")
