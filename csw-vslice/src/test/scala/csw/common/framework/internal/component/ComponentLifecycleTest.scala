@@ -4,9 +4,8 @@ import akka.typed.PostStop
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.common.framework.models.FromComponentLifecycleMessage.Running
 import csw.common.framework.models.IdleMessage.Initialize
-import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
@@ -19,28 +18,18 @@ import scala.concurrent.Future
 //DEOPSCSW-179-Unique Action for a component
 class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
-  class IdleComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
+  class RunningComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
     private val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
 
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
-    when(sampleHcdHandler.onRun()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
     val behavior = new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleHcdHandler)
 
-    val idleComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
-      behavior.onMessage(Initialize)
-      supervisorProbe.expectMsgType[Initialized]
-      behavior
-    }
-  }
-
-  class RunningComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage])
-      extends IdleComponent(supervisorProbe) {
     val runningComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
-      idleComponentBehavior.onMessage(Run)
+      behavior.onMessage(Initialize)
       supervisorProbe.expectMsgType[Running]
-      idleComponentBehavior
+      behavior
     }
   }
 

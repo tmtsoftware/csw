@@ -15,7 +15,6 @@ import scala.concurrent.Future
 
 object SampleComponentState {
   val restartChoice  = Choice("Restart")
-  val runChoice      = Choice("Run")
   val onlineChoice   = Choice("Online")
   val domainChoice   = Choice("Domain")
   val shutdownChoice = Choice("Shutdown")
@@ -27,7 +26,6 @@ object SampleComponentState {
   val choices: Choices =
     Choices.fromChoices(
       restartChoice,
-      runChoice,
       onlineChoice,
       domainChoice,
       shutdownChoice,
@@ -51,9 +49,6 @@ class SampleComponentHandlers(
     Thread.sleep(100)
     Future.unit
   }
-
-  override def onRun(): Future[Unit] =
-    Future.successful(pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
 
   override def onGoOffline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
 

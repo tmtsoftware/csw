@@ -5,9 +5,8 @@ import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.common.ccs.CommandStatus
 import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.CommonMessage.UnderlyingHookFailed
-import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.common.framework.models.FromComponentLifecycleMessage.Running
 import csw.common.framework.models.IdleMessage.Initialize
-import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models.{RunningMessage, _}
@@ -37,11 +36,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   def onMessage(msg: ComponentMessage): Behavior[ComponentMessage] = {
     (mode, msg) match {
-      case (_, msg: CommonMessage)                          ⇒ onCommon(msg)
-      case (ComponentMode.Idle, msg: IdleMessage)           ⇒ onIdle(msg)
-      case (ComponentMode.Initialized, msg: InitialMessage) ⇒ onInitial(msg)
-      case (ComponentMode.Running, msg: RunningMessage)     ⇒ onRun(msg)
-      case _                                                ⇒ println(s"current context=$mode does not handle message=$msg")
+      case (_, msg: CommonMessage)                      ⇒ onCommon(msg)
+      case (ComponentMode.Idle, msg: IdleMessage)       ⇒ onIdle(msg)
+      case (ComponentMode.Running, msg: RunningMessage) ⇒ onRun(msg)
+      case _                                            ⇒ println(s"current context=$mode does not handle message=$msg")
     }
     this
   }
@@ -66,15 +64,6 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case Initialize ⇒
       async {
         await(lifecycleHandlers.initialize())
-        mode = ComponentMode.Initialized
-        supervisor ! Initialized(ctx.self)
-      }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))
-  }
-
-  private def onInitial(x: InitialMessage): Unit = x match {
-    case Run ⇒
-      async {
-        await(lifecycleHandlers.onRun())
         mode = ComponentMode.Running
         lifecycleHandlers.isOnline = true
         supervisor ! Running(ctx.self)

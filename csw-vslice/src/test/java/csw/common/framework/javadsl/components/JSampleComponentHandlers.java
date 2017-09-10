@@ -39,17 +39,6 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public CompletableFuture<BoxedUnit> jOnRun() {
-        return CompletableFuture.supplyAsync(() -> {
-        CurrentState runState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.runChoice()));
-        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(runState);
-
-        pubSubRef.tell(publish);
-        return BoxedUnit.UNIT;
-        });
-    }
-
-    @Override
     public void onDomainMsg(JComponentDomainMessage hcdDomainMsg) {
         CurrentState domainState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.domainChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(domainState);

@@ -6,12 +6,13 @@ import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.common.framework.models.InitialMessage.Run
+import csw.common.framework.models.SupervisorIdleMessage.RegistrationComplete
+import csw.common.framework.models.FromComponentLifecycleMessage.Running
+import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.common.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationComplete, RunTimeout}
+import csw.common.framework.models.SupervisorIdleMessage.InitializeTimeout
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -41,6 +42,12 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
         registrationFactory,
         locationService
       )
+    supervisor.onMessage(RegistrationComplete(registrationResult))
+    verify(timer).startSingleTimer(
+      SupervisorBehavior.InitializeTimerKey,
+      InitializeTimeout,
+      SupervisorBehavior.initializeTimeout
+    )
     val childComponentInbox: Inbox[ComponentMessage]                    = ctx.childInbox(supervisor.component.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)
@@ -52,45 +59,21 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisor.mode shouldBe SupervisorMode.Idle
     ctx.children.size shouldBe 3
-    verify(timer).startSingleTimer(
-      SupervisorBehavior.InitializeTimerKey,
-      InitializeTimeout,
-      SupervisorBehavior.initializeTimeout
-    )
+
   }
 
   // *************** Begin testing of onIdleMessages ***************
-  test("supervisor should accept Initialized message and send Run message to TLA") {
-    val testData = new TestData()
-    import testData._
-    import testData.testMocks._
-
-    val childRef = childComponentInbox.ref.upcast
-
-    supervisor.onMessage(Initialized(childRef))
-
-    verify(locationService).register(akkaRegistration)
-    verify(timer).cancel(SupervisorBehavior.InitializeTimerKey)
-    supervisor.onMessage(RegistrationComplete(registrationResult, childRef))
-
-    verify(timer).startSingleTimer(
-      SupervisorBehavior.RunTimerKey,
-      RunTimeout,
-      SupervisorBehavior.runTimeout
-    )
-
-    childComponentInbox.receiveMsg() shouldBe Run
-    supervisor.mode shouldBe SupervisorMode.Idle
-  }
-
   test("supervisor should accept Running message from component and change its mode and publish state change") {
     val testData = new TestData()
     import testData._
 
+    supervisor.runningComponent shouldBe empty
     supervisor.onMessage(Running(childComponentInbox.ref))
 
-    verify(timer).cancel(SupervisorBehavior.RunTimerKey)
+    verify(timer).cancel(SupervisorBehavior.InitializeTimerKey)
     supervisor.mode shouldBe SupervisorMode.Running
+    supervisor.runningComponent shouldBe Some(childComponentInbox.ref)
+    containerIdleMessageProbe.expectMsg(SupervisorModeChanged(ctx.selfInbox.ref, SupervisorMode.Running))
     childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
   }
   // *************** End of testing onIdleMessages ***************

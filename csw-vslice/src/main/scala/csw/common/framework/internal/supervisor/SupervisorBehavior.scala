@@ -6,9 +6,8 @@ import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Ter
 import csw.common.framework.exceptions.FailureRestart
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.SupervisorMode.Idle
-import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.common.framework.models.FromComponentLifecycleMessage.Running
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
-import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{
@@ -35,9 +34,7 @@ object SupervisorBehavior {
   val ComponentActor                    = "component"
   val PubSubLifecycleActor              = "pub-sub-lifecycle"
   val InitializeTimerKey                = "initialize-timer"
-  val RunTimerKey                       = "run-timer"
   val initializeTimeout: FiniteDuration = 5.seconds
-  val runTimeout: FiniteDuration        = 5.seconds
 }
 
 class SupervisorBehavior(
@@ -59,7 +56,7 @@ class SupervisorBehavior(
   val componentId                                        = ComponentId(name, componentInfo.componentType)
   val akkaRegistration: AkkaRegistration                 = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   var haltingFlag                                        = false
-  var mode: SupervisorMode                               = _
+  var mode: SupervisorMode                               = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
   var registrationOpt: Option[RegistrationResult]        = None
   var component: ActorRef[Nothing]                       = _
@@ -67,7 +64,7 @@ class SupervisorBehavior(
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor)
   val pubSubComponent: ActorRef[PubSub[CurrentState]]          = pubSubBehaviorFactory.make(ctx, PubSubComponentActor)
 
-  spawnAndWatchComponent()
+  registerWithLocationService()
 
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     (mode, msg) match {
@@ -86,8 +83,8 @@ class SupervisorBehavior(
       println(s"log.error(mode is $mode and actor is $componentRef)") //FIXME use log statement
       mode match {
         case SupervisorMode.Restart ⇒
-          spawnAndWatchComponent()
           mode = SupervisorMode.Idle
+          registerWithLocationService()
         case SupervisorMode.Shutdown ⇒
           ctx.system.terminate()
         case _ ⇒
@@ -107,18 +104,14 @@ class SupervisorBehavior(
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
-    case Initialized(componentRef) ⇒
-      timerScheduler.cancel(InitializeTimerKey)
-      registerWithLocationService(componentRef)
-    case RegistrationComplete(registrationResult, componentRef) ⇒
+    case RegistrationComplete(registrationResult) ⇒
       registrationOpt = Some(registrationResult)
-      timerScheduler.startSingleTimer(RunTimerKey, RunTimeout, runTimeout)
-      componentRef ! Run
+      spawnAndWatchComponent()
     case RegistrationFailed(throwable) ⇒
       println(s"log.error($throwable)") //FIXME use log statement
     case Running(componentRef) ⇒
       mode = SupervisorMode.Running
-      timerScheduler.cancel(RunTimerKey)
+      timerScheduler.cancel(InitializeTimerKey)
       runningComponent = Some(componentRef)
       maybeContainerRef foreach (_ ! SupervisorModeChanged(ctx.self, mode))
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
@@ -139,6 +132,17 @@ class SupervisorBehavior(
     }
   }
 
+  private def onRestart(): Unit = {
+    mode = SupervisorMode.Restart
+    registrationOpt match {
+      case Some(registrationResult) ⇒
+        unRegisterFromLocationService(registrationResult)
+      case None ⇒
+        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME use log statement
+        respawnComponent()
+    }
+  }
+
   private def onRestarting(msg: SupervisorRestartMessage): Unit = msg match {
     case UnRegistrationComplete ⇒
       respawnComponent()
@@ -148,10 +152,13 @@ class SupervisorBehavior(
   }
 
   private def respawnComponent(): Unit = {
-    registrationOpt = None
+//    registrationOpt = None
     ctx.child(ComponentActor) match {
-      case Some(componentRef) ⇒ ctx.stop(component)
-      case None               ⇒ spawnAndWatchComponent()
+      case Some(componentRef) ⇒
+        ctx.stop(component)
+      case None ⇒
+        mode = SupervisorMode.Idle
+        registerWithLocationService()
     }
   }
 
@@ -162,24 +169,10 @@ class SupervisorBehavior(
     }
   }
 
-  private def registerWithLocationService(componentRef: ActorRef[InitialMessage]): Unit = {
+  private def registerWithLocationService(): Unit = {
     locationService.register(akkaRegistration).onComplete {
-      case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult, componentRef)
+      case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
       case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
-    }
-  }
-
-  private def onRestart(): Unit = {
-    mode = SupervisorMode.Restart
-    registrationOpt match {
-      case Some(registrationResult) ⇒
-        unRegisterFromLocationService(registrationResult)
-      case None ⇒
-        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME use log statement
-        ctx.child(ComponentActor) match {
-          case Some(componentRef) ⇒ ctx.stop(component)
-          case None               ⇒ spawnAndWatchComponent()
-        }
     }
   }
 
@@ -191,7 +184,6 @@ class SupervisorBehavior(
   }
 
   private def spawnAndWatchComponent(): Unit = {
-    mode = Idle
     component = ctx.spawn[Nothing](
       Actor
         .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))

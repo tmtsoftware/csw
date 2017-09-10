@@ -52,8 +52,6 @@ class TromboneHcdHandlers(
     stats = await(tromboneAxis ? GetStatistics)
   }
 
-  override def onRun(): Future[Unit] = Future.successful(println("received Running"))
-
   override def onShutdown(): Future[Unit] = {
     Future.successful(println("shutdown complete during Running context"))
   }
