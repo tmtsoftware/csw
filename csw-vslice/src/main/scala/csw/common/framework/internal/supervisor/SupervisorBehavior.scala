@@ -109,6 +109,7 @@ class SupervisorBehavior(
       spawnAndWatchComponent()
     case RegistrationFailed(throwable) ⇒
       println(s"log.error($throwable)") //FIXME use log statement
+      throw throwable
     case Running(componentRef) ⇒
       mode = SupervisorMode.Running
       timerScheduler.cancel(InitializeTimerKey)

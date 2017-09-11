@@ -2,7 +2,7 @@ package csw.common.framework.integration
 
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.ActorSystem
+import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
@@ -19,7 +19,7 @@ import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscr
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models._
 import csw.param.states.CurrentState
-import csw.services.location.commons.ClusterSettings
+import csw.services.location.commons.{BlockingUtils, ClusterSettings}
 import csw.services.location.models.ComponentType.{Assembly, HCD}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
@@ -27,7 +27,7 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.DurationLong
+import scala.concurrent.duration.{Duration, DurationLong}
 
 // DEOPSCSW-169: Creation of Multiple Components
 // DEOPSCSW-182: Control Life Cycle of Components
@@ -49,6 +49,20 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
   override protected def afterAll(): Unit = Await.result(seedActorSystem.terminate(), 5.seconds)
+
+  def waitForContainerToMoveIntoRunningMode(
+      containerRef: ActorRef[ContainerExternalMessage],
+      probe: TestProbe[ContainerMode],
+      duration: Duration
+  ): Boolean = {
+
+    def getContainerMode: ContainerMode = {
+      containerRef ! GetContainerMode(probe.ref)
+      probe.expectMsgType[ContainerMode]
+    }
+
+    BlockingUtils.poll(getContainerMode == ContainerMode.Running, duration)
+  }
 
   test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
@@ -81,6 +95,8 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     resolvedContainerRef ! GetComponents(componentsProbe.ref)
     val components = componentsProbe.expectMsgType[Components].components
     components.size shouldBe 3
+
+    waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe, 5.seconds)
 
     // resolve all the components from container using location service
     val filterAssemblyLocation = Await.result(locationService.find(filterAssemblyConnection), 5.seconds)

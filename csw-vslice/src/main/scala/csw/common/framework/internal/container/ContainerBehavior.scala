@@ -33,6 +33,7 @@ class ContainerBehavior(
   var mode: ContainerMode                         = ContainerMode.Idle
   var registrationOpt: Option[RegistrationResult] = None
 
+  registerWithLocationService()
   createComponents(containerInfo.components)
 
   override def onMessage(msg: ContainerMessage): Behavior[ContainerMessage] = {
@@ -63,7 +64,6 @@ class ContainerBehavior(
     case Restart ⇒
       mode = ContainerMode.Idle
       runningComponents = Set.empty
-      registrationOpt.foreach(_.unregister())
       supervisors.foreach(_.component.supervisor ! Restart)
     case Shutdown ⇒
       mode = ContainerMode.Idle
@@ -82,7 +82,6 @@ class ContainerBehavior(
       }
     case RegistrationComplete(registrationResult) ⇒
       registrationOpt = Some(registrationResult)
-      mode = ContainerMode.Running
     case RegistrationFailed(throwable) ⇒
       println(s"log.error($throwable)") //FIXME use log statement
   }
@@ -96,7 +95,7 @@ class ContainerBehavior(
   }
 
   private def updateRunningComponents(): Unit = {
-    if (runningComponents.size == supervisors.size) registerWithLocationService()
+    if (runningComponents.size == supervisors.size) mode = ContainerMode.Running
   }
 
   private def registerWithLocationService(): Unit = {

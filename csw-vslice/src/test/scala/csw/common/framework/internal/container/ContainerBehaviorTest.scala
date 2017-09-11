@@ -93,8 +93,6 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
     ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
 
-    containerBehavior.onMessage(RegistrationComplete(registrationResult))
-
     ctx.children
       .map(child ⇒ ctx.childInbox(child.upcast))
       .map(_.receiveAll())
@@ -104,13 +102,18 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     val idleContainer = new IdleContainer
     import idleContainer._
 
+    verify(locationService).register(akkaRegistration)
     containerBehavior.mode shouldBe ContainerMode.Idle
+    containerBehavior.onMessage(RegistrationComplete(registrationResult))
+    containerBehavior.registrationOpt.get shouldBe registrationResult
   }
 
   test("should change its mode to running after all components move to running mode") {
     val idleContainer = new IdleContainer
     import idleContainer._
 
+    verify(locationService).register(akkaRegistration)
+    ctx.selfInbox.receiveMsg() shouldBe a[RegistrationComplete]
     // supervisor per component
     ctx.children.size shouldBe containerInfo.components.size
     ctx.selfInbox.receiveMsg() shouldBe a[SupervisorsCreated]
@@ -128,7 +131,6 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     containerBehavior.onMessage(RegistrationComplete(registrationResult))
 
     containerBehavior.mode shouldBe ContainerMode.Running
-    containerBehavior.registrationOpt.get shouldBe registrationResult
   }
 
   test("should handle restart message by changing its mode to initialize") {
@@ -155,10 +157,6 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
       .map(_.receiveAll())
 
     ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
-
-    verify(locationService, times(2)).register(akkaRegistration)
-
-    containerBehavior.onMessage(RegistrationComplete(registrationResult))
 
     containerBehavior.mode shouldBe ContainerMode.Running
   }
@@ -188,6 +186,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     val idleContainer = new IdleContainer
     import idleContainer._
 
+    verify(locationService).register(akkaRegistration)
     // Container should handle GetComponents message in Idle mode
     containerBehavior.mode shouldBe ContainerMode.Idle
     val probe = TestProbe[Components]
@@ -204,8 +203,6 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
       .map(child ⇒ ctx.childInbox(child.upcast))
       .map(_.receiveAll())
 
-    verify(locationService).register(akkaRegistration)
-
     containerBehavior.onMessage(RegistrationComplete(registrationResult))
 
     containerBehavior.mode shouldBe ContainerMode.Running
@@ -213,26 +210,5 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     containerBehavior.onMessage(GetComponents(probe.ref))
 
     probe.expectMsg(Components(containerBehavior.supervisors.map(_.component)))
-  }
-
-  test("container should retain mode if registration with location service fails") {
-    val idleContainer = new IdleContainer
-    import idleContainer._
-
-    val runtimeException = mock[RuntimeException]
-    val failedResult     = Promise[RegistrationResult].complete(Failure(runtimeException)).future
-    when(locationService.register(akkaRegistration)).thenReturn(failedResult)
-
-    containerBehavior.mode shouldBe ContainerMode.Idle
-
-    // simulate that container receives LifecycleStateChanged to Running message from all components
-    containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
-    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
-
-    verify(locationService).register(akkaRegistration)
-    containerBehavior.onMessage(RegistrationFailed(runtimeException))
-    containerBehavior.mode shouldBe ContainerMode.Idle
-    containerBehavior.registrationOpt shouldBe None
-    containerBehavior.runningComponents should not be Set.empty
   }
 }
