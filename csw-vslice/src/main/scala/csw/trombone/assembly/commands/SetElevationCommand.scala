@@ -3,8 +3,6 @@ package csw.trombone.assembly.commands
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.common.ccs.CommandMsgs
-import csw.common.ccs.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
 import csw.common.ccs.CommandStatus.{Completed, Error, NoLongerValid}
 import csw.common.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.common.framework.models.CommandMessage.Submit
@@ -15,6 +13,8 @@ import csw.param.states.CurrentState
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.trombone.hcd.TromboneHcdState
+import csw.trombone.messages.CommandMsgs
+import csw.trombone.messages.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
 import csw.units.Units.encoder
 
 object SetElevationCommand {

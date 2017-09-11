@@ -6,8 +6,6 @@ import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
-import csw.common.ccs.CommandMsgs
-import csw.common.ccs.CommandMsgs.StopCurrentCommand
 import csw.common.ccs.CommandStatus._
 import csw.common.ccs.ValidationIssue.{
   RequiredHCDUnavailableIssue,
@@ -21,6 +19,8 @@ import csw.trombone.assembly.TromboneCommandHandlerMsgs._
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneCommandHandler.Mode
 import csw.trombone.assembly.commands._
+import csw.trombone.messages.CommandMsgs
+import csw.trombone.messages.CommandMsgs.StopCurrentCommand
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt

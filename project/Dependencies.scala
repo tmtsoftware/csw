@@ -111,13 +111,7 @@ object Dependencies {
     Libs.`scala-async`,
     Libs.`play-json`,
     Enumeratum.`enumeratum-play`,
-    Akka.`akka-typed`,
-    Akka.`akka-typed-testkit`  % Test,
-    Akka.`akka-stream-testkit` % Test,
-    Libs.`scalatest`           % Test,
-    Libs.`junit`               % Test,
-    Libs.`junit-interface`     % Test,
-    Libs.`mockito-core`        % Test
+    Akka.`akka-typed`
   )
 
   val CswClusterSeed = Seq(
@@ -127,9 +121,18 @@ object Dependencies {
     Libs.`scalatest` % Test
   )
 
-  val CswFrameworkApps = Seq(
+  val CswFramework = Seq(
+    Libs.`scala-async`,
+    Libs.`play-json`,
+    Enumeratum.`enumeratum-play`,
+    Akka.`akka-typed`,
     Libs.`scopt`,
-    Libs.`scalatest` % Test
+    Akka.`akka-typed-testkit`  % Test,
+    Akka.`akka-stream-testkit` % Test,
+    Libs.`scalatest`           % Test,
+    Libs.`junit`               % Test,
+    Libs.`junit-interface`     % Test,
+    Libs.`mockito-core`        % Test
   )
 
   val CswProdExamples = Seq(

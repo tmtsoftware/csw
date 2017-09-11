@@ -9,7 +9,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-config-client`,
   `csw-config-client-cli`,
   `csw-config-server`,
-  `csw-framework-apps`,
+  `csw-framework`,
   `csw-location`,
   `csw-location-agent`,
   `csw-benchmark`,
@@ -128,17 +128,16 @@ lazy val `csw-config-client-cli` = project
   )
 
 lazy val `csw-vslice` = project
-  .enablePlugins(AutoMultiJvm, GenJavadocPlugin)
-  .dependsOn(`csw-params`, `csw-config-client`, `csw-location` % "compile->compile;multi-jvm->multi-jvm")
+  .dependsOn(`csw-framework`)
   .settings(
     libraryDependencies ++= Dependencies.Vslice
   )
 
-lazy val `csw-framework-apps` = project
-  .dependsOn(`csw-vslice` % "compile->compile; test->test")
-  .enablePlugins(DeployApp)
+lazy val `csw-framework` = project
+  .dependsOn(`csw-params`, `csw-config-client`, `csw-location` % "compile->compile;multi-jvm->multi-jvm")
+  .enablePlugins(AutoMultiJvm, GenJavadocPlugin, CswBuildInfo)
   .settings(
-    libraryDependencies ++= Dependencies.CswFrameworkApps
+    libraryDependencies ++= Dependencies.CswFramework
   )
 
 //Integration test project

@@ -1,4 +1,5 @@
 import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
+import com.typesafe.sbt.packager.universal.UniversalPlugin
 import sbt.Keys._
 import sbt._
 
@@ -53,4 +54,15 @@ object DeployApp extends AutoPlugin {
       buildInfoPackage := "csw.services",
       target in Universal := baseDirectory.value.getParentFile / "target" / "universal"
     )
+}
+
+object CswBuildInfo extends AutoPlugin {
+  import sbtbuildinfo.BuildInfoPlugin
+  import BuildInfoPlugin.autoImport._
+
+  override def requires: Plugins = BuildInfoPlugin
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    buildInfoKeys := Seq[BuildInfoKey](name, version),
+    buildInfoPackage := "csw.services"
+  )
 }
