@@ -10,12 +10,12 @@ import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.apps.containercmd.exceptions.Exceptions.{FileDataNotFound, FileNotFound}
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.common.framework.models.{ContainerMessage, SupervisorExternalMessage}
-import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.async.Async.{async, await}
+import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, Future}
 
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
 
@@ -59,28 +59,18 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
     } else {
       import wiring.actorRuntime.{ec, mat}
 
-      var config: Config                    = ConfigFactory.empty()
-      var maybeException: Option[Throwable] = None
-      wiring.configService.exists(inputFilePath).onComplete {
-        case Success(fileExists) ⇒
-          if (fileExists) {
-            wiring.configService.getActive(inputFilePath).onComplete {
-              case Success(Some(configData)) ⇒
-                configData.toConfigObject.onComplete {
-                  case Success(configObject) ⇒ config = configObject
-                  case Failure(exception)    ⇒ maybeException = Some(exception)
-                }
-              case Success(None) ⇒
-                maybeException = Some(FileDataNotFound(inputFilePath))
-              case Failure(exception) ⇒ maybeException = Some(exception)
-            }
-          } else
-            maybeException = Some(FileNotFound(inputFilePath))
-        case Failure(exception) ⇒ maybeException = Some(exception)
+      val configF = async {
+        val fileExists = await(wiring.configService.exists(inputFilePath))
+
+        val maybeData =
+          if (fileExists) await(wiring.configService.getActive(inputFilePath))
+          else throw FileNotFound(inputFilePath)
+
+        if (maybeData.isDefined) await(maybeData.get.toConfigObject)
+        else throw FileDataNotFound(inputFilePath)
       }
 
-      if (!config.isEmpty) config
-      else throw maybeException.get
+      Await.result(configF, 10.seconds)
     }
   }
 }
