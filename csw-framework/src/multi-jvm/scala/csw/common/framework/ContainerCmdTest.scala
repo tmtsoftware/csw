@@ -122,7 +122,9 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val testProbe = TestProbe[ContainerMode]
 
-      val containerCmd = new ContainerCmd(ClusterAwareSettings.joinLocal(3552))
+      // withEntries required for multi-node test where seed node is picked up from environment variable
+      val clusterSettings = ClusterAwareSettings.joinLocal(3552).withEntries(sys.env)
+      val containerCmd    = new ContainerCmd(clusterSettings)
 
       // only file path is provided, by default - file will be fetched from configuration service
       // and will be considered as container configuration.
