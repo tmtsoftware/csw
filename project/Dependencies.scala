@@ -107,13 +107,6 @@ object Dependencies {
     Akka.`akka-stream-testkit`     % Test
   )
 
-  val Vslice = Seq(
-    Libs.`scala-async`,
-    Libs.`play-json`,
-    Enumeratum.`enumeratum-play`,
-    Akka.`akka-typed`
-  )
-
   val CswClusterSeed = Seq(
     AkkaHttp.`akka-http`,
     Libs.`spray-json`,

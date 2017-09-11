@@ -129,9 +129,6 @@ lazy val `csw-config-client-cli` = project
 
 lazy val `csw-vslice` = project
   .dependsOn(`csw-framework`)
-  .settings(
-    libraryDependencies ++= Dependencies.Vslice
-  )
 
 lazy val `csw-framework` = project
   .dependsOn(`csw-params`, `csw-config-client`, `csw-location` % "compile->compile;multi-jvm->multi-jvm")

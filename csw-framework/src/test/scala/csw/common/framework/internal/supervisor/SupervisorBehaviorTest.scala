@@ -6,7 +6,6 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{Behavior, Props}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.common.framework.models.ContainerIdleMessage.RegistrationComplete
 import csw.common.framework.models.{ContainerIdleMessage, SupervisorExternalMessage}
 import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import org.scalatest.mockito.MockitoSugar

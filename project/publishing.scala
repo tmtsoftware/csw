@@ -45,13 +45,11 @@ object DeployApp extends AutoPlugin {
   import sbtbuildinfo.BuildInfoPlugin
   import BuildInfoPlugin.autoImport._
 
-  override def requires: Plugins = UniversalPlugin && JavaAppPackaging && PublishBintray && BuildInfoPlugin
+  override def requires: Plugins = UniversalPlugin && JavaAppPackaging && PublishBintray && CswBuildInfo
 
   override def projectSettings: Seq[Setting[_]] =
     SettingsHelper.makeDeploymentSettings(Universal, packageBin in Universal, "zip") ++
     SettingsHelper.makeDeploymentSettings(UniversalDocs, packageBin in UniversalDocs, "zip") ++ Seq(
-      buildInfoKeys := Seq[BuildInfoKey](name, version),
-      buildInfoPackage := "csw.services",
       target in Universal := baseDirectory.value.getParentFile / "target" / "universal"
     )
 }
@@ -61,6 +59,7 @@ object CswBuildInfo extends AutoPlugin {
   import BuildInfoPlugin.autoImport._
 
   override def requires: Plugins = BuildInfoPlugin
+
   override def projectSettings: Seq[Setting[_]] = Seq(
     buildInfoKeys := Seq[BuildInfoKey](name, version),
     buildInfoPackage := "csw.services"

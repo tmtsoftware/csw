@@ -9,7 +9,7 @@ import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorMode}
 import csw.common.framework.models.ContainerCommonMessage.GetComponents
-import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed, SupervisorsCreated}
+import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, SupervisorsCreated}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
@@ -25,7 +25,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.{Future, Promise}
-import scala.util.{Failure, Success}
+import scala.util.Success
 
 //DEOPSCSW-182-Control Life Cycle of Components
 //DEOPSCSW-216-Locate and connect components to send AKKA commands
