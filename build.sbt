@@ -131,7 +131,7 @@ lazy val `csw-vslice` = project
   .dependsOn(`csw-framework`)
 
 lazy val `csw-framework` = project
-  .dependsOn(`csw-params`, `csw-config-client`, `csw-location` % "compile->compile;multi-jvm->multi-jvm")
+  .dependsOn(`csw-params`, `csw-config-client`, `csw-location` % "compile->compile;multi-jvm->multi-jvm", `csw-config-server` % "multi-jvm->test")
   .enablePlugins(AutoMultiJvm, GenJavadocPlugin, CswBuildInfo)
   .settings(
     libraryDependencies ++= Dependencies.CswFramework
