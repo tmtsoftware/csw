@@ -1,6 +1,7 @@
 package csw.common.framework
 
-import java.nio.file.Paths
+import java.io.FileWriter
+import java.nio.file.{Files, Path, Paths}
 
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
@@ -35,6 +36,10 @@ class ContainerCmdTestMultiJvm1 extends ContainerCmdTest(0)
 class ContainerCmdTestMultiJvm2 extends ContainerCmdTest(0)
 class ContainerCmdTestMultiJvm3 extends ContainerCmdTest(0)
 
+// DEOPSCSW-167: Creation and Deployment of Standalone Components
+// DEOPSCSW-169: Creation of Multiple Components
+// DEOPSCSW-182: Control Life Cycle of Components
+// DEOPSCSW-216: Locate and connect components to send AKKA commands
 class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._
@@ -54,37 +59,73 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
     testFileUtils.deleteServerFiles()
   }
 
-  test("should able to start container and component in standalone mode through configuration service") {
+  def waitForContainerToMoveIntoRunningMode(
+      containerRef: ActorRef[ContainerExternalMessage],
+      probe: TestProbe[ContainerMode],
+      duration: Duration
+  ): Boolean = {
 
+    def getContainerMode: ContainerMode = {
+      containerRef ! GetContainerMode(probe.ref)
+      probe.expectMsgType[ContainerMode]
+    }
+
+    BlockingUtils.poll(getContainerMode == ContainerMode.Running, duration)
+  }
+
+  def waitForSupervisorToMoveIntoRunningMode(
+      actorRef: ActorRef[SupervisorExternalMessage],
+      probe: TestProbe[SupervisorMode],
+      duration: Duration
+  ): Boolean = {
+
+    def getSupervisorMode: SupervisorMode = {
+      actorRef ! GetSupervisorMode(probe.ref)
+      probe.expectMsgType[SupervisorMode]
+    }
+
+    BlockingUtils.poll(getSupervisorMode == SupervisorMode.Running, duration)
+  }
+
+  def createStandaloneTmpFile(): Path = {
+    val hcdConfiguration       = scala.io.Source.fromResource("eaton_hcd_standalone.conf").mkString
+    val standaloneConfFilePath = Files.createTempFile("eaton_hcd_standalone", ".conf")
+    val fileWriter             = new FileWriter(standaloneConfFilePath.toFile, true)
+    fileWriter.write(hcdConfiguration)
+    fileWriter.close()
+    standaloneConfFilePath
+  }
+
+  test("should able to start components in container mode and in standalone mode through configuration service") {
+
+    // start config server and upload laser_container.conf file
     runOn(seed) {
       val serverWiring = ServerWiring.make(locationService)
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.registeredLazyBinding.await
 
-      val configService = ConfigClientFactory.adminApi(system, locationService)
-
-      val containerConfigData  = ConfigData.fromString(Source.fromResource("laser_container.conf").mkString)
-      val standaloneConfigData = ConfigData.fromString(Source.fromResource("eaton_hcd_standalone.conf").mkString)
-
-      Await.result(configService.create(Paths.get("/laser_container.conf"), containerConfigData, comment = "container"),
-                   5.seconds)
+      val configService       = ConfigClientFactory.adminApi(system, locationService)
+      val containerConfigData = ConfigData.fromString(Source.fromResource("laser_container.conf").mkString)
 
       Await.result(
-        configService.create(Paths.get("/eaton_hcd_standalone.conf"), standaloneConfigData, comment = "standalone"),
+        configService.create(Paths.get("/laser_container.conf"), containerConfigData, comment = "container"),
         5.seconds
       )
 
-      enterBarrier("config-files-created")
+      enterBarrier("config-file-uploaded")
       enterBarrier("running")
       enterBarrier("offline")
     }
 
     runOn(member1) {
-      enterBarrier("config-files-created")
+      enterBarrier("config-file-uploaded")
 
       val testProbe = TestProbe[ContainerMode]
 
       val containerCmd = new ContainerCmd(ClusterAwareSettings.joinLocal(3552))
+
+      // only file path is provided, by default - file will be fetched from configuration service
+      // and will be considered as container configuration.
       val args         = Array("/laser_container.conf")
       val containerRef = containerCmd.start(args).get.asInstanceOf[ActorRef[ContainerExternalMessage]]
 
@@ -124,12 +165,17 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
     }
 
     runOn(member2) {
-      enterBarrier("config-files-created")
+      enterBarrier("config-file-uploaded")
 
       val testProbe = TestProbe[SupervisorMode]
 
-      val containerCmd  = new ContainerCmd(ClusterAwareSettings.joinLocal(3552))
-      val args          = Array("--standalone", "/eaton_hcd_standalone.conf")
+      val containerCmd = new ContainerCmd(ClusterAwareSettings.joinLocal(3552))
+
+      // this step is required for multi-node, as eaton_hcd_standalone.conf file is not directly available
+      // when sbt-assembly creates fat jar
+      val standaloneConfFilePath = createStandaloneTmpFile()
+
+      val args          = Array("--standalone", "--local", standaloneConfFilePath.toString)
       val supervisorRef = containerCmd.start(args).get.asInstanceOf[ActorRef[SupervisorExternalMessage]]
 
       waitForSupervisorToMoveIntoRunningMode(supervisorRef, testProbe, 5.seconds) shouldBe true
@@ -139,35 +185,10 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       Thread.sleep(50)
       supervisorRef ! GetSupervisorMode(testProbe.ref)
       testProbe.expectMsg(SupervisorMode.RunningOffline)
+
+      Files.delete(standaloneConfFilePath)
     }
     enterBarrier("end")
   }
 
-  def waitForContainerToMoveIntoRunningMode(
-      containerRef: ActorRef[ContainerExternalMessage],
-      probe: TestProbe[ContainerMode],
-      duration: Duration
-  ): Boolean = {
-
-    def getContainerMode: ContainerMode = {
-      containerRef ! GetContainerMode(probe.ref)
-      probe.expectMsgType[ContainerMode]
-    }
-
-    BlockingUtils.poll(getContainerMode == ContainerMode.Running, duration)
-  }
-
-  def waitForSupervisorToMoveIntoRunningMode(
-      actorRef: ActorRef[SupervisorExternalMessage],
-      probe: TestProbe[SupervisorMode],
-      duration: Duration
-  ): Boolean = {
-
-    def getSupervisorMode: SupervisorMode = {
-      actorRef ! GetSupervisorMode(probe.ref)
-      probe.expectMsgType[SupervisorMode]
-    }
-
-    BlockingUtils.poll(getSupervisorMode == SupervisorMode.Running, duration)
-  }
 }

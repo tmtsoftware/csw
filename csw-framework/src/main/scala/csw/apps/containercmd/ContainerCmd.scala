@@ -59,7 +59,7 @@ class ContainerCmd(clusterSettings: ClusterSettings = ClusterAwareSettings, star
   private def getConfig(isLocal: Boolean, inputFilePath: Path): Config = {
     if (isLocal) {
       if (Files.exists(inputFilePath)) ConfigFactory.parseFile(inputFilePath.toFile)
-      else throw new RuntimeException("Config file does not exist")
+      else throw new RuntimeException(s"Config file : ${inputFilePath} does not exist")
     } else {
       import wiring.actorRuntime.{ec, mat}
 
