@@ -10,6 +10,7 @@ import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.apps.containercmd.exceptions.Exceptions.{FileDataNotFound, FileNotFound}
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.common.framework.models.{ContainerMessage, SupervisorExternalMessage}
+import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
