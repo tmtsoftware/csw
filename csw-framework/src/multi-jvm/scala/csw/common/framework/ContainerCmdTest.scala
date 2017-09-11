@@ -2,14 +2,13 @@ package csw.common.framework
 
 import java.nio.file.Paths
 
-import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
+import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import csw.apps.containercmd.Main
+import csw.apps.containercmd.ContainerCmd
 import csw.common.components.{ComponentStatistics, SampleComponentState}
-import csw.common.components.SampleComponentState.{choiceKey, domainChoice, prefix}
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
@@ -21,8 +20,8 @@ import csw.common.framework.models.{Components, ContainerExternalMessage, Superv
 import csw.param.states.CurrentState
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.config.server.commons.TestFileUtils
+import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.location.commons.{BlockingUtils, ClusterAwareSettings}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
@@ -85,9 +84,9 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val testProbe = TestProbe[ContainerMode]
 
-      val main         = new Main(ClusterAwareSettings.joinLocal(3552))
+      val containerCmd = new ContainerCmd(ClusterAwareSettings.joinLocal(3552))
       val args         = Array("/laser_container.conf")
-      val containerRef = main.start(args).get.asInstanceOf[ActorRef[ContainerExternalMessage]]
+      val containerRef = containerCmd.start(args).get.asInstanceOf[ActorRef[ContainerExternalMessage]]
 
       waitForContainerToMoveIntoRunningMode(containerRef, testProbe, 5.seconds) shouldBe true
 
@@ -129,9 +128,9 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val testProbe = TestProbe[SupervisorMode]
 
-      val main          = new Main(ClusterAwareSettings.joinLocal(3552))
+      val containerCmd  = new ContainerCmd(ClusterAwareSettings.joinLocal(3552))
       val args          = Array("--standalone", "/eaton_hcd_standalone.conf")
-      val supervisorRef = main.start(args).get.asInstanceOf[ActorRef[SupervisorExternalMessage]]
+      val supervisorRef = containerCmd.start(args).get.asInstanceOf[ActorRef[SupervisorExternalMessage]]
 
       waitForSupervisorToMoveIntoRunningMode(supervisorRef, testProbe, 5.seconds) shouldBe true
       enterBarrier("running")
