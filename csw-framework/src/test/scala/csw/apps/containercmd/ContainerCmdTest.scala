@@ -18,14 +18,14 @@ import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, DurationDouble}
 
 // DEOPSCSW-171: Starting component from command line
-class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class ContainerCmdTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   implicit val actorSystem: typed.ActorSystem[Nothing] = ActorSystem("test").toTyped
   implicit val testKitSettings: TestKitSettings        = TestKitSettings(actorSystem)
 
-  var main: Main = _
+  var main: ContainerCmd = _
 
   override def beforeEach(): Unit = {
-    main = new Main(ClusterAwareSettings.onPort(3552))
+    main = new ContainerCmd(ClusterAwareSettings.onPort(3552))
   }
 
   override def afterEach(): Unit = {

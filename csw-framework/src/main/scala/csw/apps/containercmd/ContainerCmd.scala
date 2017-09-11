@@ -9,7 +9,6 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.apps.containercmd.exceptions.Exceptions.{FileDataNotFound, FileNotFound}
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.common.framework.models.{ContainerMessage, SupervisorExternalMessage}
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
@@ -18,27 +17,33 @@ import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 
-class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
+class ContainerCmd(clusterSettings: ClusterSettings = ClusterAwareSettings, startLogging: Boolean = false) {
 
   lazy val actorSystem: ActorSystem = clusterSettings.system
   lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
 
-  def start(args: Array[String]): Option[ActorRef[SupervisorExternalMessage with ContainerMessage]] = {
-    new ArgsParser().parse(args).map {
-      case Options(standalone, isLocal, inputFilePath) =>
-        if (startLogging) {
-          LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
-        }
-
-        try {
-          createComponent(standalone, wiring, getConfig(isLocal, inputFilePath.get))
-        } catch {
-          case ex: Exception ⇒ {
-            shutdown
-            println(s"log.error(${ex.getMessage}, ex)")
-            throw ex
+  def start(args: Array[String]): Option[ActorRef[_]] = {
+    if (clusterSettings.seedNodes.isEmpty) {
+      println(
+        "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
+      )
+      None
+    } else {
+      new ArgsParser().parse(args).map {
+        case Options(standalone, isLocal, inputFilePath) =>
+          if (startLogging) {
+            LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
           }
-        }
+
+          try {
+            createComponent(standalone, wiring, getConfig(isLocal, inputFilePath.get))
+          } catch {
+            case ex: Exception ⇒
+              println(s"log.error(${ex.getMessage}, $ex)")
+              shutdown
+              throw ex
+          }
+      }
     }
   }
 
@@ -46,9 +51,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
     wiring.actorRuntime.shutdown()
   }
 
-  private def createComponent(standalone: Boolean,
-                              wiring: FrameworkWiring,
-                              config: Config): ActorRef[SupervisorExternalMessage with ContainerMessage] = {
+  private def createComponent(standalone: Boolean, wiring: FrameworkWiring, config: Config): ActorRef[_] = {
     if (standalone) Standalone.spawn(config, wiring)
     else Container.spawn(config, wiring)
   }
@@ -74,15 +77,4 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
       Await.result(configF, 10.seconds)
     }
   }
-}
-
-object Main extends App {
-  if (ClusterAwareSettings.seedNodes.isEmpty) {
-    println(
-      "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
-    )
-  } else {
-    new Main(ClusterAwareSettings, startLogging = true).start(args)
-  }
-
 }
