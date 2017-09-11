@@ -38,13 +38,13 @@ node('master'){
                 sh "sbt csw-location/multi-jvm:test"
                 sh "sbt csw-config-client/multi-jvm:test"
                 sh "sbt csw-config-client-cli/multi-jvm:test"
-                sh "sbt csw-vslice/multi-jvm:test"
+                sh "sbt csw-framework/multi-jvm:test"
              }
 
              stage('Multi-Node Test') { // These tests cover the scenario of multiple components in multiple containers on different machines.
                 sh "sbt -DenableCoverage=false csw-location/multi-node-test"
                 sh "sbt -DenableCoverage=false csw-config-client/multi-node-test"
-                sh "sbt -DenableCoverage=false csw-vslice/multi-node-test"
+                sh "sbt -DenableCoverage=false csw-framework/multi-node-test"
              }
 
              stage('Package') {
