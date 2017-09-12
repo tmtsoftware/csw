@@ -7,7 +7,7 @@ import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
-import csw.apps.containercmd.exceptions.Exceptions.{FileDataNotFound, FileNotFound}
+import csw.apps.containercmd.exceptions.Exceptions.{FileNotFound, LocalFileNotFound}
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
@@ -59,21 +59,15 @@ class ContainerCmd(clusterSettings: ClusterSettings = ClusterAwareSettings, star
   private def getConfig(isLocal: Boolean, inputFilePath: Path): Config = {
     if (isLocal) {
       if (Files.exists(inputFilePath)) ConfigFactory.parseFile(inputFilePath.toFile)
-      else throw new RuntimeException(s"Config file : ${inputFilePath} does not exist")
+      else throw LocalFileNotFound(inputFilePath)
     } else {
       import wiring.actorRuntime.{ec, mat}
-
       val configF = async {
-        val fileExists = await(wiring.configService.exists(inputFilePath))
-
-        val maybeData =
-          if (fileExists) await(wiring.configService.getActive(inputFilePath))
-          else throw FileNotFound(inputFilePath)
+        val maybeData = await(wiring.configService.getActive(inputFilePath))
 
         if (maybeData.isDefined) await(maybeData.get.toConfigObject)
-        else throw FileDataNotFound(inputFilePath)
+        else throw FileNotFound(inputFilePath)
       }
-
       Await.result(configF, 10.seconds)
     }
   }
