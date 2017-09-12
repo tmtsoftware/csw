@@ -186,7 +186,7 @@ class SupervisorBehavior(
   private def spawnAndWatchComponent(): Unit = {
     component = ctx.spawn[Nothing](
       Actor
-        .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent))
+        .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent, locationService))
         .onFailure[FailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)), //FIXME to disable logs in test
       ComponentActor
     )

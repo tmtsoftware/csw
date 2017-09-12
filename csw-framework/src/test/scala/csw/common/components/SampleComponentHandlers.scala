@@ -10,6 +10,7 @@ import csw.param.generics.GChoiceKey
 import csw.param.generics.KeyType.ChoiceKey
 import csw.param.models.{Choice, Choices, Prefix}
 import csw.param.states.CurrentState
+import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.Future
 
@@ -39,8 +40,9 @@ object SampleComponentState {
 class SampleComponentHandlers(
     ctx: ActorContext[ComponentMessage],
     componentInfo: ComponentInfo,
-    pubSubRef: ActorRef[PublisherMessage[CurrentState]]
-) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, pubSubRef) {
+    pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+    locationService: LocationService
+) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, pubSubRef, locationService) {
 
   import SampleComponentState._
 

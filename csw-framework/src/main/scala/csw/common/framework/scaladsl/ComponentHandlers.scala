@@ -7,6 +7,7 @@ import csw.common.framework.models.PubSub.PublisherMessage
 import csw.common.framework.models.RunningMessage.DomainMessage
 import csw.common.framework.models.{CommandMessage, ComponentInfo, ComponentMessage}
 import csw.param.states.CurrentState
+import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
@@ -14,7 +15,8 @@ import scala.reflect.ClassTag
 abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
     ctx: ActorContext[ComponentMessage],
     componentInfo: ComponentInfo,
-    pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+    pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+    locationService: LocationService
 ) extends FrameworkLogger.Simple {
 
   override val componentName: String = componentInfo.name

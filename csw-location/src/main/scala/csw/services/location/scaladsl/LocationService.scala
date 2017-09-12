@@ -3,6 +3,7 @@ package csw.services.location.scaladsl
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
+import csw.services.location.javadsl.ILocationService
 import csw.services.location.models._
 
 import scala.concurrent.Future
@@ -106,4 +107,9 @@ trait LocationService {
    * @return A Future which completes when the location service has shutdown successfully
    */
   def shutdown(): Future[Done]
+
+  /**
+   * Returns the Java API for this instance of location service
+   */
+  def asJava: ILocationService
 }

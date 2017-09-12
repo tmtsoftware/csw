@@ -11,6 +11,7 @@ import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.commands.{Observe, Setup}
 import csw.param.states.CurrentState
+import csw.services.location.scaladsl.LocationService
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}
 import csw.trombone.assembly.ParamValidation._
@@ -24,16 +25,18 @@ class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPubli
   override def handlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
-      pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+      pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+      locationService: LocationService
   ): ComponentHandlers[DiagPublisherMessages] =
-    new TromboneAssemblyHandlers(ctx, componentInfo, pubSubRef)
+    new TromboneAssemblyHandlers(ctx, componentInfo, pubSubRef, locationService)
 }
 
 class TromboneAssemblyHandlers(
     ctx: ActorContext[ComponentMessage],
     componentInfo: ComponentInfo,
-    pubSubRef: ActorRef[PublisherMessage[CurrentState]]
-) extends ComponentHandlers[DiagPublisherMessages](ctx, componentInfo, pubSubRef) {
+    pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+    locationService: LocationService
+) extends ComponentHandlers[DiagPublisherMessages](ctx, componentInfo, pubSubRef, locationService) {
 
   private var diagPublsher: ActorRef[DiagPublisherMessages] = _
 

@@ -10,6 +10,7 @@ import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.SupervisorBehavior
 import csw.common.framework.models.{LifecycleStateChanged, PubSub, SupervisorMessage}
 import csw.param.states.CurrentState
+import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -36,6 +37,7 @@ class FrameworkTestMocks(
   when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]])).thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(registrationResult.unregister()).thenReturn(Future.successful(Done))
+  when(locationService.asJava).thenReturn(mock[ILocationService])
   when(
     pubSubBehaviorFactory.make[LifecycleStateChanged](
       any[ActorContext[SupervisorMessage]],

@@ -12,7 +12,7 @@ import csw.common.framework.models.ComponentInfo;
 import csw.common.framework.models.ComponentMessage;
 import csw.common.framework.models.PubSub;
 import csw.param.states.CurrentState;
-import scala.concurrent.Future;
+import csw.services.location.javadsl.ILocationService;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
@@ -22,8 +22,9 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
 
-    JSampleComponentHandlers(ActorContext<ComponentMessage> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef, Class<JComponentDomainMessage> klass) {
-        super(ctx, componentInfo, pubSubRef, klass);
+    JSampleComponentHandlers(ActorContext<ComponentMessage> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMessage<CurrentState>>
+            pubSubRef, ILocationService locationService, Class<JComponentDomainMessage> klass) {
+        super(ctx, componentInfo, pubSubRef, locationService, klass);
         this.pubSubRef = pubSubRef;
     }
 

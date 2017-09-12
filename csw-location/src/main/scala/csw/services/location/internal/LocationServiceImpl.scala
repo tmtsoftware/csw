@@ -16,6 +16,7 @@ import csw.services.location.exceptions.{
 }
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.internal.StreamExt.RichSource
+import csw.services.location.javadsl.ILocationService
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
 
@@ -217,6 +218,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     log.info(s"Subscribing to connection: [${connection.name}]")
     track(connection).to(Sink.foreach(callback)).run()
   }
+
+  override def asJava: ILocationService = new JLocationServiceImpl(this, cswCluster)
 
   /**
    * Terminate the ActorSystem and gracefully leave the akka cluster

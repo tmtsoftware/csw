@@ -10,7 +10,7 @@ import csw.common.framework.models.PubSub.PublisherMessage
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.states.CurrentState
-import csw.services.location.scaladsl.ActorSystemFactory
+import csw.services.location.scaladsl.{ActorSystemFactory, LocationService}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -36,7 +36,8 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
       override def handlers(
           ctx: ActorContext[ComponentMessage],
           componentInfo: ComponentInfo,
-          pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+          pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+          locationService: LocationService
       ): ComponentHandlers[ComponentDomainMessage] =
         componentHandlers
     }
@@ -48,7 +49,8 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
       override def handlers(
           ctx: ActorContext[ComponentMessage],
           componentInfo: ComponentInfo,
-          pubSubRef: ActorRef[PublisherMessage[CurrentState]]
+          pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+          locationService: LocationService
       ): ComponentHandlers[ComponentDomainMessage] =
         assemblyHandlers
     }

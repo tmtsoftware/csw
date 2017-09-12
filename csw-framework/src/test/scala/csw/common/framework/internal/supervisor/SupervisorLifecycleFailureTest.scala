@@ -13,6 +13,7 @@ import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.states.CurrentState
+import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.Answer
@@ -80,7 +81,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
       componentBehaviorFactory.make(
         any[ComponentInfo],
         any[ActorRef[FromComponentLifecycleMessage]],
-        any[ActorRef[PublisherMessage[CurrentState]]]
+        any[ActorRef[PublisherMessage[CurrentState]]],
+        any[LocationService]
       )
     ).thenCallRealMethod()
 
@@ -88,7 +90,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
       componentBehaviorFactory.handlers(
         any[ActorContext[ComponentMessage]],
         any[ComponentInfo],
-        any[ActorRef[PublisherMessage[CurrentState]]]
+        any[ActorRef[PublisherMessage[CurrentState]]],
+        any[LocationService]
       )
     ).thenReturn(componentHandlers)
 
