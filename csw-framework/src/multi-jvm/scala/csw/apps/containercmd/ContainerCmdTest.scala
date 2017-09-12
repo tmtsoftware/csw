@@ -163,7 +163,6 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
       enterBarrier("offline")
-      Await.result(containerCmd.shutdown, 5.seconds)
     }
 
     runOn(member2) {
@@ -189,7 +188,6 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       testProbe.expectMsg(SupervisorMode.RunningOffline)
 
       Files.delete(standaloneConfFilePath)
-      Await.result(containerCmd.shutdown, 5.seconds)
     }
     enterBarrier("end")
   }
