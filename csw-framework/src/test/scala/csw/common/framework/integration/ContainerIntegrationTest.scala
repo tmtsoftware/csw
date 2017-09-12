@@ -2,10 +2,10 @@ package csw.common.framework.integration
 
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
+import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit}
 import com.typesafe.config.ConfigFactory
 import csw.common.components.SampleComponentState._
@@ -85,6 +85,8 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     containerRef ! GetContainerMode(containerModeProbe.ref)
     containerModeProbe.expectMsg(ContainerMode.Idle)
 
+    waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe, 5.seconds)
+
     // resolve container using location service
     val containerLocation = Await.result(locationService.resolve(irisContainerConnection, 5.seconds), 5.seconds)
 
@@ -95,8 +97,6 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     resolvedContainerRef ! GetComponents(componentsProbe.ref)
     val components = componentsProbe.expectMsgType[Components].components
     components.size shouldBe 3
-
-    waitForContainerToMoveIntoRunningMode(containerRef, containerModeProbe, 5.seconds)
 
     // resolve all the components from container using location service
     val filterAssemblyLocation = Await.result(locationService.find(filterAssemblyConnection), 5.seconds)
@@ -110,11 +110,6 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     val assemblySupervisor  = filterAssemblyLocation.get.typedRef[SupervisorExternalMessage]
     val filterSupervisor    = instrumentHcdLocation.get.typedRef[SupervisorExternalMessage]
     val disperserSupervisor = disperserHcdLocation.get.typedRef[SupervisorExternalMessage]
-
-    // once all components from container moves to Running mode,
-    // container moves to Running mode and ready to accept external lifecycle messages
-    resolvedContainerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerMode.Running)
 
     // Subscribe to component's current state
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))

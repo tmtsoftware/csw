@@ -97,10 +97,10 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
       await(pathStatus(path, configId)) match {
         case PathStatus.NormalSize ⇒
-          log.info(s"Getting file for normal file at path ${path.toString}")
+          log.info(s"Getting normal file at path ${path.toString}")
           await(getNormalSize(path, svnRevision))
         case PathStatus.Annex ⇒
-          log.info(s"Getting file for annex file at path ${path.toString}")
+          log.info(s"Getting annex file at path ${path.toString}")
           await(getAnnex(path, svnRevision))
         case PathStatus.Missing ⇒ None
       }

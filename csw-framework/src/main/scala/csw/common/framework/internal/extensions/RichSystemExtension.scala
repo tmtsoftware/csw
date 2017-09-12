@@ -17,13 +17,14 @@ object RichSystemExtension {
   case class CreateActor[T](behavior: Behavior[T], name: String, props: Props)(val replyTo: ActorRef[ActorRef[T]])
       extends GuardianBehaviorMsg
 
-  def behavior: Behavior[GuardianBehaviorMsg] = Actor.immutable[GuardianBehaviorMsg] {
-    case (ctx, msg) ⇒
-      msg match {
-        case create: CreateActor[t] => create.replyTo ! ctx.spawn(create.behavior, create.name, create.props)
-      }
-      Actor.same
-  } onSignal {
+  def behavior: Behavior[GuardianBehaviorMsg] =
+    Actor.immutable[GuardianBehaviorMsg] {
+      case (ctx, msg) ⇒
+        msg match {
+          case create: CreateActor[t] => create.replyTo ! ctx.spawn(create.behavior, create.name, create.props)
+        }
+        Actor.same
+    } onSignal {
       case (ctx, Terminated(ref)) ⇒
         println("Rich system in terminated")
         ctx.system.terminate()

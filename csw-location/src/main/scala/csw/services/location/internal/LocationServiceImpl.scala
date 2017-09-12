@@ -37,7 +37,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
 
     //Get the location from this registration
     val location = registration.location(cswCluster.hostname)
-    log.info(s"Registering connection ${registration.connection.name} with location ${location.uri.toString}")
+    log.info(s"Registering connection: [${registration.connection.name}] with location: [${location.uri.toString}]")
 
     //Create a message handler for this connection
     val service = new Registry.Service(registration.connection)
@@ -73,7 +73,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
         (replicator ? updateRegistry).map {
           case _: UpdateSuccess[_] ⇒ {
             log.info(
-              s"Successfully registered connection: ${registration.connection.name} with location ${location.uri}"
+              s"Successfully registered connection: [${registration.connection.name}] with location [${location.uri}]"
             )
             registrationResult(location)
           }
@@ -97,7 +97,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Unregister the connection from CRDT
    */
   def unregister(connection: Connection): Future[Done] = {
-    log.info(s"Un-registering connection ${connection.name}")
+    log.info(s"Un-registering connection: [${connection.name}]")
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
 
@@ -137,7 +137,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Resolves the location for a connection from the local cache
    */
   def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]] = async {
-    log.info(s"Finding location for connection ${connection.name}")
+    log.info(s"Finding location for connection: [${connection.name}]")
     await(list).find(_.connection == connection).asInstanceOf[Option[L]]
   }
 
@@ -145,7 +145,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Resolve a location for the given connection
    */
   def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): Future[Option[L]] = async {
-    log.info(s"Resolving location for connection ${connection.name} within ${within.toString()}")
+    log.info(s"Resolving location for connection: [${connection.name}] within ${within.toString()}")
     val foundInLocalCache = await(find(connection))
     if (foundInLocalCache.isDefined) foundInLocalCache else await(resolveWithin(connection, within))
   }
@@ -187,7 +187,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Track the status of given connection
    */
   def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
-    log.debug(s"Tracking connection ${connection.name}")
+    log.debug(s"Tracking connection: [${connection.name}]")
     //Create a message handler for this connection
     val service = new Registry.Service(connection)
     //Get a stream that emits messages sent to the actor generated after materialization
@@ -214,7 +214,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
    * Subscribe to events of a connection by providing a callback.
    */
   override def subscribe(connection: Connection, callback: TrackingEvent ⇒ Unit): KillSwitch = {
-    log.info(s"Subscribing to connection ${connection.name}")
+    log.info(s"Subscribing to connection: [${connection.name}]")
     track(connection).to(Sink.foreach(callback)).run()
   }
 

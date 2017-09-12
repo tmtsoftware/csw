@@ -29,10 +29,7 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
   /**
    * Gives the ipv4 host address
    */
-  def hostname(): String = {
-    log.info(s"Fetching hostname for interface $interfaceName")
-    ipv4Address.getHostAddress
-  }
+  def hostname(): String = ipv4Address.getHostAddress
 
   /**
    * Gives the non-loopback, ipv4 address for the given network interface. If no interface name is provided then the address mapped

@@ -16,7 +16,6 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) exte
   def start(args: Array[String]): Option[HttpService] =
     new ArgsParser().parse(args).map {
       case Options(init, maybePort) =>
-        clusterSettings.logDebugString()
         val wiring = ServerWiring.make(clusterSettings, maybePort)
         import wiring._
 
