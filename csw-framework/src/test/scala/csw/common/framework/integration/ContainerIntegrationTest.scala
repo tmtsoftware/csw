@@ -15,7 +15,11 @@ import csw.common.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.common.framework.models.SupervisorCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorMode,
+  LifecycleStateSubscription
+}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models._
 import csw.param.states.CurrentState
@@ -121,7 +125,16 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     filterSupervisor ! LifecycleStateSubscription(Subscribe(filterLifecycleStateProbe.ref))
     disperserSupervisor ! LifecycleStateSubscription(Subscribe(disperserLifecycleStateProbe.ref))
 
-    Thread.sleep(50)
+    val supervisorModeProbe = TestProbe[SupervisorMode]
+    assemblySupervisor ! GetSupervisorMode(supervisorModeProbe.ref)
+    filterSupervisor ! GetSupervisorMode(supervisorModeProbe.ref)
+    disperserSupervisor ! GetSupervisorMode(supervisorModeProbe.ref)
+
+    // make sure that all the components are in running mode before sending lifecycle messages
+    supervisorModeProbe.expectMsg(SupervisorMode.Running)
+    supervisorModeProbe.expectMsg(SupervisorMode.Running)
+    supervisorModeProbe.expectMsg(SupervisorMode.Running)
+
     // lifecycle messages gets forwarded to all components and their corresponding handlers gets invoked
     // ********** Message: Lifecycle(GoOffline) **********
     resolvedContainerRef ! Lifecycle(GoOffline)
@@ -159,9 +172,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorMode.Running))
     disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(disperserSupervisor, SupervisorMode.Running))
 
-    Thread.sleep(100)
-    resolvedContainerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerMode.Running)
+    waitForContainerToMoveIntoRunningMode(resolvedContainerRef, containerModeProbe, 2.seconds) shouldBe true
 
     val containerTracker      = testkit.TestProbe()
     val filterAssemblyTracker = testkit.TestProbe()
