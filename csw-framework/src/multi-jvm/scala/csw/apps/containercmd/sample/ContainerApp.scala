@@ -1,4 +1,4 @@
-package csw.apps.containercmd
+package csw.apps.containercmd.sample
 
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
@@ -13,7 +13,7 @@ import csw.common.framework.models.{ContainerMessage, Restart}
 import csw.services.location.commons.ClusterSettings
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
-object FrameworkApp extends App {
+object ContainerApp extends App {
   private val clusterSettings: ClusterSettings = ClusterSettings().withManagementPort(5555)
   private val system: ActorSystem              = clusterSettings.system
   implicit val actorSystem                     = system.toTyped
