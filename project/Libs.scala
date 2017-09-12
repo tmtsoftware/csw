@@ -1,4 +1,5 @@
 import sbt._
+import com.trueaccord.scalapb.compiler.Version.scalapbVersion
 
 object Libs {
   val ScalaVersion = "2.12.3"
@@ -22,6 +23,7 @@ object Libs {
   val `gson`                         = "com.google.code.gson"   % "gson"                          % "2.8.2" //Apache 2.0
   val `play-json`                    = "com.typesafe.play"      %% "play-json"                    % "2.6.6" //Apache 2.0
   val `play-json-extensions`         = "ai.x"                   %% "play-json-extensions"         % "0.10.0"
+  val `scalapb-runtime`              = "com.trueaccord.scalapb" %% "scalapb-runtime"              % scalapbVersion % "protobuf"
 }
 
 object Jackson {

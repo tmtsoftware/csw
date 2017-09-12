@@ -1,3 +1,4 @@
+addSbtPlugin("com.thesamet"                      % "sbt-protoc"             % "0.99.11")
 addSbtPlugin("org.scalastyle"                    %% "scalastyle-sbt-plugin" % "1.0.0")
 addSbtPlugin("com.geirsson"                      % "sbt-scalafmt"           % "1.3.0")
 addSbtPlugin("com.dwijnand"                      % "sbt-dynver"             % "2.0.0")
@@ -16,6 +17,8 @@ addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                % "0
 
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-RC12")
 classpathTypes += "maven-plugin"
+
+libraryDependencies += "com.trueaccord.scalapb" %% "compilerplugin" % "0.6.0"
 
 scalacOptions ++= Seq(
   "-encoding",

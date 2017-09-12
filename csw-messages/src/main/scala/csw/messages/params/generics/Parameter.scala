@@ -5,6 +5,9 @@ import java.util.Optional
 
 import csw.messages.TMTSerializable
 import csw.messages.params.models.Units
+import csw.param.ParamSerializable
+import csw.param.pb.PbFormat
+import csw.units.Units
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
@@ -54,6 +57,17 @@ object Parameter extends DefaultJsonProtocol {
     }
 
   def apply[T](implicit x: JsonFormat[Parameter[T]]): JsonFormat[Parameter[T]] = x
+
+//  implicit def pbFormat[S: PbFormat]: PbFormat[Parameter[S]] = new PbFormat[Parameter[S]] {
+//    override def read(bytes: Array[Byte]): Parameter[S] = Parameter(
+//
+//    )
+//
+//    override def write(x: Parameter[S]): Array[Byte] = {
+//      csw_params.parameter.Parameter()
+//        .withName(x.keyName).withUnits(csw_params.units.Units.fromName(x.units.entryName).ge)
+//    }
+//  }
 }
 
 case class Parameter[S: JsonFormat: ClassTag] private[messages] (

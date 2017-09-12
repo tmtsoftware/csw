@@ -1,6 +1,9 @@
 package csw.messages.params.models
 
 import csw.messages.TMTSerializable
+import com.google.protobuf.wrappers.{Int32Value, StringValue}
+import csw.param.pb.PbFormat
+import csw_params.units.PbUnits
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
 
@@ -17,6 +20,10 @@ object Units extends Enum[Units] {
 
   override def values: immutable.IndexedSeq[Units] = findValues
   implicit val format: JsonFormat[Units]           = enumFormat(this)
+//  implicit def pbFormat: PbFormat[Units] = new PbFormat[Units] {
+//    override def read(bytes: Array[Byte]): Units = PbUnits().
+//    override def write(x: Units): Array[Byte]    = ???
+//  }
 
   // SI units
   object angstrom    extends Units("Anstrom", "10 -1 nm")

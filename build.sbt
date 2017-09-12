@@ -45,7 +45,10 @@ lazy val `csw-messages` = project
     libraryDependencies ++= Dependencies.Messages
   )
   .settings(
-    Common.detectCycles := false
+    Common.detectCycles := false,
+    PB.targets in Compile := Seq(
+      scalapb.gen() -> (sourceManaged in Compile).value
+    )
   )
 
 lazy val `csw-logging-macros` = project
