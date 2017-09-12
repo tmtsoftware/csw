@@ -9,6 +9,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.apps.containercmd.exceptions.Exceptions.{FileNotFound, LocalFileNotFound}
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+import csw.common.framework.scaladsl.FrameworkLogger
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
@@ -18,12 +19,12 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 object ContainerCmd {
-  def start(args: Array[String]): Future[Option[ActorRef[_]]] = {
+  def start(args: Array[String]): Future[Option[ActorRef[_]]] =
     new ContainerCmd(ClusterAwareSettings).start(args)
-  }
 }
 
-private[containercmd] class ContainerCmd(clusterSettings: ClusterSettings, startLogging: Boolean = true) {
+private[containercmd] class ContainerCmd(clusterSettings: ClusterSettings, startLogging: Boolean = true)
+    extends FrameworkLogger.Simple {
 
   lazy val actorSystem: ActorSystem = clusterSettings.system
   lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
@@ -36,7 +37,7 @@ private[containercmd] class ContainerCmd(clusterSettings: ClusterSettings, start
         await(createComponent(standalone, wiring, configF))
       } recover {
         case NonFatal(ex) ⇒
-          println(s"log.error(${ex.getMessage}, $ex)")
+          log.error(s"${ex.getMessage}", ex = ex)
           shutdown
           throw ex
       }
@@ -65,27 +66,22 @@ private[containercmd] class ContainerCmd(clusterSettings: ClusterSettings, start
     wiring.actorRuntime.shutdown()
   }
 
-  private def createComponent(
-      standalone: Boolean,
-      wiring: FrameworkWiring,
-      config: Config
-  ): Future[ActorRef[_]] = {
+  private def createComponent(standalone: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] = {
     if (standalone) Standalone.spawn(config, wiring)
     else Container.spawn(config, wiring)
   }
 
-  private def getConfig(isLocal: Boolean, inputFilePath: Path): Future[Config] = {
+  private def getConfig(isLocal: Boolean, inputFilePath: Path): Future[Config] = async {
     if (isLocal) {
-      if (Files.exists(inputFilePath)) Future { ConfigFactory.parseFile(inputFilePath.toFile) } else
-        throw LocalFileNotFound(inputFilePath)
+      if (Files.exists(inputFilePath)) ConfigFactory.parseFile(inputFilePath.toFile)
+      else throw LocalFileNotFound(inputFilePath)
     } else {
-      val configF = async {
-        val maybeData = await(wiring.configService.getActive(inputFilePath))
+      val maybeData = await(wiring.configService.getActive(inputFilePath))
 
-        if (maybeData.isDefined) await(maybeData.get.toConfigObject)
-        else throw FileNotFound(inputFilePath)
-      }
-      configF
+      if (maybeData.isDefined) await(maybeData.get.toConfigObject)
+      else throw FileNotFound(inputFilePath)
     }
   }
+
+  override protected val componentName = "ContainerCmdApp"
 }
