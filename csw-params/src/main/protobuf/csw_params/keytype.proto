@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package csw_params;
+
+enum PbKeyType {
+    BooleanKey      = 0;
+    ByteKey         = 1;
+    CharKey         = 2;
+    ShortKey        = 3;
+    LongKey         = 4;
+    IntKey          = 5;
+    FloatKey        = 6;
+    DoubleKey       = 7;
+    TimestampKey    = 8;
+
+    ByteArrayKey    = 9;
+    ShortArrayKey   = 10;
+    LongArrayKey    = 11;
+    IntArrayKey     = 12;
+    FloatArrayKey   = 13;
+    DoubleArrayKey  = 14;
+}

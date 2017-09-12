@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package csw_params;
+
+enum PbUnits {
+    // SI units
+    angstrom    = 0;
+    arcmin      = 1;
+    arcsec      = 2;
+    day         = 3;
+    degree      = 4;
+    elvolt      = 5;
+    gram        = 6;
+    hour        = 7;
+    hertz       = 8;
+    joule       = 9;
+    kelvin      = 10;
+    kilogram    = 11;
+    kilometer   = 12;
+    liter       = 13;
+    meter       = 14;
+    marcsec     = 15;
+    millimeter  = 16;
+    millisecond = 17;
+    micron      = 18;
+    micrometer  = 19;
+    minute      = 20;
+    newton      = 21;
+    pascal      = 22;
+    radian      = 23;
+    second      = 24;
+    sday        = 25;
+    steradian   = 26;
+    microarcsec = 27;
+    volt        = 28;
+    watt        = 29;
+    week        = 30;
+    year        = 31;
+
+    // CGS units
+    coulomb    = 32;
+    centimeter = 33;
+    erg        = 34;
+
+    // Astrophsics units
+    au        = 35;
+    jansky    = 36;
+    lightyear = 37;
+    mag       = 38;
+
+    // Imperial units
+    cal   = 39;
+    foot  = 40;
+    inch  = 41;
+    pound = 42;
+    mile  = 43;
+    ounce = 44;
+    yard  = 45;
+
+    // Others - engineering
+    NoUnits = 46;
+    encoder = 47;
+    count   = 48;
+    pix     = 49;
+}

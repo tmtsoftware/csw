@@ -1,8 +1,10 @@
 package csw.param.pb
 
+import com.google.protobuf.ByteString
+
 trait PbFormat[T] {
-  def read(bytes: Array[Byte]): T
-  def write(x: T): Array[Byte]
+  def read(bytes: ByteString): T
+  def write(x: T): ByteString
 }
 
 object PbFormat {

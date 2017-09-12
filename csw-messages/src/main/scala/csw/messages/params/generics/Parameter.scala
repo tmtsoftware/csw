@@ -5,9 +5,14 @@ import java.util.Optional
 
 import csw.messages.TMTSerializable
 import csw.messages.params.models.Units
+import com.google.protobuf.ByteString
 import csw.param.ParamSerializable
 import csw.param.pb.PbFormat
 import csw.units.Units
+import csw_params.keytype.PbKeyType
+import csw_params.parameter.PbParameter
+import csw_params.parameter_types.Items
+import csw_params.units.PbUnits
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
@@ -58,16 +63,26 @@ object Parameter extends DefaultJsonProtocol {
 
   def apply[T](implicit x: JsonFormat[Parameter[T]]): JsonFormat[Parameter[T]] = x
 
-//  implicit def pbFormat[S: PbFormat]: PbFormat[Parameter[S]] = new PbFormat[Parameter[S]] {
-//    override def read(bytes: Array[Byte]): Parameter[S] = Parameter(
-//
-//    )
-//
-//    override def write(x: Parameter[S]): Array[Byte] = {
-//      csw_params.parameter.Parameter()
-//        .withName(x.keyName).withUnits(csw_params.units.Units.fromName(x.units.entryName).ge)
-//    }
-//  }
+  implicit def pbFormat[S: PbFormat: ClassTag: JsonFormat]: PbFormat[Parameter[S]] = new PbFormat[Parameter[S]] {
+    override def read(bytes: ByteString): Parameter[S] = {
+      val pbParameter = PbParameter.parseFrom(bytes.toByteArray)
+      Parameter(
+        pbParameter.name,
+        KeyType.withName(pbParameter.keyType.toString()).asInstanceOf[KeyType[S]],
+        pbParameter.items.get.values.map(x ⇒ PbFormat[S].read(x)).toArray[S],
+        Units.withName(pbParameter.units.toString())
+      )
+    }
+
+    override def write(x: Parameter[S]): ByteString = {
+      PbParameter()
+        .withName(x.keyName)
+        .withKeyType(PbKeyType.fromName(x.keyType.entryName).get)
+        .withUnits(PbUnits.fromName(x.units.entryName).get)
+        .withItems(Items().withValues(x.items.map(y ⇒ PbFormat[S].write(y))))
+        .toByteString
+    }
+  }
 }
 
 case class Parameter[S: JsonFormat: ClassTag] private[messages] (
