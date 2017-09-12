@@ -1,6 +1,5 @@
 package csw.common.framework.internal.supervisor
 
-import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.common.framework.exceptions.FailureRestart
@@ -19,7 +18,7 @@ import csw.common.framework.models.SupervisorIdleMessage._
 import csw.common.framework.models.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.ComponentBehaviorFactory
+import csw.common.framework.scaladsl.{ComponentBehaviorFactory, FrameworkLogger}
 import csw.param.states.CurrentState
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, RegistrationResult}
@@ -46,7 +45,7 @@ class SupervisorBehavior(
     pubSubBehaviorFactory: PubSubBehaviorFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
-) extends MutableBehavior[SupervisorMessage] {
+) extends FrameworkLogger.TypedActor[SupervisorMessage](ctx, componentInfo.name) {
 
   import SupervisorBehavior._
 

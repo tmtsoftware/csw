@@ -51,9 +51,9 @@ class TromboneHcd(componentName: String, loggingSystem: LoggingSystem) extends T
 
 class LogAdminTest extends AdminLogTestSuite with HttpSupport {
   import adminWiring.actorRuntime._
-  val componentName    = "tromboneHcd"
-  val tromboneActorRef = actorSystem.actorOf(TromboneHcd.props(componentName, loggingSystem), name = "TromboneActor")
-  val connection       = AkkaConnection(ComponentId(componentName, ComponentType.HCD))
+  val compName         = "tromboneHcd"
+  val tromboneActorRef = actorSystem.actorOf(TromboneHcd.props(compName, loggingSystem), name = "TromboneActor")
+  val connection       = AkkaConnection(ComponentId(compName, ComponentType.HCD))
   Await.result(adminWiring.locationService.register(AkkaRegistration(connection, tromboneActorRef)), 5.seconds)
 
   // DEOPSCSW-127: Runtime update for logging characteristics
@@ -75,7 +75,7 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
     val logLevel          = Level(config.getString("logLevel"))
     val akkaLevel         = Level(config.getString("akkaLogLevel"))
     val slf4jLevel        = Level(config.getString("slf4jLogLevel"))
-    val componentLogLevel = Level(config.getObject("component-log-levels").unwrapped().asScala(componentName).toString)
+    val componentLogLevel = Level(config.getObject("component-log-levels").unwrapped().asScala(compName).toString)
 
     logMetadata1 shouldBe LogMetadata(logLevel, akkaLevel, slf4jLevel, componentLogLevel)
 

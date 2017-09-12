@@ -1,6 +1,7 @@
 package csw.apps.clusterseed.app
 
 import akka.actor.{Actor, Props}
+import akka.typed.scaladsl.adapter._
 import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.Connection.AkkaConnection
@@ -10,7 +11,6 @@ import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-import akka.typed.scaladsl.adapter._
 
 object AppLogger extends ComponentLogger("app")
 

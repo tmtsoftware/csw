@@ -6,13 +6,12 @@ import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.common.framework.models.SupervisorIdleMessage.RegistrationComplete
 import csw.common.framework.models.FromComponentLifecycleMessage.Running
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.common.framework.models.SupervisorIdleMessage.InitializeTimeout
+import csw.common.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationComplete}
 import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}

@@ -1,6 +1,5 @@
 package csw.common.framework.internal.container
 
-import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{Behavior, PostStop, Signal, Terminated}
 import csw.common.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorMode}
@@ -9,6 +8,7 @@ import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, R
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models._
+import csw.common.framework.scaladsl.FrameworkLogger
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -22,7 +22,7 @@ class ContainerBehavior(
     supervisorInfoFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
-) extends MutableBehavior[ContainerMessage] {
+) extends FrameworkLogger.TypedActor[ContainerMessage](ctx, containerInfo.name) {
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
