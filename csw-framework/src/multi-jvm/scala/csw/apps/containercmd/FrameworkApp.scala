@@ -1,4 +1,4 @@
-package csw.common.framework
+package csw.apps.containercmd
 
 import akka.actor.ActorSystem
 import akka.typed.ActorRef

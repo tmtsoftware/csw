@@ -17,7 +17,13 @@ import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 
-class ContainerCmd(clusterSettings: ClusterSettings = ClusterAwareSettings, startLogging: Boolean = false) {
+object ContainerCmd {
+  def start(args: Array[String]): Option[ActorRef[_]] = {
+    new ContainerCmd(ClusterAwareSettings).start(args)
+  }
+}
+
+private[containercmd] class ContainerCmd(clusterSettings: ClusterSettings, startLogging: Boolean = true) {
 
   lazy val actorSystem: ActorSystem = clusterSettings.system
   lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)

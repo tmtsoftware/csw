@@ -1,4 +1,4 @@
-package csw.common.framework
+package csw.apps.containercmd
 
 import java.io.FileWriter
 import java.nio.file.{Files, Path, Paths}
@@ -8,7 +8,6 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import csw.apps.containercmd.ContainerCmd
 import csw.common.components.{ComponentStatistics, SampleComponentState}
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
@@ -164,6 +163,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
       enterBarrier("offline")
+      Await.result(containerCmd.shutdown, 5.seconds)
     }
 
     runOn(member2) {
@@ -189,6 +189,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       testProbe.expectMsg(SupervisorMode.RunningOffline)
 
       Files.delete(standaloneConfFilePath)
+      Await.result(containerCmd.shutdown, 5.seconds)
     }
     enterBarrier("end")
   }

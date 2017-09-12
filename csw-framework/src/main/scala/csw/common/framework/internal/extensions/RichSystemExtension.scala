@@ -4,7 +4,7 @@ import akka.actor.{ActorSystem, Scheduler}
 import akka.typed.scaladsl.Actor
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.{ActorRef, Behavior, Props}
+import akka.typed.{ActorRef, Behavior, Props, Terminated}
 import akka.util.Timeout
 
 import scala.concurrent.Future
@@ -17,11 +17,18 @@ object RichSystemExtension {
   case class CreateActor[T](behavior: Behavior[T], name: String, props: Props)(val replyTo: ActorRef[ActorRef[T]])
       extends GuardianBehaviorMsg
 
-  def behavior: Behavior[GuardianBehaviorMsg] = Actor.immutable {
-    case (ctx, create: CreateActor[t]) ⇒
-      create.replyTo ! ctx.spawn(create.behavior, create.name, create.props)
+  def behavior: Behavior[GuardianBehaviorMsg] = Actor.immutable[GuardianBehaviorMsg] {
+    case (ctx, msg) ⇒
+      msg match {
+        case create: CreateActor[t] => create.replyTo ! ctx.spawn(create.behavior, create.name, create.props)
+      }
       Actor.same
-  }
+  } onSignal {
+      case (ctx, Terminated(ref)) ⇒
+        println("Rich system in terminated")
+        ctx.system.terminate()
+        Actor.stopped
+    }
 
   class RichSystem(val system: ActorSystem) {
     implicit def sched: Scheduler = system.scheduler
