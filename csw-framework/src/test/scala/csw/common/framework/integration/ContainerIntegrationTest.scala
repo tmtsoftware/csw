@@ -68,7 +68,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
 
     val wiring = FrameworkWiring.make(containerActorSystem)
     // start a container and verify it moves to running mode
-    val containerRef = Container.spawn(ConfigFactory.load("container.conf"), wiring)
+    val containerRef = Await.result(Container.spawn(ConfigFactory.load("container.conf"), wiring), 5.seconds)
 
     val componentsProbe    = TestProbe[Components]("comp-probe")
     val containerModeProbe = TestProbe[ContainerMode]("container-mode-probe")

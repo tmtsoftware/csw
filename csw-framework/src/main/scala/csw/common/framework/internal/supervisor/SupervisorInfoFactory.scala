@@ -7,7 +7,7 @@ import csw.common.framework.models.{Component, ComponentInfo, ContainerIdleMessa
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
 
 import scala.async.Async._
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.control.NonFatal
 
 class SupervisorInfoFactory {
@@ -17,11 +17,11 @@ class SupervisorInfoFactory {
       componentInfo: ComponentInfo,
       locationService: LocationService
   ): Future[Option[SupervisorInfo]] = {
-    val system                = ActorSystemFactory.remote(s"${componentInfo.name}-system")
-    val richSystem            = new RichSystem(system)
-    implicit val ec           = system.dispatcher
-    val registrationFactory   = new RegistrationFactory
-    val pubSubBehaviorFactory = new PubSubBehaviorFactory
+    val system                                = ActorSystemFactory.remote(s"${componentInfo.name}-system")
+    implicit val ec: ExecutionContextExecutor = system.dispatcher
+    val richSystem                            = new RichSystem(system)
+    val registrationFactory                   = new RegistrationFactory
+    val pubSubBehaviorFactory                 = new PubSubBehaviorFactory
 
     async {
       val supervisorBehavior = {

@@ -44,6 +44,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
   import config._
 
   implicit val actorSystem: ActorSystem[_] = system.toTyped
+  implicit val ec                          = actorSystem.executionContext
   implicit val testkit: TestKitSettings    = TestKitSettings(actorSystem)
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
@@ -127,8 +128,9 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       // only file path is provided, by default - file will be fetched from configuration service
       // and will be considered as container configuration.
-      val args         = Array("/laser_container.conf")
-      val containerRef = containerCmd.start(args).get.asInstanceOf[ActorRef[ContainerExternalMessage]]
+      val args = Array("/laser_container.conf")
+      val containerRef =
+        Await.result(containerCmd.start(args), 5.seconds).map(_.asInstanceOf[ActorRef[ContainerExternalMessage]]).get
 
       waitForContainerToMoveIntoRunningMode(containerRef, testProbe, 5.seconds) shouldBe true
 
@@ -176,8 +178,9 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       // when sbt-assembly creates fat jar
       val standaloneConfFilePath = createStandaloneTmpFile()
 
-      val args          = Array("--standalone", "--local", standaloneConfFilePath.toString)
-      val supervisorRef = containerCmd.start(args).get.asInstanceOf[ActorRef[SupervisorExternalMessage]]
+      val args = Array("--standalone", "--local", standaloneConfFilePath.toString)
+      val supervisorRef =
+        Await.result(containerCmd.start(args), 5.seconds).map(_.asInstanceOf[ActorRef[SupervisorExternalMessage]]).get
 
       waitForSupervisorToMoveIntoRunningMode(supervisorRef, testProbe, 5.seconds) shouldBe true
       enterBarrier("running")
