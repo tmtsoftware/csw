@@ -67,6 +67,7 @@ class SampleComponentHandlers(
 
   override def onShutdown(): Future[Unit] = {
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    Thread.sleep(100)
     Future.unit
   }
 }

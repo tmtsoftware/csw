@@ -130,7 +130,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       // and will be considered as container configuration.
       val args = Array("/laser_container.conf")
       val containerRef =
-        Await.result(containerCmd.start(args), 5.seconds).map(_.asInstanceOf[ActorRef[ContainerExternalMessage]]).get
+        Await.result(containerCmd.start(args), 15.seconds).map(_.asInstanceOf[ActorRef[ContainerExternalMessage]]).get
 
       waitForContainerToMoveIntoRunningMode(containerRef, testProbe, 5.seconds) shouldBe true
 
@@ -152,7 +152,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       // resolve and send message to component running in different jvm or on different physical machine
       val etonSupervisorF =
         locationService.resolve(AkkaConnection(ComponentId("Eton", ComponentType.HCD)), 2.seconds)
-      val etonSupervisorLocation = Await.result(etonSupervisorF, 5.seconds).get
+      val etonSupervisorLocation = Await.result(etonSupervisorF, 15.seconds).get
 
       val etonSupervisorTypedRef = etonSupervisorLocation.typedRef[SupervisorExternalMessage]
       val compStateProbe         = TestProbe[CurrentState]
@@ -180,7 +180,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val args = Array("--standalone", "--local", standaloneConfFilePath.toString)
       val supervisorRef =
-        Await.result(containerCmd.start(args), 5.seconds).map(_.asInstanceOf[ActorRef[SupervisorExternalMessage]]).get
+        Await.result(containerCmd.start(args), 15.seconds).map(_.asInstanceOf[ActorRef[SupervisorExternalMessage]]).get
 
       waitForSupervisorToMoveIntoRunningMode(supervisorRef, testProbe, 5.seconds) shouldBe true
       enterBarrier("running")
