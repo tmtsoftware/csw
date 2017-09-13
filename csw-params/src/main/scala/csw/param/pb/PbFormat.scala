@@ -27,7 +27,7 @@ object PbFormat {
     override def toBase(custom: Array[T]): Items = Items().withValues(custom.map(x ⇒ PbFormat[T].toBase(x)))
   }
 
-  def genericFormat[PbType <: GeneratedMessage with Message[PbType], CswType](
+  implicit def genericFormat[PbType <: GeneratedMessage with Message[PbType], CswType](
       implicit mapper: TypeMapper[PbType, CswType],
       companion: GeneratedMessageCompanion[PbType]
   ): PbFormat[CswType] =

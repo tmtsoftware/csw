@@ -84,7 +84,7 @@ object Parameter {
           .withItems(PbFormat.arrayTypeMapper[S].toBase(x.items.array))
     }
 
-  implicit def pbFormat[S: ClassTag: JsonFormat: PbFormat]: PbFormat[Parameter[S]] = PbFormat.genericFormat
+//  implicit def pbFormat[S: ClassTag: JsonFormat: PbFormat]: PbFormat[Parameter[S]] = PbFormat.genericFormat
 }
 
 case class Parameter[S: JsonFormat: ClassTag] private[messages] (
