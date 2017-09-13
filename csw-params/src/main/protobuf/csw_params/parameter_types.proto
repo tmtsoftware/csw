@@ -3,8 +3,6 @@ syntax = "proto3";
 package csw_params;
 
 import "csw_params/keytype.proto";
-import "google/protobuf/any.proto";
-
 
 message Items {
     repeated bytes values = 1;

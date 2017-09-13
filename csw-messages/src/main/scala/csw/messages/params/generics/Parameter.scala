@@ -6,6 +6,7 @@ import java.util.Optional
 import csw.messages.TMTSerializable
 import csw.messages.params.models.Units
 import com.google.protobuf.ByteString
+import com.trueaccord.scalapb.TypeMapper
 import csw.param.ParamSerializable
 import csw.param.pb.PbFormat
 import csw.units.Units
@@ -63,26 +64,27 @@ object Parameter extends DefaultJsonProtocol {
 
   def apply[T](implicit x: JsonFormat[Parameter[T]]): JsonFormat[Parameter[T]] = x
 
-  implicit def pbFormat[S: PbFormat: ClassTag: JsonFormat]: PbFormat[Parameter[S]] = new PbFormat[Parameter[S]] {
-    override def read(bytes: ByteString): Parameter[S] = {
-      val pbParameter = PbParameter.parseFrom(bytes.toByteArray)
-      Parameter(
+  implicit def typeMapper[S: PbFormat: ClassTag: JsonFormat]: TypeMapper[PbParameter, Parameter[S]] =
+    new TypeMapper[PbParameter, Parameter[S]] {
+      override def toCustom(pbParameter: PbParameter): Parameter[S] = Parameter(
         pbParameter.name,
         KeyType.withName(pbParameter.keyType.toString()).asInstanceOf[KeyType[S]],
         pbParameter.items.get.values.map(x ⇒ PbFormat[S].read(x)).toArray[S],
         Units.withName(pbParameter.units.toString())
       )
+
+      override def toBase(x: Parameter[S]): PbParameter =
+        PbParameter()
+          .withName(x.keyName)
+          .withKeyType(PbKeyType.fromName(x.keyType.entryName).get)
+          .withUnits(PbUnits.fromName(x.units.entryName).get)
+          .withItems(Items().withValues(x.items.map(y ⇒ PbFormat[S].write(y))))
     }
 
-    override def write(x: Parameter[S]): ByteString = {
-      PbParameter()
-        .withName(x.keyName)
-        .withKeyType(PbKeyType.fromName(x.keyType.entryName).get)
-        .withUnits(PbUnits.fromName(x.units.entryName).get)
-        .withItems(Items().withValues(x.items.map(y ⇒ PbFormat[S].write(y))))
-        .toByteString
-    }
-  }
+  implicit def dd[S: PbFormat: ClassTag: JsonFormat]: PbFormat[Parameter[S]] =
+    PbFormat.genericFormat[PbParameter, Parameter[S]]
+
+  implicitly[PbFormat[Parameter[Int]]]
 }
 
 case class Parameter[S: JsonFormat: ClassTag] private[messages] (

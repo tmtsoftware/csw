@@ -3,7 +3,7 @@ package csw.param
 import com.google.protobuf.wrappers.BoolValue
 import csw_params.keytype.PbKeyType
 import csw_params.parameter.PbParameter
-import csw_params.parameter_types.Items
+import csw_params.parameter_types.{Booleans, Items}
 import csw_params.units.PbUnits
 
 object DD2 extends App {
