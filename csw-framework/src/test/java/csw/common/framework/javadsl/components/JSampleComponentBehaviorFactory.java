@@ -16,7 +16,7 @@ public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory<J
     }
 
     @Override
-    public JComponentHandlers<JComponentDomainMessage> make(
+    public JComponentHandlers<JComponentDomainMessage> jHandlers(
             ActorContext<ComponentMessage> ctx,
             ComponentInfo componentInfo,
             ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,

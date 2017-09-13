@@ -21,9 +21,9 @@ abstract class JComponentBehaviorFactory[Msg <: DomainMessage](
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
       locationService: LocationService
   ): ComponentHandlers[Msg] =
-    make(ctx.asJava, componentInfo, pubSubRef, locationService.asJava)
+    jHandlers(ctx.asJava, componentInfo, pubSubRef, locationService.asJava)
 
-  def make(
+  def jHandlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
