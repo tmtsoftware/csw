@@ -8,10 +8,10 @@ import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, R
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.FrameworkLogger
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
+import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -22,7 +22,7 @@ class ContainerBehavior(
     supervisorInfoFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
-) extends FrameworkLogger.TypedActor[ContainerMessage](ctx, containerInfo.name) {
+) extends ComponentLogger.TypedActor[ContainerMessage](ctx, containerInfo.name) {
 
   implicit val ec: ExecutionContext = ctx.executionContext
 

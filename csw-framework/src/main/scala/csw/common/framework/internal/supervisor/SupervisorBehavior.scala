@@ -18,11 +18,12 @@ import csw.common.framework.models.SupervisorIdleMessage._
 import csw.common.framework.models.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models._
-import csw.common.framework.scaladsl.{ComponentBehaviorFactory, FrameworkLogger}
+import csw.common.framework.scaladsl.ComponentBehaviorFactory
 import csw.param.states.CurrentState
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
+import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
@@ -45,7 +46,7 @@ class SupervisorBehavior(
     pubSubBehaviorFactory: PubSubBehaviorFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
-) extends FrameworkLogger.TypedActor[SupervisorMessage](ctx, componentInfo.name) {
+) extends ComponentLogger.TypedActor[SupervisorMessage](ctx, componentInfo.name) {
 
   import SupervisorBehavior._
 

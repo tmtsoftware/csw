@@ -1,10 +1,17 @@
 package csw.services.logging.components.trombone;
 
 import csw.services.logging.javadsl.ILogger;
+import csw.services.logging.javadsl.JComponentLoggerActor;
 
-public class JTromboneHCDSupervisorActor extends JTromboneHCDActorLogger{
+public class JTromboneHCDSupervisorActor extends JComponentLoggerActor {
 
-    private ILogger log = getLogger();
+    private ILogger log;
+    private String componentName;
+
+    public JTromboneHCDSupervisorActor(String componentName) {
+        this.componentName = componentName;
+        this.log = getLogger();
+    }
 
     @Override
     public Receive createReceive() {
@@ -16,5 +23,10 @@ public class JTromboneHCDSupervisorActor extends JTromboneHCDActorLogger{
                 .match(String.class, msg -> msg.equals("error"), msg -> log.error(() -> msg))
                 .match(String.class, msg -> msg.equals("fatal"), msg -> log.fatal(() -> msg))
                 .build();
+    }
+
+    @Override
+    public String componentName() {
+        return this.componentName;
     }
 }

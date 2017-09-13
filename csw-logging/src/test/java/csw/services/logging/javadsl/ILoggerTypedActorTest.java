@@ -60,7 +60,7 @@ public class ILoggerTypedActorTest {
     @Test
     public void testDefaultLogConfigurationForActor() throws InterruptedException {
 
-        ActorRef<LogCommand> irisTyped = Adapter.spawn(actorSystem, JIrisSupervisorTypedActor.irisBeh(), "irisTyped");
+        ActorRef<LogCommand> irisTyped = Adapter.spawn(actorSystem, JIrisSupervisorTypedActor.irisBeh("jIRISTyped"), "irisTyped");
 
         String actorPath = irisTyped.path().toString();
         String className = JIrisSupervisorTypedActor.class.getName();

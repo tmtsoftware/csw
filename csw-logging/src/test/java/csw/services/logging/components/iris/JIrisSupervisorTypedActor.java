@@ -7,19 +7,23 @@ import akka.typed.javadsl.ActorContext;
 import akka.typed.javadsl.ReceiveBuilder;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.LogCommand;
+import csw.services.logging.javadsl.JComponentLoggerTypedActor;
 
-public class JIrisSupervisorTypedActor extends JIrisTypedActorLogger<LogCommand> {
+public class JIrisSupervisorTypedActor extends JComponentLoggerTypedActor<LogCommand> {
 
-    private ActorContext<LogCommand> actorContext = null;
-    private ILogger log = getLogger();
+    private ActorContext<LogCommand> actorContext;
+    private ILogger log;
+    private String componentName;
 
-    private JIrisSupervisorTypedActor(ActorContext<LogCommand> actorContext) {
+    private JIrisSupervisorTypedActor(ActorContext<LogCommand> actorContext, String componentName) {
         super(actorContext);
         this.actorContext = actorContext;
+        this.componentName = componentName;
+        this.log = getLogger();
     }
 
-    public static <LogCommand> Behavior<LogCommand> irisBeh() {
-        return Actor.mutable(ctx -> (MutableBehavior<LogCommand>) new JIrisSupervisorTypedActor((ActorContext<csw.services.logging.LogCommand>) ctx));
+    public static <LogCommand> Behavior<LogCommand> irisBeh(String componentName) {
+        return Actor.mutable(ctx -> (MutableBehavior<LogCommand>) new JIrisSupervisorTypedActor((ActorContext<csw.services.logging.LogCommand>) ctx, componentName));
     }
 
     @Override
@@ -63,5 +67,10 @@ public class JIrisSupervisorTypedActor extends JIrisTypedActorLogger<LogCommand>
                             return Actor.same();
                         });
         return builder.build();
+    }
+
+    @Override
+    public String componentName() {
+        return this.componentName;
     }
 }

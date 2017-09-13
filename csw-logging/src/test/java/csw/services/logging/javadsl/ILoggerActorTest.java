@@ -58,7 +58,7 @@ public class ILoggerActorTest {
     }
     @Test
     public void testDefaultLogConfigurationForActor() throws InterruptedException {
-        ActorRef tromboneActor = actorSystem.actorOf(Props.create(JTromboneHCDSupervisorActor.class), "JTromboneActor");
+        ActorRef tromboneActor = actorSystem.actorOf(Props.create(JTromboneHCDSupervisorActor.class, "jTromboneHcdActor"), "JTromboneActor");
         String actorPath = tromboneActor.path().toString();
         String className = JTromboneHCDSupervisorActor.class.getName();
 

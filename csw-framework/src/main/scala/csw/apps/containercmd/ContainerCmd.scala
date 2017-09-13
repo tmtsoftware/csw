@@ -9,10 +9,9 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.apps.containercmd.exceptions.Exceptions.{FileNotFound, LocalFileNotFound}
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.common.framework.scaladsl.FrameworkLogger
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.logging.scaladsl.LoggingSystemFactory
+import csw.services.logging.scaladsl.{ComponentLogger, LoggingSystemFactory}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -24,7 +23,7 @@ object ContainerCmd {
 }
 
 private[containercmd] class ContainerCmd(clusterSettings: ClusterSettings, startLogging: Boolean = true)
-    extends FrameworkLogger.Simple {
+    extends ComponentLogger.Simple {
 
   lazy val actorSystem: ActorSystem = clusterSettings.system
   lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)

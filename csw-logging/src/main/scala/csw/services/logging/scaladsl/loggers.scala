@@ -27,6 +27,8 @@ class ComponentLogger(_componentName: String) extends BasicLogger {
   abstract class TypedActor[T](ctx: ActorContext[T]) extends super.TypedActor[T](ctx, _componentName)
 }
 
+object ComponentLogger extends BasicLogger
+
 class BasicLogger {
 
   /**

@@ -10,7 +10,8 @@ import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models.{RunningMessage, _}
-import csw.common.framework.scaladsl.{ComponentHandlers, FrameworkLogger}
+import csw.common.framework.scaladsl.ComponentHandlers
+import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
@@ -26,7 +27,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     ctx: ActorContext[ComponentMessage],
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers[Msg]
-) extends FrameworkLogger.TypedActor[ComponentMessage](ctx, lifecycleHandlers.componentName) {
+) extends ComponentLogger.TypedActor[ComponentMessage](ctx, lifecycleHandlers.componentName) {
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
