@@ -2,9 +2,7 @@ package csw.services.logging.components
 
 import csw.services.logging.scaladsl.ComponentLogger
 
-object TromboneAssemblyLogger extends ComponentLogger("tromboneAssembly")
-
-class TromboneAssembly() extends TromboneAssemblyLogger.Simple {
+class TromboneAssembly(compName: String) extends ComponentLogger.Simple {
   def startLogging(logs: Map[String, String]): Unit = {
     log.trace(logs("trace"))
     log.debug(logs("debug"))
@@ -13,4 +11,6 @@ class TromboneAssembly() extends TromboneAssemblyLogger.Simple {
     log.error(logs("error"))
     log.fatal(logs("fatal"))
   }
+
+  override protected val componentName = compName
 }

@@ -13,11 +13,15 @@ import csw.common.framework.models.ComponentMessage;
 import csw.common.framework.models.PubSub;
 import csw.param.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
+import csw.services.logging.javadsl.ILogger;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
 
 public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> {
+
+    private ILogger log = getLogger();
+
     private ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef;
 
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());

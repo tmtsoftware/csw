@@ -28,7 +28,7 @@ class TimingTest extends LoggingTestSuite with Timing {
     new LoggingSystem(loggingSystemName, "version", "localhost", actorSystem)
 
   private val irisActorRef =
-    actorSystem.actorOf(IRIS.props(), name = "IRIS-Supervisor-Actor")
+    actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
   private val fileTimestamp   = FileAppender.decideTimestampForFile(ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC)))
   private val fullLogFileDir  = logFileDir + "/" + loggingSystemName

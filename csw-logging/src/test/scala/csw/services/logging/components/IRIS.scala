@@ -6,7 +6,7 @@ import csw.services.logging.scaladsl.{ComponentLogger, GenericLogger}
 
 object IRISLogger extends ComponentLogger(IRIS.COMPONENT_NAME)
 
-class IRIS() extends IRISLogger.Actor {
+class IRIS(componentName: String) extends ComponentLogger.Actor(componentName) {
 
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers
@@ -43,7 +43,7 @@ object IRIS {
   case object LogError
   case object LogFatal
 
-  def props() = Props(new IRIS())
+  def props(componentName: String) = Props(new IRIS(componentName))
 
   val irisLogs = Map(
     "trace" → "iris: trace",

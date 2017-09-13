@@ -9,7 +9,7 @@ import csw.services.logging.utils.LoggingTestSuite
 
 class ActorLoggingTest extends LoggingTestSuite {
   private val irisActorRef =
-    actorSystem.actorOf(IRIS.props(), name = "IRIS-Supervisor-Actor")
+    actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME), name = "IRIS-Supervisor-Actor")
 
   def sendMessagesToActor() = {
     irisActorRef ! LogTrace

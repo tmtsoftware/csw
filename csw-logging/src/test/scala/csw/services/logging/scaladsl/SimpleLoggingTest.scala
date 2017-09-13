@@ -157,7 +157,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
   test("should apply default log level provided in configuration file for normal logging messages") {
 
-    new TromboneAssembly().startLogging(logMsgMap)
+    new TromboneAssembly("tromboneAssembly").startLogging(logMsgMap)
     Thread.sleep(300)
 
     //   Verify that default level is TRACE in config
@@ -209,7 +209,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
       // confirm default log level is not changing when we change the component log level
       loggingSystem.getDefaultLogLevel shouldBe defaultLogLevel
 
-      new TromboneAssembly().startLogging(logMsgMap)
+      new TromboneAssembly("tromboneAssembly").startLogging(logMsgMap)
       Thread.sleep(200)
 
       val tromboneAssemblyLogs = filterLogsByComponentName(compName)

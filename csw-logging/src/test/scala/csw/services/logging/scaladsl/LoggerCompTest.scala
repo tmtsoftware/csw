@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class LoggerCompTest extends LoggingTestSuite {
 
-  private val irisSupervisorActorRef = actorSystem.actorOf(IRIS.props())
+  private val irisSupervisorActorRef = actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME))
   private val irisUtilActorRef       = actorSystem.actorOf(IrisActorUtil.props)
   private val irisTLA                = new IrisTLA()
   private val irisUtil               = new IrisUtil()

@@ -8,13 +8,14 @@ import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.LogCommand._
 import csw.services.logging.utils.LoggingTestSuite
 
-object TromboneTypedHcdLogger extends ComponentLogger("tromboneTypedHcdActor")
-
 object TromboneTypedActor {
-  def beh: Behavior[LogCommand] = Actor.mutable(ctx ⇒ new TromboneTypedActor(ctx))
+  def beh(componentName: String): Behavior[LogCommand] = Actor.mutable(ctx ⇒ new TromboneTypedActor(ctx, componentName))
 }
 
-class TromboneTypedActor(ctx: ActorContext[LogCommand]) extends TromboneTypedHcdLogger.TypedActor[LogCommand](ctx) {
+class TromboneTypedActor(
+    ctx: ActorContext[LogCommand],
+    componentName: String
+) extends ComponentLogger.TypedActor[LogCommand](ctx, componentName) {
   override def onMessage(msg: LogCommand): Behavior[LogCommand] = {
     msg match {
       case LogTrace => log.trace("Level is trace")
@@ -33,7 +34,8 @@ class TromboneTypedActor(ctx: ActorContext[LogCommand]) extends TromboneTypedHcd
 class TypedActorLoggingTest extends LoggingTestSuite {
   import akka.typed.scaladsl.adapter._
 
-  private val tromboneActorRef = actorSystem.spawn(TromboneTypedActor.beh, "TromboneTypedActor")
+  private val tromboneActorRef =
+    actorSystem.spawn(TromboneTypedActor.beh("tromboneTypedHcdActor"), "TromboneTypedActor")
 
   def sendMessagesToActor(): Unit = {
     tromboneActorRef ! LogTrace

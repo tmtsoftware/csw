@@ -10,6 +10,7 @@ import csw.common.framework.models._
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.param.states.CurrentState
 import csw.services.location.javadsl.ILocationService
+import csw.services.logging.javadsl.JComponentLogger
 
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -21,7 +22,8 @@ abstract class JComponentHandlers[Msg <: DomainMessage](
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: ILocationService
 )(klass: Class[Msg])
-    extends ComponentHandlers[Msg](ctx.asScala, componentInfo, pubSubRef, locationService.asScala)(ClassTag(klass)) {
+    extends ComponentHandlers[Msg](ctx.asScala, componentInfo, pubSubRef, locationService.asScala)(ClassTag(klass))
+    with JComponentLogger {
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
 
