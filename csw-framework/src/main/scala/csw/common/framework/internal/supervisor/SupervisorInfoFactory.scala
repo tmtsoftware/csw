@@ -37,6 +37,7 @@ class SupervisorInfoFactory {
       Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))
     } recover {
       case NonFatal(ex) ⇒
+        system.terminate()
         println(ex.getMessage) // FIXME
         None
     }

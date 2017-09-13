@@ -72,9 +72,13 @@ class ContainerBehavior(
 
   def onIdle(idleContainerMessage: ContainerIdleMessage): Unit = idleContainerMessage match {
     case SupervisorsCreated(supervisorInfos) ⇒
-      supervisors = supervisorInfos
-      supervisors.foreach(supervisor ⇒ ctx.watch(supervisor.component.supervisor))
-      updateRunningComponents()
+      if (supervisorInfos.isEmpty) {
+        ctx.system.terminate()
+      } else {
+        supervisors = supervisorInfos
+        supervisors.foreach(supervisorInfo ⇒ ctx.watch(supervisorInfo.component.supervisor))
+        updateRunningComponents()
+      }
     case SupervisorModeChanged(supervisor, supervisorMode) ⇒
       if (supervisorMode == SupervisorMode.Running) {
         runningComponents = (supervisors.find(_.component.supervisor == supervisor) ++ runningComponents).toSet
