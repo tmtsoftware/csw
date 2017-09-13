@@ -10,7 +10,7 @@ class CliApp(commandLineRunner: CommandLineRunner) {
       start(options)
     }
 
-  def start(options: Options) = {
+  def start(options: Options): Any = {
     options.op match {
       //adminApi
       case "create"             ⇒ commandLineRunner.create(options)

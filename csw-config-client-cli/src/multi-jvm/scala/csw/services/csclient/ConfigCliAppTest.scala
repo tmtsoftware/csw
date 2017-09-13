@@ -46,7 +46,9 @@ class ConfigCliAppTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAn
       serverWiring.httpService.registeredLazyBinding.await
       enterBarrier("server-started")
       enterBarrier("client1-create")
+      enterBarrier("client2-create-pass")
       enterBarrier("client1-update")
+      enterBarrier("client2-update-pass")
       enterBarrier("client1-setActive")
       enterBarrier("client2-create")
     }
@@ -59,9 +61,11 @@ class ConfigCliAppTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAn
 
       cliApp().start(Array("create", repoPath1, "-i", inputFilePath, "-c", comment))
       enterBarrier("client1-create")
+      enterBarrier("client2-create-pass")
 
       cliApp().start(Array("update", repoPath1, "-i", updatedInputFilePath, "-c", comment))
       enterBarrier("client1-update")
+      enterBarrier("client2-update-pass")
 
       cliApp().start(Array("setActiveVersion", repoPath1, "--id", "1", "-c", comment))
       enterBarrier("client1-setActive")
@@ -84,10 +88,12 @@ class ConfigCliAppTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAn
       enterBarrier("client1-create")
       val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
       actualConfigValue shouldBe inputFileContents
+      enterBarrier("client2-create-pass")
 
       enterBarrier("client1-update")
       val actualUpdatedConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await
       actualUpdatedConfigValue shouldBe updatedInputFileContents
+      enterBarrier("client2-update-pass")
 
       enterBarrier("client1-setActive")
       val actualActiveConfigValue = configService.getActive(Paths.get(repoPath1)).await.get.toStringF.await
