@@ -21,7 +21,7 @@ import org.scalatest.{FunSpec, Matchers}
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
 // DEOPSCSW-188: Efficient Serialization to/from JSON
-//DEOPSCSW-184: Change configurations - attributes and values
+// DEOPSCSW-184: Change configurations - attributes and values
 class KeyParameterTest extends FunSpec with Matchers {
 
   private val s1: String = "encoder"
@@ -1038,6 +1038,64 @@ class KeyParameterTest extends FunSpec with Matchers {
     }
   }
 
+  describe("test raDecKey") {
+
+    val keyName  = "raDecKey"
+    val raDec1   = RaDec(1.0, 2.0)
+    val raDec2   = RaDec(3.0, 4.0)
+    val raDecKey = KeyType.RaDecKey.make(keyName)
+
+    it("should allow single val") {
+      val ii = raDecKey.set(raDec1)
+      ii.values should be(Array(raDec1))
+      ii.get(0).get should equal(raDec1)
+    }
+
+    val listIn = Array(raDec1, raDec2)
+
+    it("should work with list, withUnits") {
+      val ii = raDecKey.set(listIn).withUnits(degree)
+      ii.units should be(degree)
+      ii.value(1) should equal(listIn(1))
+      ii.values should equal(listIn)
+    }
+
+    it("should work with list, units") {
+      val ii = raDecKey.set(listIn, degree)
+      ii.units should be(degree)
+      ii.value(1) should equal(listIn(1))
+      ii.values should equal(listIn)
+    }
+  }
+
+  describe("test stringKey") {
+
+    val keyName   = "stringKey"
+    val stringKey = KeyType.StringKey.make(keyName)
+
+    it("should allow single val") {
+      val ii = stringKey.set("First")
+      ii.values should be(Array("First"))
+      ii.get(0).get should equal("First")
+    }
+
+    val listIn = Array("First", "Second")
+
+    it("should work with list, withUnits") {
+      val ii = stringKey.set(listIn).withUnits(degree)
+      ii.units should be(degree)
+      ii.value(1) should equal(listIn(1))
+      ii.values should equal(listIn)
+    }
+
+    it("should work with list, units") {
+      val ii = stringKey.set(listIn, degree)
+      ii.units should be(degree)
+      ii.value(1) should equal(listIn(1))
+      ii.values should equal(listIn)
+    }
+  }
+
   describe("testing StructItem") {
     it("should allow creating Struct items") {
       val skey = StructKey.make("myStruct")
@@ -1059,29 +1117,34 @@ class KeyParameterTest extends FunSpec with Matchers {
   }
 
   // DEOPSCSW-190: Implement Unit Support
+  // DEOPSCSW-184: Change configurations - attributes and values
   describe("test setting multiple values") {
-    val t1 = KeyType.IntKey.make("test1")
+
+    val intKey = KeyType.IntKey.make("test1")
     it("should allow setting a single value") {
-      val i1 = t1.set(1)
+      val i1 = intKey.set(1)
       assert(i1.values === Array(1))
       assert(i1.units == NoUnits)
       assert(i1(0) == 1)
     }
     it("should allow setting several") {
-      val i1 = t1.set(1, 3, 5, 7)
+      val i1 = intKey.set(1, 3, 5, 7)
       assert(i1.values === Array(1, 3, 5, 7))
       assert(i1.units == NoUnits)
       assert(i1(1) == 3)
 
-      val i2 = t1.set(Array(10, 30, 50, 70)).withUnits(degree)
+      val i2 = intKey.set(Array(10, 30, 50, 70)).withUnits(degree)
       assert(i2.values === Array(10, 30, 50, 70))
       assert(i2.units == degree)
       assert(i2(1) == 30)
       assert(i2(3) == 70)
+
+      // to prove that existing Parameter is not mutated and every time `set` is called on key, it creates new Parameter
+      assert(i1.values === Array(1, 3, 5, 7))
     }
     it("should also allow setting with sequence") {
       val s1 = Array(2, 4, 6, 8)
-      val i1 = t1.set(s1).withUnits(meter)
+      val i1 = intKey.set(s1).withUnits(meter)
       assert(i1.values === s1)
       assert(i1.values.length == s1.length)
       assert(i1.units == meter)
