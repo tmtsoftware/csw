@@ -80,14 +80,15 @@ class SupervisorBehavior(
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
-      println(s"log.error(mode is $mode and actor is $componentRef)") //FIXME use log statement
       mode match {
         case SupervisorMode.Restart ⇒
+          log.info(s"Restarting component")
           mode = SupervisorMode.Idle
           registerWithLocationService()
         case SupervisorMode.Shutdown ⇒
+          log.info(s"Shutting down")
           ctx.system.terminate()
-        case _ ⇒
+        case _ ⇒ log.error(s"Terminated signal received for $componentRef when supervisor mode is $mode")
       }
       this
     case PostStop ⇒
@@ -188,7 +189,7 @@ class SupervisorBehavior(
     component = ctx.spawn[Nothing](
       Actor
         .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent, locationService))
-        .onFailure[FailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)), //FIXME to disable logs in test
+        .onFailure[FailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)),
       ComponentActor
     )
     ctx.watch(component)

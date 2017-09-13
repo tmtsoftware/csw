@@ -40,7 +40,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       case (_, msg: CommonMessage)                      ⇒ onCommon(msg)
       case (ComponentMode.Idle, msg: IdleMessage)       ⇒ onIdle(msg)
       case (ComponentMode.Running, msg: RunningMessage) ⇒ onRun(msg)
-      case _                                            ⇒ println(s"current context=$mode does not handle message=$msg")
+      case _                                            ⇒ println(s"current context=$mode does not handle message=$msg") //FIXME use log statement
     }
     this
   }
@@ -51,7 +51,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
         Await.result(lifecycleHandlers.onShutdown(), ComponentBehavior.shutdownTimeout)
       }
       //log exception if onShutdown fails and proceed with `Shutdown` or `Restart`
-      shutdownResult.failed.foreach(throwable ⇒ println(s"log.error($throwable)")) //FIXME use log statement
+      shutdownResult.failed.foreach(throwable ⇒ log.error(throwable.getMessage, ex = throwable)) //FIXME use log statement
       this
   }
 
@@ -75,7 +75,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case Lifecycle(message) ⇒ onLifecycle(message)
     case x: Msg             ⇒ lifecycleHandlers.onDomainMsg(x)
     case x: CommandMessage  ⇒ onRunningCompCommandMessage(x)
-    case _                  ⇒ println("wrong msg")
+    case msg                ⇒ log.error(s"Message $msg cannot be handled")
   }
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {

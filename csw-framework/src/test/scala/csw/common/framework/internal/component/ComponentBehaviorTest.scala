@@ -7,6 +7,7 @@ import csw.common.framework.models.FromComponentLifecycleMessage.Running
 import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
+import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
@@ -16,14 +17,20 @@ import scala.concurrent.Future
 // DEOPSCSW-166-CSW HCD Creation
 class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
+  trait TypedActorMock[T] { this: ComponentLogger.TypedActor[T] ⇒
+    override protected lazy val log: Logger = mock[Logger]
+  }
+
   class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
     val sampleComponentHandler: ComponentHandlers[ComponentDomainMessage] =
       mock[ComponentHandlers[ComponentDomainMessage]]
+    when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
+    when(sampleComponentHandler.componentName).thenReturn("test-component")
 
     val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
     val componentBehavior =
       new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleComponentHandler)
-    when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
+      with TypedActorMock[ComponentMessage]
   }
 
   test("component should start in idle mode") {

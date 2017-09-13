@@ -1,5 +1,6 @@
 package csw.common.framework.internal.supervisor
 
+import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
 import csw.common.ccs.CommandStatus.CommandResponse
@@ -22,7 +23,6 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.Tables.Table
 
-import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 /**
@@ -34,7 +34,6 @@ import scala.concurrent.duration.DurationInt
 // DEOPSCSW-176: Provide Infrastructure to manage TMT lifecycle
 // DEOPSCSW-177: Hooks for lifecycle management
 class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
-
   import csw.common.components.SampleComponentState._
 
   val supervisorModeProbe: TestProbe[SupervisorMode]             = TestProbe[SupervisorMode]
@@ -61,7 +60,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
-    supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
+    supervisorRef = untypedSystem.spawnAnonymous(supervisorBehavior)
   }
 
   test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {

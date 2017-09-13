@@ -2,6 +2,7 @@ package csw.common.framework.internal.supervisor
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.SampleComponentState._
 import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
@@ -18,8 +19,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.Answer
 
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 // DEOPSCSW-178: Lifecycle success/failure notification
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
@@ -105,7 +105,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
-    supervisorRef = Await.result(system.systemActorOf(supervisorBehavior, "comp-supervisor"), 5.seconds)
+    supervisorRef = untypedSystem.spawnAnonymous(supervisorBehavior)
   }
 
   private def createComponentHandlers(testMocks: FrameworkTestMocks) = {
@@ -116,6 +116,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
     val componentHandlers = mock[SampleComponentHandlers]
     when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
     when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
+    when(componentHandlers.componentName).thenReturn(hcdInfo.name)
     componentHandlers
   }
 

@@ -41,7 +41,8 @@ class ContainerBehavior(
       case (_, msg: ContainerCommonMessage)                ⇒ onCommon(msg)
       case (ContainerMode.Idle, msg: ContainerIdleMessage) ⇒ onIdle(msg)
       case (ContainerMode.Running, msg: Lifecycle)         ⇒ supervisors.foreach(_.component.supervisor ! msg)
-      case (_, message)                                    ⇒ println(s"Container in $mode received an unexpected message: $message")
+      case (_, message) ⇒
+        log.warn(s"Container in $mode received an unexpected message: $message") //FIXME use log statement
     }
     this
   }

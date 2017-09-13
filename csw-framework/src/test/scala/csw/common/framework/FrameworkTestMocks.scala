@@ -14,6 +14,7 @@ import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
+import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -51,4 +52,10 @@ class FrameworkTestMocks(
     )
   ).thenReturn(compStateProbe.ref)
 
+}
+
+object FrameworkTestMocks {
+  trait TypedActorMock[T] { this: ComponentLogger.TypedActor[T] ⇒
+    override protected lazy val log: Logger = MockitoSugar.mock[Logger]
+  }
 }

@@ -3,6 +3,7 @@ package csw.common.framework.internal.component
 import akka.typed.PostStop
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
+import csw.common.framework.FrameworkTestMocks.TypedActorMock
 import csw.common.framework.FrameworkTestSuite
 import csw.common.framework.models.FromComponentLifecycleMessage.Running
 import csw.common.framework.models.IdleMessage.Initialize
@@ -24,7 +25,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
+    when(sampleHcdHandler.componentName).thenReturn("test-component")
     val behavior = new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleHcdHandler)
+    with TypedActorMock[ComponentMessage]
 
     val runningComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
       behavior.onMessage(Initialize)
