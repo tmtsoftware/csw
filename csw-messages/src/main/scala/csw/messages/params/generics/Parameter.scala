@@ -6,6 +6,7 @@ import java.util.Optional
 import csw.messages.TMTSerializable
 import csw.messages.params.models.Units
 import com.google.protobuf.ByteString
+import com.google.protobuf.wrappers.StringValue
 import com.trueaccord.scalapb.TypeMapper
 import csw.param.ParamSerializable
 import csw.param.pb.PbFormat
@@ -21,7 +22,9 @@ import scala.collection.mutable
 import scala.compat.java8.OptionConverters.RichOptionForJava8
 import scala.reflect.ClassTag
 
-object Parameter extends DefaultJsonProtocol {
+object Parameter {
+
+  import DefaultJsonProtocol._
 
   private[generics] def apply[S: JsonFormat: ClassTag](
       keyName: String,
@@ -64,12 +67,12 @@ object Parameter extends DefaultJsonProtocol {
 
   def apply[T](implicit x: JsonFormat[Parameter[T]]): JsonFormat[Parameter[T]] = x
 
-  implicit def typeMapper[S: PbFormat: ClassTag: JsonFormat]: TypeMapper[PbParameter, Parameter[S]] =
+  implicit def typeMapper[S: ClassTag: JsonFormat: PbFormat]: TypeMapper[PbParameter, Parameter[S]] =
     new TypeMapper[PbParameter, Parameter[S]] {
       override def toCustom(pbParameter: PbParameter): Parameter[S] = Parameter(
         pbParameter.name,
         KeyType.withName(pbParameter.keyType.toString()).asInstanceOf[KeyType[S]],
-        pbParameter.items.get.values.map(x ⇒ PbFormat[S].read(x)).toArray[S],
+        PbFormat.arrayTypeMapper[S].toCustom(pbParameter.items.get),
         Units.withName(pbParameter.units.toString())
       )
 
@@ -77,14 +80,11 @@ object Parameter extends DefaultJsonProtocol {
         PbParameter()
           .withName(x.keyName)
           .withKeyType(PbKeyType.fromName(x.keyType.entryName).get)
-          .withUnits(PbUnits.fromName(x.units.entryName).get)
-          .withItems(Items().withValues(x.items.map(y ⇒ PbFormat[S].write(y))))
+          .withUnits(PbUnits.fromName(x.units.toString).get)
+          .withItems(PbFormat.arrayTypeMapper[S].toBase(x.items.array))
     }
 
-  implicit def dd[S: PbFormat: ClassTag: JsonFormat]: PbFormat[Parameter[S]] =
-    PbFormat.genericFormat[PbParameter, Parameter[S]]
-
-  implicitly[PbFormat[Parameter[Int]]]
+  implicit def pbFormat[S: ClassTag: JsonFormat: PbFormat]: PbFormat[Parameter[S]] = PbFormat.genericFormat
 }
 
 case class Parameter[S: JsonFormat: ClassTag] private[messages] (

@@ -2,6 +2,10 @@ package csw.messages.params.models
 
 import java.util
 
+import com.google.protobuf.ByteString
+import com.trueaccord.scalapb.TypeMapper
+import csw.param.pb.PbFormat
+import csw_params.parameter_types.Items
 import spray.json.JsonFormat
 
 import scala.collection.JavaConverters._
@@ -24,6 +28,12 @@ object ArrayData {
   implicit def fromArray[T](xs: Array[T]): ArrayData[T] = new ArrayData(xs)
 
   def fromArray[T: ClassTag](xs: T*): ArrayData[T] = new ArrayData(xs.toArray[T])
+
+  implicit def typeMapper[T: PbFormat: ClassTag]: TypeMapper[Items, ArrayData[T]] =
+    new TypeMapper[Items, ArrayData[T]] {
+      override def toCustom(base: Items): ArrayData[T] = PbFormat.arrayTypeMapper[T].toCustom(base)
+      override def toBase(custom: ArrayData[T]): Items = PbFormat.arrayTypeMapper[T].toBase(custom.values)
+    }
 }
 
 object JArrayData {
