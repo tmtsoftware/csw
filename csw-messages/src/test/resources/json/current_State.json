@@ -8,7 +8,7 @@
     "keyName": "charKey",
     "keyType": "CharKey",
     "values": ["A", "B", "C"],
-    "units": "[enc]"
+    "units": "encoder"
   }, {
     "keyName": "intArrayKey",
     "keyType": "IntArrayKey",
@@ -17,7 +17,7 @@
     }, {
       "data": [10, 20, 30, 40, 50]
     }],
-    "units": "[m]"
+    "units": "meter"
   },
   {
     "keyName": "timestampKey",
@@ -26,6 +26,6 @@
       "1970-01-01T00:00:00Z",
       "2017-09-04T16:28:00.123456789Z"
     ],
-    "units": "[s]"
+    "units": "second"
   }]
 }

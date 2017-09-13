@@ -13,7 +13,7 @@
         "B",
         "C"
       ],
-      "units": "[none]"
+      "units": "NoUnits"
     },
     {
       "keyName": "intKey",
@@ -23,7 +23,7 @@
         2,
         3
       ],
-      "units": "[m]"
+      "units": "meter"
     },
     {
       "keyName": "booleanKey",
@@ -32,7 +32,7 @@
         true,
         false
       ],
-      "units": "[none]"
+      "units": "NoUnits"
     },
     {
       "keyName": "timestampKey",
@@ -41,7 +41,7 @@
         "1970-01-01T00:00:00Z",
         "2017-09-04T16:28:00.123456789Z"
       ],
-      "units": "[s]"
+      "units": "second"
     }
 
   ]

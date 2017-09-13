@@ -2,7 +2,6 @@ package csw.messages.params.models
 
 import java.util
 
-import com.google.protobuf.ByteString
 import com.trueaccord.scalapb.TypeMapper
 import csw.param.pb.PbFormat
 import csw_params.parameter_types.Items

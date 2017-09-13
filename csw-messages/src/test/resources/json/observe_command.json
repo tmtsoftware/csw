@@ -15,7 +15,7 @@
       "values": [
         22
       ],
-      "units": "[none]"
+      "units": "NoUnits"
     },
     {
       "keyName": "expTime",
@@ -23,7 +23,7 @@
       "values": [
         "11:10"
       ],
-      "units": "[none]"
+      "units": "NoUnits"
     }
   ]
 }

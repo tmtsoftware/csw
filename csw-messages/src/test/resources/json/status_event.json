@@ -16,7 +16,7 @@
       "values": [
         22
       ],
-      "units": "[none]"
+      "units": "NoUnits"
     },
     {
       "keyName": "windspeed",
@@ -24,7 +24,7 @@
       "values": [
         44
       ],
-      "units": "[none]"
+      "units": "NoUnits"
     }
   ]
 }

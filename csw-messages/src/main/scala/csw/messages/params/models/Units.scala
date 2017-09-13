@@ -12,6 +12,8 @@ import scala.collection.immutable
 sealed abstract class Units(name: String, description: String) extends EnumEntry with TMTSerializable {
   // Should parameterize Units so concat can be created concat[A, B]
 //  override def toString: String = "[" + name + "]"
+  def getAbbreviation: String = s"[$abbreviation]"
+  def getDescription: String  = description
 }
 
 object Units extends Enum[Units] {
@@ -20,10 +22,6 @@ object Units extends Enum[Units] {
 
   override def values: immutable.IndexedSeq[Units] = findValues
   implicit val format: JsonFormat[Units]           = enumFormat(this)
-//  implicit def pbFormat: PbFormat[Units] = new PbFormat[Units] {
-//    override def read(bytes: Array[Byte]): Units = PbUnits().
-//    override def write(x: Units): Array[Byte]    = ???
-//  }
 
   // SI units
   case object angstrom    extends Units("Anstrom", "10 -1 nm")

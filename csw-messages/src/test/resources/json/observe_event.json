@@ -22,7 +22,7 @@
               "values": [
                 "12:13:14.1"
               ],
-              "units": "[none]"
+              "units": "NoUnits"
             },
             {
               "keyName": "dec",
@@ -30,7 +30,7 @@
               "values": [
                 "32:33:34.4"
               ],
-              "units": "[none]"
+              "units": "NoUnits"
             },
             {
               "keyName": "epoch",
@@ -38,12 +38,12 @@
               "values": [
                 1950.0
               ],
-              "units": "[none]"
+              "units": "NoUnits"
             }
           ]
         }
       ],
-      "units": "[none]"
+      "units": "NoUnits"
     }
   ]
 }
