@@ -5,6 +5,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
 import csw.common.framework.ComponentInfos._
+import csw.common.framework.FrameworkTestMocks.TypedActorMock
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.models.FromComponentLifecycleMessage.Running
 import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
@@ -40,7 +41,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
         new PubSubBehaviorFactory,
         registrationFactory,
         locationService
-      )
+      ) with TypedActorMock[SupervisorMessage]
     supervisor.onMessage(RegistrationComplete(registrationResult))
     verify(timer).startSingleTimer(
       SupervisorBehavior.InitializeTimerKey,

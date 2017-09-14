@@ -67,13 +67,14 @@ class SupervisorBehavior(
   registerWithLocationService()
 
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
+    log.debug(s"Supervisor in $mode state received a $msg message")
     (mode, msg) match {
       case (_, msg: SupervisorCommonMessage)                                                       ⇒ onCommon(msg)
       case (SupervisorMode.Idle, msg: SupervisorIdleMessage)                                       ⇒ onIdle(msg)
       case (SupervisorMode.Running | SupervisorMode.RunningOffline, msg: SupervisorRunningMessage) ⇒ onRunning(msg)
       case (SupervisorMode.Restart, msg: SupervisorRestartMessage)                                 ⇒ onRestarting(msg)
       case (_, message) =>
-        println(s"Supervisor in $mode received an unexpected message: $message")
+        log.error(s"Supervisor in $mode received an unexpected message: $message")
     }
     this
   }
@@ -100,27 +101,33 @@ class SupervisorBehavior(
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
     case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
     case GetSupervisorMode(replyTo)                    ⇒ replyTo ! mode
-    case Shutdown                                      ⇒ mode = SupervisorMode.Shutdown; ctx.stop(component);
     case Restart                                       ⇒ onRestart()
+    case Shutdown ⇒
+      log.debug(s"Supervisor is changing state from $mode to ${SupervisorMode.Shutdown}")
+      mode = SupervisorMode.Shutdown
+      ctx.stop(component)
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
     case RegistrationComplete(registrationResult) ⇒
+      log.info("Supervisor registered itself with location service")
       registrationOpt = Some(registrationResult)
       spawnAndWatchComponent()
     case RegistrationFailed(throwable) ⇒
-      println(s"log.error($throwable)") //FIXME use log statement
+      log.error(throwable.getMessage, ex = throwable)
       throw throwable
     case Running(componentRef) ⇒
+      log.debug(s"Supervisor is changing state from $mode to ${SupervisorMode.Running}")
       mode = SupervisorMode.Running
       timerScheduler.cancel(InitializeTimerKey)
       runningComponent = Some(componentRef)
-      maybeContainerRef foreach (_ ! SupervisorModeChanged(ctx.self, mode))
+      maybeContainerRef foreach { container ⇒
+        container ! SupervisorModeChanged(ctx.self, mode)
+        log.debug(s"Supervisor acknowledged container $container with its current state $mode")
+      }
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
     case InitializeTimeout ⇒
-      println("TLA initialization timed out") //FIXME use log statement
-    case RunTimeout ⇒
-      println("TLA onRun timed out") //FIXME use log statement
+      log.error("Component initialization timed out")
   }
 
   private def onRunning(supervisorRunningMessage: SupervisorRunningMessage): Unit = {
@@ -135,30 +142,33 @@ class SupervisorBehavior(
   }
 
   private def onRestart(): Unit = {
+    log.debug(s"Supervisor is changing state from $mode to ${SupervisorMode.Restart}")
     mode = SupervisorMode.Restart
     registrationOpt match {
       case Some(registrationResult) ⇒
         unRegisterFromLocationService(registrationResult)
       case None ⇒
-        println("log.warn(No valid RegistrationResult found to unregister.)") //FIXME use log statement
+        log.warn("No valid RegistrationResult found to unregister") //FIXME use log statement
         respawnComponent()
     }
   }
 
   private def onRestarting(msg: SupervisorRestartMessage): Unit = msg match {
     case UnRegistrationComplete ⇒
+      log.info("Supervisor unregistered itself from location service")
       respawnComponent()
     case UnRegistrationFailed(throwable) ⇒
-      println(s"log.error($throwable)") //FIXME use log statement
+      log.error(throwable.getMessage, ex = throwable)
       respawnComponent()
   }
 
   private def respawnComponent(): Unit = {
-//    registrationOpt = None
+    log.info("Supervisor re-spawning component")
     ctx.child(ComponentActor) match {
       case Some(componentRef) ⇒
         ctx.stop(component)
       case None ⇒
+        log.debug(s"Supervisor is changing state from $mode to ${SupervisorMode.Idle}")
         mode = SupervisorMode.Idle
         registerWithLocationService()
     }
@@ -166,12 +176,21 @@ class SupervisorBehavior(
 
   private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = {
     message match {
-      case GoOffline ⇒ if (mode == SupervisorMode.Running) mode = SupervisorMode.RunningOffline
-      case GoOnline  ⇒ if (mode == SupervisorMode.RunningOffline) mode = SupervisorMode.Running
+      case GoOffline ⇒
+        if (mode == SupervisorMode.Running) {
+          log.debug(s"Supervisor is changing state from $mode to ${SupervisorMode.RunningOffline}")
+          mode = SupervisorMode.RunningOffline
+        }
+      case GoOnline ⇒
+        if (mode == SupervisorMode.RunningOffline) {
+          log.debug(s"Supervisor is changing state from $mode to ${SupervisorMode.Running}")
+          mode = SupervisorMode.Running
+        }
     }
   }
 
   private def registerWithLocationService(): Unit = {
+    log.debug("Supervisor is registering with location service")
     locationService.register(akkaRegistration).onComplete {
       case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
       case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
@@ -186,6 +205,7 @@ class SupervisorBehavior(
   }
 
   private def spawnAndWatchComponent(): Unit = {
+    log.debug(s"Supervisor is spawning component")
     component = ctx.spawn[Nothing](
       Actor
         .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent, locationService))
