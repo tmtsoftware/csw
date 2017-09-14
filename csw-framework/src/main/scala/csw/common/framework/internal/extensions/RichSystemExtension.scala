@@ -30,7 +30,6 @@ object RichSystemExtension {
         Actor.same
     } onSignal {
       case (ctx, Terminated(ref)) ⇒
-        println("Rich system in terminated")
         ctx.system.terminate()
         Actor.stopped
     }

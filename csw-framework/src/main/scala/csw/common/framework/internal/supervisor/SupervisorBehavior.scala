@@ -80,18 +80,18 @@ class SupervisorBehavior(
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
+      log.error(s"Supervisor in $mode state received terminated signal from [$componentRef] component")
       mode match {
         case SupervisorMode.Restart ⇒
-          log.info(s"Restarting component")
           mode = SupervisorMode.Idle
           registerWithLocationService()
         case SupervisorMode.Shutdown ⇒
-          log.info(s"Shutting down")
           ctx.system.terminate()
         case _ ⇒ log.error(s"Terminated signal received for $componentRef when supervisor mode is $mode")
       }
       this
     case PostStop ⇒
+      log.error(s"Supervisor is shutting down")
       registrationOpt.foreach(registrationResult ⇒ registrationResult.unregister())
       this
   }

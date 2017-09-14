@@ -47,6 +47,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
     case PostStop ⇒
+      log.error(s"Component is shutting down")
       val shutdownResult = Try {
         Await.result(lifecycleHandlers.onShutdown(), ComponentBehavior.shutdownTimeout)
       }
