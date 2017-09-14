@@ -26,7 +26,7 @@ class ClusterConfirmationActor extends Actor {
 }
 
 object ClusterConfirmationActor {
-  def props() = Props(new ClusterConfirmationActor)
+  def props(): Props = Props(new ClusterConfirmationActor)
 
   case object HasJoinedCluster
   case object IsMemberUp

@@ -1,8 +1,9 @@
 package csw.common.framework.internal.wiring
 
 import akka.Done
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
+import csw.services.location.commons.CswCoordinatedShutdown
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -11,6 +12,5 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   implicit val mat: Materializer            = ActorMaterializer()
 
-  val coordinatedShutdown      = CoordinatedShutdown(actorSystem)
-  def shutdown(): Future[Done] = coordinatedShutdown.run()
+  def shutdown(): Future[Done] = CswCoordinatedShutdown.run(actorSystem)
 }
