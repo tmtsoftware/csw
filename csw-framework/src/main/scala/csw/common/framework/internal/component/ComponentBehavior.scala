@@ -36,11 +36,12 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   ctx.self ! Initialize
 
   def onMessage(msg: ComponentMessage): Behavior[ComponentMessage] = {
+    log.debug(s"Component in $mode state received a $msg message")
     (mode, msg) match {
       case (_, msg: CommonMessage)                      ⇒ onCommon(msg)
       case (ComponentMode.Idle, msg: IdleMessage)       ⇒ onIdle(msg)
       case (ComponentMode.Running, msg: RunningMessage) ⇒ onRun(msg)
-      case _                                            ⇒ println(s"current context=$mode does not handle message=$msg") //FIXME use log statement
+      case _                                            ⇒ log.error(s"Component in $mode state received an unexpected message: $msg")
     }
     this
   }
@@ -51,14 +52,16 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       val shutdownResult = Try {
         Await.result(lifecycleHandlers.onShutdown(), ComponentBehavior.shutdownTimeout)
       }
-      //log exception if onShutdown fails and proceed with `Shutdown` or `Restart`
-      shutdownResult.failed.foreach(throwable ⇒ log.error(throwable.getMessage, ex = throwable)) //FIXME use log statement
+      //log exception if onShutdown handler fails and proceed with `Shutdown` or `Restart`
+      shutdownResult.failed.foreach(throwable ⇒ log.error(throwable.getMessage, ex = throwable))
       this
   }
 
   private def onCommon(msg: CommonMessage): Unit = {
     msg match {
-      case UnderlyingHookFailed(exception) ⇒ throw exception
+      case UnderlyingHookFailed(exception) ⇒
+        log.error(exception.getMessage, ex = exception)
+        throw exception
     }
   }
 
@@ -66,6 +69,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case Initialize ⇒
       async {
         await(lifecycleHandlers.initialize())
+        log.debug(s"Component is changing state from $mode to ${ComponentMode.Running}")
         mode = ComponentMode.Running
         lifecycleHandlers.isOnline = true
         supervisor ! Running(ctx.self)
@@ -76,7 +80,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case Lifecycle(message) ⇒ onLifecycle(message)
     case x: Msg             ⇒ lifecycleHandlers.onDomainMsg(x)
     case x: CommandMessage  ⇒ onRunningCompCommandMessage(x)
-    case msg                ⇒ log.error(s"Message $msg cannot be handled")
+    case msg                ⇒ log.error(s"Component cannot handle $msg message")
   }
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {

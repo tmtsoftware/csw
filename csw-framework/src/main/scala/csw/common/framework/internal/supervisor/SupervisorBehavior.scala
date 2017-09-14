@@ -74,7 +74,7 @@ class SupervisorBehavior(
       case (SupervisorMode.Running | SupervisorMode.RunningOffline, msg: SupervisorRunningMessage) ⇒ onRunning(msg)
       case (SupervisorMode.Restart, msg: SupervisorRestartMessage)                                 ⇒ onRestarting(msg)
       case (_, message) =>
-        log.error(s"Supervisor in $mode received an unexpected message: $message")
+        log.error(s"Supervisor in $mode state received an unexpected message: $message")
     }
     this
   }
