@@ -5,9 +5,10 @@ import csw.param.events.Setup2
 import csw.param.generics.{KeyType, Parameter}
 import csw.param.models.MatrixData
 import csw.param.pb.PbFormat
-import csw_params.keytype.PbKeyType
-import csw_params.parameter.PbParameter
-import csw_params.parameter_types.Items
+import csw.units.Units
+import csw_params.keytype.{KeytypeProto, PbKeyType}
+import csw_params.parameter.{ParameterProto, PbParameter}
+import csw_params.parameter_types._
 import csw_params.units.PbUnits
 import org.scalatest.FunSuite
 
@@ -16,7 +17,7 @@ class DD2 extends FunSuite {
   test("1") {
     val parameter: PbParameter = PbParameter()
       .withName("encoder")
-      .withUnits(PbUnits.centimeter)
+      .withUnits(Units.centimeter)
       .withKeyType(PbKeyType.IntKey)
       .withItems(Items().withValues(Seq(1, 2).map(x => Int32Value().withValue(x).toByteString)))
 
@@ -107,5 +108,11 @@ class DD2 extends FunSuite {
     println(value3)
     println(out3)
     println(out3 == param3)
+  }
+
+  test("7") {
+    BoolItems().addValues(true, false)
+    val str = ParameterTypesProto.keyType.get(BoolItems.scalaDescriptor.getOptions)
+    println(str)
   }
 }

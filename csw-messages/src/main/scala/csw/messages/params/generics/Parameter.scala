@@ -13,7 +13,6 @@ import csw.param.pb.PbFormat
 import csw.units.Units
 import csw_params.keytype.PbKeyType
 import csw_params.parameter.PbParameter
-import csw_params.units.PbUnits
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
@@ -72,7 +71,7 @@ object Parameter {
         pbParameter.name,
         KeyType.withName(pbParameter.keyType.toString()).asInstanceOf[KeyType[S]],
         PbFormat.arrayTypeMapper[S].toCustom(pbParameter.items.get),
-        Units.withName(pbParameter.units.toString())
+        pbParameter.units
       )
 
       override def toBase(x: Parameter[S]): PbParameter =
@@ -81,7 +80,7 @@ object Parameter {
           .withKeyType(
             PbKeyType.fromName(x.keyType.toString).getOrElse(throw new RuntimeException(s"${x.keyType.toString}"))
           )
-          .withUnits(PbUnits.fromName(x.units.toString).get)
+          .withUnits(x.units)
           .withItems(PbFormat.arrayTypeMapper[S].toBase(x.items.array))
     }
 }

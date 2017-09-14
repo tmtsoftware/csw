@@ -3,7 +3,6 @@ syntax = "proto3";
 package csw_params;
 
 enum PbKeyType {
-
     RaDecKey        = 0;
     StringKey       = 1;
     StructKey       = 2;

@@ -2,6 +2,19 @@ syntax = "proto3";
 
 package csw_params;
 
+import "scalapb/scalapb.proto";
+import "google/protobuf/descriptor.proto";
+
 message Items {
     repeated bytes values = 1;
+}
+
+extend google.protobuf.MessageOptions {
+    string keyType = 50001;
+}
+
+message BoolItems {
+    option (scalapb.message).extends = "csw.param.pb.ItemType[Boolean]";
+    option (keyType) = "BooleanKey";
+    repeated bool values = 1;
 }
