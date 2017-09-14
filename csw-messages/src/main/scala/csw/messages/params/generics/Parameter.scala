@@ -13,7 +13,6 @@ import csw.param.pb.PbFormat
 import csw.units.Units
 import csw_params.keytype.PbKeyType
 import csw_params.parameter.PbParameter
-import csw_params.parameter_types.Items
 import csw_params.units.PbUnits
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
@@ -79,12 +78,12 @@ object Parameter {
       override def toBase(x: Parameter[S]): PbParameter =
         PbParameter()
           .withName(x.keyName)
-          .withKeyType(PbKeyType.fromName(x.keyType.entryName).get)
+          .withKeyType(
+            PbKeyType.fromName(x.keyType.toString).getOrElse(throw new RuntimeException(s"${x.keyType.toString}"))
+          )
           .withUnits(PbUnits.fromName(x.units.toString).get)
           .withItems(PbFormat.arrayTypeMapper[S].toBase(x.items.array))
     }
-
-//  implicit def pbFormat[S: ClassTag: JsonFormat: PbFormat]: PbFormat[Parameter[S]] = PbFormat.genericFormat
 }
 
 case class Parameter[S: JsonFormat: ClassTag] private[messages] (

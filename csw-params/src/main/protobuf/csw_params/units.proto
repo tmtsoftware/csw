@@ -3,63 +3,65 @@ syntax = "proto3";
 package csw_params;
 
 enum PbUnits {
+    //default unit
+    NoUnits = 0;
+
     // SI units
-    angstrom    = 0;
-    arcmin      = 1;
-    arcsec      = 2;
-    day         = 3;
-    degree      = 4;
-    elvolt      = 5;
-    gram        = 6;
-    hour        = 7;
-    hertz       = 8;
-    joule       = 9;
-    kelvin      = 10;
-    kilogram    = 11;
-    kilometer   = 12;
-    liter       = 13;
-    meter       = 14;
-    marcsec     = 15;
-    millimeter  = 16;
-    millisecond = 17;
-    micron      = 18;
-    micrometer  = 19;
-    minute      = 20;
-    newton      = 21;
-    pascal      = 22;
-    radian      = 23;
-    second      = 24;
-    sday        = 25;
-    steradian   = 26;
-    microarcsec = 27;
-    volt        = 28;
-    watt        = 29;
-    week        = 30;
-    year        = 31;
+    angstrom    = 1;
+    arcmin      = 2;
+    arcsec      = 3;
+    day         = 4;
+    degree      = 5;
+    elvolt      = 6;
+    gram        = 7;
+    hour        = 8;
+    hertz       = 9;
+    joule       = 10;
+    kelvin      = 11;
+    kilogram    = 12;
+    kilometer   = 13;
+    liter       = 14;
+    meter       = 15;
+    marcsec     = 16;
+    millimeter  = 17;
+    millisecond = 18;
+    micron      = 19;
+    micrometer  = 20;
+    minute      = 21;
+    newton      = 22;
+    pascal      = 23;
+    radian      = 24;
+    second      = 25;
+    sday        = 26;
+    steradian   = 27;
+    microarcsec = 28;
+    volt        = 29;
+    watt        = 30;
+    week        = 32;
+    year        = 33;
 
     // CGS units
-    coulomb    = 32;
-    centimeter = 33;
-    erg        = 34;
+    coulomb    = 34;
+    centimeter = 35;
+    erg        = 36;
 
     // Astrophsics units
-    au        = 35;
-    jansky    = 36;
-    lightyear = 37;
-    mag       = 38;
+    au        = 37;
+    jansky    = 38;
+    lightyear = 39;
+    mag       = 40;
 
     // Imperial units
-    cal   = 39;
-    foot  = 40;
-    inch  = 41;
-    pound = 42;
-    mile  = 43;
-    ounce = 44;
-    yard  = 45;
+    cal   = 41;
+    foot  = 42;
+    inch  = 43;
+    pound = 44;
+    mile  = 45;
+    ounce = 46;
+    yard  = 48;
 
     // Others - engineering
-    NoUnits = 46;
-    encoder = 47;
-    count   = 48;
-    pix     = 49;
+    encoder = 49;
+    count   = 50;
+    pix     = 51;
 }

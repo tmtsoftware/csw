@@ -11,29 +11,8 @@ message PbParameter {
     PbUnits units = 2;
     PbKeyType keyType = 3;
     Items items = 4;
-//    oneof items {
-//        Booleans boolean_items = 91;
-//        Bytes bytes = 92;
-//        Chars chars = 93;
-//        Shorts shorts = 94;
-//        Ints ints = 95;
-//        Longs longs = 96;
-//        Floats floats = 97;
-//        Doubles doubles = 98;
-//        Timestamps timestamps = 99;
-//
-//        BytesArray bytesArray = 201;
-//        ShortsArray shortsArray = 202;
-//        LongsArray longsArray = 203;
-//        IntsArray intsArray = 204;
-//        FloatsArray floatsArray = 205;
-//        DoublesArray doublesArray = 206;
-//
-//        ByteMatrix byteMatrix = 301;
-//        ShortMatrix shortMatrix = 302;
-//        LongMatrix longMatrix = 303;
-//        IntMatrix intMatrix = 304;
-//        FloatMatrix floatMatrix = 305;
-//        DoubleMatrix doubleMatrix = 306;
-//    }
+}
+
+message PbSetup {
+    repeated PbParameter params = 1;
 }

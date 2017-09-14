@@ -12,13 +12,8 @@ trait PbFormat[T] extends TypeMapper[ByteString, T]
 object PbFormat {
   def apply[T](implicit x: PbFormat[T]): PbFormat[T] = x
 
-  implicit val doublePbFormat: PbFormat[Double]                         = genericFormat[DoubleValue, Double]
-  implicit val floatPbFormat: PbFormat[Float]                           = genericFormat[FloatValue, Float]
   implicit val longPbFormat: PbFormat[Long]                             = genericFormat[Int64Value, Long]
   implicit val intPbFormat: PbFormat[Int]                               = genericFormat[Int32Value, Int]
-  implicit val booleanPbFormat: PbFormat[Boolean]                       = genericFormat[BoolValue, Boolean]
-  implicit val stringPbFormat: PbFormat[String]                         = genericFormat[StringValue, String]
-  implicit val byteStringPbFormat: PbFormat[ByteString]                 = genericFormat[BytesValue, ByteString]
   implicit def arrayPbFormat[T: PbFormat: ClassTag]: PbFormat[Array[T]] = genericFormat[Items, Array[T]]
 
   implicit def arrayTypeMapper[T: PbFormat: ClassTag]: TypeMapper[Items, Array[T]] = new TypeMapper[Items, Array[T]] {
@@ -36,5 +31,4 @@ object PbFormat {
         mapper.toCustom(companion.parseFrom(byteString.toByteArray))
       override def toBase(x: CswType): ByteString = mapper.toBase(x).toByteString
     }
-
 }
