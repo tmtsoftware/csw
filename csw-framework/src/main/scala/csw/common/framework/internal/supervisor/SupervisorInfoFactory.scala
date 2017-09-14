@@ -37,8 +37,8 @@ class SupervisorInfoFactory {
       Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))
     } recover {
       case NonFatal(ex) ⇒
+        println(s"Exception occured while spwaning supervisor: $ex") // FIXME
         system.terminate()
-        println(ex.getMessage) // FIXME
         None
     }
   }
