@@ -21,7 +21,11 @@ object RichSystemExtension {
     Actor.immutable[GuardianBehaviorMsg] {
       case (ctx, msg) ⇒
         msg match {
-          case create: CreateActor[t] => create.replyTo ! ctx.spawn(create.behavior, create.name, create.props)
+          case create: CreateActor[t] => {
+            val componentRef = ctx.spawn(create.behavior, create.name, create.props)
+            ctx.watch(componentRef)
+            create.replyTo ! componentRef
+          }
         }
         Actor.same
     } onSignal {
