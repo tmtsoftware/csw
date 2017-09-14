@@ -26,16 +26,12 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
   val ArgsUtil = new ArgsUtil
   import ArgsUtil._
 
-  override protected def beforeEach(): Unit =
-    serverWiring.svnRepo.initSvnRepo()
-
+  override protected def beforeAll(): Unit  = testFileUtils.deleteServerFiles()
+  override protected def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
   override protected def afterEach(): Unit = {
     testFileUtils.deleteServerFiles()
-    if (Files.exists(Paths.get(outputFilePath))) {
-      Files.delete(Paths.get(outputFilePath))
-    }
+    if (Files.exists(Paths.get(outputFilePath))) Files.delete(Paths.get(outputFilePath))
   }
-
   override protected def afterAll(): Unit = {
     httpService.shutdown().await
     wiring.actorRuntime.shutdown().await

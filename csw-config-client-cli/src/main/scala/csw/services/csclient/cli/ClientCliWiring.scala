@@ -17,7 +17,7 @@ class ClientCliWiring(actorSystem: ActorSystem) {
 }
 
 object ClientCliWiring {
-  def noPrinting(_clusterSettings: ClusterSettings) = new ClientCliWiring(_clusterSettings.system) {
+  def noPrinting(_clusterSettings: ClusterSettings): ClientCliWiring = new ClientCliWiring(_clusterSettings.system) {
     override lazy val printLine: Any ⇒ Unit = _ ⇒ ()
   }
 }
