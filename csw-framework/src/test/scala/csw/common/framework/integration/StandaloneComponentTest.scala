@@ -4,19 +4,20 @@ import akka.actor
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.{ActorRef, ActorSystem}
+import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
+import csw.common.FrameworkAssertions._
 import csw.common.components.SampleComponentState._
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.common.framework.models.PubSub.Subscribe
-import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorMode}
+import csw.common.framework.models.SupervisorCommonMessage.ComponentStateSubscription
 import csw.common.framework.models.{Shutdown, SupervisorExternalMessage}
 import csw.param.states.CurrentState
-import csw.services.location.commons.{BlockingUtils, ClusterSettings}
+import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.ComponentType.HCD
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
@@ -24,7 +25,7 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{Duration, DurationLong}
+import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
@@ -61,8 +62,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
     resolvedAkkaLocation.connection shouldBe akkaConnection
 
     val supervisorRef = resolvedAkkaLocation.typedRef[SupervisorExternalMessage]
-
-    waitForSupervisorToMoveIntoRunningMode(supervisorRef, supervisorModeProbe, 5.seconds) shouldBe true
+    assertThatSupervisorIsInRunningMode(supervisorRef, supervisorModeProbe, 5.seconds)
 
     val (_, akkaProbe) =
       locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
@@ -73,19 +73,5 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
     supervisorRef ! Shutdown
     supervisorStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
     akkaProbe.requestNext(LocationRemoved(akkaConnection))
-  }
-
-  def waitForSupervisorToMoveIntoRunningMode(
-      actorRef: ActorRef[SupervisorExternalMessage],
-      probe: TestProbe[SupervisorMode],
-      duration: Duration
-  ): Boolean = {
-
-    def getSupervisorMode: SupervisorMode = {
-      actorRef ! GetSupervisorMode(probe.ref)
-      probe.expectMsgType[SupervisorMode]
-    }
-
-    BlockingUtils.poll(getSupervisorMode == SupervisorMode.Running, duration)
   }
 }

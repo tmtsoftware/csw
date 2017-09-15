@@ -8,10 +8,11 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
+import csw.common.FrameworkAssertions._
 import csw.common.components.{ComponentStatistics, SampleComponentState}
 import csw.common.framework.internal.container.ContainerMode
 import csw.common.framework.internal.supervisor.SupervisorMode
-import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
+import csw.common.framework.models.ContainerCommonMessage.GetComponents
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorMode}
@@ -22,13 +23,13 @@ import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.{ServerWiring, Settings}
-import csw.services.location.commons.{BlockingUtils, ClusterAwareSettings}
+import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{Duration, DurationLong}
+import scala.concurrent.duration.DurationLong
 import scala.io.Source
 
 class ContainerCmdTestMultiJvm1 extends ContainerCmdTest(0)
@@ -37,6 +38,7 @@ class ContainerCmdTestMultiJvm3 extends ContainerCmdTest(0)
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-169: Creation of Multiple Components
+// DEOPSCSW-171: Starting component from command line
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
@@ -57,34 +59,6 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
   override def afterAll(): Unit = {
     super.afterAll()
     testFileUtils.deleteServerFiles()
-  }
-
-  def waitForContainerToMoveIntoRunningMode(
-      containerRef: ActorRef[ContainerExternalMessage],
-      probe: TestProbe[ContainerMode],
-      duration: Duration
-  ): Boolean = {
-
-    def getContainerMode: ContainerMode = {
-      containerRef ! GetContainerMode(probe.ref)
-      probe.expectMsgType[ContainerMode]
-    }
-
-    BlockingUtils.poll(getContainerMode == ContainerMode.Running, duration)
-  }
-
-  def waitForSupervisorToMoveIntoRunningMode(
-      actorRef: ActorRef[SupervisorExternalMessage],
-      probe: TestProbe[SupervisorMode],
-      duration: Duration
-  ): Boolean = {
-
-    def getSupervisorMode: SupervisorMode = {
-      actorRef ! GetSupervisorMode(probe.ref)
-      probe.expectMsgType[SupervisorMode]
-    }
-
-    BlockingUtils.poll(getSupervisorMode == SupervisorMode.Running, duration)
   }
 
   def createStandaloneTmpFile(): Path = {
@@ -132,7 +106,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val containerRef =
         Await.result(containerCmd.start(args), 15.seconds).map(_.asInstanceOf[ActorRef[ContainerExternalMessage]]).get
 
-      waitForContainerToMoveIntoRunningMode(containerRef, testProbe, 5.seconds) shouldBe true
+      assertThatContainerIsInRunningMode(containerRef, testProbe, 5.seconds)
 
       val componentsProbe     = TestProbe[Components]
       val supervisorModeProbe = TestProbe[SupervisorMode]
@@ -182,7 +156,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val supervisorRef =
         Await.result(containerCmd.start(args), 15.seconds).map(_.asInstanceOf[ActorRef[SupervisorExternalMessage]]).get
 
-      waitForSupervisorToMoveIntoRunningMode(supervisorRef, testProbe, 5.seconds) shouldBe true
+      assertThatSupervisorIsInRunningMode(supervisorRef, testProbe, 5.seconds)
       enterBarrier("running")
 
       enterBarrier("offline")
