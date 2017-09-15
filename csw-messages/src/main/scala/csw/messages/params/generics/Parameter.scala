@@ -79,7 +79,7 @@ object Parameter {
         PbParameter()
           .withName(x.keyName)
           .withUnits(x.units)
-          .withAnyItems(AnyItems().withValues(x.items.map(s ⇒ PbF)))
+          .withAnyItems(AnyItems().withValues(x.items.map(s ⇒ PbFormat[S].toBase(s))))
     }
 }
 
