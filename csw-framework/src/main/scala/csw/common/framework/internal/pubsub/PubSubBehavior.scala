@@ -35,7 +35,8 @@ class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], componentName: String)
     subscribers -= actorRef
   }
 
-  protected def notifySubscribers(a: T): Unit = {
-    subscribers.foreach(_ ! a)
+  protected def notifySubscribers(data: T): Unit = {
+    log.debug(s"Notifying subscribers :[${subscribers.mkString(",")}] with data :[$data]")
+    subscribers.foreach(_ ! data)
   }
 }
