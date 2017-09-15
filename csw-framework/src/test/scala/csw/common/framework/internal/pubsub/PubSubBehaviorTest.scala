@@ -9,12 +9,18 @@ import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import csw.common.framework.internal.supervisor.SupervisorMode
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.{LifecycleStateChanged, PubSub, SupervisorExternalMessage}
+import csw.services.logging.scaladsl.{ComponentLogger, Logger}
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
+
+  trait TypedActorMock[T] { this: ComponentLogger.TypedActor[T] ⇒
+    override protected lazy val log: Logger = MockitoSugar.mock[Logger]
+  }
 
   private val actorSystem                        = ActorSystem("test-1")
   implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
@@ -25,15 +31,17 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   private val lifecycleProbe1 = TestProbe[LifecycleStateChanged]
   private val lifecycleProbe2 = TestProbe[LifecycleStateChanged]
 
+  def createPubSubBehavior(): PubSubBehavior[LifecycleStateChanged] =
+    new PubSubBehavior(ctx, "test-component") with TypedActorMock[PubSub[LifecycleStateChanged]]
+
   override protected def afterAll(): Unit = Await.result(actorSystem.terminate(), 5.seconds)
 
   test("initially set of subscribers should be empty") {
-    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, "test-component")
-    pubSubBehavior.subscribers shouldBe Set.empty[ActorRef[LifecycleStateChanged]]
+    createPubSubBehavior().subscribers shouldBe Set.empty[ActorRef[LifecycleStateChanged]]
   }
 
   test("should able to subscribe") {
-    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, "test-component")
+    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = createPubSubBehavior()
 
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe1.ref))
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe2.ref))
@@ -42,7 +50,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   test("message should be published to all the subscribers") {
-    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, "test-component")
+    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = createPubSubBehavior()
     val supervisorProbe                                       = TestProbe[SupervisorExternalMessage]
 
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe1.ref))
@@ -54,7 +62,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   test("should not receive messages on un-subscription") {
-    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, "test-component")
+    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = createPubSubBehavior()
     val supervisorProbe                                       = TestProbe[SupervisorExternalMessage]
 
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe1.ref))
