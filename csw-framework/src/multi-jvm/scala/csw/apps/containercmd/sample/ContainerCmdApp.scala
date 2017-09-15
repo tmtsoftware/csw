@@ -4,5 +4,7 @@ import csw.apps.containercmd.ContainerCmd
 
 // DEOPSCSW-171: Starting component from command line
 object ContainerCmdApp extends App {
-  ContainerCmd.start(args)
+  // name which will appear in log statements as `@componentName`
+  val componentName = "Sample-App"
+  ContainerCmd.start(componentName, args)
 }

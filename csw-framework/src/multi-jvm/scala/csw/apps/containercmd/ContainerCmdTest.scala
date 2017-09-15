@@ -99,7 +99,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       // withEntries required for multi-node test where seed node is picked up from environment variable
       val clusterSettings = ClusterAwareSettings.joinLocal(3552).withEntries(sys.env)
-      val containerCmd    = new ContainerCmd(clusterSettings, startLogging = false)
+      val containerCmd    = new ContainerCmd("laser_container_app", clusterSettings, false)
 
       // only file path is provided, by default - file will be fetched from configuration service
       // and will be considered as container configuration.
@@ -147,7 +147,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val testProbe = TestProbe[SupervisorMode]
 
-      val containerCmd = new ContainerCmd(ClusterAwareSettings.joinLocal(3552), startLogging = false)
+      val containerCmd = new ContainerCmd("eaton_hcd_standalone_app", ClusterAwareSettings.joinLocal(3552), false)
 
       // this step is required for multi-node, as eaton_hcd_standalone.conf file is not directly available
       // when sbt-assembly creates fat jar
