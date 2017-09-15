@@ -52,12 +52,12 @@ class ContainerBehavior(
 
   override def onSignal: PartialFunction[Signal, Behavior[ContainerMessage]] = {
     case Terminated(supervisor) ⇒
-      log.error(s"Container in mode :[$mode] received terminated signal from supervisor :[$supervisor]")
+      log.warn(s"Container in mode :[$mode] received terminated signal from supervisor :[$supervisor]")
       supervisors = supervisors.filterNot(_.component.supervisor == supervisor.upcast)
       if (supervisors.isEmpty) coordinatedShutdown()
       this
     case PostStop ⇒
-      log.error(s"Un-registering container :[${containerInfo.name}] from location service")
+      log.warn(s"Un-registering container from location service")
       registrationOpt.foreach(_.unregister())
       Behavior.stopped
   }
@@ -68,12 +68,12 @@ class ContainerBehavior(
     case GetContainerMode(replyTo) ⇒
       replyTo ! mode
     case Restart ⇒
-      log.debug(s"Container is changing mode from $mode to ${ContainerMode.Idle}")
+      log.debug(s"Container is changing mode from [$mode] to [${ContainerMode.Idle}]")
       mode = ContainerMode.Idle
       runningComponents = Set.empty
       supervisors.foreach(_.component.supervisor ! Restart)
     case Shutdown ⇒
-      log.debug(s"Container is changing mode from $mode to ${ContainerMode.Idle}")
+      log.debug(s"Container is changing mode from [$mode] to [${ContainerMode.Idle}]")
       mode = ContainerMode.Idle
       supervisors.foreach(_.component.supervisor ! Shutdown)
   }
@@ -113,7 +113,7 @@ class ContainerBehavior(
 
   private def updateRunningComponents(): Unit = {
     if (runningComponents.size == supervisors.size) {
-      log.debug(s"Container is changing state from $mode to ${ContainerMode.Running}")
+      log.debug(s"Container is changing state from [$mode] to ${ContainerMode.Running}")
       mode = ContainerMode.Running
     }
   }
