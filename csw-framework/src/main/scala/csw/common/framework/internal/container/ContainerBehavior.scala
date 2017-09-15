@@ -54,7 +54,10 @@ class ContainerBehavior(
     case Terminated(supervisor) ⇒
       log.warn(s"Container in mode :[$mode] received terminated signal from supervisor :[$supervisor]")
       supervisors = supervisors.filterNot(_.component.supervisor == supervisor.upcast)
-      if (supervisors.isEmpty) coordinatedShutdown()
+      if (supervisors.isEmpty) {
+        log.warn("All supervisors from this container are terminated. Initiating co-ordinated shutdown.")
+        coordinatedShutdown()
+      }
       this
     case PostStop ⇒
       log.warn(s"Un-registering container from location service")
@@ -126,5 +129,5 @@ class ContainerBehavior(
     }
   }
 
-  private def coordinatedShutdown(): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run
+  private def coordinatedShutdown(): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run()
 }

@@ -4,7 +4,7 @@ import akka.actor
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.ActorSystem
+import akka.typed.{ActorRef, ActorSystem}
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
@@ -16,15 +16,15 @@ import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorMode}
 import csw.common.framework.models.{Shutdown, SupervisorExternalMessage}
 import csw.param.states.CurrentState
-import csw.services.location.commons.ClusterSettings
+import csw.services.location.commons.{BlockingUtils, ClusterSettings}
 import csw.services.location.models.ComponentType.HCD
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{ComponentId, LocationRemoved, TrackingEvent}
+import csw.services.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.DurationLong
+import scala.concurrent.duration.{Duration, DurationLong}
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
@@ -62,18 +62,30 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
 
     val supervisorRef = resolvedAkkaLocation.typedRef[SupervisorExternalMessage]
 
-    Thread.sleep(500)
-    supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
-    supervisorModeProbe.expectMsg(SupervisorMode.Running)
+    waitForSupervisorToMoveIntoRunningMode(supervisorRef, supervisorModeProbe, 5.seconds) shouldBe true
 
     val (_, akkaProbe) =
       locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+    akkaProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service
-
     supervisorRef ! ComponentStateSubscription(Subscribe(supervisorStateProbe.ref))
     supervisorRef ! Shutdown
     supervisorStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
     akkaProbe.requestNext(LocationRemoved(akkaConnection))
+  }
+
+  def waitForSupervisorToMoveIntoRunningMode(
+      actorRef: ActorRef[SupervisorExternalMessage],
+      probe: TestProbe[SupervisorMode],
+      duration: Duration
+  ): Boolean = {
+
+    def getSupervisorMode: SupervisorMode = {
+      actorRef ! GetSupervisorMode(probe.ref)
+      probe.expectMsgType[SupervisorMode]
+    }
+
+    BlockingUtils.poll(getSupervisorMode == SupervisorMode.Running, duration)
   }
 }

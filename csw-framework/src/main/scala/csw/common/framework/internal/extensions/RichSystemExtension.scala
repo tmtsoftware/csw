@@ -1,9 +1,9 @@
 package csw.common.framework.internal.extensions
 
-import akka.actor.{ActorSystem, Scheduler}
+import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
 import akka.typed.scaladsl.Actor
 import akka.typed.scaladsl.AskPattern.Askable
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
 import akka.typed.{ActorRef, Behavior, Props, Terminated}
 import akka.util.Timeout
 
@@ -30,7 +30,7 @@ object RichSystemExtension {
         Actor.same
     } onSignal {
       case (ctx, Terminated(ref)) ⇒
-        ctx.system.terminate()
+        CoordinatedShutdown(ctx.system.toUntyped).run()
         Actor.stopped
     }
 

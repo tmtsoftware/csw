@@ -1,5 +1,8 @@
 package csw.common.framework.internal.supervisor
 
+import akka.Done
+import akka.actor.CoordinatedShutdown
+import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.common.framework.exceptions.FailureRestart
@@ -25,7 +28,7 @@ import csw.services.location.models.{AkkaRegistration, ComponentId, Registration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
@@ -88,7 +91,7 @@ class SupervisorBehavior(
           registerWithLocationService()
         case SupervisorMode.Shutdown ⇒
           log.warn(s"Supervisor in mode :[$mode] received terminated signal from component :[$componentRef]")
-          ctx.system.terminate()
+          coordinatedShutdown()
         case _ ⇒
           log.error(
             s"Supervisor in mode :[$mode] received unexpected terminated signal from component :[$componentRef]"
@@ -220,4 +223,6 @@ class SupervisorBehavior(
     ctx.watch(component)
     timerScheduler.startSingleTimer(InitializeTimerKey, InitializeTimeout, initializeTimeout)
   }
+
+  private def coordinatedShutdown(): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run()
 }
