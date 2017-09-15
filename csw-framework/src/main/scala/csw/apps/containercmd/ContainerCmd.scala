@@ -37,7 +37,7 @@ private[containercmd] class ContainerCmd(clusterSettings: ClusterSettings, start
       } recover {
         case NonFatal(ex) ⇒
           log.error(s"${ex.getMessage}", ex = ex)
-          shutdown
+          shutdown()
           throw ex
       }
     }
@@ -61,9 +61,7 @@ private[containercmd] class ContainerCmd(clusterSettings: ClusterSettings, start
     }
   }
 
-  def shutdown: Future[Done] = {
-    wiring.actorRuntime.shutdown()
-  }
+  def shutdown(): Future[Done] = wiring.actorRuntime.shutdown()
 
   private def createComponent(standalone: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] = {
     if (standalone) Standalone.spawn(config, wiring)
