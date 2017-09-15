@@ -5,6 +5,13 @@ import java.time.Instant
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.models.Units.second
 import csw.messages.params.models.{Units, _}
+import com.trueaccord.scalapb.TypeMapper
+import csw.param.formats.JsonSupport
+import csw.param.models._
+import csw.param.pb.PbFormat
+import csw.units.Units
+import csw.units.Units.second
+import csw_params.keytype.PbKeyType
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
 
@@ -13,6 +20,7 @@ import scala.reflect.ClassTag
 
 sealed class KeyType[S: JsonFormat: ClassTag] extends EnumEntry with Serializable {
   def paramFormat: JsonFormat[Parameter[S]] = Parameter[S]
+  def tag: ClassTag[S]                      = scala.reflect.classTag[S]
 }
 
 sealed class SimpleKeyType[S: JsonFormat: ClassTag] extends KeyType[S] {
@@ -95,6 +103,8 @@ object KeyType extends Enum[KeyType[_]] {
   implicit def format[T]: JsonFormat[KeyType[T]] = enumFormat(this).asInstanceOf[JsonFormat[KeyType[T]]]
 
   implicit def format2: JsonFormat[KeyType[_]] = enumFormat(this)
+
+  implicit val typeMapper: TypeMapper[PbKeyType, KeyType[_]] = PbFormat.enumMapper
 }
 
 object JKeyTypes {

@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString
 import com.google.protobuf.wrappers._
 import com.trueaccord.scalapb._
 import csw_params.parameter_types.Items
+import enumeratum.{Enum, EnumEntry}
 
 import scala.reflect.ClassTag
 
@@ -22,13 +23,19 @@ object PbFormat {
     override def toBase(custom: Array[T]): Items = Items().withValues(custom.map(x ⇒ PbFormat[T].toBase(x)))
   }
 
-  implicit def genericFormat[PbType <: GeneratedMessage with Message[PbType], CswType](
-      implicit mapper: TypeMapper[PbType, CswType],
-      companion: GeneratedMessageCompanion[PbType]
-  ): PbFormat[CswType] =
-    new PbFormat[CswType] {
-      override def toCustom(byteString: ByteString): CswType =
+  implicit def genericFormat[Pb <: GeneratedMessage with Message[Pb], Csw](
+      implicit mapper: TypeMapper[Pb, Csw],
+      companion: GeneratedMessageCompanion[Pb]
+  ): PbFormat[Csw] =
+    new PbFormat[Csw] {
+      override def toCustom(byteString: ByteString): Csw =
         mapper.toCustom(companion.parseFrom(byteString.toByteArray))
-      override def toBase(x: CswType): ByteString = mapper.toBase(x).toByteString
+      override def toBase(x: Csw): ByteString = mapper.toBase(x).toByteString
     }
+
+  implicit def enumMapper[Pb <: GeneratedEnum: GeneratedEnumCompanion, Csw <: EnumEntry: Enum]: TypeMapper[Pb, Csw] = {
+    val csw = implicitly[Enum[Csw]]
+    val pb  = implicitly[GeneratedEnumCompanion[Pb]]
+    TypeMapper[Pb, Csw](x ⇒ csw.withName(x.toString()))(x ⇒ pb.fromName(x.toString).get)
+  }
 }

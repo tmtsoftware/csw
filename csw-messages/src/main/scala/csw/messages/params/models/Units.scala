@@ -4,6 +4,7 @@ import csw.messages.TMTSerializable
 import com.google.protobuf.wrappers.{Int32Value, StringValue}
 import csw.param.pb.PbFormat
 import com.trueaccord.scalapb.TypeMapper
+import csw.param.pb.PbFormat
 import csw_params.units.PbUnits
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
@@ -21,10 +22,9 @@ object Units extends Enum[Units] {
 
   import csw.messages.params.formats.JsonSupport._
 
-  override def values: immutable.IndexedSeq[Units] = findValues
-  implicit val format: JsonFormat[Units]           = enumFormat(this)
-  implicit val typeMapper: TypeMapper[PbUnits, Units] =
-    TypeMapper[PbUnits, Units](x ⇒ Units.withName(x.toString()))(x ⇒ PbUnits.fromName(x.toString).get)
+  override def values: immutable.IndexedSeq[Units]    = findValues
+  implicit val format: JsonFormat[Units]              = enumFormat(this)
+  implicit val typeMapper: TypeMapper[PbUnits, Units] = PbFormat.enumMapper
 
   // SI units
   case object angstrom    extends Units("Anstrom", "10 -1 nm")

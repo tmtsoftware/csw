@@ -2,8 +2,8 @@ package csw.messages.params.models
 
 import java.util
 
-import com.trueaccord.scalapb.TypeMapper
-import csw.param.pb.PbFormat
+import com.trueaccord.scalapb.{GeneratedMessageCompanion, TypeMapper}
+import csw.param.pb.{ItemType, PbFormat}
 import csw_params.parameter_types.Items
 import spray.json.JsonFormat
 
@@ -41,6 +41,11 @@ object MatrixData {
         PbFormat.arrayTypeMapper[Array[T]].toBase(custom.values)
     }
 
+  implicit def typeMapper2[T: ClassTag, S <: ItemType[ArrayData[T], S]: GeneratedMessageCompanion]
+    : TypeMapper[S, MatrixData[T]] =
+    TypeMapper[S, MatrixData[T]](x ⇒ MatrixData.fromArrays(x.values.toArray.map(a ⇒ a.data.array)))(
+      x ⇒ implicitly[GeneratedMessageCompanion[S]].defaultInstance.withValues(x.data.map(ArrayData.apply))
+    )
 }
 
 object JMatrixData {

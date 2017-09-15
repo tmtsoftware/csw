@@ -3,7 +3,7 @@ package csw.param
 import com.google.protobuf.wrappers.Int32Value
 import csw.param.events.Setup2
 import csw.param.generics.{KeyType, Parameter}
-import csw.param.models.MatrixData
+import csw.param.models.{ArrayData, MatrixData}
 import csw.param.pb.PbFormat
 import csw.units.Units
 import csw_params.keytype.{KeytypeProto, PbKeyType}
@@ -111,8 +111,14 @@ class DD2 extends FunSuite {
   }
 
   test("7") {
-    BoolItems().addValues(true, false)
-    val str = ParameterTypesProto.keyType.get(BoolItems.scalaDescriptor.getOptions)
-    println(str)
+    BooleanItems().addValues(true, false)
+//    val str = ParameterTypesProto.keyType.get(BoolItems.scalaDescriptor.getOptions)
+    println(BooleanItems().keyType)
+//    println(str)
+  }
+
+  test("8") {
+    println(IntItems().addValues(1, 2, 3).as[ArrayData[Int]])
+    println(IntArrayItems().addValues(ArrayData.fromArray(1, 2, 3), ArrayData.fromArray(6, 7)).as[MatrixData[Int]])
   }
 }
