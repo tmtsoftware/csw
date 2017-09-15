@@ -4,7 +4,6 @@ package csw_params;
 
 import "scalapb/scalapb.proto";
 import "google/protobuf/descriptor.proto";
-import "csw_params/keytype.proto";
 
 //ByteItems
 //CharItems
@@ -13,10 +12,6 @@ import "csw_params/keytype.proto";
 //ShortArrayItems
 //ByteMatrixItems
 //ShortMatrixItems
-
-message Items {
-    repeated bytes values = 1;
-}
 
 message StringItems {
     option (scalapb.message).extends = "csw.param.pb.ItemType[String, StringItems]";

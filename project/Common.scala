@@ -32,6 +32,7 @@ object Common extends AutoPlugin {
       "-Yno-adapted-args",
       "-Ywarn-dead-code",
       "-Xfuture",
+//      "-Xprint:typer"
       if (cycleCheckEnabled && detectCycles.value) "-P:acyclic:force" else ""
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),

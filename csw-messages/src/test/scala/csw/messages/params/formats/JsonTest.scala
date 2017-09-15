@@ -102,11 +102,6 @@ class JsonTest extends FunSpec {
       val j1  = i1.toJson
       val in1 = j1.convertTo[Parameter[Int]]
       assert(in1 == i1)
-      val string = PbFormat[Parameter[Int]].toBase(i1)
-      val value  = PbFormat[Parameter[Int]].toCustom(string)
-      println(string)
-      println(value)
-      println(value == in1)
     }
 
     it("long item encode/decode") {
@@ -339,16 +334,9 @@ class JsonTest extends FunSpec {
 
   describe("Test Int Matrix items") {
     it("Should allow int matrix values") {
-      val k1 = IntMatrixKey.make("myMatrix")
-      val m1 = MatrixData.fromArrays(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
-      val i1 = k1.set(m1)
-      println(i1)
-      val pbFormat = PbFormat[Parameter[MatrixData[Int]]]
-      val string   = pbFormat.toBase(i1)
-      val value    = pbFormat.toCustom(string)
-      println(string)
-      println(value)
-      println(value == i1)
+      val k1  = IntMatrixKey.make("myMatrix")
+      val m1  = MatrixData.fromArrays(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
+      val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, Prefix(ck)).add(i1)
       assert(sc1(k1).head == m1)
 
@@ -366,15 +354,9 @@ class JsonTest extends FunSpec {
 
   describe("Test Int Array items") {
     it("Should allow int array values") {
-      val k1       = KeyType.IntArrayKey.make("myArray")
-      val m1       = ArrayData(Array(1, 2, 3))
-      val i1       = k1.set(m1)
-      val pbFormat = PbFormat[Parameter[ArrayData[Int]]]
-      val string   = pbFormat.toBase(i1)
-      val value    = pbFormat.toCustom(string)
-      println(string)
-      println(value)
-      println(value == i1)
+      val k1  = KeyType.IntArrayKey.make("myArray")
+      val m1  = ArrayData(Array(1, 2, 3))
+      val i1  = k1.set(m1)
       val sc1 = Setup(commandInfo, Prefix(ck)).add(i1)
       assert(sc1(k1).head == m1)
 
