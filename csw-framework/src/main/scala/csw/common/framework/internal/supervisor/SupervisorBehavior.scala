@@ -55,8 +55,8 @@ class SupervisorBehavior(
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  val name: String                                       = componentInfo.name
-  val componentId                                        = ComponentId(name, componentInfo.componentType)
+  val componentName: String                              = componentInfo.name
+  val componentId                                        = ComponentId(componentName, componentInfo.componentType)
   val akkaRegistration: AkkaRegistration                 = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   var haltingFlag                                        = false
   var mode: SupervisorMode                               = Idle
@@ -64,8 +64,10 @@ class SupervisorBehavior(
   var registrationOpt: Option[RegistrationResult]        = None
   var component: ActorRef[Nothing]                       = _
 
-  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor)
-  val pubSubComponent: ActorRef[PubSub[CurrentState]]          = pubSubBehaviorFactory.make(ctx, PubSubComponentActor)
+  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
+    pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, componentName)
+  val pubSubComponent: ActorRef[PubSub[CurrentState]] =
+    pubSubBehaviorFactory.make(ctx, PubSubComponentActor, componentName)
 
   registerWithLocationService()
 

@@ -28,12 +28,12 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   override protected def afterAll(): Unit = Await.result(actorSystem.terminate(), 5.seconds)
 
   test("initially set of subscribers should be empty") {
-    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx)
+    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, "test-component")
     pubSubBehavior.subscribers shouldBe Set.empty[ActorRef[LifecycleStateChanged]]
   }
 
   test("should able to subscribe") {
-    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx)
+    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, "test-component")
 
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe1.ref))
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe2.ref))
@@ -42,7 +42,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   test("message should be published to all the subscribers") {
-    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx)
+    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, "test-component")
     val supervisorProbe                                       = TestProbe[SupervisorExternalMessage]
 
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe1.ref))
@@ -54,7 +54,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   test("should not receive messages on un-subscription") {
-    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx)
+    val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, "test-component")
     val supervisorProbe                                       = TestProbe[SupervisorExternalMessage]
 
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe1.ref))

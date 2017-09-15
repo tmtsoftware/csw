@@ -42,13 +42,15 @@ class FrameworkTestMocks(
   when(
     pubSubBehaviorFactory.make[LifecycleStateChanged](
       any[ActorContext[SupervisorMessage]],
-      ArgumentMatchers.eq(SupervisorBehavior.PubSubLifecycleActor)
+      ArgumentMatchers.eq(SupervisorBehavior.PubSubLifecycleActor),
+      any[String]
     )
   ).thenReturn(lifecycleStateProbe.ref)
   when(
     pubSubBehaviorFactory.make[CurrentState](
       any[ActorContext[SupervisorMessage]],
-      ArgumentMatchers.eq(SupervisorBehavior.PubSubComponentActor)
+      ArgumentMatchers.eq(SupervisorBehavior.PubSubComponentActor),
+      any[String]
     )
   ).thenReturn(compStateProbe.ref)
 
