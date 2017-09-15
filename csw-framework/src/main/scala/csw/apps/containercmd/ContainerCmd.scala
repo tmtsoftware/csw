@@ -8,7 +8,6 @@ import akka.typed.ActorRef
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.apps.containercmd.exceptions.Exceptions.{FileNotFound, LocalFileNotFound}
-import csw.common.framework.exceptions.ClusterSeedsNotFound
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
@@ -29,50 +28,49 @@ private[containercmd] class ContainerCmd(
     startLogging: Boolean = true
 ) extends ComponentLogger.Simple {
 
-  lazy val actorSystem: ActorSystem = clusterSettings.system
-  lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
+  override protected val componentName: String = name
+  lazy val actorSystem: ActorSystem            = clusterSettings.system
+  lazy val wiring: FrameworkWiring             = FrameworkWiring.make(actorSystem)
   import wiring.actorRuntime.{ec, mat}
 
-  override protected val componentName: String = name
-
-  def start(args: Array[String]): Future[Option[ActorRef[_]]] = async {
-    if (startLogging)
-      LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
-
-    log.debug(s"$componentName started with following arguments [${args.mkString(",")}]")
+  def start(args: Array[String]): Future[Option[ActorRef[_]]] = {
+    def createF(standalone: Boolean, isLocal: Boolean, inputFilePath: Option[Path]): Future[ActorRef[_]] = {
+      async {
+        val configF = await(getConfig(isLocal, inputFilePath.get))
+        await(createComponent(standalone, wiring, configF))
+      } recover {
+        case NonFatal(ex) ⇒
+          log.error(s"${ex.getMessage}", ex = ex)
+          shutdown()
+          throw ex
+      }
+    }
 
     if (clusterSettings.seedNodes.isEmpty) {
-      val exception = ClusterSeedsNotFound()
-      log.error(exception.getMessage, ex = exception)
-      throw exception
+      println(
+        "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
+      )
+      Future.successful(None)
     } else {
       val maybeOptions = new ArgsParser().parse(args)
       maybeOptions match {
         case Some(Options(standalone, isLocal, inputFilePath)) =>
-          val created = await(createF(standalone, isLocal, inputFilePath))
-          log.info(s"Component is successfully created with actor ref $created")
-          Some(created)
-        case _ ⇒ None
+          if (startLogging)
+            LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
+
+          log.debug(s"$componentName started with following arguments [${args.mkString(",")}]")
+
+          createF(standalone, isLocal, inputFilePath).map { ref ⇒
+            log.info(s"Component is successfully created with actor ref $ref")
+            Some(ref)
+          }
+
+        case _ ⇒ Future.successful(None)
       }
     }
   }
 
   def shutdown(): Future[Done] = wiring.actorRuntime.shutdown()
-
-  private def createF(
-      standalone: Boolean,
-      isLocal: Boolean,
-      inputFilePath: Option[Path]
-  ): Future[ActorRef[_]] =
-    async {
-      val configF = await(getConfig(isLocal, inputFilePath.get))
-      await(createComponent(standalone, wiring, configF))
-    } recover {
-      case NonFatal(ex) ⇒
-        log.error(s"${ex.getMessage}", ex = ex)
-        shutdown()
-        throw ex
-    }
 
   private def createComponent(standalone: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] = {
     if (standalone) Standalone.spawn(config, wiring)
