@@ -1,12 +1,16 @@
 package csw.param.pb
 
 import com.google.protobuf.ByteString
+import com.google.protobuf.wrappers.{Int32Value, Int64Value}
 import com.trueaccord.scalapb.{GeneratedMessage, GeneratedMessageCompanion, Message, TypeMapper}
 
 trait PbFormat[T] extends TypeMapper[ByteString, T]
 
 object PbFormat {
   def apply[T](implicit x: PbFormat[T]): PbFormat[T] = x
+
+//  implicit val longPbFormat: PbFormat[Long] = genericFormat[Int64Value, Long]
+  implicit val intPbFormat: PbFormat[Int] = genericFormat[Int32Value, Int]
 
   def genericFormat[Pb <: GeneratedMessage with Message[Pb], Csw](
       implicit mapper: TypeMapper[Pb, Csw],

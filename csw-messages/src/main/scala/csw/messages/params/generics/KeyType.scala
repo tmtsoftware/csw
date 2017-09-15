@@ -18,7 +18,7 @@ import scala.reflect.ClassTag
 
 sealed class KeyType[S: JsonFormat: ClassTag] extends EnumEntry with Serializable {
   def paramFormat: JsonFormat[Parameter[S]] = Parameter[S]
-//  def tag: ClassTag[S]                      = scala.reflect.classTag[S]
+  def tag: ClassTag[S]                      = scala.reflect.classTag[S]
 }
 
 sealed class SimpleKeyType[S: JsonFormat: ClassTag] extends KeyType[S] {

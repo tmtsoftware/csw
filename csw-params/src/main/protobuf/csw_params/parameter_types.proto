@@ -13,6 +13,11 @@ import "google/protobuf/descriptor.proto";
 //ByteMatrixItems
 //ShortMatrixItems
 
+message AnyItems {
+//    option (scalapb.message).extends = "csw.param.pb.ItemType[com.google.protobuf.ByteString, AnyItems]";
+    repeated bytes values = 1;
+}
+
 message StringItems {
     option (scalapb.message).extends = "csw.param.pb.ItemType[String, StringItems]";
     repeated string values = 1;

@@ -7,6 +7,8 @@ import "csw_params/units.proto";
 import "scalapb/scalapb.proto";
 
 message PbParameter {
+    option (scalapb.message).extends = "csw.param.pb.ParamType";
+
     string name = 1;
     PbUnits units = 2 [(scalapb.field).type = "csw.units.Units"];
     oneof items {
@@ -27,6 +29,8 @@ message PbParameter {
         LongMatrixItems longMatrixItems = 14;
         FloatMatrixItems floatMatrixItems = 15;
         DoubleMatrixItems doubleMatrixItems = 16;
+
+        AnyItems anyItems = 30;
     }
 }
 

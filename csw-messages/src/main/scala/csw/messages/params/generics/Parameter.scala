@@ -9,7 +9,11 @@ import com.google.protobuf.ByteString
 import com.google.protobuf.wrappers.StringValue
 import com.trueaccord.scalapb.TypeMapper
 import csw.param.ParamSerializable
+import csw.param.pb.PbFormat
 import csw.units.Units
+import csw_params.parameter.PbParameter
+import csw_params.parameter.PbParameter.Items
+import csw_params.parameter_types.AnyItems
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
@@ -62,24 +66,21 @@ object Parameter {
 
   def apply[T](implicit x: JsonFormat[Parameter[T]]): JsonFormat[Parameter[T]] = x
 
-//  implicit def typeMapper[S: ClassTag: JsonFormat: PbFormat]: TypeMapper[PbParameter, Parameter[S]] =
-//    new TypeMapper[PbParameter, Parameter[S]] {
-//      override def toCustom(pbParameter: PbParameter): Parameter[S] = Parameter(
-//        pbParameter.name,
-//        KeyType.withName(pbParameter.keyType.toString()).asInstanceOf[KeyType[S]],
-//        PbFormat.arrayTypeMapper[S].toCustom(pbParameter.items.get),
-//        pbParameter.units
-//      )
-//
-//      override def toBase(x: Parameter[S]): PbParameter =
-//        PbParameter()
-//          .withName(x.keyName)
-//          .withKeyType(
-//            PbKeyType.fromName(x.keyType.toString).getOrElse(throw new RuntimeException(s"${x.keyType.toString}"))
-//          )
-//          .withUnits(x.units)
-//          .withItems(PbFormat.arrayTypeMapper[S].toBase(x.items.array))
-//    }
+  implicit def typeMapper[S: ClassTag: JsonFormat: PbFormat]: TypeMapper[PbParameter, Parameter[S]] =
+    new TypeMapper[PbParameter, Parameter[S]] {
+      override def toCustom(pbParameter: PbParameter): Parameter[S] = Parameter(
+        pbParameter.name,
+        pbParameter.cswItems.keyType.asInstanceOf[KeyType[S]],
+        pbParameter.cswItems.values.asInstanceOf[Seq[S]].toArray[S],
+        pbParameter.units
+      )
+
+      override def toBase(x: Parameter[S]): PbParameter =
+        PbParameter()
+          .withName(x.keyName)
+          .withUnits(x.units)
+          .withAnyItems(AnyItems().withValues(x.items.map(s ⇒ PbF)))
+    }
 }
 
 case class Parameter[S: JsonFormat: ClassTag] private[messages] (

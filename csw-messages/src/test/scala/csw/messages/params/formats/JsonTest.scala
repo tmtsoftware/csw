@@ -20,7 +20,6 @@ import csw.messages.params.models._
 import csw.messages.params.states.{CurrentState, DemandState}
 import csw.param.generics._
 import csw.param.models.{Subsystem, _}
-import csw.param.pb.PbFormat
 import csw.param.states.{CurrentState, DemandState}
 import csw.units.Units
 import csw.units.Units.{degree, encoder, meter, NoUnits}
