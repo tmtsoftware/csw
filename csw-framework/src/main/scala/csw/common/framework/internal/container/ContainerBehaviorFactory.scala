@@ -8,7 +8,7 @@ import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 
 object ContainerBehaviorFactory {
   def behavior(containerInfo: ContainerInfo, locationService: LocationService): Behavior[ContainerMessage] = {
-    val supervisorFactory   = new SupervisorInfoFactory()
+    val supervisorFactory   = new SupervisorInfoFactory(containerInfo.name)
     val registrationFactory = new RegistrationFactory
     Actor.mutable(
       ctx ⇒ new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService)

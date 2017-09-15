@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> {
 
+    // Demonstrating logger accessibility in Java Component handlers
     private ILogger log = getLogger();
 
     private ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef;
@@ -34,6 +35,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
     @Override
     public CompletableFuture<BoxedUnit> jInitialize() {
+        log.debug("Initializing Sample component");
         return CompletableFuture.supplyAsync(() -> {
             CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
             PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(initState);
