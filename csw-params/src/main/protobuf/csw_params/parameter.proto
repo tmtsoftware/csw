@@ -6,6 +6,10 @@ import "csw_params/parameter_types.proto";
 import "csw_params/units.proto";
 import "scalapb/scalapb.proto";
 
+option (scalapb.options) = {
+    single_file: true
+};
+
 message PbParameter {
     option (scalapb.message).extends = "csw.param.pb.ParamType";
 

@@ -3,7 +3,12 @@ syntax = "proto3";
 package csw_params;
 
 import "scalapb/scalapb.proto";
-import "google/protobuf/descriptor.proto";
+
+option (scalapb.options) = {
+    import: "csw.param.pb._"
+    import: "csw.param.models._"
+    single_file: true
+};
 
 //ByteItems
 //CharItems
@@ -14,76 +19,90 @@ import "google/protobuf/descriptor.proto";
 //ShortMatrixItems
 
 message AnyItems {
-//    option (scalapb.message).extends = "csw.param.pb.ItemType[com.google.protobuf.ByteString, AnyItems]";
+    //    option (scalapb.message).extends = "ItemType[com.google.protobuf.ByteString, AnyItems]";
     repeated bytes values = 1;
 }
 
 message StringItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[String, StringItems]";
+    option (scalapb.message).extends = "ItemType[String]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[StringItems]";
     repeated string values = 1;
 }
 
 message BooleanItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[Boolean, BooleanItems]";
+    option (scalapb.message).extends = "ItemType[Boolean]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[BooleanItems]";
     repeated bool values = 1;
 }
 
 message IntItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[Int, IntItems]";
+    option (scalapb.message).extends = "ItemType[Int]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[IntItems]";
     repeated int32 values = 1;
 }
 
 message LongItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[Long, LongItems]";
+    option (scalapb.message).extends = "ItemType[Long]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[LongItems]";
     repeated fixed64 values = 1;
 }
 
 message DoubleItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[Double, DoubleItems]";
+    option (scalapb.message).extends = "ItemType[Double]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[DoubleItems]";
     repeated double values = 1;
 }
 
 message FloatItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[Float, FloatItems]";
+    option (scalapb.message).extends = "ItemType[Float]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[FloatItems]";
     repeated float values = 1;
 }
 
 message IntArrayItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[csw.param.models.ArrayData[Int], IntArrayItems]";
-    repeated IntItems values = 1 [(scalapb.field).type = "csw.param.models.ArrayData[Int]"];
+    option (scalapb.message).extends = "ItemType[ArrayData[Int]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[IntArrayItems]";
+    repeated IntItems values = 1 [(scalapb.field).type = "ArrayData[Int]"];
 }
 
 message LongArrayItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[csw.param.models.ArrayData[Long], LongArrayItems]";
-    repeated LongItems values = 1 [(scalapb.field).type = "csw.param.models.ArrayData[Long]"];
+    option (scalapb.message).extends = "ItemType[ArrayData[Long]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[LongArrayItems]";
+    repeated LongItems values = 1 [(scalapb.field).type = "ArrayData[Long]"];
 }
 
 message FloatArrayItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[csw.param.models.ArrayData[Float], FloatArrayItems]";
-    repeated FloatItems values = 1 [(scalapb.field).type = "csw.param.models.ArrayData[Float]"];
+    option (scalapb.message).extends = "ItemType[ArrayData[Float]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[FloatArrayItems]";
+    repeated FloatItems values = 1 [(scalapb.field).type = "ArrayData[Float]"];
 }
 
 message DoubleArrayItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[csw.param.models.ArrayData[Double], DoubleArrayItems]";
-    repeated DoubleItems values = 1 [(scalapb.field).type = "csw.param.models.ArrayData[Double]"];
+    option (scalapb.message).extends = "ItemType[ArrayData[Double]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[DoubleArrayItems]";
+    repeated DoubleItems values = 1 [(scalapb.field).type = "ArrayData[Double]"];
 }
 
 message IntMatrixItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[csw.param.models.MatrixData[Int], IntMatrixItems]";
-    repeated IntArrayItems values = 1 [(scalapb.field).type = "csw.param.models.MatrixData[Int]"];
+    option (scalapb.message).extends = "ItemType[MatrixData[Int]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[IntMatrixItems]";
+    repeated IntArrayItems values = 1 [(scalapb.field).type = "MatrixData[Int]"];
 }
 
 message LongMatrixItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[csw.param.models.MatrixData[Long], LongMatrixItems]";
-    repeated LongArrayItems values = 1 [(scalapb.field).type = "csw.param.models.MatrixData[Long]"];
+    option (scalapb.message).extends = "ItemType[MatrixData[Long]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[LongMatrixItems]";
+    repeated LongArrayItems values = 1 [(scalapb.field).type = "MatrixData[Long]"];
 }
 
 message FloatMatrixItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[csw.param.models.MatrixData[Float], FloatMatrixItems]";
-    repeated FloatArrayItems values = 1 [(scalapb.field).type = "csw.param.models.MatrixData[Float]"];
+    option (scalapb.message).extends = "ItemType[MatrixData[Float]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[FloatMatrixItems]";
+    repeated FloatArrayItems values = 1 [(scalapb.field).type = "MatrixData[Float]"];
 }
 
 message DoubleMatrixItems {
-    option (scalapb.message).extends = "csw.param.pb.ItemType[csw.param.models.MatrixData[Double], DoubleMatrixItems]";
-    repeated DoubleArrayItems values = 1 [(scalapb.field).type = "csw.param.models.MatrixData[Double]"];
+    option (scalapb.message).extends = "ItemType[MatrixData[Double]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[DoubleMatrixItems]";
+    repeated DoubleArrayItems values = 1 [(scalapb.field).type = "MatrixData[Double]"];
 }

@@ -1,22 +1,29 @@
 package csw.param.pb
 
-import com.trueaccord.scalapb.{GeneratedMessage, Message, TypeMapper}
 import csw.param.generics._
 import csw_params.parameter.PbParameter.Items
 
 import scala.reflect.ClassTag
 
-trait ItemType[T, S <: ItemType[T, S]] extends GeneratedMessage with Message[S] { self: S ⇒
+trait ItemType[T] {
   def values: Seq[T]
-  def withValues(xs: Seq[T]): S
-  def as[R](implicit mapper: TypeMapper[S, R]): R    = mapper.toCustom(this)
+  def withValues2[R](xs: Seq[T]): R = withValues(xs).asInstanceOf[R]
+  def withValues(xs: Seq[T]): Any
   def keyType(implicit tag: ClassTag[T]): KeyType[T] = KeyType.values.find(_.tag == tag).get.asInstanceOf[KeyType[T]]
+}
+
+trait ItemTypeCompanion[S] {
+  def defaultInstance: S
+}
+
+object ItemTypeCompanion {
+  def apply[T](implicit x: ItemTypeCompanion[T]): ItemTypeCompanion[T] = x
 }
 
 trait ParamType {
   def items: Items
-  def cswItems: ItemType[_, _] = items.value match {
-    case x: ItemType[_, _] ⇒ x
-    case x                 ⇒ throw new RuntimeException(s"unexpected type ${x.getClass} found, ItemType expected")
+  def cswItems: ItemType[_] = items.value match {
+    case x: ItemType[_] ⇒ x
+    case x              ⇒ throw new RuntimeException(s"unexpected type ${x.getClass} found, ItemType expected")
   }
 }

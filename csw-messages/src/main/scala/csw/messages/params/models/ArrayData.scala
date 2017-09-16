@@ -2,8 +2,8 @@ package csw.messages.params.models
 
 import java.util
 
-import com.trueaccord.scalapb.{GeneratedMessageCompanion, TypeMapper}
-import csw.param.pb.ItemType
+import com.trueaccord.scalapb.TypeMapper
+import csw.param.pb.{ItemType, ItemTypeCompanion}
 import spray.json.JsonFormat
 
 import scala.collection.JavaConverters._
@@ -27,9 +27,9 @@ object ArrayData {
 
   def fromArray[T: ClassTag](xs: T*): ArrayData[T] = new ArrayData(xs.toArray[T])
 
-  implicit def typeMapper2[T: ClassTag, S <: ItemType[T, S]: GeneratedMessageCompanion]: TypeMapper[S, ArrayData[T]] =
+  implicit def typeMapper2[T: ClassTag, S <: ItemType[T]: ItemTypeCompanion]: TypeMapper[S, ArrayData[T]] =
     TypeMapper[S, ArrayData[T]](x ⇒ ArrayData(x.values.toArray[T]))(
-      x ⇒ implicitly[GeneratedMessageCompanion[S]].defaultInstance.withValues(x.data)
+      x ⇒ ItemTypeCompanion[S].defaultInstance.withValues2(x.data)
     )
 
 }

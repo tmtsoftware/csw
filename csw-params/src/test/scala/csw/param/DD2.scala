@@ -1,13 +1,12 @@
 package csw.param
 
 import csw.param.generics.{KeyType, Parameter}
-import csw.param.generics.KeyType.IntKey
 import csw.param.models.{ArrayData, MatrixData}
 import csw.units.Units
 import csw_params.parameter.PbParameter
-import csw_params.parameter.PbParameter.Items
 import csw_params.parameter_types._
 import org.scalatest.FunSuite
+import spray.json.JsonFormat
 
 class DD2 extends FunSuite {
 
@@ -74,11 +73,6 @@ class DD2 extends FunSuite {
     println(out2 === param2)
   }
 
-  test("5") {
-    println(IntItems().addValues(1, 2, 3).as[ArrayData[Int]])
-    println(IntArrayItems().addValues(ArrayData.fromArray(1, 2, 3), ArrayData.fromArray(6, 7)).as[MatrixData[Int]])
-  }
-
   test("6") {
     import spray.json.DefaultJsonProtocol._
     val key    = KeyType.IntKey.make("encoder")
@@ -86,6 +80,21 @@ class DD2 extends FunSuite {
     val format = Parameter.typeMapper[Int]
     val value  = format.toCustom(format.toBase(param))
     println(value)
+  }
+
+  test("7") {
+    println(PbParameter.scalaDescriptor.fields)
+  }
+
+  test("8") {
+    import spray.json.DefaultJsonProtocol._
+    ArrayData.format[Int]
+    implicitly[JsonFormat[ArrayData[Int]]]
+    Parameter.typeMapper[ArrayData[Int]]
+    Parameter.typeMapper[MatrixData[Int]]
+//    val key   = KeyType.IntArrayKey.make("blah")
+//    val param = key.set(ArrayData.fromArray(1, 2, 3))
+
   }
 
 }

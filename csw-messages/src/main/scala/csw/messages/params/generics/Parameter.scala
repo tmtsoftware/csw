@@ -12,7 +12,6 @@ import csw.param.ParamSerializable
 import csw.param.pb.PbFormat
 import csw.units.Units
 import csw_params.parameter.PbParameter
-import csw_params.parameter.PbParameter.Items
 import csw_params.parameter_types.AnyItems
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
@@ -66,7 +65,7 @@ object Parameter {
 
   def apply[T](implicit x: JsonFormat[Parameter[T]]): JsonFormat[Parameter[T]] = x
 
-  implicit def typeMapper[S: ClassTag: JsonFormat: PbFormat]: TypeMapper[PbParameter, Parameter[S]] =
+  implicit def typeMapper[S: ClassTag: JsonFormat]: TypeMapper[PbParameter, Parameter[S]] =
     new TypeMapper[PbParameter, Parameter[S]] {
       override def toCustom(pbParameter: PbParameter): Parameter[S] = Parameter(
         pbParameter.name,
@@ -79,7 +78,7 @@ object Parameter {
         PbParameter()
           .withName(x.keyName)
           .withUnits(x.units)
-          .withAnyItems(AnyItems().withValues(x.items.map(s ⇒ PbFormat[S].toBase(s))))
+//          .withAnyItems(AnyItems().withValues(x.items.map(s ⇒ PbFormat[S].toBase(s))))
     }
 }
 
