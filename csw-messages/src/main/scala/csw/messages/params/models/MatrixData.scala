@@ -34,7 +34,7 @@ object MatrixData {
 
   implicit def typeMapper2[T: ClassTag, S <: ItemType[ArrayData[T]]: ItemTypeCompanion]: TypeMapper[S, MatrixData[T]] =
     TypeMapper[S, MatrixData[T]](x ⇒ MatrixData.fromArrays(x.values.toArray.map(a ⇒ a.data.array)))(
-      x ⇒ ItemTypeCompanion[S].defaultInstance.withValues2(x.data.map(ArrayData.apply))
+      x ⇒ ItemTypeCompanion.make(x.data.map(ArrayData.apply))
     )
 }
 

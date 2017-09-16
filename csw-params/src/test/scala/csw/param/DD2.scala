@@ -90,11 +90,11 @@ class DD2 extends FunSuite {
     import spray.json.DefaultJsonProtocol._
     ArrayData.format[Int]
     implicitly[JsonFormat[ArrayData[Int]]]
-    Parameter.typeMapper[ArrayData[Int]]
+    val value = Parameter.typeMapper[ArrayData[Int]]
     Parameter.typeMapper[MatrixData[Int]]
-//    val key   = KeyType.IntArrayKey.make("blah")
-//    val param = key.set(ArrayData.fromArray(1, 2, 3))
-
+    val key   = KeyType.IntArrayKey.make("blah")
+    val param = key.set(ArrayData.fromArray(1, 2, 3))
+    value.toCustom(value.toBase(param))
   }
 
 }
