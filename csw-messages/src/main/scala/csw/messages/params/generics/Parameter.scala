@@ -9,10 +9,8 @@ import com.google.protobuf.ByteString
 import com.google.protobuf.wrappers.StringValue
 import com.trueaccord.scalapb.TypeMapper
 import csw.param.ParamSerializable
-import csw.param.pb.PbFormat
 import csw.units.Units
 import csw_params.parameter.PbParameter
-import csw_params.parameter_types.AnyItems
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter

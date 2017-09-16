@@ -6,6 +6,7 @@ import "scalapb/scalapb.proto";
 
 option (scalapb.options) = {
     import: "csw.param.pb._"
+    import: "csw.param.pb.Mapping._"
     import: "csw.param.models._"
     single_file: true
 };

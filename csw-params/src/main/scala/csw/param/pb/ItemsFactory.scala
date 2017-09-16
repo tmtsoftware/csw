@@ -1,8 +1,7 @@
 package csw.param.pb
 
 import csw_params.parameter.PbParameter.Items
-import csw_params.parameter.PbParameter.Items.IntItems
-import csw_params.parameter_types
+import csw_params.parameter_types.IntItems
 
 trait ItemsFactory[T] {
   type S
@@ -16,16 +15,15 @@ object ItemsFactory {
     override type S = _S
     override def make(s: _S): Items = _make(s)
   }
-  def apply[T](implicit x: ItemsFactory[T]): ItemsFactory.Aux[T, x.S] = x.asInstanceOf
+  def apply[T](implicit x: ItemsFactory[T]): ItemsFactory.Aux[T, x.S] = x.asInstanceOf[ItemsFactory.Aux[T, x.S]]
 
-  implicit val IntItemsFactory: ItemsFactory.Aux[Int, parameter_types.IntItems] = ItemsFactory.from(IntItems)
+  implicit val IntItemsFactory: ItemsFactory.Aux[Int, IntItems] = ItemsFactory.from(Items.IntItems)
 }
 
-object A {
-  private val items: parameter_types.IntItems = parameter_types.IntItems().addValues(1, 2, 3)
+object A extends App {
+  def m[T: ItemsFactory, S <: ItemType[T]: ItemTypeCompanion](items: Seq[T]): Items = {
+    ItemsFactory[T].make(ItemTypeCompanion[S].defaultInstance.withValues2(items))
+  }
 
-//  implicitly[ItemsFactory[Int] { type S = parameter_types.IntItems }].make(items)
-//  implicitly[ItemsFactory.Aux[Int, parameter_types.IntItems]].make(items)
-
-  ItemsFactory[Int].make(items)
+  println(m[Int, IntItems](Seq(1, 2, 3)))
 }
