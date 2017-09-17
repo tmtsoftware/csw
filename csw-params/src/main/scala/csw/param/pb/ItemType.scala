@@ -7,8 +7,8 @@ import scala.reflect.ClassTag
 
 trait ItemType[T] {
   def values: Seq[T]
-  def withValues2[R](xs: Seq[T]): R = withValues(xs).asInstanceOf[R]
   def withValues(xs: Seq[T]): Any
+  def withValues2(xs: Seq[T]): this.type             = withValues(xs).asInstanceOf[this.type]
   def keyType(implicit tag: ClassTag[T]): KeyType[T] = KeyType.values.find(_.tag == tag).get.asInstanceOf[KeyType[T]]
 }
 
