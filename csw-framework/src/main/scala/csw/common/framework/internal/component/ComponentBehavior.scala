@@ -36,7 +36,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   ctx.self ! Initialize
 
   def onMessage(msg: ComponentMessage): Behavior[ComponentMessage] = {
-    log.debug(s"Component in mode :[$mode] received message :[$msg]")
+    log.debug(s"Component TLA in mode :[$mode] received message :[$msg]")
     (mode, msg) match {
       case (_, msg: CommonMessage)                      ⇒ onCommon(msg)
       case (ComponentMode.Idle, msg: IdleMessage)       ⇒ onIdle(msg)
@@ -48,7 +48,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
     case PostStop ⇒
-      log.warn(s"Component is shutting down")
+      log.warn(s"Component TLA is shutting down")
       val shutdownResult = Try {
         Await.result(lifecycleHandlers.onShutdown(), ComponentBehavior.shutdownTimeout)
       }
@@ -69,7 +69,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case Initialize ⇒
       async {
         await(lifecycleHandlers.initialize())
-        log.debug(s"Component is changing state from [$mode] to [${ComponentMode.Running}]")
+        log.debug(s"Component TLA is changing state from [$mode] to [${ComponentMode.Running}]")
         mode = ComponentMode.Running
         lifecycleHandlers.isOnline = true
         supervisor ! Running(ctx.self)
@@ -80,7 +80,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case Lifecycle(message) ⇒ onLifecycle(message)
     case x: Msg             ⇒ lifecycleHandlers.onDomainMsg(x)
     case x: CommandMessage  ⇒ onRunningCompCommandMessage(x)
-    case msg                ⇒ log.error(s"Component cannot handle message :[$msg]")
+    case msg                ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
   }
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
@@ -88,13 +88,13 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       if (!lifecycleHandlers.isOnline) {
         lifecycleHandlers.isOnline = true
         lifecycleHandlers.onGoOnline()
-        log.debug(s"Component is Online")
+        log.debug(s"Component TLA is Online")
       }
     case GoOffline ⇒
       if (lifecycleHandlers.isOnline) {
         lifecycleHandlers.isOnline = false
         lifecycleHandlers.onGoOffline()
-        log.debug(s"Component is Offline")
+        log.debug(s"Component TLA is Offline")
       }
   }
 

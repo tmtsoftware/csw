@@ -112,21 +112,20 @@ class SupervisorBehavior(
     case GetSupervisorMode(replyTo)                    ⇒ replyTo ! mode
     case Restart                                       ⇒ onRestart()
     case Shutdown ⇒
-      log.debug(s"Supervisor is changing state from [$mode] to ${SupervisorMode.Shutdown}")
+      log.debug(s"Supervisor is changing state from [$mode] to [${SupervisorMode.Shutdown}]")
       mode = SupervisorMode.Shutdown
       ctx.stop(component)
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
     case RegistrationComplete(registrationResult) ⇒
-      log.info(s"Supervisor with connection :[${akkaRegistration.connection}] is registering with location service")
       registrationOpt = Some(registrationResult)
       spawnAndWatchComponent()
     case RegistrationFailed(throwable) ⇒
       log.error(throwable.getMessage, ex = throwable)
       throw throwable
     case Running(componentRef) ⇒
-      log.debug(s"Supervisor is changing state from [$mode] to ${SupervisorMode.Running}")
+      log.debug(s"Supervisor is changing state from [$mode] to [${SupervisorMode.Running}]")
       mode = SupervisorMode.Running
       timerScheduler.cancel(InitializeTimerKey)
       runningComponent = Some(componentRef)
@@ -151,7 +150,7 @@ class SupervisorBehavior(
   }
 
   private def onRestart(): Unit = {
-    log.debug(s"Supervisor is changing state from [$mode] to ${SupervisorMode.Restart}")
+    log.debug(s"Supervisor is changing state from [$mode] to [${SupervisorMode.Restart}]")
     mode = SupervisorMode.Restart
     registrationOpt match {
       case Some(registrationResult) ⇒
@@ -199,7 +198,9 @@ class SupervisorBehavior(
   }
 
   private def registerWithLocationService(): Unit = {
-    log.debug(s"Supervisor with connection :[${akkaRegistration.connection}] is registering with location service")
+    log.debug(
+      s"Supervisor with connection :[${akkaRegistration.connection.name}] is registering with location service with ref :[${akkaRegistration.actorRef}]"
+    )
     locationService.register(akkaRegistration).onComplete {
       case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
       case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
@@ -215,7 +216,7 @@ class SupervisorBehavior(
   }
 
   private def spawnAndWatchComponent(): Unit = {
-    log.debug(s"Supervisor is spawning component")
+    log.debug(s"Supervisor is spawning component TLA")
     component = ctx.spawn[Nothing](
       Actor
         .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent, locationService))

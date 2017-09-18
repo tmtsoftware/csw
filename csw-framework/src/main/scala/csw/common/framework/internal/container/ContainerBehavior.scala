@@ -93,20 +93,18 @@ class ContainerBehavior(
         updateRunningComponents()
       }
     case SupervisorModeChanged(supervisor, supervisorMode) ⇒
-      log.debug(s"Container received acknowledgement from supervisor :[$supervisor] for mode :[$supervisorMode]")
       if (supervisorMode == SupervisorMode.Running) {
         runningComponents = (supervisors.find(_.component.supervisor == supervisor) ++ runningComponents).toSet
         updateRunningComponents()
       }
     case RegistrationComplete(registrationResult) ⇒
       registrationOpt = Some(registrationResult)
-      log.info(s"Successfully registered container with location :[${registrationResult.location}]")
     case RegistrationFailed(throwable) ⇒
       log.error(throwable.getMessage, ex = throwable)
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
-    log.debug(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
+    log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
     Future
       .traverse(componentInfos) { ci ⇒
         supervisorInfoFactory.make(ctx.self, ci, locationService)
@@ -116,13 +114,15 @@ class ContainerBehavior(
 
   private def updateRunningComponents(): Unit = {
     if (runningComponents.size == supervisors.size) {
-      log.debug(s"Container is changing state from [$mode] to ${ContainerMode.Running}")
+      log.debug(s"Container is changing state from [$mode] to [${ContainerMode.Running}]")
       mode = ContainerMode.Running
     }
   }
 
   private def registerWithLocationService(): Unit = {
-    log.debug(s"Container with connection :[${akkaRegistration.connection}] is registering with location service")
+    log.debug(
+      s"Container with connection :[${akkaRegistration.connection.name}] is registering with location service with ref :[${akkaRegistration.actorRef}]"
+    )
     locationService.register(akkaRegistration).onComplete {
       case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
       case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)

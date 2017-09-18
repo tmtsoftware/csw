@@ -58,7 +58,6 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
         case r @ LWWRegister(Some(`location`) | None) ⇒ r.withValue(Some(location))
         case LWWRegister(Some(otherLocation)) ⇒
           val locationIsRegistered = OtherLocationIsRegistered(location, otherLocation)
-          log.error(locationIsRegistered.getMessage, ex = locationIsRegistered)
           throw locationIsRegistered
       },
       await(initialValue)
@@ -231,6 +230,8 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     override def location: Location = loc
 
     override def unregister(): Future[Done] = outer.unregister(location.connection)
+
+    override def toString: String = location.toString
   }
 
   private def resolveWithin[L <: Location](connection: TypedConnection[L],
