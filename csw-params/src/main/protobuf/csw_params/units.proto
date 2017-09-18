@@ -1,6 +1,11 @@
 syntax = "proto3";
 
 package csw_params;
+import "scalapb/scalapb.proto";
+
+option (scalapb.options) = {
+    single_file: true
+};
 
 enum PbUnits {
     //default unit

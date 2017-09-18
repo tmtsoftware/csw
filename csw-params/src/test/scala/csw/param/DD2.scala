@@ -77,8 +77,8 @@ class DD2 extends FunSuite {
     import spray.json.DefaultJsonProtocol._
     val key    = KeyType.IntKey.make("encoder")
     val param  = key.set(1, 2, 3, 4)
-    val format = Parameter.typeMapper[Int]
-    val value  = format.toCustom(format.toBase(param))
+    val mapper = Parameter.typeMapper[Int]
+    val value  = mapper.toCustom(mapper.toBase(param))
     println(value)
   }
 
@@ -92,13 +92,20 @@ class DD2 extends FunSuite {
 
   test("8") {
     import spray.json.DefaultJsonProtocol._
-    ArrayData.format[Int]
-    implicitly[JsonFormat[ArrayData[Int]]]
     val value = Parameter.typeMapper[ArrayData[Int]]
-    Parameter.typeMapper[MatrixData[Int]]
     val key   = KeyType.IntArrayKey.make("blah")
     val param = key.set(ArrayData.fromArray(1, 2, 3))
-    value.toCustom(value.toBase(param))
+    println(value.toCustom(value.toBase(param)))
+  }
+
+  test("9") {
+    import spray.json.DefaultJsonProtocol._
+    val value  = Parameter.typeMapper[MatrixData[Int]]
+    val key    = KeyType.IntMatrixKey.make("blah")
+    val param  = key.set(MatrixData.fromArrays(Array(1, 2, 3), Array(6, 7)))
+    val result = value.toCustom(value.toBase(param))
+    println(result)
+    println(result.keyType)
   }
 
 }

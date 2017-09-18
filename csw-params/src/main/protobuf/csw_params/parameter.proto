@@ -4,6 +4,7 @@ package csw_params;
 
 import "csw_params/parameter_types.proto";
 import "csw_params/units.proto";
+import "csw_params/keytype.proto";
 import "scalapb/scalapb.proto";
 
 option (scalapb.options) = {
@@ -11,10 +12,10 @@ option (scalapb.options) = {
 };
 
 message PbParameter {
-    option (scalapb.message).extends = "csw.param.pb.ParamType";
-
     string name = 1;
     PbUnits units = 2 [(scalapb.field).type = "csw.units.Units"];
+    PbKeyType keyType = 20 [(scalapb.field).type = "csw.param.generics.KeyType[_]"];
+
     oneof items {
         StringItems stringItems = 3;
 
@@ -36,8 +37,4 @@ message PbParameter {
 
         AnyItems anyItems = 30;
     }
-}
-
-message PbSetup {
-    repeated PbParameter params = 1;
 }

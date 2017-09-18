@@ -10,6 +10,8 @@ import csw.param.formats.JsonSupport
 import csw.param.models._
 import csw.units.Units
 import csw.units.Units.second
+import csw_params.keytype.PbKeyType
+import csw_params.parameter.PbParameter
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
 
@@ -17,8 +19,8 @@ import scala.collection.immutable
 import scala.reflect.ClassTag
 
 sealed class KeyType[S: JsonFormat: ClassTag] extends EnumEntry with Serializable {
-  def paramFormat: JsonFormat[Parameter[S]] = Parameter[S]
-  def tag: ClassTag[S]                      = scala.reflect.classTag[S]
+  def paramFormat: JsonFormat[Parameter[S]]             = Parameter[S]
+  def typeMapper: TypeMapper[PbParameter, Parameter[S]] = ???
 }
 
 sealed class SimpleKeyType[S: JsonFormat: ClassTag] extends KeyType[S] {
@@ -98,9 +100,12 @@ object KeyType extends Enum[KeyType[_]] {
   case object JFloatMatrixKey  extends MatrixKeyType[java.lang.Float]
   case object JDoubleMatrixKey extends MatrixKeyType[java.lang.Double]
 
-  implicit def format[T]: JsonFormat[KeyType[T]] = enumFormat(this).asInstanceOf[JsonFormat[KeyType[T]]]
+  implicit def format: JsonFormat[KeyType[_]] = enumFormat(this)
 
-  implicit def format2: JsonFormat[KeyType[_]] = enumFormat(this)
+  implicit def format2[T]: JsonFormat[KeyType[T]] = enumFormat(this).asInstanceOf[JsonFormat[KeyType[T]]]
+
+  implicit val typeMapper: TypeMapper[PbKeyType, KeyType[_]] =
+    TypeMapper[PbKeyType, KeyType[_]](x ⇒ KeyType.withName(x.toString()))(x ⇒ PbKeyType.fromName(x.toString).get)
 }
 
 object JKeyTypes {

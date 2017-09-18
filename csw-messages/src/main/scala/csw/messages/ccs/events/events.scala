@@ -4,6 +4,12 @@ import java.util.Optional
 
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.messages.params.models.{ObsId, Prefix}
+import com.trueaccord.scalapb.TypeMapper
+import csw.param.models.{ObsId, Prefix}
+import csw.param.generics.{Key, Parameter, ParameterSetKeyData, ParameterSetType}
+import csw_params.events.PbEvent
+import csw_params.events.PbEvent.PbEventType
+import csw_params.parameter.PbParameter
 
 import scala.compat.java8.OptionConverters.RichOptionForJava8
 
@@ -41,6 +47,39 @@ sealed trait EventType[T <: EventType[T]] extends ParameterSetType[T] with Param
    */
   def obsIdOption: Option[ObsId]     = info.obsId
   def obsIdOptional: Optional[ObsId] = info.obsId.asJava
+}
+
+object EventType {
+  private val mapper =
+    TypeMapper[Seq[PbParameter], Set[Parameter[_]]] {
+      _.map(Parameter.typeMapper2.toCustom).toSet
+    } {
+      _.map(Parameter.typeMapper2.toBase).toSeq
+    }
+
+  implicit def typeMapper[T <: EventType[_]]: TypeMapper[PbEvent, T] = new TypeMapper[PbEvent, T] {
+    override def toCustom(base: PbEvent): T = {
+      val factory: (EventInfo, Set[Parameter[_]]) ⇒ Any = base.eventType match {
+        case PbEventType.StatusEvent      ⇒ StatusEvent.apply
+        case PbEventType.ObserveEvent     ⇒ ObserveEvent.apply
+        case PbEventType.SystemEvent      ⇒ SystemEvent.apply
+        case PbEventType.Unrecognized(dd) ⇒ throw new RuntimeException(s"unknown event type=$dd")
+      }
+      factory(EventInfo(base.prefix), mapper.toCustom(base.paramSet)).asInstanceOf[T]
+    }
+
+    override def toBase(custom: T): PbEvent = {
+      val pbEventType = custom match {
+        case _: StatusEvent  ⇒ PbEventType.StatusEvent
+        case _: ObserveEvent ⇒ PbEventType.ObserveEvent
+        case _: SystemEvent  ⇒ PbEventType.SystemEvent
+      }
+      PbEvent()
+        .withPrefix(custom.prefixStr)
+        .withEventType(pbEventType)
+        .withParamSet(mapper.toBase(custom.paramSet))
+    }
+  }
 }
 
 /**

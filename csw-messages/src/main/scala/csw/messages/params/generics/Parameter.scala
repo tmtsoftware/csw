@@ -9,8 +9,10 @@ import com.google.protobuf.ByteString
 import com.google.protobuf.wrappers.StringValue
 import com.trueaccord.scalapb.TypeMapper
 import csw.param.ParamSerializable
+import csw.param.pb.{ItemType, ItemsFactory}
 import csw.units.Units
 import csw_params.parameter.PbParameter
+import csw_params.parameter.PbParameter.Items
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
@@ -63,12 +65,12 @@ object Parameter {
 
   def apply[T](implicit x: JsonFormat[Parameter[T]]): JsonFormat[Parameter[T]] = x
 
-  implicit def typeMapper[S: ClassTag: JsonFormat]: TypeMapper[PbParameter, Parameter[S]] =
+  implicit def typeMapper[S: ClassTag: JsonFormat: ItemsFactory]: TypeMapper[PbParameter, Parameter[S]] =
     new TypeMapper[PbParameter, Parameter[S]] {
       override def toCustom(pbParameter: PbParameter): Parameter[S] = Parameter(
         pbParameter.name,
-        pbParameter.cswItems.keyType.asInstanceOf[KeyType[S]],
-        pbParameter.cswItems.values.asInstanceOf[Seq[S]].toArray[S],
+        pbParameter.keyType.asInstanceOf[KeyType[S]],
+        cswItems(pbParameter.items),
         pbParameter.units
       )
 
@@ -76,8 +78,18 @@ object Parameter {
         PbParameter()
           .withName(x.keyName)
           .withUnits(x.units)
-//          .withAnyItems(AnyItems().withValues(x.items.map(s ⇒ PbFormat[S].toBase(s))))
+          .withKeyType(x.keyType)
+          .withItems(ItemsFactory[S].make(x.items))
     }
+
+  implicit val typeMapper2: TypeMapper[PbParameter, Parameter[_]] =
+    TypeMapper[PbParameter, Parameter[_]](p ⇒ p.keyType.typeMapper.toCustom(p))(p => p.toPb)
+
+  def cswItems[T: ClassTag](items: Items): mutable.WrappedArray[T] = items.value match {
+    case x: ItemType[_] ⇒ x.asInstanceOf[ItemType[T]].values.toArray[T]
+    case x              ⇒ throw new RuntimeException(s"unexpected type ${x.getClass} found, ItemType expected")
+  }
+
 }
 
 case class Parameter[S: JsonFormat: ClassTag] private[messages] (
@@ -140,4 +152,5 @@ case class Parameter[S: JsonFormat: ClassTag] private[messages] (
   def valuesToString: String = items.mkString("(", ",", ")")
   override def toString      = s"$keyName($valuesToString$units)"
   def toJson: JsValue        = Parameter[S].write(this)
+  def toPb: PbParameter      = ???
 }

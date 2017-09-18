@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package csw_params;
+
+import "csw_params/parameter.proto";
+import "scalapb/scalapb.proto";
+
+option (scalapb.options) = {
+    single_file: true
+};
+
+message PbEvent {
+    enum PbEventType {
+        StatusEvent = 0;
+        ObserveEvent = 1;
+        SystemEvent = 2;
+    }
+    repeated PbParameter paramSet = 1;
+    PbEventType eventType = 2;
+    string prefix = 3;
+}

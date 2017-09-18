@@ -15,8 +15,10 @@ object ItemsFactory {
     makeItems(ItemTypeCompanion.make(xs))
   }
 
-  implicit val ints: ItemsFactory[Int]             = ItemsFactory(Items.IntItems)
-  implicit val intss: ItemsFactory[ArrayData[Int]] = ItemsFactory(Items.IntArrayItems)
+  implicit val IntItemsFactory: ItemsFactory[Int]                       = ItemsFactory(Items.IntItems)
+  implicit val IntArrayItemsFactory: ItemsFactory[ArrayData[Int]]       = ItemsFactory(Items.IntArrayItems)
+  implicit val IntMatrixItemsFactory: ItemsFactory[MatrixData[Int]]     = ItemsFactory(Items.IntMatrixItems)
+  implicit val FloatMatrixItemsFactory: ItemsFactory[MatrixData[Float]] = ItemsFactory(Items.FloatMatrixItems)
 }
 
 object A extends App {
