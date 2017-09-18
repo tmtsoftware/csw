@@ -10,12 +10,12 @@ import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.{ComponentStatistics, SampleComponentState}
-import csw.common.framework.internal.container.ContainerMode
-import csw.common.framework.internal.supervisor.SupervisorMode
+import csw.common.framework.internal.container.ContainerLifecycleState
+import csw.common.framework.internal.supervisor.SupervisorLifecycleState
 import csw.common.framework.models.ContainerCommonMessage.GetComponents
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
-import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorMode}
+import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.common.framework.models.ToComponentLifecycleMessage.GoOffline
 import csw.common.framework.models.{Components, ContainerExternalMessage, SupervisorExternalMessage}
 import csw.param.states.CurrentState
@@ -95,7 +95,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
     runOn(member1) {
       enterBarrier("config-file-uploaded")
 
-      val testProbe = TestProbe[ContainerMode]
+      val testProbe = TestProbe[ContainerLifecycleState]
 
       // withEntries required for multi-node test where seed node is picked up from environment variable
       val clusterSettings = ClusterAwareSettings.joinLocal(3552).withEntries(sys.env)
@@ -107,20 +107,20 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val containerRef =
         Await.result(containerCmd.start(args), 15.seconds).map(_.asInstanceOf[ActorRef[ContainerExternalMessage]]).get
 
-      assertThatContainerIsInRunningMode(containerRef, testProbe, 5.seconds)
+      assertContainerIsRunning(containerRef, testProbe, 5.seconds)
 
-      val componentsProbe     = TestProbe[Components]
-      val supervisorModeProbe = TestProbe[SupervisorMode]
+      val componentsProbe               = TestProbe[Components]
+      val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
 
       containerRef ! GetComponents(componentsProbe.ref)
       val laserContainerComponents = componentsProbe.expectMsgType[Components].components
       laserContainerComponents.size shouldBe 3
 
-      // check that all the components within supervisor moves to Running mode
+      // check that all the components within supervisor moves to Running lifecycle state
       laserContainerComponents
         .foreach { component ⇒
-          component.supervisor ! GetSupervisorMode(supervisorModeProbe.ref)
-          supervisorModeProbe.expectMsg(SupervisorMode.Running)
+          component.supervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
+          supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Running)
         }
       enterBarrier("running")
 
@@ -145,7 +145,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
     runOn(member2) {
       enterBarrier("config-file-uploaded")
 
-      val testProbe = TestProbe[SupervisorMode]
+      val testProbe = TestProbe[SupervisorLifecycleState]
 
       val containerCmd = new ContainerCmd("eaton_hcd_standalone_app", ClusterAwareSettings.joinLocal(3552), false)
 
@@ -157,13 +157,13 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val supervisorRef =
         Await.result(containerCmd.start(args), 15.seconds).map(_.asInstanceOf[ActorRef[SupervisorExternalMessage]]).get
 
-      assertThatSupervisorIsInRunningMode(supervisorRef, testProbe, 5.seconds)
+      assertSupervisorIsRunning(supervisorRef, testProbe, 5.seconds)
       enterBarrier("running")
 
       enterBarrier("offline")
       Thread.sleep(50)
-      supervisorRef ! GetSupervisorMode(testProbe.ref)
-      testProbe.expectMsg(SupervisorMode.RunningOffline)
+      supervisorRef ! GetSupervisorLifecycleState(testProbe.ref)
+      testProbe.expectMsg(SupervisorLifecycleState.RunningOffline)
 
       Files.delete(standaloneConfFilePath)
     }

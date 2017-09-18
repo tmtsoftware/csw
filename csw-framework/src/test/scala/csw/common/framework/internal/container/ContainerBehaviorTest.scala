@@ -7,10 +7,14 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, Done}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.common.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorMode}
+import csw.common.framework.internal.supervisor.{
+  SupervisorBehaviorFactory,
+  SupervisorInfoFactory,
+  SupervisorLifecycleState
+}
 import csw.common.framework.models.ContainerCommonMessage.GetComponents
 import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, SupervisorsCreated}
-import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
+import csw.common.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models.{SupervisorInfo, _}
@@ -97,24 +101,27 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
   class RunningContainer() extends IdleContainer {
     containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
-    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
+    ctx.children.map(
+      child ⇒
+        containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
+    )
 
     ctx.children
       .map(child ⇒ ctx.childInbox(child.upcast))
       .map(_.receiveAll())
   }
 
-  test("should start in initialize mode and should not accept any outside messages") {
+  test("should start in initialize lifecycle state and should not accept any outside messages") {
     val idleContainer = new IdleContainer
     import idleContainer._
 
     verify(locationService).register(akkaRegistration)
-    containerBehavior.mode shouldBe ContainerMode.Idle
+    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Idle
     containerBehavior.onMessage(RegistrationComplete(registrationResult))
     containerBehavior.registrationOpt.get shouldBe registrationResult
   }
 
-  test("should change its mode to running after all components move to running mode") {
+  test("should change its lifecycle state to running after all components move to running lifecycle state") {
     val idleContainer = new IdleContainer
     import idleContainer._
 
@@ -129,30 +136,31 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     ctx.children.map(
-      child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running))
+      child ⇒
+        containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
     )
 
     verify(locationService).register(akkaRegistration)
 
     containerBehavior.onMessage(RegistrationComplete(registrationResult))
 
-    containerBehavior.mode shouldBe ContainerMode.Running
+    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Running
   }
 
-  test("should handle restart message by changing its mode to initialize") {
+  test("should handle restart message by changing its lifecycle state to initialize") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
     containerBehavior.onMessage(Restart)
     containerBehavior.runningComponents shouldBe Set.empty
-    containerBehavior.mode shouldBe ContainerMode.Idle
+    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Idle
 
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
       .map(_.receiveMsg()) should contain only Restart
   }
 
-  test("should change its mode from restarting to running after all components have restarted") {
+  test("should change its lifecycle state from restarting to running after all components have restarted") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
@@ -162,30 +170,33 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
       .map(component ⇒ ctx.childInbox(component.name))
       .map(_.receiveAll())
 
-    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
+    ctx.children.map(
+      child ⇒
+        containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
+    )
 
-    containerBehavior.mode shouldBe ContainerMode.Running
+    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Running
   }
 
   test("should handle GoOnline and GoOffline Lifecycle messages by forwarding to all components") {
     val runningContainer = new RunningContainer
     import runningContainer._
 
-    val initialMode = containerBehavior.mode
+    val initialLifecycleState = containerBehavior.lifecycleState
 
     containerBehavior.onMessage(Lifecycle(GoOnline))
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
       .map(_.receiveMsg()) should contain only Lifecycle(GoOnline)
 
-    initialMode shouldBe containerBehavior.mode
+    initialLifecycleState shouldBe containerBehavior.lifecycleState
 
     containerBehavior.onMessage(Lifecycle(GoOffline))
     containerInfo.components.toList
       .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
       .map(_.receiveMsg()) should contain only Lifecycle(GoOffline)
 
-    initialMode shouldBe containerBehavior.mode
+    initialLifecycleState shouldBe containerBehavior.lifecycleState
   }
 
   test("container should be able to handle GetAllComponents message by responding with list of all components") {
@@ -193,17 +204,20 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     import idleContainer._
 
     verify(locationService).register(akkaRegistration)
-    // Container should handle GetComponents message in Idle mode
-    containerBehavior.mode shouldBe ContainerMode.Idle
+    // Container should handle GetComponents message in Idle lifecycle state
+    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Idle
     val probe = TestProbe[Components]
 
     containerBehavior.onMessage(GetComponents(probe.ref))
 
     probe.expectMsg(Components(containerBehavior.supervisors.map(_.component)))
 
-    // Container should handle GetComponents message in Running mode
+    // Container should handle GetComponents message in Running lifecycle state
     containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
-    ctx.children.map(child ⇒ containerBehavior.onMessage(SupervisorModeChanged(child.upcast, SupervisorMode.Running)))
+    ctx.children.map(
+      child ⇒
+        containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
+    )
 
     ctx.children
       .map(child ⇒ ctx.childInbox(child.upcast))
@@ -211,7 +225,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     containerBehavior.onMessage(RegistrationComplete(registrationResult))
 
-    containerBehavior.mode shouldBe ContainerMode.Running
+    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Running
 
     containerBehavior.onMessage(GetComponents(probe.ref))
 

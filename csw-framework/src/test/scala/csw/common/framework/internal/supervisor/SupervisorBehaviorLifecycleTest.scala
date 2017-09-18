@@ -8,7 +8,7 @@ import csw.common.framework.ComponentInfos._
 import csw.common.framework.FrameworkTestMocks.TypedActorMock
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.models.FromComponentLifecycleMessage.Running
-import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
+import csw.common.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.common.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.common.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
@@ -54,17 +54,19 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)
   }
 
-  test("supervisor should start in Idle mode and spawn three actors") {
+  test("supervisor should start in Idle lifecycle state and spawn three actors") {
     val testData = new TestData()
     import testData._
 
-    supervisor.mode shouldBe SupervisorMode.Idle
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
     ctx.children.size shouldBe 3
 
   }
 
   // *************** Begin testing of onIdleMessages ***************
-  test("supervisor should accept Running message from component and change its mode and publish state change") {
+  test(
+    "supervisor should accept Running message from component and change its lifecycle state and publish state change"
+  ) {
     val testData = new TestData()
     import testData._
 
@@ -72,10 +74,14 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisor.onMessage(Running(childComponentInbox.ref))
 
     verify(timer).cancel(SupervisorBehavior.InitializeTimerKey)
-    supervisor.mode shouldBe SupervisorMode.Running
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
     supervisor.runningComponent shouldBe Some(childComponentInbox.ref)
-    containerIdleMessageProbe.expectMsg(SupervisorModeChanged(ctx.selfInbox.ref, SupervisorMode.Running))
-    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
+    containerIdleMessageProbe.expectMsg(
+      SupervisorLifecycleStateChanged(ctx.selfInbox.ref, SupervisorLifecycleState.Running)
+    )
+    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(
+      LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running)
+    )
   }
   // *************** End of testing onIdleMessages ***************
 
@@ -84,18 +90,18 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData()
     import testData._
 
-    val previousSupervisorMode = supervisor.mode
-    val subscriberProbe        = TestProbe[LifecycleStateChanged]
+    val previousSupervisorLifecyleState = supervisor.lifecycleState
+    val subscriberProbe                 = TestProbe[LifecycleStateChanged]
 
     // Subscribe
     supervisor.onMessage(LifecycleStateSubscription(Subscribe(subscriberProbe.ref)))
-    supervisor.mode shouldBe previousSupervisorMode
+    supervisor.lifecycleState shouldBe previousSupervisorLifecyleState
     val subscribeMessage = childPubSubLifecycleInbox.receiveMsg()
     subscribeMessage shouldBe Subscribe[LifecycleStateChanged](subscriberProbe.ref)
 
     // Unsubscribe
     supervisor.onMessage(LifecycleStateSubscription(Unsubscribe[LifecycleStateChanged](subscriberProbe.ref)))
-    supervisor.mode shouldBe previousSupervisorMode
+    supervisor.lifecycleState shouldBe previousSupervisorLifecyleState
     val unsubscribeMessage = childPubSubLifecycleInbox.receiveMsg()
     unsubscribeMessage shouldBe Unsubscribe[LifecycleStateChanged](subscriberProbe.ref)
   }
@@ -104,18 +110,18 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData()
     import testData._
 
-    val subscriberProbe        = TestProbe[CurrentState]
-    val previousSupervisorMode = testData.supervisor.mode
+    val subscriberProbe                 = TestProbe[CurrentState]
+    val previousSupervisorLifecyleState = testData.supervisor.lifecycleState
 
     // Subscribe
     supervisor.onMessage(ComponentStateSubscription(Subscribe[CurrentState](subscriberProbe.ref)))
-    supervisor.mode shouldBe previousSupervisorMode
+    supervisor.lifecycleState shouldBe previousSupervisorLifecyleState
     val subscribeMessage = childPubSubCompStateInbox.receiveMsg()
     subscribeMessage shouldBe Subscribe[CurrentState](subscriberProbe.ref)
 
     // Unsubscribe
     supervisor.onMessage(ComponentStateSubscription(Unsubscribe[CurrentState](subscriberProbe.ref)))
-    supervisor.mode shouldBe previousSupervisorMode
+    supervisor.lifecycleState shouldBe previousSupervisorLifecyleState
     val unsubscribeMessage = childPubSubCompStateInbox.receiveMsg()
     unsubscribeMessage shouldBe Unsubscribe[CurrentState](subscriberProbe.ref)
   }
@@ -134,7 +140,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Restart)
-    supervisor.mode shouldBe SupervisorMode.Restart
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Restart
   }
 
   test("supervisor should handle lifecycle GoOffline message") {
@@ -143,7 +149,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
-    supervisor.mode shouldBe SupervisorMode.RunningOffline
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.RunningOffline
     childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.GoOffline))
   }
 
@@ -154,7 +160,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
-    supervisor.mode shouldBe SupervisorMode.Running
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
     childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.GoOnline))
   }
 
@@ -171,43 +177,43 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
   // *************** End of testing onRunning Messages ***************
 
-  test("should not forward Domain message to a TLA when supervisor is in Idle mode") {
+  test("should not forward Domain message to a TLA when supervisor is in Idle lifecycle state") {
     val testData = new TestData()
     import testData._
 
     sealed trait TestDomainMessage extends DomainMessage
     case object TestCompMessage    extends TestDomainMessage
 
-    // TestCompMessage (DomainMessage) is sent to supervisor when mode is Idle
+    // TestCompMessage (DomainMessage) is sent to supervisor when lifecycle state is Idle
     // in this case, verify that log.error is called once
-    supervisor.mode shouldBe SupervisorMode.Idle
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
     supervisor.onMessage(TestCompMessage)
     supervisor.runningComponent shouldBe empty
     verify(supervisor.log, times(1)).error(ArgumentMatchers.any())
   }
 
-  test("should not forward Domain message to a TLA when supervisor is in Restart mode") {
+  test("should not forward Domain message to a TLA when supervisor is in Restart lifecycle state") {
     val testData = new TestData()
     import testData._
 
     sealed trait TestDomainMessage extends DomainMessage
     case object TestCompMessage    extends TestDomainMessage
 
-    supervisor.mode shouldBe SupervisorMode.Idle
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
     supervisor.onMessage(Running(childComponentInbox.ref))
-    supervisor.mode shouldBe SupervisorMode.Running
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
 
-    // TestCompMessage (DomainMessage) is sent to supervisor when mode is running
+    // TestCompMessage (DomainMessage) is sent to supervisor when lifecycle state is running
     // in this case, verify that log.error is never called
     supervisor.onMessage(TestCompMessage)
     verify(supervisor.log, never()).error(ArgumentMatchers.any())
     childComponentInbox.receiveMsg() shouldBe TestCompMessage
 
-    // TestCompMessage (DomainMessage) is sent to supervisor when mode is Restart
+    // TestCompMessage (DomainMessage) is sent to supervisor when lifecycle state is Restart
     // in this case, verify that log.error is called once and
     // TLA does not receive any message
     supervisor.onMessage(Restart)
-    supervisor.mode shouldBe SupervisorMode.Restart
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Restart
     supervisor.onMessage(TestCompMessage)
     childComponentInbox.receiveAll() shouldBe Seq.empty
     verify(supervisor.log, times(1)).error(ArgumentMatchers.any())

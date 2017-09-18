@@ -5,10 +5,10 @@ import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.{Behavior, PostStop, Signal, Terminated}
-import csw.common.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorMode}
-import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
+import csw.common.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorLifecycleState}
+import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.common.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed, SupervisorsCreated}
-import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
+import csw.common.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models._
 import csw.services.location.models.Connection.AkkaConnection
@@ -33,26 +33,29 @@ class ContainerBehavior(
   val akkaRegistration: AkkaRegistration          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   var supervisors: Set[SupervisorInfo]            = Set.empty
   var runningComponents: Set[SupervisorInfo]      = Set.empty
-  var mode: ContainerMode                         = ContainerMode.Idle
+  var lifecycleState: ContainerLifecycleState     = ContainerLifecycleState.Idle
   var registrationOpt: Option[RegistrationResult] = None
 
   registerWithLocationService()
   createComponents(containerInfo.components)
 
   override def onMessage(msg: ContainerMessage): Behavior[ContainerMessage] = {
-    log.debug(s"Container in mode :[$mode] received message :[$msg]")
-    (mode, msg) match {
-      case (_, msg: ContainerCommonMessage)                ⇒ onCommon(msg)
-      case (ContainerMode.Idle, msg: ContainerIdleMessage) ⇒ onIdle(msg)
-      case (ContainerMode.Running, msg: Lifecycle)         ⇒ supervisors.foreach(_.component.supervisor ! msg)
-      case (_, message)                                    ⇒ log.error(s"Unexpected message :[$message] received by container in mode :[$mode]")
+    log.debug(s"Container in lifecycle state :[$lifecycleState] received message :[$msg]")
+    (lifecycleState, msg) match {
+      case (_, msg: ContainerCommonMessage)                          ⇒ onCommon(msg)
+      case (ContainerLifecycleState.Idle, msg: ContainerIdleMessage) ⇒ onIdle(msg)
+      case (ContainerLifecycleState.Running, msg: Lifecycle)         ⇒ supervisors.foreach(_.component.supervisor ! msg)
+      case (_, message) ⇒
+        log.error(s"Unexpected message :[$message] received by container in lifecycle state :[$lifecycleState]")
     }
     this
   }
 
   override def onSignal: PartialFunction[Signal, Behavior[ContainerMessage]] = {
     case Terminated(supervisor) ⇒
-      log.warn(s"Container in mode :[$mode] received terminated signal from supervisor :[$supervisor]")
+      log.warn(
+        s"Container in lifecycle state :[$lifecycleState] received terminated signal from supervisor :[$supervisor]"
+      )
       supervisors = supervisors.filterNot(_.component.supervisor == supervisor.upcast)
       if (supervisors.isEmpty) {
         log.warn("All supervisors from this container are terminated. Initiating co-ordinated shutdown.")
@@ -68,16 +71,16 @@ class ContainerBehavior(
   def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
     case GetComponents(replyTo) ⇒
       replyTo ! Components(supervisors.map(_.component))
-    case GetContainerMode(replyTo) ⇒
-      replyTo ! mode
+    case GetContainerLifecycleState(replyTo) ⇒
+      replyTo ! lifecycleState
     case Restart ⇒
-      log.debug(s"Container is changing mode from [$mode] to [${ContainerMode.Idle}]")
-      mode = ContainerMode.Idle
+      log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Idle}]")
+      lifecycleState = ContainerLifecycleState.Idle
       runningComponents = Set.empty
       supervisors.foreach(_.component.supervisor ! Restart)
     case Shutdown ⇒
-      log.debug(s"Container is changing mode from [$mode] to [${ContainerMode.Idle}]")
-      mode = ContainerMode.Idle
+      log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Idle}]")
+      lifecycleState = ContainerLifecycleState.Idle
       supervisors.foreach(_.component.supervisor ! Shutdown)
   }
 
@@ -92,8 +95,8 @@ class ContainerBehavior(
         supervisors.foreach(supervisorInfo ⇒ ctx.watch(supervisorInfo.component.supervisor))
         updateRunningComponents()
       }
-    case SupervisorModeChanged(supervisor, supervisorMode) ⇒
-      if (supervisorMode == SupervisorMode.Running) {
+    case SupervisorLifecycleStateChanged(supervisor, supervisorLifecycleState) ⇒
+      if (supervisorLifecycleState == SupervisorLifecycleState.Running) {
         runningComponents = (supervisors.find(_.component.supervisor == supervisor) ++ runningComponents).toSet
         updateRunningComponents()
       }
@@ -114,8 +117,8 @@ class ContainerBehavior(
 
   private def updateRunningComponents(): Unit = {
     if (runningComponents.size == supervisors.size) {
-      log.debug(s"Container is changing state from [$mode] to [${ContainerMode.Running}]")
-      mode = ContainerMode.Running
+      log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Running}]")
+      lifecycleState = ContainerLifecycleState.Running
     }
   }
 

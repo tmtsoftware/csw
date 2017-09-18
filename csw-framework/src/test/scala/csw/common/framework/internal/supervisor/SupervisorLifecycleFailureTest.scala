@@ -9,7 +9,7 @@ import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.exceptions.{FailureRestart, FailureStop}
 import csw.common.framework.models.PubSub.{Publish, PublisherMessage}
-import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
+import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.common.framework.models._
 import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -24,11 +24,11 @@ import scala.concurrent.Future
 // DEOPSCSW-178: Lifecycle success/failure notification
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
 
-  val supervisorModeProbe: TestProbe[SupervisorMode]     = TestProbe[SupervisorMode]
-  var supervisorRef: ActorRef[SupervisorExternalMessage] = _
-  var initializeAnswer: Answer[Future[Unit]]             = _
-  var shutdownAnswer: Answer[Future[Unit]]               = _
-  var runAnswer: Answer[Future[Unit]]                    = _
+  val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
+  var supervisorRef: ActorRef[SupervisorExternalMessage]                 = _
+  var initializeAnswer: Answer[Future[Unit]]                             = _
+  var shutdownAnswer: Answer[Future[Unit]]                               = _
+  var runAnswer: Answer[Future[Unit]]                                    = _
 
   test("handle when TLA throws FailureStop exception in initialize") {
     val testMocks = frameworkTestMocks()
@@ -40,14 +40,14 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
 
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
 
-    supervisorRef ! GetSupervisorMode(supervisorModeProbe.ref)
-    supervisorModeProbe.expectMsg(SupervisorMode.Idle)
+    supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
+    supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Idle)
 
     supervisorRef ! Restart
 
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
-    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
+    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
     verify(registrationResult).unregister()
     verify(locationService, times(2)).register(akkaRegistration)
@@ -63,7 +63,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
 
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
-    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorMode.Running)))
+    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
     verify(locationService).register(akkaRegistration)
     verify(registrationResult, never()).unregister()

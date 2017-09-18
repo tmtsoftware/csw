@@ -31,17 +31,17 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  var mode: ComponentMode = ComponentMode.Idle
+  var lifecycleState: ComponentLifecycleState = ComponentLifecycleState.Idle
 
   ctx.self ! Initialize
 
   def onMessage(msg: ComponentMessage): Behavior[ComponentMessage] = {
-    log.debug(s"Component TLA in mode :[$mode] received message :[$msg]")
-    (mode, msg) match {
-      case (_, msg: CommonMessage)                      ⇒ onCommon(msg)
-      case (ComponentMode.Idle, msg: IdleMessage)       ⇒ onIdle(msg)
-      case (ComponentMode.Running, msg: RunningMessage) ⇒ onRun(msg)
-      case _                                            ⇒ log.error(s"Unexpected message :[$msg] received by component in mode :[$mode]")
+    log.debug(s"Component TLA in lifecycle state :[$lifecycleState] received message :[$msg]")
+    (lifecycleState, msg) match {
+      case (_, msg: CommonMessage)                                ⇒ onCommon(msg)
+      case (ComponentLifecycleState.Idle, msg: IdleMessage)       ⇒ onIdle(msg)
+      case (ComponentLifecycleState.Running, msg: RunningMessage) ⇒ onRun(msg)
+      case _                                                      ⇒ log.error(s"Unexpected message :[$msg] received by component in lifecycle state :[$lifecycleState]")
     }
     this
   }
@@ -69,8 +69,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case Initialize ⇒
       async {
         await(lifecycleHandlers.initialize())
-        log.debug(s"Component TLA is changing state from [$mode] to [${ComponentMode.Running}]")
-        mode = ComponentMode.Running
+        log.debug(
+          s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Running}]"
+        )
+        lifecycleState = ComponentLifecycleState.Running
         lifecycleHandlers.isOnline = true
         supervisor ! Running(ctx.self)
       }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))

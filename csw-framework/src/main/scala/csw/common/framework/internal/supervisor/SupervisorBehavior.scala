@@ -7,14 +7,14 @@ import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.common.framework.exceptions.FailureRestart
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.common.framework.internal.supervisor.SupervisorMode.Idle
+import csw.common.framework.internal.supervisor.SupervisorLifecycleState.Idle
 import csw.common.framework.models.FromComponentLifecycleMessage.Running
-import csw.common.framework.models.FromSupervisorMessage.SupervisorModeChanged
+import csw.common.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{
   ComponentStateSubscription,
-  GetSupervisorMode,
+  GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
 import csw.common.framework.models.SupervisorIdleMessage._
@@ -59,7 +59,7 @@ class SupervisorBehavior(
   val componentId                                        = ComponentId(componentName, componentInfo.componentType)
   val akkaRegistration: AkkaRegistration                 = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   var haltingFlag                                        = false
-  var mode: SupervisorMode                               = Idle
+  var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
   var registrationOpt: Option[RegistrationResult]        = None
   var component: ActorRef[Nothing]                       = _
@@ -72,31 +72,36 @@ class SupervisorBehavior(
   registerWithLocationService()
 
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
-    log.debug(s"Supervisor in mode :[$mode] received message :[$msg]")
-    (mode, msg) match {
-      case (_, msg: SupervisorCommonMessage)                                                       ⇒ onCommon(msg)
-      case (SupervisorMode.Idle, msg: SupervisorIdleMessage)                                       ⇒ onIdle(msg)
-      case (SupervisorMode.Running | SupervisorMode.RunningOffline, msg: SupervisorRunningMessage) ⇒ onRunning(msg)
-      case (SupervisorMode.Restart, msg: SupervisorRestartMessage)                                 ⇒ onRestarting(msg)
+    log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
+    (lifecycleState, msg) match {
+      case (_, msg: SupervisorCommonMessage)                           ⇒ onCommon(msg)
+      case (SupervisorLifecycleState.Idle, msg: SupervisorIdleMessage) ⇒ onIdle(msg)
+      case (SupervisorLifecycleState.Running | SupervisorLifecycleState.RunningOffline, msg: SupervisorRunningMessage) ⇒
+        onRunning(msg)
+      case (SupervisorLifecycleState.Restart, msg: SupervisorRestartMessage) ⇒ onRestarting(msg)
       case (_, message) =>
-        log.error(s"Unexpected message :[$message] received by supervisor in mode :[$mode]")
+        log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")
     }
     this
   }
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
-      mode match {
-        case SupervisorMode.Restart ⇒
-          log.warn(s"Supervisor in mode :[$mode] received terminated signal from component :[$componentRef]")
-          mode = SupervisorMode.Idle
+      lifecycleState match {
+        case SupervisorLifecycleState.Restart ⇒
+          log.warn(
+            s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]"
+          )
+          lifecycleState = SupervisorLifecycleState.Idle
           registerWithLocationService()
-        case SupervisorMode.Shutdown ⇒
-          log.warn(s"Supervisor in mode :[$mode] received terminated signal from component :[$componentRef]")
+        case SupervisorLifecycleState.Shutdown ⇒
+          log.warn(
+            s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]"
+          )
           coordinatedShutdown()
         case _ ⇒
           log.error(
-            s"Supervisor in mode :[$mode] received unexpected terminated signal from component :[$componentRef]"
+            s"Supervisor in lifecycle state :[$lifecycleState] received unexpected terminated signal from component :[$componentRef]"
           )
       }
       this
@@ -109,11 +114,13 @@ class SupervisorBehavior(
   def onCommon(msg: SupervisorCommonMessage): Unit = msg match {
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
     case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
-    case GetSupervisorMode(replyTo)                    ⇒ replyTo ! mode
+    case GetSupervisorLifecycleState(replyTo)          ⇒ replyTo ! lifecycleState
     case Restart                                       ⇒ onRestart()
     case Shutdown ⇒
-      log.debug(s"Supervisor is changing state from [$mode] to [${SupervisorMode.Shutdown}]")
-      mode = SupervisorMode.Shutdown
+      log.debug(
+        s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Shutdown}]"
+      )
+      lifecycleState = SupervisorLifecycleState.Shutdown
       ctx.stop(component)
   }
 
@@ -125,15 +132,17 @@ class SupervisorBehavior(
       log.error(throwable.getMessage, ex = throwable)
       throw throwable
     case Running(componentRef) ⇒
-      log.debug(s"Supervisor is changing state from [$mode] to [${SupervisorMode.Running}]")
-      mode = SupervisorMode.Running
+      log.debug(
+        s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
+      )
+      lifecycleState = SupervisorLifecycleState.Running
       timerScheduler.cancel(InitializeTimerKey)
       runningComponent = Some(componentRef)
       maybeContainerRef foreach { container ⇒
-        container ! SupervisorModeChanged(ctx.self, mode)
-        log.debug(s"Supervisor acknowledged container :[$container] for mode :[$mode]")
+        container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
+        log.debug(s"Supervisor acknowledged container :[$container] for lifecycle state :[$lifecycleState]")
       }
-      pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorMode.Running))
+      pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
     case InitializeTimeout ⇒
       log.error("Component initialization timed out")
   }
@@ -150,8 +159,8 @@ class SupervisorBehavior(
   }
 
   private def onRestart(): Unit = {
-    log.debug(s"Supervisor is changing state from [$mode] to [${SupervisorMode.Restart}]")
-    mode = SupervisorMode.Restart
+    log.debug(s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Restart}]")
+    lifecycleState = SupervisorLifecycleState.Restart
     registrationOpt match {
       case Some(registrationResult) ⇒
         unRegisterFromLocationService(registrationResult)
@@ -176,8 +185,10 @@ class SupervisorBehavior(
       case Some(componentRef) ⇒
         ctx.stop(component)
       case None ⇒
-        log.debug(s"Supervisor is changing state from [$mode] to [${SupervisorMode.Idle}]")
-        mode = SupervisorMode.Idle
+        log.debug(
+          s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Idle}]"
+        )
+        lifecycleState = SupervisorLifecycleState.Idle
         registerWithLocationService()
     }
   }
@@ -185,14 +196,18 @@ class SupervisorBehavior(
   private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = {
     message match {
       case GoOffline ⇒
-        if (mode == SupervisorMode.Running) {
-          log.debug(s"Supervisor is changing state from [$mode] to [${SupervisorMode.RunningOffline}]")
-          mode = SupervisorMode.RunningOffline
+        if (lifecycleState == SupervisorLifecycleState.Running) {
+          log.debug(
+            s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.RunningOffline}]"
+          )
+          lifecycleState = SupervisorLifecycleState.RunningOffline
         }
       case GoOnline ⇒
-        if (mode == SupervisorMode.RunningOffline) {
-          log.debug(s"Supervisor is changing state from [$mode] to [${SupervisorMode.Running}]")
-          mode = SupervisorMode.Running
+        if (lifecycleState == SupervisorLifecycleState.RunningOffline) {
+          log.debug(
+            s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
+          )
+          lifecycleState = SupervisorLifecycleState.Running
         }
     }
   }

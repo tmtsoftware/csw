@@ -11,7 +11,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.SampleComponentState._
-import csw.common.framework.internal.supervisor.SupervisorMode
+import csw.common.framework.internal.supervisor.SupervisorLifecycleState
 import csw.common.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.SupervisorCommonMessage.ComponentStateSubscription
@@ -49,9 +49,9 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
     val wiring: FrameworkWiring = FrameworkWiring.make(hcdActorSystem)
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
-    val supervisorModeProbe  = TestProbe[SupervisorMode]("supervisor-probe")
-    val supervisorStateProbe = TestProbe[CurrentState]("supervisor-state-probe")
-    val akkaConnection       = AkkaConnection(ComponentId("IFS_Detector", HCD))
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
+    val supervisorStateProbe          = TestProbe[CurrentState]("supervisor-state-probe")
+    val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
 
     // verify component gets registered with location service
     val eventualLocation = locationService.resolve(akkaConnection, 5.seconds)
@@ -62,7 +62,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
     resolvedAkkaLocation.connection shouldBe akkaConnection
 
     val supervisorRef = resolvedAkkaLocation.typedRef[SupervisorExternalMessage]
-    assertThatSupervisorIsInRunningMode(supervisorRef, supervisorModeProbe, 5.seconds)
+    assertSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)
 
     val (_, akkaProbe) =
       locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()

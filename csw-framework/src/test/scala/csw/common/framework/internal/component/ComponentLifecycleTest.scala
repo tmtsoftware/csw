@@ -42,11 +42,11 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(true)
 
-    val previousComponentMode = runningComponentBehavior.mode
+    val previousComponentLifecyleState = runningComponentBehavior.lifecycleState
     runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     verify(sampleHcdHandler).onGoOffline()
     verify(sampleHcdHandler).isOnline
-    previousComponentMode shouldBe runningComponentBehavior.mode
+    previousComponentLifecyleState shouldBe runningComponentBehavior.lifecycleState
   }
 
   test("A running component should not accept RunOffline lifecycle message when it is already offline") {
@@ -55,10 +55,10 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(false)
 
-    val previousComponentMode = runningComponentBehavior.mode
+    val previousComponentLifecyleState = runningComponentBehavior.lifecycleState
     runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     verify(sampleHcdHandler, never).onGoOffline()
-    previousComponentMode shouldBe runningComponentBehavior.mode
+    previousComponentLifecyleState shouldBe runningComponentBehavior.lifecycleState
   }
 
   test("A running component should handle RunOnline lifecycle message when it is Offline") {
@@ -67,10 +67,10 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(false)
 
-    val previousComponentMode = runningComponentBehavior.mode
+    val previousComponentLifecyleState = runningComponentBehavior.lifecycleState
     runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
     verify(sampleHcdHandler).onGoOnline()
-    previousComponentMode shouldBe runningComponentBehavior.mode
+    previousComponentLifecyleState shouldBe runningComponentBehavior.lifecycleState
   }
 
   test("A running component should not accept RunOnline lifecycle message when it is already Online") {

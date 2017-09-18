@@ -33,12 +33,12 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
       with TypedActorMock[ComponentMessage]
   }
 
-  test("component should start in idle mode") {
+  test("component should start in idle lifecycle state") {
     val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
     val testData        = new TestData(supervisorProbe)
     import testData._
 
-    componentBehavior.mode shouldBe ComponentMode.Idle
+    componentBehavior.lifecycleState shouldBe ComponentLifecycleState.Idle
   }
 
   test("component should send itself initialize message and handle initialization") {

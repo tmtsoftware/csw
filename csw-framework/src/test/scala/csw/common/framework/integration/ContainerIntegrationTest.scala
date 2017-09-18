@@ -9,15 +9,15 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.{actor, testkit}
 import com.typesafe.config.ConfigFactory
 import csw.common.components.SampleComponentState._
-import csw.common.framework.internal.container.ContainerMode
-import csw.common.framework.internal.supervisor.SupervisorMode
+import csw.common.framework.internal.container.ContainerLifecycleState
+import csw.common.framework.internal.supervisor.SupervisorLifecycleState
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerMode}
+import csw.common.framework.models.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{
   ComponentStateSubscription,
-  GetSupervisorMode,
+  GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
@@ -59,25 +59,25 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
   test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
     val wiring = FrameworkWiring.make(containerActorSystem)
-    // start a container and verify it moves to running mode
+    // start a container and verify it moves to running lifecycle state
     val containerRef = Await.result(Container.spawn(ConfigFactory.load("container.conf"), wiring), 5.seconds)
 
-    val componentsProbe    = TestProbe[Components]("comp-probe")
-    val containerModeProbe = TestProbe[ContainerMode]("container-mode-probe")
-    val assemblyProbe      = TestProbe[CurrentState]("assembly-state-probe")
-    val filterProbe        = TestProbe[CurrentState]("filter-state-probe")
-    val disperserProbe     = TestProbe[CurrentState]("disperser-state-probe")
+    val componentsProbe              = TestProbe[Components]("comp-probe")
+    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
+    val assemblyProbe                = TestProbe[CurrentState]("assembly-state-probe")
+    val filterProbe                  = TestProbe[CurrentState]("filter-state-probe")
+    val disperserProbe               = TestProbe[CurrentState]("disperser-state-probe")
 
     val assemblyLifecycleStateProbe  = TestProbe[LifecycleStateChanged]("assembly-lifecycle-probe")
     val filterLifecycleStateProbe    = TestProbe[LifecycleStateChanged]("filter-lifecycle-probe")
     val disperserLifecycleStateProbe = TestProbe[LifecycleStateChanged]("disperser-lifecycle-probe")
 
-    // initially container is put in Idle state and wait for all the components to move into Running mode
-    // ********** Message: GetContainerMode **********
-    containerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerMode.Idle)
+    // initially container is put in Idle lifecycle state and wait for all the components to move into Running lifecycle state
+    // ********** Message: GetContainerLifecycleState **********
+    containerRef ! GetContainerLifecycleState(containerLifecycleStateProbe.ref)
+    containerLifecycleStateProbe.expectMsg(ContainerLifecycleState.Idle)
 
-    assertThatContainerIsInRunningMode(containerRef, containerModeProbe, 5.seconds)
+    assertContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve container using location service
     val containerLocation = Await.result(locationService.resolve(irisContainerConnection, 5.seconds), 5.seconds)
@@ -113,15 +113,15 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     filterSupervisor ! LifecycleStateSubscription(Subscribe(filterLifecycleStateProbe.ref))
     disperserSupervisor ! LifecycleStateSubscription(Subscribe(disperserLifecycleStateProbe.ref))
 
-    val supervisorModeProbe = TestProbe[SupervisorMode]
-    assemblySupervisor ! GetSupervisorMode(supervisorModeProbe.ref)
-    filterSupervisor ! GetSupervisorMode(supervisorModeProbe.ref)
-    disperserSupervisor ! GetSupervisorMode(supervisorModeProbe.ref)
+    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
+    assemblySupervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
+    filterSupervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
+    disperserSupervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
 
-    // make sure that all the components are in running mode before sending lifecycle messages
-    supervisorModeProbe.expectMsg(SupervisorMode.Running)
-    supervisorModeProbe.expectMsg(SupervisorMode.Running)
-    supervisorModeProbe.expectMsg(SupervisorMode.Running)
+    // make sure that all the components are in running lifecycle state before sending lifecycle messages
+    supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Running)
+    supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Running)
+    supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Running)
 
     // lifecycle messages gets forwarded to all components and their corresponding handlers gets invoked
     // ********** Message: Lifecycle(GoOffline) **********
@@ -136,8 +136,8 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
 
-    // on Restart message, container falls back to Idle mode and wait for all the components to get restarted
-    // and moves to Running mode
+    // on Restart message, container falls back to Idle lifecycle state and wait for all the components to get restarted
+    // and moves to Running lifecycle state
     // component handlers hooks should be invoked in following sequence:
     // 1. onShutdown (old TLA)
     // 2. initialize (new TLA)
@@ -145,8 +145,8 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     // ********** Message: Restart **********
     resolvedContainerRef ! Restart
 
-    resolvedContainerRef ! GetContainerMode(containerModeProbe.ref)
-    containerModeProbe.expectMsg(ContainerMode.Idle)
+    resolvedContainerRef ! GetContainerLifecycleState(containerLifecycleStateProbe.ref)
+    containerLifecycleStateProbe.expectMsg(ContainerLifecycleState.Idle)
 
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
@@ -156,11 +156,11 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
-    assemblyLifecycleStateProbe.expectMsg(LifecycleStateChanged(assemblySupervisor, SupervisorMode.Running))
-    filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorMode.Running))
-    disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(disperserSupervisor, SupervisorMode.Running))
+    assemblyLifecycleStateProbe.expectMsg(LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running))
+    filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running))
+    disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running))
 
-    assertThatContainerIsInRunningMode(resolvedContainerRef, containerModeProbe, 2.seconds)
+    assertContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)
 
     val containerTracker      = testkit.TestProbe()
     val filterAssemblyTracker = testkit.TestProbe()

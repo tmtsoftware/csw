@@ -2,10 +2,10 @@ package csw.common
 
 import akka.typed.ActorRef
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.framework.internal.container.ContainerMode
-import csw.common.framework.internal.supervisor.SupervisorMode
-import csw.common.framework.models.ContainerCommonMessage.GetContainerMode
-import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorMode
+import csw.common.framework.internal.container.ContainerLifecycleState
+import csw.common.framework.internal.supervisor.SupervisorLifecycleState
+import csw.common.framework.models.ContainerCommonMessage.GetContainerLifecycleState
+import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.common.framework.models.{ContainerExternalMessage, SupervisorExternalMessage}
 import csw.services.location.commons.BlockingUtils
 
@@ -13,31 +13,35 @@ import scala.concurrent.duration.Duration
 
 object FrameworkAssertions {
 
-  def assertThatContainerIsInRunningMode(
+  def assertContainerIsRunning(
       containerRef: ActorRef[ContainerExternalMessage],
-      probe: TestProbe[ContainerMode],
+      probe: TestProbe[ContainerLifecycleState],
       duration: Duration
   ): Unit = {
-    def getContainerMode: ContainerMode = {
-      containerRef ! GetContainerMode(probe.ref)
-      probe.expectMsgType[ContainerMode]
+    def getContainerLifecycleState: ContainerLifecycleState = {
+      containerRef ! GetContainerLifecycleState(probe.ref)
+      probe.expectMsgType[ContainerLifecycleState]
     }
 
-    assert(BlockingUtils.poll(getContainerMode == ContainerMode.Running, duration),
-           s"expected :${ContainerMode.Running}, found :$getContainerMode")
+    assert(
+      BlockingUtils.poll(getContainerLifecycleState == ContainerLifecycleState.Running, duration),
+      s"expected :${ContainerLifecycleState.Running}, found :$getContainerLifecycleState"
+    )
   }
 
-  def assertThatSupervisorIsInRunningMode(
+  def assertSupervisorIsRunning(
       actorRef: ActorRef[SupervisorExternalMessage],
-      probe: TestProbe[SupervisorMode],
+      probe: TestProbe[SupervisorLifecycleState],
       duration: Duration
   ): Unit = {
-    def getSupervisorMode: SupervisorMode = {
-      actorRef ! GetSupervisorMode(probe.ref)
-      probe.expectMsgType[SupervisorMode]
+    def getSupervisorLifecycleState: SupervisorLifecycleState = {
+      actorRef ! GetSupervisorLifecycleState(probe.ref)
+      probe.expectMsgType[SupervisorLifecycleState]
     }
 
-    assert(BlockingUtils.poll(getSupervisorMode == SupervisorMode.Running, duration),
-           s"expected :${SupervisorMode.Running}, found :$getSupervisorMode")
+    assert(
+      BlockingUtils.poll(getSupervisorLifecycleState == SupervisorLifecycleState.Running, duration),
+      s"expected :${SupervisorLifecycleState.Running}, found :$getSupervisorLifecycleState"
+    )
   }
 }

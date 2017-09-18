@@ -3,8 +3,8 @@ package csw.common.framework.models
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.internal.container.ContainerMode
-import csw.common.framework.internal.supervisor.SupervisorMode
+import csw.common.framework.internal.container.ContainerLifecycleState
+import csw.common.framework.internal.supervisor.SupervisorLifecycleState
 import csw.common.framework.models.PubSub.SubscriberMessage
 import csw.param.commands.ControlCommand
 import csw.param.states.CurrentState
@@ -85,7 +85,7 @@ object SupervisorCommonMessage {
       extends SupervisorCommonMessage
   case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState])
       extends SupervisorCommonMessage
-  case class GetSupervisorMode(replyTo: ActorRef[SupervisorMode]) extends SupervisorCommonMessage
+  case class GetSupervisorLifecycleState(replyTo: ActorRef[SupervisorLifecycleState]) extends SupervisorCommonMessage
 }
 
 sealed trait SupervisorIdleMessage extends SupervisorMessage
@@ -108,8 +108,8 @@ sealed trait ContainerExternalMessage extends ContainerMessage with TmtSerializa
 
 sealed trait ContainerCommonMessage extends ContainerExternalMessage
 object ContainerCommonMessage {
-  case class GetContainerMode(replyTo: ActorRef[ContainerMode]) extends ContainerCommonMessage
-  case class GetComponents(replyTo: ActorRef[Components])       extends ContainerCommonMessage
+  case class GetContainerLifecycleState(replyTo: ActorRef[ContainerLifecycleState]) extends ContainerCommonMessage
+  case class GetComponents(replyTo: ActorRef[Components])                           extends ContainerCommonMessage
 }
 
 sealed trait ContainerIdleMessage extends ContainerMessage
@@ -121,11 +121,12 @@ object ContainerIdleMessage {
 
 sealed trait FromSupervisorMessage extends ContainerIdleMessage
 object FromSupervisorMessage {
-  case class SupervisorModeChanged(supervisor: ActorRef[SupervisorExternalMessage], supervisorMode: SupervisorMode)
+  case class SupervisorLifecycleStateChanged(supervisor: ActorRef[SupervisorExternalMessage],
+                                             supervisorLifecycleState: SupervisorLifecycleState)
       extends FromSupervisorMessage
 }
 
-case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage], state: SupervisorMode)
+case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage], state: SupervisorLifecycleState)
     extends TmtSerializable
 
 case class Components(components: Set[Component]) extends TmtSerializable
