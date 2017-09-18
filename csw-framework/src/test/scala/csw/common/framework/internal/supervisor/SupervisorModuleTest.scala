@@ -155,9 +155,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     }
   }
 
-  test(
-    "running component should invoke onShutdown hook when supervisor restarts component using Restart external message"
-  ) {
+  test("should invoke onShutdown hook when supervisor restarts component using Restart external message") {
     forAll(testData) { (info: ComponentInfo) =>
       {
         val mocks = frameworkTestMocks()

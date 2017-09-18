@@ -22,6 +22,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
+// DEOPSCSW-177: Hooks for lifecycle management
 class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   class TestData() {

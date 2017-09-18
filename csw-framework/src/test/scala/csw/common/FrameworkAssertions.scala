@@ -13,7 +13,7 @@ import scala.concurrent.duration.Duration
 
 object FrameworkAssertions {
 
-  def assertContainerIsRunning(
+  def assertThatContainerIsRunning(
       containerRef: ActorRef[ContainerExternalMessage],
       probe: TestProbe[ContainerLifecycleState],
       duration: Duration
@@ -29,7 +29,7 @@ object FrameworkAssertions {
     )
   }
 
-  def assertSupervisorIsRunning(
+  def assertThatSupervisorIsRunning(
       actorRef: ActorRef[SupervisorExternalMessage],
       probe: TestProbe[SupervisorLifecycleState],
       duration: Duration

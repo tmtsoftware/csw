@@ -28,6 +28,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
+// DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
@@ -62,7 +63,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
     resolvedAkkaLocation.connection shouldBe akkaConnection
 
     val supervisorRef = resolvedAkkaLocation.typedRef[SupervisorExternalMessage]
-    assertSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)
+    assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)
 
     val (_, akkaProbe) =
       locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
@@ -71,7 +72,17 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
     // on shutdown, component unregisters from location service
     supervisorRef ! ComponentStateSubscription(Subscribe(supervisorStateProbe.ref))
     supervisorRef ! Shutdown
+
+    // this proves that ComponentBehaviors postStop signal gets invoked
+    // as onShutdownHook of TLA gets invoked from postStop signal
     supervisorStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+
+    // this proves that postStop signal of supervisor gets invoked
+    // as supervisor gets unregistered in postStop signal
     akkaProbe.requestNext(LocationRemoved(akkaConnection))
+
+    // this proves that on shutdown message, supervisor's actor system gets terminated
+    // if it does not get terminated in 5 seconds, future will fail which in turn fail this test
+    Await.result(hcdActorSystem.whenTerminated, 5.seconds)
   }
 }

@@ -36,6 +36,7 @@ import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-168: Deployment of multiple Assemblies and HCDs
 // DEOPSCSW-169: Creation of Multiple Components
+// DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
@@ -77,7 +78,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     containerRef ! GetContainerLifecycleState(containerLifecycleStateProbe.ref)
     containerLifecycleStateProbe.expectMsg(ContainerLifecycleState.Idle)
 
-    assertContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
+    assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve container using location service
     val containerLocation = Await.result(locationService.resolve(irisContainerConnection, 5.seconds), 5.seconds)
@@ -160,7 +161,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running))
     disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running))
 
-    assertContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)
+    assertThatContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)
 
     val containerTracker      = testkit.TestProbe()
     val filterAssemblyTracker = testkit.TestProbe()
@@ -192,10 +193,14 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
 
     resolvedContainerRef ! Shutdown
 
+    // this proves that ComponentBehaviors postStop signal gets invoked for all components
+    // as onShutdownHook of all TLA gets invoked from postStop signal
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
 
+    // this proves that postStop signal of all supervisor's gets invoked
+    // as supervisor gets unregistered in postStop signal
     val filterAssemblyRemoved = filterAssemblyTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved ⇒ x }
     val instrumentHcdRemoved  = instrumentHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved  ⇒ x }
     val disperserHcdRemoved   = disperserHcdTracker.fishForSpecificMessage(5.seconds) { case x: LocationRemoved   ⇒ x }
@@ -206,6 +211,9 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     disperserHcdRemoved.connection shouldBe disperserHcdConnection
     containerRemoved.connection shouldBe irisContainerConnection
 
+    // this proves that on shutdown message, container's actor system gets terminated
+    // if it does not get terminated in 5 seconds, future will fail which in turn fail this test
+    Await.result(containerActorSystem.whenTerminated, 5.seconds)
   }
 
 }

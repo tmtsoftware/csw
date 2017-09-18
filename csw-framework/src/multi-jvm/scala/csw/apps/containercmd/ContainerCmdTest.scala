@@ -107,7 +107,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val containerRef =
         Await.result(containerCmd.start(args), 15.seconds).map(_.asInstanceOf[ActorRef[ContainerExternalMessage]]).get
 
-      assertContainerIsRunning(containerRef, testProbe, 5.seconds)
+      assertThatContainerIsRunning(containerRef, testProbe, 5.seconds)
 
       val componentsProbe               = TestProbe[Components]
       val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
@@ -157,7 +157,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val supervisorRef =
         Await.result(containerCmd.start(args), 15.seconds).map(_.asInstanceOf[ActorRef[SupervisorExternalMessage]]).get
 
-      assertSupervisorIsRunning(supervisorRef, testProbe, 5.seconds)
+      assertThatSupervisorIsRunning(supervisorRef, testProbe, 5.seconds)
       enterBarrier("running")
 
       enterBarrier("offline")
