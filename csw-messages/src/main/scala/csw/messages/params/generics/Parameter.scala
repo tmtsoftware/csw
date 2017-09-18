@@ -24,7 +24,7 @@ object Parameter {
 
   import DefaultJsonProtocol._
 
-  private[generics] def apply[S: JsonFormat: ClassTag](
+  private[generics] def apply[S: JsonFormat: ClassTag: ItemsFactory](
       keyName: String,
       keyType: KeyType[S],
       items: mutable.WrappedArray[S],
@@ -41,7 +41,7 @@ object Parameter {
     }
   }
 
-  implicit def parameterFormat[T: JsonFormat: ClassTag]: JsonFormat[Parameter[T]] =
+  implicit def parameterFormat[T: JsonFormat: ClassTag: ItemsFactory]: JsonFormat[Parameter[T]] =
     new JsonFormat[Parameter[T]] {
       override def write(obj: Parameter[T]): JsValue = {
         JsObject(
@@ -92,7 +92,7 @@ object Parameter {
 
 }
 
-case class Parameter[S: JsonFormat: ClassTag] private[messages] (
+case class Parameter[S: JsonFormat: ClassTag: ItemsFactory] private[messages] (
     keyName: String,
     keyType: KeyType[S],
     items: mutable.WrappedArray[S],
@@ -152,5 +152,5 @@ case class Parameter[S: JsonFormat: ClassTag] private[messages] (
   def valuesToString: String = items.mkString("(", ",", ")")
   override def toString      = s"$keyName($valuesToString$units)"
   def toJson: JsValue        = Parameter[S].write(this)
-  def toPb: PbParameter      = ???
+  def toPb: PbParameter      = Parameter.typeMapper[S].toBase(this)
 }

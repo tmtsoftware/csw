@@ -28,7 +28,7 @@ public class JCommandsTest {
 
     private final CommandInfo commandInfo = new CommandInfo("obsId");
     private final String prefix = "wfos.red.detector";
-    
+
     private void assertOnCommandAPI(ParameterSetType<?> command) {
         // contains and exists
         Assert.assertFalse(command.contains(notUsedKey));
@@ -72,7 +72,7 @@ public class JCommandsTest {
         };
         Assert.assertEquals(expectedParamMap, command.jGetStringMap());
     }
-    
+
     @Test
     public void shouldAbleToCreateAndAccessSetupCommand() {
         Setup setup = new Setup(commandInfo, prefix).add(encoderParam).add(epochStringParam);

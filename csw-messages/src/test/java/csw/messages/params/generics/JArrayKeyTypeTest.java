@@ -55,7 +55,7 @@ public class JArrayKeyTypeTest {
         Parameter<ArrayData<Byte>> parameterWithUnits = key.set(arrayData, millisecond);
         commonAssertions(keyName, JKeyTypes.ByteArrayKey(), arrayData, parameterWithUnits, millisecond);
     }
-    
+
     @Test
     public void testShortArrayKeyParameter() {
         String keyName = "shortKey";
@@ -95,7 +95,7 @@ public class JArrayKeyTypeTest {
         Parameter<ArrayData<Long>> parameterWithUnits = key.set(arrayData, millimeter);
         commonAssertions(keyName, JKeyTypes.LongArrayKey(), arrayData, parameterWithUnits, millimeter);
     }
-    
+
     @Test
     public void testIntArrayKeyParameter() {
         String keyName = "integerKey";

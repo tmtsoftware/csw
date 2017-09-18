@@ -13,12 +13,6 @@ option (scalapb.options) = {
     single_file: true
 };
 
-message ChoiceItems {
-    option (scalapb.message).extends = "ItemType[Choice]";
-    option (scalapb.message).companion_extends = "ItemTypeCompanion[ChoiceItems]";
-    repeated string values = 1 [(scalapb.field).type = "Choice"];
-}
-
 message StringItems {
     option (scalapb.message).extends = "ItemType[String]";
     option (scalapb.message).companion_extends = "ItemTypeCompanion[StringItems]";
@@ -31,10 +25,42 @@ message BooleanItems {
     repeated bool values = 1;
 }
 
+message ChoiceItems {
+    option (scalapb.message).extends = "ItemType[Choice]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[ChoiceItems]";
+    repeated string values = 1 [(scalapb.field).type = "Choice"];
+}
+
 message RaDecItems {
     option (scalapb.message).extends = "ItemType[RaDec]";
     option (scalapb.message).companion_extends = "ItemTypeCompanion[RaDecItems]";
     repeated PbRaDec values = 1 [(scalapb.field).type = "RaDec"];
+}
+
+message CharItems {
+    option (scalapb.message).extends = "ItemType[Char]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[CharItems]";
+    string values = 1 [(scalapb.field).type = "Seq[Char]"];
+}
+
+message InstantItems {
+    option (scalapb.message).extends = "ItemType[java.time.Instant]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[InstantItems]";
+    repeated google.protobuf.Timestamp values = 1 [(scalapb.field).type = "java.time.Instant"];
+}
+
+////////////////////////////////////////////////////
+
+message ByteItems {
+    option (scalapb.message).extends = "ItemType[Byte]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[ByteItems]";
+    bytes values = 1 [(scalapb.field).type = "Seq[Byte]"];
+}
+
+message ShortItems {
+    option (scalapb.message).extends = "ItemType[Short]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[ShortItems]";
+    repeated int32 values = 1 [(scalapb.field).type = "Short"];
 }
 
 message IntItems {
@@ -61,10 +87,18 @@ message FloatItems {
     repeated float values = 1;
 }
 
-message TimestampItems {
-    option (scalapb.message).extends = "ItemType[java.time.Instant]";
-    option (scalapb.message).companion_extends = "ItemTypeCompanion[TimestampItems]";
-    repeated google.protobuf.Timestamp values = 1 [(scalapb.field).type = "java.time.Instant"];
+//////////////////////////////////////
+
+message ByteArrayItems {
+    option (scalapb.message).extends = "ItemType[ArrayData[Byte]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[ByteArrayItems]";
+    repeated ByteItems values = 1 [(scalapb.field).type = "ArrayData[Byte]"];
+}
+
+message ShortArrayItems {
+    option (scalapb.message).extends = "ItemType[ArrayData[Short]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[ShortArrayItems]";
+    repeated ShortItems values = 1 [(scalapb.field).type = "ArrayData[Short]"];
 }
 
 message IntArrayItems {
@@ -89,6 +123,20 @@ message DoubleArrayItems {
     option (scalapb.message).extends = "ItemType[ArrayData[Double]]";
     option (scalapb.message).companion_extends = "ItemTypeCompanion[DoubleArrayItems]";
     repeated DoubleItems values = 1 [(scalapb.field).type = "ArrayData[Double]"];
+}
+
+////////////////////////////////////////
+
+message ByteMatrixItems {
+    option (scalapb.message).extends = "ItemType[MatrixData[Byte]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[ByteMatrixItems]";
+    repeated ByteArrayItems values = 1 [(scalapb.field).type = "MatrixData[Byte]"];
+}
+
+message ShortMatrixItems {
+    option (scalapb.message).extends = "ItemType[MatrixData[Short]]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[ShortMatrixItems]";
+    repeated ShortArrayItems values = 1 [(scalapb.field).type = "MatrixData[Short]"];
 }
 
 message IntMatrixItems {

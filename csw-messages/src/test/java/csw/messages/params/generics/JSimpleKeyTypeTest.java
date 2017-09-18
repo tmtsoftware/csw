@@ -306,7 +306,7 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
     }
-    
+
     @Test
     public void testStringKeyParameter() {
         String keyName = "StringKey";
@@ -372,5 +372,5 @@ public class JSimpleKeyTypeTest {
         Assert.assertEquals(paramData[0], parameterWithoutUnits.head());
         Assert.assertEquals(paramData.length, parameterWithoutUnits.size());
     }
-    
+
 }

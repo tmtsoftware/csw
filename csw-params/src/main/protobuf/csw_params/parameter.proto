@@ -20,22 +20,30 @@ message PbParameter {
     oneof items {
         ChoiceItems choiceItems = 4;
         RaDecItems raDecItems = 5;
-        StringItems stringItems = 51;
         StructItems structItems = 6;
+        InstantItems instantItems = 61;
 
+        StringItems stringItems = 51;
         BooleanItems booleanItems = 7;
+        CharItems charItems = 112;
+
+        ByteItems byteItems = 80;
+        ShortItems shortItems = 81;
         IntItems intItems = 8;
         LongItems longItems = 9;
         DoubleItems doubleItems = 10;
         FloatItems floatItems = 11;
-        TimestampItems timestampItems = 111;
 
-        IntArrayItems intArrayItems = 12;
+        ByteArrayItems byteArrayItems = 121;
+        ShortArrayItems shortArrayItems = 122;
+        IntArrayItems intArrayItems = 123;
         LongArrayItems longArrayItems = 13;
         FloatArrayItems floatArrayItems = 14;
         DoubleArrayItems doubleArrayItems = 15;
 
-        IntMatrixItems intMatrixItems = 16;
+        ByteMatrixItems byteMatrixItems = 16;
+        ShortMatrixItems shortMatrixItems = 161;
+        IntMatrixItems intMatrixItems = 162;
         LongMatrixItems longMatrixItems = 17;
         FloatMatrixItems floatMatrixItems = 18;
         DoubleMatrixItems doubleMatrixItems = 19;
