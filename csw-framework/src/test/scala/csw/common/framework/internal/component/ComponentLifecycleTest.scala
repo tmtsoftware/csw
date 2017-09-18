@@ -5,8 +5,9 @@ import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkTestMocks.TypedActorMock
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.models.FromComponentLifecycleMessage.Running
+import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.Initialize
+import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
@@ -19,20 +20,30 @@ import scala.concurrent.Future
 //DEOPSCSW-179-Unique Action for a component
 class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
-  class RunningComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
+  class IdleComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
     private val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
 
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
+    when(sampleHcdHandler.onRun()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
     when(sampleHcdHandler.componentName).thenReturn("test-component")
     val behavior = new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleHcdHandler)
     with TypedActorMock[ComponentMessage]
 
-    val runningComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
+    val idleComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
       behavior.onMessage(Initialize)
-      supervisorProbe.expectMsgType[Running]
+      supervisorProbe.expectMsgType[Initialized]
       behavior
+    }
+  }
+
+  class RunningComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage])
+      extends IdleComponent(supervisorProbe) {
+    val runningComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
+      idleComponentBehavior.onMessage(Run)
+      supervisorProbe.expectMsgType[Running]
+      idleComponentBehavior
     }
   }
 

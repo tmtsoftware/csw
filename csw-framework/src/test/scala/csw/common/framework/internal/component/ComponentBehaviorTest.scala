@@ -3,8 +3,9 @@ package csw.common.framework.internal.component
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.framework.FrameworkTestSuite
-import csw.common.framework.models.FromComponentLifecycleMessage.Running
+import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.Initialize
+import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
@@ -31,6 +32,8 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     val componentBehavior =
       new ComponentBehavior[ComponentDomainMessage](ctx, supervisorProbe.ref, sampleComponentHandler)
       with TypedActorMock[ComponentMessage]
+    when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
+    when(sampleComponentHandler.onRun()).thenReturn(Future.unit)
   }
 
   test("component should start in idle lifecycle state") {
@@ -52,8 +55,22 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
     Thread.sleep(100)
 
-    supervisorProbe.expectMsgType[Running]
+    supervisorProbe.expectMsgType[Initialized]
     verify(sampleComponentHandler).initialize()
+  }
+
+  test("component should accept and handle run message from supervisor") {
+    val supervisorProbe = TestProbe[FromComponentLifecycleMessage]
+    val testData        = new TestData(supervisorProbe)
+    import testData._
+
+    componentBehavior.onMessage(Initialize)
+    supervisorProbe.expectMsgType[Initialized]
+    componentBehavior.onMessage(Run)
+
+    supervisorProbe.expectMsgType[Running]
+
+    verify(sampleComponentHandler).onRun()
     verify(sampleComponentHandler).isOnline_=(true)
   }
 }
