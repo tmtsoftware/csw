@@ -30,7 +30,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
   var shutdownAnswer: Answer[Future[Unit]]                               = _
   var runAnswer: Answer[Future[Unit]]                                    = _
 
-  test("handle when TLA throws FailureStop exception in initialize") {
+  test("handle TLA failure with FailureStop exception in initialize with Restart message") {
     val testMocks = frameworkTestMocks()
     import testMocks._
 

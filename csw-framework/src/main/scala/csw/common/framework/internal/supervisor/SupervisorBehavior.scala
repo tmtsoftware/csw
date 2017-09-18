@@ -87,6 +87,7 @@ class SupervisorBehavior(
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
+      timerScheduler.cancel(InitializeTimerKey)
       lifecycleState match {
         case SupervisorLifecycleState.Restart ⇒
           log.warn(
@@ -121,7 +122,10 @@ class SupervisorBehavior(
         s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Shutdown}]"
       )
       lifecycleState = SupervisorLifecycleState.Shutdown
-      ctx.stop(component)
+      ctx.child(ComponentActor) match {
+        case Some(componentRef) ⇒ ctx.stop(componentRef)
+        case None               ⇒ coordinatedShutdown()
+      }
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
