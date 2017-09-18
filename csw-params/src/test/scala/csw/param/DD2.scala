@@ -84,7 +84,7 @@ class DD2 extends FunSuite {
 
   test("7") {
     println(PbParameter.scalaDescriptor.fields)
-    val dd2: IntMatrixItems = IntMatrixItems().withValues2(
+    val dd2: IntMatrixItems = IntMatrixItems().set(
       Seq(MatrixData.fromArrays(Array(1, 2, 3), Array(6, 7)), MatrixData.fromArrays(Array(11, 12, 13), Array(16, 17)))
     )
     println(dd2.values.head.values.head.head)

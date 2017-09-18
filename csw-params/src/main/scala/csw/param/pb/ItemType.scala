@@ -8,7 +8,7 @@ import scala.reflect.ClassTag
 trait ItemType[T] {
   def values: Seq[T]
   def withValues(xs: Seq[T]): Any
-  def withValues2(xs: Seq[T]): this.type             = withValues(xs).asInstanceOf[this.type]
+  def set(xs: Seq[T]): this.type                     = withValues(xs).asInstanceOf[this.type]
   def keyType(implicit tag: ClassTag[T]): KeyType[T] = KeyType.values.find(_.tag == tag).get.asInstanceOf[KeyType[T]]
 }
 
@@ -19,7 +19,7 @@ trait ItemTypeCompanion[S] {
 object ItemTypeCompanion {
   def apply[T](implicit x: ItemTypeCompanion[T]): ItemTypeCompanion[T] = x
   def make[T, S <: ItemType[T]: ItemTypeCompanion](items: Seq[T]): S = {
-    ItemTypeCompanion[S].defaultInstance.withValues2(items)
+    ItemTypeCompanion[S].defaultInstance.set(items)
   }
 }
 
