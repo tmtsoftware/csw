@@ -3,6 +3,7 @@ package csw.param
 import csw.param.generics.{KeyType, Parameter}
 import csw.param.models.{ArrayData, MatrixData}
 import csw.units.Units
+import csw_params.ParameterTypes
 import csw_params.parameter.PbParameter
 import csw_params.parameter_types._
 import org.scalatest.FunSuite
@@ -106,6 +107,16 @@ class DD2 extends FunSuite {
     val result = value.toCustom(value.toBase(param))
     println(result)
     println(result.keyType)
+  }
+
+  test("10") {
+    val p: ParameterTypes.BooleanItems =
+      ParameterTypes.BooleanItems.newBuilder().addValues(true).addValues(false).build()
+
+    val items = BooleanItems.parseFrom(p.toByteString.toByteArray)
+
+    println(p)
+    println(items)
   }
 
 }
