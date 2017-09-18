@@ -8,6 +8,7 @@ import csw.messages.params.models.{Units, _}
 import com.trueaccord.scalapb.TypeMapper
 import csw.param.formats.JsonSupport
 import csw.param.models._
+import csw.param.pb.ItemsFactory
 import csw.units.Units
 import csw.units.Units.second
 import csw_params.keytype.PbKeyType
@@ -18,21 +19,18 @@ import spray.json.JsonFormat
 import scala.collection.immutable
 import scala.reflect.ClassTag
 
-sealed class KeyType[S: JsonFormat: ClassTag] extends EnumEntry with Serializable {
+sealed class KeyType[S: JsonFormat: ClassTag: ItemsFactory] extends EnumEntry with Serializable {
   def paramFormat: JsonFormat[Parameter[S]]             = Parameter[S]
-  def typeMapper: TypeMapper[PbParameter, Parameter[S]] = ???
+  def typeMapper: TypeMapper[PbParameter, Parameter[S]] = Parameter.typeMapper
 }
 
-sealed class SimpleKeyType[S: JsonFormat: ClassTag] extends KeyType[S] {
+sealed class SimpleKeyType[S: JsonFormat: ClassTag: ItemsFactory] extends KeyType[S] {
   def make(name: String): Key[S] = new Key[S](name, this)
 }
 
-sealed class SimpleKeyTypeWithUnits[S: JsonFormat: ClassTag](defaultUnits: Units) extends KeyType[S] {
+sealed class SimpleKeyTypeWithUnits[S: JsonFormat: ClassTag: ItemsFactory](defaultUnits: Units) extends KeyType[S] {
   def make(name: String): Key[S] = new Key[S](name, this, defaultUnits)
 }
-
-sealed class ArrayKeyType[S: JsonFormat: ClassTag]  extends SimpleKeyType[ArrayData[S]]
-sealed class MatrixKeyType[S: JsonFormat: ClassTag] extends SimpleKeyType[MatrixData[S]]
 
 object KeyType extends Enum[KeyType[_]] {
 
@@ -61,19 +59,19 @@ object KeyType extends Enum[KeyType[_]] {
   case object DoubleKey    extends SimpleKeyType[Double]
   case object TimestampKey extends SimpleKeyTypeWithUnits[Instant](second)
 
-  case object ByteArrayKey   extends ArrayKeyType[Byte]
-  case object ShortArrayKey  extends ArrayKeyType[Short]
-  case object LongArrayKey   extends ArrayKeyType[Long]
-  case object IntArrayKey    extends ArrayKeyType[Int]
-  case object FloatArrayKey  extends ArrayKeyType[Float]
-  case object DoubleArrayKey extends ArrayKeyType[Double]
+  case object ByteArrayKey   extends SimpleKeyType[ArrayData[Byte]]
+  case object ShortArrayKey  extends SimpleKeyType[ArrayData[Short]]
+  case object LongArrayKey   extends SimpleKeyType[ArrayData[Long]]
+  case object IntArrayKey    extends SimpleKeyType[ArrayData[Int]]
+  case object FloatArrayKey  extends SimpleKeyType[ArrayData[Float]]
+  case object DoubleArrayKey extends SimpleKeyType[ArrayData[Double]]
 
-  case object ByteMatrixKey   extends MatrixKeyType[Byte]
-  case object ShortMatrixKey  extends MatrixKeyType[Short]
-  case object LongMatrixKey   extends MatrixKeyType[Long]
-  case object IntMatrixKey    extends MatrixKeyType[Int]
-  case object FloatMatrixKey  extends MatrixKeyType[Float]
-  case object DoubleMatrixKey extends MatrixKeyType[Double]
+  case object ByteMatrixKey   extends SimpleKeyType[MatrixData[Byte]]
+  case object ShortMatrixKey  extends SimpleKeyType[MatrixData[Short]]
+  case object LongMatrixKey   extends SimpleKeyType[MatrixData[Long]]
+  case object IntMatrixKey    extends SimpleKeyType[MatrixData[Int]]
+  case object FloatMatrixKey  extends SimpleKeyType[MatrixData[Float]]
+  case object DoubleMatrixKey extends SimpleKeyType[MatrixData[Double]]
 
   //java
   case object JBooleanKey   extends SimpleKeyType[java.lang.Boolean]
@@ -86,19 +84,19 @@ object KeyType extends Enum[KeyType[_]] {
   case object JDoubleKey    extends SimpleKeyType[java.lang.Double]
   case object JTimestampKey extends SimpleKeyType[java.time.Instant]
 
-  case object JByteArrayKey   extends ArrayKeyType[java.lang.Byte]
-  case object JShortArrayKey  extends ArrayKeyType[java.lang.Short]
-  case object JLongArrayKey   extends ArrayKeyType[java.lang.Long]
-  case object JIntArrayKey    extends ArrayKeyType[java.lang.Integer]
-  case object JFloatArrayKey  extends ArrayKeyType[java.lang.Float]
-  case object JDoubleArrayKey extends ArrayKeyType[java.lang.Double]
+  case object JByteArrayKey   extends SimpleKeyType[ArrayData[java.lang.Byte]]
+  case object JShortArrayKey  extends SimpleKeyType[ArrayData[java.lang.Short]]
+  case object JLongArrayKey   extends SimpleKeyType[ArrayData[java.lang.Long]]
+  case object JIntArrayKey    extends SimpleKeyType[ArrayData[java.lang.Integer]]
+  case object JFloatArrayKey  extends SimpleKeyType[ArrayData[java.lang.Float]]
+  case object JDoubleArrayKey extends SimpleKeyType[ArrayData[java.lang.Double]]
 
-  case object JByteMatrixKey   extends MatrixKeyType[java.lang.Byte]
-  case object JShortMatrixKey  extends MatrixKeyType[java.lang.Short]
-  case object JLongMatrixKey   extends MatrixKeyType[java.lang.Long]
-  case object JIntMatrixKey    extends MatrixKeyType[java.lang.Integer]
-  case object JFloatMatrixKey  extends MatrixKeyType[java.lang.Float]
-  case object JDoubleMatrixKey extends MatrixKeyType[java.lang.Double]
+  case object JByteMatrixKey   extends SimpleKeyType[MatrixData[java.lang.Byte]]
+  case object JShortMatrixKey  extends SimpleKeyType[MatrixData[java.lang.Short]]
+  case object JLongMatrixKey   extends SimpleKeyType[MatrixData[java.lang.Long]]
+  case object JIntMatrixKey    extends SimpleKeyType[MatrixData[java.lang.Integer]]
+  case object JFloatMatrixKey  extends SimpleKeyType[MatrixData[java.lang.Float]]
+  case object JDoubleMatrixKey extends SimpleKeyType[MatrixData[java.lang.Double]]
 
   implicit def format: JsonFormat[KeyType[_]] = enumFormat(this)
 
