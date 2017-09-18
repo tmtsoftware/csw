@@ -8,8 +8,9 @@ import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Ter
 import csw.common.framework.exceptions.FailureRestart
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.SupervisorLifecycleState.Idle
-import csw.common.framework.models.FromComponentLifecycleMessage.Running
+import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.SupervisorCommonMessage.{
@@ -37,7 +38,9 @@ object SupervisorBehavior {
   val ComponentActor                    = "component"
   val PubSubLifecycleActor              = "pub-sub-lifecycle"
   val InitializeTimerKey                = "initialize-timer"
+  val RunTimerKey                       = "run-timer"
   val initializeTimeout: FiniteDuration = 5.seconds
+  val runTimeout: FiniteDuration        = 5.seconds
 }
 
 class SupervisorBehavior(
@@ -69,7 +72,7 @@ class SupervisorBehavior(
   val pubSubComponent: ActorRef[PubSub[CurrentState]] =
     pubSubBehaviorFactory.make(ctx, PubSubComponentActor, componentName)
 
-  registerWithLocationService()
+  spawnAndWatchComponent()
 
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
@@ -88,13 +91,14 @@ class SupervisorBehavior(
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
       timerScheduler.cancel(InitializeTimerKey)
+      timerScheduler.cancel(RunTimerKey)
       lifecycleState match {
         case SupervisorLifecycleState.Restart ⇒
           log.warn(
             s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]"
           )
           lifecycleState = SupervisorLifecycleState.Idle
-          registerWithLocationService()
+          spawnAndWatchComponent()
         case SupervisorLifecycleState.Shutdown ⇒
           log.warn(
             s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]"
@@ -129,18 +133,22 @@ class SupervisorBehavior(
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
-    case RegistrationComplete(registrationResult) ⇒
+    case Initialized(componentRef) ⇒
+      timerScheduler.cancel(InitializeTimerKey)
+      registerWithLocationService(componentRef)
+    case RegistrationComplete(registrationResult, componentRef) ⇒
       registrationOpt = Some(registrationResult)
-      spawnAndWatchComponent()
+      timerScheduler.startSingleTimer(RunTimerKey, RunTimeout, runTimeout)
+      componentRef ! Run
     case RegistrationFailed(throwable) ⇒
       log.error(throwable.getMessage, ex = throwable)
       throw throwable
     case Running(componentRef) ⇒
+      timerScheduler.cancel(RunTimerKey)
       log.debug(
         s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
       )
       lifecycleState = SupervisorLifecycleState.Running
-      timerScheduler.cancel(InitializeTimerKey)
       runningComponent = Some(componentRef)
       maybeContainerRef foreach { container ⇒
         container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
@@ -148,7 +156,9 @@ class SupervisorBehavior(
       }
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
     case InitializeTimeout ⇒
-      log.error("Component initialization timed out")
+      log.error("Component TLA initialization timed out")
+    case RunTimeout ⇒
+      log.error("Component TLA onRun timed out")
   }
 
   private def onRunning(supervisorRunningMessage: SupervisorRunningMessage): Unit = {
@@ -193,7 +203,7 @@ class SupervisorBehavior(
           s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Idle}]"
         )
         lifecycleState = SupervisorLifecycleState.Idle
-        registerWithLocationService()
+        spawnAndWatchComponent()
     }
   }
 
@@ -216,12 +226,9 @@ class SupervisorBehavior(
     }
   }
 
-  private def registerWithLocationService(): Unit = {
-    log.debug(
-      s"Supervisor with connection :[${akkaRegistration.connection.name}] is registering with location service with ref :[${akkaRegistration.actorRef}]"
-    )
+  private def registerWithLocationService(componentRef: ActorRef[InitialMessage]): Unit = {
     locationService.register(akkaRegistration).onComplete {
-      case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
+      case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult, componentRef)
       case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
     }
   }

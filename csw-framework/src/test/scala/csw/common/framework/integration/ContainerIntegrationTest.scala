@@ -157,6 +157,10 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
+    assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
+    filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
+    disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(runChoice))))
+
     assemblyLifecycleStateProbe.expectMsg(LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running))
     filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running))
     disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running))

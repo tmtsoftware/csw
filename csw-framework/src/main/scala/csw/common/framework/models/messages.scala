@@ -90,10 +90,11 @@ object SupervisorCommonMessage {
 
 sealed trait SupervisorIdleMessage extends SupervisorMessage
 object SupervisorIdleMessage {
-  case class RegistrationComplete(registrationResult: RegistrationResult) extends SupervisorIdleMessage
-  case class RegistrationFailed(throwable: Throwable)                     extends SupervisorIdleMessage
-  case object InitializeTimeout                                           extends SupervisorIdleMessage
-  case object RunTimeout                                                  extends SupervisorIdleMessage
+  case class RegistrationComplete(registrationResult: RegistrationResult, componentRef: ActorRef[InitialMessage])
+      extends SupervisorIdleMessage
+  case class RegistrationFailed(throwable: Throwable) extends SupervisorIdleMessage
+  case object InitializeTimeout                       extends SupervisorIdleMessage
+  case object RunTimeout                              extends SupervisorIdleMessage
 }
 
 sealed trait FromComponentLifecycleMessage extends SupervisorIdleMessage

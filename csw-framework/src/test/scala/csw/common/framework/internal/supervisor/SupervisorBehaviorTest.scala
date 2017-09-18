@@ -21,17 +21,24 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
   val supervisorBehavior: Behavior[SupervisorExternalMessage]    = createBehavior()
 
-  test("Supervisor should create child actors for pub-sub actor for lifecycle and component state") {
+  test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state") {
     val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
 
     ctx.getAllEffects() should contain allOf (
+      Spawned(SupervisorBehavior.ComponentActor, Props.empty),
       Spawned(SupervisorBehavior.PubSubLifecycleActor, Props.empty),
       Spawned(SupervisorBehavior.PubSubComponentActor, Props.empty)
     )
+  }
 
+  test("Supervisor should watch child component actor [TLA]") {
+    val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
+
+    val componentActor       = ctx.childInbox(SupervisorBehavior.ComponentActor).ref
     val pubSubLifecycleActor = ctx.childInbox(SupervisorBehavior.PubSubLifecycleActor).ref
     val pubSubComponentActor = ctx.childInbox(SupervisorBehavior.PubSubComponentActor).ref
 
+    ctx.getAllEffects() should contain(Watched(componentActor))
     ctx.getAllEffects() should not contain Watched(pubSubLifecycleActor)
     ctx.getAllEffects() should not contain Watched(pubSubComponentActor)
   }
