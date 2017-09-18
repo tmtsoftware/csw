@@ -3,6 +3,10 @@ package csw.messages.params.generics;
 import csw.messages.params.models.Units;
 import csw.messages.params.models.JMatrixData;
 import csw.messages.params.models.MatrixData;
+import csw.param.models.ArrayData;
+import csw.param.models.JMatrixData;
+import csw.param.models.MatrixData;
+import csw.units.Units;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,11 +25,11 @@ import static csw.messages.javadsl.JUnits.*;
 public class JMatrixKeyTypeTest {
 
     private final String keyName;
-    private final MatrixKeyType matrixKey;
+    private final SimpleKeyType<MatrixData> matrixKey;
     private final Object[][] data;
     private final Optional<Units> units;
 
-    public JMatrixKeyTypeTest(String keyName, MatrixKeyType keyType, Object[][] data, Optional<Units> units) {
+    public JMatrixKeyTypeTest(String keyName, SimpleKeyType<MatrixData> keyType, Object[][] data, Optional<Units> units) {
         this.keyName = keyName;
         this.matrixKey = keyType;
         this.data = data;
@@ -65,7 +69,7 @@ public class JMatrixKeyTypeTest {
         MatrixData[] paramValues = {matrixData};
 
         if (units.isPresent()) parameter = matrixKey.make(keyName).set(paramValues, units.get());
-        else parameter = matrixKey.make(keyName).set((Object[])paramValues);
+        else parameter = matrixKey.make(keyName).set(paramValues);
 
         Assert.assertEquals(keyName, parameter.keyName());
         Assert.assertEquals(units.orElse(NoUnits), parameter.units());

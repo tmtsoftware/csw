@@ -2,6 +2,7 @@ package csw.messages.params.models
 
 import java.util
 
+import com.trueaccord.scalapb.TypeMapper
 import spray.json.RootJsonFormat
 
 import scala.annotation.varargs
@@ -20,8 +21,9 @@ case class Choice(name: String) {
  */
 object Choice {
   import spray.json.DefaultJsonProtocol._
-  implicit def toChoice(name: String): Choice       = new Choice(name)
-  implicit val choiceFormat: RootJsonFormat[Choice] = jsonFormat1(Choice.apply)
+  implicit def toChoice(name: String): Choice         = new Choice(name)
+  implicit val choiceFormat: RootJsonFormat[Choice]   = jsonFormat1(Choice.apply)
+  implicit val typeMapper: TypeMapper[String, Choice] = TypeMapper[String, Choice](Choice.apply)(_.name)
 }
 
 /**

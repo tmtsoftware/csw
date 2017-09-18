@@ -1,6 +1,9 @@
 package csw.messages.params.models
 
 import csw.messages.params.generics.{Parameter, ParameterSetType}
+import com.trueaccord.scalapb.TypeMapper
+import csw.param.generics.{Parameter, ParameterSetType}
+import csw_params.parameter.PbStruct
 import spray.json.JsonFormat
 
 import scala.annotation.varargs
@@ -24,6 +27,12 @@ object Struct {
   implicit val format: JsonFormat[Struct] = jsonFormat1(Struct.apply)
 
   def apply(paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Struct = new Struct().madd(paramSet)
+
+  implicit val typeMapper: TypeMapper[PbStruct, Struct] = TypeMapper[PbStruct, Struct] { s =>
+    Struct(s.paramSet.map(Parameter.typeMapper2.toCustom).toSet)
+  } { s =>
+    PbStruct().withParamSet(s.paramSet.map(Parameter.typeMapper2.toBase).toSeq)
+  }
 }
 
 object JStruct {

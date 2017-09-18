@@ -2,25 +2,21 @@ syntax = "proto3";
 
 package csw_params;
 
+import "csw_params/radec.proto";
 import "scalapb/scalapb.proto";
+import "google/protobuf/timestamp.proto";
 
 option (scalapb.options) = {
     import: "csw.param.pb._"
+    import: "csw.param.pb.Implicits._"
     import: "csw.param.models._"
     single_file: true
 };
 
-//ByteItems
-//CharItems
-//ShortItems
-//ByteArrayItems
-//ShortArrayItems
-//ByteMatrixItems
-//ShortMatrixItems
-
-message AnyItems {
-    //    option (scalapb.message).extends = "ItemType[com.google.protobuf.ByteString, AnyItems]";
-    repeated bytes values = 1;
+message ChoiceItems {
+    option (scalapb.message).extends = "ItemType[Choice]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[ChoiceItems]";
+    repeated string values = 1 [(scalapb.field).type = "Choice"];
 }
 
 message StringItems {
@@ -33,6 +29,12 @@ message BooleanItems {
     option (scalapb.message).extends = "ItemType[Boolean]";
     option (scalapb.message).companion_extends = "ItemTypeCompanion[BooleanItems]";
     repeated bool values = 1;
+}
+
+message RaDecItems {
+    option (scalapb.message).extends = "ItemType[RaDec]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[RaDecItems]";
+    repeated PbRaDec values = 1 [(scalapb.field).type = "RaDec"];
 }
 
 message IntItems {
@@ -57,6 +59,12 @@ message FloatItems {
     option (scalapb.message).extends = "ItemType[Float]";
     option (scalapb.message).companion_extends = "ItemTypeCompanion[FloatItems]";
     repeated float values = 1;
+}
+
+message TimestampItems {
+    option (scalapb.message).extends = "ItemType[java.time.Instant]";
+    option (scalapb.message).companion_extends = "ItemTypeCompanion[TimestampItems]";
+    repeated google.protobuf.Timestamp values = 1 [(scalapb.field).type = "java.time.Instant"];
 }
 
 message IntArrayItems {
