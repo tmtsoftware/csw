@@ -58,6 +58,6 @@ class FrameworkTestMocks(
 
 object FrameworkTestMocks {
   trait TypedActorMock[T] { this: ComponentLogger.TypedActor[T] ⇒
-    override protected lazy val log: Logger = MockitoSugar.mock[Logger]
+    override lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 }

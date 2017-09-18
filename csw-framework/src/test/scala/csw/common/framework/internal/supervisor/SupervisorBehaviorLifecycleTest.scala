@@ -17,6 +17,7 @@ import csw.common.framework.models.{ToComponentLifecycleMessage, _}
 import csw.common.framework.scaladsl.ComponentHandlers
 import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.states.CurrentState
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
@@ -169,4 +170,46 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     childComponentInbox.receiveMsg() shouldBe TestCompMessage$
   }
   // *************** End of testing onRunning Messages ***************
+
+  test("should not forward Domain message to a TLA when supervisor is in Idle mode") {
+    val testData = new TestData()
+    import testData._
+
+    sealed trait TestDomainMessage extends DomainMessage
+    case object TestCompMessage    extends TestDomainMessage
+
+    // TestCompMessage (DomainMessage) is sent to supervisor when mode is Idle
+    // in this case, verify that log.error is called once
+    supervisor.mode shouldBe SupervisorMode.Idle
+    supervisor.onMessage(TestCompMessage)
+    supervisor.runningComponent shouldBe empty
+    verify(supervisor.log, times(1)).error(ArgumentMatchers.any())
+  }
+
+  test("should not forward Domain message to a TLA when supervisor is in Restart mode") {
+    val testData = new TestData()
+    import testData._
+
+    sealed trait TestDomainMessage extends DomainMessage
+    case object TestCompMessage    extends TestDomainMessage
+
+    supervisor.mode shouldBe SupervisorMode.Idle
+    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.mode shouldBe SupervisorMode.Running
+
+    // TestCompMessage (DomainMessage) is sent to supervisor when mode is running
+    // in this case, verify that log.error is never called
+    supervisor.onMessage(TestCompMessage)
+    verify(supervisor.log, never()).error(ArgumentMatchers.any())
+    childComponentInbox.receiveMsg() shouldBe TestCompMessage
+
+    // TestCompMessage (DomainMessage) is sent to supervisor when mode is Restart
+    // in this case, verify that log.error is called once and
+    // TLA does not receive any message
+    supervisor.onMessage(Restart)
+    supervisor.mode shouldBe SupervisorMode.Restart
+    supervisor.onMessage(TestCompMessage)
+    childComponentInbox.receiveAll() shouldBe Seq.empty
+    verify(supervisor.log, times(1)).error(ArgumentMatchers.any())
+  }
 }
