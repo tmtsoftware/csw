@@ -1,11 +1,15 @@
 package csw.param
 
+import java.time.Instant
+
+import com.trueaccord.scalapb.json.JsonFormat
 import csw.param.generics.{JKeyTypes, KeyType, Parameter}
-import csw.param.models.{ArrayData, MatrixData}
+import csw.param.models._
 import csw.units.Units
 import csw_params.ParameterTypes
 import csw_params.parameter.PbParameter
 import csw_params.parameter_types._
+import csw_params.radec.PbRaDec
 import org.scalatest.FunSuite
 
 class DD2 extends FunSuite {
@@ -124,4 +128,72 @@ class DD2 extends FunSuite {
     println(value)
   }
 
+  test("12") {
+    val parameter = PbParameter()
+      .withName("abcd")
+      .withUnits(Units.second)
+      .withKeyType(KeyType.IntKey)
+      .withCharItems(CharItems().set(Seq('a', 'b')))
+      .withIntItems(IntItems().addValues(1))
+    println(parameter)
+  }
+
+  test("13") {
+    val parameter = PbParameter()
+      .withName("abcd")
+      .withUnits(Units.second)
+      .withKeyType(KeyType.TimestampKey)
+      .withInstantItems(InstantItems(Seq(Instant.now)))
+    println(parameter)
+  }
+
+  test("14") {
+    val parameter = PbParameter()
+      .withName("abcd")
+      .withUnits(Units.second)
+      .withKeyType(KeyType.TimestampKey)
+      .withByteItems(ByteItems(Seq(1, 2, 3, 4)))
+    println(parameter)
+  }
+
+  test("15") {
+    val choices = ChoiceItems().set(Seq("a345", "b234", "c567", "d890"))
+    val parameter = PbParameter()
+      .withName("abcd")
+      .withUnits(Units.second)
+      .withKeyType(KeyType.TimestampKey)
+      .withChoiceItems(choices)
+    println(JsonFormat.toJsonString(parameter))
+    println(JsonFormat.toJson(parameter))
+  }
+
+  test("16") {
+    PbRaDec()
+    PbRaDec.defaultInstance
+
+    val pbRaDec  = PbRaDec().withRa(10).withDec(32)
+    val pbRaDec2 = PbRaDec().withRa(10).withDec(321)
+
+    val raDec = RaDec(1, 2)
+    val param = KeyType.RaDecKey.make("Asd").set(raDec)
+
+    val pbParameter = Parameter.typeMapper2.toBase(param)
+    val array       = pbParameter.toByteArray
+    println(pbParameter)
+  }
+
+  test("17") {
+
+    val p1 = PbParameter()
+      .withName("a")
+//      .withKeyType(KeyType.BooleanKey)
+      .withIntItems(IntItems().addValues(1, 2))
+
+    println(p1)
+  }
+
+  test("18") {
+    val pbParam = PbParameter().withIntItems(IntItems().addValues(1, 2, 3, 4, 5))
+    println(pbParam)
+  }
 }

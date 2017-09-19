@@ -11,6 +11,7 @@ object Dependencies {
     Enumeratum.`enumeratum-play`,
     Chill.`chill-bijection`,
     Libs.`scalapb-runtime`,
+    Libs.`scalapb-json4s`,
     Akka.`akka-typed`,
     Akka.`akka-cluster-tools` % Test,
     Akka.`akka-typed-testkit` % Test,

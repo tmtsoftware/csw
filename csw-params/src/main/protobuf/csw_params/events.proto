@@ -15,7 +15,7 @@ message PbEvent {
         ObserveEvent = 1;
         SystemEvent = 2;
     }
+    string prefix = 3;
     repeated PbParameter paramSet = 1;
     PbEventType eventType = 2;
-    string prefix = 3;
 }

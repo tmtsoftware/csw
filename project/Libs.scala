@@ -24,6 +24,7 @@ object Libs {
   val `play-json`                    = "com.typesafe.play"      %% "play-json"                    % "2.6.6" //Apache 2.0
   val `play-json-extensions`         = "ai.x"                   %% "play-json-extensions"         % "0.10.0"
   val `scalapb-runtime`              = "com.trueaccord.scalapb" %% "scalapb-runtime"              % scalapbVersion % "protobuf"
+  val `scalapb-json4s`               = "com.trueaccord.scalapb" %% "scalapb-json4s"               % "0.3.2"
 }
 
 object Jackson {
