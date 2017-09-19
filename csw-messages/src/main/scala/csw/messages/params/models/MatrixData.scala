@@ -36,6 +36,9 @@ object MatrixData {
     TypeMapper[S, MatrixData[T]](x ⇒ MatrixData.fromArrays(x.values.toArray.map(a ⇒ a.data.array)))(
       x ⇒ ItemTypeCompanion.make(x.data.map(ArrayData.apply))
     )
+
+  implicit def conversion[A, B](implicit conversion: A ⇒ B): MatrixData[A] ⇒ MatrixData[B] =
+    _.asInstanceOf[MatrixData[B]]
 }
 
 object JMatrixData {

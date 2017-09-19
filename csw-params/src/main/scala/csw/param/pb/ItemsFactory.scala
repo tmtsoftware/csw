@@ -46,6 +46,9 @@ object ItemsFactory {
   implicit val LongMatrixItemsFactory: ItemsFactory[MatrixData[Long]]     = ItemsFactory(Items.LongMatrixItems)
   implicit val FloatMatrixItemsFactory: ItemsFactory[MatrixData[Float]]   = ItemsFactory(Items.FloatMatrixItems)
   implicit val DoubleMatrixItemsFactory: ItemsFactory[MatrixData[Double]] = ItemsFactory(Items.DoubleMatrixItems)
+
+  implicit def genericItemsFactory[A: ItemsFactory, B](implicit conversion: A ⇒ B): ItemsFactory[B] =
+    ItemsFactory[A].asInstanceOf[ItemsFactory[B]]
 }
 
 object A extends App {

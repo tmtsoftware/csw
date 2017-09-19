@@ -37,11 +37,14 @@ sealed class MatrixKeyType[S: JsonFormat: ClassTag](implicit x: ItemsFactory[Mat
     extends SimpleKeyType[MatrixData[S]]
 
 //////////
-sealed class JSimpleKeyType[S: JsonFormat: ClassTag, T: ItemsFactory]
-    extends SimpleKeyType[S]()(implicitly, implicitly, ItemsFactory[T].asInstanceOf[ItemsFactory[S]])
-sealed class JArrayKeyType[S: JsonFormat: ClassTag, T: ItemsFactory](implicit x: ItemsFactory[ArrayData[T]])
+sealed class JSimpleKeyType[S: JsonFormat: ClassTag, T: ItemsFactory](implicit conversion: T ⇒ S)
+    extends SimpleKeyType[S]
+sealed class JArrayKeyType[S: JsonFormat: ClassTag, T: ItemsFactory](implicit x: ItemsFactory[ArrayData[T]],
+                                                                     conversion: T ⇒ S)
     extends JSimpleKeyType[ArrayData[S], ArrayData[T]]
-sealed class JMatrixKeyType[S: JsonFormat: ClassTag, T: ItemsFactory](implicit x: ItemsFactory[MatrixData[T]])
+
+sealed class JMatrixKeyType[S: JsonFormat: ClassTag, T: ItemsFactory](implicit x: ItemsFactory[MatrixData[T]],
+                                                                      conversion: T ⇒ S)
     extends JSimpleKeyType[MatrixData[S], MatrixData[T]]
 
 ///////////////
@@ -64,13 +67,14 @@ object KeyType extends Enum[KeyType[_]] {
 
   //scala
   case object BooleanKey extends SimpleKeyType[Boolean]
-  case object ByteKey    extends SimpleKeyType[Byte]
   case object CharKey    extends SimpleKeyType[Char]
-  case object ShortKey   extends SimpleKeyType[Short]
-  case object LongKey    extends SimpleKeyType[Long]
-  case object IntKey     extends SimpleKeyType[Int]
-  case object FloatKey   extends SimpleKeyType[Float]
-  case object DoubleKey  extends SimpleKeyType[Double]
+
+  case object ByteKey   extends SimpleKeyType[Byte]
+  case object ShortKey  extends SimpleKeyType[Short]
+  case object LongKey   extends SimpleKeyType[Long]
+  case object IntKey    extends SimpleKeyType[Int]
+  case object FloatKey  extends SimpleKeyType[Float]
+  case object DoubleKey extends SimpleKeyType[Double]
 
   case object ByteArrayKey   extends ArrayKeyType[Byte]
   case object ShortArrayKey  extends ArrayKeyType[Short]
