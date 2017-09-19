@@ -5,7 +5,7 @@ import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.common.framework.exceptions.FailureRestart
+import csw.common.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.internal.supervisor.SupervisorLifecycleState.Idle
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
@@ -90,24 +90,16 @@ class SupervisorBehavior(
 
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
+      log.warn(
+        s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]"
+      )
       timerScheduler.cancel(InitializeTimerKey)
       timerScheduler.cancel(RunTimerKey)
       lifecycleState match {
-        case SupervisorLifecycleState.Restart ⇒
-          log.warn(
-            s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]"
-          )
-          lifecycleState = SupervisorLifecycleState.Idle
-          spawnAndWatchComponent()
-        case SupervisorLifecycleState.Shutdown ⇒
-          log.warn(
-            s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]"
-          )
-          coordinatedShutdown()
-        case _ ⇒
-          log.error(
-            s"Supervisor in lifecycle state :[$lifecycleState] received unexpected terminated signal from component :[$componentRef]"
-          )
+        case SupervisorLifecycleState.Restart  ⇒ spawn()
+        case SupervisorLifecycleState.Shutdown ⇒ coordinatedShutdown()
+        case SupervisorLifecycleState.Idle     ⇒ if (maybeContainerRef.isEmpty) throw InitializationFailed()
+        case _                                 ⇒
       }
       this
     case PostStop ⇒
@@ -157,6 +149,7 @@ class SupervisorBehavior(
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
     case InitializeTimeout ⇒
       log.error("Component TLA initialization timed out")
+      if (maybeContainerRef.isEmpty) ctx.stop(component)
     case RunTimeout ⇒
       log.error("Component TLA onRun timed out")
   }
@@ -196,15 +189,17 @@ class SupervisorBehavior(
   private def respawnComponent(): Unit = {
     log.info("Supervisor re-spawning component")
     ctx.child(ComponentActor) match {
-      case Some(componentRef) ⇒
-        ctx.stop(component)
-      case None ⇒
-        log.debug(
-          s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Idle}]"
-        )
-        lifecycleState = SupervisorLifecycleState.Idle
-        spawnAndWatchComponent()
+      case Some(_) ⇒ ctx.stop(component)
+      case None    ⇒ spawn()
     }
+  }
+
+  private def spawn(): Unit = {
+    log.debug(
+      s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Idle}]"
+    )
+    lifecycleState = SupervisorLifecycleState.Idle
+    spawnAndWatchComponent()
   }
 
   private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = {

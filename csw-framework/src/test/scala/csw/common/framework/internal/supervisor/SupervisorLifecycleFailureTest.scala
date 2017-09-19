@@ -122,7 +122,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
     ).thenReturn(componentHandlers)
 
     val supervisorBehavior = SupervisorBehaviorFactory.make(
-      None,
+      Some(mock[ActorRef[ContainerIdleMessage]]),
       hcdInfo,
       locationService,
       registrationFactory,
