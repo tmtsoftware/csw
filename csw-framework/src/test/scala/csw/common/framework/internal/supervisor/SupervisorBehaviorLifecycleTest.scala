@@ -1,11 +1,13 @@
 package csw.common.framework.internal.supervisor
 
+import akka.typed.Terminated
 import akka.typed.scaladsl.TimerScheduler
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
 import csw.common.framework.ComponentInfos._
 import csw.common.framework.FrameworkTestMocks.TypedActorMock
+import csw.common.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.common.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.InitialMessage.Run
@@ -37,7 +39,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
       new SupervisorBehavior(
         ctx,
         timer,
-        Some(containerIdleMessageProbe.ref),
+        None,
         hcdInfo,
         getSampleHcdWiring(sampleHcdHandler),
         new PubSubBehaviorFactory,
@@ -238,5 +240,15 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisor.onMessage(TestCompMessage)
     childComponentInbox.receiveAll() shouldBe Seq.empty
     verify(supervisor.log, times(1)).error(ArgumentMatchers.any())
+  }
+
+  test("supervisor should handle Terminated signal for Idle lifecycle state") {
+    val testData = new TestData()
+    import testData._
+
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
+    intercept[InitializationFailed] {
+      supervisor.onSignal(Terminated(childComponentInbox.ref)(FailureStop()))
+    }
   }
 }
