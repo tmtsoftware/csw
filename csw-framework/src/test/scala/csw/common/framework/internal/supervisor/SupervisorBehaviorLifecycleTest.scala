@@ -50,7 +50,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     verify(timer).startSingleTimer(
       SupervisorBehavior.InitializeTimerKey,
       InitializeTimeout,
-      SupervisorBehavior.initializeTimeout
+      supervisor.initializeTimeout
     )
     val childComponentInbox: Inbox[ComponentMessage]                    = ctx.childInbox(supervisor.component.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
@@ -66,7 +66,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     verify(timer).startSingleTimer(
       SupervisorBehavior.InitializeTimerKey,
       InitializeTimeout,
-      SupervisorBehavior.initializeTimeout
+      supervisor.initializeTimeout
     )
   }
 
@@ -87,7 +87,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     verify(timer).startSingleTimer(
       SupervisorBehavior.RunTimerKey,
       RunTimeout,
-      SupervisorBehavior.runTimeout
+      supervisor.runTimeout
     )
 
     childComponentInbox.receiveMsg() shouldBe Run

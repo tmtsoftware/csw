@@ -15,5 +15,27 @@ public class JComponentInfos {
             "wfos",
             "csw.common.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JDoNotRegister(),
-            Collections.emptySet());
+            Collections.emptySet(),
+            10,
+            10);
+
+    public static ComponentInfo jHcdInfoWithInitializeTimeout = JComponentInfo.from(
+            "trombone",
+            JComponentType.HCD,
+            "wfos",
+            "csw.common.framework.javadsl.components.JSampleComponentBehaviorFactory",
+            LocationServiceUsage.JDoNotRegister(),
+            Collections.emptySet(),
+            0,
+            5);
+
+    public static ComponentInfo jHcdInfoWithRunTimeout = JComponentInfo.from(
+            "trombone",
+            JComponentType.HCD,
+            "wfos",
+            "csw.common.framework.javadsl.components.JSampleComponentBehaviorFactory",
+            LocationServiceUsage.JDoNotRegister(),
+            Collections.emptySet(),
+            5,
+            0);
 }

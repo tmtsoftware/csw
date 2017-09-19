@@ -36,6 +36,9 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     @Override
     public CompletableFuture<BoxedUnit> jInitialize() {
         log.debug("Initializing Sample component");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ignored) {}
         return CompletableFuture.supplyAsync(() -> {
             CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
             PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(initState);
@@ -47,6 +50,9 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
     @Override
     public CompletableFuture<BoxedUnit> jOnRun() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ignored) {}
         return CompletableFuture.supplyAsync(() -> {
         CurrentState runState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.runChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(runState);

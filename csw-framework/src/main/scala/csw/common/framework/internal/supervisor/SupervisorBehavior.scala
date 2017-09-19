@@ -1,5 +1,7 @@
 package csw.common.framework.internal.supervisor
 
+import java.util.concurrent.TimeUnit.SECONDS
+
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
@@ -29,18 +31,16 @@ import csw.services.location.models.{AkkaRegistration, ComponentId, Registration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger
 
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.{Failure, Success}
 
 object SupervisorBehavior {
-  val PubSubComponentActor              = "pub-sub-component"
-  val ComponentActor                    = "component"
-  val PubSubLifecycleActor              = "pub-sub-lifecycle"
-  val InitializeTimerKey                = "initialize-timer"
-  val RunTimerKey                       = "run-timer"
-  val initializeTimeout: FiniteDuration = 5.seconds
-  val runTimeout: FiniteDuration        = 5.seconds
+  val PubSubComponentActor = "pub-sub-component"
+  val ComponentActor       = "component"
+  val PubSubLifecycleActor = "pub-sub-lifecycle"
+  val InitializeTimerKey   = "initialize-timer"
+  val RunTimerKey          = "run-timer"
 }
 
 class SupervisorBehavior(
@@ -59,6 +59,8 @@ class SupervisorBehavior(
   implicit val ec: ExecutionContext = ctx.executionContext
 
   val componentName: String                              = componentInfo.name
+  val initializeTimeout: FiniteDuration                  = FiniteDuration(componentInfo.initializeTimeoutInSeconds, SECONDS)
+  val runTimeout: FiniteDuration                         = FiniteDuration(componentInfo.runTimeoutInSeconds, SECONDS)
   val componentId                                        = ComponentId(componentName, componentInfo.componentType)
   val akkaRegistration: AkkaRegistration                 = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   var haltingFlag                                        = false
@@ -149,9 +151,10 @@ class SupervisorBehavior(
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
     case InitializeTimeout ⇒
       log.error("Component TLA initialization timed out")
-      if (maybeContainerRef.isEmpty) ctx.stop(component)
+      ctx.stop(component)
     case RunTimeout ⇒
       log.error("Component TLA onRun timed out")
+      ctx.stop(component)
   }
 
   private def onRunning(supervisorRunningMessage: SupervisorRunningMessage): Unit = {
@@ -244,8 +247,8 @@ class SupervisorBehavior(
         .onFailure[FailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)),
       ComponentActor
     )
-    ctx.watch(component)
     timerScheduler.startSingleTimer(InitializeTimerKey, InitializeTimeout, initializeTimeout)
+    ctx.watch(component)
   }
 
   private def coordinatedShutdown(): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run()

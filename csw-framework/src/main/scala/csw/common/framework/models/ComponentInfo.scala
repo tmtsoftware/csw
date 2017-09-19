@@ -15,7 +15,9 @@ final case class ComponentInfo(
     prefix: String,
     behaviorFactoryClassName: String,
     locationServiceUsage: LocationServiceUsage,
-    connections: Set[Connection] = Set.empty
+    connections: Set[Connection] = Set.empty,
+    initializeTimeoutInSeconds: Int = 10,
+    runTimeoutInSeconds: Int = 10
 ) {
 
   /**

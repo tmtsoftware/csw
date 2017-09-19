@@ -17,12 +17,29 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     "tcs.mobie.blue.filter",
     "csw.pkgDemo.assembly1.Assembly1",
     DoNotRegister,
-    Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka"))
+    Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka")),
+    5,
+    5
   )
   private val hcd2AInfo =
-    ComponentInfo("HCD-2A", HCD, "tcs.mobie.blue.filter", "csw.pkgDemo.hcd2.Hcd2", RegisterOnly, Set.empty)
+    ComponentInfo(
+      "HCD-2A",
+      HCD,
+      "tcs.mobie.blue.filter",
+      "csw.pkgDemo.hcd2.Hcd2",
+      RegisterOnly,
+      Set.empty
+    )
   private val hcd2BInfo =
-    ComponentInfo("HCD-2B", HCD, "tcs.mobie.blue.disperser", "csw.pkgDemo.hcd2.Hcd2", DoNotRegister, Set.empty)
+    ComponentInfo(
+      "HCD-2B",
+      HCD,
+      "tcs.mobie.blue.disperser",
+      "csw.pkgDemo.hcd2.Hcd2",
+      DoNotRegister,
+      Set.empty
+    )
+
   private val containerInfo = ContainerInfo("Container-1", RegisterOnly, Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
 
   test("should able to parse container config") {

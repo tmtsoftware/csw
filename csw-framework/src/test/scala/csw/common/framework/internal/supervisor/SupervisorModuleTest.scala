@@ -7,11 +7,17 @@ import csw.common.ccs.CommandStatus.CommandResponse
 import csw.common.ccs.DemandMatcher
 import csw.common.components.ComponentStatistics
 import csw.common.framework.ComponentInfos._
+import csw.common.framework.javadsl.commons.JComponentInfos.{
+  jHcdInfo,
+  jHcdInfoWithInitializeTimeout,
+  jHcdInfoWithRunTimeout
+}
 import csw.common.framework.javadsl.components.JComponentDomainMessage
 import csw.common.framework.models.CommandMessage.Oneway
 import csw.common.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
+import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.common.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.common.framework.models._
 import csw.common.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -228,6 +234,53 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         supervisorRef ! Lifecycle(GoOnline)
         compStateProbe.expectMsgType[Publish[CurrentState]]
+      }
+    }
+  }
+
+  // DEOPSCSW-284: Move Timeouts to Config file
+  test("handle InitializeTimeout by stopping TLA") {
+
+    val testData = Table(
+      "componentInfo",
+      hcdInfoWithInitializeTimeout,
+      jHcdInfoWithInitializeTimeout
+    )
+
+    forAll(testData) { (info: ComponentInfo) =>
+      {
+        val mocks = frameworkTestMocks()
+        import mocks._
+        createSupervisorAndStartTLA(info, mocks)
+        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
+
+        supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
+        supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Idle)
+        verify(locationService, never()).register(akkaRegistration)
+      }
+    }
+  }
+
+  // DEOPSCSW-284: Move Timeouts to Config file
+  test("handle RunTimeout by stopping TLA") {
+
+    val testData = Table(
+      "componentInfo",
+      hcdInfoWithRunTimeout,
+      jHcdInfoWithRunTimeout
+    )
+
+    forAll(testData) { (info: ComponentInfo) =>
+      {
+        val mocks = frameworkTestMocks()
+        import mocks._
+        createSupervisorAndStartTLA(info, mocks)
+        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
+
+        supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
+        supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Idle)
+        verify(locationService).register(akkaRegistration)
       }
     }
   }

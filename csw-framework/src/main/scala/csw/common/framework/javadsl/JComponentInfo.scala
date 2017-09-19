@@ -15,8 +15,19 @@ object JComponentInfo {
       prefix: String,
       className: String,
       locationServiceUsage: LocationServiceUsage,
-      connections: util.Set[Connection]
+      connections: util.Set[Connection],
+      initializeTimeoutInSeconds: Int,
+      runTimeoutInSeconds: Int
   ): ComponentInfo = {
-    ComponentInfo(name, componentType, prefix, className, locationServiceUsage, connections.asScala.toSet)
+    ComponentInfo(
+      name,
+      componentType,
+      prefix,
+      className,
+      locationServiceUsage,
+      connections.asScala.toSet,
+      initializeTimeoutInSeconds,
+      runTimeoutInSeconds
+    )
   }
 }

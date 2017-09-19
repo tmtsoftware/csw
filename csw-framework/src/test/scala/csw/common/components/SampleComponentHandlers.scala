@@ -49,13 +49,15 @@ class SampleComponentHandlers(
   import SampleComponentState._
 
   override def initialize(): Future[Unit] = {
-    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     Thread.sleep(100)
+    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     Future.unit
   }
 
-  override def onRun(): Future[Unit] =
+  override def onRun(): Future[Unit] = {
+    Thread.sleep(100)
     Future.successful(pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
+  }
 
   override def onGoOffline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
 
