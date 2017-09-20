@@ -1,16 +1,23 @@
 package csw.common.framework.internal.component
 
-import akka.typed.PostStop
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
+import akka.typed.{ActorRef, PostStop}
+import csw.common.ccs.CommandStatus.CommandResponse
+import csw.common.ccs.{CommandStatus, Validations}
 import csw.common.framework.FrameworkTestMocks.TypedActorMock
 import csw.common.framework.FrameworkTestSuite
+import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.common.framework.models.IdleMessage.Initialize
 import csw.common.framework.models.InitialMessage.Run
 import csw.common.framework.models.RunningMessage.Lifecycle
 import csw.common.framework.models.{ComponentMessage, FromComponentLifecycleMessage, ToComponentLifecycleMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
+import csw.param.commands.{Observe, Setup}
+import csw.param.generics.KeyType
+import csw.param.models.Prefix
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
@@ -102,5 +109,37 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     runningComponentBehavior.onSignal(PostStop)
     verify(sampleHcdHandler).onShutdown()
+  }
+
+  test("A running component should handle Submit command") {
+    val supervisorProbe      = TestProbe[FromComponentLifecycleMessage]
+    val commandResponseProbe = TestProbe[CommandResponse]
+    val runningComponent     = new RunningComponent(supervisorProbe)
+    import runningComponent._
+
+    val sc1 = Setup("Obs001", Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
+
+    when(sampleHcdHandler.onControlCommand(ArgumentMatchers.any[Submit]())).thenReturn(Validations.Valid)
+
+    runningComponentBehavior.onMessage(Submit(sc1, commandResponseProbe.ref))
+
+    verify(sampleHcdHandler).onControlCommand(Submit(sc1, commandResponseProbe.ref))
+    commandResponseProbe.expectMsg(CommandStatus.Accepted)
+  }
+
+  test("A running component should handle Oneway command") {
+    val supervisorProbe      = TestProbe[FromComponentLifecycleMessage]
+    val commandResponseProbe = TestProbe[CommandResponse]
+    val runningComponent     = new RunningComponent(supervisorProbe)
+    import runningComponent._
+
+    val sc1 = Observe("Obs001", Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
+
+    when(sampleHcdHandler.onControlCommand(ArgumentMatchers.any[Submit]())).thenReturn(Validations.Valid)
+
+    runningComponentBehavior.onMessage(Submit(sc1, commandResponseProbe.ref))
+
+    verify(sampleHcdHandler).onControlCommand(Oneway(sc1, ArgumentMatchers.any[ActorRef[AnyRef]]()))
+    commandResponseProbe.expectMsg(CommandStatus.Accepted)
   }
 }
