@@ -27,7 +27,6 @@ object UnidocSite extends AutoPlugin {
 }
 
 object ParadoxSite extends AutoPlugin {
-  import com.typesafe.sbt.site.paradox.ParadoxSitePlugin
   import ParadoxSitePlugin.autoImport._
   import com.lightbend.paradox.sbt.ParadoxPlugin.autoImport._
 

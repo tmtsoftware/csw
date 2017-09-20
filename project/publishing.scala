@@ -1,5 +1,4 @@
 import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
-import com.typesafe.sbt.packager.universal.UniversalPlugin
 import sbt.Keys._
 import sbt._
 
@@ -42,8 +41,6 @@ object DeployApp extends AutoPlugin {
   import com.typesafe.sbt.packager.SettingsHelper
   import com.typesafe.sbt.packager.universal.UniversalPlugin
   import UniversalPlugin.autoImport.{Universal, UniversalDocs}
-  import sbtbuildinfo.BuildInfoPlugin
-  import BuildInfoPlugin.autoImport._
 
   override def requires: Plugins = UniversalPlugin && JavaAppPackaging && PublishBintray && CswBuildInfo
 
