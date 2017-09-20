@@ -71,7 +71,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
   }
 
 //  This test is doing the same thing what TrackLocationTest is doing
-//  but the plan is to run this test on two amazon instance's with Jenkins configuration (multi-node-test).
+//  but the plan is to run this test on two amazon instance's with Jenkins configuration (multiNodeTest).
   test("ensure that a component registered on one node is tracked on all the nodes") {
     val componentId    = ComponentId("tromboneHcd", ComponentType.HCD)
     val akkaConnection = AkkaConnection(componentId)
