@@ -52,6 +52,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case PostStop ⇒
       log.warn(s"Component TLA is shutting down")
       val shutdownResult = Try {
+        log.info("Invoking lifecycle handler's onShutdown hook")
         Await.result(lifecycleHandlers.onShutdown(), ComponentBehavior.shutdownTimeout)
       }
       //log exception if onShutdown handler fails and proceed with `Shutdown` or `Restart`
@@ -70,6 +71,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   private def onIdle(x: IdleMessage): Unit = x match {
     case Initialize ⇒
       async {
+        log.info("Invoking lifecycle handler's initialize hook")
         await(lifecycleHandlers.initialize())
         log.debug(
           s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Initialized}]"
@@ -82,6 +84,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   private def onInitial(x: InitialMessage): Unit = x match {
     case Run ⇒
       async {
+        log.info("Invoking lifecycle handler's onRun hook")
         await(lifecycleHandlers.onRun())
         log.debug(
           s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Running}]"
@@ -93,22 +96,28 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
-    case Lifecycle(message) ⇒ onLifecycle(message)
-    case x: Msg             ⇒ lifecycleHandlers.onDomainMsg(x)
-    case x: CommandMessage  ⇒ onRunningCompCommandMessage(x)
-    case msg                ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
+    case Lifecycle(message) ⇒
+      log.info(s"Invoking lifecycle handler's onLifecycle hook with msg :[$message]")
+      onLifecycle(message)
+    case x: Msg ⇒
+      log.info(s"Invoking lifecycle handler's onDomainMsg hook with msg :[$x]")
+      lifecycleHandlers.onDomainMsg(x)
+    case x: CommandMessage ⇒ onRunningCompCommandMessage(x)
+    case msg               ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
   }
 
   private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
     case GoOnline ⇒
       if (!lifecycleHandlers.isOnline) {
         lifecycleHandlers.isOnline = true
+        log.info("Invoking lifecycle handler's onGoOnline hook")
         lifecycleHandlers.onGoOnline()
         log.debug(s"Component TLA is Online")
       }
     case GoOffline ⇒
       if (lifecycleHandlers.isOnline) {
         lifecycleHandlers.isOnline = false
+        log.info("Invoking lifecycle handler's onGoOffline hook")
         lifecycleHandlers.onGoOffline()
         log.debug(s"Component TLA is Offline")
       }
@@ -119,6 +128,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       case x: Oneway ⇒ x.copy(replyTo = ctx.spawnAnonymous(Actor.ignore))
       case x: Submit ⇒ x
     }
+    log.info(s"Invoking lifecycle handler's onControlCommand hook with msg :[$newMessage]")
     val validation              = lifecycleHandlers.onControlCommand(newMessage)
     val validationCommandResult = CommandStatus.validationAsCommandStatus(validation)
     message.replyTo ! validationCommandResult

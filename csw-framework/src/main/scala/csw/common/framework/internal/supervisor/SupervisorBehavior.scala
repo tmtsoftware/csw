@@ -128,16 +128,19 @@ class SupervisorBehavior(
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
     case Initialized(componentRef) ⇒
+      log.info(s"Received Initialized message from component within timeout, cancelling InitializeTimer")
       timerScheduler.cancel(InitializeTimerKey)
       registerWithLocationService(componentRef)
     case RegistrationComplete(registrationResult, componentRef) ⇒
       registrationOpt = Some(registrationResult)
+      log.info(s"Starting RunTimer for $runTimeout")
       timerScheduler.startSingleTimer(RunTimerKey, RunTimeout, runTimeout)
       componentRef ! Run
     case RegistrationFailed(throwable) ⇒
       log.error(throwable.getMessage, ex = throwable)
       throw throwable
     case Running(componentRef) ⇒
+      log.info(s"Received Running message from component within timeout, cancelling RunTimer")
       timerScheduler.cancel(RunTimerKey)
       log.debug(
         s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
@@ -247,6 +250,7 @@ class SupervisorBehavior(
         .onFailure[FailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)),
       ComponentActor
     )
+    log.info(s"Starting InitializeTimer for $initializeTimeout")
     timerScheduler.startSingleTimer(InitializeTimerKey, InitializeTimeout, initializeTimeout)
     ctx.watch(component)
   }
