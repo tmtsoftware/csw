@@ -84,7 +84,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'className' is missing for assembly") {
+  test("should able to throw error when 'behaviorFactoryClassName' is missing for assembly") {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/missing_classname.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -102,14 +102,6 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
 
   test("should able to throw error when 'locationServiceUsage' is missing for assembly") {
     val config = ConfigFactory.parseResources(getClass, "/conf/assembly/missing_location_service_usage.conf")
-
-    intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parseComponent(config)
-    }
-  }
-
-  test("should able to throw error when 'connections' are missing for assembly") {
-    val config = ConfigFactory.parseResources(getClass, "/conf/assembly/missing_connections.conf")
 
     intercept[java.lang.RuntimeException] {
       ComponentInfoParser.parseComponent(config)
@@ -140,7 +132,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'className' is missing for hcd") {
+  test("should able to throw error when 'behaviorFactoryClassName' is missing for hcd") {
     val config = ConfigFactory.parseResources(getClass, "/conf/hcd/missing_classname.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -172,9 +164,8 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'components' contains more than one entry for standalone mode") {
-    val path   = "/conf/standalone/invalid_standalone.conf"
-    val config = ConfigFactory.parseResources(getClass, path)
+  test("should able to throw error when 'name' is missing for standalone mode") {
+    val config = ConfigFactory.parseResources(getClass, "/conf/standalone/invalid_standalone.conf")
 
     intercept[java.lang.RuntimeException] {
       ComponentInfoParser.parseStandalone(config)
