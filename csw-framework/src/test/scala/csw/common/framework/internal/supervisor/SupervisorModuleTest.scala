@@ -13,7 +13,7 @@ import csw.common.framework.javadsl.commons.JComponentInfos.{
   jHcdInfoWithRunTimeout
 }
 import csw.common.framework.javadsl.components.JComponentDomainMessage
-import csw.common.framework.models.CommandMessage.Oneway
+import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.common.framework.models.PubSub.Publish
 import csw.common.framework.models.RunningMessage.{DomainMessage, Lifecycle}
@@ -130,11 +130,15 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
         val setup: Setup             = Setup(commandInfo, prefix, Set(param))
 
-        supervisorRef ! Oneway(setup, TestProbe[CommandResponse].ref)
+        supervisorRef ! Submit(setup, TestProbe[CommandResponse].ref)
+        val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
+        DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
 
-        val commandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val commandDemandState  = DemandState(prefix, Set(choiceKey.set(commandChoice)))
-        DemandMatcher(commandDemandState).check(commandCurrentState.data) shouldBe true
+        supervisorRef ! Oneway(setup, TestProbe[CommandResponse].ref)
+        val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
+        DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
       }
     }
   }

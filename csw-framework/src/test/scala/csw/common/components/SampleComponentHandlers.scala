@@ -3,6 +3,7 @@ package csw.common.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.ccs.{Validation, Validations}
+import csw.common.framework.models.CommandMessage.{Oneway, Submit}
 import csw.common.framework.models.PubSub.{Publish, PublisherMessage}
 import csw.common.framework.models.{CommandMessage, ComponentInfo, ComponentMessage}
 import csw.common.framework.scaladsl.ComponentHandlers
@@ -15,15 +16,16 @@ import csw.services.location.scaladsl.LocationService
 import scala.concurrent.Future
 
 object SampleComponentState {
-  val restartChoice  = Choice("Restart")
-  val runChoice      = Choice("Run")
-  val onlineChoice   = Choice("Online")
-  val domainChoice   = Choice("Domain")
-  val shutdownChoice = Choice("Shutdown")
-  val commandChoice  = Choice("Command")
-  val initChoice     = Choice("Initialize")
-  val offlineChoice  = Choice("Offline")
-  val prefix: Prefix = Prefix("wfos.prog.cloudcover")
+  val restartChoice       = Choice("Restart")
+  val runChoice           = Choice("Run")
+  val onlineChoice        = Choice("Online")
+  val domainChoice        = Choice("Domain")
+  val shutdownChoice      = Choice("Shutdown")
+  val submitCommandChoice = Choice("SubmitCommand")
+  val oneWayCommandChoice = Choice("OneWayCommand")
+  val initChoice          = Choice("Initialize")
+  val offlineChoice       = Choice("Offline")
+  val prefix: Prefix      = Prefix("wfos.prog.cloudcover")
 
   val choices: Choices =
     Choices.fromChoices(
@@ -32,7 +34,8 @@ object SampleComponentState {
       onlineChoice,
       domainChoice,
       shutdownChoice,
-      commandChoice,
+      submitCommandChoice,
+      oneWayCommandChoice,
       initChoice,
       offlineChoice
     )
@@ -68,7 +71,13 @@ class SampleComponentHandlers(
   }
 
   override def onControlCommand(commandMsg: CommandMessage): Validation = {
-    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(commandChoice))))
+    commandMsg match {
+      case Submit(command, replyTo) =>
+        pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
+      case Oneway(command, replyTo) =>
+        pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
+    }
+
     Validations.Valid
   }
 

@@ -7,10 +7,7 @@ import csw.common.ccs.Validation;
 import csw.common.ccs.Validations;
 import csw.common.components.SampleComponentState;
 import csw.common.framework.javadsl.JComponentHandlers;
-import csw.common.framework.models.CommandMessage;
-import csw.common.framework.models.ComponentInfo;
-import csw.common.framework.models.ComponentMessage;
-import csw.common.framework.models.PubSub;
+import csw.common.framework.models.*;
 import csw.param.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
@@ -72,8 +69,14 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
     @Override
     public Validation onControlCommand(CommandMessage commandMsg) {
+        CurrentState commandState;
+        if(commandMsg instanceof CommandMessage.Submit) {
+            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
+        }
+        else {
+            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));
+        }
 
-        CurrentState commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(commandState);
 
         pubSubRef.tell(publish);
