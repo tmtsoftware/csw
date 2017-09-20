@@ -40,7 +40,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
       Set.empty
     )
 
-  private val containerInfo = ContainerInfo("Container-1", RegisterOnly, Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
+  private val containerInfo = ContainerInfo("Container-1", Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
 
   test("should able to parse container config") {
     val config = ConfigFactory.parseResources(getClass, "/conf/SampleContainer.conf")
@@ -54,14 +54,6 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
 
   test("should able to throw error when 'name' is missing") {
     val config = ConfigFactory.parseResources(getClass, "/conf/container/missing_componentname.conf")
-
-    intercept[java.lang.RuntimeException] {
-      ComponentInfoParser.parseContainer(config)
-    }
-  }
-
-  test("should able to throw error when 'locationServiceUsage' is missing") {
-    val config = ConfigFactory.parseResources(getClass, "/conf/container/missing_location_seervice_usage.conf")
 
     intercept[java.lang.RuntimeException] {
       ComponentInfoParser.parseContainer(config)
