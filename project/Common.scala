@@ -31,7 +31,8 @@ object Common extends AutoPlugin {
       "-Xlint",
       "-Yno-adapted-args",
       "-Ywarn-dead-code",
-      "-Xfuture"
+      "-Xfuture",
+      acyclicOption
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
     testOptions in Test ++= Seq(
@@ -47,32 +48,18 @@ object Common extends AutoPlugin {
         case _            => "0.1-SNAPSHOT"
       }
     },
-    isSnapshot := sys.props.get("prod.publish") != Some("true"),
+    isSnapshot := !sys.props.get("prod.publish").contains("true"),
     fork := true,
     detectCycles := true,
-    scalacOptions += { if (cycleCheckEnabled && detectCycles.value) "-P:acyclic:force" else "" },
     libraryDependencies += `acyclic`,
     autoCompilerPlugins := true,
     addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7")
   )
 
+  private def acyclicOption = if (cycleCheckEnabled && detectCycles.value) "-P:acyclic:force" else ""
+
   private def cycleCheckEnabled = sys.props.get("check.cycles") match {
     case Some("true") => true
     case _            => false
   }
-
-  // After upgrading from 0.6.6 to 1.1.0 scalafmt downloads stuff after every change to the project
-  // This is a workaround from github issue : https://github.com/scalameta/scalafmt/issues/879
-  // scalafmtSettings requires scalafmt-bootstrap library
-//  private def scalafmtSettings() = {
-//    def latestScalafmt = "1.1.0"
-//
-//    commands += Command.args("scalafmt", "Run scalafmt cli.") {
-//      case (state, args) =>
-//        val Right(scalafmt) =
-//          org.scalafmt.bootstrap.ScalafmtBootstrap.fromVersion(latestScalafmt)
-//        scalafmt.main("--non-interactive" +: args.toArray)
-//        state
-//    }
-//  }
 }

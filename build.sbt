@@ -1,4 +1,4 @@
-val enableCoverage         = sys.props.get("enableCoverage") == Some("true")
+val enableCoverage         = sys.props.get("enableCoverage").contains("true")
 val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
