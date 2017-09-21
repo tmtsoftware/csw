@@ -50,7 +50,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
     case PostStop ⇒
-      log.warn(s"Component TLA is shutting down")
+      log.warn("Component TLA is shutting down")
       val shutdownResult = Try {
         log.info("Invoking lifecycle handler's onShutdown hook")
         Await.result(lifecycleHandlers.onShutdown(), ComponentBehavior.shutdownTimeout)
@@ -96,9 +96,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
-    case Lifecycle(message) ⇒
-      log.info(s"Invoking lifecycle handler's onLifecycle hook with msg :[$message]")
-      onLifecycle(message)
+    case Lifecycle(message) ⇒ onLifecycle(message)
     case x: Msg ⇒
       log.info(s"Invoking lifecycle handler's onDomainMsg hook with msg :[$x]")
       lifecycleHandlers.onDomainMsg(x)

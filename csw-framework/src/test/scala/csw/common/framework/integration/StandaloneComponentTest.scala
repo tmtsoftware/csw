@@ -8,22 +8,30 @@ import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
+import com.persist.JsonOps
+import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
+import csw.common.components.SampleComponentHandlers
 import csw.common.components.SampleComponentState._
+import csw.common.framework.internal.component.ComponentBehavior
 import csw.common.framework.internal.supervisor.SupervisorLifecycleState
 import csw.common.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.common.framework.models.PubSub.Subscribe
 import csw.common.framework.models.SupervisorCommonMessage.ComponentStateSubscription
 import csw.common.framework.models.{Shutdown, SupervisorExternalMessage}
+import csw.common.utils.TestAppender
 import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.ComponentType.HCD
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.logging.internal.LoggingLevels.{INFO, Level}
+import csw.services.logging.internal.LoggingSystem
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
+import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
@@ -41,6 +49,12 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
 
   // ActorSystem for standalone component. Component will join seed node created above.
   private val hcdActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3552).system
+
+  // all log messages will be captured in log buffer
+  private val logBuffer          = mutable.Buffer.empty[JsonObject]
+  private val testAppender       = new TestAppender(x ⇒ logBuffer += JsonOps.Json(x.toString).asInstanceOf[JsonObject])
+  private lazy val loggingSystem = new LoggingSystem("standalone", "1.0", "localhost", seedActorSystem)
+  loggingSystem.setAppenders(List(testAppender))
 
   override protected def afterAll(): Unit = Await.result(seedActorSystem.terminate(), 5.seconds)
 
@@ -84,5 +98,49 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
     // this proves that on shutdown message, supervisor's actor system gets terminated
     // if it does not get terminated in 5 seconds, future will fail which in turn fail this test
     Await.result(hcdActorSystem.whenTerminated, 5.seconds)
+
+    /*
+     * This assertion are here just to prove that LoggingSystem is integrated with framework and ComponentHandlers
+     * are able to log messages
+     */
+    // DEOPSCSW-153: Accessibility of logging service to other CSW components
+    // DEOPSCSW-180: Generic and Specific Log messages
+    assertThatMessageLogged(
+      "IFS_Detector",
+      "Invoking lifecycle handler's initialize hook",
+      INFO,
+      ComponentBehavior.getClass.getName
+    )
+    // log message from Component handler
+    assertThatMessageLogged(
+      "IFS_Detector",
+      "Initializing Component TLA",
+      INFO,
+      classOf[SampleComponentHandlers].getName
+    )
+    assertThatMessageLogged(
+      "IFS_Detector",
+      "Invoking lifecycle handler's onRun hook",
+      INFO,
+      ComponentBehavior.getClass.getName
+    )
   }
+
+  def assertThatMessageLogged(componentName: String, message: String, expLevel: Level, className: String): Unit = {
+
+    val maybeLogMsg = logBuffer.find(_.exists {
+      case (_, `message`) ⇒ true
+      case (_, _)         ⇒ false
+    })
+
+    assert(maybeLogMsg.isDefined, s"$message not found in $logBuffer")
+    val logMsg = maybeLogMsg.get
+    Level(logMsg("@severity").toString) shouldBe expLevel
+    logMsg("@componentName") shouldBe componentName
+
+    val cName = if (className.endsWith("$")) className.dropRight(1) else className
+
+    logMsg("class") shouldBe cName
+  }
+
 }

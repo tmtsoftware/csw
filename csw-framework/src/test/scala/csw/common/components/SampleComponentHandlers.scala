@@ -54,6 +54,8 @@ class SampleComponentHandlers(
   import SampleComponentState._
 
   override def initialize(): Future[Unit] = {
+    // DEOPSCSW-153: Accessibility of logging service to other CSW components
+    log.info("Initializing Component TLA")
     Thread.sleep(100)
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     Future.unit

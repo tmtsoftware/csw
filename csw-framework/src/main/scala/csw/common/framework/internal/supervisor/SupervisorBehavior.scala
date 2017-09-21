@@ -105,7 +105,7 @@ class SupervisorBehavior(
       }
       this
     case PostStop ⇒
-      log.warn(s"Supervisor is shutting down. Un-registering supervisor from location service")
+      log.warn("Supervisor is shutting down. Un-registering supervisor from location service")
       registrationOpt.foreach(registrationResult ⇒ registrationResult.unregister())
       this
   }
@@ -128,7 +128,7 @@ class SupervisorBehavior(
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
     case Initialized(componentRef) ⇒
-      log.info(s"Received Initialized message from component within timeout, cancelling InitializeTimer")
+      log.info("Received Initialized message from component within timeout, cancelling InitializeTimer")
       timerScheduler.cancel(InitializeTimerKey)
       registerWithLocationService(componentRef)
     case RegistrationComplete(registrationResult, componentRef) ⇒
@@ -140,7 +140,7 @@ class SupervisorBehavior(
       log.error(throwable.getMessage, ex = throwable)
       throw throwable
     case Running(componentRef) ⇒
-      log.info(s"Received Running message from component within timeout, cancelling RunTimer")
+      log.info("Received Running message from component within timeout, cancelling RunTimer")
       timerScheduler.cancel(RunTimerKey)
       log.debug(
         s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
