@@ -32,7 +32,7 @@ object Common extends AutoPlugin {
       "-Yno-adapted-args",
       "-Ywarn-dead-code",
       "-Xfuture",
-      acyclicOption
+      if (cycleCheckEnabled && detectCycles.value) "-P:acyclic:force" else ""
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
     testOptions in Test ++= Seq(
@@ -55,8 +55,6 @@ object Common extends AutoPlugin {
     autoCompilerPlugins := true,
     addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7")
   )
-
-  private def acyclicOption = if (cycleCheckEnabled && detectCycles.value) "-P:acyclic:force" else ""
 
   private def cycleCheckEnabled = sys.props.get("check.cycles") match {
     case Some("true") => true
