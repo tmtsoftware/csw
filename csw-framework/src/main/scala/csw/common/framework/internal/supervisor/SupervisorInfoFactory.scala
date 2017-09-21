@@ -13,7 +13,7 @@ import scala.util.control.NonFatal
 
 class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simple {
 
-  override protected val componentName: String = containerName
+  override protected def maybeComponentName(): Option[String] = Some(containerName)
 
   def make(
       containerRef: ActorRef[ContainerIdleMessage],

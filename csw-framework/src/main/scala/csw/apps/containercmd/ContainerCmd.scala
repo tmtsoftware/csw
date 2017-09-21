@@ -28,9 +28,10 @@ private[containercmd] class ContainerCmd(
     startLogging: Boolean = true
 ) extends ComponentLogger.Simple {
 
-  override protected val componentName: String = name
-  lazy val actorSystem: ActorSystem            = clusterSettings.system
-  lazy val wiring: FrameworkWiring             = FrameworkWiring.make(actorSystem)
+  override protected def maybeComponentName() = Some(name)
+
+  lazy val actorSystem: ActorSystem = clusterSettings.system
+  lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
   import wiring.actorRuntime.{ec, mat}
 
   def start(args: Array[String]): Future[Option[ActorRef[_]]] = {
@@ -58,7 +59,7 @@ private[containercmd] class ContainerCmd(
           if (startLogging)
             LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
 
-          log.debug(s"$componentName started with following arguments [${args.mkString(",")}]")
+          log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 
           createF(standalone, isLocal, inputFilePath).map { ref ⇒
             log.info(s"Component is successfully created with actor ref $ref")

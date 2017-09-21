@@ -12,5 +12,5 @@ class TromboneAssembly(compName: String) extends ComponentLogger.Simple {
     log.fatal(logs("fatal"))
   }
 
-  override protected val componentName = compName
+  override protected def maybeComponentName() = Some(compName)
 }

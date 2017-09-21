@@ -11,14 +11,16 @@ import csw.common.framework.models.*;
 import csw.param.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
+import csw.services.logging.javadsl.JComponentLogger;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
 
-public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> {
+public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> implements JComponentLogger {
 
+    private String componentName;
     // Demonstrating logger accessibility in Java Component handlers
-    private ILogger log = getLogger();
+    private ILogger log;
 
     private ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef;
 
@@ -28,6 +30,8 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
             pubSubRef, ILocationService locationService, Class<JComponentDomainMessage> klass) {
         super(ctx, componentInfo, pubSubRef, locationService, klass);
         this.pubSubRef = pubSubRef;
+        this.componentName = componentInfo.name();
+        this.log = getLogger();
     }
 
     @Override
@@ -108,5 +112,10 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(onlineState);
 
         pubSubRef.tell(publish);
+    }
+
+    @Override
+    public String componentName() {
+        return componentName;
     }
 }

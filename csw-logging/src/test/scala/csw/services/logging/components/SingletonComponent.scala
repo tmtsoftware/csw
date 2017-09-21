@@ -4,7 +4,8 @@ import csw.services.logging.scaladsl.ComponentLogger
 
 object SingletonComponent extends ComponentLogger.Simple {
 
-  override protected val componentName = "SingletonComponent"
+  override protected def maybeComponentName(): Option[String] = Some("SingletonComponent")
+
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers
   // In case any line needs to be added then update ${LEVEL}_LINE_NO constants
@@ -17,7 +18,7 @@ object SingletonComponent extends ComponentLogger.Simple {
     log.fatal(logs("fatal"))
   }
 
-  val TRACE_LINE_NO = 12
+  val TRACE_LINE_NO = 13
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3
@@ -37,5 +38,5 @@ object SingletonComponent extends ComponentLogger.Simple {
     log.fatal(logs("fatal"), userMsgMap)
   }
 
-  val USER_TRACE_LINE_NO = 32
+  val USER_TRACE_LINE_NO = 33
 }

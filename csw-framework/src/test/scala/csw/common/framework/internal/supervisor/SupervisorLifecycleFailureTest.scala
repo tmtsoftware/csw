@@ -187,7 +187,6 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
     when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
     when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
     when(componentHandlers.onRun()).thenAnswer(runAnswer)
-    when(componentHandlers.componentName).thenReturn(hcdInfo.name)
     componentHandlers
   }
 

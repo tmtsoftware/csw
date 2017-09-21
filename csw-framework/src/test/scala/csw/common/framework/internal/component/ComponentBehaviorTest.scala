@@ -26,7 +26,6 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     val sampleComponentHandler: ComponentHandlers[ComponentDomainMessage] =
       mock[ComponentHandlers[ComponentDomainMessage]]
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
-    when(sampleComponentHandler.componentName).thenReturn("test-component")
 
     val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
     val componentBehavior =

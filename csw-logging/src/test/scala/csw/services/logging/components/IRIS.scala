@@ -6,12 +6,12 @@ import csw.services.logging.scaladsl.{ComponentLogger, GenericLogger}
 
 object IRISLogger extends ComponentLogger(IRIS.COMPONENT_NAME)
 
-class IRIS(componentName: String) extends ComponentLogger.Actor(componentName) {
+class IRIS(componentName: String) extends ComponentLogger.Actor(Some(componentName)) {
 
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers
   // In case any line needs to be added then update constants in companion object
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case LogTrace => log.trace(irisLogs("trace"))
     case LogDebug => log.debug(irisLogs("debug"))
     case LogInfo  => log.info(irisLogs("info"))

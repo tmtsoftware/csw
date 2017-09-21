@@ -52,7 +52,7 @@ class SupervisorBehavior(
     pubSubBehaviorFactory: PubSubBehaviorFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
-) extends ComponentLogger.TypedActor[SupervisorMessage](ctx, componentInfo.name) {
+) extends ComponentLogger.TypedActor[SupervisorMessage](ctx, Some(componentInfo.name)) {
 
   import SupervisorBehavior._
 

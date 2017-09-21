@@ -15,7 +15,7 @@ object TromboneTypedActor {
 class TromboneTypedActor(
     ctx: ActorContext[LogCommand],
     componentName: String
-) extends ComponentLogger.TypedActor[LogCommand](ctx, componentName) {
+) extends ComponentLogger.TypedActor[LogCommand](ctx, Some(componentName)) {
   override def onMessage(msg: LogCommand): Behavior[LogCommand] = {
     msg match {
       case LogTrace => log.trace("Level is trace")

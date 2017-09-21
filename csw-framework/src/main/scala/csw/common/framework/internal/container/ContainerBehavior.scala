@@ -25,7 +25,7 @@ class ContainerBehavior(
     supervisorInfoFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
-) extends ComponentLogger.TypedActor[ContainerMessage](ctx, containerInfo.name) {
+) extends ComponentLogger.TypedActor[ContainerMessage](ctx, Some(containerInfo.name)) {
 
   implicit val ec: ExecutionContext = ctx.executionContext
 

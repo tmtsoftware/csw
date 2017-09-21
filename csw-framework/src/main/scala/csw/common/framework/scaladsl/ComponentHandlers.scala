@@ -8,7 +8,6 @@ import csw.common.framework.models.RunningMessage.DomainMessage
 import csw.common.framework.models.{CommandMessage, ComponentInfo, ComponentMessage}
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
@@ -18,10 +17,9 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
     componentInfo: ComponentInfo,
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
-) extends ComponentLogger.Simple() {
+) {
 
-  override val componentName: String = componentInfo.name
-  var isOnline: Boolean              = false
+  var isOnline: Boolean = false
 
   def initialize(): Future[Unit]
   def onRun(): Future[Unit]

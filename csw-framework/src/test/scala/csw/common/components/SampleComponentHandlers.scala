@@ -12,6 +12,7 @@ import csw.param.generics.KeyType.ChoiceKey
 import csw.param.models.{Choice, Choices, Prefix}
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.Future
 
@@ -47,7 +48,8 @@ class SampleComponentHandlers(
     componentInfo: ComponentInfo,
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
-) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, pubSubRef, locationService) {
+) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, pubSubRef, locationService)
+    with ComponentLogger.Simple {
 
   import SampleComponentState._
 
@@ -86,4 +88,6 @@ class SampleComponentHandlers(
     Thread.sleep(100)
     Future.unit
   }
+
+  override protected def maybeComponentName() = Some(componentInfo.name)
 }
