@@ -56,7 +56,7 @@ class ContainerBehavior(
       log.warn(
         s"Container in lifecycle state :[$lifecycleState] received terminated signal from supervisor :[$supervisor]"
       )
-      supervisors = supervisors.filterNot(_.component.supervisor == supervisor.upcast)
+      supervisors = supervisors.filterNot(_.component.supervisor == supervisor)
       if (supervisors.isEmpty) {
         log.warn("All supervisors from this container are terminated. Initiating co-ordinated shutdown.")
         coordinatedShutdown()
@@ -99,9 +99,11 @@ class ContainerBehavior(
         supervisors.foreach(supervisorInfo ⇒ ctx.watch(supervisorInfo.component.supervisor))
         updateContainerStateToRunning()
       }
-    case SupervisorLifecycleStateChanged(supervisor, SupervisorLifecycleState.Running) ⇒
+    case SupervisorLifecycleStateChanged(supervisor, supervisorLifecycleState) ⇒
+      if (supervisorLifecycleState == SupervisorLifecycleState.Running) {
         runningComponents = runningComponents + supervisor
         updateContainerStateToRunning()
+      }
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
