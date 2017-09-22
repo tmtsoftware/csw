@@ -4,7 +4,7 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.typed.{Behavior, PostStop, Signal, Terminated}
+import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorLifecycleState}
 import csw.framework.models.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState, RegistrationComplete, RegistrationFailed}
 import csw.framework.models.ContainerIdleMessage.SupervisorsCreated
@@ -32,7 +32,7 @@ class ContainerBehavior(
   val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
   val akkaRegistration: AkkaRegistration          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   var supervisors: Set[SupervisorInfo]            = Set.empty
-  var runningComponents: Set[SupervisorInfo]      = Set.empty
+  var runningComponents: Set[ActorRef[SupervisorExternalMessage]]      = Set.empty
   var lifecycleState: ContainerLifecycleState     = ContainerLifecycleState.Idle
   var registrationOpt: Option[RegistrationResult] = None
 
@@ -99,11 +99,9 @@ class ContainerBehavior(
         supervisors.foreach(supervisorInfo ⇒ ctx.watch(supervisorInfo.component.supervisor))
         updateRunningComponents()
       }
-    case SupervisorLifecycleStateChanged(supervisor, supervisorLifecycleState) ⇒
-      if (supervisorLifecycleState == SupervisorLifecycleState.Running) {
-        runningComponents = (supervisors.find(_.component.supervisor == supervisor) ++ runningComponents).toSet
+    case SupervisorLifecycleStateChanged(supervisor, SupervisorLifecycleState.Running) ⇒
+        runningComponents = runningComponents + supervisor
         updateRunningComponents()
-      }
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
