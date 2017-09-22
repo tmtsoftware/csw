@@ -65,6 +65,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // mocked in the test to publish a `shutdownChoice`.
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
 
+    // DEOPSCSW-180: Generic and Specific Log messages
     // component handlers initialize block throws FailureStop exception which we expect akka logs it
     assertThatExceptionIsLogged(
       logBuffer,
@@ -126,6 +127,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
+    // DEOPSCSW-180: Generic and Specific Log messages
     // component handlers initialize block throws FailureRestart exception which we expect akka logs it
     assertThatExceptionIsLogged(
       logBuffer,
