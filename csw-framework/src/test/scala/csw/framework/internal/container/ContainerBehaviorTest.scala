@@ -4,12 +4,12 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.typed.{ActorRef, ActorSystem}
-import akka.{actor, Done}
+import akka.{Done, actor}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorLifecycleState}
-import csw.framework.models.ContainerCommonMessage.GetComponents
-import csw.framework.models.ContainerIdleMessage.{RegistrationComplete, SupervisorsCreated}
+import csw.framework.models.ContainerCommonMessage.{GetComponents, RegistrationComplete}
+import csw.framework.models.ContainerIdleMessage.SupervisorsCreated
 import csw.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.framework.models.RunningMessage.Lifecycle
 import csw.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}

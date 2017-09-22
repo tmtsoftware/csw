@@ -6,8 +6,8 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.{Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorLifecycleState}
-import csw.framework.models.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.framework.models.ContainerIdleMessage.{RegistrationComplete, RegistrationFailed, SupervisorsCreated}
+import csw.framework.models.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState, RegistrationComplete, RegistrationFailed}
+import csw.framework.models.ContainerIdleMessage.SupervisorsCreated
 import csw.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.framework.models.RunningMessage.Lifecycle
 import csw.framework.models._
@@ -69,6 +69,10 @@ class ContainerBehavior(
   }
 
   def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
+    case RegistrationComplete(registrationResult) ⇒
+      registrationOpt = Some(registrationResult)
+    case RegistrationFailed(throwable) ⇒
+      log.error(throwable.getMessage, ex = throwable)
     case GetComponents(replyTo) ⇒
       replyTo ! Components(supervisors.map(_.component))
     case GetContainerLifecycleState(replyTo) ⇒
@@ -100,10 +104,6 @@ class ContainerBehavior(
         runningComponents = (supervisors.find(_.component.supervisor == supervisor) ++ runningComponents).toSet
         updateRunningComponents()
       }
-    case RegistrationComplete(registrationResult) ⇒
-      registrationOpt = Some(registrationResult)
-    case RegistrationFailed(throwable) ⇒
-      log.error(throwable.getMessage, ex = throwable)
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {

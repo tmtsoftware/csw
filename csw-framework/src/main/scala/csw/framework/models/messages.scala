@@ -64,8 +64,8 @@ object RunningMessage {
   trait DomainMessage                                        extends RunningMessage
 }
 
-case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage
-case object Restart  extends SupervisorCommonMessage with ContainerCommonMessage
+case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage with ContainerExternalMessage
+case object Restart  extends SupervisorCommonMessage with ContainerCommonMessage with ContainerExternalMessage
 
 ///////////////
 
@@ -109,17 +109,19 @@ sealed trait ContainerMessage
 
 sealed trait ContainerExternalMessage extends ContainerMessage with TmtSerializable
 
-sealed trait ContainerCommonMessage extends ContainerExternalMessage
+sealed trait ContainerCommonMessage extends ContainerMessage
 object ContainerCommonMessage {
-  case class GetContainerLifecycleState(replyTo: ActorRef[ContainerLifecycleState]) extends ContainerCommonMessage
-  case class GetComponents(replyTo: ActorRef[Components])                           extends ContainerCommonMessage
+  case class RegistrationComplete(registrationResult: RegistrationResult) extends ContainerCommonMessage
+  case class RegistrationFailed(throwable: Throwable)                     extends ContainerCommonMessage
+  case class GetComponents(replyTo: ActorRef[Components])                 extends ContainerCommonMessage with ContainerExternalMessage
+  case class GetContainerLifecycleState(replyTo: ActorRef[ContainerLifecycleState])
+      extends ContainerCommonMessage
+      with ContainerExternalMessage
 }
 
 sealed trait ContainerIdleMessage extends ContainerMessage
 object ContainerIdleMessage {
-  case class RegistrationComplete(registrationResult: RegistrationResult) extends ContainerIdleMessage
-  case class RegistrationFailed(throwable: Throwable)                     extends ContainerIdleMessage
-  case class SupervisorsCreated(supervisors: Set[SupervisorInfo])         extends ContainerIdleMessage
+  case class SupervisorsCreated(supervisors: Set[SupervisorInfo]) extends ContainerIdleMessage
 }
 
 sealed trait FromSupervisorMessage extends ContainerIdleMessage
