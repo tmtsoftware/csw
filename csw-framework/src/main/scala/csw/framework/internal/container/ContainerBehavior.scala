@@ -97,11 +97,11 @@ class ContainerBehavior(
         supervisors = supervisorInfos
         log.info(s"Container created following supervisors :[${supervisors.map(_.component.supervisor).mkString(",")}]")
         supervisors.foreach(supervisorInfo ⇒ ctx.watch(supervisorInfo.component.supervisor))
-        updateRunningComponents()
+        updateContainerStateToRunning()
       }
     case SupervisorLifecycleStateChanged(supervisor, SupervisorLifecycleState.Running) ⇒
         runningComponents = runningComponents + supervisor
-        updateRunningComponents()
+        updateContainerStateToRunning()
   }
 
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
@@ -113,7 +113,7 @@ class ContainerBehavior(
       .foreach(x ⇒ ctx.self ! SupervisorsCreated(x.flatten))
   }
 
-  private def updateRunningComponents(): Unit = {
+  private def updateContainerStateToRunning(): Unit = {
     if (runningComponents.size == supervisors.size) {
       log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Running}]")
       lifecycleState = ContainerLifecycleState.Running
