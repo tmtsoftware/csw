@@ -19,9 +19,9 @@ abstract class JComponentHandlers[Msg <: DomainMessage](
     ctx: ActorContext[ComponentMessage],
     componentInfo: ComponentInfo,
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-    locationService: ILocationService
-)(klass: Class[Msg])
-    extends ComponentHandlers[Msg](ctx.asScala, componentInfo, pubSubRef, locationService.asScala)(ClassTag(klass)) {
+    locationService: ILocationService,
+    klass: Class[Msg]
+) extends ComponentHandlers[Msg](ctx.asScala, componentInfo, pubSubRef, locationService.asScala)(ClassTag(klass)) {
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
 
