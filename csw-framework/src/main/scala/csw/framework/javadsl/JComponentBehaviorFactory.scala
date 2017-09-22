@@ -15,7 +15,7 @@ abstract class JComponentBehaviorFactory[Msg <: DomainMessage](
     klass: Class[Msg]
 ) extends ComponentBehaviorFactory[Msg]()(ClassTag(klass)) {
 
-  def handlers(
+  protected[framework] def handlers(
       ctx: scaladsl.ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
@@ -23,7 +23,7 @@ abstract class JComponentBehaviorFactory[Msg <: DomainMessage](
   ): ComponentHandlers[Msg] =
     jHandlers(ctx.asJava, componentInfo, pubSubRef, locationService.asJava)
 
-  def jHandlers(
+  protected[framework] def jHandlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],

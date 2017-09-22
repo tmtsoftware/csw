@@ -13,7 +13,7 @@ import scala.reflect.ClassTag
 
 abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
 
-  def handlers(
+  protected[framework] def handlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
