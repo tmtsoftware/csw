@@ -6,8 +6,7 @@ import play.api.libs.json._
 
 object ComponentInfoParser {
   def parseContainer(config: Config): ContainerInfo  = parse[ContainerInfo](config)
-  def parseComponent(config: Config): ComponentInfo  = parse[ComponentInfo](config)
-  def parseStandalone(config: Config): ComponentInfo = parseComponent(config)
+  def parseStandalone(config: Config): ComponentInfo = parse[ComponentInfo](config)
 
   private def parse[T: Format](config: Config): T = {
     val json = configToJsValue(config)
