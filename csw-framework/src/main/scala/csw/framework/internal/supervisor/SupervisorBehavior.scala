@@ -1,7 +1,5 @@
 package csw.framework.internal.supervisor
 
-import java.util.concurrent.TimeUnit.SECONDS
-
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
@@ -59,8 +57,8 @@ class SupervisorBehavior(
 
   val componentName: String              = componentInfo.name
   val componentActorName                 = s"$componentName-$ComponentActorNameSuffix"
-  val initializeTimeout: FiniteDuration  = FiniteDuration(componentInfo.initializeTimeoutInSeconds, SECONDS)
-  val runTimeout: FiniteDuration         = FiniteDuration(componentInfo.runTimeoutInSeconds, SECONDS)
+  val initializeTimeout: FiniteDuration  = componentInfo.initializeTimeoutInSeconds
+  val runTimeout: FiniteDuration         = componentInfo.runTimeoutInSeconds
   val componentId                        = ComponentId(componentName, componentInfo.componentType)
   val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   val isStandalone: Boolean              = maybeContainerRef.isEmpty

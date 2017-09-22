@@ -7,6 +7,8 @@ import csw.services.location.models.ComponentType.{Assembly, HCD}
 import csw.services.location.models.Connection
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.concurrent.duration.DurationInt
+
 // DEOPSCSW-283: Parsing HOCON conf file
 // DEOPSCSW-170: Starting component using a file format
 class ComponentInfoParserTest extends FunSuite with Matchers {
@@ -18,8 +20,8 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     "csw.pkgDemo.assembly1.Assembly1",
     DoNotRegister,
     Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka")),
-    5,
-    5
+    5.seconds,
+    5.seconds
   )
   private val hcd2AInfo =
     ComponentInfo(
@@ -109,7 +111,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'connectionType' is missing for 'connections' in assembly") {
+  test("should able to throw error when connection ingredients has typos for 'connections' in assembly") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/assembly/connection_entry_typo.conf")
 
     intercept[java.lang.RuntimeException] {

@@ -18,9 +18,7 @@ object ComponentInfoParser {
     }
   }
 
-  private def configToJsValue(config: Config): JsValue = {
-    Json.parse(config.root().render(ConfigRenderOptions.concise()))
-  }
+  private def configToJsValue(config: Config): JsValue = Json.parse(config.root().render(ConfigRenderOptions.concise()))
 
   private def massageErrors(jsError: JsError): String =
     jsError.errors

@@ -2,10 +2,7 @@ package csw.framework.models
 
 import play.api.libs.json._
 
-final case class ContainerInfo(
-    name: String,
-    components: Set[ComponentInfo]
-) {
+final case class ContainerInfo(name: String, components: Set[ComponentInfo]) {
   require(components.nonEmpty, "components can not be empty.")
 }
 

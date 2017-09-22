@@ -4,8 +4,10 @@ import csw.framework.javadsl.JComponentInfo;
 import csw.framework.models.ComponentInfo;
 import csw.framework.models.LocationServiceUsage;
 import csw.services.location.javadsl.JComponentType;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 public class JComponentInfos {
 
@@ -16,8 +18,8 @@ public class JComponentInfos {
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JDoNotRegister(),
             Collections.emptySet(),
-            10,
-            10);
+            new FiniteDuration(10, TimeUnit.SECONDS),
+            new FiniteDuration(10, TimeUnit.SECONDS));
 
     public static ComponentInfo jHcdInfoWithInitializeTimeout = JComponentInfo.from(
             "trombone",
@@ -26,8 +28,8 @@ public class JComponentInfos {
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JDoNotRegister(),
             Collections.emptySet(),
-            0,
-            5);
+            new FiniteDuration(0, TimeUnit.SECONDS),
+            new FiniteDuration(5, TimeUnit.SECONDS));
 
     public static ComponentInfo jHcdInfoWithRunTimeout = JComponentInfo.from(
             "trombone",
@@ -36,6 +38,6 @@ public class JComponentInfos {
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JDoNotRegister(),
             Collections.emptySet(),
-            5,
-            0);
+            new FiniteDuration(5, TimeUnit.SECONDS),
+            new FiniteDuration(0, TimeUnit.SECONDS));
 }

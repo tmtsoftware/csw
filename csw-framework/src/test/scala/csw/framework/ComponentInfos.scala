@@ -4,6 +4,8 @@ import csw.framework.models.LocationServiceUsage.DoNotRegister
 import csw.framework.models.{ComponentInfo, ContainerInfo}
 import csw.services.location.models.ComponentType.{Assembly, HCD}
 
+import scala.concurrent.duration.DurationDouble
+
 object ComponentInfos {
   val assemblyInfo =
     ComponentInfo(
@@ -42,8 +44,8 @@ object ComponentInfos {
     "csw.common.components.SampleComponentBehaviorFactory",
     DoNotRegister,
     Set.empty,
-    0,
-    5
+    0.seconds,
+    5.seconds
   )
 
   val hcdInfoWithRunTimeout = ComponentInfo(
@@ -53,8 +55,8 @@ object ComponentInfos {
     "csw.common.components.SampleComponentBehaviorFactory",
     DoNotRegister,
     Set.empty,
-    5,
-    0
+    5.seconds,
+    0.seconds
   )
 
   val containerInfo: ContainerInfo = ContainerInfo("container", Set(hcdInfo, assemblyInfo))
