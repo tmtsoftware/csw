@@ -4,10 +4,15 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
+import com.persist.JsonOps
+import com.persist.JsonOps.JsonObject
+import csw.common.FrameworkAssertions._
 import csw.common.components.SampleComponentState._
 import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
-import csw.framework.ComponentInfos._
+import csw.common.utils.TestAppender
 import csw.exceptions.{FailureRestart, FailureStop}
+import csw.framework.ComponentInfos._
+import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.PubSub.{Publish, PublisherMessage}
 import csw.framework.models.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.framework.models._
@@ -15,14 +20,19 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.appenders.FileAppender
+import csw.services.logging.internal.LoggingLevels.ERROR
+import csw.services.logging.internal.LoggingSystem
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.Answer
+import org.scalatest.BeforeAndAfterEach
 
+import scala.collection.mutable
 import scala.concurrent.Future
 
 // DEOPSCSW-178: Lifecycle success/failure notification
-class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
+class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
   var supervisorRef: ActorRef[SupervisorExternalMessage]                 = _
@@ -30,14 +40,23 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
   var shutdownAnswer: Answer[Future[Unit]]                               = _
   var runAnswer: Answer[Future[Unit]]                                    = _
 
+  // all log messages will be captured in log buffer
+  private val logBuffer          = mutable.Buffer.empty[JsonObject]
+  private val testAppender       = new TestAppender(x ⇒ logBuffer += JsonOps.Json(x.toString).asInstanceOf[JsonObject])
+  private lazy val loggingSystem = new LoggingSystem("sup-failure", "1.0", "localhost", untypedSystem)
+  loggingSystem.setAppenders(List(testAppender))
+
+  override protected def afterEach(): Unit = logBuffer.clear()
+
   test("handle TLA failure with FailureStop exception in initialize with Restart message") {
     val testMocks = frameworkTestMocks()
     import testMocks._
 
     val componentHandlers = createComponentHandlers(testMocks)
 
+    val failureStopExMsg = "testing FailureStop"
     // Throw a `FailureStop` on the first attempt to initialize but initialize successfully on the next attempt
-    doThrow(FailureStop("testing failure")).doAnswer(initializeAnswer).when(componentHandlers).initialize()
+    doThrow(FailureStop(failureStopExMsg)).doAnswer(initializeAnswer).when(componentHandlers).initialize()
 
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
@@ -45,6 +64,17 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
     // and triggers the PostStop signal of TLA. The post stop signal has `onShutdown` handler of the component which is
     // mocked in the test to publish a `shutdownChoice`.
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
+
+    // component handlers initialize block throws FailureStop exception which we expect akka logs it
+    assertThatExceptionIsLogged(
+      logBuffer,
+      "SampleHcd",
+      failureStopExMsg,
+      ERROR,
+      ComponentBehavior.getClass.getName,
+      FailureStop.getClass.getName,
+      failureStopExMsg
+    )
 
     supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
 
@@ -78,10 +108,11 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
     val testMocks = frameworkTestMocks()
     import testMocks._
 
-    val componentHandlers = createComponentHandlers(testMocks)
+    val componentHandlers   = createComponentHandlers(testMocks)
+    val failureRestartExMsg = "testing FailureRestart"
 
     // Throw a `FailureRestart` on the first attempt to initialize but initialize successfully on the next attempt
-    doThrow(FailureRestart("testing failure")).doAnswer(initializeAnswer).when(componentHandlers).initialize()
+    doThrow(FailureRestart(failureRestartExMsg)).doAnswer(initializeAnswer).when(componentHandlers).initialize()
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
     // component fails to initialize with `FailureRestart`. The akka supervision strategy specified in SupervisorBehavior
@@ -94,6 +125,17 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+
+    // component handlers initialize block throws FailureRestart exception which we expect akka logs it
+    assertThatExceptionIsLogged(
+      logBuffer,
+      "SampleHcd",
+      failureRestartExMsg,
+      ERROR,
+      ComponentBehavior.getClass.getName,
+      FailureRestart.getClass.getName,
+      failureRestartExMsg
+    )
 
     // Supervisor registers itself only after successful initialization of TLA. In this test the TLA successfully
     // initializes after Restart message after which Supervisor registers itself

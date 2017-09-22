@@ -2,16 +2,20 @@ package csw.common
 
 import akka.typed.ActorRef
 import akka.typed.testkit.scaladsl.TestProbe
+import com.persist.JsonOps.JsonObject
 import csw.framework.internal.container.ContainerLifecycleState
 import csw.framework.internal.supervisor.SupervisorLifecycleState
 import csw.framework.models.ContainerCommonMessage.GetContainerLifecycleState
 import csw.framework.models.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.framework.models.{ContainerExternalMessage, SupervisorExternalMessage}
 import csw.services.location.commons.BlockingUtils
+import csw.services.logging.internal.LoggingLevels.Level
+import org.scalatest.Matchers
 
+import scala.collection.mutable
 import scala.concurrent.duration.Duration
 
-object FrameworkAssertions {
+object FrameworkAssertions extends Matchers {
 
   def assertThatContainerIsRunning(
       containerRef: ActorRef[ContainerExternalMessage],
@@ -44,4 +48,55 @@ object FrameworkAssertions {
       s"expected :${SupervisorLifecycleState.Running}, found :$getSupervisorLifecycleState"
     )
   }
+
+  def assertThatMessageIsLogged(
+      logBuffer: mutable.Buffer[JsonObject],
+      componentName: String,
+      message: String,
+      expLevel: Level,
+      className: String
+  ): Unit = {
+
+    val maybeLogMsg = findLogMessage(logBuffer, message)
+
+    assert(maybeLogMsg.isDefined, s"$message not found in $logBuffer")
+    val logMsg = maybeLogMsg.get
+    Level(logMsg("@severity").toString) shouldBe expLevel
+    logMsg("@componentName") shouldBe componentName
+    logMsg("class") shouldBe sanitizeClassName(className)
+  }
+
+  def assertThatExceptionIsLogged(
+      logBuffer: mutable.Buffer[JsonObject],
+      componentName: String,
+      message: String,
+      expLevel: Level,
+      className: String,
+      exceptionClassName: String,
+      exceptionMessage: String
+  ): Unit = {
+
+    val maybeLogMsg = findLogMessage(logBuffer, message)
+
+    assert(maybeLogMsg.isDefined, s"$message not found in $logBuffer")
+    val logMsg = maybeLogMsg.get
+    Level(logMsg("@severity").toString) shouldBe expLevel
+    logMsg("@componentName") shouldBe componentName
+    logMsg("class") shouldBe sanitizeClassName(className)
+
+    logMsg.contains("trace") shouldBe true
+    val traceBlock    = logMsg("trace").asInstanceOf[JsonObject]
+    val traceMsgBlock = traceBlock("message").asInstanceOf[JsonObject]
+    traceMsgBlock("ex") shouldBe s"class ${sanitizeClassName(exceptionClassName)}"
+    traceMsgBlock("message") shouldBe exceptionMessage
+  }
+
+  private def findLogMessage(logBuffer: mutable.Buffer[JsonObject], message: String): Option[JsonObject] =
+    logBuffer.find(_.exists {
+      case (_, `message`) ⇒ true
+      case (_, _)         ⇒ false
+    })
+
+  private def sanitizeClassName(className: String): String =
+    if (className.endsWith("$")) className.dropRight(1) else className
 }

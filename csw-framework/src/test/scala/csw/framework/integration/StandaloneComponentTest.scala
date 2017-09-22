@@ -14,20 +14,20 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.SampleComponentHandlers
 import csw.common.components.SampleComponentState._
+import csw.common.utils.TestAppender
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.supervisor.SupervisorLifecycleState
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.framework.models.PubSub.Subscribe
 import csw.framework.models.SupervisorCommonMessage.ComponentStateSubscription
 import csw.framework.models.{Shutdown, SupervisorExternalMessage}
-import csw.common.utils.TestAppender
 import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.ComponentType.HCD
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
-import csw.services.logging.internal.LoggingLevels.{INFO, Level}
+import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.internal.LoggingSystem
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -105,42 +105,27 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
      */
     // DEOPSCSW-153: Accessibility of logging service to other CSW components
     // DEOPSCSW-180: Generic and Specific Log messages
-    assertThatMessageLogged(
+    assertThatMessageIsLogged(
+      logBuffer,
       "IFS_Detector",
       "Invoking lifecycle handler's initialize hook",
       INFO,
       ComponentBehavior.getClass.getName
     )
     // log message from Component handler
-    assertThatMessageLogged(
+    assertThatMessageIsLogged(
+      logBuffer,
       "IFS_Detector",
       "Initializing Component TLA",
       INFO,
       classOf[SampleComponentHandlers].getName
     )
-    assertThatMessageLogged(
+    assertThatMessageIsLogged(
+      logBuffer,
       "IFS_Detector",
       "Invoking lifecycle handler's onRun hook",
       INFO,
       ComponentBehavior.getClass.getName
     )
   }
-
-  def assertThatMessageLogged(componentName: String, message: String, expLevel: Level, className: String): Unit = {
-
-    val maybeLogMsg = logBuffer.find(_.exists {
-      case (_, `message`) ⇒ true
-      case (_, _)         ⇒ false
-    })
-
-    assert(maybeLogMsg.isDefined, s"$message not found in $logBuffer")
-    val logMsg = maybeLogMsg.get
-    Level(logMsg("@severity").toString) shouldBe expLevel
-    logMsg("@componentName") shouldBe componentName
-
-    val cName = if (className.endsWith("$")) className.dropRight(1) else className
-
-    logMsg("class") shouldBe cName
-  }
-
 }
