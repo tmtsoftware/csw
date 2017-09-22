@@ -66,6 +66,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     // DEOPSCSW-180: Generic and Specific Log messages
     // component handlers initialize block throws FailureStop exception which we expect akka logs it
+    Thread.sleep(10)
     assertThatExceptionIsLogged(
       logBuffer,
       "SampleHcd",
