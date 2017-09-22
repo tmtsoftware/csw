@@ -27,8 +27,6 @@ final case class ComponentInfo(
   def getConnections: java.util.List[Connection] = connections.toList.asJava
 }
 
-object FiniteDurationImplicits {}
-
 case object ComponentInfo {
 
   private def parseDuration(json: JsValue): JsResult[FiniteDuration] = json.validate[String].flatMap { str =>
@@ -38,8 +36,8 @@ case object ComponentInfo {
     }
   }
 
-  implicit val connReads: Reads[FiniteDuration]   = Reads[FiniteDuration](parseDuration)
-  implicit val connWrites: Writes[FiniteDuration] = Writes[FiniteDuration](d ⇒ Json.toJson(d.toString))
+  implicit val finiteDurationReads: Reads[FiniteDuration]   = Reads[FiniteDuration](parseDuration)
+  implicit val finiteDurationWrites: Writes[FiniteDuration] = Writes[FiniteDuration](d ⇒ Json.toJson(d.toString))
 
   implicit val componentInfoFormat: OFormat[ComponentInfo] = Jsonx.formatCaseClassUseDefaults[ComponentInfo]
 }
