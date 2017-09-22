@@ -17,8 +17,8 @@ object JComponentInfo {
       className: String,
       locationServiceUsage: LocationServiceUsage,
       connections: util.Set[Connection],
-      initializeTimeoutInSeconds: FiniteDuration,
-      runTimeoutInSeconds: FiniteDuration
+      initializeTimeout: FiniteDuration,
+      runTimeout: FiniteDuration
   ): ComponentInfo = {
     ComponentInfo(
       name,
@@ -27,8 +27,8 @@ object JComponentInfo {
       className,
       locationServiceUsage,
       connections.asScala.toSet,
-      initializeTimeoutInSeconds,
-      runTimeoutInSeconds
+      initializeTimeout,
+      runTimeout
     )
   }
 }

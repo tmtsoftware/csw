@@ -21,7 +21,7 @@ class ComponentInfoParserTest extends FunSuite with Matchers {
     DoNotRegister,
     Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka")),
     5.seconds,
-    5.seconds
+    500.milliseconds
   )
   private val hcd2AInfo =
     ComponentInfo(

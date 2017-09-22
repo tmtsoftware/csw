@@ -57,8 +57,8 @@ class SupervisorBehavior(
 
   val componentName: String              = componentInfo.name
   val componentActorName                 = s"$componentName-$ComponentActorNameSuffix"
-  val initializeTimeout: FiniteDuration  = componentInfo.initializeTimeoutInSeconds
-  val runTimeout: FiniteDuration         = componentInfo.runTimeoutInSeconds
+  val initializeTimeout: FiniteDuration  = componentInfo.initializeTimeout
+  val runTimeout: FiniteDuration         = componentInfo.runTimeout
   val componentId                        = ComponentId(componentName, componentInfo.componentType)
   val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
   val isStandalone: Boolean              = maybeContainerRef.isEmpty
