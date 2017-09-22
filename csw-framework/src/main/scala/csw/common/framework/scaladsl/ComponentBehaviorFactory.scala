@@ -28,7 +28,13 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
   ): Behavior[Nothing] =
     Actor
       .mutable[ComponentMessage](
-        ctx ⇒ new ComponentBehavior[Msg](ctx, supervisor, handlers(ctx, compInfo, pubSubRef, locationService))
+        ctx ⇒
+          new ComponentBehavior[Msg](
+            ctx,
+            compInfo.name,
+            supervisor,
+            handlers(ctx, compInfo, pubSubRef, locationService)
+        )
       )
       .narrow
 }

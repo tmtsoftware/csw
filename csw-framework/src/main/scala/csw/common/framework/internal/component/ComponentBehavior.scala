@@ -26,9 +26,10 @@ object ComponentBehavior {
 
 class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     ctx: ActorContext[ComponentMessage],
+    componentName: String,
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers[Msg]
-) extends ComponentLogger.TypedActor[ComponentMessage](ctx, None) { //FIXME get component name in constructor and give it to TypedActor
+) extends ComponentLogger.TypedActor[ComponentMessage](ctx, Some(componentName)) {
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
