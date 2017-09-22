@@ -100,7 +100,7 @@ class SupervisorBehavior(
       lifecycleState match {
         case SupervisorLifecycleState.Restart  ⇒ spawn()
         case SupervisorLifecycleState.Shutdown ⇒ coordinatedShutdown()
-        case SupervisorLifecycleState.Idle     ⇒ if (maybeContainerRef.isEmpty) throw InitializationFailed()
+        case SupervisorLifecycleState.Idle     ⇒ if (maybeContainerRef.isEmpty) throw InitializationFailed
         case _                                 ⇒
       }
       this

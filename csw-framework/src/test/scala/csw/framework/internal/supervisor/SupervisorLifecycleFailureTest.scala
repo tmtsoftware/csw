@@ -37,7 +37,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
     val componentHandlers = createComponentHandlers(testMocks)
 
     // Throw a `FailureStop` on the first attempt to initialize but initialize successfully on the next attempt
-    doThrow(FailureStop()).doAnswer(initializeAnswer).when(componentHandlers).initialize()
+    doThrow(FailureStop("testing failure")).doAnswer(initializeAnswer).when(componentHandlers).initialize()
 
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
@@ -81,7 +81,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
     val componentHandlers = createComponentHandlers(testMocks)
 
     // Throw a `FailureRestart` on the first attempt to initialize but initialize successfully on the next attempt
-    doThrow(FailureRestart()).doAnswer(initializeAnswer).when(componentHandlers).initialize()
+    doThrow(FailureRestart("testing failure")).doAnswer(initializeAnswer).when(componentHandlers).initialize()
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
     // component fails to initialize with `FailureRestart`. The akka supervision strategy specified in SupervisorBehavior
@@ -107,7 +107,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite {
     val componentHandlers = createComponentHandlers(testMocks)
 
     //Throw a `FailureStop` on the first attempt to call `onRun` handler on TLA but publish `runChoice` successfully on the next attempt
-    doThrow(FailureStop()).doAnswer(runAnswer).when(componentHandlers).onRun()
+    doThrow(FailureStop("testing failure")).doAnswer(runAnswer).when(componentHandlers).onRun()
 
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 

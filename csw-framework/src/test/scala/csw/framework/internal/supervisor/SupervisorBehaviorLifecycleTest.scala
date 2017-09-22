@@ -5,9 +5,9 @@ import akka.typed.scaladsl.TimerScheduler
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
+import csw.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks.TypedActorMock
-import csw.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.framework.models.InitialMessage.Run
@@ -247,8 +247,8 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     import testData._
 
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
-    intercept[InitializationFailed] {
-      supervisor.onSignal(Terminated(childComponentInbox.ref)(FailureStop()))
+    intercept[InitializationFailed.type] {
+      supervisor.onSignal(Terminated(childComponentInbox.ref)(FailureStop("reason of failing")))
     }
   }
 }
