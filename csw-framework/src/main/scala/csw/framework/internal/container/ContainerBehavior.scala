@@ -6,7 +6,12 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorLifecycleState}
-import csw.framework.models.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState, RegistrationComplete, RegistrationFailed}
+import csw.framework.models.ContainerCommonMessage.{
+  GetComponents,
+  GetContainerLifecycleState,
+  RegistrationComplete,
+  RegistrationFailed
+}
 import csw.framework.models.ContainerIdleMessage.SupervisorsCreated
 import csw.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.framework.models.RunningMessage.Lifecycle
@@ -29,12 +34,12 @@ class ContainerBehavior(
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  val componentId                                 = ComponentId(containerInfo.name, ComponentType.Container)
-  val akkaRegistration: AkkaRegistration          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
-  var supervisors: Set[SupervisorInfo]            = Set.empty
-  var runningComponents: Set[ActorRef[SupervisorExternalMessage]]      = Set.empty
-  var lifecycleState: ContainerLifecycleState     = ContainerLifecycleState.Idle
-  var registrationOpt: Option[RegistrationResult] = None
+  val componentId                                                 = ComponentId(containerInfo.name, ComponentType.Container)
+  val akkaRegistration: AkkaRegistration                          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
+  var supervisors: Set[SupervisorInfo]                            = Set.empty
+  var runningComponents: Set[ActorRef[SupervisorExternalMessage]] = Set.empty
+  var lifecycleState: ContainerLifecycleState                     = ContainerLifecycleState.Idle
+  var registrationOpt: Option[RegistrationResult]                 = None
 
   registerWithLocationService()
   createComponents(containerInfo.components)

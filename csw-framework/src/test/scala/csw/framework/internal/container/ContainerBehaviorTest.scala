@@ -4,7 +4,7 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.typed.{ActorRef, ActorSystem}
-import akka.{Done, actor}
+import akka.{actor, Done}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorLifecycleState}

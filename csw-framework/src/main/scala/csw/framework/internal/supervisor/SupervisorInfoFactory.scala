@@ -42,7 +42,7 @@ class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simpl
       case NonFatal(exception) ⇒
         async {
           log.error(s"Exception :[${exception.getMessage}] occurred while spawning supervisor: [${componentInfo.name}]",
-            ex = exception)
+                    ex = exception)
           await(system.terminate())
           None
         }
