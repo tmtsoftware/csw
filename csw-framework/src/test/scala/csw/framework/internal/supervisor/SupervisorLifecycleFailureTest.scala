@@ -72,7 +72,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       "SampleHcd",
       failureStopExMsg,
       ERROR,
-      ComponentBehavior.getClass.getName,
+      classOf[ComponentBehavior[ComponentDomainMessage]].getName,
       FailureStop.getClass.getName,
       failureStopExMsg
     )
@@ -134,7 +134,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       "SampleHcd",
       failureRestartExMsg,
       ERROR,
-      ComponentBehavior.getClass.getName,
+      classOf[ComponentBehavior[ComponentDomainMessage]].getName,
       FailureRestart.getClass.getName,
       failureRestartExMsg
     )

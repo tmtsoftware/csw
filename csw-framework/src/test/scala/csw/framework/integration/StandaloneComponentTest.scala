@@ -12,7 +12,7 @@ import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
-import csw.common.components.SampleComponentHandlers
+import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
 import csw.common.components.SampleComponentState._
 import csw.common.utils.TestAppender
 import csw.framework.internal.component.ComponentBehavior
@@ -110,7 +110,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
       "IFS_Detector",
       "Invoking lifecycle handler's initialize hook",
       INFO,
-      ComponentBehavior.getClass.getName
+      classOf[ComponentBehavior[ComponentDomainMessage]].getName
     )
     // log message from Component handler
     assertThatMessageIsLogged(
@@ -125,7 +125,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
       "IFS_Detector",
       "Invoking lifecycle handler's onRun hook",
       INFO,
-      ComponentBehavior.getClass.getName
+      classOf[ComponentBehavior[ComponentDomainMessage]].getName
     )
   }
 }
