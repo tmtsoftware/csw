@@ -105,7 +105,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       // and will be considered as container configuration.
       val args = Array("/laser_container.conf")
       val containerRef =
-        Await.result(containerCmd.start(args), 15.seconds).map(_.asInstanceOf[ActorRef[ContainerExternalMessage]]).get
+        containerCmd.start(args).asInstanceOf[ActorRef[ContainerExternalMessage]]
 
       assertThatContainerIsRunning(containerRef, testProbe, 5.seconds)
 
@@ -155,7 +155,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val args = Array("--standalone", "--local", standaloneConfFilePath.toString)
       val supervisorRef =
-        Await.result(containerCmd.start(args), 15.seconds).map(_.asInstanceOf[ActorRef[SupervisorExternalMessage]]).get
+        containerCmd.start(args).asInstanceOf[ActorRef[SupervisorExternalMessage]]
 
       assertThatSupervisorIsRunning(supervisorRef, testProbe, 5.seconds)
       enterBarrier("running")

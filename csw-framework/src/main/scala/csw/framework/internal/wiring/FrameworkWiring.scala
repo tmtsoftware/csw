@@ -8,13 +8,13 @@ import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 
 class FrameworkWiring {
-  lazy val clusterSettings: ClusterSettings   = ClusterSettings()
-  lazy val actorSystem: ActorSystem           = clusterSettings.system
-  lazy val locationService: LocationService   = LocationServiceFactory.withSystem(actorSystem)
-  lazy val actorRuntime: ActorRuntime         = new ActorRuntime(actorSystem)
-  lazy val registrationFactory                = new RegistrationFactory
-  lazy val pubSubBehaviorFactory              = new PubSubBehaviorFactory
-  lazy val configService: ConfigClientService = ConfigClientFactory.clientApi(actorSystem, locationService)
+  lazy val clusterSettings: ClusterSettings         = ClusterSettings()
+  lazy val actorSystem: ActorSystem                 = clusterSettings.system
+  lazy val locationService: LocationService         = LocationServiceFactory.withSystem(actorSystem)
+  lazy val actorRuntime: ActorRuntime               = new ActorRuntime(actorSystem)
+  lazy val registrationFactory                      = new RegistrationFactory
+  lazy val pubSubBehaviorFactory                    = new PubSubBehaviorFactory
+  lazy val configClientService: ConfigClientService = ConfigClientFactory.clientApi(actorSystem, locationService)
 }
 
 object FrameworkWiring {
