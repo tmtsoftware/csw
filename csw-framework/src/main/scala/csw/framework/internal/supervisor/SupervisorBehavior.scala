@@ -31,16 +31,16 @@ import csw.services.location.models.{AkkaRegistration, ComponentId, Registration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 object SupervisorBehavior {
-  val PubSubComponentActor = "pub-sub-component"
-  val ComponentActor       = "component"
-  val PubSubLifecycleActor = "pub-sub-lifecycle"
-  val InitializeTimerKey   = "initialize-timer"
-  val RunTimerKey          = "run-timer"
+  val PubSubComponentActor     = "pub-sub-component"
+  val PubSubLifecycleActor     = "pub-sub-lifecycle"
+  val InitializeTimerKey       = "initialize-timer"
+  val RunTimerKey              = "run-timer"
+  val ComponentActorNameSuffix = "component-actor"
 }
 
 class SupervisorBehavior(
@@ -58,32 +58,35 @@ class SupervisorBehavior(
 
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  val componentName: String                              = componentInfo.name
-  val initializeTimeout: FiniteDuration                  = FiniteDuration(componentInfo.initializeTimeoutInSeconds, SECONDS)
-  val runTimeout: FiniteDuration                         = FiniteDuration(componentInfo.runTimeoutInSeconds, SECONDS)
-  val componentId                                        = ComponentId(componentName, componentInfo.componentType)
-  val akkaRegistration: AkkaRegistration                 = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
-  var haltingFlag                                        = false
+  val componentName: String              = componentInfo.name
+  val componentActorName                 = s"$componentName-$ComponentActorNameSuffix"
+  val initializeTimeout: FiniteDuration  = FiniteDuration(componentInfo.initializeTimeoutInSeconds, SECONDS)
+  val runTimeout: FiniteDuration         = FiniteDuration(componentInfo.runTimeoutInSeconds, SECONDS)
+  val componentId                        = ComponentId(componentName, componentInfo.componentType)
+  val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
+  val isStandalone: Boolean              = maybeContainerRef.isEmpty
+
+  val pubSubComponent: ActorRef[PubSub[CurrentState]] =
+    pubSubBehaviorFactory.make(ctx, PubSubComponentActor, componentName)
+  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
+    pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, componentName)
+
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
   var registrationOpt: Option[RegistrationResult]        = None
-  var component: ActorRef[Nothing]                       = _
-
-  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
-    pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, componentName)
-  val pubSubComponent: ActorRef[PubSub[CurrentState]] =
-    pubSubBehaviorFactory.make(ctx, PubSubComponentActor, componentName)
+  var component: Option[ActorRef[Nothing]]               = None
 
   spawnAndWatchComponent()
 
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
-      case (_, msg: SupervisorCommonMessage)                           ⇒ onCommon(msg)
-      case (SupervisorLifecycleState.Idle, msg: SupervisorIdleMessage) ⇒ onIdle(msg)
-      case (SupervisorLifecycleState.Running | SupervisorLifecycleState.RunningOffline, msg: SupervisorRunningMessage) ⇒
-        onRunning(msg)
-      case (SupervisorLifecycleState.Restart, msg: SupervisorRestartMessage) ⇒ onRestarting(msg)
+      case (_, commonMessage: SupervisorCommonMessage)                                  ⇒ onCommon(commonMessage)
+      case (SupervisorLifecycleState.Idle, idleMessage: SupervisorIdleMessage)          ⇒ onIdle(idleMessage)
+      case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage) ⇒ onRestarting(restartMessage)
+      case (SupervisorLifecycleState.Running | SupervisorLifecycleState.RunningOffline,
+            runningMessage: SupervisorRunningMessage) ⇒
+        onRunning(runningMessage)
       case (_, message) =>
         log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")
     }
@@ -100,8 +103,9 @@ class SupervisorBehavior(
       lifecycleState match {
         case SupervisorLifecycleState.Restart  ⇒ spawn()
         case SupervisorLifecycleState.Shutdown ⇒ coordinatedShutdown()
-        case SupervisorLifecycleState.Idle     ⇒ if (maybeContainerRef.isEmpty) throw InitializationFailed
-        case _                                 ⇒
+        case SupervisorLifecycleState.Idle ⇒
+          if (isStandalone) throw InitializationFailed
+        case _ ⇒
       }
       this
     case PostStop ⇒
@@ -120,7 +124,7 @@ class SupervisorBehavior(
         s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Shutdown}]"
       )
       lifecycleState = SupervisorLifecycleState.Shutdown
-      ctx.child(ComponentActor) match {
+      ctx.child(componentActorName) match {
         case Some(componentRef) ⇒ ctx.stop(componentRef)
         case None               ⇒ coordinatedShutdown()
       }
@@ -154,10 +158,10 @@ class SupervisorBehavior(
       pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
     case InitializeTimeout ⇒
       log.error("Component TLA initialization timed out")
-      ctx.stop(component)
+      component.foreach(ctx.stop)
     case RunTimeout ⇒
       log.error("Component TLA onRun timed out")
-      ctx.stop(component)
+      component.foreach(ctx.stop)
   }
 
   private def onRunning(supervisorRunningMessage: SupervisorRunningMessage): Unit = {
@@ -194,8 +198,8 @@ class SupervisorBehavior(
 
   private def respawnComponent(): Unit = {
     log.info("Supervisor re-spawning component")
-    ctx.child(ComponentActor) match {
-      case Some(_) ⇒ ctx.stop(component)
+    ctx.child(componentActorName) match {
+      case Some(_) ⇒ component.foreach(ctx.stop)
       case None    ⇒ spawn()
     }
   }
@@ -244,15 +248,17 @@ class SupervisorBehavior(
 
   private def spawnAndWatchComponent(): Unit = {
     log.debug(s"Supervisor is spawning component TLA")
-    component = ctx.spawn[Nothing](
-      Actor
-        .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent, locationService))
-        .onFailure[FailureRestart](SupervisorStrategy.restart.withLoggingEnabled(true)),
-      ComponentActor
+    component = Some(
+      ctx.spawn[Nothing](
+        Actor
+          .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent, locationService))
+          .onFailure[FailureRestart](SupervisorStrategy.restartWithLimit(3, Duration.Zero).withLoggingEnabled(true)),
+        componentActorName
+      )
     )
     log.info(s"Starting InitializeTimer for $initializeTimeout")
     timerScheduler.startSingleTimer(InitializeTimerKey, InitializeTimeout, initializeTimeout)
-    ctx.watch(component)
+    component.foreach(ctx.watch)
   }
 
   private def coordinatedShutdown(): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run()

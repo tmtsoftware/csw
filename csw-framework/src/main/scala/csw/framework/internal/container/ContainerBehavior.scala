@@ -70,7 +70,7 @@ class ContainerBehavior(
     case PostStop ⇒
       log.warn(s"Un-registering container from location service")
       registrationOpt.foreach(_.unregister())
-      Behavior.stopped
+      this
   }
 
   def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
