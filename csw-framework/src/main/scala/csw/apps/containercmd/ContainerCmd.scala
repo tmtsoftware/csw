@@ -19,13 +19,13 @@ import scala.util.control.NonFatal
 
 object ContainerCmd {
   def start(name: String, args: Array[String]): ActorRef[_] =
-    new ContainerCmd(name, clusterSettings = ClusterAwareSettings).start(args)
+    new ContainerCmd(name, ClusterAwareSettings, true).start(args)
 }
 
 private[containercmd] class ContainerCmd(
     name: String,
     clusterSettings: ClusterSettings,
-    startLogging: Boolean = true
+    startLogging: Boolean
 ) extends ComponentLogger.Simple {
 
   override protected def maybeComponentName() = Some(name)

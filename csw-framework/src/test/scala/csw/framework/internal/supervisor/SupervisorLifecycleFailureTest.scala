@@ -20,7 +20,6 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.appenders.FileAppender
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem
 import org.mockito.ArgumentMatchers.any

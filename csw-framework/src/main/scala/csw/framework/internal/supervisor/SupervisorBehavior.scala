@@ -31,8 +31,8 @@ import csw.services.location.models.{AkkaRegistration, ComponentId, Registration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger
 
+import scala.concurrent.Future
 import scala.concurrent.duration.{Duration, FiniteDuration}
-import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 object SupervisorBehavior {
