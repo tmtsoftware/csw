@@ -2,11 +2,11 @@ package csw.common.components
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.common.ccs.{Validation, Validations}
-import csw.common.framework.models.CommandMessage.{Oneway, Submit}
-import csw.common.framework.models.PubSub.{Publish, PublisherMessage}
-import csw.common.framework.models.{CommandMessage, ComponentInfo, ComponentMessage}
-import csw.common.framework.scaladsl.ComponentHandlers
+import csw.ccs.{Validation, Validations}
+import csw.framework.models.CommandMessage.{Oneway, Submit}
+import csw.framework.models.PubSub.{Publish, PublisherMessage}
+import csw.framework.models.{CommandMessage, ComponentInfo, ComponentMessage}
+import csw.framework.scaladsl.ComponentHandlers
 import csw.param.generics.GChoiceKey
 import csw.param.generics.KeyType.ChoiceKey
 import csw.param.models.{Choice, Choices, Prefix}

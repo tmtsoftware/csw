@@ -1,7 +1,7 @@
 package csw.trombone.assembly
 
 import com.typesafe.config.Config
-import csw.common.framework.models.ComponentInfo
+import csw.framework.models.ComponentInfo
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
 import csw.param.models.Prefix

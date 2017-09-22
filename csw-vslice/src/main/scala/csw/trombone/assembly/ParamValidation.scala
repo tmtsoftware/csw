@@ -1,8 +1,8 @@
 package csw.trombone.assembly
 
-import csw.common.ccs.Validation
-import csw.common.ccs.ValidationIssue._
-import csw.common.ccs.Validations._
+import csw.ccs.Validation
+import csw.ccs.ValidationIssue._
+import csw.ccs.Validations._
 import csw.param.commands.Setup
 
 import scala.util.Try

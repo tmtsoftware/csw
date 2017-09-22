@@ -2,11 +2,11 @@ package csw.common
 
 import akka.typed.ActorRef
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.framework.internal.container.ContainerLifecycleState
-import csw.common.framework.internal.supervisor.SupervisorLifecycleState
-import csw.common.framework.models.ContainerCommonMessage.GetContainerLifecycleState
-import csw.common.framework.models.SupervisorCommonMessage.GetSupervisorLifecycleState
-import csw.common.framework.models.{ContainerExternalMessage, SupervisorExternalMessage}
+import csw.framework.internal.container.ContainerLifecycleState
+import csw.framework.internal.supervisor.SupervisorLifecycleState
+import csw.framework.models.ContainerCommonMessage.GetContainerLifecycleState
+import csw.framework.models.SupervisorCommonMessage.GetSupervisorLifecycleState
+import csw.framework.models.{ContainerExternalMessage, SupervisorExternalMessage}
 import csw.services.location.commons.BlockingUtils
 
 import scala.concurrent.duration.Duration

@@ -2,8 +2,8 @@ package csw.common.components
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.common.framework.models.PubSub.PublisherMessage
-import csw.common.framework.models.{ComponentInfo, ComponentMessage}
+import csw.framework.models.PubSub.PublisherMessage
+import csw.framework.models.{ComponentInfo, ComponentMessage}
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 

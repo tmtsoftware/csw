@@ -1,10 +1,10 @@
 package csw.trombone.assembly
 
 import akka.typed.ActorRef
-import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.framework.models.CommandMessage.Submit
-import csw.common.framework.models.FromComponentLifecycleMessage.Running
-import csw.common.framework.models.RunningMessage.DomainMessage
+import csw.ccs.CommandStatus.CommandResponse
+import csw.framework.models.CommandMessage.Submit
+import csw.framework.models.FromComponentLifecycleMessage.Running
+import csw.framework.models.RunningMessage.DomainMessage
 import csw.param.commands.Setup
 import csw.param.events.EventTime
 import csw.param.generics.Parameter

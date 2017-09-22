@@ -2,13 +2,13 @@ package csw.trombone.assembly.actors
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.ccs.Validations.Valid
-import csw.common.ccs.{Validation, Validations}
-import csw.common.framework.models.FromComponentLifecycleMessage.Running
-import csw.common.framework.models.PubSub.PublisherMessage
-import csw.common.framework.models._
-import csw.common.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.ccs.CommandStatus.CommandResponse
+import csw.ccs.Validations.Valid
+import csw.ccs.{Validation, Validations}
+import csw.framework.models.FromComponentLifecycleMessage.Running
+import csw.framework.models.PubSub.PublisherMessage
+import csw.framework.models._
+import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.commands.{Observe, Setup}
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.LocationService

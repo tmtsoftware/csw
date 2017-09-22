@@ -4,10 +4,10 @@ import akka.actor.Scheduler
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
-import csw.common.ccs.CommandStatus.CommandResponse
-import csw.common.ccs.MultiStateMatcherMsgs.StartMatch
-import csw.common.ccs._
-import csw.common.framework.models.PubSub
+import csw.ccs.CommandStatus.CommandResponse
+import csw.ccs.MultiStateMatcherMsgs.StartMatch
+import csw.ccs._
+import csw.framework.models.PubSub
 import csw.trombone.hcd.TromboneHcdState
 import akka.typed.scaladsl.AskPattern._
 import csw.param.states.{CurrentState, DemandState}
