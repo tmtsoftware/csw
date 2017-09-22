@@ -7,7 +7,7 @@ import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
-import csw.apps.containercmd.exceptions.Exceptions.{FileNotFound, LocalFileNotFound}
+import csw.apps.containercmd.exceptions.{FileNotFound, LocalFileNotFound}
 import csw.common.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
