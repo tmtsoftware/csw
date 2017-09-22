@@ -1,8 +1,8 @@
 package csw.framework.internal.supervisor
 
 import akka.typed.ActorRef
-import csw.framework.internal.extensions.RichSystemExtension.RichSystem
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
+import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.framework.models.{Component, ComponentInfo, ContainerIdleMessage, SupervisorInfo}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger
@@ -22,7 +22,7 @@ class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simpl
   ): Future[Option[SupervisorInfo]] = {
     val system                                = ActorSystemFactory.remote(s"${componentInfo.name}-system")
     implicit val ec: ExecutionContextExecutor = system.dispatcher
-    val richSystem                            = new RichSystem(system)
+    val richSystem                            = new CswFrameworkSystem(system)
     val registrationFactory                   = new RegistrationFactory
     val pubSubBehaviorFactory                 = new PubSubBehaviorFactory
 

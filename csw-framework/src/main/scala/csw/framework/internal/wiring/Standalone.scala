@@ -2,7 +2,6 @@ package csw.framework.internal.wiring
 
 import akka.typed.ActorRef
 import csw.framework.internal.configparser.ComponentInfoParser
-import csw.framework.internal.extensions.RichSystemExtension.RichSystem
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.models.SupervisorExternalMessage
 
@@ -21,7 +20,7 @@ object Standalone {
       registrationFactory,
       pubSubBehaviorFactory
     )
-    val richSystem = new RichSystem(actorSystem)
+    val richSystem = new CswFrameworkSystem(actorSystem)
     richSystem.spawnTyped(supervisorBehavior, componentInfo.name)
   }
 }
