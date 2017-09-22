@@ -32,7 +32,7 @@ class ContainerBehavior(
     locationService: LocationService
 ) extends ComponentLogger.TypedActor[ContainerMessage](ctx, Some(containerInfo.name)) {
 
-  implicit val ec: ExecutionContext = ctx.executionContext
+  import ctx.executionContext
 
   val componentId                                                 = ComponentId(containerInfo.name, ComponentType.Container)
   val akkaRegistration: AkkaRegistration                          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)

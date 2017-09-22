@@ -15,14 +15,10 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.async.Async.{async, await}
+import scala.concurrent.Await
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
-import scala.concurrent.{Await, ExecutionContext}
 import scala.reflect.ClassTag
-import scala.util.Try
-
-object ComponentBehavior {
-  val shutdownTimeout: FiniteDuration = 10.seconds
-}
+import scala.util.control.NonFatal
 
 class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     ctx: ActorContext[ComponentMessage],
@@ -31,7 +27,9 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     lifecycleHandlers: ComponentHandlers[Msg]
 ) extends ComponentLogger.TypedActor[ComponentMessage](ctx, Some(componentName)) {
 
-  implicit val ec: ExecutionContext = ctx.executionContext
+  import ctx.executionContext
+
+  val shutdownTimeout: FiniteDuration = 10.seconds
 
   var lifecycleState: ComponentLifecycleState = ComponentLifecycleState.Idle
 
@@ -52,24 +50,22 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
     case PostStop ⇒
       log.warn("Component TLA is shutting down")
-      val shutdownResult = Try {
+      try {
         log.info("Invoking lifecycle handler's onShutdown hook")
-        Await.result(lifecycleHandlers.onShutdown(), ComponentBehavior.shutdownTimeout)
+        Await.result(lifecycleHandlers.onShutdown(), shutdownTimeout)
+      } catch {
+        case NonFatal(throwable) ⇒ log.error(throwable.getMessage, ex = throwable)
       }
-      //log exception if onShutdown handler fails and proceed with `Shutdown` or `Restart`
-      shutdownResult.failed.foreach(throwable ⇒ log.error(throwable.getMessage, ex = throwable))
       this
   }
 
-  private def onCommon(msg: CommonMessage): Unit = {
-    msg match {
-      case UnderlyingHookFailed(exception) ⇒
-        log.error(exception.getMessage, ex = exception)
-        throw exception
-    }
+  private def onCommon(commonMessage: CommonMessage): Unit = commonMessage match {
+    case UnderlyingHookFailed(exception) ⇒
+      log.error(exception.getMessage, ex = exception)
+      throw exception
   }
 
-  private def onIdle(x: IdleMessage): Unit = x match {
+  private def onIdle(idleMessage: IdleMessage): Unit = idleMessage match {
     case Initialize ⇒
       async {
         log.info("Invoking lifecycle handler's initialize hook")
@@ -82,7 +78,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))
   }
 
-  private def onInitial(x: InitialMessage): Unit = x match {
+  private def onInitial(initialMessage: InitialMessage): Unit = initialMessage match {
     case Run ⇒
       async {
         log.info("Invoking lifecycle handler's onRun hook")
@@ -105,32 +101,33 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case msg               ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
   }
 
-  private def onLifecycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case GoOnline ⇒
-      if (!lifecycleHandlers.isOnline) {
-        lifecycleHandlers.isOnline = true
-        log.info("Invoking lifecycle handler's onGoOnline hook")
-        lifecycleHandlers.onGoOnline()
-        log.debug(s"Component TLA is Online")
-      }
-    case GoOffline ⇒
-      if (lifecycleHandlers.isOnline) {
-        lifecycleHandlers.isOnline = false
-        log.info("Invoking lifecycle handler's onGoOffline hook")
-        lifecycleHandlers.onGoOffline()
-        log.debug(s"Component TLA is Offline")
-      }
-  }
+  private def onLifecycle(toComponentLifecycleMessage: ToComponentLifecycleMessage): Unit =
+    toComponentLifecycleMessage match {
+      case GoOnline ⇒
+        if (!lifecycleHandlers.isOnline) {
+          lifecycleHandlers.isOnline = true
+          log.info("Invoking lifecycle handler's onGoOnline hook")
+          lifecycleHandlers.onGoOnline()
+          log.debug(s"Component TLA is Online")
+        }
+      case GoOffline ⇒
+        if (lifecycleHandlers.isOnline) {
+          lifecycleHandlers.isOnline = false
+          log.info("Invoking lifecycle handler's onGoOffline hook")
+          lifecycleHandlers.onGoOffline()
+          log.debug(s"Component TLA is Offline")
+        }
+    }
 
-  def onRunningCompCommandMessage(message: CommandMessage): Unit = {
-    val newMessage: CommandMessage = message match {
+  def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
+    val newMessage: CommandMessage = commandMessage match {
       case x: Oneway ⇒ x.copy(replyTo = ctx.spawnAnonymous(Actor.ignore))
       case x: Submit ⇒ x
     }
     log.info(s"Invoking lifecycle handler's onControlCommand hook with msg :[$newMessage]")
     val validation              = lifecycleHandlers.onControlCommand(newMessage)
     val validationCommandResult = CommandStatus.validationAsCommandStatus(validation)
-    message.replyTo ! validationCommandResult
+    commandMessage.replyTo ! validationCommandResult
   }
 
 }

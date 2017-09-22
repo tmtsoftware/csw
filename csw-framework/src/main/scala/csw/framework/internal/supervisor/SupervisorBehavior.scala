@@ -55,8 +55,7 @@ class SupervisorBehavior(
 ) extends ComponentLogger.TypedActor[SupervisorMessage](ctx, Some(componentInfo.name)) {
 
   import SupervisorBehavior._
-
-  implicit val ec: ExecutionContext = ctx.executionContext
+  import ctx.executionContext
 
   val componentName: String              = componentInfo.name
   val componentActorName                 = s"$componentName-$ComponentActorNameSuffix"
