@@ -30,9 +30,9 @@ object Matchers {
       ctx: ActorContext[_],
       stateMatcher: StateMatcher,
       currentStateSource: ActorRef[PubSub[CurrentState]],
-      replyTo: Option[ActorRef[CommandResponse]] = None,
+      replyTo: Option[ActorRef[CommandExecutionResponse]] = None,
       timeout: Timeout = Timeout(5.seconds)
-  )(codeBlock: PartialFunction[CommandResponse, Unit]): Unit = {
+  )(codeBlock: PartialFunction[CommandExecutionResponse, Unit]): Unit = {
     implicit val t                    = Timeout(timeout.duration + 1.seconds)
     implicit val scheduler: Scheduler = ctx.system.scheduler
     import ctx.executionContext
@@ -40,7 +40,7 @@ object Matchers {
     val matcher: ActorRef[MultiStateMatcherMsgs.WaitingMsg] =
       ctx.spawnAnonymous(MultiStateMatcherActor.make(currentStateSource, timeout))
     for {
-      cmdStatus <- matcher ? { x: ActorRef[CommandResponse] ⇒
+      cmdStatus <- matcher ? { x: ActorRef[CommandExecutionResponse] ⇒
         StartMatch(x, stateMatcher)
       }
     } {

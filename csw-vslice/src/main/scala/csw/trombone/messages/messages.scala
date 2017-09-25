@@ -1,12 +1,12 @@
 package csw.trombone.messages
 
 import akka.typed.ActorRef
-import csw.ccs.CommandResponse
+import csw.ccs.CommandExecutionResponse
 import csw.trombone.assembly.actors.TromboneStateActor.StateWasSet
 
 sealed trait CommandMsgs
 object CommandMsgs {
-  case class CommandStart(replyTo: ActorRef[CommandResponse]) extends CommandMsgs
-  case object StopCurrentCommand                              extends CommandMsgs
-  case class SetStateResponseE(response: StateWasSet)         extends CommandMsgs
+  case class CommandStart(replyTo: ActorRef[CommandExecutionResponse]) extends CommandMsgs
+  case object StopCurrentCommand                                       extends CommandMsgs
+  case class SetStateResponseE(response: StateWasSet)                  extends CommandMsgs
 }

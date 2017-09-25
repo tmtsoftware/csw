@@ -3,7 +3,7 @@ package csw.trombone.assembly.actors
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.ccs.Validations.Valid
-import csw.ccs.{CommandResponse, Validation, Validations}
+import csw.ccs.{CommandExecutionResponse, CommandResponse, Validation, Validations}
 import csw.framework.models.FromComponentLifecycleMessage.Running
 import csw.framework.models.PubSub.PublisherMessage
 import csw.framework.models._
@@ -85,7 +85,7 @@ class TromboneAssemblyHandlers(
     validation
   }
 
-  private def observe(o: Observe, replyTo: ActorRef[CommandResponse]): Validation = Validations.Valid
+  private def observe(o: Observe, replyTo: ActorRef[CommandExecutionResponse]): Validation = Validations.Valid
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
 }

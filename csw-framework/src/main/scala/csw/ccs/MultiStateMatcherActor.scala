@@ -33,10 +33,10 @@ class MultiStateMatcherActor(
 
   val currentStateAdapter: ActorRef[CurrentState] = ctx.spawnAdapter(StateUpdate)
 
-  var replyTo: ActorRef[CommandResponse] = _
-  var context: Mode                      = Mode.Waiting
-  var timer: Cancellable                 = _
-  var matchers: List[StateMatcher]       = _
+  var replyTo: ActorRef[CommandExecutionResponse] = _
+  var context: Mode                               = Mode.Waiting
+  var timer: Cancellable                          = _
+  var matchers: List[StateMatcher]                = _
 
   currentStateReceiver ! Subscribe(currentStateAdapter)
 
