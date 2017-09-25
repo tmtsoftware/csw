@@ -9,7 +9,10 @@ import scala.concurrent.Future
 
 object Standalone {
 
-  def spawn(config: com.typesafe.config.Config, wiring: FrameworkWiring): Future[ActorRef[SupervisorExternalMessage]] = {
+  def spawn(
+      config: com.typesafe.config.Config,
+      wiring: FrameworkWiring
+  ): Future[ActorRef[SupervisorExternalMessage]] = {
     import wiring._
     val componentInfo = ComponentInfoParser.parseStandalone(config)
     val supervisorBehavior = SupervisorBehaviorFactory.make(
