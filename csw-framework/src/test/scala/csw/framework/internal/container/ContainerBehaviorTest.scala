@@ -8,7 +8,7 @@ import akka.{actor, Done}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorLifecycleState}
-import csw.framework.models.ContainerCommonMessage.{GetComponents, RegistrationComplete}
+import csw.framework.models.ContainerCommonMessage.GetComponents
 import csw.framework.models.ContainerIdleMessage.SupervisorsCreated
 import csw.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.framework.models.RunningMessage.Lifecycle
@@ -113,8 +113,6 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     verify(locationService).register(akkaRegistration)
     containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Idle
-    containerBehavior.onMessage(RegistrationComplete(registrationResult))
-    containerBehavior.registrationOpt.get shouldBe registrationResult
   }
 
   test("should change its lifecycle state to running after all components move to running lifecycle state") {
@@ -122,7 +120,6 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     import idleContainer._
 
     verify(locationService).register(akkaRegistration)
-    ctx.selfInbox.receiveMsg() shouldBe a[RegistrationComplete]
     // supervisor per component
     ctx.children.size shouldBe containerInfo.components.size
     ctx.selfInbox.receiveMsg() shouldBe a[SupervisorsCreated]
@@ -137,9 +134,6 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     )
 
     verify(locationService).register(akkaRegistration)
-
-    containerBehavior.onMessage(RegistrationComplete(registrationResult))
-
     containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Running
   }
 
@@ -218,8 +212,6 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     ctx.children
       .map(child ⇒ ctx.childInbox(child.upcast))
       .map(_.receiveAll())
-
-    containerBehavior.onMessage(RegistrationComplete(registrationResult))
 
     containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Running
 

@@ -8,7 +8,7 @@ import csw.framework.internal.supervisor.SupervisorLifecycleState
 import csw.framework.models.PubSub.SubscriberMessage
 import csw.param.commands.ControlCommand
 import csw.param.states.CurrentState
-import csw.services.location.models.{RegistrationResult, TmtSerializable}
+import csw.services.location.models.TmtSerializable
 
 /////////////
 
@@ -90,11 +90,10 @@ object SupervisorCommonMessage {
 
 sealed trait SupervisorIdleMessage extends SupervisorMessage
 object SupervisorIdleMessage {
-  case class RegistrationComplete(registrationResult: RegistrationResult, componentRef: ActorRef[InitialMessage])
-      extends SupervisorIdleMessage
-  case class RegistrationFailed(throwable: Throwable) extends SupervisorIdleMessage
-  case object InitializeTimeout                       extends SupervisorIdleMessage
-  case object RunTimeout                              extends SupervisorIdleMessage
+  case class RegistrationSuccess(componentRef: ActorRef[InitialMessage]) extends SupervisorIdleMessage
+  case class RegistrationFailed(throwable: Throwable)                    extends SupervisorIdleMessage
+  case object InitializeTimeout                                          extends SupervisorIdleMessage
+  case object RunTimeout                                                 extends SupervisorIdleMessage
 }
 
 sealed trait FromComponentLifecycleMessage extends SupervisorIdleMessage
@@ -111,9 +110,7 @@ sealed trait ContainerExternalMessage extends ContainerMessage with TmtSerializa
 
 sealed trait ContainerCommonMessage extends ContainerMessage
 object ContainerCommonMessage {
-  case class RegistrationComplete(registrationResult: RegistrationResult) extends ContainerCommonMessage
-  case class RegistrationFailed(throwable: Throwable)                     extends ContainerCommonMessage
-  case class GetComponents(replyTo: ActorRef[Components])                 extends ContainerCommonMessage with ContainerExternalMessage
+  case class GetComponents(replyTo: ActorRef[Components]) extends ContainerCommonMessage with ContainerExternalMessage
   case class GetContainerLifecycleState(replyTo: ActorRef[ContainerLifecycleState])
       extends ContainerCommonMessage
       with ContainerExternalMessage

@@ -25,7 +25,7 @@ import csw.framework.models._
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.param.states.CurrentState
 import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId, RegistrationResult}
+import csw.services.location.models.{AkkaRegistration, ComponentId}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger
 
@@ -59,8 +59,8 @@ class SupervisorBehavior(
   val componentActorName                 = s"$componentName-$ComponentActorNameSuffix"
   val initializeTimeout: FiniteDuration  = componentInfo.initializeTimeout
   val runTimeout: FiniteDuration         = componentInfo.runTimeout
-  val componentId                        = ComponentId(componentName, componentInfo.componentType)
-  val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
+  val akkaConnection                     = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
+  val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
   val isStandalone: Boolean              = maybeContainerRef.isEmpty
 
   val pubSubComponent: ActorRef[PubSub[CurrentState]] =
@@ -70,7 +70,6 @@ class SupervisorBehavior(
 
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
-  var registrationOpt: Option[RegistrationResult]        = None
   var component: Option[ActorRef[Nothing]]               = None
 
   spawnAndWatchComponent()
@@ -107,7 +106,7 @@ class SupervisorBehavior(
       this
     case PostStop ⇒
       log.warn("Supervisor is shutting down. Un-registering supervisor from location service")
-      registrationOpt.foreach(registrationResult ⇒ registrationResult.unregister())
+      locationService.unregister(akkaConnection)
       this
   }
 
@@ -132,8 +131,7 @@ class SupervisorBehavior(
       log.info("Received Initialized message from component within timeout, cancelling InitializeTimer")
       timerScheduler.cancel(InitializeTimerKey)
       registerWithLocationService(componentRef)
-    case RegistrationComplete(registrationResult, componentRef) ⇒
-      registrationOpt = Some(registrationResult)
+    case RegistrationSuccess(componentRef) ⇒
       log.info(s"Starting RunTimer for $runTimeout")
       timerScheduler.startSingleTimer(RunTimerKey, RunTimeout, runTimeout)
       componentRef ! Run
@@ -175,13 +173,7 @@ class SupervisorBehavior(
   private def onRestart(): Unit = {
     log.debug(s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Restart}]")
     lifecycleState = SupervisorLifecycleState.Restart
-    registrationOpt match {
-      case Some(registrationResult) ⇒
-        unRegisterFromLocationService(registrationResult)
-      case None ⇒
-        log.warn("No valid RegistrationResult found to unregister")
-        respawnComponent()
-    }
+    unRegisterFromLocationService()
   }
 
   private def onRestarting(msg: SupervisorRestartMessage): Unit = msg match {
@@ -230,14 +222,14 @@ class SupervisorBehavior(
 
   private def registerWithLocationService(componentRef: ActorRef[InitialMessage]): Unit = {
     locationService.register(akkaRegistration).onComplete {
-      case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult, componentRef)
+      case Success(registrationResult) ⇒ ctx.self ! RegistrationSuccess(componentRef)
       case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
     }
   }
 
-  private def unRegisterFromLocationService(registrationResult: RegistrationResult): Unit = {
+  private def unRegisterFromLocationService(): Unit = {
     log.debug(s"Un-registering supervisor from location service")
-    registrationResult.unregister().onComplete {
+    locationService.unregister(akkaConnection).onComplete {
       case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
       case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
     }

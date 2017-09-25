@@ -19,6 +19,7 @@ import csw.framework.models._
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.states.CurrentState
+import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem
@@ -179,7 +180,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
     // On receiving Restart message the supervisor first unregisters itself.
-    verify(registrationResult).unregister()
+    verify(locationService).unregister(any[AkkaConnection])
 
     // Supervisor registers itself after successful TLA initialization. The TLA initialized successfully twice during this test.
     verify(locationService, times(2)).register(akkaRegistration)

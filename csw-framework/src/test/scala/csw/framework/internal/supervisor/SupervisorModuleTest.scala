@@ -19,6 +19,8 @@ import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
 import csw.param.states.{CurrentState, DemandState}
+import csw.services.location.models.Connection.AkkaConnection
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
@@ -191,7 +193,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
         )
 
-        verify(registrationResult).unregister()
+        verify(locationService).unregister(any[AkkaConnection])
         verify(locationService, times(2)).register(akkaRegistration)
       }
     }

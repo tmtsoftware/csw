@@ -37,7 +37,7 @@ class FrameworkTestMocks(
 
   when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]])).thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
-  when(registrationResult.unregister()).thenReturn(Future.successful(Done))
+  when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
   when(locationService.asJava).thenReturn(mock[ILocationService])
   when(
     pubSubBehaviorFactory.make[LifecycleStateChanged](

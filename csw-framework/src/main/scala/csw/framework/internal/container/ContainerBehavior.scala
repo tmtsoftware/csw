@@ -6,12 +6,7 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorLifecycleState}
-import csw.framework.models.ContainerCommonMessage.{
-  GetComponents,
-  GetContainerLifecycleState,
-  RegistrationComplete,
-  RegistrationFailed
-}
+import csw.framework.models.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.framework.models.ContainerIdleMessage.SupervisorsCreated
 import csw.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.framework.models.RunningMessage.Lifecycle
@@ -34,12 +29,11 @@ class ContainerBehavior(
 
   import ctx.executionContext
 
-  val componentId                                                 = ComponentId(containerInfo.name, ComponentType.Container)
-  val akkaRegistration: AkkaRegistration                          = registrationFactory.akkaTyped(AkkaConnection(componentId), ctx.self)
+  val akkaConnection                                              = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
+  val akkaRegistration: AkkaRegistration                          = registrationFactory.akkaTyped(akkaConnection, ctx.self)
   var supervisors: Set[SupervisorInfo]                            = Set.empty
   var runningComponents: Set[ActorRef[SupervisorExternalMessage]] = Set.empty
   var lifecycleState: ContainerLifecycleState                     = ContainerLifecycleState.Idle
-  var registrationOpt: Option[RegistrationResult]                 = None
 
   registerWithLocationService()
   createComponents(containerInfo.components)
@@ -69,15 +63,11 @@ class ContainerBehavior(
       this
     case PostStop ⇒
       log.warn(s"Un-registering container from location service")
-      registrationOpt.foreach(_.unregister())
+      locationService.unregister(akkaConnection)
       this
   }
 
   def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
-    case RegistrationComplete(registrationResult) ⇒
-      registrationOpt = Some(registrationResult)
-    case RegistrationFailed(throwable) ⇒
-      log.error(throwable.getMessage, ex = throwable)
     case GetComponents(replyTo) ⇒
       replyTo ! Components(supervisors.map(_.component))
     case GetContainerLifecycleState(replyTo) ⇒
@@ -132,8 +122,9 @@ class ContainerBehavior(
       s"Container with connection :[${akkaRegistration.connection.name}] is registering with location service with ref :[${akkaRegistration.actorRef}]"
     )
     locationService.register(akkaRegistration).onComplete {
-      case Success(registrationResult) ⇒ ctx.self ! RegistrationComplete(registrationResult)
-      case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
+      case Success(registrationResult) ⇒
+        log.info(s"Container Registration successful with connection: [$akkaConnection]")
+      case Failure(throwable) ⇒ log.error(throwable.getMessage, ex = throwable)
     }
   }
 

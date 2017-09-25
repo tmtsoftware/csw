@@ -14,7 +14,7 @@ import csw.framework.models.InitialMessage.Run
 import csw.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationComplete, RunTimeout}
+import csw.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationSuccess, RunTimeout}
 import csw.framework.models.{ToComponentLifecycleMessage, _}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -82,7 +82,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     verify(locationService).register(akkaRegistration)
     verify(timer).cancel(SupervisorBehavior.InitializeTimerKey)
-    supervisor.onMessage(RegistrationComplete(registrationResult, childRef))
+    supervisor.onMessage(RegistrationSuccess(childRef))
 
     verify(timer).startSingleTimer(
       SupervisorBehavior.RunTimerKey,
