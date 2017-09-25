@@ -66,7 +66,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     // DEOPSCSW-180: Generic and Specific Log messages
     // component handlers initialize block throws FailureStop exception which we expect akka logs it
-    Thread.sleep(10)
+    Thread.sleep(100)
     assertThatExceptionIsLogged(
       logBuffer,
       "SampleHcd",
@@ -127,6 +127,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
+    Thread.sleep(100)
     // DEOPSCSW-180: Generic and Specific Log messages
     // component handlers initialize block throws FailureRestart exception which we expect akka logs it
     assertThatExceptionIsLogged(
