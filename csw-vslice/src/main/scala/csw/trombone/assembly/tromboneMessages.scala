@@ -1,7 +1,7 @@
 package csw.trombone.assembly
 
 import akka.typed.ActorRef
-import csw.ccs.CommandStatus.CommandResponse
+import csw.ccs.CommandResponse
 import csw.framework.models.CommandMessage.Submit
 import csw.framework.models.FromComponentLifecycleMessage.Running
 import csw.framework.models.RunningMessage.DomainMessage

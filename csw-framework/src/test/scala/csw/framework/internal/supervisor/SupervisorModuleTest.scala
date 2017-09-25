@@ -3,8 +3,7 @@ package csw.framework.internal.supervisor
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
-import csw.ccs.CommandStatus.CommandResponse
-import csw.ccs.DemandMatcher
+import csw.ccs.{CommandResponse, DemandMatcher}
 import csw.common.components.ComponentStatistics
 import csw.framework.ComponentInfos._
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout, jHcdInfoWithRunTimeout}

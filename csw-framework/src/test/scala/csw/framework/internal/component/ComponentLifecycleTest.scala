@@ -3,8 +3,7 @@ package csw.framework.internal.component
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, PostStop}
-import csw.ccs.CommandStatus.CommandResponse
-import csw.ccs.{CommandStatus, Validations}
+import csw.ccs.{Accepted, CommandResponse, Validations}
 import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.FrameworkTestSuite
 import csw.framework.models.CommandMessage.{Oneway, Submit}
@@ -124,7 +123,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     runningComponentBehavior.onMessage(Submit(sc1, commandResponseProbe.ref))
 
     verify(sampleHcdHandler).onControlCommand(Submit(sc1, commandResponseProbe.ref))
-    commandResponseProbe.expectMsg(CommandStatus.Accepted)
+    commandResponseProbe.expectMsg(Accepted)
   }
 
   test("A running component should handle Oneway command") {
@@ -140,6 +139,6 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     runningComponentBehavior.onMessage(Submit(sc1, commandResponseProbe.ref))
 
     verify(sampleHcdHandler).onControlCommand(Oneway(sc1, ArgumentMatchers.any[ActorRef[AnyRef]]()))
-    commandResponseProbe.expectMsg(CommandStatus.Accepted)
+    commandResponseProbe.expectMsg(Accepted)
   }
 }

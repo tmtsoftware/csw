@@ -2,7 +2,7 @@ package csw.framework.internal.component
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
-import csw.ccs.CommandStatus
+import csw.ccs.CommandResponse
 import csw.framework.models.CommandMessage.{Oneway, Submit}
 import csw.framework.models.CommonMessage.UnderlyingHookFailed
 import csw.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
@@ -126,7 +126,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     }
     log.info(s"Invoking lifecycle handler's onControlCommand hook with msg :[$newMessage]")
     val validation              = lifecycleHandlers.onControlCommand(newMessage)
-    val validationCommandResult = CommandStatus.validationAsCommandStatus(validation)
+    val validationCommandResult = CommandResponse.validationAsCommandStatus(validation)
     commandMessage.replyTo ! validationCommandResult
   }
 

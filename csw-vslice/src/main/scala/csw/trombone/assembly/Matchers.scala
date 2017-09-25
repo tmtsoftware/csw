@@ -3,14 +3,13 @@ package csw.trombone.assembly
 import akka.actor.Scheduler
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
-import csw.ccs.CommandStatus.CommandResponse
 import csw.ccs.MultiStateMatcherMsgs.StartMatch
 import csw.ccs._
 import csw.framework.models.PubSub
-import csw.trombone.hcd.TromboneHcdState
-import akka.typed.scaladsl.AskPattern._
 import csw.param.states.{CurrentState, DemandState}
+import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.duration.DurationLong
 
@@ -41,7 +40,7 @@ object Matchers {
     val matcher: ActorRef[MultiStateMatcherMsgs.WaitingMsg] =
       ctx.spawnAnonymous(MultiStateMatcherActor.make(currentStateSource, timeout))
     for {
-      cmdStatus <- matcher ? { x: ActorRef[CommandStatus.CommandResponse] ⇒
+      cmdStatus <- matcher ? { x: ActorRef[CommandResponse] ⇒
         StartMatch(x, stateMatcher)
       }
     } {

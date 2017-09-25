@@ -5,7 +5,6 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import akka.util.Timeout
-import csw.ccs.CommandStatus.CommandResponse
 import csw.ccs.MultiStateMatcherMsgs._
 import csw.framework.models.PubSub
 import csw.framework.models.PubSub.{Subscribe, Unsubscribe}
@@ -66,7 +65,7 @@ class MultiStateMatcherActor(
         if (newMatchers.isEmpty) {
           timer.cancel()
           currentStateReceiver ! Unsubscribe(currentStateAdapter)
-          replyTo ! CommandStatus.Completed
+          replyTo ! Completed
           ctx.stop(currentStateAdapter)
         } else {
           matchers = newMatchers
@@ -74,7 +73,7 @@ class MultiStateMatcherActor(
       }
 
     case Stop =>
-      replyTo ! CommandStatus.Error("Current state matching timed out")
+      replyTo ! Error("Current state matching timed out")
       currentStateReceiver ! Unsubscribe(currentStateAdapter)
       ctx.stop(currentStateAdapter)
   }

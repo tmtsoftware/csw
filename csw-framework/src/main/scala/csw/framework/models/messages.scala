@@ -2,7 +2,7 @@ package csw.framework.models
 
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
-import csw.ccs.CommandStatus.CommandResponse
+import csw.ccs.CommandResponse
 import csw.framework.internal.container.ContainerLifecycleState
 import csw.framework.internal.supervisor.SupervisorLifecycleState
 import csw.framework.models.PubSub.SubscriberMessage
