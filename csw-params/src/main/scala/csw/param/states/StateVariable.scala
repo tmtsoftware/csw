@@ -89,10 +89,6 @@ case class DemandState private (prefix: Prefix, paramSet: Set[Parameter[_]] = Se
    * Java API to create a DemandState from a Setup
    */
   def this(command: Setup) = this(command.prefix, command.paramSet)
-
-  // The following overrides are needed for the Java API and javadocs
-  // (Using a Java interface caused various Java compiler errors)
-  override def add[P <: Parameter[_]](parameter: P): DemandState = super.add(parameter)
 }
 
 object DemandState {
@@ -128,10 +124,6 @@ case class CurrentState private (prefix: Prefix, paramSet: Set[Parameter[_]] = S
    * Java API to create a DemandState from a Setup
    */
   def this(command: Setup) = this(command.prefix, command.paramSet)
-
-  // The following overrides are needed for the Java API and javadocs
-  // (Using a Java interface caused various Java compiler errors)
-  override def add[P <: Parameter[_]](parameter: P): CurrentState = super.add(parameter)
 }
 
 object CurrentState {

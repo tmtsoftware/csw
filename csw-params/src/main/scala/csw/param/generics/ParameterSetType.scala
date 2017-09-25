@@ -14,7 +14,7 @@ import scala.compat.java8.OptionConverters.RichOptionForJava8
  *
  * @tparam T the subclass of ParameterSetType
  */
-trait ParameterSetType[T <: ParameterSetType[T]] extends ParamSerializable { self: T =>
+abstract class ParameterSetType[T <: ParameterSetType[T]] extends ParamSerializable { self: T =>
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".

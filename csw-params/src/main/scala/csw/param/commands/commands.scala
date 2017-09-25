@@ -1,6 +1,6 @@
 package csw.param.commands
 
-import csw.param.generics.{Key, Parameter, ParameterSetKeyData, ParameterSetType}
+import csw.param.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.param.models.Prefix
 
 /**
@@ -57,12 +57,6 @@ case class Setup private (info: CommandInfo, prefix: Prefix, paramSet: Set[Param
 
   // This is here for Java to construct with String
   def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
-
-  // The following overrides are needed for the Java API and javadocs
-  // (Using a Java interface caused various Java compiler errors)
-  override def add[P <: Parameter[_]](parameter: P): Setup = super.add(parameter)
-
-  override def remove[S](key: Key[S]): Setup = super.remove(key)
 }
 
 object Setup {
@@ -86,12 +80,6 @@ case class Wait private (info: CommandInfo, prefix: Prefix, paramSet: Set[Parame
 
   // This is here for Java to construct with String
   def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
-
-  // The following overrides are needed for the Java API and javadocs
-  // (Using a Java interface caused various Java compiler errors)
-  override def add[P <: Parameter[_]](parameter: P): Wait = super.add(parameter)
-
-  override def remove[S](key: Key[S]): Wait = super.remove(key)
 }
 
 object Wait {
@@ -116,12 +104,6 @@ case class Observe private (info: CommandInfo, prefix: Prefix, paramSet: Set[Par
 
   // This is here for Java to construct with String
   def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
-
-  // The following overrides are needed for the Java API and javadocs
-  // (Using a Java interface caused various Java compiler errors)
-  override def add[P <: Parameter[_]](parameter: P): Observe = super.add(parameter)
-
-  override def remove[S](key: Key[S]): Observe = super.remove(key)
 }
 
 object Observe {

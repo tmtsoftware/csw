@@ -2,8 +2,8 @@ package csw.param.events
 
 import java.util.Optional
 
+import csw.param.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.param.models.{ObsId, Prefix}
-import csw.param.generics.{Key, Parameter, ParameterSetKeyData, ParameterSetType}
 
 import scala.compat.java8.OptionConverters.RichOptionForJava8
 
@@ -74,12 +74,6 @@ case class StatusEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = S
   def this(prefix: String, time: EventTime, obsId: ObsId) = this(EventInfo(prefix, time, obsId))
 
   override protected def create(data: Set[Parameter[_]]) = new StatusEvent(info, data)
-
-  // The following overrides are needed for the Java API and javadocs
-  // (Using a Java interface caused various Java compiler errors)
-  override def add[I <: Parameter[_]](param: I): StatusEvent = super.add(param)
-
-  override def remove[S](key: Key[S]): StatusEvent = super.remove(key)
 }
 
 object StatusEvent {
@@ -104,12 +98,6 @@ case class ObserveEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = 
   def this(prefix: String) = this(EventInfo(prefix))
 
   override protected def create(data: Set[Parameter[_]]) = new ObserveEvent(info, data)
-
-  // The following overrides are needed for the Java API and javadocs
-  // (Using a Java interface caused various Java compiler errors)
-  override def add[I <: Parameter[_]](param: I): ObserveEvent = super.add(param)
-
-  override def remove[S](key: Key[S]): ObserveEvent = super.remove(key)
 }
 
 object ObserveEvent {
@@ -134,12 +122,6 @@ case class SystemEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = S
   def this(prefix: String) = this(EventInfo(prefix))
 
   override protected def create(data: Set[Parameter[_]]) = new SystemEvent(info, data)
-
-  // The following overrides are needed for the Java API and javadocs
-  // (Using a Java interface caused various Java compiler errors)
-  override def add[I <: Parameter[_]](param: I): SystemEvent = super.add(param)
-
-  override def remove[S](key: Key[S]): SystemEvent = super.remove(key)
 }
 
 object SystemEvent {

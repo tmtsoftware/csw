@@ -1,7 +1,7 @@
 package csw.param.commands
 
+import csw.param.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.param.models.Prefix
-import csw.param.generics.{Key, Parameter, ParameterSetKeyData, ParameterSetType}
 
 /**
  * A parameters set for returning results
@@ -18,12 +18,6 @@ case class Result private (info: CommandInfo, prefix: Prefix, paramSet: Set[Para
 
   // This is here for Java to construct with String
   def this(info: CommandInfo, prefix: String) = this(info, new Prefix(prefix))
-
-  // The following overrides are needed for the Java API and javadocs
-  // (Using a Java interface caused various Java compiler errors)
-  override def add[P <: Parameter[_]](parameter: P): Result = super.add(parameter)
-
-  override def remove[S](key: Key[S]): Result = super.remove(key)
 }
 
 object Result {
