@@ -9,8 +9,9 @@ import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
 
-// DEOPSCSW-283: Parsing HOCON conf file
+// DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-170: Starting component using a file format
+// DEOPSCSW-283: Parsing HOCON conf file
 class ComponentInfoParserTest extends FunSuite with Matchers {
 
   private val assemblyInfo = ComponentInfo(

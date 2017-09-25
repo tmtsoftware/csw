@@ -47,7 +47,7 @@ private[containercmd] class ContainerCmd(
           log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 
           try {
-            Await.result(createF(standalone, isLocal, inputFilePath), 10.seconds)
+            Await.result(createF(standalone, isLocal, inputFilePath), 30.seconds)
           } catch {
             case NonFatal(ex) ⇒
               log.error(s"${ex.getMessage}", ex = ex)
