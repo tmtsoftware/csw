@@ -1,14 +1,12 @@
-package csw.framework.models
+package csw.param.messages
 
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
-import csw.ccs.{Validation, ValidationIssue, Validations}
-import csw.framework.internal.container.ContainerLifecycleState
-import csw.framework.internal.supervisor.SupervisorLifecycleState
-import csw.framework.models.PubSub.SubscriberMessage
+import csw.param.ParamSerializable
 import csw.param.commands.{ControlCommand, Result}
+import csw.param.messages.PubSub.SubscriberMessage
+import csw.param.models.{SerializableComponentInfo, Validation, ValidationIssue, Validations}
 import csw.param.states.CurrentState
-import csw.services.location.models.TmtSerializable
 
 /////////////
 
@@ -67,11 +65,10 @@ object RunningMessage {
 case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage with ContainerExternalMessage
 case object Restart  extends SupervisorCommonMessage with ContainerCommonMessage with ContainerExternalMessage
 
-///////////////
-
+////////////////////
 sealed trait SupervisorMessage
 
-sealed trait SupervisorExternalMessage extends SupervisorMessage with TmtSerializable
+sealed trait SupervisorExternalMessage extends SupervisorMessage with ParamSerializable
 sealed trait SupervisorRunningMessage  extends SupervisorExternalMessage
 sealed trait SupervisorRestartMessage  extends SupervisorMessage
 object SupervisorRestartMessage {
@@ -102,11 +99,10 @@ object FromComponentLifecycleMessage {
   case class Running(componentRef: ActorRef[RunningMessage])     extends FromComponentLifecycleMessage
 }
 
-///////////////
-
+///////////////////
 sealed trait ContainerMessage
 
-sealed trait ContainerExternalMessage extends ContainerMessage with TmtSerializable
+sealed trait ContainerExternalMessage extends ContainerMessage with ParamSerializable
 
 sealed trait ContainerCommonMessage extends ContainerMessage
 object ContainerCommonMessage {
@@ -129,11 +125,11 @@ object FromSupervisorMessage {
 }
 
 case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage], state: SupervisorLifecycleState)
-    extends TmtSerializable
+    extends ParamSerializable
 
-case class Components(components: Set[Component]) extends TmtSerializable
+case class Components(components: Set[Component]) extends ParamSerializable
 
-case class Component(supervisor: ActorRef[SupervisorExternalMessage], info: ComponentInfo)
+case class Component(supervisor: ActorRef[SupervisorExternalMessage], info: SerializableComponentInfo)
 
 case class SupervisorInfo(system: ActorSystem, component: Component)
 

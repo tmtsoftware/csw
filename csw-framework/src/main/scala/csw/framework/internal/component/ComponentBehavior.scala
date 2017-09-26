@@ -2,15 +2,15 @@ package csw.framework.internal.component
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
-import csw.framework.models.CommandMessage.{Oneway, Submit}
-import csw.framework.models.CommonMessage.UnderlyingHookFailed
-import csw.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.framework.models.IdleMessage.Initialize
-import csw.framework.models.InitialMessage.Run
-import csw.framework.models.RunningMessage.{DomainMessage, Lifecycle}
-import csw.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.framework.models.{CommandValidationResponse, RunningMessage, _}
 import csw.framework.scaladsl.ComponentHandlers
+import csw.param.messages.CommandMessage.{Oneway, Submit}
+import csw.param.messages.CommonMessage.UnderlyingHookFailed
+import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.param.messages.IdleMessage.Initialize
+import csw.param.messages.InitialMessage.Run
+import csw.param.messages.RunningMessage.{DomainMessage, Lifecycle}
+import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.param.messages._
 import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.async.Async.{async, await}

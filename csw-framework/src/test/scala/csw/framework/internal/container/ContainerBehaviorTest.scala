@@ -7,13 +7,14 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, Done}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory, SupervisorLifecycleState}
-import csw.framework.models.ContainerCommonMessage.GetComponents
-import csw.framework.models.ContainerIdleMessage.SupervisorsCreated
-import csw.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.framework.models.RunningMessage.Lifecycle
-import csw.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.framework.models.{SupervisorInfo, _}
+import csw.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory}
+import csw.framework.models._
+import csw.param.messages.ContainerCommonMessage.GetComponents
+import csw.param.messages.ContainerIdleMessage.SupervisorsCreated
+import csw.param.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.param.messages.RunningMessage.Lifecycle
+import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.param.messages._
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
@@ -63,7 +64,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
               supervisorBehaviorFactory,
               componentInfo.name
             ),
-            componentInfo
+            componentInfo.getSerializableInfo
           )
         )
         supervisorInfos += supervisorInfo
@@ -125,7 +126,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     ctx.selfInbox.receiveMsg() shouldBe a[SupervisorsCreated]
     containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
     containerBehavior.supervisors.size shouldBe 2
-    containerBehavior.supervisors.map(_.component.info) shouldBe containerInfo.components
+    containerBehavior.supervisors.map(_.component.info) shouldBe containerInfo.components.map(_.getSerializableInfo)
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     ctx.children.map(

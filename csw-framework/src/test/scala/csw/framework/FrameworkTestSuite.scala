@@ -6,9 +6,10 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.common.components.ComponentDomainMessage
-import csw.framework.models.PubSub.PublisherMessage
 import csw.framework.models._
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.param.messages.ComponentMessage
+import csw.param.messages.PubSub.PublisherMessage
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

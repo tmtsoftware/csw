@@ -4,10 +4,11 @@ import java.util.concurrent.CompletableFuture
 
 import akka.typed.ActorRef
 import akka.typed.javadsl.ActorContext
-import csw.framework.models.PubSub.PublisherMessage
-import csw.framework.models.RunningMessage.DomainMessage
 import csw.framework.models._
 import csw.framework.scaladsl.ComponentHandlers
+import csw.param.messages.ComponentMessage
+import csw.param.messages.PubSub.PublisherMessage
+import csw.param.messages.RunningMessage.DomainMessage
 import csw.param.states.CurrentState
 import csw.services.location.javadsl.ILocationService
 

@@ -1,7 +1,7 @@
 package csw.trombone.hcd
 
 import akka.typed.ActorRef
-import csw.framework.models.RunningMessage.DomainMessage
+import csw.param.messages.RunningMessage.DomainMessage
 import csw.services.location.models.TmtSerializable
 import csw.trombone.hcd.AxisResponse.{AxisStatistics, AxisUpdate}
 

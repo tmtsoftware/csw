@@ -1,6 +1,8 @@
 package csw.framework.models
 
 import ai.x.play.json.Jsonx
+import csw.param.models
+import csw.param.models.SerializableComponentInfo
 import csw.services.location.models.{ComponentType, Connection}
 import play.api.libs.json._
 
@@ -25,6 +27,17 @@ final case class ComponentInfo(
    * Java API to get the list of connections for the assembly
    */
   def getConnections: java.util.List[Connection] = connections.toList.asJava
+
+  def getSerializableInfo: SerializableComponentInfo = models.SerializableComponentInfo(
+    name,
+    componentType.name,
+    prefix,
+    behaviorFactoryClassName,
+    locationServiceUsage.toString,
+    connections.mkString(","),
+    initializeTimeout.toString(),
+    runTimeout.toString()
+  )
 }
 
 case object ComponentInfo {

@@ -2,7 +2,7 @@ package csw.trombone.assembly.actors
 
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
-import csw.framework.models.CommandMessage.Submit
+import csw.param.messages.CommandMessage.Submit
 import csw.trombone.assembly.TromboneControlMsg.{GoToStagePosition, UpdateTromboneHcd}
 import csw.trombone.assembly.{Algorithms, AssemblyContext, TromboneControlMsg}
 import csw.trombone.hcd.TromboneHcdState

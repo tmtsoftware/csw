@@ -6,8 +6,8 @@ import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.framework.models.FromComponentLifecycleMessage.Running
-import csw.framework.models.PubSub
+import csw.param.messages.FromComponentLifecycleMessage.Running
+import csw.param.messages.PubSub
 import csw.param.states.CurrentState
 import csw.trombone.assembly.DiagPublisherMessages._
 import csw.trombone.assembly.TrombonePublisherMsg.{AxisStateUpdate, AxisStatsUpdate}

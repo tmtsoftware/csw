@@ -10,17 +10,15 @@ import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.{ComponentStatistics, SampleComponentState}
-import csw.framework.internal.container.ContainerLifecycleState
-import csw.framework.internal.supervisor.SupervisorLifecycleState
-import csw.framework.models.CommandMessage.{Oneway, Submit}
-import csw.framework.models.ContainerCommonMessage.GetComponents
-import csw.framework.models.PubSub.Subscribe
-import csw.framework.models.RunningMessage.Lifecycle
-import csw.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
-import csw.framework.models.ToComponentLifecycleMessage.GoOffline
-import csw.framework.models.{Components, ContainerExternalMessage, SupervisorExternalMessage}
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
+import csw.param.messages.CommandMessage.{Oneway, Submit}
+import csw.param.messages.ContainerCommonMessage.GetComponents
+import csw.param.messages.PubSub.Subscribe
+import csw.param.messages.RunningMessage.Lifecycle
+import csw.param.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
+import csw.param.messages._
+import csw.param.messages.ToComponentLifecycleMessage.GoOffline
 import csw.param.states.CurrentState
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory

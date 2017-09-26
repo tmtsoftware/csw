@@ -7,22 +7,38 @@ import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.internal.supervisor.SupervisorLifecycleState.Idle
-import csw.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.framework.models.InitialMessage.Run
-import csw.framework.models.PubSub.Publish
-import csw.framework.models.RunningMessage.Lifecycle
-import csw.framework.models.SupervisorCommonMessage.{
+import csw.framework.models._
+import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.param.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.param.messages.InitialMessage.Run
+import csw.param.messages.PubSub.Publish
+import csw.param.messages.RunningMessage.Lifecycle
+import csw.param.messages.SupervisorCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.framework.models.SupervisorIdleMessage._
-import csw.framework.models.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.framework.models._
-import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.param.messages.SupervisorIdleMessage.{InitializeTimeout, RegistrationFailed, RegistrationSuccess, RunTimeout}
+import csw.param.messages.SupervisorLifecycleState.Idle
+import csw.param.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.param.messages.{
+  ContainerIdleMessage,
+  InitialMessage,
+  LifecycleStateChanged,
+  PubSub,
+  Restart,
+  RunningMessage,
+  Shutdown,
+  SupervisorCommonMessage,
+  SupervisorIdleMessage,
+  SupervisorLifecycleState,
+  SupervisorMessage,
+  SupervisorRestartMessage,
+  SupervisorRunningMessage,
+  ToComponentLifecycleMessage
+}
 import csw.param.states.CurrentState
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId}

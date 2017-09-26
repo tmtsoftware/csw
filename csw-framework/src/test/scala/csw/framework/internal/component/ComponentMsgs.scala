@@ -1,6 +1,6 @@
 package csw.framework.internal.component
 
-import csw.framework.models.RunningMessage.DomainMessage
+import csw.param.messages.RunningMessage.DomainMessage
 
 sealed trait ComponentDomainMessage   extends DomainMessage
 case class ComponentStats(value: Int) extends ComponentDomainMessage

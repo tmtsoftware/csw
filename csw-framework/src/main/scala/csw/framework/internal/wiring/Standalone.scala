@@ -3,7 +3,7 @@ package csw.framework.internal.wiring
 import akka.typed.ActorRef
 import csw.framework.internal.configparser.ComponentInfoParser
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
-import csw.framework.models.SupervisorExternalMessage
+import csw.param.messages.SupervisorExternalMessage
 
 import scala.concurrent.Future
 

@@ -1,7 +1,6 @@
-package csw.framework.internal.supervisor
+package csw.param.messages
 
 sealed trait SupervisorLifecycleState
-
 object SupervisorLifecycleState {
   case object Idle           extends SupervisorLifecycleState
   case object Running        extends SupervisorLifecycleState

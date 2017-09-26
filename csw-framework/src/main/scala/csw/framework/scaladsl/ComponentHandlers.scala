@@ -2,10 +2,11 @@ package csw.framework.scaladsl
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.ccs.Validation
-import csw.framework.models.PubSub.PublisherMessage
-import csw.framework.models.RunningMessage.DomainMessage
 import csw.framework.models._
+import csw.param.messages.PubSub.PublisherMessage
+import csw.param.messages.RunningMessage.DomainMessage
+import csw.param.messages.{CommandExecutionResponse, CommandMessage, CommandValidationResponse, ComponentMessage}
+import csw.param.models.Validation
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 

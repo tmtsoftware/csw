@@ -1,4 +1,4 @@
-package csw.framework.internal.container
+package csw.param.messages
 
 sealed trait ContainerLifecycleState
 object ContainerLifecycleState {

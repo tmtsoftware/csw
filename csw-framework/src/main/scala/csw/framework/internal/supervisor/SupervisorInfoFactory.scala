@@ -3,7 +3,8 @@ package csw.framework.internal.supervisor
 import akka.typed.ActorRef
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
-import csw.framework.models.{Component, ComponentInfo, ContainerIdleMessage, SupervisorInfo}
+import csw.framework.models.ComponentInfo
+import csw.param.messages.{Component, ContainerIdleMessage, SupervisorInfo}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger
 
@@ -37,7 +38,7 @@ class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simpl
         )
       }
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)
-      Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))
+      Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo.getSerializableInfo)))
     } recoverWith {
       case NonFatal(exception) ⇒
         async {

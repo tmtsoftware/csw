@@ -3,11 +3,11 @@ package csw.trombone.assembly.commands
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.ccs.ValidationIssue.WrongInternalStateIssue
-import csw.framework.models.CommandMessage.Submit
-import csw.framework.models.FromComponentLifecycleMessage.Running
-import csw.framework.models.{Completed, Error, NoLongerValid, PubSub}
 import csw.param.commands.Setup
+import csw.param.messages.CommandMessage.Submit
+import csw.param.messages.FromComponentLifecycleMessage.Running
+import csw.param.messages.{Completed, Error, NoLongerValid, PubSub}
+import csw.param.models.ValidationIssue.WrongInternalStateIssue
 import csw.param.states.CurrentState
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}

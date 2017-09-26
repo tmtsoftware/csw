@@ -3,12 +3,13 @@ package csw.framework.javadsl.components;
 
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
-import csw.ccs.Validation;
-import csw.ccs.ValidationIssue;
-import csw.ccs.Validations;
 import csw.common.components.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.models.*;
+import csw.framework.models.ComponentInfo;
+import csw.param.messages.*;
+import csw.param.models.Validation;
+import csw.param.models.ValidationIssue;
+import csw.param.models.Validations;
 import csw.param.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;

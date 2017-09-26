@@ -9,13 +9,13 @@ import csw.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.framework.models.InitialMessage.Run
-import csw.framework.models.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.framework.models.RunningMessage.{DomainMessage, Lifecycle}
-import csw.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.framework.models.SupervisorIdleMessage.{InitializeTimeout, RegistrationSuccess, RunTimeout}
-import csw.framework.models.{ToComponentLifecycleMessage, _}
+import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.param.messages.InitialMessage.Run
+import csw.param.messages.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.param.messages.RunningMessage.{DomainMessage, Lifecycle}
+import csw.param.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.param.messages.SupervisorIdleMessage.{InitializeTimeout, RegistrationSuccess, RunTimeout}
+import csw.param.messages._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.states.CurrentState

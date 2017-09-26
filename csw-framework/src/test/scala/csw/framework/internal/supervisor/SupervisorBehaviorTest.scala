@@ -9,7 +9,7 @@ import csw.common.components.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.models.{ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
+import csw.param.messages.{ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import org.scalatest.mockito.MockitoSugar
 

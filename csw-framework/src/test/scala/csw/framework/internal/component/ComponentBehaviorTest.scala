@@ -3,11 +3,11 @@ package csw.framework.internal.component
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.framework.FrameworkTestSuite
-import csw.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.framework.models.IdleMessage.Initialize
-import csw.framework.models.InitialMessage.Run
-import csw.framework.models.{ComponentMessage, FromComponentLifecycleMessage}
 import csw.framework.scaladsl.ComponentHandlers
+import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.param.messages.IdleMessage.Initialize
+import csw.param.messages.InitialMessage.Run
+import csw.param.messages.{ComponentMessage, FromComponentLifecycleMessage}
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

@@ -8,20 +8,28 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.{actor, testkit}
 import com.typesafe.config.ConfigFactory
+import csw.common.FrameworkAssertions._
 import csw.common.components.SampleComponentState._
-import csw.framework.internal.container.ContainerLifecycleState
-import csw.framework.internal.supervisor.SupervisorLifecycleState
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.framework.models.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.framework.models.PubSub.Subscribe
-import csw.framework.models.RunningMessage.Lifecycle
-import csw.framework.models.SupervisorCommonMessage.{
+import csw.param.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.param.messages.PubSub.Subscribe
+import csw.param.messages.RunningMessage.Lifecycle
+import csw.param.messages.SupervisorCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.framework.models._
+import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.param.messages.{
+  Components,
+  ContainerExternalMessage,
+  ContainerLifecycleState,
+  LifecycleStateChanged,
+  Restart,
+  Shutdown,
+  SupervisorExternalMessage,
+  SupervisorLifecycleState
+}
 import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.ComponentType.{Assembly, HCD}
@@ -29,7 +37,6 @@ import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-import csw.common.FrameworkAssertions._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong

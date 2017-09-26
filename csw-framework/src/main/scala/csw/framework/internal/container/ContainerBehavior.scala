@@ -5,12 +5,24 @@ import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
-import csw.framework.internal.supervisor.{SupervisorInfoFactory, SupervisorLifecycleState}
-import csw.framework.models.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.framework.models.ContainerIdleMessage.SupervisorsCreated
-import csw.framework.models.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.framework.models.RunningMessage.Lifecycle
+import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
+import csw.param.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.param.messages.ContainerIdleMessage.SupervisorsCreated
+import csw.param.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.param.messages.RunningMessage.Lifecycle
+import csw.param.messages.{
+  Components,
+  ContainerCommonMessage,
+  ContainerIdleMessage,
+  ContainerLifecycleState,
+  ContainerMessage,
+  Restart,
+  Shutdown,
+  SupervisorExternalMessage,
+  SupervisorInfo,
+  SupervisorLifecycleState
+}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}

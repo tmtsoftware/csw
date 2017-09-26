@@ -5,8 +5,8 @@ import akka.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.ComponentInfo;
-import csw.framework.models.ComponentMessage;
-import csw.framework.models.PubSub;
+import csw.param.messages.ComponentMessage;
+import csw.param.messages.PubSub;
 import csw.param.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 

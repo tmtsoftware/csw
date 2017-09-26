@@ -3,19 +3,18 @@ package csw.framework.internal.component
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, PostStop}
-import csw.ccs.Validations
 import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.FrameworkTestSuite
-import csw.framework.models.CommandMessage.{Oneway, Submit}
-import csw.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.framework.models.IdleMessage.Initialize
-import csw.framework.models.InitialMessage.Run
-import csw.framework.models.RunningMessage.Lifecycle
-import csw.framework.models._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.param.commands.{Observe, Setup}
 import csw.param.generics.KeyType
-import csw.param.models.Prefix
+import csw.param.messages.CommandMessage.{Oneway, Submit}
+import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.param.messages.IdleMessage.Initialize
+import csw.param.messages.InitialMessage.Run
+import csw.param.messages._
+import csw.param.messages.RunningMessage.Lifecycle
+import csw.param.models.{Prefix, Validations}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

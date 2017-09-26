@@ -12,15 +12,14 @@ import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
-import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
 import csw.common.components.SampleComponentState._
+import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
 import csw.common.utils.TestAppender
 import csw.framework.internal.component.ComponentBehavior
-import csw.framework.internal.supervisor.SupervisorLifecycleState
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.framework.models.PubSub.Subscribe
-import csw.framework.models.SupervisorCommonMessage.ComponentStateSubscription
-import csw.framework.models.{Shutdown, SupervisorExternalMessage}
+import csw.param.messages.PubSub.Subscribe
+import csw.param.messages.SupervisorCommonMessage.ComponentStateSubscription
+import csw.param.messages.{Shutdown, SupervisorExternalMessage, SupervisorLifecycleState}
 import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.ComponentType.HCD
