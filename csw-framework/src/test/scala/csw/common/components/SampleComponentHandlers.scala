@@ -2,7 +2,7 @@ package csw.common.components
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.ccs.ValidationIssue.{OtherIssue, WrongPrefixIssue}
+import csw.ccs.ValidationIssue.OtherIssue
 import csw.ccs._
 import csw.framework.models.CommandMessage.{Oneway, Submit}
 import csw.framework.models.PubSub.{Publish, PublisherMessage}

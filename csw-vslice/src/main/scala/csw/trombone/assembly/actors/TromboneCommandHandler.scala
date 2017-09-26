@@ -6,9 +6,9 @@ import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
-import csw.ccs._
 import csw.ccs.ValidationIssue.{RequiredHCDUnavailableIssue, UnsupportedCommandInStateIssue, WrongInternalStateIssue}
 import csw.framework.models.FromComponentLifecycleMessage.Running
+import csw.framework.models._
 import csw.param.commands.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.TromboneCommandHandlerMsgs._

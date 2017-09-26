@@ -3,8 +3,7 @@ package csw.framework.internal.supervisor
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
-import csw.ccs.Invalid
-import csw.ccs.{Accepted, CommandResponse, DemandMatcher}
+import csw.ccs.DemandMatcher
 import csw.common.components.ComponentStatistics
 import csw.framework.ComponentInfos._
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout, jHcdInfoWithRunTimeout}
@@ -15,7 +14,7 @@ import csw.framework.models.PubSub.Publish
 import csw.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.framework.models.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.framework.models._
+import csw.framework.models.{Invalid, _}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.commands.{CommandInfo, Setup}
 import csw.param.generics.{KeyType, Parameter}
@@ -142,6 +141,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     }
   }
 
+  // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
+  // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   test("component handler should be able to validate a Setup or Observe command as successful validation") {
     val mocks                                                      = frameworkTestMocks()
     val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
@@ -171,6 +172,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     commandValidationResponseProbe.expectMsg(Accepted)
   }
 
+  // DEOPSCSW-206: Sender to know that Submit configuration command's validation failed
+  // DEOPSCSW-214: Sender to know that oneway configuration command's validation failed
   test("component handler should be able to validate a Setup or Observe command as failure during validation") {
     val mocks                                                      = frameworkTestMocks()
     val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]

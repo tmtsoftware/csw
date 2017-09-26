@@ -7,7 +7,7 @@ import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.ccs.MultiStateMatcherMsgs.StartMatch
 import csw.ccs._
-import csw.framework.models.PubSub
+import csw.framework.models.{CommandExecutionResponse, PubSub}
 import csw.param.states.{CurrentState, DemandState}
 import csw.trombone.hcd.TromboneHcdState
 

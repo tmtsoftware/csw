@@ -2,7 +2,6 @@ package csw.framework.internal.component
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
-import csw.ccs.CommandValidationResponse
 import csw.framework.models.CommandMessage.{Oneway, Submit}
 import csw.framework.models.CommonMessage.UnderlyingHookFailed
 import csw.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
@@ -10,7 +9,7 @@ import csw.framework.models.IdleMessage.Initialize
 import csw.framework.models.InitialMessage.Run
 import csw.framework.models.RunningMessage.{DomainMessage, Lifecycle}
 import csw.framework.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.framework.models.{RunningMessage, _}
+import csw.framework.models.{CommandValidationResponse, RunningMessage, _}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.services.logging.scaladsl.ComponentLogger
 

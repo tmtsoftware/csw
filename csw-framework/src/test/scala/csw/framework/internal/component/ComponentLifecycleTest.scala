@@ -3,7 +3,7 @@ package csw.framework.internal.component
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, PostStop}
-import csw.ccs.{Accepted, CommandResponse, Validations}
+import csw.ccs.Validations
 import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.FrameworkTestSuite
 import csw.framework.models.CommandMessage.{Oneway, Submit}
@@ -11,7 +11,7 @@ import csw.framework.models.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.framework.models.IdleMessage.Initialize
 import csw.framework.models.InitialMessage.Run
 import csw.framework.models.RunningMessage.Lifecycle
-import csw.framework.models.{ComponentMessage, FromComponentLifecycleMessage, ToComponentLifecycleMessage}
+import csw.framework.models._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.param.commands.{Observe, Setup}
 import csw.param.generics.KeyType
