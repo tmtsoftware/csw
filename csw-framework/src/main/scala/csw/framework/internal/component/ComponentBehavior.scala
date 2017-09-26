@@ -96,8 +96,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case x: Msg ⇒
       log.info(s"Invoking lifecycle handler's onDomainMsg hook with msg :[$x]")
       lifecycleHandlers.onDomainMsg(x)
-    case x: CommandMessage ⇒ onRunningCompCommandMessage(x)
-    case msg               ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
+    case x: CommandMessage            ⇒ onRunningCompCommandMessage(x)
+    case x: CommandValidationResponse ⇒ lifecycleHandlers.onCommandValidationNotification(x)
+    case x: CommandExecutionResponse  ⇒ lifecycleHandlers.onCommandExecutionNotification(x)
+    case msg                          ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
   }
 
   private def onLifecycle(toComponentLifecycleMessage: ToComponentLifecycleMessage): Unit =

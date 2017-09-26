@@ -144,62 +144,70 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   test("component handler should be able to validate a Setup or Observe command as successful validation") {
-    val mocks                                                      = frameworkTestMocks()
-    val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
+    forAll(testData) { (info: ComponentInfo) ⇒
+      {
+        val mocks                                                      = frameworkTestMocks()
+        val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
 
-    import mocks._
-    createSupervisorAndStartTLA(hcdInfo, mocks)
+        import mocks._
+        createSupervisorAndStartTLA(hcdInfo, mocks)
 
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
+        lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
-    val commandInfo: CommandInfo = "Obs001"
-    val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
-    // setup to receive Success in validation result
-    val setup: Setup = Setup(commandInfo, successPrefix, Set(param))
+        val commandInfo: CommandInfo = "Obs001"
+        val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
+        // setup to receive Success in validation result
+        val setup: Setup = Setup(commandInfo, successPrefix, Set(param))
 
-    supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
-    val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-    val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
-    DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
-    commandValidationResponseProbe.expectMsg(Accepted)
+        supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
+        val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
+        DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
+        commandValidationResponseProbe.expectMsg(Accepted)
 
-    supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
-    val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-    val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
-    DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
-    commandValidationResponseProbe.expectMsg(Accepted)
+        supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
+        val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
+        DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
+        commandValidationResponseProbe.expectMsg(Accepted)
+      }
+    }
   }
 
   // DEOPSCSW-206: Sender to know that Submit configuration command's validation failed
   // DEOPSCSW-214: Sender to know that oneway configuration command's validation failed
   test("component handler should be able to validate a Setup or Observe command as failure during validation") {
-    val mocks                                                      = frameworkTestMocks()
-    val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
-    import mocks._
-    createSupervisorAndStartTLA(hcdInfo, mocks)
+    forAll(testData) { (info: ComponentInfo) ⇒
+      {
+        val mocks                                                      = frameworkTestMocks()
+        val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
+        import mocks._
+        createSupervisorAndStartTLA(hcdInfo, mocks)
 
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
+        lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
-    val commandInfo: CommandInfo = "Obs001"
-    val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
-    // setup to receive Success in validation result
-    val setup: Setup = Setup(commandInfo, failedPrefix, Set(param))
+        val commandInfo: CommandInfo = "Obs001"
+        val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
+        // setup to receive Success in validation result
+        val setup: Setup = Setup(commandInfo, failedPrefix, Set(param))
 
-    supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
-    val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-    val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
-    DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
-    commandValidationResponseProbe.expectMsgType[Invalid]
+        supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
+        val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
+        DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
+        commandValidationResponseProbe.expectMsgType[Invalid]
 
-    supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
-    val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-    val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
-    DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
-    commandValidationResponseProbe.expectMsgType[Invalid]
+        supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
+        val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
+        DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
+        commandValidationResponseProbe.expectMsgType[Invalid]
+      }
+    }
   }
 
   test("onGoOffline and goOnline hooks of comp handlers should be invoked when supervisor receives Lifecycle messages") {

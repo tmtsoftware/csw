@@ -12,12 +12,15 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.{ComponentStatistics, SampleComponentState}
 import csw.framework.internal.container.ContainerLifecycleState
 import csw.framework.internal.supervisor.SupervisorLifecycleState
+import csw.framework.models.CommandMessage.{Oneway, Submit}
 import csw.framework.models.ContainerCommonMessage.GetComponents
 import csw.framework.models.PubSub.Subscribe
 import csw.framework.models.RunningMessage.Lifecycle
 import csw.framework.models.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.framework.models.ToComponentLifecycleMessage.GoOffline
 import csw.framework.models.{Components, ContainerExternalMessage, SupervisorExternalMessage}
+import csw.param.commands.{CommandInfo, Setup}
+import csw.param.generics.{KeyType, Parameter}
 import csw.param.states.CurrentState
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -130,13 +133,30 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val etonSupervisorLocation = Await.result(etonSupervisorF, 15.seconds).get
 
       val etonSupervisorTypedRef = etonSupervisorLocation.typedRef[SupervisorExternalMessage]
-      val compStateProbe         = TestProbe[CurrentState]
+      val eatonCompStateProbe    = TestProbe[CurrentState]
 
-      etonSupervisorTypedRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
+      etonSupervisorTypedRef ! ComponentStateSubscription(Subscribe(eatonCompStateProbe.ref))
       etonSupervisorTypedRef ! ComponentStatistics(1)
 
       import SampleComponentState._
-      compStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
+      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
+
+      val commandInfo: CommandInfo = "Obs001"
+      val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
+      // setup to receive Success in validation result
+      val setupSuccess: Setup = Setup(commandInfo, successPrefix, Set(param))
+      val setupFailure: Setup = Setup(commandInfo, failedPrefix, Set(param))
+
+      val laserAssemblySupervisor = laserContainerComponents.head.supervisor
+      val laserCompStateProbe     = TestProbe[CurrentState]
+      laserAssemblySupervisor ! ComponentStateSubscription(Subscribe(laserCompStateProbe.ref))
+      etonSupervisorTypedRef ! Submit(setupFailure, laserAssemblySupervisor)
+      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
+      laserCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(invalidCommandChoice))))
+
+      etonSupervisorTypedRef ! Oneway(setupSuccess, laserAssemblySupervisor)
+      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
+      laserCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(validCommandChoice))))
 
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
       enterBarrier("offline")

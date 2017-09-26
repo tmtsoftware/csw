@@ -4,6 +4,7 @@ package csw.framework.javadsl.components;
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.ccs.Validation;
+import csw.ccs.ValidationIssue;
 import csw.ccs.Validations;
 import csw.common.components.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
@@ -84,7 +85,21 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(commandState);
 
         pubSubRef.tell(publish);
-        return Validations.JValid();
+        if (commandMsg.command().prefix().prefix().contains("success")) {
+            return Validations.JValid();
+        } else {
+            return new Validations.Invalid(new ValidationIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+        }
+    }
+
+    @Override
+    public void onCommandValidationNotification(CommandValidationResponse validationResponse) {
+
+    }
+
+    @Override
+    public void onCommandExecutionNotification(CommandExecutionResponse executionResponse) {
+
     }
 
     @Override

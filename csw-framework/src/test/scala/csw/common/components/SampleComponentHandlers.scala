@@ -6,7 +6,7 @@ import csw.ccs.ValidationIssue.OtherIssue
 import csw.ccs._
 import csw.framework.models.CommandMessage.{Oneway, Submit}
 import csw.framework.models.PubSub.{Publish, PublisherMessage}
-import csw.framework.models.{CommandMessage, ComponentInfo, ComponentMessage}
+import csw.framework.models._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.param.generics.GChoiceKey
 import csw.param.generics.KeyType.ChoiceKey
@@ -24,6 +24,8 @@ object SampleComponentState {
   val domainChoice          = Choice("Domain")
   val shutdownChoice        = Choice("Shutdown")
   val submitCommandChoice   = Choice("SubmitCommand")
+  val invalidCommandChoice  = Choice("InvalidCommandChoice")
+  val validCommandChoice    = Choice("ValidCommandChoice")
   val oneWayCommandChoice   = Choice("OneWayCommand")
   val initChoice            = Choice("Initialize")
   val offlineChoice         = Choice("Offline")
@@ -39,6 +41,8 @@ object SampleComponentState {
       domainChoice,
       shutdownChoice,
       submitCommandChoice,
+      invalidCommandChoice,
+      validCommandChoice,
       oneWayCommandChoice,
       initChoice,
       offlineChoice
@@ -99,4 +103,13 @@ class SampleComponentHandlers(
   }
 
   override protected def maybeComponentName() = Some(componentInfo.name)
+
+  override def onCommandValidationNotification(validationResponse: CommandValidationResponse): Unit = {
+    validationResponse match {
+      case Invalid(issue) ⇒ pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(invalidCommandChoice))))
+      case Accepted       ⇒ pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(validCommandChoice))))
+    }
+  }
+
+  override def onCommandExecutionNotification(executionResponse: CommandExecutionResponse): Unit = {}
 }

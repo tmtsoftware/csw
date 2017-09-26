@@ -88,4 +88,8 @@ class TromboneAssemblyHandlers(
   private def observe(o: Observe, replyTo: ActorRef[CommandExecutionResponse]): Validation = Validations.Valid
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
+
+  override def onCommandValidationNotification(validationResponse: CommandValidationResponse): Unit = ???
+
+  override def onCommandExecutionNotification(executionResponse: CommandExecutionResponse): Unit = ???
 }

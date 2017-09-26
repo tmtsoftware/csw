@@ -139,4 +139,8 @@ class TromboneHcdHandlers(
   private def getAxisConfig: Future[AxisConfig] = ???
 
   override def onControlCommand(commandMsg: CommandMessage): Validation = ???
+
+  override def onCommandValidationNotification(validationResponse: CommandValidationResponse): Unit = ???
+
+  override def onCommandExecutionNotification(executionResponse: CommandExecutionResponse): Unit = ???
 }
