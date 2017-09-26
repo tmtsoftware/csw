@@ -2,7 +2,8 @@ package csw.common.components
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.ccs.{Validation, Validations}
+import csw.ccs.ValidationIssue.{OtherIssue, WrongPrefixIssue}
+import csw.ccs._
 import csw.framework.models.CommandMessage.{Oneway, Submit}
 import csw.framework.models.PubSub.{Publish, PublisherMessage}
 import csw.framework.models.{CommandMessage, ComponentInfo, ComponentMessage}
@@ -17,16 +18,18 @@ import csw.services.logging.scaladsl.ComponentLogger
 import scala.concurrent.Future
 
 object SampleComponentState {
-  val restartChoice       = Choice("Restart")
-  val runChoice           = Choice("Run")
-  val onlineChoice        = Choice("Online")
-  val domainChoice        = Choice("Domain")
-  val shutdownChoice      = Choice("Shutdown")
-  val submitCommandChoice = Choice("SubmitCommand")
-  val oneWayCommandChoice = Choice("OneWayCommand")
-  val initChoice          = Choice("Initialize")
-  val offlineChoice       = Choice("Offline")
-  val prefix: Prefix      = Prefix("wfos.prog.cloudcover")
+  val restartChoice         = Choice("Restart")
+  val runChoice             = Choice("Run")
+  val onlineChoice          = Choice("Online")
+  val domainChoice          = Choice("Domain")
+  val shutdownChoice        = Choice("Shutdown")
+  val submitCommandChoice   = Choice("SubmitCommand")
+  val oneWayCommandChoice   = Choice("OneWayCommand")
+  val initChoice            = Choice("Initialize")
+  val offlineChoice         = Choice("Offline")
+  val prefix: Prefix        = Prefix("wfos.prog.cloudcover")
+  val successPrefix: Prefix = Prefix("wfos.prog.cloudcover.success")
+  val failedPrefix: Prefix  = Prefix("wfos.prog.cloudcover.failure")
 
   val choices: Choices =
     Choices.fromChoices(
@@ -82,7 +85,11 @@ class SampleComponentHandlers(
         pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
     }
 
-    Validations.Valid
+    if (commandMsg.command.prefix.prefix.contains("success")) {
+      Validations.Valid
+    } else {
+      Validations.Invalid(OtherIssue("Testing: Received failure, will return Invalid."))
+    }
   }
 
   override def onShutdown(): Future[Unit] = {
