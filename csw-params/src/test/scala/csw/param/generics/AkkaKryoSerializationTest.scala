@@ -5,10 +5,33 @@ import java.time.Instant
 
 import akka.actor.ActorSystem
 import akka.serialization.SerializationExtension
+import akka.typed
+import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.typed.testkit.TestKitSettings
+import akka.typed.testkit.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
 import csw.param.commands._
 import csw.param.events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
 import csw.param.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, RaDecKey, StructKey}
+import csw.param.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.param.messages.PubSub.Subscribe
+import csw.param.messages.RunningMessage.{DomainMessage, Lifecycle}
+import csw.param.messages.SupervisorCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
+import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.param.messages.{
+  Component,
+  Components,
+  ContainerLifecycleState,
+  LifecycleStateChanged,
+  Restart,
+  Shutdown,
+  SupervisorExternalMessage,
+  SupervisorLifecycleState
+}
 import csw.param.models._
 import csw.param.states.{CurrentState, DemandState}
 import csw.units.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
@@ -175,6 +198,75 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val demandStateBytes: Array[Byte] = demandStateSerializer.toBinary(demandState)
       demandStateSerializer.fromBinary(demandStateBytes) shouldBe demandState
+    }
+  }
+
+  describe("csw messages") {
+    implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
+    implicit val settings: TestKitSettings               = TestKitSettings(typedSystem)
+
+    it("should serialize ToComponentLifecycle messages") {
+      serialization.findSerializerFor(GoOffline).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(GoOnline).getClass shouldBe classOf[AkkaSerializer]
+    }
+
+    it("should serialize DomainMessage messages") {
+      case object MyDomainMsg extends DomainMessage
+      serialization.findSerializerFor(MyDomainMsg).getClass shouldBe classOf[AkkaSerializer]
+    }
+
+    it("should serialize Lifecycle messages") {
+      serialization.findSerializerFor(Lifecycle(GoOffline)).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(Lifecycle(GoOnline)).getClass shouldBe classOf[AkkaSerializer]
+    }
+
+    it("should serialize Common messages for all components") {
+      serialization.findSerializerFor(Shutdown).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(Restart).getClass shouldBe classOf[AkkaSerializer]
+    }
+
+    it("should serialize Common messages for supervisor") {
+      val lifecycleProbe    = TestProbe[LifecycleStateChanged]
+      val currentStateProbe = TestProbe[CurrentState]
+      val supStateProbe     = TestProbe[SupervisorLifecycleState]
+
+      val lifecycleStateSubscription      = LifecycleStateSubscription(Subscribe(lifecycleProbe.ref))
+      val currentStateSubscription        = ComponentStateSubscription(Subscribe(currentStateProbe.ref))
+      val supervisorLifecycleStateMessage = GetSupervisorLifecycleState(supStateProbe.ref)
+
+      serialization.findSerializerFor(lifecycleStateSubscription).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(currentStateSubscription).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(supervisorLifecycleStateMessage).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(SupervisorLifecycleState.Idle).getClass shouldBe classOf[AkkaSerializer]
+    }
+
+    it("should serialize Common messages for container") {
+      val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
+      val componentsProbe              = TestProbe[Components]
+      val supExtMsgProbe               = TestProbe[SupervisorExternalMessage]
+      val serializableComponentInfo = SerializableComponentInfo(
+        "name",
+        "compType",
+        "prefix",
+        "className",
+        "usage",
+        "connections",
+        "timeout",
+        "timeout"
+      )
+      val component  = Component(supExtMsgProbe.ref, serializableComponentInfo)
+      val components = Components(Set(component))
+
+      val getComponentsMessage              = GetComponents(componentsProbe.ref)
+      val getContainerLifecycleStateMessage = GetContainerLifecycleState(containerLifecycleStateProbe.ref)
+
+      serialization.findSerializerFor(getComponentsMessage).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(getContainerLifecycleStateMessage).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(components).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(ContainerLifecycleState.Idle).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(ContainerLifecycleState.Running).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(component).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(serializableComponentInfo).getClass shouldBe classOf[AkkaSerializer]
     }
   }
 }

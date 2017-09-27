@@ -1,6 +1,8 @@
 package csw.param.messages
 
-sealed trait ContainerLifecycleState
+import csw.param.ParamSerializable
+
+sealed trait ContainerLifecycleState extends ParamSerializable
 object ContainerLifecycleState {
   case object Idle    extends ContainerLifecycleState
   case object Running extends ContainerLifecycleState

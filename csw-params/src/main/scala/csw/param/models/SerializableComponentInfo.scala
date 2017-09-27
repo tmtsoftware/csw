@@ -1,5 +1,7 @@
 package csw.param.models
 
+import csw.param.ParamSerializable
+
 final case class SerializableComponentInfo(
     name: String,
     componentType: String,
@@ -9,4 +11,4 @@ final case class SerializableComponentInfo(
     connections: String,
     initializeTimeout: String,
     runTimeout: String
-)
+) extends ParamSerializable

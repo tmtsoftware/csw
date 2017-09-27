@@ -1,6 +1,8 @@
 package csw.param.messages
 
-sealed trait SupervisorLifecycleState
+import csw.param.ParamSerializable
+
+sealed trait SupervisorLifecycleState extends ParamSerializable
 object SupervisorLifecycleState {
   case object Idle           extends SupervisorLifecycleState
   case object Running        extends SupervisorLifecycleState

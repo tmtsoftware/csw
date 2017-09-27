@@ -22,7 +22,7 @@ object PubSub {
 
 ///////////////
 
-sealed trait ToComponentLifecycleMessage
+sealed trait ToComponentLifecycleMessage extends ParamSerializable
 object ToComponentLifecycleMessage {
   case object GoOffline extends ToComponentLifecycleMessage
   case object GoOnline  extends ToComponentLifecycleMessage
@@ -131,6 +131,7 @@ case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage],
 case class Components(components: Set[Component]) extends ParamSerializable
 
 case class Component(supervisor: ActorRef[SupervisorExternalMessage], info: SerializableComponentInfo)
+    extends ParamSerializable
 
 case class SupervisorInfo(system: ActorSystem, component: Component)
 
