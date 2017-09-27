@@ -16,7 +16,7 @@ public class JComponentInfos {
             JComponentType.HCD,
             "wfos",
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
-            LocationServiceUsage.JDoNotRegister(),
+            LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
             new FiniteDuration(10, TimeUnit.SECONDS),
             new FiniteDuration(10, TimeUnit.SECONDS));
@@ -26,7 +26,7 @@ public class JComponentInfos {
             JComponentType.HCD,
             "wfos",
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
-            LocationServiceUsage.JDoNotRegister(),
+            LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
             new FiniteDuration(0, TimeUnit.SECONDS),
             new FiniteDuration(5, TimeUnit.SECONDS));
@@ -36,7 +36,7 @@ public class JComponentInfos {
             JComponentType.HCD,
             "wfos",
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
-            LocationServiceUsage.JDoNotRegister(),
+            LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
             new FiniteDuration(5, TimeUnit.SECONDS),
             new FiniteDuration(0, TimeUnit.SECONDS));

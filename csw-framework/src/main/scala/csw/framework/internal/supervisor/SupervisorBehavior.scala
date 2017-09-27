@@ -7,6 +7,7 @@ import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
+import csw.framework.models.LocationServiceUsage.DoNotRegister
 import csw.framework.models._
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
@@ -19,7 +20,7 @@ import csw.param.messages.SupervisorCommonMessage.{
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.param.messages.SupervisorIdleMessage.{InitializeTimeout, RegistrationFailed, RegistrationSuccess, RunTimeout}
+import csw.param.messages.SupervisorIdleMessage._
 import csw.param.messages.SupervisorLifecycleState.Idle
 import csw.param.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
@@ -148,9 +149,9 @@ class SupervisorBehavior(
       timerScheduler.cancel(InitializeTimerKey)
       registerWithLocationService(componentRef)
     case RegistrationSuccess(componentRef) ⇒
-      log.info(s"Starting RunTimer for $runTimeout")
-      timerScheduler.startSingleTimer(RunTimerKey, RunTimeout, runTimeout)
-      componentRef ! Run
+      onRegistrationComplete(componentRef)
+    case RegistrationNotRequired(componentRef) ⇒
+      onRegistrationComplete(componentRef)
     case RegistrationFailed(throwable) ⇒
       log.error(throwable.getMessage, ex = throwable)
       throw throwable
@@ -173,6 +174,12 @@ class SupervisorBehavior(
     case RunTimeout ⇒
       log.error("Component TLA onRun timed out")
       component.foreach(ctx.stop)
+  }
+
+  private def onRegistrationComplete(componentRef: ActorRef[InitialMessage]) = {
+    log.info(s"Starting RunTimer for $runTimeout")
+    timerScheduler.startSingleTimer(RunTimerKey, RunTimeout, runTimeout)
+    componentRef ! Run
   }
 
   private def onRunning(supervisorRunningMessage: SupervisorRunningMessage): Unit = {
@@ -237,9 +244,14 @@ class SupervisorBehavior(
   }
 
   private def registerWithLocationService(componentRef: ActorRef[InitialMessage]): Unit = {
-    locationService.register(akkaRegistration).onComplete {
-      case Success(registrationResult) ⇒ ctx.self ! RegistrationSuccess(componentRef)
-      case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
+    //Honour DoNotRegister received in componentInfo
+    if (componentInfo.locationServiceUsage == DoNotRegister)
+      ctx.self ! RegistrationNotRequired(componentRef)
+    else {
+      locationService.register(akkaRegistration).onComplete {
+        case Success(registrationResult) ⇒ ctx.self ! RegistrationSuccess(componentRef)
+        case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
+      }
     }
   }
 
