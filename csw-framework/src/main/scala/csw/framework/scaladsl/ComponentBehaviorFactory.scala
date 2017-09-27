@@ -32,9 +32,10 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
         ctx ⇒
           new ComponentBehavior[Msg](
             ctx,
-            compInfo.name,
+            compInfo,
             supervisor,
-            handlers(ctx, compInfo, pubSubRef, locationService)
+            handlers(ctx, compInfo, pubSubRef, locationService),
+            locationService
         )
       )
       .narrow

@@ -2,15 +2,17 @@ package csw.framework.internal.component
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
+import csw.framework.models.ComponentInfo
 import csw.framework.scaladsl.ComponentHandlers
 import csw.param.messages.CommandMessage.{Oneway, Submit}
-import csw.param.messages.CommonMessage.UnderlyingHookFailed
+import csw.param.messages.CommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.param.messages.IdleMessage.Initialize
 import csw.param.messages.InitialMessage.Run
 import csw.param.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.param.messages._
+import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.async.Async.{async, await}
@@ -21,10 +23,11 @@ import scala.util.control.NonFatal
 
 class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     ctx: ActorContext[ComponentMessage],
-    componentName: String,
+    componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
-    lifecycleHandlers: ComponentHandlers[Msg]
-) extends ComponentLogger.TypedActor[ComponentMessage](ctx, Some(componentName)) {
+    lifecycleHandlers: ComponentHandlers[Msg],
+    locationService: LocationService
+) extends ComponentLogger.TypedActor[ComponentMessage](ctx, Some(componentInfo.name)) {
 
   import ctx.executionContext
 
@@ -62,6 +65,8 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case UnderlyingHookFailed(exception) ⇒
       log.error(exception.getMessage, ex = exception)
       throw exception
+    case TrackingEventReceived(trackingEvent) ⇒
+      lifecycleHandlers.onLocationTrackingEvent(trackingEvent)
   }
 
   private def onIdle(idleMessage: IdleMessage): Unit = idleMessage match {
@@ -73,6 +78,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
           s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Initialized}]"
         )
         lifecycleState = ComponentLifecycleState.Initialized
+        componentInfo.connections.foreach(
+          connection ⇒
+            locationService.subscribe(connection, trackingEvent ⇒ ctx.self ! TrackingEventReceived(trackingEvent))
+        )
         supervisor ! Initialized(ctx.self)
       }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))
   }
@@ -130,5 +139,4 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     val validationCommandResult = CommandValidationResponse.validationAsCommandStatus(validation)
     commandMessage.replyTo ! validationCommandResult
   }
-
 }

@@ -8,6 +8,7 @@ import csw.param.messages.RunningMessage.DomainMessage
 import csw.param.messages.{CommandExecutionResponse, CommandMessage, CommandValidationResponse, ComponentMessage}
 import csw.param.models.Validation
 import csw.param.states.CurrentState
+import csw.services.location.models.TrackingEvent
 import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.Future
@@ -22,6 +23,7 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
   var isOnline: Boolean = false
 
   def initialize(): Future[Unit]
+  def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit
   def onRun(): Future[Unit]
   def onDomainMsg(msg: Msg): Unit
   def onControlCommand(commandMessage: CommandMessage): Validation

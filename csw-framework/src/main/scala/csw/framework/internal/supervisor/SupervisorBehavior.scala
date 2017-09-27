@@ -176,7 +176,7 @@ class SupervisorBehavior(
       component.foreach(ctx.stop)
   }
 
-  private def onRegistrationComplete(componentRef: ActorRef[InitialMessage]) = {
+  private def onRegistrationComplete(componentRef: ActorRef[InitialMessage]): Unit = {
     log.info(s"Starting RunTimer for $runTimeout")
     timerScheduler.startSingleTimer(RunTimerKey, RunTimeout, runTimeout)
     componentRef ! Run

@@ -41,6 +41,7 @@ lazy val `csw-prod` = project
 
 lazy val `csw-params` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+    .dependsOn(`csw-location`)
   .settings(
     libraryDependencies ++= Dependencies.Params
   )

@@ -11,6 +11,7 @@ import csw.param.messages._
 import csw.param.models.{Validation, Validations}
 import csw.param.models.Validations.Valid
 import csw.param.states.CurrentState
+import csw.services.location.models.TrackingEvent
 import csw.services.location.scaladsl.LocationService
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}
@@ -93,4 +94,6 @@ class TromboneAssemblyHandlers(
   override def onCommandValidationNotification(validationResponse: CommandValidationResponse): Unit = ???
 
   override def onCommandExecutionNotification(executionResponse: CommandExecutionResponse): Unit = ???
+
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 }

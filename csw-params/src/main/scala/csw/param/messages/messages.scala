@@ -7,6 +7,7 @@ import csw.param.commands.{ControlCommand, Result}
 import csw.param.messages.PubSub.SubscriberMessage
 import csw.param.models.{SerializableComponentInfo, Validation, ValidationIssue, Validations}
 import csw.param.states.CurrentState
+import csw.services.location.models.TrackingEvent
 
 /////////////
 
@@ -34,7 +35,8 @@ sealed trait ComponentMessage
 
 sealed trait CommonMessage extends ComponentMessage
 object CommonMessage {
-  case class UnderlyingHookFailed(throwable: Throwable) extends CommonMessage
+  case class UnderlyingHookFailed(throwable: Throwable)          extends CommonMessage
+  case class TrackingEventReceived(trackingEvent: TrackingEvent) extends CommonMessage
 }
 
 sealed trait IdleMessage extends ComponentMessage

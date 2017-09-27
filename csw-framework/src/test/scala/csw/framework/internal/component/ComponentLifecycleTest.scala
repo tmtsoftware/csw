@@ -4,7 +4,7 @@ import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, PostStop}
 import csw.framework.FrameworkTestMocks.TypedActorMock
-import csw.framework.FrameworkTestSuite
+import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.param.commands.{Observe, Setup}
 import csw.param.generics.KeyType
@@ -15,6 +15,7 @@ import csw.param.messages.InitialMessage.Run
 import csw.param.messages._
 import csw.param.messages.RunningMessage.Lifecycle
 import csw.param.models.{Prefix, Validations}
+import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -28,13 +29,19 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   class IdleComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
     private val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
 
+    val locationService: LocationService                            = mock[LocationService]
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
     when(sampleHcdHandler.onRun()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
     val behavior =
-      new ComponentBehavior[ComponentDomainMessage](ctx, "test-component", supervisorProbe.ref, sampleHcdHandler)
-      with TypedActorMock[ComponentMessage]
+      new ComponentBehavior[ComponentDomainMessage](
+        ctx,
+        ComponentInfos.hcdInfo,
+        supervisorProbe.ref,
+        sampleHcdHandler,
+        locationService
+      ) with TypedActorMock[ComponentMessage]
 
     val idleComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
       behavior.onMessage(Initialize)

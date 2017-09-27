@@ -12,6 +12,7 @@ import csw.param.messages._
 import csw.param.models.ValidationIssue.OtherIssue
 import csw.param.models._
 import csw.param.states.CurrentState
+import csw.services.location.models.TrackingEvent
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.ComponentLogger
 
@@ -112,4 +113,6 @@ class SampleComponentHandlers(
   }
 
   override def onCommandExecutionNotification(executionResponse: CommandExecutionResponse): Unit = {}
+
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 }
