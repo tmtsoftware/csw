@@ -6,7 +6,7 @@ addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"       % "2
 addSbtPlugin("org.foundweekends"                 % "sbt-bintray"            % "0.5.1")
 addSbtPlugin("com.timushev.sbt"                  % "sbt-updates"            % "0.3.1")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-ghpages"            % "0.6.2")
-addSbtPlugin("com.typesafe.sbt"                  % "sbt-site"               % "1.3.0")
+addSbtPlugin("com.typesafe.sbt"                  % "sbt-site"               % "1.3.1")
 addSbtPlugin("com.lightbend.paradox"             % "sbt-paradox"            % "0.3.0")
 addSbtPlugin("org.scoverage"                     % "sbt-scoverage"          % "1.5.1")
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-native-packager"    % "1.2.2")
