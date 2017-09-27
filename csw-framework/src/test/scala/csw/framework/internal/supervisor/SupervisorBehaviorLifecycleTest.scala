@@ -9,12 +9,19 @@ import csw.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
+import csw.framework.models.ComponentInfo
+import csw.framework.models.LocationServiceUsage.DoNotRegister
 import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.param.messages.InitialMessage.Run
 import csw.param.messages.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.param.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.param.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.param.messages.SupervisorIdleMessage.{InitializeTimeout, RegistrationSuccess, RunTimeout}
+import csw.param.messages.SupervisorIdleMessage.{
+  InitializeTimeout,
+  RegistrationNotRequired,
+  RegistrationSuccess,
+  RunTimeout
+}
 import csw.param.messages._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -27,7 +34,7 @@ import org.scalatest.BeforeAndAfterEach
 // DEOPSCSW-177: Hooks for lifecycle management
 class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
-  class TestData() {
+  class TestData(compInfo: ComponentInfo) {
     val testMocks: FrameworkTestMocks = frameworkTestMocks()
     import testMocks._
 
@@ -40,7 +47,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
         ctx,
         timer,
         None,
-        hcdInfo,
+        compInfo,
         getSampleHcdWiring(sampleHcdHandler),
         new PubSubBehaviorFactory,
         registrationFactory,
@@ -58,7 +65,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should start in Idle lifecycle state and spawn three actors") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
@@ -71,8 +78,10 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   // *************** Begin testing of onIdleMessages ***************
-  test("supervisor should accept Initialized message and send Run message to TLA") {
-    val testData = new TestData()
+  test(
+    "supervisor should accept Initialized message and send Run message to TLA when LocationServiceUsage is RegisterOnly"
+  ) {
+    val testData = new TestData(hcdInfo)
     import testData._
     import testData.testMocks._
 
@@ -94,8 +103,33 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
   }
 
+  test(
+    "supervisor should accept Initialized message and send Run message to TLA when LocationServiceUsage is DoNotRegister"
+  ) {
+    val testData = new TestData(hcdInfo.copy(locationServiceUsage = DoNotRegister))
+    import testData._
+    import testData.testMocks._
+
+    val childRef = childComponentInbox.ref.upcast
+
+    supervisor.onMessage(Initialized(childRef))
+
+    verify(locationService, never()).register(akkaRegistration)
+    verify(timer).cancel(SupervisorBehavior.InitializeTimerKey)
+    supervisor.onMessage(RegistrationNotRequired(childRef))
+
+    verify(timer).startSingleTimer(
+      SupervisorBehavior.RunTimerKey,
+      RunTimeout,
+      supervisor.runTimeout
+    )
+
+    childComponentInbox.receiveMsg() shouldBe Run
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
+  }
+
   test("supervisor should accept Running message from component and change its mode and publish state change") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     supervisor.onMessage(Running(childComponentInbox.ref))
@@ -110,7 +144,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   // *************** Begin testing of onCommonMessages ***************
   test("supervisor should handle LifecycleStateSubscription message by coordinating with pub sub actor") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     val previousSupervisorLifecyleState = supervisor.lifecycleState
@@ -130,7 +164,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should handle ComponentStateSubscription message by coordinating with pub sub actor") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     val subscriberProbe                 = TestProbe[CurrentState]
@@ -158,7 +192,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   // *************** Begin testing of onRunning Messages ***************
 
   test("supervisor should handle lifecycle Restart message") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     supervisor.onMessage(Running(childComponentInbox.ref))
@@ -167,7 +201,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should handle lifecycle GoOffline message") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     supervisor.onMessage(Running(childComponentInbox.ref))
@@ -177,7 +211,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should handle lifecycle GoOnline message") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     supervisor.onMessage(Running(childComponentInbox.ref))
@@ -188,7 +222,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should accept and forward Domain message to a TLA") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     sealed trait TestDomainMessage extends DomainMessage
@@ -201,7 +235,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   // *************** End of testing onRunning Messages ***************
 
   test("should not forward Domain message to a TLA when supervisor is in Idle lifecycle state") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     sealed trait TestDomainMessage extends DomainMessage
@@ -216,7 +250,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("should not forward Domain message to a TLA when supervisor is in Restart lifecycle state") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     sealed trait TestDomainMessage extends DomainMessage
@@ -243,7 +277,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
   }
 
   test("supervisor should handle Terminated signal for Idle lifecycle state") {
-    val testData = new TestData()
+    val testData = new TestData(hcdInfo)
     import testData._
 
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
