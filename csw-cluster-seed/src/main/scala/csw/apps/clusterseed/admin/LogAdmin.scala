@@ -29,6 +29,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
         val logMetadataF: Future[LogMetadata] = akkaLocation
           .typedRef[LogControlMessages] ? (GetComponentLogMetadata(connection.componentId.name, _))
         await(logMetadataF)
+
       case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
     }
   }
@@ -37,10 +38,10 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
     async {
       await(getLocation(componentName)) match {
 
-        case Some(loc @ AkkaLocation(connection, _, _)) ⇒
+        case Some(akkaLocation @ AkkaLocation(connection, _, actorRef)) ⇒
           log.info(s"Setting log level to $logLevel",
-                   Map("componentName" → componentName, "actorRef" → loc.typedRef.toString))
-          loc.typedRef ! SetComponentLogLevel(connection.componentId.name, logLevel)
+                   Map("componentName" → componentName, "actorRef" → actorRef.toString))
+          akkaLocation.typedRef[LogControlMessages] ! SetComponentLogLevel(connection.componentId.name, logLevel)
 
         case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
       }

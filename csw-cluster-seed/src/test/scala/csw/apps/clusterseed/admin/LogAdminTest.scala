@@ -1,15 +1,18 @@
 package csw.apps.clusterseed.admin
 
-import akka.actor.Props
+import akka.actor.{ActorRef, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import akka.typed
+import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
+import akka.typed.scaladsl.{Actor, ActorContext}
 import com.typesafe.config.ConfigFactory
-import csw.apps.clusterseed.admin.TromboneHcd._
+import csw.apps.clusterseed.admin.TromboneHcdMessages._
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.utils.AdminLogTestSuite
-import csw.param.messages.{GetComponentLogMetadata, SetComponentLogLevel}
+import csw.param.messages.{ContainerCommonMessage, GetComponentLogMetadata, SetComponentLogLevel}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
@@ -24,20 +27,18 @@ import scala.concurrent.duration.DurationDouble
 
 object TromboneHcdLogger extends ComponentLogger("tromboneHcd")
 
-object TromboneHcd {
-  def props(componentName: String, loggingSystem: LoggingSystem) = Props(new TromboneHcd(componentName, loggingSystem))
-
-  case object LogTrace
-  case object LogDebug
-  case object LogInfo
-  case object LogWarn
-  case object LogError
-  case object LogFatal
+trait TromboneHcdMessages
+object TromboneHcdMessages {
+  case object LogTrace extends TromboneHcdMessages
+  case object LogDebug extends TromboneHcdMessages
+  case object LogInfo  extends TromboneHcdMessages
+  case object LogWarn  extends TromboneHcdMessages
+  case object LogError extends TromboneHcdMessages
+  case object LogFatal extends TromboneHcdMessages
 }
-
 class TromboneHcd(componentName: String, loggingSystem: LoggingSystem) extends TromboneHcdLogger.Actor {
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case LogTrace                                          ⇒ log.trace("Level is trace")
     case LogDebug                                          ⇒ log.debug("Level is debug")
     case LogInfo                                           ⇒ log.info("Level is info")
@@ -50,14 +51,45 @@ class TromboneHcd(componentName: String, loggingSystem: LoggingSystem) extends T
   }
 }
 
+object TromboneHcd {
+  def props(componentName: String, loggingSystem: LoggingSystem) = Props(new TromboneHcd(componentName, loggingSystem))
+}
+
+class TromboneHcdTyped(ctx: ActorContext[ContainerCommonMessage], loggingSystem: LoggingSystem)
+    extends TromboneHcdLogger.TypedActor[ContainerCommonMessage](ctx) {
+
+  override def onMessage(msg: ContainerCommonMessage): Behavior[ContainerCommonMessage] = {
+    msg match {
+      case SetComponentLogLevel(componentName, level)      ⇒ loggingSystem.setComponentLogLevel(componentName, level)
+      case GetComponentLogMetadata(componentName, replyTo) ⇒ replyTo ! loggingSystem.getLogMetadata(componentName)
+      case _                                               ⇒
+    }
+    this
+  }
+}
+
+object TromboneHcdTyped {
+  def behavior(loggingSystem: LoggingSystem): Behavior[ContainerCommonMessage] =
+    Actor.mutable[ContainerCommonMessage](ctx ⇒ new TromboneHcdTyped(ctx, loggingSystem))
+}
+
 class LogAdminTest extends AdminLogTestSuite with HttpSupport {
   import adminWiring.actorRuntime._
-  val compName         = "tromboneHcd"
-  val tromboneActorRef = actorSystem.actorOf(TromboneHcd.props(compName, loggingSystem), name = "TromboneActor")
-  val connection       = AkkaConnection(ComponentId(compName, ComponentType.HCD))
+  val compName = "tromboneHcd"
+  val tromboneActorRef: ActorRef =
+    actorSystem.actorOf(TromboneHcd.props(compName, loggingSystem), name = "TromboneActor")
+  val connection = AkkaConnection(ComponentId(compName, ComponentType.HCD))
   Await.result(adminWiring.locationService.register(AkkaRegistration(connection, tromboneActorRef)), 5.seconds)
 
+  private val compNameTyped = "tromboneActorTyped"
+  private val tromboneActorTyped: typed.ActorRef[ContainerCommonMessage] =
+    actorSystem.spawn(TromboneHcdTyped.behavior(loggingSystem), compNameTyped)
+
+  private val typedConnection = AkkaConnection(ComponentId(compNameTyped, ComponentType.HCD))
+  Await.result(adminWiring.locationService.register(AkkaRegistration(typedConnection, tromboneActorTyped)), 5.seconds)
+
   // DEOPSCSW-127: Runtime update for logging characteristics
+  // DEOPSCSW-168: Actors can receive and handle runtime update for logging characteristics
   test("should able to get the current component log meta data") {
 
     // send http get metadata request and verify the response has correct log levels
@@ -95,7 +127,55 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
     loggingSystem.setAkkaLevel(akkaLevel)
   }
 
+  // DEOPSCSW-168: Actors can receive and handle runtime update for logging characteristics
+  test("should able to get and set log level for typed actorRef") {
+    // get log metadata of tromboneHcdTyped through http endpoint
+    val getLogMetadataUri = Uri.from(scheme = "http",
+                                     host = ClusterAwareSettings.hostname,
+                                     port = 7878,
+                                     path = s"/admin/logging/${typedConnection.name}/level")
+
+    val getLogMetadataRequest  = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
+    val getLogMetadataResponse = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
+    val logMetadata            = Await.result(Unmarshal(getLogMetadataResponse).to[LogMetadata], 5.seconds)
+
+    val config            = ConfigFactory.load().getConfig("csw-logging")
+    val logLevel          = Level(config.getString("logLevel"))
+    val akkaLevel         = Level(config.getString("akkaLogLevel"))
+    val slf4jLevel        = Level(config.getString("slf4jLogLevel"))
+    val componentLogLevel = Level(config.getObject("component-log-levels").unwrapped().asScala(compNameTyped).toString)
+
+    logMetadata shouldBe LogMetadata(logLevel, akkaLevel, slf4jLevel, componentLogLevel)
+
+    // set level of tromboneHcdTyped to error through http endpoint
+    val uri = Uri.from(scheme = "http",
+                       host = ClusterAwareSettings.hostname,
+                       port = 7878,
+                       path = s"/admin/logging/${typedConnection.name}/level",
+                       queryString = Some("value=error"))
+
+    val request  = HttpRequest(HttpMethods.POST, uri = uri)
+    val response = Await.result(Http().singleRequest(request), 5.seconds)
+
+    response.status shouldBe StatusCodes.OK
+
+    // updating default and akka log level
+    loggingSystem.setDefaultLogLevel(LoggingLevels.ERROR)
+    loggingSystem.setAkkaLevel(LoggingLevels.WARN)
+
+    // Again get the log metadata of tromboneHcdTyped to verify the log levels
+    val getLogMetadataResponse2 = Await.result(Http().singleRequest(getLogMetadataRequest), 5.seconds)
+    val logMetadata2            = Await.result(Unmarshal(getLogMetadataResponse2).to[LogMetadata], 5.seconds)
+
+    logMetadata2 shouldBe LogMetadata(ERROR, WARN, slf4jLevel, ERROR)
+
+    // reset log levels to default
+    loggingSystem.setDefaultLogLevel(logLevel)
+    loggingSystem.setAkkaLevel(akkaLevel)
+  }
+
   // DEOPSCSW-127: Runtime update for logging characteristics
+  // DEOPSCSW-168: Actors can receive and handle runtime update for logging characteristics
   test("should able to set log level of the component dynamically through http end point") {
 
     def sendLogMsgs(): Unit = {
