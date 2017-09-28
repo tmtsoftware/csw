@@ -1,16 +1,15 @@
 package csw.apps.clusterseed.admin
 
-import akka.pattern.ask
-import akka.typed.scaladsl.adapter.TypedActorRefOps
+import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaLocationException}
 import csw.apps.clusterseed.admin.internal.ActorRuntime
 import csw.apps.clusterseed.commons.ClusterSeedLogger
+import csw.param.messages.{GetComponentLogMetadata, LogControlMessages, SetComponentLogLevel}
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaLocation, Connection, Location}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.internal.{GetComponentLogMetadata, SetComponentLogLevel}
 import csw.services.logging.models.LogMetadata
 
 import scala.async.Async._
@@ -22,14 +21,14 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
   import actorRuntime._
 
   def getLogMetadata(componentName: String): Future[LogMetadata] = async {
-    implicit val timeout = Timeout(5.seconds)
+    implicit val timeout: Timeout = Timeout(5.seconds)
     await(getLocation(componentName)) match {
-
-      case Some(AkkaLocation(connection, _, actorRef)) ⇒
+      case Some(akkaLocation @ AkkaLocation(connection, _, actorRef)) ⇒
         log.info("Getting log information from logging system",
                  Map("componentName" → componentName, "actorRef" → actorRef.toString))
-        await((actorRef.toUntyped ? GetComponentLogMetadata(connection.componentId.name)).mapTo[LogMetadata])
-
+        val logMetadataF: Future[LogMetadata] = akkaLocation
+          .typedRef[LogControlMessages] ? (GetComponentLogMetadata(connection.componentId.name, _))
+        await(logMetadataF)
       case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
     }
   }

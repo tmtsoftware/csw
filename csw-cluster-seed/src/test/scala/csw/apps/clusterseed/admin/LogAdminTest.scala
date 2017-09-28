@@ -4,10 +4,12 @@ import akka.actor.Props
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import akka.typed.scaladsl.adapter._
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.TromboneHcd._
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.utils.AdminLogTestSuite
+import csw.param.messages.{GetComponentLogMetadata, SetComponentLogLevel}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
@@ -19,7 +21,6 @@ import csw.services.logging.scaladsl.ComponentLogger
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
-import akka.typed.scaladsl.adapter._
 
 object TromboneHcdLogger extends ComponentLogger("tromboneHcd")
 
@@ -37,15 +38,15 @@ object TromboneHcd {
 class TromboneHcd(componentName: String, loggingSystem: LoggingSystem) extends TromboneHcdLogger.Actor {
 
   def receive = {
-    case LogTrace                                     ⇒ log.trace("Level is trace")
-    case LogDebug                                     ⇒ log.debug("Level is debug")
-    case LogInfo                                      ⇒ log.info("Level is info")
-    case LogWarn                                      ⇒ log.warn("Level is warn")
-    case LogError                                     ⇒ log.error("Level is error")
-    case LogFatal                                     ⇒ log.fatal("Level is fatal")
-    case SetComponentLogLevel(`componentName`, level) ⇒ loggingSystem.setComponentLogLevel(componentName, level)
-    case GetComponentLogMetadata(`componentName`)     ⇒ sender ! loggingSystem.getLogMetadata(componentName)
-    case x: Any                                       ⇒ log.error("Unexpected actor message", Map("message" -> x.toString))
+    case LogTrace                                          ⇒ log.trace("Level is trace")
+    case LogDebug                                          ⇒ log.debug("Level is debug")
+    case LogInfo                                           ⇒ log.info("Level is info")
+    case LogWarn                                           ⇒ log.warn("Level is warn")
+    case LogError                                          ⇒ log.error("Level is error")
+    case LogFatal                                          ⇒ log.fatal("Level is fatal")
+    case SetComponentLogLevel(`componentName`, level)      ⇒ loggingSystem.setComponentLogLevel(componentName, level)
+    case GetComponentLogMetadata(`componentName`, replyTo) ⇒ replyTo ! loggingSystem.getLogMetadata(componentName)
+    case x: Any                                            ⇒ log.error("Unexpected actor message", Map("message" -> x.toString))
   }
 }
 

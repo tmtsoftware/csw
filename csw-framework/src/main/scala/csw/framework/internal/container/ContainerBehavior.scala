@@ -17,7 +17,9 @@ import csw.param.messages.{
   ContainerIdleMessage,
   ContainerLifecycleState,
   ContainerMessage,
+  GetComponentLogMetadata,
   Restart,
+  SetComponentLogLevel,
   Shutdown,
   SupervisorExternalMessage,
   SupervisorInfo,
@@ -84,6 +86,8 @@ class ContainerBehavior(
       replyTo ! Components(supervisors.map(_.component))
     case GetContainerLifecycleState(replyTo) ⇒
       replyTo ! lifecycleState
+    case GetComponentLogMetadata(componentName, replyTo) ⇒
+    case SetComponentLogLevel(componentName, logLevel)   ⇒
     case Restart ⇒
       log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Idle}]")
       lifecycleState = ContainerLifecycleState.Idle

@@ -1,7 +1,7 @@
 package csw.apps.clusterseed.admin.internal
 
 import akka.Done
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.BuildInfo
 import csw.services.location.commons.ClusterAwareSettings
@@ -14,6 +14,7 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val actorSystem: ActorSystem     = _actorSystem
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   implicit val mat: Materializer            = ActorMaterializer()
+  implicit val scheduler: Scheduler         = actorSystem.scheduler
 
   val coordinatedShutdown = CoordinatedShutdown(actorSystem)
 

@@ -8,6 +8,8 @@ import csw.param.messages.PubSub.SubscriberMessage
 import csw.param.models.{SerializableComponentInfo, Validation, ValidationIssue, Validations}
 import csw.param.states.CurrentState
 import csw.services.location.models.TrackingEvent
+import csw.services.logging.internal.LoggingLevels.Level
+import csw.services.logging.models.LogMetadata
 
 /////////////
 
@@ -64,8 +66,18 @@ object RunningMessage {
   trait DomainMessage                                        extends RunningMessage
 }
 
-case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage with ContainerExternalMessage
-case object Restart  extends SupervisorCommonMessage with ContainerCommonMessage with ContainerExternalMessage
+case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage
+case object Restart  extends SupervisorCommonMessage with ContainerCommonMessage
+////////////////////
+
+// Parent trait for Messages which will be send to components for interacting with its logging system
+sealed trait LogControlMessages extends SupervisorCommonMessage with ContainerCommonMessage
+
+// Message to get Logging configuration metadata of the receiver
+case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata]) extends LogControlMessages
+
+// Message to change the log level of any component
+case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessages
 
 ////////////////////
 sealed trait SupervisorMessage
@@ -107,12 +119,10 @@ sealed trait ContainerMessage
 
 sealed trait ContainerExternalMessage extends ContainerMessage with ParamSerializable
 
-sealed trait ContainerCommonMessage extends ContainerMessage
+sealed trait ContainerCommonMessage extends ContainerExternalMessage
 object ContainerCommonMessage {
-  case class GetComponents(replyTo: ActorRef[Components]) extends ContainerCommonMessage with ContainerExternalMessage
-  case class GetContainerLifecycleState(replyTo: ActorRef[ContainerLifecycleState])
-      extends ContainerCommonMessage
-      with ContainerExternalMessage
+  case class GetComponents(replyTo: ActorRef[Components])                           extends ContainerCommonMessage
+  case class GetContainerLifecycleState(replyTo: ActorRef[ContainerLifecycleState]) extends ContainerCommonMessage
 }
 
 sealed trait ContainerIdleMessage extends ContainerMessage

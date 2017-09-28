@@ -26,11 +26,13 @@ import csw.param.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRe
 import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.param.messages.{
   ContainerIdleMessage,
+  GetComponentLogMetadata,
   InitialMessage,
   LifecycleStateChanged,
   PubSub,
   Restart,
   RunningMessage,
+  SetComponentLogLevel,
   Shutdown,
   SupervisorCommonMessage,
   SupervisorIdleMessage,
@@ -128,10 +130,12 @@ class SupervisorBehavior(
   }
 
   def onCommon(msg: SupervisorCommonMessage): Unit = msg match {
-    case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
-    case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
-    case GetSupervisorLifecycleState(replyTo)          ⇒ replyTo ! lifecycleState
-    case Restart                                       ⇒ onRestart()
+    case LifecycleStateSubscription(subscriberMessage)   ⇒ pubSubLifecycle ! subscriberMessage
+    case ComponentStateSubscription(subscriberMessage)   ⇒ pubSubComponent ! subscriberMessage
+    case GetSupervisorLifecycleState(replyTo)            ⇒ replyTo ! lifecycleState
+    case GetComponentLogMetadata(componentName, replyTo) ⇒
+    case SetComponentLogLevel(componentName, logLevel)   ⇒
+    case Restart                                         ⇒ onRestart()
     case Shutdown ⇒
       log.debug(
         s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Shutdown}]"

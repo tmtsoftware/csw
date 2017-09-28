@@ -3,10 +3,10 @@ package csw.apps.clusterseed.app
 import akka.actor.{Actor, Props}
 import akka.typed.scaladsl.adapter._
 import csw.apps.clusterseed.admin.internal.AdminWiring
+import csw.param.messages.{GetComponentLogMetadata, SetComponentLogLevel}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
-import csw.services.logging.internal.{GetComponentLogMetadata, SetComponentLogLevel}
 import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.Await
@@ -59,10 +59,10 @@ class DemoApp extends AppLogger.Simple {
         override def receive: Receive = {
           case SetComponentLogLevel(name, level) ⇒
             loggingSystem.setComponentLogLevel(name, level)
-          case GetComponentLogMetadata(name) ⇒ {
+          case GetComponentLogMetadata(name, replyTo) ⇒ {
             println("getMetadata")
             println(name)
-            sender ! loggingSystem.getLogMetadata(name)
+            replyTo ! loggingSystem.getLogMetadata(name)
           }
           case unknown ⇒ log.error(s"Unknown message received => $unknown")
         }
