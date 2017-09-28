@@ -5,6 +5,7 @@ import java.net.InetAddress
 import com.persist.JsonOps.{Json, JsonObject}
 import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.services.location.commons.ClusterAwareSettings
+import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.LoggingSystemFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -14,19 +15,19 @@ import scala.concurrent.duration.DurationLong
 
 abstract class AdminLogTestSuite() extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  protected val logBuffer    = mutable.Buffer.empty[JsonObject]
-  protected val testAppender = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
+  protected val logBuffer: mutable.Buffer[JsonObject] = mutable.Buffer.empty[JsonObject]
+  protected val testAppender                          = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
 
-  protected val hostName = InetAddress.getLocalHost.getHostName
+  protected val hostName: String = InetAddress.getLocalHost.getHostName
 
-  protected val adminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3552), None)
-  protected val loggingSystem =
+  protected val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3552), None)
+  protected val loggingSystem: LoggingSystem =
     LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
 
+  loggingSystem.setAppenders(List(testAppender))
+
   override protected def beforeAll(): Unit = {
-    super.beforeAll()
     logBuffer.clear()
-    loggingSystem.setAppenders(List(testAppender))
     Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)
   }
 

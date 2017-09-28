@@ -142,6 +142,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     }
   }
 
+  // DEOPSCSW-200: Send Submit Configuration command
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   test("component handler should be able to validate a Setup or Observe command as successful validation") {
@@ -164,13 +165,15 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
         val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
+        // This shows that received command by TLA is of type Submit
+        val submitCommandDemandState = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
         DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted)
 
         supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
         val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
+        // This shows that received command by TLA is of type OneWay
+        val onewayCommandDemandState = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
         DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted)
       }
@@ -198,13 +201,15 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
         val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
+        // This shows that received command by TLA is of type Submit
+        val submitCommandDemandState = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
         DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsgType[Invalid]
 
         supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
         val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
+        // This shows that received command by TLA is of type OneWay
+        val onewayCommandDemandState = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
         DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsgType[Invalid]
       }
