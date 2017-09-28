@@ -12,7 +12,7 @@ import csw.param.messages._
 import csw.param.models.ValidationIssue.OtherIssue
 import csw.param.models._
 import csw.param.states.CurrentState
-import csw.services.location.models.TrackingEvent
+import csw.services.location.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.ComponentLogger
 
@@ -30,6 +30,8 @@ object SampleComponentState {
   val oneWayCommandChoice   = Choice("OneWayCommand")
   val initChoice            = Choice("Initialize")
   val offlineChoice         = Choice("Offline")
+  val locationUpdatedChoice = Choice("LocationUpdated")
+  val locationRemovedChoice = Choice("LocationRemoved")
   val prefix: Prefix        = Prefix("wfos.prog.cloudcover")
   val successPrefix: Prefix = Prefix("wfos.prog.cloudcover.success")
   val failedPrefix: Prefix  = Prefix("wfos.prog.cloudcover.failure")
@@ -46,7 +48,9 @@ object SampleComponentState {
       validCommandChoice,
       oneWayCommandChoice,
       initChoice,
-      offlineChoice
+      offlineChoice,
+      locationUpdatedChoice,
+      locationRemovedChoice
     )
   val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", choices)
 }
@@ -114,5 +118,10 @@ class SampleComponentHandlers(
 
   override def onCommandExecutionNotification(executionResponse: CommandExecutionResponse): Unit = {}
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
+    case LocationUpdated(location) =>
+      pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(locationUpdatedChoice))))
+    case LocationRemoved(connection) =>
+      pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(locationRemovedChoice))))
+  }
 }

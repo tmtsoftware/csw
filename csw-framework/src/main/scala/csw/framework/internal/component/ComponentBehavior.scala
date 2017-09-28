@@ -3,6 +3,7 @@ package csw.framework.internal.component
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.models.ComponentInfo
+import csw.framework.models.LocationServiceUsage.RegisterAndTrackServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.param.messages.CommandMessage.{Oneway, Submit}
 import csw.param.messages.CommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
@@ -78,10 +79,13 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
           s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Initialized}]"
         )
         lifecycleState = ComponentLifecycleState.Initialized
-        componentInfo.connections.foreach(
-          connection ⇒
-            locationService.subscribe(connection, trackingEvent ⇒ ctx.self ! TrackingEventReceived(trackingEvent))
-        )
+        if (componentInfo.locationServiceUsage == RegisterAndTrackServices) {
+          componentInfo.connections.foreach(
+            connection ⇒ {
+              locationService.subscribe(connection, trackingEvent ⇒ ctx.self ! TrackingEventReceived(trackingEvent))
+            }
+          )
+        }
         supervisor ! Initialized(ctx.self)
       }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))
   }
