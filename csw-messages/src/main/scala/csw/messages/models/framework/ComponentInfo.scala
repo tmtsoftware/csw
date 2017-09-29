@@ -1,8 +1,8 @@
-package csw.framework.models
+package csw.messages.models.framework
 
 import ai.x.play.json.Jsonx
+import csw.messages.TMTSerializable
 import csw.messages.models.framework
-import csw.messages.models.framework.SerializableComponentInfo
 import csw.messages.models.location.{ComponentType, Connection}
 import play.api.libs.json._
 
@@ -21,7 +21,7 @@ final case class ComponentInfo(
     connections: Set[Connection] = Set.empty,
     initializeTimeout: FiniteDuration = 10.seconds,
     runTimeout: FiniteDuration = 10.seconds
-) {
+) extends TMTSerializable {
 
   /**
    * Java API to get the list of connections for the assembly

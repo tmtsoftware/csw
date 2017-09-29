@@ -8,7 +8,6 @@ import csw.common.components.ComponentStatistics
 import csw.framework.ComponentInfos._
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout, jHcdInfoWithRunTimeout}
 import csw.framework.javadsl.components.JComponentDomainMessage
-import csw.framework.models._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
@@ -19,6 +18,7 @@ import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
 import csw.messages.commands.{CommandInfo, Setup}
 import csw.messages.generics.{KeyType, Parameter}
+import csw.messages.models.framework.ComponentInfo
 import csw.messages.models.location.Connection.AkkaConnection
 import csw.messages.states.{CurrentState, DemandState, SupervisorLifecycleState}
 import org.mockito.ArgumentMatchers.any

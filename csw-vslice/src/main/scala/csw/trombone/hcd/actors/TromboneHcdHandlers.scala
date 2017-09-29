@@ -5,12 +5,12 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
-import csw.framework.models.ComponentInfo
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
 import csw.messages.commands.Setup
 import csw.messages.models.ccs.Validation
+import csw.messages.models.framework.ComponentInfo
 import csw.messages.models.location.TrackingEvent
 import csw.messages.states.CurrentState
 import csw.services.location.scaladsl.LocationService

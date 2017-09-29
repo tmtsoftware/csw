@@ -4,7 +4,7 @@ import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.models.ComponentInfo;
+import csw.messages.models.framework.ComponentInfo;
 import csw.messages.ComponentMessage;
 import csw.messages.PubSub;
 import csw.messages.states.CurrentState;

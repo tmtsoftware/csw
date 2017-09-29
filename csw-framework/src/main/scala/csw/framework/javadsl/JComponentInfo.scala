@@ -2,7 +2,7 @@ package csw.framework.javadsl
 
 import java.util
 
-import csw.framework.models.{ComponentInfo, LocationServiceUsage}
+import csw.messages.models.framework.{ComponentInfo, LocationServiceUsage}
 import csw.messages.models.location.{ComponentType, Connection}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter

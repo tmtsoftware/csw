@@ -9,8 +9,6 @@ import csw.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.models.ComponentInfo
-import csw.framework.models.LocationServiceUsage.DoNotRegister
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.FromComponentLifecycleMessage.{Initialized, Running}
@@ -20,6 +18,8 @@ import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.messages.SupervisorIdleMessage.{InitializeTimeout, RegistrationNotRequired, RegistrationSuccess, RunTimeout}
 import csw.messages._
+import csw.messages.models.framework.ComponentInfo
+import csw.messages.models.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.states.{CurrentState, SupervisorLifecycleState}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._

@@ -1,5 +1,6 @@
-package csw.framework.models
+package csw.messages.models.framework
 
+import csw.messages.TMTSerializable
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
 import scala.collection.immutable
@@ -7,7 +8,7 @@ import scala.collection.immutable
 /**
  * Describes how a component uses the location service
  */
-sealed abstract class LocationServiceUsage extends EnumEntry
+sealed abstract class LocationServiceUsage extends EnumEntry with TMTSerializable
 
 object LocationServiceUsage extends Enum[LocationServiceUsage] with PlayJsonEnum[LocationServiceUsage] {
 

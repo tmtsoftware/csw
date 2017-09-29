@@ -2,7 +2,6 @@ package csw.common.components
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.framework.models._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.PubSub.{Publish, PublisherMessage}
@@ -11,6 +10,7 @@ import csw.messages.generics.GChoiceKey
 import csw.messages.generics.KeyType.ChoiceKey
 import csw.messages.models.ccs.ValidationIssue.OtherIssue
 import csw.messages.models.ccs.{Validation, Validations}
+import csw.messages.models.framework.ComponentInfo
 import csw.messages.models.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.models.params.{Choice, Choices, Prefix}
 import csw.messages.states.CurrentState

@@ -8,13 +8,13 @@ import akka.{actor, Done}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory}
-import csw.framework.models._
 import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
+import csw.messages.models.framework.ComponentInfo
 import csw.messages.models.location.Connection.AkkaConnection
 import csw.messages.states.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}

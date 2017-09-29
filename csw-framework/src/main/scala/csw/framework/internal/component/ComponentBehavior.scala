@@ -2,8 +2,6 @@ package csw.framework.internal.component
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
-import csw.framework.models.ComponentInfo
-import csw.framework.models.LocationServiceUsage.RegisterAndTrackServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
@@ -13,6 +11,8 @@ import csw.messages.InitialMessage.Run
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
+import csw.messages.models.framework.ComponentInfo
+import csw.messages.models.framework.LocationServiceUsage.RegisterAndTrackServices
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.ComponentLogger
 

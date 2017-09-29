@@ -7,8 +7,6 @@ import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.models.LocationServiceUsage.DoNotRegister
-import csw.framework.models._
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
@@ -24,6 +22,8 @@ import csw.messages.SupervisorIdleMessage._
 import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
+import csw.messages.models.framework.ComponentInfo
+import csw.messages.models.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.models.location.ComponentId
 import csw.messages.models.location.Connection.AkkaConnection
 import csw.messages.states.SupervisorLifecycleState.Idle
