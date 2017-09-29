@@ -62,9 +62,12 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
   private val instrumentHcdConnection  = AkkaConnection(ComponentId("Instrument_Filter", HCD))
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
-  override protected def afterAll(): Unit = Await.result(seedActorSystem.terminate(), 5.seconds)
+  override protected def afterAll(): Unit = {
+    Await.result(seedActorSystem.terminate(), 5.seconds)
+    Await.result(containerActorSystem.terminate(), 5.seconds)
+  }
 
-  ignore("should start multiple components withing a single container and able to accept lifecycle messages") {
+  test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
     val wiring = FrameworkWiring.make(containerActorSystem)
     // start a container and verify it moves to running lifecycle state
