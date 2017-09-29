@@ -21,13 +21,10 @@ import scala.concurrent.Future
 
 object SampleComponentState {
   val restartChoice         = Choice("Restart")
-  val runChoice             = Choice("Run")
   val onlineChoice          = Choice("Online")
   val domainChoice          = Choice("Domain")
   val shutdownChoice        = Choice("Shutdown")
   val submitCommandChoice   = Choice("SubmitCommand")
-  val invalidCommandChoice  = Choice("InvalidCommandChoice")
-  val validCommandChoice    = Choice("ValidCommandChoice")
   val oneWayCommandChoice   = Choice("OneWayCommand")
   val initChoice            = Choice("Initialize")
   val offlineChoice         = Choice("Offline")
@@ -40,13 +37,10 @@ object SampleComponentState {
   val choices: Choices =
     Choices.fromChoices(
       restartChoice,
-      runChoice,
       onlineChoice,
       domainChoice,
       shutdownChoice,
       submitCommandChoice,
-      invalidCommandChoice,
-      validCommandChoice,
       oneWayCommandChoice,
       initChoice,
       offlineChoice,
@@ -72,11 +66,6 @@ class SampleComponentHandlers(
     Thread.sleep(100)
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     Future.unit
-  }
-
-  override def onRun(): Future[Unit] = {
-    Thread.sleep(100)
-    Future.successful(pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
   }
 
   override def onGoOffline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
@@ -109,15 +98,6 @@ class SampleComponentHandlers(
   }
 
   override protected def maybeComponentName() = Some(componentInfo.name)
-
-  override def onCommandValidationNotification(validationResponse: CommandValidationResponse): Unit = {
-    validationResponse match {
-      case Invalid(issue) ⇒ pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(invalidCommandChoice))))
-      case Accepted       ⇒ pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(validCommandChoice))))
-    }
-  }
-
-  override def onCommandExecutionNotification(executionResponse: CommandExecutionResponse): Unit = {}
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
     case LocationUpdated(location) =>

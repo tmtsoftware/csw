@@ -91,9 +91,5 @@ class TromboneAssemblyHandlers(
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
 
-  override def onCommandValidationNotification(validationResponse: CommandValidationResponse): Unit = ???
-
-  override def onCommandExecutionNotification(executionResponse: CommandExecutionResponse): Unit = ???
-
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 }

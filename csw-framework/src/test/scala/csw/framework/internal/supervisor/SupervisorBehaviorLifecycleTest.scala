@@ -11,12 +11,11 @@ import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.messages.InitialMessage.Run
+import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.messages.SupervisorIdleMessage.{InitializeTimeout, RegistrationNotRequired, RegistrationSuccess, RunTimeout}
+import csw.messages.SupervisorIdleMessage.{InitializeTimeout, RegistrationNotRequired, RegistrationSuccess}
 import csw.messages._
 import csw.messages.models.framework.ComponentInfo
 import csw.messages.models.framework.LocationServiceUsage.DoNotRegister
@@ -74,7 +73,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
   // *************** Begin testing of onIdleMessages ***************
   test(
-    "supervisor should accept Initialized message and send Run message to TLA when LocationServiceUsage is RegisterOnly"
+    "supervisor should accept Running message and register with Location service when LocationServiceUsage is RegisterOnly"
   ) {
     val testData = new TestData(hcdInfo)
     import testData._
@@ -82,24 +81,16 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     val childRef = childComponentInbox.ref.upcast
 
-    supervisor.onMessage(Initialized(childRef))
+    supervisor.onMessage(Running(childRef))
 
-    verify(locationService).register(akkaRegistration)
     verify(timer).cancel(SupervisorBehavior.InitializeTimerKey)
-    supervisor.onMessage(RegistrationSuccess(childRef))
+    verify(locationService).register(akkaRegistration)
 
-    verify(timer).startSingleTimer(
-      SupervisorBehavior.RunTimerKey,
-      RunTimeout,
-      supervisor.runTimeout
-    )
-
-    childComponentInbox.receiveMsg() shouldBe Run
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
   }
 
   test(
-    "supervisor should accept Initialized message and send Run message to TLA when LocationServiceUsage is DoNotRegister"
+    "supervisor should accept Running message and should not register when LocationServiceUsage is DoNotRegister"
   ) {
     val testData = new TestData(hcdInfo.copy(locationServiceUsage = DoNotRegister))
     import testData._
@@ -107,29 +98,33 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     val childRef = childComponentInbox.ref.upcast
 
-    supervisor.onMessage(Initialized(childRef))
+    supervisor.onMessage(Running(childRef))
 
     verify(locationService, never()).register(akkaRegistration)
     verify(timer).cancel(SupervisorBehavior.InitializeTimerKey)
     supervisor.onMessage(RegistrationNotRequired(childRef))
 
-    verify(timer).startSingleTimer(
-      SupervisorBehavior.RunTimerKey,
-      RunTimeout,
-      supervisor.runTimeout
-    )
-
-    childComponentInbox.receiveMsg() shouldBe Run
-    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
   }
 
-  test("supervisor should accept Running message from component and change its mode and publish state change") {
+  test("supervisor should change its mode and publish state change after successful registration with location service") {
     val testData = new TestData(hcdInfo)
     import testData._
 
-    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.onMessage(RegistrationSuccess(childComponentInbox.ref.upcast))
 
-    verify(timer).cancel(SupervisorBehavior.RunTimerKey)
+    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
+    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(
+      LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running)
+    )
+  }
+
+  test("supervisor should change its mode and publish state change if locationServiceUsage is DoNotRegister") {
+    val testData = new TestData(hcdInfo)
+    import testData._
+
+    supervisor.onMessage(RegistrationNotRequired(childComponentInbox.ref.upcast))
+
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
     childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(
       LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running)
@@ -190,7 +185,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo)
     import testData._
 
-    supervisor.onMessage(Running(childComponentInbox.ref))
     supervisor.onMessage(Restart)
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Restart
   }
@@ -199,7 +193,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo)
     import testData._
 
-    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.onMessage(RegistrationSuccess(childComponentInbox.ref.upcast))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.RunningOffline
     childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.GoOffline))
@@ -209,7 +203,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testData = new TestData(hcdInfo)
     import testData._
 
-    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.onMessage(RegistrationSuccess(childComponentInbox.ref.upcast))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
     supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
@@ -223,7 +217,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     sealed trait TestDomainMessage extends DomainMessage
     case object TestCompMessage$   extends TestDomainMessage
 
-    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.onMessage(RegistrationSuccess(childComponentInbox.ref.upcast))
     supervisor.onMessage(TestCompMessage$)
     childComponentInbox.receiveMsg() shouldBe TestCompMessage$
   }
@@ -252,7 +246,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     case object TestCompMessage    extends TestDomainMessage
 
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
-    supervisor.onMessage(Running(childComponentInbox.ref))
+    supervisor.onMessage(RegistrationSuccess(childComponentInbox.ref.upcast))
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
 
     // TestCompMessage (DomainMessage) is sent to supervisor when lifecycle state is running

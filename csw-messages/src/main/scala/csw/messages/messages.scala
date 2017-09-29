@@ -44,11 +44,6 @@ object IdleMessage {
   case object Initialize extends IdleMessage
 }
 
-sealed trait InitialMessage extends ComponentMessage
-object InitialMessage {
-  case object Run extends InitialMessage
-}
-
 sealed trait CommandMessage extends RunningMessage {
   def command: ControlCommand
   def replyTo: ActorRef[CommandResponse]
@@ -89,8 +84,8 @@ object SupervisorCommonMessage {
 
 sealed trait SupervisorIdleMessage extends SupervisorMessage
 object SupervisorIdleMessage {
-  case class RegistrationSuccess(componentRef: ActorRef[InitialMessage])     extends SupervisorIdleMessage
-  case class RegistrationNotRequired(componentRef: ActorRef[InitialMessage]) extends SupervisorIdleMessage
+  case class RegistrationSuccess(componentRef: ActorRef[RunningMessage])     extends SupervisorIdleMessage
+  case class RegistrationNotRequired(componentRef: ActorRef[RunningMessage]) extends SupervisorIdleMessage
   case class RegistrationFailed(throwable: Throwable)                        extends SupervisorIdleMessage
   case object InitializeTimeout                                              extends SupervisorIdleMessage
   case object RunTimeout                                                     extends SupervisorIdleMessage
@@ -98,8 +93,7 @@ object SupervisorIdleMessage {
 
 sealed trait FromComponentLifecycleMessage extends SupervisorIdleMessage
 object FromComponentLifecycleMessage {
-  case class Initialized(componentRef: ActorRef[InitialMessage]) extends FromComponentLifecycleMessage
-  case class Running(componentRef: ActorRef[RunningMessage])     extends FromComponentLifecycleMessage
+  case class Running(componentRef: ActorRef[RunningMessage]) extends FromComponentLifecycleMessage
 }
 
 ///////////////////

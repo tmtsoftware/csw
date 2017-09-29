@@ -6,7 +6,7 @@ import akka.typed.{ActorRef, Behavior}
 import csw.ccs.DemandMatcher
 import csw.common.components.ComponentStatistics
 import csw.framework.ComponentInfos._
-import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout, jHcdInfoWithRunTimeout}
+import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
 import csw.framework.javadsl.components.JComponentDomainMessage
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
@@ -75,7 +75,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         import mocks._
         createSupervisorAndStartTLA(info, mocks)
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
 
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
         containerIdleMessageProbe.expectMsg(
@@ -101,7 +100,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         supervisorRef ! domainMessage
@@ -122,7 +120,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         val commandInfo: CommandInfo = "Obs001"
@@ -155,7 +152,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         createSupervisorAndStartTLA(hcdInfo, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         val commandInfo: CommandInfo = "Obs001"
@@ -191,7 +187,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         createSupervisorAndStartTLA(hcdInfo, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         val commandInfo: CommandInfo = "Obs001"
@@ -224,7 +219,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         supervisorRef ! Lifecycle(GoOffline)
@@ -252,7 +246,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
         containerIdleMessageProbe.expectMsg(
           SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
@@ -262,7 +255,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
 
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
         containerIdleMessageProbe.expectMsg(
@@ -283,7 +275,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         supervisorRef ! Lifecycle(GoOnline)
@@ -300,7 +291,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         supervisorRef ! Lifecycle(GoOffline)
@@ -334,30 +324,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
         supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Idle)
         verify(locationService, never()).register(akkaRegistration)
-      }
-    }
-  }
-
-  // DEOPSCSW-284: Move Timeouts to Config file
-  test("handle RunTimeout by stopping TLA") {
-
-    val testData = Table(
-      "componentInfo",
-      hcdInfoWithRunTimeout,
-      jHcdInfoWithRunTimeout
-    )
-
-    forAll(testData) { (info: ComponentInfo) =>
-      {
-        val mocks = frameworkTestMocks()
-        import mocks._
-        createSupervisorAndStartTLA(info, mocks)
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
-
-        supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
-        supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Idle)
-        verify(locationService).register(akkaRegistration)
       }
     }
   }

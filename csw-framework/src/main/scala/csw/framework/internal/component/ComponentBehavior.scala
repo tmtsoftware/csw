@@ -5,9 +5,8 @@ import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
-import csw.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
-import csw.messages.InitialMessage.Run
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
@@ -41,11 +40,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   def onMessage(msg: ComponentMessage): Behavior[ComponentMessage] = {
     log.debug(s"Component TLA in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
-      case (_, msg: CommonMessage)                                    ⇒ onCommon(msg)
-      case (ComponentLifecycleState.Idle, msg: IdleMessage)           ⇒ onIdle(msg)
-      case (ComponentLifecycleState.Initialized, msg: InitialMessage) ⇒ onInitial(msg)
-      case (ComponentLifecycleState.Running, msg: RunningMessage)     ⇒ onRun(msg)
-      case _                                                          ⇒ log.error(s"Unexpected message :[$msg] received by component in lifecycle state :[$lifecycleState]")
+      case (_, msg: CommonMessage)                                ⇒ onCommon(msg)
+      case (ComponentLifecycleState.Idle, msg: IdleMessage)       ⇒ onIdle(msg)
+      case (ComponentLifecycleState.Running, msg: RunningMessage) ⇒ onRun(msg)
+      case _                                                      ⇒ log.error(s"Unexpected message :[$msg] received by component in lifecycle state :[$lifecycleState]")
     }
     this
   }
@@ -86,18 +84,6 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
             }
           )
         }
-        supervisor ! Initialized(ctx.self)
-      }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))
-  }
-
-  private def onInitial(initialMessage: InitialMessage): Unit = initialMessage match {
-    case Run ⇒
-      async {
-        log.info("Invoking lifecycle handler's onRun hook")
-        await(lifecycleHandlers.onRun())
-        log.debug(
-          s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Running}]"
-        )
         lifecycleState = ComponentLifecycleState.Running
         lifecycleHandlers.isOnline = true
         supervisor ! Running(ctx.self)
@@ -109,10 +95,8 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case x: Msg ⇒
       log.info(s"Invoking lifecycle handler's onDomainMsg hook with msg :[$x]")
       lifecycleHandlers.onDomainMsg(x)
-    case x: CommandMessage            ⇒ onRunningCompCommandMessage(x)
-    case x: CommandValidationResponse ⇒ lifecycleHandlers.onCommandValidationNotification(x)
-    case x: CommandExecutionResponse  ⇒ lifecycleHandlers.onCommandExecutionNotification(x)
-    case msg                          ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
+    case x: CommandMessage ⇒ onRunningCompCommandMessage(x)
+    case msg               ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
   }
 
   private def onLifecycle(toComponentLifecycleMessage: ToComponentLifecycleMessage): Unit =

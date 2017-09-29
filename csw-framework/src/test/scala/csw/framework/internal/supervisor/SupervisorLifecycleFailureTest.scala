@@ -19,7 +19,6 @@ import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.messages._
 import csw.messages.models.framework.ComponentInfo
-import csw.messages.models.location.Connection.AkkaConnection
 import csw.messages.states.{CurrentState, SupervisorLifecycleState}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
@@ -91,10 +90,6 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // component is mocked in the test to publish a `initChoice` in the second attempt.
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
-    // After successful TLA initialization, TLA receives `Run` message from supervisor which triggers `onRun` handler.
-    // The `onRun` handler of the component is mocked in the test to publish a `runChoice`.
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
-
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
@@ -122,10 +117,6 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // restarts the TLA. The `initialize` handler of the component is mocked in the test to publish a `initChoice` in the second attempt.
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
-    // After successful TLA initialization, TLA receives `Run` message from supervisor which triggers `onRun` handler.
-    // The `onRun` handler of the component is mocked in the test to publish a `runChoice`.
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
-
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
     lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
@@ -145,46 +136,6 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // Supervisor registers itself only after successful initialization of TLA. In this test the TLA successfully
     // initializes after Restart message after which Supervisor registers itself
     verify(locationService).register(akkaRegistration)
-  }
-
-  test("handle external restart when TLA throws FailureStop exception in onRun") {
-    val testMocks = frameworkTestMocks()
-    import testMocks._
-
-    val componentHandlers = createComponentHandlers(testMocks)
-
-    //Throw a `FailureStop` on the first attempt to call `onRun` handler on TLA but publish `runChoice` successfully on the next attempt
-    doThrow(FailureStop("testing failure")).doAnswer(runAnswer).when(componentHandlers).onRun()
-
-    createSupervisorAndStartTLA(testMocks, componentHandlers)
-
-    // TLA initialises successfully by calling the `initialize` component handler. The `initialize` handler of the
-    // component is mocked in the test to publish a `initChoice`.
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-
-    // TLA fails on the `onRun` component handler on the first attempt. The default akka supervision strategy kills the TLA
-    // and triggers the PostStop signal of TLA. The post stop signal has `onShutdown` handler of the component which is
-    // mocked in the test to publish a `shutdownChoice`.
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
-
-    // External entity sends restart to supervisor with the intent to restart TLA
-    supervisorRef ! Restart
-
-    // The `initialize` handler of the component is mocked in the test to publish a `initChoice`.
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-
-    // After successful TLA initialization, TLA receives `Run` message from supervisor which triggers `onRun` handler.
-    // The `onRun` handler of the component is mocked in the test to publish a `runChoice` in the second attempt.
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
-
-    // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
-    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
-
-    // On receiving Restart message the supervisor first unregisters itself.
-    verify(locationService).unregister(any[AkkaConnection])
-
-    // Supervisor registers itself after successful TLA initialization. The TLA initialized successfully twice during this test.
-    verify(locationService, times(2)).register(akkaRegistration)
   }
 
   private def createSupervisorAndStartTLA(
@@ -233,7 +184,6 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     val componentHandlers = mock[SampleComponentHandlers]
     when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
     when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
-    when(componentHandlers.onRun()).thenAnswer(runAnswer)
     componentHandlers
   }
 
@@ -243,8 +193,5 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     shutdownAnswer = (_) ⇒
       Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
-
-    runAnswer = (_) ⇒
-      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(runChoice)))))
   }
 }

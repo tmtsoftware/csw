@@ -119,12 +119,5 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
       INFO,
       classOf[SampleComponentHandlers].getName
     )
-    assertThatMessageIsLogged(
-      logBuffer,
-      "IFS_Detector",
-      "Invoking lifecycle handler's onRun hook",
-      INFO,
-      classOf[ComponentBehavior[ComponentDomainMessage]].getName
-    )
   }
 }

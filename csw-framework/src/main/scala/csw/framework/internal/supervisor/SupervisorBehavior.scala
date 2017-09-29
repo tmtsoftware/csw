@@ -8,9 +8,8 @@ import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Ter
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
-import csw.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.InitialMessage.Run
 import csw.messages.PubSub.Publish
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage.{
@@ -40,7 +39,6 @@ object SupervisorBehavior {
   val PubSubComponentActor     = "pub-sub-component"
   val PubSubLifecycleActor     = "pub-sub-lifecycle"
   val InitializeTimerKey       = "initialize-timer"
-  val RunTimerKey              = "run-timer"
   val ComponentActorNameSuffix = "component-actor"
 }
 
@@ -98,7 +96,6 @@ class SupervisorBehavior(
         s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]"
       )
       timerScheduler.cancel(InitializeTimerKey)
-      timerScheduler.cancel(RunTimerKey)
       lifecycleState match {
         case SupervisorLifecycleState.Restart  ⇒ spawn()
         case SupervisorLifecycleState.Shutdown ⇒ coordinatedShutdown()
@@ -130,10 +127,6 @@ class SupervisorBehavior(
   }
 
   def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
-    case Initialized(componentRef) ⇒
-      log.info("Received Initialized message from component within timeout, cancelling InitializeTimer")
-      timerScheduler.cancel(InitializeTimerKey)
-      registerWithLocationService(componentRef)
     case RegistrationSuccess(componentRef) ⇒
       onRegistrationComplete(componentRef)
     case RegistrationNotRequired(componentRef) ⇒
@@ -143,17 +136,11 @@ class SupervisorBehavior(
       throw throwable
     case Running(componentRef) ⇒
       log.info("Received Running message from component within timeout, cancelling RunTimer")
-      timerScheduler.cancel(RunTimerKey)
+      timerScheduler.cancel(InitializeTimerKey)
       log.debug(
         s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
       )
-      lifecycleState = SupervisorLifecycleState.Running
-      runningComponent = Some(componentRef)
-      maybeContainerRef foreach { container ⇒
-        container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
-        log.debug(s"Supervisor acknowledged container :[$container] for lifecycle state :[$lifecycleState]")
-      }
-      pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
+      registerWithLocationService(componentRef)
     case InitializeTimeout ⇒
       log.error("Component TLA initialization timed out")
       component.foreach(ctx.stop)
@@ -162,10 +149,15 @@ class SupervisorBehavior(
       component.foreach(ctx.stop)
   }
 
-  private def onRegistrationComplete(componentRef: ActorRef[InitialMessage]): Unit = {
+  private def onRegistrationComplete(componentRef: ActorRef[RunningMessage]): Unit = {
     log.info(s"Starting RunTimer for $runTimeout")
-    timerScheduler.startSingleTimer(RunTimerKey, RunTimeout, runTimeout)
-    componentRef ! Run
+    lifecycleState = SupervisorLifecycleState.Running
+    runningComponent = Some(componentRef)
+    maybeContainerRef foreach { container ⇒
+      container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
+      log.debug(s"Supervisor acknowledged container :[$container] for lifecycle state :[$lifecycleState]")
+    }
+    pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
   }
 
   private def onRunning(supervisorRunningMessage: SupervisorRunningMessage): Unit = {
@@ -229,7 +221,7 @@ class SupervisorBehavior(
     }
   }
 
-  private def registerWithLocationService(componentRef: ActorRef[InitialMessage]): Unit = {
+  private def registerWithLocationService(componentRef: ActorRef[RunningMessage]): Unit = {
     //Honour DoNotRegister received in componentInfo
     if (componentInfo.locationServiceUsage == DoNotRegister)
       ctx.self ! RegistrationNotRequired(componentRef)

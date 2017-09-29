@@ -53,20 +53,6 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public CompletableFuture<BoxedUnit> jOnRun() {
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ignored) {}
-        return CompletableFuture.supplyAsync(() -> {
-        CurrentState runState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.runChoice()));
-        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(runState);
-
-        pubSubRef.tell(publish);
-        return BoxedUnit.UNIT;
-        });
-    }
-
-    @Override
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
 
     }
@@ -97,16 +83,6 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         } else {
             return new Validations.Invalid(new ValidationIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         }
-    }
-
-    @Override
-    public void onCommandValidationNotification(CommandValidationResponse validationResponse) {
-
-    }
-
-    @Override
-    public void onCommandExecutionNotification(CommandExecutionResponse executionResponse) {
-
     }
 
     @Override

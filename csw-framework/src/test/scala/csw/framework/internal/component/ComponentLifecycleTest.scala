@@ -7,9 +7,8 @@ import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
-import csw.messages.InitialMessage.Run
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
 import csw.messages.commands.{Observe, Setup}
@@ -27,13 +26,12 @@ import scala.concurrent.Future
 //DEOPSCSW-179-Unique Action for a component
 class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
-  class IdleComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
+  class RunningComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
     private val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
 
     val locationService: LocationService                            = mock[LocationService]
     val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
-    when(sampleHcdHandler.onRun()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
     val behavior =
       new ComponentBehavior[ComponentDomainMessage](
@@ -44,19 +42,10 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
         locationService
       ) with TypedActorMock[ComponentMessage]
 
-    val idleComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
-      behavior.onMessage(Initialize)
-      supervisorProbe.expectMsgType[Initialized]
-      behavior
-    }
-  }
-
-  class RunningComponent(supervisorProbe: TestProbe[FromComponentLifecycleMessage])
-      extends IdleComponent(supervisorProbe) {
     val runningComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
-      idleComponentBehavior.onMessage(Run)
+      behavior.onMessage(Initialize)
       supervisorProbe.expectMsgType[Running]
-      idleComponentBehavior
+      behavior
     }
   }
 

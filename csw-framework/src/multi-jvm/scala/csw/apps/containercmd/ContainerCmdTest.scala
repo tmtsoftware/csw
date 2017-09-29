@@ -150,11 +150,9 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       laserAssemblySupervisor ! ComponentStateSubscription(Subscribe(laserCompStateProbe.ref))
       etonSupervisorTypedRef ! Submit(setupFailure, laserAssemblySupervisor)
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
-      laserCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(invalidCommandChoice))))
 
       etonSupervisorTypedRef ! Oneway(setupSuccess, laserAssemblySupervisor)
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
-      laserCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(validCommandChoice))))
 
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
       enterBarrier("offline")
