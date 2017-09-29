@@ -9,9 +9,10 @@ import csw.param.generics.KeyType.ChoiceKey
 import csw.param.messages.CommandMessage.{Oneway, Submit}
 import csw.param.messages.PubSub.{Publish, PublisherMessage}
 import csw.param.messages._
-import csw.param.models.ValidationIssue.OtherIssue
-import csw.param.models._
+import csw.param.models.ccs.ValidationIssue.OtherIssue
+import csw.param.models.ccs.{Validation, Validations}
 import csw.param.models.location.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.param.models.params.{Choice, Choices, Prefix}
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.ComponentLogger

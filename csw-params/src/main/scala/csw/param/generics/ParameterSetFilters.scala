@@ -1,7 +1,7 @@
 package csw.param.generics
 
 import csw.param.commands.{Observe, SequenceCommand, Setup, Wait}
-import csw.param.models.Subsystem
+import csw.param.models.params.Subsystem
 
 /**
  * Filters

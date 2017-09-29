@@ -6,7 +6,7 @@ import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
 import csw.param.events._
 import csw.param.generics.KeyType
 import csw.param.generics.KeyType.{LongMatrixKey, StructKey}
-import csw.param.models._
+import csw.param.models.params._
 import csw.param.states.{CurrentState, DemandState}
 import csw.units.Units.{encoder, meter, second, NoUnits}
 import org.scalatest.{FunSpec, Matchers}

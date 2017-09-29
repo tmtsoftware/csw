@@ -1,7 +1,7 @@
 package csw.param.generics;
 
-import csw.param.models.ArrayData;
-import csw.param.models.JArrayData;
+import csw.param.models.params.ArrayData;
+import csw.param.models.params.JArrayData;
 import csw.units.Units;
 import org.junit.Assert;
 import org.junit.Test;

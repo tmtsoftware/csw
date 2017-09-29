@@ -1,4 +1,4 @@
-package csw.param.models
+package csw.param.models.ccs
 
 /**
  * Describes the reason for a setup validation failure

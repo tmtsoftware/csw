@@ -1,4 +1,4 @@
-package csw.param.models
+package csw.param.models.params
 
 import csw.param.generics.{Parameter, ParameterSetType}
 import spray.json.JsonFormat

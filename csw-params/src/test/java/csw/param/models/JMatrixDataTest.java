@@ -1,5 +1,7 @@
 package csw.param.models;
 
+import csw.param.models.params.JMatrixData;
+import csw.param.models.params.MatrixData;
 import org.junit.Assert;
 import org.junit.Test;
 

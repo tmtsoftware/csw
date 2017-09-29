@@ -1,9 +1,9 @@
 package csw.param.models;
 
+import csw.param.models.params.ArrayData;
+import csw.param.models.params.JArrayData;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.time.Instant;
 
 // DEOPSCSW-183: Configure attributes and values
 public class JArrayDataTest {

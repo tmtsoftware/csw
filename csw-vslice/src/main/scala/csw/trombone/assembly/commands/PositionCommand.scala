@@ -7,7 +7,7 @@ import csw.param.commands.Setup
 import csw.param.messages.CommandMessage.Submit
 import csw.param.messages.FromComponentLifecycleMessage.Running
 import csw.param.messages.{Completed, Error, NoLongerValid, PubSub}
-import csw.param.models.ValidationIssue.WrongInternalStateIssue
+import csw.param.models.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.param.states.CurrentState
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}

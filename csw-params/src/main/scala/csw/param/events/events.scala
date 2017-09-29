@@ -3,7 +3,7 @@ package csw.param.events
 import java.util.Optional
 
 import csw.param.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
-import csw.param.models.{ObsId, Prefix}
+import csw.param.models.params.{ObsId, Prefix}
 
 import scala.compat.java8.OptionConverters.RichOptionForJava8
 

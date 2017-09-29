@@ -2,7 +2,7 @@ package csw.param.states
 
 import csw.param.commands.Setup
 import csw.param.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
-import csw.param.models.Prefix
+import csw.param.models.params.Prefix
 import csw.param.states.StateVariable.StateVariable
 
 import scala.annotation.varargs

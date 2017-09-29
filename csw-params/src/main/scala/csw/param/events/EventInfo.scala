@@ -2,7 +2,7 @@ package csw.param.events
 
 import java.util.UUID
 
-import csw.param.models.{ObsId, Prefix}
+import csw.param.models.params.{ObsId, Prefix}
 import spray.json.RootJsonFormat
 
 import scala.language.implicitConversions

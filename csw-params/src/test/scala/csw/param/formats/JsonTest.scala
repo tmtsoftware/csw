@@ -15,7 +15,7 @@ import csw.param.generics.KeyType.{
   StructKey
 }
 import csw.param.generics._
-import csw.param.models.{Subsystem, _}
+import csw.param.models.params.{Subsystem, _}
 import csw.param.states.{CurrentState, DemandState}
 import csw.units.Units
 import csw.units.Units.{degree, encoder, meter, NoUnits}

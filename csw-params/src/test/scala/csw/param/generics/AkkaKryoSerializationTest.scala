@@ -32,7 +32,7 @@ import csw.param.messages.{
   SupervisorExternalMessage,
   SupervisorLifecycleState
 }
-import csw.param.models._
+import csw.param.models.params._
 import csw.param.states.{CurrentState, DemandState}
 import csw.units.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}

@@ -8,8 +8,8 @@ import csw.param.commands.{Observe, Setup}
 import csw.param.messages.FromComponentLifecycleMessage.Running
 import csw.param.messages.PubSub.PublisherMessage
 import csw.param.messages._
-import csw.param.models.{Validation, Validations}
-import csw.param.models.Validations.Valid
+import csw.param.models.ccs.Validations.Valid
+import csw.param.models.ccs.{Validation, Validations}
 import csw.param.models.location.TrackingEvent
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.LocationService

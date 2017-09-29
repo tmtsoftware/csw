@@ -1,6 +1,6 @@
 package csw.param.generics
 
-import csw.param.models.{Choice, Choices}
+import csw.param.models.params.{Choice, Choices}
 import csw.units.Units
 
 class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) extends Key[Choice](name, keyType) {

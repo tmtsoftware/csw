@@ -3,7 +3,7 @@ package csw.param.formats
 import csw.param.commands._
 import csw.param.events._
 import csw.param.generics.Parameter
-import csw.param.models.Prefix
+import csw.param.models.params.Prefix
 import csw.param.states.StateVariable.StateVariable
 import csw.param.states.{CurrentState, DemandState}
 import spray.json._

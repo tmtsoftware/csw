@@ -3,7 +3,7 @@ package csw.param.events
 import java.time.Instant
 
 import csw.param.generics.KeyType
-import csw.param.models.{ObsId, Prefix}
+import csw.param.models.params.{ObsId, Prefix}
 import csw.units.Units.meter
 import org.scalatest.{FunSpec, Matchers}
 

@@ -4,7 +4,7 @@ import java.time.Instant
 
 import csw.param.commands.{CommandInfo, Observe, Setup, Wait}
 import csw.param.events.{EventServiceEvent, SystemEvent}
-import csw.param.models.{ObsId, Prefix}
+import csw.param.models.params.{ObsId, Prefix}
 import csw.param.states.{CurrentState, CurrentStates}
 import org.scalatest.FunSuite
 

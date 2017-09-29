@@ -1,7 +1,7 @@
 package csw.param.generics;
 
-import csw.param.models.JMatrixData;
-import csw.param.models.MatrixData;
+import csw.param.models.params.JMatrixData;
+import csw.param.models.params.MatrixData;
 import csw.units.Units;
 import org.junit.Assert;
 import org.junit.Test;

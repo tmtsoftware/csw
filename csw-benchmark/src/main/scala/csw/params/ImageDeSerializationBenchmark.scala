@@ -8,7 +8,7 @@ import akka.serialization.{Serialization, SerializationExtension}
 import csw.param.commands.{CommandInfo, Observe}
 import csw.param.generics.KeyType.ByteArrayKey
 import csw.param.generics.{Key, Parameter}
-import csw.param.models.{ArrayData, Prefix}
+import csw.param.models.params.{ArrayData, Prefix}
 import csw.units.Units.pascal
 import org.openjdk.jmh.annotations._
 

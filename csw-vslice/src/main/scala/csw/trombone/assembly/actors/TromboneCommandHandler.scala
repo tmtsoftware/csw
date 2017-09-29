@@ -9,7 +9,7 @@ import akka.util.Timeout
 import csw.param.commands.Setup
 import csw.param.messages.FromComponentLifecycleMessage.Running
 import csw.param.messages._
-import csw.param.models.ValidationIssue.{
+import csw.param.models.ccs.ValidationIssue.{
   RequiredHCDUnavailableIssue,
   UnsupportedCommandInStateIssue,
   WrongInternalStateIssue

@@ -5,8 +5,9 @@ import akka.typed.ActorRef
 import csw.param.ParamSerializable
 import csw.param.commands.{ControlCommand, Result}
 import csw.param.messages.PubSub.SubscriberMessage
+import csw.param.models.ccs.{Validation, ValidationIssue, Validations}
 import csw.param.models.location.TrackingEvent
-import csw.param.models.{SerializableComponentInfo, Validation, ValidationIssue, Validations}
+import csw.param.models.params.SerializableComponentInfo
 import csw.param.states.CurrentState
 
 /////////////

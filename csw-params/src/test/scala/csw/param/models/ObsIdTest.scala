@@ -1,5 +1,6 @@
 package csw.param.models
 
+import csw.param.models.params.ObsId2
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.TableFor2
 import org.scalatest.prop.Tables.Table

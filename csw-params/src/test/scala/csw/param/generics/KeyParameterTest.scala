@@ -14,7 +14,7 @@ import csw.param.generics.KeyType.{
   ShortMatrixKey,
   StructKey
 }
-import csw.param.models._
+import csw.param.models.params._
 import csw.units.Units.{degree, encoder, meter, second, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 

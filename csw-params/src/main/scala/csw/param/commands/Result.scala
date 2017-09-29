@@ -1,7 +1,7 @@
 package csw.param.commands
 
 import csw.param.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
-import csw.param.models.Prefix
+import csw.param.models.params.Prefix
 
 /**
  * A parameters set for returning results

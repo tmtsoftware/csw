@@ -4,8 +4,8 @@ import csw.param.generics.JKeyTypes;
 import csw.param.generics.Key;
 import csw.param.generics.Parameter;
 import csw.param.generics.ParameterSetType;
-import csw.param.models.ObsId;
-import csw.param.models.Prefix;
+import csw.param.models.params.ObsId;
+import csw.param.models.params.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
 

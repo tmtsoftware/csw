@@ -9,7 +9,7 @@ import akka.util.Timeout
 import csw.param.commands.{Command, CommandInfo, Setup}
 import csw.param.events.StatusEvent
 import csw.param.generics.{KeyType, Parameter}
-import csw.param.models.Prefix
+import csw.param.models.params.Prefix
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter

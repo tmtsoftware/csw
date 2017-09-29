@@ -2,7 +2,7 @@ package csw.param.generics
 
 import csw.param.commands._
 import csw.param.events._
-import csw.param.models.{ObsId, Struct}
+import csw.param.models.params.{ObsId, Struct}
 import csw.param.states.{CurrentState, DemandState}
 import org.scalatest.{FunSpec, Matchers}
 

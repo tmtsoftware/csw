@@ -14,7 +14,8 @@ import csw.param.messages.IdleMessage.Initialize
 import csw.param.messages.InitialMessage.Run
 import csw.param.messages._
 import csw.param.messages.RunningMessage.Lifecycle
-import csw.param.models.{Prefix, Validations}
+import csw.param.models.ccs.Validations
+import csw.param.models.params.Prefix
 import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._

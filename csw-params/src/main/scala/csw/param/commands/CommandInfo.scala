@@ -1,7 +1,8 @@
 package csw.param.commands
 
-import csw.param.models.{ObsId, RunId}
+import csw.param.models.params.{ObsId, RunId}
 import spray.json.JsonFormat
+
 import scala.language.implicitConversions
 
 /**

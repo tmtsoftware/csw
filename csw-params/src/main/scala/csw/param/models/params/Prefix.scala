@@ -1,6 +1,7 @@
-package csw.param.models
+package csw.param.models.params
 
 import spray.json.RootJsonFormat
+
 import scala.language.implicitConversions
 
 /**

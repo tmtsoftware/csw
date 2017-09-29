@@ -1,7 +1,7 @@
 package csw.param.commands
 
 import csw.param.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
-import csw.param.models.Prefix
+import csw.param.models.params.Prefix
 
 /**
  * Common trait for Setup, Observe and Wait commands

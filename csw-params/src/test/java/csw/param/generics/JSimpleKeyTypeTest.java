@@ -1,7 +1,7 @@
 package csw.param.generics;
 
-import csw.param.models.RaDec;
-import csw.param.models.Struct;
+import csw.param.models.params.RaDec;
+import csw.param.models.params.Struct;
 import org.junit.Assert;
 import org.junit.Test;
 

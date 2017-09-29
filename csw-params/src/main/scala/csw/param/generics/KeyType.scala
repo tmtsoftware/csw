@@ -3,7 +3,7 @@ package csw.param.generics
 import java.time.Instant
 
 import csw.param.formats.JsonSupport
-import csw.param.models._
+import csw.param.models.params._
 import csw.units.Units
 import csw.units.Units.second
 import enumeratum.{Enum, EnumEntry}

@@ -10,7 +10,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.param.commands.Setup
 import csw.param.messages.PubSub.PublisherMessage
 import csw.param.messages._
-import csw.param.models.Validation
+import csw.param.models.ccs.Validation
 import csw.param.models.location.TrackingEvent
 import csw.param.states.CurrentState
 import csw.services.location.scaladsl.LocationService

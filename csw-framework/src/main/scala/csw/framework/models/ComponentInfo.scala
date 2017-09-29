@@ -1,9 +1,9 @@
 package csw.framework.models
 
 import ai.x.play.json.Jsonx
-import csw.param.models
-import csw.param.models.SerializableComponentInfo
 import csw.param.models.location.{ComponentType, Connection}
+import csw.param.models.params
+import csw.param.models.params.SerializableComponentInfo
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._
@@ -28,7 +28,7 @@ final case class ComponentInfo(
    */
   def getConnections: java.util.List[Connection] = connections.toList.asJava
 
-  def getSerializableInfo: SerializableComponentInfo = models.SerializableComponentInfo(
+  def getSerializableInfo: SerializableComponentInfo = params.SerializableComponentInfo(
     name,
     componentType.name,
     prefix,

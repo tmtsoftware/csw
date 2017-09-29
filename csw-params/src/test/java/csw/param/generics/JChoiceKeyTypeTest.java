@@ -1,7 +1,7 @@
 package csw.param.generics;
 
-import csw.param.models.Choice;
-import csw.param.models.Choices;
+import csw.param.models.params.Choice;
+import csw.param.models.params.Choices;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

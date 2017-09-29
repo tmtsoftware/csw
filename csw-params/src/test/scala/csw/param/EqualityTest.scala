@@ -9,7 +9,7 @@ import csw.param.generics.KeyType.{
   LongMatrixKey,
   ShortMatrixKey
 }
-import csw.param.models.{ArrayData, MatrixData}
+import csw.param.models.params.{ArrayData, MatrixData}
 import org.scalatest.FunSpec
 
 class EqualityTest extends FunSpec {

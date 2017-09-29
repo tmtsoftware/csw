@@ -2,7 +2,7 @@ package csw.param.commands
 
 import csw.param.generics.KeyType.ByteKey
 import csw.param.generics._
-import csw.param.models.{ArrayData, Prefix}
+import csw.param.models.params.{ArrayData, Prefix}
 import csw.units.Units.{degree, meter, NoUnits}
 import org.scalatest.FunSpec
 

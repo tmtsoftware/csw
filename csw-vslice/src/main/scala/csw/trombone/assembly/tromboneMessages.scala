@@ -8,7 +8,7 @@ import csw.param.messages.CommandMessage.Submit
 import csw.param.messages.CommandResponse
 import csw.param.messages.FromComponentLifecycleMessage.Running
 import csw.param.messages.RunningMessage.DomainMessage
-import csw.param.models.Choice
+import csw.param.models.params.Choice
 import csw.param.states.CurrentState
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 
