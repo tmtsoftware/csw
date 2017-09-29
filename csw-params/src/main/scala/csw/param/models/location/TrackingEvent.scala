@@ -1,4 +1,4 @@
-package csw.services.location.models
+package csw.param.models.location
 
 /**
  * TrackingEvent is used to represent location events while tracking the connection

@@ -1,6 +1,7 @@
 package csw.services.location.models
 
-import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.param.models.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.param.models.location.{ComponentId, ComponentType, Connection}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 

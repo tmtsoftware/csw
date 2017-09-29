@@ -20,7 +20,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.messages._
 import csw.param.states.CurrentState
-import csw.services.location.models.Connection.AkkaConnection
+import csw.param.models.location.Connection.AkkaConnection
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem

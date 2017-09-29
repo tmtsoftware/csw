@@ -5,18 +5,19 @@ import java.net.InetAddress
 import akka.actor.{Actor, ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
+import akka.typed.scaladsl.adapter._
+import csw.param.models.location.Connection.{AkkaConnection, HttpConnection}
+import csw.param.models.location._
 import csw.services.commons.ExampleLogger
-import csw.services.location.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.{Keys, LoggingSystemFactory}
 
 import scala.async.Async._
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import akka.typed.scaladsl.adapter._
+import scala.concurrent.{Await, Future}
 
 /**
  * An example location service client application.
@@ -32,7 +33,7 @@ object LocationServiceExampleClientApp extends App {
     ActorSystemFactory.remote("csw-examples-locationServiceClient")
   //#create-actor-system
 
-  implicit val mat = ActorMaterializer()
+  implicit val mat: ActorMaterializer = ActorMaterializer()
 
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName

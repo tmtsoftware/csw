@@ -11,11 +11,14 @@ import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
+import akka.typed.javadsl.Adapter;
+import csw.param.models.location.*;
+import csw.param.models.location.Connection.AkkaConnection;
+import csw.param.models.location.Connection.HttpConnection;
 import csw.services.commons.JExampleLoggerActor;
 import csw.services.location.javadsl.*;
-import csw.services.location.models.*;
-import csw.services.location.models.Connection.AkkaConnection;
-import csw.services.location.models.Connection.HttpConnection;
+import csw.services.location.models.AkkaRegistration;
+import csw.services.location.models.HttpRegistration;
 import csw.services.location.scaladsl.ActorSystemFactory;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
@@ -26,10 +29,12 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import akka.typed.javadsl.Adapter;
 
 /**
  * An example location service client application.

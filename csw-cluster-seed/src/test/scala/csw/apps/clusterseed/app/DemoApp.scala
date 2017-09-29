@@ -3,10 +3,11 @@ package csw.apps.clusterseed.app
 import akka.actor.{Actor, Props}
 import akka.typed.scaladsl.adapter._
 import csw.apps.clusterseed.admin.internal.AdminWiring
-import csw.param.messages.{GetComponentLogMetadata, SetComponentLogLevel}
+import csw.param.models.location.{ComponentId, ComponentType}
+import csw.param.models.location.Connection.AkkaConnection
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.services.location.models.AkkaRegistration
+import csw.services.logging.internal.{GetComponentLogMetadata, SetComponentLogLevel}
 import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.Await

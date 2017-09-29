@@ -1,9 +1,9 @@
 package csw.services.integtration.tests
 
+import csw.param.models.location.Connection.AkkaConnection
+import csw.param.models.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.CswCluster
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuite, Matchers}
 

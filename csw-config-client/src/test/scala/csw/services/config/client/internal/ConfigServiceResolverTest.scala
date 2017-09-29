@@ -2,9 +2,9 @@ package csw.services.config.client.internal
 
 import java.net.URI
 
+import csw.param.models.location.HttpLocation
 import csw.services.config.client.commons.ConfigServiceConnection
 import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.location.models.HttpLocation
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

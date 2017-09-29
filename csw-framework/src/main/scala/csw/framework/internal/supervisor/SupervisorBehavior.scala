@@ -26,13 +26,11 @@ import csw.param.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRe
 import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.param.messages.{
   ContainerIdleMessage,
-  GetComponentLogMetadata,
   InitialMessage,
   LifecycleStateChanged,
   PubSub,
   Restart,
   RunningMessage,
-  SetComponentLogLevel,
   Shutdown,
   SupervisorCommonMessage,
   SupervisorIdleMessage,
@@ -42,9 +40,10 @@ import csw.param.messages.{
   SupervisorRunningMessage,
   ToComponentLifecycleMessage
 }
+import csw.param.models.location.ComponentId
+import csw.param.models.location.Connection.AkkaConnection
 import csw.param.states.CurrentState
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId}
+import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger
 
@@ -130,12 +129,10 @@ class SupervisorBehavior(
   }
 
   def onCommon(msg: SupervisorCommonMessage): Unit = msg match {
-    case LifecycleStateSubscription(subscriberMessage)   ⇒ pubSubLifecycle ! subscriberMessage
-    case ComponentStateSubscription(subscriberMessage)   ⇒ pubSubComponent ! subscriberMessage
-    case GetSupervisorLifecycleState(replyTo)            ⇒ replyTo ! lifecycleState
-    case GetComponentLogMetadata(componentName, replyTo) ⇒
-    case SetComponentLogLevel(componentName, logLevel)   ⇒
-    case Restart                                         ⇒ onRestart()
+    case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
+    case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
+    case GetSupervisorLifecycleState(replyTo)          ⇒ replyTo ! lifecycleState
+    case Restart                                       ⇒ onRestart()
     case Shutdown ⇒
       log.debug(
         s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Shutdown}]"

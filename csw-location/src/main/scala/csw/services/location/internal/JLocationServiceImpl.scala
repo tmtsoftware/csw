@@ -8,6 +8,7 @@ import java.util.function.Consumer
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
+import csw.param.models.location._
 import csw.services.location.commons.CswCluster
 import csw.services.location.javadsl.{ILocationService, IRegistrationResult}
 import csw.services.location.models._

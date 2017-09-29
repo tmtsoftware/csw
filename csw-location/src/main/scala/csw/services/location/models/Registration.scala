@@ -6,9 +6,10 @@ import akka.actor.{ActorPath, Address}
 import akka.serialization.Serialization
 import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter.TypedActorRefOps
+import csw.param.models.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.param.models.location._
 import csw.services.location.commons.LocationServiceLogger
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
-import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 /**
  * Registration holds information about a connection and its live location. This model is used to register a connection with LocationService.

@@ -19,6 +19,7 @@ import csw.param.messages.RunningMessage.Lifecycle
 import csw.param.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.param.messages._
 import csw.param.messages.ToComponentLifecycleMessage.GoOffline
+import csw.param.models.location.{ComponentId, ComponentType}
 import csw.param.states.CurrentState
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -26,8 +27,7 @@ import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{ComponentId, ComponentType}
+import csw.param.models.location.Connection.AkkaConnection
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong

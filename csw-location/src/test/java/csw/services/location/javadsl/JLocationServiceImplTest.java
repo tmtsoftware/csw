@@ -1,6 +1,9 @@
 package csw.services.location.javadsl;
 
-import akka.actor.*;
+import akka.actor.AbstractActor;
+import akka.actor.ActorSystem;
+import akka.actor.PoisonPill;
+import akka.actor.Props;
 import akka.japi.Pair;
 import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitch;
@@ -10,11 +13,15 @@ import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.javadsl.TestSink;
 import akka.testkit.TestProbe;
 import akka.typed.ActorRef;
+import akka.typed.javadsl.Adapter;
+import csw.param.models.location.*;
+import csw.param.models.location.Connection.AkkaConnection;
+import csw.param.models.location.Connection.HttpConnection;
+import csw.param.models.location.Connection.TcpConnection;
 import csw.services.location.internal.Networks;
-import csw.services.location.models.*;
-import csw.services.location.models.Connection.AkkaConnection;
-import csw.services.location.models.Connection.HttpConnection;
-import csw.services.location.models.Connection.TcpConnection;
+import csw.services.location.models.AkkaRegistration;
+import csw.services.location.models.HttpRegistration;
+import csw.services.location.models.TcpRegistration;
 import csw.services.location.scaladsl.ActorSystemFactory;
 import csw.services.logging.javadsl.ILogger;
 import org.junit.After;
@@ -24,7 +31,6 @@ import org.junit.Test;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import akka.typed.javadsl.Adapter;
 
 
 @SuppressWarnings("ConstantConditions")
@@ -36,16 +42,16 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     private Materializer mat = ActorMaterializer.create(actorSystem);
 
     private ComponentId akkaHcdComponentId = new ComponentId("hcd1", JComponentType.HCD);
-    private AkkaConnection akkaHcdConnection = new Connection.AkkaConnection(akkaHcdComponentId);
+    private AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
 
     private ComponentId tcpServiceComponentId = new ComponentId("exampleTcpService", JComponentType.Service);
-    private TcpConnection tcpServiceConnection = new Connection.TcpConnection(tcpServiceComponentId);
+    private TcpConnection tcpServiceConnection = new TcpConnection(tcpServiceComponentId);
 
     private TestProbe actorTestProbe = new TestProbe(actorSystem, "test-actor");
     private ActorRef<Object> actorRef = Adapter.toTyped(actorTestProbe.ref());
 
     private ComponentId httpServiceComponentId = new ComponentId("exampleHTTPService", JComponentType.Service);
-    private HttpConnection httpServiceConnection = new Connection.HttpConnection(httpServiceComponentId);
+    private HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
     private String Path = "/path/to/resource";
 
 
@@ -171,30 +177,30 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     public void testListComponentsByComponentType() throws ExecutionException, InterruptedException {
         //  Register HCD type component
         ComponentId akkaHcdComponentId = new ComponentId("tromboneHCD", JComponentType.HCD);
-        AkkaConnection akkaHcdConnection = new Connection.AkkaConnection(akkaHcdComponentId);
+        AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
         AkkaRegistration akkaHcdRegistration = new AkkaRegistration(akkaHcdConnection, actorRef);
         locationService.register(akkaHcdRegistration).get();
 
         //  Register Assembly type component
         ComponentId akkaAssemblyComponentId = new ComponentId("tromboneAssembly", JComponentType.Assembly);
-        AkkaConnection akkaAssemblyConnection = new Connection.AkkaConnection(akkaAssemblyComponentId);
+        AkkaConnection akkaAssemblyConnection = new AkkaConnection(akkaAssemblyComponentId);
         AkkaRegistration akkaAssemblyRegistration = new AkkaRegistration(akkaAssemblyConnection, actorRef);
         locationService.register(akkaAssemblyRegistration).get();
 
         //  Register Container type component
         ComponentId akkaContainerComponentId = new ComponentId("tromboneContainer", JComponentType.Container);
-        AkkaConnection akkaContainerConnection = new Connection.AkkaConnection(akkaContainerComponentId);
+        AkkaConnection akkaContainerConnection = new AkkaConnection(akkaContainerComponentId);
         AkkaRegistration akkaContainerRegistration = new AkkaRegistration(akkaContainerConnection, actorRef);
         locationService.register(akkaContainerRegistration).get();
 
         //  Register Tcp and Http Service
         ComponentId tcpComponentId = new ComponentId("redis", JComponentType.Service);
-        TcpConnection tcpConnection = new Connection.TcpConnection(tcpComponentId);
+        TcpConnection tcpConnection = new TcpConnection(tcpComponentId);
         TcpRegistration tcpServiceRegistration = new TcpRegistration(tcpConnection, 80);
         locationService.register(tcpServiceRegistration).get();
 
         ComponentId httpServiceComponentId = new ComponentId("ConfigService", JComponentType.Service);
-        HttpConnection httpServiceConnection = new Connection.HttpConnection(httpServiceComponentId);
+        HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
         HttpRegistration httpServiceRegistration = new HttpRegistration(httpServiceConnection, 4000, "/config/svn/");
         locationService.register(httpServiceRegistration).get();
 

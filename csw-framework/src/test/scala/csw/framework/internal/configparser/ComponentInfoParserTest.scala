@@ -3,8 +3,8 @@ package csw.framework.internal.configparser
 import com.typesafe.config.ConfigFactory
 import csw.framework.models.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.{ComponentInfo, ContainerInfo}
-import csw.services.location.models.ComponentType.{Assembly, HCD}
-import csw.services.location.models.Connection
+import csw.param.models.location.Connection
+import csw.param.models.location.ComponentType.{Assembly, HCD}
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt

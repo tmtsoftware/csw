@@ -2,7 +2,7 @@ package csw.framework
 
 import csw.framework.models.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.{ComponentInfo, ContainerInfo}
-import csw.services.location.models.ComponentType.{Assembly, HCD}
+import csw.param.models.location.ComponentType.{Assembly, HCD}
 
 import scala.concurrent.duration.DurationDouble
 

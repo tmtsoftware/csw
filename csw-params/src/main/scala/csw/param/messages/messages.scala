@@ -5,11 +5,9 @@ import akka.typed.ActorRef
 import csw.param.ParamSerializable
 import csw.param.commands.{ControlCommand, Result}
 import csw.param.messages.PubSub.SubscriberMessage
+import csw.param.models.location.TrackingEvent
 import csw.param.models.{SerializableComponentInfo, Validation, ValidationIssue, Validations}
 import csw.param.states.CurrentState
-import csw.services.location.models.TrackingEvent
-import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.models.LogMetadata
 
 /////////////
 
@@ -70,16 +68,6 @@ case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage
 case object Restart  extends SupervisorCommonMessage with ContainerCommonMessage
 ////////////////////
 
-// Parent trait for Messages which will be send to components for interacting with its logging system
-sealed trait LogControlMessages extends SupervisorCommonMessage with ContainerCommonMessage
-
-// Message to get Logging configuration metadata of the receiver
-case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata]) extends LogControlMessages
-
-// Message to change the log level of any component
-case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessages
-
-////////////////////
 sealed trait SupervisorMessage
 
 sealed trait SupervisorExternalMessage extends SupervisorMessage with ParamSerializable

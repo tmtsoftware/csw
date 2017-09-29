@@ -11,7 +11,7 @@ import csw.framework.internal.supervisor.SupervisorBehavior
 import csw.param.messages.{LifecycleStateChanged, PubSub, SupervisorMessage}
 import csw.param.states.CurrentState
 import csw.services.location.javadsl.ILocationService
-import csw.services.location.models.Connection.AkkaConnection
+import csw.param.models.location.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}

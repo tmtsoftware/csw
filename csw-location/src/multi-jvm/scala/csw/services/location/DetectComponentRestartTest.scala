@@ -3,9 +3,10 @@ package csw.services.location
 import akka.testkit.TestProbe
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import csw.param.models.location.Connection.AkkaConnection
+import csw.param.models.location.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.services.location.commons.CswCluster
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.services.location.models.Connection.AkkaConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}

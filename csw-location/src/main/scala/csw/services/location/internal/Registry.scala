@@ -3,8 +3,8 @@ package csw.services.location.internal
 import akka.cluster.Cluster
 import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata._
+import csw.param.models.location.{Connection, Location}
 import csw.services.location.commons.Constants
-import csw.services.location.models.{Connection, Location}
 
 import scala.concurrent.duration.DurationDouble
 

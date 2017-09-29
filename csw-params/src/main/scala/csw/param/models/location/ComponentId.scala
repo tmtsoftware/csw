@@ -1,5 +1,6 @@
-package csw.services.location.models
+package csw.param.models.location
 
+import csw.param.ParamSerializable
 import play.api.libs.json.{Format, Json}
 
 /**
@@ -9,7 +10,7 @@ import play.api.libs.json.{Format, Json}
  *  - leading or trailing spaces
  *  - and hyphen (-)
  */
-case class ComponentId(name: String, componentType: ComponentType) extends TmtSerializable {
+case class ComponentId(name: String, componentType: ComponentType) extends ParamSerializable {
 
   def fullName: String = s"$name-${componentType.name}"
 

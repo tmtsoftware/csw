@@ -20,7 +20,7 @@ import csw.param.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.param.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.param.states.{CurrentState, DemandState}
-import csw.services.location.models.Connection.AkkaConnection
+import csw.param.models.location.Connection.AkkaConnection
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

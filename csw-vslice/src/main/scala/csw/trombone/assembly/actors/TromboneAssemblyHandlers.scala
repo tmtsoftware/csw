@@ -10,8 +10,8 @@ import csw.param.messages.PubSub.PublisherMessage
 import csw.param.messages._
 import csw.param.models.{Validation, Validations}
 import csw.param.models.Validations.Valid
+import csw.param.models.location.TrackingEvent
 import csw.param.states.CurrentState
-import csw.services.location.models.TrackingEvent
 import csw.services.location.scaladsl.LocationService
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}

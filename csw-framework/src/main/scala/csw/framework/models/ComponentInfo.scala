@@ -3,7 +3,7 @@ package csw.framework.models
 import ai.x.play.json.Jsonx
 import csw.param.models
 import csw.param.models.SerializableComponentInfo
-import csw.services.location.models.{ComponentType, Connection}
+import csw.param.models.location.{ComponentType, Connection}
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._

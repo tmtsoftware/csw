@@ -11,8 +11,8 @@ import csw.param.commands.Setup
 import csw.param.messages.PubSub.PublisherMessage
 import csw.param.messages._
 import csw.param.models.Validation
+import csw.param.models.location.TrackingEvent
 import csw.param.states.CurrentState
-import csw.services.location.models.TrackingEvent
 import csw.services.location.scaladsl.LocationService
 import csw.trombone.hcd.AxisRequest._
 import csw.trombone.hcd.AxisResponse._

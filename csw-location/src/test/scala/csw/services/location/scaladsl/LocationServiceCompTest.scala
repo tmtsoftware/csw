@@ -7,10 +7,11 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import csw.param.models.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.param.models.location._
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
-import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}

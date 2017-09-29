@@ -17,15 +17,14 @@ import csw.param.messages.{
   ContainerIdleMessage,
   ContainerLifecycleState,
   ContainerMessage,
-  GetComponentLogMetadata,
   Restart,
-  SetComponentLogLevel,
   Shutdown,
   SupervisorExternalMessage,
   SupervisorInfo,
   SupervisorLifecycleState
 }
-import csw.services.location.models.Connection.AkkaConnection
+import csw.param.models.location.{ComponentId, ComponentType}
+import csw.param.models.location.Connection.AkkaConnection
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger
@@ -86,8 +85,6 @@ class ContainerBehavior(
       replyTo ! Components(supervisors.map(_.component))
     case GetContainerLifecycleState(replyTo) ⇒
       replyTo ! lifecycleState
-    case GetComponentLogMetadata(componentName, replyTo) ⇒
-    case SetComponentLogLevel(componentName, logLevel)   ⇒
     case Restart ⇒
       log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Idle}]")
       lifecycleState = ContainerLifecycleState.Idle

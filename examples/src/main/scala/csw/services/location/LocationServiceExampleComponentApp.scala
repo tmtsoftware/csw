@@ -4,23 +4,24 @@ import java.net.InetAddress
 
 import akka.actor._
 import akka.stream.ActorMaterializer
+import akka.typed.scaladsl.adapter._
+import csw.param.models.location.Connection.AkkaConnection
+import csw.param.models.location.{ComponentId, ComponentType}
 import csw.services.commons.ExampleLogger
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
+import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
-import akka.typed.scaladsl.adapter._
+import scala.concurrent.{Await, Future}
 
 /**
  * An example that shows how to register a component actor with the location service.
  */
 object LocationServiceExampleComponentApp extends App {
-  private val locationService = LocationServiceFactory.make()
-  implicit val system         = ActorSystemFactory.remote()
-  implicit val mat            = ActorMaterializer()
+  private val locationService         = LocationServiceFactory.make()
+  implicit val system: ActorSystem    = ActorSystemFactory.remote()
+  implicit val mat: ActorMaterializer = ActorMaterializer()
 
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName

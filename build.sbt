@@ -40,7 +40,6 @@ lazy val `csw-prod` = project
   .settings(Settings.docExclusions(unidocExclusions))
 
 lazy val `csw-params` = project
-  .dependsOn(`csw-location`)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Params
@@ -71,7 +70,7 @@ lazy val `csw-benchmark` = project
 
 //Location service related projects
 lazy val `csw-location` = project
-  .dependsOn(`csw-logging`)
+  .dependsOn(`csw-logging`, `csw-params`)
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Location

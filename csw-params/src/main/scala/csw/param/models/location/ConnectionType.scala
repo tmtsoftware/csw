@@ -1,5 +1,6 @@
-package csw.services.location.models
+package csw.param.models.location
 
+import csw.param.ParamSerializable
 import enumeratum._
 
 import scala.collection.immutable.IndexedSeq
@@ -9,7 +10,7 @@ import scala.collection.immutable.IndexedSeq
  *
  * @param entryName A name of the connection type e.g. akka, http or tcp
  */
-sealed abstract class ConnectionType(override val entryName: String) extends EnumEntry with TmtSerializable {
+sealed abstract class ConnectionType(override val entryName: String) extends EnumEntry with ParamSerializable {
   def name: String = entryName
 }
 

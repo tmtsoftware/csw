@@ -7,8 +7,8 @@ import csw.param.messages.PubSub.PublisherMessage
 import csw.param.messages.RunningMessage.DomainMessage
 import csw.param.messages.{CommandExecutionResponse, CommandMessage, CommandValidationResponse, ComponentMessage}
 import csw.param.models.Validation
+import csw.param.models.location.TrackingEvent
 import csw.param.states.CurrentState
-import csw.services.location.models.TrackingEvent
 import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.Future

@@ -11,6 +11,8 @@ import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.ComponentInfo
 import csw.framework.models.LocationServiceUsage.DoNotRegister
+import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
 import csw.param.messages.InitialMessage.Run
 import csw.param.messages.PubSub.{Publish, Subscribe, Unsubscribe}
@@ -23,8 +25,6 @@ import csw.param.messages.SupervisorIdleMessage.{
   RunTimeout
 }
 import csw.param.messages._
-import csw.framework.scaladsl.ComponentHandlers
-import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.param.states.CurrentState
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._

@@ -11,8 +11,8 @@ import csw.param.messages.PubSub.{Publish, PublisherMessage}
 import csw.param.messages._
 import csw.param.models.ValidationIssue.OtherIssue
 import csw.param.models._
+import csw.param.models.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.param.states.CurrentState
-import csw.services.location.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.ComponentLogger
 

@@ -30,11 +30,11 @@ import csw.param.messages.{
   SupervisorExternalMessage,
   SupervisorLifecycleState
 }
+import csw.param.models.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterSettings
-import csw.services.location.models.ComponentType.{Assembly, HCD}
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.param.models.location.ComponentType.{Assembly, HCD}
+import csw.param.models.location.Connection.AkkaConnection
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 

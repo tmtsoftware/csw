@@ -4,8 +4,9 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import csw.param.models.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.param.models.location._
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.services.location.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models._
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)

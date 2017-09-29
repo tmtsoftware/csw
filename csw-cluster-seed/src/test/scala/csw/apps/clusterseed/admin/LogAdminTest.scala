@@ -12,10 +12,10 @@ import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.TromboneHcdMessages._
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.utils.AdminLogTestSuite
-import csw.param.messages.{ContainerCommonMessage, GetComponentLogMetadata, SetComponentLogLevel}
+import csw.param.models.location.Connection.AkkaConnection
+import csw.param.models.location.{ComponentId, ComponentType}
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.services.location.models.AkkaRegistration
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
 import csw.services.logging.models.LogMetadata
@@ -55,10 +55,10 @@ object TromboneHcd {
   def props(componentName: String, loggingSystem: LoggingSystem) = Props(new TromboneHcd(componentName, loggingSystem))
 }
 
-class TromboneHcdTyped(ctx: ActorContext[ContainerCommonMessage], loggingSystem: LoggingSystem)
-    extends TromboneHcdLogger.TypedActor[ContainerCommonMessage](ctx) {
+class TromboneHcdTyped(ctx: ActorContext[LogControlMessages], loggingSystem: LoggingSystem)
+    extends TromboneHcdLogger.TypedActor[LogControlMessages](ctx) {
 
-  override def onMessage(msg: ContainerCommonMessage): Behavior[ContainerCommonMessage] = {
+  override def onMessage(msg: LogControlMessages): Behavior[LogControlMessages] = {
     msg match {
       case SetComponentLogLevel(componentName, level)      ⇒ loggingSystem.setComponentLogLevel(componentName, level)
       case GetComponentLogMetadata(componentName, replyTo) ⇒ replyTo ! loggingSystem.getLogMetadata(componentName)
@@ -69,8 +69,8 @@ class TromboneHcdTyped(ctx: ActorContext[ContainerCommonMessage], loggingSystem:
 }
 
 object TromboneHcdTyped {
-  def behavior(loggingSystem: LoggingSystem): Behavior[ContainerCommonMessage] =
-    Actor.mutable[ContainerCommonMessage](ctx ⇒ new TromboneHcdTyped(ctx, loggingSystem))
+  def behavior(loggingSystem: LoggingSystem): Behavior[LogControlMessages] =
+    Actor.mutable[LogControlMessages](ctx ⇒ new TromboneHcdTyped(ctx, loggingSystem))
 }
 
 class LogAdminTest extends AdminLogTestSuite with HttpSupport {
@@ -82,7 +82,7 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
   Await.result(adminWiring.locationService.register(AkkaRegistration(connection, tromboneActorRef)), 5.seconds)
 
   private val compNameTyped = "tromboneActorTyped"
-  private val tromboneActorTyped: typed.ActorRef[ContainerCommonMessage] =
+  private val tromboneActorTyped: typed.ActorRef[LogControlMessages] =
     actorSystem.spawn(TromboneHcdTyped.behavior(loggingSystem), compNameTyped)
 
   private val typedConnection = AkkaConnection(ComponentId(compNameTyped, ComponentType.HCD))

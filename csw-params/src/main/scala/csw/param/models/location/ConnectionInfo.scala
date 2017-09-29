@@ -1,6 +1,5 @@
-package csw.services.location.internal
+package csw.param.models.location
 
-import csw.services.location.models.{ComponentType, ConnectionType}
 import play.api.libs.json.{Json, OFormat}
 
 private[location] case class ConnectionInfo(name: String,

@@ -3,7 +3,7 @@ package csw.framework.javadsl
 import java.util
 
 import csw.framework.models.{ComponentInfo, LocationServiceUsage}
-import csw.services.location.models.{ComponentType, Connection}
+import csw.param.models.location.{ComponentType, Connection}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.concurrent.duration.FiniteDuration

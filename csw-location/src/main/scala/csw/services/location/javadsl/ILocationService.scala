@@ -9,6 +9,7 @@ import java.{util ⇒ ju}
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
+import csw.param.models.location._
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
 

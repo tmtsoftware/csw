@@ -20,11 +20,12 @@ import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.param.messages.PubSub.Subscribe
 import csw.param.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.param.messages.{Shutdown, SupervisorExternalMessage, SupervisorLifecycleState}
+import csw.param.models.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.param.states.CurrentState
 import csw.services.location.commons.ClusterSettings
-import csw.services.location.models.ComponentType.HCD
-import csw.services.location.models.Connection.AkkaConnection
-import csw.services.location.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.param.models.location.ComponentType.HCD
+import csw.param.models.location.Connection.AkkaConnection
+import csw.param.models.location.{LocationRemoved, LocationUpdated}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.internal.LoggingSystem

@@ -1,7 +1,7 @@
 package csw.services.config.client.commons
 
-import csw.services.location.models.Connection.HttpConnection
-import csw.services.location.models.{ComponentId, ComponentType}
+import csw.param.models.location.Connection.HttpConnection
+import csw.param.models.location.{ComponentId, ComponentType}
 
 object ConfigServiceConnection {
   val value = HttpConnection(ComponentId("config", ComponentType.Service))
