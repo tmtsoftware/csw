@@ -8,7 +8,7 @@ import csw.messages.generics.KeyType
 import csw.messages.generics.KeyType.{LongMatrixKey, StructKey}
 import csw.messages.models.params._
 import csw.messages.states.{CurrentState, DemandState}
-import csw.units.Units.{encoder, meter, second, NoUnits}
+import csw.messages.models.params.Units.{encoder, meter, second, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 import spray.json.pimpString
 

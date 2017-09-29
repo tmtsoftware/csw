@@ -2,7 +2,7 @@ package csw.messages.generics;
 
 import csw.messages.models.params.JMatrixData;
 import csw.messages.models.params.MatrixData;
-import csw.units.Units;
+import csw.messages.models.params.Units;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

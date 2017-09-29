@@ -15,7 +15,7 @@ import csw.messages.generics.KeyType.{
   StructKey
 }
 import csw.messages.models.params._
-import csw.units.Units.{degree, encoder, meter, second, NoUnits}
+import csw.messages.models.params.Units.{degree, encoder, meter, second, NoUnits}
 import org.scalatest.{FunSpec, Matchers}
 
 // DEOPSCSW-183: Configure attributes and values

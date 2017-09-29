@@ -3,9 +3,8 @@ package csw.messages.generics
 import java.time.Instant
 
 import csw.messages.formats.JsonSupport
-import csw.messages.models.params._
-import csw.units.Units
-import csw.units.Units.second
+import csw.messages.models.params.Units.second
+import csw.messages.models.params.{Units, _}
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
 

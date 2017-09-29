@@ -3,8 +3,8 @@ package csw.messages.events
 import java.time.Instant
 
 import csw.messages.generics.KeyType
+import csw.messages.models.params.Units.meter
 import csw.messages.models.params.{ObsId, Prefix}
-import csw.units.Units.meter
 import org.scalatest.{FunSpec, Matchers}
 
 // DEOPSCSW-183: Configure attributes and values

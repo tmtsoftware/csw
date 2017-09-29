@@ -7,7 +7,7 @@ import csw.messages.models.framework.ComponentInfo
 import csw.messages.models.location.ComponentId
 import csw.messages.models.params.Prefix
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
-import csw.units.Units.{degree, kilometer, micrometer, millimeter}
+import csw.messages.models.params.Units.{degree, kilometer, micrometer, millimeter}
 
 /**
  * TMT Source Code: 10/4/16.

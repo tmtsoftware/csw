@@ -12,13 +12,13 @@ import csw.messages.commands.Setup
 import csw.messages.models.ccs.Validation
 import csw.messages.models.framework.ComponentInfo
 import csw.messages.models.location.TrackingEvent
+import csw.messages.models.params.Units.encoder
 import csw.messages.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.trombone.hcd.AxisRequest._
 import csw.trombone.hcd.AxisResponse._
 import csw.trombone.hcd.TromboneEngineering.{GetAxisConfig, GetAxisStats, GetAxisUpdate, GetAxisUpdateNow}
 import csw.trombone.hcd._
-import csw.units.Units.encoder
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationLong

@@ -2,8 +2,8 @@ package csw.messages.commands
 
 import csw.messages.generics.KeyType.ByteKey
 import csw.messages.generics._
+import csw.messages.models.params.Units.{degree, meter, NoUnits}
 import csw.messages.models.params.{ArrayData, Prefix}
-import csw.units.Units.{degree, meter, NoUnits}
 import org.scalatest.FunSpec
 
 import scala.util.Try

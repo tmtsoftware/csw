@@ -4,7 +4,7 @@ import java.util
 import java.util.Optional
 
 import csw.messages.TMTSerializable
-import csw.units.Units
+import csw.messages.models.params.Units
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter

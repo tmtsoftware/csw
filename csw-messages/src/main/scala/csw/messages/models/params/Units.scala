@@ -1,4 +1,4 @@
-package csw.units
+package csw.messages.models.params
 
 import csw.messages.TMTSerializable
 import enumeratum.{Enum, EnumEntry}

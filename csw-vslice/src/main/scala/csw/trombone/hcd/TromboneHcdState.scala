@@ -5,9 +5,9 @@ import java.io.File
 import csw.messages.commands.{CommandInfo, Setup}
 import csw.messages.generics.KeyType.ChoiceKey
 import csw.messages.generics.{GChoiceKey, Key, KeyType}
+import csw.messages.models.params.Units.encoder
 import csw.messages.models.params.{Choice, Prefix}
 import csw.messages.states.CurrentState
-import csw.units.Units.encoder
 
 object TromboneHcdState {
   val tromboneConfigFile = new File("trombone/tromboneHCD.conf")

@@ -15,10 +15,9 @@ import csw.messages.generics.KeyType.{
   StructKey
 }
 import csw.messages.generics._
-import csw.messages.models.params.{Subsystem, _}
+import csw.messages.models.params.{Subsystem, Units, _}
 import csw.messages.states.{CurrentState, DemandState}
-import csw.units.Units
-import csw.units.Units.{degree, encoder, meter, NoUnits}
+import csw.messages.models.params.Units.{degree, encoder, meter, NoUnits}
 import org.scalatest.FunSpec
 import spray.json._
 

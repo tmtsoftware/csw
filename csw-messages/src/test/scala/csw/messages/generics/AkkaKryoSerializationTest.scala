@@ -28,7 +28,7 @@ import csw.messages.models.location.ComponentType.HCD
 import csw.messages.models.params._
 import csw.messages.states.{ContainerLifecycleState, CurrentState, DemandState, SupervisorLifecycleState}
 import csw.messages.{Component, Components, LifecycleStateChanged, Restart, Shutdown, SupervisorExternalMessage}
-import csw.units.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
+import csw.messages.models.params.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 import scala.concurrent.Await

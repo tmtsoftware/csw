@@ -1,7 +1,6 @@
 package csw.messages.generics
 
-import csw.messages.models.params.{Choice, Choices}
-import csw.units.Units
+import csw.messages.models.params.{Choice, Choices, Units}
 
 class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) extends Key[Choice](name, keyType) {
   private def validate(xs: Seq[Choice]) =

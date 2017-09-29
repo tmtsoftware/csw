@@ -7,6 +7,7 @@ import csw.messages.CommandMessage.Submit
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.commands.Setup
 import csw.messages.models.ccs.ValidationIssue.WrongInternalStateIssue
+import csw.messages.models.params.Units.encoder
 import csw.messages.states.CurrentState
 import csw.messages.{Completed, Error, NoLongerValid, PubSub}
 import csw.trombone.assembly._
@@ -14,7 +15,6 @@ import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneS
 import csw.trombone.hcd.TromboneHcdState
 import csw.trombone.messages.CommandMsgs
 import csw.trombone.messages.CommandMsgs.{CommandStart, SetStateResponseE, StopCurrentCommand}
-import csw.units.Units.encoder
 
 object MoveCommand {
   def make(

@@ -1,12 +1,12 @@
 package csw.messages.generics
 
-import csw.units.Units
-import csw.units.Units.NoUnits
+import csw.messages.models.params.Units
+import csw.messages.models.params.Units.NoUnits
 import spray.json.JsonFormat
-import scala.runtime.ScalaRunTime._
 
 import scala.annotation.varargs
 import scala.reflect.ClassTag
+import scala.runtime.ScalaRunTime._
 
 case class Key[S: JsonFormat: ClassTag] private[generics] (keyName: String, keyType: KeyType[S], units: Units) {
 

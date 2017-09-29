@@ -1,6 +1,6 @@
 package csw.messages.javadsl;
 
-import csw.units.Units;
+import csw.messages.models.params.Units;
 
 @SuppressWarnings("unused")
 public class JUnits {

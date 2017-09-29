@@ -2,7 +2,7 @@ package csw.messages.generics;
 
 import csw.messages.models.params.ArrayData;
 import csw.messages.models.params.JArrayData;
-import csw.units.Units;
+import csw.messages.models.params.Units;
 import org.junit.Assert;
 import org.junit.Test;
 
