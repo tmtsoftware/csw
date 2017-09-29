@@ -6,16 +6,16 @@ import akka.typed.{ActorRef, PostStop}
 import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.framework.scaladsl.ComponentHandlers
-import csw.param.commands.{Observe, Setup}
-import csw.param.generics.KeyType
-import csw.param.messages.CommandMessage.{Oneway, Submit}
-import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.param.messages.IdleMessage.Initialize
-import csw.param.messages.InitialMessage.Run
-import csw.param.messages._
-import csw.param.messages.RunningMessage.Lifecycle
-import csw.param.models.ccs.Validations
-import csw.param.models.params.Prefix
+import csw.messages.commands.{Observe, Setup}
+import csw.messages.generics.KeyType
+import csw.messages.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.messages.messages.IdleMessage.Initialize
+import csw.messages.messages.InitialMessage.Run
+import csw.messages.messages._
+import csw.messages.messages.RunningMessage.Lifecycle
+import csw.messages.models.ccs.Validations
+import csw.messages.models.params.Prefix
 import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._

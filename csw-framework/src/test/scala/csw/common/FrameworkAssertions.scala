@@ -3,9 +3,9 @@ package csw.common
 import akka.typed.ActorRef
 import akka.typed.testkit.scaladsl.TestProbe
 import com.persist.JsonOps.JsonObject
-import csw.param.messages.ContainerCommonMessage.GetContainerLifecycleState
-import csw.param.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
-import csw.param.messages.{
+import csw.messages.messages.ContainerCommonMessage.GetContainerLifecycleState
+import csw.messages.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
+import csw.messages.messages.{
   ContainerExternalMessage,
   ContainerLifecycleState,
   SupervisorExternalMessage,

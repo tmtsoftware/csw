@@ -2,7 +2,7 @@ package csw.services.config.client.internal
 
 import java.net.URI
 
-import csw.param.models.location.HttpLocation
+import csw.messages.models.location.HttpLocation
 import csw.services.config.client.commons.ConfigServiceConnection
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}

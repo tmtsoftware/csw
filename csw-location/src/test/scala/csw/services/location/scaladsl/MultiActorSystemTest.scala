@@ -1,7 +1,7 @@
 package csw.services.location.scaladsl
 
-import csw.param.models.location.{ComponentId, ComponentType}
-import csw.param.models.location.Connection.TcpConnection
+import csw.messages.models.location.{ComponentId, ComponentType}
+import csw.messages.models.location.Connection.TcpConnection
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.internal.Networks

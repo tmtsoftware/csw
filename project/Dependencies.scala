@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
 
-  val Params = Seq(
+  val Messages = Seq(
     Libs.`spray-json`,
     Libs.`scala-java8-compat`,
     Enumeratum.`enumeratum`,
@@ -53,9 +53,6 @@ object Dependencies {
     Libs.`scala-async`,
     Enumeratum.`enumeratum`,
     Libs.`akka-management-cluster-http`,
-    Libs.`play-json`,
-    Libs.`play-json-extensions`,
-    Enumeratum.`enumeratum-play`,
     Chill.`chill-akka`,
     AkkaHttp.`akka-http`,
     Libs.`scalatest`               % Test,

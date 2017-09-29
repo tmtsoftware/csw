@@ -5,8 +5,8 @@ import java.net.InetAddress
 import akka.actor._
 import akka.stream.ActorMaterializer
 import akka.typed.scaladsl.adapter._
-import csw.param.models.location.Connection.AkkaConnection
-import csw.param.models.location.{ComponentId, ComponentType}
+import csw.messages.models.location.Connection.AkkaConnection
+import csw.messages.models.location.{ComponentId, ComponentType}
 import csw.services.commons.ExampleLogger
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}

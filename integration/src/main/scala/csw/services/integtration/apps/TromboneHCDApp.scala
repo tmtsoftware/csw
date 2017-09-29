@@ -2,8 +2,8 @@ package csw.services.integtration.apps
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.typed.scaladsl.adapter._
-import csw.param.models.location.Connection.AkkaConnection
-import csw.param.models.location.{ComponentId, ComponentType}
+import csw.messages.models.location.Connection.AkkaConnection
+import csw.messages.models.location.{ComponentId, ComponentType}
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.CswCluster
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}

@@ -7,7 +7,7 @@ import akka.pattern.ask
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, OverflowStrategy}
 import akka.util.Timeout
-import csw.param.models.location._
+import csw.messages.models.location._
 import csw.services.location.commons.{CswCluster, LocationServiceLogger}
 import csw.services.location.exceptions.{
   OtherLocationIsRegistered,

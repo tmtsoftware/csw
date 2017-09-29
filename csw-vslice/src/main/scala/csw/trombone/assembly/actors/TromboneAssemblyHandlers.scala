@@ -4,14 +4,14 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.models.ComponentInfo
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.param.commands.{Observe, Setup}
-import csw.param.messages.FromComponentLifecycleMessage.Running
-import csw.param.messages.PubSub.PublisherMessage
-import csw.param.messages._
-import csw.param.models.ccs.Validations.Valid
-import csw.param.models.ccs.{Validation, Validations}
-import csw.param.models.location.TrackingEvent
-import csw.param.states.CurrentState
+import csw.messages.commands.{Observe, Setup}
+import csw.messages.messages.FromComponentLifecycleMessage.Running
+import csw.messages.messages.PubSub.PublisherMessage
+import csw.messages.messages._
+import csw.messages.models.ccs.Validations.Valid
+import csw.messages.models.ccs.{Validation, Validations}
+import csw.messages.models.location.TrackingEvent
+import csw.messages.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}

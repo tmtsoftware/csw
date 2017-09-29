@@ -3,9 +3,9 @@ package csw.trombone.assembly.actors
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.param.generics.KeyType.ChoiceKey
-import csw.param.generics.{KeyType, _}
-import csw.param.models.params.Choice
+import csw.messages.generics.KeyType.ChoiceKey
+import csw.messages.generics.{KeyType, _}
+import csw.messages.models.params.Choice
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneStateMsg
 
 object TromboneStateActor {

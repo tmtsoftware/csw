@@ -3,9 +3,9 @@ package csw.trombone.assembly.commands
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.param.messages.CommandMessage.Submit
-import csw.param.events.EventTime
-import csw.param.generics.Parameter
+import csw.messages.messages.CommandMessage.Submit
+import csw.messages.events.EventTime
+import csw.messages.generics.Parameter
 import csw.trombone.assembly.FollowActorMessages.{StopFollowing, UpdatedEventData}
 import csw.trombone.assembly.FollowCommandMessages.{UpdateNssInUse, UpdateTromboneHcd, UpdateZAandFE}
 import csw.trombone.assembly._

@@ -17,15 +17,15 @@ import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
 import csw.common.utils.TestAppender
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.param.messages.PubSub.Subscribe
-import csw.param.messages.SupervisorCommonMessage.ComponentStateSubscription
-import csw.param.messages.{Shutdown, SupervisorExternalMessage, SupervisorLifecycleState}
-import csw.param.models.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.param.states.CurrentState
+import csw.messages.messages.PubSub.Subscribe
+import csw.messages.messages.SupervisorCommonMessage.ComponentStateSubscription
+import csw.messages.messages.{Shutdown, SupervisorExternalMessage, SupervisorLifecycleState}
+import csw.messages.models.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.messages.states.CurrentState
 import csw.services.location.commons.ClusterSettings
-import csw.param.models.location.ComponentType.HCD
-import csw.param.models.location.Connection.AkkaConnection
-import csw.param.models.location.{LocationRemoved, LocationUpdated}
+import csw.messages.models.location.ComponentType.HCD
+import csw.messages.models.location.Connection.AkkaConnection
+import csw.messages.models.location.{LocationRemoved, LocationUpdated}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.internal.LoggingSystem

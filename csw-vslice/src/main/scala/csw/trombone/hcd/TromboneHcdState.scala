@@ -2,11 +2,11 @@ package csw.trombone.hcd
 
 import java.io.File
 
-import csw.param.commands.{CommandInfo, Setup}
-import csw.param.generics.KeyType.ChoiceKey
-import csw.param.generics.{GChoiceKey, Key, KeyType}
-import csw.param.models.params.{Choice, Prefix}
-import csw.param.states.CurrentState
+import csw.messages.commands.{CommandInfo, Setup}
+import csw.messages.generics.KeyType.ChoiceKey
+import csw.messages.generics.{GChoiceKey, Key, KeyType}
+import csw.messages.models.params.{Choice, Prefix}
+import csw.messages.states.CurrentState
 import csw.units.Units.encoder
 
 object TromboneHcdState {

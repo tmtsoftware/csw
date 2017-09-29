@@ -10,21 +10,21 @@ import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.LocationServiceUsage.DoNotRegister
 import csw.framework.models._
 import csw.framework.scaladsl.ComponentBehaviorFactory
-import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.param.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.param.messages.InitialMessage.Run
-import csw.param.messages.PubSub.Publish
-import csw.param.messages.RunningMessage.Lifecycle
-import csw.param.messages.SupervisorCommonMessage.{
+import csw.messages.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.messages.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.messages.InitialMessage.Run
+import csw.messages.messages.PubSub.Publish
+import csw.messages.messages.RunningMessage.Lifecycle
+import csw.messages.messages.SupervisorCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.param.messages.SupervisorIdleMessage._
-import csw.param.messages.SupervisorLifecycleState.Idle
-import csw.param.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.param.messages.{
+import csw.messages.messages.SupervisorIdleMessage._
+import csw.messages.messages.SupervisorLifecycleState.Idle
+import csw.messages.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.messages.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.messages.{
   ContainerIdleMessage,
   InitialMessage,
   LifecycleStateChanged,
@@ -40,9 +40,9 @@ import csw.param.messages.{
   SupervisorRunningMessage,
   ToComponentLifecycleMessage
 }
-import csw.param.models.location.ComponentId
-import csw.param.models.location.Connection.AkkaConnection
-import csw.param.states.CurrentState
+import csw.messages.models.location.ComponentId
+import csw.messages.models.location.Connection.AkkaConnection
+import csw.messages.states.CurrentState
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger

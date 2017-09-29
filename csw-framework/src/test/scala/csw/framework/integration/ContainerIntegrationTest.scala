@@ -11,16 +11,16 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.param.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.param.messages.PubSub.Subscribe
-import csw.param.messages.RunningMessage.Lifecycle
-import csw.param.messages.SupervisorCommonMessage.{
+import csw.messages.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.messages.PubSub.Subscribe
+import csw.messages.messages.RunningMessage.Lifecycle
+import csw.messages.messages.SupervisorCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.param.messages.{
+import csw.messages.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.messages.{
   Components,
   ContainerExternalMessage,
   ContainerLifecycleState,
@@ -30,11 +30,11 @@ import csw.param.messages.{
   SupervisorExternalMessage,
   SupervisorLifecycleState
 }
-import csw.param.models.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
-import csw.param.states.CurrentState
+import csw.messages.models.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.messages.states.CurrentState
 import csw.services.location.commons.ClusterSettings
-import csw.param.models.location.ComponentType.{Assembly, HCD}
-import csw.param.models.location.Connection.AkkaConnection
+import csw.messages.models.location.ComponentType.{Assembly, HCD}
+import csw.messages.models.location.Connection.AkkaConnection
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 

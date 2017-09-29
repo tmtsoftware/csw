@@ -4,7 +4,7 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.Actor
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models.ContainerInfo
-import csw.param.messages.ContainerMessage
+import csw.messages.messages.ContainerMessage
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 
 object ContainerBehaviorFactory {

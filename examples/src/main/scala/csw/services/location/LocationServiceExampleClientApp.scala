@@ -6,8 +6,8 @@ import akka.actor.{Actor, ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.scaladsl.adapter._
-import csw.param.models.location.Connection.{AkkaConnection, HttpConnection}
-import csw.param.models.location._
+import csw.messages.models.location.Connection.{AkkaConnection, HttpConnection}
+import csw.messages.models.location._
 import csw.services.commons.ExampleLogger
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}

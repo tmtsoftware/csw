@@ -14,7 +14,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-location-agent`,
   `csw-benchmark`,
   `csw-vslice`,
-  `csw-params`,
+  `csw-messages`,
   `integration`,
   `examples`
 )
@@ -39,10 +39,10 @@ lazy val `csw-prod` = project
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
 
-lazy val `csw-params` = project
+lazy val `csw-messages` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
-    libraryDependencies ++= Dependencies.Params
+    libraryDependencies ++= Dependencies.Messages
   )
   .settings(
     Common.detectCycles := false
@@ -62,7 +62,7 @@ lazy val `csw-logging` = project
   )
 
 lazy val `csw-benchmark` = project
-  .dependsOn(`csw-logging`, `csw-params`)
+  .dependsOn(`csw-logging`, `csw-messages`)
   .enablePlugins(JmhPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Benchmark
@@ -70,7 +70,7 @@ lazy val `csw-benchmark` = project
 
 //Location service related projects
 lazy val `csw-location` = project
-  .dependsOn(`csw-logging`, `csw-params`)
+  .dependsOn(`csw-logging`, `csw-messages`)
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Location
@@ -78,7 +78,7 @@ lazy val `csw-location` = project
 
 //Cluster seed
 lazy val `csw-cluster-seed` = project
-  .dependsOn(`csw-params`, `csw-location`)
+  .dependsOn(`csw-messages`, `csw-location`)
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.CswClusterSeed
@@ -131,7 +131,7 @@ lazy val `csw-vslice` = project
   .dependsOn(`csw-framework`)
 
 lazy val `csw-framework` = project
-  .dependsOn(`csw-params`,
+  .dependsOn(`csw-messages`,
              `csw-config-client`,
              `csw-logging`,
              `csw-location`      % "compile->compile;multi-jvm->multi-jvm",

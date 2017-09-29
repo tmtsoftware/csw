@@ -5,9 +5,9 @@ import akka.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.ComponentInfo;
-import csw.param.messages.ComponentMessage;
-import csw.param.messages.PubSub;
-import csw.param.states.CurrentState;
+import csw.messages.messages.ComponentMessage;
+import csw.messages.messages.PubSub;
+import csw.messages.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 
 public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory<JComponentDomainMessage> {

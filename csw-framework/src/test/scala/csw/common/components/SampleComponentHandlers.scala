@@ -4,16 +4,16 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.models._
 import csw.framework.scaladsl.ComponentHandlers
-import csw.param.generics.GChoiceKey
-import csw.param.generics.KeyType.ChoiceKey
-import csw.param.messages.CommandMessage.{Oneway, Submit}
-import csw.param.messages.PubSub.{Publish, PublisherMessage}
-import csw.param.messages._
-import csw.param.models.ccs.ValidationIssue.OtherIssue
-import csw.param.models.ccs.{Validation, Validations}
-import csw.param.models.location.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.param.models.params.{Choice, Choices, Prefix}
-import csw.param.states.CurrentState
+import csw.messages.generics.GChoiceKey
+import csw.messages.generics.KeyType.ChoiceKey
+import csw.messages.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.messages.PubSub.{Publish, PublisherMessage}
+import csw.messages.messages._
+import csw.messages.models.ccs.ValidationIssue.OtherIssue
+import csw.messages.models.ccs.{Validation, Validations}
+import csw.messages.models.location.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.messages.models.params.{Choice, Choices, Prefix}
+import csw.messages.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.ComponentLogger
 

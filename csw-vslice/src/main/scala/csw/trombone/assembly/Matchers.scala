@@ -7,8 +7,8 @@ import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.ccs.MultiStateMatcherMsgs.StartMatch
 import csw.ccs._
-import csw.param.messages.{CommandExecutionResponse, PubSub}
-import csw.param.states.{CurrentState, DemandState}
+import csw.messages.messages.{CommandExecutionResponse, PubSub}
+import csw.messages.states.{CurrentState, DemandState}
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.duration.DurationLong

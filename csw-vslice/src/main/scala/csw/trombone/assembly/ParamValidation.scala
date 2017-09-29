@@ -1,9 +1,9 @@
 package csw.trombone.assembly
 
-import csw.param.commands.Setup
-import csw.param.models.ccs.ValidationIssue._
-import csw.param.models.ccs.Validations.{Invalid, Valid}
-import csw.param.models.ccs.Validation
+import csw.messages.commands.Setup
+import csw.messages.models.ccs.ValidationIssue._
+import csw.messages.models.ccs.Validations.{Invalid, Valid}
+import csw.messages.models.ccs.Validation
 
 import scala.util.Try
 

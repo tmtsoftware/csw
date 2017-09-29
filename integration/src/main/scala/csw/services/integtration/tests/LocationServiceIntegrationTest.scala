@@ -3,8 +3,8 @@ package csw.services.integtration.tests
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
 import akka.typed.scaladsl.adapter._
-import csw.param.models.location.Connection.{AkkaConnection, HttpConnection}
-import csw.param.models.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
+import csw.messages.models.location.Connection.{AkkaConnection, HttpConnection}
+import csw.messages.models.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.services.integtration.apps.TromboneHCD
 import csw.services.integtration.apps.TromboneHCD.Unregister
 import csw.services.integtration.common.TestFutureExtension.RichFuture

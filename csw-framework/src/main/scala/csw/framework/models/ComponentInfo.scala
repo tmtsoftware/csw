@@ -1,9 +1,9 @@
 package csw.framework.models
 
 import ai.x.play.json.Jsonx
-import csw.param.models.location.{ComponentType, Connection}
-import csw.param.models.params
-import csw.param.models.params.SerializableComponentInfo
+import csw.messages.models.location.{ComponentType, Connection}
+import csw.messages.models.params
+import csw.messages.models.params.SerializableComponentInfo
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._

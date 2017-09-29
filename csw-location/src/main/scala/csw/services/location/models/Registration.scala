@@ -6,8 +6,8 @@ import akka.actor.{ActorPath, Address}
 import akka.serialization.Serialization
 import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter.TypedActorRefOps
-import csw.param.models.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.param.models.location._
+import csw.messages.models.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.messages.models.location._
 import csw.services.location.commons.LocationServiceLogger
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 

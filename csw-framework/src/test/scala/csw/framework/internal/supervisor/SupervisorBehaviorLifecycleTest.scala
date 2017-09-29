@@ -13,19 +13,19 @@ import csw.framework.models.ComponentInfo
 import csw.framework.models.LocationServiceUsage.DoNotRegister
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.param.messages.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.param.messages.InitialMessage.Run
-import csw.param.messages.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.param.messages.RunningMessage.{DomainMessage, Lifecycle}
-import csw.param.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.param.messages.SupervisorIdleMessage.{
+import csw.messages.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.messages.messages.InitialMessage.Run
+import csw.messages.messages.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.messages.RunningMessage.{DomainMessage, Lifecycle}
+import csw.messages.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.messages.messages.SupervisorIdleMessage.{
   InitializeTimeout,
   RegistrationNotRequired,
   RegistrationSuccess,
   RunTimeout
 }
-import csw.param.messages._
-import csw.param.states.CurrentState
+import csw.messages.messages._
+import csw.messages.states.CurrentState
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

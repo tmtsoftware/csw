@@ -9,13 +9,13 @@ import csw.framework.ComponentInfos._
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory}
 import csw.framework.models._
-import csw.param.messages.ContainerCommonMessage.GetComponents
-import csw.param.messages.ContainerIdleMessage.SupervisorsCreated
-import csw.param.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.param.messages.RunningMessage.Lifecycle
-import csw.param.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.param.messages._
-import csw.param.models.location.Connection.AkkaConnection
+import csw.messages.messages.ContainerCommonMessage.GetComponents
+import csw.messages.messages.ContainerIdleMessage.SupervisorsCreated
+import csw.messages.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.messages.RunningMessage.Lifecycle
+import csw.messages.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.messages._
+import csw.messages.models.location.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}

@@ -1,7 +1,7 @@
 package csw.ccs
 
-import csw.param.states.{CurrentState, DemandState}
-import csw.param.generics.Parameter
+import csw.messages.states.{CurrentState, DemandState}
+import csw.messages.generics.Parameter
 
 trait StateMatcher {
   def prefix: String

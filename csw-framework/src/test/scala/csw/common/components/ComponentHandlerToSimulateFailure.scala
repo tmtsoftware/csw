@@ -3,9 +3,9 @@ package csw.common.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.models.ComponentInfo
-import csw.param.messages.ComponentMessage
-import csw.param.messages.PubSub.PublisherMessage
-import csw.param.states.CurrentState
+import csw.messages.messages.ComponentMessage
+import csw.messages.messages.PubSub.PublisherMessage
+import csw.messages.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.Future

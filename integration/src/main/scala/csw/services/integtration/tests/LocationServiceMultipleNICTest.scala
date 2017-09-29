@@ -1,7 +1,7 @@
 package csw.services.integtration.tests
 
-import csw.param.models.location.Connection.AkkaConnection
-import csw.param.models.location.{AkkaLocation, ComponentId, ComponentType}
+import csw.messages.models.location.Connection.AkkaConnection
+import csw.messages.models.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.CswCluster
 import csw.services.location.scaladsl.LocationServiceFactory

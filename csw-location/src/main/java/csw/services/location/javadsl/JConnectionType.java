@@ -1,6 +1,6 @@
 package csw.services.location.javadsl;
 
-import csw.param.models.location.ConnectionType;
+import csw.messages.models.location.ConnectionType;
 
 /**
  * Java API for connection type. It encapsulates `ConnectionType` which is fundamental to LocationService library.

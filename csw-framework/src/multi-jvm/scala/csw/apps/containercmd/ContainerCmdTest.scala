@@ -10,24 +10,24 @@ import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.{ComponentStatistics, SampleComponentState}
-import csw.param.commands.{CommandInfo, Setup}
-import csw.param.generics.{KeyType, Parameter}
-import csw.param.messages.CommandMessage.{Oneway, Submit}
-import csw.param.messages.ContainerCommonMessage.GetComponents
-import csw.param.messages.PubSub.Subscribe
-import csw.param.messages.RunningMessage.Lifecycle
-import csw.param.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
-import csw.param.messages._
-import csw.param.messages.ToComponentLifecycleMessage.GoOffline
-import csw.param.models.location.{ComponentId, ComponentType}
-import csw.param.states.CurrentState
+import csw.messages.commands.{CommandInfo, Setup}
+import csw.messages.generics.{KeyType, Parameter}
+import csw.messages.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.messages.ContainerCommonMessage.GetComponents
+import csw.messages.messages.PubSub.Subscribe
+import csw.messages.messages.RunningMessage.Lifecycle
+import csw.messages.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
+import csw.messages.messages._
+import csw.messages.messages.ToComponentLifecycleMessage.GoOffline
+import csw.messages.models.location.{ComponentId, ComponentType}
+import csw.messages.states.CurrentState
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.param.models.location.Connection.AkkaConnection
+import csw.messages.models.location.Connection.AkkaConnection
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong

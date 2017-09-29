@@ -6,10 +6,10 @@ import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
-import csw.param.commands.Setup
-import csw.param.messages.FromComponentLifecycleMessage.Running
-import csw.param.messages._
-import csw.param.models.ccs.ValidationIssue.{
+import csw.messages.commands.Setup
+import csw.messages.messages.FromComponentLifecycleMessage.Running
+import csw.messages.messages._
+import csw.messages.models.ccs.ValidationIssue.{
   RequiredHCDUnavailableIssue,
   UnsupportedCommandInStateIssue,
   WrongInternalStateIssue

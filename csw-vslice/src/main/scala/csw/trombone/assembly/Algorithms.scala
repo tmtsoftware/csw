@@ -1,6 +1,6 @@
 package csw.trombone.assembly
 
-import csw.param.generics.Parameter
+import csw.messages.generics.Parameter
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 
 /**
