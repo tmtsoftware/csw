@@ -1,11 +1,11 @@
 package csw.trombone.hcd
 
 import akka.typed.ActorRef
-import csw.param.ParamSerializable
+import csw.param.TMTSerializable
 import csw.param.messages.RunningMessage.DomainMessage
 import csw.trombone.hcd.AxisResponse.{AxisStatistics, AxisUpdate}
 
-sealed trait SimulatorCommand extends ParamSerializable
+sealed trait SimulatorCommand extends TMTSerializable
 
 sealed trait AxisRequest extends SimulatorCommand
 object AxisRequest {

@@ -5,7 +5,7 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import csw.param.ParamSerializable
+import csw.param.TMTSerializable
 import csw.param.models.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.param.models.location._
 import csw.services.location.commons.TestFutureExtension.RichFuture
@@ -159,7 +159,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
 }
 
-case class UnregisterConnection(akkaConnection: AkkaConnection) extends ParamSerializable
+case class UnregisterConnection(akkaConnection: AkkaConnection) extends TMTSerializable
 
 class AssemblyActor(locationService: LocationService) extends Actor {
   override def receive: Receive = {

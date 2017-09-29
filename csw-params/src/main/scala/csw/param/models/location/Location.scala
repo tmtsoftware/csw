@@ -5,13 +5,13 @@ import java.net.URI
 import acyclic.skipped
 import akka.typed
 import akka.typed.ActorRef
-import csw.param.ParamSerializable
+import csw.param.TMTSerializable
 import csw.param.models.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 /**
  * Location represents a live Connection along with its URI
  */
-sealed abstract class Location extends ParamSerializable {
+sealed abstract class Location extends TMTSerializable {
   def connection: Connection
   def uri: URI
 }

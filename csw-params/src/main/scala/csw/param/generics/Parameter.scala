@@ -3,7 +3,7 @@ package csw.param.generics
 import java.util
 import java.util.Optional
 
-import csw.param.ParamSerializable
+import csw.param.TMTSerializable
 import csw.units.Units
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}
 
@@ -61,7 +61,7 @@ case class Parameter[S: JsonFormat: ClassTag] private[param] (
     keyType: KeyType[S],
     items: mutable.WrappedArray[S],
     units: Units
-) extends ParamSerializable {
+) extends TMTSerializable {
 
   def values: Array[S] = items.array
 

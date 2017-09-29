@@ -1,6 +1,6 @@
 package csw.param.models.location
 
-import csw.param.ParamSerializable
+import csw.param.TMTSerializable
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
@@ -10,7 +10,7 @@ import scala.collection.immutable.IndexedSeq
  * Represents a type of the Component. It should be serializable since it has to be transmittable over the network.
  * The type will always be represented in lower case.
  */
-sealed abstract class ComponentType extends EnumEntry with Lowercase with ParamSerializable {
+sealed abstract class ComponentType extends EnumEntry with Lowercase with TMTSerializable {
 
   /**
    * The name of ComponentType e.g. for HCD components, the name will be represented as `hcd`.

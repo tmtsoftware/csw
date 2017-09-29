@@ -1,14 +1,14 @@
 package csw.param.models.location
 
 import acyclic.skipped
-import csw.param.ParamSerializable
+import csw.param.TMTSerializable
 import csw.param.models.location.ConnectionType.{AkkaType, HttpType, TcpType}
 import play.api.libs.json._
 
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component
  */
-sealed abstract class Connection(val connectionType: ConnectionType) extends ParamSerializable {
+sealed abstract class Connection(val connectionType: ConnectionType) extends TMTSerializable {
 
   type L <: Location
 

@@ -2,7 +2,7 @@ package csw.param.messages
 
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
-import csw.param.ParamSerializable
+import csw.param.TMTSerializable
 import csw.param.commands.{ControlCommand, Result}
 import csw.param.messages.PubSub.SubscriberMessage
 import csw.param.models.ccs.{Validation, ValidationIssue, Validations}
@@ -24,7 +24,7 @@ object PubSub {
 
 ///////////////
 
-sealed trait ToComponentLifecycleMessage extends ParamSerializable
+sealed trait ToComponentLifecycleMessage extends TMTSerializable
 object ToComponentLifecycleMessage {
   case object GoOffline extends ToComponentLifecycleMessage
   case object GoOnline  extends ToComponentLifecycleMessage
@@ -71,7 +71,7 @@ case object Restart  extends SupervisorCommonMessage with ContainerCommonMessage
 
 sealed trait SupervisorMessage
 
-sealed trait SupervisorExternalMessage extends SupervisorMessage with ParamSerializable
+sealed trait SupervisorExternalMessage extends SupervisorMessage with TMTSerializable
 sealed trait SupervisorRunningMessage  extends SupervisorExternalMessage
 sealed trait SupervisorRestartMessage  extends SupervisorMessage
 object SupervisorRestartMessage {
@@ -106,7 +106,7 @@ object FromComponentLifecycleMessage {
 ///////////////////
 sealed trait ContainerMessage
 
-sealed trait ContainerExternalMessage extends ContainerMessage with ParamSerializable
+sealed trait ContainerExternalMessage extends ContainerMessage with TMTSerializable
 
 sealed trait ContainerCommonMessage extends ContainerExternalMessage
 object ContainerCommonMessage {
@@ -127,12 +127,12 @@ object FromSupervisorMessage {
 }
 
 case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage], state: SupervisorLifecycleState)
-    extends ParamSerializable
+    extends TMTSerializable
 
-case class Components(components: Set[Component]) extends ParamSerializable
+case class Components(components: Set[Component]) extends TMTSerializable
 
 case class Component(supervisor: ActorRef[SupervisorExternalMessage], info: SerializableComponentInfo)
-    extends ParamSerializable
+    extends TMTSerializable
 
 case class SupervisorInfo(system: ActorSystem, component: Component)
 
