@@ -1,13 +1,13 @@
 package csw.trombone.assembly
 
 import com.typesafe.config.Config
-import csw.messages.commands.{CommandInfo, Setup}
-import csw.messages.generics.{KeyType, Parameter}
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.models.location.ComponentId
-import csw.messages.models.params.Prefix
+import csw.messages.ccs.commands.{CommandInfo, Setup}
+import csw.messages.framework.ComponentInfo
+import csw.messages.location.ComponentId
+import csw.messages.params.generics.{KeyType, Parameter}
+import csw.messages.params.models.Prefix
+import csw.messages.params.models.Units.{degree, kilometer, micrometer, millimeter}
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
-import csw.messages.models.params.Units.{degree, kilometer, micrometer, millimeter}
 
 /**
  * TMT Source Code: 10/4/16.

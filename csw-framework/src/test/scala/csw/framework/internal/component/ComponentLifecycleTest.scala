@@ -11,10 +11,10 @@ import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
-import csw.messages.commands.{Observe, Setup}
-import csw.messages.generics.KeyType
-import csw.messages.models.ccs.Validations
-import csw.messages.models.params.Prefix
+import csw.messages.ccs.commands.{Observe, Setup}
+import csw.messages.params.generics.KeyType
+import csw.messages.ccs.Validations
+import csw.messages.params.models.Prefix
 import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._

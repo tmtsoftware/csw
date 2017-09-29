@@ -6,12 +6,12 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
-import csw.messages.commands.{Observe, Setup}
-import csw.messages.models.ccs.Validations.Valid
-import csw.messages.models.ccs.{Validation, Validations}
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.models.location.TrackingEvent
-import csw.messages.states.CurrentState
+import csw.messages.ccs.commands.{Observe, Setup}
+import csw.messages.ccs.Validations.Valid
+import csw.messages.ccs.{Validation, Validations}
+import csw.messages.framework.ComponentInfo
+import csw.messages.location.TrackingEvent
+import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}

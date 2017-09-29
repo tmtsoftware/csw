@@ -12,10 +12,9 @@ import csw.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.models.location.Connection.AkkaConnection
-import csw.messages.models.location.{ComponentId, ComponentType}
-import csw.messages.states.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger

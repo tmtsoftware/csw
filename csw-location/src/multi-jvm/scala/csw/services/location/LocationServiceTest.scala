@@ -6,8 +6,8 @@ import akka.stream.testkit.scaladsl.TestSink
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.TMTSerializable
-import csw.messages.models.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.messages.models.location._
+import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.messages.location._
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.location.models._

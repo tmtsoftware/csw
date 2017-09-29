@@ -4,10 +4,10 @@ import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.messages.models.framework.ComponentInfo;
+import csw.messages.framework.ComponentInfo;
 import csw.messages.ComponentMessage;
 import csw.messages.PubSub;
-import csw.messages.states.CurrentState;
+import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 
 public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory<JComponentDomainMessage> {

@@ -9,7 +9,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
-import csw.messages.states.ContainerLifecycleState
+import csw.messages.framework.ContainerLifecycleState
 import csw.messages.{ContainerMessage, Restart}
 import csw.services.location.commons.ClusterSettings
 import csw.services.logging.scaladsl.LoggingSystemFactory

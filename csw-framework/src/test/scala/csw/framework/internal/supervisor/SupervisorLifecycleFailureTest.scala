@@ -18,8 +18,8 @@ import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.messages._
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.states.{CurrentState, SupervisorLifecycleState}
+import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem

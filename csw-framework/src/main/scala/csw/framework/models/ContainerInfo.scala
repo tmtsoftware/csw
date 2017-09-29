@@ -1,6 +1,6 @@
 package csw.framework.models
 
-import csw.messages.models.framework.ComponentInfo
+import csw.messages.framework.ComponentInfo
 import play.api.libs.json._
 
 final case class ContainerInfo(name: String, components: Set[ComponentInfo]) {

@@ -7,7 +7,7 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import csw.messages.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.messages.states.SupervisorLifecycleState
+import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.{LifecycleStateChanged, PubSub, SupervisorExternalMessage}
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.scalatest.mockito.MockitoSugar

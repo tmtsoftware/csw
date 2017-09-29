@@ -4,7 +4,7 @@ import acyclic.skipped
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.messages.models.location._
+import csw.messages.location._
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models._
 

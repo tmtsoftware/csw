@@ -12,8 +12,8 @@ import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.TromboneHcdMessages._
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.utils.AdminLogTestSuite
-import csw.messages.models.location.Connection.AkkaConnection
-import csw.messages.models.location.{ComponentId, ComponentType}
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.AkkaRegistration
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}

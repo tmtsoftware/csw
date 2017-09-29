@@ -2,12 +2,12 @@ package csw.trombone.hcd
 
 import java.io.File
 
-import csw.messages.commands.{CommandInfo, Setup}
-import csw.messages.generics.KeyType.ChoiceKey
-import csw.messages.generics.{GChoiceKey, Key, KeyType}
-import csw.messages.models.params.Units.encoder
-import csw.messages.models.params.{Choice, Prefix}
-import csw.messages.states.CurrentState
+import csw.messages.ccs.commands.{CommandInfo, Setup}
+import csw.messages.params.generics.KeyType.ChoiceKey
+import csw.messages.params.generics.{GChoiceKey, Key, KeyType}
+import csw.messages.params.models.Units.encoder
+import csw.messages.params.models.{Choice, Prefix}
+import csw.messages.params.states.CurrentState
 
 object TromboneHcdState {
   val tromboneConfigFile = new File("trombone/tromboneHCD.conf")

@@ -1,15 +1,15 @@
 package csw.trombone.assembly
 
 import akka.typed.ActorRef
-import csw.messages.commands.Setup
-import csw.messages.events.EventTime
-import csw.messages.generics.Parameter
+import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.events.EventTime
+import csw.messages.params.generics.Parameter
 import csw.messages.CommandMessage.Submit
 import csw.messages.CommandResponse
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.RunningMessage.DomainMessage
-import csw.messages.models.params.Choice
-import csw.messages.states.CurrentState
+import csw.messages.params.models.Choice
+import csw.messages.params.states.CurrentState
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 
 sealed trait FollowCommandMessages

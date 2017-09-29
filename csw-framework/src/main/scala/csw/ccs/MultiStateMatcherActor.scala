@@ -7,7 +7,7 @@ import akka.typed.{ActorRef, Behavior}
 import akka.util.Timeout
 import csw.ccs.MultiStateMatcherMsgs._
 import csw.messages.PubSub.{Subscribe, Unsubscribe}
-import csw.messages.states.CurrentState
+import csw.messages.params.states.CurrentState
 import csw.messages.{CommandExecutionResponse, Completed, Error, PubSub}
 
 object MultiStateMatcherActor {

@@ -6,10 +6,10 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.messages.commands.{Command, CommandInfo, Setup}
-import csw.messages.events.StatusEvent
-import csw.messages.generics.{KeyType, Parameter}
-import csw.messages.models.params.Prefix
+import csw.messages.ccs.commands.{Command, CommandInfo, Setup}
+import csw.messages.ccs.events.StatusEvent
+import csw.messages.params.generics.{KeyType, Parameter}
+import csw.messages.params.models.Prefix
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter

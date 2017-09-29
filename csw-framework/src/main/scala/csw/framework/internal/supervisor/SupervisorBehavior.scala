@@ -21,12 +21,12 @@ import csw.messages.SupervisorIdleMessage._
 import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.models.framework.LocationServiceUsage.DoNotRegister
-import csw.messages.models.location.ComponentId
-import csw.messages.models.location.Connection.AkkaConnection
-import csw.messages.states.SupervisorLifecycleState.Idle
-import csw.messages.states.{CurrentState, SupervisorLifecycleState}
+import csw.messages.framework.LocationServiceUsage.DoNotRegister
+import csw.messages.framework.SupervisorLifecycleState.Idle
+import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.location.ComponentId
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.params.states.CurrentState
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger

@@ -5,7 +5,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.persist.JsonOps.JsonObject
 import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
-import csw.messages.states.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage}
 import csw.services.location.commons.BlockingUtils
 import csw.services.logging.internal.LoggingLevels.Level

@@ -1,7 +1,7 @@
 package csw.messages.models;
 
-import csw.messages.models.params.ArrayData;
-import csw.messages.models.params.JArrayData;
+import csw.messages.params.models.ArrayData;
+import csw.messages.params.models.JArrayData;
 import org.junit.Assert;
 import org.junit.Test;
 

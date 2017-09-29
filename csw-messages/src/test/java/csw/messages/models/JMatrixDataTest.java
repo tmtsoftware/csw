@@ -1,7 +1,7 @@
 package csw.messages.models;
 
-import csw.messages.models.params.JMatrixData;
-import csw.messages.models.params.MatrixData;
+import csw.messages.params.models.JMatrixData;
+import csw.messages.params.models.MatrixData;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -1,6 +1,6 @@
 package csw.messages.models
 
-import csw.messages.models.params.ObsId2
+import csw.messages.params.models.ObsId2
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.TableFor2
 import org.scalatest.prop.Tables.Table

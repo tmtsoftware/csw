@@ -8,7 +8,7 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.PubSub
-import csw.messages.states.CurrentState
+import csw.messages.params.states.CurrentState
 import csw.trombone.assembly.DiagPublisherMessages._
 import csw.trombone.assembly.TrombonePublisherMsg.{AxisStateUpdate, AxisStatsUpdate}
 import csw.trombone.assembly.actors.DiagPublisher.{Mode, _}

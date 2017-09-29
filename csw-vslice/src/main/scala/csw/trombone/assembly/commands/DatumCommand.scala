@@ -5,9 +5,9 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.CommandMessage.Submit
 import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.commands.Setup
-import csw.messages.models.ccs.ValidationIssue.WrongInternalStateIssue
-import csw.messages.states.CurrentState
+import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
+import csw.messages.params.states.CurrentState
 import csw.messages.{Completed, Error, NoLongerValid, PubSub}
 import csw.trombone.assembly.Matchers
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}

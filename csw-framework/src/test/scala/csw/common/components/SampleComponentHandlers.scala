@@ -6,14 +6,14 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages._
-import csw.messages.generics.GChoiceKey
-import csw.messages.generics.KeyType.ChoiceKey
-import csw.messages.models.ccs.ValidationIssue.OtherIssue
-import csw.messages.models.ccs.{Validation, Validations}
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.models.location.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.models.params.{Choice, Choices, Prefix}
-import csw.messages.states.CurrentState
+import csw.messages.ccs.ValidationIssue.OtherIssue
+import csw.messages.ccs.{Validation, Validations}
+import csw.messages.framework.ComponentInfo
+import csw.messages.params.generics.GChoiceKey
+import csw.messages.params.generics.KeyType.ChoiceKey
+import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.messages.params.models.{Choice, Choices, Prefix}
+import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.ComponentLogger
 

@@ -3,7 +3,7 @@ package csw.services.location.internal
 import akka.cluster.ddata.Replicator.{Changed, Subscribe}
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior, Terminated}
-import csw.messages.models.location.AkkaLocation
+import csw.messages.location.AkkaLocation
 import csw.services.location.commons.{CswCluster, LocationServiceLogger}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.scaladsl.LocationService

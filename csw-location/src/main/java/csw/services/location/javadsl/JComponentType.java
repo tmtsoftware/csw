@@ -1,6 +1,6 @@
 package csw.services.location.javadsl;
 
-import csw.messages.models.location.ComponentType;
+import csw.messages.location.ComponentType;
 
 /**
  * Java API for component types. It encapsulates `ComponentType` which is fundamental to LocationService library.

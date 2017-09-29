@@ -4,8 +4,8 @@ import java.net.URI
 import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
-import csw.messages.models.location.Connection.TcpConnection
-import csw.messages.models.location.{ComponentId, ComponentType, TcpLocation}
+import csw.messages.location.Connection.TcpConnection
+import csw.messages.location.{ComponentId, ComponentType, TcpLocation}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.internal.Networks
 import csw.services.location.scaladsl.LocationServiceFactory

@@ -1,7 +1,7 @@
 package csw.services.location.scaladsl
 
 import akka.typed.ActorRef
-import csw.messages.models.location.Connection.AkkaConnection
+import csw.messages.location.Connection.AkkaConnection
 import csw.services.location.models.AkkaRegistration
 
 class RegistrationFactory {

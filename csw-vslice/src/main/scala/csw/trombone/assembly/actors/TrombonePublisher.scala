@@ -3,8 +3,8 @@ package csw.trombone.assembly.actors
 import akka.typed.Behavior
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.messages.generics.Parameter
-import csw.messages.models.params.Choice
+import csw.messages.params.generics.Parameter
+import csw.messages.params.models.Choice
 import csw.trombone.assembly.TrombonePublisherMsg._
 import csw.trombone.assembly.{AssemblyContext, TrombonePublisherMsg}
 

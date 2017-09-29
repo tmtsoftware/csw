@@ -1,9 +1,9 @@
 package csw.framework
 
-import csw.messages.models.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
+import csw.messages.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.ContainerInfo
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.models.location.ComponentType.{Assembly, HCD}
+import csw.messages.framework.ComponentInfo
+import csw.messages.location.ComponentType.{Assembly, HCD}
 
 import scala.concurrent.duration.DurationDouble
 

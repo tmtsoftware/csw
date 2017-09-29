@@ -8,8 +8,8 @@ import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages._
-import csw.messages.commands.Setup
-import csw.messages.models.ccs.ValidationIssue.{
+import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.ValidationIssue.{
   RequiredHCDUnavailableIssue,
   UnsupportedCommandInStateIssue,
   WrongInternalStateIssue

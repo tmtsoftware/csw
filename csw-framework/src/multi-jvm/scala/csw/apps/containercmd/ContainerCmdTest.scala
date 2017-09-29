@@ -16,11 +16,12 @@ import csw.messages.PubSub.Subscribe
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.messages.ToComponentLifecycleMessage.GoOffline
-import csw.messages.commands.{CommandInfo, Setup}
-import csw.messages.generics.{KeyType, Parameter}
-import csw.messages.models.location.Connection.AkkaConnection
-import csw.messages.models.location.{ComponentId, ComponentType}
-import csw.messages.states.{ContainerLifecycleState, CurrentState, SupervisorLifecycleState}
+import csw.messages.ccs.commands.{CommandInfo, Setup}
+import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.params.generics.{KeyType, Parameter}
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.params.states.CurrentState
 import csw.messages.{Components, ContainerExternalMessage, SupervisorExternalMessage}
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory

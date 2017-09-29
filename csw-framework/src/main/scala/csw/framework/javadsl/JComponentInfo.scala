@@ -2,8 +2,8 @@ package csw.framework.javadsl
 
 import java.util
 
-import csw.messages.models.framework.{ComponentInfo, LocationServiceUsage}
-import csw.messages.models.location.{ComponentType, Connection}
+import csw.messages.framework.{ComponentInfo, LocationServiceUsage}
+import csw.messages.location.{ComponentType, Connection}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.concurrent.duration.FiniteDuration

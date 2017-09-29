@@ -17,9 +17,9 @@ import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.messages.SupervisorIdleMessage.{InitializeTimeout, RegistrationNotRequired, RegistrationSuccess}
 import csw.messages._
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.models.framework.LocationServiceUsage.DoNotRegister
-import csw.messages.states.{CurrentState, SupervisorLifecycleState}
+import csw.messages.framework.LocationServiceUsage.DoNotRegister
+import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.params.states.CurrentState
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

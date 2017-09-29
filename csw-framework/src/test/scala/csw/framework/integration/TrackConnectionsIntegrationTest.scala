@@ -13,10 +13,11 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.PubSub.Subscribe
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages.SupervisorExternalMessage
-import csw.messages.models.location.ComponentId
-import csw.messages.models.location.ComponentType.{Assembly, HCD}
-import csw.messages.models.location.Connection.AkkaConnection
-import csw.messages.states.{ContainerLifecycleState, CurrentState}
+import csw.messages.framework.ContainerLifecycleState
+import csw.messages.location.ComponentId
+import csw.messages.location.ComponentType.{Assembly, HCD}
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.params.states.CurrentState
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

@@ -19,10 +19,11 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.PubSub.Subscribe
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
-import csw.messages.models.location.ComponentType.HCD
-import csw.messages.models.location.Connection.AkkaConnection
-import csw.messages.models.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.states.{CurrentState, SupervisorLifecycleState}
+import csw.messages.framework.SupervisorLifecycleState
+import csw.messages.location.ComponentType.HCD
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.messages.params.states.CurrentState
 import csw.messages.{Shutdown, SupervisorExternalMessage}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}

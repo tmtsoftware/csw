@@ -20,10 +20,11 @@ import csw.messages.SupervisorCommonMessage.{
   LifecycleStateSubscription
 }
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.messages.models.location.ComponentType.{Assembly, HCD}
-import csw.messages.models.location.Connection.AkkaConnection
-import csw.messages.models.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
-import csw.messages.states.{ContainerLifecycleState, CurrentState, SupervisorLifecycleState}
+import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.location.ComponentType.{Assembly, HCD}
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.messages.params.states.CurrentState
 import csw.messages.{
   Components,
   ContainerExternalMessage,

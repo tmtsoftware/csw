@@ -1,7 +1,7 @@
 package csw.messages
 
-import csw.messages.generics.KeyType
-import csw.messages.generics.KeyType.{
+import csw.messages.params.generics.KeyType
+import csw.messages.params.generics.KeyType.{
   ByteMatrixKey,
   DoubleMatrixKey,
   FloatMatrixKey,
@@ -9,7 +9,7 @@ import csw.messages.generics.KeyType.{
   LongMatrixKey,
   ShortMatrixKey
 }
-import csw.messages.models.params.{ArrayData, MatrixData}
+import csw.messages.params.models.{ArrayData, MatrixData}
 import org.scalatest.FunSpec
 
 class EqualityTest extends FunSpec {

@@ -9,8 +9,8 @@ import csw.common.components.ComponentDomainMessage
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.ComponentMessage
 import csw.messages.PubSub.PublisherMessage
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.states.CurrentState
+import csw.messages.framework.ComponentInfo
+import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 

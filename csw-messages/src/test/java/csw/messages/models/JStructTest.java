@@ -1,10 +1,10 @@
 package csw.messages.models;
 
-import csw.messages.generics.JKeyTypes;
-import csw.messages.generics.Key;
-import csw.messages.generics.Parameter;
-import csw.messages.models.params.JStruct;
-import csw.messages.models.params.Struct;
+import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.Key;
+import csw.messages.params.generics.Parameter;
+import csw.messages.params.models.JStruct;
+import csw.messages.params.models.Struct;
 import org.junit.Assert;
 import org.junit.Test;
 

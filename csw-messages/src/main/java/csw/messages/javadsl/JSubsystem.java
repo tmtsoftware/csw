@@ -1,6 +1,6 @@
 package csw.messages.javadsl;
 
-import csw.messages.models.params.Subsystem;
+import csw.messages.params.models.Subsystem;
 
 @SuppressWarnings("unused")
 public class JSubsystem {

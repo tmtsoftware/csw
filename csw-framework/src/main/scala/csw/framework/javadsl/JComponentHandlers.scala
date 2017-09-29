@@ -8,8 +8,8 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.ComponentMessage
 import csw.messages.PubSub.PublisherMessage
 import csw.messages.RunningMessage.DomainMessage
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.states.CurrentState
+import csw.messages.framework.ComponentInfo
+import csw.messages.params.states.CurrentState
 import csw.services.location.javadsl.ILocationService
 
 import scala.compat.java8.FutureConverters._

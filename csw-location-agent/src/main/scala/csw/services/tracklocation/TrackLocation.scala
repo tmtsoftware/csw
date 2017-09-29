@@ -2,8 +2,8 @@ package csw.services.tracklocation
 
 import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
-import csw.messages.models.location.Connection.TcpConnection
-import csw.messages.models.location.{ComponentId, ComponentType}
+import csw.messages.location.Connection.TcpConnection
+import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.CswCluster
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory

@@ -4,8 +4,8 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import csw.messages.models.location.Connection.{AkkaConnection, HttpConnection}
-import csw.messages.models.location._
+import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
+import csw.messages.location._
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models._
 import csw.services.location.scaladsl.ActorSystemFactory

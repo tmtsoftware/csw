@@ -16,11 +16,11 @@ import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
-import csw.messages.commands.{CommandInfo, Setup}
-import csw.messages.generics.{KeyType, Parameter}
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.models.location.Connection.AkkaConnection
-import csw.messages.states.{CurrentState, DemandState, SupervisorLifecycleState}
+import csw.messages.ccs.commands.{CommandInfo, Setup}
+import csw.messages.params.generics.{KeyType, Parameter}
+import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.params.states.{CurrentState, DemandState}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

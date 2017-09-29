@@ -4,8 +4,8 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.messages.ComponentMessage
 import csw.messages.PubSub.PublisherMessage
-import csw.messages.models.framework.ComponentInfo
-import csw.messages.states.CurrentState
+import csw.messages.framework.ComponentInfo
+import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.Future
