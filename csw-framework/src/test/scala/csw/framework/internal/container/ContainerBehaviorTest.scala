@@ -65,7 +65,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
               supervisorBehaviorFactory,
               componentInfo.name
             ),
-            componentInfo.getSerializableInfo
+            componentInfo
           )
         )
         supervisorInfos += supervisorInfo
@@ -127,7 +127,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     ctx.selfInbox.receiveMsg() shouldBe a[SupervisorsCreated]
     containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
     containerBehavior.supervisors.size shouldBe 2
-    containerBehavior.supervisors.map(_.component.info) shouldBe containerInfo.components.map(_.getSerializableInfo)
+    containerBehavior.supervisors.map(_.component.info) shouldBe containerInfo.components
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     ctx.children.map(

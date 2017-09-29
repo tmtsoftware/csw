@@ -2,7 +2,6 @@ package csw.messages.models.framework
 
 import ai.x.play.json.Jsonx
 import csw.messages.TMTSerializable
-import csw.messages.models.framework
 import csw.messages.models.location.{ComponentType, Connection}
 import play.api.libs.json._
 
@@ -27,17 +26,6 @@ final case class ComponentInfo(
    * Java API to get the list of connections for the assembly
    */
   def getConnections: java.util.List[Connection] = connections.toList.asJava
-
-  def getSerializableInfo: SerializableComponentInfo = framework.SerializableComponentInfo(
-    name,
-    componentType.name,
-    prefix,
-    behaviorFactoryClassName,
-    locationServiceUsage.toString,
-    connections.mkString(","),
-    initializeTimeout.toString(),
-    runTimeout.toString()
-  )
 }
 
 case object ComponentInfo {

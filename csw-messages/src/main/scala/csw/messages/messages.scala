@@ -5,7 +5,7 @@ import akka.typed.ActorRef
 import csw.messages.PubSub.SubscriberMessage
 import csw.messages.commands.{ControlCommand, Result}
 import csw.messages.models.ccs.{Validation, ValidationIssue, Validations}
-import csw.messages.models.framework.SerializableComponentInfo
+import csw.messages.models.framework.ComponentInfo
 import csw.messages.models.location.TrackingEvent
 import csw.messages.states.{ContainerLifecycleState, CurrentState, SupervisorLifecycleState}
 
@@ -130,8 +130,7 @@ case class LifecycleStateChanged(publisher: ActorRef[SupervisorExternalMessage],
 
 case class Components(components: Set[Component]) extends TMTSerializable
 
-case class Component(supervisor: ActorRef[SupervisorExternalMessage], info: SerializableComponentInfo)
-    extends TMTSerializable
+case class Component(supervisor: ActorRef[SupervisorExternalMessage], info: ComponentInfo) extends TMTSerializable
 
 case class SupervisorInfo(system: ActorSystem, component: Component)
 

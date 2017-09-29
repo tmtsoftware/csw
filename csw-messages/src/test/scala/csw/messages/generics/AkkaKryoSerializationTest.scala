@@ -22,7 +22,9 @@ import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages.commands._
 import csw.messages.events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
 import csw.messages.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, RaDecKey, StructKey}
-import csw.messages.models.framework.SerializableComponentInfo
+import csw.messages.models.framework.ComponentInfo
+import csw.messages.models.framework.LocationServiceUsage.DoNotRegister
+import csw.messages.models.location.ComponentType.HCD
 import csw.messages.models.params._
 import csw.messages.states.{ContainerLifecycleState, CurrentState, DemandState, SupervisorLifecycleState}
 import csw.messages.{Component, Components, LifecycleStateChanged, Restart, Shutdown, SupervisorExternalMessage}
@@ -236,17 +238,17 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
       val componentsProbe              = TestProbe[Components]
       val supExtMsgProbe               = TestProbe[SupervisorExternalMessage]
-      val serializableComponentInfo = SerializableComponentInfo(
+      val componentInfo = ComponentInfo(
         "name",
-        "compType",
+        HCD,
         "prefix",
         "className",
-        "usage",
-        "connections",
-        "timeout",
-        "timeout"
+        DoNotRegister,
+        Set.empty,
+        10.seconds,
+        10.seconds
       )
-      val component  = Component(supExtMsgProbe.ref, serializableComponentInfo)
+      val component  = Component(supExtMsgProbe.ref, componentInfo)
       val components = Components(Set(component))
 
       val getComponentsMessage              = GetComponents(componentsProbe.ref)
@@ -258,7 +260,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       serialization.findSerializerFor(ContainerLifecycleState.Idle).getClass shouldBe classOf[AkkaSerializer]
       serialization.findSerializerFor(ContainerLifecycleState.Running).getClass shouldBe classOf[AkkaSerializer]
       serialization.findSerializerFor(component).getClass shouldBe classOf[AkkaSerializer]
-      serialization.findSerializerFor(serializableComponentInfo).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(componentInfo).getClass shouldBe classOf[AkkaSerializer]
     }
   }
 }

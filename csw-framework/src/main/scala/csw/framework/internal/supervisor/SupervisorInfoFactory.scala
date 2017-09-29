@@ -38,7 +38,7 @@ class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simpl
         )
       }
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)
-      Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo.getSerializableInfo)))
+      Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))
     } recoverWith {
       case NonFatal(exception) ⇒
         async {
