@@ -1,4 +1,4 @@
-package csw.messages.messages
+package csw.messages.states
 
 import csw.messages.TMTSerializable
 

@@ -7,9 +7,9 @@ import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import csw.framework.models.ComponentInfo
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.messages.PubSub.PublisherMessage
+import csw.messages._
 import csw.messages.commands.Setup
-import csw.messages.messages.PubSub.PublisherMessage
-import csw.messages.messages._
 import csw.messages.models.ccs.Validation
 import csw.messages.models.location.TrackingEvent
 import csw.messages.states.CurrentState

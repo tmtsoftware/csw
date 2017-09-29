@@ -4,10 +4,10 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.ComponentInfo
-import csw.messages.messages.{ComponentMessage, FromComponentLifecycleMessage}
-import csw.messages.messages.PubSub.PublisherMessage
-import csw.messages.messages.RunningMessage.DomainMessage
+import csw.messages.PubSub.PublisherMessage
+import csw.messages.RunningMessage.DomainMessage
 import csw.messages.states.CurrentState
+import csw.messages.{ComponentMessage, FromComponentLifecycleMessage}
 import csw.services.location.scaladsl.LocationService
 
 import scala.reflect.ClassTag

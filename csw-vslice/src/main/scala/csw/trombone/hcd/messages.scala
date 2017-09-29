@@ -2,7 +2,7 @@ package csw.trombone.hcd
 
 import akka.typed.ActorRef
 import csw.messages.TMTSerializable
-import csw.messages.messages.RunningMessage.DomainMessage
+import csw.messages.RunningMessage.DomainMessage
 import csw.trombone.hcd.AxisResponse.{AxisStatistics, AxisUpdate}
 
 sealed trait SimulatorCommand extends TMTSerializable

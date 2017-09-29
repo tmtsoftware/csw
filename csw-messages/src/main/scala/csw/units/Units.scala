@@ -1,11 +1,12 @@
 package csw.units
 
+import csw.messages.TMTSerializable
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
 
 import scala.collection.immutable
 
-sealed abstract class Units(name: String, description: String) extends EnumEntry with Serializable {
+sealed abstract class Units(name: String, description: String) extends EnumEntry with TMTSerializable {
   // Should parameterize Units so concat can be created concat[A, B]
   override def toString: String = "[" + name + "]"
 }

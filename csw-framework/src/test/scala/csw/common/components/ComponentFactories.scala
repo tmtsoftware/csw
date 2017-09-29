@@ -4,8 +4,8 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.models.ComponentInfo
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.messages.messages.{ComponentMessage, PubSub}
 import csw.messages.states.CurrentState
+import csw.messages.{ComponentMessage, PubSub}
 import csw.services.location.scaladsl.LocationService
 
 class SampleComponentBehaviorFactory extends ComponentBehaviorFactory[ComponentDomainMessage] {

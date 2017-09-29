@@ -6,7 +6,7 @@ import akka.typed.javadsl.ActorContext;
 import csw.common.components.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.ComponentInfo;
-import csw.messages.messages.*;
+import csw.messages.*;
 import csw.messages.models.ccs.Validations;
 import csw.messages.models.ccs.Validation;
 import csw.messages.models.ccs.ValidationIssue;

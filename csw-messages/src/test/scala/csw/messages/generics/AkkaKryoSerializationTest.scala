@@ -10,30 +10,22 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
-import csw.messages.commands._
-import csw.messages.events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
-import csw.messages.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, RaDecKey, StructKey}
-import csw.messages.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.messages.PubSub.Subscribe
-import csw.messages.messages.RunningMessage.{DomainMessage, Lifecycle}
-import csw.messages.messages.SupervisorCommonMessage.{
+import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.PubSub.Subscribe
+import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
+import csw.messages.SupervisorCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.messages.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.messages.messages.{
-  Component,
-  Components,
-  ContainerLifecycleState,
-  LifecycleStateChanged,
-  Restart,
-  Shutdown,
-  SupervisorExternalMessage,
-  SupervisorLifecycleState
-}
+import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.commands._
+import csw.messages.events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
+import csw.messages.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, RaDecKey, StructKey}
+import csw.messages.models.framework.SerializableComponentInfo
 import csw.messages.models.params._
-import csw.messages.states.{CurrentState, DemandState}
+import csw.messages.states.{ContainerLifecycleState, CurrentState, DemandState, SupervisorLifecycleState}
+import csw.messages.{Component, Components, LifecycleStateChanged, Restart, Shutdown, SupervisorExternalMessage}
 import csw.units.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 

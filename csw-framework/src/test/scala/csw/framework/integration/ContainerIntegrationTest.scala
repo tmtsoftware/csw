@@ -11,30 +11,28 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.messages.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.messages.PubSub.Subscribe
-import csw.messages.messages.RunningMessage.Lifecycle
-import csw.messages.messages.SupervisorCommonMessage.{
+import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.PubSub.Subscribe
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.messages.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.messages.messages.{
+import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.models.location.ComponentType.{Assembly, HCD}
+import csw.messages.models.location.Connection.AkkaConnection
+import csw.messages.models.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.messages.states.{ContainerLifecycleState, CurrentState, SupervisorLifecycleState}
+import csw.messages.{
   Components,
   ContainerExternalMessage,
-  ContainerLifecycleState,
   LifecycleStateChanged,
   Restart,
   Shutdown,
-  SupervisorExternalMessage,
-  SupervisorLifecycleState
+  SupervisorExternalMessage
 }
-import csw.messages.models.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
-import csw.messages.states.CurrentState
 import csw.services.location.commons.ClusterSettings
-import csw.messages.models.location.ComponentType.{Assembly, HCD}
-import csw.messages.models.location.Connection.AkkaConnection
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 

@@ -10,39 +10,24 @@ import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.LocationServiceUsage.DoNotRegister
 import csw.framework.models._
 import csw.framework.scaladsl.ComponentBehaviorFactory
-import csw.messages.messages.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.messages.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.messages.InitialMessage.Run
-import csw.messages.messages.PubSub.Publish
-import csw.messages.messages.RunningMessage.Lifecycle
-import csw.messages.messages.SupervisorCommonMessage.{
+import csw.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.InitialMessage.Run
+import csw.messages.PubSub.Publish
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.messages.messages.SupervisorIdleMessage._
-import csw.messages.messages.SupervisorLifecycleState.Idle
-import csw.messages.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.messages.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.messages.messages.{
-  ContainerIdleMessage,
-  InitialMessage,
-  LifecycleStateChanged,
-  PubSub,
-  Restart,
-  RunningMessage,
-  Shutdown,
-  SupervisorCommonMessage,
-  SupervisorIdleMessage,
-  SupervisorLifecycleState,
-  SupervisorMessage,
-  SupervisorRestartMessage,
-  SupervisorRunningMessage,
-  ToComponentLifecycleMessage
-}
+import csw.messages.SupervisorIdleMessage._
+import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages._
 import csw.messages.models.location.ComponentId
 import csw.messages.models.location.Connection.AkkaConnection
-import csw.messages.states.CurrentState
+import csw.messages.states.SupervisorLifecycleState.Idle
+import csw.messages.states.{CurrentState, SupervisorLifecycleState}
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger

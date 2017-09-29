@@ -3,12 +3,12 @@ package csw.framework.scaladsl
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.models._
-import csw.messages.messages.PubSub.PublisherMessage
-import csw.messages.messages.RunningMessage.DomainMessage
-import csw.messages.messages.{CommandExecutionResponse, CommandMessage, CommandValidationResponse, ComponentMessage}
+import csw.messages.PubSub.PublisherMessage
+import csw.messages.RunningMessage.DomainMessage
 import csw.messages.models.ccs.Validation
 import csw.messages.models.location.TrackingEvent
 import csw.messages.states.CurrentState
+import csw.messages.{CommandExecutionResponse, CommandMessage, CommandValidationResponse, ComponentMessage}
 import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.Future

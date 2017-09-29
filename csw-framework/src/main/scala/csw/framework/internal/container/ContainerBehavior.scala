@@ -7,24 +7,14 @@ import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
-import csw.messages.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.messages.ContainerIdleMessage.SupervisorsCreated
-import csw.messages.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.messages.RunningMessage.Lifecycle
-import csw.messages.messages.{
-  Components,
-  ContainerCommonMessage,
-  ContainerIdleMessage,
-  ContainerLifecycleState,
-  ContainerMessage,
-  Restart,
-  Shutdown,
-  SupervisorExternalMessage,
-  SupervisorInfo,
-  SupervisorLifecycleState
-}
-import csw.messages.models.location.{ComponentId, ComponentType}
+import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.ContainerIdleMessage.SupervisorsCreated
+import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages._
 import csw.messages.models.location.Connection.AkkaConnection
+import csw.messages.models.location.{ComponentId, ComponentType}
+import csw.messages.states.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger

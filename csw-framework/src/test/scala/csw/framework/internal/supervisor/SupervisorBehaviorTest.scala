@@ -9,8 +9,8 @@ import csw.common.components.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks.TypedActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.messages.messages.{ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
+import csw.messages.{ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
 import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role

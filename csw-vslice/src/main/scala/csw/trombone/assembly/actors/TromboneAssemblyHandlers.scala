@@ -4,10 +4,10 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.models.ComponentInfo
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.messages.FromComponentLifecycleMessage.Running
+import csw.messages.PubSub.PublisherMessage
+import csw.messages._
 import csw.messages.commands.{Observe, Setup}
-import csw.messages.messages.FromComponentLifecycleMessage.Running
-import csw.messages.messages.PubSub.PublisherMessage
-import csw.messages.messages._
 import csw.messages.models.ccs.Validations.Valid
 import csw.messages.models.ccs.{Validation, Validations}
 import csw.messages.models.location.TrackingEvent

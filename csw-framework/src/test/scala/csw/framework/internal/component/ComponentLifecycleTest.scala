@@ -4,16 +4,16 @@ import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, PostStop}
 import csw.framework.FrameworkTestMocks.TypedActorMock
-import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.{ComponentInfos, FrameworkTestSuite}
+import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.messages.IdleMessage.Initialize
+import csw.messages.InitialMessage.Run
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages._
 import csw.messages.commands.{Observe, Setup}
 import csw.messages.generics.KeyType
-import csw.messages.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.messages.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.messages.messages.IdleMessage.Initialize
-import csw.messages.messages.InitialMessage.Run
-import csw.messages.messages._
-import csw.messages.messages.RunningMessage.Lifecycle
 import csw.messages.models.ccs.Validations
 import csw.messages.models.params.Prefix
 import csw.services.location.scaladsl.LocationService

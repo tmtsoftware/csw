@@ -10,17 +10,17 @@ import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInit
 import csw.framework.javadsl.components.JComponentDomainMessage
 import csw.framework.models._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
+import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.PubSub.Publish
+import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
+import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
+import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages._
 import csw.messages.commands.{CommandInfo, Setup}
 import csw.messages.generics.{KeyType, Parameter}
-import csw.messages.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.messages._
-import csw.messages.messages.PubSub.Publish
-import csw.messages.messages.RunningMessage.{DomainMessage, Lifecycle}
-import csw.messages.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
-import csw.messages.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.messages.states.{CurrentState, DemandState}
 import csw.messages.models.location.Connection.AkkaConnection
+import csw.messages.states.{CurrentState, DemandState, SupervisorLifecycleState}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

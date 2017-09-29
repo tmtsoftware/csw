@@ -1,4 +1,4 @@
-package csw.messages.models.params
+package csw.messages.models.framework
 
 import csw.messages.TMTSerializable
 

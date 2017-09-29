@@ -4,11 +4,11 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.models._
 import csw.framework.scaladsl.ComponentHandlers
+import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.PubSub.{Publish, PublisherMessage}
+import csw.messages._
 import csw.messages.generics.GChoiceKey
 import csw.messages.generics.KeyType.ChoiceKey
-import csw.messages.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.messages.PubSub.{Publish, PublisherMessage}
-import csw.messages.messages._
 import csw.messages.models.ccs.ValidationIssue.OtherIssue
 import csw.messages.models.ccs.{Validation, Validations}
 import csw.messages.models.location.{LocationRemoved, LocationUpdated, TrackingEvent}

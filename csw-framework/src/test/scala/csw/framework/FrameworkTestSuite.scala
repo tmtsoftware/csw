@@ -8,8 +8,8 @@ import akka.util.Timeout
 import csw.common.components.ComponentDomainMessage
 import csw.framework.models._
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.messages.messages.ComponentMessage
-import csw.messages.messages.PubSub.PublisherMessage
+import csw.messages.ComponentMessage
+import csw.messages.PubSub.PublisherMessage
 import csw.messages.states.CurrentState
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

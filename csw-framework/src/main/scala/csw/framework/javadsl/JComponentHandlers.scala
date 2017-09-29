@@ -6,9 +6,9 @@ import akka.typed.ActorRef
 import akka.typed.javadsl.ActorContext
 import csw.framework.models._
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.messages.ComponentMessage
-import csw.messages.messages.PubSub.PublisherMessage
-import csw.messages.messages.RunningMessage.DomainMessage
+import csw.messages.ComponentMessage
+import csw.messages.PubSub.PublisherMessage
+import csw.messages.RunningMessage.DomainMessage
 import csw.messages.states.CurrentState
 import csw.services.location.javadsl.ILocationService
 

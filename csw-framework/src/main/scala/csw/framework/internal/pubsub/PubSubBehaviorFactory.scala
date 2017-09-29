@@ -2,7 +2,7 @@ package csw.framework.internal.pubsub
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.messages.messages.{PubSub, SupervisorMessage}
+import csw.messages.{PubSub, SupervisorMessage}
 
 class PubSubBehaviorFactory() {
   def make[T](ctx: ActorContext[SupervisorMessage], actorName: String, componentName: String): ActorRef[PubSub[T]] =

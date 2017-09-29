@@ -14,13 +14,13 @@ import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.ComponentInfo
-import csw.messages.messages.PubSub.{Publish, PublisherMessage}
-import csw.messages.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.messages._
-import csw.messages.states.CurrentState
+import csw.messages.PubSub.{Publish, PublisherMessage}
+import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
+import csw.messages._
 import csw.messages.models.location.Connection.AkkaConnection
+import csw.messages.states.{CurrentState, SupervisorLifecycleState}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem

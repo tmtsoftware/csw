@@ -2,12 +2,12 @@ package csw.framework.internal.component
 
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.messages.FromComponentLifecycleMessage.{Initialized, Running}
-import csw.messages.messages.IdleMessage.Initialize
-import csw.messages.messages.InitialMessage.Run
-import csw.messages.messages.{ComponentMessage, FromComponentLifecycleMessage}
+import csw.framework.{ComponentInfos, FrameworkTestSuite}
+import csw.messages.FromComponentLifecycleMessage.{Initialized, Running}
+import csw.messages.IdleMessage.Initialize
+import csw.messages.InitialMessage.Run
+import csw.messages.{ComponentMessage, FromComponentLifecycleMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.mockito.Mockito._
