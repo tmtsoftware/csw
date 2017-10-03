@@ -24,6 +24,7 @@ import csw.messages.ccs.events.{EventInfo, ObserveEvent, StatusEvent, SystemEven
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.HCD
+import csw.messages.location.Connection
 import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, RaDecKey, StructKey}
 import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.messages.params.models._
@@ -238,13 +239,14 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
       val componentsProbe              = TestProbe[Components]
       val supExtMsgProbe               = TestProbe[SupervisorExternalMessage]
+      val connection                   = Connection.from("Trombone-hcd-akka")
       val componentInfo = ComponentInfo(
         "name",
         HCD,
         "prefix",
         "className",
         DoNotRegister,
-        Set.empty,
+        Set(connection),
         10.seconds,
         10.seconds
       )
@@ -261,6 +263,10 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       serialization.findSerializerFor(ContainerLifecycleState.Running).getClass shouldBe classOf[AkkaSerializer]
       serialization.findSerializerFor(component).getClass shouldBe classOf[AkkaSerializer]
       serialization.findSerializerFor(componentInfo).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(componentInfo.componentType).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(componentInfo.locationServiceUsage).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(componentInfo.connections.head).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(connection.componentId).getClass shouldBe classOf[AkkaSerializer]
     }
   }
 }
