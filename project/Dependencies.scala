@@ -37,8 +37,8 @@ object Dependencies {
   val Benchmark = Seq(
     Libs.`persist-json`,
     Libs.`gson`,
-    Libs.`jackson-core`,
-    Libs.`jackson-databind`,
+    Jackson.`jackson-core`,
+    Jackson.`jackson-databind`,
     Chill.`chill-akka`
   )
 
