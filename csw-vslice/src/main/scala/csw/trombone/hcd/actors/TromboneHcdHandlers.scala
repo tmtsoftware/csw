@@ -138,7 +138,9 @@ class TromboneHcdHandlers(
 
   private def getAxisConfig: Future[AxisConfig] = ???
 
-  override def onControlCommand(commandMsg: CommandMessage): Validation = ???
+  override def onSetup(commandMessage: CommandMessage): Validation = ???
+
+  override def onObserve(commandMessage: CommandMessage): Validation = ???
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 }

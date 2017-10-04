@@ -76,7 +76,11 @@ class SampleComponentHandlers(
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
   }
 
-  override def onControlCommand(commandMsg: CommandMessage): Validation = {
+  override def onSetup(commandMessage: CommandMessage): Validation = onControlCommand(commandMessage)
+
+  override def onObserve(commandMessage: CommandMessage): Validation = onControlCommand(commandMessage)
+
+  def onControlCommand(commandMsg: CommandMessage): Validation = {
     commandMsg match {
       case Submit(command, replyTo) =>
         pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))

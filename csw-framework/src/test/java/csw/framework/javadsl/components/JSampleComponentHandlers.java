@@ -5,11 +5,13 @@ import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.common.components.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.messages.framework.ComponentInfo;
-import csw.messages.*;
-import csw.messages.ccs.Validations;
+import csw.messages.CommandMessage;
+import csw.messages.ComponentMessage;
+import csw.messages.PubSub;
 import csw.messages.ccs.Validation;
 import csw.messages.ccs.ValidationIssue;
+import csw.messages.ccs.Validations;
+import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
@@ -66,7 +68,16 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public Validation onControlCommand(CommandMessage commandMsg) {
+    public Validation onSetup(CommandMessage commandMessage) {
+        return onControlCommand(commandMessage);
+    }
+
+    @Override
+    public Validation onObserve(CommandMessage commandMessage) {
+        return onControlCommand(commandMessage);
+    }
+
+    private Validation onControlCommand(CommandMessage commandMsg) {
         CurrentState commandState;
         if(commandMsg instanceof CommandMessage.Submit) {
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));

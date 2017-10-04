@@ -25,7 +25,8 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
   def initialize(): Future[Unit]
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit
   def onDomainMsg(msg: Msg): Unit
-  def onControlCommand(commandMessage: CommandMessage): Validation
+  def onSetup(commandMessage: CommandMessage): Validation
+  def onObserve(commandMessage: CommandMessage): Validation
   def onShutdown(): Future[Unit]
   def onGoOffline(): Unit
   def onGoOnline(): Unit

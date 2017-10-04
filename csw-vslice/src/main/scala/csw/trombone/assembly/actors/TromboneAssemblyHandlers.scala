@@ -6,8 +6,8 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
-import csw.messages.ccs.commands.{Observe, Setup}
 import csw.messages.ccs.Validations.Valid
+import csw.messages.ccs.commands.Setup
 import csw.messages.ccs.{Validation, Validations}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
@@ -74,20 +74,16 @@ class TromboneAssemblyHandlers(
     case _                                   ⇒
   }
 
-  override def onControlCommand(commandMsg: CommandMessage): Validation = commandMsg.command match {
-    case x: Setup   => setup(x, commandMsg.replyTo)
-    case x: Observe => observe(x, commandMsg.replyTo)
-  }
-
-  private def setup(s: Setup, commandOriginator: ActorRef[CommandResponse]): Validation = {
-    val validation = validateOneSetup(s)
+  override def onSetup(commandMessage: CommandMessage): Validation = {
+    val validation = validateOneSetup(commandMessage.command.asInstanceOf[Setup])
     if (validation == Valid) {
-      commandHandler ! TromboneCommandHandlerMsgs.Submit(s, commandOriginator)
+      commandHandler ! TromboneCommandHandlerMsgs.Submit(commandMessage.command.asInstanceOf[Setup],
+                                                         commandMessage.replyTo)
     }
     validation
   }
 
-  private def observe(o: Observe, replyTo: ActorRef[CommandExecutionResponse]): Validation = Validations.Valid
+  override def onObserve(commandMessage: CommandMessage): Validations.Valid.type = Validations.Valid
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
 

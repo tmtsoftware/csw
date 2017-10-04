@@ -10,6 +10,7 @@ import csw.messages.IdleMessage.Initialize
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
+import csw.messages.ccs.commands.{Observe, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
 import csw.services.location.scaladsl.LocationService
@@ -122,8 +123,16 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       case x: Oneway ⇒ x.copy(replyTo = ctx.spawnAnonymous(Actor.ignore))
       case x: Submit ⇒ x
     }
-    log.info(s"Invoking lifecycle handler's onControlCommand hook with msg :[$newMessage]")
-    val validation              = lifecycleHandlers.onControlCommand(newMessage)
+
+    val validation = newMessage.command match {
+      case _: Setup =>
+        log.info(s"Invoking lifecycle handler's onSetup hook with msg :[$newMessage]")
+        lifecycleHandlers.onSetup(newMessage)
+      case _: Observe =>
+        log.info(s"Invoking lifecycle handler's onObserve hook with msg :[$newMessage]")
+        lifecycleHandlers.onObserve(newMessage)
+    }
+
     val validationCommandResult = CommandValidationResponse.validationAsCommandStatus(validation)
     commandMessage.replyTo ! validationCommandResult
   }
