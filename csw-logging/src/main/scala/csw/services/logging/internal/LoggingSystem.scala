@@ -185,11 +185,9 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
     logActor ! SetAppenders(appenders)
   }
 
-  // todo: this can be achieved through LoggerImpl as well, decide the place for setting log level dynamically while playing framework stories
   def setComponentLogLevel(componentName: String, level: Level): Unit =
     ComponentLoggingStateManager.add(componentName, level)
 
-  // todo: this can be achieved through LoggerImpl as well, decide the place for setting log level dynamically while playing framework stories
   /**
    * Get the basic logging configuration values
    * @return LogMetadata which comprises of current root log level, akka log level, sl4j log level and component log level
