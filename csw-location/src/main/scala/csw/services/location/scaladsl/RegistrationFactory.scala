@@ -5,6 +5,6 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.services.location.models.AkkaRegistration
 
 class RegistrationFactory {
-  def akkaTyped(akkaConnection: AkkaConnection, actorRef: ActorRef[_]): AkkaRegistration =
-    AkkaRegistration(akkaConnection, actorRef)
+  def akkaTyped(akkaConnection: AkkaConnection, actorRef: ActorRef[_], adminActorRef: ActorRef[_]): AkkaRegistration =
+    AkkaRegistration.apply(akkaConnection, actorRef, adminActorRef)
 }

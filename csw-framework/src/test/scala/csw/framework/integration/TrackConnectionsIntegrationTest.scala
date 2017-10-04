@@ -2,7 +2,7 @@ package csw.framework.integration
 
 import akka.actor
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.ActorSystem
+import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
@@ -20,6 +20,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.states.CurrentState
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.logging.internal.LogControlMessages
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -47,10 +48,12 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
 
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
 
-    val wiring = FrameworkWiring.make(containerActorSystem)
+    val wiring                                      = FrameworkWiring.make(containerActorSystem)
+    val adminActorRef: ActorRef[LogControlMessages] = containerActorSystem.spawn(Behavior.empty, "log-admin")
     // start a container and verify it moves to running lifecycle state
     val containerRef =
-      Await.result(Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring), 5.seconds)
+      Await.result(Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring, adminActorRef),
+                   5.seconds)
 
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
     val assemblyProbe                = TestProbe[CurrentState]("assembly-state-probe")

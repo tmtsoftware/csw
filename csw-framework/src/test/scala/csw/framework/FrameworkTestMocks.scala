@@ -27,7 +27,8 @@ class FrameworkTestMocks(
     system: ActorSystem[Nothing],
     settings: TestKitSettings
 ) extends MockitoSugar {
-  val akkaRegistration                                              = AkkaRegistration(mock[AkkaConnection], testkit.TestProbe("test-probe").testActor)
+  val testActor: ActorRef[Any]                                      = testkit.TestProbe("test-probe").testActor
+  val akkaRegistration                                              = AkkaRegistration(mock[AkkaConnection], testActor, testActor)
   val locationService: LocationService                              = mock[LocationService]
   val registrationResult: RegistrationResult                        = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory                      = mock[RegistrationFactory]
@@ -35,7 +36,8 @@ class FrameworkTestMocks(
   val lifecycleStateProbe: TestProbe[PubSub[LifecycleStateChanged]] = TestProbe[PubSub[LifecycleStateChanged]]
   val compStateProbe: TestProbe[PubSub[CurrentState]]               = TestProbe[PubSub[CurrentState]]
 
-  when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]])).thenReturn(akkaRegistration)
+  when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], any[ActorRef[_]]))
+    .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
   when(locationService.asJava).thenReturn(mock[ILocationService])

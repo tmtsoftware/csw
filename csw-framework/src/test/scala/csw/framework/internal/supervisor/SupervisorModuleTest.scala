@@ -60,7 +60,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       componentInfo,
       locationService,
       registrationFactory,
-      pubSubBehaviorFactory
+      pubSubBehaviorFactory,
+      testActor
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA

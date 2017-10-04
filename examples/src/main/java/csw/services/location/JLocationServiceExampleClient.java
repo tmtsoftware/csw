@@ -20,10 +20,12 @@ import csw.services.location.javadsl.*;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
 import csw.services.location.scaladsl.ActorSystemFactory;
+import csw.services.logging.internal.LogControlMessages;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JKeys;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
+import csw.services.logging.scaladsl.LogAdminActor$;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -53,6 +55,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
     private IRegistrationResult httpRegResult;
     private IRegistrationResult hcdRegResult;
     private IRegistrationResult assemblyRegResult;
+    private akka.typed.ActorRef<LogControlMessages> adminActorRef = Adapter.spawn(getContext(), LogAdminActor$.MODULE$.behavior(loggingSystem), "");
 
     private static LoggingSystem loggingSystem;
 
@@ -95,12 +98,12 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
                 }),
                 "my-actor-1"
         );
-        AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, Adapter.toTyped(actorRef));
+        AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, Adapter.toTyped(actorRef), adminActorRef);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         //. register the client "assembly" created in this example
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
-        AkkaRegistration assemblyRegistration = new AkkaRegistration(assemblyConnection, Adapter.toTyped(getSelf()));
+        AkkaRegistration assemblyRegistration = new AkkaRegistration(assemblyConnection, Adapter.toTyped(getSelf()), adminActorRef);
         assemblyRegResult = locationService.register(assemblyRegistration).get();
         //#Components-Connections-Registrations
     }

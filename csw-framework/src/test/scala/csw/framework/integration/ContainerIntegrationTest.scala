@@ -2,10 +2,10 @@ package csw.framework.integration
 
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
+import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.{actor, testkit}
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
@@ -35,6 +35,7 @@ import csw.messages.{
 }
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.logging.internal.LogControlMessages
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -65,9 +66,11 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
 
   test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
-    val wiring = FrameworkWiring.make(containerActorSystem)
+    val wiring                                      = FrameworkWiring.make(containerActorSystem)
+    val adminActorRef: ActorRef[LogControlMessages] = containerActorSystem.spawn(Behavior.empty, "log-admin")
     // start a container and verify it moves to running lifecycle state
-    val containerRef = Await.result(Container.spawn(ConfigFactory.load("container.conf"), wiring), 5.seconds)
+    val containerRef =
+      Await.result(Container.spawn(ConfigFactory.load("container.conf"), wiring, adminActorRef), 5.seconds)
 
     val componentsProbe              = TestProbe[Components]("comp-probe")
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")

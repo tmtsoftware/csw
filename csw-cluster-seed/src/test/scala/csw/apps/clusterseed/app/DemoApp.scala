@@ -3,12 +3,12 @@ package csw.apps.clusterseed.app
 import akka.actor.{Actor, Props}
 import akka.typed.scaladsl.adapter._
 import csw.apps.clusterseed.admin.internal.AdminWiring
-import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.AkkaRegistration
 import csw.services.logging.internal.{GetComponentLogMetadata, SetComponentLogLevel}
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.{ComponentLogger, LogAdminActor}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -70,7 +70,9 @@ class DemoApp extends AppLogger.Simple {
       }),
       "test-actor"
     )
-    val akkaRegistration = AkkaRegistration(connection, actorRef)
+
+    val adminActorRef    = actorSystem.spawn(LogAdminActor.behavior(loggingSystem), "log-admin")
+    val akkaRegistration = AkkaRegistration(connection, actorRef, adminActorRef)
 
     log.info(s"Registering akka connection = ${connection.name} with location service")
     Await.result(locationService.register(akkaRegistration), 5.seconds)

@@ -1,6 +1,8 @@
 package csw.services.integtration.apps
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.typed
+import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
@@ -14,11 +16,12 @@ object TromboneHCD {
 
   val hcdActorSystem = ActorSystem("trombone-hcd-system")
 
-  val tromboneHcdActorRef: ActorRef = hcdActorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
-  val componentId                   = ComponentId("trombonehcd", ComponentType.HCD)
-  val connection                    = AkkaConnection(componentId)
+  val tromboneHcdActorRef: ActorRef          = hcdActorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
+  val adminActorRef: typed.ActorRef[Nothing] = hcdActorSystem.spawn(Behavior.empty, "trombone-hcd-admin")
+  val componentId                            = ComponentId("trombonehcd", ComponentType.HCD)
+  val connection                             = AkkaConnection(componentId)
 
-  val registration                           = AkkaRegistration(connection, tromboneHcdActorRef)
+  val registration                           = AkkaRegistration(connection, tromboneHcdActorRef, adminActorRef)
   private val locationService                = LocationServiceFactory.withCluster(cswCluster)
   val registrationResult: RegistrationResult = locationService.register(registration).await
 

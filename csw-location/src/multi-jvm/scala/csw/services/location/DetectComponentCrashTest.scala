@@ -69,7 +69,12 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
       val actorRef = ActorSystemFactory
         .remote()
         .spawn(Behavior.empty, "trombone-hcd-1")
-      locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
+
+      val adminActorRef = ActorSystemFactory
+        .remote()
+        .spawn(Behavior.empty, "trombone-hcd-1")
+
+      locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
       enterBarrier("Registration")
 
       Await.ready(system.whenTerminated, 5.seconds)

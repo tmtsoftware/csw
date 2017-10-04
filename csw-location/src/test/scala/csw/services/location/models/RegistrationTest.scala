@@ -25,13 +25,13 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
     val actorSystem    = ActorSystemFactory.remote()
     val actorRef       = actorSystem.spawn(Behavior.empty, "my-actor-1")
+    val adminActorRef  = actorSystem.spawn(Behavior.empty, "my-actor-1-admin")
+    val actorPath      = ActorPath.fromString(Serialization.serializedActorPath(actorRef.toUntyped))
+    val akkaUri        = new URI(actorPath.toString)
 
-    val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef.toUntyped))
-    val akkaUri   = new URI(actorPath.toString)
+    val akkaRegistration = AkkaRegistration(akkaConnection, actorRef, adminActorRef)
 
-    val akkaRegistration = AkkaRegistration(akkaConnection, actorRef)
-
-    val expectedAkkaLocation = AkkaLocation(akkaConnection, akkaUri, actorRef)
+    val expectedAkkaLocation = AkkaLocation(akkaConnection, akkaUri, actorRef, adminActorRef)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
 
@@ -70,10 +70,11 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
     val actorSystem    = ActorSystem("local-actor-system", config)
     val actorRef       = actorSystem.spawn(Behavior.empty, "my-actor-2")
+    val adminActorRef  = actorSystem.spawn(Behavior.empty, "my-actor-2-admin")
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
-      AkkaRegistration(akkaConnection, actorRef)
+      AkkaRegistration(akkaConnection, actorRef, adminActorRef)
     }
     Await.result(actorSystem.terminate, 10.seconds)
   }

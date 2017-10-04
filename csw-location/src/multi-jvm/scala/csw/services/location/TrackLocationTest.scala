@@ -29,8 +29,9 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
     val tcpConnection = TcpConnection(ComponentId("redis1", ComponentType.Service))
 
     runOn(seed) {
-      val actorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
-      locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
+      val actorRef      = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
+      val adminActorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd-admin")
+      locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await

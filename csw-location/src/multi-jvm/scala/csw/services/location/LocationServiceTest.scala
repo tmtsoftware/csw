@@ -79,14 +79,15 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     val akkaConnection = AkkaConnection(componentId)
 
     runOn(seed) {
-      val actorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
-      locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
+      val actorRef      = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
+      val adminActorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd-admin")
+      locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await
       enterBarrier("Unregister")
 
-      locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
+      locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
       enterBarrier("Re-registration")
     }
 
@@ -143,9 +144,10 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     }
 
     runOn(member) {
-      val actorRef = assemblyActorSystem.actorOf(AssemblyActor.props(locationService), "assembly-actor")
+      val actorRef      = assemblyActorSystem.actorOf(AssemblyActor.props(locationService), "assembly-actor")
+      val adminActorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd-admin")
       import akka.typed.scaladsl.adapter._
-      locationService.register(AkkaRegistration(akkaConnection, actorRef)).await
+      locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
 
       enterBarrier("Registration")
 

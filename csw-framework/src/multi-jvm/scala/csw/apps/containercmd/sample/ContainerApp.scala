@@ -12,7 +12,8 @@ import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.{ContainerMessage, Restart}
 import csw.services.location.commons.ClusterSettings
-import csw.services.logging.scaladsl.LoggingSystemFactory
+import csw.services.logging.internal.LoggingSystem
+import csw.services.logging.scaladsl.{LogAdminActor, LoggingSystemFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
@@ -24,8 +25,9 @@ object ContainerApp extends App {
   implicit val testkit: TestKitSettings                = TestKitSettings(actorSystem)
   private val wiring                                   = FrameworkWiring.make(system)
   private val config: Config                           = ConfigFactory.load("laser_container.conf")
-  LoggingSystemFactory.start("framework", "1.0", "localhost", system)
-  private val ref: ActorRef[ContainerMessage] = Await.result(Container.spawn(config, wiring), 5.seconds)
+  private val loggingSystem: LoggingSystem             = LoggingSystemFactory.start("framework", "1.0", "localhost", system)
+  private val adminActorRef                            = system.spawn(LogAdminActor.behavior(loggingSystem), "laser")
+  private val ref: ActorRef[ContainerMessage]          = Await.result(Container.spawn(config, wiring, adminActorRef), 5.seconds)
 
   Thread.sleep(2000)
 

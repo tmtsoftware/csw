@@ -59,7 +59,8 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
                   new SampleComponentBehaviorFactory,
                   new PubSubBehaviorFactory,
                   registrationFactory,
-                  locationService
+                  locationService,
+                  testActor
                 ) with TypedActorMock[SupervisorMessage]
           )
       )

@@ -2,6 +2,7 @@ package csw.services.integtration.tests
 
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
+import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
@@ -30,10 +31,11 @@ class LocationServiceIntegrationTest
 
   test("should not allow duplicate akka registration") {
     val tromboneHcdActorRef = system.actorOf(Props[TromboneHCD], "trombone-hcd")
+    val adminActorRef       = system.spawn(Behavior.empty, "trombone-admin")
     val componentId         = ComponentId("trombonehcd", ComponentType.HCD)
     val connection          = AkkaConnection(componentId)
 
-    val registration = AkkaRegistration(connection, tromboneHcdActorRef)
+    val registration = AkkaRegistration(connection, tromboneHcdActorRef, adminActorRef)
     Thread.sleep(4000)
     intercept[OtherLocationIsRegistered] {
       locationService.register(registration).await

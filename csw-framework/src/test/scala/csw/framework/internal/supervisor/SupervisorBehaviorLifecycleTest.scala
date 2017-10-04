@@ -45,7 +45,8 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
         getSampleHcdWiring(sampleHcdHandler),
         new PubSubBehaviorFactory,
         registrationFactory,
-        locationService
+        locationService,
+        testActor
       ) with TypedActorMock[SupervisorMessage]
 
     verify(timer).startSingleTimer(

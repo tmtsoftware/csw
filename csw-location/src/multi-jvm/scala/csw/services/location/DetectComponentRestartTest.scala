@@ -30,7 +30,11 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
     val akkaConnection = AkkaConnection(ComponentId("TromboneHcd", ComponentType.HCD))
 
     runOn(member1) {
-      locationService.register(AkkaRegistration(akkaConnection, system.spawnAnonymous(Behavior.empty))).await
+      locationService
+        .register(
+          AkkaRegistration(akkaConnection, system.spawnAnonymous(Behavior.empty), system.spawnAnonymous(Behavior.empty))
+        )
+        .await
       enterBarrier("location-registered")
       enterBarrier("location-updated")
 
@@ -41,7 +45,15 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
       val freshLocationService = LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
       Thread.sleep(2000)
 
-      freshLocationService.register(AkkaRegistration(akkaConnection, newSystem.spawnAnonymous(Behavior.empty))).await
+      freshLocationService
+        .register(
+          AkkaRegistration(
+            akkaConnection,
+            newSystem.spawnAnonymous(Behavior.empty),
+            newSystem.spawnAnonymous(Behavior.empty)
+          )
+        )
+        .await
       enterBarrier("member-re-registered")
     }
 

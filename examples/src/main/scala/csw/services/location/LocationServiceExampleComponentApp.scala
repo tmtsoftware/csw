@@ -4,6 +4,8 @@ import java.net.InetAddress
 
 import akka.actor._
 import akka.stream.ActorMaterializer
+import akka.typed
+import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
@@ -51,10 +53,10 @@ object LocationServiceExampleComponent {
 class LocationServiceExampleComponent(locationService: LocationService) extends ExampleLogger.Actor {
 
   log.info("In actor LocationServiceExampleComponent")
-
+  val adminActorRef: typed.ActorRef[Nothing] = ActorSystemFactory.remote().spawn(Behavior.empty, "my-actor-1-admin")
   // Register with the location service
   val registrationResult: Future[RegistrationResult] =
-    locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self))
+    locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self, adminActorRef))
   Await.result(registrationResult, 5.seconds)
 
   log.info("LocationServiceExampleComponent registered.")

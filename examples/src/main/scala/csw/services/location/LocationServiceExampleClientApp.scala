@@ -5,14 +5,15 @@ import java.net.InetAddress
 import akka.actor.{Actor, ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
+import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter._
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.services.commons.ExampleLogger
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
-import csw.services.logging.internal.LoggingSystem
-import csw.services.logging.scaladsl.{Keys, LoggingSystemFactory}
+import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
+import csw.services.logging.scaladsl.{Keys, LogAdminActor, LoggingSystemFactory}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -66,6 +67,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds
+  private val adminActorRef: ActorRef[LogControlMessages] =
+    context.spawn(LogAdminActor.behavior(loggingSystem), "my-actor-1-admin")
 
   // EXAMPLE DEMO START
 
@@ -94,12 +97,12 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
       override def receive: Receive = {
         case "print" => log.info("hello world")
       }
-    }), name = "my-actor-1"))
+    }), name = "my-actor-1"), adminActorRef)
   val hcdRegResult: RegistrationResult = Await.result(locationService.register(hcdRegistration), 2.seconds)
 
   //register the client "assembly" created in this example
   val assemblyConnection                    = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
-  val assemblyRegistration                  = AkkaRegistration(assemblyConnection, self)
+  val assemblyRegistration                  = AkkaRegistration(assemblyConnection, self, adminActorRef)
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations
 

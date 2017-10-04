@@ -19,8 +19,11 @@ sealed abstract class Location extends TMTSerializable {
 /**
  * Represents a live Akka connection of an Actor
  */
-final case class AkkaLocation(connection: AkkaConnection, uri: URI, actorRef: ActorRef[_]) extends Location {
-  def typedRef[T]: typed.ActorRef[T] = actorRef.asInstanceOf[ActorRef[T]]
+final case class AkkaLocation(connection: AkkaConnection, uri: URI, actorRef: ActorRef[_], adminActorRef: ActorRef[_])
+    extends Location {
+
+  def typedRef[T]: typed.ActorRef[T]      = actorRef.asInstanceOf[ActorRef[T]]
+  def typedAdminRef[T]: typed.ActorRef[T] = adminActorRef.asInstanceOf[ActorRef[T]]
 }
 
 /**

@@ -23,11 +23,13 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
   def getLogMetadata(componentName: String): Future[LogMetadata] = async {
     implicit val timeout: Timeout = Timeout(5.seconds)
     await(getLocation(componentName)) match {
-      case Some(akkaLocation @ AkkaLocation(connection, _, actorRef)) ⇒
-        log.info("Getting log information from logging system",
-                 Map("componentName" → componentName, "actorRef" → actorRef.toString))
+      case Some(akkaLocation @ AkkaLocation(connection, _, actorRef, adminActorRef)) ⇒
+        log.info(
+          "Getting log information from logging system",
+          Map("componentName" → componentName, "actorRef" → actorRef.toString, "adminActorRef" → adminActorRef.toString)
+        )
         val logMetadataF: Future[LogMetadata] = akkaLocation
-          .typedRef[LogControlMessages] ? (GetComponentLogMetadata(connection.componentId.name, _))
+          .typedAdminRef[LogControlMessages] ? (GetComponentLogMetadata(connection.componentId.name, _))
         await(logMetadataF)
 
       case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
@@ -38,10 +40,16 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
     async {
       await(getLocation(componentName)) match {
 
-        case Some(akkaLocation @ AkkaLocation(connection, _, actorRef)) ⇒
-          log.info(s"Setting log level to $logLevel",
-                   Map("componentName" → componentName, "actorRef" → actorRef.toString))
-          akkaLocation.typedRef[LogControlMessages] ! SetComponentLogLevel(connection.componentId.name, logLevel)
+        case Some(akkaLocation @ AkkaLocation(connection, _, actorRef, adminActorRef)) ⇒
+          log.info(
+            s"Setting log level to $logLevel",
+            Map(
+              "componentName" → componentName,
+              "actorRef"      → actorRef.toString,
+              "adminActorRef" → adminActorRef.toString
+            )
+          )
+          akkaLocation.typedAdminRef[LogControlMessages] ! SetComponentLogLevel(connection.componentId.name, logLevel)
 
         case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
       }

@@ -18,8 +18,9 @@ import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, Superviso
 import csw.messages.location.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
+import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -42,7 +43,8 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   class IdleContainer() {
     val ctx                                                  = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
     val supervisorFactory: SupervisorInfoFactory             = mock[SupervisorInfoFactory]
-    val akkaRegistration                                     = AkkaRegistration(mock[AkkaConnection], TestProbe("test-probe").testActor)
+    private val testActor: ActorRef[Any]                     = TestProbe("test-probe").testActor
+    val akkaRegistration                                     = AkkaRegistration(mock[AkkaConnection], testActor, testActor)
     val locationService: LocationService                     = mock[LocationService]
     val registrationResult: RegistrationResult               = mock[RegistrationResult]
     private val pubSubBehaviorFactory: PubSubBehaviorFactory = mock[PubSubBehaviorFactory]
@@ -55,7 +57,8 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
           componentInfo,
           locationService,
           registrationFactory,
-          pubSubBehaviorFactory
+          pubSubBehaviorFactory,
+          testActor
         )
         val supervisorInfo = SupervisorInfo(
           untypedSystem,
@@ -74,13 +77,16 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     when(
       supervisorFactory
-        .make(ArgumentMatchers.any[ActorRef[ContainerIdleMessage]],
-              ArgumentMatchers.any[ComponentInfo],
-              ArgumentMatchers.any[LocationService])
+        .make(
+          any[ActorRef[ContainerIdleMessage]],
+          any[ComponentInfo],
+          any[LocationService],
+          any[ActorRef[LogControlMessages]]
+        )
     ).thenAnswer(answer)
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
-    when(registrationFactory.akkaTyped(ArgumentMatchers.any[AkkaConnection], ArgumentMatchers.any[ActorRef[_]]))
+    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], any[ActorRef[_]]))
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =
@@ -91,7 +97,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
     val containerBehavior =
-      new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService)
+      new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService, testActor)
       with TypedActorMock[ContainerMessage]
 
   }
