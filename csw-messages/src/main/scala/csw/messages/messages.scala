@@ -133,7 +133,7 @@ case class SupervisorInfo(system: ActorSystem, component: Component)
 /**
  * Trait for a response message from an assembly to a submit or observe request
  */
-sealed trait CommandResponse extends RunningMessage
+sealed trait CommandResponse extends RunningMessage with TMTSerializable
 
 sealed trait CommandExecutionResponse  extends CommandResponse
 sealed trait CommandValidationResponse extends CommandResponse
