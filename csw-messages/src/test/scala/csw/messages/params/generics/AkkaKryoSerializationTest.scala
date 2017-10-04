@@ -247,7 +247,6 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
         "className",
         DoNotRegister,
         Set(connection),
-        10.seconds,
         10.seconds
       )
       val component  = Component(supExtMsgProbe.ref, componentInfo)

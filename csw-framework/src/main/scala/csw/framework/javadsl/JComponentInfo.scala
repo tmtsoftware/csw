@@ -27,8 +27,7 @@ object JComponentInfo {
       className,
       locationServiceUsage,
       connections.asScala.toSet,
-      initializeTimeout,
-      runTimeout
+      initializeTimeout
     )
   }
 }

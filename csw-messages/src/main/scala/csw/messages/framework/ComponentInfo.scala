@@ -18,8 +18,7 @@ final case class ComponentInfo(
     behaviorFactoryClassName: String,
     locationServiceUsage: LocationServiceUsage,
     connections: Set[Connection] = Set.empty,
-    initializeTimeout: FiniteDuration = 10.seconds,
-    runTimeout: FiniteDuration = 10.seconds
+    initializeTimeout: FiniteDuration = 10.seconds
 ) extends TMTSerializable {
 
   /**

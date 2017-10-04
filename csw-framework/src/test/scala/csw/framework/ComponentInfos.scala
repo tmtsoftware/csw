@@ -45,8 +45,7 @@ object ComponentInfos {
     "csw.common.components.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
-    0.seconds,
-    5.seconds
+    0.seconds
   )
 
   val hcdInfoWithRunTimeout = ComponentInfo(
@@ -56,8 +55,7 @@ object ComponentInfos {
     "csw.common.components.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
-    5.seconds,
-    0.seconds
+    5.seconds
   )
 
   val containerInfo: ContainerInfo = ContainerInfo("container", Set(hcdInfo, assemblyInfo))

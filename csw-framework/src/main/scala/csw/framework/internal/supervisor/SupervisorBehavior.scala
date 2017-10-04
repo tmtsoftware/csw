@@ -59,7 +59,6 @@ class SupervisorBehavior(
   val componentName: String              = componentInfo.name
   val componentActorName                 = s"$componentName-$ComponentActorNameSuffix"
   val initializeTimeout: FiniteDuration  = componentInfo.initializeTimeout
-  val runTimeout: FiniteDuration         = componentInfo.runTimeout
   val akkaConnection                     = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
   val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
   val isStandalone: Boolean              = maybeContainerRef.isEmpty
@@ -150,7 +149,6 @@ class SupervisorBehavior(
   }
 
   private def onRegistrationComplete(componentRef: ActorRef[RunningMessage]): Unit = {
-    log.info(s"Starting RunTimer for $runTimeout")
     lifecycleState = SupervisorLifecycleState.Running
     runningComponent = Some(componentRef)
     maybeContainerRef foreach { container ⇒
