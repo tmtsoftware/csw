@@ -17,8 +17,7 @@ object JComponentInfo {
       className: String,
       locationServiceUsage: LocationServiceUsage,
       connections: util.Set[Connection],
-      initializeTimeout: FiniteDuration,
-      runTimeout: FiniteDuration
+      initializeTimeout: FiniteDuration
   ): ComponentInfo = {
     ComponentInfo(
       name,

@@ -18,8 +18,8 @@ public class JComponentInfos {
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
-            new FiniteDuration(10, TimeUnit.SECONDS),
-            new FiniteDuration(10, TimeUnit.SECONDS));
+            new FiniteDuration(10, TimeUnit.SECONDS)
+    );
 
     public static ComponentInfo jHcdInfoWithInitializeTimeout = JComponentInfo.from(
             "trombone",
@@ -28,8 +28,8 @@ public class JComponentInfos {
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
-            new FiniteDuration(0, TimeUnit.SECONDS),
-            new FiniteDuration(5, TimeUnit.SECONDS));
+            new FiniteDuration(0, TimeUnit.SECONDS)
+    );
 
     public static ComponentInfo jHcdInfoWithRunTimeout = JComponentInfo.from(
             "trombone",
@@ -38,6 +38,6 @@ public class JComponentInfos {
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
-            new FiniteDuration(5, TimeUnit.SECONDS),
-            new FiniteDuration(0, TimeUnit.SECONDS));
+            new FiniteDuration(5, TimeUnit.SECONDS)
+    );
 }
