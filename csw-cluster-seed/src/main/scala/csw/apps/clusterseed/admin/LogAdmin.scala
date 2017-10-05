@@ -39,7 +39,6 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
   def setLogLevel(componentName: String, logLevel: Level): Future[Unit] =
     async {
       await(getLocation(componentName)) match {
-
         case Some(akkaLocation @ AkkaLocation(connection, _, actorRef, adminActorRef)) ⇒
           log.info(
             s"Setting log level to $logLevel",

@@ -131,11 +131,13 @@ lazy val `csw-vslice` = project
   .dependsOn(`csw-framework`)
 
 lazy val `csw-framework` = project
-  .dependsOn(`csw-messages`,
-             `csw-config-client`,
-             `csw-logging`,
-             `csw-location`      % "compile->compile;multi-jvm->multi-jvm",
-             `csw-config-server` % "multi-jvm->test")
+  .dependsOn(
+    `csw-messages`,
+    `csw-config-client`,
+    `csw-logging`,
+    `csw-location`      % "compile->compile;multi-jvm->multi-jvm",
+    `csw-config-server` % "multi-jvm->test"
+  )
   .enablePlugins(AutoMultiJvm, GenJavadocPlugin, CswBuildInfo)
   .settings(
     libraryDependencies ++= Dependencies.CswFramework
@@ -156,4 +158,6 @@ lazy val docs = project.enablePlugins(ParadoxSite, NoPublish)
 lazy val examples = project
   .dependsOn(`csw-location`, `csw-config-client`, `csw-config-server` % "test->test", `csw-logging`)
   .enablePlugins(DeployApp)
-  .settings(libraryDependencies ++= Dependencies.CswProdExamples)
+  .settings(
+    libraryDependencies ++= Dependencies.CswProdExamples
+  )

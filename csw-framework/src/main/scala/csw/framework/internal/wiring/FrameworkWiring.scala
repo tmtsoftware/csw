@@ -23,7 +23,7 @@ object FrameworkWiring {
     override lazy val actorSystem: ActorSystem = _actorSystem
   }
 
-  def make(_actorSystem: ActorSystem, _locationService: LocationService) = new FrameworkWiring {
+  def make(_actorSystem: ActorSystem, _locationService: LocationService): FrameworkWiring = new FrameworkWiring {
     override lazy val actorSystem: ActorSystem         = _actorSystem
     override lazy val locationService: LocationService = _locationService
   }
