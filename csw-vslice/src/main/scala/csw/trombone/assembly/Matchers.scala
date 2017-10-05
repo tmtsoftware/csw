@@ -11,6 +11,7 @@ import csw.messages.params.states.{CurrentState, DemandState}
 import csw.messages.{CommandExecutionResponse, PubSub}
 import csw.trombone.hcd.TromboneHcdState
 
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
 object Matchers {
@@ -49,4 +50,19 @@ object Matchers {
     }
   }
 
+  def matchState(
+      ctx: ActorContext[_],
+      stateMatcher: StateMatcher,
+      currentStateSource: ActorRef[PubSub[CurrentState]],
+      timeout: Timeout = Timeout(5.seconds)
+  ): Future[CommandExecutionResponse] = {
+    implicit val t: Timeout           = Timeout(timeout.duration + 1.seconds)
+    implicit val scheduler: Scheduler = ctx.system.scheduler
+
+    val matcher: ActorRef[MultiStateMatcherMsgs.WaitingMsg] =
+      ctx.spawnAnonymous(MultiStateMatcherActor.make(currentStateSource, timeout))
+    matcher ? { x: ActorRef[CommandExecutionResponse] ⇒
+      StartMatch(x, stateMatcher)
+    }
+  }
 }
