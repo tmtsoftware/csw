@@ -12,7 +12,7 @@ import csw.common.components.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.PubSub.Subscribe
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
-import csw.messages.SupervisorExternalMessage
+import csw.messages.{Shutdown, SupervisorExternalMessage}
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
@@ -78,11 +78,12 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     filterSupervisor ! ComponentStateSubscription(Subscribe(filterProbe.ref))
     disperserSupervisor ! ComponentStateSubscription(Subscribe(disperserProbe.ref))
 
-    Thread.sleep(2000)
+    // assembly is tracking two HCD's, hence assemblyProbe will receive LocationUpdated event from two HCD's
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(locationUpdatedChoice))))
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(locationUpdatedChoice))))
 
-    Await.result(locationService.unregister(disperserHcdConnection), 5.seconds)
+    // if one of the HCD shuts down, then assembly should know and receive LocationRemoved event
+    disperserSupervisor ! Shutdown
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(locationRemovedChoice))))
 
     Await.result(containerActorSystem.terminate(), 5.seconds)

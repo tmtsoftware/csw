@@ -143,6 +143,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-200: Send Submit Configuration command
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
+  // DEOPSCSW-293: Sanitise handlers in Component Handlers
   test("component handler should be able to validate a Setup or Observe command as successful validation") {
     forAll(testData) { (info: ComponentInfo) ⇒
       {
