@@ -44,7 +44,7 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
   } else {
     throw new Exception(s"Bad value $levels for csw-logging.logLevel")
   }
-  @volatile var logLevel: Level = defaultLevel
+  LoggingState.logLevel = defaultLevel
 
   private[this] val akkaLogLevelS = loggingConfig.getString("akkaLogLevel")
   private[this] val defaultAkkaLogLevel: Level =
@@ -53,7 +53,7 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
     } else {
       throw new Exception(s"Bad value $akkaLogLevelS for csw-logging.akkaLogLevel")
     }
-  @volatile private[this] var akkaLogLevel = defaultAkkaLogLevel
+  LoggingState.akkaLogLevel = defaultAkkaLogLevel
 
   private[this] val slf4jLogLevelS = loggingConfig.getString("slf4jLogLevel")
   private[this] val defaultSlf4jLogLevel: Level =
@@ -62,7 +62,7 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
     } else {
       throw new Exception(s"Bad value $slf4jLogLevelS for csw-logging.slf4jLogLevel")
     }
-  @volatile private[this] var slf4jLogLevel = defaultSlf4jLogLevel
+  LoggingState.slf4jLogLevel = defaultSlf4jLogLevel
 
   private[this] val gc   = loggingConfig.getBoolean("gc")
   private[this] val time = loggingConfig.getBoolean("time")
@@ -126,14 +126,14 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
    * Get logging levels.
    * @return the current and default logging levels.
    */
-  def getDefaultLogLevel: Levels = Levels(logLevel, defaultLevel)
+  def getDefaultLogLevel: Levels = Levels(LoggingState.logLevel, defaultLevel)
 
   /**
    * Changes the logger API logging level.
    * @param level the new logging level for the logger API.
    */
   def setDefaultLogLevel(level: Level): Unit = {
-    logLevel = level
+    LoggingState.logLevel = level
     LoggingState.componentsLoggingState(Constants.DEFAULT_KEY).setLevel(level)
   }
 
@@ -141,14 +141,14 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
    * Get Akka logging levels
    * @return the current and default Akka logging levels.
    */
-  def getAkkaLevel: Levels = Levels(akkaLogLevel, defaultAkkaLogLevel)
+  def getAkkaLevel: Levels = Levels(LoggingState.akkaLogLevel, defaultAkkaLogLevel)
 
   /**
    * Changes the Akka logger logging level.
    * @param level the new logging level for the Akka logger.
    */
   def setAkkaLevel(level: Level): Unit = {
-    akkaLogLevel = level
+    LoggingState.akkaLogLevel = level
     logActor ! SetAkkaLevel(level)
   }
 
@@ -156,14 +156,14 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
    * Get the Slf4j logging levels.
    * @return the current and default Slf4j logging levels.
    */
-  def getSlf4jLevel: Levels = Levels(slf4jLogLevel, defaultSlf4jLogLevel)
+  def getSlf4jLevel: Levels = Levels(LoggingState.slf4jLogLevel, defaultSlf4jLogLevel)
 
   /**
    * Changes the slf4j logging level.
    * @param level the new logging level for slf4j.
    */
   def setSlf4jLevel(level: Level): Unit = {
-    slf4jLogLevel = level
+    LoggingState.slf4jLogLevel = level
     logActor ! SetSlf4jLevel(level)
   }
 

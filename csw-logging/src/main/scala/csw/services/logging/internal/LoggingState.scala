@@ -17,6 +17,9 @@ private[logging] object LoggingState {
   // This value gets overridden by 'logLevel' field from configuration file when logging system is started
   private[logging] var defaultLogLevel = Level("INFO")
 
+  private[logging] var logLevel: Level      = _
+  private[logging] var akkaLogLevel: Level  = _
+  private[logging] var slf4jLogLevel: Level = _
   // Queue of messages sent before logger is started
   private[logging] val msgs = new mutable.Queue[LogActorMessages]()
 
