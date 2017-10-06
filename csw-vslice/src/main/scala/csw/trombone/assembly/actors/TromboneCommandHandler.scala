@@ -22,8 +22,10 @@ import csw.trombone.assembly.commands._
 import csw.trombone.messages.CommandMsgs
 import csw.trombone.messages.CommandMsgs.StopCurrentCommand
 
+import scala.async.Async._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import scala.util.{Failure, Success}
 
 object TromboneCommandHandler {
 
@@ -100,10 +102,13 @@ class TromboneCommandHandler(
 
         case ac.datumCK =>
           if (isHCDAvailable) {
-            currentCommand =
-              ctx.spawnAnonymous(DatumCommand.make(s, tromboneHCD, currentState, Some(tromboneStateActor)))
-            mode = Mode.Executing
-            ctx.self ! CommandStart(replyTo)
+            async {
+              await(new DatumCommand(ctx, s, tromboneHCD, currentState, Some(tromboneStateActor)).startCommand())
+              mode = Mode.Executing
+            }.onComplete {
+              case Success(result) ⇒ ctx.self ! CommandStart(replyTo)
+              case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
+            }
           } else hcdNotAvailableResponse(Some(replyTo))
 
         case ac.moveCK =>
