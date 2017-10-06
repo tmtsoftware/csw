@@ -1,66 +1,85 @@
 package csw.apps.clusterseed.admin
 
-import akka.actor.{ActorRef, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.typed
-import akka.typed.scaladsl.adapter._
+import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.typed.testkit.TestKitSettings
+import akka.typed.testkit.scaladsl.TestProbe
+import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import csw.apps.clusterseed.admin.TromboneHcdMessages._
 import csw.apps.clusterseed.admin.http.HttpSupport
+import csw.apps.clusterseed.components.StartLogging
 import csw.apps.clusterseed.utils.AdminLogTestSuite
+import csw.common.FrameworkAssertions.assertThatContainerIsRunning
+import csw.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.messages.ContainerCommonMessage.GetComponents
+import csw.messages.framework.ContainerLifecycleState
+import csw.messages.location.ComponentId
+import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, ComponentType}
-import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.models.AkkaRegistration
+import csw.messages.{Component, Components, ContainerMessage}
+import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
 import csw.services.logging.models.LogMetadata
-import csw.services.logging.scaladsl.{ComponentLogger, LogAdminActor}
+import csw.services.logging.scaladsl.LogAdminActor
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-object TromboneHcdLogger extends ComponentLogger("tromboneHcd")
-
-trait TromboneHcdMessages
-object TromboneHcdMessages {
-  case object LogTrace extends TromboneHcdMessages
-  case object LogDebug extends TromboneHcdMessages
-  case object LogInfo  extends TromboneHcdMessages
-  case object LogWarn  extends TromboneHcdMessages
-  case object LogError extends TromboneHcdMessages
-  case object LogFatal extends TromboneHcdMessages
-}
-class TromboneHcd(componentName: String, loggingSystem: LoggingSystem) extends TromboneHcdLogger.Actor {
-
-  def receive: PartialFunction[Any, Unit] = {
-    case LogTrace ⇒ log.trace("Level is trace")
-    case LogDebug ⇒ log.debug("Level is debug")
-    case LogInfo  ⇒ log.info("Level is info")
-    case LogWarn  ⇒ log.warn("Level is warn")
-    case LogError ⇒ log.error("Level is error")
-    case LogFatal ⇒ log.fatal("Level is fatal")
-    case x: Any   ⇒ log.error("Unexpected actor message", Map("message" -> x.toString))
-  }
-}
-
-object TromboneHcd {
-  def props(componentName: String, loggingSystem: LoggingSystem) = Props(new TromboneHcd(componentName, loggingSystem))
-}
-
 class LogAdminTest extends AdminLogTestSuite with HttpSupport {
+
   import adminWiring.actorRuntime._
-  val compName = "tromboneHcd"
-  val tromboneActorRef: ActorRef =
-    actorSystem.actorOf(TromboneHcd.props(compName, loggingSystem), name = "TromboneActor")
-  val tromboneAdminRef: typed.ActorRef[LogControlMessages] =
-    actorSystem.spawn(LogAdminActor.behavior(loggingSystem), "LogAdminActor")
-  val connection = AkkaConnection(ComponentId(compName, ComponentType.HCD))
-  Await.result(adminWiring.locationService.register(AkkaRegistration(connection, tromboneActorRef, tromboneAdminRef)),
-               5.seconds)
+
+  implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
+  implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
+
+  private val laserConnection            = AkkaConnection(ComponentId("Laser", Assembly))
+  private val motionControllerConnection = AkkaConnection(ComponentId("Motion_Controller", HCD))
+  private val galilConnection            = AkkaConnection(ComponentId("Galil", Assembly))
+
+  private val containerActorSystem = ClusterSettings().joinLocal(3552).system
+
+  private var laserComponent: Component = _
+  private var galilComponent: Component = _
+
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+
+    // this will start seed on port 3552 and log admin server on 7878
+    adminWiring.locationService
+
+    // this will start container on random port and join seed and form a cluster
+    val containerRef = startContainerAndWaitForRunning()
+    extractComponentsFromContainer(containerRef)
+  }
+
+  override protected def afterAll(): Unit = {
+    super.afterAll()
+    Await.result(containerActorSystem.terminate(), 5.seconds)
+  }
+
+  def startContainerAndWaitForRunning(): ActorRef[ContainerMessage] = {
+    val frameworkWiring = FrameworkWiring.make(containerActorSystem)
+    val adminActorRef   = containerActorSystem.spawn(LogAdminActor.behavior(loggingSystem), "log-admin")
+    val config          = ConfigFactory.load("laser_container.conf")
+    val containerRef    = Await.result(Container.spawn(config, frameworkWiring, adminActorRef), 5.seconds)
+
+    val containerStateProbe = TestProbe[ContainerLifecycleState]
+    assertThatContainerIsRunning(containerRef, containerStateProbe, 5.seconds)
+    containerRef
+  }
+
+  def extractComponentsFromContainer(containerRef: ActorRef[ContainerMessage]): Unit = {
+    val probe = TestProbe[Components]
+    containerRef ! GetComponents(probe.ref)
+    val components = probe.expectMsgType[Components].components
+
+    laserComponent = components.find(x ⇒ x.info.name.equals("Laser")).get
+    galilComponent = components.find(x ⇒ x.info.name.equals("Galil")).get
+  }
 
   // DEOPSCSW-127: Runtime update for logging characteristics
   // DEOPSCSW-168: Actors can receive and handle runtime update for logging characteristics
@@ -71,7 +90,7 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
       scheme = "http",
       host = ClusterAwareSettings.hostname,
       port = 7878,
-      path = s"/admin/logging/${connection.name}/level"
+      path = s"/admin/logging/${motionControllerConnection.name}/level"
     )
 
     val getLogMetadataRequest   = HttpRequest(HttpMethods.GET, uri = getLogMetadataUri)
@@ -80,11 +99,13 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
 
     getLogMetadataResponse1.status shouldBe StatusCodes.OK
 
-    val config            = ConfigFactory.load().getConfig("csw-logging")
-    val logLevel          = Level(config.getString("logLevel"))
-    val akkaLevel         = Level(config.getString("akkaLogLevel"))
-    val slf4jLevel        = Level(config.getString("slf4jLogLevel"))
-    val componentLogLevel = Level(config.getObject("component-log-levels").unwrapped().asScala(compName).toString)
+    val config     = ConfigFactory.load().getConfig("csw-logging")
+    val logLevel   = Level(config.getString("logLevel"))
+    val akkaLevel  = Level(config.getString("akkaLogLevel"))
+    val slf4jLevel = Level(config.getString("slf4jLogLevel"))
+    val componentLogLevel = Level(
+      config.getObject("component-log-levels").unwrapped().asScala(motionControllerConnection.componentId.name).toString
+    )
 
     logMetadata1 shouldBe LogMetadata(logLevel, akkaLevel, slf4jLevel, componentLogLevel)
 
@@ -107,38 +128,27 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
   // DEOPSCSW-168: Actors can receive and handle runtime update for logging characteristics
   test("should able to set log level of the component dynamically through http end point") {
 
-    def sendLogMsgs(): Unit = {
-      tromboneActorRef ! LogTrace
-      tromboneActorRef ! LogDebug
-      tromboneActorRef ! LogInfo
-      tromboneActorRef ! LogWarn
-      tromboneActorRef ! LogError
-      tromboneActorRef ! LogFatal
-      tromboneActorRef ! "Unknown"
-    }
-
-    sendLogMsgs()
+    laserComponent.supervisor ! StartLogging()
     Thread.sleep(100)
 
-    // default logging level for tromboneHcd is info
+    // default logging level for Laser component is info
     val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json("@componentName").toString)
-    val tromboneHcdLogs          = groupByComponentNamesLog.get("tromboneHcd").get
+    val laserComponentLogs       = groupByComponentNamesLog(laserComponent.info.name)
 
-    tromboneHcdLogs.size shouldBe 5
-
-    tromboneHcdLogs.foreach { log ⇒
+    laserComponentLogs.exists(log ⇒ log("@severity").toString.toLowerCase.equalsIgnoreCase("info")) shouldBe true
+    laserComponentLogs.foreach { log ⇒
       val currentLogLevel = log("@severity").toString.toLowerCase
       Level(currentLogLevel) >= LoggingLevels.INFO shouldBe true
     }
 
     logBuffer.clear()
 
-    // set level of tromboneHcd to error through http endpoint
+    // set log level of laser component to error through http endpoint
     val uri = Uri.from(
       scheme = "http",
       host = ClusterAwareSettings.hostname,
       port = 7878,
-      path = s"/admin/logging/${connection.name}/level",
+      path = s"/admin/logging/${laserConnection.name}/level",
       queryString = Some("value=error")
     )
 
@@ -147,17 +157,29 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
 
     response.status shouldBe StatusCodes.OK
 
-    sendLogMsgs()
+    // laser and galil components, start logging messages at all log levels
+    // and expected is that, laser component logs messages at and above Error level
+    // and galil component  still logs messages at and above Info level
+    laserComponent.supervisor ! StartLogging()
+    galilComponent.supervisor ! StartLogging()
     Thread.sleep(100)
 
-    val groupByAfterFilter      = logBuffer.groupBy(json ⇒ json("@componentName").toString)
-    val tromboneLogsAfterFilter = groupByAfterFilter("tromboneHcd")
+    val groupByAfterFilter       = logBuffer.groupBy(json ⇒ json("@componentName").toString)
+    val laserCompLogsAfterFilter = groupByAfterFilter(laserConnection.componentId.name)
+    val galilCompLogsAfterFilter = groupByAfterFilter(galilConnection.componentId.name)
 
-    tromboneLogsAfterFilter.size shouldBe 3
-
-    tromboneLogsAfterFilter.foreach { log ⇒
+    laserCompLogsAfterFilter.exists(log ⇒ log("@severity").toString.toLowerCase.equalsIgnoreCase("error")) shouldBe true
+    laserCompLogsAfterFilter.foreach { log ⇒
       val currentLogLevel = log("@severity").toString.toLowerCase
       Level(currentLogLevel) >= LoggingLevels.ERROR shouldBe true
+    }
+
+    // this makes sure that, changing log level of one component (laser component) from container does not affect other components (galil component) log level
+    galilCompLogsAfterFilter.exists(log ⇒ log("@severity").toString.toLowerCase.equalsIgnoreCase("info")) shouldBe true
+
+    galilCompLogsAfterFilter.foreach { log ⇒
+      val currentLogLevel = log("@severity").toString.toLowerCase
+      Level(currentLogLevel) >= LoggingLevels.INFO shouldBe true
     }
   }
 

@@ -55,7 +55,7 @@ lazy val `csw-logging-macros` = project
 
 //Logging service
 lazy val `csw-logging` = project
-  .dependsOn(`csw-logging-macros`)
+  .dependsOn(`csw-logging-macros`, `csw-messages`)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Logging
@@ -78,7 +78,7 @@ lazy val `csw-location` = project
 
 //Cluster seed
 lazy val `csw-cluster-seed` = project
-  .dependsOn(`csw-messages`, `csw-location`)
+  .dependsOn(`csw-messages`, `csw-location`, `csw-framework` % "test->test")
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.CswClusterSeed

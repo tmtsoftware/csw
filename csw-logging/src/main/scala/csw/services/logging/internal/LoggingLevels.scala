@@ -1,5 +1,7 @@
 package csw.services.logging.internal
 
+import csw.messages.TMTSerializable
+
 object LoggingLevels {
 
   private[this] val levels         = Seq(TRACE, DEBUG, INFO, WARN, ERROR, FATAL)
@@ -28,7 +30,7 @@ object LoggingLevels {
   /**
    * A logging level.
    */
-  sealed trait Level extends Ordered[Level] {
+  sealed trait Level extends Ordered[Level] with TMTSerializable {
     private[logging] val pos: Int
 
     /**

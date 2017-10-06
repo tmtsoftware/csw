@@ -13,7 +13,7 @@ import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
-abstract class AdminLogTestSuite() extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
+abstract class AdminLogTestSuite extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
   protected val logBuffer: mutable.Buffer[JsonObject] = mutable.Buffer.empty[JsonObject]
   protected val testAppender                          = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
