@@ -21,7 +21,7 @@ class DatumCommand(
     tromboneHCD: Running,
     startState: TromboneState,
     stateActor: Option[ActorRef[TromboneStateMsg]]
-) {
+) extends TromboneAssemblyCommand {
 
   import csw.trombone.assembly.actors.TromboneStateActor._
 

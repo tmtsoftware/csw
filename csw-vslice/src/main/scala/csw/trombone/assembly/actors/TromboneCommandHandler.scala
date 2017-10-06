@@ -8,19 +8,17 @@ import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages._
-import csw.messages.ccs.commands.Setup
 import csw.messages.ccs.ValidationIssue.{
   RequiredHCDUnavailableIssue,
   UnsupportedCommandInStateIssue,
   WrongInternalStateIssue
 }
+import csw.messages.ccs.commands.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.TromboneCommandHandlerMsgs._
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneCommandHandler.Mode
 import csw.trombone.assembly.commands._
-import csw.trombone.messages.CommandMsgs
-import csw.trombone.messages.CommandMsgs.StopCurrentCommand
 
 import scala.async.Async._
 import scala.concurrent.Await
@@ -80,7 +78,7 @@ class TromboneCommandHandler(
   private var setElevationItem = naElevation(calculationConfig.defaultInitialElevation)
 
   private var followCommandActor: ActorRef[FollowCommandMessages] = _
-  private var currentCommand: ActorRef[CommandMsgs]               = _
+  private var currentCommand: TromboneAssemblyCommand             = _
 
   private def isHCDAvailable: Boolean = tromboneHCD.componentRef != badHCDReference
 
@@ -102,35 +100,31 @@ class TromboneCommandHandler(
 
         case ac.datumCK =>
           if (isHCDAvailable) {
-            async {
-              await(new DatumCommand(ctx, s, tromboneHCD, currentState, Some(tromboneStateActor)).startCommand())
-              mode = Mode.Executing
-            }.onComplete {
-              case Success(result) ⇒ ctx.self ! CommandStart(replyTo)
-              case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
-            }
+            currentCommand = new DatumCommand(ctx, s, tromboneHCD, currentState, Some(tromboneStateActor))
+            mode = Mode.Executing
+            ctx.self ! CommandStart(replyTo)
           } else hcdNotAvailableResponse(Some(replyTo))
 
         case ac.moveCK =>
           if (isHCDAvailable) {
-            async {
-              await(new MoveCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor)).startCommand())
-              mode = Mode.Executing
-            }.onComplete {
-              case Success(result) ⇒ ctx.self ! CommandStart(replyTo)
-              case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
-            }
+            currentCommand = new MoveCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+            mode = Mode.Executing
+            ctx.self ! CommandStart(replyTo)
           } else hcdNotAvailableResponse(Some(replyTo))
 
         case ac.positionCK =>
           if (isHCDAvailable) {
-            async {
-              await(new PositionCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor)).startCommand())
-              mode = Mode.Executing
-            }.onComplete {
-              case Success(result) ⇒ ctx.self ! CommandStart(replyTo)
-              case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
-            }
+            currentCommand = new PositionCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+            mode = Mode.Executing
+            ctx.self ! CommandStart(replyTo)
+          } else hcdNotAvailableResponse(Some(replyTo))
+
+        case ac.setElevationCK =>
+          setElevationItem = s(ac.naElevationKey)
+          if (isHCDAvailable) {
+            currentCommand = new SetElevationCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+            mode = Mode.Executing
+            ctx.self ! CommandStart(replyTo)
           } else hcdNotAvailableResponse(Some(replyTo))
 
         case ac.stopCK =>
@@ -140,20 +134,6 @@ class TromboneCommandHandler(
 
         case ac.setAngleCK =>
           replyTo ! NoLongerValid(WrongInternalStateIssue("Trombone assembly must be following for setAngle"))
-
-        case ac.setElevationCK =>
-          if (isHCDAvailable) {
-            setElevationItem = s(ac.naElevationKey)
-            async {
-              await(
-                new SetElevationCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor)).startCommand()
-              )
-              mode = Mode.Executing
-            }.onComplete {
-              case Success(result) ⇒ ctx.self ! CommandStart(replyTo)
-              case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
-            }
-          } else hcdNotAvailableResponse(Some(replyTo))
 
         case ac.followCK =>
           if (cmd(currentState) == cmdUninitialized
@@ -240,17 +220,22 @@ class TromboneCommandHandler(
 
   def onExecuting(msg: ExecutingMsgs): Unit = msg match {
     case CommandStart(replyTo) =>
-      for {
-        cr <- currentCommand ? CommandMsgs.CommandStart
-      } {
-        replyTo ! cr
-        ctx.stop(currentCommand)
-        mode = Mode.NotFollowing
-      }
+      if (isHCDAvailable) {
+        async {
+          await(currentCommand.startCommand())
+        }.onComplete {
+          case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
+          case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
+        }
+      } else hcdNotAvailableResponse(Some(replyTo))
+
+    case CommandComplete(replyTo, result) ⇒
+      replyTo ! result
+      currentCommand.stopCurrentCommand()
+      mode = Mode.NotFollowing
 
     case Submit(Setup(ac.commandInfo, ac.stopCK, _), replyTo) =>
-      currentCommand ! StopCurrentCommand
-      ctx.stop(currentCommand)
+      currentCommand.stopCurrentCommand()
       mode = Mode.NotFollowing
       replyTo ! Cancelled
 

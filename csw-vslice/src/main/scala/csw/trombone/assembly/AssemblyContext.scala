@@ -70,7 +70,7 @@ case class AssemblyContext(
   val followCK: Prefix = Prefix(followPrefix)
   val nssInUseKey      = KeyType.BooleanKey.make("nssInUse")
 
-  def setNssInUse(value: Boolean) = nssInUseKey -> value
+  def setNssInUse(value: Boolean): Parameter[Boolean] = nssInUseKey -> value
 
   def followSC(nssInUse: Boolean): Setup = Setup(commandInfo, followCK).add(nssInUseKey -> nssInUse)
 

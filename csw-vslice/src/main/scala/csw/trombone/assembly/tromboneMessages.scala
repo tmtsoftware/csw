@@ -5,7 +5,7 @@ import csw.messages.ccs.commands.Setup
 import csw.messages.ccs.events.EventTime
 import csw.messages.params.generics.Parameter
 import csw.messages.CommandMessage.Submit
-import csw.messages.CommandResponse
+import csw.messages.{CommandExecutionResponse, CommandResponse}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages.params.models.Choice
@@ -92,4 +92,6 @@ object TromboneCommandHandlerMsgs {
       with FollowingMsgs
 
   private[assembly] case class CommandStart(replyTo: ActorRef[CommandResponse]) extends ExecutingMsgs
+  private[assembly] case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandExecutionResponse)
+      extends ExecutingMsgs
 }
