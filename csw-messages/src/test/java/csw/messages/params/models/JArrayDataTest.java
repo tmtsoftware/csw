@@ -1,4 +1,4 @@
-package csw.messages.models;
+package csw.messages.params.models;
 
 import csw.messages.params.models.ArrayData;
 import csw.messages.params.models.JArrayData;

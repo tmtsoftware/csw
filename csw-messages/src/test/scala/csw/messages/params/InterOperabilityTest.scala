@@ -1,4 +1,4 @@
-package csw.messages
+package csw.messages.params
 
 import akka.actor
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps

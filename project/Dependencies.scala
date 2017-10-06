@@ -11,6 +11,7 @@ object Dependencies {
     Enumeratum.`enumeratum-play`,
     Chill.`chill-bijection`,
     Akka.`akka-typed`,
+    Akka.`akka-cluster-tools` % Test,
     Akka.`akka-typed-testkit` % Test,
     Akka.`akka-actor`         % Test,
     Chill.`chill-akka`        % Test,

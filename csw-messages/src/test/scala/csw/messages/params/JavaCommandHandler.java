@@ -1,4 +1,4 @@
-package csw.messages;
+package csw.messages.params;
 
 import akka.typed.Behavior;
 import akka.typed.javadsl.Actor;

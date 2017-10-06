@@ -1,4 +1,4 @@
-package csw.messages.models;
+package csw.messages.params.models;
 
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;

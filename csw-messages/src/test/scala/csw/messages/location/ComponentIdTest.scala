@@ -1,6 +1,5 @@
-package csw.services.location.models
+package csw.messages.location
 
-import csw.messages.location.{ComponentId, ComponentType}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ComponentIdTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {

@@ -1,4 +1,4 @@
-package csw.messages
+package csw.messages.params
 
 import csw.messages.params.generics.KeyType
 import csw.messages.params.generics.KeyType.{
