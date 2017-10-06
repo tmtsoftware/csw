@@ -142,11 +142,18 @@ class TromboneCommandHandler(
           replyTo ! NoLongerValid(WrongInternalStateIssue("Trombone assembly must be following for setAngle"))
 
         case ac.setElevationCK =>
-          setElevationItem = s(ac.naElevationKey)
-          currentCommand =
-            ctx.spawnAnonymous(SetElevationCommand.make(ac, s, tromboneHCD, currentState, Some(tromboneStateActor)))
-          mode = Mode.Executing
-          ctx.self ! CommandStart(replyTo)
+          if (isHCDAvailable) {
+            setElevationItem = s(ac.naElevationKey)
+            async {
+              await(
+                new SetElevationCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor)).startCommand()
+              )
+              mode = Mode.Executing
+            }.onComplete {
+              case Success(result) ⇒ ctx.self ! CommandStart(replyTo)
+              case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
+            }
+          } else hcdNotAvailableResponse(Some(replyTo))
 
         case ac.followCK =>
           if (cmd(currentState) == cmdUninitialized
