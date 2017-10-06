@@ -113,10 +113,13 @@ class TromboneCommandHandler(
 
         case ac.moveCK =>
           if (isHCDAvailable) {
-            currentCommand =
-              ctx.spawnAnonymous(MoveCommand.make(ac, s, tromboneHCD, currentState, Some(tromboneStateActor)))
-            mode = Mode.Executing
-            ctx.self ! CommandStart(replyTo)
+            async {
+              await(new MoveCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor)).startCommand())
+              mode = Mode.Executing
+            }.onComplete {
+              case Success(result) ⇒ ctx.self ! CommandStart(replyTo)
+              case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
+            }
           } else hcdNotAvailableResponse(Some(replyTo))
 
         case ac.positionCK =>
