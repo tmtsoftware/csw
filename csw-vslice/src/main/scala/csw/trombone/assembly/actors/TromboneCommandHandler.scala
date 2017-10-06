@@ -20,7 +20,6 @@ import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneCommandHandler.Mode
 import csw.trombone.assembly.commands._
 
-import scala.async.Async._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.util.{Failure, Success}
@@ -221,9 +220,7 @@ class TromboneCommandHandler(
   def onExecuting(msg: ExecutingMsgs): Unit = msg match {
     case CommandStart(replyTo) =>
       if (isHCDAvailable) {
-        async {
-          await(currentCommand.startCommand())
-        }.onComplete {
+        currentCommand.startCommand().onComplete {
           case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
           case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
         }
