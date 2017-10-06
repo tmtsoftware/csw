@@ -22,4 +22,7 @@ object Container {
     val richSystem = new CswFrameworkSystem(actorSystem)
     richSystem.spawnTyped(containerBehavior, containerInfo.name)
   }
+
+  private[framework] def spawn(config: Config, wiring: FrameworkWiring): Future[ActorRef[ContainerMessage]] =
+    spawn(config, wiring, null)
 }

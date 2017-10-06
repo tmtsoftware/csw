@@ -65,7 +65,7 @@ private[containercmd] class ContainerCmd(
       loggingSystem: LoggingSystem
   ): Future[ActorRef[_]] = {
     async {
-      val adminLogActor = actorSystem.spawn(LogAdminActor.behavior(loggingSystem), "log-admin")
+      val adminLogActor = actorSystem.spawn(LogAdminActor.behavior(), "log-admin")
       val config        = await(getConfig(isLocal, inputFilePath.get))
       val actorRef      = await(createComponent(standalone, wiring, config, adminLogActor))
       log.info(s"Component is successfully created with actor actorRef $actorRef")

@@ -10,7 +10,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
-import csw.services.location.internal.Networks
+import csw.services.location.internal.{AkkaLocationFactory, AkkaRegistrationFactory, Networks}
 import csw.services.location.scaladsl.ActorSystemFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -25,13 +25,12 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
     val actorSystem    = ActorSystemFactory.remote()
     val actorRef       = actorSystem.spawn(Behavior.empty, "my-actor-1")
-    val adminActorRef  = actorSystem.spawn(Behavior.empty, "my-actor-1-admin")
     val actorPath      = ActorPath.fromString(Serialization.serializedActorPath(actorRef.toUntyped))
     val akkaUri        = new URI(actorPath.toString)
 
-    val akkaRegistration = AkkaRegistration(akkaConnection, actorRef, adminActorRef)
+    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, actorRef)
 
-    val expectedAkkaLocation = AkkaLocation(akkaConnection, akkaUri, actorRef, adminActorRef)
+    val expectedAkkaLocation = AkkaLocationFactory.make(akkaConnection, akkaUri, actorRef)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
 
@@ -70,11 +69,10 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
     val actorSystem    = ActorSystem("local-actor-system", config)
     val actorRef       = actorSystem.spawn(Behavior.empty, "my-actor-2")
-    val adminActorRef  = actorSystem.spawn(Behavior.empty, "my-actor-2-admin")
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
-      AkkaRegistration(akkaConnection, actorRef, adminActorRef)
+      AkkaRegistrationFactory.make(akkaConnection, actorRef)
     }
     Await.result(actorSystem.terminate, 10.seconds)
   }

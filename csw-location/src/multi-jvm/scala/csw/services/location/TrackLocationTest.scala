@@ -7,6 +7,7 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.services.location.internal.AkkaRegistrationFactory
 import csw.services.location.models._
 
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)
@@ -29,9 +30,8 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
     val tcpConnection = TcpConnection(ComponentId("redis1", ComponentType.Service))
 
     runOn(seed) {
-      val actorRef      = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
-      val adminActorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd-admin")
-      locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
+      val actorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
+      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await

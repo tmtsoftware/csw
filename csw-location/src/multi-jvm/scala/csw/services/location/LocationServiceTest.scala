@@ -10,6 +10,7 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location._
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import csw.services.location.internal.AkkaRegistrationFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
 import org.scalatest.BeforeAndAfterEach
@@ -79,15 +80,14 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     val akkaConnection = AkkaConnection(componentId)
 
     runOn(seed) {
-      val actorRef      = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
-      val adminActorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd-admin")
-      locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
+      val actorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
+      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await
       enterBarrier("Unregister")
 
-      locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
+      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
       enterBarrier("Re-registration")
     }
 
@@ -144,10 +144,9 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     }
 
     runOn(member) {
-      val actorRef      = assemblyActorSystem.actorOf(AssemblyActor.props(locationService), "assembly-actor")
-      val adminActorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd-admin")
+      val actorRef = assemblyActorSystem.actorOf(AssemblyActor.props(locationService), "assembly-actor")
       import akka.typed.scaladsl.adapter._
-      locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
+      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
 
       enterBarrier("Registration")
 

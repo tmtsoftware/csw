@@ -63,7 +63,7 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   def startContainerAndWaitForRunning(): ActorRef[ContainerMessage] = {
     val frameworkWiring = FrameworkWiring.make(containerActorSystem)
-    val adminActorRef   = containerActorSystem.spawn(LogAdminActor.behavior(loggingSystem), "log-admin")
+    val adminActorRef   = containerActorSystem.spawn(LogAdminActor.behavior(), "log-admin")
     val config          = ConfigFactory.load("laser_container.conf")
     val containerRef    = Await.result(Container.spawn(config, frameworkWiring, adminActorRef), 5.seconds)
 

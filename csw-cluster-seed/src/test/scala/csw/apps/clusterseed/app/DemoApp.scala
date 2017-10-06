@@ -71,7 +71,7 @@ class DemoApp extends AppLogger.Simple {
       "test-actor"
     )
 
-    val adminActorRef    = actorSystem.spawn(LogAdminActor.behavior(loggingSystem), "log-admin")
+    val adminActorRef    = actorSystem.spawn(LogAdminActor.behavior(), "log-admin")
     val akkaRegistration = AkkaRegistration(connection, actorRef, adminActorRef)
 
     log.info(s"Registering akka connection = ${connection.name} with location service")

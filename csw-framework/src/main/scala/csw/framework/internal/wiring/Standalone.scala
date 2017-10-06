@@ -28,4 +28,10 @@ object Standalone {
     val richSystem = new CswFrameworkSystem(actorSystem)
     richSystem.spawnTyped(supervisorBehavior, componentInfo.name)
   }
+
+  private[framework] def spawn(
+      config: com.typesafe.config.Config,
+      wiring: FrameworkWiring
+  ): Future[ActorRef[SupervisorExternalMessage]] =
+    spawn(config, wiring, null)
 }

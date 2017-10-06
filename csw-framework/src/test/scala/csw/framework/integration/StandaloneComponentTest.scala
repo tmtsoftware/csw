@@ -4,7 +4,7 @@ import akka.actor
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.{ActorRef, ActorSystem, Behavior}
+import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
@@ -28,7 +28,7 @@ import csw.messages.{Shutdown, SupervisorExternalMessage}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LoggingLevels.INFO
-import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
+import csw.services.logging.internal.LoggingSystem
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.collection.mutable
@@ -61,9 +61,8 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
   test("should start a component in standalone mode and register with location service") {
 
     // start component in standalone mode
-    val wiring: FrameworkWiring                     = FrameworkWiring.make(hcdActorSystem)
-    val adminActorRef: ActorRef[LogControlMessages] = hcdActorSystem.spawn(Behavior.empty, "log-admin")
-    Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring, adminActorRef)
+    val wiring: FrameworkWiring = FrameworkWiring.make(hcdActorSystem)
+    Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
     val supervisorStateProbe          = TestProbe[CurrentState]("supervisor-state-probe")

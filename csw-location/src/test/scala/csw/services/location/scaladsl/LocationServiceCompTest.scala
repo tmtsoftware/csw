@@ -11,7 +11,7 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location._
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
-import csw.services.location.internal.Networks
+import csw.services.location.internal.{AkkaRegistrationFactory, Networks}
 import csw.services.location.models._
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -93,8 +93,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val componentId      = ComponentId("hcd1", ComponentType.HCD)
     val connection       = AkkaConnection(componentId)
     val actorRef         = actorSystem.spawn(Behavior.empty, "my-actor-1")
-    val adminActorRef    = actorSystem.spawn(Behavior.empty, "my-actor-1-admin")
-    val akkaRegistration = AkkaRegistration(connection, actorRef, adminActorRef)
+    val akkaRegistration = AkkaRegistrationFactory.make(connection, actorRef)
 
     // register, resolve & list akka connection for the first time
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
@@ -120,11 +119,10 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val componentId = ComponentId("hcd1", ComponentType.HCD)
     val connection  = AkkaConnection(componentId)
 
-    val actorRef      = actorSystem.spawn(Behavior.empty[Any], "my-actor-to-die")
-    val adminActorRef = actorSystem.spawn(Behavior.empty, "my-actor-to-die-admin")
+    val actorRef = actorSystem.spawn(Behavior.empty[Any], "my-actor-to-die")
 
     locationService
-      .register(AkkaRegistration(connection, actorRef, adminActorRef))
+      .register(AkkaRegistrationFactory.make(connection, actorRef))
       .await
       .location
       .connection shouldBe connection
@@ -132,7 +130,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     Thread.sleep(10)
 
     locationService.list.await shouldBe List(
-      AkkaRegistration(connection, actorRef, adminActorRef).location(new Networks().hostname())
+      AkkaRegistrationFactory.make(connection, actorRef).location(new Networks().hostname())
     )
 
     actorRef ! PoisonPill
@@ -202,8 +200,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val akkaComponentId  = ComponentId("container1", ComponentType.Container)
     val akkaConnection   = AkkaConnection(akkaComponentId)
     val actorRef         = actorSystem.spawn(Behavior.empty, "container1-actor")
-    val adminActorRef    = actorSystem.spawn(Behavior.empty, "container1-admin")
-    val akkaRegistration = AkkaRegistration(akkaConnection, actorRef, adminActorRef)
+    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, actorRef)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
     val akkaRegistrationResult = locationService.register(akkaRegistration).await
@@ -327,9 +324,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
   test("should filter components with component type") {
     val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
     val actorRef      = actorSystem.spawn(Behavior.empty, "my-actor-2")
-    val adminActorRef = actorSystem.spawn(Behavior.empty, "my-actor-2-admin")
 
-    locationService.register(AkkaRegistration(hcdConnection, actorRef, adminActorRef)).await
+    locationService.register(AkkaRegistrationFactory.make(hcdConnection, actorRef)).await
 
     val redisConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
     locationService.register(TcpRegistration(redisConnection, 1234)).await
@@ -350,9 +346,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
       Behavior.empty,
       "my-actor-3"
     )
-    val adminActorRef = actorSystem.spawn(Behavior.empty, "my-actor-3-admin")
 
-    locationService.register(AkkaRegistration(hcdAkkaConnection, actorRef, adminActorRef)).await
+    locationService.register(AkkaRegistrationFactory.make(hcdAkkaConnection, actorRef)).await
 
     val redisTcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
     locationService.register(TcpRegistration(redisTcpConnection, 1234)).await
@@ -385,9 +380,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
       Behavior.empty,
       "my-actor-4"
     )
-    val adminActorRef = actorSystem.spawn(Behavior.empty, "my-actor-4-admin")
 
-    locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
+    locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
 
     locationService.list(new Networks().hostname()).await.map(_.connection).toSet shouldBe Set(tcpConnection,
                                                                                                httpConnection,

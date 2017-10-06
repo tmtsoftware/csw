@@ -26,7 +26,7 @@ object ContainerApp extends App {
   private val wiring                                   = FrameworkWiring.make(system)
   private val config: Config                           = ConfigFactory.load("laser_container.conf")
   private val loggingSystem: LoggingSystem             = LoggingSystemFactory.start("framework", "1.0", "localhost", system)
-  private val adminActorRef                            = system.spawn(LogAdminActor.behavior(loggingSystem), "laser")
+  private val adminActorRef                            = system.spawn(LogAdminActor.behavior(), "laser")
   private val ref: ActorRef[ContainerMessage]          = Await.result(Container.spawn(config, wiring, adminActorRef), 5.seconds)
 
   Thread.sleep(2000)

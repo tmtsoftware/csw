@@ -55,7 +55,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
     private IRegistrationResult httpRegResult;
     private IRegistrationResult hcdRegResult;
     private IRegistrationResult assemblyRegResult;
-    private akka.typed.ActorRef<LogControlMessages> adminActorRef = Adapter.spawn(getContext(), LogAdminActor$.MODULE$.behavior(loggingSystem), "");
+    private akka.typed.ActorRef<LogControlMessages> adminActorRef = Adapter.spawn(getContext(), LogAdminActor$.MODULE$.behavior(), "");
 
     private static LoggingSystem loggingSystem;
 

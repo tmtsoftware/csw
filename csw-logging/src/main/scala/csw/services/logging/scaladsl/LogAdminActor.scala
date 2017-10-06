@@ -7,8 +7,7 @@ import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.internal._
 import csw.services.logging.models.LogMetadata
 
-class LogAdminActor(ctx: ActorContext[LogControlMessages], loggingSystem: LoggingSystem)
-    extends GenericLogger.TypedActor(ctx) {
+class LogAdminActor(ctx: ActorContext[LogControlMessages]) extends GenericLogger.TypedActor(ctx) {
   override def onMessage(msg: LogControlMessages): Behavior[LogControlMessages] = {
     msg match {
       case GetComponentLogMetadata(componentName, replyTo) ⇒ replyTo ! getLogMetadata(componentName)
@@ -32,6 +31,5 @@ class LogAdminActor(ctx: ActorContext[LogControlMessages], loggingSystem: Loggin
 }
 
 object LogAdminActor {
-  def behavior(loggingSystem: LoggingSystem): Behavior[LogControlMessages] =
-    Actor.mutable[LogControlMessages](ctx ⇒ new LogAdminActor(ctx, loggingSystem))
+  def behavior(): Behavior[LogControlMessages] = Actor.mutable[LogControlMessages](ctx ⇒ new LogAdminActor(ctx))
 }

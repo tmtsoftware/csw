@@ -68,7 +68,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds
   private val adminActorRef: ActorRef[LogControlMessages] =
-    context.spawn(LogAdminActor.behavior(loggingSystem), "my-actor-1-admin")
+    context.spawn(LogAdminActor.behavior(), "my-actor-1-admin")
 
   // EXAMPLE DEMO START
 

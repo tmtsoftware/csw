@@ -7,6 +7,7 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.services.location.internal.AkkaRegistrationFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.ActorSystemFactory
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
@@ -70,11 +71,7 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
         .remote()
         .spawn(Behavior.empty, "trombone-hcd-1")
 
-      val adminActorRef = ActorSystemFactory
-        .remote()
-        .spawn(Behavior.empty, "trombone-hcd-1")
-
-      locationService.register(AkkaRegistration(akkaConnection, actorRef, adminActorRef)).await
+      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
       Await.ready(system.whenTerminated, 5.seconds)
