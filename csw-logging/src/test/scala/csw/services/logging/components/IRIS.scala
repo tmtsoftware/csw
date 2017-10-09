@@ -6,7 +6,7 @@ import csw.services.logging.scaladsl.{ComponentLogger, GenericLogger, ServiceLog
 
 object IRISLogger extends ServiceLogger(IRIS.COMPONENT_NAME)
 
-class IRIS(componentName: String) extends ComponentLogger.Actor(Some(componentName)) {
+class IRIS(componentName: String) extends ComponentLogger.Actor(componentName) {
 
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers

@@ -49,5 +49,5 @@ class GalilComponentHandlers(
 
   override def onGoOnline(): Unit = ()
 
-  override protected def maybeComponentName(): Option[String] = Some(componentInfo.name)
+  override protected def componentName(): String = componentInfo.name
 }

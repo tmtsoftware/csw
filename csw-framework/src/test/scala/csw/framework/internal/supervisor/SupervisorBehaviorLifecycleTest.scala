@@ -7,7 +7,7 @@ import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.ComponentDomainMessage
 import csw.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
-import csw.framework.FrameworkTestMocks.TypedActorMock
+import csw.framework.FrameworkTestMocks.MutableActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -47,7 +47,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
         registrationFactory,
         locationService,
         testActor
-      ) with TypedActorMock[SupervisorMessage]
+      ) with MutableActorMock[SupervisorMessage]
 
     verify(timer).startSingleTimer(
       SupervisorBehavior.InitializeTimerKey,

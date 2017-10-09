@@ -28,7 +28,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers[Msg],
     locationService: LocationService
-) extends ComponentLogger.TypedActor[ComponentMessage](ctx, componentInfo.name) {
+) extends ComponentLogger.MutableActor[ComponentMessage](ctx, componentInfo.name) {
 
   import ctx.executionContext
 

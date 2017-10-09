@@ -111,7 +111,7 @@ class SampleComponentHandlers(
     Future.unit
   }
 
-  override protected def maybeComponentName() = Some(componentInfo.name)
+  override protected def componentName(): String = componentInfo.name
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
     case LocationUpdated(location) =>

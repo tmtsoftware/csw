@@ -15,7 +15,7 @@ import scala.util.control.NonFatal
 
 class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simple {
 
-  override protected def maybeComponentName(): Option[String] = Some(containerName)
+  override protected def componentName(): String = containerName
 
   def make(
       containerRef: ActorRef[ContainerIdleMessage],

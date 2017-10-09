@@ -7,7 +7,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{Behavior, Props}
 import csw.common.components.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
-import csw.framework.FrameworkTestMocks.TypedActorMock
+import csw.framework.FrameworkTestMocks.MutableActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.{ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
@@ -61,7 +61,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
                   registrationFactory,
                   locationService,
                   testActor
-                ) with TypedActorMock[SupervisorMessage]
+                ) with MutableActorMock[SupervisorMessage]
           )
       )
       .narrow

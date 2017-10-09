@@ -8,14 +8,15 @@ import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.LogCommand._
 import csw.services.logging.utils.LoggingTestSuite
 
-object TromboneTypedActor {
-  def beh(componentName: String): Behavior[LogCommand] = Actor.mutable(ctx ⇒ new TromboneTypedActor(ctx, componentName))
+object TromboneMutableActor {
+  def beh(componentName: String): Behavior[LogCommand] =
+    Actor.mutable(ctx ⇒ new TromboneMutableActor(ctx, componentName))
 }
 
-class TromboneTypedActor(
+class TromboneMutableActor(
     ctx: ActorContext[LogCommand],
     componentName: String
-) extends ComponentLogger.TypedActor[LogCommand](ctx, Some(componentName)) {
+) extends ComponentLogger.MutableActor[LogCommand](ctx, componentName) {
   override def onMessage(msg: LogCommand): Behavior[LogCommand] = {
     msg match {
       case LogTrace => log.trace("Level is trace")
@@ -31,11 +32,11 @@ class TromboneTypedActor(
 }
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
-class TypedActorLoggingTest extends LoggingTestSuite {
+class MutableActorLoggingTest extends LoggingTestSuite {
   import akka.typed.scaladsl.adapter._
 
   private val tromboneActorRef =
-    actorSystem.spawn(TromboneTypedActor.beh("tromboneTypedHcdActor"), "TromboneTypedActor")
+    actorSystem.spawn(TromboneMutableActor.beh("tromboneMutableHcdActor"), "TromboneMutableActor")
 
   def sendMessagesToActor(): Unit = {
     tromboneActorRef ! LogTrace
@@ -59,11 +60,11 @@ class TypedActorLoggingTest extends LoggingTestSuite {
     logBuffer.foreach { log ⇒
       log.contains("@componentName") shouldBe true
       log.contains("actor") shouldBe true
-      log("@componentName") shouldBe "tromboneTypedHcdActor"
+      log("@componentName") shouldBe "tromboneMutableHcdActor"
       log("actor") shouldBe tromboneActorRef.path.toString
-      log("file") shouldBe "TypedActorLoggingTest.scala"
+      log("file") shouldBe "MutableActorLoggingTest.scala"
       log.contains("line") shouldBe true
-      log("class") shouldBe "csw.services.logging.scaladsl.TromboneTypedActor"
+      log("class") shouldBe "csw.services.logging.scaladsl.TromboneMutableActor"
     }
   }
 
@@ -75,7 +76,7 @@ class TypedActorLoggingTest extends LoggingTestSuite {
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
     val groupByComponentNamesLog =
       logBuffer.groupBy(json ⇒ json("@componentName").toString)
-    val tromboneHcdLogs = groupByComponentNamesLog("tromboneTypedHcdActor")
+    val tromboneHcdLogs = groupByComponentNamesLog("tromboneMutableHcdActor")
 
     tromboneHcdLogs.size shouldBe 3
 

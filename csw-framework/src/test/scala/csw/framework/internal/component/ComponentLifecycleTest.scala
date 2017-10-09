@@ -3,7 +3,7 @@ package csw.framework.internal.component
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, PostStop}
-import csw.framework.FrameworkTestMocks.TypedActorMock
+import csw.framework.FrameworkTestMocks.MutableActorMock
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
@@ -40,7 +40,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
         supervisorProbe.ref,
         sampleHcdHandler,
         locationService
-      ) with TypedActorMock[ComponentMessage]
+      ) with MutableActorMock[ComponentMessage]
 
     val runningComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
       behavior.onMessage(Initialize)

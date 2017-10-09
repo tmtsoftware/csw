@@ -4,7 +4,7 @@ import csw.services.logging.scaladsl.ComponentLogger
 
 object SingletonComponent extends ComponentLogger.Simple {
 
-  override protected def maybeComponentName(): Option[String] = Some("SingletonComponent")
+  override protected def componentName(): String = "SingletonComponent"
 
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers

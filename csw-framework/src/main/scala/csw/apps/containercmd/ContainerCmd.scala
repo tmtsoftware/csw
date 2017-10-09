@@ -29,7 +29,7 @@ private[containercmd] class ContainerCmd(
     startLogging: Boolean
 ) extends ComponentLogger.Simple {
 
-  override protected def maybeComponentName() = Some(name)
+  override protected def componentName() = name
 
   lazy val actorSystem: ActorSystem = clusterSettings.system
   lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)

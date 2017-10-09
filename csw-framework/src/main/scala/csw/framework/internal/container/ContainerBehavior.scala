@@ -30,7 +30,7 @@ class ContainerBehavior(
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
     logAdminActorRef: ActorRef[LogControlMessages]
-) extends ComponentLogger.TypedActor[ContainerMessage](ctx, containerInfo.name) {
+) extends ComponentLogger.MutableActor[ContainerMessage](ctx, containerInfo.name) {
 
   import ctx.executionContext
 

@@ -18,7 +18,7 @@ import scala.concurrent.Future
 // DEOPSCSW-166-CSW HCD Creation
 class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
-  trait TypedActorMock[T] { this: ComponentLogger.TypedActor[T] ⇒
+  trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
     override protected lazy val log: Logger = mock[Logger]
   }
 
@@ -35,7 +35,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
         supervisorProbe.ref,
         sampleComponentHandler,
         locationService
-      ) with TypedActorMock[ComponentMessage]
+      ) with MutableActorMock[ComponentMessage]
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
   }
 

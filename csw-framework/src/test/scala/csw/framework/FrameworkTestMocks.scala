@@ -59,7 +59,7 @@ class FrameworkTestMocks(
 }
 
 object FrameworkTestMocks {
-  trait TypedActorMock[T] { this: ComponentLogger.TypedActor[T] ⇒
+  trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
     override lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 }

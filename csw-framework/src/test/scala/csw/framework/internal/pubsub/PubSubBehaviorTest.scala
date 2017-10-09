@@ -18,7 +18,7 @@ import scala.concurrent.duration.DurationInt
 
 class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  trait TypedActorMock[T] { this: ComponentLogger.TypedActor[T] ⇒
+  trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
     override protected lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 
@@ -32,7 +32,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   private val lifecycleProbe2 = TestProbe[LifecycleStateChanged]
 
   def createPubSubBehavior(): PubSubBehavior[LifecycleStateChanged] =
-    new PubSubBehavior(ctx, "test-component") with TypedActorMock[PubSub[LifecycleStateChanged]]
+    new PubSubBehavior(ctx, "test-component") with MutableActorMock[PubSub[LifecycleStateChanged]]
 
   override protected def afterAll(): Unit = Await.result(actorSystem.terminate(), 5.seconds)
 

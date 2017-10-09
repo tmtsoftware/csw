@@ -36,7 +36,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   implicit val untypedSystem: actor.ActorSystem  = ActorSystemFactory.remote()
   implicit val typedSystem: ActorSystem[Nothing] = untypedSystem.toTyped
   implicit val settings: TestKitSettings         = TestKitSettings(typedSystem)
-  trait TypedActorMock[T] { this: ComponentLogger.TypedActor[T] ⇒
+  trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
     override protected lazy val log: Logger = mock[Logger]
   }
 
@@ -98,7 +98,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     val containerBehavior =
       new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService, testActor)
-      with TypedActorMock[ContainerMessage]
+      with MutableActorMock[ContainerMessage]
 
   }
 
