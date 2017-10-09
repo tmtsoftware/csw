@@ -42,17 +42,21 @@ private[logging] class BasicServiceAndGenericLogger(_maybeComponentName: Option[
 }
 
 /**
- * Extend this class to obtain a reference to a Simple or Actor Logger with the provided component name
+ * Extend this class to access Loggers(Simple, Actor, MutableActor, immutable) with the provided component name
  *
  * @param _componentName name of the component to initialize the logger
  */
 class ServiceLogger(_componentName: String) extends BasicServiceAndGenericLogger(Some(_componentName))
 
 /**
- * Extend this object to obtain a reference to a Simple or Actor Logger without a component name
+ * Extend this object to access Loggers(Simple, Actor, MutableActor, immutable) without a component name
  */
 object GenericLogger extends BasicServiceAndGenericLogger(None)
 
+/**
+ * Extend this object to access Loggers(Simple, Actor, MutableActor, immutable) which has componentName as constructor
+ * dependency. It is mainly used when componentName is not available before-hand.
+ */
 object ComponentLogger extends BasicLogger {
 
   trait Simple extends super.Simple {
