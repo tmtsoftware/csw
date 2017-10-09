@@ -150,9 +150,11 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val laserCompStateProbe     = TestProbe[CurrentState]
       laserAssemblySupervisor ! ComponentStateSubscription(Subscribe(laserCompStateProbe.ref))
       etonSupervisorTypedRef ! Submit(setupFailure, laserAssemblySupervisor)
+      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(setupConfigChoice))))
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
 
       etonSupervisorTypedRef ! Oneway(setupSuccess, laserAssemblySupervisor)
+      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(setupConfigChoice))))
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
 
       etonSupervisorTypedRef ! Lifecycle(GoOffline)

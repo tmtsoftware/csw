@@ -24,6 +24,8 @@ object SampleComponentState {
   val onlineChoice          = Choice("Online")
   val domainChoice          = Choice("Domain")
   val shutdownChoice        = Choice("Shutdown")
+  val setupConfigChoice     = Choice("SetupConfig")
+  val observeConfigChoice   = Choice("SetupConfig")
   val submitCommandChoice   = Choice("SubmitCommand")
   val oneWayCommandChoice   = Choice("OneWayCommand")
   val initChoice            = Choice("Initialize")
@@ -40,6 +42,8 @@ object SampleComponentState {
       onlineChoice,
       domainChoice,
       shutdownChoice,
+      setupConfigChoice,
+      observeConfigChoice,
       submitCommandChoice,
       oneWayCommandChoice,
       initChoice,
@@ -76,11 +80,17 @@ class SampleComponentHandlers(
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
   }
 
-  override def onSetup(commandMessage: CommandMessage): Validation = onControlCommand(commandMessage)
+  override def onSetup(commandMessage: CommandMessage): Validation = {
+    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(setupConfigChoice))))
+    validateCommand(commandMessage)
+  }
 
-  override def onObserve(commandMessage: CommandMessage): Validation = onControlCommand(commandMessage)
+  override def onObserve(commandMessage: CommandMessage): Validation = {
+    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(observeConfigChoice))))
+    validateCommand(commandMessage)
+  }
 
-  def onControlCommand(commandMsg: CommandMessage): Validation = {
+  private def validateCommand(commandMsg: CommandMessage): Validation = {
     commandMsg match {
       case Submit(command, replyTo) =>
         pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))

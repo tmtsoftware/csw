@@ -16,7 +16,7 @@ import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
-import csw.messages.ccs.commands.{CommandInfo, Setup}
+import csw.messages.ccs.commands.{CommandInfo, Observe, Setup}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
@@ -112,7 +112,13 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     }
   }
 
-  test("onControlCommand hook of comp handlers should be invoked when supervisor receives Control command") {
+  // DEOPSCSW-198: Enable Assembly to accept a Setup or an Observe configuration
+  // DEOPSCSW-199: Enable HCD to accept a Setup configuration
+  // DEOPSCSW-200: Send Submit Configuration command
+  // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
+  // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
+  // DEOPSCSW-293: Sanitise handlers in Component Handlers
+  test("onSetup hook should be invoked and command validation should be successful on receiving Observe config") {
     forAll(testData) { (info: ComponentInfo) =>
       {
         val mocks = frameworkTestMocks()
@@ -125,53 +131,76 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         val commandInfo: CommandInfo = "Obs001"
         val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
-        val setup: Setup             = Setup(commandInfo, prefix, Set(param))
+        val setup: Setup             = Setup(commandInfo, successPrefix, Set(param))
 
         supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
+        // verify that onSetup handler is invoked
+        val submitSetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val submitSetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice)))
+        DemandMatcher(submitSetupConfigDemandState).check(submitSetupConfigCurrentState.data) shouldBe true
+
+        // verify that Submit command is received by handler
         val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
         DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
+        commandValidationResponseProbe.expectMsg(Accepted)
 
         supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
+        // verify that onSetup handler is invoked
+        val oneWaySetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val oneWaySetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice)))
+        DemandMatcher(oneWaySetupConfigDemandState).check(oneWaySetupConfigCurrentState.data) shouldBe true
+
+        // verify that OneWay command is received by handler
         val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
         DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
+        commandValidationResponseProbe.expectMsg(Accepted)
       }
     }
   }
 
+  // DEOPSCSW-198: Enable Assembly to accept a Setup or an Observe configuration
   // DEOPSCSW-200: Send Submit Configuration command
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
-  test("component handler should be able to validate a Setup or Observe command as successful validation") {
-    forAll(testData) { (info: ComponentInfo) ⇒
+  test("onObserve hook should be invoked and command validation should be successful on receiving Observe config") {
+    forAll(testData) { (info: ComponentInfo) =>
       {
-        val mocks                                                      = frameworkTestMocks()
-        val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
-
+        val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(hcdInfo, mocks)
+        createSupervisorAndStartTLA(info, mocks)
+        val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         val commandInfo: CommandInfo = "Obs001"
         val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
-        // setup to receive Success in validation result
-        val setup: Setup = Setup(commandInfo, successPrefix, Set(param))
+        val observe: Observe         = Observe(commandInfo, successPrefix, Set(param))
 
-        supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
+        supervisorRef ! Submit(observe, commandValidationResponseProbe.ref)
+        // verify that onSetup handler is invoked
+        val submitObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val submitObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(observeConfigChoice)))
+        DemandMatcher(submitObserveConfigDemandState).check(submitObserveConfigCurrentState.data) shouldBe true
+
+        // verify that Submit command is received by handler
         val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        // This shows that received command by TLA is of type Submit
-        val submitCommandDemandState = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
+        val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
         DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted)
 
-        supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
+        supervisorRef ! Oneway(observe, commandValidationResponseProbe.ref)
+        // verify that onSetup handler is invoked
+        val oneWayObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val oneWayObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice)))
+        DemandMatcher(oneWayObserveConfigDemandState).check(oneWayObserveConfigCurrentState.data) shouldBe true
+
+        // verify that OneWay command is received by handler
         val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        // This shows that received command by TLA is of type OneWay
-        val onewayCommandDemandState = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
+        val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
         DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted)
       }
@@ -197,17 +226,9 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val setup: Setup = Setup(commandInfo, failedPrefix, Set(param))
 
         supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
-        val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        // This shows that received command by TLA is of type Submit
-        val submitCommandDemandState = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
-        DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsgType[Invalid]
 
         supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
-        val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        // This shows that received command by TLA is of type OneWay
-        val onewayCommandDemandState = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
-        DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsgType[Invalid]
       }
     }
@@ -238,9 +259,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     }
   }
 
-  test(
-    "running component should invoke onShutdown hook when supervisor restarts component using Restart external message"
-  ) {
+  test("should invoke onShutdown hook when supervisor restarts component using Restart external message") {
     forAll(testData) { (info: ComponentInfo) =>
       {
         val mocks = frameworkTestMocks()

@@ -9,10 +9,9 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.exceptions.{ClusterSeedsNotFound, FileNotFound, LocalFileNotFound, UnableToParseOptions}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LogControlMessages
-import csw.services.logging.scaladsl.{ComponentLogger, LogAdminActor, LoggingSystemFactory}
+import csw.services.logging.scaladsl.{ComponentLogger, LogAdminActor}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble

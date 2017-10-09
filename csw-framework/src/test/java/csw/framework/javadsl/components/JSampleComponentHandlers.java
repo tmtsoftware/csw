@@ -69,15 +69,22 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
     @Override
     public Validation onSetup(CommandMessage commandMessage) {
-        return onControlCommand(commandMessage);
+        CurrentState setupState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()));
+        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(setupState);
+        pubSubRef.tell(publish);
+        return validateCommand(commandMessage);
     }
 
     @Override
     public Validation onObserve(CommandMessage commandMessage) {
-        return onControlCommand(commandMessage);
+        CurrentState observeState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice()));
+        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(observeState);
+        pubSubRef.tell(publish);
+
+        return validateCommand(commandMessage);
     }
 
-    private Validation onControlCommand(CommandMessage commandMsg) {
+    private Validation validateCommand(CommandMessage commandMsg) {
         CurrentState commandState;
         if(commandMsg instanceof CommandMessage.Submit) {
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
