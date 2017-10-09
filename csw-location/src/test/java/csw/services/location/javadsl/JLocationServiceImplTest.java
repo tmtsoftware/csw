@@ -29,10 +29,11 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("ConstantConditions")
 public class JLocationServiceImplTest implements JLocationServiceLogger {
@@ -54,7 +55,6 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     private ComponentId httpServiceComponentId = new ComponentId("exampleHTTPService", JComponentType.Service);
     private HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
     private String Path = "/path/to/resource";
-
 
     @After
     public void unregisterAllServices() throws ExecutionException, InterruptedException {
@@ -108,7 +108,6 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
 
     @Test
     public void testResolveAkkaConnection() throws ExecutionException, InterruptedException {
-
         AkkaRegistration registration = AkkaRegistrationFactory$.MODULE$.make(akkaHcdConnection, actorRef);
         locationService.register(registration).get();
         Assert.assertEquals(registration.location(new Networks().hostname()), locationService.find(akkaHcdConnection).get().get());
@@ -130,7 +129,6 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     @Test
     public void testTcpRegistration() throws ExecutionException, InterruptedException {
         int port = 8080;
-
         TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
 
         locationService.register(tcpRegistration).get();
@@ -142,7 +140,6 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
 
     @Test
     public void testAkkaRegistration() throws ExecutionException, InterruptedException {
-
         AkkaRegistration registration = AkkaRegistrationFactory$.MODULE$.make(akkaHcdConnection, actorRef);
 
         locationService.register(registration).get();
@@ -285,9 +282,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         TcpConnection redis2Connection = new TcpConnection(new ComponentId("redis2", JComponentType.Service));
         TcpRegistration redis2registration = new TcpRegistration(redis2Connection, Port);
 
-
         Pair<KillSwitch, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(actorSystem), Keep.both()).run(mat);
-
 
         IRegistrationResult result = locationService.register(redis1Registration).get();
         IRegistrationResult result2 = locationService.register(redis2registration).get();
@@ -324,7 +319,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
 
         //shutdown the notification stream, should no longer receive any notifications
         killSwitch.shutdown();
-        probe.expectNoMsg();
+        probe.expectNoMessage(new FiniteDuration(200, TimeUnit.MILLISECONDS));
     }
 
     class TestActor extends JLocationServiceLoggerActor {

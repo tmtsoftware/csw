@@ -185,7 +185,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
 
     switch.shutdown()
     locationService.register(redis1Registration).await
-    probe.expectNoMsg()
+    probe.expectNoMessage(200.millis)
   }
 
   test("should able to track http and akka connection registered before tracking started") {
@@ -261,7 +261,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
 
     httpRegistrationResult.unregister().await
 
-    httpProbe.expectNoMsg()
+    httpProbe.expectNoMessage(200.millis)
   }
 
   test("should not register a different Registration(connection + port/URI/actorRef) against already registered name") {

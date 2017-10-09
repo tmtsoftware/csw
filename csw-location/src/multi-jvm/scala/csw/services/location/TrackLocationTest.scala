@@ -10,6 +10,8 @@ import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.internal.AkkaRegistrationFactory
 import csw.services.location.models._
 
+import scala.concurrent.duration.DurationInt
+
 class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0)
 class TrackLocationTestMultiJvmNode3 extends TrackLocationTest(0)
@@ -79,7 +81,7 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
       enterBarrier("Http-unregister")
       enterBarrier("Tcp-unregister")
 
-      tcpProbe.expectNoMsg()
+      tcpProbe.expectNoMessage(200.millis)
 
     }
 
