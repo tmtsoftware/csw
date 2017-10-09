@@ -40,7 +40,6 @@ class DatumCommand(
         )
       )
     } else {
-
       (stateActor.get ? { x: ActorRef[StateWasSet] ⇒
         SetState(cmdItem(cmdBusy),
                  moveItem(moveIndexing),

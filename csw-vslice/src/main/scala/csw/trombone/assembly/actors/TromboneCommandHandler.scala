@@ -15,7 +15,6 @@ import csw.messages.ccs.ValidationIssue.{
 }
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.generics.Parameter
-import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.TromboneCommandHandlerMsgs._
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneCommandHandler.Mode
@@ -148,29 +147,16 @@ class TromboneCommandHandler(
           )
 
         case ac.setAngleCK =>
-          Await.ready(
-            tromboneStateActor ? { x: ActorRef[StateWasSet] ⇒
-              SetState(cmdBusy, move(currentState), sodiumLayer(currentState), nss(currentState), x)
-            },
-            timeout.duration
-          )
-
-          val zenithAngleItem = s(ac.zenithAngleKey)
-          followCommandActor ! SetZenithAngle(zenithAngleItem)
-          Matchers.matchState(ctx, Matchers.idleMatcher, pubSubRef, 5.seconds).map {
-            case Completed =>
-              Await.ready(
-                tromboneStateActor ? { x: ActorRef[StateWasSet] ⇒
-                  SetState(cmdContinuous, move(currentState), sodiumLayer(currentState), nss(currentState), x)
-                },
-                timeout.duration
-              )
-            case Error(message) =>
-              println(s"setElevation command failed with message: $message")
-          }
+          currentCommand = new SetAngleCommand(ctx, ac, s, followCommandActor, currentState, tromboneStateActor)
+          currentCommand
+            .startCommand()
+            .onComplete {
+              case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
+              case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
+            }
 
         case ac.stopCK =>
-          followCommandActor ! StopFollowing
+          currentCommand.stopCurrentCommand()
           Await.ready(
             tromboneStateActor ? { x: ActorRef[StateWasSet] ⇒
               SetState(cmdReady, moveIndexed, sodiumLayer(currentState), nss(currentState), x)
