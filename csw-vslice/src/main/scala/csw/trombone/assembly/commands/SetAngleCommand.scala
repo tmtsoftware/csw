@@ -11,8 +11,8 @@ import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.actors.TromboneStateActor._
 import csw.trombone.assembly.{AssemblyContext, FollowCommandMessages, Matchers, TromboneCommandHandlerMsgs}
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, Future}
 
 class SetAngleCommand(
     ctx: ActorContext[TromboneCommandHandlerMsgs],
@@ -27,7 +27,7 @@ class SetAngleCommand(
   implicit val scheduler: Scheduler = ctx.system.scheduler
   implicit val timeout: Timeout     = Timeout(5.seconds)
   override def startCommand(): Future[CommandExecutionResponse] = {
-    (stateActor ? { x: ActorRef[StateWasSet] ⇒
+    sendState(
       SetState(
         cmdBusy,
         move(startState),
@@ -35,23 +35,33 @@ class SetAngleCommand(
         nss(startState),
         ctx.spawnAnonymous(Actor.ignore)
       )
-    }).flatMap { _ ⇒
-      val zenithAngleItem = s(ac.zenithAngleKey)
-      followCommandActor ! SetZenithAngle(zenithAngleItem)
-      Matchers.matchState(ctx, Matchers.idleMatcher, pubSubRef, 5.seconds).map {
-        case Completed =>
-          stateActor ? { x: ActorRef[StateWasSet] ⇒
-            SetState(cmdContinuous, move(startState), sodiumLayer(startState), nss(startState), x)
-          }
-          Completed
-        case Error(message) =>
-          println(s"setElevation command failed with message: $message")
-          Error(message)
-      }
+    )
+    val zenithAngleItem = s(ac.zenithAngleKey)
+    followCommandActor ! SetZenithAngle(zenithAngleItem)
+    Matchers.matchState(ctx, Matchers.idleMatcher, pubSubRef, 5.seconds).map {
+      case Completed =>
+        sendState(
+          SetState(cmdContinuous,
+                   move(startState),
+                   sodiumLayer(startState),
+                   nss(startState),
+                   ctx.spawnAnonymous(Actor.ignore))
+        )
+        Completed
+      case Error(message) =>
+        println(s"setElevation command failed with message: $message")
+        Error(message)
     }
   }
 
   override def stopCurrentCommand(): Unit = {
     followCommandActor ! StopFollowing
+  }
+
+  private def sendState(setState: SetState): Unit = {
+    implicit val timeout: Timeout = Timeout(5.seconds)
+    Await.ready(stateActor ? { x: ActorRef[StateWasSet] ⇒
+      setState
+    }, timeout.duration)
   }
 }

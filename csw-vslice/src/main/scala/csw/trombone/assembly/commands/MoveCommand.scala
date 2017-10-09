@@ -1,7 +1,10 @@
 package csw.trombone.assembly.commands
 
+import akka.actor.Scheduler
 import akka.typed.ActorRef
+import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages._
@@ -13,8 +16,8 @@ import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.trombone.hcd.TromboneHcdState
 
-import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, Future}
 
 class MoveCommand(
     ctx: ActorContext[TromboneCommandHandlerMsgs],
@@ -22,7 +25,7 @@ class MoveCommand(
     s: Setup,
     tromboneHCD: Running,
     startState: TromboneState,
-    stateActor: Option[ActorRef[TromboneStateMsg]]
+    stateActor: ActorRef[TromboneStateMsg]
 ) extends TromboneAssemblyCommand {
 
   import csw.trombone.assembly.actors.TromboneStateActor._
@@ -44,8 +47,7 @@ class MoveCommand(
       val scOut = Setup(s.info, TromboneHcdState.axisMoveCK)
         .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
 
-      stateActor.foreach(
-        _ !
+      sendState(
         SetState(cmdItem(cmdBusy),
                  moveItem(moveMoving),
                  startState.sodiumLayer,
@@ -57,8 +59,7 @@ class MoveCommand(
 
       Matchers.matchState(ctx, stateMatcher, pubSubRef, 5.seconds).map {
         case Completed =>
-          stateActor.foreach(
-            _ !
+          sendState(
             SetState(cmdItem(cmdReady),
                      moveItem(moveIndexed),
                      sodiumItem(false),
@@ -76,6 +77,15 @@ class MoveCommand(
 
   def stopCurrentCommand(): Unit = {
     tromboneHCD.componentRef ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
+  }
+
+  private def sendState(setState: SetState): Unit = {
+    implicit val timeout: Timeout     = Timeout(5.seconds)
+    implicit val scheduler: Scheduler = ctx.system.scheduler
+
+    Await.ready(stateActor ? { x: ActorRef[StateWasSet] ⇒
+      setState
+    }, timeout.duration)
   }
 
 }

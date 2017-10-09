@@ -1,7 +1,9 @@
 package csw.trombone.assembly.commands
 
+import akka.actor.Scheduler
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages._
@@ -12,9 +14,10 @@ import csw.messages.params.states.CurrentState
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.trombone.hcd.TromboneHcdState
+import akka.typed.scaladsl.AskPattern._
 
-import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, Future}
 
 class SetElevationCommand(
     ctx: ActorContext[TromboneCommandHandlerMsgs],
@@ -22,7 +25,7 @@ class SetElevationCommand(
     s: Setup,
     tromboneHCD: Running,
     startState: TromboneState,
-    stateActor: Option[ActorRef[TromboneStateMsg]]
+    stateActor: ActorRef[TromboneStateMsg]
 ) extends TromboneAssemblyCommand {
 
   import TromboneHcdState._
@@ -50,19 +53,17 @@ class SetElevationCommand(
       val stateMatcher = Matchers.posMatcher(encoderPosition)
       val scOut        = Setup(ac.commandInfo, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
 
-      stateActor.foreach(
-        _ ! SetState(cmdItem(cmdBusy),
-                     moveItem(moveIndexing),
-                     startState.sodiumLayer,
-                     startState.nss,
-                     ctx.spawnAnonymous(Actor.ignore))
+      sendState(
+        SetState(cmdItem(cmdBusy),
+                 moveItem(moveIndexing),
+                 startState.sodiumLayer,
+                 startState.nss,
+                 ctx.spawnAnonymous(Actor.ignore))
       )
       tromboneHCD.componentRef ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore))
       Matchers.matchState(ctx, stateMatcher, pubSubRef, 5.seconds).map {
         case Completed =>
-          stateActor.foreach(
-            _ ! SetState(cmdReady, moveIndexed, sodiumLayer = false, nss = false, ctx.spawnAnonymous(Actor.ignore))
-          )
+          sendState(SetState(cmdReady, moveIndexed, sodiumLayer = false, nss = false, ctx.spawnAnonymous(Actor.ignore)))
           Completed
         case Error(message) =>
           println(s"Data command match failed with error: $message")
@@ -74,5 +75,14 @@ class SetElevationCommand(
 
   def stopCurrentCommand(): Unit = {
     tromboneHCD.componentRef ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
+  }
+
+  private def sendState(setState: SetState): Unit = {
+    implicit val timeout: Timeout     = Timeout(5.seconds)
+    implicit val scheduler: Scheduler = ctx.system.scheduler
+
+    Await.ready(stateActor ? { x: ActorRef[StateWasSet] ⇒
+      setState
+    }, timeout.duration)
   }
 }

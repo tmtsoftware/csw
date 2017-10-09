@@ -98,24 +98,24 @@ class TromboneCommandHandler(
           replyTo ! Completed
 
         case ac.datumCK =>
-          currentCommand = new DatumCommand(ctx, s, tromboneHCD, currentState, Some(tromboneStateActor))
+          currentCommand = new DatumCommand(ctx, s, tromboneHCD, currentState, tromboneStateActor)
           executeCommand(replyTo)
 
         case ac.moveCK =>
-          currentCommand = new MoveCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+          currentCommand = new MoveCommand(ctx, ac, s, tromboneHCD, currentState, tromboneStateActor)
           executeCommand(replyTo)
 
         case ac.positionCK =>
-          currentCommand = new PositionCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+          currentCommand = new PositionCommand(ctx, ac, s, tromboneHCD, currentState, tromboneStateActor)
           executeCommand(replyTo)
 
         case ac.setElevationCK =>
           setElevationItem = s(ac.naElevationKey)
-          currentCommand = new SetElevationCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+          currentCommand = new SetElevationCommand(ctx, ac, s, tromboneHCD, currentState, tromboneStateActor)
           executeCommand(replyTo)
 
         case ac.followCK =>
-          currentCommand = new FollowCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+          currentCommand = new FollowCommand(ctx, ac, s, tromboneHCD, currentState, tromboneStateActor)
           executeFollow(replyTo, s(ac.nssInUseKey))
 
         case ac.stopCK =>
