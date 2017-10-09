@@ -4,9 +4,8 @@ import akka.typed.ActorRef
 import csw.messages.location.Connection.AkkaConnection
 import csw.services.location.models.AkkaRegistration
 
-/**
- * It is strictly recommended to use for testing purposes only
- */
+//FIXME decide the place of this factory once HttpRegistration and TcpRegistration requires similar factory
 object AkkaRegistrationFactory {
-  def make(connection: AkkaConnection, actorRef: ActorRef[_]) = AkkaRegistration(connection, actorRef, null)
+  private[location] def make(connection: AkkaConnection, actorRef: ActorRef[_]) =
+    AkkaRegistration(connection, actorRef, null)
 }
