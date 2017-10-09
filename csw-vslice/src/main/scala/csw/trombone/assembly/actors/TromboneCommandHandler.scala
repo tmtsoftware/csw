@@ -14,6 +14,7 @@ import csw.messages.ccs.ValidationIssue.{
   WrongInternalStateIssue
 }
 import csw.messages.ccs.commands.Setup
+import csw.messages.params.generics.Parameter
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.TromboneCommandHandlerMsgs._
 import csw.trombone.assembly._
@@ -98,33 +99,25 @@ class TromboneCommandHandler(
           replyTo ! Completed
 
         case ac.datumCK =>
-          if (isHCDAvailable) {
-            currentCommand = new DatumCommand(ctx, s, tromboneHCD, currentState, Some(tromboneStateActor))
-            mode = Mode.Executing
-            ctx.self ! CommandStart(replyTo)
-          } else hcdNotAvailableResponse(Some(replyTo))
+          currentCommand = new DatumCommand(ctx, s, tromboneHCD, currentState, Some(tromboneStateActor))
+          executeCommand(replyTo)
 
         case ac.moveCK =>
-          if (isHCDAvailable) {
-            currentCommand = new MoveCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
-            mode = Mode.Executing
-            ctx.self ! CommandStart(replyTo)
-          } else hcdNotAvailableResponse(Some(replyTo))
+          currentCommand = new MoveCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+          executeCommand(replyTo)
 
         case ac.positionCK =>
-          if (isHCDAvailable) {
-            currentCommand = new PositionCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
-            mode = Mode.Executing
-            ctx.self ! CommandStart(replyTo)
-          } else hcdNotAvailableResponse(Some(replyTo))
+          currentCommand = new PositionCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+          executeCommand(replyTo)
 
         case ac.setElevationCK =>
           setElevationItem = s(ac.naElevationKey)
-          if (isHCDAvailable) {
-            currentCommand = new SetElevationCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
-            mode = Mode.Executing
-            ctx.self ! CommandStart(replyTo)
-          } else hcdNotAvailableResponse(Some(replyTo))
+          currentCommand = new SetElevationCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+          executeCommand(replyTo)
+
+        case ac.followCK =>
+          currentCommand = new FollowCommand(ctx, ac, s, tromboneHCD, currentState, Some(tromboneStateActor))
+          executeFollow(replyTo, s(ac.nssInUseKey))
 
         case ac.stopCK =>
           replyTo ! NoLongerValid(
@@ -134,30 +127,6 @@ class TromboneCommandHandler(
         case ac.setAngleCK =>
           replyTo ! NoLongerValid(WrongInternalStateIssue("Trombone assembly must be following for setAngle"))
 
-        case ac.followCK =>
-          if (cmd(currentState) == cmdUninitialized
-              || (move(currentState) != moveIndexed && move(currentState) != moveMoving)
-              || !sodiumLayer(currentState)) {
-            replyTo ! NoLongerValid(
-              WrongInternalStateIssue(
-                s"Assembly state of ${cmd(currentState)}/${move(currentState)}/${sodiumLayer(currentState)} does not allow follow"
-              )
-            )
-          } else {
-            val nssItem = s(ac.nssInUseKey)
-
-            followCommandActor = ctx.spawnAnonymous(
-              FollowCommand.make(ac, setElevationItem, nssItem, Some(tromboneHCD.componentRef), allEventPublisher)
-            )
-            mode = Mode.Following
-            (tromboneStateActor ? { x: ActorRef[StateWasSet] ⇒
-              SetState(cmdContinuous, moveMoving, sodiumLayer(currentState), nssItem.head, x)
-            }).onComplete { _ =>
-              replyTo ! Completed
-            }
-
-            replyTo ! BehaviorChanged[FollowingMsgs](ctx.self)
-          }
         case otherCommand =>
           replyTo ! Invalid(
             UnsupportedCommandInStateIssue(
@@ -188,7 +157,7 @@ class TromboneCommandHandler(
 
           val zenithAngleItem = s(ac.zenithAngleKey)
           followCommandActor ! SetZenithAngle(zenithAngleItem)
-          Matchers.executeMatch(ctx, Matchers.idleMatcher, pubSubRef, Some(replyTo)) {
+          Matchers.matchState(ctx, Matchers.idleMatcher, pubSubRef, 5.seconds).map {
             case Completed =>
               Await.ready(
                 tromboneStateActor ? { x: ActorRef[StateWasSet] ⇒
@@ -218,14 +187,6 @@ class TromboneCommandHandler(
   }
 
   def onExecuting(msg: ExecutingMsgs): Unit = msg match {
-    case CommandStart(replyTo) =>
-      if (isHCDAvailable) {
-        currentCommand.startCommand().onComplete {
-          case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
-          case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
-        }
-      } else hcdNotAvailableResponse(Some(replyTo))
-
     case CommandComplete(replyTo, result) ⇒
       replyTo ! result
       currentCommand.stopCurrentCommand()
@@ -238,6 +199,28 @@ class TromboneCommandHandler(
 
     case TromboneStateE(x) ⇒ currentState = x
     case s: Submit         ⇒
+  }
+
+  private def executeCommand(replyTo: ActorRef[CommandResponse]): Unit = {
+    if (isHCDAvailable) {
+      mode = Mode.Executing
+      currentCommand.startCommand().onComplete {
+        case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
+        case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
+      }
+    } else hcdNotAvailableResponse(Some(replyTo))
+  }
+
+  private def executeFollow(replyTo: ActorRef[CommandResponse], nssItem: Parameter[Boolean]): Unit = {
+    followCommandActor = ctx.spawnAnonymous(
+      FollowCommandActor.make(ac, setElevationItem, nssItem, Some(tromboneHCD.componentRef), allEventPublisher)
+    )
+    mode = Mode.Following
+    currentCommand.startCommand().onComplete {
+      case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
+      case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
+    }
+    replyTo ! BehaviorChanged[FollowingMsgs](ctx.self)
   }
 
   private def hcdNotAvailableResponse(commandOriginator: Option[ActorRef[CommandExecutionResponse]]): Unit = {

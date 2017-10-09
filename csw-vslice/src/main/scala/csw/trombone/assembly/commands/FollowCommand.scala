@@ -1,76 +1,53 @@
 package csw.trombone.assembly.commands
 
-import akka.typed.scaladsl.Actor.MutableBehavior
+import akka.actor.Scheduler
+import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior}
-import csw.messages.CommandMessage.Submit
-import csw.messages.ccs.events.EventTime
-import csw.messages.params.generics.Parameter
-import csw.trombone.assembly.FollowActorMessages.{StopFollowing, UpdatedEventData}
-import csw.trombone.assembly.FollowCommandMessages.{UpdateNssInUse, UpdateTromboneHcd, UpdateZAandFE}
-import csw.trombone.assembly._
-import csw.trombone.assembly.actors.{FollowActor, TromboneControl}
+import csw.messages.FromComponentLifecycleMessage.Running
+import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
+import csw.messages.ccs.commands.Setup
+import csw.messages.{CommandExecutionResponse, Completed, NoLongerValid}
+import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg, _}
+import csw.trombone.assembly.{AssemblyContext, TromboneCommandHandlerMsgs}
+import akka.typed.scaladsl.AskPattern._
+import akka.util.Timeout
 
-object FollowCommand {
-
-  def make(
-      assemblyContext: AssemblyContext,
-      initialElevation: Parameter[Double],
-      nssInUse: Parameter[Boolean],
-      tromboneHCD: Option[ActorRef[Submit]],
-      eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
-  ): Behavior[FollowCommandMessages] =
-    Actor.mutable(
-      ctx ⇒ new FollowCommand(assemblyContext, initialElevation, nssInUse, tromboneHCD, eventPublisher, ctx)
-    )
-}
+import scala.concurrent.Future
+import scala.concurrent.duration.DurationLong
 
 class FollowCommand(
+    ctx: ActorContext[TromboneCommandHandlerMsgs],
     ac: AssemblyContext,
-    initialElevation: Parameter[Double],
-    val nssInUseIn: Parameter[Boolean],
-    val tromboneHCDIn: Option[ActorRef[Submit]],
-    eventPublisher: Option[ActorRef[TrombonePublisherMsg]],
-    ctx: ActorContext[FollowCommandMessages]
-) extends MutableBehavior[FollowCommandMessages] {
-
-  val tromboneControl: ActorRef[TromboneControlMsg] =
-    ctx.spawn(TromboneControl.behavior(ac, tromboneHCDIn), "TromboneControl")
-
-  var followActor: ActorRef[FollowActorMessages] = ctx.spawn(
-    FollowActor.make(ac, initialElevation, nssInUseIn, Some(tromboneControl), eventPublisher, eventPublisher),
-    "FollowActor"
-  )
-
-  val nssInUse: Parameter[Boolean] = nssInUseIn
-
-  var tromboneHCD: Option[ActorRef[Submit]] = tromboneHCDIn
-
-  override def onMessage(msg: FollowCommandMessages): Behavior[FollowCommandMessages] = msg match {
-    case UpdateNssInUse(nssInUseUpdate) =>
-      if (nssInUseUpdate != nssInUse) {
-        ctx.stop(followActor)
-        followActor = ctx.spawnAnonymous(
-          FollowActor.make(ac, initialElevation, nssInUseIn, Some(tromboneControl), eventPublisher, eventPublisher)
+    s: Setup,
+    tromboneHCD: Running,
+    startState: TromboneState,
+    stateActor: Option[ActorRef[TromboneStateMsg]]
+) extends TromboneAssemblyCommand {
+  import ctx.executionContext
+  implicit val scheduler: Scheduler = ctx.system.scheduler
+  implicit val timeout: Timeout     = Timeout(5.seconds)
+  override def startCommand(): Future[CommandExecutionResponse] = {
+    if (cmd(startState) == cmdUninitialized
+        || (move(startState) != moveIndexed && move(startState) != moveMoving)
+        || !sodiumLayer(startState)) {
+      Future(
+        NoLongerValid(
+          WrongInternalStateIssue(
+            s"Assembly state of ${cmd(startState)}/${move(startState)}/${sodiumLayer(startState)} does not allow follow"
+          )
         )
-      }
-      this
+      )
+    } else {
+      (stateActor.get ? { x: ActorRef[StateWasSet] ⇒
+        SetState(cmdContinuous,
+                 moveMoving,
+                 sodiumLayer(startState),
+                 s(ac.nssInUseKey).head,
+                 ctx.spawnAnonymous(Actor.ignore))
+      }).map(_ ⇒ Completed)
+    }
 
-    case UpdateZAandFE(zenithAngleIn, focusErrorIn) =>
-      followActor ! UpdatedEventData(zenithAngleIn, focusErrorIn, EventTime())
-      this
-
-    case UpdateTromboneHcd(running) =>
-      tromboneHCD = running
-      tromboneControl ! TromboneControlMsg.UpdateTromboneHcd(running)
-      this
-
-    case StopFollowing =>
-      ctx.stop(followActor)
-      this
-
-    case m: FollowActorMessages =>
-      followActor ! m
-      this
   }
+
+  override def stopCurrentCommand(): Unit = ???
 }
