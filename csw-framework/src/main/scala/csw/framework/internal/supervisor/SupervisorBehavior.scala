@@ -53,7 +53,7 @@ class SupervisorBehavior(
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
     logAdminActorRef: ActorRef[LogControlMessages]
-) extends ComponentLogger.TypedActor[SupervisorMessage](ctx, Some(componentInfo.name)) {
+) extends ComponentLogger.TypedActor[SupervisorMessage](ctx, componentInfo.name) {
 
   import SupervisorBehavior._
   import ctx.executionContext

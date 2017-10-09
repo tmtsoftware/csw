@@ -9,9 +9,9 @@ import csw.messages._
 import csw.messages.ccs.ValidationIssue.OtherIssue
 import csw.messages.ccs.{Validation, Validations}
 import csw.messages.framework.ComponentInfo
+import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.generics.GChoiceKey
 import csw.messages.params.generics.KeyType.ChoiceKey
-import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.models.{Choice, Choices, Prefix}
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService

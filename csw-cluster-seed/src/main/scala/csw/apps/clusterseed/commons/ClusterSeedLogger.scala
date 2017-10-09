@@ -1,5 +1,5 @@
 package csw.apps.clusterseed.commons
 
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.ServiceLogger
 
-object ClusterSeedLogger extends ComponentLogger("cluster-seed-app")
+object ClusterSeedLogger extends ServiceLogger("cluster-seed-app")

@@ -2,9 +2,9 @@ package csw.services.logging.components
 
 import akka.actor.Props
 import csw.services.logging.components.IRIS._
-import csw.services.logging.scaladsl.{ComponentLogger, GenericLogger}
+import csw.services.logging.scaladsl.{ComponentLogger, GenericLogger, ServiceLogger}
 
-object IRISLogger extends ComponentLogger(IRIS.COMPONENT_NAME)
+object IRISLogger extends ServiceLogger(IRIS.COMPONENT_NAME)
 
 class IRIS(componentName: String) extends ComponentLogger.Actor(Some(componentName)) {
 

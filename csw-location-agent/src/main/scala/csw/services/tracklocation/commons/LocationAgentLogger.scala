@@ -1,5 +1,5 @@
 package csw.services.tracklocation.commons
 
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.ServiceLogger
 
-object LocationAgentLogger extends ComponentLogger("location-agent-app")
+object LocationAgentLogger extends ServiceLogger("location-agent-app")

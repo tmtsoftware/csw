@@ -7,7 +7,7 @@ import csw.messages.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.services.logging.scaladsl.ComponentLogger
 
 class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], componentName: String)
-    extends ComponentLogger.TypedActor[PubSub[T]](ctx, Some(componentName)) {
+    extends ComponentLogger.TypedActor[PubSub[T]](ctx, componentName) {
 
   var subscribers: Set[ActorRef[T]] = Set.empty
 

@@ -1,7 +1,7 @@
 package csw.services.commons
 
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.ServiceLogger
 
 //#component-logger
-object ExampleLogger extends ComponentLogger("my-component-name")
+object ExampleLogger extends ServiceLogger("my-component-name")
 //#component-logger

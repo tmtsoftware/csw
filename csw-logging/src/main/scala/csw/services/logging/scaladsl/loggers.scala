@@ -2,6 +2,7 @@ package csw.services.logging.scaladsl
 
 import akka.actor.{ActorPath, ActorRef}
 import akka.serialization.Serialization
+import akka.typed.scaladsl.adapter.TypedActorRefOps
 import akka.typed.scaladsl.{Actor, ActorContext}
 
 /**
@@ -17,6 +18,7 @@ object GenericLogger extends BasicLogger {
 
   abstract class TypedActor[T](ctx: ActorContext[T]) extends super.TypedActor[T](ctx, None)
 
+  def getLogger[T](ctx: ActorContext[T]): LoggerImpl = getLogger(ctx, None)
 }
 
 /**
@@ -24,7 +26,7 @@ object GenericLogger extends BasicLogger {
  *
  * @param _componentName name of the component to initialize the logger
  */
-class ComponentLogger(_componentName: String) extends BasicLogger {
+class ServiceLogger(_componentName: String) extends BasicLogger {
 
   trait Simple extends super.Simple {
     override protected def maybeComponentName(): Option[String] = Some(_componentName)
@@ -34,9 +36,13 @@ class ComponentLogger(_componentName: String) extends BasicLogger {
 
   abstract class TypedActor[T](ctx: ActorContext[T]) extends super.TypedActor[T](ctx, Some(_componentName))
 
+  def getLogger[T](ctx: ActorContext[T]): LoggerImpl = getLogger(ctx, Some(_componentName))
+
 }
 
-object ComponentLogger extends BasicLogger
+object ComponentLogger extends BasicLogger {
+  def getLogger[T](ctx: ActorContext[T], componentName: String): Logger = getLogger(ctx, Some(componentName))
+}
 
 class BasicLogger {
 
@@ -53,23 +59,26 @@ class BasicLogger {
    *
    * @param maybeComponentName name of the component to initialize the logger
    */
-  abstract class Actor(maybeComponentName: Option[String]) extends akka.actor.Actor {
+  abstract class Actor private[logging] (maybeComponentName: Option[String]) extends akka.actor.Actor {
+    def this(componentName: String) = this(Some(componentName))
     protected val log: Logger = new LoggerImpl(maybeComponentName, Some(actorPath(self)))
   }
-
-  import akka.typed.scaladsl.adapter._
-  import akka.typed.scaladsl.ActorContext
 
   /**
    * Mix in this trait to create a TypedActor and obtain a reference to a logger initialized with name of the component and it's ActorPath
    *
    * @param maybeComponentName name of the component to initialize the logger
    */
-  abstract class TypedActor[T](ctx: ActorContext[T], maybeComponentName: Option[String])
+  abstract class TypedActor[T] private[logging] (ctx: ActorContext[T], maybeComponentName: Option[String])
       extends Actor.MutableBehavior[T] {
-    protected lazy val log: Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self.toUntyped)))
+
+    def this(ctx: ActorContext[T], componentName: String) = this(ctx, Some(componentName))
+    protected lazy val log: Logger = getLogger(ctx, maybeComponentName)
   }
 
-  private def actorPath(actorRef: ActorRef): String =
+  private[logging] def getLogger[T](ctx: ActorContext[T], maybeComponentName: Option[String]) =
+    new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self.toUntyped)))
+
+  private[logging] def actorPath(actorRef: ActorRef): String =
     ActorPath.fromString(Serialization.serializedActorPath(actorRef)).toString
 }

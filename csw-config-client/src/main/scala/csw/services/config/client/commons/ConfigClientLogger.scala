@@ -1,5 +1,5 @@
 package csw.services.config.client.commons
 
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.ServiceLogger
 
-object ConfigClientLogger extends ComponentLogger(s"${ConfigServiceConnection.value.componentId.fullName}-client")
+object ConfigClientLogger extends ServiceLogger(s"${ConfigServiceConnection.value.componentId.fullName}-client")

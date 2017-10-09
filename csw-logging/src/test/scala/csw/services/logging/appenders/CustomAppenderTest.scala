@@ -7,16 +7,16 @@ import com.persist.JsonOps
 import com.persist.JsonOps.{Json, JsonObject}
 import com.typesafe.config.ConfigFactory
 import csw.services.logging.RichMsg
-import csw.services.logging.scaladsl.{ComponentLogger, LoggingSystemFactory}
+import csw.services.logging.scaladsl.{LoggingSystemFactory, ServiceLogger}
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-object MyFavComponentLogger extends ComponentLogger("MyFavComponent")
+object MyFavServiceLogger extends ServiceLogger("MyFavComponent")
 
-class MyFavComponent extends MyFavComponentLogger.Simple {
+class MyFavComponent extends MyFavServiceLogger.Simple {
   def startLogging(): Unit = {
     log.info("info")
     log.warn("warn")
