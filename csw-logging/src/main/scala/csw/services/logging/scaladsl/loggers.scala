@@ -21,7 +21,7 @@ private[logging] class BasicLogger {
     protected lazy val log: Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self.toUntyped)))
   }
 
-  private[logging] def immutable[T](ctx: ActorContext[T], maybeComponentName: Option[String]) =
+  private[logging] def immutable[T](ctx: ActorContext[T], maybeComponentName: Option[String]): Logger =
     new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self.toUntyped)))
 
   private def actorPath(actorRef: ActorRef): String =
@@ -38,7 +38,7 @@ private[logging] class BasicServiceAndGenericLogger(_maybeComponentName: Option[
 
   abstract class MutableActor[T](ctx: ActorContext[T]) extends super.MutableActor[T](ctx, _maybeComponentName)
 
-  def immutable[T](ctx: ActorContext[T]): LoggerImpl = immutable(ctx, _maybeComponentName)
+  def immutable[T](ctx: ActorContext[T]): Logger = immutable(ctx, _maybeComponentName)
 }
 
 /**
