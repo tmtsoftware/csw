@@ -1,14 +1,19 @@
 package csw.apps.clusterseed.app
 
-import akka.actor.{Actor, Props}
 import akka.typed.scaladsl.adapter._
+import akka.typed.testkit.TestKitSettings
+import akka.typed.testkit.scaladsl.TestProbe
+import akka.typed.{ActorRef, ActorSystem}
+import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.internal.AdminWiring
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.apps.clusterseed.components.StartLogging
+import csw.common.FrameworkAssertions.assertThatContainerIsRunning
+import csw.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.messages.ContainerCommonMessage.GetComponents
+import csw.messages.framework.ContainerLifecycleState
+import csw.messages.{Component, Components, ContainerMessage}
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.models.AkkaRegistration
-import csw.services.logging.internal.{GetComponentLogMetadata, SetComponentLogLevel}
-import csw.services.logging.scaladsl.{ComponentLogger, LogAdminActor}
+import csw.services.logging.scaladsl.{ComponentLogger, LogAdminActor, LoggingSystemFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -21,8 +26,8 @@ object AppLogger extends ComponentLogger("app")
   DemoApp does four things :
     1. Start seed node on port 3552
     2. Start AdminHttpServer on port 7878
-    3. Register component having name = `app` with location service
-    4. Start logging messages at all levels in infinite loop
+    3. Creates a Laser Container with 3 components within it
+    4. Laser Assembly start logging messages at all levels in infinite loop
 
   How to test :
     1. Start the app
@@ -35,67 +40,48 @@ object AppLogger extends ComponentLogger("app")
 
  */
 
-class DemoApp extends AppLogger.Simple {
-
-  val adminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3552), Some(7878))
-  import adminWiring._
-
-  private val loggingSystem = actorRuntime.startLogging()
-
-  def run(): Unit = {
-    startSeed()
-    registerWithLocationService()
-    sampleLogging()
-  }
-
-  def startSeed(): Unit = {
-    Await.result(adminHttpService.registeredLazyBinding, 5.seconds)
-  }
-
-  def registerWithLocationService(): Unit = {
-    val componentName = "app"
-    val connection    = AkkaConnection(ComponentId(componentName, ComponentType.HCD))
-    val actorRef = actorSystem.actorOf(
-      Props(new Actor {
-        override def receive: Receive = {
-          case SetComponentLogLevel(name, level) ⇒
-            loggingSystem.setComponentLogLevel(name, level)
-          case GetComponentLogMetadata(name, replyTo) ⇒ {
-            println("getMetadata")
-            println(name)
-            replyTo ! loggingSystem.getLogMetadata(name)
-          }
-          case unknown ⇒ log.error(s"Unknown message received => $unknown")
-        }
-      }),
-      "test-actor"
-    )
-
-    val adminActorRef    = actorSystem.spawn(LogAdminActor.behavior(), "log-admin")
-    val akkaRegistration = AkkaRegistration(connection, actorRef, adminActorRef)
-
-    log.info(s"Registering akka connection = ${connection.name} with location service")
-    Await.result(locationService.register(akkaRegistration), 5.seconds)
-
-    val result = Await.result(locationService.list, 5.seconds)
-    log.debug(s"List of registered locations : $result")
-  }
-
-  def sampleLogging(): Unit = {
-    while (true) {
-      println("------------------------------------")
-      log.trace("logging at trace level")
-      log.debug("logging at debug level")
-      log.info("logging at info level")
-      log.warn("logging at warn level")
-      log.error("logging at error level")
-      log.fatal("logging at fatal level")
-      println("------------------------------------")
-      Thread.sleep(1000)
-    }
-  }
-}
-
 object DemoApp extends App {
-  new DemoApp().run()
+
+  val seedSettings             = ClusterAwareSettings.onPort(3552)
+  val adminWiring: AdminWiring = AdminWiring.make(seedSettings, None)
+
+  val frameworkSystem = ClusterAwareSettings.joinLocal(3552).system
+  val frameworkWiring = FrameworkWiring.make(frameworkSystem)
+
+  implicit val typedSystem: ActorSystem[Nothing] = frameworkWiring.actorSystem.toTyped
+  implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
+
+  private def startSeed() = {
+    LoggingSystemFactory.start("logging", "version", ClusterAwareSettings.hostname, adminWiring.actorSystem)
+    adminWiring.locationService
+    Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)
+  }
+
+  private def spawnContainer(): ActorRef[ContainerMessage] = {
+
+    val config        = ConfigFactory.load("laser_container.conf")
+    val adminActorRef = frameworkWiring.actorSystem.spawn(LogAdminActor.behavior(), "log-admin")
+    val containerRef  = Await.result(Container.spawn(config, frameworkWiring, adminActorRef), 5.seconds)
+
+    val containerStateProbe = TestProbe[ContainerLifecycleState]
+    assertThatContainerIsRunning(containerRef, containerStateProbe, 5.seconds)
+    containerRef
+  }
+
+  startSeed()
+
+  private val containerRef: ActorRef[ContainerMessage] = spawnContainer()
+
+  val probe = TestProbe[Components]
+  containerRef ! GetComponents(probe.ref)
+  val components = probe.expectMsgType[Components].components
+
+  private val laserComponent: Component = components.find(x ⇒ x.info.name.equals("Laser")).get
+
+  while (true) {
+    println("------------------------------------")
+    laserComponent.supervisor ! StartLogging()
+    println("------------------------------------")
+    Thread.sleep(1000)
+  }
 }
