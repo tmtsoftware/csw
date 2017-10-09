@@ -43,8 +43,7 @@ private[containercmd] class ContainerCmd(
       new ArgsParser().parse(args) match {
         case None ⇒ throw UnableToParseOptions
         case Some(Options(standalone, isLocal, inputFilePath)) =>
-          if (startLogging)
-            LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
+          if (startLogging) wiring.actorRuntime.startLogging()
 
           log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 
