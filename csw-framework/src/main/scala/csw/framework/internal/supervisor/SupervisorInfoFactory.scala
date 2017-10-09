@@ -21,7 +21,7 @@ class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simpl
       containerRef: ActorRef[ContainerIdleMessage],
       componentInfo: ComponentInfo,
       locationService: LocationService,
-      adminActorRef: ActorRef[LogControlMessages]
+      logAdminActorRef: ActorRef[LogControlMessages]
   ): Future[Option[SupervisorInfo]] = {
     val system                                = ActorSystemFactory.remote(s"${componentInfo.name}-system")
     implicit val ec: ExecutionContextExecutor = system.dispatcher
@@ -37,7 +37,7 @@ class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simpl
           locationService,
           registrationFactory,
           pubSubBehaviorFactory,
-          adminActorRef
+          logAdminActorRef
         )
       }
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)

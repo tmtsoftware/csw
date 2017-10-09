@@ -12,7 +12,7 @@ object ContainerBehaviorFactory {
   def behavior(
       containerInfo: ContainerInfo,
       locationService: LocationService,
-      adminActorRef: ActorRef[LogControlMessages]
+      logAdminActorRef: ActorRef[LogControlMessages]
   ): Behavior[ContainerMessage] = {
     val supervisorFactory   = new SupervisorInfoFactory(containerInfo.name)
     val registrationFactory = new RegistrationFactory
@@ -24,7 +24,7 @@ object ContainerBehaviorFactory {
           supervisorFactory,
           registrationFactory,
           locationService,
-          adminActorRef
+          logAdminActorRef
       )
     )
   }

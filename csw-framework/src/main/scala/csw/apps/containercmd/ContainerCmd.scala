@@ -11,7 +11,7 @@ import csw.exceptions.{ClusterSeedsNotFound, FileNotFound, LocalFileNotFound, Un
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
+import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.{ComponentLogger, LogAdminActor, LoggingSystemFactory}
 
 import scala.async.Async.{async, await}
@@ -21,12 +21,13 @@ import scala.util.control.NonFatal
 
 object ContainerCmd {
   def start(name: String, args: Array[String]): ActorRef[_] =
-    new ContainerCmd(name, ClusterAwareSettings).start(args)
+    new ContainerCmd(name, ClusterAwareSettings, true).start(args)
 }
 
 private[containercmd] class ContainerCmd(
     name: String,
-    clusterSettings: ClusterSettings
+    clusterSettings: ClusterSettings,
+    startLogging: Boolean
 ) extends ComponentLogger.Simple {
 
   override protected def maybeComponentName() = Some(name)
@@ -42,13 +43,13 @@ private[containercmd] class ContainerCmd(
       new ArgsParser().parse(args) match {
         case None ⇒ throw UnableToParseOptions
         case Some(Options(standalone, isLocal, inputFilePath)) =>
-          val loggingSystem =
+          if (startLogging)
             LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
 
           log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 
           try {
-            Await.result(createF(standalone, isLocal, inputFilePath, loggingSystem), 30.seconds)
+            Await.result(createF(standalone, isLocal, inputFilePath), 30.seconds)
           } catch {
             case NonFatal(ex) ⇒
               log.error(s"${ex.getMessage}", ex = ex)
@@ -61,13 +62,12 @@ private[containercmd] class ContainerCmd(
   private def createF(
       standalone: Boolean,
       isLocal: Boolean,
-      inputFilePath: Option[Path],
-      loggingSystem: LoggingSystem
+      inputFilePath: Option[Path]
   ): Future[ActorRef[_]] = {
     async {
-      val adminLogActor = actorSystem.spawn(LogAdminActor.behavior(), "log-admin")
-      val config        = await(getConfig(isLocal, inputFilePath.get))
-      val actorRef      = await(createComponent(standalone, wiring, config, adminLogActor))
+      val logAdminActorRef = actorSystem.spawn(LogAdminActor.behavior(), "log-admin")
+      val config           = await(getConfig(isLocal, inputFilePath.get))
+      val actorRef         = await(createComponent(standalone, wiring, config, logAdminActorRef))
       log.info(s"Component is successfully created with actor actorRef $actorRef")
       actorRef
     }
@@ -77,10 +77,10 @@ private[containercmd] class ContainerCmd(
       standalone: Boolean,
       wiring: FrameworkWiring,
       config: Config,
-      adminActorRef: ActorRef[LogControlMessages]
+      logAdminActorRef: ActorRef[LogControlMessages]
   ): Future[ActorRef[_]] = {
-    if (standalone) Standalone.spawn(config, wiring, adminActorRef)
-    else Container.spawn(config, wiring, adminActorRef)
+    if (standalone) Standalone.spawn(config, wiring, logAdminActorRef)
+    else Container.spawn(config, wiring, logAdminActorRef)
   }
 
   private def getConfig(isLocal: Boolean, inputFilePath: Path): Future[Config] = {

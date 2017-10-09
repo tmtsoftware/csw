@@ -13,12 +13,12 @@ object Container {
   def spawn(
       config: Config,
       wiring: FrameworkWiring,
-      adminActorRef: ActorRef[LogControlMessages]
+      logAdminActorRef: ActorRef[LogControlMessages]
   ): Future[ActorRef[ContainerMessage]] = {
     import wiring._
     val containerInfo = ComponentInfoParser.parseContainer(config)
     val containerBehavior: Behavior[ContainerMessage] =
-      ContainerBehaviorFactory.behavior(containerInfo, locationService, adminActorRef)
+      ContainerBehaviorFactory.behavior(containerInfo, locationService, logAdminActorRef)
     val richSystem = new CswFrameworkSystem(actorSystem)
     richSystem.spawnTyped(containerBehavior, containerInfo.name)
   }

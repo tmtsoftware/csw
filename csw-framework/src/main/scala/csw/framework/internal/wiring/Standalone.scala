@@ -13,7 +13,7 @@ object Standalone {
   def spawn(
       config: com.typesafe.config.Config,
       wiring: FrameworkWiring,
-      adminActorRef: ActorRef[LogControlMessages]
+      logAdminActorRef: ActorRef[LogControlMessages]
   ): Future[ActorRef[SupervisorExternalMessage]] = {
     import wiring._
     val componentInfo = ComponentInfoParser.parseStandalone(config)
@@ -23,7 +23,7 @@ object Standalone {
       locationService,
       registrationFactory,
       pubSubBehaviorFactory,
-      adminActorRef
+      logAdminActorRef
     )
     val richSystem = new CswFrameworkSystem(actorSystem)
     richSystem.spawnTyped(supervisorBehavior, componentInfo.name)

@@ -52,7 +52,7 @@ class SupervisorBehavior(
     pubSubBehaviorFactory: PubSubBehaviorFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
-    adminActorRef: ActorRef[LogControlMessages]
+    logAdminActorRef: ActorRef[LogControlMessages]
 ) extends ComponentLogger.TypedActor[SupervisorMessage](ctx, Some(componentInfo.name)) {
 
   import SupervisorBehavior._
@@ -62,7 +62,7 @@ class SupervisorBehavior(
   val componentActorName                 = s"$componentName-$ComponentActorNameSuffix"
   val initializeTimeout: FiniteDuration  = componentInfo.initializeTimeout
   val akkaConnection                     = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
-  val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self, adminActorRef)
+  val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self, logAdminActorRef)
   val isStandalone: Boolean              = maybeContainerRef.isEmpty
 
   val pubSubComponent: ActorRef[PubSub[CurrentState]] =

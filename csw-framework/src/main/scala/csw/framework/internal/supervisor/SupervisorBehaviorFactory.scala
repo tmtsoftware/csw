@@ -17,7 +17,7 @@ object SupervisorBehaviorFactory {
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
       pubSubBehaviorFactory: PubSubBehaviorFactory,
-      adminActorRef: ActorRef[LogControlMessages]
+      logAdminActorRef: ActorRef[LogControlMessages]
   ): Behavior[SupervisorExternalMessage] = {
 
     val componentWiringClass     = Class.forName(componentInfo.behaviorFactoryClassName)
@@ -30,7 +30,7 @@ object SupervisorBehaviorFactory {
       registrationFactory,
       pubSubBehaviorFactory,
       componentBehaviorFactory,
-      adminActorRef
+      logAdminActorRef
     )
   }
 
@@ -41,7 +41,7 @@ object SupervisorBehaviorFactory {
       registrationFactory: RegistrationFactory,
       pubSubBehaviorFactory: PubSubBehaviorFactory,
       componentBehaviorFactory: ComponentBehaviorFactory[_],
-      adminActorRef: ActorRef[LogControlMessages]
+      logAdminActorRef: ActorRef[LogControlMessages]
   ): Behavior[SupervisorExternalMessage] = {
     Actor
       .withTimers[SupervisorMessage](
@@ -58,7 +58,7 @@ object SupervisorBehaviorFactory {
                   pubSubBehaviorFactory,
                   registrationFactory,
                   locationService,
-                  adminActorRef
+                  logAdminActorRef
               )
           )
       )

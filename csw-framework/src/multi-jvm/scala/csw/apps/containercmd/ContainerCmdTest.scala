@@ -18,9 +18,9 @@ import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupe
 import csw.messages.ToComponentLifecycleMessage.GoOffline
 import csw.messages.ccs.commands.{CommandInfo, Setup}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.states.CurrentState
 import csw.messages.{Components, ContainerExternalMessage, SupervisorExternalMessage}
 import csw.services.config.api.models.ConfigData
@@ -101,7 +101,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       // withEntries required for multi-node test where seed node is picked up from environment variable
       val clusterSettings = ClusterAwareSettings.joinLocal(3552).withEntries(sys.env)
-      val containerCmd    = new ContainerCmd("laser_container_app", clusterSettings)
+      val containerCmd    = new ContainerCmd("laser_container_app", clusterSettings, false)
 
       // only file path is provided, by default - file will be fetched from configuration service
       // and will be considered as container configuration.
@@ -164,7 +164,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val testProbe = TestProbe[SupervisorLifecycleState]
 
-      val containerCmd = new ContainerCmd("eaton_hcd_standalone_app", ClusterAwareSettings.joinLocal(3552))
+      val containerCmd = new ContainerCmd("eaton_hcd_standalone_app", ClusterAwareSettings.joinLocal(3552), false)
 
       // this step is required for multi-node, as eaton_hcd_standalone.conf file is not directly available
       // when sbt-assembly creates fat jar
