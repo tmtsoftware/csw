@@ -7,15 +7,15 @@ import akka.typed.javadsl.ActorContext;
 import akka.typed.javadsl.ReceiveBuilder;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.LogCommand;
-import csw.services.logging.javadsl.JComponentLoggerTypedActor;
+import csw.services.logging.javadsl.JComponentLoggerMutableActor;
 
-public class JIrisSupervisorTypedActor extends JComponentLoggerTypedActor<LogCommand> {
+public class JIrisSupervisorMutableActor extends JComponentLoggerMutableActor<LogCommand> {
 
     private ActorContext<LogCommand> actorContext;
     private ILogger log;
     private String componentName;
 
-    private JIrisSupervisorTypedActor(ActorContext<LogCommand> actorContext, String componentName) {
+    private JIrisSupervisorMutableActor(ActorContext<LogCommand> actorContext, String componentName) {
         super(actorContext);
         this.actorContext = actorContext;
         this.componentName = componentName;
@@ -23,7 +23,7 @@ public class JIrisSupervisorTypedActor extends JComponentLoggerTypedActor<LogCom
     }
 
     public static <LogCommand> Behavior<LogCommand> irisBeh(String componentName) {
-        return Actor.mutable(ctx -> (MutableBehavior<LogCommand>) new JIrisSupervisorTypedActor((ActorContext<csw.services.logging.LogCommand>) ctx, componentName));
+        return Actor.mutable(ctx -> (MutableBehavior<LogCommand>) new JIrisSupervisorMutableActor((ActorContext<csw.services.logging.LogCommand>) ctx, componentName));
     }
 
     @Override

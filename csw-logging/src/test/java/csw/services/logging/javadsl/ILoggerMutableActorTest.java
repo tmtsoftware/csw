@@ -8,7 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
 import csw.services.logging.commons.LoggingKeys$;
-import csw.services.logging.components.iris.JIrisSupervisorTypedActor;
+import csw.services.logging.components.iris.JIrisSupervisorMutableActor;
 import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.LogCommand;
@@ -60,10 +60,10 @@ public class ILoggerMutableActorTest {
     @Test
     public void testDefaultLogConfigurationForActor() throws InterruptedException {
 
-        ActorRef<LogCommand> irisTyped = Adapter.spawn(actorSystem, JIrisSupervisorTypedActor.irisBeh("jIRISTyped"), "irisTyped");
+        ActorRef<LogCommand> irisTyped = Adapter.spawn(actorSystem, JIrisSupervisorMutableActor.irisBeh("jIRISTyped"), "irisTyped");
 
         String actorPath = irisTyped.path().toString();
-        String className = JIrisSupervisorTypedActor.class.getName();
+        String className = JIrisSupervisorMutableActor.class.getName();
 
         sendLogMsgToTypedActorInBulk(irisTyped);
 
