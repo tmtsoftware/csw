@@ -141,8 +141,6 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
       Level(currentLogLevel) >= LoggingLevels.INFO shouldBe true
     }
 
-    logBuffer.clear()
-
     // set log level of laser component to error through http endpoint
     val uri = Uri.from(
       scheme = "http",
@@ -156,6 +154,10 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
     val response = Await.result(Http().singleRequest(request), 5.seconds)
 
     response.status shouldBe StatusCodes.OK
+
+    Thread.sleep(100)
+
+    logBuffer.clear()
 
     // laser and galil components, start logging messages at all log levels
     // and expected is that, laser component logs messages at and above Error level

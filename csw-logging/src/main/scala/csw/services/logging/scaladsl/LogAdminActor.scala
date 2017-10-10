@@ -9,6 +9,8 @@ import csw.services.logging.models.LogMetadata
 
 object LogAdminActor {
   def behavior(): Behavior[LogControlMessages] = Actor.immutable[LogControlMessages] { (ctx, msg) ⇒
+    val log = GenericLogger.immutable(ctx)
+    log.debug(s"LogAdminActor received message :[$msg]")
     msg match {
       case GetComponentLogMetadata(componentName, replyTo) ⇒ replyTo ! getLogMetadata(componentName)
       case SetComponentLogLevel(componentName, logLevel)   ⇒ setComponentLogLevel(componentName, logLevel)
