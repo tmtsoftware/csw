@@ -8,6 +8,8 @@ import akka.typed.ActorRef
 import csw.messages.TMTSerializable
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
+import scala.reflect.ClassTag
+
 /**
  * Location represents a live Connection along with its URI
  */
@@ -19,10 +21,23 @@ sealed abstract class Location extends TMTSerializable {
 /**
  * Represents a live Akka connection of an Actor
  */
-final case class AkkaLocation(connection: AkkaConnection, uri: URI, actorRef: ActorRef[_], adminActorRef: ActorRef[_])
-    extends Location {
+final case class AkkaLocation(
+    connection: AkkaConnection,
+    uri: URI,
+    actorRef: ActorRef[Nothing],
+    adminActorRef: ActorRef[_]
+) extends Location {
 
-  def typedRef[T]: typed.ActorRef[T]      = actorRef.asInstanceOf[ActorRef[T]]
+  def typedRef[T: ClassTag]: typed.ActorRef[T] = {
+    val typeManifest    = scala.reflect.classTag[T].runtimeClass.getSimpleName
+    val messageManifest = connection.componentId.componentType.messageManifest
+
+    require(typeManifest == messageManifest,
+            s"actorRef for type $messageManifest can not handle messages of type $typeManifest")
+
+    actorRef.asInstanceOf[ActorRef[T]]
+  }
+
   def typedAdminRef[T]: typed.ActorRef[T] = adminActorRef.asInstanceOf[ActorRef[T]]
 }
 

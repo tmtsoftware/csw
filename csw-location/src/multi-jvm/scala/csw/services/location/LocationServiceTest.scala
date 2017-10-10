@@ -5,7 +5,8 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import csw.messages.TMTSerializable
+import csw.messages.RunningMessage.DomainMessage
+import csw.messages.{SupervisorExternalMessage, TMTSerializable}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.commons.TestFutureExtension.RichFuture
@@ -117,8 +118,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     "ensure that component is able to resolve and send message to remote actor created through separate actor system than LocationService actor system"
   ) {
 
-    val tcpConnection = TcpConnection(ComponentId("redis1", ComponentType.Service))
-
+    val tcpConnection  = TcpConnection(ComponentId("redis1", ComponentType.Service))
     val akkaConnection = AkkaConnection(ComponentId("Assembly1", ComponentType.Assembly))
 
     runOn(seed) {
@@ -130,7 +130,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
       val resolvedLocation = Await.result(locationService.resolve(akkaConnection, 5.seconds), 5.seconds).get
 
-      val assemblyActorRef = resolvedLocation.typedRef
+      val assemblyActorRef = resolvedLocation.typedRef[SupervisorExternalMessage]
 
       assemblyActorRef ! UnregisterConnection(akkaConnection)
       Thread.sleep(2000)
@@ -140,7 +140,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
       val connections: Set[Connection] = locations.map(_.connection).toSet
 
       locations.size shouldBe 1
-      connections shouldBe (Set(tcpConnection))
+      connections shouldBe Set(tcpConnection)
     }
 
     runOn(member) {
@@ -160,7 +160,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
 }
 
-case class UnregisterConnection(akkaConnection: AkkaConnection) extends TMTSerializable
+case class UnregisterConnection(akkaConnection: AkkaConnection) extends DomainMessage with TMTSerializable
 
 class AssemblyActor(locationService: LocationService) extends Actor {
   override def receive: Receive = {

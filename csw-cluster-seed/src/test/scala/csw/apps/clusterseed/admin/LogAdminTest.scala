@@ -156,7 +156,6 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
     response.status shouldBe StatusCodes.OK
 
     Thread.sleep(100)
-
     logBuffer.clear()
 
     // laser and galil components, start logging messages at all log levels
