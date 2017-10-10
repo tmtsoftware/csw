@@ -17,30 +17,37 @@ private[logging] object JBasicLogger {
 }
 
 /**
- * Implement this trait to obtain a reference to a generic logger which is not initialized with component name
+ * Implement this trait to obtain a generic logger that does not have a component name
  */
 trait JGenericLogger {
   def getLogger: ILogger = JBasicLogger.getLogger(None, None, getClass)
 }
 
 /**
- * Extend this class to create an Actor and obtain a reference to a generic logger which is initialized with Actor path but no component name
+ * Extend this class to create an Actor and obtain a generic logger which is initialized with Actor path without a component name
  */
 abstract class JGenericLoggerActor extends AbstractActor {
   def getLogger: ILogger = JBasicLogger.getLogger(None, Some(getSelf()), getClass)
 }
 
+/**
+ * Extend this class to create a Typed Mutable Actor by providing an ActorContext and a component name to obtain the logger
+ * initialized with the name of the component and it's ActorPath
+ */
 abstract class JGenericLoggerMutableActor[T](ctx: ActorContext[T]) extends akka.typed.javadsl.Actor.MutableBehavior[T] {
   def getLogger: ILogger = JBasicLogger.getLogger(None, Some(ctx.getSelf.toUntyped), getClass)
 }
 
-final class JGenericLoggerImmutable {
+/**
+ * Use this instance to obtain the logger initialized with ActorPath and the provided Class without a component name
+ */
+object JGenericLoggerImmutable {
   def getLogger[T](ctx: ActorContext[T], klass: Class[_]): ILogger =
     JBasicLogger.getLogger(None, Some(ctx.getSelf.toUntyped), klass)
 }
 
 /**
- * Implement this trait to provide a component name and obtain a reference to a logger initialized with the name of the component
+ * Implement this trait to provide a component name and obtain the logger initialized with the name of the component
  */
 trait JComponentLogger {
   protected def componentName: String
@@ -48,20 +55,27 @@ trait JComponentLogger {
 }
 
 /**
- * Extend this class to create an Actor and provide a component name to obtain a reference to a logger initialized with the name of the component and it's ActorPath
+ * Extend this class to create an Actor and provide a component name to obtain the logger initialized with the name of the component and it's ActorPath
  */
 abstract class JComponentLoggerActor extends AbstractActor {
   protected def componentName: String
   def getLogger: ILogger = JBasicLogger.getLogger(Some(componentName), Some(getSelf()), getClass)
 }
 
+/**
+ * Extend this class to create a Typed Mutable Actor by providing an ActorContext and a component name to obtain the logger
+ * initialized with the name of the component and it's ActorPath
+ */
 abstract class JComponentLoggerMutableActor[T](ctx: ActorContext[T])
     extends akka.typed.javadsl.Actor.MutableBehavior[T] {
   protected def componentName: String
   def getLogger: ILogger = JBasicLogger.getLogger(Some(componentName), Some(ctx.getSelf.toUntyped), getClass)
 }
 
-final class JComponentLoggerImmutable {
+/**
+ * Use this instance to obtain the logger initialized with the name of the component, it's ActorPath and the provided Class
+ */
+object JComponentLoggerImmutable {
   def getLogger[T](ctx: ActorContext[T], componentName: String, klass: Class[_]): ILogger =
     JBasicLogger.getLogger(Some(componentName), Some(ctx.getSelf.toUntyped), klass)
 }

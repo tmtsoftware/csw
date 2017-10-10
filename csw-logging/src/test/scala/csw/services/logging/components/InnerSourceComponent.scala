@@ -1,8 +1,8 @@
 package csw.services.logging.components
 
-import csw.services.logging.scaladsl.ServiceLogger
+import csw.services.logging.scaladsl.CommonComponentLogger
 
-object InnerSourceLogger extends ServiceLogger("InnerSourceComponent")
+object InnerSourceLogger extends CommonComponentLogger("InnerSourceComponent")
 
 class InnerSourceComponent extends InnerSourceLogger.Simple {
 

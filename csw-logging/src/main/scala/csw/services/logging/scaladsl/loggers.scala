@@ -5,7 +5,7 @@ import akka.serialization.Serialization
 import akka.typed.scaladsl.adapter.TypedActorRefOps
 import akka.typed.scaladsl.{Actor, ActorContext}
 
-private[logging] class BasicLogger {
+private[logging] abstract class AbstractLogger {
 
   private[logging] trait Simple {
     protected def maybeComponentName(): Option[String]
@@ -28,7 +28,7 @@ private[logging] class BasicLogger {
     ActorPath.fromString(Serialization.serializedActorPath(actorRef)).toString
 }
 
-private[logging] class BasicServiceAndGenericLogger(_maybeComponentName: Option[String]) extends BasicLogger {
+private[logging] class CommonLogger(_maybeComponentName: Option[String]) extends AbstractLogger {
 
   trait Simple extends super.Simple {
     override protected def maybeComponentName(): Option[String] = _maybeComponentName
@@ -46,18 +46,18 @@ private[logging] class BasicServiceAndGenericLogger(_maybeComponentName: Option[
  *
  * @param _componentName name of the component to initialize the logger
  */
-class ServiceLogger(_componentName: String) extends BasicServiceAndGenericLogger(Some(_componentName))
+class CommonComponentLogger(_componentName: String) extends CommonLogger(Some(_componentName))
 
 /**
  * Extend this object to access Loggers(Simple, Actor, MutableActor, immutable) without a component name
  */
-object GenericLogger extends BasicServiceAndGenericLogger(None)
+object GenericLogger extends CommonLogger(None)
 
 /**
  * Extend this object to access Loggers(Simple, Actor, MutableActor, immutable) which has componentName as constructor
  * dependency. It is mainly used when componentName is not available before-hand.
  */
-object ComponentLogger extends BasicLogger {
+object ComponentLogger extends AbstractLogger {
 
   trait Simple extends super.Simple {
     protected def componentName(): String

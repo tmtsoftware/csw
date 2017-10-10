@@ -13,12 +13,12 @@ import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.{Component, Components, ContainerMessage}
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.logging.scaladsl.{LogAdminActor, LoggingSystemFactory, ServiceLogger}
+import csw.services.logging.scaladsl.{CommonComponentLogger, LogAdminActor, LoggingSystemFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-object AppLogger extends ServiceLogger("app")
+object AppLogger extends CommonComponentLogger("app")
 
 /*
   This app is for testing runtime changes of component log level
