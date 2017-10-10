@@ -30,11 +30,13 @@ class ArgsParserTest extends org.scalatest.FunSuite with Matchers with BeforeAnd
     options should contain(Options(standalone = true, local = true, Some(Paths.get(inputFilePath))))
   }
 
-  test("should not parse arguments when mandatory argument of file path is not provided") {
-    val args                     = Array("--standalone", "--local")
-    val options: Option[Options] = silentParse(args)
-    options shouldBe None
-  }
+  // Note: file path is optional now, since there can be a defaultConfig argument
+  // (If neither file path nor defaultConfig are given, an exception is thrown)
+//  test("should not parse arguments when mandatory argument of file path is not provided") {
+//    val args                     = Array("--standalone", "--local")
+//    val options: Option[Options] = silentParse(args)
+//    options shouldBe None
+//  }
 
   test("should parse arguments with default value of false when standalone option is not provided") {
     val args                     = Array("--local", inputFilePath)

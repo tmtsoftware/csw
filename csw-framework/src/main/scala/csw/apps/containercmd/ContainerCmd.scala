@@ -19,17 +19,18 @@ import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 
 object ContainerCmd {
-  def start(name: String, args: Array[String]): ActorRef[_] =
-    new ContainerCmd(name, ClusterAwareSettings, true).start(args)
+  def start(name: String, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[_] =
+    new ContainerCmd(name, ClusterAwareSettings, true, defaultConfig).start(args)
 }
 
 private[containercmd] class ContainerCmd(
     name: String,
     clusterSettings: ClusterSettings,
-    startLogging: Boolean
+    startLogging: Boolean,
+    defaultConfig: Option[Config] = None
 ) extends ComponentLogger.Simple {
 
-  override protected def componentName() = name
+  override protected def componentName(): String = name
 
   lazy val actorSystem: ActorSystem = clusterSettings.system
   lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
@@ -47,7 +48,7 @@ private[containercmd] class ContainerCmd(
           log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 
           try {
-            Await.result(createF(standalone, isLocal, inputFilePath), 30.seconds)
+            Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
           } catch {
             case NonFatal(ex) ⇒
               log.error(s"${ex.getMessage}", ex = ex)
@@ -60,11 +61,12 @@ private[containercmd] class ContainerCmd(
   private def createF(
       standalone: Boolean,
       isLocal: Boolean,
-      inputFilePath: Option[Path]
+      inputFilePath: Option[Path],
+      defaultConfig: Option[Config]
   ): Future[ActorRef[_]] = {
     async {
       val logAdminActorRef = actorSystem.spawn(LogAdminActor.behavior(), "log-admin")
-      val config           = await(getConfig(isLocal, inputFilePath.get))
+      val config           = await(getConfig(isLocal, inputFilePath, defaultConfig))
       val actorRef         = await(createComponent(standalone, wiring, config, logAdminActorRef))
       log.info(s"Component is successfully created with actor actorRef $actorRef")
       actorRef
@@ -81,11 +83,14 @@ private[containercmd] class ContainerCmd(
     else Container.spawn(config, wiring, logAdminActorRef)
   }
 
-  private def getConfig(isLocal: Boolean, inputFilePath: Path): Future[Config] = {
-    if (isLocal) {
-      val config = getConfigFromLocalFile(inputFilePath)
+  private def getConfig(isLocal: Boolean, inputFilePath: Option[Path], defaultConfig: Option[Config]): Future[Config] = {
+    if (inputFilePath.isEmpty && defaultConfig.isEmpty) throw UnableToParseOptions
+    if (inputFilePath.isEmpty && defaultConfig.isDefined) {
+      Future.successful(defaultConfig.get)
+    } else if (isLocal) {
+      val config = getConfigFromLocalFile(inputFilePath.get)
       Future.successful(config)
-    } else getConfigFromRemoteFile(inputFilePath)
+    } else getConfigFromRemoteFile(inputFilePath.get)
   }
 
   private def getConfigFromLocalFile(inputFilePath: Path): Config = {

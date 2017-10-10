@@ -19,7 +19,7 @@ class ArgsParser() {
       c.copy(local = true)
     } text s"run using the file on local file system without fetching file from config service"
 
-    arg[String]("<file>") maxOccurs 1 action { (x, c) =>
+    arg[String]("<file>") maxOccurs 1 minOccurs 0 action { (x, c) =>
       c.copy(inputFilePath = Some(Paths.get(x)))
     } text "config file path"
 
