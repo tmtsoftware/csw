@@ -4,9 +4,8 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
+import csw.messages._
 import csw.messages.ccs.commands.Setup
-import csw.messages.params.states.CurrentState
-import csw.messages.{CommandExecutionResponse, Completed, Error, PubSub}
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.actors.TromboneStateActor._
 import csw.trombone.assembly.{AssemblyContext, FollowCommandMessages, Matchers, TromboneCommandHandlerMsgs}
@@ -19,10 +18,10 @@ class SetAngleCommand(
     ac: AssemblyContext,
     s: Setup,
     followCommandActor: ActorRef[FollowCommandMessages],
+    tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[TromboneStateMsg]
 ) extends TromboneAssemblyCommand {
-  private val pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.system.deadLetters
   import ctx.executionContext
   implicit val scheduler: Scheduler = ctx.system.scheduler
   implicit val timeout: Timeout     = Timeout(5.seconds)
@@ -38,7 +37,7 @@ class SetAngleCommand(
     )
     val zenithAngleItem = s(ac.zenithAngleKey)
     followCommandActor ! SetZenithAngle(zenithAngleItem)
-    Matchers.matchState(ctx, Matchers.idleMatcher, pubSubRef, 5.seconds).map {
+    Matchers.matchState(ctx, Matchers.idleMatcher, tromboneHCD, 5.seconds).map {
       case Completed =>
         sendState(
           SetState(cmdContinuous,

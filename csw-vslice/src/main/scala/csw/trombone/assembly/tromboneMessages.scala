@@ -2,14 +2,13 @@ package csw.trombone.assembly
 
 import akka.typed.ActorRef
 import csw.messages.CommandMessage.Submit
-import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages.ccs.commands.Setup
 import csw.messages.ccs.events.EventTime
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.Choice
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandExecutionResponse, CommandResponse}
+import csw.messages.{CommandExecutionResponse, CommandResponse, SupervisorExternalMessage}
 import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 
 sealed trait FollowCommandMessages
@@ -70,11 +69,11 @@ object TromboneControlMsg {
 
 sealed trait DiagPublisherMessages extends DomainMessage
 object DiagPublisherMessages {
-  final case class TimeForAxisStats(periodInseconds: Int)      extends DiagPublisherMessages
-  final case object DiagnosticState                            extends DiagPublisherMessages
-  final case object OperationsState                            extends DiagPublisherMessages
-  final case class CurrentStateE(cs: CurrentState)             extends DiagPublisherMessages
-  final case class UpdateTromboneHcd(running: Option[Running]) extends DiagPublisherMessages
+  final case class TimeForAxisStats(periodInseconds: Int)                                  extends DiagPublisherMessages
+  final case object DiagnosticState                                                        extends DiagPublisherMessages
+  final case object OperationsState                                                        extends DiagPublisherMessages
+  final case class CurrentStateE(cs: CurrentState)                                         extends DiagPublisherMessages
+  final case class UpdateTromboneHcd(running: Option[ActorRef[SupervisorExternalMessage]]) extends DiagPublisherMessages
 }
 
 ////////////////////

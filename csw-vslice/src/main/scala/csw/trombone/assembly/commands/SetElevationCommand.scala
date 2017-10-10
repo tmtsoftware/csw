@@ -2,19 +2,17 @@ package csw.trombone.assembly.commands
 
 import akka.actor.Scheduler
 import akka.typed.ActorRef
+import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
-import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.models.Units.encoder
-import csw.messages.params.states.CurrentState
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
 import csw.trombone.hcd.TromboneHcdState
-import akka.typed.scaladsl.AskPattern._
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
@@ -23,7 +21,7 @@ class SetElevationCommand(
     ctx: ActorContext[TromboneCommandHandlerMsgs],
     ac: AssemblyContext,
     s: Setup,
-    tromboneHCD: Running,
+    tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[TromboneStateMsg]
 ) extends TromboneAssemblyCommand {
@@ -31,8 +29,6 @@ class SetElevationCommand(
   import TromboneHcdState._
   import csw.trombone.assembly.actors.TromboneStateActor._
   import ctx.executionContext
-
-  private val pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.system.deadLetters
 
   def startCommand(): Future[CommandExecutionResponse] = {
     if (cmd(startState) == cmdUninitialized || (move(startState) != moveIndexed && move(startState) != moveMoving)) {
@@ -60,8 +56,8 @@ class SetElevationCommand(
                  startState.nss,
                  ctx.spawnAnonymous(Actor.ignore))
       )
-      tromboneHCD.componentRef ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore))
-      Matchers.matchState(ctx, stateMatcher, pubSubRef, 5.seconds).map {
+      tromboneHCD ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore))
+      Matchers.matchState(ctx, stateMatcher, tromboneHCD, 5.seconds).map {
         case Completed =>
           sendState(SetState(cmdReady, moveIndexed, sodiumLayer = false, nss = false, ctx.spawnAnonymous(Actor.ignore)))
           Completed
@@ -74,7 +70,7 @@ class SetElevationCommand(
   }
 
   def stopCurrentCommand(): Unit = {
-    tromboneHCD.componentRef ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
+    tromboneHCD ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
   }
 
   private def sendState(setState: SetState): Unit = {

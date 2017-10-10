@@ -5,10 +5,9 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
-import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
-import csw.messages.{CommandExecutionResponse, Completed, NoLongerValid}
+import csw.messages.{CommandExecutionResponse, Completed, NoLongerValid, SupervisorExternalMessage}
 import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg, _}
 import csw.trombone.assembly.{AssemblyContext, TromboneCommandHandlerMsgs}
 
@@ -19,7 +18,7 @@ class FollowCommand(
     ctx: ActorContext[TromboneCommandHandlerMsgs],
     ac: AssemblyContext,
     s: Setup,
-    tromboneHCD: Running,
+    tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[TromboneStateMsg]
 ) extends TromboneAssemblyCommand {

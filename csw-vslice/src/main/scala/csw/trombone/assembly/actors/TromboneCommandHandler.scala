@@ -6,7 +6,6 @@ import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
-import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.{
   RequiredHCDUnavailableIssue,
@@ -28,7 +27,7 @@ object TromboneCommandHandler {
 
   def make(
       assemblyContext: AssemblyContext,
-      tromboneHCDIn: Option[Running],
+      tromboneHCDIn: Option[ActorRef[SupervisorExternalMessage]],
       allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
   ): Behavior[NotFollowingMsgs] =
     Actor
@@ -48,7 +47,7 @@ object TromboneCommandHandler {
 class TromboneCommandHandler(
     ctx: ActorContext[TromboneCommandHandlerMsgs],
     ac: AssemblyContext,
-    tromboneHCDIn: Option[Running],
+    tromboneHCDIn: Option[ActorRef[SupervisorExternalMessage]],
     allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
 ) extends MutableBehavior[TromboneCommandHandlerMsgs] {
 
@@ -71,15 +70,14 @@ class TromboneCommandHandler(
   private var currentState: TromboneState = defaultTromboneState
 
   private val badHCDReference = ctx.system.deadLetters
-  private val pubSubRef       = ctx.system.deadLetters
-  private val tromboneHCD     = tromboneHCDIn.getOrElse(Running(badHCDReference))
+  private val tromboneHCD     = tromboneHCDIn.getOrElse(badHCDReference)
 
   private var setElevationItem = naElevation(calculationConfig.defaultInitialElevation)
 
   private var followCommandActor: ActorRef[FollowCommandMessages] = _
   private var currentCommand: TromboneAssemblyCommand             = _
 
-  private def isHCDAvailable: Boolean = tromboneHCD.componentRef != badHCDReference
+  private def isHCDAvailable: Boolean = tromboneHCD != badHCDReference
 
   override def onMessage(msg: TromboneCommandHandlerMsgs): Behavior[TromboneCommandHandlerMsgs] = {
     (mode, msg) match {
@@ -147,7 +145,8 @@ class TromboneCommandHandler(
           )
 
         case ac.setAngleCK =>
-          currentCommand = new SetAngleCommand(ctx, ac, s, followCommandActor, currentState, tromboneStateActor)
+          currentCommand =
+            new SetAngleCommand(ctx, ac, s, followCommandActor, tromboneHCD, currentState, tromboneStateActor)
           currentCommand
             .startCommand()
             .onComplete {
@@ -199,7 +198,7 @@ class TromboneCommandHandler(
 
   private def executeFollow(replyTo: ActorRef[CommandResponse], nssItem: Parameter[Boolean]): Unit = {
     followCommandActor = ctx.spawnAnonymous(
-      FollowCommandActor.make(ac, setElevationItem, nssItem, Some(tromboneHCD.componentRef), allEventPublisher)
+      FollowCommandActor.make(ac, setElevationItem, nssItem, Some(tromboneHCD), allEventPublisher)
     )
     mode = Mode.Following
     currentCommand.startCommand().onComplete {

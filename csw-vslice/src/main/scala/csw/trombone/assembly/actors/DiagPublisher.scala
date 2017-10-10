@@ -6,9 +6,8 @@ import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.PubSub
 import csw.messages.params.states.CurrentState
+import csw.messages.{PubSub, SupervisorExternalMessage}
 import csw.trombone.assembly.DiagPublisherMessages._
 import csw.trombone.assembly.TrombonePublisherMsg.{AxisStateUpdate, AxisStatsUpdate}
 import csw.trombone.assembly.actors.DiagPublisher.{Mode, _}
@@ -22,7 +21,7 @@ object DiagPublisher {
 
   def make(
       assemblyContext: AssemblyContext,
-      runningIn: Option[Running],
+      runningIn: Option[ActorRef[SupervisorExternalMessage]],
       eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
   ): Behavior[DiagPublisherMessages] =
     Actor.mutable(ctx ⇒ new DiagPublisher(ctx, assemblyContext, runningIn, eventPublisher))
@@ -41,17 +40,17 @@ object DiagPublisher {
 class DiagPublisher(
     ctx: ActorContext[DiagPublisherMessages],
     assemblyContext: AssemblyContext,
-    runningIn: Option[Running],
+    runningIn: Option[ActorRef[SupervisorExternalMessage]],
     eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
 ) extends MutableBehavior[DiagPublisherMessages] {
 
   val currentStateAdapter: ActorRef[CurrentState] = ctx.spawnAdapter(CurrentStateE)
 
-  val pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.system.deadLetters
-  var stateMessageCounter: Int                  = 0
-  var running: Option[Running]                  = runningIn
-  var context: Mode                             = _
-  var cancelToken: Cancellable                  = _
+  val pubSubRef: ActorRef[PubSub[CurrentState]]            = ctx.system.deadLetters
+  var stateMessageCounter: Int                             = 0
+  var running: Option[ActorRef[SupervisorExternalMessage]] = runningIn
+  var context: Mode                                        = _
+  var cancelToken: Cancellable                             = _
 
   pubSubRef ! PubSub.Subscribe(currentStateAdapter)
 
@@ -98,7 +97,7 @@ class DiagPublisher(
       publishStatsUpdate(cs)
 
     case TimeForAxisStats(periodInSeconds) =>
-      running.foreach(_.componentRef ! GetAxisStats)
+      running.foreach(_ ! GetAxisStats)
       val canceltoken: Cancellable =
         ctx.schedule(Instant.now().plusSeconds(periodInSeconds).toEpochMilli.millis,
                      ctx.self,

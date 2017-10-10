@@ -8,8 +8,9 @@ import akka.typed.scaladsl.adapter._
 import akka.util.Timeout
 import csw.ccs._
 import csw.messages.PubSub.Subscribe
+import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages.params.states.{CurrentState, DemandState}
-import csw.messages.{CommandExecutionResponse, Completed, Error, PubSub}
+import csw.messages.{CommandExecutionResponse, Completed, Error}
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future
@@ -31,7 +32,7 @@ object Matchers {
 
   def matchState(ctx: ActorContext[_],
                  stateMatcher: StateMatcher,
-                 currentStateSource: ActorRef[PubSub[CurrentState]],
+                 currentStateSource: ActorRef[ComponentStateSubscription],
                  timeout: Timeout = Timeout(5.seconds)): Future[CommandExecutionResponse] = {
 
     import ctx.executionContext
@@ -40,7 +41,7 @@ object Matchers {
     val source = Source
       .actorRef[CurrentState](256, OverflowStrategy.fail)
       .mapMaterializedValue { ref ⇒
-        currentStateSource ! Subscribe[CurrentState](ref)
+        currentStateSource ! ComponentStateSubscription(Subscribe[CurrentState](ref))
       }
       .filter(cs ⇒ cs.prefixStr == stateMatcher.prefix && stateMatcher.check(cs))
       .completionTimeout(timeout.duration)

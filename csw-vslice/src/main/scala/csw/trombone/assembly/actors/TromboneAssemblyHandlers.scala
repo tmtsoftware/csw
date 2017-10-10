@@ -3,14 +3,13 @@ package csw.trombone.assembly.actors
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
 import csw.messages.ccs.Validations.Valid
 import csw.messages.ccs.commands.Setup
 import csw.messages.ccs.{Validation, Validations}
 import csw.messages.framework.ComponentInfo
-import csw.messages.location.TrackingEvent
+import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
@@ -46,7 +45,7 @@ class TromboneAssemblyHandlers(
   implicit var ac: AssemblyContext  = _
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  val runningHcd: Option[Running] = None
+  private var runningHcd: Option[ActorRef[SupervisorExternalMessage]] = None
 
   def onRun(): Future[Unit] = Future.unit
 
@@ -87,5 +86,10 @@ class TromboneAssemblyHandlers(
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
+    case LocationUpdated(location) =>
+      runningHcd = Some(location.asInstanceOf[AkkaLocation].typedRef[SupervisorExternalMessage])
+    case LocationRemoved(connection) =>
+      runningHcd = None
+  }
 }
