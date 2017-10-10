@@ -37,8 +37,6 @@ final case class AkkaLocation(
 
     actorRef.asInstanceOf[ActorRef[T]]
   }
-
-  def typedAdminRef[T]: typed.ActorRef[T] = adminActorRef.asInstanceOf[ActorRef[T]]
 }
 
 /**

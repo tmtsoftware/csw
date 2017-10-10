@@ -1,5 +1,6 @@
 package csw.apps.clusterseed.admin
 
+import akka.typed.ActorRef
 import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaLocationException}
@@ -28,8 +29,9 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
           "Getting log information from logging system",
           Map("componentName" → componentName, "actorRef" → actorRef.toString, "adminActorRef" → adminActorRef.toString)
         )
-        val logMetadataF: Future[LogMetadata] = akkaLocation
-          .typedAdminRef[LogControlMessages] ? (GetComponentLogMetadata(connection.componentId.name, _))
+        val logMetadataF: Future[LogMetadata] =
+        getTypedAdminActorRef(adminActorRef) ? (GetComponentLogMetadata(connection.componentId.name, _))
+
         await(logMetadataF)
 
       case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
@@ -48,7 +50,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
               "adminActorRef" → adminActorRef.toString
             )
           )
-          akkaLocation.typedAdminRef[LogControlMessages] ! SetComponentLogLevel(connection.componentId.name, logLevel)
+          getTypedAdminActorRef(adminActorRef) ! SetComponentLogLevel(connection.componentId.name, logLevel)
 
         case _ ⇒ throw UnresolvedAkkaLocationException(componentName)
       }
@@ -61,4 +63,7 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
         case _                          ⇒ throw InvalidComponentNameException(componentName)
       }
     }
+
+  private def getTypedAdminActorRef(adminActorRef: ActorRef[_]) =
+    adminActorRef.asInstanceOf[ActorRef[LogControlMessages]]
 }
