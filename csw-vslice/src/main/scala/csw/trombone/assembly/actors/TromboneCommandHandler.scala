@@ -66,8 +66,8 @@ class TromboneCommandHandler(
 
   ctx.system.eventStream.subscribe(tromboneStateAdapter, classOf[TromboneState])
 
-  private val tromboneStateActor: ActorRef[PubSub[TromboneState]] =
-    ctx.spawnAnonymous(Actor.mutable[PubSub[TromboneState]](ctx ⇒ new PubSubBehavior(ctx, componentName)))
+  private val tromboneStateActor: ActorRef[PubSub[AssemblyState]] =
+    ctx.spawnAnonymous(Actor.mutable[PubSub[AssemblyState]](ctx ⇒ new PubSubBehavior(ctx, componentName)))
   private var currentState: TromboneState = defaultTromboneState
 
   private val badHCDReference = ctx.system.deadLetters
@@ -156,7 +156,7 @@ class TromboneCommandHandler(
             }
 
         case ac.stopCK =>
-          currentCommand.stopCurrentCommand()
+          currentCommand.stopCommand()
           tromboneStateActor ! Publish(
             TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), currentState.sodiumLayer, currentState.nss)
           )
@@ -172,11 +172,11 @@ class TromboneCommandHandler(
   def onExecuting(msg: ExecutingMsgs): Unit = msg match {
     case CommandComplete(replyTo, result) ⇒
       replyTo ! result
-      currentCommand.stopCurrentCommand()
+      currentCommand.stopCommand()
       mode = Mode.NotFollowing
 
     case Submit(Setup(ac.commandInfo, ac.stopCK, _), replyTo) =>
-      currentCommand.stopCurrentCommand()
+      currentCommand.stopCommand()
       mode = Mode.NotFollowing
       replyTo ! Cancelled
 

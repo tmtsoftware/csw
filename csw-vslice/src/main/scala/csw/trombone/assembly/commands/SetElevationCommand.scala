@@ -2,9 +2,7 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.ccs.DemandMatcher
 import csw.messages.CommandMessage.Submit
-import csw.messages.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
@@ -22,7 +20,7 @@ class SetElevationCommand(
     s: Setup,
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
-    stateActor: ActorRef[PubSub[TromboneState]]
+    stateActor: ActorRef[PubSub[AssemblyState]]
 ) extends AssemblyCommand {
 
   import TromboneHcdState._
@@ -50,11 +48,13 @@ class SetElevationCommand(
       val stateMatcher = Matchers.posMatcher(encoderPosition)
       val scOut        = Setup(ac.commandInfo, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
 
-      sendState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
+      publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss),
+                   stateActor)
       tromboneHCD ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore))
-      Matchers.matchState(ctx, stateMatcher, tromboneHCD, 5.seconds).map {
+      matchCompletion(ctx, stateMatcher, tromboneHCD, 5.seconds) {
         case Completed =>
-          sendState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
+          publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)),
+                       stateActor)
           Completed
         case Error(message) =>
           println(s"Data command match failed with error: $message")
@@ -64,21 +64,8 @@ class SetElevationCommand(
     }
   }
 
-  def stopCurrentCommand(): Unit = {
+  def stopCommand(): Unit = {
     tromboneHCD ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
   }
 
-  private def sendState(setState: TromboneState): Unit = {
-    stateActor ! Publish(setState)
-  }
-
-  override def isAssemblyStateValid: Boolean = ???
-
-  override def sendInvalidCommandResponse: Future[NoLongerValid] = ???
-
-  override def publishInitialState(): Unit = ???
-
-  override def matchState(stateMatcher: DemandMatcher): Future[CommandExecutionResponse] = ???
-
-  override def sendState(setState: AssemblyState): Unit = ???
 }
