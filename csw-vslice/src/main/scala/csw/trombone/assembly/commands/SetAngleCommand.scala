@@ -3,11 +3,12 @@ import akka.actor.Scheduler
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
+import csw.ccs.DemandMatcher
 import csw.messages.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.commands.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
-import csw.trombone.assembly.actors.TromboneStateActor._
+import csw.trombone.assembly.actors.TromboneState._
 import csw.trombone.assembly.{AssemblyContext, FollowCommandMessages, Matchers, TromboneCommandHandlerMsgs}
 
 import scala.concurrent.Future
@@ -21,7 +22,7 @@ class SetAngleCommand(
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[TromboneState]]
-) extends TromboneAssemblyCommand {
+) extends AssemblyCommand {
   import ctx.executionContext
   implicit val scheduler: Scheduler = ctx.system.scheduler
   implicit val timeout: Timeout     = Timeout(5.seconds)
@@ -53,4 +54,14 @@ class SetAngleCommand(
   private def sendState(setState: TromboneState): Unit = {
     stateActor ! Publish(setState)
   }
+
+  override def isAssemblyStateValid: Boolean = ???
+
+  override def sendInvalidCommandResponse: Future[NoLongerValid] = ???
+
+  override def publishInitialState(): Unit = ???
+
+  override def matchState(stateMatcher: DemandMatcher): Future[CommandExecutionResponse] = ???
+
+  override def sendState(setState: AssemblyState): Unit = ???
 }

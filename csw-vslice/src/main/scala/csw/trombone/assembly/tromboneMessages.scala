@@ -9,7 +9,7 @@ import csw.messages.params.generics.Parameter
 import csw.messages.params.models.Choice
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandExecutionResponse, CommandResponse, SupervisorExternalMessage}
-import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
+import csw.trombone.assembly.actors.TromboneState.TromboneState
 
 sealed trait FollowCommandMessages
 object FollowCommandMessages {

@@ -2,6 +2,7 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
+import csw.ccs.DemandMatcher
 import csw.messages.CommandMessage.Submit
 import csw.messages.PubSub.Publish
 import csw.messages._
@@ -9,7 +10,7 @@ import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.models.Units.encoder
 import csw.trombone.assembly._
-import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
+import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future
@@ -22,17 +23,19 @@ class SetElevationCommand(
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[TromboneState]]
-) extends TromboneAssemblyCommand {
+) extends AssemblyCommand {
 
   import TromboneHcdState._
-  import csw.trombone.assembly.actors.TromboneStateActor._
+  import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
 
   def startCommand(): Future[CommandExecutionResponse] = {
-    if (cmd(startState) == cmdUninitialized || (move(startState) != moveIndexed && move(startState) != moveMoving)) {
+    if (startState.cmdChoice == cmdUninitialized || startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving) {
       Future(
         NoLongerValid(
-          WrongInternalStateIssue(s"Assembly state of ${cmd(startState)}/${move(startState)} does not allow datum")
+          WrongInternalStateIssue(
+            s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice} does not allow datum"
+          )
         )
       )
     } else {
@@ -68,4 +71,14 @@ class SetElevationCommand(
   private def sendState(setState: TromboneState): Unit = {
     stateActor ! Publish(setState)
   }
+
+  override def isAssemblyStateValid: Boolean = ???
+
+  override def sendInvalidCommandResponse: Future[NoLongerValid] = ???
+
+  override def publishInitialState(): Unit = ???
+
+  override def matchState(stateMatcher: DemandMatcher): Future[CommandExecutionResponse] = ???
+
+  override def sendState(setState: AssemblyState): Unit = ???
 }

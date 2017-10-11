@@ -10,7 +10,7 @@ import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.models.Units.encoder
 import csw.trombone.assembly._
-import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
+import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future
@@ -23,16 +23,21 @@ class MoveCommand(
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[TromboneState]]
-) extends TromboneAssemblyCommand {
+) extends AssemblyCommand {
 
-  import csw.trombone.assembly.actors.TromboneStateActor._
+  import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
+  val stagePosition   = s(ac.stagePositionKey)
+  val encoderPosition = Algorithms.stagePositionToEncoder(ac.controlConfig, stagePosition.head)
+  val stateMatcher    = Matchers.posMatcher(encoderPosition)
+  val scOut = Setup(s.info, TromboneHcdState.axisMoveCK)
+    .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
 
   def startCommand(): Future[CommandExecutionResponse] = {
     if (!isCommandValid) {
       sendInvalidCommandResponse
     } else {
-      val (stateMatcher: DemandMatcher, scOut: Setup) = publishInitialState
+      publishInitialState()
 
       tromboneHCD ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore))
 
@@ -44,7 +49,7 @@ class MoveCommand(
     tromboneHCD ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
   }
 
-  private def matchState(stateMatcher: DemandMatcher) = {
+  override def matchState(stateMatcher: DemandMatcher): Future[CommandExecutionResponse] = {
     Matchers.matchState(ctx, stateMatcher, tromboneHCD, 5.seconds).map {
       case Completed =>
         sendState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss))
@@ -56,25 +61,20 @@ class MoveCommand(
     }
   }
 
-  private def publishInitialState = {
-    val stagePosition   = s(ac.stagePositionKey)
-    val encoderPosition = Algorithms.stagePositionToEncoder(ac.controlConfig, stagePosition.head)
-    val stateMatcher    = Matchers.posMatcher(encoderPosition)
-    val scOut = Setup(s.info, TromboneHcdState.axisMoveCK)
-      .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
-
+  override def publishInitialState(): Unit = {
     sendState(TromboneState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss))
-    (stateMatcher, scOut)
   }
 
   private def isCommandValid: Boolean = {
-    cmd(startState) == cmdUninitialized || (move(startState) != moveIndexed && move(startState) != moveMoving)
+    startState.cmdChoice == cmdUninitialized || startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving
   }
 
-  private def sendInvalidCommandResponse: Future[NoLongerValid] = {
+  override def sendInvalidCommandResponse: Future[NoLongerValid] = {
     Future(
       NoLongerValid(
-        WrongInternalStateIssue(s"Assembly state of ${cmd(startState)}/${move(startState)} does not allow move")
+        WrongInternalStateIssue(
+          s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice} does not allow move"
+        )
       )
     )
   }
@@ -82,4 +82,8 @@ class MoveCommand(
   private def sendState(setState: TromboneState): Unit = {
     stateActor ! Publish(setState)
   }
+
+  override def isAssemblyStateValid: Boolean = ???
+
+  override def sendState(setState: AssemblyState): Unit = ???
 }

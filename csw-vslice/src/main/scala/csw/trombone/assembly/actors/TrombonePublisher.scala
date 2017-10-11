@@ -17,7 +17,7 @@ class TrombonePublisher(
     assemblyContext: AssemblyContext,
     ctx: ActorContext[TrombonePublisherMsg]
 ) extends MutableBehavior[TrombonePublisherMsg] {
-  import TromboneStateActor._
+  import TromboneState._
 
   override def onMessage(msg: TrombonePublisherMsg): Behavior[TrombonePublisherMsg] = msg match {
     case AOESWUpdate(elevationItem, rangeItem) =>

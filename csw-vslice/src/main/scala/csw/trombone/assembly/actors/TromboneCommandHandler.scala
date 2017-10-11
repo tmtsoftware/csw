@@ -57,7 +57,7 @@ class TromboneCommandHandler(
   var mode: Mode = Mode.NotFollowing
 
   import TromboneCommandHandler._
-  import TromboneStateActor._
+  import TromboneState._
   import ac._
   implicit val system: ActorSystem[Nothing] = ctx.system
   implicit val timeout                      = Timeout(5.seconds)
@@ -76,7 +76,7 @@ class TromboneCommandHandler(
   private var setElevationItem = naElevation(calculationConfig.defaultInitialElevation)
 
   private var followCommandActor: ActorRef[FollowCommandMessages] = _
-  private var currentCommand: TromboneAssemblyCommand             = _
+  private var currentCommand: AssemblyCommand                     = _
 
   private def isHCDAvailable: Boolean = tromboneHCD != badHCDReference
 
