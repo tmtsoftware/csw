@@ -1,16 +1,10 @@
 package csw.trombone.assembly.actors
 
-import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior}
 import csw.messages.params.generics.KeyType.ChoiceKey
 import csw.messages.params.generics.{KeyType, _}
 import csw.messages.params.models.Choice
-import csw.trombone.assembly.actors.TromboneStateActor.TromboneStateMsg
 
 object TromboneStateActor {
-
-  def make(): Behavior[TromboneStateMsg] = Actor.mutable(ctx ⇒ new TromboneStateActor(ctx))
 
   // Keys for state telemetry item
   val cmdUninitialized               = Choice("uninitialized")
@@ -54,49 +48,4 @@ object TromboneStateActor {
       sodiumLayer: Parameter[Boolean],
       nss: Parameter[Boolean]
   )
-
-  sealed trait TromboneStateMsg
-
-  case class SetState(tromboneState: TromboneState, replyTo: ActorRef[StateWasSet]) extends TromboneStateMsg
-
-  object SetState {
-
-    def apply(
-        cmd: Parameter[Choice],
-        move: Parameter[Choice],
-        sodiumLayer: Parameter[Boolean],
-        nss: Parameter[Boolean],
-        replyTo: ActorRef[StateWasSet]
-    ): SetState = SetState(TromboneState(cmd, move, sodiumLayer, nss), replyTo)
-
-    def apply(cmd: Choice, move: Choice, sodiumLayer: Boolean, nss: Boolean, replyTo: ActorRef[StateWasSet]): SetState =
-      SetState(TromboneState(cmdItem(cmd), moveItem(move), sodiumItem(sodiumLayer), nssItem(nss)), replyTo)
-  }
-
-  case class GetState(replyTo: ActorRef[TromboneState]) extends TromboneStateMsg
-
-  case class StateWasSet(wasSet: Boolean)
-}
-
-class TromboneStateActor(ctx: ActorContext[TromboneStateMsg]) extends MutableBehavior[TromboneStateMsg] {
-
-  import TromboneStateActor._
-
-  var currentState: TromboneState = TromboneState(cmdDefault, moveDefault, sodiumLayerDefault, nssDefault)
-
-  override def onMessage(msg: TromboneStateMsg): Behavior[TromboneStateMsg] = msg match {
-    case SetState(tromboneState, replyTo) =>
-      if (tromboneState != currentState) {
-        ctx.system.eventStream.publish(tromboneState)
-        currentState = tromboneState
-        replyTo ! StateWasSet(true)
-        this
-      } else {
-        replyTo ! StateWasSet(false)
-        this
-      }
-    case GetState(replyTo) =>
-      replyTo ! currentState
-      this
-  }
 }

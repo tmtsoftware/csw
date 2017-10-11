@@ -36,12 +36,12 @@ object Matchers {
                  timeout: Timeout = Timeout(5.seconds)): Future[CommandExecutionResponse] = {
 
     import ctx.executionContext
-    implicit val mat = ActorMaterializer()(ctx.system.toUntyped)
+    implicit val mat: ActorMaterializer = ActorMaterializer()(ctx.system.toUntyped)
 
     val source = Source
       .actorRef[CurrentState](256, OverflowStrategy.fail)
       .mapMaterializedValue { ref ⇒
-        currentStateSource ! ComponentStateSubscription(Subscribe[CurrentState](ref))
+        currentStateSource ! ComponentStateSubscription(Subscribe(ref))
       }
       .filter(cs ⇒ cs.prefixStr == stateMatcher.prefix && stateMatcher.check(cs))
       .completionTimeout(timeout.duration)

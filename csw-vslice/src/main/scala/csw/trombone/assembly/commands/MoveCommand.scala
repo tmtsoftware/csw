@@ -1,22 +1,20 @@
 package csw.trombone.assembly.commands
 
-import akka.actor.Scheduler
 import akka.typed.ActorRef
-import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.util.Timeout
 import csw.ccs.DemandMatcher
 import csw.messages.CommandMessage.Submit
+import csw.messages.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.models.Units.encoder
 import csw.trombone.assembly._
-import csw.trombone.assembly.actors.TromboneStateActor.{TromboneState, TromboneStateMsg}
+import csw.trombone.assembly.actors.TromboneStateActor.TromboneState
 import csw.trombone.hcd.TromboneHcdState
 
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, Future}
 
 class MoveCommand(
     ctx: ActorContext[TromboneCommandHandlerMsgs],
@@ -24,14 +22,14 @@ class MoveCommand(
     s: Setup,
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
-    stateActor: ActorRef[TromboneStateMsg]
+    stateActor: ActorRef[PubSub[TromboneState]]
 ) extends TromboneAssemblyCommand {
 
   import csw.trombone.assembly.actors.TromboneStateActor._
   import ctx.executionContext
 
   def startCommand(): Future[CommandExecutionResponse] = {
-    if (isCommandValid) {
+    if (!isCommandValid) {
       sendInvalidCommandResponse
     } else {
       val (stateMatcher: DemandMatcher, scOut: Setup) = publishInitialState
@@ -49,13 +47,7 @@ class MoveCommand(
   private def matchState(stateMatcher: DemandMatcher) = {
     Matchers.matchState(ctx, stateMatcher, tromboneHCD, 5.seconds).map {
       case Completed =>
-        sendState(
-          SetState(cmdItem(cmdReady),
-                   moveItem(moveIndexed),
-                   sodiumItem(false),
-                   startState.nss,
-                   ctx.spawnAnonymous(Actor.ignore))
-        )
+        sendState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss))
         Completed
       case Error(message) =>
         println(s"Move command match failed with message: $message")
@@ -71,17 +63,11 @@ class MoveCommand(
     val scOut = Setup(s.info, TromboneHcdState.axisMoveCK)
       .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
 
-    sendState(
-      SetState(cmdItem(cmdBusy),
-               moveItem(moveMoving),
-               startState.sodiumLayer,
-               startState.nss,
-               ctx.spawnAnonymous(Actor.ignore))
-    )
+    sendState(TromboneState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss))
     (stateMatcher, scOut)
   }
 
-  private def isCommandValid = {
+  private def isCommandValid: Boolean = {
     cmd(startState) == cmdUninitialized || (move(startState) != moveIndexed && move(startState) != moveMoving)
   }
 
@@ -93,12 +79,7 @@ class MoveCommand(
     )
   }
 
-  private def sendState(setState: SetState): Unit = {
-    implicit val timeout: Timeout     = Timeout(5.seconds)
-    implicit val scheduler: Scheduler = ctx.system.scheduler
-
-    Await.ready(stateActor ? { x: ActorRef[StateWasSet] ⇒
-      setState
-    }, timeout.duration)
+  private def sendState(setState: TromboneState): Unit = {
+    stateActor ! Publish(setState)
   }
 }

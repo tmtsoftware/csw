@@ -6,6 +6,7 @@ import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
+import csw.messages.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
@@ -23,7 +24,7 @@ class PositionCommand(
     s: Setup,
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
-    stateActor: ActorRef[TromboneStateMsg]
+    stateActor: ActorRef[PubSub[TromboneState]]
 ) extends TromboneAssemblyCommand {
 
   import csw.trombone.assembly.actors.TromboneStateActor._
@@ -48,18 +49,12 @@ class PositionCommand(
       val stateMatcher = Matchers.posMatcher(encoderPosition)
       val scOut = Setup(s.info, TromboneHcdState.axisMoveCK)
         .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
-      sendState(
-        SetState(cmdItem(cmdBusy),
-                 moveItem(moveIndexing),
-                 startState.sodiumLayer,
-                 startState.nss,
-                 ctx.spawnAnonymous(Actor.ignore))
-      )
+      sendState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
       tromboneHCD ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore))
       Matchers.matchState(ctx, stateMatcher, tromboneHCD, 5.seconds).map {
         case Completed =>
-          sendState(SetState(cmdReady, moveIndexed, sodiumLayer = false, nss = false, ctx.spawnAnonymous(Actor.ignore)))
+          sendState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed
         case Error(message) =>
           println(s"Data command match failed with error: $message")
@@ -73,13 +68,8 @@ class PositionCommand(
     tromboneHCD ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
   }
 
-  private def sendState(setState: SetState): Unit = {
-    implicit val timeout: Timeout     = Timeout(5.seconds)
-    implicit val scheduler: Scheduler = ctx.system.scheduler
-
-    Await.ready(stateActor ? { x: ActorRef[StateWasSet] ⇒
-      setState
-    }, timeout.duration)
+  private def sendState(setState: TromboneState): Unit = {
+    stateActor ! Publish(setState)
   }
 
 }

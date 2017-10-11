@@ -2,10 +2,11 @@ package csw.trombone.assembly.actors
 
 import akka.actor.Scheduler
 import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
+import csw.framework.internal.pubsub.PubSubBehavior
+import csw.messages.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.{
   RequiredHCDUnavailableIssue,
@@ -19,7 +20,6 @@ import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneCommandHandler.Mode
 import csw.trombone.assembly.commands._
 
-import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.util.{Failure, Success}
 
@@ -66,7 +66,8 @@ class TromboneCommandHandler(
 
   ctx.system.eventStream.subscribe(tromboneStateAdapter, classOf[TromboneState])
 
-  private val tromboneStateActor          = ctx.spawnAnonymous(TromboneStateActor.make())
+  private val tromboneStateActor: ActorRef[PubSub[TromboneState]] =
+    ctx.spawnAnonymous(Actor.mutable[PubSub[TromboneState]](ctx ⇒ new PubSubBehavior(ctx, componentName)))
   private var currentState: TromboneState = defaultTromboneState
 
   private val badHCDReference = ctx.system.deadLetters
@@ -156,11 +157,8 @@ class TromboneCommandHandler(
 
         case ac.stopCK =>
           currentCommand.stopCurrentCommand()
-          Await.ready(
-            tromboneStateActor ? { x: ActorRef[StateWasSet] ⇒
-              SetState(cmdReady, moveIndexed, sodiumLayer(currentState), nss(currentState), x)
-            },
-            timeout.duration
+          tromboneStateActor ! Publish(
+            TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), currentState.sodiumLayer, currentState.nss)
           )
           mode = Mode.NotFollowing
           replyTo ! Completed
