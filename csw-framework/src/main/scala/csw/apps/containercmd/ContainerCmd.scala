@@ -83,7 +83,11 @@ private[containercmd] class ContainerCmd(
     else Container.spawn(config, wiring, logAdminActorRef)
   }
 
-  private def getConfig(isLocal: Boolean, inputFilePath: Option[Path], defaultConfig: Option[Config]): Future[Config] = {
+  private def getConfig(
+      isLocal: Boolean,
+      inputFilePath: Option[Path],
+      defaultConfig: Option[Config]
+  ): Future[Config] = {
     if (inputFilePath.isEmpty && defaultConfig.isEmpty) throw UnableToParseOptions
     if (inputFilePath.isEmpty && defaultConfig.isDefined) {
       Future.successful(defaultConfig.get)

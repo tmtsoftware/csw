@@ -136,7 +136,7 @@ class SupervisorBehavior(
       log.error(throwable.getMessage, ex = throwable)
       throw throwable
     case Running(componentRef) ⇒
-      log.info("Received Running message from component within timeout, cancelling RunTimer")
+      log.info("Received Running message from component within timeout, cancelling InitializeTimer")
       timerScheduler.cancel(InitializeTimerKey)
       log.debug(
         s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
@@ -144,9 +144,6 @@ class SupervisorBehavior(
       registerWithLocationService(componentRef)
     case InitializeTimeout ⇒
       log.error("Component TLA initialization timed out")
-      component.foreach(ctx.stop)
-    case RunTimeout ⇒
-      log.error("Component TLA onRun timed out")
       component.foreach(ctx.stop)
   }
 
