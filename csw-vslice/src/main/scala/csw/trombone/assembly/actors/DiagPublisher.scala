@@ -10,6 +10,7 @@ import csw.messages.params.states.CurrentState
 import csw.messages.{PubSub, SupervisorExternalMessage}
 import csw.trombone.assembly.DiagPublisherMessages._
 import csw.trombone.assembly.TrombonePublisherMsg.{AxisStateUpdate, AxisStatsUpdate}
+import csw.trombone.assembly.actors.DiagPublisher.Mode.{Diagnostic, Operations}
 import csw.trombone.assembly.actors.DiagPublisher.{Mode, _}
 import csw.trombone.assembly.{AssemblyContext, DiagPublisherMessages, TrombonePublisherMsg}
 import csw.trombone.hcd.TromboneEngineering.GetAxisStats
@@ -80,7 +81,7 @@ class DiagPublisher(
         TimeForAxisStats(diagnosticAxisStatsPeriod)
       )
       this.cancelToken = cancelToken
-      context = Mode.Diagnostic
+      context = Diagnostic
 
     case UpdateTromboneHcd(maybeRunning) =>
       this.running = maybeRunning
@@ -108,7 +109,7 @@ class DiagPublisher(
 
     case OperationsState =>
       cancelToken.cancel
-      context = Mode.Operations
+      context = Operations
 
     case UpdateTromboneHcd(maybeRunning) =>
       running = maybeRunning

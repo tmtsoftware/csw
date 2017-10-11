@@ -17,7 +17,6 @@ import csw.messages.ccs.commands.Setup
 import csw.messages.params.generics.Parameter
 import csw.trombone.assembly.TromboneCommandHandlerMsgs._
 import csw.trombone.assembly._
-import csw.trombone.assembly.actors.TromboneCommandHandler.Mode
 import csw.trombone.assembly.commands._
 
 import scala.concurrent.duration.DurationInt
@@ -54,9 +53,8 @@ class TromboneCommandHandler(
   implicit val scheduler: Scheduler = ctx.system.scheduler
   import ctx.executionContext
 
-  var mode: Mode = Mode.NotFollowing
+  var mode: CommandExecutionState = CommandExecutionState.NotFollowing
 
-  import TromboneCommandHandler._
   import TromboneState._
   import ac._
   implicit val system: ActorSystem[Nothing] = ctx.system
@@ -82,10 +80,10 @@ class TromboneCommandHandler(
 
   override def onMessage(msg: TromboneCommandHandlerMsgs): Behavior[TromboneCommandHandlerMsgs] = {
     (mode, msg) match {
-      case (Mode.NotFollowing, x: NotFollowingMsgs) ⇒ onNotFollowing(x)
-      case (Mode.Following, x: FollowingMsgs)       ⇒ onFollowing(x)
-      case (Mode.Executing, x: ExecutingMsgs)       ⇒ onExecuting(x)
-      case _                                        ⇒ println(s"current context=$mode does not handle message=$msg")
+      case (CommandExecutionState.NotFollowing, x: NotFollowingMsgs) ⇒ onNotFollowing(x)
+      case (CommandExecutionState.Following, x: FollowingMsgs)       ⇒ onFollowing(x)
+      case (CommandExecutionState.Executing, x: ExecutingMsgs)       ⇒ onExecuting(x)
+      case _                                                         ⇒ println(s"current context=$mode does not handle message=$msg")
     }
     this
   }
@@ -160,7 +158,7 @@ class TromboneCommandHandler(
           tromboneStateActor ! Publish(
             TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), currentState.sodiumLayer, currentState.nss)
           )
-          mode = Mode.NotFollowing
+          mode = CommandExecutionState.NotFollowing
           replyTo ! Completed
 
         case other => println(s"Unknown config key: $msg")
@@ -173,11 +171,11 @@ class TromboneCommandHandler(
     case CommandComplete(replyTo, result) ⇒
       replyTo ! result
       currentCommand.stopCommand()
-      mode = Mode.NotFollowing
+      mode = CommandExecutionState.NotFollowing
 
     case Submit(Setup(ac.commandInfo, ac.stopCK, _), replyTo) =>
       currentCommand.stopCommand()
-      mode = Mode.NotFollowing
+      mode = CommandExecutionState.NotFollowing
       replyTo ! Cancelled
 
     case TromboneStateE(x) ⇒ currentState = x
@@ -186,7 +184,7 @@ class TromboneCommandHandler(
 
   private def executeCommand(replyTo: ActorRef[CommandResponse]): Unit = {
     if (isHCDAvailable) {
-      mode = Mode.Executing
+      mode = CommandExecutionState.Executing
       currentCommand.startCommand().onComplete {
         case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
         case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
@@ -198,7 +196,7 @@ class TromboneCommandHandler(
     followCommandActor = ctx.spawnAnonymous(
       FollowCommandActor.make(ac, setElevationItem, nssItem, Some(tromboneHCD), allEventPublisher)
     )
-    mode = Mode.Following
+    mode = CommandExecutionState.Following
     currentCommand.startCommand().onComplete {
       case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
       case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self

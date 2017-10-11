@@ -94,3 +94,16 @@ object TromboneCommandHandlerMsgs {
   private[assembly] case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandExecutionResponse)
       extends ExecutingMsgs
 }
+
+////////////////////
+sealed trait AssemblyCommandHandlerMsgs
+object AssemblyCommandHandlerMsgs {
+  sealed trait NotFollowingMsgs                           extends AssemblyCommandHandlerMsgs
+  sealed trait FollowingMsgs                              extends AssemblyCommandHandlerMsgs
+  sealed trait ExecutingMsgs                              extends AssemblyCommandHandlerMsgs
+  case class TromboneStateE(tromboneState: TromboneState) extends AssemblyCommandHandlerMsgs
+  case class SubmitE(submit: Submit)                      extends AssemblyCommandHandlerMsgs
+  case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandExecutionResponse)
+      extends ExecutingMsgs
+      with FollowingMsgs
+}
