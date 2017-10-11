@@ -13,7 +13,7 @@ import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.{Component, Components, ContainerMessage}
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.logging.scaladsl.{CommonComponentLogger, LogAdminActor, LoggingSystemFactory}
+import csw.services.logging.scaladsl.{CommonComponentLogger, LogAdminActorFactory, LoggingSystemFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -60,7 +60,7 @@ object DemoApp extends App {
   private def spawnContainer(): ActorRef[ContainerMessage] = {
 
     val config        = ConfigFactory.load("laser_container.conf")
-    val adminActorRef = frameworkWiring.actorSystem.spawn(LogAdminActor.behavior(), "log-admin")
+    val adminActorRef = LogAdminActorFactory.make(frameworkWiring.actorSystem)
     val containerRef  = Await.result(Container.spawn(config, frameworkWiring, adminActorRef), 5.seconds)
 
     val containerStateProbe = TestProbe[ContainerLifecycleState]

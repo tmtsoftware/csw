@@ -9,9 +9,10 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
+import csw.services.location.commons.RegistrationFactory
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
-import csw.services.location.internal.{AkkaRegistrationFactory, Networks}
+import csw.services.location.internal.Networks
 import csw.services.location.models._
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -67,7 +68,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val httpConnection: HttpConnection     = HttpConnection(componentId)
     val Port: Int                          = 8080
     val Path: String                       = "path/to/resource"
-    val httpRegistration: HttpRegistration = HttpRegistration(httpConnection, Port, Path)
+    val httpRegistration: HttpRegistration = RegistrationFactory.http(httpConnection, Port, Path)
 
     // register, resolve & list http connection for the first time
     locationService.register(httpRegistration).await.location.connection shouldBe httpConnection
@@ -93,7 +94,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val componentId      = ComponentId("hcd1", ComponentType.HCD)
     val connection       = AkkaConnection(componentId)
     val actorRef         = actorSystem.spawn(Behavior.empty, "my-actor-1")
-    val akkaRegistration = AkkaRegistrationFactory.make(connection, actorRef)
+    val akkaRegistration = RegistrationFactory.akka(connection, actorRef)
 
     // register, resolve & list akka connection for the first time
     locationService.register(akkaRegistration).await.location.connection shouldBe connection
@@ -122,7 +123,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val actorRef = actorSystem.spawn(Behavior.empty[Any], "my-actor-to-die")
 
     locationService
-      .register(AkkaRegistrationFactory.make(connection, actorRef))
+      .register(RegistrationFactory.akka(connection, actorRef))
       .await
       .location
       .connection shouldBe connection
@@ -130,7 +131,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     Thread.sleep(10)
 
     locationService.list.await shouldBe List(
-      AkkaRegistrationFactory.make(connection, actorRef).location(new Networks().hostname())
+      RegistrationFactory.akka(connection, actorRef).location(new Networks().hostname())
     )
 
     actorRef ! PoisonPill
@@ -194,13 +195,13 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val port             = 9595
     val prefix           = "/trombone/hcd"
     val httpConnection   = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
-    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
+    val httpRegistration = RegistrationFactory.http(httpConnection, port, prefix)
 
     //create akka registration
     val akkaComponentId  = ComponentId("container1", ComponentType.Container)
     val akkaConnection   = AkkaConnection(akkaComponentId)
     val actorRef         = actorSystem.spawn(Behavior.empty, "container1-actor")
-    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, actorRef)
+    val akkaRegistration = RegistrationFactory.akka(akkaConnection, actorRef)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
     val akkaRegistrationResult = locationService.register(akkaRegistration).await
@@ -243,7 +244,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val port             = 9595
     val prefix           = "/trombone/hcd"
     val httpConnection   = HttpConnection(ComponentId("trombone1", ComponentType.HCD))
-    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
+    val httpRegistration = RegistrationFactory.http(httpConnection, port, prefix)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
 
@@ -325,7 +326,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
     val actorRef      = actorSystem.spawn(Behavior.empty, "my-actor-2")
 
-    locationService.register(AkkaRegistrationFactory.make(hcdConnection, actorRef)).await
+    locationService.register(RegistrationFactory.akka(hcdConnection, actorRef)).await
 
     val redisConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
     locationService.register(TcpRegistration(redisConnection, 1234)).await
@@ -347,7 +348,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
       "my-actor-3"
     )
 
-    locationService.register(AkkaRegistrationFactory.make(hcdAkkaConnection, actorRef)).await
+    locationService.register(RegistrationFactory.akka(hcdAkkaConnection, actorRef)).await
 
     val redisTcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
     locationService.register(TcpRegistration(redisTcpConnection, 1234)).await
@@ -356,7 +357,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     locationService.register(TcpRegistration(configTcpConnection, 1234)).await
 
     val assemblyHttpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
-    locationService.register(HttpRegistration(assemblyHttpConnection, 1234, "path123")).await
+    locationService.register(RegistrationFactory.http(assemblyHttpConnection, 1234, "path123")).await
 
     locationService.list(ConnectionType.TcpType).await.map(_.connection).toSet shouldBe Set(redisTcpConnection,
                                                                                             configTcpConnection)
@@ -373,7 +374,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     locationService.register(TcpRegistration(tcpConnection, 1234)).await
 
     val httpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
-    locationService.register(HttpRegistration(httpConnection, 1234, "path123")).await
+    locationService.register(RegistrationFactory.http(httpConnection, 1234, "path123")).await
 
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
     val actorRef = actorSystem.spawn(
@@ -381,7 +382,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
       "my-actor-4"
     )
 
-    locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
+    locationService.register(RegistrationFactory.akka(akkaConnection, actorRef)).await
 
     locationService.list(new Networks().hostname()).await.map(_.connection).toSet shouldBe Set(tcpConnection,
                                                                                                httpConnection,

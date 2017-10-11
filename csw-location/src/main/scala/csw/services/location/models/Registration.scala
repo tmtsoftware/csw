@@ -76,7 +76,8 @@ final case class TcpRegistration(connection: TcpConnection, port: Int) extends R
  * @param port Provide the port where Http service is available
  * @param path Provide the path to reach the available http service
  */
-final case class HttpRegistration(connection: HttpConnection, port: Int, path: String) extends Registration {
+final case class HttpRegistration(connection: HttpConnection, port: Int, path: String, logAdminActorRef: ActorRef[_])
+    extends Registration {
 
   /**
    * Create a HttpLocation that represents the live Http service
@@ -84,5 +85,5 @@ final case class HttpRegistration(connection: HttpConnection, port: Int, path: S
    * @param hostname  Provide the hostname where Http service is available
    */
   override def location(hostname: String): Location =
-    HttpLocation(connection, new URI(s"http://$hostname:$port/$path"))
+    HttpLocation(connection, new URI(s"http://$hostname:$port/$path"), logAdminActorRef)
 }

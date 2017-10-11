@@ -1,14 +1,14 @@
-package csw.services.logging.scaladsl
+package csw.services.logging.internal
 
 import akka.typed.Behavior
 import akka.typed.scaladsl.Actor
 import csw.services.logging.commons.Constants
 import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.internal._
 import csw.services.logging.models.LogMetadata
+import csw.services.logging.scaladsl.GenericLogger
 
 object LogAdminActor {
-  def behavior(): Behavior[LogControlMessages] = Actor.immutable[LogControlMessages] { (ctx, msg) ⇒
+  private[logging] def behavior(): Behavior[LogControlMessages] = Actor.immutable[LogControlMessages] { (ctx, msg) ⇒
     val log = GenericLogger.immutable(ctx)
     log.debug(s"LogAdminActor received message :[$msg]")
     msg match {

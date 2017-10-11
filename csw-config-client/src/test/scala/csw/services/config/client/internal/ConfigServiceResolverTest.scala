@@ -2,9 +2,9 @@ package csw.services.config.client.internal
 
 import java.net.URI
 
-import csw.messages.location.HttpLocation
 import csw.services.config.client.commons.ConfigServiceConnection
 import csw.services.config.client.scaladsl.ConfigClientFactory
+import csw.services.location.commons.LocationFactory
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -32,7 +32,7 @@ class ConfigServiceResolverTest extends FunSuite with Matchers with MockitoSugar
 
     val mockedLocationService  = mock[LocationService]
     val uri                    = new URI(s"http://config-host:4000")
-    val resolvedConfigLocation = Future(Some(HttpLocation(ConfigServiceConnection.value, uri)))
+    val resolvedConfigLocation = Future(Some(LocationFactory.http(ConfigServiceConnection.value, uri)))
     when(mockedLocationService.resolve(ConfigServiceConnection.value, 5.seconds)).thenReturn(resolvedConfigLocation)
 
     val configServiceResolver = new ConfigServiceResolver(mockedLocationService, actorRuntime)

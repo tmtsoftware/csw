@@ -9,11 +9,11 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter._
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.services.commons.ExampleLogger
+import csw.services.commons.{ExampleLogger, RegistrationFactory}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
 import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
-import csw.services.logging.scaladsl.{Keys, LogAdminActor, LoggingSystemFactory}
+import csw.services.logging.scaladsl.{Keys, LogAdminActorFactory, LoggingSystemFactory}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -68,7 +68,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds
   private val adminActorRef: ActorRef[LogControlMessages] =
-    context.spawn(LogAdminActor.behavior(), "my-actor-1-admin")
+    LogAdminActorFactory.make(context.system)
 
   // EXAMPLE DEMO START
 
@@ -87,7 +87,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // dummy http connection
   val httpPort                          = 8080
   val httpConnection                    = HttpConnection(ComponentId("configuration", ComponentType.Service))
-  val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123")
+  val httpRegistration                  = RegistrationFactory.http(httpConnection, httpPort, "path123")
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
 
   // dummy HCD connection

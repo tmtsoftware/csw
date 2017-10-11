@@ -6,8 +6,8 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
+import csw.services.location.commons.RegistrationFactory
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.services.location.internal.AkkaRegistrationFactory
 import csw.services.location.models._
 
 import scala.concurrent.duration.DurationInt
@@ -33,7 +33,7 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
 
     runOn(seed) {
       val actorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
-      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
+      locationService.register(RegistrationFactory.akka(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await
@@ -46,7 +46,7 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
       val port   = 5656
       val prefix = "/trombone/hcd"
 
-      val httpRegistration       = HttpRegistration(httpConnection, port, prefix)
+      val httpRegistration       = RegistrationFactory.http(httpConnection, port, prefix)
       val httpRegistrationResult = locationService.register(httpRegistration).await
 
       val (akkaSwitch, akkaProbe) =

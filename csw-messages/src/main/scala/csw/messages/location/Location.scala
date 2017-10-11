@@ -25,7 +25,7 @@ final case class AkkaLocation(
     connection: AkkaConnection,
     uri: URI,
     actorRef: ActorRef[Nothing],
-    adminActorRef: ActorRef[_]
+    logAdminActorRef: ActorRef[Nothing]
 ) extends Location {
 
   def typedRef[T: ClassTag]: typed.ActorRef[T] = {
@@ -47,4 +47,5 @@ final case class TcpLocation(connection: TcpConnection, uri: URI) extends Locati
 /**
  * Represents a live Http connection
  */
-final case class HttpLocation(connection: HttpConnection, uri: URI) extends Location
+final case class HttpLocation(connection: HttpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing])
+    extends Location

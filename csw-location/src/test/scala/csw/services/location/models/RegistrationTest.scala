@@ -9,8 +9,9 @@ import akka.typed.scaladsl.adapter.{TypedActorRefOps, UntypedActorSystemOps}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
+import csw.services.location.commons.{LocationFactory, RegistrationFactory}
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
-import csw.services.location.internal.{AkkaLocationFactory, AkkaRegistrationFactory, Networks}
+import csw.services.location.internal.Networks
 import csw.services.location.scaladsl.ActorSystemFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -28,9 +29,9 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val actorPath      = ActorPath.fromString(Serialization.serializedActorPath(actorRef.toUntyped))
     val akkaUri        = new URI(actorPath.toString)
 
-    val akkaRegistration = AkkaRegistrationFactory.make(akkaConnection, actorRef)
+    val akkaRegistration = RegistrationFactory.akka(akkaConnection, actorRef)
 
-    val expectedAkkaLocation = AkkaLocationFactory.make(akkaConnection, akkaUri, actorRef)
+    val expectedAkkaLocation = LocationFactory.akka(akkaConnection, akkaUri, actorRef)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
 
@@ -43,9 +44,9 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val prefix   = "/trombone/hcd"
 
     val httpConnection   = HttpConnection(ComponentId("trombone", ComponentType.HCD))
-    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
+    val httpRegistration = RegistrationFactory.http(httpConnection, port, prefix)
 
-    val expectedhttpLocation = HttpLocation(httpConnection, new URI(s"http://$hostname:$port/$prefix"))
+    val expectedhttpLocation = LocationFactory.http(httpConnection, new URI(s"http://$hostname:$port/$prefix"))
 
     httpRegistration.location(hostname) shouldBe expectedhttpLocation
   }
@@ -72,7 +73,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
-      AkkaRegistrationFactory.make(akkaConnection, actorRef)
+      RegistrationFactory.akka(akkaConnection, actorRef)
     }
     Await.result(actorSystem.terminate, 10.seconds)
   }

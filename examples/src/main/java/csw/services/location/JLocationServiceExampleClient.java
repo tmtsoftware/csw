@@ -25,7 +25,7 @@ import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JKeys;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
-import csw.services.logging.scaladsl.LogAdminActor$;
+import csw.services.logging.scaladsl.LogAdminActorFactory;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -55,7 +55,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
     private IRegistrationResult httpRegResult;
     private IRegistrationResult hcdRegResult;
     private IRegistrationResult assemblyRegResult;
-    private akka.typed.ActorRef<LogControlMessages> adminActorRef = Adapter.spawn(getContext(), LogAdminActor$.MODULE$.behavior(), "");
+    private akka.typed.ActorRef<LogControlMessages> adminActorRef = LogAdminActorFactory.make(context().system());
 
     private static LoggingSystem loggingSystem;
 
@@ -85,7 +85,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         //#Components-Connections-Registrations
         // dummy http connection
         HttpConnection httpConnection   = new HttpConnection(new ComponentId("configuration", JComponentType.Service));
-        HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123");
+        HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123", adminActorRef);
         httpRegResult = locationService.register(httpRegistration).get();
 
         // dummy HCD connection

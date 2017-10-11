@@ -2,12 +2,11 @@ package csw.services.config.server.http
 
 import akka.stream.BindFailedException
 import csw.services.config.server.ServerWiring
-import csw.services.config.server.commons.ConfigServiceConnection
+import csw.services.config.server.commons.{ConfigServiceConnection, RegistrationFactory}
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
-import csw.services.location.models.HttpRegistration
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -45,7 +44,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   test("should not start server if registration with location service fails") {
     val serverWiring = new ServerWiring
     import serverWiring._
-    locationService.register(HttpRegistration(ConfigServiceConnection.value, 21212, "")).await
+    locationService.register(RegistrationFactory.http(ConfigServiceConnection.value, 21212, "")).await
 
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 

@@ -4,14 +4,13 @@ import java.nio.file.{Files, Path}
 
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.exceptions.{ClusterSeedsNotFound, FileNotFound, LocalFileNotFound, UnableToParseOptions}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LogControlMessages
-import csw.services.logging.scaladsl.{ComponentLogger, LogAdminActor}
+import csw.services.logging.scaladsl.{ComponentLogger, LogAdminActorFactory}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
@@ -65,7 +64,7 @@ private[containercmd] class ContainerCmd(
       defaultConfig: Option[Config]
   ): Future[ActorRef[_]] = {
     async {
-      val logAdminActorRef = actorSystem.spawn(LogAdminActor.behavior(), "log-admin")
+      val logAdminActorRef = LogAdminActorFactory.make(actorSystem)
       val config           = await(getConfig(isLocal, inputFilePath, defaultConfig))
       val actorRef         = await(createComponent(standalone, wiring, config, logAdminActorRef))
       log.info(s"Component is successfully created with actor actorRef $actorRef")

@@ -23,7 +23,7 @@ import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
 import csw.services.logging.models.LogMetadata
-import csw.services.logging.scaladsl.LogAdminActor
+import csw.services.logging.scaladsl.LogAdminActorFactory
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
@@ -63,7 +63,7 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   def startContainerAndWaitForRunning(): ActorRef[ContainerMessage] = {
     val frameworkWiring = FrameworkWiring.make(containerActorSystem)
-    val adminActorRef   = containerActorSystem.spawn(LogAdminActor.behavior(), "log-admin")
+    val adminActorRef   = LogAdminActorFactory.make(containerActorSystem)
     val config          = ConfigFactory.load("laser_container.conf")
     val containerRef    = Await.result(Container.spawn(config, frameworkWiring, adminActorRef), 5.seconds)
 

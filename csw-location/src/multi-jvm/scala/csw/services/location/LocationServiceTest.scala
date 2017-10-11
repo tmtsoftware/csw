@@ -6,12 +6,12 @@ import akka.stream.testkit.scaladsl.TestSink
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.RunningMessage.DomainMessage
-import csw.messages.{SupervisorExternalMessage, TMTSerializable}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
+import csw.messages.{SupervisorExternalMessage, TMTSerializable}
+import csw.services.location.commons.RegistrationFactory
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.services.location.internal.AkkaRegistrationFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
 import org.scalatest.BeforeAndAfterEach
@@ -45,7 +45,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     val httpPort         = 81
     val httpPath         = "/test/hcd"
     val httpConnection   = HttpConnection(ComponentId("tromboneHcd", ComponentType.HCD))
-    val httpRegistration = HttpRegistration(httpConnection, httpPort, httpPath)
+    val httpRegistration = RegistrationFactory.http(httpConnection, httpPort, httpPath)
 
     runOn(seed) {
       locationService.register(tcpRegistration).await
@@ -82,13 +82,13 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
     runOn(seed) {
       val actorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
-      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
+      locationService.register(RegistrationFactory.akka(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await
       enterBarrier("Unregister")
 
-      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
+      locationService.register(RegistrationFactory.akka(akkaConnection, actorRef)).await
       enterBarrier("Re-registration")
     }
 
@@ -146,7 +146,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     runOn(member) {
       val actorRef = assemblyActorSystem.actorOf(AssemblyActor.props(locationService), "assembly-actor")
       import akka.typed.scaladsl.adapter._
-      locationService.register(AkkaRegistrationFactory.make(akkaConnection, actorRef)).await
+      locationService.register(RegistrationFactory.akka(akkaConnection, actorRef)).await
 
       enterBarrier("Registration")
 
