@@ -40,7 +40,6 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
   private val locationService: LocationService = LocationServiceFactory.withSystem(seedActorSystem)
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val instrumentHcdConnection  = AkkaConnection(ComponentId("Instrument_Filter", HCD))
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
   override protected def afterAll(): Unit = Await.result(seedActorSystem.terminate(), 5.seconds)
@@ -54,8 +53,6 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
 
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
     val assemblyProbe                = TestProbe[CurrentState]("assembly-state-probe")
-    val filterProbe                  = TestProbe[CurrentState]("filter-state-probe")
-    val disperserProbe               = TestProbe[CurrentState]("disperser-state-probe")
 
     // initially container is put in Idle lifecycle state and wait for all the components to move into Running lifecycle state
     // ********** Message: GetContainerLifecycleState **********
@@ -63,17 +60,13 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
 
     // resolve all the components from container using location service
     val filterAssemblyLocation = Await.result(locationService.find(filterAssemblyConnection), 5.seconds)
-    val instrumentHcdLocation  = Await.result(locationService.find(instrumentHcdConnection), 5.seconds)
     val disperserHcdLocation   = Await.result(locationService.find(disperserHcdConnection), 5.seconds)
 
     val assemblySupervisor  = filterAssemblyLocation.get.typedRef[SupervisorExternalMessage]
-    val filterSupervisor    = instrumentHcdLocation.get.typedRef[SupervisorExternalMessage]
     val disperserSupervisor = disperserHcdLocation.get.typedRef[SupervisorExternalMessage]
 
     // Subscribe to component's current state
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))
-    filterSupervisor ! ComponentStateSubscription(Subscribe(filterProbe.ref))
-    disperserSupervisor ! ComponentStateSubscription(Subscribe(disperserProbe.ref))
 
     // assembly is tracking two HCD's, hence assemblyProbe will receive LocationUpdated event from two HCD's
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(locationUpdatedChoice))))

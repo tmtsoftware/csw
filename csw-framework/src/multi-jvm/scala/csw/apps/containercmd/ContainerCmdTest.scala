@@ -22,7 +22,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.states.CurrentState
-import csw.messages.{Components, ContainerExternalMessage, SupervisorExternalMessage}
+import csw.messages.{Components, ContainerExternalMessage, Shutdown, SupervisorExternalMessage}
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
@@ -30,7 +30,7 @@ import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration.DurationLong
 import scala.io.Source
 
@@ -48,9 +48,9 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
   import config._
 
-  implicit val actorSystem: ActorSystem[_] = system.toTyped
-  implicit val ec                          = actorSystem.executionContext
-  implicit val testkit: TestKitSettings    = TestKitSettings(actorSystem)
+  implicit val actorSystem: ActorSystem[_]  = system.toTyped
+  implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
+  implicit val testkit: TestKitSettings     = TestKitSettings(actorSystem)
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
@@ -92,6 +92,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       enterBarrier("config-file-uploaded")
       enterBarrier("running")
       enterBarrier("offline")
+      enterBarrier("eton-shutdown")
     }
 
     runOn(member1) {
@@ -159,6 +160,12 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
       enterBarrier("offline")
+      enterBarrier("eton-shutdown")
+
+      // DEOPSCSW-218: Discover component connection information using Akka protocol
+      // Laser assembly is tracking Eton Hcd which is running on member2 (different jvm than this)
+      // When Eton Hcd shutdowns, laser assembly receives LocationRemoved event
+      laserCompStateProbe.expectMsg(5.seconds, CurrentState(prefix, Set(choiceKey.set(locationRemovedChoice))))
     }
 
     runOn(member2) {
@@ -183,6 +190,9 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       Thread.sleep(50)
       supervisorRef ! GetSupervisorLifecycleState(testProbe.ref)
       testProbe.expectMsg(SupervisorLifecycleState.RunningOffline)
+
+      supervisorRef ! Shutdown
+      enterBarrier("eton-shutdown")
 
       Files.delete(standaloneConfFilePath)
     }
