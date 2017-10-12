@@ -6,13 +6,13 @@ import csw.messages._
 import csw.messages.ccs.commands.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.actors.TromboneState._
-import csw.trombone.assembly.{AssemblyContext, FollowCommandMessages, Matchers, TromboneCommandHandlerMsgs}
+import csw.trombone.assembly._
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
 class SetAngleCommand(
-    ctx: ActorContext[TromboneCommandHandlerMsgs],
+    ctx: ActorContext[AssemblyCommandHandlerMsgs],
     ac: AssemblyContext,
     s: Setup,
     followCommandActor: ActorRef[FollowCommandMessages],

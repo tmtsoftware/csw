@@ -6,12 +6,12 @@ import csw.messages._
 import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
 import csw.trombone.assembly.actors.TromboneState.{TromboneState, _}
-import csw.trombone.assembly.{AssemblyContext, TromboneCommandHandlerMsgs}
+import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext}
 
 import scala.concurrent.Future
 
 class FollowCommand(
-    ctx: ActorContext[TromboneCommandHandlerMsgs],
+    ctx: ActorContext[AssemblyCommandHandlerMsgs],
     ac: AssemblyContext,
     s: Setup,
     tromboneHCD: ActorRef[SupervisorExternalMessage],

@@ -12,10 +12,10 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
+import csw.trombone.assembly.AssemblyCommandHandlerMsgs.CommandMessageE
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}
 import csw.trombone.assembly.ParamValidation._
-import csw.trombone.assembly.TromboneCommandHandlerMsgs.NotFollowingMsgs
 import csw.trombone.assembly._
 
 import scala.async.Async.{async, await}
@@ -40,7 +40,7 @@ class TromboneAssemblyHandlers(
 
   private var diagPublsher: ActorRef[DiagPublisherMessages] = _
 
-  private var commandHandler: ActorRef[NotFollowingMsgs] = _
+  private var commandHandler: ActorRef[AssemblyCommandHandlerMsgs] = _
 
   implicit var ac: AssemblyContext  = _
   implicit val ec: ExecutionContext = ctx.executionContext
@@ -55,7 +55,8 @@ class TromboneAssemblyHandlers(
 
     val eventPublisher = ctx.spawnAnonymous(TrombonePublisher.make(ac))
 
-    commandHandler = ctx.spawnAnonymous(TromboneCommandHandler.make(ac, runningHcd, Some(eventPublisher)))
+    commandHandler =
+      ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcd, Some(eventPublisher)))
 
     diagPublsher = ctx.spawnAnonymous(DiagPublisher.make(ac, runningHcd, Some(eventPublisher)))
   }
@@ -76,8 +77,7 @@ class TromboneAssemblyHandlers(
   override def onSetup(commandMessage: CommandMessage): Validation = {
     val validation = validateOneSetup(commandMessage.command.asInstanceOf[Setup])
     if (validation == Valid) {
-      commandHandler ! TromboneCommandHandlerMsgs.Submit(commandMessage.command.asInstanceOf[Setup],
-                                                         commandMessage.replyTo)
+      commandHandler ! CommandMessageE(commandMessage)
     }
     validation
   }

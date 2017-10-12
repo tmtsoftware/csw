@@ -7,14 +7,14 @@ import csw.messages._
 import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
 import csw.trombone.assembly.actors.TromboneState.TromboneState
-import csw.trombone.assembly.{Matchers, TromboneCommandHandlerMsgs}
+import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, Matchers}
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
 class DatumCommand(
-    ctx: ActorContext[TromboneCommandHandlerMsgs],
+    ctx: ActorContext[AssemblyCommandHandlerMsgs],
     s: Setup,
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,

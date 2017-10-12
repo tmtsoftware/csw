@@ -15,7 +15,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
 class SetElevationCommand(
-    ctx: ActorContext[TromboneCommandHandlerMsgs],
+    ctx: ActorContext[AssemblyCommandHandlerMsgs],
     ac: AssemblyContext,
     s: Setup,
     tromboneHCD: ActorRef[SupervisorExternalMessage],
