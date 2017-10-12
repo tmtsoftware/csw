@@ -165,7 +165,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       // DEOPSCSW-218: Discover component connection information using Akka protocol
       // Laser assembly is tracking Eton Hcd which is running on member2 (different jvm than this)
       // When Eton Hcd shutdowns, laser assembly receives LocationRemoved event
-      laserCompStateProbe.expectMsg(5.seconds, CurrentState(prefix, Set(choiceKey.set(locationRemovedChoice))))
+      laserCompStateProbe.expectMsg(10.seconds, CurrentState(prefix, Set(choiceKey.set(locationRemovedChoice))))
     }
 
     runOn(member2) {
