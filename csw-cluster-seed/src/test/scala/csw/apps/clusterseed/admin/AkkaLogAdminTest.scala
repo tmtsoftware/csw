@@ -1,5 +1,6 @@
 package csw.apps.clusterseed.admin
 
+import akka.actor
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -29,7 +30,7 @@ import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-class LogAdminTest extends AdminLogTestSuite with HttpSupport {
+class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   import adminWiring.actorRuntime._
 
@@ -40,7 +41,7 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
   private val motionControllerConnection = AkkaConnection(ComponentId("Motion_Controller", HCD))
   private val galilConnection            = AkkaConnection(ComponentId("Galil", Assembly))
 
-  private val containerActorSystem = ClusterSettings().joinLocal(3552).system
+  private var containerActorSystem: actor.ActorSystem = _
 
   private var laserComponent: Component = _
   private var galilComponent: Component = _
@@ -50,6 +51,8 @@ class LogAdminTest extends AdminLogTestSuite with HttpSupport {
 
     // this will start seed on port 3552 and log admin server on 7878
     adminWiring.locationService
+
+    containerActorSystem = ClusterSettings().joinLocal(3552).system
 
     // this will start container on random port and join seed and form a cluster
     val containerRef = startContainerAndWaitForRunning()

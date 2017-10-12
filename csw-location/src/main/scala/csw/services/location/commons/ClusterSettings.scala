@@ -70,7 +70,8 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
 
   def joinSeeds(seeds: String): ClusterSettings = withEntry(ClusterSeedsKey, seeds)
 
-  //If no seeds are provided (which happens only during testing), then create a single node cluster by joining to self.
+  //Tries to connect to seed which is running locally on the provided port.
+  //This method should be used for testing only.
   def joinLocal(port: Int, ports: Int*): ClusterSettings = {
     val seeds = s"$hostname:$port" +: ports.map(port ⇒ s"$hostname:$port")
     joinSeeds(seeds.mkString(","))
