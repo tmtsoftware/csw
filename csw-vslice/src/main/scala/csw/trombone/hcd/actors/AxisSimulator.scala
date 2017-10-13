@@ -62,10 +62,10 @@ class AxisSimulator(
 
   override def onMessage(msg: SimulatorCommand): Behavior[SimulatorCommand] = {
     (context, msg) match {
-      case (Mode.Idle, x: AxisRequest)                ⇒ mainReceive(x)
-      case (Mode.Idle, x: InternalMessages)           ⇒ internalReceive(x)
-      case (Mode.Homing(worker), x: MotionWorkerMsgs) ⇒ homeReceive(x, worker)
-      case (Mode.Moving(worker), x: MotionWorkerMsgs) ⇒ moveReceive(x, worker)
+      case (Mode.Idle, x: AxisRequest)                ⇒ onIdleRequest(x)
+      case (Mode.Idle, x: InternalMessages)           ⇒ onIdleInternal(x)
+      case (Mode.Homing(worker), x: MotionWorkerMsgs) ⇒ onHoming(x, worker)
+      case (Mode.Moving(worker), x: MotionWorkerMsgs) ⇒ onMoving(x, worker)
       case _                                          ⇒ println(s"current context=$context does not handle message=$msg")
     }
     this
@@ -73,7 +73,7 @@ class AxisSimulator(
 
   import MotionWorkerMsgs._
 
-  def mainReceive(msg: AxisRequest): Unit = msg match {
+  def onIdleRequest(msg: AxisRequest): Unit = msg match {
     case InitialState(replyToIn) =>
       replyToIn ! getState
 
@@ -104,9 +104,8 @@ class AxisSimulator(
       update(replyTo, AxisStarted)
       println(s"AxisHome: $axisState")
 
-      val workerB =
-        MotionWorker.behavior(current, axisConfig.home, delayInMS = 100, ctx.self, diagFlag = false)
-      val worker = ctx.spawnAnonymous(workerB)
+      val workerB = MotionWorker.behavior(current, axisConfig.home, delayInMS = 100, ctx.self, diagFlag = false)
+      val worker  = ctx.spawnAnonymous(workerB)
 
       worker ! Start(ctx.self)
       context = Mode.Homing(worker)
@@ -133,51 +132,7 @@ class AxisSimulator(
 
   }
 
-  def homeReceive(message: MotionWorkerMsgs, worker: ActorRef[MotionWorkerMsgs]): Unit = message match {
-    case Start(_) =>
-      println("Home Start")
-
-    case End(finalpos) =>
-      println("Move End")
-      context = Mode.Idle
-      ctx.self ! HomeComplete(finalpos)
-
-    case Tick(currentIn) =>
-      current = currentIn
-      checkLimits()
-      update(replyTo, getState)
-
-    case MoveUpdate(destination) =>
-    case Cancel                  =>
-  }
-
-  def moveReceive(messsage: MotionWorkerMsgs, worker: ActorRef[MotionWorkerMsgs]): Unit = messsage match {
-    case Start(_) =>
-      println("Move Start")
-
-    case Cancel =>
-      println("Cancel MOVE")
-      worker ! Cancel
-      cancelCount = cancelCount + 1
-      context = Mode.Idle
-
-    case MoveUpdate(targetPosition) =>
-      worker ! MoveUpdate(targetPosition)
-
-    case Tick(currentIn) =>
-      current = currentIn
-      checkLimits()
-      println("Move Update")
-      update(replyTo, getState)
-
-    case End(finalpos) =>
-      println("Move End")
-      context = Mode.Idle
-      ctx.self ! MoveComplete(finalpos)
-
-  }
-
-  def internalReceive(internalMessages: InternalMessages): Unit = internalMessages match {
+  def onIdleInternal(internalMessages: InternalMessages): Unit = internalMessages match {
     case DatumComplete =>
       axisState = AXIS_IDLE
       current += 1
@@ -203,6 +158,50 @@ class AxisSimulator(
       update(replyTo, getState)
 
     case InitialStatistics =>
+  }
+
+  def onHoming(message: MotionWorkerMsgs, worker: ActorRef[MotionWorkerMsgs]): Unit = message match {
+    case Start(_) =>
+      println("Home Start")
+
+    case End(finalpos) =>
+      println("Move End")
+      context = Mode.Idle
+      ctx.self ! HomeComplete(finalpos)
+
+    case Tick(currentIn) =>
+      current = currentIn
+      checkLimits()
+      update(replyTo, getState)
+
+    case MoveUpdate(destination) =>
+    case Cancel                  =>
+  }
+
+  def onMoving(messsage: MotionWorkerMsgs, worker: ActorRef[MotionWorkerMsgs]): Unit = messsage match {
+    case Start(_) =>
+      println("Move Start")
+
+    case Cancel =>
+      println("Cancel MOVE")
+      worker ! Cancel
+      cancelCount = cancelCount + 1
+      context = Mode.Idle
+
+    case MoveUpdate(targetPosition) =>
+      worker ! MoveUpdate(targetPosition)
+
+    case Tick(currentIn) =>
+      current = currentIn
+      checkLimits()
+      println("Move Update")
+      update(replyTo, getState)
+
+    case End(finalpos) =>
+      println("Move End")
+      context = Mode.Idle
+      ctx.self ! MoveComplete(finalpos)
+
   }
 
   private def checkLimits(): Unit = {

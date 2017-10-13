@@ -9,7 +9,8 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
 import csw.messages.ccs.Validation
-import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.Validations.Valid
+import csw.messages.ccs.commands.{Observe, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.models.Units.encoder
@@ -65,7 +66,18 @@ class TromboneHcdHandlers(
 
   override def onGoOnline(): Unit = println("Received running offline")
 
-  def onSetup(sc: Setup): Unit = {
+  override def onSetup(commandMessage: CommandMessage): Validation = {
+    val validation = ParamValidation.validateSetup(commandMessage.command.asInstanceOf[Setup])
+    if (validation == Valid)
+      onSetup(commandMessage.command.asInstanceOf[Setup])
+    validation
+  }
+
+  override def onObserve(commandMessage: CommandMessage): Validation = {
+    ParamValidation.validateObserve(commandMessage.command.asInstanceOf[Observe])
+  }
+
+  private def onSetup(sc: Setup): Unit = {
     import csw.trombone.hcd.TromboneHcdState._
     println(s"Trombone process received sc: $sc")
 
@@ -137,10 +149,6 @@ class TromboneHcdHandlers(
   }
 
   private def getAxisConfig: Future[AxisConfig] = ???
-
-  override def onSetup(commandMessage: CommandMessage): Validation = ???
-
-  override def onObserve(commandMessage: CommandMessage): Validation = ???
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 }
