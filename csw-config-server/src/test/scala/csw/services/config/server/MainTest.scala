@@ -28,8 +28,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
-  override protected def afterEach(): Unit =
-    testFileUtils.deleteServerFiles()
+  override protected def afterEach(): Unit = testFileUtils.deleteServerFiles()
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await

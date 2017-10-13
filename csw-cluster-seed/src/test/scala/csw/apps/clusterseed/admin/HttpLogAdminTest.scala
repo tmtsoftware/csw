@@ -9,8 +9,8 @@ import akka.typed.testkit.TestKitSettings
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.utils.AdminLogTestSuite
-import csw.services.config.server.ServerWiring
-import csw.services.config.server.commons.ConfigServiceConnection
+import csw.services.config.server.{ServerWiring, Settings}
+import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
@@ -27,9 +27,11 @@ class HttpLogAdminTest extends AdminLogTestSuite with HttpSupport {
   implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
-  val serverWiring = ServerWiring.make(adminWiring.locationService)
+  private val serverWiring = ServerWiring.make(adminWiring.locationService)
   serverWiring.svnRepo.initSvnRepo()
   Await.result(serverWiring.httpService.registeredLazyBinding, 20.seconds)
+
+  private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -38,6 +40,7 @@ class HttpLogAdminTest extends AdminLogTestSuite with HttpSupport {
   }
 
   override protected def afterAll(): Unit = {
+    testFileUtils.deleteServerFiles()
     super.afterAll()
   }
 
