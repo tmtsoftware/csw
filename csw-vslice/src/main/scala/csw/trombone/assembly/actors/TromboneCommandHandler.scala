@@ -98,7 +98,7 @@ class TromboneCommandHandler(
             Some(
               new FollowCommand(ctx, ac, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor)
             ),
-            CommandExecutionState.Executing
+            CommandExecutionState.Following
           )
 
         case ac.stopCK =>
