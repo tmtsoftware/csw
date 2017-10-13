@@ -49,9 +49,8 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
     val doneF = async {
       await(httpService.shutdown())
       await(locationService.shutdown())
-      await(actorSystem.terminate())
     }
-    Await.result(doneF, 5.seconds)
+    Await.result(doneF, 10.seconds)
   }
 
   //#declare_string_config
