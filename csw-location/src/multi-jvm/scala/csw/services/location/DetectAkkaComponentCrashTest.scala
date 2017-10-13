@@ -36,9 +36,6 @@ class DetectAkkaComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new 
   import config._
   import cswCluster.mat
 
-  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
-
   test("akka component running on one node should detect if other component running on another node crashes") {
 
     val akkaConnection = AkkaConnection(ComponentId("Container1", ComponentType.Container))
