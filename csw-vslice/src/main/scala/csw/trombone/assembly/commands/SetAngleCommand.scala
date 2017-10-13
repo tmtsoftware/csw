@@ -19,21 +19,20 @@ class SetAngleCommand(
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand {
+) extends AssemblyCommand(ctx, startState, stateActor) {
 
   implicit val timeout: Timeout = Timeout(5.seconds)
 
   override def startCommand(): Future[CommandExecutionResponse] = {
-    publishState(TromboneState(cmdItem(cmdBusy), startState.move, startState.sodiumLayer, startState.nss), stateActor)
+    publishState(TromboneState(cmdItem(cmdBusy), startState.move, startState.sodiumLayer, startState.nss))
 
     val zenithAngleItem = s(ac.zenithAngleKey)
 
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
-    matchCompletion(ctx, Matchers.idleMatcher, tromboneHCD, 5.seconds) {
+    matchCompletion(Matchers.idleMatcher, tromboneHCD, 5.seconds) {
       case Completed =>
-        publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss),
-                     stateActor)
+        publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
         Completed
       case Error(message) =>
         println(s"setElevation command failed with message: $message")

@@ -17,7 +17,7 @@ class FollowCommand(
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand {
+) extends AssemblyCommand(ctx, startState, stateActor) {
 
   import ctx.executionContext
 
@@ -37,8 +37,7 @@ class FollowCommand(
         TromboneState(cmdItem(cmdContinuous),
                       moveItem(moveMoving),
                       sodiumItem(startState.sodiumLayerValue),
-                      nssItem(s(ac.nssInUseKey).head)),
-        stateActor
+                      nssItem(s(ac.nssInUseKey).head))
       )
       Future(Completed)
     }

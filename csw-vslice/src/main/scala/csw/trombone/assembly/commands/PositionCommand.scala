@@ -21,7 +21,7 @@ class PositionCommand(
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand {
+) extends AssemblyCommand(ctx, startState, stateActor) {
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
@@ -47,14 +47,12 @@ class PositionCommand(
       val stateMatcher = Matchers.posMatcher(encoderPosition)
       val scOut = Setup(s.info, TromboneHcdState.axisMoveCK)
         .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
-      publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss),
-                   stateActor)
+      publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
       tromboneHCD ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore))
       Matchers.matchState(ctx, stateMatcher, tromboneHCD, 5.seconds).map {
         case Completed =>
-          publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)),
-                       stateActor)
+          publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed
         case Error(message) =>
           println(s"Data command match failed with error: $message")

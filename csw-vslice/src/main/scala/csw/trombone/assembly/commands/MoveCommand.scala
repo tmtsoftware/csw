@@ -21,7 +21,7 @@ class MoveCommand(
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand {
+) extends AssemblyCommand(ctx, startState, stateActor) {
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
@@ -33,7 +33,8 @@ class MoveCommand(
 
   def startCommand(): Future[CommandExecutionResponse] = {
     if (! {
-          startState.cmdChoice == cmdUninitialized || startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving
+          startState.cmdChoice == cmdUninitialized ||
+          startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving
         }) {
       {
         Future(
@@ -45,15 +46,13 @@ class MoveCommand(
         )
       }
     } else {
-      publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss),
-                   stateActor)
+      publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss))
 
       tromboneHCD ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore))
 
-      matchCompletion(ctx, stateMatcher, tromboneHCD, 5.seconds) {
+      matchCompletion(stateMatcher, tromboneHCD, 5.seconds) {
         case Completed =>
-          publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss),
-                       stateActor)
+          publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss))
           Completed
         case Error(message) =>
           println(s"Move command match failed with message: $message")
