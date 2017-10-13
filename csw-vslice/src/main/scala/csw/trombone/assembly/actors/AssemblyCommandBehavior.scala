@@ -22,17 +22,19 @@ class AssemblyCommandBehavior(
 ) extends MutableBehavior[AssemblyCommandHandlerMsgs] {
 
   import ctx.executionContext
-  private var mode: CommandExecutionState                   = NotFollowing
+  private var commandExecutionState: CommandExecutionState  = NotFollowing
   private val assemblyStateAdapter: ActorRef[AssemblyState] = ctx.spawnAdapter(AssemblyStateE)
 
   assemblyCommandHandlers.tromboneStateActor ! Subscribe(assemblyStateAdapter)
 
   override def onMessage(msg: AssemblyCommandHandlerMsgs): Behavior[AssemblyCommandHandlerMsgs] = {
-    (mode, msg) match {
+    (commandExecutionState, msg) match {
       case (_, msg: CommonMsgs)                  ⇒ onCommon(msg)
       case (NotFollowing, msg: NotFollowingMsgs) ⇒ onNotFollowing(msg)
       case (Following, msg: FollowingMsgs)       ⇒ onFollowing(msg)
       case (Executing, msg: ExecutingMsgs)       ⇒ onExecuting(msg)
+      case _                                     ⇒ println(s"Unexpected message :[$msg] received by component in lifecycle state :[$commandExecutionState]")
+
     }
     this
   }
@@ -60,12 +62,12 @@ class AssemblyCommandBehavior(
       executeCommand(assemblyCommandState.mayBeAssemblyCommand.get, commandMessage.replyTo)
     case CommandComplete(replyTo, result) =>
       assemblyCommandHandlers.onExecutingCommandComplete(replyTo, result)
-      mode = CommandExecutionState.NotFollowing
+      commandExecutionState = CommandExecutionState.NotFollowing
   }
 
   private def executeCommand(assemblyCommand: AssemblyCommand, replyTo: ActorRef[CommandResponse]): Unit = {
     if (hcd.isDefined) {
-      mode = CommandExecutionState.Executing
+      commandExecutionState = CommandExecutionState.Executing
       assemblyCommand.startCommand().onComplete {
         case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
         case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
@@ -74,7 +76,7 @@ class AssemblyCommandBehavior(
   }
 
   private def executeFollow(assemblyCommand: AssemblyCommand, replyTo: ActorRef[CommandResponse]): Unit = {
-    mode = CommandExecutionState.Following
+    commandExecutionState = CommandExecutionState.Following
     assemblyCommand.startCommand().onComplete {
       case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
       case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self

@@ -119,6 +119,10 @@ class TromboneCommandHandler(
           )
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
       }
+    case _ ⇒
+      println(s"Unexpected command :[$commandMessage] received by component")
+      AssemblyCommandState(None, CommandExecutionState.NotFollowing)
+
   }
 
   override def onFollowing(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
@@ -161,6 +165,9 @@ class TromboneCommandHandler(
           println(s"Unknown config key: $commandMessage")
           AssemblyCommandState(None, CommandExecutionState.Following)
       }
+    case _ ⇒
+      println(s"Unexpected command :[$commandMessage] received by component")
+      AssemblyCommandState(None, CommandExecutionState.NotFollowing)
   }
 
   override def onExecuting(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
