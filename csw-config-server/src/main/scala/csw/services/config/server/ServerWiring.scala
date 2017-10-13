@@ -6,7 +6,7 @@ import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.files._
 import csw.services.config.server.http.{ConfigExceptionHandler, ConfigServiceRoute, HttpService}
 import csw.services.config.server.svn.{SvnConfigService, SvnRepo}
-import csw.services.location.commons.{ClusterSettings, CswCluster}
+import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 /**
@@ -16,17 +16,16 @@ class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
 
-  lazy val actorSystem   = ActorSystem("config-service", config)
-  lazy val actorRuntime  = new ActorRuntime(actorSystem, settings)
-  lazy val annexFileRepo = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
-  lazy val svnRepo       = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
+  lazy val clusterSettings          = ClusterSettings()
+  lazy val actorSystem: ActorSystem = clusterSettings.system
+  lazy val actorRuntime             = new ActorRuntime(actorSystem, settings)
+  lazy val annexFileRepo            = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
+  lazy val svnRepo                  = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
 
   lazy val annexFileService             = new AnnexFileService(settings, annexFileRepo, actorRuntime)
   lazy val configService: ConfigService = new SvnConfigService(settings, annexFileService, actorRuntime, svnRepo)
 
-  lazy val clusterSettings                  = ClusterSettings()
-  lazy val cswCluster: CswCluster           = CswCluster.withSettings(clusterSettings)
-  lazy val locationService: LocationService = LocationServiceFactory.withCluster(cswCluster)
+  lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem)
 
   lazy val configExceptionHandler = new ConfigExceptionHandler
   lazy val configServiceRoute     = new ConfigServiceRoute(configService, actorRuntime, configExceptionHandler)

@@ -22,11 +22,12 @@ import scala.util.control.NonFatal
  * @param settings                 Runtime configuration of server
  * @param actorRuntime             ActorRuntime instance wrapper for actor system
  */
-class HttpService(locationService: LocationService,
-                  configServiceRoute: ConfigServiceRoute,
-                  settings: Settings,
-                  actorRuntime: ActorRuntime)
-    extends ConfigServerLogger.Simple {
+class HttpService(
+    locationService: LocationService,
+    configServiceRoute: ConfigServiceRoute,
+    settings: Settings,
+    actorRuntime: ActorRuntime
+) extends ConfigServerLogger.Simple {
 
   import actorRuntime._
 

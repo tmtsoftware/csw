@@ -20,10 +20,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) exte
         import wiring._
 
         if (startLogging) actorRuntime.startLogging()
-
-        if (init) {
-          svnRepo.initSvnRepo()
-        }
+        if (init) svnRepo.initSvnRepo()
 
         try {
           svnRepo.testConnection()
