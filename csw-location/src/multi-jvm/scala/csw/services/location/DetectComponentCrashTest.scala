@@ -8,7 +8,9 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.services.location.commons.RegistrationFactory
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.services.location.models.HttpRegistration
 import csw.services.location.scaladsl.ActorSystemFactory
+import csw.services.logging.scaladsl.LogAdminActorFactory
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
@@ -81,7 +83,7 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
       val prefix = "/trombone/hcd"
 
       val httpConnection   = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
-      val httpRegistration = RegistrationFactory.http(httpConnection, port, prefix)
+      val httpRegistration = HttpRegistration(httpConnection, port, prefix, LogAdminActorFactory.make(system))
 
       locationService.register(httpRegistration).await
 

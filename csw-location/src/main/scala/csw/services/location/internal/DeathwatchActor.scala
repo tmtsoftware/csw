@@ -3,7 +3,7 @@ package csw.services.location.internal
 import akka.cluster.ddata.Replicator.{Changed, Subscribe}
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior, Terminated}
-import csw.messages.location.AkkaLocation
+import csw.messages.location.{AkkaLocation, HttpLocation, Location}
 import csw.services.location.commons.{CswCluster, LocationServiceLogger}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.scaladsl.LocationService
@@ -22,26 +22,36 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
    *
    * @see [[akka.actor.Terminated]]
    */
-  def behavior(watchedLocations: Set[AkkaLocation]): Behavior[Msg] =
+  def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
     Actor.immutable[Msg] { (context, changeMsg) ⇒
       val allLocations = changeMsg.get(AllServices.Key).entries.values.toSet
       //take only akka locations
-      val akkaLocations = allLocations.collect { case x: AkkaLocation ⇒ x }
+      val eligibleLocations: Set[Location] = allLocations.collect {
+        case x: AkkaLocation ⇒ x
+        case x: HttpLocation ⇒ x
+      }
       //find out the ones that are not being watched and watch them
-      val unwatchedLocations = akkaLocations diff watchedLocations
+      val unwatchedLocations = eligibleLocations diff watchedLocations
       unwatchedLocations.foreach(loc ⇒ {
-        log.debug(s"Started watching actor: ${loc.actorRef.toString}")
-        context.watch(loc.actorRef)
+        val actorRefToWatch = loc match {
+          case AkkaLocation(_, _, actorRef, _)      ⇒ actorRef
+          case HttpLocation(_, _, logAdminActorRef) ⇒ logAdminActorRef
+        }
+        log.debug(s"Started watching actor: ${actorRefToWatch.toString}")
+        context.watch(actorRefToWatch)
       })
       //all akka locations are now watched
-      behavior(akkaLocations)
+      behavior(eligibleLocations)
     } onSignal {
       case (ctx, Terminated(deadActorRef)) ⇒
         log.warn(s"Un-watching terminated actor: ${deadActorRef.toString}")
         //stop watching the terminated actor
         ctx.unwatch(deadActorRef)
-        //Unregister the dead akka location and remove it from the list of watched locations
-        val maybeLocation = watchedLocations.find(_.actorRef == deadActorRef)
+        //Unregister the dead location and remove it from the list of watched locations
+        val maybeLocation = watchedLocations.find {
+          case AkkaLocation(_, _, actorRef, _)      ⇒ deadActorRef == actorRef
+          case HttpLocation(_, _, logAdminActorRef) ⇒ deadActorRef == logAdminActorRef
+        }
         maybeLocation match {
           case Some(location) =>
             //if deadActorRef is mapped to a location, unregister it and remove it from watched locations
