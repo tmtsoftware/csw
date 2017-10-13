@@ -37,7 +37,7 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
           case AkkaLocation(_, _, actorRef, _)      ⇒ actorRef
           case HttpLocation(_, _, logAdminActorRef) ⇒ logAdminActorRef
         }
-        log.debug(s"Started watching actor: ${actorRefToWatch.toString}")
+        log.warn(s"Started watching actor: ${actorRefToWatch.toString}")
         context.watch(actorRefToWatch)
       })
       //all akka locations are now watched

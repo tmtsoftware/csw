@@ -16,9 +16,9 @@ import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class DetectComponentCrashTestMultiJvmNode1 extends DetectComponentCrashTest(0)
-class DetectComponentCrashTestMultiJvmNode2 extends DetectComponentCrashTest(0)
-class DetectComponentCrashTestMultiJvmNode3 extends DetectComponentCrashTest(0)
+class DetectAkkaComponentCrashTestMultiJvmNode1 extends DetectAkkaComponentCrashTest(0)
+class DetectAkkaComponentCrashTestMultiJvmNode2 extends DetectAkkaComponentCrashTest(0)
+class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrashTest(0)
 
 /**
  * This test is running as a part of jenkins master-slave setup forming three nodes cluster. (seed: running on jenkins master, member1: running on jenkins slave, member2: running on jenkins slave)
@@ -31,7 +31,7 @@ class DetectComponentCrashTestMultiJvmNode3 extends DetectComponentCrashTest(0)
  * => probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
  *
 **/
-class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
+class DetectAkkaComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._
   import cswCluster.mat
@@ -39,7 +39,7 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  test("component running on one node should detect if other component running on another node crashes") {
+  test("akka component running on one node should detect if other component running on another node crashes") {
 
     val akkaConnection = AkkaConnection(ComponentId("Container1", ComponentType.Container))
 
@@ -61,8 +61,6 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
           probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
         }
       }
-
-      Thread.sleep(2000)
 
       locationService.list.await.size shouldBe 1
     }
@@ -97,11 +95,6 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
           probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
         }
       }
-
-      Thread.sleep(2000)
-
-      locationService.list.await.size shouldBe 1
-
     }
   }
 }
