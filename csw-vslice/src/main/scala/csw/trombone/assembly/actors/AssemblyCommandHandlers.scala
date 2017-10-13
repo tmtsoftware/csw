@@ -2,7 +2,6 @@ package csw.trombone.assembly.actors
 
 import akka.typed.ActorRef
 import csw.messages.{CommandExecutionResponse, CommandMessage, CommandResponse, PubSub}
-import csw.trombone.assembly.AssemblyCommandState
 import csw.trombone.assembly.commands.{AssemblyCommand, AssemblyState}
 
 trait AssemblyCommandHandlers {

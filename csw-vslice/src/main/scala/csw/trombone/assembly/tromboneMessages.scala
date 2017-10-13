@@ -8,9 +8,8 @@ import csw.messages.params.generics.Parameter
 import csw.messages.params.models.Choice
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandExecutionResponse, CommandMessage, CommandResponse, SupervisorExternalMessage}
-import csw.trombone.assembly.actors.CommandExecutionState
 import csw.trombone.assembly.actors.TromboneState.TromboneState
-import csw.trombone.assembly.commands.{AssemblyCommand, AssemblyState}
+import csw.trombone.assembly.commands.AssemblyState
 
 sealed trait FollowCommandMessages
 object FollowCommandMessages {
@@ -111,6 +110,3 @@ object AssemblyCommandHandlerMsgs {
       extends ExecutingMsgs
       with FollowingMsgs
 }
-
-case class AssemblyCommandState(mayBeAssemblyCommand: Option[AssemblyCommand],
-                                commandExecutionState: CommandExecutionState)
