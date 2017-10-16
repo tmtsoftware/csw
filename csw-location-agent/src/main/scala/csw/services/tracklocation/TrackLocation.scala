@@ -23,9 +23,9 @@ import scala.util.control.NonFatal
 class TrackLocation(names: List[String], command: Command, actorSystem: ActorSystem)
     extends LocationAgentLogger.Simple {
 
-  private val cswCluster      = CswCluster.withSystem(actorSystem)
-  private val locationService = LocationServiceFactory.withCluster(cswCluster)
-
+  private val cswCluster       = CswCluster.withSystem(actorSystem)
+  private val locationService  = LocationServiceFactory.withCluster(cswCluster)
+  private val logAdminActorRef = LogAdminActorFactory.make(actorSystem)
   import cswCluster._
 
   def run(): Process =
@@ -46,7 +46,7 @@ class TrackLocation(names: List[String], command: Command, actorSystem: ActorSys
   private def registerName(name: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
     val connection  = TcpConnection(componentId)
-    locationService.register(TcpRegistration(connection, command.port, LogAdminActorFactory.make(actorSystem)))
+    locationService.register(TcpRegistration(connection, command.port, logAdminActorRef))
   }
 
   /**

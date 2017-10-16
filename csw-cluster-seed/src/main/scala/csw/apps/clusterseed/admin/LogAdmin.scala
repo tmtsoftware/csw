@@ -24,10 +24,11 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
     implicit val timeout: Timeout = Timeout(5.seconds)
     await(getLocation(componentFullName)) match {
       case Some(location) ⇒
-        log.info("Getting log information from logging system", Map("location" → location.toString))
-        await(
-          typedLogAdminActor(location) ? (GetComponentLogMetadata(componentName(location), _))
-        )
+        log.info("Getting log information from logging system",
+                 Map("componentName" → componentFullName, "location" → location.toString))
+        val logAdminActor = location.logAdminActorRef.upcast[LogControlMessages]
+        val componentName = location.connection.componentId.name
+        await(logAdminActor ? (GetComponentLogMetadata(componentName, _)))
       case _ ⇒ throw UnresolvedAkkaOrHttpLocationException(componentFullName)
     }
   }
@@ -36,8 +37,11 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
     async {
       await(getLocation(componentFullName)) match {
         case Some(location) ⇒
-          log.info(s"Setting log level to $logLevel", Map("location" → location.toString))
-          typedLogAdminActor(location) ! SetComponentLogLevel(componentName(location), logLevel)
+          log.info(s"Setting log level to $logLevel",
+                   Map("componentName" → componentFullName, "location" → location.toString))
+          val logAdminActor = location.logAdminActorRef.upcast[LogControlMessages]
+          val componentName = location.connection.componentId.name
+          logAdminActor ! SetComponentLogLevel(componentName, logLevel)
         case _ ⇒ throw UnresolvedAkkaOrHttpLocationException(componentFullName)
       }
     }
@@ -50,12 +54,4 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
         case _                          ⇒ throw InvalidComponentNameException(componentFullName)
       }
     }
-
-  private def typedLogAdminActor(location: Location) = {
-    location.logAdminActorRef.upcast[LogControlMessages]
-  }
-
-  private def componentName(location: Location) = {
-    location.connection.componentId.name
-  }
 }

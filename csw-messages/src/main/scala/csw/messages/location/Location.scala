@@ -36,7 +36,7 @@ final case class AkkaLocation(
     require(typeManifest == messageManifest,
             s"actorRef for type $messageManifest can not handle messages of type $typeManifest")
 
-    actorRef.asInstanceOf[ActorRef[T]]
+    actorRef.upcast[T]
   }
 }
 
