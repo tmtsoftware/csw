@@ -46,20 +46,20 @@ class AssemblyCommandBehavior(
   def onNotFollowing(msg: NotFollowingMsgs): Unit = msg match {
     case CommandMessageE(commandMessage) =>
       val assemblyCommandState = assemblyCommandHandlers.onNotFollowing(commandMessage)
-      executeCommand(assemblyCommandState.mayBeAssemblyCommand.get, commandMessage.replyTo)
+      assemblyCommandState.mayBeAssemblyCommand.foreach(x ⇒ x.foreach(executeCommand(_, commandMessage.replyTo)))
   }
 
   def onFollowing(msg: FollowingMsgs): Unit = msg match {
     case CommandMessageE(commandMessage) =>
       val assemblyCommandState = assemblyCommandHandlers.onFollowing(commandMessage)
-      executeFollow(assemblyCommandState.mayBeAssemblyCommand.get, commandMessage.replyTo)
+      assemblyCommandState.mayBeAssemblyCommand.foreach(x ⇒ x.foreach(executeCommand(_, commandMessage.replyTo)))
     case CommandComplete(replyTo, result) => assemblyCommandHandlers.onFollowingCommandComplete(replyTo, result)
   }
 
   def onExecuting(msg: ExecutingMsgs): Unit = msg match {
     case CommandMessageE(commandMessage) =>
       val assemblyCommandState = assemblyCommandHandlers.onExecuting(commandMessage)
-      executeCommand(assemblyCommandState.mayBeAssemblyCommand.get, commandMessage.replyTo)
+      assemblyCommandState.mayBeAssemblyCommand.foreach(x ⇒ x.foreach(executeCommand(_, commandMessage.replyTo)))
     case CommandComplete(replyTo, result) =>
       assemblyCommandHandlers.onExecutingCommandComplete(replyTo, result)
       commandExecutionState = CommandExecutionState.NotFollowing

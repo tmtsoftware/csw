@@ -58,36 +58,47 @@ class TromboneCommandHandler(
 
         case ac.datumCK =>
           AssemblyCommandState(
-            Some(new DatumCommand(ctx, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor)),
+            Some(
+              List(new DatumCommand(ctx, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor))
+            ),
             CommandExecutionState.Executing
           )
         case ac.moveCK =>
           AssemblyCommandState(
             Some(
-              new MoveCommand(ctx, ac, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor)
+              List(
+                new MoveCommand(ctx, ac, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor)
+              )
             ),
             CommandExecutionState.Executing
           )
         case ac.positionCK =>
           AssemblyCommandState(
             Some(
-              new PositionCommand(ctx, ac, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor)
+              List(
+                new PositionCommand(ctx,
+                                    ac,
+                                    s,
+                                    tromboneHCD,
+                                    currentState.asInstanceOf[TromboneState],
+                                    tromboneStateActor)
+              )
             ),
             CommandExecutionState.Executing
           )
         case ac.setElevationCK =>
           setElevationItem = s(ac.naElevationKey)
-          AssemblyCommandState(
-            Some(
-              new SetElevationCommand(ctx,
-                                      ac,
-                                      s,
-                                      tromboneHCD,
-                                      currentState.asInstanceOf[TromboneState],
-                                      tromboneStateActor)
-            ),
-            CommandExecutionState.Executing
-          )
+          AssemblyCommandState(Some(
+                                 List(
+                                   new SetElevationCommand(ctx,
+                                                           ac,
+                                                           s,
+                                                           tromboneHCD,
+                                                           currentState.asInstanceOf[TromboneState],
+                                                           tromboneStateActor)
+                                 )
+                               ),
+                               CommandExecutionState.Executing)
 
         case ac.followCK =>
           val nssItem = s(ac.nssInUseKey)
@@ -96,7 +107,9 @@ class TromboneCommandHandler(
           )
           AssemblyCommandState(
             Some(
-              new FollowCommand(ctx, ac, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor)
+              List(
+                new FollowCommand(ctx, ac, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor)
+              )
             ),
             CommandExecutionState.Following
           )
@@ -139,13 +152,15 @@ class TromboneCommandHandler(
         case ac.setAngleCK =>
           AssemblyCommandState(
             Some(
-              new SetAngleCommand(ctx,
-                                  ac,
-                                  s,
-                                  followCommandActor,
-                                  tromboneHCD,
-                                  currentState.asInstanceOf[TromboneState],
-                                  tromboneStateActor)
+              List(
+                new SetAngleCommand(ctx,
+                                    ac,
+                                    s,
+                                    followCommandActor,
+                                    tromboneHCD,
+                                    currentState.asInstanceOf[TromboneState],
+                                    tromboneStateActor)
+              )
             ),
             CommandExecutionState.Following
           )
