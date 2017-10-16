@@ -8,7 +8,7 @@ import csw.services.logging.internal.LogControlMessages
 class RegistrationFactory(logAdminActorRef: ActorRef[LogControlMessages]) {
   def akkaTyped(
       akkaConnection: AkkaConnection,
-      actorRef: ActorRef[Nothing],
+      actorRef: ActorRef[Nothing]
   ): AkkaRegistration =
     AkkaRegistration.apply(akkaConnection, actorRef, logAdminActorRef)
 }
