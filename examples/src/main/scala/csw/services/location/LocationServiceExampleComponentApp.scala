@@ -12,6 +12,7 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.commons.ExampleLogger
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
+import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.duration._
@@ -53,10 +54,11 @@ object LocationServiceExampleComponent {
 class LocationServiceExampleComponent(locationService: LocationService) extends ExampleLogger.Actor {
 
   log.info("In actor LocationServiceExampleComponent")
-  val adminActorRef: typed.ActorRef[Nothing] = ActorSystemFactory.remote().spawn(Behavior.empty, "my-actor-1-admin")
+  val logAdminActorRef: typed.ActorRef[LogControlMessages] =
+    ActorSystemFactory.remote().spawn(Behavior.empty, "my-actor-1-admin")
   // Register with the location service
   val registrationResult: Future[RegistrationResult] =
-    locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self, adminActorRef))
+    locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self, logAdminActorRef))
   Await.result(registrationResult, 5.seconds)
 
   log.info("LocationServiceExampleComponent registered.")

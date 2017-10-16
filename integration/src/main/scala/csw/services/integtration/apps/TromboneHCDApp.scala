@@ -10,18 +10,19 @@ import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.CswCluster
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.logging.internal.LogControlMessages
 
 object TromboneHCD {
   private val cswCluster = CswCluster.make()
 
   val hcdActorSystem = ActorSystem("trombone-hcd-system")
 
-  val tromboneHcdActorRef: ActorRef          = hcdActorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
-  val adminActorRef: typed.ActorRef[Nothing] = hcdActorSystem.spawn(Behavior.empty, "trombone-hcd-admin")
-  val componentId                            = ComponentId("trombonehcd", ComponentType.HCD)
-  val connection                             = AkkaConnection(componentId)
+  val tromboneHcdActorRef: ActorRef                        = hcdActorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
+  val logAdminActorRef: typed.ActorRef[LogControlMessages] = hcdActorSystem.spawn(Behavior.empty, "trombone-hcd-admin")
+  val componentId                                          = ComponentId("trombonehcd", ComponentType.HCD)
+  val connection                                           = AkkaConnection(componentId)
 
-  val registration                           = AkkaRegistration(connection, tromboneHcdActorRef, adminActorRef)
+  val registration                           = AkkaRegistration(connection, tromboneHcdActorRef, logAdminActorRef)
   private val locationService                = LocationServiceFactory.withCluster(cswCluster)
   val registrationResult: RegistrationResult = locationService.register(registration).await
 

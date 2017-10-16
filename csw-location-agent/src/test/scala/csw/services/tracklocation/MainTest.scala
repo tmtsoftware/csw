@@ -3,13 +3,13 @@ package csw.services.tracklocation
 import java.net.URI
 import java.nio.file.Paths
 
+import akka.typed.ActorRef
 import com.typesafe.config.ConfigFactory
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.services.location.commons.ClusterAwareSettings
+import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.internal.Networks
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.tracklocation.common.LocationFactory
 import csw.services.tracklocation.common.TestFutureExtension.RichFuture
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -24,7 +24,8 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552))
+  private val clusterSettings: ClusterSettings = ClusterAwareSettings.onPort(3552)
+  private val locationService                  = LocationServiceFactory.withSystem(clusterSettings.system)
 
   override protected def afterAll(): Unit = locationService.shutdown().await
 
@@ -53,7 +54,9 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     val connection       = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
-    resolvedLocation shouldBe LocationFactory.tcp(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
+    resolvedLocation.connection shouldBe connection
+    resolvedLocation.uri shouldBe new URI(s"tcp://${new Networks().hostname()}:$port")
+    resolvedLocation.logAdminActorRef.isInstanceOf[ActorRef[_]] shouldBe true
 
     process.destroy()
     Thread.sleep(1000)

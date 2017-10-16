@@ -16,14 +16,14 @@ import csw.services.logging.internal.LogControlMessages
 object AssemblyApp {
   private val cswCluster = CswCluster.withSettings(ClusterSettings().withInterface("eth1"))
 
-  private val actorSystem: ActorSystem                  = ActorSystemFactory.remote()
-  val assemblyActorRef: ActorRef                        = actorSystem.actorOf(Props[AssemblyApp], "assembly")
-  val adminActorRef: typed.ActorRef[LogControlMessages] = actorSystem.spawn(Behavior.empty, "my-actor-1-admin")
-  val componentId                                       = ComponentId("assembly", ComponentType.Assembly)
-  val connection                                        = AkkaConnection(componentId)
+  private val actorSystem: ActorSystem                     = ActorSystemFactory.remote()
+  val assemblyActorRef: ActorRef                           = actorSystem.actorOf(Props[AssemblyApp], "assembly")
+  val logAdminActorRef: typed.ActorRef[LogControlMessages] = actorSystem.spawn(Behavior.empty, "my-actor-1-admin")
+  val componentId                                          = ComponentId("assembly", ComponentType.Assembly)
+  val connection                                           = AkkaConnection(componentId)
 
   val actorPath: ActorPath = ActorPath.fromString(Serialization.serializedActorPath(assemblyActorRef))
-  val registration         = AkkaRegistration(connection, assemblyActorRef, adminActorRef)
+  val registration         = AkkaRegistration(connection, assemblyActorRef, logAdminActorRef)
   val registrationResult: RegistrationResult =
     LocationServiceFactory.withCluster(cswCluster).register(registration).await
 

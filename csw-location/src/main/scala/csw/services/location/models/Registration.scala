@@ -10,6 +10,7 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location._
 import csw.services.location.commons.LocationServiceLogger
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
+import csw.services.logging.internal.LogControlMessages
 
 /**
  * Registration holds information about a connection and its live location. This model is used to register a connection with LocationService.
@@ -31,8 +32,11 @@ sealed abstract class Registration {
  * @param actorRef Provide a remote actor that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
  */
-final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef[_], logAdminActorRef: ActorRef[_])
-    extends Registration
+final case class AkkaRegistration(
+    connection: AkkaConnection,
+    actorRef: ActorRef[Nothing],
+    logAdminActorRef: ActorRef[LogControlMessages]
+) extends Registration
     with LocationServiceLogger.Simple {
 
   // ActorPath represents the akka path of an Actor
@@ -60,7 +64,7 @@ final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef
  *
  * @param port Provide the port where Tcp service is available
  */
-final case class TcpRegistration(connection: TcpConnection, port: Int, logAdminActorRef: ActorRef[_])
+final case class TcpRegistration(connection: TcpConnection, port: Int, logAdminActorRef: ActorRef[LogControlMessages])
     extends Registration {
 
   /**
@@ -78,8 +82,12 @@ final case class TcpRegistration(connection: TcpConnection, port: Int, logAdminA
  * @param port Provide the port where Http service is available
  * @param path Provide the path to reach the available http service
  */
-final case class HttpRegistration(connection: HttpConnection, port: Int, path: String, logAdminActorRef: ActorRef[_])
-    extends Registration {
+final case class HttpRegistration(
+    connection: HttpConnection,
+    port: Int,
+    path: String,
+    logAdminActorRef: ActorRef[LogControlMessages]
+) extends Registration {
 
   /**
    * Create a HttpLocation that represents the live Http service

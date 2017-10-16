@@ -59,9 +59,9 @@ object DemoApp extends App {
 
   private def spawnContainer(): ActorRef[ContainerMessage] = {
 
-    val config        = ConfigFactory.load("laser_container.conf")
-    val adminActorRef = LogAdminActorFactory.make(frameworkWiring.actorSystem)
-    val containerRef  = Await.result(Container.spawn(config, frameworkWiring, adminActorRef), 5.seconds)
+    val config           = ConfigFactory.load("laser_container.conf")
+    val logAdminActorRef = LogAdminActorFactory.make(frameworkWiring.actorSystem)
+    val containerRef     = Await.result(Container.spawn(config, frameworkWiring, logAdminActorRef), 5.seconds)
 
     val containerStateProbe = TestProbe[ContainerLifecycleState]
     assertThatContainerIsRunning(containerRef, containerStateProbe, 5.seconds)

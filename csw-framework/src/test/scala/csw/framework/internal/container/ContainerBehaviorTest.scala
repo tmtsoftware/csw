@@ -86,7 +86,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     ).thenAnswer(answer)
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
-    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], any[ActorRef[_]]))
+    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], any[ActorRef[LogControlMessages]]))
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =

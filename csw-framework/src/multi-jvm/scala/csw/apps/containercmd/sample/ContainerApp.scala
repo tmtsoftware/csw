@@ -24,8 +24,9 @@ object ContainerApp extends App {
   implicit val testkit: TestKitSettings                = TestKitSettings(actorSystem)
   private val wiring                                   = FrameworkWiring.make(system)
   private val config: Config                           = ConfigFactory.load("laser_container.conf")
-  private val adminActorRef                            = LogAdminActorFactory.make(system)
-  private val ref: ActorRef[ContainerMessage]          = Await.result(Container.spawn(config, wiring, adminActorRef), 5.seconds)
+  private val logAdminActorRef                         = LogAdminActorFactory.make(system)
+  private val ref: ActorRef[ContainerMessage] =
+    Await.result(Container.spawn(config, wiring, logAdminActorRef), 5.seconds)
 
   Thread.sleep(2000)
 

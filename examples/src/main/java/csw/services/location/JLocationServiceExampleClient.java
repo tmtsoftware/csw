@@ -55,7 +55,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
     private IRegistrationResult httpRegResult;
     private IRegistrationResult hcdRegResult;
     private IRegistrationResult assemblyRegResult;
-    private akka.typed.ActorRef<LogControlMessages> adminActorRef = LogAdminActorFactory.make(context().system());
+    private akka.typed.ActorRef<LogControlMessages> logAdminActorRef = LogAdminActorFactory.make(context().system());
 
     private static LoggingSystem loggingSystem;
 
@@ -85,7 +85,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         //#Components-Connections-Registrations
         // dummy http connection
         HttpConnection httpConnection   = new HttpConnection(new ComponentId("configuration", JComponentType.Service));
-        HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123", adminActorRef);
+        HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123", logAdminActorRef);
         httpRegResult = locationService.register(httpRegistration).get();
 
         // dummy HCD connection
@@ -98,12 +98,12 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
                 }),
                 "my-actor-1"
         );
-        AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, Adapter.toTyped(actorRef), adminActorRef);
+        AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, Adapter.toTyped(actorRef), logAdminActorRef);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         //. register the client "assembly" created in this example
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
-        AkkaRegistration assemblyRegistration = new AkkaRegistration(assemblyConnection, Adapter.toTyped(getSelf()), adminActorRef);
+        AkkaRegistration assemblyRegistration = new AkkaRegistration(assemblyConnection, Adapter.toTyped(getSelf()), logAdminActorRef);
         assemblyRegResult = locationService.register(assemblyRegistration).get();
         //#Components-Connections-Registrations
     }

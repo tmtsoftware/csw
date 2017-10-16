@@ -54,9 +54,9 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
           log.info(
             s"Setting log level to $logLevel",
             Map(
-              "componentName" → componentFullName,
-              "actorRef"      → actorRef.toString,
-              "adminActorRef" → logAdminActorRef.toString
+              "componentName"    → componentFullName,
+              "actorRef"         → actorRef.toString,
+              "logAdminActorRef" → logAdminActorRef.toString
             )
           )
           logAdminActorTyped(logAdminActorRef) ! SetComponentLogLevel(connection.componentId.name, logLevel)

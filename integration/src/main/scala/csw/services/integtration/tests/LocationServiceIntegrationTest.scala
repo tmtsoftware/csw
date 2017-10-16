@@ -31,11 +31,11 @@ class LocationServiceIntegrationTest
 
   test("should not allow duplicate akka registration") {
     val tromboneHcdActorRef = system.actorOf(Props[TromboneHCD], "trombone-hcd")
-    val adminActorRef       = system.spawn(Behavior.empty, "trombone-admin")
+    val logAdminActorRef    = system.spawn(Behavior.empty, "trombone-admin")
     val componentId         = ComponentId("trombonehcd", ComponentType.HCD)
     val connection          = AkkaConnection(componentId)
 
-    val registration = AkkaRegistration(connection, tromboneHcdActorRef, adminActorRef)
+    val registration = AkkaRegistration(connection, tromboneHcdActorRef, logAdminActorRef)
     Thread.sleep(4000)
     intercept[OtherLocationIsRegistered] {
       locationService.register(registration).await

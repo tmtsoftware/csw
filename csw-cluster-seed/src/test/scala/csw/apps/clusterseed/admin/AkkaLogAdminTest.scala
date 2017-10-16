@@ -65,10 +65,10 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   }
 
   def startContainerAndWaitForRunning(): ActorRef[ContainerMessage] = {
-    val frameworkWiring = FrameworkWiring.make(containerActorSystem)
-    val adminActorRef   = LogAdminActorFactory.make(containerActorSystem)
-    val config          = ConfigFactory.load("laser_container.conf")
-    val containerRef    = Await.result(Container.spawn(config, frameworkWiring, adminActorRef), 5.seconds)
+    val frameworkWiring  = FrameworkWiring.make(containerActorSystem)
+    val logAdminActorRef = LogAdminActorFactory.make(containerActorSystem)
+    val config           = ConfigFactory.load("laser_container.conf")
+    val containerRef     = Await.result(Container.spawn(config, frameworkWiring, logAdminActorRef), 5.seconds)
 
     val containerStateProbe = TestProbe[ContainerLifecycleState]
     assertThatContainerIsRunning(containerRef, containerStateProbe, 5.seconds)

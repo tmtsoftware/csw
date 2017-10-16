@@ -67,7 +67,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds
-  private val adminActorRef: ActorRef[LogControlMessages] =
+  private val logAdminActorRef: ActorRef[LogControlMessages] =
     LogAdminActorFactory.make(context.system)
 
   // EXAMPLE DEMO START
@@ -97,12 +97,12 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
       override def receive: Receive = {
         case "print" => log.info("hello world")
       }
-    }), name = "my-actor-1"), adminActorRef)
+    }), name = "my-actor-1"), logAdminActorRef)
   val hcdRegResult: RegistrationResult = Await.result(locationService.register(hcdRegistration), 2.seconds)
 
   //register the client "assembly" created in this example
   val assemblyConnection                    = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
-  val assemblyRegistration                  = AkkaRegistration(assemblyConnection, self, adminActorRef)
+  val assemblyRegistration                  = AkkaRegistration(assemblyConnection, self, logAdminActorRef)
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations
 
