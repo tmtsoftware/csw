@@ -2,13 +2,9 @@ package csw.services.config.client.commons
 
 import java.net.URI
 
-import akka.typed.ActorRef
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
-import csw.messages.location.{AkkaLocation, HttpLocation}
+import csw.messages.location.Connection.HttpConnection
+import csw.messages.location.HttpLocation
 
 object LocationFactory {
-  def akka(connection: AkkaConnection, uri: URI, actorRef: ActorRef[_]) =
-    AkkaLocation(connection, uri, actorRef, null)
-
   def http(connection: HttpConnection, uri: URI) = HttpLocation(connection, uri, null)
 }
