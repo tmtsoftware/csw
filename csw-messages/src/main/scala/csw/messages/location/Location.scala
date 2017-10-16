@@ -16,6 +16,7 @@ import scala.reflect.ClassTag
 sealed abstract class Location extends TMTSerializable {
   def connection: Connection
   def uri: URI
+  def logAdminActorRef: ActorRef[Nothing]
 }
 
 /**
@@ -37,15 +38,25 @@ final case class AkkaLocation(
 
     actorRef.asInstanceOf[ActorRef[T]]
   }
+
+  override def toString: String =
+    s"connection: [${connection.name}], actorRef: [${actorRef.toString}], logAdminActorRef: [${logAdminActorRef.toString}]"
 }
 
 /**
  * Represents a live Tcp connection
  */
-final case class TcpLocation(connection: TcpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing]) extends Location
+final case class TcpLocation(connection: TcpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing])
+    extends Location {
+  override def toString: String =
+    s"connection: [${connection.name}], uri: [${uri.toString}], logAdminActorRef: [${logAdminActorRef.toString}]"
+}
 
 /**
  * Represents a live Http connection
  */
 final case class HttpLocation(connection: HttpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing])
-    extends Location
+    extends Location {
+  override def toString: String =
+    s"connection: [${connection.name}], uri: [${uri.toString}], logAdminActorRef: [${logAdminActorRef.toString}]"
+}

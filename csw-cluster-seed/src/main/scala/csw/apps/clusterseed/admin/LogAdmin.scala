@@ -1,13 +1,12 @@
 package csw.apps.clusterseed.admin
 
-import akka.typed.ActorRef
 import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaOrHttpLocationException}
 import csw.apps.clusterseed.admin.internal.ActorRuntime
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
-import csw.messages.location.{AkkaLocation, Connection, HttpLocation, Location}
+import csw.messages.location.{Connection, Location}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.internal.{GetComponentLogMetadata, LogControlMessages, SetComponentLogLevel}
@@ -22,27 +21,13 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
   import actorRuntime._
 
   def getLogMetadata(componentFullName: String): Future[LogMetadata] = async {
+    implicit val timeout: Timeout = Timeout(5.seconds)
     await(getLocation(componentFullName)) match {
-      case Some(AkkaLocation(connection, _, actorRef, logAdminActorRef)) ⇒
-        log.info(
-          "Getting log information from logging system",
-          Map(
-            "componentName"    → componentFullName,
-            "actorRef"         → actorRef.toString,
-            "logAdminActorRef" → logAdminActorRef.toString
-          )
+      case Some(loc: Location) ⇒
+        log.info("Getting log information from logging system", Map("location" → loc.toString))
+        await(
+          typedLogAdminActor(loc) ? (GetComponentLogMetadata(componentName(loc), _))
         )
-        await(getLogMetadata(logAdminActorRef, connection.componentId.name))
-      case Some(HttpLocation(connection, uri, logAdminActorRef)) ⇒
-        log.info(
-          "Getting log information from logging system",
-          Map(
-            "componentName"    → componentFullName,
-            "uri"              → uri.toString,
-            "logAdminActorRef" → logAdminActorRef.toString
-          )
-        )
-        await(getLogMetadata(logAdminActorRef, connection.componentId.name))
       case _ ⇒ throw UnresolvedAkkaOrHttpLocationException(componentFullName)
     }
   }
@@ -50,34 +35,12 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
   def setLogLevel(componentFullName: String, logLevel: Level): Future[Unit] =
     async {
       await(getLocation(componentFullName)) match {
-        case Some(akkaLocation @ AkkaLocation(connection, _, actorRef, logAdminActorRef)) ⇒
-          log.info(
-            s"Setting log level to $logLevel",
-            Map(
-              "componentName"    → componentFullName,
-              "actorRef"         → actorRef.toString,
-              "logAdminActorRef" → logAdminActorRef.toString
-            )
-          )
-          logAdminActorTyped(logAdminActorRef) ! SetComponentLogLevel(connection.componentId.name, logLevel)
-        case Some(HttpLocation(connection, uri, logAdminActorRef)) ⇒
-          log.info(
-            s"Setting log level to $logLevel",
-            Map(
-              "componentName"    → componentFullName,
-              "uri"              → uri.toString,
-              "logAdminActorRef" → logAdminActorRef.toString
-            )
-          )
-          logAdminActorTyped(logAdminActorRef) ! SetComponentLogLevel(connection.componentId.name, logLevel)
+        case Some(loc: Location) ⇒
+          log.info(s"Setting log level to $logLevel", Map("location" → loc.toString))
+          typedLogAdminActor(loc) ! SetComponentLogLevel(componentName(loc), logLevel)
         case _ ⇒ throw UnresolvedAkkaOrHttpLocationException(componentFullName)
       }
     }
-
-  private def getLogMetadata(logAdminActorRef: ActorRef[Nothing], componentName: String): Future[LogMetadata] = {
-    implicit val timeout: Timeout = Timeout(5.seconds)
-    logAdminActorTyped(logAdminActorRef) ? (GetComponentLogMetadata(componentName, _))
-  }
 
   private def getLocation(componentFullName: String): Future[Option[Location]] =
     async {
@@ -88,6 +51,11 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
       }
     }
 
-  private def logAdminActorTyped(logAdminActorRef: ActorRef[_]) =
-    logAdminActorRef.asInstanceOf[ActorRef[LogControlMessages]]
+  private def typedLogAdminActor(loc: Location) = {
+    loc.logAdminActorRef.upcast[LogControlMessages]
+  }
+
+  private def componentName(loc: Location) = {
+    loc.connection.componentId.name
+  }
 }
