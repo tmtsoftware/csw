@@ -31,7 +31,7 @@ sealed abstract class Registration {
  * @param actorRef Provide a remote actor that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
  */
-final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef[_], adminActorRef: ActorRef[_])
+final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef[_], logAdminActorRef: ActorRef[_])
     extends Registration
     with LocationServiceLogger.Simple {
 
@@ -52,7 +52,7 @@ final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef
   /**
    * Create a AkkaLocation that represents the live connection offered by the actor
    */
-  override def location(hostname: String): Location = AkkaLocation(connection, uri, actorRef, adminActorRef)
+  override def location(hostname: String): Location = AkkaLocation(connection, uri, actorRef, logAdminActorRef)
 }
 
 /**
@@ -60,14 +60,16 @@ final case class AkkaRegistration(connection: AkkaConnection, actorRef: ActorRef
  *
  * @param port Provide the port where Tcp service is available
  */
-final case class TcpRegistration(connection: TcpConnection, port: Int) extends Registration {
+final case class TcpRegistration(connection: TcpConnection, port: Int, logAdminActorRef: ActorRef[_])
+    extends Registration {
 
   /**
    * Create a TcpLocation that represents the live Tcp service
    *
    * @param hostname Provide the hostname where Tcp service is available
    */
-  override def location(hostname: String): Location = TcpLocation(connection, new URI(s"tcp://$hostname:$port"))
+  override def location(hostname: String): Location =
+    TcpLocation(connection, new URI(s"tcp://$hostname:$port"), logAdminActorRef)
 }
 
 /**

@@ -56,9 +56,9 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val port     = 9596
 
     val tcpConnection   = TcpConnection(ComponentId("lgsTrombone", ComponentType.HCD))
-    val tcpRegistration = TcpRegistration(tcpConnection, port)
+    val tcpRegistration = RegistrationFactory.tcp(tcpConnection, port)
 
-    val expectedTcpLocation = TcpLocation(tcpConnection, new URI(s"tcp://$hostname:$port"))
+    val expectedTcpLocation = LocationFactory.tcp(tcpConnection, new URI(s"tcp://$hostname:$port"))
 
     tcpRegistration.location(hostname) shouldBe expectedTcpLocation
   }

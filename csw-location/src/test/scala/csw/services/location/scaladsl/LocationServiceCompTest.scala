@@ -41,7 +41,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val componentId: ComponentId         = ComponentId("exampleTCPService", ComponentType.Service)
     val connection: TcpConnection        = TcpConnection(componentId)
     val Port: Int                        = 1234
-    val tcpRegistration: TcpRegistration = TcpRegistration(connection, Port)
+    val tcpRegistration: TcpRegistration = RegistrationFactory.tcp(connection, Port)
 
     // register, resolve & list tcp connection for the first time
     locationService.register(tcpRegistration).await
@@ -146,10 +146,10 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
   ) {
     val Port               = 1234
     val redis1Connection   = TcpConnection(ComponentId("redis1", ComponentType.Service))
-    val redis1Registration = TcpRegistration(redis1Connection, Port)
+    val redis1Registration = RegistrationFactory.tcp(redis1Connection, Port)
 
     val redis2Connection   = TcpConnection(ComponentId("redis2", ComponentType.Service))
-    val redis2registration = TcpRegistration(redis2Connection, Port)
+    val redis2registration = RegistrationFactory.tcp(redis2Connection, Port)
 
     val (switch, probe) = locationService.track(redis1Connection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
 
@@ -172,7 +172,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val hostname           = new Networks().hostname()
     val Port               = 1234
     val redis1Connection   = TcpConnection(ComponentId("redis1", ComponentType.Service))
-    val redis1Registration = TcpRegistration(redis1Connection, Port)
+    val redis1Registration = RegistrationFactory.tcp(redis1Connection, Port)
 
     val probe = TestProbe()
 
@@ -268,8 +268,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
   test("should not register a different Registration(connection + port/URI/actorRef) against already registered name") {
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
-    val duplicateTcpRegistration = TcpRegistration(connection, 1234)
-    val tcpRegistration          = TcpRegistration(connection, 1111)
+    val duplicateTcpRegistration = RegistrationFactory.tcp(connection, 1234)
+    val tcpRegistration          = RegistrationFactory.tcp(connection, 1111)
 
     val result = locationService.register(tcpRegistration).await
 
@@ -286,8 +286,8 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     val componentId = ComponentId("redis4", ComponentType.Service)
     val connection  = TcpConnection(componentId)
 
-    val duplicateTcpRegistration = TcpRegistration(connection, 1234)
-    val tcpRegistration          = TcpRegistration(connection, 1234)
+    val duplicateTcpRegistration = RegistrationFactory.tcp(connection, 1234)
+    val tcpRegistration          = RegistrationFactory.tcp(connection, 1234)
 
     val result = locationService.register(tcpRegistration).await
 
@@ -307,7 +307,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
   test("unregistering an already unregistered connection does not result in failure") {
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
-    val tcpRegistration = TcpRegistration(connection, 1111)
+    val tcpRegistration = RegistrationFactory.tcp(connection, 1111)
 
     val result = locationService.register(tcpRegistration).await
 
@@ -317,7 +317,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
 
   test("should able to resolve tcp connection") {
     val connection = TcpConnection(ComponentId("redis5", ComponentType.Service))
-    locationService.register(TcpRegistration(connection, 1234)).await
+    locationService.register(RegistrationFactory.tcp(connection, 1234)).await
 
     locationService.find(connection).await.get.connection shouldBe connection
   }
@@ -329,10 +329,10 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     locationService.register(RegistrationFactory.akka(hcdConnection, actorRef)).await
 
     val redisConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
-    locationService.register(TcpRegistration(redisConnection, 1234)).await
+    locationService.register(RegistrationFactory.tcp(redisConnection, 1234)).await
 
     val configServiceConnection = TcpConnection(ComponentId("configservice", ComponentType.Service))
-    locationService.register(TcpRegistration(configServiceConnection, 1234)).await
+    locationService.register(RegistrationFactory.tcp(configServiceConnection, 1234)).await
 
     locationService.list(ComponentType.HCD).await.map(_.connection) shouldBe List(hcdConnection)
 
@@ -351,10 +351,10 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     locationService.register(RegistrationFactory.akka(hcdAkkaConnection, actorRef)).await
 
     val redisTcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
-    locationService.register(TcpRegistration(redisTcpConnection, 1234)).await
+    locationService.register(RegistrationFactory.tcp(redisTcpConnection, 1234)).await
 
     val configTcpConnection = TcpConnection(ComponentId("configservice", ComponentType.Service))
-    locationService.register(TcpRegistration(configTcpConnection, 1234)).await
+    locationService.register(RegistrationFactory.tcp(configTcpConnection, 1234)).await
 
     val assemblyHttpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
     locationService.register(RegistrationFactory.http(assemblyHttpConnection, 1234, "path123")).await
@@ -371,7 +371,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
 
   test("should filter connections based on hostname") {
     val tcpConnection = TcpConnection(ComponentId("redis", ComponentType.Service))
-    locationService.register(TcpRegistration(tcpConnection, 1234)).await
+    locationService.register(RegistrationFactory.tcp(tcpConnection, 1234)).await
 
     val httpConnection = HttpConnection(ComponentId("assembly1", ComponentType.Assembly))
     locationService.register(RegistrationFactory.http(httpConnection, 1234, "path123")).await
@@ -394,10 +394,10 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
   test("should able to unregister all components") {
     val Port               = 1234
     val redis1Connection   = TcpConnection(ComponentId("redis1", ComponentType.Service))
-    val redis1Registration = TcpRegistration(redis1Connection, Port)
+    val redis1Registration = RegistrationFactory.tcp(redis1Connection, Port)
 
     val redis2Connection   = TcpConnection(ComponentId("redis2", ComponentType.Service))
-    val redis2registration = TcpRegistration(redis2Connection, Port)
+    val redis2registration = RegistrationFactory.tcp(redis2Connection, Port)
 
     locationService.register(redis1Registration).await
     locationService.register(redis2registration).await

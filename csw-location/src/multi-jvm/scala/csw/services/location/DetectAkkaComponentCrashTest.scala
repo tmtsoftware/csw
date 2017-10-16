@@ -11,7 +11,6 @@ import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.HttpRegistration
 import csw.services.location.scaladsl.ActorSystemFactory
 import csw.services.logging.scaladsl.LogAdminActorFactory
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._

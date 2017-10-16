@@ -5,10 +5,11 @@ import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
 import csw.messages.location.Connection.TcpConnection
-import csw.messages.location.{ComponentId, ComponentType, TcpLocation}
+import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.internal.Networks
 import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.tracklocation.common.LocationFactory
 import csw.services.tracklocation.common.TestFutureExtension.RichFuture
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -52,7 +53,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     val connection       = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
-    resolvedLocation shouldBe TcpLocation(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
+    resolvedLocation shouldBe LocationFactory.tcp(connection, new URI(s"tcp://${new Networks().hostname()}:$port"))
 
     process.destroy()
     Thread.sleep(1000)

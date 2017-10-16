@@ -7,6 +7,7 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.CswCluster
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.logging.scaladsl.LogAdminActorFactory
 import csw.services.tracklocation.commons.LocationAgentLogger
 import csw.services.tracklocation.models.Command
 
@@ -45,7 +46,7 @@ class TrackLocation(names: List[String], command: Command, actorSystem: ActorSys
   private def registerName(name: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
     val connection  = TcpConnection(componentId)
-    locationService.register(TcpRegistration(connection, command.port))
+    locationService.register(TcpRegistration(connection, command.port, LogAdminActorFactory.make(actorSystem)))
   }
 
   /**

@@ -12,7 +12,6 @@ import csw.messages.{SupervisorExternalMessage, TMTSerializable}
 import csw.services.location.commons.RegistrationFactory
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
 import org.scalatest.BeforeAndAfterEach
 
@@ -40,7 +39,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
   test("ensure that a component registered by one node is resolved and listed on all the nodes") {
     val tcpPort         = 446
     val tcpConnection   = TcpConnection(ComponentId("reddis", ComponentType.Service))
-    val tcpRegistration = TcpRegistration(tcpConnection, tcpPort)
+    val tcpRegistration = RegistrationFactory.tcp(tcpConnection, tcpPort)
 
     val httpPort         = 81
     val httpPath         = "/test/hcd"
@@ -123,7 +122,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
     runOn(seed) {
       val tcpPort         = 470
-      val tcpRegistration = TcpRegistration(tcpConnection, tcpPort)
+      val tcpRegistration = RegistrationFactory.tcp(tcpConnection, tcpPort)
 
       locationService.register(tcpRegistration).await
       enterBarrier("Registration")

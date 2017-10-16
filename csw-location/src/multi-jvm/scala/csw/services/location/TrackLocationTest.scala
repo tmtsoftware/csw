@@ -8,7 +8,6 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location._
 import csw.services.location.commons.RegistrationFactory
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.services.location.models._
 
 import scala.concurrent.duration.DurationInt
 
@@ -87,7 +86,7 @@ class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersA
 
     runOn(member2) {
       val Port                  = 5657
-      val tcpRegistration       = TcpRegistration(tcpConnection, Port)
+      val tcpRegistration       = RegistrationFactory.tcp(tcpConnection, Port)
       val tcpRegistrationResult = locationService.register(tcpRegistration).await
 
       val (httpSwitch, httpProbe) =

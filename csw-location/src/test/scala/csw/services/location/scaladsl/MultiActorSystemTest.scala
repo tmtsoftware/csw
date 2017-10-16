@@ -3,7 +3,7 @@ package csw.services.location.scaladsl
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.location.Connection.TcpConnection
 import csw.services.location.commons.TestFutureExtension.RichFuture
-import csw.services.location.commons.{ClusterSettings, CswCluster}
+import csw.services.location.commons.{ClusterSettings, CswCluster, RegistrationFactory}
 import csw.services.location.internal.Networks
 import csw.services.location.models.TcpRegistration
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -13,7 +13,7 @@ import scala.concurrent.duration.DurationInt
 class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   val connection: TcpConnection        = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
-  val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
+  val tcpRegistration: TcpRegistration = RegistrationFactory.tcp(connection, 1234)
 
   private val locationService =
     LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().onPort(3552)))

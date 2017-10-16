@@ -6,7 +6,7 @@ import csw.messages.location.Connection.HttpConnection
 import csw.messages.location._
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.services.location.models.HttpRegistration
-import csw.services.logging.scaladsl.{LogAdminActorFactory, LoggingSystemFactory}
+import csw.services.logging.scaladsl.LogAdminActorFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -14,23 +14,12 @@ import scala.concurrent.duration._
 class DetectHttpComponentCrashTestMultiJvmNode1 extends DetectHttpComponentCrashTest(0)
 class DetectHttpComponentCrashTestMultiJvmNode2 extends DetectHttpComponentCrashTest(0)
 
-/**
- * This test is running as a part of jenkins master-slave setup forming three nodes cluster. (seed: running on jenkins master, member1: running on jenkins slave, member2: running on jenkins slave)
- * This test exercises below steps :
- * 1. Registering akka connection on member1 node
- * 2. seed(master) and member2 is tracking a akka connection which is registered on slave (member1)
- * 3. Exiting member1 using testConductor.exit(member1, 1) (tell the remote node to shut itself down using System.exit with the given
- * exitValue 1. The node will also be removed from cluster)
- * 4. Once remote member1 is exited, we are asserting that master (seed) and member2 should receive LocationRemoved event within 5 seconds
- * => probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
- *
-**/
 class DetectHttpComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) {
 
   import config._
   import cswCluster.mat
 
-  test("http component running on one node should detect if other component running on another node crashes") {
+  test("A component running on one node should detect if a http component running on another node crashes") {
 
     val httpConnection = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
 

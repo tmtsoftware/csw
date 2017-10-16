@@ -85,7 +85,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         int port = 8080;
         AkkaRegistration akkaRegistration = RegistrationFactory.akka(akkaHcdConnection, actorRef);
         HttpRegistration httpRegistration = RegistrationFactory.http(httpServiceConnection, port, Path);
-        TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
+        TcpRegistration tcpRegistration = RegistrationFactory.tcp(tcpServiceConnection, port);
 
         locationService.register(akkaRegistration).get();
         locationService.register(httpRegistration).get();
@@ -100,7 +100,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     @Test
     public void testResolveTcpConnection() throws ExecutionException, InterruptedException {
         int port = 1234;
-        TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
+        TcpRegistration tcpRegistration = RegistrationFactory.tcp(tcpServiceConnection, port);
 
         locationService.register(tcpRegistration).get();
         Assert.assertEquals(tcpRegistration.location(new Networks().hostname()), locationService.find(tcpServiceConnection).get().get());
@@ -129,7 +129,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     @Test
     public void testTcpRegistration() throws ExecutionException, InterruptedException {
         int port = 8080;
-        TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, port);
+        TcpRegistration tcpRegistration = RegistrationFactory.tcp(tcpServiceConnection, port);
 
         locationService.register(tcpRegistration).get();
         Assert.assertEquals(1, locationService.list().get().size());
@@ -159,7 +159,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         locationService.register(akkaHcdRegistration).get();
 
         //  Register Tcp service
-        TcpRegistration tcpServiceRegistration = new TcpRegistration(tcpServiceConnection, 80);
+        TcpRegistration tcpServiceRegistration = RegistrationFactory.tcp(tcpServiceConnection, 80);
         locationService.register(tcpServiceRegistration).get();
 
         Set<Location> locations = new HashSet<>();
@@ -194,7 +194,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         //  Register Tcp and Http Service
         ComponentId tcpComponentId = new ComponentId("redis", JComponentType.Service);
         TcpConnection tcpConnection = new TcpConnection(tcpComponentId);
-        TcpRegistration tcpServiceRegistration = new TcpRegistration(tcpConnection, 80);
+        TcpRegistration tcpServiceRegistration = RegistrationFactory.tcp(tcpConnection, 80);
         locationService.register(tcpServiceRegistration).get();
 
         ComponentId httpServiceComponentId = new ComponentId("ConfigService", JComponentType.Service);
@@ -228,7 +228,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     @Test
     public void testListComponentsByHostname() throws ExecutionException, InterruptedException {
         //  Register Tcp connection
-        TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, 8080);
+        TcpRegistration tcpRegistration = RegistrationFactory.tcp(tcpServiceConnection, 8080);
         locationService.register(tcpRegistration).get();
 
         //  Register Akka connection
@@ -246,7 +246,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     @Test
     public void testListComponentsByConnectionType() throws ExecutionException, InterruptedException {
         // Register Tcp connection
-        TcpRegistration tcpRegistration = new TcpRegistration(tcpServiceConnection, 80);
+        TcpRegistration tcpRegistration = RegistrationFactory.tcp(tcpServiceConnection, 80);
         locationService.register(tcpRegistration).get();
 
         // Register Http connection
@@ -277,10 +277,10 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     public void testTrackingConnection() throws ExecutionException, InterruptedException {
         int Port = 1234;
         TcpConnection redis1Connection = new TcpConnection(new ComponentId("redis1", JComponentType.Service));
-        TcpRegistration redis1Registration = new TcpRegistration(redis1Connection, Port);
+        TcpRegistration redis1Registration = RegistrationFactory.tcp(redis1Connection, Port);
 
         TcpConnection redis2Connection = new TcpConnection(new ComponentId("redis2", JComponentType.Service));
-        TcpRegistration redis2registration = new TcpRegistration(redis2Connection, Port);
+        TcpRegistration redis2registration = RegistrationFactory.tcp(redis2Connection, Port);
 
         Pair<KillSwitch, TestSubscriber.Probe<TrackingEvent>> source = locationService.track(redis1Connection).toMat(TestSink.probe(actorSystem), Keep.both()).run(mat);
 
@@ -304,7 +304,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     public void testSubscribeConnection() throws ExecutionException, InterruptedException {
         int Port = 1234;
         TcpConnection redis1Connection = new TcpConnection(new ComponentId("redis1", JComponentType.Service));
-        TcpRegistration redis1Registration = new TcpRegistration(redis1Connection, Port);
+        TcpRegistration redis1Registration = RegistrationFactory.tcp(redis1Connection, Port);
 
         //Test probe actor to receive the TrackingEvent notifications
         TestProbe probe = new TestProbe(actorSystem);

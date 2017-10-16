@@ -42,7 +42,7 @@ final case class AkkaLocation(
 /**
  * Represents a live Tcp connection
  */
-final case class TcpLocation(connection: TcpConnection, uri: URI) extends Location
+final case class TcpLocation(connection: TcpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing]) extends Location
 
 /**
  * Represents a live Http connection
