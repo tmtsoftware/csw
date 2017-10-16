@@ -51,11 +51,11 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
       }
     }
 
-  private def typedLogAdminActor(loc: Location) = {
-    loc.logAdminActorRef.upcast[LogControlMessages]
+  private def typedLogAdminActor(location: Location) = {
+    location.logAdminActorRef.upcast[LogControlMessages]
   }
 
-  private def componentName(loc: Location) = {
-    loc.connection.componentId.name
+  private def componentName(location: Location) = {
+    location.connection.componentId.name
   }
 }
