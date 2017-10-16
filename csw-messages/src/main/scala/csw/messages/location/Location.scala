@@ -38,25 +38,15 @@ final case class AkkaLocation(
 
     actorRef.asInstanceOf[ActorRef[T]]
   }
-
-  override def toString: String =
-    s"connection: [${connection.name}], actorRef: [${actorRef.toString}], logAdminActorRef: [${logAdminActorRef.toString}]"
 }
 
 /**
  * Represents a live Tcp connection
  */
-final case class TcpLocation(connection: TcpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing])
-    extends Location {
-  override def toString: String =
-    s"connection: [${connection.name}], uri: [${uri.toString}], logAdminActorRef: [$logAdminActorRef]"
-}
+final case class TcpLocation(connection: TcpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing]) extends Location
 
 /**
  * Represents a live Http connection
  */
 final case class HttpLocation(connection: HttpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing])
-    extends Location {
-  override def toString: String =
-    s"connection: [${connection.name}], uri: [${uri.toString}], logAdminActorRef: [$logAdminActorRef]"
-}
+    extends Location
