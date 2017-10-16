@@ -64,9 +64,8 @@ private[containercmd] class ContainerCmd(
       defaultConfig: Option[Config]
   ): Future[ActorRef[_]] = {
     async {
-      val logAdminActorRef = LogAdminActorFactory.make(actorSystem)
-      val config           = await(getConfig(isLocal, inputFilePath, defaultConfig))
-      val actorRef         = await(createComponent(standalone, wiring, config, logAdminActorRef))
+      val config   = await(getConfig(isLocal, inputFilePath, defaultConfig))
+      val actorRef = await(createComponent(standalone, wiring, config))
       log.info(s"Component is successfully created with actor actorRef $actorRef")
       actorRef
     }
@@ -75,11 +74,10 @@ private[containercmd] class ContainerCmd(
   private def createComponent(
       standalone: Boolean,
       wiring: FrameworkWiring,
-      config: Config,
-      logAdminActorRef: ActorRef[LogControlMessages]
+      config: Config
   ): Future[ActorRef[_]] = {
-    if (standalone) Standalone.spawn(config, wiring, logAdminActorRef)
-    else Container.spawn(config, wiring, logAdminActorRef)
+    if (standalone) Standalone.spawn(config, wiring)
+    else Container.spawn(config, wiring)
   }
 
   private def getConfig(

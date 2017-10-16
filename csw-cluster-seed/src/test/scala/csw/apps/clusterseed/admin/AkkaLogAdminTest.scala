@@ -24,7 +24,6 @@ import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
 import csw.services.logging.models.LogMetadata
-import csw.services.logging.scaladsl.LogAdminActorFactory
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
@@ -65,10 +64,9 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   }
 
   def startContainerAndWaitForRunning(): ActorRef[ContainerMessage] = {
-    val frameworkWiring  = FrameworkWiring.make(containerActorSystem)
-    val logAdminActorRef = LogAdminActorFactory.make(containerActorSystem)
-    val config           = ConfigFactory.load("laser_container.conf")
-    val containerRef     = Await.result(Container.spawn(config, frameworkWiring, logAdminActorRef), 5.seconds)
+    val frameworkWiring = FrameworkWiring.make(containerActorSystem)
+    val config          = ConfigFactory.load("laser_container.conf")
+    val containerRef    = Await.result(Container.spawn(config, frameworkWiring), 5.seconds)
 
     val containerStateProbe = TestProbe[ContainerLifecycleState]
     assertThatContainerIsRunning(containerRef, containerStateProbe, 5.seconds)

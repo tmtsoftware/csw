@@ -7,7 +7,6 @@ import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
 import csw.messages.{ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.internal.LogControlMessages
 
 object SupervisorBehaviorFactory {
 
@@ -16,8 +15,7 @@ object SupervisorBehaviorFactory {
       componentInfo: ComponentInfo,
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
-      pubSubBehaviorFactory: PubSubBehaviorFactory,
-      logAdminActorRef: ActorRef[LogControlMessages]
+      pubSubBehaviorFactory: PubSubBehaviorFactory
   ): Behavior[SupervisorExternalMessage] = {
 
     val componentWiringClass     = Class.forName(componentInfo.behaviorFactoryClassName)
@@ -29,8 +27,7 @@ object SupervisorBehaviorFactory {
       locationService,
       registrationFactory,
       pubSubBehaviorFactory,
-      componentBehaviorFactory,
-      logAdminActorRef
+      componentBehaviorFactory
     )
   }
 
@@ -40,8 +37,7 @@ object SupervisorBehaviorFactory {
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
       pubSubBehaviorFactory: PubSubBehaviorFactory,
-      componentBehaviorFactory: ComponentBehaviorFactory[_],
-      logAdminActorRef: ActorRef[LogControlMessages]
+      componentBehaviorFactory: ComponentBehaviorFactory[_]
   ): Behavior[SupervisorExternalMessage] = {
     Actor
       .withTimers[SupervisorMessage](
@@ -57,8 +53,7 @@ object SupervisorBehaviorFactory {
                   componentBehaviorFactory,
                   pubSubBehaviorFactory,
                   registrationFactory,
-                  locationService,
-                  logAdminActorRef
+                  locationService
               )
           )
       )

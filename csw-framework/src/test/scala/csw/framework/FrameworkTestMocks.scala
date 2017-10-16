@@ -14,7 +14,6 @@ import csw.messages.{LifecycleStateChanged, PubSub, SupervisorMessage}
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
@@ -37,7 +36,7 @@ class FrameworkTestMocks(
   val lifecycleStateProbe: TestProbe[PubSub[LifecycleStateChanged]] = TestProbe[PubSub[LifecycleStateChanged]]
   val compStateProbe: TestProbe[PubSub[CurrentState]]               = TestProbe[PubSub[CurrentState]]
 
-  when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], any[ActorRef[LogControlMessages]]))
+  when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]]))
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))

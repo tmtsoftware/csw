@@ -18,7 +18,6 @@ import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, Superviso
 import csw.messages.location.Connection.AkkaConnection
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
-import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
@@ -57,8 +56,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
           componentInfo,
           locationService,
           registrationFactory,
-          pubSubBehaviorFactory,
-          testActor
+          pubSubBehaviorFactory
         )
         val supervisorInfo = SupervisorInfo(
           untypedSystem,
@@ -81,12 +79,12 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
           any[ActorRef[ContainerIdleMessage]],
           any[ComponentInfo],
           any[LocationService],
-          any[ActorRef[LogControlMessages]]
+          any[RegistrationFactory]
         )
     ).thenAnswer(answer)
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
-    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]], any[ActorRef[LogControlMessages]]))
+    when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]]))
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =
@@ -97,7 +95,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
     val containerBehavior =
-      new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService, testActor)
+      new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService)
       with MutableActorMock[ContainerMessage]
 
   }

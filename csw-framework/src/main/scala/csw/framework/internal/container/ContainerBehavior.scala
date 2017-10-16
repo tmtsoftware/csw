@@ -17,7 +17,6 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.Future
@@ -28,14 +27,13 @@ class ContainerBehavior(
     containerInfo: ContainerInfo,
     supervisorInfoFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
-    locationService: LocationService,
-    logAdminActorRef: ActorRef[LogControlMessages]
+    locationService: LocationService
 ) extends ComponentLogger.MutableActor[ContainerMessage](ctx, containerInfo.name) {
 
   import ctx.executionContext
 
   val akkaConnection                                              = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
-  val akkaRegistration: AkkaRegistration                          = registrationFactory.akkaTyped(akkaConnection, ctx.self, logAdminActorRef)
+  val akkaRegistration: AkkaRegistration                          = registrationFactory.akkaTyped(akkaConnection, ctx.self)
   var supervisors: Set[SupervisorInfo]                            = Set.empty
   var runningComponents: Set[ActorRef[SupervisorExternalMessage]] = Set.empty
   var lifecycleState: ContainerLifecycleState                     = ContainerLifecycleState.Idle
@@ -110,7 +108,7 @@ class ContainerBehavior(
     log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
     Future
       .traverse(componentInfos) { ci ⇒
-        supervisorInfoFactory.make(ctx.self, ci, locationService, logAdminActorRef)
+        supervisorInfoFactory.make(ctx.self, ci, locationService, registrationFactory)
       }
       .foreach(x ⇒ ctx.self ! SupervisorsCreated(x.flatten))
   }

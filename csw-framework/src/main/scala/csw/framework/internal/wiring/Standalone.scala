@@ -4,7 +4,6 @@ import akka.typed.ActorRef
 import csw.framework.internal.configparser.ComponentInfoParser
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.messages.SupervisorExternalMessage
-import csw.services.logging.internal.LogControlMessages
 
 import scala.concurrent.Future
 
@@ -12,8 +11,7 @@ object Standalone {
 
   def spawn(
       config: com.typesafe.config.Config,
-      wiring: FrameworkWiring,
-      logAdminActorRef: ActorRef[LogControlMessages]
+      wiring: FrameworkWiring
   ): Future[ActorRef[SupervisorExternalMessage]] = {
     import wiring._
     val componentInfo = ComponentInfoParser.parseStandalone(config)
@@ -22,16 +20,9 @@ object Standalone {
       componentInfo,
       locationService,
       registrationFactory,
-      pubSubBehaviorFactory,
-      logAdminActorRef
+      pubSubBehaviorFactory
     )
     val richSystem = new CswFrameworkSystem(actorSystem)
     richSystem.spawnTyped(supervisorBehavior, componentInfo.name)
   }
-
-  private[framework] def spawn(
-      config: com.typesafe.config.Config,
-      wiring: FrameworkWiring
-  ): Future[ActorRef[SupervisorExternalMessage]] =
-    spawn(config, wiring, null)
 }

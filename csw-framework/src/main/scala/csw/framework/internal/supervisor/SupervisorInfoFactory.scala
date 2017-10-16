@@ -6,7 +6,6 @@ import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.messages.framework.ComponentInfo
 import csw.messages.{Component, ContainerIdleMessage, SupervisorInfo}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
-import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.async.Async._
@@ -21,12 +20,11 @@ class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simpl
       containerRef: ActorRef[ContainerIdleMessage],
       componentInfo: ComponentInfo,
       locationService: LocationService,
-      logAdminActorRef: ActorRef[LogControlMessages]
+      registrationFactory: RegistrationFactory
   ): Future[Option[SupervisorInfo]] = {
     val system                                = ActorSystemFactory.remote(s"${componentInfo.name}-system")
     implicit val ec: ExecutionContextExecutor = system.dispatcher
     val richSystem                            = new CswFrameworkSystem(system)
-    val registrationFactory                   = new RegistrationFactory
     val pubSubBehaviorFactory                 = new PubSubBehaviorFactory
 
     async {
@@ -36,8 +34,7 @@ class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simpl
           componentInfo,
           locationService,
           registrationFactory,
-          pubSubBehaviorFactory,
-          logAdminActorRef
+          pubSubBehaviorFactory
         )
       }
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)

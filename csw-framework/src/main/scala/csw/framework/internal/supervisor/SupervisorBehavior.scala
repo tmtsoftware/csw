@@ -29,7 +29,6 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.states.CurrentState
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.ComponentLogger
 
 import scala.concurrent.Future
@@ -51,8 +50,7 @@ class SupervisorBehavior(
     componentBehaviorFactory: ComponentBehaviorFactory[_],
     pubSubBehaviorFactory: PubSubBehaviorFactory,
     registrationFactory: RegistrationFactory,
-    locationService: LocationService,
-    logAdminActorRef: ActorRef[LogControlMessages]
+    locationService: LocationService
 ) extends ComponentLogger.MutableActor[SupervisorMessage](ctx, componentInfo.name) {
 
   import SupervisorBehavior._
@@ -62,7 +60,7 @@ class SupervisorBehavior(
   val componentActorName                 = s"$componentName-$ComponentActorNameSuffix"
   val initializeTimeout: FiniteDuration  = componentInfo.initializeTimeout
   val akkaConnection                     = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
-  val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self, logAdminActorRef)
+  val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
   val isStandalone: Boolean              = maybeContainerRef.isEmpty
 
   val pubSubComponent: ActorRef[PubSub[CurrentState]] =
