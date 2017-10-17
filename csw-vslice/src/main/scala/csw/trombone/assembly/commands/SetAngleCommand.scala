@@ -11,15 +11,14 @@ import csw.trombone.assembly._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class SetAngleCommand(
-    ctx: ActorContext[AssemblyCommandHandlerMsgs],
-    ac: AssemblyContext,
-    s: Setup,
-    followCommandActor: ActorRef[FollowCommandMessages],
-    tromboneHCD: ActorRef[SupervisorExternalMessage],
-    startState: TromboneState,
-    stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand(ctx, startState, stateActor, Some(tromboneHCD)) {
+class SetAngleCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
+                      ac: AssemblyContext,
+                      s: Setup,
+                      followCommandActor: ActorRef[FollowCommandMessages],
+                      tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+                      startState: TromboneState,
+                      stateActor: ActorRef[PubSub[AssemblyState]])
+    extends AssemblyCommand(ctx, startState, stateActor, tromboneHCD) {
 
   implicit val timeout: Timeout = Timeout(5.seconds)
 
@@ -30,7 +29,7 @@ class SetAngleCommand(
 
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
-    matchCompletion(Matchers.idleMatcher, tromboneHCD, 5.seconds) {
+    matchCompletion(Matchers.idleMatcher, tromboneHCD.get, 5.seconds) {
       case Completed =>
         publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
         Completed

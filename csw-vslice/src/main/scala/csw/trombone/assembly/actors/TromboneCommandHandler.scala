@@ -10,27 +10,27 @@ import csw.messages.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.{UnsupportedCommandInStateIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.Setup
+import csw.messages.location.Connection
 import csw.trombone.assembly._
 import csw.trombone.assembly.commands._
 
 import scala.concurrent.duration.DurationInt
 
-class TromboneAssemblyCommandBehaviorFactory extends AssmeblyCommandBehaviorFactory {
+class TromboneAssemblyCommandBehaviorFactory extends AssemblyCommandBehaviorFactory {
   override protected def assemblyCommandHandlers(
       ctx: ActorContext[AssemblyCommandHandlerMsgs],
       ac: AssemblyContext,
-      tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+      tromboneHCD: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
       allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
-  ) =
+  ): AssemblyCommandHandlers =
     new TromboneCommandHandler(ctx, ac, tromboneHCD, allEventPublisher)
 }
 
-class TromboneCommandHandler(
-    ctx: ActorContext[AssemblyCommandHandlerMsgs],
-    ac: AssemblyContext,
-    tromboneHCDIn: Option[ActorRef[SupervisorExternalMessage]],
-    allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
-) extends AssemblyCommandHandlers {
+class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
+                             ac: AssemblyContext,
+                             tromboneHCD: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
+                             allEventPublisher: Option[ActorRef[TrombonePublisherMsg]])
+    extends AssemblyCommandHandlers {
 
   implicit val scheduler: Scheduler = ctx.system.scheduler
   import TromboneState._
@@ -40,9 +40,9 @@ class TromboneCommandHandler(
 
   private val badHCDReference = ctx.system.deadLetters
 
-  private val tromboneHCD                                         = tromboneHCDIn.getOrElse(badHCDReference)
-  private var setElevationItem                                    = naElevation(calculationConfig.defaultInitialElevation)
-  private var followCommandActor: ActorRef[FollowCommandMessages] = _
+  private val tromboneHcd: Option[ActorRef[SupervisorExternalMessage]] = tromboneHCD.head._2
+  private var setElevationItem                                         = naElevation(calculationConfig.defaultInitialElevation)
+  private var followCommandActor: ActorRef[FollowCommandMessages]      = _
 
   override var currentState: AssemblyState     = defaultTromboneState
   override var currentCommand: AssemblyCommand = _
@@ -59,7 +59,7 @@ class TromboneCommandHandler(
         case ac.datumCK =>
           AssemblyCommandState(
             Some(
-              List(new DatumCommand(ctx, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor))
+              List(new DatumCommand(ctx, s, tromboneHcd, currentState.asInstanceOf[TromboneState], tromboneStateActor))
             ),
             CommandExecutionState.Executing
           )
@@ -67,7 +67,7 @@ class TromboneCommandHandler(
           AssemblyCommandState(
             Some(
               List(
-                new MoveCommand(ctx, ac, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor)
+                new MoveCommand(ctx, ac, s, tromboneHcd, currentState.asInstanceOf[TromboneState], tromboneStateActor)
               )
             ),
             CommandExecutionState.Executing
@@ -79,7 +79,7 @@ class TromboneCommandHandler(
                 new PositionCommand(ctx,
                                     ac,
                                     s,
-                                    tromboneHCD,
+                                    tromboneHcd,
                                     currentState.asInstanceOf[TromboneState],
                                     tromboneStateActor)
               )
@@ -93,7 +93,7 @@ class TromboneCommandHandler(
                                    new SetElevationCommand(ctx,
                                                            ac,
                                                            s,
-                                                           tromboneHCD,
+                                                           tromboneHcd,
                                                            currentState.asInstanceOf[TromboneState],
                                                            tromboneStateActor)
                                  )
@@ -103,12 +103,12 @@ class TromboneCommandHandler(
         case ac.followCK =>
           val nssItem = s(ac.nssInUseKey)
           followCommandActor = ctx.spawnAnonymous(
-            FollowCommandActor.make(ac, setElevationItem, nssItem, Some(tromboneHCD), allEventPublisher)
+            FollowCommandActor.make(ac, setElevationItem, nssItem, tromboneHcd, allEventPublisher)
           )
           AssemblyCommandState(
             Some(
               List(
-                new FollowCommand(ctx, ac, s, tromboneHCD, currentState.asInstanceOf[TromboneState], tromboneStateActor)
+                new FollowCommand(ctx, ac, s, tromboneHcd, currentState.asInstanceOf[TromboneState], tromboneStateActor)
               )
             ),
             CommandExecutionState.Following
@@ -157,7 +157,7 @@ class TromboneCommandHandler(
                                     ac,
                                     s,
                                     followCommandActor,
-                                    tromboneHCD,
+                                    tromboneHcd,
                                     currentState.asInstanceOf[TromboneState],
                                     tromboneStateActor)
               )

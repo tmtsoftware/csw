@@ -14,14 +14,13 @@ import csw.trombone.hcd.TromboneHcdState
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
-class PositionCommand(
-    ctx: ActorContext[AssemblyCommandHandlerMsgs],
-    ac: AssemblyContext,
-    s: Setup,
-    tromboneHCD: ActorRef[SupervisorExternalMessage],
-    startState: TromboneState,
-    stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand(ctx, startState, stateActor, Some(tromboneHCD)) {
+class PositionCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
+                      ac: AssemblyContext,
+                      s: Setup,
+                      tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+                      startState: TromboneState,
+                      stateActor: ActorRef[PubSub[AssemblyState]])
+    extends AssemblyCommand(ctx, startState, stateActor, tromboneHCD) {
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
@@ -49,8 +48,8 @@ class PositionCommand(
         .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
-      tromboneHCD ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore))
-      Matchers.matchState(ctx, stateMatcher, tromboneHCD, 5.seconds).map {
+      tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
+      Matchers.matchState(ctx, stateMatcher, tromboneHCD.get, 5.seconds).map {
         case Completed =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed
@@ -63,7 +62,7 @@ class PositionCommand(
   }
 
   def stopCommand(): Unit = {
-    tromboneHCD ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
+    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore)))
   }
 
 }

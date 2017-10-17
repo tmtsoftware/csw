@@ -6,8 +6,9 @@ import akka.typed.{ActorRef, Behavior}
 import csw.messages.PubSub.Subscribe
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.RequiredHCDUnavailableIssue
+import csw.messages.location.Connection
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs.{CommandComplete, CommandMessageE}
-import csw.trombone.assembly.CommonMsgs.AssemblyStateE
+import csw.trombone.assembly.CommonMsgs.{AssemblyStateE, UpdateHcdLocations}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.CommandExecutionState.{Executing, Following, NotFollowing}
 import csw.trombone.assembly.commands.{AssemblyCommand, AssemblyState}
@@ -17,7 +18,7 @@ import scala.util.{Failure, Success}
 class AssemblyCommandBehavior(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
     assemblyContext: AssemblyContext,
-    hcd: Option[ActorRef[SupervisorExternalMessage]],
+    var hcds: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
     assemblyCommandHandlers: AssemblyCommandHandlers
 ) extends MutableBehavior[AssemblyCommandHandlerMsgs] {
 
@@ -39,7 +40,9 @@ class AssemblyCommandBehavior(
   }
 
   def onCommon(msg: CommonMsgs): Unit = msg match {
-    case AssemblyStateE(state) => assemblyCommandHandlers.currentState = state
+    case AssemblyStateE(state)           => assemblyCommandHandlers.currentState = state
+    case UpdateHcdLocations(updatedHcds) ⇒ hcds = updatedHcds
+
   }
 
   def onNotFollowing(msg: NotFollowingMsgs): Unit = msg match {

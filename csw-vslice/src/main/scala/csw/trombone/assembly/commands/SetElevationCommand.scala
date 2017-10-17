@@ -14,14 +14,13 @@ import csw.trombone.hcd.TromboneHcdState
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class SetElevationCommand(
-    ctx: ActorContext[AssemblyCommandHandlerMsgs],
-    ac: AssemblyContext,
-    s: Setup,
-    tromboneHCD: ActorRef[SupervisorExternalMessage],
-    startState: TromboneState,
-    stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand(ctx, startState, stateActor, Some(tromboneHCD)) {
+class SetElevationCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
+                          ac: AssemblyContext,
+                          s: Setup,
+                          tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+                          startState: TromboneState,
+                          stateActor: ActorRef[PubSub[AssemblyState]])
+    extends AssemblyCommand(ctx, startState, stateActor, tromboneHCD) {
 
   import TromboneHcdState._
   import csw.trombone.assembly.actors.TromboneState._
@@ -49,8 +48,8 @@ class SetElevationCommand(
       val scOut        = Setup(ac.commandInfo, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
 
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
-      tromboneHCD ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore))
-      matchCompletion(stateMatcher, tromboneHCD, 5.seconds) {
+      tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
+      matchCompletion(stateMatcher, tromboneHCD.get, 5.seconds) {
         case Completed =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed
@@ -63,7 +62,7 @@ class SetElevationCommand(
   }
 
   def stopCommand(): Unit = {
-    tromboneHCD ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
+    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore)))
   }
 
 }

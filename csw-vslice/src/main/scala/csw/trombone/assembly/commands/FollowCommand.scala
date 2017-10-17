@@ -10,14 +10,13 @@ import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext}
 
 import scala.concurrent.Future
 
-class FollowCommand(
-    ctx: ActorContext[AssemblyCommandHandlerMsgs],
-    ac: AssemblyContext,
-    s: Setup,
-    tromboneHCD: ActorRef[SupervisorExternalMessage],
-    startState: TromboneState,
-    stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand(ctx, startState, stateActor, Some(tromboneHCD)) {
+class FollowCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
+                    ac: AssemblyContext,
+                    s: Setup,
+                    tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+                    startState: TromboneState,
+                    stateActor: ActorRef[PubSub[AssemblyState]])
+    extends AssemblyCommand(ctx, startState, stateActor, tromboneHCD) {
 
   import ctx.executionContext
 

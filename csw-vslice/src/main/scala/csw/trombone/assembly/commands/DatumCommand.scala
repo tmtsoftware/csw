@@ -13,13 +13,12 @@ import csw.trombone.hcd.TromboneHcdState
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
-class DatumCommand(
-    ctx: ActorContext[AssemblyCommandHandlerMsgs],
-    s: Setup,
-    tromboneHCD: ActorRef[SupervisorExternalMessage],
-    startState: TromboneState,
-    stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand(ctx, startState, stateActor, Some(tromboneHCD)) {
+class DatumCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
+                   s: Setup,
+                   tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+                   startState: TromboneState,
+                   stateActor: ActorRef[PubSub[AssemblyState]])
+    extends AssemblyCommand(ctx, startState, stateActor, tromboneHCD) {
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
@@ -35,8 +34,8 @@ class DatumCommand(
       )
     } else {
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
-      tromboneHCD ! Submit(Setup(s.info, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore))
-      matchCompletion(Matchers.idleMatcher, tromboneHCD, 5.seconds) {
+      tromboneHCD.foreach(_ ! Submit(Setup(s.info, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore)))
+      matchCompletion(Matchers.idleMatcher, tromboneHCD.get, 5.seconds) {
         case Completed =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed
@@ -49,7 +48,7 @@ class DatumCommand(
   }
 
   def stopCommand(): Unit = {
-    tromboneHCD ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore))
+    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore)))
   }
 
 }

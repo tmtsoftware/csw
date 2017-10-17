@@ -4,6 +4,7 @@ import akka.typed.ActorRef
 import csw.messages.CommandMessage.Submit
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages.ccs.events.EventTime
+import csw.messages.location.Connection
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.Choice
 import csw.messages.params.states.CurrentState
@@ -95,7 +96,8 @@ sealed trait AssemblyCommandHandlerMsgs
 
 sealed trait CommonMsgs extends AssemblyCommandHandlerMsgs
 object CommonMsgs {
-  case class AssemblyStateE(state: AssemblyState) extends CommonMsgs
+  case class AssemblyStateE(state: AssemblyState)                                                  extends CommonMsgs
+  case class UpdateHcdLocations(hcd: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]]) extends CommonMsgs
 }
 sealed trait NotFollowingMsgs extends AssemblyCommandHandlerMsgs
 sealed trait FollowingMsgs    extends AssemblyCommandHandlerMsgs

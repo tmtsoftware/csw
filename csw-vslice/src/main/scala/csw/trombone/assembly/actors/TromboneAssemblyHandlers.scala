@@ -9,11 +9,12 @@ import csw.messages.ccs.Validations.Valid
 import csw.messages.ccs.commands.Setup
 import csw.messages.ccs.{Validation, Validations}
 import csw.messages.framework.ComponentInfo
-import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.messages.location._
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs.CommandMessageE
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
+import csw.trombone.assembly.CommonMsgs.UpdateHcdLocations
 import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}
 import csw.trombone.assembly.ParamValidation._
 import csw.trombone.assembly._
@@ -45,7 +46,7 @@ class TromboneAssemblyHandlers(
   implicit var ac: AssemblyContext  = _
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  private var runningHcd: Option[ActorRef[SupervisorExternalMessage]] = None
+  private var runningHcds: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]] = Map.empty
 
   def onRun(): Future[Unit] = Future.unit
 
@@ -56,9 +57,9 @@ class TromboneAssemblyHandlers(
     val eventPublisher = ctx.spawnAnonymous(TrombonePublisher.make(ac))
 
     commandHandler =
-      ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcd, Some(eventPublisher)))
+      ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcds, Some(eventPublisher)))
 
-    diagPublsher = ctx.spawnAnonymous(DiagPublisher.make(ac, runningHcd, Some(eventPublisher)))
+    diagPublsher = ctx.spawnAnonymous(DiagPublisher.make(ac, runningHcds.head._2, Some(eventPublisher)))
   }
 
   override def onShutdown(): Future[Unit] = {
@@ -86,10 +87,15 @@ class TromboneAssemblyHandlers(
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
-    case LocationUpdated(location) =>
-      runningHcd = Some(location.asInstanceOf[AkkaLocation].typedRef[SupervisorExternalMessage])
-    case LocationRemoved(connection) =>
-      runningHcd = None
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {
+    trackingEvent match {
+      case LocationUpdated(location) =>
+        runningHcds = runningHcds + (location.connection → Some(
+          location.asInstanceOf[AkkaLocation].typedRef[SupervisorExternalMessage]
+        ))
+      case LocationRemoved(connection) =>
+        runningHcds = runningHcds + (connection → None)
+    }
+    commandHandler ! UpdateHcdLocations(runningHcds)
   }
 }
