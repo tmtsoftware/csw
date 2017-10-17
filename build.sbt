@@ -47,8 +47,8 @@ lazy val `csw-messages` = project
   .settings(
     Common.detectCycles := false,
     PB.targets in Compile := Seq(
-      PB.gens.java -> (sourceManaged in Compile).value,
-      scalapb.gen(javaConversions=true) -> (sourceManaged in Compile).value
+      PB.gens.java                        -> (sourceManaged in Compile).value,
+      scalapb.gen(javaConversions = true) -> (sourceManaged in Compile).value
     )
   )
 
