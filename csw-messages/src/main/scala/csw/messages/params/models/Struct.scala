@@ -1,8 +1,7 @@
 package csw.messages.params.models
 
-import csw.messages.params.generics.{Parameter, ParameterSetType}
 import com.trueaccord.scalapb.TypeMapper
-import csw.param.generics.{Parameter, ParameterSetType}
+import csw.messages.params.generics.{Parameter, ParameterSetType}
 import csw_params.parameter.PbStruct
 import spray.json.JsonFormat
 

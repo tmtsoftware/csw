@@ -2,15 +2,11 @@ package csw.messages.params.generics
 
 import java.time.Instant
 
+import com.trueaccord.scalapb.TypeMapper
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.models.Units.second
 import csw.messages.params.models.{Units, _}
-import com.trueaccord.scalapb.TypeMapper
-import csw.param.formats.JsonSupport
-import csw.param.models._
-import csw.param.pb.ItemsFactory
-import csw.units.Units
-import csw.units.Units.second
+import csw.messages.params.pb.ItemsFactory
 import csw_params.keytype.PbKeyType
 import csw_params.parameter.PbParameter
 import enumeratum.{Enum, EnumEntry}

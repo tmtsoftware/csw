@@ -1,4 +1,4 @@
-package csw.param.pb
+package csw.messages.params.pb
 
 import com.google.protobuf.ByteString
 import com.google.protobuf.wrappers.Int32Value

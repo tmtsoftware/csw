@@ -1,9 +1,7 @@
 package csw.messages.params.models
 
-import csw.messages.TMTSerializable
-import com.google.protobuf.wrappers.{Int32Value, StringValue}
-import csw.param.pb.PbFormat
 import com.trueaccord.scalapb.TypeMapper
+import csw.messages.TMTSerializable
 import csw_params.units.PbUnits
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
@@ -13,8 +11,8 @@ import scala.collection.immutable
 sealed abstract class Units(name: String, description: String) extends EnumEntry with TMTSerializable {
   // Should parameterize Units so concat can be created concat[A, B]
 //  override def toString: String = "[" + name + "]"
-  def getAbbreviation: String = s"[$abbreviation]"
-  def getDescription: String  = description
+  def getName: String        = s"[$name]"
+  def getDescription: String = description
 }
 
 object Units extends Enum[Units] {

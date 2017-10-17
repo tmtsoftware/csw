@@ -2,12 +2,9 @@ package csw.messages.params.generics
 
 import csw.messages.params.models.Units
 import csw.messages.params.models.Units.NoUnits
-import csw.param.pb.ItemsFactory
-import csw.units.Units
-import csw.units.Units.NoUnits
+import csw.messages.params.pb.ItemsFactory
 import spray.json.JsonFormat
 
-import scala.runtime.ScalaRunTime._
 import scala.annotation.varargs
 import scala.reflect.ClassTag
 import scala.runtime.ScalaRunTime._

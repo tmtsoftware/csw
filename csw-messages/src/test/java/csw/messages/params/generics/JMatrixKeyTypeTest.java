@@ -1,12 +1,8 @@
 package csw.messages.params.generics;
 
-import csw.messages.params.models.Units;
 import csw.messages.params.models.JMatrixData;
 import csw.messages.params.models.MatrixData;
-import csw.param.models.ArrayData;
-import csw.param.models.JMatrixData;
-import csw.param.models.MatrixData;
-import csw.units.Units;
+import csw.messages.params.models.Units;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package csw.param.pb
+package csw.messages.params.pb
 
 import java.time.Instant
 

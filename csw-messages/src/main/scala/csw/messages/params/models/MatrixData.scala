@@ -3,7 +3,7 @@ package csw.messages.params.models
 import java.util
 
 import com.trueaccord.scalapb.TypeMapper
-import csw.param.pb.{ItemType, ItemTypeCompanion}
+import csw.messages.params.pb.{ItemType, ItemTypeCompanion}
 import spray.json.JsonFormat
 
 import scala.collection.JavaConverters._

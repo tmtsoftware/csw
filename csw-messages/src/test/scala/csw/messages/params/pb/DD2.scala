@@ -1,11 +1,10 @@
-package csw.param
+package csw.messages.params.pb
 
 import java.time.Instant
 
 import com.trueaccord.scalapb.json.JsonFormat
-import csw.param.generics.{JKeyTypes, KeyType, Parameter}
-import csw.param.models._
-import csw.units.Units
+import csw.messages.params.generics.{JKeyTypes, KeyType, Parameter}
+import csw.messages.params.models._
 import csw_params.ParameterTypes
 import csw_params.parameter.PbParameter
 import csw_params.parameter_types._
@@ -171,14 +170,14 @@ class DD2 extends FunSuite {
     PbRaDec()
     PbRaDec.defaultInstance
 
-    val pbRaDec  = PbRaDec().withRa(10).withDec(32)
-    val pbRaDec2 = PbRaDec().withRa(10).withDec(321)
+    PbRaDec().withRa(10).withDec(32)
+    PbRaDec().withRa(10).withDec(321)
 
     val raDec = RaDec(1, 2)
     val param = KeyType.RaDecKey.make("Asd").set(raDec)
 
     val pbParameter = Parameter.typeMapper2.toBase(param)
-    val array       = pbParameter.toByteArray
+    pbParameter.toByteArray
     println(pbParameter)
   }
 

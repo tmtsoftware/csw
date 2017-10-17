@@ -2,11 +2,9 @@ package csw.messages.ccs.events
 
 import java.util.Optional
 
+import com.trueaccord.scalapb.TypeMapper
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.messages.params.models.{ObsId, Prefix}
-import com.trueaccord.scalapb.TypeMapper
-import csw.param.models.{ObsId, Prefix}
-import csw.param.generics.{Key, Parameter, ParameterSetKeyData, ParameterSetType}
 import csw_params.events.PbEvent
 import csw_params.events.PbEvent.PbEventType
 import csw_params.parameter.PbParameter

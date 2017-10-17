@@ -8,15 +8,15 @@ import "scalapb/scalapb.proto";
 import "csw_params/parameter_types.proto";
 
 option (scalapb.options) = {
-    import: "csw.param.pb._"
-    import: "csw.param.models._"
+    import: "csw.messages.params.pb._"
+    import: "csw.messages.params.models._"
     single_file: true
 };
 
 message PbParameter {
     string name = 1;
-    PbUnits units = 2 [(scalapb.field).type = "csw.units.Units"];
-    PbKeyType keyType = 3 [(scalapb.field).type = "csw.param.generics.KeyType[_]"];
+    PbUnits units = 2 [(scalapb.field).type = "csw.messages.params.models.Units"];
+    PbKeyType keyType = 3 [(scalapb.field).type = "csw.messages.params.generics.KeyType[_]"];
     oneof items {
         ChoiceItems choiceItems = 4;
         RaDecItems raDecItems = 5;

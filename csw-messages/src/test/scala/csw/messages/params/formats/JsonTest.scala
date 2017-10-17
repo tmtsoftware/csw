@@ -18,11 +18,6 @@ import csw.messages.params.generics._
 import csw.messages.params.models.Units.{degree, encoder, meter, NoUnits}
 import csw.messages.params.models._
 import csw.messages.params.states.{CurrentState, DemandState}
-import csw.param.generics._
-import csw.param.models.{Subsystem, _}
-import csw.param.states.{CurrentState, DemandState}
-import csw.units.Units
-import csw.units.Units.{degree, encoder, meter, NoUnits}
 import org.scalatest.FunSpec
 import spray.json._
 

@@ -3,14 +3,10 @@ package csw.messages.params.generics
 import java.util
 import java.util.Optional
 
+import com.trueaccord.scalapb.TypeMapper
 import csw.messages.TMTSerializable
 import csw.messages.params.models.Units
-import com.google.protobuf.ByteString
-import com.google.protobuf.wrappers.StringValue
-import com.trueaccord.scalapb.TypeMapper
-import csw.param.ParamSerializable
-import csw.param.pb.{ItemType, ItemsFactory}
-import csw.units.Units
+import csw.messages.params.pb.{ItemType, ItemsFactory}
 import csw_params.parameter.PbParameter
 import csw_params.parameter.PbParameter.Items
 import spray.json.{pimpAny, DefaultJsonProtocol, JsObject, JsValue, JsonFormat}

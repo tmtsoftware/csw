@@ -1,4 +1,4 @@
-package csw.param;
+package csw.messages.params.pb;
 
 import csw_params.Events;
 import csw_params.Keytype;
@@ -6,7 +6,6 @@ import csw_params.Parameter;
 import csw_params.ParameterTypes;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

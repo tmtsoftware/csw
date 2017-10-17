@@ -1,11 +1,8 @@
-package csw.param
+package csw.messages.params.pb
 
-import csw.param.generics.Parameter
+import csw.messages.params.formats.{EnumJsonSupport, JavaFormats, JsonSupport, WrappedArrayProtocol}
+import csw.messages.params.generics.Parameter
 import spray.json.{DefaultJsonProtocol, JsonFormat}
-import java.lang
-
-import csw.param.formats.{EnumJsonSupport, JavaFormats, JsonSupport, WrappedArrayProtocol}
-import csw.param.pb.ItemsFactory
 
 import scala.reflect.ClassTag
 

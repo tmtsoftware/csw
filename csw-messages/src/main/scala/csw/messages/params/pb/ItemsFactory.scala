@@ -1,10 +1,10 @@
-package csw.param.pb
+package csw.messages.params.pb
 
 import java.time.Instant
 
-import csw.param.models._
+import csw.messages.params.models._
 import csw_params.parameter.PbParameter.Items
-import csw_params.parameter_types._
+import csw_params.parameter_types.IntItems
 
 abstract class ItemsFactory[T] {
   def make(xs: Seq[T]): Items

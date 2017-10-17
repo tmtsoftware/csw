@@ -7,9 +7,9 @@ import "scalapb/scalapb.proto";
 import "google/protobuf/timestamp.proto";
 
 option (scalapb.options) = {
-    import: "csw.param.pb._"
-    import: "csw.param.pb.Implicits._"
-    import: "csw.param.models._"
+    import: "csw.messages.params.pb._"
+    import: "csw.messages.params.pb.Implicits._"
+    import: "csw.messages.params.models._"
     single_file: true
 };
 
