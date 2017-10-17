@@ -1,7 +1,7 @@
 package csw.messages.params.models
 
 import com.trueaccord.scalapb.TypeMapper
-import csw_params.radec.PbRaDec
+import csw_messages_params.radec.PbRaDec
 import spray.json.RootJsonFormat
 
 case class RaDec(ra: Double, dec: Double)

@@ -7,8 +7,8 @@ import csw.messages.params.formats.JsonSupport
 import csw.messages.params.models.Units.second
 import csw.messages.params.models.{Units, _}
 import csw.messages.params.pb.ItemsFactory
-import csw_params.keytype.PbKeyType
-import csw_params.parameter.PbParameter
+import csw_messages_params.keytype.PbKeyType
+import csw_messages_params.parameter.PbParameter
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
 

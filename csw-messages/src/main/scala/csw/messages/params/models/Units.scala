@@ -2,7 +2,7 @@ package csw.messages.params.models
 
 import com.trueaccord.scalapb.TypeMapper
 import csw.messages.TMTSerializable
-import csw_params.units.PbUnits
+import csw_messages_params.units.PbUnits
 import enumeratum.{Enum, EnumEntry}
 import spray.json.JsonFormat
 

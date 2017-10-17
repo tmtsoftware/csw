@@ -5,10 +5,10 @@ import java.time.Instant
 import com.trueaccord.scalapb.json.JsonFormat
 import csw.messages.params.generics.{JKeyTypes, KeyType, Parameter}
 import csw.messages.params.models._
-import csw_params.ParameterTypes
-import csw_params.parameter.PbParameter
-import csw_params.parameter_types._
-import csw_params.radec.PbRaDec
+import csw_messages_params.ParameterTypes
+import csw_messages_params.parameter.PbParameter
+import csw_messages_params.parameter_types._
+import csw_messages_params.radec.PbRaDec
 import org.scalatest.FunSuite
 
 class DD2 extends FunSuite {

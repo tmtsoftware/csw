@@ -2,7 +2,7 @@ package csw.messages.params.models
 
 import com.trueaccord.scalapb.TypeMapper
 import csw.messages.params.generics.{Parameter, ParameterSetType}
-import csw_params.parameter.PbStruct
+import csw_messages_params.parameter.PbStruct
 import spray.json.JsonFormat
 
 import scala.annotation.varargs

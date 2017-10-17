@@ -5,9 +5,9 @@ import java.util.Optional
 import com.trueaccord.scalapb.TypeMapper
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.messages.params.models.{ObsId, Prefix}
-import csw_params.events.PbEvent
-import csw_params.events.PbEvent.PbEventType
-import csw_params.parameter.PbParameter
+import csw_messages_params.events.PbEvent
+import csw_messages_params.events.PbEvent.PbEventType
+import csw_messages_params.parameter.PbParameter
 
 import scala.compat.java8.OptionConverters.RichOptionForJava8
 
