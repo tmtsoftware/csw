@@ -15,7 +15,8 @@ import scala.concurrent.Future
 abstract class AssemblyCommand(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
     startState: AssemblyState,
-    stateActor: ActorRef[PubSub[AssemblyState]]
+    stateActor: ActorRef[PubSub[AssemblyState]],
+    val hcd: Option[ActorRef[SupervisorExternalMessage]]
 ) {
   import ctx.executionContext
 

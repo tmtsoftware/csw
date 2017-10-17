@@ -19,7 +19,7 @@ class DatumCommand(
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand(ctx, startState, stateActor) {
+) extends AssemblyCommand(ctx, startState, stateActor, Some(tromboneHCD)) {
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext

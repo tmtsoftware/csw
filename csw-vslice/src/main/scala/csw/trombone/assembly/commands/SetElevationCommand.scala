@@ -21,7 +21,7 @@ class SetElevationCommand(
     tromboneHCD: ActorRef[SupervisorExternalMessage],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
-) extends AssemblyCommand(ctx, startState, stateActor) {
+) extends AssemblyCommand(ctx, startState, stateActor, Some(tromboneHCD)) {
 
   import TromboneHcdState._
   import csw.trombone.assembly.actors.TromboneState._

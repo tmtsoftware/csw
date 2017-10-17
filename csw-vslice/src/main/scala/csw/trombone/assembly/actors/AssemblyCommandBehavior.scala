@@ -34,7 +34,6 @@ class AssemblyCommandBehavior(
       case (Following, msg: FollowingMsgs)       ⇒ onFollowing(msg)
       case (Executing, msg: ExecutingMsgs)       ⇒ onExecuting(msg)
       case _                                     ⇒ println(s"Unexpected message :[$msg] received by component in lifecycle state :[$commandExecutionState]")
-
     }
     this
   }
@@ -46,19 +45,24 @@ class AssemblyCommandBehavior(
   def onNotFollowing(msg: NotFollowingMsgs): Unit = msg match {
     case CommandMessageE(commandMessage) =>
       val assemblyCommandState = assemblyCommandHandlers.onNotFollowing(commandMessage)
+      commandExecutionState = assemblyCommandState.commandExecutionState
       assemblyCommandState.mayBeAssemblyCommand.foreach(x ⇒ x.foreach(executeCommand(_, commandMessage.replyTo)))
   }
 
   def onFollowing(msg: FollowingMsgs): Unit = msg match {
     case CommandMessageE(commandMessage) =>
       val assemblyCommandState = assemblyCommandHandlers.onFollowing(commandMessage)
+      commandExecutionState = assemblyCommandState.commandExecutionState
       assemblyCommandState.mayBeAssemblyCommand.foreach(x ⇒ x.foreach(executeCommand(_, commandMessage.replyTo)))
-    case CommandComplete(replyTo, result) => assemblyCommandHandlers.onFollowingCommandComplete(replyTo, result)
+    case CommandComplete(replyTo, result) =>
+      assemblyCommandHandlers.onFollowingCommandComplete(replyTo, result)
+      commandExecutionState = CommandExecutionState.NotFollowing
   }
 
   def onExecuting(msg: ExecutingMsgs): Unit = msg match {
     case CommandMessageE(commandMessage) =>
       val assemblyCommandState = assemblyCommandHandlers.onExecuting(commandMessage)
+      commandExecutionState = assemblyCommandState.commandExecutionState
       assemblyCommandState.mayBeAssemblyCommand.foreach(x ⇒ x.foreach(executeCommand(_, commandMessage.replyTo)))
     case CommandComplete(replyTo, result) =>
       assemblyCommandHandlers.onExecutingCommandComplete(replyTo, result)
@@ -66,22 +70,12 @@ class AssemblyCommandBehavior(
   }
 
   private def executeCommand(assemblyCommand: AssemblyCommand, replyTo: ActorRef[CommandResponse]): Unit = {
-    if (hcd.isDefined) {
-      commandExecutionState = CommandExecutionState.Executing
+    if (assemblyCommand.hcd.isDefined) {
       assemblyCommand.startCommand().onComplete {
         case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
         case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
       }
     } else hcdNotAvailableResponse(Some(replyTo))
-  }
-
-  private def executeFollow(assemblyCommand: AssemblyCommand, replyTo: ActorRef[CommandResponse]): Unit = {
-    commandExecutionState = CommandExecutionState.Following
-    assemblyCommand.startCommand().onComplete {
-      case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
-      case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
-    }
-    replyTo ! BehaviorChanged[FollowingMsgs](ctx.self)
   }
 
   private def hcdNotAvailableResponse(commandOriginator: Option[ActorRef[CommandExecutionResponse]]): Unit = {
