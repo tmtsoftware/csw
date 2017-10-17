@@ -42,6 +42,6 @@ class FollowCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
     }
   }
 
-  override def stopCommand(): Unit = ???
+  override def stopCommand(): Unit = {}
 
 }

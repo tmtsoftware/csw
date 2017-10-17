@@ -43,7 +43,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
 
   override var hcds: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]] = tromboneHCDs
   override var currentState: AssemblyState                                        = defaultTromboneState
-  override var currentCommand: AssemblyCommand                                    = _
+  override var currentCommand: Option[List[AssemblyCommand]]                      = _
   override var tromboneStateActor: ActorRef[PubSub[AssemblyState]] =
     ctx.spawnAnonymous(Actor.mutable[PubSub[AssemblyState]](ctx ⇒ new PubSubBehavior(ctx, "")))
 
@@ -88,17 +88,19 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
           )
         case ac.setElevationCK =>
           setElevationItem = s(ac.naElevationKey)
-          AssemblyCommandState(Some(
-                                 List(
-                                   new SetElevationCommand(ctx,
-                                                           ac,
-                                                           s,
-                                                           hcds.head._2,
-                                                           currentState.asInstanceOf[TromboneState],
-                                                           tromboneStateActor)
-                                 )
-                               ),
-                               CommandExecutionState.Executing)
+          AssemblyCommandState(
+            Some(
+              List(
+                new SetElevationCommand(ctx,
+                                        ac,
+                                        s,
+                                        hcds.head._2,
+                                        currentState.asInstanceOf[TromboneState],
+                                        tromboneStateActor)
+              )
+            ),
+            CommandExecutionState.Executing
+          )
 
         case ac.followCK =>
           val nssItem = s(ac.nssInUseKey)
@@ -171,7 +173,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
           )
 
         case ac.stopCK =>
-          currentCommand.stopCommand()
+          currentCommand.foreach(x ⇒ x.foreach(_.stopCommand()))
           tromboneStateActor ! Publish(
             TromboneState(cmdItem(cmdReady),
                           moveItem(moveIndexed),
@@ -179,6 +181,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                           currentState.asInstanceOf[TromboneState].nss)
           )
           replyTo ! Completed
+          ctx.stop(followCommandActor)
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
         case other =>
@@ -192,7 +195,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
 
   override def onExecuting(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
     case Submit(Setup(ac.commandInfo, ac.stopCK, _), replyTo) =>
-      currentCommand.stopCommand()
+      currentCommand.foreach(x ⇒ x.foreach(_.stopCommand()))
       replyTo ! Cancelled
       AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
@@ -207,7 +210,6 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   override def onExecutingCommandComplete(replyTo: ActorRef[CommandResponse],
                                           result: CommandExecutionResponse): Unit = {
     replyTo ! result
-    currentCommand.stopCommand()
   }
 
 }

@@ -8,7 +8,7 @@ import csw.trombone.assembly.commands.{AssemblyCommand, AssemblyState}
 trait AssemblyCommandHandlers {
   var hcds: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]]
   var currentState: AssemblyState
-  var currentCommand: AssemblyCommand
+  var currentCommand: Option[List[AssemblyCommand]]
   var tromboneStateActor: ActorRef[PubSub[AssemblyState]]
 
   def onNotFollowing(commandMessage: CommandMessage): AssemblyCommandState
