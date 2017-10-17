@@ -12,12 +12,9 @@ import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, Matchers}
 
 import scala.concurrent.Future
 
-abstract class AssemblyCommand(
-    ctx: ActorContext[AssemblyCommandHandlerMsgs],
-    startState: AssemblyState,
-    stateActor: ActorRef[PubSub[AssemblyState]],
-    val hcd: Option[ActorRef[SupervisorExternalMessage]]
-) {
+abstract class AssemblyCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
+                               startState: AssemblyState,
+                               stateActor: ActorRef[PubSub[AssemblyState]]) {
   import ctx.executionContext
 
   def startCommand(): Future[CommandExecutionResponse]
@@ -41,11 +38,8 @@ abstract class AssemblyCommand(
       partialFunction: PartialFunction[CommandExecutionResponse, CommandExecutionResponse]
   ): Future[CommandExecutionResponse] = {
 
-    (destination ? { x: ActorRef[CommandExecutionResponse] ⇒
-      command
-    })(timeout, ctx.system.scheduler).map(partialFunction)
+    (destination ? execute(command))(timeout, ctx.system.scheduler).map(partialFunction)
   }
 
-  def execute[T](x: T)(replyTo: ActorRef[CommandExecutionResponse]): T = x
-
+  private def execute[T](x: T)(replyTo: ActorRef[CommandExecutionResponse]): T = x
 }

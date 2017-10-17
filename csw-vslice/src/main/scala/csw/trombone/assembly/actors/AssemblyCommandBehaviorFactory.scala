@@ -26,7 +26,6 @@ abstract class AssemblyCommandBehaviorFactory {
           new AssemblyCommandBehavior(
             ctx,
             assemblyContext,
-            hcds,
             assemblyCommandHandlers(ctx, assemblyContext, hcds, allEventPublisher)
         )
       )

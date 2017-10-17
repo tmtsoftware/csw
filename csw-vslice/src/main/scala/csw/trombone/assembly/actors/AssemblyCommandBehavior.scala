@@ -5,8 +5,6 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.PubSub.Subscribe
 import csw.messages._
-import csw.messages.ccs.ValidationIssue.RequiredHCDUnavailableIssue
-import csw.messages.location.Connection
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs.{CommandComplete, CommandMessageE}
 import csw.trombone.assembly.CommonMsgs.{AssemblyStateE, UpdateHcdLocations}
 import csw.trombone.assembly._
@@ -18,7 +16,6 @@ import scala.util.{Failure, Success}
 class AssemblyCommandBehavior(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
     assemblyContext: AssemblyContext,
-    var hcds: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
     assemblyCommandHandlers: AssemblyCommandHandlers
 ) extends MutableBehavior[AssemblyCommandHandlerMsgs] {
 
@@ -41,7 +38,7 @@ class AssemblyCommandBehavior(
 
   def onCommon(msg: CommonMsgs): Unit = msg match {
     case AssemblyStateE(state)           => assemblyCommandHandlers.currentState = state
-    case UpdateHcdLocations(updatedHcds) ⇒ hcds = updatedHcds
+    case UpdateHcdLocations(updatedHcds) ⇒ assemblyCommandHandlers.hcds = updatedHcds
 
   }
 
@@ -73,17 +70,10 @@ class AssemblyCommandBehavior(
   }
 
   private def executeCommand(assemblyCommand: AssemblyCommand, replyTo: ActorRef[CommandResponse]): Unit = {
-    if (assemblyCommand.hcd.isDefined) {
-      assemblyCommand.startCommand().onComplete {
-        case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
-        case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
-      }
-    } else hcdNotAvailableResponse(Some(replyTo))
+    assemblyCommand.startCommand().onComplete {
+      case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
+      case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self
+    }
   }
 
-  private def hcdNotAvailableResponse(commandOriginator: Option[ActorRef[CommandExecutionResponse]]): Unit = {
-    commandOriginator.foreach(
-      _ ! NoLongerValid(RequiredHCDUnavailableIssue(s"${assemblyContext.hcdComponentId} is not available"))
-    )
-  }
 }

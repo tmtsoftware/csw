@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
-import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
+import csw.messages.ccs.ValidationIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.models.Units.encoder
 import csw.trombone.assembly._
@@ -20,12 +20,14 @@ class PositionCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                       tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
                       startState: TromboneState,
                       stateActor: ActorRef[PubSub[AssemblyState]])
-    extends AssemblyCommand(ctx, startState, stateActor, tromboneHCD) {
+    extends AssemblyCommand(ctx, startState, stateActor) {
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
 
   def startCommand(): Future[CommandExecutionResponse] = {
+    if (tromboneHCD.isEmpty)
+      Future(NoLongerValid(RequiredHCDUnavailableIssue(s"${ac.hcdComponentId} is not available")))
     if (startState.cmdChoice == cmdUninitialized || startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving) {
       Future(
         NoLongerValid(

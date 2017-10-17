@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
-import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
+import csw.messages.ccs.ValidationIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.models.Units.encoder
 import csw.trombone.assembly._
@@ -20,7 +20,7 @@ class MoveCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                   tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
                   startState: TromboneState,
                   stateActor: ActorRef[PubSub[AssemblyState]])
-    extends AssemblyCommand(ctx, startState, stateActor, tromboneHCD) {
+    extends AssemblyCommand(ctx, startState, stateActor) {
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
@@ -31,19 +31,19 @@ class MoveCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
     .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
 
   def startCommand(): Future[CommandExecutionResponse] = {
-    if (! {
-          startState.cmdChoice == cmdUninitialized ||
-          startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving
-        }) {
-      {
-        Future(
-          NoLongerValid(
-            WrongInternalStateIssue(
-              s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice} does not allow move"
-            )
+    if (tromboneHCD.isEmpty)
+      Future(NoLongerValid(RequiredHCDUnavailableIssue(s"${ac.hcdComponentId} is not available")))
+    else if (!(
+               startState.cmdChoice == cmdUninitialized ||
+               startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving
+             )) {
+      Future(
+        NoLongerValid(
+          WrongInternalStateIssue(
+            s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice} does not allow move"
           )
         )
-      }
+      )
     } else {
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss))
 
@@ -58,7 +58,6 @@ class MoveCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
           Error(message)
         case _ ⇒ Error("")
       }
-
     }
   }
 

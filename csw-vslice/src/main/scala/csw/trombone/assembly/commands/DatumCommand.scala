@@ -4,26 +4,29 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
-import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
+import csw.messages.ccs.ValidationIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.Setup
 import csw.trombone.assembly.actors.TromboneState.TromboneState
-import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, Matchers}
+import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext, Matchers}
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
 class DatumCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
+                   ac: AssemblyContext,
                    s: Setup,
                    tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
                    startState: TromboneState,
                    stateActor: ActorRef[PubSub[AssemblyState]])
-    extends AssemblyCommand(ctx, startState, stateActor, tromboneHCD) {
+    extends AssemblyCommand(ctx, startState, stateActor) {
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
 
   def startCommand(): Future[CommandExecutionResponse] = {
+    if (tromboneHCD.isEmpty)
+      Future(NoLongerValid(RequiredHCDUnavailableIssue(s"${ac.hcdComponentId} is not available")))
     if (startState.cmd.head == cmdUninitialized) {
       Future(
         NoLongerValid(

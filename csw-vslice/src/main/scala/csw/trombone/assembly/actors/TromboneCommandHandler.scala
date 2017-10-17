@@ -20,15 +20,15 @@ class TromboneAssemblyCommandBehaviorFactory extends AssemblyCommandBehaviorFact
   override protected def assemblyCommandHandlers(
       ctx: ActorContext[AssemblyCommandHandlerMsgs],
       ac: AssemblyContext,
-      tromboneHCD: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
+      tromboneHCDs: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
       allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
   ): AssemblyCommandHandlers =
-    new TromboneCommandHandler(ctx, ac, tromboneHCD, allEventPublisher)
+    new TromboneCommandHandler(ctx, ac, tromboneHCDs, allEventPublisher)
 }
 
 class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                              ac: AssemblyContext,
-                             tromboneHCD: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
+                             tromboneHCDs: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
                              allEventPublisher: Option[ActorRef[TrombonePublisherMsg]])
     extends AssemblyCommandHandlers {
 
@@ -36,16 +36,14 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   import TromboneState._
   import ac._
   implicit val system: ActorSystem[Nothing] = ctx.system
-  implicit val timeout                      = Timeout(5.seconds)
+  implicit val timeout: Timeout             = Timeout(5.seconds)
 
-  private val badHCDReference = ctx.system.deadLetters
+  private var setElevationItem                                    = naElevation(calculationConfig.defaultInitialElevation)
+  private var followCommandActor: ActorRef[FollowCommandMessages] = _
 
-  private val tromboneHcd: Option[ActorRef[SupervisorExternalMessage]] = tromboneHCD.head._2
-  private var setElevationItem                                         = naElevation(calculationConfig.defaultInitialElevation)
-  private var followCommandActor: ActorRef[FollowCommandMessages]      = _
-
-  override var currentState: AssemblyState     = defaultTromboneState
-  override var currentCommand: AssemblyCommand = _
+  override var hcds: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]] = tromboneHCDs
+  override var currentState: AssemblyState                                        = defaultTromboneState
+  override var currentCommand: AssemblyCommand                                    = _
   override var tromboneStateActor: ActorRef[PubSub[AssemblyState]] =
     ctx.spawnAnonymous(Actor.mutable[PubSub[AssemblyState]](ctx ⇒ new PubSubBehavior(ctx, "")))
 
@@ -59,7 +57,9 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
         case ac.datumCK =>
           AssemblyCommandState(
             Some(
-              List(new DatumCommand(ctx, s, tromboneHcd, currentState.asInstanceOf[TromboneState], tromboneStateActor))
+              List(
+                new DatumCommand(ctx, ac, s, hcds.head._2, currentState.asInstanceOf[TromboneState], tromboneStateActor)
+              )
             ),
             CommandExecutionState.Executing
           )
@@ -67,7 +67,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
           AssemblyCommandState(
             Some(
               List(
-                new MoveCommand(ctx, ac, s, tromboneHcd, currentState.asInstanceOf[TromboneState], tromboneStateActor)
+                new MoveCommand(ctx, ac, s, hcds.head._2, currentState.asInstanceOf[TromboneState], tromboneStateActor)
               )
             ),
             CommandExecutionState.Executing
@@ -79,7 +79,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                 new PositionCommand(ctx,
                                     ac,
                                     s,
-                                    tromboneHcd,
+                                    hcds.head._2,
                                     currentState.asInstanceOf[TromboneState],
                                     tromboneStateActor)
               )
@@ -93,7 +93,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                                    new SetElevationCommand(ctx,
                                                            ac,
                                                            s,
-                                                           tromboneHcd,
+                                                           hcds.head._2,
                                                            currentState.asInstanceOf[TromboneState],
                                                            tromboneStateActor)
                                  )
@@ -103,12 +103,17 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
         case ac.followCK =>
           val nssItem = s(ac.nssInUseKey)
           followCommandActor = ctx.spawnAnonymous(
-            FollowCommandActor.make(ac, setElevationItem, nssItem, tromboneHcd, allEventPublisher)
+            FollowCommandActor.make(ac, setElevationItem, nssItem, hcds.head._2, allEventPublisher)
           )
           AssemblyCommandState(
             Some(
               List(
-                new FollowCommand(ctx, ac, s, tromboneHcd, currentState.asInstanceOf[TromboneState], tromboneStateActor)
+                new FollowCommand(ctx,
+                                  ac,
+                                  s,
+                                  hcds.head._2,
+                                  currentState.asInstanceOf[TromboneState],
+                                  tromboneStateActor)
               )
             ),
             CommandExecutionState.Following
@@ -157,7 +162,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                                     ac,
                                     s,
                                     followCommandActor,
-                                    tromboneHcd,
+                                    hcds.head._2,
                                     currentState.asInstanceOf[TromboneState],
                                     tromboneStateActor)
               )
