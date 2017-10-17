@@ -24,10 +24,16 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
     implicit val timeout: Timeout = Timeout(5.seconds)
     await(getLocation(componentFullName)) match {
       case Some(location) ⇒
-        log.info("Getting log information from logging system",
-                 Map("componentName" → componentFullName, "location" → location.toString))
         val logAdminActor = location.logAdminActorRef.upcast[LogControlMessages]
         val componentName = location.connection.componentId.name
+        log.info(
+          "Getting log information from logging system",
+          Map(
+            "componentName" → componentFullName,
+            "logAdminActor" → logAdminActor.toString,
+            "location"      → location.toString
+          )
+        )
         await(logAdminActor ? (GetComponentLogMetadata(componentName, _)))
       case _ ⇒ throw UnresolvedAkkaOrHttpLocationException(componentFullName)
     }
@@ -37,10 +43,16 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) ext
     async {
       await(getLocation(componentFullName)) match {
         case Some(location) ⇒
-          log.info(s"Setting log level to $logLevel",
-                   Map("componentName" → componentFullName, "location" → location.toString))
           val logAdminActor = location.logAdminActorRef.upcast[LogControlMessages]
           val componentName = location.connection.componentId.name
+          log.info(
+            s"Setting log level to $logLevel",
+            Map(
+              "componentName" → componentFullName,
+              "logAdminActor" → logAdminActor.toString,
+              "location"      → location.toString
+            )
+          )
           logAdminActor ! SetComponentLogLevel(componentName, logLevel)
         case _ ⇒ throw UnresolvedAkkaOrHttpLocationException(componentFullName)
       }

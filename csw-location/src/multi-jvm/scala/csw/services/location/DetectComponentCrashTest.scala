@@ -23,15 +23,18 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
   test("A component running on one node should detect if a http/tcp component running on another node crashes") {
 
     val httpConnection = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
-    val tcpConnection  = TcpConnection(ComponentId("Assembly2", ComponentType.Assembly))
+    val tcpConnection1 = TcpConnection(ComponentId("Assembly2", ComponentType.Assembly))
+    val tcpConnection2 = TcpConnection(ComponentId("Assembly3", ComponentType.Assembly))
 
     runOn(seed) {
       val (_, httpProbe) = locationService.track(httpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
-      val (_, tcpProbe)  = locationService.track(tcpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+      val (_, tcpProbe1) = locationService.track(tcpConnection1).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+      val (_, tcpProbe2) = locationService.track(tcpConnection2).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
       enterBarrier("Registration")
 
       httpProbe.requestNext() shouldBe a[LocationUpdated]
-      tcpProbe.requestNext() shouldBe a[LocationUpdated]
+      tcpProbe1.requestNext() shouldBe a[LocationUpdated]
+      tcpProbe2.requestNext() shouldBe a[LocationUpdated]
       Thread.sleep(2000)
 
       Await.result(testConductor.exit(member1, 0), 5.seconds)
@@ -46,7 +49,8 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
 
       within(20.seconds) {
         awaitAssert {
-          tcpProbe.requestNext(20.seconds) shouldBe a[LocationRemoved]
+          tcpProbe1.requestNext(20.seconds) shouldBe a[LocationRemoved]
+          tcpProbe2.requestNext(20.seconds) shouldBe a[LocationRemoved]
         }
       }
     }
@@ -65,10 +69,12 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
     }
 
     runOn(member2) {
-      val port            = 9595
-      val tcpRegistration = TcpRegistration(tcpConnection, port, LogAdminActorFactory.make(system))
+      val port             = 9595
+      val tcpRegistration1 = TcpRegistration(tcpConnection1, port, LogAdminActorFactory.make(system))
+      val tcpRegistration2 = TcpRegistration(tcpConnection2, port, LogAdminActorFactory.make(system))
 
-      locationService.register(tcpRegistration).await
+      locationService.register(tcpRegistration1).await
+      locationService.register(tcpRegistration2).await
       enterBarrier("Registration")
 
       enterBarrier("after-crash")

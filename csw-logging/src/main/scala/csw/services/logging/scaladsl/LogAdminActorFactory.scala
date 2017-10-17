@@ -7,5 +7,5 @@ import csw.services.logging.internal.{LogAdminActor, LogControlMessages}
 
 object LogAdminActorFactory {
   def make(actorSystem: ActorSystem): ActorRef[LogControlMessages] =
-    actorSystem.spawn(LogAdminActor.behavior(), "log-admin")
+    actorSystem.spawnAnonymous(LogAdminActor.behavior())
 }
