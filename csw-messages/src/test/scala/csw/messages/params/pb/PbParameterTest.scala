@@ -149,6 +149,7 @@ class PbParameterTest extends FunSuite with Matchers {
   }
 
   test("should able to create PbParameter with MatrixItems") {
+    //FIXME: need a way to test Fields
     //    println(PbParameter.scalaDescriptor.fields)
 
     val matrixItems: IntMatrixItems = IntMatrixItems().set(
