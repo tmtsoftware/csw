@@ -6,7 +6,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
 import csw.messages.ccs.Validations.Valid
-import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.commands.{ControlCommand, Setup}
 import csw.messages.ccs.{Validation, Validations}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
@@ -84,6 +84,9 @@ class TromboneAssemblyHandlers(
   }
 
   override def onObserve(commandMessage: CommandMessage): Validations.Valid.type = Validations.Valid
+
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = Validations.Valid
+  override def onOneway(controlCommand: ControlCommand): Validation = Validations.Valid
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
 

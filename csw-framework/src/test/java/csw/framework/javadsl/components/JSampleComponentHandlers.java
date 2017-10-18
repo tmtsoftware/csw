@@ -6,11 +6,13 @@ import akka.typed.javadsl.ActorContext;
 import csw.common.components.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandMessage;
+import csw.messages.CommandResponse;
 import csw.messages.ComponentMessage;
 import csw.messages.PubSub;
 import csw.messages.ccs.Validation;
 import csw.messages.ccs.ValidationIssue;
 import csw.messages.ccs.Validations;
+import csw.messages.ccs.commands.ControlCommand;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
 import csw.messages.params.states.CurrentState;
@@ -82,6 +84,16 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         pubSubRef.tell(publish);
 
         return validateCommand(commandMessage);
+    }
+
+    @Override
+    public Validation onSubmit(ControlCommand commandMessage, ActorRef<CommandResponse> actorRef) {
+        return Validations.JValid();
+    }
+
+    @Override
+    public Validation onOneway(ControlCommand commandMessage) {
+        return Validations.JValid();
     }
 
     private Validation validateCommand(CommandMessage commandMsg) {

@@ -7,6 +7,7 @@ import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.OtherIssue
+import csw.messages.ccs.commands.ControlCommand
 import csw.messages.ccs.{Validation, Validations}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
@@ -89,6 +90,10 @@ class SampleComponentHandlers(
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(observeConfigChoice))))
     validateCommand(commandMessage)
   }
+
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = Validations.Valid
+  override def onOneway(controlCommand: ControlCommand): Validation = Validations.Valid
+
 
   private def validateCommand(commandMsg: CommandMessage): Validation = {
     commandMsg match {
