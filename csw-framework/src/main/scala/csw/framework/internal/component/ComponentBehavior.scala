@@ -161,18 +161,14 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
    * @param commandMessage  Message encapsulating a [[csw.messages.ccs.commands.Command]]
    */
   def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
-    val newMessage: CommandMessage = commandMessage match {
-      case x: Oneway ⇒ x.copy(replyTo = ctx.spawnAnonymous(Actor.ignore))
-      case x: Submit ⇒ x
-    }
 
-    val validation = newMessage.command match {
-      case _: Setup =>
-        log.info(s"Invoking lifecycle handler's onSetup hook with msg :[$newMessage]")
-        lifecycleHandlers.onSetup(newMessage)
-      case _: Observe =>
-        log.info(s"Invoking lifecycle handler's onObserve hook with msg :[$newMessage]")
-        lifecycleHandlers.onObserve(newMessage)
+    val validation = commandMessage match {
+      case _: Oneway =>
+        log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
+        lifecycleHandlers.onOneway(commandMessage.command)
+      case _: Submit =>
+        log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
+        lifecycleHandlers.onSubmit(commandMessage.command, commandMessage.replyTo)
     }
 
     val validationCommandResult = CommandValidationResponse.validationAsCommandStatus(validation)
