@@ -9,7 +9,8 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-public class DD1 {
+//FIXME: need asserts in all test
+public class JPbParameterTest {
 
     @Test
     public void booleanParam() {
@@ -55,9 +56,9 @@ public class DD1 {
                 .setKeyType(Keytype.PbKeyType.IntArrayKey)
                 .build();
 
-        System.out.println(pbParameter.getInstantItems());
-        System.out.println(pbParameter.getIntArrayItems());
-        System.out.println(pbParameter);
+//        System.out.println(pbParameter.getInstantItems());
+//        System.out.println(pbParameter.getIntArrayItems());
+//        System.out.println(pbParameter);
     }
 
     @Test
@@ -94,6 +95,6 @@ public class DD1 {
                 .addParamSet(pbParameter)
                 .build();
 
-        System.out.println(pbEvent);
+//        System.out.println(pbEvent);
     }
 }
