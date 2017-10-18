@@ -69,6 +69,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
 
     val config =
       ConfigFactory.parseString("""
+        |include "logging.conf"
         |csw-logging {
         | appenders = ["csw.services.logging.appenders.CustomAppenderBuilderObject$"]
         | appender-config {
@@ -96,6 +97,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
   test("should be able to add and configure a custom appender using a class extending from CustomAppenderBuilder") {
 
     val config = ConfigFactory.parseString("""
+        |include "logging.conf"
         |csw-logging {
         | appenders = ["csw.services.logging.appenders.CustomAppenderBuilderClass"]
         | appender-config {
@@ -127,6 +129,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
   ) {
 
     val config = ConfigFactory.parseString("""
+                                             |include "logging.conf"
                                              |csw-logging {
                                              | appenders = ["csw.services.logging.appenders.CustomAppenderBuilderClass"]
                                              | appender-config {

@@ -38,10 +38,21 @@ gradle
 These are the relevant default configuration values for logging
 
 logging.conf
-:   @@snip [logging.conf](../../../../csw-logging/src/main/resources/logging.conf)
+:   @@snip [logging.conf](../../../../csw-logging/src/main/resources/logging.conf) { #default-logging-conf }
 
-These values can be overridden directly in the `reference.conf` or `application.conf`. Also `logLevel` for each component can be set
-in reference.conf/application.conf as follows:
+@@@ note
+
+It is required to include `logging.conf` that is shipped with this library in `application.conf` as follows:
+
+```
+include "logging.conf"
+```
+ 
+Default configuration values can be then overridden in `application.conf`. 
+
+@@@
+
+Also `logLevel` for each component can be set in application.conf as follows:
 
 ```
 component-log-levels {
@@ -193,10 +204,12 @@ Java
 To enable logging for some utility code that does not require `@componentName` in log statements, inherit from following traits:
 
 Scala
+:   * For typed mutable actor class extend `GenericLogger.MutableActor`
 :   * For actor class extend `GenericLogger.Actor`
     * For non-actor class extend `GenericLogger.Simple`
 
 Java
+:   * For typed mutable actor class inherit `JGenericLoggerMutableActor`
 :   * For actor class inherit `JGenericLoggerActor`
     * For non-actor class inherit `JGenericLogger`
 
