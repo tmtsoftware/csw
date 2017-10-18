@@ -92,6 +92,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       enterBarrier("config-file-uploaded")
       enterBarrier("running")
       enterBarrier("offline")
+      enterBarrier("before-shutdown")
       enterBarrier("eton-shutdown")
     }
 
@@ -157,10 +158,11 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(setupConfigChoice))))
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
 
-      laserAssemblySupervisor ! ComponentStateSubscription(Subscribe(laserCompStateProbe.ref))
-
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
       enterBarrier("offline")
+
+      enterBarrier("before-shutdown")
+      laserAssemblySupervisor ! ComponentStateSubscription(Subscribe(laserCompStateProbe.ref))
       enterBarrier("eton-shutdown")
 
       // DEOPSCSW-218: Discover component connection information using Akka protocol
@@ -192,6 +194,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       supervisorRef ! GetSupervisorLifecycleState(testProbe.ref)
       testProbe.expectMsg(SupervisorLifecycleState.RunningOffline)
 
+      enterBarrier("before-shutdown")
       supervisorRef ! Shutdown
       enterBarrier("eton-shutdown")
 
