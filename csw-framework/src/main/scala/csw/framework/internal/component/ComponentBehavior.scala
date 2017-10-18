@@ -22,6 +22,16 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
+/**
+ * The Behavior of a component actor represented as a mutable behavior
+ * @param ctx                  The Actor Context under which the actor instance of this behavior is created
+ * @param componentInfo        ComponentInfo as described in the configuration file
+ * @param supervisor           The actor reference of the supervisor actor which created this component
+ * @param lifecycleHandlers    The implementation of handlers which defines the domain actions to be performed by this
+ *                             component
+ * @param locationService      The single instance of Location service created for a running application
+ * @tparam Msg                 The type of messages created for domain specific message hierarchy of any component
+ */
 class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     ctx: ActorContext[ComponentMessage],
     componentInfo: ComponentInfo,
@@ -38,6 +48,11 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   ctx.self ! Initialize
 
+  /**
+   * Defines processing for a [[csw.messages.ComponentMessage]] received by the actor instance.
+   * @param msg      ComponentMessage received from supervisor
+   * @return         The same behavior
+   */
   def onMessage(msg: ComponentMessage): Behavior[ComponentMessage] = {
     log.debug(s"Component TLA in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
@@ -49,6 +64,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     this
   }
 
+  /**
+   * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
+   * @return        The same behvaior
+   */
   override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
     case PostStop ⇒
       log.warn("Component TLA is shutting down")
@@ -61,6 +80,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       this
   }
 
+  /**
+   * Defines action for messages which can be received in any [[csw.framework.internal.component.ComponentLifecycleState]] state
+   * @param commonMessage Message representing a message received in any lifecycle state
+   */
   private def onCommon(commonMessage: CommonMessage): Unit = commonMessage match {
     case UnderlyingHookFailed(exception) ⇒
       log.error(exception.getMessage, ex = exception)
@@ -69,6 +92,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       lifecycleHandlers.onLocationTrackingEvent(trackingEvent)
   }
 
+  /**
+   * Defines action for messages which can be received in [[csw.framework.internal.component.ComponentLifecycleState.Idle]] state
+   * @param idleMessage  Message representing a message received in [[csw.framework.internal.component.ComponentLifecycleState.Idle]] state
+   */
   private def onIdle(idleMessage: IdleMessage): Unit = idleMessage match {
     case Initialize ⇒
       async {
@@ -78,6 +105,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
           s"Component TLA is changing lifecycle state from [$lifecycleState] to [${ComponentLifecycleState.Initialized}]"
         )
         lifecycleState = ComponentLifecycleState.Initialized
+        // track all connections in component info for location updates
         if (componentInfo.locationServiceUsage == RegisterAndTrackServices) {
           componentInfo.connections.foreach(
             connection ⇒ {
@@ -91,6 +119,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       }.failed.foreach(throwable ⇒ ctx.self ! UnderlyingHookFailed(throwable))
   }
 
+  /**
+   * Defines action for messages which can be received in [[csw.framework.internal.component.ComponentLifecycleState.Running]] state
+   * @param runningMessage  Message representing a message received in [[csw.framework.internal.component.ComponentLifecycleState.Running]] state
+   */
   private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
     case Lifecycle(message) ⇒ onLifecycle(message)
     case x: Msg ⇒
@@ -100,9 +132,14 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     case msg               ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
   }
 
+  /**
+   * Defines action for messages which alter the [[csw.framework.internal.component.ComponentLifecycleState]] state
+   * @param toComponentLifecycleMessage  Message representing a lifecycle message sent by the supervisor to the component
+   */
   private def onLifecycle(toComponentLifecycleMessage: ToComponentLifecycleMessage): Unit =
     toComponentLifecycleMessage match {
       case GoOnline ⇒
+        // process only if the component is offline currently
         if (!lifecycleHandlers.isOnline) {
           lifecycleHandlers.isOnline = true
           log.info("Invoking lifecycle handler's onGoOnline hook")
@@ -110,6 +147,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
           log.debug(s"Component TLA is Online")
         }
       case GoOffline ⇒
+        // process only if the component is online currently
         if (lifecycleHandlers.isOnline) {
           lifecycleHandlers.isOnline = false
           log.info("Invoking lifecycle handler's onGoOffline hook")
@@ -118,6 +156,10 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
         }
     }
 
+  /**
+   * Defines action for messages which represent a [[csw.messages.ccs.commands.Command]]
+   * @param commandMessage  Message encapsulating a [[csw.messages.ccs.commands.Command]]
+   */
   def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
     val newMessage: CommandMessage = commandMessage match {
       case x: Oneway ⇒ x.copy(replyTo = ctx.spawnAnonymous(Actor.ignore))
