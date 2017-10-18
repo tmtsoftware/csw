@@ -8,7 +8,7 @@ import csw.messages._
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs.{CommandComplete, CommandMessageE}
 import csw.trombone.assembly.CommonMsgs.{AssemblyStateE, UpdateHcdLocations}
 import csw.trombone.assembly._
-import csw.trombone.assembly.actors.CommandExecutionState.{Executing, Following, NotFollowing}
+import csw.trombone.assembly.actors.CommandExecutionState.{Executing, NotFollowing}
 import csw.trombone.assembly.commands.{AssemblyCommand, AssemblyState}
 
 import scala.util.{Failure, Success}
@@ -16,12 +16,12 @@ import scala.util.{Failure, Success}
 class AssemblyCommandBehavior(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
     assemblyContext: AssemblyContext,
-    assemblyCommandHandlers: AssemblyCommandHandlers
+    assemblyCommandHandlers: AssemblyFollowingCommandHandlers
 ) extends MutableBehavior[AssemblyCommandHandlerMsgs] {
 
   import ctx.executionContext
-  private var commandExecutionState: CommandExecutionState  = NotFollowing
-  private val assemblyStateAdapter: ActorRef[AssemblyState] = ctx.spawnAdapter(AssemblyStateE)
+  var commandExecutionState: CommandExecutionState  = NotFollowing
+  val assemblyStateAdapter: ActorRef[AssemblyState] = ctx.spawnAdapter(AssemblyStateE)
 
   assemblyCommandHandlers.tromboneStateActor ! Subscribe(assemblyStateAdapter)
 
@@ -29,7 +29,6 @@ class AssemblyCommandBehavior(
     (commandExecutionState, msg) match {
       case (_, msg: CommonMsgs)                  ⇒ onCommon(msg)
       case (NotFollowing, msg: NotFollowingMsgs) ⇒ onNotFollowing(msg)
-      case (Following, msg: FollowingMsgs)       ⇒ onFollowing(msg)
       case (Executing, msg: ExecutingMsgs)       ⇒ onExecuting(msg)
       case _                                     ⇒ println(s"Unexpected message :[$msg] received by component in lifecycle state :[$commandExecutionState]")
     }
@@ -50,16 +49,6 @@ class AssemblyCommandBehavior(
       assemblyCommandState.mayBeAssemblyCommand.foreach(x ⇒ x.foreach(executeCommand(_, commandMessage.replyTo)))
   }
 
-  def onFollowing(msg: FollowingMsgs): Unit = msg match {
-    case CommandMessageE(commandMessage) =>
-      val assemblyCommandState = assemblyCommandHandlers.onFollowing(commandMessage)
-      commandExecutionState = assemblyCommandState.commandExecutionState
-      assemblyCommandHandlers.currentCommand = assemblyCommandState.mayBeAssemblyCommand
-      assemblyCommandState.mayBeAssemblyCommand.foreach(x ⇒ x.foreach(executeCommand(_, commandMessage.replyTo)))
-    case CommandComplete(replyTo, result) =>
-      assemblyCommandHandlers.onFollowingCommandComplete(replyTo, result)
-  }
-
   def onExecuting(msg: ExecutingMsgs): Unit = msg match {
     case CommandMessageE(commandMessage) =>
       val assemblyCommandState = assemblyCommandHandlers.onExecuting(commandMessage)
@@ -71,7 +60,7 @@ class AssemblyCommandBehavior(
       commandExecutionState = CommandExecutionState.NotFollowing
   }
 
-  private def executeCommand(assemblyCommand: AssemblyCommand, replyTo: ActorRef[CommandResponse]): Unit = {
+  protected def executeCommand(assemblyCommand: AssemblyCommand, replyTo: ActorRef[CommandResponse]): Unit = {
     assemblyCommand.startCommand().onComplete {
       case Success(result) ⇒ ctx.self ! CommandComplete(replyTo, result)
       case Failure(ex)     ⇒ throw ex // replace with sending a failed message to self

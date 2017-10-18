@@ -13,7 +13,7 @@ abstract class AssemblyCommandBehaviorFactory {
       ac: AssemblyContext,
       tromboneHCDs: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
       allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
-  ): AssemblyCommandHandlers
+  ): AssemblyFollowingCommandHandlers
 
   def make(
       assemblyContext: AssemblyContext,

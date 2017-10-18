@@ -13,9 +13,6 @@ trait AssemblyCommandHandlers {
 
   def onNotFollowing(commandMessage: CommandMessage): AssemblyCommandState
 
-  def onFollowing(commandMessage: CommandMessage): AssemblyCommandState
-  def onFollowingCommandComplete(replyTo: ActorRef[CommandResponse], result: CommandExecutionResponse): Unit
-
   def onExecuting(commandMessage: CommandMessage): AssemblyCommandState
   def onExecutingCommandComplete(replyTo: ActorRef[CommandResponse], result: CommandExecutionResponse): Unit
 }

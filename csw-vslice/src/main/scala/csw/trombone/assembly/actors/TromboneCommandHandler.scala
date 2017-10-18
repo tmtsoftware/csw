@@ -22,7 +22,7 @@ class TromboneAssemblyCommandBehaviorFactory extends AssemblyCommandBehaviorFact
       ac: AssemblyContext,
       tromboneHCDs: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
       allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
-  ): AssemblyCommandHandlers =
+  ): TromboneCommandHandler =
     new TromboneCommandHandler(ctx, ac, tromboneHCDs, allEventPublisher)
 }
 
@@ -30,7 +30,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                              ac: AssemblyContext,
                              tromboneHCDs: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
                              allEventPublisher: Option[ActorRef[TrombonePublisherMsg]])
-    extends AssemblyCommandHandlers {
+    extends AssemblyFollowingCommandHandlers {
 
   implicit val scheduler: Scheduler = ctx.system.scheduler
   import TromboneState._
