@@ -15,6 +15,8 @@ class DetectComponentCrashTestMultiJvmNode1 extends DetectComponentCrashTest(0)
 class DetectComponentCrashTestMultiJvmNode2 extends DetectComponentCrashTest(0)
 class DetectComponentCrashTestMultiJvmNode3 extends DetectComponentCrashTest(0)
 
+// DEOPSCSW-298: DeathWatch Http components
+// DEOPSCSW-300: DeathWatch tcp components
 class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._
