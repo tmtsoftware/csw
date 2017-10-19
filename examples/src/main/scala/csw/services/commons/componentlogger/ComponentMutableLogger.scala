@@ -5,10 +5,10 @@ import akka.typed.scaladsl.ActorContext
 import csw.services.logging.scaladsl.ComponentLogger
 
 //#component-logger-mutable-actor
-class ComponentMutableLogger(ctx: ActorContext[_], _componentName: String)
+class ComponentMutableLogger(ctx: ActorContext[Any], _componentName: String)
     extends ComponentLogger.MutableActor(ctx, _componentName) {
 
-  override def onMessage(msg: Any): Behavior[_] = ???
+  override def onMessage(msg: Any): Behavior[Any] = ???
 
 }
 //#component-logger-mutable-actor

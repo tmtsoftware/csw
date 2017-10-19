@@ -212,6 +212,14 @@ Java
 :   * For typed mutable actor class inherit `JGenericLoggerMutableActor`
 :   * For actor class inherit `JGenericLoggerActor`
     * For non-actor class inherit `JGenericLogger`
+    
+For immutable actors, refer the following example:
+
+Scala Immutable Actor
+:   @@snip [immutableloggers.scala](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #generic-logger }
+
+Java Immutable Actor
+:   @@snip [JGenericImmutableActorLogger](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JGenericImmutableActorLogger.java) { #generic-logger}
 
 ### Enable component level logging
 To include `@componentName` in your log statements, follow one of the below approaches:
@@ -264,6 +272,15 @@ The runtime class from where the `getLogger` method is called, will be picked to
 
 @@@
 
+For immutable actors, refer the following example:
+
+Scala Immutable Actor
+:   @@snip [immutableloggers.scala](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #common-component-logger }
+
+Java Immutable Actor
+:   @@snip [JGenericImmutableActorLogger](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JComponentImmutableActorLogger.java) { #component-logger}
+
+
 #### Runtime component name for each actor/class 
 
 If the component name is not a constant and is available only at runtime in an actor or class, then this is the recommended approach. 
@@ -287,6 +304,15 @@ Java Actor
 
 Java class
 :   @@snip [JComponentSimpleLogger.scala](../../../../examples/src/main/java/csw/services/commons/componentlogger/JComponentSimpleLogger.java) { #component-logger }
+
+For immutable actors, refer the following example:
+
+Scala Immutable Actor
+:   @@snip [immutableloggers.scala](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #component-logger }
+
+Java Immutable Actor
+:   @@snip [JGenericImmutableActorLogger](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JComponentImmutableActorLogger.java) { #component-logger}
+
 
 `log` variable is now available in scala and java classes to log statements as explained in next segment.
 
