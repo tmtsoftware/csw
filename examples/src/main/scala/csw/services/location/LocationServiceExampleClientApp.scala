@@ -107,7 +107,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
       logAdminActorRef
     )
 
-  // Register unTyped ActorRef with Location service. Import scaladsl adapter to implicitly convert
+  // Register UnTyped ActorRef with Location service. Import scaladsl adapter to implicitly convert
   // UnTyped ActorRefs to Typed ActorRef[Nothing]
   val hcdRegResult: RegistrationResult = Await.result(locationService.register(hcdRegistration), 2.seconds)
 
