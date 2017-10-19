@@ -2,10 +2,11 @@ package csw.services.location
 
 import java.net.InetAddress
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.{ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.ActorRef
+import akka.typed.scaladsl.Actor
+import akka.typed.{ActorRef, Behavior}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.services.commons.commonlogger.ExampleLogger
@@ -96,16 +97,29 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // dummy HCD connection
   val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
   val hcdRegistration =
-    AkkaRegistration(hcdConnection, context.actorOf(Props(new Actor {
-      override def receive: Receive = {
-        case "print" => log.info("hello world")
-      }
-    }), name = "my-actor-1"), logAdminActorRef)
+    AkkaRegistration(
+      hcdConnection,
+      context.actorOf(Props(new akka.actor.Actor {
+        override def receive: Receive = {
+          case "print" => log.info("hello world")
+        }
+      }), name = "my-actor-1"),
+      logAdminActorRef
+    )
+
+  // Register unTyped ActorRef with Location service. Import scaladsl adapter to implicitly convert
+  // UnTyped ActorRefs to Typed ActorRef[Nothing]
   val hcdRegResult: RegistrationResult = Await.result(locationService.register(hcdRegistration), 2.seconds)
 
-  //register the client "assembly" created in this example
-  val assemblyConnection                    = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
-  val assemblyRegistration                  = AkkaRegistration(assemblyConnection, self, logAdminActorRef)
+  def behavior(): Behavior[String] = Actor.deferred { ctx =>
+    Actor.same
+  }
+  val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
+
+  val assemblyConnection = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
+
+  // Register Typed ActorRef[String] with Location Service
+  val assemblyRegistration                  = AkkaRegistration(assemblyConnection, typedActorRef, logAdminActorRef)
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations
 
@@ -127,7 +141,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   findResult.foreach(akkaLocation ⇒ {
     //#typed-ref
-    val typedActorRef: ActorRef[Int] = akkaLocation.typedRef[Int]
+    val typedActorRef: ActorRef[String] = akkaLocation.typedRef[String]
     //#typed-ref
   })
   //#resolve

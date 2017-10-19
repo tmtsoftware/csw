@@ -97,6 +97,8 @@ If registration fails for some reason, the returned future will fail with an exc
 (Registration will fail if the `csw-cluster-seed` application is
 not running or could not be found or if the given component name was already registered.)
 
+The following example shows registration of both UnTyped ActorRef and Typed ActorRef:
+ 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #Components-Connections-Registrations }
 

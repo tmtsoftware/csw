@@ -11,6 +11,8 @@ import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
+import akka.typed.Behavior;
+import akka.typed.javadsl.Actor;
 import akka.typed.javadsl.Adapter;
 import csw.messages.location.*;
 import csw.messages.location.Connection.AkkaConnection;
@@ -100,13 +102,21 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
                 "my-actor-1"
         );
 
-        //Use javadsl Adapter to convert UnTyped ActorRefs to Typed ActorRef[Nothing]
+        // Register UnTyped ActorRef with Location service. Use javadsl Adapter to convert UnTyped ActorRefs
+        // to Typed ActorRef[Nothing]
         AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, Adapter.toTyped(actorRef), logAdminActorRef);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
-        //. register the client "assembly" created in this example
+
+        Behavior<String> behavior = Actor.deferred(ctx -> {
+            return Actor.same();
+        });
+        akka.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
+
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
-        AkkaRegistration assemblyRegistration = new AkkaRegistration(assemblyConnection, Adapter.toTyped(getSelf()), logAdminActorRef);
+
+        // Register Typed ActorRef[String] with Location Service
+        AkkaRegistration assemblyRegistration = new AkkaRegistration(assemblyConnection, typedActorRef, logAdminActorRef);
         assemblyRegResult = locationService.register(assemblyRegistration).get();
         //#Components-Connections-Registrations
     }
@@ -137,7 +147,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
 
         findResult.ifPresent(akkaLocation -> {
             //#typed-ref
-            akka.typed.ActorRef<Integer> typedActorRef = akkaLocation.jTypedRef(Integer.class);
+            akka.typed.ActorRef<String> typedActorRef = akkaLocation.jTypedRef(String.class);
             //#typed-ref
         });
         //#resolve

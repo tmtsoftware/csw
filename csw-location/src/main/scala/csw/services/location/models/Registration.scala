@@ -34,7 +34,7 @@ sealed abstract class Registration {
  */
 final case class AkkaRegistration(
     connection: AkkaConnection,
-    actorRef: ActorRef[Nothing],
+    actorRef: ActorRef[_],
     logAdminActorRef: ActorRef[LogControlMessages]
 ) extends Registration
     with LocationServiceLogger.Simple {
