@@ -3,7 +3,6 @@ package csw.messages.location
 import java.net.URI
 
 import acyclic.skipped
-import akka.typed
 import akka.typed.ActorRef
 import csw.messages.TMTSerializable
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -29,7 +28,7 @@ final case class AkkaLocation(
     logAdminActorRef: ActorRef[Nothing]
 ) extends Location {
 
-  def typedRef[T: ClassTag]: typed.ActorRef[T] = {
+  def typedRef[T: ClassTag]: ActorRef[T] = {
     val typeManifest    = scala.reflect.classTag[T].runtimeClass.getSimpleName
     val messageManifest = connection.componentId.componentType.messageManifest
 
@@ -38,6 +37,8 @@ final case class AkkaLocation(
 
     actorRef.upcast[T]
   }
+
+  def jTypedRef[T](klass: Class[T]): ActorRef[T] = typedRef[T](ClassTag(klass))
 }
 
 /**

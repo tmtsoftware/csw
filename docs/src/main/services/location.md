@@ -103,6 +103,21 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #Components-Connections-Registrations }
 
+@@@ note
+
+Notice the `logAdminActorRef` that is used while registering any connection. For an application, make sure there is only one 
+`logAdminActorRef` used for all registrations. 
+
+@@@
+
+@@@ note
+
+The `AkkaRegistration` api takes only Typed ActorRefs. Hence, to register an UnTyped ActorRef for an akka connection, it needs to be
+adapted to Typed `ActorRef[Nothing]`. This can be achieved using adapter provided for scaladsl and javadsl. The usage of adapter is
+shown in above snippet for scala and java both. 
+     
+@@@
+
 ## Creating ActorRef for registration
 
 Make sure the ActorSystem used to start actors using the location service is created using `ActorSystemFactory` as follows:
@@ -117,7 +132,6 @@ Java
 This is required to start a remote ActorSystem on the same network interface where the csw-cluster is running. 
 All the ActorRefs created using this ActorSystem will be available for communication from other components 
 that are part of csw-cluster.
-
 
 ## Resolving Connections
 
@@ -166,6 +180,23 @@ If not, eventually the operation will timeout and the output should read:
 ```
 [INFO] Timeout waiting for location AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) to resolve.
 ```
+
+@@@ note
+
+Once the akka location is found or resolved, there could be a need to give a specific type to the actorRef. Since, the type of the
+ActorRef used while registering cannot be restored due to the concept of `erasure`, the ActorRef can still be typed while retrieving 
+as follows:
+
+Scala
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #typed-ref }
+
+Java
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #typed-ref }
+ 
+If an UnTyped ActorRef was used while registering, then at retrieval, using just `actorRef` instead of `typedRef` from `AkkaLocation` 
+would suffice. 
+
+@@@ 
 ## Filtering
 
 The `list` API and its variants offer means to inquire about available connections with the LocationService. 

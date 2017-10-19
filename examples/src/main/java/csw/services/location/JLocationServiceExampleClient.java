@@ -55,7 +55,6 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
     private IRegistrationResult httpRegResult;
     private IRegistrationResult hcdRegResult;
     private IRegistrationResult assemblyRegResult;
-    private akka.typed.ActorRef<LogControlMessages> logAdminActorRef = LogAdminActorFactory.make(context().system());
 
     private static LoggingSystem loggingSystem;
 
@@ -83,6 +82,8 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
 
     private void registerConnectionsBlocking() throws ExecutionException, InterruptedException {
         //#Components-Connections-Registrations
+        akka.typed.ActorRef<LogControlMessages> logAdminActorRef = LogAdminActorFactory.make(context().system());
+
         // dummy http connection
         HttpConnection httpConnection   = new HttpConnection(new ComponentId("configuration", JComponentType.Service));
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123", logAdminActorRef);
@@ -98,6 +99,8 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
                 }),
                 "my-actor-1"
         );
+
+        //Use javadsl Adapter to convert UnTyped ActorRefs to Typed ActorRef[Nothing]
         AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, Adapter.toTyped(actorRef), logAdminActorRef);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
@@ -132,6 +135,11 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         }
         //#find
 
+        findResult.ifPresent(akkaLocation -> {
+            //#typed-ref
+            akka.typed.ActorRef<Integer> typedActorRef = akkaLocation.jTypedRef(Integer.class);
+            //#typed-ref
+        });
         //#resolve
         // resolve connection to LocationServiceExampleComponent
         // [start LocationServiceExampleComponent after this command but before timeout]

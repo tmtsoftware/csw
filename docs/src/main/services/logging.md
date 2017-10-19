@@ -267,9 +267,6 @@ Java
 
 Loggers for Mutable actors and classes can be mixed in a similar way.
 
-*While writing java code make sure to call `getLogger` method in concrete class only as shown in above java example.
-The runtime class from where the `getLogger` method is called, will be picked to display against `class` tag in log statements*  
-
 @@@
 
 For immutable actors, refer the following example:
@@ -280,6 +277,12 @@ Scala Immutable Actor
 Java Immutable Actor
 :   @@snip [JGenericImmutableActorLogger](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JComponentImmutableActorLogger.java) { #component-logger}
 
+@@@ note
+
+*While writing java code make sure to call `getLogger` method in concrete class only as shown in above java example.
+The runtime class from where the `getLogger` method is called, will be picked to display against `class` tag in log statements*  
+
+@@@
 
 #### Runtime component name for each actor/class 
 
@@ -314,7 +317,7 @@ Java Immutable Actor
 :   @@snip [JGenericImmutableActorLogger](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JComponentImmutableActorLogger.java) { #component-logger}
 
 
-`log` variable is now available in scala and java classes to log statements as explained in next segment.
+`log` variable is now available in scala and java classes to write log statements as explained in next segment.
 
 @@@ note
 

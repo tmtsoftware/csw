@@ -6,10 +6,8 @@ import akka.actor.{Actor, ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.ActorRef
-import akka.typed.scaladsl.adapter._
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.services.commons.RegistrationFactory
 import csw.services.commons.commonlogger.ExampleLogger
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
@@ -68,8 +66,6 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds
-  private val logAdminActorRef: ActorRef[LogControlMessages] =
-    LogAdminActorFactory.make(context.system)
 
   // EXAMPLE DEMO START
 
@@ -83,13 +79,19 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   //#Components-Connections-Registrations
 
+  private val logAdminActorRef: ActorRef[LogControlMessages] =
+    LogAdminActorFactory.make(context.system)
+
   // add some dummy registrations for illustrative purposes
 
   // dummy http connection
   val httpPort                          = 8080
   val httpConnection                    = HttpConnection(ComponentId("configuration", ComponentType.Service))
-  val httpRegistration                  = RegistrationFactory.http(httpConnection, httpPort, "path123")
+  val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123", logAdminActorRef)
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
+
+  // import scaladsl adapter to implicitly convert UnTyped ActorRefs to Typed ActorRef[Nothing]
+  import akka.typed.scaladsl.adapter._
 
   // dummy HCD connection
   val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
@@ -116,20 +118,25 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   log.info(s"Attempting to find $exampleConnection",
            Map(Keys.OBS_ID → "foo_obs_id", "exampleConnection" → exampleConnection.name))
   //#log-info-map
-  val findResult: Option[Location] = Await.result(locationService.find(exampleConnection), timeout)
+  val findResult: Option[AkkaLocation] = Await.result(locationService.find(exampleConnection), timeout)
 
   //#log-info
   log.info(s"Result of the find call: $findResult")
   //#log-info
   //#find
 
+  findResult.foreach(akkaLocation ⇒ {
+    //#typed-ref
+    val typedActorRef: ActorRef[Int] = akkaLocation.typedRef[Int]
+    //#typed-ref
+  })
   //#resolve
   // resolve connection to LocationServiceExampleComponent
   // [start LocationServiceExampleComponent after this command but before timeout]
   log.info(s"Attempting to resolve $exampleConnection with a wait of $waitForResolveLimit ...")
 
-  val resolveResultF: Future[Option[Location]] = locationService.resolve(exampleConnection, waitForResolveLimit)
-  val resolveResult: Option[Location]          = Await.result(resolveResultF, waitForResolveLimit + timeout)
+  val resolveResultF: Future[Option[AkkaLocation]] = locationService.resolve(exampleConnection, waitForResolveLimit)
+  val resolveResult: Option[AkkaLocation]          = Await.result(resolveResultF, waitForResolveLimit + timeout)
   resolveResult match {
     case Some(result) ⇒
       log.info(s"Resolve result: ${locationInfoToString(result)}")
