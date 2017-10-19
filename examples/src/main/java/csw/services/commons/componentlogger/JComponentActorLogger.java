@@ -3,6 +3,7 @@ package csw.services.commons.componentlogger;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JComponentLoggerActor;
 
+//#component-logger-actor
 public class JComponentActorLogger extends JComponentLoggerActor {
 
     private ILogger log;
@@ -16,3 +17,4 @@ public class JComponentActorLogger extends JComponentLoggerActor {
         return null;
     }
 }
+//#component-logger-actor

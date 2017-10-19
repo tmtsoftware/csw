@@ -223,17 +223,17 @@ If log statements appearing from multiple actors/classes has same `@componentNam
 then this is the recommended approach. Create an object/abstract class/interface as follows:
 
 Scala
-:   @@snip [ExampleLogger.scala](../../../../examples/src/main/scala/csw/services/commons/commonlogger/ExampleLogger.scala) { #component-logger }
+:   @@snip [ExampleLogger.scala](../../../../examples/src/main/scala/csw/services/commons/commonlogger/ExampleLogger.scala) { #common-component-logger }
 
 
-Mutable Actor Java class
-:   @@snip [JExampleLoggerMutableActor](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLoggerMutableActor.java) { #jcomponent-logger-mutable-actor }
+Java Mutable Actor
+:   @@snip [JExampleLoggerMutableActor](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLoggerMutableActor.java) { #common-component-logger-mutable-actor }
 
-Actor Java Class
-:   @@snip [JExampleLoggerActor.scala](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLoggerActor.java) { #jcomponent-logger-actor }
+Java Actor
+:   @@snip [JExampleLoggerActor.scala](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLoggerActor.java) { #common-component-logger-actor }
 
-Non-Actor Java class
-:   @@snip [JExampleLogger.scala](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLogger.java) { #jcomponent-logger }
+Java class
+:   @@snip [JExampleLogger.scala](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLogger.java) { #common-component-logger }
 
 
 Then, inherit following object/interface:
@@ -252,7 +252,7 @@ Java
 @@@ note { title="Example to mixin above loggers in actors "}
 
 Scala
-:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #actor-mixin }
+:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #actor-mixin }
 
 Java
 :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #actor-mixin }
@@ -266,44 +266,31 @@ The runtime class from where the `getLogger` method is called, will be picked to
 
 #### Runtime component name for each actor/class 
 
-If the component name is not constant and available only at runtime in an actor or class then this is the recommended approach. 
+If the component name is not a constant and is available only at runtime in an actor or class, then this is the recommended approach. 
+Mixin loggers as follows:
 
-Scala
-:   @@snip [ExampleLogger.scala](../../../../examples/src/main/scala/csw/services/commons/commonlogger/ExampleLogger.scala) { #component-logger }
+Scala Mutable Actor
+:   @@snip [ComponentMutableLogger.scala](../../../../examples/src/main/scala/csw/services/commons/componentlogger/ComponentMutableLogger.scala) { #component-logger-mutable-actor }
 
+Scala Actor
+:   @@snip [ComponentActorLogger.scala](../../../../examples/src/main/scala/csw/services/commons/componentlogger/ComponentActorLogger.scala) { #component-logger-actor }
 
-Mutable Actor Java class
-:   @@snip [JExampleLoggerMutableActor](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLoggerMutableActor.java) { #jcomponent-logger-mutable-actor }
-
-Actor Java Class
-:   @@snip [JExampleLoggerActor.scala](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLoggerActor.java) { #jcomponent-logger-actor }
-
-Non-Actor Java class
-:   @@snip [JExampleLogger.scala](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLogger.java) { #jcomponent-logger }
+Scala class
+:   @@snip [ComponentSimpleLogger.scala](../../../../examples/src/main/scala/csw/services/commons/componentlogger/ComponentSimpleLogger.scala) { #component-logger }
 
 
-Then, inherit following object/interface:
+Java Mutable Actor
+:   @@snip [JComponentMutableActorLogger](../../../../examples/src/main/java/csw/services/commons/componentlogger/JComponentMutableActorLogger.java) { #component-logger-mutable-actor }
 
-Scala
-:   * For all mutable actors that need 'my-component-name', extend `ExampleLogger.MutableActor`
-:   * For all untyped actors that need 'my-component-name', extend `ExampleLogger.Actor`
-    * For all non-actor classes that need 'my-component-name', extend `ExampleLogger.Simple`
-    
-Java
-:   * For all  mutable actors that need 'my-component-name', inherit `JExampleLoggerMutableActor`
-:   * For all untyped actors that need 'my-component-name', inherit `JExampleLoggerActor`
-    * For all non-actor classes that need 'my-component-name', inherit `JExampleLogger`
+Java Actor
+:   @@snip [JComponentActorLogger.scala](../../../../examples/src/main/java/csw/services/commons/componentlogger/JComponentActorLogger.java) { #component-logger-actor }
 
+Java class
+:   @@snip [JComponentSimpleLogger.scala](../../../../examples/src/main/java/csw/services/commons/componentlogger/JComponentSimpleLogger.java) { #component-logger }
 
-@@@ note { title="Example to mixin above loggers in actors "}
+`log` variable is now available in scala and java classes to log statements as explained in next segment.
 
-Scala
-:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #actor-mixin }
-
-Java
-:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #actor-mixin }
-
-Loggers for Mutable actors and classes can be mixed in a similar way.
+@@@ note
 
 *While writing java code make sure to call `getLogger` method in concrete class only as shown in above java example.
 The runtime class from where the `getLogger` method is called, will be picked to display against `class` tag in log statements*  

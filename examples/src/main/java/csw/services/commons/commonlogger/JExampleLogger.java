@@ -2,7 +2,7 @@ package csw.services.commons.commonlogger;
 
 import csw.services.logging.javadsl.JCommonComponentLogger;
 
-//#jcomponent-logger
+//#common-component-logger
 //JExampleLogger is used for non-actor java class only
 public interface JExampleLogger extends JCommonComponentLogger {
     @Override
@@ -10,4 +10,4 @@ public interface JExampleLogger extends JCommonComponentLogger {
         return "my-component-name";
     }
 }
-//#jcomponent-logger
+//#common-component-logger

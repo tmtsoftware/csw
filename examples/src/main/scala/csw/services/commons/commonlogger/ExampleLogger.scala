@@ -2,6 +2,6 @@ package csw.services.commons.commonlogger
 
 import csw.services.logging.scaladsl.CommonComponentLogger
 
-//#component-logger
+//#common-component-logger
 object ExampleLogger extends CommonComponentLogger("my-component-name")
-//#component-logger
+//#common-component-logger
