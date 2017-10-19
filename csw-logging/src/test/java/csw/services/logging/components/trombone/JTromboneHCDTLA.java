@@ -7,19 +7,12 @@ import csw.services.logging.utils.JLogUtil;
 public class JTromboneHCDTLA implements JComponentLogger {
 
     private ILogger logger;
-    private String componentName;
 
     public JTromboneHCDTLA(String componentName) {
-        this.componentName = componentName;
-        this.logger = getLogger();
+        this.logger = getLogger(componentName);
     }
 
     public void startLogging() {
         new JLogUtil().logInBulk(logger);
-    }
-
-    @Override
-    public String componentName() {
-        return this.componentName;
     }
 }

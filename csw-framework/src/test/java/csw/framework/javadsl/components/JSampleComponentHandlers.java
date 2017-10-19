@@ -16,12 +16,12 @@ import csw.messages.location.TrackingEvent;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JComponentLogger;
+import csw.services.logging.javadsl.JCommonComponentLogger;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
 
-public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> implements JComponentLogger {
+public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> implements JCommonComponentLogger {
 
     private String componentName;
     // Demonstrating logger accessibility in Java Component handlers
