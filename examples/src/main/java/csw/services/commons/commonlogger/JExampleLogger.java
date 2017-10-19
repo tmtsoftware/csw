@@ -1,4 +1,4 @@
-package csw.services.commons;
+package csw.services.commons.commonlogger;
 
 import csw.services.logging.javadsl.JComponentLogger;
 
@@ -7,7 +7,7 @@ import csw.services.logging.javadsl.JComponentLogger;
 public interface JExampleLogger extends JComponentLogger {
     @Override
     default String componentName() {
-        return "examples";
+        return "my-component-name";
     }
 }
 //#jcomponent-logger

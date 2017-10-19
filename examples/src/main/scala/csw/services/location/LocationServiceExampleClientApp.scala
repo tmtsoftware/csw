@@ -9,7 +9,8 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter._
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.services.commons.{ExampleLogger, RegistrationFactory}
+import csw.services.commons.RegistrationFactory
+import csw.services.commons.commonlogger.ExampleLogger
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
 import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
