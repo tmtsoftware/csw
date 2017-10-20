@@ -180,7 +180,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val observe: Observe         = Observe(commandInfo, successPrefix, Set(param))
 
         supervisorRef ! Submit(observe, commandValidationResponseProbe.ref)
-        // verify that onSetup handler is invoked
+        // verify that onObserve handler is invoked
         val submitObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(observeConfigChoice)))
         DemandMatcher(submitObserveConfigDemandState).check(submitObserveConfigCurrentState.data) shouldBe true
@@ -192,9 +192,9 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         commandValidationResponseProbe.expectMsg(Accepted)
 
         supervisorRef ! Oneway(observe, commandValidationResponseProbe.ref)
-        // verify that onSetup handler is invoked
+        // verify that onObserve handler is invoked
         val oneWayObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val oneWayObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice)))
+        val oneWayObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(observeConfigChoice)))
         DemandMatcher(oneWayObserveConfigDemandState).check(oneWayObserveConfigCurrentState.data) shouldBe true
 
         // verify that OneWay command is received by handler

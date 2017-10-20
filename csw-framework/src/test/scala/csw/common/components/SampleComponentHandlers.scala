@@ -25,7 +25,7 @@ object SampleComponentState {
   val domainChoice          = Choice("Domain")
   val shutdownChoice        = Choice("Shutdown")
   val setupConfigChoice     = Choice("SetupConfig")
-  val observeConfigChoice   = Choice("SetupConfig")
+  val observeConfigChoice   = Choice("ObserveConfig")
   val submitCommandChoice   = Choice("SubmitCommand")
   val oneWayCommandChoice   = Choice("OneWayCommand")
   val initChoice            = Choice("Initialize")
