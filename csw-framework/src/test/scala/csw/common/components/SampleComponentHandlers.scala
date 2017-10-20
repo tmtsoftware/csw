@@ -82,13 +82,17 @@ class SampleComponentHandlers(
 
   override def onSetup(commandMessage: CommandMessage): Validation = {
     // Adding passed in parameter to see if data is transferred properly
-    pubSubRef ! Publish(CurrentState(commandMessage.command.prefix, Set(choiceKey.set(setupConfigChoice), commandMessage.command.paramSet.head)))
+    pubSubRef ! Publish(
+      CurrentState(prefix, Set(choiceKey.set(setupConfigChoice), commandMessage.command.paramSet.head))
+    )
     validateCommand(commandMessage)
   }
 
   override def onObserve(commandMessage: CommandMessage): Validation = {
     // Adding passed in parameter to see if data is transferred properly
-    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(observeConfigChoice), commandMessage.command.paramSet.head)))
+    pubSubRef ! Publish(
+      CurrentState(prefix, Set(choiceKey.set(observeConfigChoice), commandMessage.command.paramSet.head))
+    )
     validateCommand(commandMessage)
   }
 
