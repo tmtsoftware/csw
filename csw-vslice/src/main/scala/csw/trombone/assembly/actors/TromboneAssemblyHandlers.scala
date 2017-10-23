@@ -3,10 +3,11 @@ package csw.trombone.assembly.actors
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.messages.CommandMessage.Submit
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
 import csw.messages.ccs.Validations.Valid
-import csw.messages.ccs.commands.{ControlCommand, Setup}
+import csw.messages.ccs.commands.{ControlCommand, Observe, Setup}
 import csw.messages.ccs.{Validation, Validations}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
@@ -75,17 +76,17 @@ class TromboneAssemblyHandlers(
     case _                                   ⇒
   }
 
-  override def onSetup(commandMessage: CommandMessage): Validation = {
-    val validation = validateOneSetup(commandMessage.command.asInstanceOf[Setup])
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = {
+    val validation = controlCommand match {
+      case Setup(info, prefix, paramSet)   => validateOneSetup(controlCommand.asInstanceOf[Setup])
+      case Observe(info, prefix, paramSet) => Valid
+    }
     if (validation == Valid) {
-      commandHandler ! CommandMessageE(commandMessage)
+      commandHandler ! CommandMessageE(Submit(controlCommand, replyTo))
     }
     validation
   }
 
-  override def onObserve(commandMessage: CommandMessage): Validations.Valid.type = Validations.Valid
-
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = Validations.Valid
   override def onOneway(controlCommand: ControlCommand): Validation = Validations.Valid
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???

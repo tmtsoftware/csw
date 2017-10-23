@@ -3,11 +3,10 @@ package csw.common.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.OtherIssue
-import csw.messages.ccs.commands.ControlCommand
+import csw.messages.ccs.commands.{ControlCommand, Observe, Setup}
 import csw.messages.ccs.{Validation, Validations}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
@@ -81,35 +80,32 @@ class SampleComponentHandlers(
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
   }
 
-  override def onSetup(commandMessage: CommandMessage): Validation = {
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = {
     // Adding passed in parameter to see if data is transferred properly
     pubSubRef ! Publish(
-      CurrentState(prefix, Set(choiceKey.set(setupConfigChoice), commandMessage.command.paramSet.head))
+      CurrentState(prefix, Set(choiceKey.set(submitCommandChoice)))
     )
-    validateCommand(commandMessage)
+    validateCommand(controlCommand)
   }
 
-  override def onObserve(commandMessage: CommandMessage): Validation = {
+  override def onOneway(controlCommand: ControlCommand): Validation = {
     // Adding passed in parameter to see if data is transferred properly
     pubSubRef ! Publish(
-      CurrentState(prefix, Set(choiceKey.set(observeConfigChoice), commandMessage.command.paramSet.head))
+      CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
     )
-    validateCommand(commandMessage)
+    validateCommand(controlCommand)
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = Validations.Valid
-  override def onOneway(controlCommand: ControlCommand): Validation = Validations.Valid
-
-
-  private def validateCommand(commandMsg: CommandMessage): Validation = {
-    commandMsg match {
-      case Submit(command, replyTo) =>
-        pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
-      case Oneway(command, replyTo) =>
-        pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
+  private def validateCommand(command: ControlCommand) = {
+    command match {
+      case Setup(_, _, _) ⇒
+        pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(setupConfigChoice), command.paramSet.head)))
+      case Observe(_, _, _) ⇒
+        pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(observeConfigChoice), command.paramSet.head)))
+      case _ ⇒
     }
 
-    if (commandMsg.command.prefix.prefix.contains("success")) {
+    if (command.prefix.prefix.contains("success")) {
       Validations.Valid
     } else {
       Validations.Invalid(OtherIssue("Testing: Received failure, will return Invalid."))
@@ -125,9 +121,9 @@ class SampleComponentHandlers(
   override protected def componentName(): String = componentInfo.name
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
-    case LocationUpdated(location) =>
+    case LocationUpdated(_) ⇒
       pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(locationUpdatedChoice))))
-    case LocationRemoved(connection) =>
+    case LocationRemoved(_) ⇒
       pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(locationRemovedChoice))))
   }
 }

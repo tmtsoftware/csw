@@ -9,7 +9,7 @@ import csw.messages.ccs.commands.ControlCommand
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandMessage, CommandResponse, ComponentMessage}
+import csw.messages.{CommandResponse, ComponentMessage}
 import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.Future
@@ -26,8 +26,6 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
   def initialize(): Future[Unit]
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit
   def onDomainMsg(msg: Msg): Unit
-  def onSetup(commandMessage: CommandMessage): Validation
-  def onObserve(commandMessage: CommandMessage): Validation
   def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation
   def onOneway(controlCommand: ControlCommand): Validation
   def onShutdown(): Future[Unit]

@@ -114,11 +114,12 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     val sc1 = Setup("Obs001", Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
 
-    when(sampleHcdHandler.onSetup(ArgumentMatchers.any[Submit]())).thenReturn(Validations.Valid)
+    when(sampleHcdHandler.onSubmit(ArgumentMatchers.any[Setup](), ArgumentMatchers.any[ActorRef[CommandResponse]]()))
+      .thenReturn(Validations.Valid)
 
     runningComponentBehavior.onMessage(Submit(sc1, commandResponseProbe.ref))
 
-    verify(sampleHcdHandler).onSetup(Submit(sc1, commandResponseProbe.ref))
+    verify(sampleHcdHandler).onSubmit(sc1, commandResponseProbe.ref)
     commandResponseProbe.expectMsg(Accepted)
   }
 
@@ -130,11 +131,11 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     val sc1 = Observe("Obs001", Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
 
-    when(sampleHcdHandler.onObserve(ArgumentMatchers.any[Submit]())).thenReturn(Validations.Valid)
+    when(sampleHcdHandler.onOneway(ArgumentMatchers.any[Setup]())).thenReturn(Validations.Valid)
 
-    runningComponentBehavior.onMessage(Submit(sc1, commandResponseProbe.ref))
+    runningComponentBehavior.onMessage(Oneway(sc1, commandResponseProbe.ref))
 
-    verify(sampleHcdHandler).onObserve(Oneway(sc1, ArgumentMatchers.any[ActorRef[AnyRef]]()))
+    verify(sampleHcdHandler).onOneway(sc1)
     commandResponseProbe.expectMsg(Accepted)
   }
 }

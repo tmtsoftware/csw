@@ -40,12 +40,8 @@ class GalilComponentHandlers(
     log.fatal("Level is fatal")
   }
 
-  override def onSetup(commandMessage: CommandMessage): Validation = Valid
-
-  override def onObserve(commandMessage: CommandMessage): Validation = Valid
-
   override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = Valid
-  override def onOneway(controlCommand: ControlCommand): Validation = Valid
+  override def onOneway(controlCommand: ControlCommand): Validation                                     = Valid
 
   override def onShutdown(): Future[Unit] = Future.successful(())
 

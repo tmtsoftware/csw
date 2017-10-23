@@ -66,17 +66,6 @@ class TromboneHcdHandlers(
 
   override def onGoOnline(): Unit = println("Received running offline")
 
-  override def onSetup(commandMessage: CommandMessage): Validation = {
-    val validation = ParamValidation.validateSetup(commandMessage.command.asInstanceOf[Setup])
-    if (validation == Valid)
-      onSetup(commandMessage.command.asInstanceOf[Setup])
-    validation
-  }
-
-  override def onObserve(commandMessage: CommandMessage): Validation = {
-    ParamValidation.validateObserve(commandMessage.command.asInstanceOf[Observe])
-  }
-
   private def onSetup(sc: Setup): Unit = {
     import csw.trombone.hcd.TromboneHcdState._
     println(s"Trombone process received sc: $sc")
@@ -95,9 +84,16 @@ class TromboneHcdHandlers(
     }
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = Validations.Valid
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = {
+    val validation = controlCommand match {
+      case setup: Setup     => ParamValidation.validateSetup(setup)
+      case observe: Observe => ParamValidation.validateObserve(observe)
+    }
+    if (validation == Valid)
+      onSetup(controlCommand.asInstanceOf[Setup])
+    validation
+  }
   override def onOneway(controlCommand: ControlCommand): Validation = Validations.Valid
-
 
   def onDomainMsg(tromboneMsg: TromboneMessage): Unit = tromboneMsg match {
     case x: TromboneEngineering => onEngMsg(x)

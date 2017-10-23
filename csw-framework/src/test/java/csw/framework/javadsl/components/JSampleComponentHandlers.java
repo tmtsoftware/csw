@@ -13,6 +13,7 @@ import csw.messages.ccs.Validation;
 import csw.messages.ccs.ValidationIssue;
 import csw.messages.ccs.Validations;
 import csw.messages.ccs.commands.ControlCommand;
+import csw.messages.ccs.commands.Setup;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
 import csw.messages.params.states.CurrentState;
@@ -70,46 +71,38 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public Validation onSetup(CommandMessage commandMessage) {
-        CurrentState setupState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add( commandMessage.command().paramSet().head());
-        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(setupState);
-        pubSubRef.tell(publish);
-        return validateCommand(commandMessage);
-    }
-
-    @Override
-    public Validation onObserve(CommandMessage commandMessage) {
+    public Validation onSubmit(ControlCommand controlCommand, ActorRef<CommandResponse> actorRef) {
         // Adding item from CommandMessage paramset to ensure things are working
-        CurrentState observeState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add( commandMessage.command().paramSet().head());
-        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(observeState);
+        CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
+        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(submitState);
         pubSubRef.tell(publish);
 
-        return validateCommand(commandMessage);
+        return validateCommand(controlCommand);
     }
 
     @Override
-    public Validation onSubmit(ControlCommand commandMessage, ActorRef<CommandResponse> actorRef) {
-        return Validations.JValid();
+    public Validation onOneway(ControlCommand controlCommand) {
+        // Adding item from CommandMessage paramset to ensure things are working
+        CurrentState onewayState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));
+        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(onewayState);
+        pubSubRef.tell(publish);
+
+        return validateCommand(controlCommand);
     }
 
-    @Override
-    public Validation onOneway(ControlCommand commandMessage) {
-        return Validations.JValid();
-    }
-
-    private Validation validateCommand(CommandMessage commandMsg) {
+    private Validation validateCommand(ControlCommand controlCommand) {
         CurrentState commandState;
-        if(commandMsg instanceof CommandMessage.Submit) {
-            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
+        if(controlCommand instanceof Setup) {
+            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
         }
         else {
-            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));
+            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());
         }
 
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(commandState);
 
         pubSubRef.tell(publish);
-        if (commandMsg.command().prefix().prefix().contains("success")) {
+        if (controlCommand.prefix().prefix().contains("success")) {
             return Validations.JValid();
         } else {
             return new Validations.Invalid(new ValidationIssue.OtherIssue("Testing: Received failure, will return Invalid."));

@@ -117,7 +117,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
-  test("onSetup hook should be invoked and command validation should be successful on receiving Setup config") {
+  test("onSubmit hook should be invoked and command validation should be successful on receiving Setup config") {
     forAll(testData) { (info: ComponentInfo) =>
       {
         val mocks = frameworkTestMocks()
@@ -133,28 +133,31 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val setup: Setup             = Setup(commandInfo, successPrefix, Set(param))
 
         supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
-        // verify that onSetup handler is invoked and provide check that data is transferred
+        // verify that onSubmit handler is invoked
+        val submitSetupCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val submitSetupCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
+        DemandMatcher(submitSetupCommandDemandState).check(submitSetupCommandCurrentState.data) shouldBe true
+
+        // verify that setup config is received by handler and provide check that data is transferred
         val submitSetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitSetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice), param))
         DemandMatcher(submitSetupConfigDemandState).check(submitSetupConfigCurrentState.data) shouldBe true
+        commandValidationResponseProbe.expectMsg(Accepted)
 
-        // verify that Submit command is received by handler
+        val observe: Observe = Observe(commandInfo, successPrefix, Set(param))
+
+        supervisorRef ! Submit(observe, commandValidationResponseProbe.ref)
+
+        // verify that onSubmit handler is invoked
         val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
         DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted)
 
-        supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
-        // verify that onSetup handler is invoked and that data is transferred
-        val oneWaySetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val oneWaySetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice), param))
-        DemandMatcher(oneWaySetupConfigDemandState).check(oneWaySetupConfigCurrentState.data) shouldBe true
-
-        // verify that OneWay command is received by handler
-        val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
-        DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
-        commandValidationResponseProbe.expectMsg(Accepted)
+        // verify that observe config is received by handler and provide check that data is transferred
+        val submitObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val submitObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(observeConfigChoice), param))
+        DemandMatcher(submitObserveConfigDemandState).check(submitObserveConfigCurrentState.data) shouldBe true
       }
     }
   }
@@ -164,12 +167,12 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
-  test("onObserve hook should be invoked and command validation should be successful on receiving Observe config") {
+  test("onOneway hook should be invoked and command validation should be successful on receiving Observe config") {
     forAll(testData) { (info: ComponentInfo) =>
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(info, mocks)
+        createSupervisorAndStartTLA(hcdInfo, mocks)
         val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
@@ -177,30 +180,32 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         val commandInfo: CommandInfo = "Obs001"
         val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
-        val observe: Observe         = Observe(commandInfo, successPrefix, Set(param))
+        val setup: Setup             = Setup(commandInfo, successPrefix, Set(param))
 
-        supervisorRef ! Submit(observe, commandValidationResponseProbe.ref)
-        // verify that onObserve handler is invoked and parameter is successfully transferred
-        val submitObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val submitObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(observeConfigChoice), param))
-        DemandMatcher(submitObserveConfigDemandState).check(submitObserveConfigCurrentState.data) shouldBe true
+        supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
+        // verify that onSetup handler is invoked and that data is transferred
+        val onewaySetupCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val onewaySetupCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
+        DemandMatcher(onewaySetupCommandDemandState).check(onewaySetupCommandCurrentState.data) shouldBe true
 
-        // verify that Submit command is received by handler
-        val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
-        DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
+        // verify that OneWay command is received by handler
+        val onewaySetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val onewaySetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice), param))
+        DemandMatcher(onewaySetupConfigDemandState).check(onewaySetupConfigCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted)
+
+        val observe: Observe = Observe(commandInfo, successPrefix, Set(param))
 
         supervisorRef ! Oneway(observe, commandValidationResponseProbe.ref)
         // verify that onObserve handler is invoked and parameter is successfully transferred
+        val oneWayObserveCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
+        val oneWayObserveCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
+        DemandMatcher(oneWayObserveCommandDemandState).check(oneWayObserveCommandCurrentState.data) shouldBe true
+
+        // verify that OneWay command is received by handler
         val oneWayObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val oneWayObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(observeConfigChoice), param))
         DemandMatcher(oneWayObserveConfigDemandState).check(oneWayObserveConfigCurrentState.data) shouldBe true
-
-        // verify that OneWay command is received by handler
-        val onewayCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val onewayCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
-        DemandMatcher(onewayCommandDemandState).check(onewayCommandCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted)
       }
     }
