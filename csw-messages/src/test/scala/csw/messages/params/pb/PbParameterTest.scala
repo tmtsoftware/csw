@@ -2,7 +2,6 @@ package csw.messages.params.pb
 
 import java.time.Instant
 
-import com.trueaccord.scalapb.json.JsonFormat
 import csw.messages.params.generics.KeyType.IntMatrixKey
 import csw.messages.params.generics.{JKeyTypes, KeyType, Parameter}
 import csw.messages.params.models._
@@ -14,6 +13,7 @@ import org.scalatest.{FunSuite, Matchers}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 
+// DEOPSCSW-297: Merge protobuf branch in master
 class PbParameterTest extends FunSuite with Matchers {
 
   test("should able to parse PbParameter with multiple values") {
@@ -86,10 +86,6 @@ class PbParameterTest extends FunSuite with Matchers {
     parameter.name shouldBe "encoder"
     parameter.units shouldBe Units.second
     parameter.keyType shouldBe KeyType.TimestampKey
-
-    //FIXME: need assert for json values
-    JsonFormat.toJsonString(parameter)
-    JsonFormat.toJson(parameter)
   }
 
   test("should able to create PbParameter with int items only when KeyType is Int") {
@@ -149,9 +145,6 @@ class PbParameterTest extends FunSuite with Matchers {
   }
 
   test("should able to create PbParameter with MatrixItems") {
-    //FIXME: need a way to test Fields
-    //    println(PbParameter.scalaDescriptor.fields)
-
     val matrixItems: IntMatrixItems = IntMatrixItems().set(
       Seq(MatrixData.fromArrays(Array(1, 2, 3), Array(6, 7)), MatrixData.fromArrays(Array(11, 12, 13), Array(16, 17)))
     )
@@ -213,22 +206,5 @@ class PbParameterTest extends FunSuite with Matchers {
     param.units shouldBe pbParameter.units
     param.keyType shouldBe pbParameter.keyType
     param.items shouldBe pbParameter.getRaDecItems.values
-  }
-
-  //FIXME: why do we need this?
-  test("17") {
-
-    val p1 = PbParameter()
-      .withName("a")
-//      .withKeyType(KeyType.BooleanKey)
-      .withIntItems(IntItems().addValues(1, 2))
-
-//    println(p1)
-  }
-
-  //FIXME: why do we need this?
-  test("18") {
-    val pbParam = PbParameter().withIntItems(IntItems().addValues(1, 2, 3, 4, 5))
-    println(pbParam)
   }
 }
