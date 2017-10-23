@@ -2,7 +2,7 @@ import sbt._
 import com.trueaccord.scalapb.compiler.Version.scalapbVersion
 
 object Libs {
-  val ScalaVersion = "2.12.3"
+  val ScalaVersion = "2.12.4"
 
   val `scalatest`                    = "org.scalatest"          %% "scalatest"                    % "3.0.4" //Apache License 2.0
   val `scala-java8-compat`           = "org.scala-lang.modules" %% "scala-java8-compat"           % "0.8.0" //BSD 3-clause "New" or "Revised" License
