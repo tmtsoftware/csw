@@ -80,6 +80,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   //#Components-Connections-Registrations
 
+  // logAdminActorRef handles dynamically setting/getting log level of the component
   private val logAdminActorRef: ActorRef[LogControlMessages] =
     LogAdminActorFactory.make(context.system)
 
@@ -90,6 +91,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val httpConnection                    = HttpConnection(ComponentId("configuration", ComponentType.Service))
   val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123", logAdminActorRef)
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
+
+  // ************************************************************************************************************
 
   // import scaladsl adapter to implicitly convert UnTyped ActorRefs to Typed ActorRef[Nothing]
   import akka.typed.scaladsl.adapter._
@@ -110,6 +113,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // Register UnTyped ActorRef with Location service. Import scaladsl adapter to implicitly convert
   // UnTyped ActorRefs to Typed ActorRef[Nothing]
   val hcdRegResult: RegistrationResult = Await.result(locationService.register(hcdRegistration), 2.seconds)
+
+  // ************************************************************************************************************
 
   def behavior(): Behavior[String] = Actor.deferred { ctx =>
     Actor.same

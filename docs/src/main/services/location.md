@@ -9,6 +9,7 @@ An example of location information is:
 * host address/port pairs
 * URL/URIs paths
 * connection protocols
+* log-admin actor reference
 
 @@@ note { title="async handling in scala and java examples." }
 
@@ -107,8 +108,8 @@ Java
 
 @@@ note
 
-Notice the `logAdminActorRef` that is used while registering any connection. For an application, make sure there is only one 
-`logAdminActorRef` used for all registrations. 
+Notice the `logAdminActorRef` that is used while registering any connection. It is used to dynamically change the log level of a component. For an application, make sure there
+is only one `logAdminActorRef` used for all registrations. The source code of `LogAdminActor` can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-logging/src/main/scala/csw/services/logging/internal/LogAdminActor.scala). 
 
 @@@
 
@@ -117,7 +118,9 @@ Notice the `logAdminActorRef` that is used while registering any connection. For
 The `AkkaRegistration` api takes only Typed ActorRefs. Hence, to register an UnTyped ActorRef for an akka connection, it needs to be
 adapted to Typed `ActorRef[Nothing]`. This can be achieved using adapter provided for scaladsl and javadsl. The usage of adapter is
 shown in above snippet for scala and java both. 
-     
+
+Also, note that for components, the registration will be taken care of via `csw-framework`. Hence, component developers won't register any connections during their development.
+So, above demonstration of registering connections is for explanatory and testing purpose only.  
 @@@
 
 ## Creating ActorRef for registration
@@ -185,18 +188,15 @@ If not, eventually the operation will timeout and the output should read:
 
 @@@ note
 
-Once the akka location is found or resolved, there could be a need to give a specific type to the actorRef. Since, the type of the
-ActorRef used while registering cannot be restored due to the concept of `erasure`, the ActorRef can still be typed while retrieving 
-as follows:
+The `resolve` and `find` api returns the concrete `Location` type i.e. `Akkalocation`, `HttpLocation` or `TcpLocation` as demonstrated in this section. Once the akka location
+is found or resolved, we need to retain the type to the actorRef, since the explicit type annotation is removed from the program, before it is executed at run-time 
+(refer [type erasure](https://en.wikipedia.org/wiki/Type_erasure)). Retaining the type can be acheived using following `AkkaLocation` api:
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #typed-ref }
 
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #typed-ref }
- 
-If an UnTyped ActorRef was used while registering, then at retrieval, using just `actorRef` instead of `typedRef` from `AkkaLocation` 
-would suffice. 
 
 @@@ 
 ## Filtering

@@ -84,12 +84,16 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
 
     private void registerConnectionsBlocking() throws ExecutionException, InterruptedException {
         //#Components-Connections-Registrations
+
+        // logAdminActorRef handles dynamically setting/getting log level of the component
         akka.typed.ActorRef<LogControlMessages> logAdminActorRef = LogAdminActorFactory.make(context().system());
 
         // dummy http connection
         HttpConnection httpConnection   = new HttpConnection(new ComponentId("configuration", JComponentType.Service));
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123", logAdminActorRef);
         httpRegResult = locationService.register(httpRegistration).get();
+
+        // ************************************************************************************************************
 
         // dummy HCD connection
         AkkaConnection hcdConnection = new AkkaConnection(new ComponentId("hcd1", JComponentType.HCD));
@@ -107,6 +111,7 @@ public class JLocationServiceExampleClient extends JExampleLoggerActor {
         AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, Adapter.toTyped(actorRef), logAdminActorRef);
         hcdRegResult = locationService.register(hcdRegistration).get();
 
+        // ************************************************************************************************************
 
         Behavior<String> behavior = Actor.deferred(ctx -> {
             return Actor.same();
