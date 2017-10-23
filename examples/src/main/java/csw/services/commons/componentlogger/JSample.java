@@ -4,11 +4,11 @@ import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JComponentLogger;
 
 //#component-logger
-public class JComponentSimpleLogger implements JComponentLogger {
+public class JSample implements JComponentLogger {
 
     private ILogger log;
 
-    public JComponentSimpleLogger(String _componentName) {
+    public JSample(String _componentName) {
         this.log = getLogger(_componentName);
     }
 }

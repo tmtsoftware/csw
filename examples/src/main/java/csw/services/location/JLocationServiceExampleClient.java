@@ -17,7 +17,7 @@ import akka.typed.javadsl.Adapter;
 import csw.messages.location.*;
 import csw.messages.location.Connection.AkkaConnection;
 import csw.messages.location.Connection.HttpConnection;
-import csw.services.commons.commonlogger.JExampleLoggerActor;
+import csw.services.commons.commonlogger.JActorSample;
 import csw.services.location.javadsl.*;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  * An example location service client application.
  */
 //#actor-mixin
-public class JLocationServiceExampleClient extends JExampleLoggerActor {
+public class JLocationServiceExampleClient extends JActorSample {
 
     private ILogger log = getLogger();
 //#actor-mixin

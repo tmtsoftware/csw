@@ -6,10 +6,10 @@ import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JComponentLoggerMutableActor;
 
 //#component-logger-mutable-actor
-public class JComponentMutableActorLogger extends JComponentLoggerMutableActor<Object> {
+public class JMutableActorSample extends JComponentLoggerMutableActor<Object> {
 
     private ILogger log;
-    public JComponentMutableActorLogger(ActorContext<Object> ctx, String _componentName) {
+    public JMutableActorSample(ActorContext<Object> ctx, String _componentName) {
         log = getLogger(ctx, _componentName);
     }
 

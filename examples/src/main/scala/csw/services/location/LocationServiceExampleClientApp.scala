@@ -9,7 +9,7 @@ import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.services.commons.commonlogger.ExampleLogger
+import csw.services.commons.commonlogger.SampleLogger
 import csw.services.location.models._
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
 import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
@@ -60,7 +60,7 @@ object LocationServiceExampleClient {
 //#actor-mixin
 class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(
     implicit mat: Materializer
-) extends ExampleLogger.Actor
+) extends SampleLogger.Actor
     //#actor-mixin
     {
   import LocationServiceExampleClient._

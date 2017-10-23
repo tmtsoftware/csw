@@ -6,13 +6,13 @@ import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JGenericLoggerImmutable;
 
 //#generic-logger
-public class JGenericImmutableActorLogger {
+public class JGenericImmutableSample {
 
     public static <T> Behavior<T> behavior(String componentName) {
         return Actor.immutable((ctx, msg) -> {
 
-            //JGenericImmutableActorLogger.class will appear against class tag in log statements
-            ILogger log = JGenericLoggerImmutable.getLogger(ctx, JGenericImmutableActorLogger.class);
+            //JGenericImmutableSample.class will appear against class tag in log statements
+            ILogger log = JGenericLoggerImmutable.getLogger(ctx, JGenericImmutableSample.class);
 
             return Actor.same();
         });

@@ -9,7 +9,7 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.services.commons.commonlogger.ExampleLogger
+import csw.services.commons.commonlogger.SampleLogger
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LogControlMessages
@@ -51,7 +51,7 @@ object LocationServiceExampleComponent {
 /**
  * A dummy akka test service that registers with the location service
  */
-class LocationServiceExampleComponent(locationService: LocationService) extends ExampleLogger.Actor {
+class LocationServiceExampleComponent(locationService: LocationService) extends SampleLogger.Actor {
 
   log.info("In actor LocationServiceExampleComponent")
   val logAdminActorRef: typed.ActorRef[LogControlMessages] =
