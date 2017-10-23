@@ -40,7 +40,7 @@ These are the relevant default configuration values for logging
 logging.conf
 :   @@snip [logging.conf](../../../../csw-logging/src/main/resources/logging.conf) { #default-logging-conf }
 
-@@@ note
+@@@ note { title="IMPORTANT !!!"}
 
 It is required to include `logging.conf` that is shipped with this library in `application.conf` as follows:
 
@@ -176,10 +176,10 @@ For logging statements to appear in the program, start `LoggingSystem` at an ear
 the folder and dump all logging files.
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #create-logging-system }
+:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #create-logging-system }
 
 Java
-:   @@snip [JLocationServiceExampleClientApp.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #create-logging-system }
+:   @@snip [JLocationServiceExampleClientApp](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #create-logging-system }
 
 @@@ note
 
@@ -192,10 +192,10 @@ Java
 Please ensure to stop `LoggingSystem` before application exits.
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #stop-logging-system }
+:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #stop-logging-system }
 
 Java
-:   @@snip [JLocationServiceExampleClientApp.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #stop-logging-system }
+:   @@snip [JLocationServiceExampleClientApp](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #stop-logging-system }
 
 
 ## Enable logging
@@ -216,32 +216,73 @@ Java
 For immutable actors, refer the following example:
 
 Scala Immutable Actor
-:   @@snip [immutableloggers.scala](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #generic-logger }
+:   @@snip [immutableloggers](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #generic-logger }
 
 Java Immutable Actor
-:   @@snip [JGenericImmutableActorLogger](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JGenericImmutableActorLogger.java) { #generic-logger}
+:   @@snip [JGenericImmutableSample](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JGenericImmutableSample.java) { #generic-logger}
 
 ### Enable component level logging
 To include `@componentName` in your log statements, follow one of the below approaches:
 
+#### Runtime component name for each actor/class 
 
-#### Common component name for multiple actors/classes
+If the component name is not a constant and is available only at runtime in an actor or class, then this is the recommended approach. Component developers will have to mostly use
+this approach. For reference, `csw-framework` uses this approach and it can referred for [Simple Logger](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorInfoFactory.scala)
+and [Mutable Actor](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala).
+For this approach, mixin loggers as follows:
 
-If log statements appearing from multiple actors/classes has same `@componentName` to be displayed and it is a constant,
-then this is the recommended approach. Create an object/abstract class/interface as follows:
+Scala Mutable Actor
+:   @@snip [MutableActorSample](../../../../examples/src/main/scala/csw/services/commons/componentlogger/MutableActorSample.scala) { #component-logger-mutable-actor }
 
-Scala
-:   @@snip [ExampleLogger.scala](../../../../examples/src/main/scala/csw/services/commons/commonlogger/ExampleLogger.scala) { #common-component-logger }
+Scala Actor
+:   @@snip [ActorSample](../../../../examples/src/main/scala/csw/services/commons/componentlogger/ActorSample.scala) { #component-logger-actor }
+
+Scala Class
+:   @@snip [Sample](../../../../examples/src/main/scala/csw/services/commons/componentlogger/Sample.scala) { #component-logger }
 
 
 Java Mutable Actor
-:   @@snip [JExampleLoggerMutableActor](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLoggerMutableActor.java) { #common-component-logger-mutable-actor }
+:   @@snip [JMutableActorSample](../../../../examples/src/main/java/csw/services/commons/componentlogger/JMutableActorSample.java) { #component-logger-mutable-actor }
 
 Java Actor
-:   @@snip [JExampleLoggerActor.scala](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLoggerActor.java) { #common-component-logger-actor }
+:   @@snip [JActorSample](../../../../examples/src/main/java/csw/services/commons/componentlogger/JActorSample.java) { #component-logger-actor }
+
+Java Class
+:   @@snip [JSample](../../../../examples/src/main/java/csw/services/commons/componentlogger/JSample.java) { #component-logger }
+
+For immutable actors, refer the following example:
+
+Scala Immutable Actor
+:   @@snip [immutableloggers](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #component-logger }
+
+Java Immutable Actor
+:   @@snip [JImmutableSample](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JImmutableSample.java) { #component-logger}
+
+@@@ note
+
+*While writing java code make sure to call `getLogger` method in concrete class only as shown in above java example.
+The runtime class from where the `getLogger` method is called, will be picked to display against `class` tag in log statements*  
+
+@@@
+
+#### Common component name for multiple actors/classes
+
+If log statements appearing from multiple actors/classes has same `@componentName` to be displayed and it is a constant, then this is the recommended approach. This approach is
+less-likely to be used by component developers. For reference, it is used in `csw-location` service and can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-location/src/main/scala/csw/services/location/commons/LocationServiceLogger.scala).
+To use this approach, create an object/abstract class/interface as follows:
+
+Scala
+:   @@snip [SampleLogger](../../../../examples/src/main/scala/csw/services/commons/commonlogger/SampleLogger.scala) { #common-component-logger }
+
+
+Java Mutable Actor
+:   @@snip [JMutableActorSample](../../../../examples/src/main/java/csw/services/commons/commonlogger/JMutableActorSample.java) { #common-component-logger-mutable-actor }
+
+Java Actor
+:   @@snip [JActorSample](../../../../examples/src/main/java/csw/services/commons/commonlogger/JActorSample.java) { #common-component-logger-actor }
 
 Java class
-:   @@snip [JExampleLogger.scala](../../../../examples/src/main/java/csw/services/commons/commonlogger/JExampleLogger.java) { #common-component-logger }
+:   @@snip [JSample](../../../../examples/src/main/java/csw/services/commons/commonlogger/JSample.java) { #common-component-logger }
 
 
 Then, inherit following object/interface:
@@ -272,10 +313,10 @@ Loggers for Mutable actors and classes can be mixed in a similar way.
 For immutable actors, refer the following example:
 
 Scala Immutable Actor
-:   @@snip [immutableloggers.scala](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #common-component-logger }
+:   @@snip [immutableloggers](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #common-component-logger }
 
 Java Immutable Actor
-:   @@snip [JGenericImmutableActorLogger](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JComponentImmutableActorLogger.java) { #component-logger}
+:   @@snip [JImmutableSample](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JImmutableSample.java) { #component-logger}
 
 @@@ note
 
@@ -283,48 +324,8 @@ Java Immutable Actor
 The runtime class from where the `getLogger` method is called, will be picked to display against `class` tag in log statements*  
 
 @@@
-
-#### Runtime component name for each actor/class 
-
-If the component name is not a constant and is available only at runtime in an actor or class, then this is the recommended approach. 
-Mixin loggers as follows:
-
-Scala Mutable Actor
-:   @@snip [ComponentMutableLogger.scala](../../../../examples/src/main/scala/csw/services/commons/componentlogger/ComponentMutableLogger.scala) { #component-logger-mutable-actor }
-
-Scala Actor
-:   @@snip [ComponentActorLogger.scala](../../../../examples/src/main/scala/csw/services/commons/componentlogger/ComponentActorLogger.scala) { #component-logger-actor }
-
-Scala class
-:   @@snip [ComponentSimpleLogger.scala](../../../../examples/src/main/scala/csw/services/commons/componentlogger/ComponentSimpleLogger.scala) { #component-logger }
-
-
-Java Mutable Actor
-:   @@snip [JComponentMutableActorLogger](../../../../examples/src/main/java/csw/services/commons/componentlogger/JComponentMutableActorLogger.java) { #component-logger-mutable-actor }
-
-Java Actor
-:   @@snip [JComponentActorLogger.scala](../../../../examples/src/main/java/csw/services/commons/componentlogger/JComponentActorLogger.java) { #component-logger-actor }
-
-Java class
-:   @@snip [JComponentSimpleLogger.scala](../../../../examples/src/main/java/csw/services/commons/componentlogger/JComponentSimpleLogger.java) { #component-logger }
-
-For immutable actors, refer the following example:
-
-Scala Immutable Actor
-:   @@snip [immutableloggers.scala](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #component-logger }
-
-Java Immutable Actor
-:   @@snip [JGenericImmutableActorLogger](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JComponentImmutableActorLogger.java) { #component-logger}
-
 
 `log` variable is now available in scala and java classes to write log statements as explained in next segment.
-
-@@@ note
-
-*While writing java code make sure to call `getLogger` method in concrete class only as shown in above java example.
-The runtime class from where the `getLogger` method is called, will be picked to display against `class` tag in log statements*  
-
-@@@
 
 ## Log statements
 
@@ -333,13 +334,13 @@ Logging statements are used very much like existing logging services such as log
 A basic info statement can be written as follows:
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info }
+:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info }
 
 Java
-:   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info }
+:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info }
 
 Java (Supplier)
-:   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-supplier }
+:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-supplier }
 
 The output of log statement will be:
 
@@ -392,13 +393,13 @@ Java (Supplier)
 Library allows usage of `Map` in message as follows:
 
 Scala
- :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info-map }
+ :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info-map }
  
 Java
- :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-map }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-map }
 
 Java (Supplier)
- :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-map-supplier }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-map-supplier }
 
 The output of log statement will be: 
 
@@ -459,13 +460,13 @@ Java (Supplier)
 Library allows to log an error with it's full stacktrace as follows:
  
 Scala
-  :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-error }
+  :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-error }
  
 Java
- :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error }
  
 Java (Supplier)
- :   @@snip [JLocationServiceExampleClient.scala](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error-supplier }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error-supplier }
  
  
 ## Source code for examples
