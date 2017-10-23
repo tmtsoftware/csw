@@ -8,9 +8,9 @@ import akka.util.Timeout
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
-import csw.messages.ccs.Validation
+import csw.messages.ccs.{Validation, Validations}
 import csw.messages.ccs.Validations.Valid
-import csw.messages.ccs.commands.{Observe, Setup}
+import csw.messages.ccs.commands.{ControlCommand, Observe, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.models.Units.encoder
@@ -94,6 +94,10 @@ class TromboneHcdHandlers(
       case x => println(s"Unknown config key $x")
     }
   }
+
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = Validations.Valid
+  override def onOneway(controlCommand: ControlCommand): Validation = Validations.Valid
+
 
   def onDomainMsg(tromboneMsg: TromboneMessage): Unit = tromboneMsg match {
     case x: TromboneEngineering => onEngMsg(x)

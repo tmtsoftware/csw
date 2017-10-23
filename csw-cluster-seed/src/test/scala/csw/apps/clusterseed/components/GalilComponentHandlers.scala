@@ -8,6 +8,7 @@ import csw.messages.RunningMessage.DomainMessage
 import csw.messages._
 import csw.messages.ccs.Validation
 import csw.messages.ccs.Validations.Valid
+import csw.messages.ccs.commands.ControlCommand
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.states.CurrentState
@@ -42,6 +43,9 @@ class GalilComponentHandlers(
   override def onSetup(commandMessage: CommandMessage): Validation = Valid
 
   override def onObserve(commandMessage: CommandMessage): Validation = Valid
+
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = Valid
+  override def onOneway(controlCommand: ControlCommand): Validation = Valid
 
   override def onShutdown(): Future[Unit] = Future.successful(())
 
