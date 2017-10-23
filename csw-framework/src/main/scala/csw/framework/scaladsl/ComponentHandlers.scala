@@ -1,7 +1,5 @@
 package csw.framework.scaladsl
 
-import javax.naming.ldap.Control
-
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.messages.PubSub.PublisherMessage

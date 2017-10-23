@@ -18,7 +18,7 @@ addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                % "0
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-RC12")
 classpathTypes += "maven-plugin"
 
-libraryDependencies += "com.trueaccord.scalapb" %% "compilerplugin" % "0.6.4"
+libraryDependencies += "com.trueaccord.scalapb" %% "compilerplugin" % "0.6.6"
 
 scalacOptions ++= Seq(
   "-encoding",
