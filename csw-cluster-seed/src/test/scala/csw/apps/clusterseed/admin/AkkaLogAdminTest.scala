@@ -199,4 +199,21 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
     getLogMetadataResponse1.status shouldBe StatusCodes.NotFound
   }
+
+  test("should give appropriate exception when logging level is incorrect") {
+    // send http set request for invalid log level
+    val uri = Uri.from(
+      scheme = "http",
+      host = ClusterAwareSettings.hostname,
+      port = 7878,
+      path = s"/admin/logging/${laserConnection.name}/level",
+      queryString = Some("value=error1")
+    )
+
+    val request  = HttpRequest(HttpMethods.POST, uri = uri)
+    val response = Await.result(Http().singleRequest(request), 5.seconds)
+
+    response.status shouldBe StatusCodes.BadRequest
+
+  }
 }

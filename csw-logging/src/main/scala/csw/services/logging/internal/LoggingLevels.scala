@@ -7,6 +7,8 @@ object LoggingLevels {
   private[this] val levels         = Seq(TRACE, DEBUG, INFO, WARN, ERROR, FATAL)
   private[this] val nameToLevelMap = levels.map(level => (level.name, level)).toMap
 
+  def stringify(): String = nameToLevelMap.keySet.mkString(",")
+
   /**
    * Companion object for the level trait.
    */
