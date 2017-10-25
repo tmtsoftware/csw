@@ -18,13 +18,13 @@ import csw.common.utils.TestAppender
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.PubSub.Subscribe
+import csw.messages.Shutdown
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.CurrentState
-import csw.messages.{Shutdown, SupervisorExternalMessage}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LoggingLevels.INFO
