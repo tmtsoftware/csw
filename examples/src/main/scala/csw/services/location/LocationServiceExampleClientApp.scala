@@ -7,7 +7,7 @@ import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.SupervisorExternalMessage
+import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.services.commons.commonlogger.SampleLogger
@@ -147,7 +147,11 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   findResult.foreach(akkaLocation ⇒ {
     //#typed-ref
-    val typedActorRef: ActorRef[SupervisorExternalMessage] = akkaLocation.componentRef()
+    // If the component type is HCD or Assembly, use this to get the correct ActorRef
+    val typedComponentRef: ActorRef[SupervisorExternalMessage] = akkaLocation.componentRef()
+
+    // If the component type is Container, use this to get the correct ActorRef
+    val typedContainerRef: ActorRef[ContainerExternalMessage] = akkaLocation.containerRef()
     //#typed-ref
   })
   //#resolve

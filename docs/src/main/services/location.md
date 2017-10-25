@@ -190,7 +190,7 @@ If not, eventually the operation will timeout and the output should read:
 
 The `resolve` and `find` api returns the concrete `Location` type i.e. `Akkalocation`, `HttpLocation` or `TcpLocation` as demonstrated in this section. Once the akka location
 is found or resolved, we need to retain the type to the actorRef, since the explicit type annotation is removed from the program, before it is executed at run-time 
-(refer [type erasure](https://en.wikipedia.org/wiki/Type_erasure)). Retaining the type can be acheived using following `AkkaLocation` api:
+(refer [type erasure](https://en.wikipedia.org/wiki/Type_erasure)). Use following `AkkaLocation` api to get the correct Typed ActorRef:
 
 Scala
 :   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #typed-ref }
