@@ -3,20 +3,28 @@ package csw.apps.clusterseed.admin.http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.{Directives, ExceptionHandler, RejectionHandler}
 import csw.apps.clusterseed.admin.exceptions.UnresolvedAkkaOrHttpLocationException
-import csw.apps.clusterseed.admin.internal.JsonSupport
 import csw.apps.clusterseed.commons.ClusterSeedLogger
-import spray.json.pimpAny
+import spray.json.{pimpAny, RootJsonFormat}
 
 import scala.util.control.NonFatal
 
 // Two classes are used just to wrap status code and error message inside "error" key in json representation
 case class ErrorResponse(error: ErrorMessage)
+case object ErrorResponse {
+  import spray.json.DefaultJsonProtocol._
+  implicit val errorResponseFormat: RootJsonFormat[ErrorResponse] = jsonFormat1(ErrorResponse.apply)
+}
+
 case class ErrorMessage(code: Int, message: String)
+case object ErrorMessage {
+  import spray.json.DefaultJsonProtocol._
+  implicit val errorMessageFormat: RootJsonFormat[ErrorMessage] = jsonFormat2(ErrorMessage.apply)
+}
 
 /**
  * Maps server side exceptions to Http Status codes
  */
-class AdminHandlers extends JsonSupport with Directives with ClusterSeedLogger.Simple {
+class AdminHandlers extends Directives with ClusterSeedLogger.Simple {
 
   private def httpJsonEntity(statusCode: StatusCode, message: String): HttpEntity.Strict = {
     val errorResponse = ErrorResponse(ErrorMessage(statusCode.intValue, message))

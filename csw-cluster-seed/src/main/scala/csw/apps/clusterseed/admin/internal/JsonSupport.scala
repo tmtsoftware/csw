@@ -1,7 +1,6 @@
 package csw.apps.clusterseed.admin.internal
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import csw.apps.clusterseed.admin.http.{ErrorMessage, ErrorResponse}
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.models.LogMetadata
@@ -20,7 +19,5 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol with Cluster
     }
   }
 
-  implicit val logMetadataFormat: RootJsonFormat[LogMetadata]     = jsonFormat4(LogMetadata.apply)
-  implicit val errorMessageFormat: RootJsonFormat[ErrorMessage]   = jsonFormat2(ErrorMessage.apply)
-  implicit val errorResponseFormat: RootJsonFormat[ErrorResponse] = jsonFormat1(ErrorResponse.apply)
+  implicit val logMetadataFormat: RootJsonFormat[LogMetadata] = jsonFormat4(LogMetadata.apply)
 }
