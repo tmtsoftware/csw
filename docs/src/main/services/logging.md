@@ -258,6 +258,11 @@ Scala Immutable Actor
 Java Immutable Actor
 :   @@snip [JImmutableSample](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JImmutableSample.java) { #component-logger}
 
+Considering there is a domain message hierarchy for component as follows:
+
+Scala
+:   @@snip [messages](../../../../examples/src/main/scala/csw/services/commons/messages.scala) { #message-hierarchy }
+ 
 @@@ note
 
 *While writing java code make sure to call `getLogger` method in concrete class only as shown in above java example.
@@ -318,6 +323,12 @@ Scala Immutable Actor
 Java Immutable Actor
 :   @@snip [JImmutableSample](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JImmutableSample.java) { #component-logger}
 
+Considering there is a domain message hierarchy for component as follows:
+
+Scala
+:   @@snip [messages](../../../../examples/src/main/scala/csw/services/commons/messages.scala) { #message-hierarchy }
+ 
+ 
 @@@ note
 
 *While writing java code make sure to call `getLogger` method in concrete class only as shown in above java example.

@@ -8,7 +8,7 @@ import csw.services.logging.javadsl.JComponentLoggerImmutable;
 //#component-logger
 public class JImmutableSample {
 
-    public static <T> Behavior<T> behavior(String componentName) {
+    public static <ComponentDomainMessage> Behavior<ComponentDomainMessage> behavior(String componentName) {
         return Actor.immutable((ctx, msg) -> {
 
             //JImmutableSample.class will appear against class tag in log statements

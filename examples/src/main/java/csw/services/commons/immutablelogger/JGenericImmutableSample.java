@@ -8,7 +8,7 @@ import csw.services.logging.javadsl.JGenericLoggerImmutable;
 //#generic-logger
 public class JGenericImmutableSample {
 
-    public static <T> Behavior<T> behavior(String componentName) {
+    public static <ComponentDomainMessage> Behavior<ComponentDomainMessage> behavior(String componentName) {
         return Actor.immutable((ctx, msg) -> {
 
             //JGenericImmutableSample.class will appear against class tag in log statements
