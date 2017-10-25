@@ -4,6 +4,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.typed
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
+import csw.messages.RunningMessage.DomainMessage
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.integtration.common.TestFutureExtension.RichFuture
@@ -29,7 +30,7 @@ object TromboneHCD {
   println("Trombone HCD registered")
 
   def main(args: Array[String]): Unit = {}
-  case class Unregister()
+  case class Unregister() extends DomainMessage
 }
 
 class TromboneHCD extends Actor {

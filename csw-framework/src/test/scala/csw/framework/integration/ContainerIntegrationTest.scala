@@ -25,14 +25,7 @@ import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.messages.params.states.CurrentState
-import csw.messages.{
-  Components,
-  ContainerExternalMessage,
-  LifecycleStateChanged,
-  Restart,
-  Shutdown,
-  SupervisorExternalMessage
-}
+import csw.messages.{Components, LifecycleStateChanged, Restart, Shutdown}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -91,7 +84,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     val containerLocation = Await.result(locationService.resolve(irisContainerConnection, 5.seconds), 5.seconds)
 
     containerLocation.isDefined shouldBe true
-    val resolvedContainerRef = containerLocation.get.typedRef[ContainerExternalMessage]
+    val resolvedContainerRef = containerLocation.get.containerRef()
 
     // ********** Message: GetComponents **********
     resolvedContainerRef ! GetComponents(componentsProbe.ref)
@@ -107,9 +100,9 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     instrumentHcdLocation.isDefined shouldBe true
     disperserHcdLocation.isDefined shouldBe true
 
-    val assemblySupervisor  = filterAssemblyLocation.get.typedRef[SupervisorExternalMessage]
-    val filterSupervisor    = instrumentHcdLocation.get.typedRef[SupervisorExternalMessage]
-    val disperserSupervisor = disperserHcdLocation.get.typedRef[SupervisorExternalMessage]
+    val assemblySupervisor  = filterAssemblyLocation.get.componentRef()
+    val filterSupervisor    = instrumentHcdLocation.get.componentRef()
+    val disperserSupervisor = disperserHcdLocation.get.componentRef()
 
     // Subscribe to component's current state
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))

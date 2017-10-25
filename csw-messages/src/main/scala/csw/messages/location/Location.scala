@@ -4,7 +4,7 @@ import java.net.URI
 
 import acyclic.skipped
 import akka.typed.ActorRef
-import csw.messages.TMTSerializable
+import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage, TMTSerializable}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 import scala.reflect.ClassTag
@@ -18,6 +18,10 @@ sealed abstract class Location extends TMTSerializable {
   def logAdminActorRef: ActorRef[Nothing]
 }
 
+// *************** IMPORTANT ***********************
+// Do not directly access actorRef from constructor,
+// Use one of componentRef() or containerRef() method to get correct reference.
+// *************************************************
 /**
  * Represents a live Akka connection of an Actor
  */
@@ -28,7 +32,7 @@ final case class AkkaLocation(
     logAdminActorRef: ActorRef[Nothing]
 ) extends Location {
 
-  def typedRef[T: ClassTag]: ActorRef[T] = {
+  private def typedRef[T: ClassTag]: ActorRef[T] = {
     val typeManifest    = scala.reflect.classTag[T].runtimeClass.getSimpleName
     val messageManifest = connection.componentId.componentType.messageManifest
 
@@ -38,7 +42,11 @@ final case class AkkaLocation(
     actorRef.upcast[T]
   }
 
-  def jTypedRef[T](klass: Class[T]): ActorRef[T] = typedRef[T](ClassTag(klass))
+  // If the component type is HCD or Assembly, use this to get the correct ActorRef
+  def componentRef(): ActorRef[SupervisorExternalMessage] = typedRef[SupervisorExternalMessage]
+
+  // If the component type is Container, use this to get the correct ActorRef
+  def containerRef(): ActorRef[ContainerExternalMessage] = typedRef[ContainerExternalMessage]
 }
 
 /**

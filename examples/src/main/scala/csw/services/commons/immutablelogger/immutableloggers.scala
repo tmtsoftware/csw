@@ -11,6 +11,7 @@ object CommonImmutableSample {
   def behavior(): Behavior[ComponentDomainMessage] = Actor.immutable[ComponentDomainMessage] { (ctx, msg) ⇒
     val log = SampleLogger.immutable(ctx)
 
+    log.info(s"Received msg: [$msg]")
     Actor.same
   }
 }
@@ -22,6 +23,7 @@ object ImmutableSample {
     (ctx, msg) ⇒
       val log = ComponentLogger.immutable(ctx, _componentName)
 
+      log.info(s"Received msg: [$msg]")
       Actor.same
   }
 }
@@ -32,6 +34,7 @@ object GenericImmutableSample {
   def behavior(): Behavior[ComponentDomainMessage] = Actor.immutable[ComponentDomainMessage] { (ctx, msg) ⇒
     val log = GenericLogger.immutable(ctx)
 
+    log.info(s"Received msg: [$msg]")
     Actor.same
   }
 }

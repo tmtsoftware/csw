@@ -95,7 +95,7 @@ class TromboneAssemblyHandlers(
     trackingEvent match {
       case LocationUpdated(location) =>
         runningHcds = runningHcds + (location.connection → Some(
-          location.asInstanceOf[AkkaLocation].typedRef[SupervisorExternalMessage]
+          location.asInstanceOf[AkkaLocation].componentRef()
         ))
       case LocationRemoved(connection) =>
         runningHcds = runningHcds + (connection → None)

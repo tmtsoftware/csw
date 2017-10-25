@@ -14,6 +14,7 @@ import akka.stream.javadsl.Sink;
 import akka.typed.Behavior;
 import akka.typed.javadsl.Actor;
 import akka.typed.javadsl.Adapter;
+import csw.messages.SupervisorExternalMessage;
 import csw.messages.location.*;
 import csw.messages.location.Connection.AkkaConnection;
 import csw.messages.location.Connection.HttpConnection;
@@ -152,7 +153,7 @@ public class JLocationServiceExampleClient extends JActorSample {
 
         findResult.ifPresent(akkaLocation -> {
             //#typed-ref
-            akka.typed.ActorRef<String> typedActorRef = akkaLocation.jTypedRef(String.class);
+            akka.typed.ActorRef<SupervisorExternalMessage> typedActorRef = akkaLocation.componentRef();
             //#typed-ref
         });
         //#resolve

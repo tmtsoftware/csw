@@ -7,6 +7,7 @@ import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
+import csw.messages.SupervisorExternalMessage
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.services.commons.commonlogger.SampleLogger
@@ -146,7 +147,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   findResult.foreach(akkaLocation ⇒ {
     //#typed-ref
-    val typedActorRef: ActorRef[String] = akkaLocation.typedRef[String]
+    val typedActorRef: ActorRef[SupervisorExternalMessage] = akkaLocation.componentRef()
     //#typed-ref
   })
   //#resolve
@@ -168,7 +169,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   if (resolveResult.isDefined) {
     resolveResult.get match {
       case c: AkkaLocation =>
-        c.typedRef ! LocationServiceExampleComponent.ClientMessage
+        c.componentRef() ! LocationServiceExampleComponent.ClientMessage
       case x => log.error(s"Received unexpected location type: $x")
     }
   }

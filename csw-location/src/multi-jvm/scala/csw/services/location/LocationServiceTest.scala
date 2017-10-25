@@ -6,9 +6,9 @@ import akka.stream.testkit.scaladsl.TestSink
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.RunningMessage.DomainMessage
+import csw.messages.TMTSerializable
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.messages.{SupervisorExternalMessage, TMTSerializable}
 import csw.services.location.commons.RegistrationFactory
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
@@ -129,7 +129,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
       val resolvedLocation = Await.result(locationService.resolve(akkaConnection, 5.seconds), 5.seconds).get
 
-      val assemblyActorRef = resolvedLocation.typedRef[SupervisorExternalMessage]
+      val assemblyActorRef = resolvedLocation.componentRef()
 
       assemblyActorRef ! UnregisterConnection(akkaConnection)
       Thread.sleep(2000)

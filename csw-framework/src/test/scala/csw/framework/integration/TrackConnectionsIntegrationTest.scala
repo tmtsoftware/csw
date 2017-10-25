@@ -11,8 +11,8 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.PubSub.Subscribe
+import csw.messages.Shutdown
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
-import csw.messages.{Shutdown, SupervisorExternalMessage}
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
@@ -62,8 +62,8 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     val filterAssemblyLocation = Await.result(locationService.find(filterAssemblyConnection), 5.seconds)
     val disperserHcdLocation   = Await.result(locationService.find(disperserHcdConnection), 5.seconds)
 
-    val assemblySupervisor  = filterAssemblyLocation.get.typedRef[SupervisorExternalMessage]
-    val disperserSupervisor = disperserHcdLocation.get.typedRef[SupervisorExternalMessage]
+    val assemblySupervisor  = filterAssemblyLocation.get.componentRef()
+    val disperserSupervisor = disperserHcdLocation.get.componentRef()
 
     // Subscribe to component's current state
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))

@@ -76,7 +76,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
     val resolvedAkkaLocation = maybeLocation.get
     resolvedAkkaLocation.connection shouldBe akkaConnection
 
-    val supervisorRef = resolvedAkkaLocation.typedRef[SupervisorExternalMessage]
+    val supervisorRef = resolvedAkkaLocation.componentRef()
     assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)
 
     val (_, akkaProbe) =
