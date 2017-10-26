@@ -1,22 +1,27 @@
-FROM centos:7
-ENV	HOME /root
-ENV	LANG en_US.UTF-8
-ENV	LC_ALL en_US.UTF-8
+FROM openjdk:8u141
 
-RUN yum install yum upgrade -y; yum update -y;  yum clean all
+# Env variables
+ENV SCALA_VERSION 2.12.3
+ENV SBT_VERSION 1.0.2
 
-RUN yum install -y strace procps tree vim git curl wget gnuplot unzip net-tools
-RUN yum groupinstall -y 'Development Tools'
-RUN yum install -y openssl-devel
+# Scala expects this file
+RUN touch /usr/lib/jvm/java-8-openjdk-amd64/release
 
-ENV JDK_VERSION 8u11
-ENV JDK_BUILD_VERSION b13
-RUN mkdir -p /usr/local
-RUN curl -LO "http://download.oracle.com/otn-pub/java/jdk/8u121-b13/e9e7ea248e2c4826b92b3f075a80e441/jdk-8u121-linux-x64.tar.gz" -H 'Cookie: oraclelicense=accept-securebackup-cookie' && tar -xvz -f jdk-8u121-linux-x64.tar.gz -C /usr/local
-ENV JAVA_HOME /jdk1.8.0_121/bin/
-RUN ls /usr/local/
+# Install Scala
+## Piping curl directly in tar
+RUN \
+  curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /root/ && \
+  echo >> /root/.bashrc && \
+  echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc
 
-RUN curl -LO "https://dl.bintray.com/sbt/native-packages/sbt/0.13.15/sbt-0.13.15.tgz" && tar -xzv  -f sbt-0.13.15.tgz -C /usr/local
-ENV PATH="/usr/local/jdk1.8.0_121/bin/:/usr/local/sbt/bin/:${PATH}"
-RUN java -version
-RUN sbt --version
+# Install sbt
+RUN \
+  curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
+  dpkg -i sbt-$SBT_VERSION.deb && \
+  rm sbt-$SBT_VERSION.deb && \
+  apt-get update && \
+  apt-get install sbt && \
+  sbt sbtVersion
+
+# Define working directory
+WORKDIR /root
