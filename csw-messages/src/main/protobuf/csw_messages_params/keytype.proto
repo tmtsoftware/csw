@@ -9,31 +9,32 @@ option (scalapb.options) = {
 };
 
 enum PbKeyType {
-    RaDecKey        = 0;
-    StringKey       = 1;
-    StructKey       = 2;
+    ChoiceKey       = 0;
+    RaDecKey        = 1;
+    StringKey       = 2;
+    StructKey       = 3;
 
-    BooleanKey      = 3;
-    ByteKey         = 4;
-    CharKey         = 5;
-    ShortKey        = 6;
-    LongKey         = 7;
-    IntKey          = 8;
-    FloatKey        = 9;
-    DoubleKey       = 10;
-    TimestampKey    = 11;
+    BooleanKey      = 4;
+    ByteKey         = 5;
+    CharKey         = 6;
+    ShortKey        = 7;
+    LongKey         = 8;
+    IntKey          = 9;
+    FloatKey        = 10;
+    DoubleKey       = 11;
+    TimestampKey    = 12;
 
-    ByteArrayKey    = 12;
-    ShortArrayKey   = 13;
-    LongArrayKey    = 14;
-    IntArrayKey     = 15;
-    FloatArrayKey   = 16;
-    DoubleArrayKey  = 17;
+    ByteArrayKey    = 13;
+    ShortArrayKey   = 14;
+    LongArrayKey    = 15;
+    IntArrayKey     = 16;
+    FloatArrayKey   = 17;
+    DoubleArrayKey  = 18;
 
-    ByteMatrixKey   = 18;
-    ShortMatrixKey  = 19;
-    LongMatrixKey   = 20;
-    IntMatrixKey    = 21;
-    FloatMatrixKey  = 22;
-    DoubleMatrixKey = 23;
+    ByteMatrixKey   = 19;
+    ShortMatrixKey  = 20;
+    LongMatrixKey   = 21;
+    IntMatrixKey    = 22;
+    FloatMatrixKey  = 23;
+    DoubleMatrixKey = 24;
 }
