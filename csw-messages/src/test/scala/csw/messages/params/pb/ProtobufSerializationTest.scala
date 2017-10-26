@@ -5,13 +5,14 @@ import csw.messages.params.generics.KeyType
 import csw.messages.params.generics.KeyType.{ChoiceKey, RaDecKey, StructKey}
 import csw.messages.params.models.Units.{arcmin, joule}
 import csw.messages.params.models._
+import csw_messages_params.events.PbEvent
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 // DEOPSCSW-297: Merge protobuf branch in master
 class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfterAll {
   private final val prefixStr = "wfos.prog.cloudcover"
 
-  describe("Test akka serialization of Events") {
+  describe("Test protobuf serialization of Events") {
     val eventInfo = EventInfo(prefixStr)
 
     it("should serialize StatusEvent") {
@@ -22,9 +23,12 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val param  = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
 
       val statusEvent: StatusEvent = StatusEvent(eventInfo).add(param)
-      val mapper                   = EventType.typeMapper[StatusEvent]
 
-      mapper.toCustom(mapper.toBase(statusEvent)) shouldBe statusEvent
+      //able to generate protobuf from event
+      StatusEvent.fromPb(statusEvent.toPb) shouldBe statusEvent
+
+      //able to generate event from protobuf byteArray
+      StatusEvent.fromPb(PbEvent.parseFrom(statusEvent.toPb.toByteArray)) shouldBe statusEvent
     }
 
     it("should serialize ObserveEvent") {
@@ -36,9 +40,12 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val param = choiceKey.set(jupiter, pluto).withUnits(arcmin)
 
       val observeEvent: ObserveEvent = ObserveEvent(eventInfo).add(param)
-      val mapper                     = EventType.typeMapper[ObserveEvent]
 
-      mapper.toCustom(mapper.toBase(observeEvent)) shouldBe observeEvent
+      //able to generate protobuf from event
+      ObserveEvent.fromPb(observeEvent.toPb) shouldBe observeEvent
+
+      //able to generate event from protobuf byteArray
+      ObserveEvent.fromPb(PbEvent.parseFrom(observeEvent.toPb.toByteArray)) shouldBe observeEvent
     }
 
     it("should serialize SystemEvent") {
@@ -52,9 +59,12 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val param = structKey.set(struct).withUnits(joule)
 
       val systemEvent: SystemEvent = SystemEvent(eventInfo).add(param)
-      val mapper                   = EventType.typeMapper[SystemEvent]
 
-      mapper.toCustom(mapper.toBase(systemEvent)) shouldBe systemEvent
+      //able to generate protobuf from event
+      SystemEvent.fromPb(systemEvent.toPb) shouldBe systemEvent
+
+      //able to generate event from protobuf byteArray
+      SystemEvent.fromPb(PbEvent.parseFrom(systemEvent.toPb.toByteArray)) shouldBe systemEvent
     }
   }
 }

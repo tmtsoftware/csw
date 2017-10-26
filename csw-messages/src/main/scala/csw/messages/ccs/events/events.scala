@@ -111,6 +111,7 @@ case class StatusEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = S
   def this(prefix: String, time: EventTime, obsId: ObsId) = this(EventInfo(prefix, time, obsId))
 
   override protected def create(data: Set[Parameter[_]]) = new StatusEvent(info, data)
+  def toPb: PbEvent                                      = EventType.typeMapper[StatusEvent].toBase(this)
 }
 
 object StatusEvent {
@@ -119,6 +120,8 @@ object StatusEvent {
 
   def apply(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): StatusEvent =
     new StatusEvent(info).madd(paramSet)
+
+  def fromPb(pbEvent: PbEvent): StatusEvent = EventType.typeMapper[StatusEvent].toCustom(pbEvent)
 }
 
 /**
@@ -135,6 +138,8 @@ case class ObserveEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = 
   def this(prefix: String) = this(EventInfo(prefix))
 
   override protected def create(data: Set[Parameter[_]]) = new ObserveEvent(info, data)
+
+  def toPb: PbEvent = EventType.typeMapper[ObserveEvent].toBase(this)
 }
 
 object ObserveEvent {
@@ -143,6 +148,8 @@ object ObserveEvent {
 
   def apply(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): ObserveEvent =
     new ObserveEvent(info).madd(paramSet)
+
+  def fromPb(pbEvent: PbEvent): ObserveEvent = EventType.typeMapper[ObserveEvent].toCustom(pbEvent)
 }
 
 /**
@@ -159,6 +166,8 @@ case class SystemEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = S
   def this(prefix: String) = this(EventInfo(prefix))
 
   override protected def create(data: Set[Parameter[_]]) = new SystemEvent(info, data)
+
+  def toPb: PbEvent = EventType.typeMapper[SystemEvent].toBase(this)
 }
 
 object SystemEvent {
@@ -167,4 +176,6 @@ object SystemEvent {
 
   def apply(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): SystemEvent =
     new SystemEvent(info).madd(paramSet)
+
+  def fromPb(pbEvent: PbEvent): SystemEvent = EventType.typeMapper[SystemEvent].toCustom(pbEvent)
 }
