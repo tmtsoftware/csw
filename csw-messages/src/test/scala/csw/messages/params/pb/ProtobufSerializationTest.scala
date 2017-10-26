@@ -9,7 +9,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 // DEOPSCSW-297: Merge protobuf branch in master
 class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfterAll {
-  private final val prefixStr     = "wfos.prog.cloudcover"
+  private final val prefixStr = "wfos.prog.cloudcover"
 
   describe("Test akka serialization of Events") {
     val eventInfo = EventInfo(prefixStr)
@@ -22,7 +22,7 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val param  = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
 
       val statusEvent: StatusEvent = StatusEvent(eventInfo).add(param)
-      val mapper = EventType.typeMapper[StatusEvent]
+      val mapper                   = EventType.typeMapper[StatusEvent]
 
       mapper.toCustom(mapper.toBase(statusEvent)) shouldBe statusEvent
     }
@@ -36,7 +36,7 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val param = choiceKey.set(jupiter, pluto).withUnits(arcmin)
 
       val observeEvent: ObserveEvent = ObserveEvent(eventInfo).add(param)
-      val mapper = EventType.typeMapper[ObserveEvent]
+      val mapper                     = EventType.typeMapper[ObserveEvent]
 
       mapper.toCustom(mapper.toBase(observeEvent)) shouldBe observeEvent
     }
@@ -52,7 +52,7 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val param = structKey.set(struct).withUnits(joule)
 
       val systemEvent: SystemEvent = SystemEvent(eventInfo).add(param)
-      val mapper = EventType.typeMapper[SystemEvent]
+      val mapper                   = EventType.typeMapper[SystemEvent]
 
       mapper.toCustom(mapper.toBase(systemEvent)) shouldBe systemEvent
     }
