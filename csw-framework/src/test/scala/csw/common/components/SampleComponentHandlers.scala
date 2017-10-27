@@ -9,7 +9,8 @@ import csw.messages.ccs.ValidationIssue.OtherIssue
 import csw.messages.ccs.commands.{ControlCommand, Observe, Setup}
 import csw.messages.ccs.{Validation, Validations}
 import csw.messages.framework.ComponentInfo
-import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.messages.location._
 import csw.messages.params.generics.GChoiceKey
 import csw.messages.params.generics.KeyType.ChoiceKey
 import csw.messages.params.models.{Choice, Choices, Prefix}
@@ -20,21 +21,25 @@ import csw.services.logging.scaladsl.ComponentLogger
 import scala.concurrent.Future
 
 object SampleComponentState {
-  val restartChoice         = Choice("Restart")
-  val onlineChoice          = Choice("Online")
-  val domainChoice          = Choice("Domain")
-  val shutdownChoice        = Choice("Shutdown")
-  val setupConfigChoice     = Choice("SetupConfig")
-  val observeConfigChoice   = Choice("ObserveConfig")
-  val submitCommandChoice   = Choice("SubmitCommand")
-  val oneWayCommandChoice   = Choice("OneWayCommand")
-  val initChoice            = Choice("Initialize")
-  val offlineChoice         = Choice("Offline")
-  val locationUpdatedChoice = Choice("LocationUpdated")
-  val locationRemovedChoice = Choice("LocationRemoved")
-  val prefix: Prefix        = Prefix("wfos.prog.cloudcover")
-  val successPrefix: Prefix = Prefix("wfos.prog.cloudcover.success")
-  val failedPrefix: Prefix  = Prefix("wfos.prog.cloudcover.failure")
+  val restartChoice             = Choice("Restart")
+  val onlineChoice              = Choice("Online")
+  val domainChoice              = Choice("Domain")
+  val shutdownChoice            = Choice("Shutdown")
+  val setupConfigChoice         = Choice("SetupConfig")
+  val observeConfigChoice       = Choice("ObserveConfig")
+  val submitCommandChoice       = Choice("SubmitCommand")
+  val oneWayCommandChoice       = Choice("OneWayCommand")
+  val initChoice                = Choice("Initialize")
+  val offlineChoice             = Choice("Offline")
+  val akkaLocationUpdatedChoice = Choice("LocationUpdated")
+  val akkaLocationRemovedChoice = Choice("LocationRemoved")
+  val httpLocationUpdatedChoice = Choice("HttpLocationUpdated")
+  val httpLocationRemovedChoice = Choice("HttpLocationRemoved")
+  val tcpLocationUpdatedChoice  = Choice("TcpLocationUpdated")
+  val tcpLocationRemovedChoice  = Choice("TcpLocationRemoved")
+  val prefix: Prefix            = Prefix("wfos.prog.cloudcover")
+  val successPrefix: Prefix     = Prefix("wfos.prog.cloudcover.success")
+  val failedPrefix: Prefix      = Prefix("wfos.prog.cloudcover.failure")
 
   val choices: Choices =
     Choices.fromChoices(
@@ -48,10 +53,16 @@ object SampleComponentState {
       oneWayCommandChoice,
       initChoice,
       offlineChoice,
-      locationUpdatedChoice,
-      locationRemovedChoice
+      akkaLocationUpdatedChoice,
+      akkaLocationRemovedChoice,
+      httpLocationUpdatedChoice,
+      httpLocationRemovedChoice,
+      tcpLocationUpdatedChoice,
+      tcpLocationRemovedChoice
     )
-  val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", choices)
+  val choiceKey: GChoiceKey          = ChoiceKey.make("choiceKey", choices)
+  val httpConnection: HttpConnection = HttpConnection(ComponentId("exampleHTTPService", ComponentType.Service))
+  val tcpConnection: TcpConnection   = TcpConnection(ComponentId("exampleTcpService", ComponentType.Service))
 }
 
 class SampleComponentHandlers(
@@ -69,6 +80,9 @@ class SampleComponentHandlers(
     log.info("Initializing Component TLA")
     Thread.sleep(100)
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+
+    trackConnection(httpConnection)
+    trackConnection(tcpConnection)
     Future.unit
   }
 
@@ -121,9 +135,23 @@ class SampleComponentHandlers(
   override protected def componentName(): String = componentInfo.name
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
-    case LocationUpdated(_) ⇒
-      pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(locationUpdatedChoice))))
-    case LocationRemoved(_) ⇒
-      pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(locationRemovedChoice))))
+    case LocationUpdated(location) ⇒
+      location.connection match {
+        case _: AkkaConnection =>
+          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(akkaLocationUpdatedChoice))))
+        case _: HttpConnection =>
+          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(httpLocationUpdatedChoice))))
+        case _: TcpConnection =>
+          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(tcpLocationUpdatedChoice))))
+      }
+    case LocationRemoved(connection) ⇒
+      connection match {
+        case _: AkkaConnection =>
+          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
+        case _: HttpConnection =>
+          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(httpLocationRemovedChoice))))
+        case _: TcpConnection =>
+          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(tcpLocationRemovedChoice))))
+      }
   }
 }
