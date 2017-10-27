@@ -27,9 +27,6 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
-// DEOPSCSW-218: Discover component connection information using Akka protocol
-// DEOPSCSW-220: Access and Monitor components for current values
-// DEOPSCSW-221: Avoid sending commands to non-executing components
 class TrackConnectionsIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(3552).system
@@ -48,6 +45,9 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
 
   }
 
+  // DEOPSCSW-218: Discover component connection information using Akka protocol
+  // DEOPSCSW-220: Access and Monitor components for current values
+  // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
     val containerActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3552).system
     val wiring: FrameworkWiring                 = FrameworkWiring.make(containerActorSystem)
@@ -82,6 +82,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     Await.result(wiring.locationService.shutdown(), 5.seconds)
   }
 
+  //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
     val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3552).system
     val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem)
@@ -106,27 +107,32 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
 
     // Subscribe to component's current state
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))
-    Await.result(wiring.locationService.register(
-                   HttpRegistration(httpConnection, 9090, "test/path", LogAdminActorFactory.make(actorSystem))
-                 ),
-                 5.seconds)
 
-    // assembly is tracking two HCD's, hence assemblyProbe will receive LocationUpdated event from two HCD's
+    // register http connection
+    Await.result(
+      wiring.locationService.register(
+        HttpRegistration(httpConnection, 9090, "test/path", LogAdminActorFactory.make(actorSystem))
+      ),
+      5.seconds
+    )
+
+    // assembly is tracking HttpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(httpLocationUpdatedChoice))))
 
-    // if one of the HCD shuts down, then assembly should know and receive LocationRemoved event
+    // On unavailability of HttpConnection, the assembly should know and receive LocationRemoved event
     wiring.locationService.unregister(httpConnection)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(httpLocationRemovedChoice))))
 
+    // register tcp connection
     Await.result(
       wiring.locationService.register(TcpRegistration(tcpConnection, 9090, LogAdminActorFactory.make(actorSystem))),
       5.seconds
     )
 
-    // assembly is tracking two HCD's, hence assemblyProbe will receive LocationUpdated event from two HCD's
+    // assembly is tracking TcpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event.
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(tcpLocationUpdatedChoice))))
 
-    // if one of the HCD shuts down, then assembly should know and receive LocationRemoved event
+    // On unavailability of TcpConnection, the assembly should know and receive LocationRemoved event
     wiring.locationService.unregister(tcpConnection)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(tcpLocationRemovedChoice))))
 
