@@ -3,9 +3,10 @@ package csw.services.config.server.http
 import java.time.Instant
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.{MalformedQueryParamRejection, Route}
+import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId, FileType, _}
+import csw.commons.http.ErrorResponse
+import csw.services.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId, _}
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFileUtils
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
@@ -246,7 +247,9 @@ class ConfigServiceRouteTest
 
   test("list by pattern - rejection") {
     Get("/list?pattern=?i)") ~> route ~> check {
-      rejection shouldBe MalformedQueryParamRejection("pattern", "Dangling meta character '?' near index 0\n?i)\n^")
+      status shouldEqual StatusCodes.BadRequest
+      responseAs[ErrorResponse].error.code shouldBe StatusCodes.BadRequest.intValue
+      responseAs[ErrorResponse].error.message should not be empty
     }
   }
 
@@ -268,7 +271,9 @@ class ConfigServiceRouteTest
 
   test("list by file type - rejection") {
     Get("/list?type=invalidtype") ~> route ~> check {
-      rejection shouldBe MalformedQueryParamRejection("type", s"Supported types: ${FileType.stringify}")
+      status shouldEqual StatusCodes.BadRequest
+      responseAs[ErrorResponse].error.code shouldBe StatusCodes.BadRequest.intValue
+      responseAs[ErrorResponse].error.message should not be empty
     }
   }
 

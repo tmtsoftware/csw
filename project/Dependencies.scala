@@ -133,6 +133,11 @@ object Dependencies {
     Libs.`mockito-core`        % Test
   )
 
+  val CswCommons = Seq(
+    AkkaHttp.`akka-http`,
+    Libs.`spray-json`
+  )
+
   val CswProdExamples = Seq(
     AkkaHttp.`akka-http`,
     Libs.`scalatest`       % Test,

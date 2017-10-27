@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.server.files._
-import csw.services.config.server.http.{ConfigExceptionHandler, ConfigServiceRoute, HttpService}
+import csw.services.config.server.http.{ConfigHandlers, ConfigServiceRoute, HttpService}
 import csw.services.config.server.svn.{SvnConfigService, SvnRepo}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
@@ -27,8 +27,8 @@ class ServerWiring {
 
   lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem)
 
-  lazy val configExceptionHandler = new ConfigExceptionHandler
-  lazy val configServiceRoute     = new ConfigServiceRoute(configService, actorRuntime, configExceptionHandler)
+  lazy val configHandlers     = new ConfigHandlers
+  lazy val configServiceRoute = new ConfigServiceRoute(configService, actorRuntime, configHandlers)
 
   lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }

@@ -15,6 +15,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-benchmark`,
   `csw-vslice`,
   `csw-messages`,
+  `csw-commons`,
   `integration`,
   `examples`
 )
@@ -85,6 +86,7 @@ lazy val `csw-cluster-seed` = project
   .dependsOn(
     `csw-messages`,
     `csw-location`,
+    `csw-commons`,
     `csw-framework`     % "test->test",
     `csw-config-server` % "test->test",
   )
@@ -108,7 +110,7 @@ lazy val `csw-config-api` = project
   )
 
 lazy val `csw-config-server` = project
-  .dependsOn(`csw-location`, `csw-config-api`)
+  .dependsOn(`csw-location`, `csw-config-api`, `csw-commons`)
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigServer
@@ -150,6 +152,12 @@ lazy val `csw-framework` = project
   .enablePlugins(AutoMultiJvm, GenJavadocPlugin, CswBuildInfo)
   .settings(
     libraryDependencies ++= Dependencies.CswFramework
+  )
+
+lazy val `csw-commons` = project
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(
+    libraryDependencies ++= Dependencies.CswCommons
   )
 
 //Integration test project
