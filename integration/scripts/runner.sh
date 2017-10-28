@@ -11,12 +11,12 @@ HOST_DIR_MAPPING="-v $(pwd):/source/csw"
 echo $HOST_DIR_MAPPING
 
 #2. Pulls docker image from docker hub (This is a custom image which has sbt, java installed)
-docker pull twtmt/centos-tmt
+docker pull twtmt/scala-sbt:8u141_2.12.3_1.0.2
 
 #3. Start first container and run TromboneHcdApp which acts as a seed
 # cmd line param : -DclusterPort=3552 => This will start app on port 3552 and create a cluster with a single node
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
-docker run -d --name=HCD $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./target/universal/stage/bin/trombone-h-c-d -DclusterPort=3552'
+docker run -d --name=HCD $HOST_DIR_MAPPING twtmt/scala-sbt:8u141_2.12.3_1.0.2 bash -c 'cd /source/csw && ./target/universal/stage/bin/trombone-h-c-d -DclusterPort=3552'
 
 #4. Store the ip address and port of first container (HCD App) into variable clusterSeeds
 clusterSeeds="$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD):3552"
@@ -27,7 +27,7 @@ sleep 5
 # cmd line param :-DclusterSeeds=$clusterSeeds (Ip:Port combination of seed - refer #4)
 # with clusterSeeds parameters, this container will join the cluster created at step #3
 printf "${YELLOW}----------- Starting Reddis App -----------${NC}\n"
-docker run -d --name=Reddis --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./target/universal/stage/bin/test-service -DclusterSeeds=$clusterSeeds'
+docker run -d --name=Reddis --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/scala-sbt:8u141_2.12.3_1.0.2 bash -c 'cd /source/csw && ./target/universal/stage/bin/test-service -DclusterSeeds=$clusterSeeds'
 
 sleep 5
 
@@ -35,7 +35,7 @@ sleep 5
 # cmd line param :-DclusterSeeds=$clusterSeeds (Ip:Port combination of seed - refer #4)
 # with clusterSeeds parameters, this container will join the cluster created at step #3
 printf "${YELLOW}------ Starting Test App ------${NC}\n"
-docker run --name=Test-App --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/centos-tmt bash -c 'cd /source/csw && ./target/universal/stage/bin/test-app -DclusterSeeds=$clusterSeeds'
+docker run --name=Test-App --env clusterSeeds=$clusterSeeds $HOST_DIR_MAPPING twtmt/scala-sbt:8u141_2.12.3_1.0.2 bash -c 'cd /source/csw && ./target/universal/stage/bin/test-app -DclusterSeeds=$clusterSeeds'
 test_exit_code=$?
 
 printf "${PURPLE}---------- Stopping and Removing all docker containers ---------- ${NC}"
