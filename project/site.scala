@@ -35,6 +35,7 @@ object ParadoxSite extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     sourceDirectory in Paradox := baseDirectory.value / "src" / "main",
+    paradoxTheme := Some("io.github.jonas" % "paradox-material-theme" % "0.2.0"),
     paradoxProperties in Paradox ++= Map(
       "version"                -> version.value,
       "scala.binaryVersion"    -> scalaBinaryVersion.value,
