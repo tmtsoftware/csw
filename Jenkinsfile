@@ -1,80 +1,92 @@
-#!groovy
-node('master'){
-    try{
-        ansiColor('xterm') {
-            def failBuild = false
+pipeline {
+    agent {
+        label 'master'
+    }
 
-            stage('Checkout') {
+    options {
+        // using the Timestamper plugin we can add timestamps to the console log
+        timestamps()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
                 git 'https://github.com/tmtsoftware/csw-prod.git'
             }
+        }
 
-             stage('Build') {
+        stage('Build') {
+            steps {
                 sh "sbt 'scalafmt --test'"
                 sh "sbt -Dcheck.cycles=true clean scalastyle compile"
-             }
+            }
+        }
 
-             stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
-                try {
-                    sh "sbt -DenableCoverage=true test:test"
-                }
-                catch (Exception e) {
-                    currentBuild.result = 'FAILED'
-                    failBuild = true
-                }
-                try {
+        stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
+            steps {
+                sh "sbt -DenableCoverage=true test:test"
+            }
+            post {
+                always {
                     sh "sbt -DenableCoverage=true coverageReport"
+                    sh "sbt coverageAggregate"
+                    junit '**/target/test-reports/*.xml'
+                    publishHTML(target: [
+                            allowMissing         : true,
+                            alwaysLinkToLastBuild: false,
+                            keepAll              : true,
+                            reportDir            : './target/scala-2.12/scoverage-report',
+                            reportFiles          : 'index.html',
+                            reportName           : "Scoverage Report"
+                    ])
                 }
-                catch (Exception ex) {
-                    failBuild = true
-                }
+            }
+        }
 
-                sh "sbt coverageAggregate"
-
-                if (failBuild == true)
-                    sh "exit 1"
-             }
-
-             stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine.
+        stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine.
+            steps {
                 sh "sbt csw-location/multi-jvm:test"
                 sh "sbt csw-config-client/multi-jvm:test"
                 sh "sbt csw-config-client-cli/multi-jvm:test"
                 sh "sbt csw-framework/multi-jvm:test"
-             }
+            }
+        }
 
-             stage('Multi-Node Test') { // These tests cover the scenario of multiple components in multiple containers on different machines.
+        stage('Multi-Node Test') { // These tests cover the scenario of multiple components in multiple containers on different machines.
+            steps {
                 sh "sbt -DenableCoverage=false csw-location/multiNodeTest"
                 sh "sbt -DenableCoverage=false csw-config-client/multiNodeTest"
                 sh "sbt -DenableCoverage=false csw-framework/multiNodeTest"
-             }
+            }
+        }
 
-             stage('Package') {
+        stage('Package') {
+            steps {
                 sh "./integration/scripts/package_integration.sh"
-             }
+            }
+        }
 
-             stage('Multi-Container Docker') {
+        stage('Multi-Container Docker') {
+            steps {
                 sh "./integration/scripts/runner.sh"
-             }
+            }
+        }
 
-             stage('Multi-NICs Docker') {
+        stage('Multi-NICs Docker') {
+            steps {
                 sh "./integration/scripts/multiple_nic_test.sh"
-             }
+            }
+        }
 
-             stage('Deploy') {
+        stage('Deploy') {
+            steps {
                 sh "./publish.sh"
-             }
+            }
         }
     }
-    catch (Exception e) {
-        currentBuild.result = "FAILED"
-        throw e
-    }
-    finally {
-        stage("Report") {
-            try{
-                publishJunitReport()
-                publishScoverageReport()
-            }
-            finally {
+    post {
+        always {
+            script {
                 sendNotification(currentBuild.result)
             }
         }
@@ -108,20 +120,4 @@ def sendNotification(String buildStatus = 'STARTED') {
     }
 
     slackSend(color: colorCode, message: summary)
-
-}
-
-def publishJunitReport() {
-    junit '**/target/test-reports/*.xml'
-}
-
-def publishScoverageReport() {
-    publishHTML(target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: false,
-            keepAll              : true,
-            reportDir            : './target/scala-2.12/scoverage-report',
-            reportFiles          : 'index.html',
-            reportName           : "Scoverage Report"
-    ])
 }
