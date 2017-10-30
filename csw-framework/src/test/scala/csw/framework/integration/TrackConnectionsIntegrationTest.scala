@@ -82,6 +82,11 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     Await.result(wiring.locationService.shutdown(), 5.seconds)
   }
 
+  /**
+   * If component writer wants to track additional connections which are not specified in configuration file,
+   * then using trackConnection(connection: Connection) hook which is added in ComponentHandlers can be used
+   * Uses of this are shown in [[csw.common.components.SampleComponentHandlers]]
+   * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
     val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3552).system
@@ -110,7 +115,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
 
     // register http connection
     Await.result(
-      wiring.locationService.register(
+      locationService.register(
         HttpRegistration(httpConnection, 9090, "test/path", LogAdminActorFactory.make(actorSystem))
       ),
       5.seconds
@@ -120,12 +125,12 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(httpLocationUpdatedChoice))))
 
     // On unavailability of HttpConnection, the assembly should know and receive LocationRemoved event
-    wiring.locationService.unregister(httpConnection)
+    locationService.unregister(httpConnection)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(httpLocationRemovedChoice))))
 
     // register tcp connection
     Await.result(
-      wiring.locationService.register(TcpRegistration(tcpConnection, 9090, LogAdminActorFactory.make(actorSystem))),
+      locationService.register(TcpRegistration(tcpConnection, 9090, LogAdminActorFactory.make(actorSystem))),
       5.seconds
     )
 
@@ -133,7 +138,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(tcpLocationUpdatedChoice))))
 
     // On unavailability of TcpConnection, the assembly should know and receive LocationRemoved event
-    wiring.locationService.unregister(tcpConnection)
+    locationService.unregister(tcpConnection)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(tcpLocationRemovedChoice))))
 
     Await.result(wiring.locationService.shutdown(), 5.seconds)

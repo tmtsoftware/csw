@@ -81,6 +81,7 @@ class SampleComponentHandlers(
     Thread.sleep(100)
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
+    // DEOPSCSW-219: Discover component connection using HTTP protocol
     trackConnection(httpConnection)
     trackConnection(tcpConnection)
     Future.unit
