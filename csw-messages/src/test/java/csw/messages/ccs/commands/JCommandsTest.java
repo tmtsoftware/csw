@@ -6,7 +6,6 @@ import csw.messages.params.generics.Parameter;
 import csw.messages.params.generics.ParameterSetType;
 import csw.messages.params.models.ObsId;
 import csw.messages.params.models.Prefix;
-import csw.messages.params.models.RunId;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,7 +27,6 @@ public class JCommandsTest {
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
 
-    private final RunId runId = RunId.apply();
     private final ObsId obsId = new ObsId("obsId");
     private final String prefix = "wfos.red.detector";
 
@@ -78,10 +76,10 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessSetupCommand() {
-        Setup setup = new Setup(runId, obsId, prefix).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(obsId, prefix).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
-        Assert.assertEquals(runId, setup.runId());
+        Assert.assertNotNull(setup.runId());
         Assert.assertEquals(obsId, setup.obsId());
         Assert.assertEquals(prefix, setup.prefixStr());
         Assert.assertEquals(new Prefix(prefix), setup.prefix());
@@ -93,10 +91,10 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessObserveCommand() {
-        Observe observe = new Observe(runId, obsId, prefix).add(encoderParam).add(epochStringParam);
+        Observe observe = new Observe(obsId, prefix).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
-        Assert.assertEquals(runId, observe.runId());
+        Assert.assertNotNull(observe.runId());
         Assert.assertEquals(obsId, observe.obsId());
         Assert.assertEquals(prefix, observe.prefixStr());
         Assert.assertEquals(new Prefix(prefix), observe.prefix());
@@ -108,10 +106,10 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessWaitCommand() {
-        Wait wait = new Wait(runId, obsId, prefix).add(encoderParam).add(epochStringParam);
+        Wait wait = new Wait(obsId, prefix).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
-        Assert.assertEquals(runId, wait.runId());
+        Assert.assertNotNull(wait.runId());
         Assert.assertEquals(obsId, wait.obsId());
         Assert.assertEquals(prefix, wait.prefixStr());
         Assert.assertEquals(new Prefix(prefix), wait.prefix());

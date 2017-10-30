@@ -9,7 +9,7 @@ import akka.util.Timeout
 import csw.messages.ccs.commands.{Command, Setup}
 import csw.messages.ccs.events.StatusEvent
 import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.{ObsId, Prefix, RunId}
+import csw.messages.params.models.{ObsId, Prefix}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
@@ -23,7 +23,6 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
   implicit val timeout: Timeout = Timeout(5.seconds)
 
   private val prefixStr    = "wfos.red.detector"
-  private val runId: RunId = RunId()
   private val obsId: ObsId = ObsId("Obs001")
   private val intKey       = KeyType.IntKey.make("intKey")
   private val stringKey    = KeyType.StringKey.make("stringKey")
@@ -34,7 +33,7 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
   implicit val typedSystem: ActorSystem[Nothing] = system.toTyped
   implicit val testKit: TestKitSettings          = TestKitSettings(typedSystem)
 
-  private val scalaSetup = Setup(runId, obsId, Prefix(prefixStr)).add(intParam).add(stringParam)
+  private val scalaSetup = Setup(obsId, Prefix(prefixStr)).add(intParam).add(stringParam)
 
   private val javaCmdHandlerBehavior: Future[ActorRef[CommandMsg]] =
     typedSystem.systemActorOf[CommandMsg](JavaCommandHandler.behavior(), "javaCommandHandler")

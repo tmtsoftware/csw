@@ -47,7 +47,7 @@ class PositionCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
       )
 
       val stateMatcher = Matchers.posMatcher(encoderPosition)
-      val scOut = Setup(RunId(), s.obsId, TromboneHcdState.axisMoveCK)
+      val scOut = Setup(s.obsId, TromboneHcdState.axisMoveCK)
         .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 

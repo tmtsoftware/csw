@@ -46,7 +46,7 @@ class SetElevationCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
       )
 
       val stateMatcher = Matchers.posMatcher(encoderPosition)
-      val scOut        = Setup(RunId(), ac.obsId, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
+      val scOut        = Setup(ac.obsId, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
 
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))

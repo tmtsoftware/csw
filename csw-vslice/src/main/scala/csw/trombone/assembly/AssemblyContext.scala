@@ -46,25 +46,25 @@ case class AssemblyContext(
   val moveCK: Prefix = Prefix(movePrefix)
 
   def moveSC(runId: RunId, position: Double): Setup =
-    Setup(runId, obsId, moveCK).add(stagePositionKey -> position withUnits stagePositionUnits)
+    Setup(obsId, moveCK).add(stagePositionKey -> position withUnits stagePositionUnits)
 
   // Position submit command
   val positionPrefix     = s"$componentPrefix.position"
   val positionCK: Prefix = Prefix(positionPrefix)
 
   def positionSC(runId: RunId, rangeDistance: Double): Setup =
-    Setup(runId, obsId, positionCK).add(naRangeDistanceKey -> rangeDistance withUnits naRangeDistanceUnits)
+    Setup(obsId, positionCK).add(naRangeDistanceKey -> rangeDistance withUnits naRangeDistanceUnits)
 
   // setElevation submit command
   val setElevationPrefix     = s"$componentPrefix.setElevation"
   val setElevationCK: Prefix = Prefix(setElevationPrefix)
   def setElevationSC(runId: RunId, elevation: Double): Setup =
-    Setup(runId, obsId, setElevationCK).add(naElevation(elevation))
+    Setup(obsId, setElevationCK).add(naElevation(elevation))
 
   // setAngle submit command
   val setAnglePrefx                                        = s"$componentPrefix.setAngle"
   val setAngleCK: Prefix                                   = Prefix(setAnglePrefx)
-  def setAngleSC(runId: RunId, zenithAngle: Double): Setup = Setup(runId, obsId, setAngleCK).add(za(zenithAngle))
+  def setAngleSC(runId: RunId, zenithAngle: Double): Setup = Setup(obsId, setAngleCK).add(za(zenithAngle))
 
   // Follow submit command
   val followPrefix     = s"$componentPrefix.follow"
@@ -73,7 +73,7 @@ case class AssemblyContext(
 
   def setNssInUse(value: Boolean): Parameter[Boolean] = nssInUseKey -> value
 
-  def followSC(runId: RunId, nssInUse: Boolean): Setup = Setup(runId, obsId, followCK).add(nssInUseKey -> nssInUse)
+  def followSC(runId: RunId, nssInUse: Boolean): Setup = Setup(obsId, followCK).add(nssInUseKey -> nssInUse)
 
   // A list of all commands
   val allCommandKeys: List[Prefix] =

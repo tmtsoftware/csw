@@ -1,6 +1,6 @@
 {
   "type": "Observe",
-  "runId": "f22dc990-a02c-4d7e-b719-50b167cb7a1e",
+  "runId": "test-runId",
   "obsId": "Obs001",
   "prefix": {
     "subsystem": "wfos",

@@ -82,17 +82,17 @@ object TromboneHcdState {
   val axisMoveCK: Prefix = Prefix(axisMovePrefix)
 
   def positionSC(runId: RunId, obsId: ObsId, value: Int): Setup =
-    Setup(runId, obsId, axisMoveCK).add(positionKey -> value withUnits encoder)
+    Setup(obsId, axisMoveCK).add(positionKey -> value withUnits encoder)
 
   val axisDatumPrefix                     = s"$trombonePrefix.datum"
   val axisDatumCK: Prefix                 = Prefix(axisDatumPrefix)
-  def datumSC(runId: RunId, obsId: ObsId) = Setup(runId, obsId, axisDatumCK)
+  def datumSC(runId: RunId, obsId: ObsId) = Setup(obsId, axisDatumCK)
 
   val axisHomePrefix                     = s"$trombonePrefix.home"
   val axisHomeCK: Prefix                 = Prefix(axisHomePrefix)
-  def homeSC(runId: RunId, obsId: ObsId) = Setup(runId, obsId, axisHomeCK)
+  def homeSC(runId: RunId, obsId: ObsId) = Setup(obsId, axisHomeCK)
 
   val axisCancelPrefix                     = s"$trombonePrefix.cancel"
   val axisCancelCK: Prefix                 = Prefix(axisCancelPrefix)
-  def cancelSC(runId: RunId, obsId: ObsId) = Setup(runId, obsId, axisCancelCK)
+  def cancelSC(runId: RunId, obsId: ObsId) = Setup(obsId, axisCancelCK)
 }

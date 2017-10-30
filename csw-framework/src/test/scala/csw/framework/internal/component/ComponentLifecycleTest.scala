@@ -11,10 +11,10 @@ import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
+import csw.messages.ccs.Validations
 import csw.messages.ccs.commands.{Observe, Setup}
 import csw.messages.params.generics.KeyType
-import csw.messages.ccs.Validations
-import csw.messages.params.models.{ObsId, Prefix, RunId}
+import csw.messages.params.models.{ObsId, Prefix}
 import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
@@ -112,9 +112,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     val runningComponent     = new RunningComponent(supervisorProbe)
     import runningComponent._
 
-    val runId: RunId = RunId()
     val obsId: ObsId = ObsId("Obs001")
-    val sc1          = Setup(runId, obsId, Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
+    val sc1          = Setup(obsId, Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
 
     when(sampleHcdHandler.onSubmit(ArgumentMatchers.any[Setup](), ArgumentMatchers.any[ActorRef[CommandResponse]]()))
       .thenReturn(Validations.Valid)
@@ -131,9 +130,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     val runningComponent     = new RunningComponent(supervisorProbe)
     import runningComponent._
 
-    val runId: RunId = RunId()
     val obsId: ObsId = ObsId("Obs001")
-    val sc1          = Observe(runId, obsId, Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
+    val sc1          = Observe(obsId, Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
 
     when(sampleHcdHandler.onOneway(ArgumentMatchers.any[Setup]())).thenReturn(Validations.Valid)
 

@@ -55,7 +55,7 @@ case class Setup private (
     runId: RunId,
     obsId: ObsId,
     prefix: Prefix,
-    paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
+    paramSet: Set[Parameter[_]] = Set.empty
 ) extends ParameterSetType[Setup]
     with ParameterSetKeyData
     with SequenceCommand
@@ -64,12 +64,23 @@ case class Setup private (
   override protected def create(data: Set[Parameter[_]]): Setup = new Setup(runId, obsId, prefix, data)
 
   // This is here for Java to construct with String
-  def this(runId: RunId, obsId: ObsId, prefix: String) = this(runId, obsId, Prefix(prefix))
+  def this(obsId: ObsId, prefix: String) = this(RunId(), obsId, Prefix(prefix))
 }
 
 object Setup {
-  def apply(runId: RunId, obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Setup =
-    new Setup(runId, obsId, prefix).madd(paramSet)
+  private[messages] def apply(
+      runId: RunId,
+      obsId: ObsId,
+      prefix: Prefix,
+      paramSet: Set[Parameter[_]]
+  ): Setup =
+    new Setup(runId, obsId, prefix, paramSet) //madd is not required as this version of apply is only used for reading json
+
+  def apply(
+      obsId: ObsId,
+      prefix: Prefix,
+      paramSet: Set[Parameter[_]] = Set.empty
+  ): Setup = new Setup(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
 }
 
 /**
@@ -82,7 +93,7 @@ case class Wait private (
     runId: RunId,
     obsId: ObsId,
     prefix: Prefix,
-    paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
+    paramSet: Set[Parameter[_]] = Set.empty
 ) extends ParameterSetType[Wait]
     with ParameterSetKeyData
     with SequenceCommand {
@@ -90,12 +101,23 @@ case class Wait private (
   override protected def create(data: Set[Parameter[_]]) = new Wait(runId, obsId, prefix, data)
 
   // This is here for Java to construct with String
-  def this(runId: RunId, obsId: ObsId, prefix: String) = this(runId, obsId, Prefix(prefix))
+  def this(obsId: ObsId, prefix: String) = this(RunId(), obsId, Prefix(prefix))
 }
 
 object Wait {
-  def apply(runId: RunId, obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Wait =
-    new Wait(runId, obsId, prefix).madd(paramSet)
+  private[messages] def apply(
+      runId: RunId,
+      obsId: ObsId,
+      prefix: Prefix,
+      paramSet: Set[Parameter[_]]
+  ): Wait =
+    new Wait(runId, obsId, prefix, paramSet) //madd is not required as this version of apply is only used for reading json
+
+  def apply(
+      obsId: ObsId,
+      prefix: Prefix,
+      paramSet: Set[Parameter[_]] = Set.empty
+  ): Wait = new Wait(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
 }
 
 /**
@@ -108,7 +130,7 @@ case class Observe private (
     runId: RunId,
     obsId: ObsId,
     prefix: Prefix,
-    paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
+    paramSet: Set[Parameter[_]] = Set.empty
 ) extends ParameterSetType[Observe]
     with ParameterSetKeyData
     with SequenceCommand
@@ -117,15 +139,22 @@ case class Observe private (
   override protected def create(data: Set[Parameter[_]]) = new Observe(runId, obsId, prefix, data)
 
   // This is here for Java to construct with String
-  def this(runId: RunId, obsId: ObsId, prefix: String) = this(runId, obsId, Prefix(prefix))
+  def this(obsId: ObsId, prefix: String) = this(RunId(), obsId, Prefix(prefix))
 }
 
 object Observe {
-  def apply(
+  private[messages] def apply(
       runId: RunId,
       obsId: ObsId,
       prefix: Prefix,
-      paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
+      paramSet: Set[Parameter[_]]
   ): Observe =
-    new Observe(runId, obsId, prefix).madd(paramSet)
+    new Observe(runId, obsId, prefix, paramSet) //madd is not required as this version of apply is only used for reading json
+
+  def apply(
+      obsId: ObsId,
+      prefix: Prefix,
+      paramSet: Set[Parameter[_]] = Set.empty
+  ): Observe =
+    new Observe(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
 }

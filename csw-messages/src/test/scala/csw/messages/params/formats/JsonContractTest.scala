@@ -19,7 +19,6 @@ import spray.json.pimpString
 class JsonContractTest extends FunSpec with Matchers {
 
   private val prefix: Prefix       = "wfos.blue.filter"
-  private val runId: RunId         = RunId("f22dc990-a02c-4d7e-b719-50b167cb7a1e")
   private val obsId: ObsId         = ObsId("Obs001")
   private val instantStr: String   = "2017-08-09T06:40:00.898Z"
   private val eventId: String      = "7a4cd6ab-6077-476d-a035-6f83be1de42c"
@@ -34,10 +33,14 @@ class JsonContractTest extends FunSpec with Matchers {
       val raDec2     = RaDec(9.1, 2.9)
       val raDecParam = raDecKey.set(raDec1, raDec2)
 
-      val setup       = Setup(runId, obsId, prefix).add(raDecParam)
+      val setup       = Setup(obsId, prefix).add(raDecParam)
       val setupToJson = JsonSupport.writeSequenceCommand(setup)
 
-      val expectedSetupJson = scala.io.Source.fromResource("json/setup_command.json").mkString
+      val expectedSetupJson = scala.io.Source
+        .fromResource("json/setup_command.json")
+        .mkString
+        .replace("test-runId", setup.runId.id)
+
       assert(setupToJson.equals(expectedSetupJson.parseJson))
     }
 
@@ -46,11 +49,15 @@ class JsonContractTest extends FunSpec with Matchers {
       val k2      = KeyType.StringKey.make("expTime")
       val i1      = k1.set(22)
       val i2      = k2.set("11:10")
-      val observe = Observe(runId, obsId, prefix).add(i1).add(i2)
+      val observe = Observe(obsId, prefix).add(i1).add(i2)
 
       val observeToJson = JsonSupport.writeSequenceCommand(observe)
 
-      val expectedObserveJson = scala.io.Source.fromResource("json/observe_command.json").mkString
+      val expectedObserveJson =
+        scala.io.Source
+          .fromResource("json/observe_command.json")
+          .mkString
+          .replace("test-runId", observe.runId.id)
       assert(observeToJson.equals(expectedObserveJson.parseJson))
     }
 
@@ -60,10 +67,14 @@ class JsonContractTest extends FunSpec with Matchers {
       val m2: MatrixData[Long] = MatrixData.fromArrays(Array(2, 3, 4), Array(5, 6, 7), Array(8, 9, 10))
       val matrixParam          = k1.set(m1, m2)
 
-      val wait       = Wait(runId, obsId, prefix).add(matrixParam)
+      val wait       = Wait(obsId, prefix).add(matrixParam)
       val waitToJson = JsonSupport.writeSequenceCommand(wait)
 
-      val expectedWaitJson = scala.io.Source.fromResource("json/wait_command.json").mkString
+      val expectedWaitJson =
+        scala.io.Source
+          .fromResource("json/wait_command.json")
+          .mkString
+          .replace("test-runId", wait.runId.id)
       assert(waitToJson.equals(expectedWaitJson.parseJson))
     }
   }
@@ -193,7 +204,7 @@ class JsonContractTest extends FunSpec with Matchers {
     val p25 = StringKey.make("StringKey").set("Str1", "Str2")
 
     it("should able to serialize and deserialize Setup command with all keys to and from json") {
-      val setup = Setup(runId, obsId, prefix).madd(
+      val setup = Setup(obsId, prefix).madd(
         p1,
         p2,
         p3,
@@ -223,7 +234,10 @@ class JsonContractTest extends FunSpec with Matchers {
 
       val setupToJson = JsonSupport.writeSequenceCommand(setup)
 
-      val expectedSetupJson = scala.io.Source.fromResource("json/setup_with_all_keys.json").mkString
+      val expectedSetupJson = scala.io.Source
+        .fromResource("json/setup_with_all_keys.json")
+        .mkString
+        .replace("test-runId", setup.runId.id)
       setupToJson shouldBe expectedSetupJson.parseJson
     }
   }

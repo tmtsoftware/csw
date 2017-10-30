@@ -9,7 +9,7 @@ import csw.messages.ccs.commands.Observe
 import csw.messages.params.generics.KeyType.ByteArrayKey
 import csw.messages.params.generics.{Key, Parameter}
 import csw.messages.params.models.Units.pascal
-import csw.messages.params.models.{ArrayData, ObsId, Prefix, RunId}
+import csw.messages.params.models.{ArrayData, ObsId, Prefix}
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await
@@ -33,7 +33,6 @@ class ImageDeSerializationBenchmark {
   private final var system: ActorSystem          = _
   private final var serialization: Serialization = _
   private final var prefixStr: String            = _
-  private final var runId: RunId                 = _
   private final var obsId: ObsId                 = _
 
   private final var img_32k_tuple: (Array[Byte], Observe)  = _
@@ -45,7 +44,6 @@ class ImageDeSerializationBenchmark {
     system = ActorSystem("example")
     serialization = SerializationExtension(system)
     prefixStr = "wfos.prog.cloudcover"
-    runId = RunId()
     obsId = ObsId("Obs001")
 
     img_32k_tuple = serializeImage("/images/32k_image.bin")
@@ -66,7 +64,7 @@ class ImageDeSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(binaryData)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe(runId, obsId, Prefix(prefixStr)).add(param)
+    val observe           = Observe(obsId, Prefix(prefixStr)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     (observeSerializer.toBinary(observe), observe)

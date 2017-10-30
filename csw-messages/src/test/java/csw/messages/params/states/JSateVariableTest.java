@@ -6,7 +6,6 @@ import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.ObsId;
 import csw.messages.params.models.Prefix;
-import csw.messages.params.models.RunId;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,7 +25,6 @@ public class JSateVariableTest {
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
 
     private final String prefix = "wfos.red.detector";
-    private final RunId runId = RunId.apply();
     private final ObsId obsId = new ObsId("obsId");
 
     @Test
@@ -48,7 +46,7 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateCurrentStateFromSetup() {
-        Setup setup = new Setup(runId, obsId, prefix).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(obsId, prefix).add(encoderParam).add(epochStringParam);
         CurrentState currentState = new CurrentState(setup);
 
         // typeName and prefix
@@ -83,7 +81,7 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateDemandStateFromSetup() {
-        Setup setup = new Setup(runId, obsId, prefix).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(obsId, prefix).add(encoderParam).add(epochStringParam);
         DemandState demandState = new DemandState(setup);
 
         // typeName and prefix

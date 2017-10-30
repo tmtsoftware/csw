@@ -39,7 +39,7 @@ class DatumCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
     } else {
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
       tromboneHCD.foreach(
-        _ ! Submit(Setup(RunId(), s.obsId, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore))
+        _ ! Submit(Setup(s.obsId, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore))
       )
       matchCompletion(Matchers.idleMatcher, tromboneHCD.get, 5.seconds) {
         case Completed =>

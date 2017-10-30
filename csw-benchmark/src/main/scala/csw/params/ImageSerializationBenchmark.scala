@@ -9,7 +9,7 @@ import csw.messages.ccs.commands.Observe
 import csw.messages.params.generics.KeyType.ByteArrayKey
 import csw.messages.params.generics.{Key, Parameter}
 import csw.messages.params.models.Units.pascal
-import csw.messages.params.models.{ArrayData, ObsId, Prefix, RunId}
+import csw.messages.params.models.{ArrayData, ObsId, Prefix}
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await
@@ -39,7 +39,6 @@ class ImageSerializationBenchmark {
   private final var system: ActorSystem          = _
   private final var serialization: Serialization = _
   private final var prefixStr: String            = _
-  private final var runId: RunId                 = _
   private final var obsId: ObsId                 = _
 
   @Setup(Level.Trial)
@@ -57,7 +56,6 @@ class ImageSerializationBenchmark {
     system = ActorSystem("example")
     serialization = SerializationExtension(system)
     prefixStr = "wfos.prog.cloudcover"
-    runId = RunId()
     obsId = ObsId("Obs001")
   }
 
@@ -75,7 +73,7 @@ class ImageSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_32k_Bytes)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe(runId, obsId, Prefix(prefixStr)).add(param)
+    val observe           = Observe(obsId, Prefix(prefixStr)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     observeSerializer.toBinary(observe)
@@ -90,7 +88,7 @@ class ImageSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_128k_Bytes)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe(runId, obsId, Prefix(prefixStr)).add(param)
+    val observe           = Observe(obsId, Prefix(prefixStr)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     observeSerializer.toBinary(observe)
@@ -105,7 +103,7 @@ class ImageSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_512k_Bytes)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe(runId, obsId, Prefix(prefixStr)).add(param)
+    val observe           = Observe(obsId, Prefix(prefixStr)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     observeSerializer.toBinary(observe)

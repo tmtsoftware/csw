@@ -21,7 +21,7 @@ import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.{ObsId, RunId}
+import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
 import csw.messages.{Components, ContainerExternalMessage, Shutdown, SupervisorExternalMessage}
 import csw.services.config.api.models.ConfigData
@@ -143,12 +143,11 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       import SampleComponentState._
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
 
-      val runId: RunId          = RunId()
       val obsId: ObsId          = ObsId("Obs001")
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
       // setup to receive Success in validation result
-      val setupSuccess: Setup = Setup(runId, obsId, successPrefix, Set(param))
-      val setupFailure: Setup = Setup(runId, obsId, failedPrefix, Set(param))
+      val setupSuccess: Setup = Setup(obsId, successPrefix, Set(param))
+      val setupFailure: Setup = Setup(obsId, failedPrefix, Set(param))
 
       val laserAssemblySupervisor = laserContainerComponents.head.supervisor
       val laserCompStateProbe     = TestProbe[CurrentState]
