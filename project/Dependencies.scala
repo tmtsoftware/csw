@@ -134,6 +134,7 @@ object Dependencies {
   )
 
   val CswCommons = Seq(
+    Akka.`akka-stream`,
     AkkaHttp.`akka-http`,
     Libs.`spray-json`
   )
