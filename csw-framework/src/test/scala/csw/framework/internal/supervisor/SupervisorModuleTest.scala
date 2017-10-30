@@ -16,10 +16,11 @@ import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
-import csw.messages.ccs.commands.{CommandInfo, Observe, Setup}
-import csw.messages.params.generics.{KeyType, Parameter}
+import csw.messages.ccs.commands.{Observe, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.params.generics.{KeyType, Parameter}
+import csw.messages.params.models.{ObsId, RunId}
 import csw.messages.params.states.{CurrentState, DemandState}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
@@ -128,9 +129,10 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
-        val commandInfo: CommandInfo = "Obs001"
-        val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
-        val setup: Setup             = Setup(commandInfo, successPrefix, Set(param))
+        val runId: RunId          = RunId()
+        val obsId: ObsId          = ObsId("Obs001")
+        val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
+        val setup: Setup          = Setup(runId, obsId, successPrefix, Set(param))
 
         supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
         // verify that onSubmit handler is invoked
@@ -144,7 +146,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         DemandMatcher(submitSetupConfigDemandState).check(submitSetupConfigCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted)
 
-        val observe: Observe = Observe(commandInfo, successPrefix, Set(param))
+        val observe: Observe = Observe(runId, obsId, successPrefix, Set(param))
 
         supervisorRef ! Submit(observe, commandValidationResponseProbe.ref)
 
@@ -178,9 +180,10 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
-        val commandInfo: CommandInfo = "Obs001"
-        val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
-        val setup: Setup             = Setup(commandInfo, successPrefix, Set(param))
+        val runId: RunId          = RunId()
+        val obsId: ObsId          = ObsId("Obs001")
+        val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
+        val setup: Setup          = Setup(runId, obsId, successPrefix, Set(param))
 
         supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
         // verify that onSetup handler is invoked and that data is transferred
@@ -194,7 +197,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         DemandMatcher(onewaySetupConfigDemandState).check(onewaySetupConfigCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted)
 
-        val observe: Observe = Observe(commandInfo, successPrefix, Set(param))
+        val observe: Observe = Observe(runId, obsId, successPrefix, Set(param))
 
         supervisorRef ! Oneway(observe, commandValidationResponseProbe.ref)
         // verify that onObserve handler is invoked and parameter is successfully transferred
@@ -224,10 +227,11 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
-        val commandInfo: CommandInfo = "Obs001"
-        val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
+        val runId: RunId          = RunId()
+        val obsId: ObsId          = ObsId("Obs001")
+        val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
         // setup to receive Success in validation result
-        val setup: Setup = Setup(commandInfo, failedPrefix, Set(param))
+        val setup: Setup = Setup(runId, obsId, failedPrefix, Set(param))
 
         supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
         commandValidationResponseProbe.expectMsgType[Invalid]

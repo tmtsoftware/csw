@@ -1,7 +1,7 @@
 package csw.messages.ccs.commands
 
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
-import csw.messages.params.models.Prefix
+import csw.messages.params.models.{ObsId, Prefix, RunId}
 
 /**
  * Common trait for Setup, Observe and Wait commands
@@ -15,9 +15,14 @@ sealed trait Command {
   def typeName: String
 
   /**
-   * information related to the parameter set
+   * unique ID for command parameter set
    */
-  val info: CommandInfo
+  val runId: RunId
+
+  /**
+   * the observation id
+   */
+  val obsId: ObsId
 
   /**
    * identifies the target subsystem
@@ -43,70 +48,84 @@ sealed trait ControlCommand extends Command
 /**
  * a parameter set for setting telescope and instrument parameters
  *
- * @param info     information related to the parameter set
  * @param prefix   identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Setup private (info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
-    extends ParameterSetType[Setup]
+case class Setup private (
+    runId: RunId,
+    obsId: ObsId,
+    prefix: Prefix,
+    paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
+) extends ParameterSetType[Setup]
     with ParameterSetKeyData
     with SequenceCommand
     with ControlCommand {
 
-  override protected def create(data: Set[Parameter[_]]): Setup = new Setup(info, prefix, data)
+  override protected def create(data: Set[Parameter[_]]): Setup = new Setup(runId, obsId, prefix, data)
 
   // This is here for Java to construct with String
-  def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
+  def this(runId: RunId, obsId: ObsId, prefix: String) = this(runId, obsId, Prefix(prefix))
 }
 
 object Setup {
-  def apply(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Setup =
-    new Setup(info, prefix).madd(paramSet)
+  def apply(runId: RunId, obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Setup =
+    new Setup(runId, obsId, prefix).madd(paramSet)
 }
 
 /**
  * a parameter set indicating a pause in processing
  *
- * @param info     information related to the parameter set
  * @param prefix   identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Wait private (info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
-    extends ParameterSetType[Wait]
+case class Wait private (
+    runId: RunId,
+    obsId: ObsId,
+    prefix: Prefix,
+    paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
+) extends ParameterSetType[Wait]
     with ParameterSetKeyData
     with SequenceCommand {
 
-  override protected def create(data: Set[Parameter[_]]) = new Wait(info, prefix, data)
+  override protected def create(data: Set[Parameter[_]]) = new Wait(runId, obsId, prefix, data)
 
   // This is here for Java to construct with String
-  def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
+  def this(runId: RunId, obsId: ObsId, prefix: String) = this(runId, obsId, Prefix(prefix))
 }
 
 object Wait {
-  def apply(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Wait =
-    new Wait(info, prefix).madd(paramSet)
+  def apply(runId: RunId, obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Wait =
+    new Wait(runId, obsId, prefix).madd(paramSet)
 }
 
 /**
  * a parameter set for setting observation parameters
  *
- * @param info     information related to the parameter set
  * @param prefix   identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Observe private (info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
-    extends ParameterSetType[Observe]
+case class Observe private (
+    runId: RunId,
+    obsId: ObsId,
+    prefix: Prefix,
+    paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
+) extends ParameterSetType[Observe]
     with ParameterSetKeyData
     with SequenceCommand
     with ControlCommand {
 
-  override protected def create(data: Set[Parameter[_]]) = new Observe(info, prefix, data)
+  override protected def create(data: Set[Parameter[_]]) = new Observe(runId, obsId, prefix, data)
 
   // This is here for Java to construct with String
-  def this(info: CommandInfo, prefix: String) = this(info, Prefix(prefix))
+  def this(runId: RunId, obsId: ObsId, prefix: String) = this(runId, obsId, Prefix(prefix))
 }
 
 object Observe {
-  def apply(info: CommandInfo, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Observe =
-    new Observe(info, prefix).madd(paramSet)
+  def apply(
+      runId: RunId,
+      obsId: ObsId,
+      prefix: Prefix,
+      paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
+  ): Observe =
+    new Observe(runId, obsId, prefix).madd(paramSet)
 }

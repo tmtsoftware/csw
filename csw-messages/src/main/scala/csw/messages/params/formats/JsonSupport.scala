@@ -3,7 +3,7 @@ package csw.messages.params.formats
 import csw.messages.ccs.commands._
 import csw.messages.ccs.events._
 import csw.messages.params.generics.Parameter
-import csw.messages.params.models.Prefix
+import csw.messages.params.models.{ObsId, Prefix, RunId}
 import csw.messages.params.states.StateVariable.StateVariable
 import csw.messages.params.states.{CurrentState, DemandState}
 import spray.json._
@@ -24,6 +24,8 @@ trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupp
   // JSON formats
   lazy val paramSetFormat    = implicitly[JsonFormat[Set[Parameter[_]]]]
   lazy val commandInfoFormat = implicitly[JsonFormat[CommandInfo]]
+  lazy val runIdFormat       = implicitly[JsonFormat[RunId]]
+  lazy val obsIdFormat       = implicitly[JsonFormat[ObsId]]
   lazy val prefixFormat      = implicitly[JsonFormat[Prefix]]
   lazy val eventInfoFormat   = implicitly[JsonFormat[EventInfo]]
 
@@ -49,7 +51,8 @@ trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupp
   def writeSequenceCommand[A <: SequenceCommand](sequenceCommand: A): JsValue = {
     JsObject(
       "type"     -> JsString(sequenceCommand.typeName),
-      "info"     -> commandInfoFormat.write(sequenceCommand.info),
+      "runId"    -> runIdFormat.write(sequenceCommand.runId),
+      "obsId"    -> obsIdFormat.write(sequenceCommand.obsId),
       "prefix"   -> prefixFormat.write(sequenceCommand.prefix),
       "paramSet" -> sequenceCommand.paramSet.toJson
     )
@@ -64,15 +67,25 @@ trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupp
   def readSequenceCommand[A <: SequenceCommand](json: JsValue): A = {
     json match {
       case JsObject(fields) =>
-        (fields("type"), fields("info"), fields("prefix"), fields("paramSet")) match {
-          case (JsString(typeName), info, prefix, paramSet) =>
-            val commandInfo = info.convertTo[CommandInfo]
-            val ck          = prefix.convertTo[Prefix]
+        (fields("type"), fields("runId"), fields("obsId"), fields("prefix"), fields("paramSet")) match {
+          case (JsString(typeName), runId, obsId, prefix, paramSet) =>
             typeName match {
-              case `setupType`   => Setup(commandInfo, ck, paramSetFormat.read(paramSet)).asInstanceOf[A]
-              case `observeType` => Observe(commandInfo, ck, paramSetFormat.read(paramSet)).asInstanceOf[A]
-              case `waitType`    => Wait(commandInfo, ck, paramSetFormat.read(paramSet)).asInstanceOf[A]
-              case _             => unexpectedJsValueError(json)
+              case `setupType` =>
+                Setup(runId.convertTo[RunId],
+                      obsId.convertTo[ObsId],
+                      prefix.convertTo[Prefix],
+                      paramSetFormat.read(paramSet)).asInstanceOf[A]
+              case `observeType` =>
+                Observe(runId.convertTo[RunId],
+                        obsId.convertTo[ObsId],
+                        prefix.convertTo[Prefix],
+                        paramSetFormat.read(paramSet)).asInstanceOf[A]
+              case `waitType` =>
+                Wait(runId.convertTo[RunId],
+                     obsId.convertTo[ObsId],
+                     prefix.convertTo[Prefix],
+                     paramSetFormat.read(paramSet)).asInstanceOf[A]
+              case _ => unexpectedJsValueError(json)
             }
           case _ => unexpectedJsValueError(json)
         }

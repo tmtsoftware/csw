@@ -6,6 +6,7 @@ import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
+import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
@@ -45,7 +46,7 @@ class SetElevationCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
       )
 
       val stateMatcher = Matchers.posMatcher(encoderPosition)
-      val scOut        = Setup(ac.commandInfo, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
+      val scOut        = Setup(RunId(), ac.obsId, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
 
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
@@ -62,7 +63,7 @@ class SetElevationCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   }
 
   def stopCommand(): Unit = {
-    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore)))
+    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(RunId(), s.obsId), ctx.spawnAnonymous(Actor.ignore)))
   }
 
 }

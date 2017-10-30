@@ -194,7 +194,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   }
 
   override def onExecuting(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
-    case Submit(Setup(ac.commandInfo, ac.stopCK, _), replyTo) =>
+    case Submit(Setup(_, ac.obsId, ac.stopCK, _), replyTo) =>
       currentCommand.foreach(x ⇒ x.foreach(_.stopCommand()))
       replyTo ! Cancelled
       AssemblyCommandState(None, CommandExecutionState.NotFollowing)

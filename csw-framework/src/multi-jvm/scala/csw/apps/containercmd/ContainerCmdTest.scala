@@ -16,11 +16,12 @@ import csw.messages.PubSub.Subscribe
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.messages.ToComponentLifecycleMessage.GoOffline
-import csw.messages.ccs.commands.{CommandInfo, Setup}
+import csw.messages.ccs.commands.Setup
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
+import csw.messages.params.models.{ObsId, RunId}
 import csw.messages.params.states.CurrentState
 import csw.messages.{Components, ContainerExternalMessage, Shutdown, SupervisorExternalMessage}
 import csw.services.config.api.models.ConfigData
@@ -30,8 +31,8 @@ import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
-import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration.DurationLong
+import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.io.Source
 
 class ContainerCmdTestMultiJvm1 extends ContainerCmdTest(0)
@@ -142,11 +143,12 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       import SampleComponentState._
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
 
-      val commandInfo: CommandInfo = "Obs001"
-      val param: Parameter[Int]    = KeyType.IntKey.make("encoder").set(22)
+      val runId: RunId          = RunId()
+      val obsId: ObsId          = ObsId("Obs001")
+      val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
       // setup to receive Success in validation result
-      val setupSuccess: Setup = Setup(commandInfo, successPrefix, Set(param))
-      val setupFailure: Setup = Setup(commandInfo, failedPrefix, Set(param))
+      val setupSuccess: Setup = Setup(runId, obsId, successPrefix, Set(param))
+      val setupFailure: Setup = Setup(runId, obsId, failedPrefix, Set(param))
 
       val laserAssemblySupervisor = laserContainerComponents.head.supervisor
       val laserCompStateProbe     = TestProbe[CurrentState]

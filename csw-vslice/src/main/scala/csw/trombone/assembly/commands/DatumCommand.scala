@@ -6,6 +6,7 @@ import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.Setup
+import csw.messages.params.models.RunId
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext, Matchers}
 import csw.trombone.hcd.TromboneHcdState
@@ -37,7 +38,9 @@ class DatumCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
       )
     } else {
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
-      tromboneHCD.foreach(_ ! Submit(Setup(s.info, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore)))
+      tromboneHCD.foreach(
+        _ ! Submit(Setup(RunId(), s.obsId, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore))
+      )
       matchCompletion(Matchers.idleMatcher, tromboneHCD.get, 5.seconds) {
         case Completed =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
@@ -51,7 +54,7 @@ class DatumCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   }
 
   def stopCommand(): Unit = {
-    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore)))
+    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(RunId(), s.obsId), ctx.spawnAnonymous(Actor.ignore)))
   }
 
 }

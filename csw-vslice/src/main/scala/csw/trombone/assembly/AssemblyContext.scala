@@ -1,12 +1,12 @@
 package csw.trombone.assembly
 
 import com.typesafe.config.Config
-import csw.messages.ccs.commands.{CommandInfo, Setup}
+import csw.messages.ccs.commands.Setup
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.ComponentId
 import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.Prefix
 import csw.messages.params.models.Units.{degree, kilometer, micrometer, millimeter}
+import csw.messages.params.models.{ObsId, Prefix, RunId}
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 
 /**
@@ -45,25 +45,26 @@ case class AssemblyContext(
   val movePrefix     = s"$componentPrefix.move"
   val moveCK: Prefix = Prefix(movePrefix)
 
-  def moveSC(position: Double): Setup =
-    Setup(commandInfo, moveCK).add(stagePositionKey -> position withUnits stagePositionUnits)
+  def moveSC(runId: RunId, position: Double): Setup =
+    Setup(runId, obsId, moveCK).add(stagePositionKey -> position withUnits stagePositionUnits)
 
   // Position submit command
   val positionPrefix     = s"$componentPrefix.position"
   val positionCK: Prefix = Prefix(positionPrefix)
 
-  def positionSC(rangeDistance: Double): Setup =
-    Setup(commandInfo, positionCK).add(naRangeDistanceKey -> rangeDistance withUnits naRangeDistanceUnits)
+  def positionSC(runId: RunId, rangeDistance: Double): Setup =
+    Setup(runId, obsId, positionCK).add(naRangeDistanceKey -> rangeDistance withUnits naRangeDistanceUnits)
 
   // setElevation submit command
-  val setElevationPrefix                       = s"$componentPrefix.setElevation"
-  val setElevationCK: Prefix                   = Prefix(setElevationPrefix)
-  def setElevationSC(elevation: Double): Setup = Setup(commandInfo, setElevationCK).add(naElevation(elevation))
+  val setElevationPrefix     = s"$componentPrefix.setElevation"
+  val setElevationCK: Prefix = Prefix(setElevationPrefix)
+  def setElevationSC(runId: RunId, elevation: Double): Setup =
+    Setup(runId, obsId, setElevationCK).add(naElevation(elevation))
 
   // setAngle submit command
-  val setAnglePrefx                          = s"$componentPrefix.setAngle"
-  val setAngleCK: Prefix                     = Prefix(setAnglePrefx)
-  def setAngleSC(zenithAngle: Double): Setup = Setup(commandInfo, setAngleCK).add(za(zenithAngle))
+  val setAnglePrefx                                        = s"$componentPrefix.setAngle"
+  val setAngleCK: Prefix                                   = Prefix(setAnglePrefx)
+  def setAngleSC(runId: RunId, zenithAngle: Double): Setup = Setup(runId, obsId, setAngleCK).add(za(zenithAngle))
 
   // Follow submit command
   val followPrefix     = s"$componentPrefix.follow"
@@ -72,7 +73,7 @@ case class AssemblyContext(
 
   def setNssInUse(value: Boolean): Parameter[Boolean] = nssInUseKey -> value
 
-  def followSC(nssInUse: Boolean): Setup = Setup(commandInfo, followCK).add(nssInUseKey -> nssInUse)
+  def followSC(runId: RunId, nssInUse: Boolean): Setup = Setup(runId, obsId, followCK).add(nssInUseKey -> nssInUse)
 
   // A list of all commands
   val allCommandKeys: List[Prefix] =
@@ -129,8 +130,7 @@ case class AssemblyContext(
   val axisStatsEventPrefix           = s"$componentPrefix.axis1Stats"
 
   // Normally this would contain the obsId, runId and other info about the current observation
-  val commandInfo = new CommandInfo("obs001")
-
+  val obsId: ObsId = ObsId("Obs001")
 }
 
 object AssemblyContext {

@@ -2,7 +2,7 @@ package csw.messages.params.formats
 
 import java.time.Instant
 
-import csw.messages.ccs.commands.{CommandInfo, Observe, Setup, Wait}
+import csw.messages.ccs.commands.{Observe, Setup, Wait}
 import csw.messages.ccs.events._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.generics.KeyType.{LongMatrixKey, StructKey}
@@ -18,14 +18,13 @@ import spray.json.pimpString
 //DEOPSCSW-184: Change configurations - attributes and values
 class JsonContractTest extends FunSpec with Matchers {
 
-  private val prefix: Prefix           = "wfos.blue.filter"
-  private val runId: RunId             = RunId("f22dc990-a02c-4d7e-b719-50b167cb7a1e")
-  private val obsId: ObsId             = ObsId("Obs001")
-  private val commandInfo: CommandInfo = CommandInfo(obsId, runId)
-  private val instantStr: String       = "2017-08-09T06:40:00.898Z"
-  private val eventId: String          = "7a4cd6ab-6077-476d-a035-6f83be1de42c"
-  private val eventTime: EventTime     = EventTime(Instant.parse(instantStr))
-  private val eventInfo: EventInfo     = EventInfo(prefix, eventTime, Some(obsId), eventId)
+  private val prefix: Prefix       = "wfos.blue.filter"
+  private val runId: RunId         = RunId("f22dc990-a02c-4d7e-b719-50b167cb7a1e")
+  private val obsId: ObsId         = ObsId("Obs001")
+  private val instantStr: String   = "2017-08-09T06:40:00.898Z"
+  private val eventId: String      = "7a4cd6ab-6077-476d-a035-6f83be1de42c"
+  private val eventTime: EventTime = EventTime(Instant.parse(instantStr))
+  private val eventInfo: EventInfo = EventInfo(prefix, eventTime, Some(obsId), eventId)
 
   describe("Test Sequence Commands") {
 
@@ -35,7 +34,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val raDec2     = RaDec(9.1, 2.9)
       val raDecParam = raDecKey.set(raDec1, raDec2)
 
-      val setup       = Setup(commandInfo, prefix).add(raDecParam)
+      val setup       = Setup(runId, obsId, prefix).add(raDecParam)
       val setupToJson = JsonSupport.writeSequenceCommand(setup)
 
       val expectedSetupJson = scala.io.Source.fromResource("json/setup_command.json").mkString
@@ -47,7 +46,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val k2      = KeyType.StringKey.make("expTime")
       val i1      = k1.set(22)
       val i2      = k2.set("11:10")
-      val observe = Observe(commandInfo, prefix).add(i1).add(i2)
+      val observe = Observe(runId, obsId, prefix).add(i1).add(i2)
 
       val observeToJson = JsonSupport.writeSequenceCommand(observe)
 
@@ -61,7 +60,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val m2: MatrixData[Long] = MatrixData.fromArrays(Array(2, 3, 4), Array(5, 6, 7), Array(8, 9, 10))
       val matrixParam          = k1.set(m1, m2)
 
-      val wait       = Wait(commandInfo, prefix).add(matrixParam)
+      val wait       = Wait(runId, obsId, prefix).add(matrixParam)
       val waitToJson = JsonSupport.writeSequenceCommand(wait)
 
       val expectedWaitJson = scala.io.Source.fromResource("json/wait_command.json").mkString
@@ -194,7 +193,7 @@ class JsonContractTest extends FunSpec with Matchers {
     val p25 = StringKey.make("StringKey").set("Str1", "Str2")
 
     it("should able to serialize and deserialize Setup command with all keys to and from json") {
-      val setup = Setup(commandInfo, prefix).madd(
+      val setup = Setup(runId, obsId, prefix).madd(
         p1,
         p2,
         p3,

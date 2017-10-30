@@ -2,7 +2,7 @@ package csw.messages.params.generics
 
 import csw.messages.ccs.commands._
 import csw.messages.ccs.events._
-import csw.messages.params.models.{ObsId, Struct}
+import csw.messages.params.models.{ObsId, RunId, Struct}
 import csw.messages.params.states.{CurrentState, DemandState}
 import org.scalatest.{FunSpec, Matchers}
 
@@ -13,9 +13,10 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
   val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
   val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
-  val commandInfo = CommandInfo(ObsId("Obs001"))
-  val eventInfo   = EventInfo("wfos.blue.filter", EventTime(), None)
-  val prefix      = "wfos.blue.filter"
+  val runId     = RunId()
+  val obsId     = ObsId("Obs001")
+  val eventInfo = EventInfo("wfos.blue.filter", EventTime(), None)
+  val prefix    = "wfos.blue.filter"
 
   private val encParam1 = encoderKey.set(1)
   private val encParam2 = encoderKey.set(2)
@@ -33,7 +34,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val setup =
-        Setup(commandInfo, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Setup(runId, obsId, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       setup.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
@@ -52,7 +53,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val observe =
-        Observe(commandInfo, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Observe(runId, obsId, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       observe.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName,
                                                                                    filterKey.keyName)
 
@@ -72,7 +73,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val wait =
-        Wait(commandInfo, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Wait(runId, obsId, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       wait.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
@@ -94,7 +95,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val result =
-        Result(commandInfo, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Result(runId, obsId, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       result.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd

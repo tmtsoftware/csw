@@ -2,9 +2,9 @@ package csw.messages.params.generics
 
 import java.time.Instant
 
-import csw.messages.ccs.commands.{CommandInfo, Observe, Setup, Wait}
+import csw.messages.ccs.commands.{Observe, Setup, Wait}
 import csw.messages.ccs.events.{EventServiceEvent, SystemEvent}
-import csw.messages.params.models.{ObsId, Prefix}
+import csw.messages.params.models.{ObsId, Prefix, RunId}
 import csw.messages.params.states.{CurrentState, CurrentStates}
 import org.scalatest.FunSuite
 
@@ -13,14 +13,13 @@ import org.scalatest.FunSuite
 //DEOPSCSW-282: Add a timestamp Key and Parameter
 class SerializationTest extends FunSuite {
 
-  val obsId       = ObsId("2023-Q22-4-33")
-  val commandInfo = CommandInfo(obsId)
-
-  val fqn1       = "tcs.base.pos.name"
-  val fqn1prefix = "tcs.base.pos"
-  val fqn1name   = "name"
-  val fqn2       = "tcs.base.pos.ra"
-  val fqn3       = "tcs.base.pos.dec"
+  val obsId        = ObsId("2023-Q22-4-33")
+  val runId: RunId = RunId()
+  val fqn1         = "tcs.base.pos.name"
+  val fqn1prefix   = "tcs.base.pos"
+  val fqn1name     = "name"
+  val fqn2         = "tcs.base.pos.ra"
+  val fqn3         = "tcs.base.pos.dec"
 
   val exposureTime: Key[Double] = KeyType.DoubleKey.make("exposureTime")
   val repeats: Key[Int]         = KeyType.IntKey.make("repeats")
@@ -30,7 +29,7 @@ class SerializationTest extends FunSuite {
   val test: Key[Int]            = KeyType.IntKey.make("test")
   val timestamp: Key[Instant]   = KeyType.TimestampKey.make("ts")
 
-  val sc1: Setup = Setup(commandInfo, Prefix("tcs.pos")).madd(
+  val sc1: Setup = Setup(runId, obsId, Prefix("tcs.pos")).madd(
     ra.set("12:32:11"),
     dec.set("30:22:22"),
     epoch.set(1950.0),
@@ -48,15 +47,15 @@ class SerializationTest extends FunSuite {
 
   val disperser: Key[String] = KeyType.StringKey.make("disperser")
   val filter1: Key[String]   = KeyType.StringKey.make("filter1")
-  val sc2: Setup = Setup(commandInfo, Prefix("wfos.blue"))
+  val sc2: Setup = Setup(runId, obsId, Prefix("wfos.blue"))
     .add(disperser.set("gr243"))
     .add(filter1.set("GG433"))
 
-  val ob1: Observe = Observe(commandInfo, Prefix("wfos.blue.camera"))
+  val ob1: Observe = Observe(runId, obsId, Prefix("wfos.blue.camera"))
     .add(exposureTime.set(22.3)) // .sec,
     .add(repeats.set(3))
 
-  val wc1: Wait = Wait(commandInfo, Prefix("wfos.blue.camera"))
+  val wc1: Wait = Wait(runId, obsId, Prefix("wfos.blue.camera"))
 
   test("ConfigType kryo serialization") {
     import csw.messages.params.generics.ParamSetSerializer._

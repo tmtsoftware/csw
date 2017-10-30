@@ -1,9 +1,7 @@
 {
   "type": "Setup",
-  "info": {
-    "obsId": "Obs001",
-    "runId": "f22dc990-a02c-4d7e-b719-50b167cb7a1e"
-  },
+  "runId": "f22dc990-a02c-4d7e-b719-50b167cb7a1e",
+  "obsId": "Obs001",
   "prefix": {
     "subsystem": "wfos",
     "prefix": "wfos.blue.filter"

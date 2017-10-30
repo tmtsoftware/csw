@@ -6,6 +6,7 @@ import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.ValidationIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.Setup
+import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
@@ -46,7 +47,7 @@ class PositionCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
       )
 
       val stateMatcher = Matchers.posMatcher(encoderPosition)
-      val scOut = Setup(s.info, TromboneHcdState.axisMoveCK)
+      val scOut = Setup(RunId(), s.obsId, TromboneHcdState.axisMoveCK)
         .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
@@ -64,7 +65,7 @@ class PositionCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   }
 
   def stopCommand(): Unit = {
-    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(s.info), ctx.spawnAnonymous(Actor.ignore)))
+    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(RunId(), s.obsId), ctx.spawnAnonymous(Actor.ignore)))
   }
 
 }

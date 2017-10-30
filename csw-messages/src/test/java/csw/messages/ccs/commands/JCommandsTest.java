@@ -1,10 +1,12 @@
 package csw.messages.ccs.commands;
 
-import csw.messages.params.models.Prefix;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.generics.ParameterSetType;
+import csw.messages.params.models.ObsId;
+import csw.messages.params.models.Prefix;
+import csw.messages.params.models.RunId;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,7 +28,8 @@ public class JCommandsTest {
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
 
-    private final CommandInfo commandInfo = new CommandInfo("obsId");
+    private final RunId runId = RunId.apply();
+    private final ObsId obsId = new ObsId("obsId");
     private final String prefix = "wfos.red.detector";
 
     private void assertOnCommandAPI(ParameterSetType<?> command) {
@@ -75,10 +78,11 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessSetupCommand() {
-        Setup setup = new Setup(commandInfo, prefix).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(runId, obsId, prefix).add(encoderParam).add(epochStringParam);
 
-        // commandInfo, prefix, subsystem
-        Assert.assertEquals(commandInfo, setup.info());
+        // runId, obsId, prefix, subsystem
+        Assert.assertEquals(runId, setup.runId());
+        Assert.assertEquals(obsId, setup.obsId());
         Assert.assertEquals(prefix, setup.prefixStr());
         Assert.assertEquals(new Prefix(prefix), setup.prefix());
         Assert.assertEquals(WFOS, setup.subsystem());
@@ -89,10 +93,11 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessObserveCommand() {
-        Observe observe = new Observe(commandInfo, prefix).add(encoderParam).add(epochStringParam);
+        Observe observe = new Observe(runId, obsId, prefix).add(encoderParam).add(epochStringParam);
 
-        // commandInfo, prefix, subsystem
-        Assert.assertEquals(commandInfo, observe.info());
+        // runId, obsId, prefix, subsystem
+        Assert.assertEquals(runId, observe.runId());
+        Assert.assertEquals(obsId, observe.obsId());
         Assert.assertEquals(prefix, observe.prefixStr());
         Assert.assertEquals(new Prefix(prefix), observe.prefix());
         Assert.assertEquals(WFOS, observe.subsystem());
@@ -103,10 +108,11 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessWaitCommand() {
-        Wait wait = new Wait(commandInfo, prefix).add(encoderParam).add(epochStringParam);
+        Wait wait = new Wait(runId, obsId, prefix).add(encoderParam).add(epochStringParam);
 
-        // commandInfo, prefix, subsystem
-        Assert.assertEquals(commandInfo, wait.info());
+        // runId, obsId, prefix, subsystem
+        Assert.assertEquals(runId, wait.runId());
+        Assert.assertEquals(obsId, wait.obsId());
         Assert.assertEquals(prefix, wait.prefixStr());
         Assert.assertEquals(new Prefix(prefix), wait.prefix());
         Assert.assertEquals(WFOS, wait.subsystem());

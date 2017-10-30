@@ -6,10 +6,10 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.messages.ccs.commands.{Command, CommandInfo, Setup}
+import csw.messages.ccs.commands.{Command, Setup}
 import csw.messages.ccs.events.StatusEvent
 import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.Prefix
+import csw.messages.params.models.{ObsId, Prefix, RunId}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
@@ -22,18 +22,19 @@ case class CommandMsg(command: Command, ackTo: ActorRef[java.util.Set[Parameter[
 class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll {
   implicit val timeout: Timeout = Timeout(5.seconds)
 
-  private val prefixStr                = "wfos.red.detector"
-  private val commandInfo: CommandInfo = "Obs001"
-  private val intKey                   = KeyType.IntKey.make("intKey")
-  private val stringKey                = KeyType.StringKey.make("stringKey")
-  private val intParam                 = intKey.set(22, 33)
-  private val stringParam              = stringKey.set("First", "Second")
+  private val prefixStr    = "wfos.red.detector"
+  private val runId: RunId = RunId()
+  private val obsId: ObsId = ObsId("Obs001")
+  private val intKey       = KeyType.IntKey.make("intKey")
+  private val stringKey    = KeyType.StringKey.make("stringKey")
+  private val intParam     = intKey.set(22, 33)
+  private val stringParam  = stringKey.set("First", "Second")
 
   private val system: actor.ActorSystem          = actor.ActorSystem("test")
   implicit val typedSystem: ActorSystem[Nothing] = system.toTyped
   implicit val testKit: TestKitSettings          = TestKitSettings(typedSystem)
 
-  private val scalaSetup = Setup(commandInfo, Prefix(prefixStr)).add(intParam).add(stringParam)
+  private val scalaSetup = Setup(runId, obsId, Prefix(prefixStr)).add(intParam).add(stringParam)
 
   private val javaCmdHandlerBehavior: Future[ActorRef[CommandMsg]] =
     typedSystem.systemActorOf[CommandMsg](JavaCommandHandler.behavior(), "javaCommandHandler")

@@ -60,7 +60,8 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
   private final val system        = ActorSystem("example")
   private final val serialization = SerializationExtension(system)
   private final val prefixStr     = "wfos.prog.cloudcover"
-  private final val commandInfo   = "Obs001"
+  private val runId: RunId        = RunId()
+  private val obsId: ObsId        = ObsId("Obs001")
 
   override protected def afterAll(): Unit = Await.result(system.terminate(), 2.seconds)
 
@@ -70,7 +71,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val intKey = IntKey.make("intKey")
       val param  = intKey.set(1, 2, 3).withUnits(coulomb)
 
-      val setup           = Setup(commandInfo, Prefix(prefixStr)).add(param)
+      val setup           = Setup(runId, obsId, Prefix(prefixStr)).add(param)
       val setupSerializer = serialization.findSerializerFor(setup)
 
       setupSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -89,7 +90,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(imgBytes)
       val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-      val observe           = Observe(commandInfo, Prefix(prefixStr)).add(param)
+      val observe           = Observe(runId, obsId, Prefix(prefixStr)).add(param)
       val observeSerializer = serialization.findSerializerFor(observe)
 
       observeSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -108,7 +109,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val doubleMatrixKey = DoubleMatrixKey.make(keyName)
       val param           = doubleMatrixKey.set(Array(matrixData1, matrixData2), lightyear)
 
-      val wait: Wait     = Wait(commandInfo, Prefix(prefixStr)).add(param)
+      val wait: Wait     = Wait(runId, obsId, Prefix(prefixStr)).add(param)
       val waitSerializer = serialization.findSerializerFor(wait)
 
       waitSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -298,7 +299,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     it("should serialize CommandExecutionResponse messages") {
       val testData = Table(
         "CommandExecutionResponse models",
-        CompletedWithResult(Result(commandInfo, Prefix(prefixStr))),
+        CompletedWithResult(Result(runId, obsId, Prefix(prefixStr))),
         NoLongerValid(ValidationIssue.OtherIssue("test issue")),
         Completed,
         InProgress("test"),

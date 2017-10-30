@@ -78,8 +78,8 @@ class TromboneAssemblyHandlers(
 
   override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = {
     val validation = controlCommand match {
-      case Setup(info, prefix, paramSet)   => validateOneSetup(controlCommand.asInstanceOf[Setup])
-      case Observe(info, prefix, paramSet) => Valid
+      case _: Setup   => validateOneSetup(controlCommand.asInstanceOf[Setup])
+      case _: Observe => Valid
     }
     if (validation == Valid) {
       commandHandler ! CommandMessageE(Submit(controlCommand, replyTo))

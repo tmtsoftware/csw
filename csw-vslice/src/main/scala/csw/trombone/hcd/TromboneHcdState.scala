@@ -2,11 +2,11 @@ package csw.trombone.hcd
 
 import java.io.File
 
-import csw.messages.ccs.commands.{CommandInfo, Setup}
+import csw.messages.ccs.commands.Setup
 import csw.messages.params.generics.KeyType.ChoiceKey
 import csw.messages.params.generics.{GChoiceKey, Key, KeyType}
 import csw.messages.params.models.Units.encoder
-import csw.messages.params.models.{Choice, Prefix}
+import csw.messages.params.models.{Choice, ObsId, Prefix, RunId}
 import csw.messages.params.states.CurrentState
 
 object TromboneHcdState {
@@ -81,18 +81,18 @@ object TromboneHcdState {
   val axisMovePrefix     = s"$trombonePrefix.move"
   val axisMoveCK: Prefix = Prefix(axisMovePrefix)
 
-  def positionSC(commandInfo: CommandInfo, value: Int): Setup =
-    Setup(commandInfo, axisMoveCK).add(positionKey -> value withUnits encoder)
+  def positionSC(runId: RunId, obsId: ObsId, value: Int): Setup =
+    Setup(runId, obsId, axisMoveCK).add(positionKey -> value withUnits encoder)
 
-  val axisDatumPrefix                   = s"$trombonePrefix.datum"
-  val axisDatumCK: Prefix               = Prefix(axisDatumPrefix)
-  def datumSC(commandInfo: CommandInfo) = Setup(commandInfo, axisDatumCK)
+  val axisDatumPrefix                     = s"$trombonePrefix.datum"
+  val axisDatumCK: Prefix                 = Prefix(axisDatumPrefix)
+  def datumSC(runId: RunId, obsId: ObsId) = Setup(runId, obsId, axisDatumCK)
 
-  val axisHomePrefix                   = s"$trombonePrefix.home"
-  val axisHomeCK: Prefix               = Prefix(axisHomePrefix)
-  def homeSC(commandInfo: CommandInfo) = Setup(commandInfo, axisHomeCK)
+  val axisHomePrefix                     = s"$trombonePrefix.home"
+  val axisHomeCK: Prefix                 = Prefix(axisHomePrefix)
+  def homeSC(runId: RunId, obsId: ObsId) = Setup(runId, obsId, axisHomeCK)
 
-  val axisCancelPrefix                   = s"$trombonePrefix.cancel"
-  val axisCancelCK: Prefix               = Prefix(axisCancelPrefix)
-  def cancelSC(commandInfo: CommandInfo) = Setup(commandInfo, axisCancelCK)
+  val axisCancelPrefix                     = s"$trombonePrefix.cancel"
+  val axisCancelCK: Prefix                 = Prefix(axisCancelPrefix)
+  def cancelSC(runId: RunId, obsId: ObsId) = Setup(runId, obsId, axisCancelCK)
 }
