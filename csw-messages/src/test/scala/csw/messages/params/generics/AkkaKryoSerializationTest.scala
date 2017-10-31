@@ -10,6 +10,7 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
+import csw.messages.CommandExecutionResponses._
 import csw.messages.CommandValidationResponses.{Accepted, Invalid}
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.PubSub.Subscribe
@@ -31,22 +32,7 @@ import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatr
 import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.messages.params.models._
 import csw.messages.params.states.{CurrentState, DemandState}
-import csw.messages.{
-  Aborted,
-  BehaviorChanged,
-  Cancelled,
-  Completed,
-  CompletedWithResult,
-  Component,
-  Components,
-  Error,
-  InProgress,
-  LifecycleStateChanged,
-  NoLongerValid,
-  Restart,
-  Shutdown,
-  SupervisorExternalMessage
-}
+import csw.messages.{Component, Components, LifecycleStateChanged, Restart, Shutdown, SupervisorExternalMessage}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}

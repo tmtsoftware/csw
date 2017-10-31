@@ -7,10 +7,11 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter._
 import akka.util.Timeout
 import csw.ccs._
+import csw.messages.CommandExecutionResponse
+import csw.messages.CommandExecutionResponses.{Completed, Error}
 import csw.messages.PubSub.Subscribe
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages.params.states.{CurrentState, DemandState}
-import csw.messages.{CommandExecutionResponse, Completed, Error}
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future

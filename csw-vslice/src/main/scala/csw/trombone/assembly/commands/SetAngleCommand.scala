@@ -2,6 +2,7 @@ package csw.trombone.assembly.commands
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
+import csw.messages.CommandExecutionResponses.{Completed, Error}
 import csw.messages._
 import csw.messages.ccs.commands.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}

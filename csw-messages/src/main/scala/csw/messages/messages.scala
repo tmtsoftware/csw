@@ -134,7 +134,6 @@ case class SupervisorInfo(system: ActorSystem, component: Component)
  */
 sealed trait CommandResponse extends RunningMessage with TMTSerializable
 
-sealed trait CommandExecutionResponse  extends CommandResponse
 sealed trait CommandValidationResponse extends CommandResponse
 object CommandValidationResponses {
   val jAccepted: CommandValidationResponse = Accepted
@@ -142,43 +141,51 @@ object CommandValidationResponses {
   final case class Invalid(issue: CommandIssue) extends CommandValidationResponse
 }
 
-/**
- * Command Completed with a result
- * @param result - Result ParamSet to types in Configuration and use it here
- */
-final case class CompletedWithResult(result: Result) extends CommandExecutionResponse
+sealed trait CommandExecutionResponse extends CommandResponse
+object CommandExecutionResponses {
 
-/**
- * The command was valid when received, but is no longer valid because of intervening activities
- */
-final case class NoLongerValid(issue: CommandIssue) extends CommandExecutionResponse
+  val jAborted: CommandExecutionResponse   = Aborted
+  val jCancelled: CommandExecutionResponse = Cancelled
+  val jCompleted: CommandExecutionResponse = Completed
 
-/**
- * The command has completed successfully
- */
-case object Completed extends CommandExecutionResponse
+  /**
+   * Command Completed with a result
+   * @param result - Result ParamSet to types in Configuration and use it here
+   */
+  final case class CompletedWithResult(result: Result) extends CommandExecutionResponse
 
-/**
- * The command is currently executing or has not yet started
- * When used for a specific command, it indicates the command has not yet executed or is currently executing and is providing an update
- */
-final case class InProgress(message: String = "") extends CommandExecutionResponse
+  /**
+   * The command was valid when received, but is no longer valid because of intervening activities
+   */
+  final case class NoLongerValid(issue: CommandIssue) extends CommandExecutionResponse
 
-/**
- * The command was started, but ended with error with the given message
- */
-final case class Error(message: String) extends CommandExecutionResponse
+  /**
+   * The command has completed successfully
+   */
+  case object Completed extends CommandExecutionResponse
 
-/**
- * The command was aborted
- * Aborted means that the command/actions were stopped immediately.
- */
-case object Aborted extends CommandExecutionResponse
+  /**
+   * The command is currently executing or has not yet started
+   * When used for a specific command, it indicates the command has not yet executed or is currently executing and is providing an update
+   */
+  final case class InProgress(message: String = "") extends CommandExecutionResponse
 
-/**
- * The command was cancelled
- * Cancelled means the command/actions were stopped at the next convenient place. This is usually appropriate for
- */
-case object Cancelled extends CommandExecutionResponse
+  /**
+   * The command was started, but ended with error with the given message
+   */
+  final case class Error(message: String) extends CommandExecutionResponse
 
-case class BehaviorChanged[T](ref: ActorRef[T]) extends CommandExecutionResponse
+  /**
+   * The command was aborted
+   * Aborted means that the command/actions were stopped immediately.
+   */
+  case object Aborted extends CommandExecutionResponse
+
+  /**
+   * The command was cancelled
+   * Cancelled means the command/actions were stopped at the next convenient place. This is usually appropriate for
+   */
+  case object Cancelled extends CommandExecutionResponse
+
+  case class BehaviorChanged[T](ref: ActorRef[T]) extends CommandExecutionResponse
+}
