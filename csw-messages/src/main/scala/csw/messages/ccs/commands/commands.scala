@@ -46,9 +46,11 @@ sealed trait SequenceCommand extends Command
 sealed trait ControlCommand extends Command
 
 /**
- * a parameter set for setting telescope and instrument parameters
+ * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  *
- * @param prefix   identifies the target subsystem
+ * @param runId unique ID for this parameter set
+ * @param obsId the observation id
+ * @param prefix identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Setup private (
@@ -68,6 +70,8 @@ case class Setup private (
 }
 
 object Setup {
+
+  // The default apply method is used only internally while reading the incoming json and de-serializing it to setup model
   private[messages] def apply(
       runId: RunId,
       obsId: ObsId,
@@ -76,6 +80,7 @@ object Setup {
   ): Setup =
     new Setup(runId, obsId, prefix, paramSet) //madd is not required as this version of apply is only used for reading json
 
+  // The apply method is used to create Setup command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
   def apply(
       obsId: ObsId,
       prefix: Prefix,
@@ -84,9 +89,11 @@ object Setup {
 }
 
 /**
- * a parameter set indicating a pause in processing
+ * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  *
- * @param prefix   identifies the target subsystem
+ * @param runId unique ID for this parameter set
+ * @param obsId the observation id
+ * @param prefix identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Wait private (
@@ -105,6 +112,8 @@ case class Wait private (
 }
 
 object Wait {
+
+  // The default apply method is used only internally while reading the incoming json and de-serializing it to observe model
   private[messages] def apply(
       runId: RunId,
       obsId: ObsId,
@@ -113,6 +122,7 @@ object Wait {
   ): Wait =
     new Wait(runId, obsId, prefix, paramSet) //madd is not required as this version of apply is only used for reading json
 
+  // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
   def apply(
       obsId: ObsId,
       prefix: Prefix,
@@ -121,9 +131,11 @@ object Wait {
 }
 
 /**
- * a parameter set for setting observation parameters
+ * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  *
- * @param prefix   identifies the target subsystem
+ * @param runId unique ID for this parameter set
+ * @param obsId the observation id
+ * @param prefix identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Observe private (
@@ -143,6 +155,8 @@ case class Observe private (
 }
 
 object Observe {
+
+  // The default apply method is used only internally while reading the incoming json and de-serializing it to observe model
   private[messages] def apply(
       runId: RunId,
       obsId: ObsId,
@@ -151,6 +165,7 @@ object Observe {
   ): Observe =
     new Observe(runId, obsId, prefix, paramSet) //madd is not required as this version of apply is only used for reading json
 
+  // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
   def apply(
       obsId: ObsId,
       prefix: Prefix,
