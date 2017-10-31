@@ -8,6 +8,7 @@ import csw.ccs.StateMatcher
 import csw.messages.PubSub.Publish
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages._
+import csw.messages.ccs.commands.CommandExecutionResponse
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, MatcherResponse, Matchers}
 
 import scala.concurrent.Future

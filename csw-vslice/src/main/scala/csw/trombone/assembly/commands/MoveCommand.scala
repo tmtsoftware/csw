@@ -2,11 +2,11 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.messages.CommandExecutionResponse.{Completed, Error, NoLongerValid}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
-import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error, NoLongerValid}
+import csw.messages.ccs.commands.{CommandExecutionResponse, Setup}
 import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
 import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}

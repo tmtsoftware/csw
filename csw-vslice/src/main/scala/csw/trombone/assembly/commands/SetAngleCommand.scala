@@ -2,13 +2,13 @@ package csw.trombone.assembly.commands
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
-import csw.messages.CommandExecutionResponse.{Completed, Error}
 import csw.messages._
-import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error}
+import csw.messages.ccs.commands.{CommandExecutionResponse, Setup}
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.trombone.assembly.actors.TromboneState._
 import csw.trombone.assembly._
+import csw.trombone.assembly.actors.TromboneState._
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble

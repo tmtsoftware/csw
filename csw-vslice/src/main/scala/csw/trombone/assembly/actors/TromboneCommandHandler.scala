@@ -5,13 +5,13 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.framework.internal.pubsub.PubSubBehavior
-import csw.messages.CommandExecutionResponse.{Cancelled, Completed, NoLongerValid}
 import csw.messages.CommandMessage.Submit
-import csw.messages.CommandValidationResponse.Invalid
 import csw.messages.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{UnsupportedCommandInStateIssue, WrongInternalStateIssue}
-import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.commands.CommandExecutionResponse.{Cancelled, Completed, NoLongerValid}
+import csw.messages.ccs.commands.CommandValidationResponse.Invalid
+import csw.messages.ccs.commands.{CommandExecutionResponse, CommandResponse, Setup}
 import csw.messages.location.Connection
 import csw.trombone.assembly._
 import csw.trombone.assembly.commands._

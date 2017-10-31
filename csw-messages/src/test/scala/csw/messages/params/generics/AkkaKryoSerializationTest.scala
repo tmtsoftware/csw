@@ -10,8 +10,6 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
-import csw.messages.CommandExecutionResponse._
-import csw.messages.CommandValidationResponse.{Accepted, Invalid}
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.PubSub.Subscribe
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
@@ -22,6 +20,8 @@ import csw.messages.SupervisorCommonMessage.{
 }
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages.ccs.CommandIssue
+import csw.messages.ccs.commands.CommandExecutionResponse._
+import csw.messages.ccs.commands.CommandValidationResponse.{Accepted, Invalid}
 import csw.messages.ccs.commands._
 import csw.messages.ccs.events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
 import csw.messages.framework.LocationServiceUsage.DoNotRegister

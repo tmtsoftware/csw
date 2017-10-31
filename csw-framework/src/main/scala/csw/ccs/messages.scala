@@ -1,7 +1,7 @@
 package csw.ccs
 
 import akka.typed.ActorRef
-import csw.messages.CommandExecutionResponse
+import csw.messages.ccs.commands.CommandExecutionResponse
 import csw.messages.params.states.CurrentState
 
 sealed trait MultiStateMatcherMsgs

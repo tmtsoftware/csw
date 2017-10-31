@@ -1,7 +1,7 @@
 package csw.trombone.messages
 
 import akka.typed.ActorRef
-import csw.messages.CommandExecutionResponse
+import csw.messages.ccs.commands.CommandExecutionResponse
 
 sealed trait CommandMsgs
 object CommandMsgs {

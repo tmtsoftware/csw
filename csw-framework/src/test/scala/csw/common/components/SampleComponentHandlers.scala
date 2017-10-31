@@ -3,11 +3,11 @@ package csw.common.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.CommandValidationResponse.{Accepted, Invalid}
 import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages._
 import csw.messages.ccs.CommandIssue.OtherIssue
-import csw.messages.ccs.commands.{ControlCommand, Observe, Setup}
+import csw.messages.ccs.commands.CommandValidationResponse.{Accepted, Invalid}
+import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
@@ -112,7 +112,7 @@ class SampleComponentHandlers(
     validateCommand(controlCommand)
   }
 
-  private def validateCommand(command: ControlCommand) = {
+  private def validateCommand(command: ControlCommand): CommandValidationResponse = {
     command match {
       case Setup(_, _, somePrefix, _) ⇒
         pubSubRef ! Publish(CurrentState(somePrefix, Set(choiceKey.set(setupConfigChoice), command.paramSet.head)))
@@ -122,6 +122,7 @@ class SampleComponentHandlers(
     }
 
     if (command.prefix.prefix.contains("success")) {
+
       Accepted(command.runId)
     } else {
       Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))

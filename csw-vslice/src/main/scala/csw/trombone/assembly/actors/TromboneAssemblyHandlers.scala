@@ -4,10 +4,10 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.CommandMessage.Submit
-import csw.messages.CommandValidationResponse.Accepted
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
-import csw.messages.ccs.commands.{ControlCommand, Observe, Setup}
+import csw.messages.ccs.commands.CommandValidationResponse.Accepted
+import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.messages.params.states.CurrentState

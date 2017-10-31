@@ -3,12 +3,13 @@ package csw.trombone.assembly
 import akka.typed.ActorRef
 import csw.messages.CommandMessage.Submit
 import csw.messages.RunningMessage.DomainMessage
+import csw.messages.ccs.commands.{CommandExecutionResponse, CommandResponse}
 import csw.messages.ccs.events.EventTime
 import csw.messages.location.Connection
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.Choice
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandExecutionResponse, CommandMessage, CommandResponse, SupervisorExternalMessage}
+import csw.messages.{CommandMessage, SupervisorExternalMessage}
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.assembly.commands.AssemblyState
 

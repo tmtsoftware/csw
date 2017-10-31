@@ -1,9 +1,8 @@
 package csw.trombone.assembly
 
-import csw.messages.CommandValidationResponse
-import csw.messages.CommandValidationResponse.{Accepted, Invalid}
 import csw.messages.ccs.CommandIssue._
-import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.commands.CommandValidationResponse.{Accepted, Invalid}
+import csw.messages.ccs.commands.{CommandValidationResponse, Setup}
 
 import scala.util.Try
 

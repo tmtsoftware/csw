@@ -16,7 +16,7 @@ import csw.messages.PubSub.Subscribe
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.messages.ToComponentLifecycleMessage.GoOffline
-import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
@@ -151,11 +151,12 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val laserAssemblySupervisor = laserContainerComponents.head.supervisor
       val laserCompStateProbe     = TestProbe[CurrentState]
-      etonSupervisorTypedRef ! Submit(setupFailure, laserAssemblySupervisor)
+      val commandResponseProbe    = TestProbe[CommandResponse]
+      etonSupervisorTypedRef ! Submit(setupFailure, commandResponseProbe.ref)
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
       eatonCompStateProbe.expectMsg(CurrentState(failedPrefix, Set(choiceKey.set(setupConfigChoice), param)))
 
-      etonSupervisorTypedRef ! Oneway(setupSuccess, laserAssemblySupervisor)
+      etonSupervisorTypedRef ! Oneway(setupSuccess, commandResponseProbe.ref)
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
       eatonCompStateProbe.expectMsg(CurrentState(successPrefix, Set(choiceKey.set(setupConfigChoice), param)))
 
