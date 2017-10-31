@@ -2,6 +2,7 @@ package csw.framework.internal.wiring
 
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
+import csw.apps.deployment.commons.ConfigUtils
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -19,6 +20,7 @@ class FrameworkWiring {
   lazy val registrationFactory                            = new RegistrationFactory(logAdminActorRef)
   lazy val pubSubBehaviorFactory                          = new PubSubBehaviorFactory
   lazy val configClientService: ConfigClientService       = ConfigClientFactory.clientApi(actorSystem, locationService)
+  lazy val configUtils: ConfigUtils                       = new ConfigUtils(configClientService, actorRuntime)
 }
 
 object FrameworkWiring {

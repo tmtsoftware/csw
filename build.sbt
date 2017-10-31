@@ -149,7 +149,7 @@ lazy val `csw-framework` = project
     `csw-location`      % "compile->compile;multi-jvm->multi-jvm",
     `csw-config-server` % "multi-jvm->test"
   )
-  .enablePlugins(AutoMultiJvm, GenJavadocPlugin, CswBuildInfo)
+  .enablePlugins(AutoMultiJvm, GenJavadocPlugin, CswBuildInfo, DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.CswFramework
   )

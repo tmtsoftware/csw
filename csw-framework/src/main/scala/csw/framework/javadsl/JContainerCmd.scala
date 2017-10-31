@@ -2,10 +2,11 @@ package csw.framework.javadsl
 
 import java.util.Optional
 
-import scala.compat.java8.OptionConverters._
 import akka.typed.ActorRef
 import com.typesafe.config.Config
-import csw.apps.containercmd.ContainerCmd
+import csw.apps.deployment.containercmd.ContainerCmd
+
+import scala.compat.java8.OptionConverters._
 
 object JContainerCmd {
   def start(name: String, args: Array[String], defaultConfig: Optional[Config]): ActorRef[_] =

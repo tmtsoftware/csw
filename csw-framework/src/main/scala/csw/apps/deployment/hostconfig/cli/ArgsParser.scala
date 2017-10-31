@@ -1,27 +1,24 @@
-package csw.apps.containercmd.cli
+package csw.apps.deployment.hostconfig.cli
 
 import java.nio.file.Paths
 
 import csw.services.BuildInfo
+import scopt.OptionParser
 
 /**
  * Parses the command line options using `scopt` library.
  */
 class ArgsParser() {
-  val parser = new scopt.OptionParser[Options]("scopt") {
+  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("scopt") {
     head(BuildInfo.name, BuildInfo.version)
-
-    opt[Unit]("standalone") action { (_, c) =>
-      c.copy(standalone = true)
-    } text "run component in standalone mode, without a container"
 
     opt[Unit]("local") action { (_, c) =>
       c.copy(local = true)
-    } text s"run using the file on local file system without fetching file from config service"
+    } text "if provided, get the host configuration file from local machine located at hostConfigPath, else fetch it from config service"
 
     arg[String]("<file>") maxOccurs 1 minOccurs 0 action { (x, c) =>
-      c.copy(inputFilePath = Some(Paths.get(x)))
-    } text "config file path"
+      c.copy(hostConfigPath = Some(Paths.get(x)))
+    } text "host configuration file path"
 
     help("help")
     version("version")

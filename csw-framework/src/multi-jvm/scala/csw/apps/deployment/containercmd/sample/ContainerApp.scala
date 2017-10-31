@@ -1,4 +1,4 @@
-package csw.apps.containercmd.sample
+package csw.apps.deployment.containercmd.sample
 
 import akka.actor.ActorSystem
 import akka.typed

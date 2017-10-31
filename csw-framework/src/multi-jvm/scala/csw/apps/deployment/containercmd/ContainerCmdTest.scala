@@ -1,4 +1,4 @@
-package csw.apps.containercmd
+package csw.apps.deployment.containercmd
 
 import java.io.FileWriter
 import java.nio.file.{Files, Path, Paths}

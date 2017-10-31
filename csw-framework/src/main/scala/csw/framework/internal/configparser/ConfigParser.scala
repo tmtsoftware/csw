@@ -1,13 +1,14 @@
 package csw.framework.internal.configparser
 
 import com.typesafe.config.{Config, ConfigRenderOptions}
-import csw.framework.models.ContainerInfo
+import csw.framework.models.{ContainerInfo, HostBootstrapInfo}
 import csw.messages.framework.ComponentInfo
 import play.api.libs.json._
 
-object ComponentInfoParser {
+object ConfigParser {
   def parseContainer(config: Config): ContainerInfo  = parse[ContainerInfo](config)
   def parseStandalone(config: Config): ComponentInfo = parse[ComponentInfo](config)
+  def parseHost(config: Config): HostBootstrapInfo   = parse[HostBootstrapInfo](config)
 
   private def parse[T: Format](config: Config): T = {
     val json = configToJsValue(config)
