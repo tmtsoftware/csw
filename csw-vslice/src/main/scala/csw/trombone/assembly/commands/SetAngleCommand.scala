@@ -6,20 +6,22 @@ import csw.messages.CommandExecutionResponse.{Completed, Error}
 import csw.messages._
 import csw.messages.ccs.commands.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
+import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly.actors.TromboneState._
 import csw.trombone.assembly._
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class SetAngleCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
-                      ac: AssemblyContext,
-                      s: Setup,
-                      followCommandActor: ActorRef[FollowCommandMessages],
-                      tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
-                      startState: TromboneState,
-                      stateActor: ActorRef[PubSub[AssemblyState]])
-    extends AssemblyCommand(ctx, startState, stateActor) {
+class SetAngleCommand(
+    ctx: ActorContext[AssemblyCommandHandlerMsgs],
+    ac: AssemblyContext,
+    s: Setup,
+    followCommandActor: ActorRef[FollowCommandMessages],
+    tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+    startState: TromboneState,
+    stateActor: ActorRef[PubSub[AssemblyState]]
+) extends AssemblyCommand(ctx, startState, stateActor) {
 
   implicit val timeout: Timeout = Timeout(5.seconds)
 
@@ -31,12 +33,12 @@ class SetAngleCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
     matchCompletion(Matchers.idleMatcher, tromboneHCD.get, 5.seconds) {
-      case Completed() =>
+      case MatchCompleted =>
         publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
-        Completed()
-      case Error(message) =>
-        println(s"setElevation command failed with message: $message")
-        Error(message)
+        Completed(s.runId)
+      case MatchFailed(ex) =>
+        println(s"setElevation command failed with message: ${ex.getMessage}")
+        Error(s.runId, ex.getMessage)
     }
   }
 

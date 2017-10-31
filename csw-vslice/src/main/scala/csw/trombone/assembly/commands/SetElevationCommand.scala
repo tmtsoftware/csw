@@ -9,6 +9,7 @@ import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
+import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
@@ -16,13 +17,14 @@ import csw.trombone.hcd.TromboneHcdState
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class SetElevationCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
-                          ac: AssemblyContext,
-                          s: Setup,
-                          tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
-                          startState: TromboneState,
-                          stateActor: ActorRef[PubSub[AssemblyState]])
-    extends AssemblyCommand(ctx, startState, stateActor) {
+class SetElevationCommand(
+    ctx: ActorContext[AssemblyCommandHandlerMsgs],
+    ac: AssemblyContext,
+    s: Setup,
+    tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+    startState: TromboneState,
+    stateActor: ActorRef[PubSub[AssemblyState]]
+) extends AssemblyCommand(ctx, startState, stateActor) {
 
   import TromboneHcdState._
   import csw.trombone.assembly.actors.TromboneState._
@@ -31,11 +33,10 @@ class SetElevationCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   def startCommand(): Future[CommandExecutionResponse] = {
     if (startState.cmdChoice == cmdUninitialized || startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving) {
       Future(
-        NoLongerValid(
-          WrongInternalStateIssue(
-            s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice} does not allow datum"
-          )
-        )
+        NoLongerValid(s.runId,
+                      WrongInternalStateIssue(
+                        s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice} does not allow datum"
+                      ))
       )
     } else {
       val elevationItem   = s(ac.naElevationKey)
@@ -51,14 +52,15 @@ class SetElevationCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
 
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
+
       matchCompletion(stateMatcher, tromboneHCD.get, 5.seconds) {
-        case Completed() =>
+        case MatchCompleted =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
-          Completed()
-        case Error(message) =>
-          println(s"Data command match failed with error: $message")
-          Error(message)
-        case _ ⇒ Error("")
+          Completed(s.runId)
+        case MatchFailed(ex) =>
+          println(s"Data command match failed with error: ${ex.getMessage}")
+          Error(s.runId, ex.getMessage)
+        case _ ⇒ Error(s.runId, "")
       }
     }
   }

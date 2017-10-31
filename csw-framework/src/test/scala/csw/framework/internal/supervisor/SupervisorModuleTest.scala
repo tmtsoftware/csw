@@ -119,7 +119,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
-  // DEOPSCSW-306: Include runId in validation response
+  // DEOPSCSW-306: Include runId in Command response
   test("onSubmit hook should be invoked and command validation should be successful on receiving Setup config") {
     forAll(testData) { (info: ComponentInfo) =>
       {
@@ -170,7 +170,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
-  // DEOPSCSW-306: Include runId in validation response
+  // DEOPSCSW-306: Include runId in Command response
   test("onOneway hook should be invoked and command validation should be successful on receiving Observe config") {
     forAll(testData) { (info: ComponentInfo) =>
       {

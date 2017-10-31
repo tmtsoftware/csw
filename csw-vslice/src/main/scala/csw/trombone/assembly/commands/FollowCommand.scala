@@ -27,6 +27,7 @@ class FollowCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
         || !startState.sodiumLayerValue) {
       Future(
         NoLongerValid(
+          s.runId,
           WrongInternalStateIssue(
             s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice}/${startState.sodiumLayerValue} does not allow follow"
           )
@@ -39,7 +40,7 @@ class FollowCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                       sodiumItem(startState.sodiumLayerValue),
                       nssItem(s(ac.nssInUseKey).head))
       )
-      Future(Completed())
+      Future(Completed(s.runId))
     }
   }
 

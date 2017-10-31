@@ -8,6 +8,7 @@ import akka.util.Timeout
 import csw.ccs.MultiStateMatcherMsgs._
 import csw.messages.CommandExecutionResponse.{Completed, Error}
 import csw.messages.PubSub.{Subscribe, Unsubscribe}
+import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandExecutionResponse, PubSub}
 
@@ -66,7 +67,7 @@ class MultiStateMatcherActor(
         if (newMatchers.isEmpty) {
           timer.cancel()
           currentStateReceiver ! Unsubscribe(currentStateAdapter)
-          replyTo ! Completed()
+          replyTo ! Completed(RunId())
           ctx.stop(currentStateAdapter)
         } else {
           matchers = newMatchers
@@ -74,7 +75,7 @@ class MultiStateMatcherActor(
       }
 
     case Stop =>
-      replyTo ! Error("Current state matching timed out")
+      replyTo ! Error(RunId(), "Current state matching timed out")
       currentStateReceiver ! Unsubscribe(currentStateAdapter)
       ctx.stop(currentStateAdapter)
   }

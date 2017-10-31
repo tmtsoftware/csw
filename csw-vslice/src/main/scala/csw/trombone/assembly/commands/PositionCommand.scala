@@ -9,6 +9,7 @@ import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternal
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
+import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
@@ -16,27 +17,27 @@ import csw.trombone.hcd.TromboneHcdState
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
-class PositionCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
-                      ac: AssemblyContext,
-                      s: Setup,
-                      tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
-                      startState: TromboneState,
-                      stateActor: ActorRef[PubSub[AssemblyState]])
-    extends AssemblyCommand(ctx, startState, stateActor) {
+class PositionCommand(
+    ctx: ActorContext[AssemblyCommandHandlerMsgs],
+    ac: AssemblyContext,
+    s: Setup,
+    tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+    startState: TromboneState,
+    stateActor: ActorRef[PubSub[AssemblyState]]
+) extends AssemblyCommand(ctx, startState, stateActor) {
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
 
   def startCommand(): Future[CommandExecutionResponse] = {
     if (tromboneHCD.isEmpty)
-      Future(NoLongerValid(RequiredHCDUnavailableIssue(s"${ac.hcdComponentId} is not available")))
+      Future(NoLongerValid(s.runId, RequiredHCDUnavailableIssue(s"${ac.hcdComponentId} is not available")))
     if (startState.cmdChoice == cmdUninitialized || startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving) {
       Future(
-        NoLongerValid(
-          WrongInternalStateIssue(
-            s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice} does not allow datum"
-          )
-        )
+        NoLongerValid(s.runId,
+                      WrongInternalStateIssue(
+                        s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice} does not allow datum"
+                      ))
       )
     } else {
       val rangeDistance   = s(ac.naRangeDistanceKey)
@@ -53,14 +54,15 @@ class PositionCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
+
       Matchers.matchState(ctx, stateMatcher, tromboneHCD.get, 5.seconds).map {
-        case Completed() =>
+        case MatchCompleted =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
-          Completed()
-        case Error(message) =>
-          println(s"Data command match failed with error: $message")
-          Error(message)
-        case _ ⇒ Error("")
+          Completed(s.runId)
+        case MatchFailed(ex) =>
+          println(s"Data command match failed with error: ${ex.getMessage}")
+          Error(s.runId, ex.getMessage)
+        case _ ⇒ Error(s.runId, "")
       }
     }
   }

@@ -53,7 +53,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
     case Submit(s: Setup, replyTo) =>
       s.prefix match {
         case ac.initCK =>
-          replyTo ! Completed()
+          replyTo ! Completed(s.runId)
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
         case ac.datumCK =>
@@ -124,13 +124,12 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
           )
 
         case ac.stopCK =>
-          replyTo ! NoLongerValid(
-            WrongInternalStateIssue("Trombone assembly must be executing a command to use stop")
-          )
+          replyTo ! NoLongerValid(s.runId,
+                                  WrongInternalStateIssue("Trombone assembly must be executing a command to use stop"))
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
         case ac.setAngleCK =>
-          replyTo ! NoLongerValid(WrongInternalStateIssue("Trombone assembly must be following for setAngle"))
+          replyTo ! NoLongerValid(s.runId, WrongInternalStateIssue("Trombone assembly must be following for setAngle"))
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
         case otherCommand =>
@@ -184,7 +183,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                           currentState.asInstanceOf[TromboneState].sodiumLayer,
                           currentState.asInstanceOf[TromboneState].nss)
           )
-          replyTo ! Completed()
+          replyTo ! Completed(s.runId)
           ctx.stop(followCommandActor)
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
@@ -198,9 +197,9 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   }
 
   override def onExecuting(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
-    case Submit(Setup(_, ac.obsId, ac.stopCK, _), replyTo) =>
+    case Submit(Setup(runId, ac.obsId, ac.stopCK, _), replyTo) =>
       currentCommand.foreach(x ⇒ x.foreach(_.stopCommand()))
-      replyTo ! Cancelled()
+      replyTo ! Cancelled(runId)
       AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
     case x =>

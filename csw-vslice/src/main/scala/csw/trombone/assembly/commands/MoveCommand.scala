@@ -9,6 +9,7 @@ import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternal
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
+import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
@@ -16,13 +17,14 @@ import csw.trombone.hcd.TromboneHcdState
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class MoveCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
-                  ac: AssemblyContext,
-                  s: Setup,
-                  tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
-                  startState: TromboneState,
-                  stateActor: ActorRef[PubSub[AssemblyState]])
-    extends AssemblyCommand(ctx, startState, stateActor) {
+class MoveCommand(
+    ctx: ActorContext[AssemblyCommandHandlerMsgs],
+    ac: AssemblyContext,
+    s: Setup,
+    tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+    startState: TromboneState,
+    stateActor: ActorRef[PubSub[AssemblyState]]
+) extends AssemblyCommand(ctx, startState, stateActor) {
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
@@ -34,17 +36,16 @@ class MoveCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
 
   def startCommand(): Future[CommandExecutionResponse] = {
     if (tromboneHCD.isEmpty)
-      Future(NoLongerValid(RequiredHCDUnavailableIssue(s"${ac.hcdComponentId} is not available")))
+      Future(NoLongerValid(s.runId, RequiredHCDUnavailableIssue(s"${ac.hcdComponentId} is not available")))
     else if (!(
                startState.cmdChoice == cmdUninitialized ||
                startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving
              )) {
       Future(
-        NoLongerValid(
-          WrongInternalStateIssue(
-            s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice} does not allow move"
-          )
-        )
+        NoLongerValid(s.runId,
+                      WrongInternalStateIssue(
+                        s"Assembly state of ${startState.cmdChoice}/${startState.moveChoice} does not allow move"
+                      ))
       )
     } else {
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss))
@@ -52,13 +53,13 @@ class MoveCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
 
       matchCompletion(stateMatcher, tromboneHCD.get, 5.seconds) {
-        case Completed() =>
+        case MatchCompleted =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss))
-          Completed()
-        case Error(message) =>
-          println(s"Move command match failed with message: $message")
-          Error(message)
-        case _ ⇒ Error("")
+          Completed(s.runId)
+        case MatchFailed(ex) =>
+          println(s"Move command match failed with message: ${ex.getMessage}")
+          Error(s.runId, ex.getMessage)
+        case _ ⇒ Error(s.runId, "")
       }
     }
   }
