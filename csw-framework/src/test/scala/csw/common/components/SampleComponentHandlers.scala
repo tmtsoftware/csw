@@ -122,9 +122,9 @@ class SampleComponentHandlers(
     }
 
     if (command.prefix.prefix.contains("success")) {
-      Accepted()
+      Accepted(command.runId)
     } else {
-      Invalid(OtherIssue("Testing: Received failure, will return Invalid."))
+      Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))
     }
   }
 

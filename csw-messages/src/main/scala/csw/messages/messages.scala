@@ -7,6 +7,7 @@ import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.{ControlCommand, Result}
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.TrackingEvent
+import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 
 /////////////
@@ -134,10 +135,12 @@ case class SupervisorInfo(system: ActorSystem, component: Component)
  */
 sealed trait CommandResponse extends RunningMessage with TMTSerializable
 
-sealed trait CommandValidationResponse extends CommandResponse
+sealed trait CommandValidationResponse extends CommandResponse {
+  val runId: RunId
+}
 object CommandValidationResponse {
-  final case class Accepted()                   extends CommandValidationResponse
-  final case class Invalid(issue: CommandIssue) extends CommandValidationResponse
+  final case class Accepted(runId: RunId)                     extends CommandValidationResponse
+  final case class Invalid(runId: RunId, issue: CommandIssue) extends CommandValidationResponse
 }
 
 sealed trait CommandExecutionResponse extends CommandResponse

@@ -101,9 +101,9 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
         pubSubRef.tell(publish);
         if (controlCommand.prefix().prefix().contains("success")) {
-            return new CommandValidationResponse.Accepted();
+            return new CommandValidationResponse.Accepted(controlCommand.runId());
         } else {
-            return new CommandValidationResponse.Invalid(new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+            return new CommandValidationResponse.Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         }
     }
 

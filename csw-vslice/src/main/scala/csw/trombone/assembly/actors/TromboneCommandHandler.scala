@@ -135,6 +135,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
 
         case otherCommand =>
           replyTo ! Invalid(
+            s.runId,
             UnsupportedCommandInStateIssue(
               s"""Trombone assembly does not support the command \"${otherCommand.prefix}\" in the current state."""
             )
@@ -152,6 +153,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
       s.prefix match {
         case ac.datumCK | ac.moveCK | ac.positionCK | ac.followCK | ac.setElevationCK =>
           replyTo ! Invalid(
+            s.runId,
             WrongInternalStateIssue(
               "Trombone assembly cannot be following for datum, move, position, setElevation, and follow"
             )

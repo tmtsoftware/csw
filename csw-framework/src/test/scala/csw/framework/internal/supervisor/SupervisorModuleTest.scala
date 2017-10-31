@@ -119,6 +119,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
+  // DEOPSCSW-306: Include runId in validation response
   test("onSubmit hook should be invoked and command validation should be successful on receiving Setup config") {
     forAll(testData) { (info: ComponentInfo) =>
       {
@@ -144,7 +145,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val submitSetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitSetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice), param))
         DemandMatcher(submitSetupConfigDemandState).check(submitSetupConfigCurrentState.data) shouldBe true
-        commandValidationResponseProbe.expectMsg(Accepted())
+        commandValidationResponseProbe.expectMsg(Accepted(setup.runId))
 
         val observe: Observe = Observe(obsId, successPrefix, Set(param))
 
@@ -154,7 +155,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
         DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
-        commandValidationResponseProbe.expectMsg(Accepted())
+        commandValidationResponseProbe.expectMsg(Accepted(observe.runId))
 
         // verify that observe config is received by handler and provide check that data is transferred
         val submitObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
@@ -169,6 +170,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
+  // DEOPSCSW-306: Include runId in validation response
   test("onOneway hook should be invoked and command validation should be successful on receiving Observe config") {
     forAll(testData) { (info: ComponentInfo) =>
       {
@@ -194,7 +196,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val onewaySetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val onewaySetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice), param))
         DemandMatcher(onewaySetupConfigDemandState).check(onewaySetupConfigCurrentState.data) shouldBe true
-        commandValidationResponseProbe.expectMsg(Accepted())
+        commandValidationResponseProbe.expectMsg(Accepted(setup.runId))
 
         val observe: Observe = Observe(obsId, successPrefix, Set(param))
 
@@ -208,7 +210,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val oneWayObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val oneWayObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(observeConfigChoice), param))
         DemandMatcher(oneWayObserveConfigDemandState).check(oneWayObserveConfigCurrentState.data) shouldBe true
-        commandValidationResponseProbe.expectMsg(Accepted())
+        commandValidationResponseProbe.expectMsg(Accepted(observe.runId))
       }
     }
   }

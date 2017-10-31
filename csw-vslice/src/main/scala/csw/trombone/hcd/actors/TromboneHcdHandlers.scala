@@ -89,11 +89,11 @@ class TromboneHcdHandlers(
       case setup: Setup     => ParamValidation.validateSetup(setup)
       case observe: Observe => ParamValidation.validateObserve(observe)
     }
-    if (validation == Accepted())
+    if (validation == Accepted(controlCommand.runId))
       onSetup(controlCommand.asInstanceOf[Setup])
     validation
   }
-  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted()
+  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted(controlCommand.runId)
 
   def onDomainMsg(tromboneMsg: TromboneMessage): Unit = tromboneMsg match {
     case x: TromboneEngineering => onEngMsg(x)

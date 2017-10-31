@@ -40,8 +40,8 @@ class GalilComponentHandlers(
   }
 
   override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandValidationResponse =
-    Accepted()
-  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted()
+    Accepted(controlCommand.runId)
+  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted(controlCommand.runId)
 
   override def onShutdown(): Future[Unit] = Future.successful(())
 

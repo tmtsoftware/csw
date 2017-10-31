@@ -275,9 +275,9 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     }
 
     it("should serialize CommandValidationResponse messages") {
-      serialization.findSerializerFor(Accepted()).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(Accepted(RunId())).getClass shouldBe classOf[AkkaSerializer]
       serialization
-        .findSerializerFor(Invalid(CommandIssue.OtherIssue("test issue")))
+        .findSerializerFor(Invalid(RunId(), CommandIssue.OtherIssue("test issue")))
         .getClass shouldBe classOf[AkkaSerializer]
     }
 

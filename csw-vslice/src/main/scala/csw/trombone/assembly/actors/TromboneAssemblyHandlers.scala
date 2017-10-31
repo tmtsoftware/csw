@@ -79,15 +79,15 @@ class TromboneAssemblyHandlers(
                         replyTo: ActorRef[CommandResponse]): CommandValidationResponse = {
     val validation = controlCommand match {
       case _: Setup   => validateOneSetup(controlCommand.asInstanceOf[Setup])
-      case _: Observe => Accepted()
+      case _: Observe => Accepted(controlCommand.runId)
     }
-    if (validation == Accepted()) {
+    if (validation == Accepted(controlCommand.runId)) {
       commandHandler ! CommandMessageE(Submit(controlCommand, replyTo))
     }
     validation
   }
 
-  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted()
+  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted(controlCommand.runId)
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
 
