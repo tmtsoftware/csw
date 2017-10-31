@@ -6,9 +6,10 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.messages.CommandMessage.Submit
+import csw.messages.CommandValidationResponses.Invalid
 import csw.messages.PubSub.Publish
 import csw.messages._
-import csw.messages.ccs.ValidationIssue.{UnsupportedCommandInStateIssue, WrongInternalStateIssue}
+import csw.messages.ccs.CommandIssue.{UnsupportedCommandInStateIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.Setup
 import csw.messages.location.Connection
 import csw.trombone.assembly._

@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
-import csw.messages.ccs.ValidationIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
+import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.Setup
 import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder

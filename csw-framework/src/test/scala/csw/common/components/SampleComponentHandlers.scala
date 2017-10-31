@@ -3,11 +3,11 @@ package csw.common.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
+import csw.messages.CommandValidationResponses.{Accepted, Invalid}
 import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages._
-import csw.messages.ccs.ValidationIssue.OtherIssue
+import csw.messages.ccs.CommandIssue.OtherIssue
 import csw.messages.ccs.commands.{ControlCommand, Observe, Setup}
-import csw.messages.ccs.{Validation, Validations}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
@@ -95,7 +95,8 @@ class SampleComponentHandlers(
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = {
+  override def onSubmit(controlCommand: ControlCommand,
+                        replyTo: ActorRef[CommandResponse]): CommandValidationResponse = {
     // Adding passed in parameter to see if data is transferred properly
     pubSubRef ! Publish(
       CurrentState(prefix, Set(choiceKey.set(submitCommandChoice)))
@@ -103,7 +104,7 @@ class SampleComponentHandlers(
     validateCommand(controlCommand)
   }
 
-  override def onOneway(controlCommand: ControlCommand): Validation = {
+  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = {
     // Adding passed in parameter to see if data is transferred properly
     pubSubRef ! Publish(
       CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
@@ -121,9 +122,9 @@ class SampleComponentHandlers(
     }
 
     if (command.prefix.prefix.contains("success")) {
-      Validations.Valid
+      Accepted
     } else {
-      Validations.Invalid(OtherIssue("Testing: Received failure, will return Invalid."))
+      Invalid(OtherIssue("Testing: Received failure, will return Invalid."))
     }
   }
 

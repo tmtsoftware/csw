@@ -10,6 +10,7 @@ import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInit
 import csw.framework.javadsl.components.JComponentDomainMessage
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.CommandValidationResponses.{Accepted, Invalid}
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.PubSub.Publish
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}

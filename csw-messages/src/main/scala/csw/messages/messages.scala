@@ -3,7 +3,7 @@ package csw.messages
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import csw.messages.PubSub.SubscriberMessage
-import csw.messages.ccs.{Validation, ValidationIssue, Validations}
+import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.{ControlCommand, Result}
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.TrackingEvent
@@ -136,42 +136,11 @@ sealed trait CommandResponse extends RunningMessage with TMTSerializable
 
 sealed trait CommandExecutionResponse  extends CommandResponse
 sealed trait CommandValidationResponse extends CommandResponse
-object CommandValidationResponse {
-
-  /**
-   * Converts a validation result to a CommandStatus result
-   *
-   * @param validation the result of a validation either Validation.Valid or Validation.Invalid
-   * @return cooresponding CommandStatus as CommandStatus.Valid or CommandStatus.Invalid with the identical issue
-   */
-  def validationAsCommandStatus(validation: Validation): CommandValidationResponse = {
-    validation match {
-      case Validations.Valid        => Accepted
-      case inv: Validations.Invalid => Invalid(inv.issue)
-    }
-  }
+object CommandValidationResponses {
+  val jAccepted: CommandValidationResponse = Accepted
+  final case object Accepted                    extends CommandValidationResponse
+  final case class Invalid(issue: CommandIssue) extends CommandValidationResponse
 }
-
-/**
- * The configuration was not valid before starting
- * @param issue an issue that caused the input configuration to be invalid
- */
-final case class Invalid(issue: ValidationIssue) extends CommandValidationResponse
-
-object Invalid {
-  // This is present to support returning a Validation as a CommandStatus
-  def apply(in: Validations.Invalid): Invalid = new Invalid(in.issue)
-
-  /**
-   * Java API: This is present to support returning a Validation as a CommandStatus
-   */
-  def createInvalid(in: Validations.Invalid): Invalid = Invalid(in)
-}
-
-/**
- * The configuration was valid and started
- */
-case object Accepted extends CommandValidationResponse
 
 /**
  * Command Completed with a result
@@ -180,9 +149,9 @@ case object Accepted extends CommandValidationResponse
 final case class CompletedWithResult(result: Result) extends CommandExecutionResponse
 
 /**
- * The command was valid when received, but is no longer valid because of itervening activities
+ * The command was valid when received, but is no longer valid because of intervening activities
  */
-final case class NoLongerValid(issue: ValidationIssue) extends CommandExecutionResponse
+final case class NoLongerValid(issue: CommandIssue) extends CommandExecutionResponse
 
 /**
  * The command has completed successfully

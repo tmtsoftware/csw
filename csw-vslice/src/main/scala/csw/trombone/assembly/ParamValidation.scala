@@ -1,9 +1,9 @@
 package csw.trombone.assembly
 
+import csw.messages.CommandValidationResponse
+import csw.messages.CommandValidationResponses.{Accepted, Invalid}
+import csw.messages.ccs.CommandIssue._
 import csw.messages.ccs.commands.Setup
-import csw.messages.ccs.ValidationIssue._
-import csw.messages.ccs.Validations.{Invalid, Valid}
-import csw.messages.ccs.Validation
 
 import scala.util.Try
 
@@ -16,7 +16,7 @@ object ParamValidation {
    * Runs Trombone-specific validation on a single Setup.
    * @return
    */
-  def validateOneSetup(s: Setup)(implicit ac: AssemblyContext): Validation = {
+  def validateOneSetup(s: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
     s.prefix match {
       case ac.initCK         => initValidation(s)
       case ac.datumCK        => datumValidation(s)
@@ -31,17 +31,17 @@ object ParamValidation {
   }
 
   /**
-   * Validation for the init Setup
+   * CommandValidationResponse for the init Setup
    * @param sc the received Setup
-   * @return Valid or Invalid
+   * @return Accepted or Invalid
    */
-  def initValidation(sc: Setup)(implicit ac: AssemblyContext): Validation = {
+  def initValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
 
     val size = sc.size
     if (sc.prefix != ac.initCK) Invalid(WrongPrefixIssue("The Setup is not an init configuration"))
     else // If no arguments, then this is okay
     if (sc.size == 0)
-      Valid
+      Accepted
     else if (size == 2) {
       import ac._
       // Check for correct keys and types
@@ -59,35 +59,35 @@ object ParamValidation {
             s"The init Setup requires keys named: $configurationVersionKey and $configurationVersionKey of type GParam[String]"
           )
         )
-      else Valid
+      else Accepted
     } else Invalid(WrongNumberOfParametersIssue(s"The init Setup requires 0 or 2 items, but $size were received"))
   }
 
   /**
-   * Validation for the datum Setup -- currently nothing to validate
+   * CommandValidationResponse for the datum Setup -- currently nothing to validate
    * @param sc the received Setup
-   * @return Valid or Invalid
+   * @return Accepted or Invalid
    */
-  def datumValidation(sc: Setup): Validation = Valid
+  def datumValidation(sc: Setup): CommandValidationResponse = Accepted
 
   /**
-   * Validation for the stop Setup -- currently nothing to validate
+   * CommandValidationResponse for the stop Setup -- currently nothing to validate
    * @param sc the received Setup
-   * @return Valid or Invalid
+   * @return Accepted or Invalid
    */
-  def stopValidation(sc: Setup): Validation = Valid
+  def stopValidation(sc: Setup): CommandValidationResponse = Accepted
 
   /**
-   * Validation for the move Setup
+   * CommandValidationResponse for the move Setup
    * Note: position is optional, if not present, it moves to home
    * @param sc the received Setup
-   * @return Valid or Invalid
+   * @return Accepted or Invalid
    */
-  def moveValidation(sc: Setup)(implicit ac: AssemblyContext): Validation = {
+  def moveValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
     if (sc.prefix != ac.moveCK) {
       Invalid(WrongPrefixIssue("The Setup is not a move configuration."))
     } else if (sc.size == 0)
-      Valid
+      Accepted
     else {
       // Check for correct key and type -- only checks that essential key is present, not strict
       if (!sc.exists(ac.stagePositionKey)) {
@@ -100,16 +100,16 @@ object ParamValidation {
             s"The move Setup parameter: ${ac.stagePositionKey} must have units of: ${ac.stagePositionUnits}"
           )
         )
-      } else Valid
+      } else Accepted
     }
   }
 
   /**
-   * Validation for the position Setup -- must have a single parameter named rangeDistance
+   * CommandValidationResponse for the position Setup -- must have a single parameter named rangeDistance
    * @param sc the received Setup
-   * @return Valid or Invalid
+   * @return Accepted or Invalid
    */
-  def positionValidation(sc: Setup)(implicit ac: AssemblyContext): Validation = {
+  def positionValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
     if (sc.prefix != ac.positionCK) {
       Invalid(WrongPrefixIssue("The Setup is not a position configuration."))
     } else {
@@ -135,17 +135,17 @@ object ParamValidation {
               s"Range distance value of $el for position must be greater than or equal 0 km."
             )
           )
-        } else Valid
+        } else Accepted
       }
     }
   }
 
   /**
-   * Validation for the setElevation Setup
+   * CommandValidationResponse for the setElevation Setup
    * @param sc the received Setup
-   * @return Valid or Invalid
+   * @return Accepted or Invalid
    */
-  def setElevationValidation(sc: Setup)(implicit ac: AssemblyContext): Validation = {
+  def setElevationValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
     if (sc.prefix != ac.setElevationCK) {
       Invalid(WrongPrefixIssue("The Setup is not a setElevation configuration"))
     } else if (sc.missingKeys(ac.naElevationKey).nonEmpty) {
@@ -161,15 +161,15 @@ object ParamValidation {
       Invalid(
         WrongUnitsIssue(s"The move Setup parameter: ${ac.naElevationKey} must have units: ${ac.naElevationUnits}")
       )
-    } else Valid
+    } else Accepted
   }
 
   /**
-   * Validation for the setAngle Setup
+   * CommandValidationResponse for the setAngle Setup
    * @param sc the received Setup
-   * @return Valid or Invalid
+   * @return Accepted or Invalid
    */
-  def setAngleValidation(sc: Setup)(implicit ac: AssemblyContext): Validation = {
+  def setAngleValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
     if (sc.prefix != ac.setAngleCK) {
       Invalid(WrongPrefixIssue("The Setup is not a setAngle configuration"))
     } else // Check for correct key and type -- only checks that essential key is present, not strict
@@ -181,15 +181,15 @@ object ParamValidation {
       Invalid(
         WrongUnitsIssue(s"The setAngle Setup parameter: ${ac.zenithAngleKey} must have units: ${ac.zenithAngleUnits}")
       )
-    } else Valid
+    } else Accepted
   }
 
   /**
-   * Validation for the follow Setup
+   * CommandValidationResponse for the follow Setup
    * @param sc the received Setup
-   * @return Valid or Invalid
+   * @return Accepted or Invalid
    */
-  def followValidation(sc: Setup)(implicit ac: AssemblyContext): Validation = {
+  def followValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
     if (sc.prefix != ac.followCK) {
       Invalid(WrongPrefixIssue("The Setup is not a follow configuration"))
     } else if (!sc.exists(ac.nssInUseKey)) {
@@ -197,6 +197,6 @@ object ParamValidation {
       Invalid(MissingKeyIssue(s"The follow Setup must have a BooleanParameter named: ${ac.nssInUseKey}"))
     } else if (Try(sc(ac.nssInUseKey)).isFailure) {
       Invalid(WrongParameterTypeIssue(s"The follow Setup must have a BooleanParameter named ${ac.nssInUseKey}"))
-    } else Valid
+    } else Accepted
   }
 }

@@ -3,7 +3,7 @@ package csw.trombone.assembly.commands
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.messages._
-import csw.messages.ccs.ValidationIssue.WrongInternalStateIssue
+import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
 import csw.trombone.assembly.actors.TromboneState.{TromboneState, _}
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext}

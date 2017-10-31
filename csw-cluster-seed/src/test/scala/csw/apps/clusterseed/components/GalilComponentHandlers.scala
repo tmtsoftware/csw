@@ -3,11 +3,10 @@ package csw.apps.clusterseed.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
+import csw.messages.CommandValidationResponses.Accepted
 import csw.messages.PubSub.PublisherMessage
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages._
-import csw.messages.ccs.Validation
-import csw.messages.ccs.Validations.Valid
 import csw.messages.ccs.commands.ControlCommand
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
@@ -40,8 +39,9 @@ class GalilComponentHandlers(
     log.fatal("Level is fatal")
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Validation = Valid
-  override def onOneway(controlCommand: ControlCommand): Validation                                     = Valid
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandValidationResponse =
+    Accepted
+  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted
 
   override def onShutdown(): Future[Unit] = Future.successful(())
 

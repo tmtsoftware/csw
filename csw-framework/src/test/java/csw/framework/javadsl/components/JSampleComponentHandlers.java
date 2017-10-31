@@ -5,13 +5,8 @@ import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.common.components.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.messages.CommandMessage;
-import csw.messages.CommandResponse;
-import csw.messages.ComponentMessage;
-import csw.messages.PubSub;
-import csw.messages.ccs.Validation;
-import csw.messages.ccs.ValidationIssue;
-import csw.messages.ccs.Validations;
+import csw.messages.*;
+import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.ControlCommand;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.framework.ComponentInfo;
@@ -71,7 +66,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public Validation onSubmit(ControlCommand controlCommand, ActorRef<CommandResponse> actorRef) {
+    public CommandValidationResponse onSubmit(ControlCommand controlCommand, ActorRef<CommandResponse> actorRef) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(submitState);
@@ -81,7 +76,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public Validation onOneway(ControlCommand controlCommand) {
+    public CommandValidationResponse onOneway(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState onewayState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(onewayState);
@@ -90,7 +85,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         return validateCommand(controlCommand);
     }
 
-    private Validation validateCommand(ControlCommand controlCommand) {
+    private CommandValidationResponse validateCommand(ControlCommand controlCommand) {
         CurrentState commandState;
         if(controlCommand instanceof Setup) {
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
@@ -103,9 +98,9 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
         pubSubRef.tell(publish);
         if (controlCommand.prefix().prefix().contains("success")) {
-            return Validations.JValid();
+            return CommandValidationResponses.jAccepted();
         } else {
-            return new Validations.Invalid(new ValidationIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+            return new CommandValidationResponses.Invalid(new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         }
     }
 

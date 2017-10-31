@@ -10,6 +10,7 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
+import csw.messages.CommandValidationResponses.{Accepted, Invalid}
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.PubSub.Subscribe
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
@@ -19,7 +20,7 @@ import csw.messages.SupervisorCommonMessage.{
   LifecycleStateSubscription
 }
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.messages.ccs.ValidationIssue
+import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands._
 import csw.messages.ccs.events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
@@ -32,7 +33,6 @@ import csw.messages.params.models._
 import csw.messages.params.states.{CurrentState, DemandState}
 import csw.messages.{
   Aborted,
-  Accepted,
   BehaviorChanged,
   Cancelled,
   Completed,
@@ -41,7 +41,6 @@ import csw.messages.{
   Components,
   Error,
   InProgress,
-  Invalid,
   LifecycleStateChanged,
   NoLongerValid,
   Restart,
@@ -292,7 +291,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     it("should serialize CommandValidationResponse messages") {
       serialization.findSerializerFor(Accepted).getClass shouldBe classOf[AkkaSerializer]
       serialization
-        .findSerializerFor(Invalid(ValidationIssue.OtherIssue("test issue")))
+        .findSerializerFor(Invalid(CommandIssue.OtherIssue("test issue")))
         .getClass shouldBe classOf[AkkaSerializer]
     }
 
@@ -300,7 +299,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val testData = Table(
         "CommandExecutionResponse models",
         CompletedWithResult(Result(runId, obsId, Prefix(prefixStr))),
-        NoLongerValid(ValidationIssue.OtherIssue("test issue")),
+        NoLongerValid(CommandIssue.OtherIssue("test issue")),
         Completed,
         InProgress("test"),
         Error("test"),
