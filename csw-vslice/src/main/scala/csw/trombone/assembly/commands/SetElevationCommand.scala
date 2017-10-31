@@ -2,7 +2,7 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.messages.CommandExecutionResponses.{Completed, Error, NoLongerValid}
+import csw.messages.CommandExecutionResponse.{Completed, Error, NoLongerValid}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
@@ -52,9 +52,9 @@ class SetElevationCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
       matchCompletion(stateMatcher, tromboneHCD.get, 5.seconds) {
-        case Completed =>
+        case Completed() =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
-          Completed
+          Completed()
         case Error(message) =>
           println(s"Data command match failed with error: $message")
           Error(message)

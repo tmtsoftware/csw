@@ -135,18 +135,13 @@ case class SupervisorInfo(system: ActorSystem, component: Component)
 sealed trait CommandResponse extends RunningMessage with TMTSerializable
 
 sealed trait CommandValidationResponse extends CommandResponse
-object CommandValidationResponses {
-  val jAccepted: CommandValidationResponse = Accepted
-  final case object Accepted                    extends CommandValidationResponse
+object CommandValidationResponse {
+  final case class Accepted()                   extends CommandValidationResponse
   final case class Invalid(issue: CommandIssue) extends CommandValidationResponse
 }
 
 sealed trait CommandExecutionResponse extends CommandResponse
-object CommandExecutionResponses {
-
-  val jAborted: CommandExecutionResponse   = Aborted
-  val jCancelled: CommandExecutionResponse = Cancelled
-  val jCompleted: CommandExecutionResponse = Completed
+object CommandExecutionResponse {
 
   /**
    * Command Completed with a result
@@ -162,7 +157,7 @@ object CommandExecutionResponses {
   /**
    * The command has completed successfully
    */
-  case object Completed extends CommandExecutionResponse
+  final case class Completed() extends CommandExecutionResponse
 
   /**
    * The command is currently executing or has not yet started
@@ -179,13 +174,13 @@ object CommandExecutionResponses {
    * The command was aborted
    * Aborted means that the command/actions were stopped immediately.
    */
-  case object Aborted extends CommandExecutionResponse
+  final case class Aborted() extends CommandExecutionResponse
 
   /**
    * The command was cancelled
    * Cancelled means the command/actions were stopped at the next convenient place. This is usually appropriate for
    */
-  case object Cancelled extends CommandExecutionResponse
+  final case class Cancelled() extends CommandExecutionResponse
 
-  case class BehaviorChanged[T](ref: ActorRef[T]) extends CommandExecutionResponse
+  final case class BehaviorChanged[T](ref: ActorRef[T]) extends CommandExecutionResponse
 }

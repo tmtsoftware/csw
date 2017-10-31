@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.CommandMessage.Submit
-import csw.messages.CommandValidationResponses.Accepted
+import csw.messages.CommandValidationResponse.Accepted
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
 import csw.messages.ccs.commands.{ControlCommand, Observe, Setup}
@@ -79,15 +79,15 @@ class TromboneAssemblyHandlers(
                         replyTo: ActorRef[CommandResponse]): CommandValidationResponse = {
     val validation = controlCommand match {
       case _: Setup   => validateOneSetup(controlCommand.asInstanceOf[Setup])
-      case _: Observe => Accepted
+      case _: Observe => Accepted()
     }
-    if (validation == Accepted) {
+    if (validation == Accepted()) {
       commandHandler ! CommandMessageE(Submit(controlCommand, replyTo))
     }
     validation
   }
 
-  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted
+  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted()
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
 

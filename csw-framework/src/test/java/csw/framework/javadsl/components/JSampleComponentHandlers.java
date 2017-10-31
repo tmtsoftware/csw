@@ -5,7 +5,10 @@ import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.common.components.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.messages.*;
+import csw.messages.CommandResponse;
+import csw.messages.CommandValidationResponse;
+import csw.messages.ComponentMessage;
+import csw.messages.PubSub;
 import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.ControlCommand;
 import csw.messages.ccs.commands.Setup;
@@ -98,9 +101,9 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
         pubSubRef.tell(publish);
         if (controlCommand.prefix().prefix().contains("success")) {
-            return CommandValidationResponses.jAccepted();
+            return new CommandValidationResponse.Accepted();
         } else {
-            return new CommandValidationResponses.Invalid(new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+            return new CommandValidationResponse.Invalid(new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         }
     }
 

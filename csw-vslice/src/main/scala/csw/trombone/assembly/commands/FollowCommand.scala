@@ -2,7 +2,7 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.messages.CommandExecutionResponses.{Completed, NoLongerValid}
+import csw.messages.CommandExecutionResponse.{Completed, NoLongerValid}
 import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.Setup
@@ -39,7 +39,7 @@ class FollowCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                       sodiumItem(startState.sodiumLayerValue),
                       nssItem(s(ac.nssInUseKey).head))
       )
-      Future(Completed)
+      Future(Completed())
     }
   }
 

@@ -10,8 +10,8 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
-import csw.messages.CommandExecutionResponses._
-import csw.messages.CommandValidationResponses.{Accepted, Invalid}
+import csw.messages.CommandExecutionResponse._
+import csw.messages.CommandValidationResponse.{Accepted, Invalid}
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.PubSub.Subscribe
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
@@ -275,7 +275,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     }
 
     it("should serialize CommandValidationResponse messages") {
-      serialization.findSerializerFor(Accepted).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(Accepted()).getClass shouldBe classOf[AkkaSerializer]
       serialization
         .findSerializerFor(Invalid(CommandIssue.OtherIssue("test issue")))
         .getClass shouldBe classOf[AkkaSerializer]
@@ -286,11 +286,11 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
         "CommandExecutionResponse models",
         CompletedWithResult(Result(runId, obsId, Prefix(prefixStr))),
         NoLongerValid(CommandIssue.OtherIssue("test issue")),
-        Completed,
+        Completed(),
         InProgress("test"),
         Error("test"),
-        Aborted,
-        Cancelled,
+        Aborted(),
+        Cancelled(),
         BehaviorChanged(TestProbe[SupervisorExternalMessage].ref)
       )
 

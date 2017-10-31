@@ -3,7 +3,7 @@ package csw.common.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.CommandValidationResponses.{Accepted, Invalid}
+import csw.messages.CommandValidationResponse.{Accepted, Invalid}
 import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages._
 import csw.messages.ccs.CommandIssue.OtherIssue
@@ -122,7 +122,7 @@ class SampleComponentHandlers(
     }
 
     if (command.prefix.prefix.contains("success")) {
-      Accepted
+      Accepted()
     } else {
       Invalid(OtherIssue("Testing: Received failure, will return Invalid."))
     }

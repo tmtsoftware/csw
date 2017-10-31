@@ -1,7 +1,7 @@
 package csw.trombone.assembly
 
 import csw.messages.CommandValidationResponse
-import csw.messages.CommandValidationResponses.{Accepted, Invalid}
+import csw.messages.CommandValidationResponse.{Accepted, Invalid}
 import csw.messages.ccs.CommandIssue._
 import csw.messages.ccs.commands.Setup
 
@@ -41,7 +41,7 @@ object ParamValidation {
     if (sc.prefix != ac.initCK) Invalid(WrongPrefixIssue("The Setup is not an init configuration"))
     else // If no arguments, then this is okay
     if (sc.size == 0)
-      Accepted
+      Accepted()
     else if (size == 2) {
       import ac._
       // Check for correct keys and types
@@ -59,7 +59,7 @@ object ParamValidation {
             s"The init Setup requires keys named: $configurationVersionKey and $configurationVersionKey of type GParam[String]"
           )
         )
-      else Accepted
+      else Accepted()
     } else Invalid(WrongNumberOfParametersIssue(s"The init Setup requires 0 or 2 items, but $size were received"))
   }
 
@@ -68,14 +68,14 @@ object ParamValidation {
    * @param sc the received Setup
    * @return Accepted or Invalid
    */
-  def datumValidation(sc: Setup): CommandValidationResponse = Accepted
+  def datumValidation(sc: Setup): CommandValidationResponse = Accepted()
 
   /**
    * CommandValidationResponse for the stop Setup -- currently nothing to validate
    * @param sc the received Setup
    * @return Accepted or Invalid
    */
-  def stopValidation(sc: Setup): CommandValidationResponse = Accepted
+  def stopValidation(sc: Setup): CommandValidationResponse = Accepted()
 
   /**
    * CommandValidationResponse for the move Setup
@@ -87,7 +87,7 @@ object ParamValidation {
     if (sc.prefix != ac.moveCK) {
       Invalid(WrongPrefixIssue("The Setup is not a move configuration."))
     } else if (sc.size == 0)
-      Accepted
+      Accepted()
     else {
       // Check for correct key and type -- only checks that essential key is present, not strict
       if (!sc.exists(ac.stagePositionKey)) {
@@ -100,7 +100,7 @@ object ParamValidation {
             s"The move Setup parameter: ${ac.stagePositionKey} must have units of: ${ac.stagePositionUnits}"
           )
         )
-      } else Accepted
+      } else Accepted()
     }
   }
 
@@ -135,7 +135,7 @@ object ParamValidation {
               s"Range distance value of $el for position must be greater than or equal 0 km."
             )
           )
-        } else Accepted
+        } else Accepted()
       }
     }
   }
@@ -161,7 +161,7 @@ object ParamValidation {
       Invalid(
         WrongUnitsIssue(s"The move Setup parameter: ${ac.naElevationKey} must have units: ${ac.naElevationUnits}")
       )
-    } else Accepted
+    } else Accepted()
   }
 
   /**
@@ -181,7 +181,7 @@ object ParamValidation {
       Invalid(
         WrongUnitsIssue(s"The setAngle Setup parameter: ${ac.zenithAngleKey} must have units: ${ac.zenithAngleUnits}")
       )
-    } else Accepted
+    } else Accepted()
   }
 
   /**
@@ -197,6 +197,6 @@ object ParamValidation {
       Invalid(MissingKeyIssue(s"The follow Setup must have a BooleanParameter named: ${ac.nssInUseKey}"))
     } else if (Try(sc(ac.nssInUseKey)).isFailure) {
       Invalid(WrongParameterTypeIssue(s"The follow Setup must have a BooleanParameter named ${ac.nssInUseKey}"))
-    } else Accepted
+    } else Accepted()
   }
 }

@@ -5,9 +5,9 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.framework.internal.pubsub.PubSubBehavior
-import csw.messages.CommandExecutionResponses.{Cancelled, Completed, NoLongerValid}
+import csw.messages.CommandExecutionResponse.{Cancelled, Completed, NoLongerValid}
 import csw.messages.CommandMessage.Submit
-import csw.messages.CommandValidationResponses.Invalid
+import csw.messages.CommandValidationResponse.Invalid
 import csw.messages.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{UnsupportedCommandInStateIssue, WrongInternalStateIssue}
@@ -53,7 +53,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
     case Submit(s: Setup, replyTo) =>
       s.prefix match {
         case ac.initCK =>
-          replyTo ! Completed
+          replyTo ! Completed()
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
         case ac.datumCK =>
@@ -182,7 +182,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                           currentState.asInstanceOf[TromboneState].sodiumLayer,
                           currentState.asInstanceOf[TromboneState].nss)
           )
-          replyTo ! Completed
+          replyTo ! Completed()
           ctx.stop(followCommandActor)
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
@@ -198,7 +198,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   override def onExecuting(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
     case Submit(Setup(_, ac.obsId, ac.stopCK, _), replyTo) =>
       currentCommand.foreach(x ⇒ x.foreach(_.stopCommand()))
-      replyTo ! Cancelled
+      replyTo ! Cancelled()
       AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
     case x =>

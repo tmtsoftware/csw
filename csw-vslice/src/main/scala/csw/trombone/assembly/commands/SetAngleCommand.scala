@@ -2,7 +2,7 @@ package csw.trombone.assembly.commands
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
-import csw.messages.CommandExecutionResponses.{Completed, Error}
+import csw.messages.CommandExecutionResponse.{Completed, Error}
 import csw.messages._
 import csw.messages.ccs.commands.Setup
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
@@ -31,9 +31,9 @@ class SetAngleCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
     matchCompletion(Matchers.idleMatcher, tromboneHCD.get, 5.seconds) {
-      case Completed =>
+      case Completed() =>
         publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
-        Completed
+        Completed()
       case Error(message) =>
         println(s"setElevation command failed with message: $message")
         Error(message)

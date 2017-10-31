@@ -8,7 +8,7 @@ import akka.typed.scaladsl.adapter._
 import akka.util.Timeout
 import csw.ccs._
 import csw.messages.CommandExecutionResponse
-import csw.messages.CommandExecutionResponses.{Completed, Error}
+import csw.messages.CommandExecutionResponse.{Completed, Error}
 import csw.messages.PubSub.Subscribe
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages.params.states.{CurrentState, DemandState}
@@ -49,7 +49,7 @@ object Matchers {
 
     source
       .runWith(Sink.head)
-      .map(_ ⇒ Completed)
+      .map(_ ⇒ Completed())
       .recover {
         case NonFatal(ex) ⇒ Error("")
       }

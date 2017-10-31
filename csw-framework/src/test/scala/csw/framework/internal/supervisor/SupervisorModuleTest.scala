@@ -10,7 +10,7 @@ import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInit
 import csw.framework.javadsl.components.JComponentDomainMessage
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandValidationResponses.{Accepted, Invalid}
+import csw.messages.CommandValidationResponse.{Accepted, Invalid}
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.PubSub.Publish
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
@@ -144,7 +144,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val submitSetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitSetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice), param))
         DemandMatcher(submitSetupConfigDemandState).check(submitSetupConfigCurrentState.data) shouldBe true
-        commandValidationResponseProbe.expectMsg(Accepted)
+        commandValidationResponseProbe.expectMsg(Accepted())
 
         val observe: Observe = Observe(obsId, successPrefix, Set(param))
 
@@ -154,7 +154,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
         DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
-        commandValidationResponseProbe.expectMsg(Accepted)
+        commandValidationResponseProbe.expectMsg(Accepted())
 
         // verify that observe config is received by handler and provide check that data is transferred
         val submitObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
@@ -194,7 +194,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val onewaySetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val onewaySetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice), param))
         DemandMatcher(onewaySetupConfigDemandState).check(onewaySetupConfigCurrentState.data) shouldBe true
-        commandValidationResponseProbe.expectMsg(Accepted)
+        commandValidationResponseProbe.expectMsg(Accepted())
 
         val observe: Observe = Observe(obsId, successPrefix, Set(param))
 
@@ -208,7 +208,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val oneWayObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val oneWayObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(observeConfigChoice), param))
         DemandMatcher(oneWayObserveConfigDemandState).check(oneWayObserveConfigCurrentState.data) shouldBe true
-        commandValidationResponseProbe.expectMsg(Accepted)
+        commandValidationResponseProbe.expectMsg(Accepted())
       }
     }
   }
