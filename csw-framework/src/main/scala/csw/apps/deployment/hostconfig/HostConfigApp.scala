@@ -61,7 +61,6 @@ class HostConfigApp(clusterSettings: ClusterSettings, startLogging: Boolean = fa
   }
 
   private def shutdown() = Await.result(wiring.actorRuntime.shutdown(), 10.seconds)
-
 }
 
 object HostConfigApp extends App {
@@ -70,7 +69,6 @@ object HostConfigApp extends App {
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
     )
   } else {
-    val args = Array("--local", "/Users/pritamkadam/Downloads/host-config.conf")
-    new HostConfigApp(ClusterAwareSettings.joinLocal(3552), startLogging = true).start(args)
+    new HostConfigApp(ClusterAwareSettings, startLogging = true).start(args)
   }
 }
