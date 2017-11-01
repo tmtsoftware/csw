@@ -113,7 +113,7 @@ public class JLocationServiceExampleClient extends JActorSample {
 
         // Register UnTyped ActorRef with Location service. Use javadsl Adapter to convert UnTyped ActorRefs
         // to Typed ActorRef[Nothing]
-        AkkaRegistration hcdRegistration = registrationFactory.akkaTyped(hcdConnection, "nfiraos.ncc.trombone", Adapter.toTyped(actorRef));
+        AkkaRegistration hcdRegistration = registrationFactory.akkaTyped(hcdConnection, "nfiraos.ncc.tromboneHcd", Adapter.toTyped(actorRef));
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************
@@ -126,7 +126,7 @@ public class JLocationServiceExampleClient extends JActorSample {
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
 
         // Register Typed ActorRef[String] with Location Service
-        AkkaRegistration assemblyRegistration = registrationFactory.akkaTyped(assemblyConnection, "nfiraos.ncc.trombone", typedActorRef);
+        AkkaRegistration assemblyRegistration = registrationFactory.akkaTyped(assemblyConnection, "nfiraos.ncc.tromboneAssembly", typedActorRef);
         assemblyRegResult = locationService.register(assemblyRegistration).get();
         //#Components-Connections-Registrations
     }
@@ -225,6 +225,13 @@ public class JLocationServiceExampleClient extends JActorSample {
         }
         //#filtering-connection
 
+        //#filtering-prefix
+        List<AkkaLocation> akkaLocations = locationService.listByPrefix("nfiraos.ncc").get();
+        log.info("Registered akka locations for nfiraos.ncc");
+        for (Location loc : akkaLocations) {
+            log.info("--- " + connectionInfo(loc.connection()));
+        }
+        //#filtering-prefix
     }
 
     private void trackingAndSubscribingBlocking() {

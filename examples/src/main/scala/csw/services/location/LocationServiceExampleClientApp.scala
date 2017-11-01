@@ -13,7 +13,7 @@ import csw.messages.location._
 import csw.services.commons.commonlogger.SampleLogger
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
 import csw.services.logging.scaladsl.{Keys, LogAdminActorFactory, LoggingSystemFactory}
 
@@ -86,6 +86,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   private val logAdminActorRef: ActorRef[LogControlMessages] =
     LogAdminActorFactory.make(context.system)
 
+  private val registrationFactory = new RegistrationFactory(logAdminActorRef)
+
   // add some dummy registrations for illustrative purposes
 
   // dummy http connection
@@ -101,17 +103,15 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // dummy HCD connection
   val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-  val hcdRegistration =
-    AkkaRegistration(
-      hcdConnection,
-      Some("nfiraos.ncc.trombone"),
-      context.actorOf(Props(new akka.actor.Actor {
-        override def receive: Receive = {
-          case "print" => log.info("hello world")
-        }
-      }), name = "my-actor-1"),
-      logAdminActorRef
-    )
+  val hcdRegistration: AkkaRegistration = registrationFactory.akkaTyped(
+    hcdConnection,
+    "nfiraos.ncc.tromboneHcd",
+    context.actorOf(Props(new akka.actor.Actor {
+      override def receive: Receive = {
+        case "print" => log.info("hello world")
+      }
+    }), name = "my-actor-1")
+  )
 
   // Register UnTyped ActorRef with Location service. Import scaladsl adapter to implicitly convert
   // UnTyped ActorRefs to Typed ActorRef[Nothing]
@@ -127,8 +127,9 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val assemblyConnection = AkkaConnection(ComponentId("assembly1", ComponentType.Assembly))
 
   // Register Typed ActorRef[String] with Location Service
-  val assemblyRegistration =
-    AkkaRegistration(assemblyConnection, Some("nfiraos.ncc.trombone"), typedActorRef, logAdminActorRef)
+  val assemblyRegistration: AkkaRegistration =
+    registrationFactory.akkaTyped(assemblyConnection, "nfiraos.ncc.tromboneAssembly", typedActorRef)
+
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations
 
@@ -201,6 +202,13 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   log.info("Registered Akka connections:")
   akkaList.foreach(c => log.info(s"--- ${locationInfoToString(c)}"))
   //#filtering-connection
+
+  //#filtering-prefix
+  // filter akka locations based on prefix
+  val akkaLocations: List[AkkaLocation] = Await.result(locationService.listByPrefix("nfiraos.ncc"), timeout)
+  log.info("Registered akka locations for nfiraos.ncc")
+  akkaLocations.foreach(c ⇒ log.info(s"--- ${locationInfoToString(c)}"))
+  //#filtering-prefix
 
   if (resolveResult.isDefined) {
 

@@ -255,6 +255,22 @@ The log output should contain:
 [INFO] --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
 ```
 
+Filtering akka connections by prefix is shown below:
+
+Scala
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #filtering-prefix }
+
+Java
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #filtering-prefix }
+
+The log output should contain:
+
+```
+[INFO] Registered akka locations for nfiraos.ncc
+[INFO] --- hcd1-hcd-akka, component type=HCD, connection type=AkkaType
+[INFO] --- assembly1-assembly-akka, component type=Assembly, connection type=AkkaType
+```
+
 ## Tracking and Subscribing
 
 The lifecycle of a connection of interest can be followed using either the `track` API or the `subscribe` API.  
