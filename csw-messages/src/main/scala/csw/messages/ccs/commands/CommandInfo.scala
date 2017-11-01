@@ -1,7 +1,8 @@
 package csw.messages.ccs.commands
 
+import ai.x.play.json.Jsonx
 import csw.messages.params.models.{ObsId, RunId}
-import spray.json.JsonFormat
+import play.api.libs.json.OFormat
 
 import scala.language.implicitConversions
 
@@ -21,7 +22,6 @@ case class CommandInfo(obsId: ObsId, runId: RunId = RunId()) {
 }
 
 object CommandInfo {
-  import spray.json.DefaultJsonProtocol._
-  implicit val format: JsonFormat[CommandInfo]               = jsonFormat2(CommandInfo.apply)
+  implicit val format: OFormat[CommandInfo]                  = Jsonx.formatCaseClassUseDefaults[CommandInfo]
   implicit def strToParamSetInfo(obsId: String): CommandInfo = CommandInfo(ObsId(obsId))
 }

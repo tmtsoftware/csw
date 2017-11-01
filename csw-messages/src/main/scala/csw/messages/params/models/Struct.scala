@@ -3,7 +3,7 @@ package csw.messages.params.models
 import com.trueaccord.scalapb.TypeMapper
 import csw.messages.params.generics.{Parameter, ParameterSetType}
 import csw_messages_params.parameter.PbStruct
-import spray.json.JsonFormat
+import play.api.libs.json.{Json, OFormat}
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
@@ -21,9 +21,7 @@ case class Struct private (paramSet: Set[Parameter[_]]) extends ParameterSetType
 }
 
 object Struct {
-
-  import spray.json.DefaultJsonProtocol._
-  implicit val format: JsonFormat[Struct] = jsonFormat1(Struct.apply)
+  implicit val format: OFormat[Struct] = Json.format[Struct]
 
   def apply(paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Struct = new Struct().madd(paramSet)
 

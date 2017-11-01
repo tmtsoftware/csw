@@ -152,7 +152,6 @@ class PbParameterTest extends FunSuite with Matchers {
   }
 
   test("should able to change the type from/to PbParameter to/from Parameter for IntKey") {
-    import spray.json.DefaultJsonProtocol._
     val key         = KeyType.IntKey.make("encoder")
     val param       = key.set(1, 2, 3, 4)
     val mapper      = Parameter.typeMapper[Int]

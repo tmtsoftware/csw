@@ -2,7 +2,8 @@ package csw.messages.ccs.events
 
 import java.time.{Clock, Instant}
 
-import spray.json.{JsString, JsValue, JsonFormat}
+import play.api.libs.json._
+
 import scala.language.implicitConversions
 
 case class EventTime(time: Instant = Instant.now(Clock.systemUTC)) {
@@ -10,13 +11,11 @@ case class EventTime(time: Instant = Instant.now(Clock.systemUTC)) {
 }
 
 object EventTime {
-  import spray.json.DefaultJsonProtocol._
 
   implicit def toEventTime(time: Instant): EventTime = EventTime(time)
   implicit def toCurrent: EventTime                  = EventTime()
-  implicit val format: JsonFormat[EventTime] = new JsonFormat[EventTime] {
-    def write(et: EventTime): JsValue  = JsString(et.toString)
-    def read(json: JsValue): EventTime = Instant.parse(json.convertTo[String])
+  implicit val format: Format[EventTime] = new Format[EventTime] {
+    def writes(et: EventTime): JsValue            = JsString(et.toString)
+    def reads(json: JsValue): JsResult[EventTime] = JsSuccess(Instant.parse(Json.stringify(json)))
   }
-
 }

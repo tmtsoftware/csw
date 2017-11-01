@@ -1,8 +1,8 @@
 package csw.messages.params.models
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum.{Enum, EnumEntry}
-import spray.json.JsonFormat
+import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+import play.api.libs.json.Format
 
 import scala.collection.immutable
 
@@ -16,12 +16,12 @@ sealed abstract class Subsystem(description: String) extends EnumEntry with Lowe
 /**
  * Defines constants for the available subsystems
  */
-object Subsystem extends Enum[Subsystem] {
+object Subsystem extends Enum[Subsystem] with PlayJsonEnum[Subsystem] {
 
   import csw.messages.params.formats.JsonSupport._
 
   override def values: immutable.IndexedSeq[Subsystem] = findValues
-  implicit val format: JsonFormat[Subsystem]           = enumFormat(this)
+  implicit val format: Format[Subsystem]               = enumFormat(this)
 
   case object AOESW   extends Subsystem("AO Executive Software")
   case object APS     extends Subsystem("Alignment and Phasing System")

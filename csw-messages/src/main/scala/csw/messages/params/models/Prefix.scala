@@ -1,6 +1,6 @@
 package csw.messages.params.models
 
-import spray.json.RootJsonFormat
+import play.api.libs.json.{Json, OFormat}
 
 import scala.language.implicitConversions
 
@@ -27,7 +27,6 @@ case class Prefix(subsystem: Subsystem, prefix: String) {
  * A top level key for a parameter set: combines subsystem and the subsystem's prefix
  */
 object Prefix {
-  import spray.json.DefaultJsonProtocol._
   private val SEPARATOR = '.'
 
   implicit def apply(prefix: String): Prefix = Prefix(subsystem(prefix), prefix)
@@ -37,5 +36,5 @@ object Prefix {
     Subsystem.withNameOption(keyText.splitAt(keyText.indexOf(SEPARATOR))._1).getOrElse(Subsystem.BAD)
   }
 
-  implicit val format: RootJsonFormat[Prefix] = jsonFormat2(Prefix.apply)
+  implicit val format: OFormat[Prefix] = Json.format[Prefix]
 }

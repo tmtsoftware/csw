@@ -6,28 +6,23 @@ import csw.messages.params.generics.Parameter
 import csw.messages.params.models.{ObsId, Prefix, RunId}
 import csw.messages.params.states.StateVariable.StateVariable
 import csw.messages.params.states.{CurrentState, DemandState}
-import spray.json._
+import play.api.libs.json._
 
-object JsonSupport
-    extends JsonSupport
-    with DefaultJsonProtocol
-    with JavaFormats
-    with EnumJsonSupport
-    with WrappedArrayProtocol
+object JsonSupport extends JsonSupport with JavaFormats with EnumJsonSupport with WrappedArrayProtocol
 
 /**
  * Supports conversion of commands and events to/from JSON
  */
 //noinspection TypeAnnotation
-trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupport with WrappedArrayProtocol ⇒
+trait JsonSupport { self: JavaFormats with EnumJsonSupport with WrappedArrayProtocol ⇒
 
   // JSON formats
-  lazy val paramSetFormat    = implicitly[JsonFormat[Set[Parameter[_]]]]
-  lazy val commandInfoFormat = implicitly[JsonFormat[CommandInfo]]
-  lazy val runIdFormat       = implicitly[JsonFormat[RunId]]
-  lazy val obsIdFormat       = implicitly[JsonFormat[ObsId]]
-  lazy val prefixFormat      = implicitly[JsonFormat[Prefix]]
-  lazy val eventInfoFormat   = implicitly[JsonFormat[EventInfo]]
+  lazy val paramSetFormat    = implicitly[Format[Set[Parameter[_]]]]
+  lazy val commandInfoFormat = implicitly[Format[CommandInfo]]
+  lazy val runIdFormat       = implicitly[Format[RunId]]
+  lazy val obsIdFormat       = implicitly[Format[ObsId]]
+  lazy val prefixFormat      = implicitly[Format[Prefix]]
+  lazy val eventInfoFormat   = implicitly[Format[EventInfo]]
 
   // config and event type JSON tags
   private val setupType        = classOf[Setup].getSimpleName
@@ -39,7 +34,7 @@ trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupp
   private val currentStateType = classOf[CurrentState].getSimpleName
   private val demandStateType  = classOf[DemandState].getSimpleName
 
-  private def unexpectedJsValueError(x: JsValue) = deserializationError(s"Unexpected JsValue: $x")
+  private def unexpectedJsValueError(x: JsValue) = throw new RuntimeException(s"Unexpected JsValue: $x")
 
   /**
    * Writes a SequenceParameterSet to JSON
@@ -50,11 +45,13 @@ trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupp
    */
   def writeSequenceCommand[A <: SequenceCommand](sequenceCommand: A): JsValue = {
     JsObject(
-      "type"     -> JsString(sequenceCommand.typeName),
-      "runId"    -> runIdFormat.write(sequenceCommand.runId),
-      "obsId"    -> obsIdFormat.write(sequenceCommand.obsId),
-      "prefix"   -> prefixFormat.write(sequenceCommand.prefix),
-      "paramSet" -> sequenceCommand.paramSet.toJson
+      Seq(
+        "type"     -> JsString(sequenceCommand.typeName),
+        "runId"    -> runIdFormat.writes(sequenceCommand.runId),
+        "obsId"    -> obsIdFormat.writes(sequenceCommand.obsId),
+        "prefix"   -> prefixFormat.writes(sequenceCommand.prefix),
+        "paramSet" -> Json.toJson(sequenceCommand.paramSet)
+      )
     )
   }
 
@@ -71,20 +68,14 @@ trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupp
           case (JsString(typeName), runId, obsId, prefix, paramSet) =>
             typeName match {
               case `setupType` =>
-                Setup(runId.convertTo[RunId],
-                      obsId.convertTo[ObsId],
-                      prefix.convertTo[Prefix],
-                      paramSetFormat.read(paramSet)).asInstanceOf[A]
+                Setup(runId.as[RunId], obsId.as[ObsId], prefix.as[Prefix], paramSetFormat.reads(paramSet).get)
+                  .asInstanceOf[A]
               case `observeType` =>
-                Observe(runId.convertTo[RunId],
-                        obsId.convertTo[ObsId],
-                        prefix.convertTo[Prefix],
-                        paramSetFormat.read(paramSet)).asInstanceOf[A]
+                Observe(runId.as[RunId], obsId.as[ObsId], prefix.as[Prefix], paramSetFormat.reads(paramSet).get)
+                  .asInstanceOf[A]
               case `waitType` =>
-                Wait(runId.convertTo[RunId],
-                     obsId.convertTo[ObsId],
-                     prefix.convertTo[Prefix],
-                     paramSetFormat.read(paramSet)).asInstanceOf[A]
+                Wait(runId.as[RunId], obsId.as[ObsId], prefix.as[Prefix], paramSetFormat.reads(paramSet).get)
+                  .asInstanceOf[A]
               case _ => unexpectedJsValueError(json)
             }
           case _ => unexpectedJsValueError(json)
@@ -102,9 +93,11 @@ trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupp
    */
   def writeStateVariable[A <: StateVariable](stateVariable: A): JsValue = {
     JsObject(
-      "type"     -> JsString(stateVariable.typeName),
-      "prefix"   -> prefixFormat.write(stateVariable.prefix),
-      "paramSet" -> stateVariable.paramSet.toJson
+      Seq(
+        "type"     -> JsString(stateVariable.typeName),
+        "prefix"   -> prefixFormat.writes(stateVariable.prefix),
+        "paramSet" -> Json.toJson(stateVariable.paramSet)
+      )
     )
   }
 
@@ -119,10 +112,10 @@ trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupp
       case JsObject(fields) =>
         (fields("type"), fields("prefix"), fields("paramSet")) match {
           case (JsString(typeName), prefix, paramSet) =>
-            val ck = prefix.convertTo[Prefix]
+            val ck = prefix.as[Prefix]
             typeName match {
-              case `currentStateType` => CurrentState(ck, paramSetFormat.read(paramSet)).asInstanceOf[A]
-              case `demandStateType`  => DemandState(ck, paramSetFormat.read(paramSet)).asInstanceOf[A]
+              case `currentStateType` => CurrentState(ck, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
+              case `demandStateType`  => DemandState(ck, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
               case _                  => unexpectedJsValueError(json)
             }
           case _ => unexpectedJsValueError(json)
@@ -140,9 +133,11 @@ trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupp
    */
   def writeEvent[A <: EventType[_]](event: A): JsValue = {
     JsObject(
-      "type"     -> JsString(event.typeName),
-      "info"     -> eventInfoFormat.write(event.info),
-      "paramSet" -> event.paramSet.toJson
+      Seq(
+        "type"     -> JsString(event.typeName),
+        "info"     -> eventInfoFormat.writes(event.info),
+        "paramSet" -> Json.toJson(event.paramSet)
+      )
     )
   }
 
@@ -158,11 +153,11 @@ trait JsonSupport { self: DefaultJsonProtocol with JavaFormats with EnumJsonSupp
       case JsObject(fields) =>
         (fields("type"), fields("info"), fields("paramSet")) match {
           case (JsString(typeName), eventInfo, paramSet) =>
-            val info = eventInfo.convertTo[EventInfo]
+            val info = eventInfo.as[EventInfo]
             typeName match {
-              case `statusEventType`  => StatusEvent(info, paramSetFormat.read(paramSet)).asInstanceOf[A]
-              case `observeEventType` => ObserveEvent(info, paramSetFormat.read(paramSet)).asInstanceOf[A]
-              case `systemEventType`  => SystemEvent(info, paramSetFormat.read(paramSet)).asInstanceOf[A]
+              case `statusEventType`  => StatusEvent(info, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
+              case `observeEventType` => ObserveEvent(info, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
+              case `systemEventType`  => SystemEvent(info, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
               case _                  => unexpectedJsValueError(json)
             }
           case _ => unexpectedJsValueError(json)

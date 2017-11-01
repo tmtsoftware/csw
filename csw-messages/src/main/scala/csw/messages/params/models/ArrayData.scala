@@ -4,7 +4,7 @@ import java.util
 
 import com.trueaccord.scalapb.TypeMapper
 import csw.messages.params.pb.{ItemType, ItemTypeCompanion}
-import spray.json.JsonFormat
+import play.api.libs.json.{Format, Json}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -19,9 +19,7 @@ case class ArrayData[T](data: mutable.WrappedArray[T]) {
 }
 
 object ArrayData {
-  import csw.messages.params.formats.JsonSupport._
-  implicit def format[T: JsonFormat: ClassTag]: JsonFormat[ArrayData[T]] =
-    jsonFormat1((xs: mutable.WrappedArray[T]) ⇒ new ArrayData[T](xs))
+  implicit def format[T: Format: ClassTag]: Format[ArrayData[T]] = Json.format[ArrayData[T]]
 
   implicit def fromArray[T](xs: Array[T]): ArrayData[T] = new ArrayData(xs)
 

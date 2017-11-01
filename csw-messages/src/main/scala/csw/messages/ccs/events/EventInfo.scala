@@ -2,8 +2,8 @@ package csw.messages.ccs.events
 
 import java.util.UUID
 
+import ai.x.play.json.Jsonx
 import csw.messages.params.models.{ObsId, Prefix}
-import spray.json.RootJsonFormat
 
 import scala.language.implicitConversions
 import scala.runtime.ScalaRunTime._
@@ -36,7 +36,6 @@ case class EventInfo(source: Prefix,
 }
 
 object EventInfo {
-  import spray.json.DefaultJsonProtocol._
   implicit def apply(prefixStr: String): EventInfo = {
     val prefix: Prefix = Prefix(prefixStr)
     EventInfo(prefix, EventTime.toCurrent, None)
@@ -55,5 +54,5 @@ object EventInfo {
   // Java APIs
   def create(prefix: String): EventInfo = EventInfo(prefix)
 
-  implicit val eventInfoFormat: RootJsonFormat[EventInfo] = jsonFormat4(EventInfo.apply)
+  implicit val eventInfoFormat = Jsonx.formatCaseClassUseDefaults[EventInfo]
 }

@@ -1,6 +1,6 @@
 package csw.messages.params.models
 
-import spray.json.{JsString, JsValue, JsonFormat}
+import play.api.libs.json._
 
 import scala.language.implicitConversions
 import scala.util.matching.Regex
@@ -16,11 +16,10 @@ case object Classical          extends ProgramKind
 case object PreProgrammedQueue extends ProgramKind
 
 object ObsId {
-  import spray.json.DefaultJsonProtocol._
 
-  implicit val format: JsonFormat[ObsId] = new JsonFormat[ObsId] {
-    override def write(obj: ObsId): JsValue = JsString(obj.obsId)
-    override def read(json: JsValue): ObsId = ObsId(json.convertTo[String])
+  implicit val format: Format[ObsId] = new Format[ObsId] {
+    override def writes(obj: ObsId): JsValue           = JsString(obj.obsId)
+    override def reads(json: JsValue): JsResult[ObsId] = JsSuccess(ObsId(Json.stringify(json)))
   }
 
   def empty: ObsId = ObsId("")

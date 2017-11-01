@@ -50,10 +50,3 @@ object ItemsFactory {
   implicit def genericItemsFactory[A: ItemsFactory, B](implicit conversion: A ⇒ B): ItemsFactory[B] =
     ItemsFactory[A].asInstanceOf[ItemsFactory[B]]
 }
-
-object A extends App {
-  def m[T: ItemsFactory](items: Seq[T]): Items = ItemsFactory[T].make(items)
-
-  println(m(Seq(1, 2, 3)))
-  println(ItemTypeCompanion.make[Int, IntItems](Seq(1, 2, 3)))
-}

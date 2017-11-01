@@ -19,7 +19,7 @@ import csw.messages.params.models.Units.{degree, encoder, meter, NoUnits}
 import csw.messages.params.models._
 import csw.messages.params.states.{CurrentState, DemandState}
 import org.scalatest.FunSpec
-import spray.json._
+import play.api.libs.json.Json
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-188: Efficient Serialization to/from JSON
@@ -38,10 +38,10 @@ class JsonTest extends FunSpec {
 
     it("should encode and decode properly") {
       val expectedJson = "\"wfos\""
-      val json         = wfos.toJson
-      val sub          = json.convertTo[Subsystem]
+      val json         = Json.toJson(wfos)
+      val sub          = json.as[Subsystem]
       assert(sub == wfos)
-      assert(json.compactPrint.equals(expectedJson))
+      assert(json.equals(expectedJson))
     }
   }
 
@@ -49,8 +49,8 @@ class JsonTest extends FunSpec {
     val encoderUnit: Units = encoder
 
     it("should encode and decode properly") {
-      val json                 = encoderUnit.toJson
-      val encoderUnitsFromJson = json.convertTo[Units]
+      val json                 = Json.toJson(encoderUnit)
+      val encoderUnitsFromJson = json.as[Units]
       assert(encoderUnit == encoderUnitsFromJson)
     }
   }
@@ -62,7 +62,7 @@ class JsonTest extends FunSpec {
       val i1 = k1.set('d').withUnits(NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[Parameter[Char]]
+      val in1 = j1.as[Parameter[Char]]
       assert(in1 == i1)
       assert(in1.units == i1.units)
       assert(in1.units == NoUnits)
@@ -73,7 +73,7 @@ class JsonTest extends FunSpec {
       val i1 = k1.set('d').withUnits(encoder)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[Parameter[Char]]
+      val in1 = j1.as[Parameter[Char]]
       assert(in1 == i1)
       assert(in1.units == i1.units)
       assert(in1.units == encoder)
@@ -85,7 +85,7 @@ class JsonTest extends FunSpec {
       val i1       = k1.set(s).withUnits(NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[Parameter[Short]]
+      val in1 = j1.as[Parameter[Short]]
       assert(in1 == i1)
     }
 
@@ -94,7 +94,7 @@ class JsonTest extends FunSpec {
       val i1 = k1.set(23).withUnits(NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[Parameter[Int]]
+      val in1 = j1.as[Parameter[Int]]
       assert(in1 == i1)
     }
 
@@ -103,7 +103,7 @@ class JsonTest extends FunSpec {
       val i1 = k1.set(123456L).withUnits(NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[Parameter[Long]]
+      val in1 = j1.as[Parameter[Long]]
       assert(in1 == i1)
     }
 
@@ -112,7 +112,7 @@ class JsonTest extends FunSpec {
       val i1 = k1.set(123.456f).withUnits(NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[Parameter[Float]]
+      val in1 = j1.as[Parameter[Float]]
       assert(in1 == i1)
     }
 
@@ -121,7 +121,7 @@ class JsonTest extends FunSpec {
       val i1 = k1.set(123.456).withUnits(NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[Parameter[Double]]
+      val in1 = j1.as[Parameter[Double]]
       assert(in1 == i1)
     }
 
@@ -131,13 +131,13 @@ class JsonTest extends FunSpec {
 
       val j1 = i1.toJson
       //      info("j1: " + j1)
-      val in1: Parameter[Boolean] = j1.convertTo[Parameter[Boolean]]
+      val in1: Parameter[Boolean] = j1.as[Parameter[Boolean]]
       assert(in1 == i1)
 
       val i2 = k1.set(true)
 
       val j2  = i2.toJson
-      val in2 = j2.convertTo[Parameter[Boolean]]
+      val in2 = j2.as[Parameter[Boolean]]
       assert(in2 == i2)
     }
 
@@ -146,7 +146,7 @@ class JsonTest extends FunSpec {
       val i1 = k1.set("Blue", "Green").withUnits(NoUnits)
 
       val j1  = i1.toJson
-      val in1 = j1.convertTo[Parameter[String]]
+      val in1 = j1.as[Parameter[String]]
       assert(in1 == i1)
     }
   }
@@ -164,9 +164,9 @@ class JsonTest extends FunSpec {
       val sc1   = Setup(obsId, Prefix(ck)).add(i1).add(i2)
       val items = sc1.paramSet
 
-      val js3 = JsonSupport.paramSetFormat.write(items)
-      val in1 = JsonSupport.paramSetFormat.read(js3)
-      assert(in1 == items)
+      val js3 = JsonSupport.paramSetFormat.writes(items)
+      val in1 = JsonSupport.paramSetFormat.reads(js3)
+      assert(in1.get == items)
     }
   }
 

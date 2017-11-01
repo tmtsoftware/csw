@@ -9,42 +9,43 @@ import csw.messages.params.models.{Units, _}
 import csw.messages.params.pb.ItemsFactory
 import csw_messages_params.keytype.PbKeyType
 import csw_messages_params.parameter.PbParameter
-import enumeratum.{Enum, EnumEntry}
-import spray.json.JsonFormat
+import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+import play.api.libs.json._
 
 import scala.collection.immutable
 import scala.reflect.ClassTag
 
-sealed class KeyType[S: JsonFormat: ClassTag: ItemsFactory] extends EnumEntry with Serializable {
-  def paramFormat: JsonFormat[Parameter[S]]             = Parameter[S]
+sealed class KeyType[S: Format: ClassTag: ItemsFactory] extends EnumEntry with Serializable {
+  def paramFormat: Format[Parameter[S]]                 = Parameter[S]
   def typeMapper: TypeMapper[PbParameter, Parameter[S]] = Parameter.typeMapper
 }
 
-sealed class SimpleKeyType[S: JsonFormat: ClassTag: ItemsFactory] extends KeyType[S] {
+sealed class SimpleKeyType[S: Format: ClassTag: ItemsFactory] extends KeyType[S] {
   def make(name: String): Key[S] = new Key[S](name, this)
 }
 
-sealed class SimpleKeyTypeWithUnits[S: JsonFormat: ClassTag: ItemsFactory](defaultUnits: Units) extends KeyType[S] {
+sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag: ItemsFactory](defaultUnits: Units) extends KeyType[S] {
   def make(name: String): Key[S] = new Key[S](name, this, defaultUnits)
 }
-sealed class ArrayKeyType[S: JsonFormat: ClassTag](implicit x: ItemsFactory[ArrayData[S]])
+sealed class ArrayKeyType[S: Format: ClassTag](implicit x: ItemsFactory[ArrayData[S]])
     extends SimpleKeyType[ArrayData[S]]
-sealed class MatrixKeyType[S: JsonFormat: ClassTag](implicit x: ItemsFactory[MatrixData[S]])
+sealed class MatrixKeyType[S: Format: ClassTag](implicit x: ItemsFactory[MatrixData[S]])
     extends SimpleKeyType[MatrixData[S]]
 
 //////////
-sealed class JSimpleKeyType[S: JsonFormat: ClassTag, T: ItemsFactory](implicit conversion: T ⇒ S)
-    extends SimpleKeyType[S]
-sealed class JArrayKeyType[S: JsonFormat: ClassTag, T: ItemsFactory](implicit x: ItemsFactory[ArrayData[T]],
-                                                                     conversion: T ⇒ S)
-    extends JSimpleKeyType[ArrayData[S], ArrayData[T]]
+sealed class JSimpleKeyType[S: Format: ClassTag, T: ItemsFactory](implicit conversion: T ⇒ S) extends SimpleKeyType[S]
+sealed class JArrayKeyType[S: Format: ClassTag, T: ItemsFactory](
+    implicit x: ItemsFactory[ArrayData[T]],
+    conversion: T ⇒ S
+) extends JSimpleKeyType[ArrayData[S], ArrayData[T]]
 
-sealed class JMatrixKeyType[S: JsonFormat: ClassTag, T: ItemsFactory](implicit x: ItemsFactory[MatrixData[T]],
-                                                                      conversion: T ⇒ S)
-    extends JSimpleKeyType[MatrixData[S], MatrixData[T]]
+sealed class JMatrixKeyType[S: Format: ClassTag, T: ItemsFactory](
+    implicit x: ItemsFactory[MatrixData[T]],
+    conversion: T ⇒ S
+) extends JSimpleKeyType[MatrixData[S], MatrixData[T]]
 
 ///////////////
-object KeyType extends Enum[KeyType[_]] {
+object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
 
   import JsonSupport._
 
@@ -111,9 +112,9 @@ object KeyType extends Enum[KeyType[_]] {
   case object JFloatMatrixKey  extends JMatrixKeyType[java.lang.Float, Float]
   case object JDoubleMatrixKey extends JMatrixKeyType[java.lang.Double, Double]
 
-  implicit def format: JsonFormat[KeyType[_]] = enumFormat(this)
+  implicit def format: Format[KeyType[_]] = enumFormat(this)
 
-  implicit def format2[T]: JsonFormat[KeyType[T]] = enumFormat(this).asInstanceOf[JsonFormat[KeyType[T]]]
+  implicit def format2[T]: Format[KeyType[T]] = enumFormat(this).asInstanceOf[Format[KeyType[T]]]
 
   implicit val typeMapper: TypeMapper[PbKeyType, KeyType[_]] =
     TypeMapper[PbKeyType, KeyType[_]](x ⇒ KeyType.withName(x.toString()))(x ⇒ PbKeyType.fromName(x.toString).get)

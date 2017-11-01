@@ -1,13 +1,13 @@
 package csw.messages.params.formats
 
 import enumeratum.{Enum, EnumEntry}
-import spray.json.{DefaultJsonProtocol, JsString, JsValue, JsonFormat}
+import play.api.libs.json._
 
-trait EnumJsonSupport { self: DefaultJsonProtocol ⇒
-  def enumFormat[T <: EnumEntry](enum: Enum[T]): JsonFormat[T] = new JsonFormat[T] {
-    override def write(obj: T): JsValue = JsString(obj.entryName)
-    override def read(json: JsValue): T = enum.withName(json.convertTo[String])
+trait EnumJsonSupport { self ⇒
+  def enumFormat[T <: EnumEntry](enum: Enum[T]): Format[T] = new Format[T] {
+    override def writes(obj: T): JsValue            = JsString(obj.entryName)
+    override def reads(json: JsValue): JsSuccess[T] = JsSuccess(enum.withName(Json.stringify(json)))
   }
 }
 
-object EnumJsonSupport extends EnumJsonSupport with DefaultJsonProtocol
+object EnumJsonSupport extends EnumJsonSupport

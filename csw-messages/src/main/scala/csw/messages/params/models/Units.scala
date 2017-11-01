@@ -3,8 +3,7 @@ package csw.messages.params.models
 import com.trueaccord.scalapb.TypeMapper
 import csw.messages.TMTSerializable
 import csw_messages_params.units.PbUnits
-import enumeratum.{Enum, EnumEntry}
-import spray.json.JsonFormat
+import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
 import scala.collection.immutable
 
@@ -15,12 +14,9 @@ sealed abstract class Units(name: String, description: String) extends EnumEntry
   def getDescription: String = description
 }
 
-object Units extends Enum[Units] {
-
-  import csw.messages.params.formats.JsonSupport._
+object Units extends Enum[Units] with PlayJsonEnum[Units] {
 
   override def values: immutable.IndexedSeq[Units] = findValues
-  implicit val format: JsonFormat[Units]           = enumFormat(this)
   implicit val typeMapper: TypeMapper[PbUnits, Units] =
     TypeMapper[PbUnits, Units](x ⇒ Units.withName(x.toString()))(x ⇒ PbUnits.fromName(x.toString).get)
 

@@ -3,15 +3,15 @@ package csw.messages.params.generics
 import csw.messages.params.models.Units
 import csw.messages.params.models.Units.NoUnits
 import csw.messages.params.pb.ItemsFactory
-import spray.json.JsonFormat
+import play.api.libs.json.Format
 
 import scala.annotation.varargs
 import scala.reflect.ClassTag
 import scala.runtime.ScalaRunTime._
 
-case class Key[S: JsonFormat: ClassTag: ItemsFactory] private[generics] (keyName: String,
-                                                                         keyType: KeyType[S],
-                                                                         units: Units) {
+case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: String,
+                                                                     keyType: KeyType[S],
+                                                                     units: Units) {
 
   def this(keyName: String, keyType: KeyType[S]) = this(keyName, keyType, NoUnits)
 

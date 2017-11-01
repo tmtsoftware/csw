@@ -3,7 +3,7 @@ package csw.messages.params.models
 import java.util
 
 import com.trueaccord.scalapb.TypeMapper
-import spray.json.RootJsonFormat
+import play.api.libs.json.{Json, OFormat}
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters.seqAsJavaListConverter
@@ -20,9 +20,8 @@ case class Choice(name: String) {
  * Provides implicit conversion from String to Choice
  */
 object Choice {
-  import spray.json.DefaultJsonProtocol._
   implicit def toChoice(name: String): Choice         = new Choice(name)
-  implicit val choiceFormat: RootJsonFormat[Choice]   = jsonFormat1(Choice.apply)
+  implicit val choiceFormat: OFormat[Choice]          = Json.format[Choice]
   implicit val typeMapper: TypeMapper[String, Choice] = TypeMapper[String, Choice](Choice.apply)(_.name)
 }
 
@@ -41,11 +40,10 @@ case class Choices(values: Set[Choice]) {
  * Provides a varargs constructor for Choices
  */
 object Choices {
-  import spray.json.DefaultJsonProtocol._
   @varargs
   def from(choicesIn: String*): Choices = Choices(choicesIn.map(Choice(_)).toSet)
 
   @varargs
-  def fromChoices(choicesIn: Choice*): Choices        = Choices(choicesIn.toSet)
-  implicit val choicesFormat: RootJsonFormat[Choices] = jsonFormat1(Choices.apply)
+  def fromChoices(choicesIn: Choice*): Choices = Choices(choicesIn.toSet)
+  implicit val choicesFormat: OFormat[Choices] = Json.format[Choices]
 }
