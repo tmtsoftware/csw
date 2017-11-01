@@ -1,8 +1,10 @@
 package csw.framework.internal.configparser
 
 import com.typesafe.config.ConfigFactory
+import csw.framework.models.ConfigFileLocation.{Local, Remote}
+import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.messages.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
-import csw.framework.models.ContainerInfo
+import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection
 import csw.messages.location.ComponentType.{Assembly, HCD}
@@ -45,14 +47,26 @@ class ConfigParserTest extends FunSuite with Matchers {
 
   private val containerInfo = ContainerInfo("Container-1", Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
 
+  private val containerBootstrapInfo = ContainerBootstrapInfo(
+    "/org.tmt/csw-framework/bin/container-cmd-app",
+    Container,
+    "/csw-framework/src/resources/laser_container.conf",
+    Local
+  )
+
+  private val standaloneBootstrapInfo = ContainerBootstrapInfo(
+    "/org.tmt/csw-framework/bin/container-cmd-app",
+    Standalone,
+    "standalone.conf",
+    Remote
+  )
+
+  private val hostBootstrapInfo = HostBootstrapInfo(Set(standaloneBootstrapInfo, containerBootstrapInfo))
+
+  // ################### Start : Container Parsing ###################
   test("should able to parse container config") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/SampleContainer.conf")
     ConfigParser.parseContainer(config) shouldEqual containerInfo
-  }
-
-  test("should able to parse standalone assembly config") {
-    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/standalone/SampleStandalone.conf")
-    ConfigParser.parseStandalone(config) shouldEqual assemblyInfo
   }
 
   test("should able to throw error when 'name' is missing") {
@@ -77,6 +91,13 @@ class ConfigParserTest extends FunSuite with Matchers {
     intercept[java.lang.RuntimeException] {
       ConfigParser.parseContainer(config)
     }
+  }
+  // ################### End : Container Parsing #####################
+
+  // ################### Start : Standalone Parsing ##################
+  test("should able to parse standalone assembly config") {
+    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/standalone/SampleStandalone.conf")
+    ConfigParser.parseStandalone(config) shouldEqual assemblyInfo
   }
 
   test("should able to throw error when 'behaviorFactoryClassName' is missing for assembly") {
@@ -167,4 +188,37 @@ class ConfigParserTest extends FunSuite with Matchers {
       ConfigParser.parseStandalone(config)
     }
   }
+  // ################### End : Standalone Parsing ##################
+
+  // DEOPSCSW-175: Starting multiple containers from command Line
+  // ################### Start : Host Parsing ######################
+  test("should able to parse host config") {
+    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/valid_hostconfig.conf")
+    ConfigParser.parseHost(config) shouldEqual hostBootstrapInfo
+  }
+
+  test("should able to throw error when 'containerCmdApp' is missing from host config") {
+    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/missing_containerCmdApp.conf")
+
+    intercept[java.lang.RuntimeException] {
+      ConfigParser.parseHost(config)
+    }
+  }
+
+  test("should able to throw error when provided mode is invalid in host config") {
+    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/invalid_mode.conf")
+
+    intercept[java.lang.RuntimeException] {
+      ConfigParser.parseHost(config)
+    }
+  }
+
+  test("should able to throw error when provided location is invalid in host config") {
+    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/invalid_location.conf")
+
+    intercept[java.lang.RuntimeException] {
+      ConfigParser.parseHost(config)
+    }
+  }
+  // ################### End : Host Parsing ######################
 }

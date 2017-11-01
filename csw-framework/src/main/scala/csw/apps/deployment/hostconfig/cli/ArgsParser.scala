@@ -16,7 +16,7 @@ class ArgsParser() {
       c.copy(local = true)
     } text "if provided, get the host configuration file from local machine located at hostConfigPath, else fetch it from config service"
 
-    arg[String]("<file>") maxOccurs 1 minOccurs 0 action { (x, c) =>
+    arg[String]("<file>") required () action { (x, c) =>
       c.copy(hostConfigPath = Some(Paths.get(x)))
     } text "host configuration file path"
 

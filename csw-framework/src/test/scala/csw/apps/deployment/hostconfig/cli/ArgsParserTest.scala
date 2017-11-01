@@ -1,10 +1,11 @@
-package csw.apps.deployment.containercmd.cli
+package csw.apps.deployment.hostconfig.cli
 
 import java.io.ByteArrayOutputStream
 import java.nio.file.Paths
 
 import org.scalatest.{BeforeAndAfterEach, Matchers}
 
+// DEOPSCSW-175: Starting multiple containers from command Line
 class ArgsParserTest extends org.scalatest.FunSuite with Matchers with BeforeAndAfterEach {
   val inputFilePath = "/tmp/some/input/file"
 
@@ -24,21 +25,27 @@ class ArgsParserTest extends org.scalatest.FunSuite with Matchers with BeforeAnd
       }
     }
 
-  test("should parse arguments when all arguments are provided") {
-    val args                     = Array("--standalone", "--local", inputFilePath)
-    val options: Option[Options] = silentParse(args)
-    options should contain(Options(standalone = true, local = true, Some(Paths.get(inputFilePath))))
-  }
-
-  test("should parse arguments with default value of false when standalone option is not provided") {
+  test("should able to parse when all arguments are provided") {
     val args                     = Array("--local", inputFilePath)
     val options: Option[Options] = silentParse(args)
-    options should contain(Options(standalone = false, local = true, Some(Paths.get(inputFilePath))))
+    options should contain(Options(local = true, Some(Paths.get(inputFilePath))))
   }
 
-  test("should parse arguments with default value of false when local option is not provided") {
-    val args                     = Array("--standalone", inputFilePath)
+  test("should able to parse arguments with default value of false when local option is not provided") {
+    val args                     = Array(inputFilePath)
     val options: Option[Options] = silentParse(args)
-    options should contain(Options(standalone = true, local = false, Some(Paths.get(inputFilePath))))
+    options should contain(Options(local = false, Some(Paths.get(inputFilePath))))
+  }
+
+  test("should not parse if inputFilePath is not provided") {
+    val args                     = Array("--local")
+    val options: Option[Options] = silentParse(args)
+    options shouldBe None
+  }
+
+  test("should not parse if no arguments provided") {
+    val args                     = Array[String]()
+    val options: Option[Options] = silentParse(args)
+    options shouldBe None
   }
 }
