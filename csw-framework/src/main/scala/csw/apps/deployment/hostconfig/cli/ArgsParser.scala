@@ -14,11 +14,11 @@ class ArgsParser() {
 
     opt[Unit]("local") action { (_, c) =>
       c.copy(local = true)
-    } text "if provided, get the host configuration file from local machine located at hostConfigPath, else fetch it from config service"
+    } text "Optional: if provided, get the host configuration file from local machine located at hostConfigPath, else fetch it from config service"
 
     arg[String]("<file>") required () action { (x, c) =>
       c.copy(hostConfigPath = Some(Paths.get(x)))
-    } text "host configuration file path"
+    } text "Required: host configuration file path"
 
     help("help")
     version("version")

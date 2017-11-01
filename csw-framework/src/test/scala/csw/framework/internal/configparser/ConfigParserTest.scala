@@ -48,14 +48,14 @@ class ConfigParserTest extends FunSuite with Matchers {
   private val containerInfo = ContainerInfo("Container-1", Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
 
   private val containerBootstrapInfo = ContainerBootstrapInfo(
-    "/org.tmt/csw-framework/bin/container-cmd-app",
+    "/TMT/csw-prod/target/universal/stage/bin/container-cmd-app",
     Container,
     "/csw-framework/src/resources/laser_container.conf",
     Local
   )
 
   private val standaloneBootstrapInfo = ContainerBootstrapInfo(
-    "/org.tmt/csw-framework/bin/container-cmd-app",
+    "/TMT/csw-prod/target/universal/stage/bin/container-cmd-app",
     Standalone,
     "standalone.conf",
     Remote
