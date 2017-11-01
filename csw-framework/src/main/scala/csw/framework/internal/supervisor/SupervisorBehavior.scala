@@ -122,7 +122,8 @@ class SupervisorBehavior(
         case SupervisorLifecycleState.Restart  ⇒ spawn()
         case SupervisorLifecycleState.Shutdown ⇒ coordinatedShutdown()
         case SupervisorLifecycleState.Idle     ⇒ if (isStandalone) throw InitializationFailed
-        case _                                 ⇒
+        case _ ⇒
+          lifecycleState = SupervisorLifecycleState.Idle // Change mode to idle and wait for an action(Restart or Shutdown) to be taken from outside
       }
       this
     case PostStop ⇒
