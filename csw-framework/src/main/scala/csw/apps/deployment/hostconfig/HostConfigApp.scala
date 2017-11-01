@@ -50,13 +50,13 @@ class HostConfigApp(clusterSettings: ClusterSettings, startLogging: Boolean = fa
     bootstrapInfo.containers
       .foreach {
         case container @ ContainerBootstrapInfo(_, Container, _, Remote) ⇒
-          s"${container.containerCmdApp} ${container.configFilePath}".run()
+          s"${container.containerCmdAppExecPath} ${container.configFilePath}".run()
         case container @ ContainerBootstrapInfo(_, Container, _, Local) ⇒
-          s"${container.containerCmdApp} ${container.configFilePath} --local".run()
+          s"${container.containerCmdAppExecPath} ${container.configFilePath} --local".run()
         case container @ ContainerBootstrapInfo(_, Standalone, _, Remote) ⇒
-          s"${container.containerCmdApp} ${container.configFilePath} --standalone".run()
+          s"${container.containerCmdAppExecPath} ${container.configFilePath} --standalone".run()
         case container @ ContainerBootstrapInfo(_, Standalone, _, Local) ⇒
-          s"${container.containerCmdApp} ${container.configFilePath} --local --standalone".run()
+          s"${container.containerCmdAppExecPath} ${container.configFilePath} --local --standalone".run()
       }
   }
 
