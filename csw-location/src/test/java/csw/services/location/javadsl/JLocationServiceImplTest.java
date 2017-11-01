@@ -273,6 +273,29 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         Assert.assertEquals(akkaLocations, locationService.list(JConnectionType.AkkaType).get());
     }
 
+    //DEOPSCSW-308: Add prefix in Location service models
+    @Test
+    public void testListakkaComponentsByPrefix() throws ExecutionException, InterruptedException {
+        AkkaConnection akkaHcdConnection1 = new AkkaConnection(new ComponentId("hcd1", JComponentType.HCD));
+        AkkaConnection akkaHcdConnection2 = new AkkaConnection(new ComponentId("assembly2", JComponentType.HCD));
+        AkkaConnection akkaHcdConnection3 = new AkkaConnection(new ComponentId("hcd3", JComponentType.HCD));
+
+       // Register Akka connection
+        AkkaRegistration akkaRegistration1 = RegistrationFactory.akka(akkaHcdConnection1, "nfiraos.ncc.tromboneHcd1", actorRef);
+        AkkaRegistration akkaRegistration2 = RegistrationFactory.akka(akkaHcdConnection2, "nfiraos.ncc.tromboneAssembly2", actorRef);
+        AkkaRegistration akkaRegistration3 = RegistrationFactory.akka(akkaHcdConnection3, "nfiraos.ncc.tromboneHcd3", actorRef);
+        locationService.register(akkaRegistration1).get();
+        locationService.register(akkaRegistration2).get();
+        locationService.register(akkaRegistration3).get();
+
+        // filter akka locations by prefix
+        ArrayList<AkkaLocation> akkaLocations = new ArrayList<>();
+        akkaLocations.add((AkkaLocation) akkaRegistration1.location(new Networks().hostname()));
+        akkaLocations.add((AkkaLocation) akkaRegistration2.location(new Networks().hostname()));
+        akkaLocations.add((AkkaLocation) akkaRegistration3.location(new Networks().hostname()));
+        Assert.assertEquals(akkaLocations, locationService.listByPrefix("nfiraos.ncc.trombone").get());
+    }
+
     @Test
     public void testTrackingConnection() throws ExecutionException, InterruptedException {
         int Port = 1234;

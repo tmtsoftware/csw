@@ -391,6 +391,27 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     locationService.list("Invalid_hostname").await shouldBe List.empty
   }
 
+  //DEOPSCSW-308: Add prefix in Location service models
+  test("should filter akka connections based on prefix") {
+    val akkaConnection1 = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+    val akkaConnection2 = AkkaConnection(ComponentId("assembly2", ComponentType.Assembly))
+    val akkaConnection3 = AkkaConnection(ComponentId("hcd3", ComponentType.HCD))
+
+    val actorRef  = actorSystem.spawnAnonymous(Behavior.empty)
+    val actorRef2 = actorSystem.spawnAnonymous(Behavior.empty)
+    val actorRef3 = actorSystem.spawnAnonymous(Behavior.empty)
+
+    locationService.register(RegistrationFactory.akka(akkaConnection1, "nfiraos.ncc.tromboneHcd1", actorRef)).await
+    locationService
+      .register(RegistrationFactory.akka(akkaConnection2, "nfiraos.ncc.tromboneAssembly2", actorRef2))
+      .await
+    locationService.register(RegistrationFactory.akka(akkaConnection3, "nfiraos.ncc.tromboneHcd3", actorRef3)).await
+
+    locationService.listByPrefix("nfiraos.ncc.trombone").await.map(_.connection).toSet shouldBe Set(akkaConnection1,
+                                                                                                    akkaConnection2,
+                                                                                                    akkaConnection3)
+  }
+
   test("should able to unregister all components") {
     val Port               = 1234
     val redis1Connection   = TcpConnection(ComponentId("redis1", ComponentType.Service))

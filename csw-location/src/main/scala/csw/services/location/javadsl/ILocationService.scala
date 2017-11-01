@@ -87,6 +87,14 @@ trait ILocationService {
   def list(connectionType: ConnectionType): CompletableFuture[ju.List[Location]]
 
   /**
+   * Filters all locations registered based on a prefix. Note that all locations having subsystem prefix that starts with the given prefix
+   * value will be listed.
+   *
+   * @return A Future which completes with filtered locations
+   */
+  def listByPrefix(prefix: String): CompletableFuture[ju.List[AkkaLocation]]
+
+  /**
    * Tracks the connection and send events for modification or removal of its location
    *
    * @return A stream that emits events related to the connection. It can be cancelled using KillSwitch. This will stop giving

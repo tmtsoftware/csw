@@ -183,6 +183,12 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     await(list).filter(_.connection.connectionType == connectionType)
   }
 
+  override def listByPrefix(_prefix: String): Future[List[AkkaLocation]] = async {
+    await(list).collect {
+      case akkaLocation @ AkkaLocation(_, prefix, _, _, _) if prefix.exists(_.startsWith(_prefix)) ⇒ akkaLocation
+    }
+  }
+
   /**
    * Track the status of given connection
    */

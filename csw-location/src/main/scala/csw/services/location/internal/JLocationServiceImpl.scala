@@ -52,6 +52,9 @@ private[location] class JLocationServiceImpl(locationService: LocationService, c
   override def list(connectionType: ConnectionType): CompletableFuture[util.List[Location]] =
     locationService.list(connectionType).map(_.asJava).toJava.toCompletableFuture
 
+  override def listByPrefix(prefix: String): CompletableFuture[util.List[AkkaLocation]] =
+    locationService.listByPrefix(prefix).map(_.asJava).toJava.toCompletableFuture
+
   override def track(connection: Connection): Source[TrackingEvent, KillSwitch] =
     locationService.track(connection).asJava
 
