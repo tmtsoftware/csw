@@ -32,7 +32,7 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
       //Multiple AkkaLocation can have same logAdminActorRef, hence watch actorRef instead of logAdminActorRef for akka
       unwatchedLocations.foreach(loc ⇒ {
         val actorRefToWatch = loc match {
-          case AkkaLocation(_, _, actorRef, _)          ⇒ actorRef
+          case AkkaLocation(_, _, _, actorRef, _)       ⇒ actorRef
           case loc @ (_: HttpLocation | _: TcpLocation) ⇒ loc.logAdminActorRef
         }
         log.debug(s"Started watching actor: ${actorRefToWatch.toString}")
@@ -47,7 +47,7 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
         ctx.unwatch(deadActorRef)
         //Unregister the dead location and remove it from the list of watched locations
         val maybeLocation = watchedLocations.find {
-          case AkkaLocation(_, _, actorRef, _)          ⇒ deadActorRef == actorRef
+          case AkkaLocation(_, _, _, actorRef, _)       ⇒ deadActorRef == actorRef
           case loc @ (_: HttpLocation | _: TcpLocation) ⇒ deadActorRef == loc.logAdminActorRef
         }
         maybeLocation match {
