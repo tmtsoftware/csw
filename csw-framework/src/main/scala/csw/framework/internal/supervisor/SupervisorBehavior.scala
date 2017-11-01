@@ -42,6 +42,20 @@ object SupervisorBehavior {
   val ComponentActorNameSuffix = "component-actor"
 }
 
+/**
+ * The Behavior of a Supervisor of a component actor represented as a mutable behavior.
+ *
+ * @param ctx                        The Actor Context under which the actor instance of this behavior is created
+ * @param timerScheduler             Provides support for scheduled `self` messages in an actor
+ * @param maybeContainerRef          The container ref of the container under which this supervisor is started if
+ *                                  its not running in standalone mode
+ * @param componentInfo              ComponentInfo as described in the configuration file
+ * @param componentBehaviorFactory   The factory for creating the component supervised by this Supervisor
+ * @param pubSubBehaviorFactory      The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
+ *                                  for utilising pub-sub of any state of a component
+ * @param registrationFactory        The factory for creating a typed [[AkkaRegistration]] from [[AkkaConnection]]
+ * @param locationService            The single instance of Location service created for a running application
+ */
 class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
     timerScheduler: TimerScheduler[SupervisorMessage],
@@ -74,6 +88,11 @@ class SupervisorBehavior(
 
   spawnAndWatchComponent()
 
+  /**
+   * Defines processing for a [[SupervisorMessage]] received by the actor instance.
+   * @param msg      SupervisorMessage received
+   * @return         The existing behavior
+   */
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
@@ -89,6 +108,10 @@ class SupervisorBehavior(
     this
   }
 
+  /**
+   * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
+   * @return        The existing behavior
+   */
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
       log.warn(
@@ -98,9 +121,8 @@ class SupervisorBehavior(
       lifecycleState match {
         case SupervisorLifecycleState.Restart  ⇒ spawn()
         case SupervisorLifecycleState.Shutdown ⇒ coordinatedShutdown()
-        case SupervisorLifecycleState.Idle ⇒
-          if (isStandalone) throw InitializationFailed
-        case _ ⇒
+        case SupervisorLifecycleState.Idle     ⇒ if (isStandalone) throw InitializationFailed
+        case _                                 ⇒
       }
       this
     case PostStop ⇒
@@ -109,7 +131,11 @@ class SupervisorBehavior(
       this
   }
 
-  def onCommon(msg: SupervisorCommonMessage): Unit = msg match {
+  /**
+   * Defines action for messages which can be received in any [[SupervisorLifecycleState]] state
+   * @param commonMessage Message representing a message received in any lifecycle state
+   */
+  private def onCommon(commonMessage: SupervisorCommonMessage): Unit = commonMessage match {
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
     case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
     case GetSupervisorLifecycleState(replyTo)          ⇒ replyTo ! lifecycleState
@@ -120,12 +146,17 @@ class SupervisorBehavior(
       )
       lifecycleState = SupervisorLifecycleState.Shutdown
       ctx.child(componentActorName) match {
-        case Some(componentRef) ⇒ ctx.stop(componentRef)
-        case None               ⇒ coordinatedShutdown()
+        case Some(componentRef) ⇒
+          ctx.stop(componentRef) // stop component actor for a graceful shutdown before shutting down the actor system
+        case None ⇒ coordinatedShutdown()
       }
   }
 
-  def onIdle(msg: SupervisorIdleMessage): Unit = msg match {
+  /**
+   * Defines action for messages which can be received in [[SupervisorLifecycleState.Idle]] state
+   * @param idleMessage  Message representing a message received in [[SupervisorLifecycleState.Idle]] state
+   */
+  private def onIdle(idleMessage: SupervisorIdleMessage): Unit = idleMessage match {
     case RegistrationSuccess(componentRef) ⇒
       onRegistrationComplete(componentRef)
     case RegistrationNotRequired(componentRef) ⇒
@@ -145,18 +176,12 @@ class SupervisorBehavior(
       component.foreach(ctx.stop)
   }
 
-  private def onRegistrationComplete(componentRef: ActorRef[RunningMessage]): Unit = {
-    lifecycleState = SupervisorLifecycleState.Running
-    runningComponent = Some(componentRef)
-    maybeContainerRef foreach { container ⇒
-      container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
-      log.debug(s"Supervisor acknowledged container :[$container] for lifecycle state :[$lifecycleState]")
-    }
-    pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
-  }
-
-  private def onRunning(supervisorRunningMessage: SupervisorRunningMessage): Unit = {
-    supervisorRunningMessage match {
+  /**
+   * Defines action for messages which can be received in [[SupervisorLifecycleState.Running]] state
+   * @param runningMessage  Message representing a message received in [[SupervisorLifecycleState.Running]] state
+   */
+  private def onRunning(runningMessage: SupervisorRunningMessage): Unit = {
+    runningMessage match {
       case runningMessage: RunningMessage ⇒
         runningMessage match {
           case Lifecycle(message) ⇒ onLifeCycle(message)
@@ -166,13 +191,11 @@ class SupervisorBehavior(
     }
   }
 
-  private def onRestart(): Unit = {
-    log.debug(s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Restart}]")
-    lifecycleState = SupervisorLifecycleState.Restart
-    unRegisterFromLocationService()
-  }
-
-  private def onRestarting(msg: SupervisorRestartMessage): Unit = msg match {
+  /**
+   * Defines action for messages which can be received in [[SupervisorLifecycleState.Restart]] state
+   * @param restartMessage  Message representing a message received in [[SupervisorLifecycleState.Restart]] state
+   */
+  private def onRestarting(restartMessage: SupervisorRestartMessage): Unit = restartMessage match {
     case UnRegistrationComplete ⇒
       log.info("Supervisor unregistered itself from location service")
       respawnComponent()
@@ -181,10 +204,16 @@ class SupervisorBehavior(
       respawnComponent()
   }
 
+  private def onRestart(): Unit = {
+    log.debug(s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Restart}]")
+    lifecycleState = SupervisorLifecycleState.Restart
+    unRegisterFromLocationService()
+  }
+
   private def respawnComponent(): Unit = {
     log.info("Supervisor re-spawning component")
     ctx.child(componentActorName) match {
-      case Some(_) ⇒ component.foreach(ctx.stop)
+      case Some(_) ⇒ component.foreach(ctx.stop) // stop component actor for a graceful shutdown before restart
       case None    ⇒ spawn()
     }
   }
@@ -222,8 +251,8 @@ class SupervisorBehavior(
       ctx.self ! RegistrationNotRequired(componentRef)
     else {
       locationService.register(akkaRegistration).onComplete {
-        case Success(registrationResult) ⇒ ctx.self ! RegistrationSuccess(componentRef)
-        case Failure(throwable)          ⇒ ctx.self ! RegistrationFailed(throwable)
+        case Success(_)         ⇒ ctx.self ! RegistrationSuccess(componentRef)
+        case Failure(throwable) ⇒ ctx.self ! RegistrationFailed(throwable)
       }
     }
   }
@@ -234,6 +263,16 @@ class SupervisorBehavior(
       case Success(_)         ⇒ ctx.self ! UnRegistrationComplete
       case Failure(throwable) ⇒ ctx.self ! UnRegistrationFailed(throwable)
     }
+  }
+
+  private def onRegistrationComplete(componentRef: ActorRef[RunningMessage]): Unit = {
+    lifecycleState = SupervisorLifecycleState.Running
+    runningComponent = Some(componentRef)
+    maybeContainerRef foreach { container ⇒
+      container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
+      log.debug(s"Supervisor acknowledged container :[$container] for lifecycle state :[$lifecycleState]")
+    }
+    pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
   }
 
   private def spawnAndWatchComponent(): Unit = {
@@ -248,8 +287,13 @@ class SupervisorBehavior(
     )
     log.info(s"Starting InitializeTimer for $initializeTimeout")
     timerScheduler.startSingleTimer(InitializeTimerKey, InitializeTimeout, initializeTimeout)
+    // watch created component to get notified when it’s terminated.
     component.foreach(ctx.watch)
   }
 
+  /**
+   * Trigger actor system shutdown with graceful exit from the cluster
+   * @return
+   */
   private def coordinatedShutdown(): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run()
 }

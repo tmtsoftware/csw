@@ -23,6 +23,7 @@ import scala.util.control.NonFatal
 
 /**
  * The Behavior of a component actor represented as a mutable behavior
+ *
  * @param ctx                  The Actor Context under which the actor instance of this behavior is created
  * @param componentInfo        ComponentInfo as described in the configuration file
  * @param supervisor           The actor reference of the supervisor actor which created this component
@@ -48,9 +49,9 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   ctx.self ! Initialize
 
   /**
-   * Defines processing for a [[csw.messages.ComponentMessage]] received by the actor instance.
+   * Defines processing for a [[ComponentMessage]] received by the actor instance.
    * @param msg      ComponentMessage received from supervisor
-   * @return         The same behavior
+   * @return         The existing behavior
    */
   def onMessage(msg: ComponentMessage): Behavior[ComponentMessage] = {
     log.debug(s"Component TLA in lifecycle state :[$lifecycleState] received message :[$msg]")
@@ -65,7 +66,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   /**
    * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
-   * @return        The same behvaior
+   * @return        The existing behavior
    */
   override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
     case PostStop ⇒
@@ -80,7 +81,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   /**
-   * Defines action for messages which can be received in any [[csw.framework.internal.component.ComponentLifecycleState]] state
+   * Defines action for messages which can be received in any [[ComponentLifecycleState]] state
    * @param commonMessage Message representing a message received in any lifecycle state
    */
   private def onCommon(commonMessage: CommonMessage): Unit = commonMessage match {
@@ -92,8 +93,8 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   /**
-   * Defines action for messages which can be received in [[csw.framework.internal.component.ComponentLifecycleState.Idle]] state
-   * @param idleMessage  Message representing a message received in [[csw.framework.internal.component.ComponentLifecycleState.Idle]] state
+   * Defines action for messages which can be received in [[ComponentLifecycleState.Idle]] state
+   * @param idleMessage  Message representing a message received in [[ComponentLifecycleState.Idle]] state
    */
   private def onIdle(idleMessage: IdleMessage): Unit = idleMessage match {
     case Initialize ⇒
@@ -119,8 +120,8 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   /**
-   * Defines action for messages which can be received in [[csw.framework.internal.component.ComponentLifecycleState.Running]] state
-   * @param runningMessage  Message representing a message received in [[csw.framework.internal.component.ComponentLifecycleState.Running]] state
+   * Defines action for messages which can be received in [[ComponentLifecycleState.Running]] state
+   * @param runningMessage  Message representing a message received in [[ComponentLifecycleState.Running]] state
    */
   private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
     case Lifecycle(message) ⇒ onLifecycle(message)
@@ -132,7 +133,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   }
 
   /**
-   * Defines action for messages which alter the [[csw.framework.internal.component.ComponentLifecycleState]] state
+   * Defines action for messages which alter the [[ComponentLifecycleState]] state
    * @param toComponentLifecycleMessage  Message representing a lifecycle message sent by the supervisor to the component
    */
   private def onLifecycle(toComponentLifecycleMessage: ToComponentLifecycleMessage): Unit =
