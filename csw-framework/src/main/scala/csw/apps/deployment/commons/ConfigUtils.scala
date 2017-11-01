@@ -16,8 +16,7 @@ class ConfigUtils(configClientService: ConfigClientService, actorRuntime: ActorR
   def getConfig(
       isLocal: Boolean,
       inputFilePath: Option[Path],
-      defaultConfig: Option[Config],
-      configClientService: ConfigClientService
+      defaultConfig: Option[Config]
   ): Future[Config] = {
     if (inputFilePath.isEmpty && defaultConfig.isEmpty) throw UnableToParseOptions
     if (inputFilePath.isEmpty && defaultConfig.isDefined) {
@@ -25,7 +24,7 @@ class ConfigUtils(configClientService: ConfigClientService, actorRuntime: ActorR
     } else if (isLocal) {
       val config = getConfigFromLocalFile(inputFilePath.get)
       Future.successful(config)
-    } else getConfigFromRemoteFile(inputFilePath.get, configClientService)
+    } else getConfigFromRemoteFile(inputFilePath.get)
   }
 
   def getConfigFromLocalFile(inputFilePath: Path): Config = {
@@ -33,7 +32,7 @@ class ConfigUtils(configClientService: ConfigClientService, actorRuntime: ActorR
     else throw LocalFileNotFound(inputFilePath)
   }
 
-  def getConfigFromRemoteFile(inputFilePath: Path, configClientService: ConfigClientService): Future[Config] =
+  def getConfigFromRemoteFile(inputFilePath: Path): Future[Config] =
     async {
       await(configClientService.getActive(inputFilePath)) match {
         case Some(configData) ⇒ await(configData.toConfigObject)

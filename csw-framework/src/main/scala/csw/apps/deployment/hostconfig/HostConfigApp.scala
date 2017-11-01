@@ -31,7 +31,7 @@ class HostConfigApp(clusterSettings: ClusterSettings, startLogging: Boolean = fa
           if (startLogging) wiring.actorRuntime.startLogging()
 
           val hostConfig = Await.result(
-            wiring.configUtils.getConfig(isLocal, hostConfigPath, None, wiring.configClientService),
+            wiring.configUtils.getConfig(isLocal, hostConfigPath, None),
             10.seconds
           )
           val bootstrapInfo = ConfigParser.parseHost(hostConfig)

@@ -65,8 +65,7 @@ private[containercmd] class ContainerCmd(
       defaultConfig: Option[Config]
   ): Future[ActorRef[_]] = {
     async {
-      val config =
-        await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig, wiring.configClientService))
+      val config   = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
       val actorRef = await(createComponent(standalone, wiring, config))
       log.info(s"Component is successfully created with actor actorRef $actorRef")
       actorRef
