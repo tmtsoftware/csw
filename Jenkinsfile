@@ -4,7 +4,6 @@ pipeline {
     }
 
     options {
-        ansiColor('xterm')
         // using the Timestamper plugin we can add timestamps to the console log
         timestamps()
     }
