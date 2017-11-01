@@ -6,317 +6,173 @@
     "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },
-  "paramSet": [
-    {
-      "keyName": "FloatMatrix",
-      "keyType": "FloatMatrixKey",
-      "values": [
-        {
-          "data": [
-            [
-              16.0,
-              17.0
-            ],
-            [
-              18.0,
-              19.0
-            ]
-          ]
-        }
-      ],
-      "units": "NoUnits"
+  "paramSet" : [ {
+    "keyName" : "LongKey",
+    "keyType" : "LongKey",
+    "values" : [ 50, 60 ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "RaDecKey",
+    "keyType" : "RaDecKey",
+    "values" : [ {
+      "ra" : 7.3,
+      "dec" : 12.1
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "FloatKey",
+    "keyType" : "FloatKey",
+    "values" : [ 90, 100 ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "StructKey",
+    "keyType" : "StructKey",
+    "values" : [ {
+      "paramSet" : [ {
+        "keyName" : "BooleanKey",
+        "keyType" : "BooleanKey",
+        "values" : [ true, false ],
+        "units" : "NoUnits"
+      }, {
+        "keyName" : "ByteKey",
+        "keyType" : "ByteKey",
+        "values" : [ 10, 20 ],
+        "units" : "NoUnits"
+      } ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "IntArrayKey",
+    "keyType" : "IntArrayKey",
+    "values" : [ {
+      "data" : [ 7, 8 ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "IntMatrix",
+    "keyType" : "IntMatrixKey",
+    "values" : [ {
+      "data" : [ [ 12, 13 ], [ 14, 15 ] ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "LongArrayKey",
+    "keyType" : "LongArrayKey",
+    "values" : [ {
+      "data" : [ 5, 6 ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "ShortKey",
+    "keyType" : "ShortKey",
+    "values" : [ 30, 40 ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "LongMatrix",
+    "keyType" : "LongMatrixKey",
+    "values" : [ {
+      "data" : [ [ 8, 9 ], [ 10, 11 ] ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "ByteMatrix",
+    "keyType" : "ByteMatrixKey",
+    "values" : [ {
+      "data" : [ [ 1, 2 ], [ 3, 4 ] ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "ShortArrayKey",
+    "keyType" : "ShortArrayKey",
+    "values" : [ {
+      "data" : [ 3, 4 ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "ByteKey",
+    "keyType" : "ByteKey",
+    "values" : [ 10, 20 ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "DoubleKey",
+    "keyType" : "DoubleKey",
+    "values" : [ 110, 120 ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "DoubleArrayKey",
+    "keyType" : "DoubleArrayKey",
+    "values" : [ {
+      "data" : [ 11, 12 ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "DoubleMatrix",
+    "keyType" : "DoubleMatrixKey",
+    "values" : [ {
+      "data" : [ [ 20, 21 ], [ 22, 23 ] ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "TimestampKey",
+    "keyType" : "TimestampKey",
+    "values" : [ "1970-01-01T00:00:00Z", "2017-09-04T19:00:00.123456789Z" ],
+    "units" : "second"
+  }, {
+    "keyName" : "ByteArrayKey",
+    "keyType" : "ByteArrayKey",
+    "values" : [ {
+      "data" : [ 1, 2 ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "CharKey",
+    "keyType" : "CharKey",
+    "values" : [ "A", "B" ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "IntKey",
+    "keyType" : "IntKey",
+    "values" : [ 70, 80 ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "ChoiceKey",
+    "keyType" : "ChoiceKey",
+    "values" : [ {
+      "name" : "First"
     }, {
-      "keyName": "FloatKey",
-      "keyType": "FloatKey",
-      "values": [
-        90.0,
-        100.0
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "LongArrayKey",
-      "keyType": "LongArrayKey",
-      "values": [
-        {
-          "data": [
-            5,
-            6
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "DoubleKey",
-      "keyType": "DoubleKey",
-      "values": [
-        110.0,
-        120.0
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "StringKey",
-      "keyType": "StringKey",
-      "values": [
-        "Str1",
-        "Str2"
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "StructKey",
-      "keyType": "StructKey",
-      "values": [
-        {
-          "paramSet": [
-            {
-              "keyName": "BooleanKey",
-              "keyType": "BooleanKey",
-              "values": [
-                true,
-                false
-              ],
-              "units": "NoUnits"
-            },
-            {
-              "keyName": "ByteKey",
-              "keyType": "ByteKey",
-              "values": [
-                10,
-                20
-              ],
-              "units": "NoUnits"
-            }
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "ChoiceKey",
-      "keyType": "ChoiceKey",
-      "values": [
-        {
-          "name": "First"
-        },
-        {
-          "name": "Second"
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "LongMatrix",
-      "keyType": "LongMatrixKey",
-      "values": [
-        {
-          "data": [
-            [
-              8,
-              9
-            ],
-            [
-              10,
-              11
-            ]
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "IntKey",
-      "keyType": "IntKey",
-      "values": [
-        70,
-        80
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "DoubleArrayKey",
-      "keyType": "DoubleArrayKey",
-      "values": [
-        {
-          "data": [
-            11.0,
-            12.0
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "LongKey",
-      "keyType": "LongKey",
-      "values": [
-        50,
-        60
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "ShortKey",
-      "keyType": "ShortKey",
-      "values": [
-        30,
-        40
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "TimestampKey",
-      "keyType": "TimestampKey",
-      "values": [
-        "1970-01-01T00:00:00Z",
-        "2017-09-04T19:00:00.123456789Z"
-      ],
-      "units": "second"
-    }, {
-      "keyName": "ByteArrayKey",
-      "keyType": "ByteArrayKey",
-      "values": [
-        {
-          "data": [
-            1,
-            2
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "CharKey",
-      "keyType": "CharKey",
-      "values": [
-        "A",
-        "B"
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "IntMatrix",
-      "keyType": "IntMatrixKey",
-      "values": [
-        {
-          "data": [
-            [
-              12,
-              13
-            ],
-            [
-              14,
-              15
-            ]
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "ByteMatrix",
-      "keyType": "ByteMatrixKey",
-      "values": [
-        {
-          "data": [
-            [
-              1,
-              2
-            ],
-            [
-              3,
-              4
-            ]
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "BooleanKey",
-      "keyType": "BooleanKey",
-      "values": [
-        true,
-        false
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "ByteKey",
-      "keyType": "ByteKey",
-      "values": [
-        10,
-        20
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "DoubleMatrix",
-      "keyType": "DoubleMatrixKey",
-      "values": [
-        {
-          "data": [
-            [
-              20.0,
-              21.0
-            ],
-            [
-              22.0,
-              23.0
-            ]
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "IntArrayKey",
-      "keyType": "IntArrayKey",
-      "values": [
-        {
-          "data": [
-            7,
-            8
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "ShortMatrix",
-      "keyType": "ShortMatrixKey",
-      "values": [
-        {
-          "data": [
-            [
-              4,
-              5
-            ],
-            [
-              6,
-              7
-            ]
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "RaDecKey",
-      "keyType": "RaDecKey",
-      "values": [
-        {
-          "ra": 7.3,
-          "dec": 12.1
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "ShortArrayKey",
-      "keyType": "ShortArrayKey",
-      "values": [
-        {
-          "data": [
-            3,
-            4
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }, {
-      "keyName": "FloatArrayKey",
-      "keyType": "FloatArrayKey",
-      "values": [
-        {
-          "data": [
-            9.0,
-            10.0
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    }
-  ]
+      "name" : "Second"
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "FloatArrayKey",
+    "keyType" : "FloatArrayKey",
+    "values" : [ {
+      "data" : [ 9, 10 ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "StringKey",
+    "keyType" : "StringKey",
+    "values" : [ "Str1", "Str2" ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "BooleanKey",
+    "keyType" : "BooleanKey",
+    "values" : [ true, false ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "ShortMatrix",
+    "keyType" : "ShortMatrixKey",
+    "values" : [ {
+      "data" : [ [ 4, 5 ], [ 6, 7 ] ]
+    } ],
+    "units" : "NoUnits"
+  }, {
+    "keyName" : "FloatMatrix",
+    "keyType" : "FloatMatrixKey",
+    "values" : [ {
+      "data" : [ [ 16, 17 ], [ 18, 19 ] ]
+    } ],
+    "units" : "NoUnits"
+  } ]
 }
