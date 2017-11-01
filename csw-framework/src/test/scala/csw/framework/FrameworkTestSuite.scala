@@ -11,7 +11,8 @@ import csw.messages.ComponentMessage
 import csw.messages.PubSub.PublisherMessage
 import csw.messages.framework.ComponentInfo
 import csw.messages.params.states.CurrentState
-import csw.services.location.scaladsl.{ActorSystemFactory, LocationService}
+import csw.services.location.commons.ActorSystemFactory
+import csw.services.location.scaladsl.LocationService
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await

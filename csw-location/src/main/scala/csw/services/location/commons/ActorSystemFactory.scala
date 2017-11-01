@@ -1,8 +1,7 @@
-package csw.services.location.scaladsl
+package csw.services.location.commons
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
-import csw.services.location.commons.{ClusterSettings, Constants, LocationServiceLogger}
 
 /**
  * ActorSystemFactory creates a remote ActorSystem on the interface where csw-cluster is running. The ActorSystem starts on a

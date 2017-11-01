@@ -23,7 +23,7 @@ import csw.services.commons.commonlogger.JActorSample;
 import csw.services.location.javadsl.*;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
-import csw.services.location.scaladsl.ActorSystemFactory;
+import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.scaladsl.RegistrationFactory;
 import csw.services.logging.internal.LogControlMessages;
 import csw.services.logging.internal.LoggingSystem;

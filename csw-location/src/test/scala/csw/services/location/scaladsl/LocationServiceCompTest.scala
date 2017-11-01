@@ -9,8 +9,8 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.services.location.commons.RegistrationFactory
 import csw.services.location.commons.TestFutureExtension.RichFuture
+import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory}
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
 import csw.services.location.models._

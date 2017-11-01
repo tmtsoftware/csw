@@ -16,8 +16,9 @@ import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
+import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
-import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, RegistrationFactory}
+import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._

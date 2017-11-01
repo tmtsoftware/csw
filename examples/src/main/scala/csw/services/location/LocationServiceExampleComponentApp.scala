@@ -11,8 +11,9 @@ import csw.messages.RunningMessage.DomainMessage
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.commons.commonlogger.SampleLogger
+import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
-import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.LoggingSystemFactory
 

@@ -9,10 +9,9 @@ import akka.typed.scaladsl.adapter.{TypedActorRefOps, UntypedActorSystemOps}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.services.location.commons.{LocationFactory, RegistrationFactory}
+import csw.services.location.commons.{ActorSystemFactory, LocationFactory, RegistrationFactory}
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.internal.Networks
-import csw.services.location.scaladsl.ActorSystemFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await

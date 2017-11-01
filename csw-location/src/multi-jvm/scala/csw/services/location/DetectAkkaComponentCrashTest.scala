@@ -6,10 +6,9 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.services.location.commons.RegistrationFactory
+import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.HttpRegistration
-import csw.services.location.scaladsl.ActorSystemFactory
 import csw.services.logging.scaladsl.LogAdminActorFactory
 
 import scala.concurrent.Await

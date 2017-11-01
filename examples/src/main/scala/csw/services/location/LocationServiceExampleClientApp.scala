@@ -11,8 +11,9 @@ import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.services.commons.commonlogger.SampleLogger
+import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
-import csw.services.location.scaladsl.{ActorSystemFactory, LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
 import csw.services.logging.scaladsl.{Keys, LogAdminActorFactory, LoggingSystemFactory}
 

@@ -23,7 +23,7 @@ import csw.services.location.internal.Networks;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
 import csw.services.location.models.TcpRegistration;
-import csw.services.location.scaladsl.ActorSystemFactory;
+import csw.services.location.commons.ActorSystemFactory;
 import csw.services.logging.javadsl.ILogger;
 import org.junit.After;
 import org.junit.AfterClass;
