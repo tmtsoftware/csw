@@ -34,23 +34,18 @@ class JsonContractTest extends FunSpec with Matchers {
       val raDec2     = RaDec(9.1, 2.9)
       val raDecParam = raDecKey.set(raDec1, raDec2)
 
-<<<<<<< HEAD
       val setup       = Setup(obsId, prefix).add(raDecParam)
-      val setupToJson = JsonSupport.writeSequenceCommand(setup)
-
-      val expectedSetupJson = scala.io.Source
-        .fromResource("json/setup_command.json")
-        .mkString
-        .replace("test-runId", setup.runId.id)
-
-      assert(setupToJson.equals(expectedSetupJson.parseJson))
-=======
-      val setup       = Setup(runId, obsId, prefix).add(raDecParam)
       val setupToJson = Json.prettyPrint(JsonSupport.writeSequenceCommand(setup))
 
-      val expectedSetupJson = Json.prettyPrint(Json.parse(Source.fromResource("json/setup_command.json").mkString))
+      val expectedSetupJson = Json.prettyPrint(
+        Json.parse(
+          Source
+            .fromResource("json/setup_command.json")
+            .mkString
+            .replace("test-runId", setup.runId.id)
+        )
+      )
       setupToJson shouldEqual expectedSetupJson
->>>>>>> #307 - Mahendra - JsonContractTest passing.
     }
 
     it("should adhere to specified standard Observe json format") {
@@ -62,17 +57,10 @@ class JsonContractTest extends FunSpec with Matchers {
 
       val observeToJson = Json.prettyPrint(JsonSupport.writeSequenceCommand(observe))
 
-<<<<<<< HEAD
-      val expectedObserveJson =
-        scala.io.Source
-          .fromResource("json/observe_command.json")
-          .mkString
-          .replace("test-runId", observe.runId.id)
-      assert(observeToJson.equals(expectedObserveJson.parseJson))
-=======
-      val expectedObserveJson = Json.prettyPrint(Json.parse(Source.fromResource("json/observe_command.json").mkString))
+      val expectedObserveJson = Json.prettyPrint(
+        Json.parse(Source.fromResource("json/observe_command.json").mkString.replace("test-runId", observe.runId.id))
+      )
       observeToJson shouldEqual expectedObserveJson
->>>>>>> #307 - Mahendra - JsonContractTest passing.
     }
 
     it("should adhere to specified standard Wait json format") {
@@ -81,23 +69,13 @@ class JsonContractTest extends FunSpec with Matchers {
       val m2: MatrixData[Long] = MatrixData.fromArrays(Array(2, 3, 4), Array(5, 6, 7), Array(8, 9, 10))
       val matrixParam          = k1.set(m1, m2)
 
-<<<<<<< HEAD
       val wait       = Wait(obsId, prefix).add(matrixParam)
-      val waitToJson = JsonSupport.writeSequenceCommand(wait)
-
-      val expectedWaitJson =
-        scala.io.Source
-          .fromResource("json/wait_command.json")
-          .mkString
-          .replace("test-runId", wait.runId.id)
-      assert(waitToJson.equals(expectedWaitJson.parseJson))
-=======
-      val wait       = Wait(runId, obsId, prefix).add(matrixParam)
       val waitToJson = Json.prettyPrint(JsonSupport.writeSequenceCommand(wait))
 
-      val expectedWaitJson = Json.prettyPrint(Json.parse(Source.fromResource("json/wait_command.json").mkString))
+      val expectedWaitJson = Json.prettyPrint(
+        Json.parse(Source.fromResource("json/wait_command.json").mkString.replace("test-runId", wait.runId.id))
+      )
       waitToJson shouldEqual expectedWaitJson
->>>>>>> #307 - Mahendra - JsonContractTest passing.
     }
   }
 
