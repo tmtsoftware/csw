@@ -16,6 +16,6 @@ object EventTime {
   implicit def toCurrent: EventTime                  = EventTime()
   implicit val format: Format[EventTime] = new Format[EventTime] {
     def writes(et: EventTime): JsValue            = JsString(et.toString)
-    def reads(json: JsValue): JsResult[EventTime] = JsSuccess(Instant.parse(Json.stringify(json)))
+    def reads(json: JsValue): JsResult[EventTime] = JsSuccess(json.as[Instant])
   }
 }

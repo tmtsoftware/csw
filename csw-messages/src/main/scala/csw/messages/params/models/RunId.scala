@@ -14,6 +14,6 @@ object RunId {
 
   implicit val format: Format[RunId] = new Format[RunId] {
     override def writes(obj: RunId): JsValue           = JsString(obj.id)
-    override def reads(json: JsValue): JsResult[RunId] = JsSuccess(RunId(Json.stringify(json)))
+    override def reads(json: JsValue): JsResult[RunId] = JsSuccess(RunId(json.as[String]))
   }
 }

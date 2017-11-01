@@ -19,7 +19,7 @@ object ObsId {
 
   implicit val format: Format[ObsId] = new Format[ObsId] {
     override def writes(obj: ObsId): JsValue           = JsString(obj.obsId)
-    override def reads(json: JsValue): JsResult[ObsId] = JsSuccess(ObsId(Json.stringify(json)))
+    override def reads(json: JsValue): JsResult[ObsId] = JsSuccess(ObsId(json.as[String]))
   }
 
   def empty: ObsId = ObsId("")

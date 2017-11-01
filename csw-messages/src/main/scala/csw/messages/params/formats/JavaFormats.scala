@@ -68,7 +68,7 @@ trait JavaFormats { self ⇒
   implicit val doubleReads: Reads[java.lang.Double] = implicitly[Reads[Double]].asInstanceOf[Reads[java.lang.Double]]
 
   implicit val timestampFormat: Format[Instant] = new Format[Instant] {
-    override def reads(json: JsValue): JsResult[Instant] = JsSuccess(Instant.parse(Json.stringify(json)))
+    override def reads(json: JsValue): JsResult[Instant] = JsSuccess(Instant.parse(json.as[String]))
     override def writes(instant: Instant): JsValue       = JsString(instant.toString)
   }
 }

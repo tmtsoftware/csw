@@ -112,9 +112,7 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
   case object JFloatMatrixKey  extends JMatrixKeyType[java.lang.Float, Float]
   case object JDoubleMatrixKey extends JMatrixKeyType[java.lang.Double, Double]
 
-  implicit def format: Format[KeyType[_]] = enumFormat(this)
-
-  implicit def format2[T]: Format[KeyType[T]] = enumFormat(this).asInstanceOf[Format[KeyType[T]]]
+  implicit def format2[T]: Format[KeyType[T]] = implicitly[Format[KeyType[_]]].asInstanceOf[Format[KeyType[T]]]
 
   implicit val typeMapper: TypeMapper[PbKeyType, KeyType[_]] =
     TypeMapper[PbKeyType, KeyType[_]](x ⇒ KeyType.withName(x.toString()))(x ⇒ PbKeyType.fromName(x.toString).get)

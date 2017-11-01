@@ -37,7 +37,7 @@ class JsonTest extends FunSpec {
     val wfos: Subsystem = Subsystem.WFOS
 
     it("should encode and decode properly") {
-      val expectedJson = "\"wfos\""
+      val expectedJson = Json.parse("\"wfos\"")
       val json         = Json.toJson(wfos)
       val sub          = json.as[Subsystem]
       assert(sub == wfos)

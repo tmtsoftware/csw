@@ -8,13 +8,13 @@ import csw.messages.params.states.StateVariable.StateVariable
 import csw.messages.params.states.{CurrentState, DemandState}
 import play.api.libs.json._
 
-object JsonSupport extends JsonSupport with JavaFormats with EnumJsonSupport with WrappedArrayProtocol
+object JsonSupport extends JsonSupport with JavaFormats with WrappedArrayProtocol
 
 /**
  * Supports conversion of commands and events to/from JSON
  */
 //noinspection TypeAnnotation
-trait JsonSupport { self: JavaFormats with EnumJsonSupport with WrappedArrayProtocol ⇒
+trait JsonSupport { self: JavaFormats with WrappedArrayProtocol ⇒
 
   // JSON formats
   lazy val paramSetFormat    = implicitly[Format[Set[Parameter[_]]]]
