@@ -59,7 +59,9 @@ class LocationServiceExampleComponent(locationService: LocationService) extends 
     ActorSystemFactory.remote().spawn(Behavior.empty, "my-actor-1-admin")
   // Register with the location service
   val registrationResult: Future[RegistrationResult] =
-    locationService.register(AkkaRegistration(LocationServiceExampleComponent.connection, self, logAdminActorRef))
+    locationService.register(
+      AkkaRegistration(LocationServiceExampleComponent.connection, Some("nfiraos.ncc.trombone"), self, logAdminActorRef)
+    )
   Await.result(registrationResult, 5.seconds)
 
   log.info("LocationServiceExampleComponent registered.")

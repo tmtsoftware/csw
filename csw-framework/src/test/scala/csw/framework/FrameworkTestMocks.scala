@@ -28,7 +28,7 @@ class FrameworkTestMocks(
     settings: TestKitSettings
 ) extends MockitoSugar {
   val testActor: ActorRef[Any]                                      = testkit.TestProbe("test-probe").testActor
-  val akkaRegistration                                              = AkkaRegistration(mock[AkkaConnection], testActor, testActor)
+  val akkaRegistration                                              = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
   val locationService: LocationService                              = mock[LocationService]
   val registrationResult: RegistrationResult                        = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory                      = mock[RegistrationFactory]

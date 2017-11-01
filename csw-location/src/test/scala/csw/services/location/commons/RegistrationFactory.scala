@@ -6,7 +6,7 @@ import csw.services.location.models.{AkkaRegistration, HttpRegistration, TcpRegi
 
 object RegistrationFactory {
   def akka(connection: AkkaConnection, actorRef: ActorRef[_]) =
-    AkkaRegistration(connection, actorRef, null)
+    AkkaRegistration(connection, Some("nfiraos.ncc.trombone"), actorRef, null)
 
   def http(connection: HttpConnection, port: Int, path: String) = HttpRegistration(connection, port, path, null)
   def tcp(connection: TcpConnection, port: Int)                 = TcpRegistration(connection, port, null)

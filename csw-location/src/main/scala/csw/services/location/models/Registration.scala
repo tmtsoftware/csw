@@ -34,6 +34,7 @@ sealed abstract class Registration {
  */
 final case class AkkaRegistration(
     connection: AkkaConnection,
+    prefix: Option[String],
     actorRef: ActorRef[_],
     logAdminActorRef: ActorRef[LogControlMessages]
 ) extends Registration
@@ -56,7 +57,7 @@ final case class AkkaRegistration(
   /**
    * Create a AkkaLocation that represents the live connection offered by the actor
    */
-  override def location(hostname: String): Location = AkkaLocation(connection, uri, actorRef, logAdminActorRef)
+  override def location(hostname: String): Location = AkkaLocation(connection, prefix, uri, actorRef, logAdminActorRef)
 }
 
 /**

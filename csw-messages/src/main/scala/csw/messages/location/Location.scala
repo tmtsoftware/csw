@@ -27,6 +27,7 @@ sealed abstract class Location extends TMTSerializable {
  */
 final case class AkkaLocation(
     connection: AkkaConnection,
+    prefix: Option[String],
     uri: URI,
     actorRef: ActorRef[Nothing],
     logAdminActorRef: ActorRef[Nothing]

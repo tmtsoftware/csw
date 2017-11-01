@@ -43,7 +43,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     val ctx                                                  = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
     val supervisorFactory: SupervisorInfoFactory             = mock[SupervisorInfoFactory]
     private val testActor: ActorRef[Any]                     = TestProbe("test-probe").testActor
-    val akkaRegistration                                     = AkkaRegistration(mock[AkkaConnection], testActor, testActor)
+    val akkaRegistration                                     = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
     val locationService: LocationService                     = mock[LocationService]
     val registrationResult: RegistrationResult               = mock[RegistrationResult]
     private val pubSubBehaviorFactory: PubSubBehaviorFactory = mock[PubSubBehaviorFactory]

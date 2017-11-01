@@ -23,7 +23,7 @@ object AssemblyApp {
   val connection                                           = AkkaConnection(componentId)
 
   val actorPath: ActorPath = ActorPath.fromString(Serialization.serializedActorPath(assemblyActorRef))
-  val registration         = AkkaRegistration(connection, assemblyActorRef, logAdminActorRef)
+  val registration         = AkkaRegistration(connection, Some("nfiraos.ncc.trombone"), assemblyActorRef, logAdminActorRef)
   val registrationResult: RegistrationResult =
     LocationServiceFactory.withCluster(cswCluster).register(registration).await
 

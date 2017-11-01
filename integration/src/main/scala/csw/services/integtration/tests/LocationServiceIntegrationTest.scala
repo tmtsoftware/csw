@@ -35,7 +35,7 @@ class LocationServiceIntegrationTest
     val componentId         = ComponentId("trombonehcd", ComponentType.HCD)
     val connection          = AkkaConnection(componentId)
 
-    val registration = AkkaRegistration(connection, tromboneHcdActorRef, logAdminActorRef)
+    val registration = AkkaRegistration(connection, Some("nfiraos.ncc.trombone"), tromboneHcdActorRef, logAdminActorRef)
     Thread.sleep(4000)
     intercept[OtherLocationIsRegistered] {
       locationService.register(registration).await

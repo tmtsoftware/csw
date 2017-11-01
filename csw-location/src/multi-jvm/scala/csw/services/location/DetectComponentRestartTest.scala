@@ -32,7 +32,10 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
     runOn(member1) {
       locationService
         .register(
-          AkkaRegistration(akkaConnection, system.spawnAnonymous(Behavior.empty), system.spawnAnonymous(Behavior.empty))
+          AkkaRegistration(akkaConnection,
+                           Some("nfiraos.ncc.trombone"),
+                           system.spawnAnonymous(Behavior.empty),
+                           system.spawnAnonymous(Behavior.empty))
         )
         .await
       enterBarrier("location-registered")
@@ -47,11 +50,10 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
 
       freshLocationService
         .register(
-          AkkaRegistration(
-            akkaConnection,
-            newSystem.spawnAnonymous(Behavior.empty),
-            newSystem.spawnAnonymous(Behavior.empty)
-          )
+          AkkaRegistration(akkaConnection,
+                           Some("nfiraos.ncc.trombone"),
+                           newSystem.spawnAnonymous(Behavior.empty),
+                           newSystem.spawnAnonymous(Behavior.empty))
         )
         .await
       enterBarrier("member-re-registered")

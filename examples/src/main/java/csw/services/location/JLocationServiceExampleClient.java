@@ -24,6 +24,7 @@ import csw.services.location.javadsl.*;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
 import csw.services.location.scaladsl.ActorSystemFactory;
+import csw.services.location.scaladsl.RegistrationFactory;
 import csw.services.logging.internal.LogControlMessages;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
@@ -108,9 +109,11 @@ public class JLocationServiceExampleClient extends JActorSample {
                 "my-actor-1"
         );
 
+        RegistrationFactory registrationFactory = new RegistrationFactory(logAdminActorRef);
+
         // Register UnTyped ActorRef with Location service. Use javadsl Adapter to convert UnTyped ActorRefs
         // to Typed ActorRef[Nothing]
-        AkkaRegistration hcdRegistration = new AkkaRegistration(hcdConnection, Adapter.toTyped(actorRef), logAdminActorRef);
+        AkkaRegistration hcdRegistration = registrationFactory.akkaTyped(hcdConnection, "nfiraos.ncc.trombone", Adapter.toTyped(actorRef));
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************
@@ -123,7 +126,7 @@ public class JLocationServiceExampleClient extends JActorSample {
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
 
         // Register Typed ActorRef[String] with Location Service
-        AkkaRegistration assemblyRegistration = new AkkaRegistration(assemblyConnection, typedActorRef, logAdminActorRef);
+        AkkaRegistration assemblyRegistration = registrationFactory.akkaTyped(assemblyConnection, "nfiraos.ncc.trombone", typedActorRef);
         assemblyRegResult = locationService.register(assemblyRegistration).get();
         //#Components-Connections-Registrations
     }
