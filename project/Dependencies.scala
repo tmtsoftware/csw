@@ -86,8 +86,8 @@ object Dependencies {
   val ConfigApi = Seq(
     Enumeratum.`enumeratum`,
     Akka.`akka-stream`,
-    AkkaHttp.`akka-http-spray-json`,
-    Libs.`spray-json`,
+    Libs.`akka-http-play-json`,
+    Libs.`play-json`,
     Libs.`scalatest`           % Test,
     Akka.`akka-stream-testkit` % Test
   )
@@ -113,7 +113,8 @@ object Dependencies {
 
   val CswClusterSeed = Seq(
     AkkaHttp.`akka-http`,
-    Libs.`spray-json`,
+    Libs.`play-json`,
+    Libs.`akka-http-play-json`,
     Libs.`scopt`,
     Libs.`scalatest` % Test
   )
@@ -135,7 +136,7 @@ object Dependencies {
   val CswCommons = Seq(
     Akka.`akka-stream`,
     AkkaHttp.`akka-http`,
-    Libs.`spray-json`
+    Libs.`play-json`
   )
 
   val CswProdExamples = Seq(

@@ -7,9 +7,10 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import csw.services.config.api.internal.ConfigStreamExts.RichSource
+import csw.commons.http.ErrorResponse
 import csw.services.config.api.commons.BinaryUtils
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
+import csw.services.config.api.internal.ConfigStreamExts.RichSource
 import csw.services.config.api.internal.JsonSupport
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
@@ -224,24 +225,24 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
   }
 
   private def handleResponse[T](response: HttpResponse)(pf: PartialFunction[StatusCode, Future[T]]): Future[T] = {
-    def contentF = Unmarshal(response).to[String]
+    def contentF = Unmarshal(response).to[ErrorResponse]
 
     val defaultHandler: PartialFunction[StatusCode, Future[T]] = {
       case StatusCodes.BadRequest ⇒
-        contentF.map(message ⇒ {
-          val invalidInput = InvalidInput(message)
+        contentF.map(errorResponse ⇒ {
+          val invalidInput = InvalidInput(errorResponse.error.message)
           log.error(invalidInput.getMessage, ex = invalidInput)
           throw invalidInput
         })
       case StatusCodes.NotFound ⇒
-        contentF.map(message ⇒ {
-          val fileNotFound = FileNotFound(message)
+        contentF.map(errorResponse ⇒ {
+          val fileNotFound = FileNotFound(errorResponse.error.message)
           log.error(fileNotFound.getMessage, ex = fileNotFound)
           throw fileNotFound
         })
       case _ ⇒
-        contentF.map(message ⇒ {
-          val runtimeException = new RuntimeException(message)
+        contentF.map(errorResponse ⇒ {
+          val runtimeException = new RuntimeException(errorResponse.error.message)
           log.error(runtimeException.getMessage, ex = runtimeException)
           throw runtimeException
         })
@@ -251,10 +252,12 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     handler(response.status)
   }
 
-  private def handleHistory(uri: Future[Uri],
-                            from: Instant,
-                            to: Instant,
-                            maxResults: Int): Future[List[ConfigFileRevision]] = async {
+  private def handleHistory(
+      uri: Future[Uri],
+      from: Instant,
+      to: Instant,
+      maxResults: Int
+  ): Future[List[ConfigFileRevision]] = async {
     val _uri =
       await(uri).withQuery(Query("maxResults" → maxResults.toString, "from" → from.toString, "to" → to.toString))
 

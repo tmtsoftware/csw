@@ -9,6 +9,8 @@ import akka.http.scaladsl.model.headers.HttpEncoding
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
+import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
+import akka.util.ByteString
 import csw.services.config.api.internal.JsonSupport
 import csw.services.config.api.models.{ConfigData, ConfigId, FileType}
 import csw.services.config.server.commons.{ConfigServerLogger, PathValidator}
@@ -72,4 +74,12 @@ trait HttpSupport extends Directives with JsonSupport with ConfigServerLogger.Si
   implicit val configDataMarshaller: ToEntityMarshaller[ConfigData] = Marshaller.opaque { configData =>
     HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
   }
+
+  implicit val configDataUnmarshaller: FromEntityUnmarshaller[String] =
+    Unmarshaller.byteStringUnmarshaller
+      .forContentTypes(ContentTypes.`application/octet-stream`)
+      .mapWithCharset {
+        case (ByteString.empty, _) => throw Unmarshaller.NoContentException
+        case (data, charset)       => data.decodeString(charset.nioCharset.name)
+      }
 }

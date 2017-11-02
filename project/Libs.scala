@@ -16,13 +16,13 @@ object Libs {
   val `akka-management-cluster-http` = "com.lightbend.akka"     %% "akka-management-cluster-http" % "0.4" //N/A at the moment
   val svnkit                         = "org.tmatesoft.svnkit"   % "svnkit"                        % "1.9.0" //TMate Open Source License
   val `commons-codec`                = "commons-codec"          % "commons-codec"                 % "1.10" //Apache 2.0
-  val `spray-json`                   = "io.spray"               %% "spray-json"                   % "1.3.3" //Apache 2.0
   val `persist-json`                 = "com.persist"            %% "persist-json"                 % "1.2.1" //Apache 2.0
   val `joda-time`                    = "joda-time"              % "joda-time"                     % "2.9.9" //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"         % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"   % "gson"                          % "2.8.2" //Apache 2.0
   val `play-json`                    = "com.typesafe.play"      %% "play-json"                    % "2.6.6" //Apache 2.0
-  val `play-json-extensions`         = "ai.x"                   %% "play-json-extensions"         % "0.10.0"
+  val `play-json-extensions`         = "ai.x"                   %% "play-json-extensions"         % "0.10.0" //Simplified BSD License
+  val `akka-http-play-json`          = "de.heikoseeberger"      %% "akka-http-play-json"          % "1.18.0" //Apache 2.0
   val `scalapb-runtime`              = "com.trueaccord.scalapb" %% "scalapb-runtime"              % scalapbVersion % "protobuf"
   val `scalapb-json4s`               = "com.trueaccord.scalapb" %% "scalapb-json4s"               % "0.3.2"
 }
@@ -60,8 +60,7 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version                = "10.0.10"
-  val `akka-http`            = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
-  val `akka-http-spray-json` = "com.typesafe.akka" %% "akka-http-spray-json" % Version //ApacheV2
-  val `akka-http-testkit`    = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
+  val Version             = "10.0.10"
+  val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
+  val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
 }

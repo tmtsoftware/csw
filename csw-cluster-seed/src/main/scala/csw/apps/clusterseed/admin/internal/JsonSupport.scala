@@ -1,17 +1,17 @@
 package csw.apps.clusterseed.admin.internal
 
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.models.LogMetadata
-import spray.json.{DefaultJsonProtocol, JsString, JsValue, RootJsonFormat}
+import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
+import play.api.libs.json._
 
-trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol with ClusterSeedLogger.Simple {
-  implicit val levelFormat: RootJsonFormat[Level] = new RootJsonFormat[Level] {
-    override def write(obj: Level): JsValue = JsString(obj.name)
+trait JsonSupport extends PlayJsonSupport with ClusterSeedLogger.Simple {
+  implicit val levelFormat: Format[Level] = new Format[Level] {
+    override def writes(obj: Level): JsValue = JsString(obj.name)
 
-    override def read(json: JsValue): Level = json match {
-      case JsString(value) ⇒ Level(value)
+    override def reads(json: JsValue): JsResult[Level] = json match {
+      case JsString(value) ⇒ JsSuccess(Level(value))
       case _ ⇒
         val runtimeException = new RuntimeException(s"can not parse $json")
         log.error(runtimeException.getMessage, ex = runtimeException)
@@ -19,5 +19,5 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol with Cluster
     }
   }
 
-  implicit val logMetadataFormat: RootJsonFormat[LogMetadata] = jsonFormat4(LogMetadata.apply)
+  implicit val logMetadataFormat = Json.format[LogMetadata]
 }
