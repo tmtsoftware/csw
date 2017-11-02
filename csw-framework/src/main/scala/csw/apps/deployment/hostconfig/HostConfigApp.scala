@@ -35,13 +35,14 @@ class HostConfigApp(clusterSettings: ClusterSettings, startLogging: Boolean = fa
           )
           val bootstrapInfo = ConfigParser.parseHost(hostConfig)
           log.info(s"Bootstrapping containers: [${bootstrapInfo.containers}]")
-          val processes = bootstrapContainers(bootstrapInfo)
+          val processes: Set[(String, process.Process)] = bootstrapContainers(bootstrapInfo)
 
-          processes.foreach {
-            case (container, process) ⇒
-              log.info(s"Status of container process for $container => isAlive = ${process.isAlive()}")
-          }
+          // once all the processes are started for each container,
+          // host applications actor system is no longer needed,
+          // otherwise it will keep taking part of cluster decisions
+          shutdown()
 
+          waitForProcessTermination(processes)
         } catch {
           case NonFatal(ex) ⇒
             log.error(s"${ex.getMessage}", ex = ex)
@@ -62,6 +63,12 @@ class HostConfigApp(clusterSettings: ClusterSettings, startLogging: Boolean = fa
         case ContainerBootstrapInfo(executable, Standalone, configPath, Local) ⇒
           executable → s"$executable $configPath --local --standalone".run()
       }
+  }
+
+  private def waitForProcessTermination(processes: Set[(String, process.Process)]): Unit = processes.foreach {
+    case (container, process) ⇒
+      val exitCode = process.exitValue()
+      log.info(s"Container $container exited with code: [$exitCode]")
   }
 
   private def shutdown() = Await.result(wiring.actorRuntime.shutdown(), 10.seconds)

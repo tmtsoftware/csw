@@ -10,8 +10,8 @@ import csw.messages.params.models.{Choice, ObsId, Prefix, RunId}
 import csw.messages.params.states.CurrentState
 
 object TromboneHcdState {
-  val tromboneConfigFile = new File("trombone/tromboneHCD.conf")
-  val resource           = new File("tromboneHCD.conf")
+  val tromboneConfigFile = new File("hcdStandalone.conf")
+  val resource           = new File("tromboneHCDAxisConfig.conf")
 
   // HCD Info
   val componentName = "lgsTromboneHCD"

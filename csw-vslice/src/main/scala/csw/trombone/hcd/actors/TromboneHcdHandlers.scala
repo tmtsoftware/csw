@@ -5,6 +5,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
@@ -148,7 +149,8 @@ class TromboneHcdHandlers(
       stats = as
   }
 
-  private def getAxisConfig: Future[AxisConfig] = ???
+  private def getAxisConfig: Future[AxisConfig] = Future(AxisConfig(ConfigFactory.load("tromboneHCDAxisConfig.conf")))
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit =
+    println(s"Received tracking event: [$trackingEvent]")
 }

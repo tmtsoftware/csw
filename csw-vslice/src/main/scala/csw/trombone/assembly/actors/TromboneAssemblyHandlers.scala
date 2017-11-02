@@ -2,6 +2,7 @@ package csw.trombone.assembly.actors
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
+import com.typesafe.config.ConfigFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.CommandMessage.Submit
 import csw.messages.PubSub.PublisherMessage
@@ -52,14 +53,15 @@ class TromboneAssemblyHandlers(
 
   def initialize(): Future[Unit] = async {
     val (calculationConfig, controlConfig) = await(getAssemblyConfigs)
-    ac = AssemblyContext(componentInfo.asInstanceOf[ComponentInfo], calculationConfig, controlConfig)
+    ac = AssemblyContext(componentInfo, calculationConfig, controlConfig)
 
     val eventPublisher = ctx.spawnAnonymous(TrombonePublisher.make(ac))
 
     commandHandler =
       ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcds, Some(eventPublisher)))
 
-    diagPublsher = ctx.spawnAnonymous(DiagPublisher.make(ac, runningHcds.head._2, Some(eventPublisher)))
+    val hcdRef = if (runningHcds.nonEmpty) runningHcds.head._2 else None
+    diagPublsher = ctx.spawnAnonymous(DiagPublisher.make(ac, hcdRef, Some(eventPublisher)))
   }
 
   override def onShutdown(): Future[Unit] = {
@@ -89,7 +91,10 @@ class TromboneAssemblyHandlers(
 
   override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted(controlCommand.runId)
 
-  private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = ???
+  private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = {
+    val config = ConfigFactory.load("tromboneAssemblyContext.conf")
+    Future((TromboneCalculationConfig(config), TromboneControlConfig(config)))
+  }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {
     trackingEvent match {
