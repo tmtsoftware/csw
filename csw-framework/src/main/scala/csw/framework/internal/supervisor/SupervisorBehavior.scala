@@ -189,6 +189,7 @@ class SupervisorBehavior(
           case _                  ⇒
         }
         runningComponent.get ! runningMessage
+      case Running(_) ⇒ log.info("Component TLA restarted while Running")
     }
   }
 

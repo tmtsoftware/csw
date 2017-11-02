@@ -89,7 +89,7 @@ object SupervisorIdleMessage {
   case object InitializeTimeout                                              extends SupervisorIdleMessage
 }
 
-sealed trait FromComponentLifecycleMessage extends SupervisorIdleMessage
+sealed trait FromComponentLifecycleMessage extends SupervisorIdleMessage with SupervisorRunningMessage
 object FromComponentLifecycleMessage {
   case class Running(componentRef: ActorRef[RunningMessage]) extends FromComponentLifecycleMessage
 }

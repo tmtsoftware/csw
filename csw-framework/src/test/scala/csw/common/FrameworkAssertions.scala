@@ -90,10 +90,24 @@ object FrameworkAssertions extends Matchers {
     traceMsgBlock("message") shouldBe exceptionMessage
   }
 
+  def assertThatExceptionIsNotLogged(
+      logBuffer: mutable.Buffer[JsonObject],
+      message: String,
+  ): Unit = {
+    val maybeLogMsg = findLogMessageSubString(logBuffer, message)
+    assert(maybeLogMsg.isEmpty, s"$message found in $logBuffer")
+  }
+
   private def findLogMessage(logBuffer: mutable.Buffer[JsonObject], message: String): Option[JsonObject] =
     logBuffer.find(_.exists {
       case (_, `message`) ⇒ true
       case (_, _)         ⇒ false
+    })
+
+  private def findLogMessageSubString(logBuffer: mutable.Buffer[JsonObject], message: String): Option[JsonObject] =
+    logBuffer.find(_.exists {
+      case (_, actualMessage: String) if actualMessage.startsWith(message) ⇒ true
+      case (_, _)                                                          ⇒ false
     })
 
   private def sanitizeClassName(className: String): String =

@@ -7,18 +7,22 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import csw.common.FrameworkAssertions._
+import csw.common.components.ComponentDomainMessage
 import csw.common.components.SampleComponentState._
-import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
 import csw.common.utils.TestAppender
 import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
+import csw.messages.CommandMessage.Submit
 import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.messages._
+import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.params.generics.{KeyType, Parameter}
+import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
@@ -37,6 +41,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
   var supervisorRef: ActorRef[SupervisorExternalMessage]                 = _
   var initializeAnswer: Answer[Future[Unit]]                             = _
+  var submitAnswer: Answer[Future[Unit]]                                 = _
   var shutdownAnswer: Answer[Future[Unit]]                               = _
   var runAnswer: Answer[Future[Unit]]                                    = _
 
@@ -138,30 +143,56 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     verify(locationService).register(akkaRegistration)
   }
 
+  // DEOPSCSW-294 : FailureRestart exception from onDomainMsg, onSetup or onObserve component handlers results into unexpected message to supervisor
+  test("handle TLA failure with FailureRestart exception in Running") {
+    val testMocks = frameworkTestMocks()
+    import testMocks._
+
+    val componentHandlers   = createComponentHandlers(testMocks)
+    val failureRestartExMsg = "testing FailureRestart"
+    val unexpectedMessage   = "Unexpected message :[Running"
+
+    val obsId: ObsId          = ObsId("Obs001")
+    val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
+    val setup: Setup          = Setup(obsId, successPrefix, Set(param))
+
+    doThrow(FailureRestart(failureRestartExMsg))
+      .when(componentHandlers)
+      .onSubmit(any[ControlCommand], any[ActorRef[CommandResponse]])
+
+    createSupervisorAndStartTLA(testMocks, componentHandlers)
+
+    // component Intializes succesfully
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+
+    // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
+    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+
+    // Supervisor sends component a submit command which will fail with FailureRestart exception on calling onSubmit Handler
+    supervisorRef ! Submit(setup, TestProbe[CommandResponse].ref)
+
+    // Component initializes again by the akka framework without termination
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+
+    supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
+
+    // Supervisor is still in the Running lifecycle state
+    supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Running)
+
+    Thread.sleep(100)
+
+    // Assert that the error log statement of type "Unexpected message received in Running lifecycle state" is not generated
+    assertThatExceptionIsNotLogged(
+      logBuffer,
+      unexpectedMessage,
+    )
+  }
+
   private def createSupervisorAndStartTLA(
       testMocks: FrameworkTestMocks,
       componentHandlers: ComponentHandlers[ComponentDomainMessage]
   ): Unit = {
     import testMocks._
-
-    val componentBehaviorFactory = mock[ComponentBehaviorFactory[ComponentDomainMessage]]
-    when(
-      componentBehaviorFactory.make(
-        any[ComponentInfo],
-        any[ActorRef[FromComponentLifecycleMessage]],
-        any[ActorRef[PublisherMessage[CurrentState]]],
-        any[LocationService]
-      )
-    ).thenCallRealMethod()
-
-    when(
-      componentBehaviorFactory.handlers(
-        any[ActorContext[ComponentMessage]],
-        any[ComponentInfo],
-        any[ActorRef[PublisherMessage[CurrentState]]],
-        any[LocationService]
-      )
-    ).thenReturn(componentHandlers)
 
     val supervisorBehavior = SupervisorBehaviorFactory.make(
       Some(mock[ActorRef[ContainerIdleMessage]]),
@@ -169,7 +200,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       locationService,
       registrationFactory,
       pubSubBehaviorFactory,
-      componentBehaviorFactory
+      new SampleBehaviorFactory(componentHandlers)
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
@@ -181,7 +212,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     createAnswers(compStateProbe)
 
-    val componentHandlers = mock[SampleComponentHandlers]
+    val componentHandlers = mock[ComponentHandlers[ComponentDomainMessage]]
     when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
     when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
     componentHandlers
@@ -194,4 +225,14 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     shutdownAnswer = (_) ⇒
       Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
   }
+}
+
+class SampleBehaviorFactory(componentHandlers: ComponentHandlers[ComponentDomainMessage])
+    extends ComponentBehaviorFactory[ComponentDomainMessage] {
+  override protected[framework] def handlers(
+      ctx: ActorContext[ComponentMessage],
+      componentInfo: ComponentInfo,
+      pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+      locationService: LocationService
+  ): ComponentHandlers[ComponentDomainMessage] = componentHandlers
 }
