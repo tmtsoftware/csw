@@ -16,7 +16,7 @@ import scala.concurrent.Future
 import scala.reflect.ClassTag
 
 /**
- * Contract for component handlers which will be used by the component actor
+ * Base class for component handlers which will be used by the component actor
  * @param ctx               The Actor Context under which the actor instance of the component, which use these handlers, is created
  * @param componentInfo     Component related information as described in the configuration file
  * @param pubSubRef         The pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]] for this component

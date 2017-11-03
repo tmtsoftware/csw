@@ -12,6 +12,10 @@ import csw.services.location.scaladsl.LocationService
 
 import scala.reflect.ClassTag
 
+/**
+ * Base class for the factory for creating the behavior representing a component actor
+ * @tparam Msg  The type of messages created for domain specific message hierarchy of the component
+ */
 abstract class JComponentBehaviorFactory[Msg <: DomainMessage](
     klass: Class[Msg]
 ) extends ComponentBehaviorFactory[Msg]()(ClassTag(klass)) {

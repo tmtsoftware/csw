@@ -10,6 +10,13 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 /**
  * The information needed to create a component
+ * @param name                          The name of the component
+ * @param componentType                 The type of the component as defined by [[csw.messages.location.ComponentType]]
+ * @param prefix                        Identifies the subsystem
+ * @param behaviorFactoryClassName      Specifies the component to be created by name of the class of it's factory
+ * @param locationServiceUsage          Specifies component's usage of location service
+ * @param connections                   Set of connections that will be used by this component for interaction
+ * @param initializeTimeout             The timeout value used while initializing a component
  */
 final case class ComponentInfo(
     name: String,

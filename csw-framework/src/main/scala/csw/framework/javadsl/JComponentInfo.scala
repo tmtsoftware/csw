@@ -8,6 +8,9 @@ import csw.messages.location.{ComponentType, Connection}
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.concurrent.duration.FiniteDuration
 
+/**
+ * Java API for creating [[csw.messages.framework.ComponentInfo]]
+ */
 object JComponentInfo {
 
   def from(
