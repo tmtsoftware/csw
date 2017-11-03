@@ -16,10 +16,10 @@ import scala.concurrent.Future
 import scala.reflect.ClassTag
 
 /**
- *
+ * Contract for component handlers which will be used by the component actor
  * @param ctx               The Actor Context under which the actor instance of the component, which use these handlers, is created
  * @param componentInfo     Component related information as described in the configuration file
- * @param pubSubRef         The pub sub actor to publish state represented by [[CurrentState]] for this component
+ * @param pubSubRef         The pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]] for this component
  * @param locationService   The single instance of Location service created for a running application
  * @tparam Msg              The type of messages created for domain specific message hierarchy of any component
  */
@@ -41,7 +41,7 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
   def onGoOnline(): Unit
 
   /**
-   * Track any connection. The handlers for received events are defined in `onLocationTrackingEvent` method
+   * Track any connection. The handlers for received events are defined in onLocationTrackingEvent() method
    * @param connection Connection to be tracked for location updates
    */
   def trackConnection(connection: Connection): Unit =

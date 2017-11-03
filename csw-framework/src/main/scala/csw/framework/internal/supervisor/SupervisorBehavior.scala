@@ -53,7 +53,8 @@ object SupervisorBehavior {
  * @param componentBehaviorFactory   The factory for creating the component supervised by this Supervisor
  * @param pubSubBehaviorFactory      The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
  *                                   for utilising pub-sub of any state of a component
- * @param registrationFactory        The factory for creating a typed [[AkkaRegistration]] from [[AkkaConnection]]
+ * @param registrationFactory        The factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
+ *                                   [[csw.messages.location.Connection.AkkaConnection]]
  * @param locationService            The single instance of Location service created for a running application
  */
 class SupervisorBehavior(
@@ -89,7 +90,7 @@ class SupervisorBehavior(
   spawnAndWatchComponent()
 
   /**
-   * Defines processing for a [[SupervisorMessage]] received by the actor instance.
+   * Defines processing for a [[csw.messages.SupervisorMessage]] received by the actor instance.
    * @param msg      SupervisorMessage received
    * @return         The existing behavior
    */

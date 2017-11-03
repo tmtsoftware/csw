@@ -28,7 +28,8 @@ import scala.util.{Failure, Success}
  * @param ctx                       The Actor Context under which the actor instance of this behavior is created
  * @param containerInfo             Container related information as described in the configuration file
  * @param supervisorInfoFactory     The factory for creating the Supervisors for components described in ContainerInfo
- * @param registrationFactory       The factory for creating a typed [[AkkaRegistration]] from [[AkkaConnection]]
+ * @param registrationFactory       The factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
+                                    [[csw.messages.location.Connection.AkkaConnection]]
  * @param locationService           The single instance of Location service created for a running application
  */
 class ContainerBehavior(
@@ -57,7 +58,7 @@ class ContainerBehavior(
   createComponents(containerInfo.components)
 
   /**
-   * Defines processing for a [[ContainerMessage]] received by the actor instance.
+   * Defines processing for a [[csw.messages.ContainerMessage]] received by the actor instance.
    * @param msg      ContainerMessage received
    * @return         The existing behavior
    */
@@ -95,7 +96,7 @@ class ContainerBehavior(
   }
 
   /**
-   * Defines action for messages which can be received in any [[ContainerLifecycleState]] state
+   * Defines action for messages which can be received in any [[csw.messages.framework.ContainerLifecycleState]] state
    * @param commonMessage Message representing a message received in any lifecycle state
    */
   def onCommon(commonMessage: ContainerCommonMessage): Unit = commonMessage match {
@@ -115,8 +116,8 @@ class ContainerBehavior(
   }
 
   /**
-   * Defines action for messages which can be received in [[ContainerLifecycleState.Idle]] state
-   * @param idleMessage  Message representing a message received in [[ContainerLifecycleState.Idle]] state
+   * Defines action for messages which can be received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
+   * @param idleMessage  Message representing a message received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
    */
   def onIdle(idleMessage: ContainerIdleMessage): Unit = idleMessage match {
     case SupervisorsCreated(supervisorInfos) ⇒

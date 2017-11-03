@@ -13,6 +13,9 @@ import scala.async.Async._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.control.NonFatal
 
+/**
+ * The factory for creating supervisor actors of a component specified by [[csw.messages.framework.ComponentInfo]]
+ */
 class SupervisorInfoFactory(containerName: String) extends ComponentLogger.Simple {
 
   override protected def componentName(): String = containerName

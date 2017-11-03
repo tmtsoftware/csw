@@ -49,7 +49,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   ctx.self ! Initialize
 
   /**
-   * Defines processing for a [[ComponentMessage]] received by the actor instance.
+   * Defines processing for a [[csw.messages.ComponentMessage]] received by the actor instance.
    * @param msg      ComponentMessage received from supervisor
    * @return         The existing behavior
    */

@@ -8,6 +8,9 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.{ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 
+/**
+ * The factory for creating [[akka.typed.scaladsl.Actor.MutableBehavior]] of the supervisor of a component
+ */
 object SupervisorBehaviorFactory {
 
   def make(

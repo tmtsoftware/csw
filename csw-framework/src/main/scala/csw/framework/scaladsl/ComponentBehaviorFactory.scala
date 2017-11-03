@@ -1,6 +1,5 @@
 package csw.framework.scaladsl
 
-import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.framework.internal.component.ComponentBehavior
@@ -23,7 +22,8 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
    * Implement this method for providing the component handlers to be used by component actor
    * @param ctx               The Actor Context under which the actor instance of this behavior is created
    * @param componentInfo     Component related information as described in the configuration file
-   * @param pubSubRef         The pub sub actor to publish state represented by [[CurrentState]] for this component
+   * @param pubSubRef         The pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]]
+   *                          for this component
    * @param locationService   The single instance of Location service created for a running application
    * @return                  ComponentHandlers to be used by this component
    */
@@ -35,10 +35,11 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
   ): ComponentHandlers[Msg]
 
   /**
-   * Creates the [[MutableBehavior]] of the component
+   * Creates the [[akka.typed.scaladsl.Actor.MutableBehavior]] of the component
    * @param componentInfo     Component related information as described in the configuration file
    * @param supervisor        The actor reference of the supervisor actor which created this component
-   * @param pubSubRef         The pub sub actor to publish state represented by [[CurrentState]] for this component
+   * @param pubSubRef         The pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]]
+   *                          for this component
    * @param locationService   The single instance of Location service created for a running application
    * @return                  Behavior for component Actor
    */

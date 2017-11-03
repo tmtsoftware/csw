@@ -17,6 +17,14 @@ import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 
 object ContainerCmd {
+
+  /**
+   * Utility for starting a Container to host components or start a component in Standalone mode.
+   * @param name              The name to be used for the main app which uses this utility
+   * @param args              The command line args accepted in the main app which uses this utility
+   * @param defaultConfig     The default configuration which specifies the container or the component in standalone mode
+   * @return
+   */
   def start(name: String, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[_] =
     new ContainerCmd(name, ClusterAwareSettings, true, defaultConfig).start(args)
 }
