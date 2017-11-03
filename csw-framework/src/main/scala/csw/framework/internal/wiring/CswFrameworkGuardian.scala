@@ -5,6 +5,11 @@ import akka.typed.scaladsl.Actor
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.{ActorRef, Behavior, Props, Terminated}
 
+/**
+ * This actor should be used for spawning actors which needs to be spawned directly from the actor system.
+ * This is because the actor system used in csw is an `untyped` actor system which spawns a typed actor with default
+ * supervision strategy of `restart` rather than stopping the actor which is the default in the `typed` actor system.
+ */
 object CswFrameworkGuardian {
 
   sealed trait GuardianMsg
