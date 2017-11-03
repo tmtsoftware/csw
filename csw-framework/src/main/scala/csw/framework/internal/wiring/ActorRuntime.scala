@@ -10,6 +10,9 @@ import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
+/**
+ * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
+ */
 class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val actorSystem: ActorSystem     = _actorSystem
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher

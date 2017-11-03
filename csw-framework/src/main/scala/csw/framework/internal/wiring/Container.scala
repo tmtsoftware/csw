@@ -8,6 +8,9 @@ import csw.messages.ContainerMessage
 
 import scala.concurrent.Future
 
+/**
+ * Start a container actor in it's own actor system, using the container information provided in a configuration file
+ */
 object Container {
   def spawn(
       config: Config,
@@ -17,7 +20,7 @@ object Container {
     val containerInfo = ConfigParser.parseContainer(config)
     val containerBehavior: Behavior[ContainerMessage] =
       ContainerBehaviorFactory.behavior(containerInfo, locationService, registrationFactory)
-    val richSystem = new CswFrameworkSystem(actorSystem)
-    richSystem.spawnTyped(containerBehavior, containerInfo.name)
+    val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
+    cswFrameworkSystem.spawnTyped(containerBehavior, containerInfo.name)
   }
 }

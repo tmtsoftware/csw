@@ -7,6 +7,9 @@ import csw.messages.SupervisorExternalMessage
 
 import scala.concurrent.Future
 
+/**
+ * Start a supervisor actor without a container, in it's own actor system, using the component information provided in a configuration file
+ */
 object Standalone {
 
   def spawn(
@@ -22,7 +25,7 @@ object Standalone {
       registrationFactory,
       pubSubBehaviorFactory
     )
-    val richSystem = new CswFrameworkSystem(actorSystem)
-    richSystem.spawnTyped(supervisorBehavior, componentInfo.name)
+    val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
+    cswFrameworkSystem.spawnTyped(supervisorBehavior, componentInfo.name)
   }
 }
