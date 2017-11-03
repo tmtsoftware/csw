@@ -22,7 +22,7 @@ import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
 /**
- * The Behavior of a component actor represented as a mutable behavior
+ * The Behavior of a component actor, represented as a mutable behavior
  *
  * @param ctx                  The Actor Context under which the actor instance of this behavior is created
  * @param componentInfo        ComponentInfo as described in the configuration file

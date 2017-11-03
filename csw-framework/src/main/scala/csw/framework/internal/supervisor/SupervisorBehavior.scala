@@ -43,16 +43,16 @@ object SupervisorBehavior {
 }
 
 /**
- * The Behavior of a Supervisor of a component actor represented as a mutable behavior.
+ * The Behavior of a Supervisor of a component actor, represented as a mutable behavior.
  *
  * @param ctx                        The Actor Context under which the actor instance of this behavior is created
  * @param timerScheduler             Provides support for scheduled `self` messages in an actor
  * @param maybeContainerRef          The container ref of the container under which this supervisor is started if
- *                                  its not running in standalone mode
+ *                                   its not running in standalone mode
  * @param componentInfo              ComponentInfo as described in the configuration file
  * @param componentBehaviorFactory   The factory for creating the component supervised by this Supervisor
  * @param pubSubBehaviorFactory      The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
- *                                  for utilising pub-sub of any state of a component
+ *                                   for utilising pub-sub of any state of a component
  * @param registrationFactory        The factory for creating a typed [[AkkaRegistration]] from [[AkkaConnection]]
  * @param locationService            The single instance of Location service created for a running application
  */

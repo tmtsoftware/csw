@@ -22,6 +22,15 @@ import csw.services.logging.scaladsl.ComponentLogger
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
+/**
+ * The Behavior of a Container of one or more components, represented as a mutable behavior.
+ *
+ * @param ctx                       The Actor Context under which the actor instance of this behavior is created
+ * @param containerInfo             [[ContainerInfo]] as described in the configuration file
+ * @param supervisorInfoFactory     The factory for creating the Supervisors for components described in ContainerInfo
+ * @param registrationFactory       The factory for creating a typed [[AkkaRegistration]] from [[AkkaConnection]]
+ * @param locationService           The single instance of Location service created for a running application
+ */
 class ContainerBehavior(
     ctx: ActorContext[ContainerMessage],
     containerInfo: ContainerInfo,
@@ -32,15 +41,26 @@ class ContainerBehavior(
 
   import ctx.executionContext
 
-  val akkaConnection                                              = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
-  val akkaRegistration: AkkaRegistration                          = registrationFactory.akkaTyped(akkaConnection, ctx.self)
-  var supervisors: Set[SupervisorInfo]                            = Set.empty
+  val akkaConnection                     = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
+  val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
+
+  // Set of successfully created supervisors for components
+  var supervisors: Set[SupervisorInfo] = Set.empty
+
+  // Set of created supervisors which moved into Running state
   var runningComponents: Set[ActorRef[SupervisorExternalMessage]] = Set.empty
   var lifecycleState: ContainerLifecycleState                     = ContainerLifecycleState.Idle
 
   registerWithLocationService()
+
+  // Failure in registration above doesn't affect creation of components
   createComponents(containerInfo.components)
 
+  /**
+   * Defines processing for a [[ContainerMessage]] received by the actor instance.
+   * @param msg      ContainerMessage received
+   * @return         The existing behavior
+   */
   override def onMessage(msg: ContainerMessage): Behavior[ContainerMessage] = {
     log.debug(s"Container in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
@@ -53,6 +73,10 @@ class ContainerBehavior(
     this
   }
 
+  /**
+   * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
+   * @return        The existing behavior
+   */
   override def onSignal: PartialFunction[Signal, Behavior[ContainerMessage]] = {
     case Terminated(supervisor) ⇒
       log.warn(
@@ -70,7 +94,11 @@ class ContainerBehavior(
       this
   }
 
-  def onCommon(commonContainerMessage: ContainerCommonMessage): Unit = commonContainerMessage match {
+  /**
+   * Defines action for messages which can be received in any [[ContainerLifecycleState]] state
+   * @param commonMessage Message representing a message received in any lifecycle state
+   */
+  def onCommon(commonMessage: ContainerCommonMessage): Unit = commonMessage match {
     case GetComponents(replyTo) ⇒
       replyTo ! Components(supervisors.map(_.component))
     case GetContainerLifecycleState(replyTo) ⇒
@@ -86,7 +114,11 @@ class ContainerBehavior(
       supervisors.foreach(_.component.supervisor ! Shutdown)
   }
 
-  def onIdle(idleContainerMessage: ContainerIdleMessage): Unit = idleContainerMessage match {
+  /**
+   * Defines action for messages which can be received in [[ContainerLifecycleState.Idle]] state
+   * @param idleMessage  Message representing a message received in [[ContainerLifecycleState.Idle]] state
+   */
+  def onIdle(idleMessage: ContainerIdleMessage): Unit = idleMessage match {
     case SupervisorsCreated(supervisorInfos) ⇒
       if (supervisorInfos.isEmpty) {
         log.error(s"Failed to spawn supervisors for ComponentInfo's :[${containerInfo.components.mkString(", ")}]")
@@ -104,6 +136,10 @@ class ContainerBehavior(
       }
   }
 
+  /**
+   * Create supervisors for all components and return a set of all successfully created supervisors as a message to self
+   * @param componentInfos Components to be created as specified in the configuration file
+   */
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
     log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
     Future
@@ -113,6 +149,9 @@ class ContainerBehavior(
       .foreach(x ⇒ ctx.self ! SupervisorsCreated(x.flatten))
   }
 
+  /**
+   * Updates ContainerLifecycleState to running if all successfully created supervisors move into running state
+   */
   private def updateContainerStateToRunning(): Unit = {
     if (runningComponents.size == supervisors.size) {
       log.debug(s"Container is changing lifecycle state from [$lifecycleState] to [${ContainerLifecycleState.Running}]")
@@ -125,8 +164,7 @@ class ContainerBehavior(
       s"Container with connection :[${akkaRegistration.connection.name}] is registering with location service with ref :[${akkaRegistration.actorRef}]"
     )
     locationService.register(akkaRegistration).onComplete {
-      case Success(registrationResult) ⇒
-        log.info(s"Container Registration successful with connection: [$akkaConnection]")
+      case Success(_)         ⇒ log.info(s"Container Registration successful with connection: [$akkaConnection]")
       case Failure(throwable) ⇒ log.error(throwable.getMessage, ex = throwable)
     }
   }
