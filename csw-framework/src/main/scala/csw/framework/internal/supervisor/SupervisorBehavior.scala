@@ -49,7 +49,7 @@ object SupervisorBehavior {
  * @param timerScheduler             Provides support for scheduled `self` messages in an actor
  * @param maybeContainerRef          The container ref of the container under which this supervisor is started if
  *                                   its not running in standalone mode
- * @param componentInfo              ComponentInfo as described in the configuration file
+ * @param componentInfo              Component related information as described in the configuration file
  * @param componentBehaviorFactory   The factory for creating the component supervised by this Supervisor
  * @param pubSubBehaviorFactory      The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
  *                                   for utilising pub-sub of any state of a component

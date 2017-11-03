@@ -26,7 +26,7 @@ import scala.util.{Failure, Success}
  * The Behavior of a Container of one or more components, represented as a mutable behavior.
  *
  * @param ctx                       The Actor Context under which the actor instance of this behavior is created
- * @param containerInfo             [[ContainerInfo]] as described in the configuration file
+ * @param containerInfo             Container related information as described in the configuration file
  * @param supervisorInfoFactory     The factory for creating the Supervisors for components described in ContainerInfo
  * @param registrationFactory       The factory for creating a typed [[AkkaRegistration]] from [[AkkaConnection]]
  * @param locationService           The single instance of Location service created for a running application

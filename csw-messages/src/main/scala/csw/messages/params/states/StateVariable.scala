@@ -105,7 +105,7 @@ object DemandState {
 /**
  * A state variable that indicates the ''current'' or actual state.
  *
- * @param prefix identifies the target subsystem
+ * @param prefix       identifies the target subsystem
  * @param paramSet     an optional initial set of items (keys with values)
  */
 case class CurrentState private (prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])

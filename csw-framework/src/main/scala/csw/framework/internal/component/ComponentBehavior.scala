@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
  * The Behavior of a component actor, represented as a mutable behavior
  *
  * @param ctx                  The Actor Context under which the actor instance of this behavior is created
- * @param componentInfo        ComponentInfo as described in the configuration file
+ * @param componentInfo        Component related information as described in the configuration file
  * @param supervisor           The actor reference of the supervisor actor which created this component
  * @param lifecycleHandlers    The implementation of handlers which defines the domain actions to be performed by this
  *                             component
