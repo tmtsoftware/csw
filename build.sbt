@@ -10,6 +10,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-config-client-cli`,
   `csw-config-server`,
   `csw-framework`,
+  `csw-command`,
   `csw-location`,
   `csw-location-agent`,
   `csw-benchmark`,
@@ -157,6 +158,11 @@ lazy val `csw-framework` = project
   .settings(
     libraryDependencies ++= Dependencies.CswFramework
   )
+
+lazy val `csw-command` = project
+  .dependsOn(`csw-messages`)
+  .enablePlugins(AutoMultiJvm, GenJavadocPlugin)
+  .settings(libraryDependencies ++= Dependencies.CswCommand)
 
 lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)

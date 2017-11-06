@@ -133,6 +133,17 @@ object Dependencies {
     Libs.`mockito-core`        % Test
   )
 
+  val CswCommand = Seq(
+    Libs.`scala-async`,
+    Akka.`akka-typed`,
+    Akka.`akka-typed-testkit`  % Test,
+    Akka.`akka-stream-testkit` % Test,
+    Libs.`scalatest`           % Test,
+    Libs.`junit`               % Test,
+    Libs.`junit-interface`     % Test,
+    Libs.`mockito-core`        % Test
+  )
+
   val CswCommons = Seq(
     Akka.`akka-stream`,
     AkkaHttp.`akka-http`,
