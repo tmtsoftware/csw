@@ -21,21 +21,14 @@ trait DerivedJsonFormats { self ⇒
   }
 
   //java
-  implicit val booleanFormat: Format[lang.Boolean] = formatFactory[Boolean, java.lang.Boolean]
-  implicit val characterFormat: Format[lang.Character] = new Format[lang.Character] {
-    override def reads(json: JsValue): JsResult[lang.Character] = json match {
-      case JsString(str) if str.length == 1 => JsSuccess(str.head)
-      case _                                => JsError("error.expected.char")
-    }
-
-    override def writes(o: lang.Character): JsValue = JsString(o.toString)
-  }
-  implicit val byteFormat: Format[lang.Byte]       = formatFactory[Byte, java.lang.Byte]
-  implicit val shortFormat: Format[lang.Short]     = formatFactory[Short, java.lang.Short]
-  implicit val longFormat: Format[lang.Long]       = formatFactory[Long, java.lang.Long]
-  implicit val integerFormat: Format[lang.Integer] = formatFactory[Int, java.lang.Integer]
-  implicit val floatFormat: Format[lang.Float]     = formatFactory[Float, java.lang.Float]
-  implicit val doubleFormat: Format[lang.Double]   = formatFactory[Double, java.lang.Double]
+  implicit val booleanFormat: Format[lang.Boolean]     = formatFactory[Boolean, java.lang.Boolean]
+  implicit val characterFormat: Format[lang.Character] = formatFactory[Char, java.lang.Character]
+  implicit val byteFormat: Format[lang.Byte]           = formatFactory[Byte, java.lang.Byte]
+  implicit val shortFormat: Format[lang.Short]         = formatFactory[Short, java.lang.Short]
+  implicit val longFormat: Format[lang.Long]           = formatFactory[Long, java.lang.Long]
+  implicit val integerFormat: Format[lang.Integer]     = formatFactory[Int, java.lang.Integer]
+  implicit val floatFormat: Format[lang.Float]         = formatFactory[Float, java.lang.Float]
+  implicit val doubleFormat: Format[lang.Double]       = formatFactory[Double, java.lang.Double]
   implicit val timestampFormat: Format[Instant] = new Format[Instant] {
     override def reads(json: JsValue): JsResult[Instant] = JsSuccess(Instant.parse(json.as[String]))
     override def writes(instant: Instant): JsValue       = JsString(instant.toString)

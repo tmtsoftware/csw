@@ -11,7 +11,7 @@ import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
-case class MatrixData[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])(implicit @transient cTag: ClassTag[T]) {
+case class MatrixData[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])(implicit cTag: ClassTag[T]) {
   def apply(row: Int, col: Int): T = data(row)(col)
 
   def values: Array[Array[T]]          = data.array.map(_.array)
