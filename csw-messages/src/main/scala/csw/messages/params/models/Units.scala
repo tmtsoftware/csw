@@ -21,7 +21,7 @@ object Units extends Enum[Units] with PlayJsonEnum[Units] {
     TypeMapper[PbUnits, Units](x ⇒ Units.withName(x.toString()))(x ⇒ PbUnits.fromName(x.toString).get)
 
   // SI units
-  case object angstrom    extends Units("Anstrom", "10 -1 nm")
+  case object angstrom    extends Units("Angstrom", "10 -1 nm")
   case object arcmin      extends Units("arcmin", "arc minute; angular measurement")
   case object arcsec      extends Units("arcsec", "arc second: angular measurement")
   case object day         extends Units("d", "day - 24 hours")
@@ -70,9 +70,9 @@ object Units extends Enum[Units] with PlayJsonEnum[Units] {
   case object cal   extends Units("cal", "thermochemical calorie: pre-SI metric unit of energy")
   case object foot  extends Units("ft", "international foot - 1.2x10+1 inch")
   case object inch  extends Units("inch", "international inch - 2.54 cm")
-  case object pound extends Units("lb", "international avoirdpois pound - 1.6x10+1 oz")
-  case object mile  extends Units("mi", "internatonal mile - 5.28x10+3 ft")
-  case object ounce extends Units("oz", "international avoirdpois ounce")
+  case object pound extends Units("lb", "international avoirdupois pound - 1.6x10+1 oz")
+  case object mile  extends Units("mi", "international mile - 5.28x10+3 ft")
+  case object ounce extends Units("oz", "international avoirdupois ounce")
   case object yard  extends Units("yd", "international yard - 3 ft")
 
   // Others - engineering
