@@ -48,14 +48,12 @@ class ConfigParserTest extends FunSuite with Matchers {
   private val containerInfo = ContainerInfo("Container-1", Set(assemblyInfo, hcd2AInfo, hcd2BInfo))
 
   private val containerBootstrapInfo = ContainerBootstrapInfo(
-    "/TMT/csw-prod/target/universal/stage/bin/container-cmd-app",
     Container,
     "/csw-framework/src/resources/laser_container.conf",
     Local
   )
 
   private val standaloneBootstrapInfo = ContainerBootstrapInfo(
-    "/TMT/csw-prod/target/universal/stage/bin/container-cmd-app",
     Standalone,
     "standalone.conf",
     Remote
@@ -195,14 +193,6 @@ class ConfigParserTest extends FunSuite with Matchers {
   test("should able to parse host config") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/valid_hostconfig.conf")
     ConfigParser.parseHost(config) shouldEqual hostBootstrapInfo
-  }
-
-  test("should able to throw error when 'containerCmdApp' is missing from host config") {
-    val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hostconfig/missing_containerCmdApp.conf")
-
-    intercept[java.lang.RuntimeException] {
-      ConfigParser.parseHost(config)
-    }
   }
 
   test("should able to throw error when provided mode is invalid in host config") {

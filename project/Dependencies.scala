@@ -139,6 +139,10 @@ object Dependencies {
     Libs.`play-json`
   )
 
+  val CswDeploy = Seq(
+    Libs.`scalatest` % Test
+  )
+
   val CswProdExamples = Seq(
     AkkaHttp.`akka-http`,
     Libs.`scalatest`       % Test,

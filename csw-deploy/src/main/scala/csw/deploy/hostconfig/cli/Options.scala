@@ -1,4 +1,4 @@
-package csw.apps.deployment.hostconfig.cli
+package csw.deploy.hostconfig.cli
 
 import java.nio.file.Path
 
@@ -11,5 +11,6 @@ import java.nio.file.Path
  */
 case class Options(
     local: Boolean = false,
-    hostConfigPath: Option[Path] = None
+    hostConfigPath: Option[Path] = None,
+    containerCmdAppScript: Option[String] = None
 )

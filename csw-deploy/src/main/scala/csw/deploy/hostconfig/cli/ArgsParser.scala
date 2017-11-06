@@ -1,4 +1,4 @@
-package csw.apps.deployment.hostconfig.cli
+package csw.deploy.hostconfig.cli
 
 import java.nio.file.Paths
 
@@ -19,6 +19,10 @@ class ArgsParser() {
     arg[String]("<file>") required () action { (x, c) =>
       c.copy(hostConfigPath = Some(Paths.get(x)))
     } text "Required: host configuration file path"
+
+    opt[String]('s', "container-script") required () action { (x, c) =>
+      c.copy(containerCmdAppScript = Some(x))
+    } text "Specifies the generated shell script path of container command app from task `universal:publish` (sbt-native-packager task)"
 
     help("help")
     version("version")
