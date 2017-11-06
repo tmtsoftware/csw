@@ -1,4 +1,4 @@
-package csw.apps.deployment.commons
+package csw.apps.commons
 
 import java.nio.file.{Files, Path}
 

@@ -1,6 +1,6 @@
-package csw.apps.deployment.containercmd.sample
+package csw.apps.containercmd.sample
 
-import csw.apps.deployment.containercmd.ContainerCmd
+import csw.apps.containercmd.ContainerCmd
 
 // DEOPSCSW-171: Starting component from command line
 object ContainerCmdApp extends App {

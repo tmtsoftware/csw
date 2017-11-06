@@ -1,4 +1,4 @@
-package csw.apps.deployment.containercmd.cli
+package csw.apps.containercmd.cli
 
 import java.nio.file.Path
 

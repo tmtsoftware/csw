@@ -1,6 +1,6 @@
 package csw.deploy.containercmd
 
-import csw.apps.deployment.containercmd.ContainerCmd
+import csw.apps.containercmd.ContainerCmd
 
 object ContainerCmdApp extends App {
 

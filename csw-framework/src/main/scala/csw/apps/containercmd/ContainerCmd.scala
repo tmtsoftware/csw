@@ -1,11 +1,11 @@
-package csw.apps.deployment.containercmd
+package csw.apps.containercmd
 
 import java.nio.file.Path
 
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import com.typesafe.config.Config
-import csw.apps.deployment.containercmd.cli.{ArgsParser, Options}
+import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
