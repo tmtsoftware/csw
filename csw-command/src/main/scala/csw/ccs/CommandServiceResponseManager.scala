@@ -19,11 +19,10 @@ class CommandServiceResponseManager(
     componentName: String
 ) extends ComponentLogger.MutableActor[CommandStatePubSub](ctx, componentName) {
 
-  val cmdToSubscribers: mutable.Map[RunId, mutable.Set[ActorRef[CommandResponse]]] = mutable.Map.empty
-  var cmdToSender: mutable.Map[RunId, Option[ActorRef[CommandResponse]]]           = mutable.Map.empty
-  val cmdToCurrentState: mutable.Map[RunId, CommandResponse]                       = mutable.Map.empty
-  val parentToChildren: mutable.Map[RunId, Set[RunId]]                             = mutable.Map.empty
-  val childToParent: mutable.Map[RunId, RunId]                                     = mutable.Map.empty
+  val cmdToCmdStatus: mutable.Map[RunId, CommandState] = mutable.Map.empty
+
+  val parentToChildren: mutable.Map[RunId, Set[RunId]] = mutable.Map.empty
+  val childToParent: mutable.Map[RunId, RunId]         = mutable.Map.empty
 
   override def onMessage(msg: CommandStatePubSub): Behavior[CommandStatePubSub] = {
     msg match {
@@ -32,65 +31,91 @@ class CommandServiceResponseManager(
       case Update(runId, cmdStatus)       ⇒ update(runId, cmdStatus)
       case Subscribe(runId, replyTo)      ⇒ subscribe(runId, replyTo)
       case UnSubscribe(runId, replyTo)    ⇒ unSubscribe(runId, replyTo)
-      case Query(runId, replyTo)          ⇒ replyTo ! cmdToCurrentState.getOrElse(runId, CommandNotAvailable(runId))
+      case Query(runId, replyTo)          ⇒ sendCurrentState(runId, replyTo)
       case ClearCommandState(runId)       ⇒ clearCmdState(runId)
     }
     this
   }
 
-  private def add(runId: RunId, replyTo: Option[ActorRef[CommandResponse]]) = {
-    cmdToSender + (runId       → replyTo)
-    cmdToCurrentState + (runId → Initialized)
-  }
+  private def add(runId: RunId, replyTo: Option[ActorRef[CommandResponse]]) =
+    cmdToCmdStatus + (runId → CommandState(runId, replyTo, Set.empty, Initialized(runId)))
 
-  private def addTo(
-      runIdParent: RunId,
-      runIdChild: RunId
-  ): mutable.Map[RunId, Object] = {
+  private def addTo(runIdParent: RunId, runIdChild: RunId): mutable.Map[RunId, Object] = {
     add(runIdChild, None)
     parentToChildren + (runIdParent → (parentToChildren(runIdParent) + runIdChild))
     childToParent + (runIdChild     → runIdParent)
   }
 
-  private def subscribe(runId: RunId, actorRef: ActorRef[CommandResponse]): Unit = {
-    cmdToSubscribers
+  private def update(
+      runId: RunId,
+      commandResponse: CommandResponse
+  ): Unit = {
+    cmdToCmdStatus
       .get(runId)
-      .foreach(subscribers ⇒ cmdToSubscribers + (runId → (subscribers + actorRef)))
-  }
+      .foreach(cmdState ⇒ cmdToCmdStatus + (runId → cmdState.copy(currentCmdStatus = commandResponse)))
 
-  private def unSubscribe(runId: RunId, actorRef: ActorRef[CommandResponse]): Unit = {
-    cmdToSubscribers
-      .get(runId)
-      .foreach(subscribers ⇒ cmdToSubscribers + (runId → (subscribers - actorRef)))
-  }
-
-  private def update(runId: RunId, commandResponse: CommandResponse): Unit = {
-    cmdToCurrentState + (runId → commandResponse)
     childToParent.get(runId) match {
       case Some(parentId) => updateParent(parentId, runId, commandResponse)
       case None =>
+        if (commandResponse.isInstanceOf[CommandFinalExecutionResponse]) {
+          cmdToCmdStatus(runId).sendStatus()
+        }
         if (commandResponse.isInstanceOf[CommandFinalResponse]) {
           timerScheduler.startSingleTimer("ClearState", ClearCommandState(runId), 10.seconds)
         }
     }
 
-    log.debug(s"Notifying subscribers :[${cmdToSubscribers(runId).mkString(",")}] with data :[$commandResponse]")
-    cmdToSubscribers(runId).foreach(_ ! commandResponse)
+    log.debug(
+      s"Notifying subscribers :[${cmdToCmdStatus(runId).subscribers.mkString(",")}] with data :[$commandResponse]"
+    )
+    cmdToCmdStatus(runId).publishStatus()
   }
 
-  private def updateParent(parentId: RunId, childId: RunId, response: CommandResponse): Unit = {
-    cmdToCurrentState(parentId).asInstanceOf[CommandStateType] match {
-      case _: CommandFinalResponse ⇒ // do nothing
-      case _: CommandIntermediateResponse ⇒
-        val resultType: CommandResultType = response.asInstanceOf[CommandResultType]
-        resultType match {
-          case _: CommandNegativeResponse ⇒ update(parentId, response)
-          case _: CommandPositiveResponse ⇒
-            parentToChildren + (parentId → (parentToChildren(parentId) - parentId))
-            if (parentToChildren(parentId).isEmpty)
-              update(parentId, response)
-        }
+  private def updateParent(
+      parentId: RunId,
+      childId: RunId,
+      responseFromChildCmd: CommandResponse
+  ): Unit =
+    if (cmdToCmdStatus(parentId).currentCmdStatus.isInstanceOf[CommandIntermediateResponse]) {
+      responseFromChildCmd.asInstanceOf[CommandResultType] match {
+        case _: CommandNegativeResponse ⇒ update(parentId, responseFromChildCmd)
+        case _: CommandPositiveResponse ⇒ updateParentForChild(parentId, childId, responseFromChildCmd)
+      }
     }
+
+  private def updateParentForChild(
+      parentId: RunId,
+      childId: RunId,
+      responseFromChildCmd: CommandResponse
+  ): Unit =
+    if (responseFromChildCmd.isInstanceOf[CommandExecutionResponse]) {
+      parentToChildren + (parentId → (parentToChildren(parentId) - childId))
+      if (parentToChildren(parentId).isEmpty)
+        update(parentId, responseFromChildCmd)
+    }
+
+  private def subscribe(
+      runId: RunId,
+      actorRef: ActorRef[CommandResponse]
+  ): Unit =
+    cmdToCmdStatus
+      .get(runId)
+      .foreach(cmdState ⇒ cmdToCmdStatus + (runId → cmdState.copy(subscribers = cmdState.subscribers + actorRef)))
+
+  private def unSubscribe(
+      runId: RunId,
+      actorRef: ActorRef[CommandResponse]
+  ): Unit =
+    cmdToCmdStatus
+      .get(runId)
+      .foreach(cmdState ⇒ cmdToCmdStatus + (runId → cmdState.copy(subscribers = cmdState.subscribers - actorRef)))
+
+  private def sendCurrentState(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit = {
+    val currentCmdState = cmdToCmdStatus.get(runId) match {
+      case Some(cmdState) => cmdState.currentCmdStatus
+      case None           => CommandNotAvailable(runId)
+    }
+    replyTo ! currentCmdState
   }
 
   def clearCmdState(runId: RunId) = ???

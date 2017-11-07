@@ -86,9 +86,6 @@ object CommandIntermediateExecutionResponse {
    * The command is currently executing or has not yet started
    * When used for a specific command, it indicates the command has not yet executed or is currently executing and is providing an update
    */
-  final case class InProgress(runId: RunId, message: String = "")
-      extends CommandFinalExecutionResponse
-      with CommandIntermediateResponse
-
-  final case class Initialized(runId: RunId) extends CommandFinalExecutionResponse with CommandIntermediateResponse
+  final case class InProgress(runId: RunId, message: String = "") extends CommandIntermediateExecutionResponse
+  final case class Initialized(runId: RunId)                      extends CommandIntermediateExecutionResponse
 }
