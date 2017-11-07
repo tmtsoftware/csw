@@ -37,6 +37,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers[Msg],
+    cmdServiceResponseManager: ActorRef[CommandStatePubSub],
     locationService: LocationService
 ) extends ComponentLogger.MutableActor[ComponentMessage](ctx, componentInfo.name) {
 

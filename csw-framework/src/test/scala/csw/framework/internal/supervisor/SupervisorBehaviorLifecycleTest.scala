@@ -58,12 +58,12 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)
   }
 
-  test("supervisor should start in Idle lifecycle state and spawn three actors") {
+  test("supervisor should start in Idle lifecycle state and spawn four actors") {
     val testData = new TestData(hcdInfo)
     import testData._
 
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
-    ctx.children.size shouldBe 3
+    ctx.children.size shouldBe 4
     verify(timer).startSingleTimer(
       SupervisorBehavior.InitializeTimerKey,
       InitializeTimeout,

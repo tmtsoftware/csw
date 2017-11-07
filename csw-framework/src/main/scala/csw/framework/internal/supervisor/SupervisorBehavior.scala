@@ -5,6 +5,7 @@ import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
+import csw.ccs.CommandServiceResponseManager
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
@@ -36,10 +37,11 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.util.{Failure, Success}
 
 object SupervisorBehavior {
-  val PubSubComponentActor     = "pub-sub-component"
-  val PubSubLifecycleActor     = "pub-sub-lifecycle"
-  val InitializeTimerKey       = "initialize-timer"
-  val ComponentActorNameSuffix = "component-actor"
+  val PubSubComponentActor               = "pub-sub-component"
+  val PubSubLifecycleActor               = "pub-sub-lifecycle"
+  val InitializeTimerKey                 = "initialize-timer"
+  val ComponentActorNameSuffix           = "component-actor"
+  val CommandServiceResponseManagerActor = "command-service-response-mgr"
 }
 
 /**
@@ -82,6 +84,12 @@ class SupervisorBehavior(
     pubSubBehaviorFactory.make(ctx, PubSubComponentActor, componentName)
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
     pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, componentName)
+  val cmdServiceResponseMananger: ActorRef[CommandStatePubSub] = ctx.spawn(
+    Actor.withTimers[CommandStatePubSub](
+      timer ⇒ Actor.mutable[CommandStatePubSub](ctx ⇒ new CommandServiceResponseManager(ctx, timer, componentName))
+    ),
+    CommandServiceResponseManagerActor
+  )
 
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
@@ -283,7 +291,16 @@ class SupervisorBehavior(
     component = Some(
       ctx.spawn[Nothing](
         Actor
-          .supervise[Nothing](componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent, locationService))
+          .supervise[Nothing](
+            componentBehaviorFactory
+              .make(
+                componentInfo,
+                ctx.self,
+                pubSubComponent,
+                cmdServiceResponseMananger,
+                locationService
+              )
+          )
           .onFailure[FailureRestart](SupervisorStrategy.restartWithLimit(3, Duration.Zero).withLoggingEnabled(true)),
         componentActorName
       )
