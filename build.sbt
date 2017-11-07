@@ -160,7 +160,10 @@ lazy val `csw-framework` = project
   )
 
 lazy val `csw-command` = project
-  .dependsOn(`csw-messages`)
+  .dependsOn(
+    `csw-messages`,
+    `csw-logging`
+  )
   .enablePlugins(AutoMultiJvm, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.CswCommand)
 

@@ -6,6 +6,7 @@ import csw.messages.PubSub.SubscriberMessage
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.TrackingEvent
+import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 
 /////////////
@@ -127,3 +128,14 @@ case class Component(supervisor: ActorRef[SupervisorExternalMessage], info: Comp
 case class SupervisorInfo(system: ActorSystem, component: Component)
 
 ////////////////
+
+sealed trait CommandStatePubSub
+object CommandStatePubSub {
+  case class Subscribe(runId: RunId, replyTo: ActorRef[CommandResponse])   extends CommandStatePubSub
+  case class UnSubscribe(runId: RunId, replyTo: ActorRef[CommandResponse]) extends CommandStatePubSub
+  case class Update(runId: RunId, data: CommandResponse)                   extends CommandStatePubSub
+  case class Query(runId: RunId, replyTo: ActorRef[CommandResponse])       extends CommandStatePubSub
+  case class Add(runId: RunId)                                             extends CommandStatePubSub
+  case class AddTo(runIdParent: RunId, runIdChild: RunId)                  extends CommandStatePubSub
+  case class ClearCommandState(runId: RunId)                               extends CommandStatePubSub
+}
