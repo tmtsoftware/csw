@@ -16,6 +16,7 @@ import scala.sys.process
 import scala.sys.process.stringToProcess
 import scala.util.control.NonFatal
 
+// $COVERAGE-OFF$
 class HostConfigApp(clusterSettings: ClusterSettings, startLogging: Boolean = false) extends ComponentLogger.Simple {
 
   lazy val actorSystem: ActorSystem           = clusterSettings.system
@@ -87,3 +88,4 @@ object HostConfigApp extends App {
     new HostConfigApp(ClusterAwareSettings, startLogging = true).start(args)
   }
 }
+// $COVERAGE-ON$
