@@ -13,7 +13,7 @@ import csw.services.logging.scaladsl.ComponentLogger
 import scala.collection.mutable
 import scala.concurrent.duration.DurationDouble
 
-class CommandStateResponseManager(
+class CommandServiceResponseManager(
     ctx: ActorContext[CommandStatePubSub],
     timerScheduler: TimerScheduler[CommandStatePubSub],
     componentName: String
