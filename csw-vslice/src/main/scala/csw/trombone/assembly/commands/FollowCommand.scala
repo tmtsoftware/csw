@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
-import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, NoLongerValid}
+import csw.messages.ccs.commands.CommandFinalExecutionResponse.{Completed, NoLongerValid}
 import csw.messages.ccs.commands.{CommandExecutionResponse, Setup}
 import csw.trombone.assembly.actors.TromboneState.{TromboneState, _}
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext}

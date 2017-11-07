@@ -20,7 +20,8 @@ import csw.messages.SupervisorCommonMessage.{
 }
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages.ccs.CommandIssue
-import csw.messages.ccs.commands.CommandExecutionResponse._
+import csw.messages.ccs.commands.CommandFinalExecutionResponse._
+import csw.messages.ccs.commands.CommandIntermediateExecutionResponse.InProgress
 import csw.messages.ccs.commands.CommandValidationResponse.{Accepted, Invalid}
 import csw.messages.ccs.commands._
 import csw.messages.ccs.events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}

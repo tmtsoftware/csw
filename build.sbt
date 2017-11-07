@@ -143,7 +143,10 @@ lazy val `csw-config-client-cli` = project
   )
 
 lazy val `csw-vslice` = project
-  .dependsOn(`csw-framework`)
+  .dependsOn(
+    `csw-framework`,
+    `csw-command`
+  )
   .enablePlugins(DeployApp)
 
 lazy val `csw-framework` = project
@@ -151,6 +154,7 @@ lazy val `csw-framework` = project
     `csw-messages`,
     `csw-config-client`,
     `csw-logging`,
+    `csw-command`,
     `csw-location`      % "compile->compile;multi-jvm->multi-jvm",
     `csw-config-server` % "multi-jvm->test"
   )

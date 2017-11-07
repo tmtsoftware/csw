@@ -135,7 +135,7 @@ object CommandStatePubSub {
   case class UnSubscribe(runId: RunId, replyTo: ActorRef[CommandResponse]) extends CommandStatePubSub
   case class Update(runId: RunId, data: CommandResponse)                   extends CommandStatePubSub
   case class Query(runId: RunId, replyTo: ActorRef[CommandResponse])       extends CommandStatePubSub
-  case class Add(runId: RunId)                                             extends CommandStatePubSub
+  case class Add(runId: RunId, actorRef: ActorRef[CommandResponse])        extends CommandStatePubSub
   case class AddTo(runIdParent: RunId, runIdChild: RunId)                  extends CommandStatePubSub
   case class ClearCommandState(runId: RunId)                               extends CommandStatePubSub
 }
