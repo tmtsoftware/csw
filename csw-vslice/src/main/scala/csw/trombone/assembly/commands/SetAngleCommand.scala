@@ -3,7 +3,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.messages._
-import csw.messages.ccs.commands.CommandFinalExecutionResponse.{Completed, Error}
+import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error}
 import csw.messages.ccs.commands.{CommandExecutionResponse, Setup}
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}

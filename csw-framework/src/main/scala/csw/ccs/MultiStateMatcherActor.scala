@@ -9,7 +9,7 @@ import csw.ccs.MultiStateMatcherMsgs._
 import csw.messages.PubSub
 import csw.messages.PubSub.{Subscribe, Unsubscribe}
 import csw.messages.ccs.commands.CommandExecutionResponse
-import csw.messages.ccs.commands.CommandFinalExecutionResponse.{Completed, Error}
+import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error}
 import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 

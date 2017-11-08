@@ -5,7 +5,7 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
-import csw.messages.ccs.commands.CommandFinalExecutionResponse.{Completed, Error, NoLongerValid}
+import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error, NoLongerValid}
 import csw.messages.ccs.commands.{CommandExecutionResponse, Setup}
 import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder

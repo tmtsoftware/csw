@@ -9,7 +9,7 @@ import csw.messages.CommandMessage.Submit
 import csw.messages.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{UnsupportedCommandInStateIssue, WrongInternalStateIssue}
-import csw.messages.ccs.commands.CommandFinalExecutionResponse.{Cancelled, Completed, NoLongerValid}
+import csw.messages.ccs.commands.CommandExecutionResponse.{Cancelled, Completed, NoLongerValid}
 import csw.messages.ccs.commands.CommandValidationResponse.Invalid
 import csw.messages.ccs.commands.{CommandExecutionResponse, CommandResponse, Setup}
 import csw.messages.location.Connection

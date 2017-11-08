@@ -4,8 +4,7 @@ import akka.typed.scaladsl.{ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.CommandStatePubSub
 import csw.messages.CommandStatePubSub._
-import csw.messages.ccs.commands.CommandFinalExecutionResponse.CommandNotAvailable
-import csw.messages.ccs.commands.CommandIntermediateExecutionResponse.Initialized
+import csw.messages.ccs.commands.CommandExecutionResponse.{CommandNotAvailable, Initialized}
 import csw.messages.ccs.commands._
 import csw.messages.params.models.RunId
 import csw.services.logging.scaladsl.ComponentLogger
@@ -57,10 +56,10 @@ class CommandServiceResponseManager(
     childToParent.get(runId) match {
       case Some(parentId) => updateParent(parentId, runId, commandResponse)
       case None =>
-        if (commandResponse.isInstanceOf[CommandFinalExecutionResponse]) {
+        if (commandResponse.isInstanceOf[CommandExecutionResponse] && commandResponse.resultType.isInstanceOf[CommandResultType.Final]) {
           cmdToCmdStatus(runId).sendStatus()
         }
-        if (commandResponse.isInstanceOf[CommandFinalResponse]) {
+        if (commandResponse.resultType.isInstanceOf[CommandResultType.Final]) {
           timerScheduler.startSingleTimer("ClearState", ClearCommandState(runId), 10.seconds)
         }
     }
@@ -76,11 +75,10 @@ class CommandServiceResponseManager(
       childId: RunId,
       responseFromChildCmd: CommandResponse
   ): Unit =
-    if (cmdToCmdStatus(parentId).currentCmdStatus.isInstanceOf[CommandIntermediateResponse]) {
-      responseFromChildCmd.asInstanceOf[CommandResultType] match {
-        case _: CommandNegativeResponse ⇒ update(parentId, responseFromChildCmd)
-        case _: CommandPositiveResponse ⇒ updateParentForChild(parentId, childId, responseFromChildCmd)
-      }
+    (cmdToCmdStatus(parentId).currentCmdStatus.resultType, responseFromChildCmd.resultType) match {
+      case (CommandResultType.Intermediate, CommandResultType.Negative) ⇒ update(parentId, responseFromChildCmd)
+      case (CommandResultType.Intermediate, CommandResultType.Positive) ⇒ updateParentForChild(parentId, childId, responseFromChildCmd)
+      case _ ⇒
     }
 
   private def updateParentForChild(
@@ -88,10 +86,12 @@ class CommandServiceResponseManager(
       childId: RunId,
       responseFromChildCmd: CommandResponse
   ): Unit =
-    if (responseFromChildCmd.isInstanceOf[CommandExecutionResponse]) {
-      parentToChildren + (parentId → (parentToChildren(parentId) - childId))
-      if (parentToChildren(parentId).isEmpty)
-        update(parentId, responseFromChildCmd)
+    responseFromChildCmd match {
+      case _:CommandExecutionResponse ⇒
+        parentToChildren + (parentId → (parentToChildren(parentId) - childId))
+        if (parentToChildren(parentId).isEmpty)
+          update(parentId, responseFromChildCmd)
+      case _ ⇒
     }
 
   private def subscribe(
