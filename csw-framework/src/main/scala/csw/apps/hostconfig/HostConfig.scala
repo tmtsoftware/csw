@@ -1,7 +1,8 @@
-package csw.deploy.hostconfig
+package csw.apps.hostconfig
 
 import akka.actor.ActorSystem
-import csw.deploy.hostconfig.cli.{ArgsParser, Options}
+import csw.apps.hostconfig.cli.{ArgsParser, Options}
+import csw.exceptions.ClusterSeedsNotFound
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.wiring.FrameworkWiring
 import csw.framework.models.ConfigFileLocation.{Local, Remote}
@@ -17,40 +18,55 @@ import scala.sys.process.stringToProcess
 import scala.util.control.NonFatal
 
 // $COVERAGE-OFF$
-class HostConfigApp(clusterSettings: ClusterSettings, startLogging: Boolean = false) extends ComponentLogger.Simple {
+object HostConfig {
+
+  /**
+   * Utility for starting multiple Containers on a single host machine
+   * @param name              The name to be used for the main app which uses this utility
+   * @param args              The command line args accepted in the main app which uses this utility
+   */
+  def start(name: String, args: Array[String]): Unit =
+    new HostConfig(name, ClusterAwareSettings, startLogging = true).start(args)
+}
+
+private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSettings, startLogging: Boolean = false)
+    extends ComponentLogger.Simple {
 
   lazy val actorSystem: ActorSystem           = clusterSettings.system
   lazy val wiring: FrameworkWiring            = FrameworkWiring.make(actorSystem)
   private var processes: Set[process.Process] = _
 
-  override protected def componentName() = "HostConfigApp"
+  override protected def componentName(): String = name
 
   def start(args: Array[String]): Unit =
-    new ArgsParser().parse(args).foreach {
-      case Options(isLocal, hostConfigPath, Some(containerScript)) =>
-        try {
-          if (startLogging) wiring.actorRuntime.startLogging()
+    if (clusterSettings.seedNodes.isEmpty)
+      throw ClusterSeedsNotFound
+    else
+      new ArgsParser().parse(args).foreach {
+        case Options(isLocal, hostConfigPath, Some(containerScript)) =>
+          try {
+            if (startLogging) wiring.actorRuntime.startLogging()
 
-          val hostConfig = Await.result(
-            wiring.configUtils.getConfig(isLocal, hostConfigPath, None),
-            10.seconds
-          )
-          val bootstrapInfo = ConfigParser.parseHost(hostConfig)
-          log.info(s"Bootstrapping containers: [${bootstrapInfo.containers}]")
-          processes = bootstrapContainers(containerScript, bootstrapInfo)
-        } catch {
-          case NonFatal(ex) ⇒
-            log.error(s"${ex.getMessage}", ex = ex)
-            throw ex
-        } finally {
-          // once all the processes are started for each container,
-          // host applications actor system is no longer needed,
-          // otherwise it will keep taking part of cluster decisions
-          shutdown()
-          waitForProcessTermination(processes)
-          log.warn("Exiting HostConfigApp as all the processes start by this app are terminated")
-        }
-    }
+            val hostConfig = Await.result(
+              wiring.configUtils.getConfig(isLocal, hostConfigPath, None),
+              10.seconds
+            )
+            val bootstrapInfo = ConfigParser.parseHost(hostConfig)
+            log.info(s"Bootstrapping containers: [${bootstrapInfo.containers}]")
+            processes = bootstrapContainers(containerScript, bootstrapInfo)
+          } catch {
+            case NonFatal(ex) ⇒
+              log.error(s"${ex.getMessage}", ex = ex)
+              throw ex
+          } finally {
+            // once all the processes are started for each container,
+            // host applications actor system is no longer needed,
+            // otherwise it will keep taking part of cluster decisions
+            shutdown()
+            waitForProcessTermination(processes)
+            log.warn("Exiting HostConfigApp as all the processes start by this app are terminated")
+          }
+      }
 
   private def bootstrapContainers(containerScript: String, bootstrapInfo: HostBootstrapInfo): Set[process.Process] =
     bootstrapInfo.containers
@@ -77,15 +93,5 @@ class HostConfigApp(clusterSettings: ClusterSettings, startLogging: Boolean = fa
   }
 
   private def shutdown() = Await.result(wiring.actorRuntime.shutdown(), 10.seconds)
-}
-
-object HostConfigApp extends App {
-  if (ClusterAwareSettings.seedNodes.isEmpty) {
-    println(
-      "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
-    )
-  } else {
-    new HostConfigApp(ClusterAwareSettings, startLogging = true).start(args)
-  }
 }
 // $COVERAGE-ON$

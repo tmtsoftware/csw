@@ -17,7 +17,6 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-vslice`,
   `csw-messages`,
   `csw-commons`,
-  `csw-deploy`,
   `integration`,
   `examples`
 )
@@ -28,7 +27,6 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-location-agent`,
   `csw-config-server`,
   `csw-config-client-cli`,
-  `csw-deploy`,
   `csw-benchmark`,
   `csw-vslice`,
   `integration`,
@@ -175,13 +173,6 @@ lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.CswCommons
-  )
-
-lazy val `csw-deploy` = project
-  .dependsOn(`csw-framework`, `csw-vslice`)
-  .enablePlugins(DeployApp)
-  .settings(
-    libraryDependencies ++= Dependencies.CswDeploy
   )
 
 //Integration test project
