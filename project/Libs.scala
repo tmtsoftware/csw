@@ -11,7 +11,7 @@ object Libs {
   val `acyclic`                      = "com.lihaoyi"            %% "acyclic"                      % "0.1.7" % Provided //MIT License
   val `junit`                        = "junit"                  % "junit"                         % "4.12" //Eclipse Public License 1.0
   val `junit-interface`              = "com.novocode"           % "junit-interface"               % "0.11" //BSD 2-clause "Simplified" License
-  val `mockito-core`                 = "org.mockito"            % "mockito-core"                  % "2.11.0" //MIT License
+  val `mockito-core`                 = "org.mockito"            % "mockito-core"                  % "2.12.0" //MIT License
   val `logback-classic`              = "ch.qos.logback"         % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka"     %% "akka-management-cluster-http" % "0.5" //N/A at the moment
   val svnkit                         = "org.tmatesoft.svnkit"   % "svnkit"                        % "1.9.0" //TMate Open Source License
