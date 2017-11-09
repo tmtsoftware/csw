@@ -188,6 +188,7 @@ class ConfigParserTest extends FunSuite with Matchers {
   }
   // ################### End : Standalone Parsing ##################
 
+  // DEOPSCSW-173: Host Configuration in file format
   // DEOPSCSW-175: Starting multiple containers from command Line
   // ################### Start : Host Parsing ######################
   test("should able to parse host config") {

@@ -198,7 +198,8 @@ class SupervisorBehavior(
           case _                  ⇒
         }
         runningComponent.get ! runningMessage
-      case Running(_) ⇒ log.info("Component TLA restarted while Running")
+      case msg @ Running(_) ⇒
+        log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
     }
   }
 
