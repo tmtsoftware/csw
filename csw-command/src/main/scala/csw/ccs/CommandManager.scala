@@ -1,45 +1,37 @@
 package csw.ccs
 
-import akka.typed.scaladsl.{ActorContext, TimerScheduler}
+import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.CommandStatePubSub
-import csw.messages.CommandStatePubSub._
+import csw.messages.CommandManagerMessages
+import csw.messages.CommandManagerMessages._
 import csw.messages.ccs.commands.CommandExecutionResponse.{CommandNotAvailable, Initialized}
 import csw.messages.ccs.commands._
 import csw.messages.params.models.RunId
 import csw.services.logging.scaladsl.ComponentLogger
 
-import scala.collection.mutable
-import scala.concurrent.duration.DurationDouble
-
-class CommandServiceResponseManager(
-    ctx: ActorContext[CommandStatePubSub],
-    timerScheduler: TimerScheduler[CommandStatePubSub],
+class CommandManager(
+    ctx: ActorContext[CommandManagerMessages],
     componentName: String
-) extends ComponentLogger.MutableActor[CommandStatePubSub](ctx, componentName) {
+) extends ComponentLogger.MutableActor[CommandManagerMessages](ctx, componentName) {
 
-  val cmdToCmdStatus: mutable.Map[RunId, CommandState] = mutable.Map.empty
+  var cmdToCmdStatus: Map[RunId, CommandState] = Map.empty
 
-  val parentToChildren: mutable.Map[RunId, Set[RunId]] = mutable.Map.empty
-  val childToParent: mutable.Map[RunId, RunId]         = mutable.Map.empty
+  val parentToChildren: Map[RunId, Set[RunId]] = Map.empty
+  val childToParent: Map[RunId, RunId]         = Map.empty
 
-  override def onMessage(msg: CommandStatePubSub): Behavior[CommandStatePubSub] = {
+  override def onMessage(msg: CommandManagerMessages): Behavior[CommandManagerMessages] = {
     msg match {
       case Add(runId, replyTo)            ⇒ add(runId, Some(replyTo))
       case AddTo(runIdParent, runIdChild) ⇒ addTo(runIdParent, runIdChild)
       case Update(runId, cmdStatus)       ⇒ update(runId, cmdStatus)
-      case Subscribe(runId, replyTo)      ⇒ subscribe(runId, replyTo)
-      case UnSubscribe(runId, replyTo)    ⇒ unSubscribe(runId, replyTo)
-      case Query(runId, replyTo)          ⇒ sendCurrentState(runId, replyTo)
-      case ClearCommandState(runId)       ⇒ clearCmdState(runId)
     }
     this
   }
 
-  private def add(runId: RunId, replyTo: Option[ActorRef[CommandResponse]]) =
-    cmdToCmdStatus + (runId → CommandState(runId, replyTo, Set.empty, Initialized(runId)))
+  private def add(runId: RunId, replyTo: Option[ActorRef[CommandResponse]]): Unit =
+    cmdToCmdStatus = cmdToCmdStatus + (runId → CommandState(runId, replyTo, Set.empty, Initialized(runId)))
 
-  private def addTo(runIdParent: RunId, runIdChild: RunId): mutable.Map[RunId, Object] = {
+  private def addTo(runIdParent: RunId, runIdChild: RunId): Unit = {
     add(runIdChild, None)
     parentToChildren + (runIdParent → (parentToChildren(runIdParent) + runIdChild))
     childToParent + (runIdChild     → runIdParent)
@@ -51,7 +43,7 @@ class CommandServiceResponseManager(
   ): Unit = {
     cmdToCmdStatus
       .get(runId)
-      .foreach(cmdState ⇒ cmdToCmdStatus + (runId → cmdState.copy(currentCmdStatus = commandResponse)))
+      .foreach(cmdState ⇒ cmdToCmdStatus = cmdToCmdStatus + (runId → cmdState.copy(currentCmdStatus = commandResponse)))
 
     childToParent.get(runId) match {
       case Some(parentId) => updateParent(parentId, runId, commandResponse)
@@ -60,9 +52,7 @@ class CommandServiceResponseManager(
               .isInstanceOf[CommandResultType.Final]) {
           cmdToCmdStatus(runId).sendStatus()
         }
-        if (commandResponse.resultType.isInstanceOf[CommandResultType.Final]) {
-          timerScheduler.startSingleTimer("ClearState", ClearCommandState(runId), 10.seconds)
-        }
+
     }
 
     log.debug(
@@ -96,22 +86,6 @@ class CommandServiceResponseManager(
       case _ ⇒
     }
 
-  private def subscribe(
-      runId: RunId,
-      actorRef: ActorRef[CommandResponse]
-  ): Unit =
-    cmdToCmdStatus
-      .get(runId)
-      .foreach(cmdState ⇒ cmdToCmdStatus + (runId → cmdState.copy(subscribers = cmdState.subscribers + actorRef)))
-
-  private def unSubscribe(
-      runId: RunId,
-      actorRef: ActorRef[CommandResponse]
-  ): Unit =
-    cmdToCmdStatus
-      .get(runId)
-      .foreach(cmdState ⇒ cmdToCmdStatus + (runId → cmdState.copy(subscribers = cmdState.subscribers - actorRef)))
-
   private def sendCurrentState(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit = {
     val currentCmdState = cmdToCmdStatus.get(runId) match {
       case Some(cmdState) => cmdState.currentCmdStatus
@@ -120,5 +94,4 @@ class CommandServiceResponseManager(
     replyTo ! currentCmdState
   }
 
-  def clearCmdState(runId: RunId) = ???
 }

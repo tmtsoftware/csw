@@ -5,7 +5,7 @@ import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.ccs.CommandServiceResponseManager
+import csw.ccs.internal.{CommandManagerFactory, CommandStatusFactory}
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
@@ -37,11 +37,12 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.util.{Failure, Success}
 
 object SupervisorBehavior {
-  val PubSubComponentActor               = "pub-sub-component"
-  val PubSubLifecycleActor               = "pub-sub-lifecycle"
-  val InitializeTimerKey                 = "initialize-timer"
-  val ComponentActorNameSuffix           = "component-actor"
-  val CommandServiceResponseManagerActor = "command-service-response-mgr"
+  val PubSubComponentActor      = "pub-sub-component"
+  val PubSubLifecycleActor      = "pub-sub-lifecycle"
+  val InitializeTimerKey        = "initialize-timer"
+  val ComponentActorNameSuffix  = "component-actor"
+  val CommandStatusServiceActor = "command-status-service"
+  val CommandManagerActor       = "command-manager"
 }
 
 /**
@@ -84,12 +85,10 @@ class SupervisorBehavior(
     pubSubBehaviorFactory.make(ctx, PubSubComponentActor, componentName)
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
     pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, componentName)
-  val cmdServiceResponseMananger: ActorRef[CommandStatePubSub] = ctx.spawn(
-    Actor.withTimers[CommandStatePubSub](
-      timer ⇒ Actor.mutable[CommandStatePubSub](ctx ⇒ new CommandServiceResponseManager(ctx, timer, componentName))
-    ),
-    CommandServiceResponseManagerActor
-  )
+  val commandStatusService: ActorRef[CommandStatusMessages] =
+    CommandStatusFactory.make(ctx, CommandStatusServiceActor, componentName)
+  val commandManager: ActorRef[CommandManagerMessages] =
+    CommandManagerFactory.make(ctx, CommandManagerActor, componentName)
 
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
@@ -298,7 +297,7 @@ class SupervisorBehavior(
                 componentInfo,
                 ctx.self,
                 pubSubComponent,
-                cmdServiceResponseMananger,
+                commandManager,
                 locationService
               )
           )

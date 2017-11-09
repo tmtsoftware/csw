@@ -63,7 +63,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     import testData._
 
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
-    ctx.children.size shouldBe 4
+    ctx.children.size shouldBe 5
     verify(timer).startSingleTimer(
       SupervisorBehavior.InitializeTimerKey,
       InitializeTimeout,

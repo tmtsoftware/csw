@@ -129,13 +129,24 @@ case class SupervisorInfo(system: ActorSystem, component: Component)
 
 ////////////////
 
-sealed trait CommandStatePubSub
-object CommandStatePubSub {
-  case class Subscribe(runId: RunId, replyTo: ActorRef[CommandResponse])   extends CommandStatePubSub
-  case class UnSubscribe(runId: RunId, replyTo: ActorRef[CommandResponse]) extends CommandStatePubSub
-  case class Update(runId: RunId, data: CommandResponse)                   extends CommandStatePubSub
-  case class Query(runId: RunId, replyTo: ActorRef[CommandResponse])       extends CommandStatePubSub
-  case class Add(runId: RunId, actorRef: ActorRef[CommandResponse])        extends CommandStatePubSub
-  case class AddTo(runIdParent: RunId, runIdChild: RunId)                  extends CommandStatePubSub
-  case class ClearCommandState(runId: RunId)                               extends CommandStatePubSub
+sealed trait CommandManagerMessages
+object CommandManagerMessages {
+  case class Update(runId: RunId, data: CommandResponse)            extends CommandManagerMessages
+  case class Add(runId: RunId, actorRef: ActorRef[CommandResponse]) extends CommandManagerMessages
+  case class AddTo(runIdParent: RunId, runIdChild: RunId)           extends CommandManagerMessages
+}
+
+sealed trait CommandStatusMessages
+
+object CommandStatusMessages {
+  case class Query(runId: RunId, replyTo: ActorRef[CommandResponse])
+      extends CommandStatusMessages
+      with SupervisorExternalMessage
+  case class Subscribe(runId: RunId, replyTo: ActorRef[CommandResponse])
+      extends CommandStatusMessages
+      with SupervisorExternalMessage
+  case class UnSubscribe(runId: RunId, replyTo: ActorRef[CommandResponse])
+      extends CommandStatusMessages
+      with SupervisorExternalMessage
+  case class Update(runId: RunId, data: CommandResponse) extends CommandStatusMessages
 }
