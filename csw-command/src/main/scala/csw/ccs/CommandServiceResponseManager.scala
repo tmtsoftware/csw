@@ -56,7 +56,8 @@ class CommandServiceResponseManager(
     childToParent.get(runId) match {
       case Some(parentId) => updateParent(parentId, runId, commandResponse)
       case None =>
-        if (commandResponse.isInstanceOf[CommandExecutionResponse] && commandResponse.resultType.isInstanceOf[CommandResultType.Final]) {
+        if (commandResponse.isInstanceOf[CommandExecutionResponse] && commandResponse.resultType
+              .isInstanceOf[CommandResultType.Final]) {
           cmdToCmdStatus(runId).sendStatus()
         }
         if (commandResponse.resultType.isInstanceOf[CommandResultType.Final]) {
@@ -77,7 +78,8 @@ class CommandServiceResponseManager(
   ): Unit =
     (cmdToCmdStatus(parentId).currentCmdStatus.resultType, responseFromChildCmd.resultType) match {
       case (CommandResultType.Intermediate, CommandResultType.Negative) ⇒ update(parentId, responseFromChildCmd)
-      case (CommandResultType.Intermediate, CommandResultType.Positive) ⇒ updateParentForChild(parentId, childId, responseFromChildCmd)
+      case (CommandResultType.Intermediate, CommandResultType.Positive) ⇒
+        updateParentForChild(parentId, childId, responseFromChildCmd)
       case _ ⇒
     }
 
@@ -87,7 +89,7 @@ class CommandServiceResponseManager(
       responseFromChildCmd: CommandResponse
   ): Unit =
     responseFromChildCmd match {
-      case _:CommandExecutionResponse ⇒
+      case _: CommandExecutionResponse ⇒
         parentToChildren + (parentId → (parentToChildren(parentId) - childId))
         if (parentToChildren(parentId).isEmpty)
           update(parentId, responseFromChildCmd)
