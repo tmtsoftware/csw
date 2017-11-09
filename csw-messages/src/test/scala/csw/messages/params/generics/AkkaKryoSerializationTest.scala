@@ -13,7 +13,11 @@ import com.twitter.chill.akka.AkkaSerializer
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.PubSub.Subscribe
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
-import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.SupervisorCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandExecutionResponse._
@@ -25,7 +29,7 @@ import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, Superviso
 import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection
 import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, RaDecKey, StructKey}
-import csw.messages.params.models.Units.{NoUnits, arcmin, coulomb, encoder, joule, lightyear, meter, pascal}
+import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.messages.params.models._
 import csw.messages.params.states.{CurrentState, DemandState}
 import csw.messages.{Component, Components, LifecycleStateChanged, Restart, Shutdown, SupervisorExternalMessage}
