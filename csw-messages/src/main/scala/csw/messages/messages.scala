@@ -131,13 +131,10 @@ case class SupervisorInfo(system: ActorSystem, component: Component)
 
 sealed trait CommandManagerMessages
 object CommandManagerMessages {
-  case class Update(runId: RunId, data: CommandResponse)            extends CommandManagerMessages
-  case class Add(runId: RunId, actorRef: ActorRef[CommandResponse]) extends CommandManagerMessages
-  case class AddTo(runIdParent: RunId, runIdChild: RunId)           extends CommandManagerMessages
+  case class AddTo(runIdParent: RunId, runIdChild: RunId) extends CommandManagerMessages
 }
 
 sealed trait CommandStatusMessages
-
 object CommandStatusMessages {
   case class Query(runId: RunId, replyTo: ActorRef[CommandResponse])
       extends CommandStatusMessages
@@ -148,5 +145,9 @@ object CommandStatusMessages {
   case class UnSubscribe(runId: RunId, replyTo: ActorRef[CommandResponse])
       extends CommandStatusMessages
       with SupervisorExternalMessage
-  case class Update(runId: RunId, data: CommandResponse) extends CommandStatusMessages
 }
+
+case class Update(runId: RunId, data: CommandResponse) extends CommandStatusMessages with CommandManagerMessages
+case class Add(runId: RunId, actorRef: ActorRef[CommandResponse])
+    extends CommandStatusMessages
+    with CommandManagerMessages

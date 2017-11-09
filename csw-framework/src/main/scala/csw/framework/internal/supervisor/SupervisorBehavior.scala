@@ -88,7 +88,7 @@ class SupervisorBehavior(
   val commandStatusService: ActorRef[CommandStatusMessages] =
     CommandStatusFactory.make(ctx, CommandStatusServiceActor, componentName)
   val commandManager: ActorRef[CommandManagerMessages] =
-    CommandManagerFactory.make(ctx, CommandManagerActor, componentName)
+    CommandManagerFactory.make(ctx, commandStatusService, CommandManagerActor, componentName)
 
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None

@@ -2,15 +2,17 @@ package csw.ccs
 
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.CommandManagerMessages
+import csw.ccs.models.CommandState
 import csw.messages.CommandManagerMessages._
-import csw.messages.ccs.commands.CommandExecutionResponse.{CommandNotAvailable, Initialized}
+import csw.messages.ccs.commands.CommandExecutionResponse.Initialized
 import csw.messages.ccs.commands._
 import csw.messages.params.models.RunId
+import csw.messages.{Add, CommandManagerMessages, CommandStatusMessages, Update}
 import csw.services.logging.scaladsl.ComponentLogger
 
 class CommandManager(
     ctx: ActorContext[CommandManagerMessages],
+    commandStatusService: ActorRef[CommandStatusMessages],
     componentName: String
 ) extends ComponentLogger.MutableActor[CommandManagerMessages](ctx, componentName) {
 
@@ -21,18 +23,17 @@ class CommandManager(
 
   override def onMessage(msg: CommandManagerMessages): Behavior[CommandManagerMessages] = {
     msg match {
-      case Add(runId, replyTo)            ⇒ add(runId, Some(replyTo))
+      case Add(runId, replyTo)            ⇒ add(runId, replyTo)
       case AddTo(runIdParent, runIdChild) ⇒ addTo(runIdParent, runIdChild)
       case Update(runId, cmdStatus)       ⇒ update(runId, cmdStatus)
     }
     this
   }
 
-  private def add(runId: RunId, replyTo: Option[ActorRef[CommandResponse]]): Unit =
+  private def add(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit =
     cmdToCmdStatus = cmdToCmdStatus + (runId → CommandState(runId, replyTo, Set.empty, Initialized(runId)))
 
   private def addTo(runIdParent: RunId, runIdChild: RunId): Unit = {
-    add(runIdChild, None)
     parentToChildren + (runIdParent → (parentToChildren(runIdParent) + runIdChild))
     childToParent + (runIdChild     → runIdParent)
   }
@@ -47,18 +48,12 @@ class CommandManager(
 
     childToParent.get(runId) match {
       case Some(parentId) => updateParent(parentId, runId, commandResponse)
-      case None =>
-        if (commandResponse.isInstanceOf[CommandExecutionResponse] && commandResponse.resultType
-              .isInstanceOf[CommandResultType.Final]) {
-          cmdToCmdStatus(runId).sendStatus()
-        }
-
+      case None           =>
     }
 
     log.debug(
       s"Notifying subscribers :[${cmdToCmdStatus(runId).subscribers.mkString(",")}] with data :[$commandResponse]"
     )
-    cmdToCmdStatus(runId).publishStatus()
   }
 
   private def updateParent(
@@ -85,13 +80,4 @@ class CommandManager(
           update(parentId, responseFromChildCmd)
       case _ ⇒
     }
-
-  private def sendCurrentState(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit = {
-    val currentCmdState = cmdToCmdStatus.get(runId) match {
-      case Some(cmdState) => cmdState.currentCmdStatus
-      case None           => CommandNotAvailable(runId)
-    }
-    replyTo ! currentCmdState
-  }
-
 }

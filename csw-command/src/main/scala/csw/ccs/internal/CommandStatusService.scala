@@ -1,13 +1,12 @@
 package csw.ccs.internal
 
+import akka.typed.Behavior
 import akka.typed.scaladsl.ActorContext
-import akka.typed.{ActorRef, Behavior}
-import csw.ccs.CommandState
-import csw.messages.CommandStatusMessages
+import csw.ccs.models.CommandStatus
 import csw.messages.CommandStatusMessages._
-import csw.messages.ccs.commands.CommandExecutionResponse.CommandNotAvailable
-import csw.messages.ccs.commands._
+import csw.messages.ccs.commands.{CommandResponse, CommandResultType}
 import csw.messages.params.models.RunId
+import csw.messages.{Add, CommandStatusMessages, Update}
 import csw.services.logging.scaladsl.ComponentLogger
 
 class CommandStatusService(
@@ -15,55 +14,34 @@ class CommandStatusService(
     componentName: String
 ) extends ComponentLogger.MutableActor[CommandStatusMessages](ctx, componentName) {
 
-  var cmdToCmdStatus: Map[RunId, CommandState] = Map.empty
+  var commandStatus: CommandStatus = CommandStatus(Map.empty)
 
   override def onMessage(msg: CommandStatusMessages): Behavior[CommandStatusMessages] = {
     msg match {
-      case Subscribe(runId, replyTo)      ⇒ subscribe(runId, replyTo)
-      case UnSubscribe(runId, replyTo)    ⇒ unSubscribe(runId, replyTo)
-      case Query(runId, replyTo)          ⇒ sendCurrentState(runId, replyTo)
-      case Update(runId, commandResponse) ⇒ updateCommandStatus(runId, commandResponse)
+      case Query(runId, replyTo)          ⇒ replyTo ! commandStatus.get(runId)
+      case Add(runId, replyTo)            ⇒ commandStatus.add(runId, replyTo)
+      case Update(runId, commandResponse) ⇒ commandStatus.updateCommandStatus(runId, commandResponse)
+      case Subscribe(runId, replyTo)      ⇒ commandStatus.subscribe(runId, replyTo)
+      case UnSubscribe(runId, replyTo)    ⇒ commandStatus.unSubscribe(runId, replyTo)
     }
     this
   }
 
-  private def subscribe(
-      runId: RunId,
-      actorRef: ActorRef[CommandResponse]
-  ): Unit =
-    cmdToCmdStatus
-      .get(runId)
-      .foreach(
-        cmdState ⇒
-          cmdToCmdStatus = cmdToCmdStatus + (runId → cmdState.copy(subscribers = cmdState.subscribers + actorRef))
-      )
-
-  private def unSubscribe(
-      runId: RunId,
-      actorRef: ActorRef[CommandResponse]
-  ): Unit =
-    cmdToCmdStatus
-      .get(runId)
-      .foreach(
-        cmdState ⇒
-          cmdToCmdStatus = cmdToCmdStatus + (runId → cmdState.copy(subscribers = cmdState.subscribers - actorRef))
-      )
-
-  private def sendCurrentState(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit = {
-    val currentCmdState = cmdToCmdStatus.get(runId) match {
-      case Some(cmdState) => cmdState.currentCmdStatus
-      case None           => CommandNotAvailable(runId)
-    }
-    replyTo ! currentCmdState
+  def updateCommandStatus(runId: RunId, commandResponse: CommandResponse): Unit = {
+    updateCommandStatus(runId, commandResponse)
+    publishFinalStateToSender(runId, commandResponse)
+    publishToSubscribers(runId)
   }
 
-  def updateCommandStatus(runId: RunId, commandResponse: CommandResponse): Unit = {
-    cmdToCmdStatus
-      .get(runId)
-      .foreach(cmdState ⇒ cmdToCmdStatus = cmdToCmdStatus + (runId → cmdState.copy(currentCmdStatus = commandResponse)))
+  private def publishToSubscribers(runId: RunId): Unit = {
+    val commandState = commandStatus.cmdToCmdStatus(runId)
+    commandState.subscribers.foreach(_ ! commandState.currentCmdStatus)
+  }
 
-    if (commandResponse.resultType.isInstanceOf[CommandResultType.Final]) cmdToCmdStatus(runId).sendStatus()
-
-    cmdToCmdStatus(runId).publishStatus()
+  private def publishFinalStateToSender(runId: RunId, commandResponse: CommandResponse): Unit = {
+    if (commandResponse.resultType.isInstanceOf[CommandResultType.Final]) {
+      val commandState = commandStatus.cmdToCmdStatus(runId)
+      commandState.replyTo ! commandState.currentCmdStatus
+    }
   }
 }
