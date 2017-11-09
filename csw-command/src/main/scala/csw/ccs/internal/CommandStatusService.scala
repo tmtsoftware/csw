@@ -2,11 +2,11 @@ package csw.ccs.internal
 
 import akka.typed.Behavior
 import akka.typed.scaladsl.ActorContext
-import csw.ccs.models.CommandStatus
+import csw.ccs.models.CommandStatusServiceState
 import csw.messages.CommandStatusMessages._
 import csw.messages.ccs.commands.{CommandResponse, CommandResultType}
 import csw.messages.params.models.RunId
-import csw.messages.{Add, CommandStatusMessages, Update}
+import csw.messages.{Add, CommandStatusMessages, UpdateCommand}
 import csw.services.logging.scaladsl.ComponentLogger
 
 class CommandStatusService(
@@ -14,13 +14,13 @@ class CommandStatusService(
     componentName: String
 ) extends ComponentLogger.MutableActor[CommandStatusMessages](ctx, componentName) {
 
-  var commandStatus: CommandStatus = CommandStatus(Map.empty)
+  var commandStatus: CommandStatusServiceState = CommandStatusServiceState(Map.empty)
 
   override def onMessage(msg: CommandStatusMessages): Behavior[CommandStatusMessages] = {
     msg match {
       case Query(runId, replyTo)          ⇒ replyTo ! commandStatus.get(runId)
       case Add(runId, replyTo)            ⇒ commandStatus.add(runId, replyTo)
-      case Update(runId, commandResponse) ⇒ commandStatus.updateCommandStatus(runId, commandResponse)
+      case UpdateCommand(commandResponse) ⇒ commandStatus.updateCommandStatus(commandResponse)
       case Subscribe(runId, replyTo)      ⇒ commandStatus.subscribe(runId, replyTo)
       case UnSubscribe(runId, replyTo)    ⇒ commandStatus.unSubscribe(runId, replyTo)
     }
@@ -35,13 +35,13 @@ class CommandStatusService(
 
   private def publishToSubscribers(runId: RunId): Unit = {
     val commandState = commandStatus.cmdToCmdStatus(runId)
-    commandState.subscribers.foreach(_ ! commandState.currentCmdStatus)
+    commandState.subscribers.foreach(_ ! commandState.commandStatus.currentCmdStatus)
   }
 
   private def publishFinalStateToSender(runId: RunId, commandResponse: CommandResponse): Unit = {
     if (commandResponse.resultType.isInstanceOf[CommandResultType.Final]) {
       val commandState = commandStatus.cmdToCmdStatus(runId)
-      commandState.replyTo ! commandState.currentCmdStatus
+      commandState.replyTo ! commandState.commandStatus.currentCmdStatus
     }
   }
 }
