@@ -4,7 +4,7 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.ActorContext
 import csw.ccs.models.CommandStatusServiceState
 import csw.messages.CommandStatusMessages._
-import csw.messages.ccs.commands.{CommandResponse, CommandResultType}
+import csw.messages.ccs.commands.CommandResponse
 import csw.messages.params.models.RunId
 import csw.messages.{Add, CommandStatusMessages, UpdateCommand}
 import csw.services.logging.scaladsl.ComponentLogger
@@ -18,11 +18,11 @@ class CommandStatusService(
 
   override def onMessage(msg: CommandStatusMessages): Behavior[CommandStatusMessages] = {
     msg match {
-      case Query(runId, replyTo)          ⇒ replyTo ! commandStatus.get(runId)
-      case Add(runId, replyTo)            ⇒ commandStatus.add(runId, replyTo)
-      case UpdateCommand(commandResponse) ⇒ updateCommandStatus(commandResponse)
-      case Subscribe(runId, replyTo)      ⇒ commandStatus.subscribe(runId, replyTo)
-      case UnSubscribe(runId, replyTo)    ⇒ commandStatus.unSubscribe(runId, replyTo)
+      case Add(runId, initialState, replyTo) ⇒ commandStatus.add(runId, initialState, replyTo)
+      case UpdateCommand(commandResponse)    ⇒ updateCommandStatus(commandResponse)
+      case Query(runId, replyTo)             ⇒ replyTo ! commandStatus.get(runId)
+      case Subscribe(runId, replyTo)         ⇒ commandStatus.subscribe(runId, replyTo)
+      case UnSubscribe(runId, replyTo)       ⇒ commandStatus.unSubscribe(runId, replyTo)
     }
     this
   }

@@ -6,8 +6,8 @@ import csw.messages.ccs.commands.CommandResponse
 import csw.messages.params.models.RunId
 
 case class CommandStatusServiceState(cmdToCmdStatus: Map[RunId, CommandState]) {
-  def add(runId: RunId, replyTo: ActorRef[CommandResponse]): CommandStatusServiceState =
-    CommandStatusServiceState(cmdToCmdStatus.updated(runId, CommandState.init(runId, replyTo)))
+  def add(runId: RunId, initialState: CommandResponse, replyTo: ActorRef[CommandResponse]) =
+    CommandStatusServiceState(cmdToCmdStatus.updated(runId, CommandState.init(runId, initialState, replyTo)))
 
   def get(runId: RunId): CommandResponse = cmdToCmdStatus.get(runId) match {
     case Some(cmdState) => cmdState.commandStatus.currentCmdStatus

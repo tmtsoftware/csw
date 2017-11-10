@@ -21,18 +21,18 @@ class CommandManager(
 
   override def onMessage(msg: CommandManagerMessages): Behavior[CommandManagerMessages] = {
     msg match {
-      case Add(runId, replyTo)            ⇒ add(runId, replyTo)
-      case AddTo(runIdParent, runIdChild) ⇒ addTo(runIdParent, runIdChild)
-      case UpdateCommand(cmdStatus)       ⇒ updateCommand(cmdStatus)
-      case UpdateSubCommand(cmdStatus)    ⇒ updateSubCommand(cmdStatus)
+      case Add(runId, initialState, replyTo) ⇒ add(runId, initialState, replyTo)
+      case AddTo(runIdParent, runIdChild)    ⇒ addTo(runIdParent, runIdChild)
+      case UpdateCommand(cmdStatus)          ⇒ updateCommand(cmdStatus)
+      case UpdateSubCommand(cmdStatus)       ⇒ updateSubCommand(cmdStatus)
       case CommandResponseE(commandResponseParent, commandResponseChild) ⇒
         updateParent(commandResponseParent, commandResponseChild)
     }
     this
   }
 
-  private def add(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit =
-    commandStatusService ! Add(runId, replyTo)
+  private def add(runId: RunId, initialState: CommandResponse, replyTo: ActorRef[CommandResponse]): Unit =
+    commandStatusService ! Add(runId, initialState, replyTo)
 
   private def addTo(runIdParent: RunId, runIdChild: RunId): Unit =
     commandManagerState = commandManagerState.add(runIdParent, runIdChild)

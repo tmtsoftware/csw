@@ -3,6 +3,7 @@ package csw.messages
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import csw.messages.PubSub.SubscriberMessage
+import csw.messages.ccs.commands.CommandExecutionResponse.Initialized
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.TrackingEvent
@@ -155,6 +156,8 @@ object CommandStatusMessages {
 }
 
 case class UpdateCommand(commandResponse: CommandResponse) extends CommandStatusMessages with CommandManagerMessages
-case class Add(runId: RunId, actorRef: ActorRef[CommandResponse])
+case class Add(runId: RunId, initialState: CommandResponse, actorRef: ActorRef[CommandResponse])
     extends CommandStatusMessages
-    with CommandManagerMessages
+    with CommandManagerMessages {
+  def apply(runId: RunId, actorRef: ActorRef[CommandResponse]): Add = Add(runId, Initialized(runId), actorRef)
+}

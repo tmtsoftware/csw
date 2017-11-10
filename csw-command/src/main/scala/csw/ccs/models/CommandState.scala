@@ -1,7 +1,6 @@
 package csw.ccs.models
 
 import akka.typed.ActorRef
-import csw.messages.ccs.commands.CommandExecutionResponse.Initialized
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.params.models.RunId
 
@@ -18,6 +17,6 @@ case class CommandState(
 }
 
 object CommandState {
-  def init(runId: RunId, replyTo: ActorRef[CommandResponse]): CommandState =
-    CommandState(CommandStatus(runId, Initialized(runId)), replyTo, Set.empty)
+  def init(runId: RunId, initialState: CommandResponse, replyTo: ActorRef[CommandResponse]): CommandState =
+    CommandState(CommandStatus(runId, initialState), replyTo, Set.empty)
 }
