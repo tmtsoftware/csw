@@ -15,7 +15,7 @@ case class CommandStatusServiceState(cmdToCmdStatus: Map[RunId, CommandState]) {
   }
 
   def updateCommandStatus(commandResponse: CommandResponse): CommandStatusServiceState =
-    update(commandResponse.runId, _.withCmdStatus(commandResponse))
+    update(commandResponse.runId, _.withCommandStatus(commandResponse))
 
   def subscribe(runId: RunId, actorRef: ActorRef[CommandResponse]): CommandStatusServiceState =
     update(runId, _.addSubscriber(actorRef))

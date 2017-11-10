@@ -2,6 +2,7 @@ package csw.ccs
 
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
+import csw.ccs.models.CommandManagerState
 import csw.messages.CommandManagerExternalMessages.{AddTo, UpdateSubCommand}
 import csw.messages.CommandManagerMessages.CommandResponseE
 import csw.messages.CommandStatusMessages.Query
@@ -16,8 +17,7 @@ class CommandManager(
     componentName: String
 ) extends ComponentLogger.MutableActor[CommandManagerMessages](ctx, componentName) {
 
-  val parentToChildren: Map[RunId, Set[RunId]] = Map.empty
-  val childToParent: Map[RunId, RunId]         = Map.empty
+  var commandManagerState = CommandManagerState(Map.empty, Map.empty)
 
   override def onMessage(msg: CommandManagerMessages): Behavior[CommandManagerMessages] = {
     msg match {
@@ -34,39 +34,43 @@ class CommandManager(
   private def add(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit =
     commandStatusService ! Add(runId, replyTo)
 
-  private def addTo(runIdParent: RunId, runIdChild: RunId): Unit = {
-    parentToChildren + (runIdParent → (parentToChildren(runIdParent) + runIdChild))
-    childToParent + (runIdChild     → runIdParent)
-  }
+  private def addTo(runIdParent: RunId, runIdChild: RunId): Unit =
+    commandManagerState = commandManagerState.add(runIdParent, runIdChild)
 
   def updateCommand(commandResponse: CommandResponse): Unit = {
-    parentToChildren.get(commandResponse.runId) match {
+    // Update the state of parent command, if it exists, directly in the command status service
+    commandManagerState.parentToChildren.get(commandResponse.runId) match {
       case Some(_) ⇒ commandStatusService ! UpdateCommand(commandResponse)
       case None    ⇒ //TODO: Implement this
     }
   }
 
   private def updateSubCommand(commandResponse: CommandResponse): Unit = {
-    childToParent
+    // If the sub command has a parent command, fetch the current status of parent command from command status service
+    commandManagerState.childToParent
       .get(commandResponse.runId)
       .foreach(commandStatusService ! Query(_, ctx.spawnAdapter(CommandResponseE(_, commandResponse))))
   }
 
-  private def updateParent(commandResponseParent: CommandResponse, commandResponseChild: CommandResponse): Unit =
-    (commandResponseParent.resultType, commandResponseChild.resultType) match {
+  private def updateParent(parentCommandResponse: CommandResponse, childCommandResponse: CommandResponse): Unit =
+    (parentCommandResponse.resultType, childCommandResponse.resultType) match {
+      // If the child command receives a negative result, the result of the parent command need not wait for the
+      // result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Negative) ⇒
-        updateCommand(commandResponseChild)
+        updateCommand(childCommandResponse)
+      // If the child command receives a positive result, the result of the parent command needs to be evaluated based
+      // on the result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Positive) ⇒
-        updateParentForChild(commandResponseParent.runId, commandResponseChild)
-      case _ ⇒
+        updateParentForChild(parentCommandResponse.runId, childCommandResponse)
+      case _ ⇒ // TODO: Implement this
     }
 
-  private def updateParentForChild(parentId: RunId, commandResponseChild: CommandResponse): Unit =
-    commandResponseChild match {
+  private def updateParentForChild(parentId: RunId, childCommandResponse: CommandResponse): Unit =
+    childCommandResponse match {
       case _: CommandExecutionResponse ⇒
-        parentToChildren + (parentId → (parentToChildren(parentId) - commandResponseChild.runId))
-        if (parentToChildren(parentId).isEmpty)
-          updateCommand(commandResponseChild)
+        commandManagerState = commandManagerState.remove(parentId, childCommandResponse.runId)
+        if (commandManagerState.parentToChildren(parentId).isEmpty)
+          updateCommand(childCommandResponse)
       case _ ⇒
     }
 }
