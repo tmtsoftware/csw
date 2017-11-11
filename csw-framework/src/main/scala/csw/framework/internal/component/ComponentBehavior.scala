@@ -2,7 +2,6 @@ package csw.framework.internal.component
 
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
-import csw.ccs.internal.CommandStatusService
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommonMessage.{TrackingEventReceived, UnderlyingHookFailed}

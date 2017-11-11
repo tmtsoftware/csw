@@ -141,10 +141,10 @@ object CommandStatusMessages {
   case class UnSubscribe(runId: RunId, replyTo: ActorRef[CommandResponse])
       extends CommandStatusMessages
       with SupervisorExternalMessage
-  case class AddTo(runIdParent: RunId, runIdChild: RunId)       extends CommandStatusMessages
-  case class UpdateCommand(commandResponse: CommandResponse)    extends CommandStatusMessages
-  case class UpdateSubCommand(commandResponse: CommandResponse) extends CommandStatusMessages
-  case class Add(runId: RunId, initialState: CommandResponse) extends CommandStatusMessages {
-    def apply(runId: RunId) = Add(runId, Initialized(runId))
+  case class AddSubCommand(runIdParent: RunId, runIdChild: RunId) extends CommandStatusMessages
+  case class UpdateCommand(commandResponse: CommandResponse)      extends CommandStatusMessages
+  case class UpdateSubCommand(commandResponse: CommandResponse)   extends CommandStatusMessages
+  case class AddCommand(runId: RunId, initialState: CommandResponse) extends CommandStatusMessages {
+    def apply(runId: RunId) = AddCommand(runId, Initialized(runId))
   }
 }

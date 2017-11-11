@@ -15,17 +15,17 @@ class CommandStatusService(
 ) extends ComponentLogger.MutableActor[CommandStatusMessages](ctx, componentName) {
 
   var commandStatus: CommandStatusServiceState = CommandStatusServiceState(Map.empty)
-  var commandManagerState                      = CommandManagerState(Map.empty, Map.empty)
+  var commandManagerState: CommandManagerState = CommandManagerState(Map.empty, Map.empty)
 
   override def onMessage(msg: CommandStatusMessages): Behavior[CommandStatusMessages] = {
     msg match {
-      case Add(runId, initialState)       ⇒ commandStatus = commandStatus.add(runId, initialState)
-      case AddTo(runIdParent, runIdChild) ⇒ addTo(runIdParent, runIdChild)
-      case UpdateCommand(cmdStatus)       ⇒ updateCommand(cmdStatus)
-      case UpdateSubCommand(cmdStatus)    ⇒ updateSubCommand(cmdStatus)
-      case Query(runId, replyTo)          ⇒ replyTo ! commandStatus.get(runId)
-      case Subscribe(runId, replyTo)      ⇒ subscribe(runId, replyTo)
-      case UnSubscribe(runId, replyTo)    ⇒ commandStatus = commandStatus.unSubscribe(runId, replyTo)
+      case AddCommand(runId, initialState)        ⇒ commandStatus = commandStatus.add(runId, initialState)
+      case AddSubCommand(runIdParent, runIdChild) ⇒ addTo(runIdParent, runIdChild)
+      case UpdateCommand(cmdStatus)               ⇒ updateCommand(cmdStatus)
+      case UpdateSubCommand(cmdStatus)            ⇒ updateSubCommand(cmdStatus)
+      case Query(runId, replyTo)                  ⇒ replyTo ! commandStatus.get(runId)
+      case Subscribe(runId, replyTo)              ⇒ subscribe(runId, replyTo)
+      case UnSubscribe(runId, replyTo)            ⇒ commandStatus = commandStatus.unSubscribe(runId, replyTo)
     }
     this
   }
