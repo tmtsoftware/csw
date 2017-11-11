@@ -156,8 +156,6 @@ object CommandStatusMessages {
 }
 
 case class UpdateCommand(commandResponse: CommandResponse) extends CommandStatusMessages with CommandManagerMessages
-case class Add(runId: RunId, initialState: CommandResponse, actorRef: ActorRef[CommandResponse])
-    extends CommandStatusMessages
-    with CommandManagerMessages {
-  def apply(runId: RunId, actorRef: ActorRef[CommandResponse]): Add = Add(runId, Initialized(runId), actorRef)
+case class Add(runId: RunId, initialState: CommandResponse) extends CommandStatusMessages with CommandManagerMessages {
+  def apply(runId: RunId) = Add(runId, Initialized(runId))
 }

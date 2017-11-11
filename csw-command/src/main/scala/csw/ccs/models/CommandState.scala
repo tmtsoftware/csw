@@ -4,11 +4,7 @@ import akka.typed.ActorRef
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.params.models.RunId
 
-case class CommandState(
-    commandStatus: CommandStatus,
-    replyTo: ActorRef[CommandResponse],
-    subscribers: Set[ActorRef[CommandResponse]]
-) {
+case class CommandState(commandStatus: CommandStatus, subscribers: Set[ActorRef[CommandResponse]]) {
   def addSubscriber(subscriber: ActorRef[CommandResponse]): CommandState = copy(subscribers = subscribers + subscriber)
   def removeSubscriber(subscriber: ActorRef[CommandResponse]): CommandState =
     copy(subscribers = subscribers - subscriber)
@@ -17,6 +13,6 @@ case class CommandState(
 }
 
 object CommandState {
-  def init(runId: RunId, initialState: CommandResponse, replyTo: ActorRef[CommandResponse]): CommandState =
-    CommandState(CommandStatus(runId, initialState), replyTo, Set.empty)
+  def init(runId: RunId, initialState: CommandResponse) =
+    CommandState(CommandStatus(runId, initialState), Set.empty)
 }

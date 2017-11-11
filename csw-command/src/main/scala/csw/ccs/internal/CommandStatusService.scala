@@ -18,11 +18,11 @@ class CommandStatusService(
 
   override def onMessage(msg: CommandStatusMessages): Behavior[CommandStatusMessages] = {
     msg match {
-      case Add(runId, initialState, replyTo) ⇒ commandStatus.add(runId, initialState, replyTo)
-      case UpdateCommand(commandResponse)    ⇒ updateCommandStatus(commandResponse)
-      case Query(runId, replyTo)             ⇒ replyTo ! commandStatus.get(runId)
-      case Subscribe(runId, replyTo)         ⇒ subscribe(runId, replyTo)
-      case UnSubscribe(runId, replyTo)       ⇒ commandStatus.unSubscribe(runId, replyTo)
+      case Add(runId, initialState)       ⇒ commandStatus.add(runId, initialState)
+      case UpdateCommand(commandResponse) ⇒ updateCommandStatus(commandResponse)
+      case Query(runId, replyTo)          ⇒ replyTo ! commandStatus.get(runId)
+      case Subscribe(runId, replyTo)      ⇒ subscribe(runId, replyTo)
+      case UnSubscribe(runId, replyTo)    ⇒ commandStatus.unSubscribe(runId, replyTo)
     }
     this
   }
