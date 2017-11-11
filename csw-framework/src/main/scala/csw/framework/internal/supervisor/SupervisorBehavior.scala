@@ -5,7 +5,7 @@ import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.ccs.internal.{CommandManagerFactory, CommandStatusFactory}
+import csw.ccs.internal.CommandStatusFactory
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
@@ -87,8 +87,6 @@ class SupervisorBehavior(
     pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, componentName)
   val commandStatusService: ActorRef[CommandStatusMessages] =
     CommandStatusFactory.make(ctx, CommandStatusServiceActor, componentName)
-  val commandManager: ActorRef[CommandManagerMessages] =
-    CommandManagerFactory.make(ctx, commandStatusService, CommandManagerActor, componentName)
 
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
@@ -297,7 +295,7 @@ class SupervisorBehavior(
                 componentInfo,
                 ctx.self,
                 pubSubComponent,
-                commandManager,
+                commandStatusService,
                 locationService
               )
           )

@@ -39,7 +39,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
         ComponentInfos.hcdInfo,
         supervisorProbe.ref,
         sampleHcdHandler,
-        TestProbe[CommandManagerMessages].ref,
+        TestProbe[CommandStatusMessages].ref,
         locationService
       ) with MutableActorMock[ComponentMessage]
 

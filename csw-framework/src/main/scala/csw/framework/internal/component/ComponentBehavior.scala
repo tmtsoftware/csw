@@ -2,6 +2,7 @@ package csw.framework.internal.component
 
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
+import csw.ccs.internal.CommandStatusService
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
@@ -37,7 +38,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers[Msg],
-    commandManager: ActorRef[CommandManagerMessages],
+    commandManager: ActorRef[CommandStatusMessages],
     locationService: LocationService
 ) extends ComponentLogger.MutableActor[ComponentMessage](ctx, componentInfo.name) {
 
