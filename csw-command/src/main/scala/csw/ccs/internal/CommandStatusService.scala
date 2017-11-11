@@ -18,17 +18,17 @@ class CommandStatusService(
 
   override def onMessage(msg: CommandStatusMessages): Behavior[CommandStatusMessages] = {
     msg match {
-      case Add(runId, initialState)       ⇒ commandStatus.add(runId, initialState)
+      case Add(runId, initialState)       ⇒ commandStatus = commandStatus.add(runId, initialState)
       case UpdateCommand(commandResponse) ⇒ updateCommandStatus(commandResponse)
       case Query(runId, replyTo)          ⇒ replyTo ! commandStatus.get(runId)
       case Subscribe(runId, replyTo)      ⇒ subscribe(runId, replyTo)
-      case UnSubscribe(runId, replyTo)    ⇒ commandStatus.unSubscribe(runId, replyTo)
+      case UnSubscribe(runId, replyTo)    ⇒ commandStatus = commandStatus.unSubscribe(runId, replyTo)
     }
     this
   }
 
   def updateCommandStatus(commandResponse: CommandResponse): Unit = {
-    commandStatus.updateCommandStatus(commandResponse)
+    commandStatus = commandStatus.updateCommandStatus(commandResponse)
     publishToSubscribers(commandResponse.runId)
   }
 
@@ -38,7 +38,7 @@ class CommandStatusService(
   }
 
   private def subscribe(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit = {
-    commandStatus.subscribe(runId, replyTo)
+    commandStatus = commandStatus.subscribe(runId, replyTo)
     replyTo ! commandStatus.get(runId)
   }
 }

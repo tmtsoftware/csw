@@ -4,16 +4,16 @@ import csw.messages.params.models.RunId
 
 case class CommandManagerState(parentToChildren: Map[RunId, Set[RunId]], childToParent: Map[RunId, RunId]) {
   def add(parentRunId: RunId, childRunId: RunId): CommandManagerState = {
-    copy(
-      parentToChildren = this.parentToChildren + (parentRunId → (this.parentToChildren(parentRunId) + childRunId)),
-      childToParent = this.childToParent + (childRunId        → parentRunId)
+    CommandManagerState(
+      parentToChildren.updated(parentRunId, parentToChildren(parentRunId) + childRunId),
+      childToParent.updated(childRunId, parentRunId)
     )
   }
 
   def remove(parentRunId: RunId, childRunID: RunId): CommandManagerState = {
-    copy(
-      parentToChildren = this.parentToChildren + (parentRunId → (this.parentToChildren(parentRunId) - childRunID)),
-      childToParent = this.childToParent - childRunID
+    CommandManagerState(
+      parentToChildren.updated(parentRunId, parentToChildren(parentRunId) - childRunID),
+      childToParent - childRunID
     )
   }
 
