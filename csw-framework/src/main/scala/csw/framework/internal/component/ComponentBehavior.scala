@@ -4,6 +4,7 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.CommandStatusMessages.AddCommand
 import csw.messages.CommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
@@ -37,7 +38,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers[Msg],
-    commandManager: ActorRef[CommandStatusMessages],
+    commandStatusService: ActorRef[CommandStatusMessages],
     locationService: LocationService
 ) extends ComponentLogger.MutableActor[ComponentMessage](ctx, componentInfo.name) {
 
@@ -171,6 +172,8 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
         log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
         lifecycleHandlers.onSubmit(commandMessage.command, commandMessage.replyTo)
     }
+
     commandMessage.replyTo ! validationResponse
+    commandStatusService ! AddCommand(commandMessage.command.runId, validationResponse)
   }
 }
