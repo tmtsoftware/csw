@@ -1,6 +1,6 @@
 package csw.ccs.internal
 
-import akka.typed.Behavior
+import akka.typed.{ActorRef, Behavior}
 import akka.typed.scaladsl.ActorContext
 import csw.ccs.models.CommandStatusServiceState
 import csw.messages.CommandStatusMessages._
@@ -21,7 +21,7 @@ class CommandStatusService(
       case Add(runId, initialState, replyTo) ⇒ commandStatus.add(runId, initialState, replyTo)
       case UpdateCommand(commandResponse)    ⇒ updateCommandStatus(commandResponse)
       case Query(runId, replyTo)             ⇒ replyTo ! commandStatus.get(runId)
-      case Subscribe(runId, replyTo)         ⇒ commandStatus.subscribe(runId, replyTo)
+      case Subscribe(runId, replyTo)         ⇒ subscribe(runId, replyTo)
       case UnSubscribe(runId, replyTo)       ⇒ commandStatus.unSubscribe(runId, replyTo)
     }
     this
@@ -35,5 +35,10 @@ class CommandStatusService(
   private def publishToSubscribers(runId: RunId): Unit = {
     val commandState = commandStatus.cmdToCmdStatus(runId)
     commandState.subscribers.foreach(_ ! commandState.commandStatus.currentCmdStatus)
+  }
+
+  private def subscribe(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit = {
+    commandStatus.subscribe(runId, replyTo)
+    replyTo ! commandStatus.get(runId)
   }
 }
