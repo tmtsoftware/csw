@@ -4,7 +4,7 @@ import csw.messages.ccs.commands.{Observe, SequenceCommand, Setup, Wait}
 import csw.messages.params.models.Subsystem
 
 /**
- * Filters
+ * A collection of Utility functions for filtering Commands and Parameters from an input sequence.
  */
 object ParameterSetFilters {
   // A filter type for various parameter set data

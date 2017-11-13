@@ -15,36 +15,66 @@ import play.api.libs.json._
 import scala.collection.immutable
 import scala.reflect.ClassTag
 
+/**
+ * Generic marker class for creating various types of Keys.
+ */
 sealed class KeyType[S: Format: ClassTag: ItemsFactory] extends EnumEntry with Serializable {
   def paramFormat: Format[Parameter[S]]                 = Parameter[S]
   def typeMapper: TypeMapper[PbParameter, Parameter[S]] = Parameter.typeMapper
 }
 
+/**
+ * SimpleKeyType with a name. Holds instances of primitives such as char, int, String etc.
+ */
 sealed class SimpleKeyType[S: Format: ClassTag: ItemsFactory] extends KeyType[S] {
   def make(name: String): Key[S] = new Key[S](name, this)
 }
 
+/**
+ * A KeyType that allows name and unit to be specified during creation. Holds instances of primitives such as
+ * char, int, String etc.
+ */
 sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag: ItemsFactory](defaultUnits: Units) extends KeyType[S] {
   def make(name: String): Key[S] = new Key[S](name, this, defaultUnits)
 }
+
+/**
+ * A KeyType that holds array
+ */
 sealed class ArrayKeyType[S: Format: ClassTag](implicit x: ItemsFactory[ArrayData[S]])
     extends SimpleKeyType[ArrayData[S]]
+
+/**
+ * A KeyType that holds Matrix
+ */
 sealed class MatrixKeyType[S: Format: ClassTag](implicit x: ItemsFactory[MatrixData[S]])
     extends SimpleKeyType[MatrixData[S]]
 
 //////////
+/**
+ * SimpleKeyType with a name for java Keys. Holds instances of primitives such as char, int, String etc.
+ */
 sealed class JSimpleKeyType[S: Format: ClassTag, T: ItemsFactory](implicit conversion: T ⇒ S) extends SimpleKeyType[S]
+
+/**
+ * A java KeyType that holds array
+ */
 sealed class JArrayKeyType[S: Format: ClassTag, T: ItemsFactory](
     implicit x: ItemsFactory[ArrayData[T]],
     conversion: T ⇒ S
 ) extends JSimpleKeyType[ArrayData[S], ArrayData[T]]
 
+/**
+ * A java KeyType that holds matrix
+ */
 sealed class JMatrixKeyType[S: Format: ClassTag, T: ItemsFactory](
     implicit x: ItemsFactory[MatrixData[T]],
     conversion: T ⇒ S
 ) extends JSimpleKeyType[MatrixData[S], MatrixData[T]]
 
-///////////////
+/**
+ * KeyTypes defined for consumption in Scala code
+ */
 object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
 
   import JsonSupport._
@@ -118,6 +148,9 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
     TypeMapper[PbKeyType, KeyType[_]](x ⇒ KeyType.withName(x.toString()))(x ⇒ PbKeyType.fromName(x.toString).get)
 }
 
+/**
+ * KeyTypes defined for consumption in Java code
+ */
 object JKeyTypes {
   val ChoiceKey    = KeyType.ChoiceKey
   val RaDecKey     = KeyType.RaDecKey

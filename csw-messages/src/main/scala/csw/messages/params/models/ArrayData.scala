@@ -11,8 +11,15 @@ import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
+/**
+ * A top level key for a parameter set representing an array like collection.
+ *
+ * @param data input array
+ */
 case class ArrayData[T](data: mutable.WrappedArray[T]) {
-  def values: Array[T]      = data.array
+  //scala
+  def values: Array[T] = data.array
+  //java
   def jValues: util.List[T] = data.asJava
 
   override def toString: String = data.mkString("(", ",", ")")
@@ -31,6 +38,9 @@ object ArrayData {
   implicit def conversion[A, B](implicit conversion: A ⇒ B): ArrayData[A] ⇒ ArrayData[B] = _.asInstanceOf[ArrayData[B]]
 }
 
+/**
+ * A Java helper to instantiate ArrayData
+ */
 object JArrayData {
   def fromArray[T](array: Array[T]): ArrayData[T] = ArrayData.fromArray(array)
 }

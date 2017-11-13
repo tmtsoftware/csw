@@ -11,9 +11,8 @@ import play.api.libs.json._
 object JsonSupport extends JsonSupport with DerivedJsonFormats with WrappedArrayProtocol
 
 /**
- * Supports conversion of commands and events to/from JSON
+ * Supports conversion of commands, state variables and events to/from JSON
  */
-//noinspection TypeAnnotation
 trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
 
   // JSON formats

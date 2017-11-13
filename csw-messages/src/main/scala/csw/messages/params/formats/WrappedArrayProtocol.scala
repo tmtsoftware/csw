@@ -5,6 +5,9 @@ import play.api.libs.json._
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
+/**
+ * The serialization and deserialization format for scala.collection.immutable.WrappedArray.
+ */
 trait WrappedArrayProtocol { self ⇒
   implicit def wrappedArrayFormat[T: Format: ClassTag]: Format[mutable.WrappedArray[T]] =
     new Format[mutable.WrappedArray[T]] {

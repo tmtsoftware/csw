@@ -8,6 +8,11 @@ import play.api.libs.json.{Json, OFormat}
 import scala.annotation.varargs
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 
+/**
+ * A configuration for setting telescope and instrument parameters
+ *
+ * @param paramSet set of Parameters
+ */
 case class Struct private (paramSet: Set[Parameter[_]]) extends ParameterSetType[Struct] {
 
   /**
@@ -21,10 +26,12 @@ case class Struct private (paramSet: Set[Parameter[_]]) extends ParameterSetType
 }
 
 object Struct {
+  //used by play-json
   implicit val format: OFormat[Struct] = Json.format[Struct]
 
   def apply(paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Struct = new Struct().madd(paramSet)
 
+  //Protobuf converter
   implicit val typeMapper: TypeMapper[PbStruct, Struct] = TypeMapper[PbStruct, Struct] { s =>
     Struct(s.paramSet.map(Parameter.typeMapper2.toCustom).toSet)
   } { s =>
@@ -32,6 +39,9 @@ object Struct {
   }
 }
 
+/**
+ * Java helpers.
+ */
 object JStruct {
 
   @varargs

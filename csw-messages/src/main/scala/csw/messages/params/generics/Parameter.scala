@@ -103,7 +103,7 @@ case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
   /**
    * The number of values in this parameter (values.size)
    *
-   * @return
+   * @return length of the array of items
    */
   def size: Int = items.size
 
@@ -146,8 +146,27 @@ case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
    */
   def withUnits(unitsIn: Units): Parameter[S] = copy(units = unitsIn)
 
+  /**
+   * Returns a formatted string representation
+   * @return String
+   */
   def valuesToString: String = items.mkString("(", ",", ")")
-  override def toString      = s"$keyName($valuesToString$units)"
-  def toJson: JsValue        = Parameter[S].writes(this)
-  def toPb: PbParameter      = Parameter.typeMapper[S].toBase(this)
+
+  /**
+   * Returns a formatted string representation with a KeyName
+   * @return String
+   */
+  override def toString: String = s"$keyName($valuesToString$units)"
+
+  /**
+   * Returns a JSON representation
+   * @return String
+   */
+  def toJson: JsValue = Parameter[S].writes(this)
+
+  /**
+   * Converts this instance of Parameter to it's Protobuf dual, represented by PbParameter
+   * @return an instance PbParameter
+   */
+  def toPb: PbParameter = Parameter.typeMapper[S].toBase(this)
 }

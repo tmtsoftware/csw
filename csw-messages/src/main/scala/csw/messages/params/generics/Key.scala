@@ -9,6 +9,14 @@ import scala.annotation.varargs
 import scala.reflect.ClassTag
 import scala.runtime.ScalaRunTime._
 
+/**
+ * A generic Key class. Never meant to be instantiated directly. [[csw.messages.params.generics.KeyType]] exposes
+ * allowed types of Keys and make method to create instances of Key.
+ *
+ * @param keyName  the name of the key
+ * @param keyType reference to an object of type KeyType[S]
+ * @param units applicable units
+ */
 case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: String,
                                                                      keyType: KeyType[S],
                                                                      units: Units) {
@@ -73,6 +81,10 @@ case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: St
    */
   def ->(v: Array[S]): Parameter[S] = set(v)
 
+  /**
+   * Returns a string representation of the object.
+   * @return String
+   */
   override def toString: String = keyName
 
   override def equals(that: Any): Boolean = {

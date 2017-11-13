@@ -5,7 +5,7 @@ import play.api.libs.json.{Json, OFormat}
 import scala.language.implicitConversions
 
 /**
- * Combines subsystem and the subsystem's prefix
+ * A top level key for a parameter set: combines subsystem and the subsystem's prefix
  *
  * @param subsystem the subsystem that is the target of the command
  * @param prefix    the subsystem's prefix
@@ -23,9 +23,6 @@ case class Prefix(subsystem: Subsystem, prefix: String) {
   }
 }
 
-/**
- * A top level key for a parameter set: combines subsystem and the subsystem's prefix
- */
 object Prefix {
   private val SEPARATOR = '.'
 
