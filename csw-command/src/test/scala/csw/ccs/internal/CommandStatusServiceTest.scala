@@ -7,6 +7,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import csw.messages.CommandStatusMessages
 import csw.messages.CommandStatusMessages._
+import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, InProgress}
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.commands.CommandValidationResponse.Accepted
 import csw.messages.params.models.RunId
@@ -55,14 +56,14 @@ class CommandStatusServiceTest extends FunSuite with Matchers {
     val commandResponseProbe = TestProbe[CommandResponse]
     val runId                = RunId()
 
-    commandStatusService.onMessage(AddCommand(runId, Accepted(runId)))
+    commandStatusService.onMessage(AddCommand(runId, Completed(runId)))
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe.ref))
 
     commandStatusService.commandStatus.cmdToCmdStatus(runId).subscribers should contain(
       commandResponseProbe.ref
     )
 
-    commandResponseProbe.expectMsg(Accepted(runId))
+    commandResponseProbe.expectMsg(Completed(runId))
   }
 
   test("should remove subscriber") {
@@ -89,5 +90,21 @@ class CommandStatusServiceTest extends FunSuite with Matchers {
     commandStatusService.onMessage(Query(runId, commandResponseProbe.ref))
 
     commandResponseProbe.expectMsg(Accepted(runId))
+  }
+
+  test("should update command status and publish update to all subscribers") {
+    val commandStatusService  = createCommandStatusService()
+    val commandResponseProbe1 = TestProbe[CommandResponse]
+    val commandResponseProbe2 = TestProbe[CommandResponse]
+    val runId                 = RunId()
+
+    commandStatusService.onMessage(AddCommand(runId, Accepted(runId)))
+    commandStatusService.onMessage(Subscribe(runId, commandResponseProbe1.ref))
+    commandStatusService.onMessage(Subscribe(runId, commandResponseProbe2.ref))
+
+    commandStatusService.onMessage(UpdateCommand(InProgress(runId, "40% completed")))
+
+    commandResponseProbe1.expectMsg(InProgress(runId, "40% completed"))
+    commandResponseProbe2.expectMsg(InProgress(runId, "40% completed"))
   }
 }

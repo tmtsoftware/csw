@@ -5,7 +5,12 @@ import akka.typed.{ActorRef, Behavior}
 import csw.ccs.models.{CommandManagerState, CommandStatusServiceState}
 import csw.messages.CommandStatusMessages
 import csw.messages.CommandStatusMessages._
-import csw.messages.ccs.commands.{CommandExecutionResponse, CommandResponse, CommandResultType}
+import csw.messages.ccs.commands.{
+  CommandExecutionResponse,
+  CommandResponse,
+  CommandResultType,
+  CommandValidationResponse
+}
 import csw.messages.params.models.RunId
 import csw.services.logging.scaladsl.ComponentLogger
 
@@ -33,14 +38,9 @@ class CommandStatusService(
   private def addTo(runIdParent: RunId, runIdChild: RunId): Unit =
     commandManagerState = commandManagerState.add(runIdParent, runIdChild)
 
-  def updateCommand(commandResponse: CommandResponse): Unit = {
-    // Update the state of parent command, if it exists, directly in the command status service
-    commandManagerState.parentToChildren.get(commandResponse.runId) match {
-      case Some(_) ⇒
-        commandStatus = commandStatus.updateCommandStatus(commandResponse)
-        publishToSubscribers(commandResponse.runId)
-      case None ⇒ //TODO: Implement this
-    }
+  private def updateCommand(commandResponse: CommandResponse): Unit = {
+    commandStatus = commandStatus.updateCommandStatus(commandResponse)
+    publishToSubscribers(commandResponse, commandStatus.cmdToCmdStatus(commandResponse.runId).subscribers)
   }
 
   private def updateSubCommand(commandResponse: CommandResponse): Unit = {
@@ -72,13 +72,19 @@ class CommandStatusService(
       case _ ⇒
     }
 
-  private def publishToSubscribers(runId: RunId): Unit = {
-    val commandState = commandStatus.cmdToCmdStatus(runId)
-    commandState.subscribers.foreach(_ ! commandState.commandStatus.currentCmdStatus)
+  private def publishToSubscribers(
+      commandResponse: CommandResponse,
+      subscribers: Set[ActorRef[CommandResponse]]
+  ): Unit = {
+    commandResponse match {
+      case _: CommandExecutionResponse ⇒
+        subscribers.foreach(_ ! commandResponse)
+      case _: CommandValidationResponse ⇒ // Do not send updates for validation response as it is send by the framework
+    }
   }
 
   private def subscribe(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit = {
     commandStatus = commandStatus.subscribe(runId, replyTo)
-    replyTo ! commandStatus.get(runId)
+    publishToSubscribers(commandStatus.get(runId), Set(replyTo))
   }
 }
