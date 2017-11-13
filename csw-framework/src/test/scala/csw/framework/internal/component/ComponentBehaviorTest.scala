@@ -6,7 +6,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
-import csw.messages.{CommandStatusMessages, ComponentMessage, FromComponentLifecycleMessage}
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage, FromComponentLifecycleMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.mockito.Mockito._
@@ -34,7 +34,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
         ComponentInfos.hcdInfo,
         supervisorProbe.ref,
         sampleComponentHandler,
-        TestProbe[CommandStatusMessages].ref,
+        TestProbe[CommandResponseManagerMessage].ref,
         locationService
       ) with MutableActorMock[ComponentMessage]
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)

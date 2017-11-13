@@ -5,8 +5,8 @@ import akka.typed
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
-import csw.messages.CommandStatusMessages
-import csw.messages.CommandStatusMessages._
+import csw.messages.CommandResponseManagerMessage
+import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error, InProgress}
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.commands.CommandValidationResponse.Accepted
@@ -15,7 +15,7 @@ import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
-class CommandStatusServiceTest extends FunSuite with Matchers {
+class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
 
   trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
     override protected lazy val log: Logger = MockitoSugar.mock[Logger]
@@ -25,11 +25,11 @@ class CommandStatusServiceTest extends FunSuite with Matchers {
   implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
-  private val ctx: StubbedActorContext[CommandStatusMessages] =
-    new StubbedActorContext[CommandStatusMessages]("ctx-command-status-service", 100, typedSystem)
+  private val ctx: StubbedActorContext[CommandResponseManagerMessage] =
+    new StubbedActorContext[CommandResponseManagerMessage]("ctx-command-status-service", 100, typedSystem)
 
-  def createCommandStatusService(): CommandStatusService =
-    new CommandStatusService(ctx, "test-component") with MutableActorMock[CommandStatusMessages]
+  def createCommandStatusService(): CommandResponseManagerBehavior =
+    new CommandResponseManagerBehavior(ctx, "test-component") with MutableActorMock[CommandResponseManagerMessage]
 
   test("should add command") {
     val commandStatusService = createCommandStatusService()
@@ -47,8 +47,8 @@ class CommandStatusServiceTest extends FunSuite with Matchers {
 
     commandStatusService.onMessage(AddSubCommand(parentId, childId))
 
-    commandStatusService.commandManagerState.childToParent(childId) shouldBe parentId
-    commandStatusService.commandManagerState.parentToChildren(parentId) shouldBe Set(childId)
+    commandStatusService.commandCoRelation.childToParent(childId) shouldBe parentId
+    commandStatusService.commandCoRelation.parentToChildren(parentId) shouldBe Set(childId)
   }
 
   test("should add subscriber and publish current state to newly added subscriber") {

@@ -2,9 +2,9 @@ package csw.ccs.internal
 
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
-import csw.ccs.models.{CommandManagerState, CommandStatusServiceState}
-import csw.messages.CommandStatusMessages
-import csw.messages.CommandStatusMessages._
+import csw.ccs.models.{CommandCoRelation, CommandResponseManagerState}
+import csw.messages.CommandResponseManagerMessage
+import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.{
   CommandExecutionResponse,
   CommandResponse,
@@ -14,15 +14,15 @@ import csw.messages.ccs.commands.{
 import csw.messages.params.models.RunId
 import csw.services.logging.scaladsl.ComponentLogger
 
-class CommandStatusService(
-    ctx: ActorContext[CommandStatusMessages],
+class CommandResponseManagerBehavior(
+    ctx: ActorContext[CommandResponseManagerMessage],
     componentName: String
-) extends ComponentLogger.MutableActor[CommandStatusMessages](ctx, componentName) {
+) extends ComponentLogger.MutableActor[CommandResponseManagerMessage](ctx, componentName) {
 
-  var commandStatus: CommandStatusServiceState = CommandStatusServiceState(Map.empty)
-  var commandManagerState: CommandManagerState = CommandManagerState(Map.empty, Map.empty)
+  var commandStatus: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
+  var commandCoRelation: CommandCoRelation       = CommandCoRelation(Map.empty, Map.empty)
 
-  override def onMessage(msg: CommandStatusMessages): Behavior[CommandStatusMessages] = {
+  override def onMessage(msg: CommandResponseManagerMessage): Behavior[CommandResponseManagerMessage] = {
     msg match {
       case AddCommand(runId, initialState)        ⇒ commandStatus = commandStatus.add(runId, initialState)
       case AddSubCommand(parentRunId, childRunId) ⇒ addTo(parentRunId, childRunId)
@@ -36,7 +36,7 @@ class CommandStatusService(
   }
 
   private def addTo(parentRunId: RunId, childRunId: RunId): Unit =
-    commandManagerState = commandManagerState.add(parentRunId, childRunId)
+    commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
 
   private def updateCommand(commandResponse: CommandResponse): Unit = {
     commandStatus = commandStatus.updateCommandStatus(commandResponse)
@@ -45,7 +45,7 @@ class CommandStatusService(
 
   private def updateSubCommand(commandResponse: CommandResponse): Unit = {
     // If the sub command has a parent command, fetch the current status of parent command from command status service
-    commandManagerState.childToParent
+    commandCoRelation.childToParent
       .get(commandResponse.runId)
       .foreach(parentId ⇒ updateParent(parentId, commandResponse))
   }
@@ -66,8 +66,8 @@ class CommandStatusService(
   private def updateParentForChild(parentRunId: RunId, childCommandResponse: CommandResponse): Unit =
     childCommandResponse match {
       case _: CommandExecutionResponse ⇒
-        commandManagerState = commandManagerState.remove(parentRunId, childCommandResponse.runId)
-        if (commandManagerState.parentToChildren(parentRunId).isEmpty)
+        commandCoRelation = commandCoRelation.remove(parentRunId, childCommandResponse.runId)
+        if (commandCoRelation.parentToChildren(parentRunId).isEmpty)
           updateCommand(childCommandResponse.withRunId(parentRunId))
       case _ ⇒
     }
