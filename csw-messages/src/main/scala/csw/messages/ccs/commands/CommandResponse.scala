@@ -60,7 +60,7 @@ object CommandExecutionResponse {
 
 sealed trait CommandResultType
 object CommandResultType {
-  case object Intermediate extends CommandResultType
+  case object Intermediate extends CommandResultType //TODO: Evaluate if its needed
   sealed trait Final       extends CommandResultType
   case object Positive     extends Final
   case object Negative     extends Final

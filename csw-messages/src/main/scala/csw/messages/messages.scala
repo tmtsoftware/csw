@@ -132,6 +132,13 @@ case class SupervisorInfo(system: ActorSystem, component: Component)
 
 sealed trait CommandResponseManagerMessage
 object CommandResponseManagerMessage {
+  case class AddCommand(commandId: RunId, initialState: CommandResponse) extends CommandResponseManagerMessage {
+    def apply(runId: RunId) = AddCommand(runId, Initialized(runId))
+  }
+  case class AddSubCommand(commandId: RunId, subCommandId: RunId)              extends CommandResponseManagerMessage
+  case class UpdateCommand(commandId: RunId, commandResponse: CommandResponse) extends CommandResponseManagerMessage
+  case class UpdateSubCommand(subCommandId: RunId, commandResponse: CommandResponse)
+      extends CommandResponseManagerMessage
   case class Query(commandId: RunId, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
       with SupervisorExternalMessage
@@ -141,11 +148,5 @@ object CommandResponseManagerMessage {
   case class UnSubscribe(commandId: RunId, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
       with SupervisorExternalMessage
-  case class AddSubCommand(commandId: RunId, subCommandId: RunId)              extends CommandResponseManagerMessage
-  case class UpdateCommand(commandId: RunId, commandResponse: CommandResponse) extends CommandResponseManagerMessage
-  case class UpdateSubCommand(subCommandId: RunId, commandResponse: CommandResponse)
-      extends CommandResponseManagerMessage
-  case class AddCommand(commandId: RunId, initialState: CommandResponse) extends CommandResponseManagerMessage {
-    def apply(runId: RunId) = AddCommand(runId, Initialized(runId))
-  }
+
 }
