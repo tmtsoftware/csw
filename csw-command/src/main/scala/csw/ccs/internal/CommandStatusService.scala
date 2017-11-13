@@ -25,7 +25,7 @@ class CommandStatusService(
   override def onMessage(msg: CommandStatusMessages): Behavior[CommandStatusMessages] = {
     msg match {
       case AddCommand(runId, initialState)        ⇒ commandStatus = commandStatus.add(runId, initialState)
-      case AddSubCommand(runIdParent, runIdChild) ⇒ addTo(runIdParent, runIdChild)
+      case AddSubCommand(parentRunId, childRunId) ⇒ addTo(parentRunId, childRunId)
       case UpdateCommand(cmdStatus)               ⇒ updateCommand(cmdStatus)
       case UpdateSubCommand(cmdStatus)            ⇒ updateSubCommand(cmdStatus)
       case Query(runId, replyTo)                  ⇒ replyTo ! commandStatus.get(runId)
@@ -35,8 +35,8 @@ class CommandStatusService(
     this
   }
 
-  private def addTo(runIdParent: RunId, runIdChild: RunId): Unit =
-    commandManagerState = commandManagerState.add(runIdParent, runIdChild)
+  private def addTo(parentRunId: RunId, childRunId: RunId): Unit =
+    commandManagerState = commandManagerState.add(parentRunId, childRunId)
 
   private def updateCommand(commandResponse: CommandResponse): Unit = {
     commandStatus = commandStatus.updateCommandStatus(commandResponse)
@@ -50,25 +50,25 @@ class CommandStatusService(
       .foreach(parentId ⇒ updateParent(parentId, commandResponse))
   }
 
-  private def updateParent(parentId: RunId, childCommandResponse: CommandResponse): Unit =
-    (commandStatus.get(parentId).resultType, childCommandResponse.resultType) match {
+  private def updateParent(parentRunId: RunId, childCommandResponse: CommandResponse): Unit =
+    (commandStatus.get(parentRunId).resultType, childCommandResponse.resultType) match {
       // If the child command receives a negative result, the result of the parent command need not wait for the
       // result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Negative) ⇒
-        updateCommand(childCommandResponse)
+        updateCommand(childCommandResponse.withRunId(parentRunId))
       // If the child command receives a positive result, the result of the parent command needs to be evaluated based
       // on the result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Positive) ⇒
-        updateParentForChild(parentId, childCommandResponse)
+        updateParentForChild(parentRunId, childCommandResponse)
       case _ ⇒ // TODO: Implement this
     }
 
-  private def updateParentForChild(parentId: RunId, childCommandResponse: CommandResponse): Unit =
+  private def updateParentForChild(parentRunId: RunId, childCommandResponse: CommandResponse): Unit =
     childCommandResponse match {
       case _: CommandExecutionResponse ⇒
-        commandManagerState = commandManagerState.remove(parentId, childCommandResponse.runId)
-        if (commandManagerState.parentToChildren(parentId).isEmpty)
-          updateCommand(childCommandResponse)
+        commandManagerState = commandManagerState.remove(parentRunId, childCommandResponse.runId)
+        if (commandManagerState.parentToChildren(parentRunId).isEmpty)
+          updateCommand(childCommandResponse.withRunId(parentRunId))
       case _ ⇒
     }
 
