@@ -24,13 +24,13 @@ class CommandResponseManagerBehavior(
 
   override def onMessage(msg: CommandResponseManagerMessage): Behavior[CommandResponseManagerMessage] = {
     msg match {
-      case AddCommand(runId, initialState)        ⇒ commandStatus = commandStatus.add(runId, initialState)
-      case AddSubCommand(parentRunId, childRunId) ⇒ addTo(parentRunId, childRunId)
-      case UpdateCommand(cmdStatus)               ⇒ updateCommand(cmdStatus)
-      case UpdateSubCommand(cmdStatus)            ⇒ updateSubCommand(cmdStatus)
-      case Query(runId, replyTo)                  ⇒ replyTo ! commandStatus.get(runId)
-      case Subscribe(runId, replyTo)              ⇒ subscribe(runId, replyTo)
-      case UnSubscribe(runId, replyTo)            ⇒ commandStatus = commandStatus.unSubscribe(runId, replyTo)
+      case AddCommand(runId, initialState)           ⇒ commandStatus = commandStatus.add(runId, initialState)
+      case AddSubCommand(parentRunId, childRunId)    ⇒ addTo(parentRunId, childRunId)
+      case UpdateCommand(commandId, cmdStatus)       ⇒ updateCommand(commandId, cmdStatus)
+      case UpdateSubCommand(subCommandId, cmdStatus) ⇒ updateSubCommand(subCommandId, cmdStatus)
+      case Query(runId, replyTo)                     ⇒ replyTo ! commandStatus.get(runId)
+      case Subscribe(runId, replyTo)                 ⇒ subscribe(runId, replyTo)
+      case UnSubscribe(runId, replyTo)               ⇒ commandStatus = commandStatus.unSubscribe(runId, replyTo)
     }
     this
   }
@@ -38,12 +38,12 @@ class CommandResponseManagerBehavior(
   private def addTo(parentRunId: RunId, childRunId: RunId): Unit =
     commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
 
-  private def updateCommand(commandResponse: CommandResponse): Unit = {
+  private def updateCommand(commandId: RunId, commandResponse: CommandResponse): Unit = {
     commandStatus = commandStatus.updateCommandStatus(commandResponse)
     publishToSubscribers(commandResponse, commandStatus.cmdToCmdStatus(commandResponse.runId).subscribers)
   }
 
-  private def updateSubCommand(commandResponse: CommandResponse): Unit = {
+  private def updateSubCommand(subCommandId: RunId, commandResponse: CommandResponse): Unit = {
     // If the sub command has a parent command, fetch the current status of parent command from command status service
     commandCoRelation.childToParent
       .get(commandResponse.runId)
@@ -55,7 +55,7 @@ class CommandResponseManagerBehavior(
       // If the child command receives a negative result, the result of the parent command need not wait for the
       // result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Negative) ⇒
-        updateCommand(childCommandResponse.withRunId(parentRunId))
+        updateCommand(parentRunId, childCommandResponse.withRunId(parentRunId))
       // If the child command receives a positive result, the result of the parent command needs to be evaluated based
       // on the result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Positive) ⇒
@@ -68,7 +68,7 @@ class CommandResponseManagerBehavior(
       case _: CommandExecutionResponse ⇒
         commandCoRelation = commandCoRelation.remove(parentRunId, childCommandResponse.runId)
         if (commandCoRelation.parentToChildren(parentRunId).isEmpty)
-          updateCommand(childCommandResponse.withRunId(parentRunId))
+          updateCommand(parentRunId, childCommandResponse.withRunId(parentRunId))
       case _ ⇒
     }
 

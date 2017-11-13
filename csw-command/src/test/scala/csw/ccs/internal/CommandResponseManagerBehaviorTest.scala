@@ -102,7 +102,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe1.ref))
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe2.ref))
 
-    commandStatusService.onMessage(UpdateCommand(InProgress(runId, "40% completed")))
+    commandStatusService.onMessage(UpdateCommand(runId, InProgress(runId, "40% completed")))
 
     commandResponseProbe1.expectMsg(InProgress(runId, "40% completed"))
     commandResponseProbe2.expectMsg(InProgress(runId, "40% completed"))
@@ -119,7 +119,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
 
     commandStatusService.onMessage(AddSubCommand(commandId, subCommandId))
 
-    commandStatusService.onMessage(UpdateSubCommand(Completed(subCommandId)))
+    commandStatusService.onMessage(UpdateSubCommand(subCommandId, Completed(subCommandId)))
 
     // Update of a sub command status(above) should update the status of parent command
     commandResponseProbe.expectMsg(Completed(commandId))
@@ -138,8 +138,8 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandStatusService.onMessage(AddSubCommand(commandId, subCommandId1))
     commandStatusService.onMessage(AddSubCommand(commandId, subCommandId2))
 
-    commandStatusService.onMessage(UpdateSubCommand(Error(subCommandId1, "Sub command 1 failed")))
-    commandStatusService.onMessage(UpdateSubCommand(Completed(subCommandId2)))
+    commandStatusService.onMessage(UpdateSubCommand(subCommandId1, Error(subCommandId1, "Sub command 1 failed")))
+    commandStatusService.onMessage(UpdateSubCommand(subCommandId2, Completed(subCommandId2)))
 
     // Update of a failed sub command status(above) should update the status of parent command as failed irrespective
     // of the result of other sub command
@@ -160,21 +160,21 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandStatusService.onMessage(AddSubCommand(commandId, subCommandId2))
 
     // Update status of sub command 1 as completed
-    commandStatusService.onMessage(UpdateSubCommand(Completed(subCommandId1)))
+    commandStatusService.onMessage(UpdateSubCommand(subCommandId1, Completed(subCommandId1)))
 
     // Status update of sub command 1 does not make the parent command complete
     commandStatusService.onMessage(Query(commandId, commandResponseProbe.ref))
     commandResponseProbe.expectMsg(Accepted(commandId))
 
     // Update status of sub command 2 with some intermediate status
-    commandStatusService.onMessage(UpdateSubCommand(InProgress(subCommandId2)))
+    commandStatusService.onMessage(UpdateSubCommand(subCommandId2, InProgress(subCommandId2)))
 
     // Status update of sub command 2  with intermediate does not make the parent command complete
     commandStatusService.onMessage(Query(commandId, commandResponseProbe.ref))
     commandResponseProbe.expectMsg(Accepted(commandId))
 
     // Update status of sub command 2 as completed
-    commandStatusService.onMessage(UpdateSubCommand(Completed(subCommandId2)))
+    commandStatusService.onMessage(UpdateSubCommand(subCommandId2, Completed(subCommandId2)))
 
     // Update of final sub command as Completed where other sub commands have completed earlier
     // should update the status of parent command as Completed
