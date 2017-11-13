@@ -30,6 +30,7 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
   protected[framework] def handlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
+      commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
       locationService: LocationService
   ): ComponentHandlers[Msg]
@@ -47,7 +48,7 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
       componentInfo: ComponentInfo,
       supervisor: ActorRef[FromComponentLifecycleMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-      commandManager: ActorRef[CommandResponseManagerMessage],
+      commandResponseManager: ActorRef[CommandResponseManagerMessage],
       locationService: LocationService
   ): Behavior[Nothing] =
     Actor
@@ -57,8 +58,8 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
             ctx,
             componentInfo,
             supervisor,
-            handlers(ctx, componentInfo, pubSubRef, locationService),
-            commandManager,
+            handlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService),
+            commandResponseManager,
             locationService
         )
       )

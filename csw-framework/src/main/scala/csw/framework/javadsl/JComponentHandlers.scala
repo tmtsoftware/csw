@@ -5,11 +5,11 @@ import java.util.concurrent.CompletableFuture
 import akka.typed.ActorRef
 import akka.typed.javadsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.ComponentMessage
 import csw.messages.PubSub.PublisherMessage
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages.framework.ComponentInfo
 import csw.messages.params.states.CurrentState
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.javadsl.ILocationService
 
 import scala.compat.java8.FutureConverters._
@@ -27,10 +27,17 @@ import scala.reflect.ClassTag
 abstract class JComponentHandlers[Msg <: DomainMessage](
     ctx: ActorContext[ComponentMessage],
     componentInfo: ComponentInfo,
+    commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: ILocationService,
     klass: Class[Msg]
-) extends ComponentHandlers[Msg](ctx.asScala, componentInfo, pubSubRef, locationService.asScala)(ClassTag(klass)) {
+) extends ComponentHandlers[Msg](
+      ctx.asScala,
+      componentInfo,
+      commandResponseManager,
+      pubSubRef,
+      locationService.asScala
+    )(ClassTag(klass)) {
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
 

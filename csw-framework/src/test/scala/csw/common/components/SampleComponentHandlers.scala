@@ -68,9 +68,16 @@ object SampleComponentState {
 class SampleComponentHandlers(
     ctx: ActorContext[ComponentMessage],
     componentInfo: ComponentInfo,
+    commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
-) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, pubSubRef, locationService)
+) extends ComponentHandlers[ComponentDomainMessage](
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      pubSubRef,
+      locationService
+    )
     with ComponentLogger.Simple {
 
   import SampleComponentState._

@@ -5,6 +5,7 @@ import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.common.components.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.messages.CommandResponseManagerMessage;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.CommandValidationResponse;
 import csw.messages.ComponentMessage;
@@ -32,9 +33,15 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
 
-    JSampleComponentHandlers(ActorContext<ComponentMessage> ctx, ComponentInfo componentInfo, ActorRef<PubSub.PublisherMessage<CurrentState>>
-            pubSubRef, ILocationService locationService, Class<JComponentDomainMessage> klass) {
-        super(ctx, componentInfo, pubSubRef, locationService, klass);
+    JSampleComponentHandlers(
+            ActorContext<ComponentMessage> ctx,
+            ComponentInfo componentInfo,
+            ActorRef<CommandResponseManagerMessage> commandResponseManager,
+            ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
+            ILocationService locationService,
+            Class<JComponentDomainMessage> klass
+    ) {
+        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, klass);
         this.pubSubRef = pubSubRef;
         this.componentName = componentInfo.name();
         this.log = getLogger();

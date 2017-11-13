@@ -21,9 +21,10 @@ case class StartLogging() extends DomainMessage
 class GalilComponentHandlers(
     ctx: ActorContext[ComponentMessage],
     componentInfo: ComponentInfo,
+    commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
-) extends ComponentHandlers[StartLogging](ctx, componentInfo, pubSubRef, locationService)
+) extends ComponentHandlers[StartLogging](ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
     with ComponentLogger.Simple {
 
   override def initialize(): Future[Unit] = Future.successful(())

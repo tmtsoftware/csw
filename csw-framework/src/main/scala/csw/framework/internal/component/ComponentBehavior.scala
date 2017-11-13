@@ -38,7 +38,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers[Msg],
-    commandStatusService: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: ActorRef[CommandResponseManagerMessage],
     locationService: LocationService
 ) extends ComponentLogger.MutableActor[ComponentMessage](ctx, componentInfo.name) {
 
@@ -174,6 +174,6 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     }
 
     commandMessage.replyTo ! validationResponse
-    commandStatusService ! AddCommand(commandMessage.command.runId, validationResponse)
+    commandResponseManager ! AddCommand(commandMessage.command.runId, validationResponse)
   }
 }

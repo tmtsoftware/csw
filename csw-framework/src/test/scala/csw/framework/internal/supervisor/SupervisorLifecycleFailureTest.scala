@@ -232,6 +232,7 @@ class SampleBehaviorFactory(componentHandlers: ComponentHandlers[ComponentDomain
   override protected[framework] def handlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
+      commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
       locationService: LocationService
   ): ComponentHandlers[ComponentDomainMessage] = componentHandlers

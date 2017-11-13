@@ -6,7 +6,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages.framework.ComponentInfo
 import csw.messages.params.states.CurrentState
-import csw.messages.{ComponentMessage, PubSub}
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage, PubSub}
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 
@@ -23,14 +23,16 @@ abstract class JComponentBehaviorFactory[Msg <: DomainMessage](
   protected[framework] def handlers(
       ctx: scaladsl.ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
+      commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
       locationService: LocationService
   ): ComponentHandlers[Msg] =
-    jHandlers(ctx.asJava, componentInfo, pubSubRef, locationService.asJava)
+    jHandlers(ctx.asJava, componentInfo, commandResponseManager, pubSubRef, locationService.asJava)
 
   protected[framework] def jHandlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
+      commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
       locationService: ILocationService
   ): JComponentHandlers[Msg]

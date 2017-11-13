@@ -27,18 +27,26 @@ class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPubli
   override def handlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
+      commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
       locationService: LocationService
   ): ComponentHandlers[DiagPublisherMessages] =
-    new TromboneAssemblyHandlers(ctx, componentInfo, pubSubRef, locationService)
+    new TromboneAssemblyHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
 }
 
 class TromboneAssemblyHandlers(
     ctx: ActorContext[ComponentMessage],
     componentInfo: ComponentInfo,
+    commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
-) extends ComponentHandlers[DiagPublisherMessages](ctx, componentInfo, pubSubRef, locationService) {
+) extends ComponentHandlers[DiagPublisherMessages](
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      pubSubRef,
+      locationService
+    ) {
 
   private var diagPublsher: ActorRef[DiagPublisherMessages] = _
 

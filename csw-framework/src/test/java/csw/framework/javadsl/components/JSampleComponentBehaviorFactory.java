@@ -4,6 +4,7 @@ import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.messages.CommandResponseManagerMessage;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.ComponentMessage;
 import csw.messages.PubSub;
@@ -19,8 +20,9 @@ public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory<J
     public JComponentHandlers<JComponentDomainMessage> jHandlers(
             ActorContext<ComponentMessage> ctx,
             ComponentInfo componentInfo,
+            ActorRef<CommandResponseManagerMessage> commandResponseManager,
             ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
             ILocationService locationService) {
-        return new JSampleComponentHandlers(ctx, componentInfo, pubSubRef, locationService, JComponentDomainMessage.class);
+        return new JSampleComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, JComponentDomainMessage.class);
     }
 }

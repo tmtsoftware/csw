@@ -29,18 +29,20 @@ class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessag
   override def handlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
+      commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
       locationService: LocationService
   ): ComponentHandlers[TromboneMessage] =
-    new TromboneHcdHandlers(ctx, componentInfo, pubSubRef, locationService)
+    new TromboneHcdHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
 }
 
 class TromboneHcdHandlers(
     ctx: ActorContext[ComponentMessage],
     componentInfo: ComponentInfo,
+    commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
-) extends ComponentHandlers[TromboneMessage](ctx, componentInfo, pubSubRef, locationService) {
+) extends ComponentHandlers[TromboneMessage](ctx, componentInfo, commandResponseManager, pubSubRef, locationService) {
 
   implicit val timeout: Timeout             = Timeout(2.seconds)
   implicit val scheduler: Scheduler         = ctx.system.scheduler
