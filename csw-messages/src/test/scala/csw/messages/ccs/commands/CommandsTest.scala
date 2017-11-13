@@ -10,6 +10,7 @@ import scala.util.Try
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
+// DEOPSCSW-196: Command Payloads for variable command content
 class CommandsTest extends FunSpec {
 
   private val ck1 = "wfos.prog.cloudcover"

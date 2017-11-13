@@ -13,6 +13,6 @@ case class CommandState(commandStatus: CommandStatus, subscribers: Set[ActorRef[
 }
 
 object CommandState {
-  def init(runId: RunId, initialState: CommandResponse) =
+  def init(runId: RunId, initialState: CommandResponse): CommandState =
     CommandState(CommandStatus(runId, initialState), Set.empty)
 }

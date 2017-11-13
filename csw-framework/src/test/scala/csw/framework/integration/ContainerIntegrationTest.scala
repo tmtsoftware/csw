@@ -33,7 +33,6 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
-// DEOPSCSW-168: Deployment of multiple Assemblies and HCDs
 // DEOPSCSW-169: Creation of Multiple Components
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-182: Control Life Cycle of Components
