@@ -63,10 +63,10 @@ enum PbUnits {
     pound = 44;
     mile  = 45;
     ounce = 46;
-    yard  = 48;
+    yard  = 47;
 
     // Others - engineering
-    encoder = 49;
-    count   = 50;
-    pix     = 51;
+    encoder = 48;
+    count   = 49;
+    pix     = 50;
 }
