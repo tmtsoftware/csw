@@ -165,7 +165,7 @@ case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
   def toJson: JsValue = Parameter[S].writes(this)
 
   /**
-   * Converts this instance of Parameter to it's Protobuf dual, represented by PbParameter
+   * Converts this instance of Parameter to Protobuf dual, represented by PbParameter
    * @return an instance PbParameter
    */
   def toPb: PbParameter = Parameter.typeMapper[S].toBase(this)

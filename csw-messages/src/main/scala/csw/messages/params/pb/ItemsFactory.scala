@@ -6,6 +6,13 @@ import csw.messages.params.models._
 import csw_messages_params.parameter.PbParameter.Items
 
 abstract class ItemsFactory[T] {
+
+  /**
+   * Abstract method to convert a Seq[T] to Items which is a base class for all supported Items.
+   * e.g. BooleanItems, StringItems etc.
+   *
+   * @return Items
+   */
   def make(xs: Seq[T]): Items
 }
 
@@ -16,6 +23,7 @@ object ItemsFactory {
     makeItems(ItemTypeCompanion.make(xs))
   }
 
+  //ItemsFactory for all ItemTypes defined in Protobuf.
   implicit val ChoiceItemsFactory: ItemsFactory[Choice]   = ItemsFactory(Items.ChoiceItems)
   implicit val RaDecItemsFactory: ItemsFactory[RaDec]     = ItemsFactory(Items.RaDecItems)
   implicit val StructItemsFactory: ItemsFactory[Struct]   = ItemsFactory(Items.StructItems)
