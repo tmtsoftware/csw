@@ -37,12 +37,11 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.util.{Failure, Success}
 
 object SupervisorBehavior {
-  val PubSubComponentActor      = "pub-sub-component"
-  val PubSubLifecycleActor      = "pub-sub-lifecycle"
-  val InitializeTimerKey        = "initialize-timer"
-  val ComponentActorNameSuffix  = "component-actor"
-  val CommandStatusServiceActor = "command-status-service"
-  val CommandManagerActor       = "command-manager"
+  val PubSubComponentActor        = "pub-sub-component"
+  val PubSubLifecycleActor        = "pub-sub-lifecycle"
+  val InitializeTimerKey          = "initialize-timer"
+  val ComponentActorNameSuffix    = "component-actor"
+  val CommandResponseManagerActor = "command-response-manager"
 }
 
 /**
@@ -85,8 +84,8 @@ class SupervisorBehavior(
     pubSubBehaviorFactory.make(ctx, PubSubComponentActor, componentName)
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
     pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, componentName)
-  val commandStatusService: ActorRef[CommandResponseManagerMessage] =
-    CommandResponseManagerFactory.make(ctx, CommandStatusServiceActor, componentName)
+  val commandResponseManager: ActorRef[CommandResponseManagerMessage] =
+    CommandResponseManagerFactory.make(ctx, CommandResponseManagerActor, componentName)
 
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
@@ -164,10 +163,8 @@ class SupervisorBehavior(
    * @param idleMessage  Message representing a message received in [[SupervisorLifecycleState.Idle]] state
    */
   private def onIdle(idleMessage: SupervisorIdleMessage): Unit = idleMessage match {
-    case RegistrationSuccess(componentRef) ⇒
-      onRegistrationComplete(componentRef)
-    case RegistrationNotRequired(componentRef) ⇒
-      onRegistrationComplete(componentRef)
+    case RegistrationSuccess(componentRef)     ⇒ onRegistrationComplete(componentRef)
+    case RegistrationNotRequired(componentRef) ⇒ onRegistrationComplete(componentRef)
     case RegistrationFailed(throwable) ⇒
       log.error(throwable.getMessage, ex = throwable)
       throw throwable
@@ -228,30 +225,26 @@ class SupervisorBehavior(
   }
 
   private def spawn(): Unit = {
-    log.debug(
-      s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Idle}]"
-    )
+    log.debug(s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Idle}]")
     lifecycleState = SupervisorLifecycleState.Idle
     spawnAndWatchComponent()
   }
 
-  private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = {
-    message match {
-      case GoOffline ⇒
-        if (lifecycleState == SupervisorLifecycleState.Running) {
-          log.debug(
-            s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.RunningOffline}]"
-          )
-          lifecycleState = SupervisorLifecycleState.RunningOffline
-        }
-      case GoOnline ⇒
-        if (lifecycleState == SupervisorLifecycleState.RunningOffline) {
-          log.debug(
-            s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
-          )
-          lifecycleState = SupervisorLifecycleState.Running
-        }
-    }
+  private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = message match {
+    case GoOffline ⇒
+      if (lifecycleState == SupervisorLifecycleState.Running) {
+        log.debug(
+          s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.RunningOffline}]"
+        )
+        lifecycleState = SupervisorLifecycleState.RunningOffline
+      }
+    case GoOnline ⇒
+      if (lifecycleState == SupervisorLifecycleState.RunningOffline) {
+        log.debug(
+          s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
+        )
+        lifecycleState = SupervisorLifecycleState.Running
+      }
   }
 
   private def registerWithLocationService(componentRef: ActorRef[RunningMessage]): Unit = {
@@ -295,7 +288,7 @@ class SupervisorBehavior(
                 componentInfo,
                 ctx.self,
                 pubSubComponent,
-                commandStatusService,
+                commandResponseManager,
                 locationService
               )
           )

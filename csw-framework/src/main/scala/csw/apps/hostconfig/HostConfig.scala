@@ -2,7 +2,7 @@ package csw.apps.hostconfig
 
 import akka.actor.ActorSystem
 import csw.apps.hostconfig.cli.{ArgsParser, Options}
-import csw.exceptions.ClusterSeedsNotFound
+import csw.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.wiring.FrameworkWiring
 import csw.framework.models.ConfigFileLocation.{Local, Remote}
@@ -42,15 +42,13 @@ private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSetti
     if (clusterSettings.seedNodes.isEmpty)
       throw ClusterSeedsNotFound
     else
-      new ArgsParser().parse(args).foreach {
-        case Options(isLocal, hostConfigPath, Some(containerScript)) =>
+      new ArgsParser().parse(args) match {
+        case None ⇒ throw UnableToParseOptions
+        case Some(Options(isLocal, hostConfigPath, Some(containerScript))) =>
           try {
             if (startLogging) wiring.actorRuntime.startLogging()
 
-            val hostConfig = Await.result(
-              wiring.configUtils.getConfig(isLocal, hostConfigPath, None),
-              10.seconds
-            )
+            val hostConfig    = Await.result(wiring.configUtils.getConfig(isLocal, hostConfigPath, None), 10.seconds)
             val bootstrapInfo = ConfigParser.parseHost(hostConfig)
             log.info(s"Bootstrapping containers: [${bootstrapInfo.containers}]")
             processes = bootstrapContainers(containerScript, bootstrapInfo)
