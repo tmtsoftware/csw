@@ -11,13 +11,17 @@ object UnidocSite extends AutoPlugin {
 
   override def requires: Plugins = ScalaUnidocPlugin && JavaUnidocPlugin
 
+  def excludeJavadoc: Set[String] = Set("internal", "scaladsl", "csw_messages_params")
+  def excludeScaladoc: String     = Seq("csw_messages_params", "akka").mkString(":")
+
   override def projectSettings: Seq[Setting[_]] = Seq(
     siteSubdirName in ScalaUnidoc := "api/scala",
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
     siteSubdirName in JavaUnidoc := "api/java",
-    filterNotSources(sources in (JavaUnidoc, unidoc), Set("internal", "scaladsl")),
+    filterNotSources(sources in (JavaUnidoc, unidoc), excludeJavadoc),
     addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
-    autoAPIMappings := true
+    scalacOptions in (ScalaUnidoc, unidoc) ++= Seq("-skip-packages", excludeScaladoc),
+    autoAPIMappings := true,
     //      apiURL := Some(url(s"http://tmtsoftware.github.io/csw-prod/api/${version.value}"))
   )
 
