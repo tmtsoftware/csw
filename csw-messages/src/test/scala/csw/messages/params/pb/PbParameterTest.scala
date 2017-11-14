@@ -5,10 +5,10 @@ import java.time.Instant
 import csw.messages.params.generics.KeyType.IntMatrixKey
 import csw.messages.params.generics.{JKeyTypes, KeyType, Parameter}
 import csw.messages.params.models._
-import csw_messages_params.ParameterTypes
-import csw_messages_params.parameter.PbParameter
-import csw_messages_params.parameter_types._
-import csw_messages_params.radec.PbRaDec
+import csw_protobuf.ParameterTypes
+import csw_protobuf.parameter.PbParameter
+import csw_protobuf.parameter_types._
+import csw_protobuf.radec.PbRaDec
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter

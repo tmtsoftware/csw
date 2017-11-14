@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package csw_messages_params;
+package csw_protobuf;
 
-import "csw_messages_params/units.proto";
-import "csw_messages_params/keytype.proto";
+import "csw_protobuf/units.proto";
+import "csw_protobuf/keytype.proto";
 import "scalapb/scalapb.proto";
-import "csw_messages_params/parameter_types.proto";
+import "csw_protobuf/parameter_types.proto";
 
 option (scalapb.options) = {
     import: "csw.messages.params.pb._"

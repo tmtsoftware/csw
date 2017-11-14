@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package csw_messages_params;
+package csw_protobuf;
 
-import "csw_messages_params/parameter.proto";
+import "csw_protobuf/parameter.proto";
 import "scalapb/scalapb.proto";
 
 option (scalapb.options) = {

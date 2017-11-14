@@ -3,7 +3,7 @@ package csw.messages.params.pb
 import java.time.Instant
 
 import csw.messages.params.models._
-import csw_messages_params.parameter.PbParameter.Items
+import csw_protobuf.parameter.PbParameter.Items
 
 abstract class ItemsFactory[T] {
 

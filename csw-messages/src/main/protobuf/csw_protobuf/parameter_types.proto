@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package csw_messages_params;
+package csw_protobuf;
 
-import "csw_messages_params/radec.proto";
+import "csw_protobuf/radec.proto";
 import "scalapb/scalapb.proto";
 import "google/protobuf/timestamp.proto";
 

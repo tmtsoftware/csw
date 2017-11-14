@@ -1,7 +1,7 @@
 package csw.messages.params.models
 
 import com.trueaccord.scalapb.TypeMapper
-import csw_messages_params.radec.PbRaDec
+import csw_protobuf.radec.PbRaDec
 import play.api.libs.json.{Json, OFormat}
 
 /**

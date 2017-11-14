@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package csw_messages_params;
+package csw_protobuf;
 
 import "scalapb/scalapb.proto";
 

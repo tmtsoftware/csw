@@ -1,9 +1,9 @@
 package csw.messages.params.pb;
 
-import csw_messages_params.Events;
-import csw_messages_params.Keytype;
-import csw_messages_params.Parameter;
-import csw_messages_params.ParameterTypes;
+import csw_protobuf.Events;
+import csw_protobuf.Keytype;
+import csw_protobuf.Parameter;
+import csw_protobuf.ParameterTypes;
 import org.junit.Test;
 
 import java.util.Arrays;
