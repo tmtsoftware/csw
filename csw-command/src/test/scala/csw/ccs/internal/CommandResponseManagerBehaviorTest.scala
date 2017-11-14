@@ -31,7 +31,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
   def createCommandStatusService(): CommandResponseManagerBehavior =
     new CommandResponseManagerBehavior(ctx, "test-component") with MutableActorMock[CommandResponseManagerMessage]
 
-  test("should able to add command entry in Command Response Manager") {
+  test("should be able to add command entry in Command Response Manager") {
     val commandStatusService = createCommandStatusService()
 
     val runId = RunId()
@@ -42,18 +42,19 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandStatusService.commandCoRelation.childToParent.isEmpty shouldBe true
   }
 
-  test("should able to add correlation between parent and child via AddSubCommand") {
+  test("should be able to add correlation between parent and child via AddSubCommand") {
     val commandStatusService = createCommandStatusService()
     val parentId             = RunId()
     val childId              = RunId()
 
+    commandStatusService.onMessage(AddCommand(parentId, Accepted(parentId)))
     commandStatusService.onMessage(AddSubCommand(parentId, childId))
 
     commandStatusService.commandCoRelation.childToParent(childId) shouldBe parentId
     commandStatusService.commandCoRelation.parentToChildren(parentId) shouldBe Set(childId)
   }
 
-  test("should able to add subscriber and publish current state to newly added subscriber") {
+  test("should be able to add subscriber and publish current state to newly added subscriber") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
     val runId                = RunId()
@@ -66,7 +67,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandResponseProbe.expectMsg(Completed(runId))
   }
 
-  test("should able to remove subscriber") {
+  test("should be able to remove subscriber") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
     val runId                = RunId()
@@ -80,7 +81,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandStatusService.commandStatus.cmdToCmdStatus(runId).subscribers should not contain commandResponseProbe.ref
   }
 
-  test("should able to get current status of command on Query message") {
+  test("should be able to get current status of command on Query message") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
     val runId                = RunId()
@@ -91,7 +92,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandResponseProbe.expectMsg(Accepted(runId))
   }
 
-  test("should able to update and publish command status to all subscribers") {
+  test("should be able to update and publish command status to all subscribers") {
     val commandStatusService  = createCommandStatusService()
     val commandResponseProbe1 = TestProbe[CommandResponse]
     val commandResponseProbe2 = TestProbe[CommandResponse]
@@ -112,7 +113,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandResponseProbe2.expectMsg(InProgress(runId, "40% completed"))
   }
 
-  test("should able to infer command status when status of sub command is updated") {
+  test("should be able to infer command status when status of sub command is updated") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
     val commandId            = RunId()
@@ -129,7 +130,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandResponseProbe.expectMsg(Completed(commandId))
   }
 
-  test("should able to update command status with the status of subcommand if one of the subcommand fails") {
+  test("should be able to update command status with the status of subcommand if one of the subcommand fails") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
     val commandId            = RunId()
@@ -150,7 +151,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandResponseProbe.expectMsg(Error(commandId, "Sub command 1 failed"))
   }
 
-  test("should able to update successful command status when all the subcommand completes with success") {
+  test("should be able to update successful command status when all the subcommand completes with success") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
     val commandId            = RunId()
