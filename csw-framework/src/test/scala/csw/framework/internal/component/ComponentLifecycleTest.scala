@@ -22,6 +22,7 @@ import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 
 //DEOPSCSW-177-Hooks for lifecycle management
 //DEOPSCSW-179-Unique Action for a component
@@ -152,6 +153,6 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     verify(sampleHcdHandler).onOneway(sc1)
     commandResponseProbe.expectMsg(Accepted(sc1.runId))
-    commmandStatusServiceProbe.expectMsg(AddCommand(sc1.runId, Accepted(sc1.runId)))
+    commmandStatusServiceProbe.expectNoMsg(3.seconds)
   }
 }
