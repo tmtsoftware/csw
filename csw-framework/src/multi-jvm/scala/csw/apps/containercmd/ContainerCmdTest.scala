@@ -39,6 +39,7 @@ class ContainerCmdTestMultiJvm1 extends ContainerCmdTest(0)
 class ContainerCmdTestMultiJvm2 extends ContainerCmdTest(0)
 class ContainerCmdTestMultiJvm3 extends ContainerCmdTest(0)
 
+// DEOPSCSW-43 :  Access Configuration service from any CSW component
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-168: Deployment of multiple Assemblies and HCDs
 // DEOPSCSW-169: Creation of Multiple Components
