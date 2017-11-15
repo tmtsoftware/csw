@@ -130,6 +130,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandResponseProbe.expectMsg(Completed(commandId))
   }
 
+  // DEOPSCSW-208: Report failure on Configuration Completion command
   test("should be able to update command status with the status of subcommand if one of the subcommand fails") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
@@ -151,6 +152,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandResponseProbe.expectMsg(Error(commandId, "Sub command 1 failed"))
   }
 
+  // DEOPSCSW-207: Report on Configuration Command Completion
   test("should be able to update successful command status when all the subcommand completes with success") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
