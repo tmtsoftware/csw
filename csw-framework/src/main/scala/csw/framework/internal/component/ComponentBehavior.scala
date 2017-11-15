@@ -4,7 +4,7 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.AddCommand
+import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.CommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
@@ -171,7 +171,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
       case _: Submit =>
         log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
         val response = lifecycleHandlers.onSubmit(commandMessage.command, commandMessage.replyTo)
-        commandResponseManager ! AddCommand(commandMessage.command.runId, response)
+        commandResponseManager ! AddOrUpdateCommand(commandMessage.command.runId, response)
         response
     }
 

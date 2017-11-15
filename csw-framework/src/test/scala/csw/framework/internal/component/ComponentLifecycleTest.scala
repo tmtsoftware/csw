@@ -7,7 +7,7 @@ import csw.framework.FrameworkTestMocks.MutableActorMock
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.AddCommand
+import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
 import csw.messages.RunningMessage.Lifecycle
@@ -134,7 +134,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     verify(sampleHcdHandler).onSubmit(sc1, commandResponseProbe.ref)
     commandResponseProbe.expectMsg(Accepted(sc1.runId))
-    commmandStatusServiceProbe.expectMsg(AddCommand(sc1.runId, Accepted(sc1.runId)))
+    commmandStatusServiceProbe.expectMsg(AddOrUpdateCommand(sc1.runId, Accepted(sc1.runId)))
   }
 
   test("A running component should handle Oneway command") {

@@ -35,7 +35,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     val commandStatusService = createCommandStatusService()
 
     val runId = RunId()
-    commandStatusService.onMessage(AddCommand(runId, Accepted(runId)))
+    commandStatusService.onMessage(AddOrUpdateCommand(runId, Accepted(runId)))
 
     commandStatusService.commandStatus.get(runId) shouldBe Accepted(runId)
     commandStatusService.commandCoRelation.parentToChildren shouldBe empty
@@ -47,7 +47,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     val parentId             = RunId()
     val childId              = RunId()
 
-    commandStatusService.onMessage(AddCommand(parentId, Accepted(parentId)))
+    commandStatusService.onMessage(AddOrUpdateCommand(parentId, Accepted(parentId)))
     commandStatusService.onMessage(AddSubCommand(parentId, childId))
 
     commandStatusService.commandCoRelation.childToParent(childId) shouldBe parentId
@@ -59,7 +59,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     val commandResponseProbe = TestProbe[CommandResponse]
     val runId                = RunId()
 
-    commandStatusService.onMessage(AddCommand(runId, Completed(runId)))
+    commandStatusService.onMessage(AddOrUpdateCommand(runId, Completed(runId)))
     commandStatusService.commandStatus.cmdToCmdStatus(runId).subscribers shouldBe empty
 
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe.ref))
@@ -72,7 +72,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     val commandResponseProbe = TestProbe[CommandResponse]
     val runId                = RunId()
 
-    commandStatusService.onMessage(AddCommand(runId, Accepted(runId)))
+    commandStatusService.onMessage(AddOrUpdateCommand(runId, Accepted(runId)))
 
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe.ref))
     commandStatusService.commandStatus.cmdToCmdStatus(runId).subscribers should contain(commandResponseProbe.ref)
@@ -86,7 +86,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     val commandResponseProbe = TestProbe[CommandResponse]
     val runId                = RunId()
 
-    commandStatusService.onMessage(AddCommand(runId, Accepted(runId)))
+    commandStatusService.onMessage(AddOrUpdateCommand(runId, Accepted(runId)))
 
     commandStatusService.onMessage(Query(runId, commandResponseProbe.ref))
     commandResponseProbe.expectMsg(Accepted(runId))
@@ -98,11 +98,11 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     val commandResponseProbe2 = TestProbe[CommandResponse]
     val runId                 = RunId()
 
-    commandStatusService.onMessage(AddCommand(runId, Accepted(runId)))
+    commandStatusService.onMessage(AddOrUpdateCommand(runId, Accepted(runId)))
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe1.ref))
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe2.ref))
 
-    commandStatusService.onMessage(UpdateCommand(runId, InProgress(runId, "40% completed")))
+    commandStatusService.onMessage(AddOrUpdateCommand(runId, InProgress(runId, "40% completed")))
 
     commandStatusService.commandStatus
       .cmdToCmdStatus(runId)
@@ -119,7 +119,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     val commandId            = RunId()
     val subCommandId         = RunId()
 
-    commandStatusService.onMessage(AddCommand(commandId, Accepted(commandId)))
+    commandStatusService.onMessage(AddOrUpdateCommand(commandId, Accepted(commandId)))
     commandStatusService.onMessage(Subscribe(commandId, commandResponseProbe.ref))
 
     commandStatusService.onMessage(AddSubCommand(commandId, subCommandId))
@@ -137,7 +137,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     val subCommandId1        = RunId()
     val subCommandId2        = RunId()
 
-    commandStatusService.onMessage(AddCommand(commandId, Accepted(commandId)))
+    commandStatusService.onMessage(AddOrUpdateCommand(commandId, Accepted(commandId)))
     commandStatusService.onMessage(Subscribe(commandId, commandResponseProbe.ref))
 
     commandStatusService.onMessage(AddSubCommand(commandId, subCommandId1))
@@ -158,7 +158,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     val subCommandId1        = RunId()
     val subCommandId2        = RunId()
 
-    commandStatusService.onMessage(AddCommand(commandId, Accepted(commandId)))
+    commandStatusService.onMessage(AddOrUpdateCommand(commandId, Accepted(commandId)))
     commandStatusService.onMessage(Subscribe(commandId, commandResponseProbe.ref))
 
     commandStatusService.onMessage(AddSubCommand(commandId, subCommandId1))

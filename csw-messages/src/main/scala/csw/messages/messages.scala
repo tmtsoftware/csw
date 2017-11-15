@@ -3,7 +3,6 @@ package csw.messages
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import csw.messages.PubSub.SubscriberMessage
-import csw.messages.ccs.commands.CommandExecutionResponse.Initialized
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.TrackingEvent
@@ -132,11 +131,9 @@ case class SupervisorInfo(system: ActorSystem, component: Component)
 
 sealed trait CommandResponseManagerMessage
 object CommandResponseManagerMessage {
-  case class AddCommand(commandId: RunId, initialState: CommandResponse) extends CommandResponseManagerMessage {
-    def apply(runId: RunId) = AddCommand(runId, Initialized(runId))
-  }
-  case class AddSubCommand(commandId: RunId, subCommandId: RunId)              extends CommandResponseManagerMessage
-  case class UpdateCommand(commandId: RunId, commandResponse: CommandResponse) extends CommandResponseManagerMessage
+  case class AddOrUpdateCommand(commandId: RunId, commandResponse: CommandResponse)
+      extends CommandResponseManagerMessage
+  case class AddSubCommand(commandId: RunId, subCommandId: RunId) extends CommandResponseManagerMessage
   case class UpdateSubCommand(subCommandId: RunId, commandResponse: CommandResponse)
       extends CommandResponseManagerMessage
   case class Query(commandId: RunId, replyTo: ActorRef[CommandResponse])

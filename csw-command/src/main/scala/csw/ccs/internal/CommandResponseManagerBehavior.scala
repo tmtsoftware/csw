@@ -5,6 +5,7 @@ import akka.typed.{ActorRef, Behavior}
 import csw.ccs.models.{CommandCoRelation, CommandResponseManagerState}
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
+import csw.messages.ccs.commands.CommandExecutionResponse.CommandNotAvailable
 import csw.messages.ccs.commands.{
   CommandExecutionResponse,
   CommandResponse,
@@ -24,9 +25,8 @@ class CommandResponseManagerBehavior(
 
   override def onMessage(msg: CommandResponseManagerMessage): Behavior[CommandResponseManagerMessage] = {
     msg match {
-      case AddCommand(runId, initialState)           ⇒ commandStatus = commandStatus.add(runId, initialState)
+      case AddOrUpdateCommand(commandId, cmdStatus)  ⇒ addOrUpdateCommand(commandId, cmdStatus)
       case AddSubCommand(parentRunId, childRunId)    ⇒ commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
-      case UpdateCommand(commandId, cmdStatus)       ⇒ updateCommand(commandId, cmdStatus)
       case UpdateSubCommand(subCommandId, cmdStatus) ⇒ updateSubCommand(subCommandId, cmdStatus)
       case Query(runId, replyTo)                     ⇒ replyTo ! commandStatus.get(runId)
       case Subscribe(runId, replyTo)                 ⇒ subscribe(runId, replyTo)
@@ -34,6 +34,12 @@ class CommandResponseManagerBehavior(
     }
     this
   }
+
+  private def addOrUpdateCommand(commandId: RunId, commandResponse: CommandResponse): Unit =
+    commandStatus.get(commandId) match {
+      case _: CommandNotAvailable ⇒ commandStatus = commandStatus.add(commandId, commandResponse)
+      case _                      ⇒ updateCommand(commandId, commandResponse)
+    }
 
   private def updateCommand(commandId: RunId, commandResponse: CommandResponse): Unit = {
     commandStatus = commandStatus.updateCommandStatus(commandResponse)
