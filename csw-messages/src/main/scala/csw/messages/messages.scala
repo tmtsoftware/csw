@@ -44,10 +44,33 @@ object IdleMessage {
   case object Initialize extends IdleMessage
 }
 
-sealed trait CommandMessage extends RunningMessage {
-  def command: ControlCommand
-  def replyTo: ActorRef[CommandResponse]
+sealed trait AssemblyRunningMessage extends RunningMessage {
+  def token: String
+  def replyTo: ActorRef[AssemblyRunningResponse]
 }
+
+object AssemblyRunningMessage {
+  case class Lock(prefix: String, token: String, replyTo: ActorRef[AssemblyRunningResponse])
+      extends AssemblyRunningMessage
+  case class Unlock(prefix: String, token: String, replyTo: ActorRef[AssemblyRunningResponse])
+      extends AssemblyRunningMessage
+}
+
+sealed trait AssemblyRunningResponse
+object AssemblyRunningResponse {
+  case object LockAcquired                               extends AssemblyRunningResponse
+  case object LockReleased                               extends AssemblyRunningResponse
+  case object LockAlreadyReleased                        extends AssemblyRunningResponse
+  case object CanLockOnlyAssembly                        extends AssemblyRunningResponse
+  case class LockAlreadyAcquired(otherComponent: String) extends AssemblyRunningResponse
+  case class LockAcquiredByOther(otherComponent: String) extends AssemblyRunningResponse
+}
+
+sealed trait CommandMessage extends RunningMessage {
+  def replyTo: ActorRef[CommandResponse]
+  def command: ControlCommand
+}
+
 object CommandMessage {
   case class Submit(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends CommandMessage
   case class Oneway(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends CommandMessage
