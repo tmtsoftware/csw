@@ -287,9 +287,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
         CompletedWithResult(RunId(), Result(runId, obsId, Prefix(prefixStr))),
         NoLongerValid(RunId(), CommandIssue.OtherIssue("test issue")),
         Completed(RunId()),
-        InProgress(RunId(), "test"),
         Error(RunId(), "test"),
-        Aborted(RunId()),
         Cancelled(RunId()),
         BehaviorChanged(RunId(), TestProbe[SupervisorExternalMessage].ref)
       )

@@ -7,7 +7,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
-import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error, InProgress}
+import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error}
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.commands.CommandValidationResponse.Accepted
 import csw.messages.params.models.RunId
@@ -15,6 +15,8 @@ import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
+// DEOPSCSW-207: Report on Configuration Command Completion
+// DEOPSCSW-208: Report failure on Configuration Completion command
 class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
 
   trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
@@ -102,15 +104,15 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe1.ref))
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe2.ref))
 
-    commandStatusService.onMessage(AddOrUpdateCommand(runId, InProgress(runId, "40% completed")))
+    commandStatusService.onMessage(AddOrUpdateCommand(runId, Completed(runId)))
 
     commandStatusService.commandStatus
       .cmdToCmdStatus(runId)
       .commandStatus
-      .currentCmdStatus shouldBe InProgress(runId, "40% completed")
+      .currentCmdStatus shouldBe Completed(runId)
 
-    commandResponseProbe1.expectMsg(InProgress(runId, "40% completed"))
-    commandResponseProbe2.expectMsg(InProgress(runId, "40% completed"))
+    commandResponseProbe1.expectMsg(Completed(runId))
+    commandResponseProbe2.expectMsg(Completed(runId))
   }
 
   test("should be able to infer command status when status of sub command is updated") {
@@ -174,7 +176,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandResponseProbe.expectMsg(Accepted(commandId))
 
     // Update status of sub command 2 with some intermediate status
-    commandStatusService.onMessage(UpdateSubCommand(subCommandId2, InProgress(subCommandId2)))
+    commandStatusService.onMessage(UpdateSubCommand(subCommandId2, Accepted(subCommandId2)))
 
     // Status update of sub command 2  with intermediate does not make the parent command complete
     commandStatusService.onMessage(Query(commandId, commandResponseProbe.ref))
