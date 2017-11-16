@@ -24,8 +24,8 @@ import org.scalatest.mockito.MockitoSugar
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
-//DEOPSCSW-177-Hooks for lifecycle management
-//DEOPSCSW-179-Unique Action for a component
+// DEOPSCSW-177-Hooks for lifecycle management
+// DEOPSCSW-179-Unique Action for a component
 class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
   class RunningComponent(
@@ -56,9 +56,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   }
 
   test("A running component should handle RunOffline lifecycle message") {
-    val supervisorProbe            = TestProbe[FromComponentLifecycleMessage]
-    val commmandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val runningComponent           = new RunningComponent(supervisorProbe, commmandStatusServiceProbe)
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
+    val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
+    val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(true)
 
@@ -70,9 +70,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   }
 
   test("A running component should not accept RunOffline lifecycle message when it is already offline") {
-    val supervisorProbe            = TestProbe[FromComponentLifecycleMessage]
-    val commmandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val runningComponent           = new RunningComponent(supervisorProbe, commmandStatusServiceProbe)
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
+    val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
+    val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(false)
 
@@ -83,9 +83,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   }
 
   test("A running component should handle RunOnline lifecycle message when it is Offline") {
-    val supervisorProbe            = TestProbe[FromComponentLifecycleMessage]
-    val commmandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val runningComponent           = new RunningComponent(supervisorProbe, commmandStatusServiceProbe)
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
+    val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
+    val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
     when(sampleHcdHandler.isOnline).thenReturn(false)
 
@@ -96,9 +96,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   }
 
   test("A running component should not accept RunOnline lifecycle message when it is already Online") {
-    val supervisorProbe            = TestProbe[FromComponentLifecycleMessage]
-    val commmandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val runningComponent           = new RunningComponent(supervisorProbe, commmandStatusServiceProbe)
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
+    val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
+    val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
     when(sampleHcdHandler.isOnline).thenReturn(true)
@@ -108,9 +108,9 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   }
 
   test("A running component should clean up using onShutdown handler before stopping") {
-    val supervisorProbe            = TestProbe[FromComponentLifecycleMessage]
-    val commmandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val runningComponent           = new RunningComponent(supervisorProbe, commmandStatusServiceProbe)
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
+    val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
+    val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
     runningComponentBehavior.onSignal(PostStop)
@@ -118,10 +118,10 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   }
 
   test("A running component should handle Submit command") {
-    val supervisorProbe            = TestProbe[FromComponentLifecycleMessage]
-    val commmandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val commandResponseProbe       = TestProbe[CommandResponse]
-    val runningComponent           = new RunningComponent(supervisorProbe, commmandStatusServiceProbe)
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
+    val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
+    val commandResponseProbe      = TestProbe[CommandResponse]
+    val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
     val obsId: ObsId = ObsId("Obs001")
@@ -138,7 +138,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     verify(sampleHcdHandler).validateSubmit(sc1)
     verify(sampleHcdHandler).onSubmit(sc1, commandResponseProbe.ref)
     commandResponseProbe.expectMsg(Accepted(sc1.runId))
-    commmandStatusServiceProbe.expectMsg(AddOrUpdateCommand(sc1.runId, Accepted(sc1.runId)))
+    commandStatusServiceProbe.expectMsg(AddOrUpdateCommand(sc1.runId, Accepted(sc1.runId)))
   }
 
   test("A running component should handle Oneway command") {

@@ -168,11 +168,11 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
 
     val validationResponse = commandMessage match {
-      case _: Oneway =>
-        log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
+      case _: Oneway ⇒
+        log.info(s"Invoking lifecycle handler's validateOneway hook with msg :[$commandMessage]")
         lifecycleHandlers.validateOneway(commandMessage.command)
-      case _: Submit =>
-        log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
+      case _: Submit ⇒
+        log.info(s"Invoking lifecycle handler's validateSubmit hook with msg :[$commandMessage]")
         val response = lifecycleHandlers.validateSubmit(commandMessage.command)
         commandResponseManager ! AddOrUpdateCommand(commandMessage.command.runId, response)
         response
@@ -182,12 +182,16 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     forwardCommand(commandMessage, validationResponse)
   }
 
-  def forwardCommand(commandMessage: CommandMessage, validationResponse: CommandResponse): Unit =
+  private def forwardCommand(commandMessage: CommandMessage, validationResponse: CommandResponse): Unit =
     validationResponse match {
       case Accepted(_) ⇒
         commandMessage match {
-          case _: Submit => lifecycleHandlers.onSubmit(commandMessage.command, commandMessage.replyTo)
-          case _: Oneway => lifecycleHandlers.onOneway(commandMessage.command)
+          case _: Submit ⇒
+            log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
+            lifecycleHandlers.onSubmit(commandMessage.command, commandMessage.replyTo)
+          case _: Oneway ⇒
+            log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
+            lifecycleHandlers.onOneway(commandMessage.command)
         }
       case _ ⇒ log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$validationResponse]")
     }
