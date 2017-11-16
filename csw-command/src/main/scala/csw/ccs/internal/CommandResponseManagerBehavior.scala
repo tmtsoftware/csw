@@ -37,10 +37,11 @@ class CommandResponseManagerBehavior(
       case _                      ⇒ updateCommand(commandId, commandResponse)
     }
 
-  private def updateCommand(commandId: RunId, commandResponse: CommandResponse): Unit = {
-    commandStatus = commandStatus.updateCommandStatus(commandResponse)
-    publishToSubscribers(commandResponse, commandStatus.cmdToCmdStatus(commandResponse.runId).subscribers)
-  }
+  private def updateCommand(commandId: RunId, commandResponse: CommandResponse): Unit =
+    if (!commandStatus.get(commandId).equals(commandResponse)) {
+      commandStatus = commandStatus.updateCommandStatus(commandResponse)
+      publishToSubscribers(commandResponse, commandStatus.cmdToCmdStatus(commandResponse.runId).subscribers)
+    }
 
   private def updateSubCommand(subCommandId: RunId, commandResponse: CommandResponse): Unit = {
     // If the sub command has a parent command, fetch the current status of parent command from command status service
