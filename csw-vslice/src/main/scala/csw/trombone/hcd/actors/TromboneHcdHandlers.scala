@@ -86,16 +86,17 @@ class TromboneHcdHandlers(
     }
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandResponse = {
-    val validation = controlCommand match {
-      case setup: Setup     => ParamValidation.validateSetup(setup)
-      case observe: Observe => ParamValidation.validateObserve(observe)
-    }
-    if (validation == Accepted(controlCommand.runId))
-      onSetup(controlCommand.asInstanceOf[Setup])
-    validation
+  override def validateSubmit(controlCommand: ControlCommand): CommandResponse = controlCommand match {
+    case setup: Setup     => ParamValidation.validateSetup(setup)
+    case observe: Observe => ParamValidation.validateObserve(observe)
   }
-  override def onOneway(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
+
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit =
+    onSetup(controlCommand.asInstanceOf[Setup])
+
+  override def validateOneway(controlCommand: ControlCommand) = Accepted(controlCommand.runId)
+
+  override def onOneway(controlCommand: ControlCommand): Unit = println("One way command received")
 
   def onDomainMsg(tromboneMsg: TromboneMessage): Unit = tromboneMsg match {
     case x: TromboneEngineering => onEngMsg(x)
@@ -154,4 +155,5 @@ class TromboneHcdHandlers(
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit =
     println(s"Received tracking event: [$trackingEvent]")
+
 }

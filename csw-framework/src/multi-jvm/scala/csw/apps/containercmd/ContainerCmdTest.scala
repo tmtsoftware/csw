@@ -16,6 +16,7 @@ import csw.messages.PubSub.Subscribe
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.messages.ToComponentLifecycleMessage.GoOffline
+import csw.messages.ccs.commands.CommandResponse.Invalid
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
@@ -45,6 +46,7 @@ class ContainerCmdTestMultiJvm3 extends ContainerCmdTest(0)
 // DEOPSCSW-169: Creation of Multiple Components
 // DEOPSCSW-171: Starting component from command line
 // DEOPSCSW-182: Control Life Cycle of Components
+// DEOPSCSW-203: Write component-specific verification code
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
@@ -154,10 +156,11 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val laserCompStateProbe     = TestProbe[CurrentState]
       val commandResponseProbe    = TestProbe[CommandResponse]
       etonSupervisorTypedRef ! Submit(setupFailure, commandResponseProbe.ref)
-      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
-      eatonCompStateProbe.expectMsg(CurrentState(failedPrefix, Set(choiceKey.set(setupConfigChoice), param)))
+      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(submitValidationChoice))))
+      commandResponseProbe.expectMsgType[Invalid]
 
       etonSupervisorTypedRef ! Oneway(setupSuccess, commandResponseProbe.ref)
+      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(oneWayValidationChoice))))
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
       eatonCompStateProbe.expectMsg(CurrentState(successPrefix, Set(choiceKey.set(setupConfigChoice), param)))
 

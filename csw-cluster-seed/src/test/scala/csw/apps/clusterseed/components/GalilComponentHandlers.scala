@@ -40,9 +40,13 @@ class GalilComponentHandlers(
     log.fatal("Level is fatal")
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandResponse =
-    Accepted(controlCommand.runId)
-  override def onOneway(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
+  override def validateSubmit(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
+
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = ()
+
+  override def validateOneway(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
+
+  override def onOneway(controlCommand: ControlCommand): Unit = ()
 
   override def onShutdown(): Future[Unit] = Future.successful(())
 

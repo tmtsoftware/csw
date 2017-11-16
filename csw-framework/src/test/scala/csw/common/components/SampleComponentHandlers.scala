@@ -27,7 +27,9 @@ object SampleComponentState {
   val shutdownChoice            = Choice("Shutdown")
   val setupConfigChoice         = Choice("SetupConfig")
   val observeConfigChoice       = Choice("ObserveConfig")
+  val submitValidationChoice    = Choice("SubmitValidation")
   val submitCommandChoice       = Choice("SubmitCommand")
+  val oneWayValidationChoice    = Choice("OneWayValidation")
   val oneWayCommandChoice       = Choice("OneWayCommand")
   val initChoice                = Choice("Initialize")
   val offlineChoice             = Choice("Offline")
@@ -49,7 +51,9 @@ object SampleComponentState {
       shutdownChoice,
       setupConfigChoice,
       observeConfigChoice,
+      submitValidationChoice,
       submitCommandChoice,
+      oneWayValidationChoice,
       oneWayCommandChoice,
       initChoice,
       offlineChoice,
@@ -102,31 +106,42 @@ class SampleComponentHandlers(
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandResponse = {
-    // Adding passed in parameter to see if data is transferred properly
-    pubSubRef ! Publish(
-      CurrentState(prefix, Set(choiceKey.set(submitCommandChoice)))
-    )
+  override def validateSubmit(controlCommand: ControlCommand): CommandResponse = {
+    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(submitValidationChoice))))
     validateCommand(controlCommand)
   }
 
-  override def onOneway(controlCommand: ControlCommand): CommandResponse = {
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = {
     // Adding passed in parameter to see if data is transferred properly
-    pubSubRef ! Publish(
-      CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
-    )
+    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
+    processCommand(controlCommand)
+  }
+
+  override def validateOneway(controlCommand: ControlCommand): CommandResponse = {
+    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(oneWayValidationChoice))))
     validateCommand(controlCommand)
   }
 
-  private def validateCommand(command: ControlCommand): CommandResponse = {
-    command match {
+  override def onOneway(controlCommand: ControlCommand): Unit = {
+    // Adding passed in parameter to see if data is transferred properly
+    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
+    processCommand(controlCommand)
+  }
+
+  private def processCommand(controlCommand: ControlCommand): Unit =
+    controlCommand match {
       case Setup(_, _, somePrefix, _) ⇒
-        pubSubRef ! Publish(CurrentState(somePrefix, Set(choiceKey.set(setupConfigChoice), command.paramSet.head)))
+        pubSubRef ! Publish(
+          CurrentState(somePrefix, Set(choiceKey.set(setupConfigChoice), controlCommand.paramSet.head))
+        )
       case Observe(_, _, somePrefix, _) ⇒
-        pubSubRef ! Publish(CurrentState(somePrefix, Set(choiceKey.set(observeConfigChoice), command.paramSet.head)))
+        pubSubRef ! Publish(
+          CurrentState(somePrefix, Set(choiceKey.set(observeConfigChoice), controlCommand.paramSet.head))
+        )
       case _ ⇒
     }
 
+  private def validateCommand(command: ControlCommand): CommandResponse = {
     if (command.prefix.prefix.contains("success")) {
       Accepted(command.runId)
     } else {

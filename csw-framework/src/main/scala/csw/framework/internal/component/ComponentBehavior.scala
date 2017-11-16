@@ -11,6 +11,8 @@ import csw.messages.IdleMessage.Initialize
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
+import csw.messages.ccs.commands.CommandResponse
+import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.framework.ComponentInfo
 import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
 import csw.services.location.scaladsl.LocationService
@@ -160,6 +162,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
 
   /**
    * Defines action for messages which represent a [[csw.messages.ccs.commands.Command]]
+   *
    * @param commandMessage  Message encapsulating a [[csw.messages.ccs.commands.Command]]
    */
   def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
@@ -167,14 +170,25 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     val validationResponse = commandMessage match {
       case _: Oneway =>
         log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
-        lifecycleHandlers.onOneway(commandMessage.command)
+        lifecycleHandlers.validateOneway(commandMessage.command)
       case _: Submit =>
         log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
-        val response = lifecycleHandlers.onSubmit(commandMessage.command, commandMessage.replyTo)
+        val response = lifecycleHandlers.validateSubmit(commandMessage.command)
         commandResponseManager ! AddOrUpdateCommand(commandMessage.command.runId, response)
         response
     }
 
     commandMessage.replyTo ! validationResponse
+    forwardCommand(commandMessage, validationResponse)
   }
+
+  def forwardCommand(commandMessage: CommandMessage, validationResponse: CommandResponse): Unit =
+    validationResponse match {
+      case Accepted(_) ⇒
+        commandMessage match {
+          case _: Submit => lifecycleHandlers.onSubmit(commandMessage.command, commandMessage.replyTo)
+          case _: Oneway => lifecycleHandlers.onOneway(commandMessage.command)
+        }
+      case _ ⇒ log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$validationResponse]")
+    }
 }

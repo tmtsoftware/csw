@@ -127,32 +127,38 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     val obsId: ObsId = ObsId("Obs001")
     val sc1          = Setup(obsId, Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
 
-    when(sampleHcdHandler.onSubmit(ArgumentMatchers.any[Setup](), ArgumentMatchers.any[ActorRef[CommandResponse]]()))
-      .thenReturn(Accepted(sc1.runId))
+    when(sampleHcdHandler.validateSubmit(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
+
+    doNothing()
+      .when(sampleHcdHandler)
+      .onSubmit(ArgumentMatchers.any[Setup](), ArgumentMatchers.any[ActorRef[CommandResponse]]())
 
     runningComponentBehavior.onMessage(Submit(sc1, commandResponseProbe.ref))
 
+    verify(sampleHcdHandler).validateSubmit(sc1)
     verify(sampleHcdHandler).onSubmit(sc1, commandResponseProbe.ref)
     commandResponseProbe.expectMsg(Accepted(sc1.runId))
     commmandStatusServiceProbe.expectMsg(AddOrUpdateCommand(sc1.runId, Accepted(sc1.runId)))
   }
 
   test("A running component should handle Oneway command") {
-    val supervisorProbe            = TestProbe[FromComponentLifecycleMessage]
-    val commmandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val commandResponseProbe       = TestProbe[CommandResponse]
-    val runningComponent           = new RunningComponent(supervisorProbe, commmandStatusServiceProbe)
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
+    val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
+    val commandResponseProbe      = TestProbe[CommandResponse]
+    val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
     val obsId: ObsId = ObsId("Obs001")
     val sc1          = Observe(obsId, Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
 
-    when(sampleHcdHandler.onOneway(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
+    when(sampleHcdHandler.validateOneway(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
+    doNothing().when(sampleHcdHandler).onOneway(ArgumentMatchers.any[Setup]())
 
     runningComponentBehavior.onMessage(Oneway(sc1, commandResponseProbe.ref))
 
+    verify(sampleHcdHandler).validateOneway(sc1)
     verify(sampleHcdHandler).onOneway(sc1)
     commandResponseProbe.expectMsg(Accepted(sc1.runId))
-    commmandStatusServiceProbe.expectNoMsg(3.seconds)
+    commandStatusServiceProbe.expectNoMsg(3.seconds)
   }
 }

@@ -85,18 +85,17 @@ class TromboneAssemblyHandlers(
     case _                                   ⇒
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandResponse = {
-    val validation = controlCommand match {
-      case _: Setup   => validateOneSetup(controlCommand.asInstanceOf[Setup])
-      case _: Observe => Accepted(controlCommand.runId)
-    }
-    if (validation == Accepted(controlCommand.runId)) {
-      commandHandler ! CommandMessageE(Submit(controlCommand, replyTo))
-    }
-    validation
+  override def validateSubmit(controlCommand: ControlCommand): CommandResponse = controlCommand match {
+    case _: Setup   => validateOneSetup(controlCommand.asInstanceOf[Setup])
+    case _: Observe => Accepted(controlCommand.runId)
   }
 
-  override def onOneway(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit =
+    commandHandler ! CommandMessageE(Submit(controlCommand, replyTo))
+
+  override def validateOneway(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
+
+  override def onOneway(controlCommand: ControlCommand): Unit = println("One way command received")
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = {
     val config = ConfigFactory.load("tromboneAssemblyContext.conf")

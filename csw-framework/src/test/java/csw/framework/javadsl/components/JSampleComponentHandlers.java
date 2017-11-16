@@ -76,26 +76,48 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public CommandResponse onSubmit(ControlCommand controlCommand, ActorRef<CommandResponse> actorRef) {
-        // Adding item from CommandMessage paramset to ensure things are working
-        CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
+    public CommandResponse validateSubmit(ControlCommand controlCommand) {
+        CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitValidationChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(submitState);
         pubSubRef.tell(publish);
-
         return validateCommand(controlCommand);
     }
 
     @Override
-    public CommandResponse onOneway(ControlCommand controlCommand) {
+    public void onSubmit(ControlCommand controlCommand, ActorRef<CommandResponse> actorRef) {
+        // Adding item from CommandMessage paramset to ensure things are working
+        CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
+        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(submitState);
+        pubSubRef.tell(publish);
+        processCommand(controlCommand);
+    }
+
+    @Override
+    public CommandResponse validateOneway(ControlCommand controlCommand) {
+        CurrentState onewayState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayValidationChoice()));
+        PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(onewayState);
+        pubSubRef.tell(publish);
+        return validateCommand(controlCommand);
+    }
+
+    @Override
+    public void onOneway(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState onewayState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(onewayState);
         pubSubRef.tell(publish);
-
-        return validateCommand(controlCommand);
+        processCommand(controlCommand);
     }
 
     private CommandResponse validateCommand(ControlCommand controlCommand) {
+        if (controlCommand.prefix().prefix().contains("success")) {
+            return new Accepted(controlCommand.runId());
+        } else {
+            return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+        }
+    }
+
+    private void processCommand(ControlCommand controlCommand) {
         CurrentState commandState;
         if(controlCommand instanceof Setup) {
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
@@ -105,13 +127,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         }
 
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(commandState);
-
         pubSubRef.tell(publish);
-        if (controlCommand.prefix().prefix().contains("success")) {
-            return new Accepted(controlCommand.runId());
-        } else {
-            return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
-        }
     }
 
     @Override
