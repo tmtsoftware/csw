@@ -2,6 +2,7 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
+import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
@@ -9,7 +10,6 @@ import csw.messages.ccs.commands.CommandResponse.{Completed, Error, NoLongerVali
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
-import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
@@ -47,7 +47,7 @@ class SetElevationCommand(
         s"Using elevation as rangeDistance: ${elevationItem.head} to get stagePosition: $stagePosition to encoder: $encoderPosition"
       )
 
-      val stateMatcher = Matchers.posMatcher(encoderPosition)
+      val stateMatcher = AssemblyMatchers.posMatcher(encoderPosition)
       val scOut        = Setup(ac.obsId, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
 
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))

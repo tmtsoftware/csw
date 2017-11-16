@@ -1,11 +1,11 @@
-package csw.ccs
+package csw.ccs.internal.matchers
 
 import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import akka.util.Timeout
-import csw.ccs.MultiStateMatcherMsgs._
+import csw.ccs.internal.matchers.MultiStateMatcherMsgs._
 import csw.messages.PubSub
 import csw.messages.PubSub.{Subscribe, Unsubscribe}
 import csw.messages.ccs.commands.CommandResponse

@@ -4,12 +4,12 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
-import csw.ccs.StateMatcher
+import csw.ccs.internal.matchers.{Matcher, MatcherResponse, StateMatcher}
 import csw.messages.PubSub.Publish
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse
-import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, MatcherResponse, Matchers}
+import csw.trombone.assembly.AssemblyCommandHandlerMsgs
 
 import scala.concurrent.Future
 
@@ -31,7 +31,7 @@ abstract class AssemblyCommand(
       currentStateSource: ActorRef[ComponentStateSubscription],
       timeout: Timeout
   )(partialFunction: PartialFunction[MatcherResponse, CommandResponse]): Future[CommandResponse] =
-    Matchers.matchState(ctx, stateMatcher, currentStateSource, timeout).map(partialFunction)
+    Matcher.matchState(ctx, stateMatcher, currentStateSource, timeout).map(partialFunction)
 
   final def responseCompletion[T](destination: ActorRef[T], command: T, timeout: Timeout)(
       partialFunction: PartialFunction[CommandResponse, CommandResponse]

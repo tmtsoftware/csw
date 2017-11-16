@@ -1,4 +1,4 @@
-package csw.trombone.assembly
+package csw.ccs.internal.matchers
 
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -6,29 +6,16 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter._
 import akka.util.Timeout
-import csw.ccs._
+import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.messages.PubSub.Subscribe
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
-import csw.messages.params.states.{CurrentState, DemandState}
-import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.trombone.hcd.TromboneHcdState
+import csw.messages.params.states.CurrentState
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 import scala.util.control.NonFatal
 
-object Matchers {
-
-  def idleMatcher: DemandMatcher =
-    DemandMatcher(
-      DemandState(TromboneHcdState.axisStateCK).add(TromboneHcdState.stateKey -> TromboneHcdState.AXIS_IDLE)
-    )
-
-  def posMatcher(position: Int): DemandMatcher =
-    DemandMatcher(
-      DemandState(TromboneHcdState.axisStateCK)
-        .madd(TromboneHcdState.stateKey -> TromboneHcdState.AXIS_IDLE, TromboneHcdState.positionKey -> position)
-    )
+object Matcher {
 
   def matchState(
       ctx: ActorContext[_],

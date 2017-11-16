@@ -2,11 +2,11 @@ package csw.trombone.assembly.commands
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
+import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
-import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState._
 
@@ -32,7 +32,7 @@ class SetAngleCommand(
 
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
-    matchCompletion(Matchers.idleMatcher, tromboneHCD.get, 5.seconds) {
+    matchCompletion(AssemblyMatchers.idleMatcher, tromboneHCD.get, 5.seconds) {
       case MatchCompleted =>
         publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
         Completed(s.runId)

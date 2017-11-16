@@ -2,6 +2,7 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
+import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
@@ -9,7 +10,6 @@ import csw.messages.ccs.commands.CommandResponse.{Completed, Error, NoLongerVali
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
-import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
@@ -30,7 +30,7 @@ class MoveCommand(
   import ctx.executionContext
   val stagePosition   = s(ac.stagePositionKey)
   val encoderPosition = Algorithms.stagePositionToEncoder(ac.controlConfig, stagePosition.head)
-  val stateMatcher    = Matchers.posMatcher(encoderPosition)
+  val stateMatcher    = AssemblyMatchers.posMatcher(encoderPosition)
   val scOut = Setup(s.obsId, TromboneHcdState.axisMoveCK)
     .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
 

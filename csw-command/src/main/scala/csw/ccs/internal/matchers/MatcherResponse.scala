@@ -1,4 +1,4 @@
-package csw.trombone.assembly
+package csw.ccs.internal.matchers
 
 sealed trait MatcherResponse
 object MatcherResponse {

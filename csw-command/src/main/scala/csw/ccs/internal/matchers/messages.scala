@@ -1,4 +1,4 @@
-package csw.ccs
+package csw.ccs.internal.matchers
 
 import akka.typed.ActorRef
 import csw.messages.ccs.commands.CommandResponse

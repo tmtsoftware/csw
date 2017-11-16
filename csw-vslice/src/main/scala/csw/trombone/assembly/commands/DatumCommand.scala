@@ -2,15 +2,15 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
+import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.CommandResponse.{Completed, Error, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.params.models.RunId
-import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly.actors.TromboneState.TromboneState
-import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext, Matchers}
+import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext, AssemblyMatchers}
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future
@@ -44,7 +44,7 @@ class DatumCommand(
         _ ! Submit(Setup(s.obsId, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore))
       )
 
-      matchCompletion(Matchers.idleMatcher, tromboneHCD.get, 5.seconds) {
+      matchCompletion(AssemblyMatchers.idleMatcher, tromboneHCD.get, 5.seconds) {
         case MatchCompleted =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed(s.runId)
