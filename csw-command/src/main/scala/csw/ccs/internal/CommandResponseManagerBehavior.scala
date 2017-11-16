@@ -5,13 +5,9 @@ import akka.typed.{ActorRef, Behavior}
 import csw.ccs.models.{CommandCorrelation, CommandResponseManagerState}
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
-import csw.messages.ccs.commands.CommandExecutionResponse.CommandNotAvailable
-import csw.messages.ccs.commands.{
-  CommandExecutionResponse,
-  CommandResponse,
-  CommandResultType,
-  CommandValidationResponse
-}
+import csw.messages.ccs.commands.CommandResponse.CommandNotAvailable
+import csw.messages.ccs.commands.CommandResultType.{Final, Intermediate}
+import csw.messages.ccs.commands.{CommandResponse, CommandResultType}
 import csw.messages.params.models.RunId
 import csw.services.logging.scaladsl.ComponentLogger
 
@@ -67,8 +63,8 @@ class CommandResponseManagerBehavior(
     }
 
   private def updateParentForChild(parentRunId: RunId, childCommandResponse: CommandResponse): Unit =
-    childCommandResponse match {
-      case _: CommandExecutionResponse ⇒
+    childCommandResponse.resultType match {
+      case _: Final ⇒
         commandCoRelation = commandCoRelation.remove(parentRunId, childCommandResponse.runId)
         if (!commandCoRelation.hasChildren(parentRunId))
           updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
@@ -79,10 +75,10 @@ class CommandResponseManagerBehavior(
       commandResponse: CommandResponse,
       subscribers: Set[ActorRef[CommandResponse]]
   ): Unit = {
-    commandResponse match {
-      case _: CommandExecutionResponse ⇒
+    commandResponse.resultType match {
+      case _: Final ⇒
         subscribers.foreach(_ ! commandResponse)
-      case _: CommandValidationResponse ⇒
+      case Intermediate ⇒
         // Do not send updates for validation response as it is send by the framework
         log.debug("Validation response will not affect status of Parent command.")
     }

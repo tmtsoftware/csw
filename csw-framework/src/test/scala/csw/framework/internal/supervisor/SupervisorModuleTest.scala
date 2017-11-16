@@ -16,7 +16,7 @@ import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
-import csw.messages.ccs.commands.CommandValidationResponse.{Accepted, Invalid}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection

@@ -1,16 +1,14 @@
 package csw.framework.javadsl.components;
 
-
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.common.components.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
-import csw.messages.ccs.commands.CommandResponse;
-import csw.messages.ccs.commands.CommandValidationResponse;
 import csw.messages.ComponentMessage;
 import csw.messages.PubSub;
 import csw.messages.ccs.CommandIssue;
+import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.framework.ComponentInfo;
@@ -22,6 +20,8 @@ import csw.services.logging.javadsl.JCommonComponentLogger;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
+
+import static csw.messages.ccs.commands.CommandResponse.*;
 
 public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> implements JCommonComponentLogger {
 
@@ -76,7 +76,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public CommandValidationResponse onSubmit(ControlCommand controlCommand, ActorRef<CommandResponse> actorRef) {
+    public CommandResponse onSubmit(ControlCommand controlCommand, ActorRef<CommandResponse> actorRef) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(submitState);
@@ -86,7 +86,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public CommandValidationResponse onOneway(ControlCommand controlCommand) {
+    public CommandResponse onOneway(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState onewayState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(onewayState);
@@ -95,7 +95,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         return validateCommand(controlCommand);
     }
 
-    private CommandValidationResponse validateCommand(ControlCommand controlCommand) {
+    private CommandResponse validateCommand(ControlCommand controlCommand) {
         CurrentState commandState;
         if(controlCommand instanceof Setup) {
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
@@ -108,9 +108,9 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
 
         pubSubRef.tell(publish);
         if (controlCommand.prefix().prefix().contains("success")) {
-            return new CommandValidationResponse.Accepted(controlCommand.runId());
+            return new Accepted(controlCommand.runId());
         } else {
-            return new CommandValidationResponse.Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+            return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         }
     }
 

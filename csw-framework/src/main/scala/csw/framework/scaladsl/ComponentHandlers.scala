@@ -5,7 +5,7 @@ import akka.typed.scaladsl.ActorContext
 import csw.messages.CommonMessage.TrackingEventReceived
 import csw.messages.PubSub.PublisherMessage
 import csw.messages.RunningMessage.DomainMessage
-import csw.messages.ccs.commands.{CommandResponse, CommandValidationResponse, ControlCommand}
+import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{Connection, TrackingEvent}
 import csw.messages.params.states.CurrentState
@@ -35,8 +35,8 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
   def initialize(): Future[Unit]
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit
   def onDomainMsg(msg: Msg): Unit
-  def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandValidationResponse
-  def onOneway(controlCommand: ControlCommand): CommandValidationResponse
+  def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandResponse
+  def onOneway(controlCommand: ControlCommand): CommandResponse
   def onShutdown(): Future[Unit]
   def onGoOffline(): Unit
   def onGoOnline(): Unit

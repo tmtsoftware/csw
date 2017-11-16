@@ -9,7 +9,7 @@ import com.typesafe.config.ConfigFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
-import csw.messages.ccs.commands.CommandValidationResponse.Accepted
+import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
@@ -86,8 +86,7 @@ class TromboneHcdHandlers(
     }
   }
 
-  override def onSubmit(controlCommand: ControlCommand,
-                        replyTo: ActorRef[CommandResponse]): CommandValidationResponse = {
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandResponse = {
     val validation = controlCommand match {
       case setup: Setup     => ParamValidation.validateSetup(setup)
       case observe: Observe => ParamValidation.validateObserve(observe)
@@ -96,7 +95,7 @@ class TromboneHcdHandlers(
       onSetup(controlCommand.asInstanceOf[Setup])
     validation
   }
-  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted(controlCommand.runId)
+  override def onOneway(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
 
   def onDomainMsg(tromboneMsg: TromboneMessage): Unit = tromboneMsg match {
     case x: TromboneEngineering => onEngMsg(x)

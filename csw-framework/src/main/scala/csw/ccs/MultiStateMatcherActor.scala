@@ -8,8 +8,8 @@ import akka.util.Timeout
 import csw.ccs.MultiStateMatcherMsgs._
 import csw.messages.PubSub
 import csw.messages.PubSub.{Subscribe, Unsubscribe}
-import csw.messages.ccs.commands.CommandExecutionResponse
-import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error}
+import csw.messages.ccs.commands.CommandResponse
+import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
 import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 
@@ -36,10 +36,10 @@ class MultiStateMatcherActor(
 
   val currentStateAdapter: ActorRef[CurrentState] = ctx.spawnAdapter(StateUpdate)
 
-  var replyTo: ActorRef[CommandExecutionResponse] = _
-  var context: Mode                               = Mode.Waiting
-  var timer: Cancellable                          = _
-  var matchers: List[StateMatcher]                = _
+  var replyTo: ActorRef[CommandResponse] = _
+  var context: Mode                      = Mode.Waiting
+  var timer: Cancellable                 = _
+  var matchers: List[StateMatcher]       = _
 
   currentStateReceiver ! Subscribe(currentStateAdapter)
 

@@ -1,8 +1,8 @@
 package csw.trombone.assembly
 
 import csw.messages.ccs.CommandIssue._
-import csw.messages.ccs.commands.CommandValidationResponse.{Accepted, Invalid}
-import csw.messages.ccs.commands.{CommandValidationResponse, Setup}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
+import csw.messages.ccs.commands.{CommandResponse, Setup}
 
 import scala.util.Try
 
@@ -15,7 +15,7 @@ object ParamValidation {
    * Runs Trombone-specific validation on a single Setup.
    * @return
    */
-  def validateOneSetup(s: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
+  def validateOneSetup(s: Setup)(implicit ac: AssemblyContext): CommandResponse = {
     s.prefix match {
       case ac.initCK         => initValidation(s)
       case ac.datumCK        => datumValidation(s)
@@ -30,11 +30,11 @@ object ParamValidation {
   }
 
   /**
-   * CommandValidationResponse for the init Setup
+   * CommandResponse for the init Setup
    * @param sc the received Setup
    * @return Accepted or Invalid
    */
-  def initValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
+  def initValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
 
     val size = sc.size
     if (sc.prefix != ac.initCK) Invalid(sc.runId, WrongPrefixIssue("The Setup is not an init configuration"))
@@ -64,26 +64,26 @@ object ParamValidation {
   }
 
   /**
-   * CommandValidationResponse for the datum Setup -- currently nothing to validate
+   * CommandResponse for the datum Setup -- currently nothing to validate
    * @param sc the received Setup
    * @return Accepted or Invalid
    */
-  def datumValidation(sc: Setup): CommandValidationResponse = Accepted(sc.runId)
+  def datumValidation(sc: Setup): CommandResponse = Accepted(sc.runId)
 
   /**
-   * CommandValidationResponse for the stop Setup -- currently nothing to validate
+   * CommandResponse for the stop Setup -- currently nothing to validate
    * @param sc the received Setup
    * @return Accepted or Invalid
    */
-  def stopValidation(sc: Setup): CommandValidationResponse = Accepted(sc.runId)
+  def stopValidation(sc: Setup): CommandResponse = Accepted(sc.runId)
 
   /**
-   * CommandValidationResponse for the move Setup
+   * CommandResponse for the move Setup
    * Note: position is optional, if not present, it moves to home
    * @param sc the received Setup
    * @return Accepted or Invalid
    */
-  def moveValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
+  def moveValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
     if (sc.prefix != ac.moveCK) {
       Invalid(sc.runId, WrongPrefixIssue("The Setup is not a move configuration."))
     } else if (sc.size == 0)
@@ -105,11 +105,11 @@ object ParamValidation {
   }
 
   /**
-   * CommandValidationResponse for the position Setup -- must have a single parameter named rangeDistance
+   * CommandResponse for the position Setup -- must have a single parameter named rangeDistance
    * @param sc the received Setup
    * @return Accepted or Invalid
    */
-  def positionValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
+  def positionValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
     if (sc.prefix != ac.positionCK) {
       Invalid(sc.runId, WrongPrefixIssue("The Setup is not a position configuration."))
     } else {
@@ -143,11 +143,11 @@ object ParamValidation {
   }
 
   /**
-   * CommandValidationResponse for the setElevation Setup
+   * CommandResponse for the setElevation Setup
    * @param sc the received Setup
    * @return Accepted or Invalid
    */
-  def setElevationValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
+  def setElevationValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
     if (sc.prefix != ac.setElevationCK) {
       Invalid(sc.runId, WrongPrefixIssue("The Setup is not a setElevation configuration"))
     } else if (sc.missingKeys(ac.naElevationKey).nonEmpty) {
@@ -167,11 +167,11 @@ object ParamValidation {
   }
 
   /**
-   * CommandValidationResponse for the setAngle Setup
+   * CommandResponse for the setAngle Setup
    * @param sc the received Setup
    * @return Accepted or Invalid
    */
-  def setAngleValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
+  def setAngleValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
     if (sc.prefix != ac.setAngleCK) {
       Invalid(sc.runId, WrongPrefixIssue("The Setup is not a setAngle configuration"))
     } else // Check for correct key and type -- only checks that essential key is present, not strict
@@ -189,11 +189,11 @@ object ParamValidation {
   }
 
   /**
-   * CommandValidationResponse for the follow Setup
+   * CommandResponse for the follow Setup
    * @param sc the received Setup
    * @return Accepted or Invalid
    */
-  def followValidation(sc: Setup)(implicit ac: AssemblyContext): CommandValidationResponse = {
+  def followValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
     if (sc.prefix != ac.followCK) {
       Invalid(sc.runId, WrongPrefixIssue("The Setup is not a follow configuration"))
     } else if (!sc.exists(ac.nssInUseKey)) {

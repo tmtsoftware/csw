@@ -3,8 +3,8 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.messages._
-import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error}
-import csw.messages.ccs.commands.{CommandExecutionResponse, Setup}
+import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
+import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly._
@@ -25,7 +25,7 @@ class SetAngleCommand(
 
   implicit val timeout: Timeout = Timeout(5.seconds)
 
-  override def startCommand(): Future[CommandExecutionResponse] = {
+  override def startCommand(): Future[CommandResponse] = {
     publishState(TromboneState(cmdItem(cmdBusy), startState.move, startState.sodiumLayer, startState.nss))
 
     val zenithAngleItem = s(ac.zenithAngleKey)

@@ -7,9 +7,8 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
-import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error}
 import csw.messages.ccs.commands.CommandResponse
-import csw.messages.ccs.commands.CommandValidationResponse.Accepted
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.params.models.RunId
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.scalatest.mockito.MockitoSugar

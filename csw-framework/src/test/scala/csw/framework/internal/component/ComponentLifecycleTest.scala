@@ -12,7 +12,7 @@ import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
-import csw.messages.ccs.commands.CommandValidationResponse.Accepted
+import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}

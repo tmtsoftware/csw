@@ -3,12 +3,24 @@ package csw.messages.ccs.commands
 import akka.typed.ActorRef
 import csw.messages.TMTSerializable
 import csw.messages.ccs.CommandIssue
-import csw.messages.ccs.commands.CommandExecutionResponse._
 import csw.messages.ccs.commands.CommandResultType.{Intermediate, Negative, Positive}
-import csw.messages.ccs.commands.CommandValidationResponse.{Accepted, Invalid}
 import csw.messages.params.models.RunId
 
+sealed abstract class CommandResponse(val resultType: CommandResultType) extends TMTSerializable {
+  def runId: RunId
+}
+
 object CommandResponse {
+  case class Accepted(runId: RunId)                             extends CommandResponse(Intermediate)
+  case class Invalid(runId: RunId, issue: CommandIssue)         extends CommandResponse(Negative)
+  case class CompletedWithResult(runId: RunId, result: Result)  extends CommandResponse(Positive)
+  case class Completed(runId: RunId)                            extends CommandResponse(Positive)
+  case class BehaviorChanged[T](runId: RunId, ref: ActorRef[T]) extends CommandResponse(Positive)
+  case class NoLongerValid(runId: RunId, issue: CommandIssue)   extends CommandResponse(Negative)
+  case class Error(runId: RunId, message: String)               extends CommandResponse(Negative)
+  case class Cancelled(runId: RunId)                            extends CommandResponse(Negative)
+  case class CommandNotAvailable(runId: RunId)                  extends CommandResponse(Negative)
+
   def withRunId(id: RunId, commandResponse: CommandResponse): CommandResponse = commandResponse match {
     case accepted: Accepted                       => accepted.copy(runId = id)
     case invalid: Invalid                         => invalid.copy(runId = id)
@@ -20,28 +32,6 @@ object CommandResponse {
     case cancelled: Cancelled                     => cancelled.copy(runId = id)
     case commandNotAvailable: CommandNotAvailable => commandNotAvailable.copy(runId = id)
   }
-}
-
-sealed abstract class CommandResponse extends TMTSerializable {
-  def runId: RunId
-  def resultType: CommandResultType
-}
-
-sealed abstract class CommandValidationResponse(val resultType: CommandResultType) extends CommandResponse
-object CommandValidationResponse {
-  case class Accepted(runId: RunId)                     extends CommandValidationResponse(Intermediate)
-  case class Invalid(runId: RunId, issue: CommandIssue) extends CommandValidationResponse(Negative)
-}
-
-sealed abstract class CommandExecutionResponse(val resultType: CommandResultType) extends CommandResponse
-object CommandExecutionResponse {
-  case class CompletedWithResult(runId: RunId, result: Result)  extends CommandExecutionResponse(Positive)
-  case class Completed(runId: RunId)                            extends CommandExecutionResponse(Positive)
-  case class BehaviorChanged[T](runId: RunId, ref: ActorRef[T]) extends CommandExecutionResponse(Positive)
-  case class NoLongerValid(runId: RunId, issue: CommandIssue)   extends CommandExecutionResponse(Negative)
-  case class Error(runId: RunId, message: String)               extends CommandExecutionResponse(Negative)
-  case class Cancelled(runId: RunId)                            extends CommandExecutionResponse(Negative)
-  case class CommandNotAvailable(runId: RunId)                  extends CommandExecutionResponse(Negative)
 }
 
 sealed trait CommandResultType

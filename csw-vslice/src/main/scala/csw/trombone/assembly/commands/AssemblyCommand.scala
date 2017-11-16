@@ -8,7 +8,7 @@ import csw.ccs.StateMatcher
 import csw.messages.PubSub.Publish
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages._
-import csw.messages.ccs.commands.CommandExecutionResponse
+import csw.messages.ccs.commands.CommandResponse
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, MatcherResponse, Matchers}
 
 import scala.concurrent.Future
@@ -20,7 +20,7 @@ abstract class AssemblyCommand(
 ) {
   import ctx.executionContext
 
-  def startCommand(): Future[CommandExecutionResponse]
+  def startCommand(): Future[CommandResponse]
   def stopCommand(): Unit
 
   final def publishState(assemblyState: AssemblyState): Unit =
@@ -30,13 +30,13 @@ abstract class AssemblyCommand(
       stateMatcher: StateMatcher,
       currentStateSource: ActorRef[ComponentStateSubscription],
       timeout: Timeout
-  )(partialFunction: PartialFunction[MatcherResponse, CommandExecutionResponse]): Future[CommandExecutionResponse] =
+  )(partialFunction: PartialFunction[MatcherResponse, CommandResponse]): Future[CommandResponse] =
     Matchers.matchState(ctx, stateMatcher, currentStateSource, timeout).map(partialFunction)
 
   final def responseCompletion[T](destination: ActorRef[T], command: T, timeout: Timeout)(
-      partialFunction: PartialFunction[CommandExecutionResponse, CommandExecutionResponse]
-  ): Future[CommandExecutionResponse] =
+      partialFunction: PartialFunction[CommandResponse, CommandResponse]
+  ): Future[CommandResponse] =
     (destination ? execute(command))(timeout, ctx.system.scheduler).map(partialFunction)
 
-  private def execute[T](x: T)(replyTo: ActorRef[CommandExecutionResponse]): T = x
+  private def execute[T](x: T)(replyTo: ActorRef[CommandResponse]): T = x
 }

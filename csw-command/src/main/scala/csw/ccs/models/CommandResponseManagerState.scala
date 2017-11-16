@@ -1,8 +1,8 @@
 package csw.ccs.models
 
 import akka.typed.ActorRef
-import csw.messages.ccs.commands.CommandExecutionResponse.CommandNotAvailable
 import csw.messages.ccs.commands.CommandResponse
+import csw.messages.ccs.commands.CommandResponse.CommandNotAvailable
 import csw.messages.params.models.RunId
 
 case class CommandResponseManagerState(cmdToCmdStatus: Map[RunId, CommandState]) {

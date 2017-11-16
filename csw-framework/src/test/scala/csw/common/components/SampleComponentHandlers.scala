@@ -6,7 +6,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages._
 import csw.messages.ccs.CommandIssue.OtherIssue
-import csw.messages.ccs.commands.CommandValidationResponse.{Accepted, Invalid}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -102,8 +102,7 @@ class SampleComponentHandlers(
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
   }
 
-  override def onSubmit(controlCommand: ControlCommand,
-                        replyTo: ActorRef[CommandResponse]): CommandValidationResponse = {
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandResponse = {
     // Adding passed in parameter to see if data is transferred properly
     pubSubRef ! Publish(
       CurrentState(prefix, Set(choiceKey.set(submitCommandChoice)))
@@ -111,7 +110,7 @@ class SampleComponentHandlers(
     validateCommand(controlCommand)
   }
 
-  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = {
+  override def onOneway(controlCommand: ControlCommand): CommandResponse = {
     // Adding passed in parameter to see if data is transferred properly
     pubSubRef ! Publish(
       CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
@@ -119,7 +118,7 @@ class SampleComponentHandlers(
     validateCommand(controlCommand)
   }
 
-  private def validateCommand(command: ControlCommand): CommandValidationResponse = {
+  private def validateCommand(command: ControlCommand): CommandResponse = {
     command match {
       case Setup(_, _, somePrefix, _) ⇒
         pubSubRef ! Publish(CurrentState(somePrefix, Set(choiceKey.set(setupConfigChoice), command.paramSet.head)))

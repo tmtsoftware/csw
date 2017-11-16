@@ -3,7 +3,7 @@ package csw.trombone.assembly
 import akka.typed.ActorRef
 import csw.messages.CommandMessage.Submit
 import csw.messages.RunningMessage.DomainMessage
-import csw.messages.ccs.commands.{CommandExecutionResponse, CommandResponse}
+import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.events.EventTime
 import csw.messages.location.Connection
 import csw.messages.params.generics.Parameter
@@ -88,7 +88,7 @@ object TromboneCommandHandlerMsgs {
   sealed trait ExecutingMsgs    extends TromboneCommandHandlerMsgs
 
   private[assembly] case class CommandStart(replyTo: ActorRef[CommandResponse]) extends ExecutingMsgs
-  private[assembly] case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandExecutionResponse)
+  private[assembly] case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandResponse)
       extends ExecutingMsgs
 }
 
@@ -109,7 +109,7 @@ object AssemblyCommandHandlerMsgs {
       extends NotFollowingMsgs
       with FollowingMsgs
       with ExecutingMsgs
-  case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandExecutionResponse)
+  case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandResponse)
       extends ExecutingMsgs
       with FollowingMsgs
 }

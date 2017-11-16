@@ -9,9 +9,8 @@ import csw.messages.CommandMessage.Submit
 import csw.messages.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{UnsupportedCommandInStateIssue, WrongInternalStateIssue}
-import csw.messages.ccs.commands.CommandExecutionResponse.{Cancelled, Completed, NoLongerValid}
-import csw.messages.ccs.commands.CommandValidationResponse.Invalid
-import csw.messages.ccs.commands.{CommandExecutionResponse, CommandResponse, Setup}
+import csw.messages.ccs.commands.CommandResponse.{Cancelled, Completed, Invalid, NoLongerValid}
+import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.location.Connection
 import csw.trombone.assembly._
 import csw.trombone.assembly.commands._
@@ -207,11 +206,10 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
       AssemblyCommandState(None, CommandExecutionState.Executing)
   }
 
-  override def onFollowingCommandComplete(replyTo: ActorRef[CommandResponse], result: CommandExecutionResponse): Unit =
+  override def onFollowingCommandComplete(replyTo: ActorRef[CommandResponse], result: CommandResponse): Unit =
     replyTo ! result
 
-  override def onExecutingCommandComplete(replyTo: ActorRef[CommandResponse],
-                                          result: CommandExecutionResponse): Unit = {
+  override def onExecutingCommandComplete(replyTo: ActorRef[CommandResponse], result: CommandResponse): Unit = {
     replyTo ! result
   }
 

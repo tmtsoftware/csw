@@ -1,9 +1,9 @@
 package csw.trombone.hcd
 
-import csw.messages.ccs.commands.CommandValidationResponse.Accepted
-import csw.messages.ccs.commands.{CommandValidationResponse, Observe, Setup}
+import csw.messages.ccs.commands.CommandResponse.Accepted
+import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 
 object ParamValidation {
-  def validateSetup(s: Setup): CommandValidationResponse     = Accepted(s.runId)
-  def validateObserve(s: Observe): CommandValidationResponse = Accepted(s.runId)
+  def validateSetup(s: Setup): CommandResponse     = Accepted(s.runId)
+  def validateObserve(s: Observe): CommandResponse = Accepted(s.runId)
 }

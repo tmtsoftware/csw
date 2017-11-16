@@ -7,7 +7,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.CommandMessage.Submit
 import csw.messages.PubSub.PublisherMessage
 import csw.messages._
-import csw.messages.ccs.commands.CommandValidationResponse.Accepted
+import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
@@ -85,8 +85,7 @@ class TromboneAssemblyHandlers(
     case _                                   ⇒
   }
 
-  override def onSubmit(controlCommand: ControlCommand,
-                        replyTo: ActorRef[CommandResponse]): CommandValidationResponse = {
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): CommandResponse = {
     val validation = controlCommand match {
       case _: Setup   => validateOneSetup(controlCommand.asInstanceOf[Setup])
       case _: Observe => Accepted(controlCommand.runId)
@@ -97,7 +96,7 @@ class TromboneAssemblyHandlers(
     validation
   }
 
-  override def onOneway(controlCommand: ControlCommand): CommandValidationResponse = Accepted(controlCommand.runId)
+  override def onOneway(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = {
     val config = ConfigFactory.load("tromboneAssemblyContext.conf")

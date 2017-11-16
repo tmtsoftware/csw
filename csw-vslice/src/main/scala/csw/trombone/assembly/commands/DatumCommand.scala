@@ -5,8 +5,8 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
-import csw.messages.ccs.commands.CommandExecutionResponse.{Completed, Error, NoLongerValid}
-import csw.messages.ccs.commands.{CommandExecutionResponse, Setup}
+import csw.messages.ccs.commands.CommandResponse.{Completed, Error, NoLongerValid}
+import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.params.models.RunId
 import csw.trombone.assembly.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly.actors.TromboneState.TromboneState
@@ -28,7 +28,7 @@ class DatumCommand(
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
 
-  def startCommand(): Future[CommandExecutionResponse] = {
+  def startCommand(): Future[CommandResponse] = {
     if (tromboneHCD.isEmpty)
       Future(NoLongerValid(s.runId, RequiredHCDUnavailableIssue(s"${ac.hcdComponentId} is not available")))
     if (startState.cmd.head == cmdUninitialized) {
