@@ -8,6 +8,7 @@ import csw.messages.models.PubSub.SubscriberMessage
 import csw.messages.models._
 import csw.messages.params.models.{Prefix, RunId}
 import csw.messages.params.states.CurrentState
+import csw.messages.ActorTypes.ComponentRef
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -113,10 +114,19 @@ object ContainerIdleMessage {
 
 sealed trait FromSupervisorMessage extends ContainerIdleMessage
 object FromSupervisorMessage {
-  case class SupervisorLifecycleStateChanged(supervisor: ActorRef[ComponentMessage],
+  case class SupervisorLifecycleStateChanged(supervisor: ComponentRef,
                                              supervisorLifecycleState: SupervisorLifecycleState)
       extends FromSupervisorMessage
 }
+
+case class LifecycleStateChanged(publisher: ComponentRef, state: SupervisorLifecycleState)
+    extends TMTSerializable
+
+case class Components(components: Set[Component]) extends TMTSerializable
+
+case class Component(supervisor: ComponentRef, info: ComponentInfo) extends TMTSerializable
+
+case class SupervisorInfo(system: ActorSystem, component: Component)
 
 ////////////////
 

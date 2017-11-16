@@ -14,6 +14,8 @@ import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
+import csw.services.logging.scaladsl.{Keys, LogAdminActorFactory, LoggingSystemFactory}
+import csw.messages.ActorTypes.{ComponentRef, ContainerRef}
 import csw.services.logging.scaladsl._
 
 import scala.async.Async._
@@ -153,10 +155,10 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   findResult.foreach(akkaLocation ⇒ {
     //#typed-ref
     // If the component type is HCD or Assembly, use this to get the correct ActorRef
-    val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.componentRef()
+    val typedComponentRef: ComponentRef = akkaLocation.componentRef()
 
     // If the component type is Container, use this to get the correct ActorRef
-    val typedContainerRef: ActorRef[ContainerExternalMessage] = akkaLocation.containerRef()
+    val typedContainerRef: ContainerRef = akkaLocation.containerRef()
     //#typed-ref
   })
   //#resolve

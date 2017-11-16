@@ -1,4 +1,6 @@
-package csw.util
+package csw
+
+import akka.typed.ActorRef
 
 /**
  * == Utility Classes ==
@@ -31,7 +33,6 @@ package csw.util
  *
  * The key/value store and event service make use of these classes, which need to be
  * serialized and deserialized for external storage (in Redis or Hornetq, for example).
- * The [[csw.messages.ParamSetSerializer]] class provides support for this.
  *
  * === Scala and Java APIs ===
  *
@@ -166,4 +167,11 @@ package csw.util
  * }}}
  *
  */
-package object messages {}
+package object messages {
+
+  object ActorTypes {
+    type ComponentRef = ActorRef[SupervisorExternalMessage]
+    type ContainerRef = ActorRef[ContainerExternalMessage]
+  }
+
+}
