@@ -43,7 +43,6 @@ private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSetti
       throw ClusterSeedsNotFound
     else
       new ArgsParser().parse(args) match {
-        case None ⇒ throw UnableToParseOptions
         case Some(Options(isLocal, hostConfigPath, Some(containerScript))) =>
           try {
             if (startLogging) wiring.actorRuntime.startLogging()
@@ -64,6 +63,7 @@ private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSetti
             waitForProcessTermination(processes)
             log.warn("Exiting HostConfigApp as all the processes start by this app are terminated")
           }
+        case _ ⇒ throw UnableToParseOptions
       }
 
   private def bootstrapContainers(containerScript: String, bootstrapInfo: HostBootstrapInfo): Set[process.Process] =
