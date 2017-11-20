@@ -44,26 +44,13 @@ object IdleMessage {
   case object Initialize extends IdleMessage
 }
 
-sealed trait AssemblyRunningMessage extends RunningMessage {
-  def token: String
-  def replyTo: ActorRef[AssemblyRunningResponse]
-}
-
-object AssemblyRunningMessage {
-  case class Lock(prefix: String, token: String, replyTo: ActorRef[AssemblyRunningResponse])
-      extends AssemblyRunningMessage
-  case class Unlock(prefix: String, token: String, replyTo: ActorRef[AssemblyRunningResponse])
-      extends AssemblyRunningMessage
-}
-
-sealed trait AssemblyRunningResponse
-object AssemblyRunningResponse {
-  case object LockAcquired                               extends AssemblyRunningResponse
-  case object LockReleased                               extends AssemblyRunningResponse
-  case object LockAlreadyReleased                        extends AssemblyRunningResponse
-  case object CanLockOnlyAssembly                        extends AssemblyRunningResponse
-  case class LockAlreadyAcquired(otherComponent: String) extends AssemblyRunningResponse
-  case class LockAcquiredByOther(otherComponent: String) extends AssemblyRunningResponse
+sealed trait LockingResponses
+object LockingResponses {
+  case object LockAcquired                                 extends LockingResponses
+  case class LockAlreadyAcquiredBy(otherComponent: String) extends LockingResponses
+  case object LockReleased                                 extends LockingResponses
+  case object LockAlreadyReleased                          extends LockingResponses
+  case class UnlockFailed(reason: String)                  extends LockingResponses
 }
 
 sealed trait CommandMessage extends RunningMessage {
@@ -78,8 +65,10 @@ object CommandMessage {
 
 sealed trait RunningMessage extends ComponentMessage with SupervisorRunningMessage
 object RunningMessage {
-  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerExternalMessage
-  trait DomainMessage                                        extends RunningMessage
+  case class Lifecycle(message: ToComponentLifecycleMessage)                            extends RunningMessage with ContainerExternalMessage
+  trait DomainMessage                                                                   extends RunningMessage
+  case class Lock(prefix: String, token: String, replyTo: ActorRef[LockingResponses])   extends RunningMessage
+  case class Unlock(prefix: String, token: String, replyTo: ActorRef[LockingResponses]) extends RunningMessage
 }
 
 case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage

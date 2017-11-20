@@ -9,12 +9,11 @@ import csw.framework.ComponentInfos._
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
 import csw.framework.javadsl.components.JComponentDomainMessage
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.AssemblyRunningMessage.{Lock, Unlock}
-import csw.messages.AssemblyRunningResponse._
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.LockingResponses._
 import csw.messages.PubSub.Publish
-import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
+import csw.messages.RunningMessage.{DomainMessage, Lifecycle, Lock, Unlock}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
@@ -386,7 +385,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   //DEOPSCSW-222: Locking a component for a specific duration
   test("should able to lock and unlock a component") {
-    val lockingStateProbe = TestProbe[AssemblyRunningResponse]
+    val lockingStateProbe = TestProbe[LockingResponses]
     val mocks             = frameworkTestMocks()
     import mocks._
 
@@ -402,7 +401,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Client 2 tries to lock the assembly while Client 1 already has the lock
     supervisorRef ! Lock("wfos.prog.cloudcover.Client2", "token-2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAlreadyAcquired("wfos.prog.cloudcover.Client1"))
+    lockingStateProbe.expectMsg(LockAlreadyAcquiredBy("wfos.prog.cloudcover.Client1"))
 
     // Client 1 re-acquires the lock by sending the same token again
     supervisorRef ! Lock("wfos.prog.cloudcover.Client1", "token-1", lockingStateProbe.ref)
@@ -410,7 +409,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Client 2 tries to unlock the assembly while Client 1 already has the lock
     supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", "token-2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAcquiredByOther("wfos.prog.cloudcover.Client1"))
+    lockingStateProbe.expectMsg(UnlockFailed("wfos.prog.cloudcover.Client1"))
 
     // Client 1 unlocks the assembly successfully
     supervisorRef ! Unlock("wfos.prog.cloudcover.Client1", "token-1", lockingStateProbe.ref)
@@ -428,7 +427,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-222: Locking a component for a specific duration
   // DEOPSCSW-301: Support UnLocking
   test("should forward command messages from client that locked the component and reject for other clients ") {
-    val lockingStateProbe    = TestProbe[AssemblyRunningResponse]
+    val lockingStateProbe    = TestProbe[LockingResponses]
     val commandResponseProbe = TestProbe[CommandResponse]
 
     val client1Prefix    = Prefix("wfos.prog.cloudcover.Client1.success")

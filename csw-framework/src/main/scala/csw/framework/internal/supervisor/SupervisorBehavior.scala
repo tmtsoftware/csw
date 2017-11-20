@@ -9,12 +9,11 @@ import csw.ccs.internal.CommandResponseManagerFactory
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
-import csw.messages.AssemblyRunningMessage.{Lock, Unlock}
-import csw.messages.AssemblyRunningResponse._
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.LockingResponses._
 import csw.messages.PubSub.Publish
-import csw.messages.RunningMessage.Lifecycle
+import csw.messages.RunningMessage.{Lifecycle, Lock, Unlock}
 import csw.messages.SupervisorCommonMessage._
 import csw.messages.SupervisorIdleMessage._
 import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
@@ -211,7 +210,7 @@ class SupervisorBehavior(
     }
   }
 
-  private def lockComponent(prefix: String, token: String, replyTo: ActorRef[AssemblyRunningResponse]): Unit = {
+  private def lockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponses]): Unit = {
     maybeLockToken match {
       case Some((currentPrefix, `token`)) ⇒
         log.info(s"The lock is re-acquired by component: [$currentPrefix]")
@@ -219,7 +218,7 @@ class SupervisorBehavior(
         replyTo ! LockAcquired
       case Some((currentPrefix, _)) ⇒
         log.error(s"Cannot acquire lock for [$prefix] as it is already acquired by component: [$currentPrefix]")
-        replyTo ! LockAlreadyAcquired(currentPrefix)
+        replyTo ! LockAlreadyAcquiredBy(currentPrefix)
       case None ⇒
         log.info(s"The lock is successfully acquired by component: [$prefix]")
         maybeLockToken = Some((prefix, token)) //TODO: Start the timer for lock lease
@@ -227,15 +226,17 @@ class SupervisorBehavior(
     }
   }
 
-  private def unlockComponent(prefix: String, token: String, replyTo: ActorRef[AssemblyRunningResponse]): Unit = {
+  private def unlockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponses]): Unit = {
     maybeLockToken match {
       case Some((`prefix`, `token`)) ⇒
         maybeLockToken = None // TODO: Stop the timer for lock lease
         log.info(s"The lock is successfully released by component: [$prefix]")
         replyTo ! LockReleased
       case Some((currentPrefix, _)) ⇒
-        log.error(s"Cannot release lock for [$prefix] as it is acquired by component: [$currentPrefix]")
-        replyTo ! LockAcquiredByOther(currentPrefix)
+        log.error(s"Cannot release lock for [$prefix] as it is acquired by other component: [$currentPrefix]")
+        replyTo ! UnlockFailed(
+          s"Cannot release lock for [$prefix] as it is acquired by other component: [$currentPrefix]"
+        )
       case _ ⇒
         log.warn(s"Cannot release lock for [$prefix] as it is already released")
         replyTo ! LockAlreadyReleased
