@@ -26,7 +26,6 @@ import csw.messages.framework.SupervisorLifecycleState.Idle
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.params.generics.KeyType
 import csw.messages.params.states.CurrentState
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -249,21 +248,17 @@ class SupervisorBehavior(
       lockToken: String,
       runningMessage: RunningMessage
   ): Unit = {
-    val maybeComponentUUID = commandMessage.command.paramSetType().get("componentUUID", KeyType.StringKey)
+    val command = commandMessage.command
 
-    maybeComponentUUID match {
-      case Some(componentUUID) if componentUUID.get(0).contains(lockToken) ⇒
+    command.getLockToken match {
+      case Some(`lockToken`) ⇒
         log.info(s"Forwarding message [${runningMessage.toString}]")
         runningComponent.get ! runningMessage
       case _ ⇒
-        log.error(
-          s"Cannot process the command [${commandMessage.command.toString}] as the lock is acquired by component: [$prefix]"
-        )
+        log.error(s"Cannot process the command [${command.toString}] as the lock is acquired by component: [$prefix]")
         commandMessage.replyTo ! Invalid(
-          commandMessage.command.runId,
-          UnsupportedCommandInStateIssue(
-            s"This component is locked by component [$prefix]"
-          )
+          command.runId,
+          UnsupportedCommandInStateIssue(s"This component is locked by component [$prefix]")
         )
     }
   }
