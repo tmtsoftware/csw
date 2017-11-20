@@ -203,11 +203,35 @@ class KeysAndParameters extends FunSpec with Matchers {
       val head: Struct          = p1.head
       val values: Array[Struct] = p2.values
 
+      //get individual keys
+      val firstKey: Option[Parameter[String]]  = struct1.get(KeyType.StringKey.make("ra"))
+      val secondKey: Option[Parameter[String]] = struct1.get("dec", KeyType.StringKey)
+      val thirdKey: Option[Parameter[Double]]  = struct1.get("epoch", KeyType.DoubleKey)
+
+      //access parameter using 'parameter' or 'apply' method
+      assert(struct1.parameter(ra) === struct1(ra))
+
+      //remove a parameter and verify it doesn't exist
+      val mutated1: Struct = struct1.remove(ra) //using key
+      val mutated2         = struct1.remove(firstKey.get)
+      assert(mutated1.exists(ra) === false)
+      assert(mutated2.exists(ra) === false)
+
+      //find out missing keys
+      val missingKeySet: Set[String] = mutated1.missingKeys(ra, dec, epoch, KeyType.FloatKey.make("missingKey"))
+      assert(missingKeySet === Set("ra", "missingKey"))
+
       //#struct
       //validations
       head should be(struct1)
       values should be(Array(struct1, struct2))
       paramWithLightYear.units should be(Units.lightyear)
+
+      assert(mutated1 === mutated2)
+
+      firstKey.get shouldBe struct1.parameter(ra)
+      secondKey.get shouldBe struct1.parameter(dec)
+      thirdKey.get shouldBe struct1.parameter(epoch)
     }
   }
 }

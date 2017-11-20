@@ -158,7 +158,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
     }
   }
 
-  // Function to find a parameter by keyname - made public to enable matchers
+  // Function to find a parameter by keyname
   private def getByKeyname[P](parametersIn: Set[Parameter[_]], keyname: String): Option[P] =
     parametersIn.find(_.keyName == keyname).asInstanceOf[Option[P]]
 
