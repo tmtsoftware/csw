@@ -425,30 +425,19 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockAlreadyReleased)
   }
 
-  //DEOPSCSW-222: Locking a component for a specific duration
-  test("should able to lock only assembly type of component") {
-    val lockingStateProbe = TestProbe[AssemblyRunningResponse]
-    val mocks             = frameworkTestMocks()
-    import mocks._
-
-    createSupervisorAndStartTLA(hcdInfo, mocks)
-
-    // Assure that component is in running state
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
-
-    // Client 1 tries to lock a HCD
-    supervisorRef ! Lock("wfos.prog.cloudcover.Client1", "token-1", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(CanLockOnlyAssembly)
-  }
-
-  //DEOPSCSW-222: Locking a component for a specific duration
+  // DEOPSCSW-222: Locking a component for a specific duration
+  // DEOPSCSW-301: Support UnLocking
   test("should forward command messages from client that locked the component and reject for other clients ") {
     val lockingStateProbe    = TestProbe[AssemblyRunningResponse]
     val commandResponseProbe = TestProbe[CommandResponse]
-    val client1Prefix        = Prefix("wfos.prog.cloudcover.Client1.success")
-    val client2Prefix        = Prefix("wfos.prog.cloudcover.Client2.success")
-    val mocks                = frameworkTestMocks()
+
+    val client1Prefix    = Prefix("wfos.prog.cloudcover.Client1.success")
+    val uuidParamClient1 = KeyType.StringKey.make("componentUUID").set("token-1")
+
+    val client2Prefix    = Prefix("wfos.prog.cloudcover.Client2.success")
+    val uuidParamClient2 = KeyType.StringKey.make("componentUUID").set("token-2")
+
+    val mocks = frameworkTestMocks()
     import mocks._
 
     createSupervisorAndStartTLA(assemblyInfo, mocks)
@@ -462,15 +451,19 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 1 sends submit command with tokenId in parameter set
-    val uuidParamClient1 = KeyType.StringKey.make("componentUUID").set("token-1")
     supervisorRef ! Submit(Setup(ObsId("Obs001"), client1Prefix).add(uuidParamClient1), commandResponseProbe.ref)
-
     commandResponseProbe.expectMsgType[Accepted]
 
     // Client 2 tries to send submit command while Client 1 has the lock
-    val uuidParamClient2 = KeyType.StringKey.make("componentUUID").set("token-2")
     supervisorRef ! Submit(Setup(ObsId("Obs001"), client2Prefix).add(uuidParamClient2), commandResponseProbe.ref)
-
     commandResponseProbe.expectMsgType[Invalid]
+
+    // Client 1 unlocks the assembly
+    supervisorRef ! Unlock(client1Prefix.toString, "token-1", lockingStateProbe.ref)
+    lockingStateProbe.expectMsg(LockReleased)
+
+    // Client 2 tries to send submit command again after lock is released
+    supervisorRef ! Submit(Setup(ObsId("Obs001"), client2Prefix).add(uuidParamClient2), commandResponseProbe.ref)
+    commandResponseProbe.expectMsgType[Accepted]
   }
 }

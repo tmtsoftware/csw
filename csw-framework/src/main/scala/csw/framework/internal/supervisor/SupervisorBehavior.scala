@@ -26,7 +26,6 @@ import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.SupervisorLifecycleState.Idle
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
-import csw.messages.location.ComponentType.Assembly
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.generics.{KeyType, ParameterSetType}
 import csw.messages.params.states.CurrentState
@@ -191,8 +190,8 @@ class SupervisorBehavior(
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = {
     runningMessage match {
-      case Lock(prefix, token, replyTo)   ⇒ handleAssemblyLockState(prefix, token, replyTo, isLock = true)
-      case Unlock(prefix, token, replyTo) ⇒ handleAssemblyLockState(prefix, token, replyTo, isLock = false)
+      case Lock(prefix, token, replyTo)   ⇒ lockComponent(prefix, token, replyTo)
+      case Unlock(prefix, token, replyTo) ⇒ unlockComponent(prefix, token, replyTo)
       case runningMessage: RunningMessage ⇒
         runningMessage match {
           case Lifecycle(message) ⇒
@@ -209,23 +208,6 @@ class SupervisorBehavior(
 
       case msg @ Running(_) ⇒
         log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
-    }
-  }
-
-  private def handleAssemblyLockState(
-      prefix: String,
-      token: String,
-      replyTo: ActorRef[AssemblyRunningResponse],
-      isLock: Boolean
-  ): Unit = {
-    componentInfo.componentType match {
-      case Assembly ⇒
-        if (isLock) lockComponent(prefix, token, replyTo) else unlockComponent(prefix, token, replyTo)
-      case _ ⇒
-        log.warn(
-          s"Component of type: [${componentInfo.componentType}] cannot be locked/unlocked. This operation is available only on [$Assembly]."
-        )
-        replyTo ! CanLockOnlyAssembly
     }
   }
 
