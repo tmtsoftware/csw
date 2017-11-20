@@ -1,6 +1,16 @@
 ## Keys and Parameters
 
-### Keys for primitive datatypes
+Library offers a flexible and typesafe means to create Parameters to store values  like **primitive types, collection types or domain specific types**. 
+
+A **Parameter** is a collection of Keys and values or binary data. A key is **unique** in a Parameter. A Parameter is **immutable**, in a sense, a modification to an existing Parameter will return a new instance.  
+
+### How to create a Parameter - 
+ 
+ * choose appropriate KeyType from below tables for your language(Scala/Java).    
+ * calling `make` function on KeyType and supplying a String keyName will return a suitably typed Key instance.    
+ * explore the overloaded `set` and `->` methods, which will allow you to store values of the based on chosen KeyType. e.g. `JKeyTypes.BooleanKey` will allow storing only `java.lang.Boolean` values.
+ 
+### Primitive datatypes
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
 | :-------------: |:--------------------------: | :-----------------------------:| 
@@ -13,9 +23,12 @@
 | Float           | KeyType.FloatKey            | JKeyTypes.FloatKey             |
 | Double          | KeyType.DoubleKey           | JKeyTypes.DoubleKey            |
 | String          | KeyType.StringKey           | JKeyTypes.StringKey            |
-| Timestamp       | KeyType.TimestampKey        | JKeyTypes.TimestampKey      |
+| Timestamp       | KeyType.TimestampKey        | JKeyTypes.TimestampKey         |
 
-### Keys for Array of Primitives
+Scala
+:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #primitives }
+
+### Arrays
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
 | :-------------: |:--------------------------: | :-----------------------------:| 
@@ -26,7 +39,10 @@
 | FloatArray      | KeyType.FloatArrayKey       | JKeyTypes.FloatArrayKey        |
 | DoubleArray     | KeyType.DoubleArrayKey      | JKeyTypes.DoubleArrayKey       |
 
-### Keys for Matrix of Primitives
+Scala
+:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #arrays }
+
+### Matrices
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
 | :-------------: |:--------------------------: | :-----------------------------:| 
@@ -37,10 +53,34 @@
 | FloatMatrix     | KeyType.FloatMatrixKey      | JKeyTypes.FloatMatrixKey       |
 | DoubleMatrix    | KeyType.DoubleMatrixKey     | JKeyTypes.DoubleMatrixKey      |
 
-### Keys for Domain Specific Types
+Scala
+:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #matrices }
 
-| Primitive       | Scala KeyType               | Java KeyType                   |
-| :-------------: |:--------------------------: | :-----------------------------:| 
+### Domain Specific Types
+
+| Primitive       | Scala KeyType               | Java KeyType                   | 
+| :-------------: |:--------------------------: | :-----------------------------:|  
 | Choice          | KeyType.ChoiceKey           | JKeyTypes.ChoiceKey            |
 | RaDec           | KeyType.RaDecKey            | JKeyTypes.RaDecKey             |
 | Struct          | KeyType.StructKey           | JKeyTypes.StructKey            |
+
+#### Choice
+
+A key for a choice item similar to an enumeration.
+
+Scala
+:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #choice }
+
+#### RaDec
+
+Holds Ra(Right Ascension) and Dec(Declination) values
+
+Scala
+:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #radec }
+
+#### Struct
+
+A configuration for setting telescope and instrument parameters.
+
+Scala
+:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #struct }

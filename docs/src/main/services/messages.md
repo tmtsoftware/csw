@@ -32,14 +32,14 @@ gradle
     ```
     @@@
 
-**csw-messages** library provides out of the box support to cater to the diverse communication requirements. Consumer of this library will be able to create Commands, Events, States to store ParameterSets. Library offers a flexible and typesafe means to create ParameterSets from **primitive types, collection types or domain specific types**.
+**csw-messages** library provides out of the box support to cater to the diverse communication requirements. Consumer of this library will be able to create Commands, Events, States to store ParameterSets.
 
-@@toc { depth=1 }
+@@toc { depth=2 }
 
 @@@ index
-### Keys and Parameters
 * [Keys and Parameters](messages/keys_parameters.md)
-### Commands
+* [Units](messages/units.md)
+* [Subsystem](messages/subsystem.md)
 * [Commands](messages/commands.md)
 * [Events](messages/events.md)
 * [States](messages/states.md)
