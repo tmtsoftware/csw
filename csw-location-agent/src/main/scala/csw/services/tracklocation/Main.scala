@@ -27,6 +27,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) exte
     }
 }
 
+// $COVERAGE-OFF$
 object Main extends App with LocationAgentLogger.Simple {
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     println(
@@ -36,3 +37,4 @@ object Main extends App with LocationAgentLogger.Simple {
     new Main(ClusterAwareSettings, startLogging = true).start(args)
   }
 }
+// $COVERAGE-ON$

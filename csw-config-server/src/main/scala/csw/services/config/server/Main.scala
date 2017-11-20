@@ -37,6 +37,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) exte
     }
 }
 
+// $COVERAGE-OFF$
 object Main extends App with ConfigServerLogger.Simple {
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     println(
@@ -46,3 +47,4 @@ object Main extends App with ConfigServerLogger.Simple {
     new Main(ClusterAwareSettings, startLogging = true).start(args)
   }
 }
+// $COVERAGE-ON$

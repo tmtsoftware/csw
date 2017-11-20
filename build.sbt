@@ -67,13 +67,6 @@ lazy val `csw-logging` = project
     libraryDependencies ++= Dependencies.Logging
   )
 
-lazy val `csw-benchmark` = project
-  .dependsOn(`csw-logging`, `csw-messages`)
-  .enablePlugins(JmhPlugin)
-  .settings(
-    libraryDependencies ++= Dependencies.Benchmark
-  )
-
 //Location service related projects
 lazy val `csw-location` = project
   .dependsOn(`csw-logging`, `csw-messages`)
@@ -173,6 +166,13 @@ lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.CswCommons
+  )
+
+lazy val `csw-benchmark` = project
+  .dependsOn(`csw-logging`, `csw-messages`)
+  .enablePlugins(JmhPlugin)
+  .settings(
+    libraryDependencies ++= Dependencies.Benchmark
   )
 
 //Integration test project
