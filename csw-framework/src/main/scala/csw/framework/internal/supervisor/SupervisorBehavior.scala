@@ -26,7 +26,7 @@ import csw.messages.framework.SupervisorLifecycleState.Idle
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.params.generics.{KeyType, ParameterSetType}
+import csw.messages.params.generics.KeyType
 import csw.messages.params.states.CurrentState
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -249,8 +249,7 @@ class SupervisorBehavior(
       lockToken: String,
       runningMessage: RunningMessage
   ): Unit = {
-    val maybeComponentUUID =
-      commandMessage.command.asInstanceOf[ParameterSetType[_]].get("componentUUID", KeyType.StringKey)
+    val maybeComponentUUID = commandMessage.command.paramSetType().get("componentUUID", KeyType.StringKey)
 
     maybeComponentUUID match {
       case Some(componentUUID) if componentUUID.get(0).contains(lockToken) ⇒

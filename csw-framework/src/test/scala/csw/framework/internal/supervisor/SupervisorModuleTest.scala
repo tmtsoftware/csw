@@ -409,7 +409,11 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Client 2 tries to unlock the assembly while Client 1 already has the lock
     supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", "token-2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(UnlockFailed("wfos.prog.cloudcover.Client1"))
+    lockingStateProbe.expectMsg(
+      UnlockFailed(
+        s"Cannot release lock for [wfos.prog.cloudcover.Client2] as it is acquired by other component: [wfos.prog.cloudcover.Client1]"
+      )
+    )
 
     // Client 1 unlocks the assembly successfully
     supervisorRef ! Unlock("wfos.prog.cloudcover.Client1", "token-1", lockingStateProbe.ref)

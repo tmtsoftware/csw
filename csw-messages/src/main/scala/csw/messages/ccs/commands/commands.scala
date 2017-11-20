@@ -6,7 +6,9 @@ import csw.messages.params.models.{ObsId, Prefix, RunId}
 /**
  * Common trait for Setup, Observe and Wait commands
  */
-sealed trait Command {
+sealed trait Command { self: ParameterSetType[_] ⇒
+
+  def paramSetType(): ParameterSetType[_] = self
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".
@@ -38,12 +40,14 @@ sealed trait Command {
 /**
  * Trait for sequence parameter sets
  */
-sealed trait SequenceCommand extends Command
+sealed trait SequenceCommand extends Command { self: ParameterSetType[_] ⇒
+}
 
 /**
  * Marker trait for control parameter sets
  */
-sealed trait ControlCommand extends Command
+sealed trait ControlCommand extends Command { self: ParameterSetType[_] ⇒
+}
 
 /**
  * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
