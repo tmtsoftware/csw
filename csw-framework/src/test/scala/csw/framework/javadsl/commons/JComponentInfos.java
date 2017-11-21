@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class JComponentInfos {
 
     public static ComponentInfo jHcdInfo = JComponentInfo.from(
-            "trombone",
+            "JSampleHcd",
             JComponentType.HCD,
             "wfos",
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",

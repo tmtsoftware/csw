@@ -10,7 +10,7 @@ import scala.concurrent.duration.DurationDouble
 object ComponentInfos {
   val assemblyInfo =
     ComponentInfo(
-      "trombone",
+      "SampleAssembly",
       Assembly,
       "wfos",
       "csw.common.components.SampleComponentBehaviorFactory",

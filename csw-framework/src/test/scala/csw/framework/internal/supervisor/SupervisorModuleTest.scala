@@ -19,6 +19,7 @@ import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.LockingResponse._
 import csw.messages.models.PubSub.Publish
@@ -129,6 +130,18 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-293: Sanitise handlers in Component Handlers
   // DEOPSCSW-306: Include runId in Command response
   test("onSubmit hook should be invoked and command validation should be successful on receiving Setup config") {
+    val testData = Table(
+      "componentInfo",
+      hcdInfo,
+      assemblyInfo,
+      jHcdInfo
+    )
+
+    // This proves that data used in this test contains HCD and Assembly ComponentType
+    testData.find(info ⇒ info.componentType == HCD && info.name == "SampleHcd") shouldBe Some(hcdInfo)
+    testData.find(info ⇒ info.componentType == HCD && info.name == "JSampleHcd") shouldBe Some(jHcdInfo)
+    testData.find(info ⇒ info.componentType == Assembly && info.name == "SampleAssembly") shouldBe Some(assemblyInfo)
+
     forAll(testData) { (info: ComponentInfo) =>
       {
         val mocks = frameworkTestMocks()
