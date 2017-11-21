@@ -66,8 +66,7 @@ abstract class JCommonComponentLoggerActor extends AbstractActor {
  * Extend this class to create a Typed Mutable Actor by providing an ActorContext and a component name to obtain the logger
  * initialized with the name of the component and it's ActorPath
  */
-abstract class JCommonComponentLoggerMutableActor[T](ctx: ActorContext[T])
-    extends akka.typed.javadsl.Actor.MutableBehavior[T] {
+abstract class JCommonComponentLoggerMutableActor[T](ctx: ActorContext[T]) extends akka.typed.javadsl.Actor.MutableBehavior[T] {
   protected def componentName: String
   def getLogger: ILogger = JBasicLogger.getLogger(Some(componentName), Some(ctx.getSelf.toUntyped), getClass)
 }

@@ -37,8 +37,7 @@ final case class AkkaLocation(
     val typeManifest    = scala.reflect.classTag[T].runtimeClass.getSimpleName
     val messageManifest = connection.componentId.componentType.messageManifest
 
-    require(typeManifest == messageManifest,
-            s"actorRef for type $messageManifest can not handle messages of type $typeManifest")
+    require(typeManifest == messageManifest, s"actorRef for type $messageManifest can not handle messages of type $typeManifest")
 
     actorRef.upcast[T]
   }
@@ -58,5 +57,4 @@ final case class TcpLocation(connection: TcpConnection, uri: URI, logAdminActorR
 /**
  * Represents a live Http connection
  */
-final case class HttpLocation(connection: HttpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing])
-    extends Location
+final case class HttpLocation(connection: HttpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing]) extends Location

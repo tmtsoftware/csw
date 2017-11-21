@@ -19,8 +19,7 @@ object TromboneControl {
             encoderPosition > ac.controlConfig.minEncoderLimit && encoderPosition < ac.controlConfig.maxEncoderLimit
           )
           tromboneHcd.foreach(
-            _ ! Submit(TromboneHcdState.positionSC(RunId(), ac.obsId, encoderPosition),
-                       ctx.spawnAnonymous(Actor.ignore))
+            _ ! Submit(TromboneHcdState.positionSC(RunId(), ac.obsId, encoderPosition), ctx.spawnAnonymous(Actor.ignore))
           )
           Actor.same
         case UpdateTromboneHcd(runningIn) =>

@@ -9,8 +9,7 @@ case class FileNotFound(filePath: Path)
 case class LocalFileNotFound(filePath: Path)
     extends RuntimeException(s"File does not exist on local disk at path ${filePath.toString}")
 
-case object UnableToParseOptions
-    extends RuntimeException("Could not parse command line options. See --help to know more.")
+case object UnableToParseOptions extends RuntimeException("Could not parse command line options. See --help to know more.")
 case object ClusterSeedsNotFound
     extends RuntimeException(
       "clusterSeeds setting is not specified either as env variable or system property. " +

@@ -18,10 +18,9 @@ object ParameterSetFilters {
 
   def onlyWaits(paramSets: Seq[SequenceCommand]): Seq[Wait] = paramSets.collect { case ct: Wait => ct }
 
-  val prefixStartsWithFilter: String => ParamSetFilter[ParameterSetKeyData] = query =>
-    sc => sc.prefixStr.startsWith(query)
-  val prefixContainsFilter: String => ParamSetFilter[ParameterSetKeyData] = query => sc => sc.prefixStr.contains(query)
-  val prefixIsSubsystem: Subsystem => ParamSetFilter[ParameterSetKeyData] = query => sc => sc.subsystem.equals(query)
+  val prefixStartsWithFilter: String => ParamSetFilter[ParameterSetKeyData] = query => sc => sc.prefixStr.startsWith(query)
+  val prefixContainsFilter: String => ParamSetFilter[ParameterSetKeyData]   = query => sc => sc.prefixStr.contains(query)
+  val prefixIsSubsystem: Subsystem => ParamSetFilter[ParameterSetKeyData]   = query => sc => sc.subsystem.equals(query)
 
   def prefixStartsWith(query: String, paramSets: Seq[ParameterSetKeyData]): Seq[ParameterSetKeyData] =
     paramSets.filter(prefixStartsWithFilter(query))

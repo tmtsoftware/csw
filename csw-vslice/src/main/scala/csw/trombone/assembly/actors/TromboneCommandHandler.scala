@@ -78,12 +78,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
           AssemblyCommandState(
             Some(
               List(
-                new PositionCommand(ctx,
-                                    ac,
-                                    s,
-                                    hcds.head._2,
-                                    currentState.asInstanceOf[TromboneState],
-                                    tromboneStateActor)
+                new PositionCommand(ctx, ac, s, hcds.head._2, currentState.asInstanceOf[TromboneState], tromboneStateActor)
               )
             ),
             CommandExecutionState.Executing
@@ -93,12 +88,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
           AssemblyCommandState(
             Some(
               List(
-                new SetElevationCommand(ctx,
-                                        ac,
-                                        s,
-                                        hcds.head._2,
-                                        currentState.asInstanceOf[TromboneState],
-                                        tromboneStateActor)
+                new SetElevationCommand(ctx, ac, s, hcds.head._2, currentState.asInstanceOf[TromboneState], tromboneStateActor)
               )
             ),
             CommandExecutionState.Executing
@@ -112,20 +102,14 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
           AssemblyCommandState(
             Some(
               List(
-                new FollowCommand(ctx,
-                                  ac,
-                                  s,
-                                  hcds.head._2,
-                                  currentState.asInstanceOf[TromboneState],
-                                  tromboneStateActor)
+                new FollowCommand(ctx, ac, s, hcds.head._2, currentState.asInstanceOf[TromboneState], tromboneStateActor)
               )
             ),
             CommandExecutionState.Following
           )
 
         case ac.stopCK =>
-          replyTo ! NoLongerValid(s.runId,
-                                  WrongInternalStateIssue("Trombone assembly must be executing a command to use stop"))
+          replyTo ! NoLongerValid(s.runId, WrongInternalStateIssue("Trombone assembly must be executing a command to use stop"))
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
 
         case ac.setAngleCK =>

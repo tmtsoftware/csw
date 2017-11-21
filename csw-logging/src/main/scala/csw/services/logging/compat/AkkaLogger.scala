@@ -10,12 +10,7 @@ import csw.services.logging.internal.{LogAkka, MessageHandler}
 private[logging] class AkkaLogger extends Actor {
   import csw.services.logging.internal.LoggingLevels._
 
-  private def log(level: Level,
-                  source: String,
-                  clazz: Class[_],
-                  msg: Any,
-                  time: Long,
-                  cause: Option[Throwable] = None): Unit = {
+  private def log(level: Level, source: String, clazz: Class[_], msg: Any, time: Long, cause: Option[Throwable] = None): Unit = {
     val logAkka = LogAkka(time, level, source, clazz, msg, cause)
     MessageHandler.sendAkkaMsg(logAkka)
   }

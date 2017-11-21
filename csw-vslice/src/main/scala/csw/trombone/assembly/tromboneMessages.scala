@@ -87,9 +87,8 @@ object TromboneCommandHandlerMsgs {
   sealed trait FollowingMsgs    extends TromboneCommandHandlerMsgs
   sealed trait ExecutingMsgs    extends TromboneCommandHandlerMsgs
 
-  private[assembly] case class CommandStart(replyTo: ActorRef[CommandResponse]) extends ExecutingMsgs
-  private[assembly] case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandResponse)
-      extends ExecutingMsgs
+  private[assembly] case class CommandStart(replyTo: ActorRef[CommandResponse])                             extends ExecutingMsgs
+  private[assembly] case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandResponse) extends ExecutingMsgs
 }
 
 ////////////////////
@@ -105,11 +104,6 @@ sealed trait FollowingMsgs    extends AssemblyCommandHandlerMsgs
 sealed trait ExecutingMsgs    extends AssemblyCommandHandlerMsgs
 
 object AssemblyCommandHandlerMsgs {
-  case class CommandMessageE(commandMessage: CommandMessage)
-      extends NotFollowingMsgs
-      with FollowingMsgs
-      with ExecutingMsgs
-  case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandResponse)
-      extends ExecutingMsgs
-      with FollowingMsgs
+  case class CommandMessageE(commandMessage: CommandMessage)                              extends NotFollowingMsgs with FollowingMsgs with ExecutingMsgs
+  case class CommandComplete(replyTo: ActorRef[CommandResponse], result: CommandResponse) extends ExecutingMsgs with FollowingMsgs
 }

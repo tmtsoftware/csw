@@ -39,8 +39,7 @@ object CustomAppenderBuilderObject extends LogAppenderBuilder {
     new CustomAppender(factory, standardHeaders, x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
 }
 
-class CustomAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg], callback: Any ⇒ Unit)
-    extends LogAppender {
+class CustomAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg], callback: Any ⇒ Unit) extends LogAppender {
 
   private[this] val system = factory match {
     case context: ActorContext => context.system

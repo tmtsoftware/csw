@@ -62,9 +62,8 @@ sealed trait SupervisorCommonMessage extends SupervisorExternalMessage
 object SupervisorCommonMessage {
   case class LifecycleStateSubscription(subscriberMessage: SubscriberMessage[LifecycleStateChanged])
       extends SupervisorCommonMessage
-  case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState])
-      extends SupervisorCommonMessage
-  case class GetSupervisorLifecycleState(replyTo: ActorRef[SupervisorLifecycleState]) extends SupervisorCommonMessage
+  case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState]) extends SupervisorCommonMessage
+  case class GetSupervisorLifecycleState(replyTo: ActorRef[SupervisorLifecycleState])       extends SupervisorCommonMessage
 }
 
 sealed trait SupervisorIdleMessage extends SupervisorMessage
@@ -107,11 +106,9 @@ object FromSupervisorMessage {
 
 sealed trait CommandResponseManagerMessage
 object CommandResponseManagerMessage {
-  case class AddOrUpdateCommand(commandId: RunId, commandResponse: CommandResponse)
-      extends CommandResponseManagerMessage
-  case class AddSubCommand(commandId: RunId, subCommandId: RunId) extends CommandResponseManagerMessage
-  case class UpdateSubCommand(subCommandId: RunId, commandResponse: CommandResponse)
-      extends CommandResponseManagerMessage
+  case class AddOrUpdateCommand(commandId: RunId, commandResponse: CommandResponse)  extends CommandResponseManagerMessage
+  case class AddSubCommand(commandId: RunId, subCommandId: RunId)                    extends CommandResponseManagerMessage
+  case class UpdateSubCommand(subCommandId: RunId, commandResponse: CommandResponse) extends CommandResponseManagerMessage
   case class Query(commandId: RunId, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
       with SupervisorExternalMessage

@@ -65,8 +65,7 @@ class TromboneAssemblyHandlers(
 
     val eventPublisher = ctx.spawnAnonymous(TrombonePublisher.make(ac))
 
-    commandHandler =
-      ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcds, Some(eventPublisher)))
+    commandHandler = ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcds, Some(eventPublisher)))
 
     val hcdRef = if (runningHcds.nonEmpty) runningHcds.head._2 else None
     diagPublsher = ctx.spawnAnonymous(DiagPublisher.make(ac, hcdRef, Some(eventPublisher)))

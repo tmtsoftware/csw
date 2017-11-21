@@ -41,14 +41,12 @@ sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag: ItemsFactory](defaultUn
 /**
  * A KeyType that holds array
  */
-sealed class ArrayKeyType[S: Format: ClassTag](implicit x: ItemsFactory[ArrayData[S]])
-    extends SimpleKeyType[ArrayData[S]]
+sealed class ArrayKeyType[S: Format: ClassTag](implicit x: ItemsFactory[ArrayData[S]]) extends SimpleKeyType[ArrayData[S]]
 
 /**
  * A KeyType that holds Matrix
  */
-sealed class MatrixKeyType[S: Format: ClassTag](implicit x: ItemsFactory[MatrixData[S]])
-    extends SimpleKeyType[MatrixData[S]]
+sealed class MatrixKeyType[S: Format: ClassTag](implicit x: ItemsFactory[MatrixData[S]]) extends SimpleKeyType[MatrixData[S]]
 
 //////////
 /**

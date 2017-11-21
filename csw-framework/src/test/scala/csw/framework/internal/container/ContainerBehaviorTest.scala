@@ -105,8 +105,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   class RunningContainer() extends IdleContainer {
     containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
     ctx.children.map(
-      child ⇒
-        containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
+      child ⇒ containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
     )
 
     ctx.children
@@ -136,8 +135,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
     ctx.children.map(
-      child ⇒
-        containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
+      child ⇒ containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
     )
 
     verify(locationService).register(akkaRegistration)
@@ -168,8 +166,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
       .map(_.receiveAll())
 
     ctx.children.map(
-      child ⇒
-        containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
+      child ⇒ containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
     )
 
     containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Running
@@ -212,8 +209,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     // Container should handle GetComponents message in Running lifecycle state
     containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
     ctx.children.map(
-      child ⇒
-        containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
+      child ⇒ containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
     )
 
     ctx.children

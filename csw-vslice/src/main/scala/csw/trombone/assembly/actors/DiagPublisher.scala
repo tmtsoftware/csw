@@ -101,9 +101,7 @@ class DiagPublisher(
     case TimeForAxisStats(periodInSeconds) =>
       running.foreach(_ ! GetAxisStats)
       val canceltoken: Cancellable =
-        ctx.schedule(Instant.now().plusSeconds(periodInSeconds).toEpochMilli.millis,
-                     ctx.self,
-                     TimeForAxisStats(periodInSeconds))
+        ctx.schedule(Instant.now().plusSeconds(periodInSeconds).toEpochMilli.millis, ctx.self, TimeForAxisStats(periodInSeconds))
       this.cancelToken = canceltoken
 
     case DiagnosticState => // Do nothing, already in this mode

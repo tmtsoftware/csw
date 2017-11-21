@@ -34,5 +34,4 @@ object RichException {
  * @param richMsg the rich exception message.
  * @param cause the optional underlying causing exception.
  */
-class RichException(val richMsg: RichMsg, val cause: Throwable = noException)
-    extends Exception(RichException.stringify(richMsg))
+class RichException(val richMsg: RichMsg, val cause: Throwable = noException) extends Exception(RichException.stringify(richMsg))

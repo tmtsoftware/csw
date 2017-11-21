@@ -25,9 +25,8 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
-private[location] class LocationServiceImpl(cswCluster: CswCluster)
-    extends LocationService
-    with LocationServiceLogger.Simple { outer ⇒
+private[location] class LocationServiceImpl(cswCluster: CswCluster) extends LocationService with LocationServiceLogger.Simple {
+  outer ⇒
 
   import cswCluster._
   implicit val timeout: Timeout = Timeout(5.seconds)
@@ -240,8 +239,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster)
     override def toString: String = location.toString
   }
 
-  private def resolveWithin[L <: Location](connection: TypedConnection[L],
-                                           waitTime: FiniteDuration): Future[Option[L]] =
+  private def resolveWithin[L <: Location](connection: TypedConnection[L], waitTime: FiniteDuration): Future[Option[L]] =
     track(connection)
       .collect {
         case LocationUpdated(location) ⇒ location.asInstanceOf[L]

@@ -601,10 +601,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val completeHistory = configService.historyActive(file).await
     completeHistory.size shouldBe 4
     completeHistory.map(_.id) shouldBe List(configId5, configId4, configId3, configId1)
-    completeHistory.map(_.comment) shouldBe List(resetActiveComment2,
-                                                 resetActiveComment1,
-                                                 setActiveComment,
-                                                 createActiveComment)
+    completeHistory.map(_.comment) shouldBe List(resetActiveComment2, resetActiveComment1, setActiveComment, createActiveComment)
 
     // verify history of active file with max results parameter
     configService.historyActive(file, maxResults = 2).await.size shouldBe 2
@@ -623,8 +620,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
     // verify history of active file within given timestamps
     val historyWithin = configService.historyActive(file, setActiveTS, resetActiveTS2).await
-    historyWithin.map(h ⇒ (h.id, h.comment)) shouldBe List((configId5, resetActiveComment2),
-                                                           (configId4, resetActiveComment1))
+    historyWithin.map(h ⇒ (h.id, h.comment)) shouldBe List((configId5, resetActiveComment2), (configId4, resetActiveComment1))
   }
 
   // DEOPSCSW-77: Set default version of configuration file in config service

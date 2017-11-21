@@ -32,10 +32,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       id
     }
 
-  private def createFile(path: Path,
-                         configData: ConfigData,
-                         annex: Boolean = false,
-                         comment: String): Future[ConfigId] = {
+  private def createFile(path: Path, configData: ConfigData, annex: Boolean = false, comment: String): Future[ConfigId] = {
 
     def createAnnex(): Future[ConfigId] = async {
       val sha1 = await(fileService.post(configData))
@@ -168,10 +165,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
       }
     }
 
-  override def historyActive(path: Path,
-                             from: Instant,
-                             to: Instant,
-                             maxResults: Int): Future[List[ConfigFileRevision]] =
+  override def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
     async {
       val activePath = activeFilePath(path)
 

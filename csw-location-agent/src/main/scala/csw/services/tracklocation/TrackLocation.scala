@@ -20,8 +20,7 @@ import scala.util.control.NonFatal
 /**
  * Starts a given external program, registers it with the location service and unregisters it when the program exits.
  */
-class TrackLocation(names: List[String], command: Command, actorSystem: ActorSystem)
-    extends LocationAgentLogger.Simple {
+class TrackLocation(names: List[String], command: Command, actorSystem: ActorSystem) extends LocationAgentLogger.Simple {
 
   private val cswCluster      = CswCluster.withSystem(actorSystem)
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
@@ -69,8 +68,7 @@ class TrackLocation(names: List[String], command: Command, actorSystem: ActorSys
    * INTERNAL API : Unregisters a service.
    */
   private def unregisterServices(results: Seq[RegistrationResult]): Future[Done] = {
-    log.info("Shutdown hook reached, un-registering connections",
-             Map("services" → results.map(_.location.connection.name)))
+    log.info("Shutdown hook reached, un-registering connections", Map("services" → results.map(_.location.connection.name)))
     Future.traverse(results)(_.unregister()).map { _ =>
       log.info(s"Services are unregistered")
       Done

@@ -25,8 +25,7 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends TMT
   def name: String = connectionInfo.toString
 }
 
-abstract sealed class TypedConnection[T <: Location](connectionType: ConnectionType)
-    extends Connection(connectionType) {
+abstract sealed class TypedConnection[T <: Location](connectionType: ConnectionType) extends Connection(connectionType) {
   override type L = T
 }
 

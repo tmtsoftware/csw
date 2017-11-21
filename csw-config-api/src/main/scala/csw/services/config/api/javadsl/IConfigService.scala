@@ -204,10 +204,7 @@ trait IConfigService extends IConfigClientService {
    * @param maxResults  the maximum number of history results to return (default: unlimited)
    * @return            a list containing one ConfigFileHistory object for each version of path
    */
-  def historyActive(path: Path,
-                    from: Instant,
-                    to: Instant,
-                    maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
+  def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
 
   /**
    * Returns the history of active versions of the file at the given path for a range of period specified by `from` and `to`.

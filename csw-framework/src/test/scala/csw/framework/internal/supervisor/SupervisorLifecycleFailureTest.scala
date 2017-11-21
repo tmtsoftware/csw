@@ -224,8 +224,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   }
 
   private def createAnswers(compStateProbe: TestProbe[PubSub[CurrentState]]): Unit = {
-    initializeAnswer = (_) ⇒
-      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    initializeAnswer = (_) ⇒ Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
     shutdownAnswer = (_) ⇒
       Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))

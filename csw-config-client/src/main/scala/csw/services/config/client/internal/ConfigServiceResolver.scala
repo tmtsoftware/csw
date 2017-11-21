@@ -11,8 +11,7 @@ import scala.concurrent.duration.DurationDouble
 /**
  * Resolves the location of server hosting the configuration service
  */
-class ConfigServiceResolver(locationService: LocationService, actorRuntime: ActorRuntime)
-    extends ConfigClientLogger.Simple {
+class ConfigServiceResolver(locationService: LocationService, actorRuntime: ActorRuntime) extends ConfigClientLogger.Simple {
 
   import actorRuntime.ec
 

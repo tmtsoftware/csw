@@ -44,8 +44,7 @@ object Units extends Enum[Units] with PlayJsonEnum[Units] {
   case object minute      extends Units("min", "minute 6x10+1 s")
   case object newton      extends Units("N", "Newton: force")
   case object pascal      extends Units("Pa", "Pascal: pressure")
-  case object radian
-      extends Units("rad", "radian: angular measurement of the ratio between the length of an arc and its radius")
+  case object radian      extends Units("rad", "radian: angular measurement of the ratio between the length of an arc and its radius")
   case object second      extends Units("s", "second: base unit of time in SI")
   case object sday        extends Units("sday", "sidereal day is the time of one rotation of the Earth: 8.6164x10+4 s")
   case object steradian   extends Units("sr", "steradian: unit of solid angle in SI - rad+2")

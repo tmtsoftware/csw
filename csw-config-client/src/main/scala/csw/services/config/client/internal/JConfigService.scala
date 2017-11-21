@@ -21,10 +21,7 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
 
   import actorRuntime._
 
-  override def create(path: Path,
-                      configData: ConfigData,
-                      annex: Boolean,
-                      comment: String): CompletableFuture[ConfigId] =
+  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): CompletableFuture[ConfigId] =
     configService.create(path, configData, annex, comment).toJava.toCompletableFuture
 
   override def create(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId] =
@@ -78,17 +75,13 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def history(path: Path): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, maxResults = Int.MaxValue)
 
-  override def historyFrom(path: Path,
-                           from: Instant,
-                           maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
+  override def historyFrom(path: Path, from: Instant, maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, from, Instant.now, maxResults)
 
   override def historyFrom(path: Path, from: Instant): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, from, Instant.now, Int.MaxValue)
 
-  override def historyUpTo(path: Path,
-                           upTo: Instant,
-                           maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
+  override def historyUpTo(path: Path, upTo: Instant, maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
     history(path, Instant.MIN, upTo, maxResults)
 
   override def historyUpTo(path: Path, upTo: Instant): CompletableFuture[util.List[ConfigFileRevision]] =
@@ -109,17 +102,13 @@ class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) e
   override def historyActive(path: Path): CompletableFuture[util.List[ConfigFileRevision]] =
     historyActive(path, Instant.MIN, Instant.now, Int.MaxValue)
 
-  override def historyActiveFrom(path: Path,
-                                 from: Instant,
-                                 maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
+  override def historyActiveFrom(path: Path, from: Instant, maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
     historyActive(path, from, Instant.now, maxResults)
 
   override def historyActiveFrom(path: Path, from: Instant): CompletableFuture[util.List[ConfigFileRevision]] =
     historyActive(path, from, Instant.now, Int.MaxValue)
 
-  override def historyActiveUpTo(path: Path,
-                                 upTo: Instant,
-                                 maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
+  override def historyActiveUpTo(path: Path, upTo: Instant, maxResults: Int): CompletableFuture[util.List[ConfigFileRevision]] =
     historyActive(path, Instant.MIN, upTo, maxResults)
 
   override def historyActiveUpTo(path: Path, upTo: Instant): CompletableFuture[util.List[ConfigFileRevision]] =

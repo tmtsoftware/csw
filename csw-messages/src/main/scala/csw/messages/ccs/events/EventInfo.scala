@@ -17,10 +17,7 @@ import scala.runtime.ScalaRunTime._
  * @param obsId optional observation id
  * @param eventId automatically generated unique event id
  */
-case class EventInfo(source: Prefix,
-                     eventTime: EventTime,
-                     obsId: Option[ObsId],
-                     eventId: String = UUID.randomUUID().toString) {
+case class EventInfo(source: Prefix, eventTime: EventTime, obsId: Option[ObsId], eventId: String = UUID.randomUUID().toString) {
   override def toString: String = s"$source: eId: $eventId, time: $eventTime, obsId: $obsId"
 
   override def equals(that: Any): Boolean = {

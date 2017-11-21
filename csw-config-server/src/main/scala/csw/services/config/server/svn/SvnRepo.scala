@@ -174,15 +174,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) exten
           else
             logEntries
       }
-      logClient.doLog(settings.svnUrl,
-                      Array(path.toString),
-                      SVNRevision.HEAD,
-                      null,
-                      null,
-                      true,
-                      true,
-                      maxResults,
-                      handler)
+      logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults, handler)
       logEntries.sortWith(_.getRevision > _.getRevision)
     } finally {
       clientManager.dispose()

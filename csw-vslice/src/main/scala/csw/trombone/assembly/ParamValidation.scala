@@ -93,8 +93,7 @@ object ParamValidation {
       if (!sc.exists(ac.stagePositionKey)) {
         Invalid(sc.runId, MissingKeyIssue(s"The move Setup must have a DoubleParameter named: ${ac.stagePositionKey}"))
       } else if (Try(sc(ac.stagePositionKey)).isFailure)
-        Invalid(sc.runId,
-                WrongParameterTypeIssue(s"The move Setup must have a DoubleParameter named: ${ac.stagePositionKey}"))
+        Invalid(sc.runId, WrongParameterTypeIssue(s"The move Setup must have a DoubleParameter named: ${ac.stagePositionKey}"))
       else if (sc(ac.stagePositionKey).units != ac.stagePositionUnits) {
         Invalid(sc.runId,
                 WrongUnitsIssue(
@@ -116,8 +115,7 @@ object ParamValidation {
       // The spec says parameter is not required, but doesn't explain so requiring parameter
       // Check for correct key and type -- only checks that essential key is present, not strict
       if (!sc.exists(ac.naRangeDistanceKey)) {
-        Invalid(sc.runId,
-                MissingKeyIssue(s"The position Setup must have a DoubleParameter named: ${ac.naRangeDistanceKey}"))
+        Invalid(sc.runId, MissingKeyIssue(s"The position Setup must have a DoubleParameter named: ${ac.naRangeDistanceKey}"))
       } else if (Try(sc(ac.naRangeDistanceKey)).isFailure) {
         Invalid(
           sc.runId,
@@ -178,8 +176,7 @@ object ParamValidation {
     if (!sc.exists(ac.zenithAngleKey)) {
       Invalid(sc.runId, MissingKeyIssue(s"The setAngle Setup must have a DoubleParameter named: ${ac.zenithAngleKey}"))
     } else if (Try(sc(ac.zenithAngleKey)).isFailure) {
-      Invalid(sc.runId,
-              WrongParameterTypeIssue(s"The setAngle Setup must have a DoubleParameter named: ${ac.zenithAngleKey}"))
+      Invalid(sc.runId, WrongParameterTypeIssue(s"The setAngle Setup must have a DoubleParameter named: ${ac.zenithAngleKey}"))
     } else if (sc(ac.zenithAngleKey).units != ac.zenithAngleUnits) {
       Invalid(
         sc.runId,
@@ -200,8 +197,7 @@ object ParamValidation {
       // Check for correct key and type -- only checks that essential key is present, not strict
       Invalid(sc.runId, MissingKeyIssue(s"The follow Setup must have a BooleanParameter named: ${ac.nssInUseKey}"))
     } else if (Try(sc(ac.nssInUseKey)).isFailure) {
-      Invalid(sc.runId,
-              WrongParameterTypeIssue(s"The follow Setup must have a BooleanParameter named ${ac.nssInUseKey}"))
+      Invalid(sc.runId, WrongParameterTypeIssue(s"The follow Setup must have a BooleanParameter named ${ac.nssInUseKey}"))
     } else Accepted(sc.runId)
   }
 }

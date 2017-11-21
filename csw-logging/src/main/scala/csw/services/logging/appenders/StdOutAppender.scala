@@ -30,8 +30,7 @@ object StdOutAppender extends LogAppenderBuilder {
  * @param factory    an Akka factory.
  * @param stdHeaders the headers that are fixes for this service.
  */
-class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg], logPrinter: Any ⇒ Unit)
-    extends LogAppender {
+class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg], logPrinter: Any ⇒ Unit) extends LogAppender {
   private[this] val system = factory match {
     case context: ActorContext => context.system
     case s: ActorSystem        => s

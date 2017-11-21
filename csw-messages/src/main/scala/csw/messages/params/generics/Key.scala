@@ -17,9 +17,7 @@ import scala.runtime.ScalaRunTime._
  * @param keyType reference to an object of type KeyType[S]
  * @param units applicable units
  */
-case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: String,
-                                                                     keyType: KeyType[S],
-                                                                     units: Units) {
+case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: String, keyType: KeyType[S], units: Units) {
 
   def this(keyName: String, keyType: KeyType[S]) = this(keyName, keyType, NoUnits)
 

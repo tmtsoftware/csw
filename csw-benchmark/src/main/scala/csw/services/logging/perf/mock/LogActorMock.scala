@@ -12,9 +12,7 @@ object LogActorMock {
 
   val noException = new Exception("No Exception")
   val standardHeaders: Map[String, RichMsg] =
-    Map[String, RichMsg](LoggingKeys.HOST    -> "hostname",
-                         LoggingKeys.NAME    -> "test",
-                         LoggingKeys.VERSION -> "SNAPSHOT-1.0")
+    Map[String, RichMsg](LoggingKeys.HOST -> "hostname", LoggingKeys.NAME -> "test", LoggingKeys.VERSION -> "SNAPSHOT-1.0")
 
   val sourceLocation = SourceLocation("hcd.scala", "iris", "tromboneHCD", 12)
   val log = Log(

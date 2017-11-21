@@ -39,10 +39,8 @@ class AxisSimulator(
 
   import AxisSimulator._
 
-  assert(axisConfig.home > axisConfig.lowUser,
-         s"home position must be greater than lowUser value: ${axisConfig.lowUser}")
-  assert(axisConfig.home < axisConfig.highUser,
-         s"home position must be less than highUser value: ${axisConfig.highUser}")
+  assert(axisConfig.home > axisConfig.lowUser, s"home position must be greater than lowUser value: ${axisConfig.lowUser}")
+  assert(axisConfig.home < axisConfig.highUser, s"home position must be less than highUser value: ${axisConfig.highUser}")
 
   private var current              = axisConfig.startPosition
   private var inLowLimit           = false
@@ -116,11 +114,8 @@ class AxisSimulator(
       update(replyTo, AxisStarted)
       println(s"Move: $position")
 
-      val workerB = MotionWorker.behavior(current,
-                                          limitMove(axisConfig, position),
-                                          delayInMS = axisConfig.stepDelayMS,
-                                          ctx.self,
-                                          diagFlag)
+      val workerB =
+        MotionWorker.behavior(current, limitMove(axisConfig, position), delayInMS = axisConfig.stepDelayMS, ctx.self, diagFlag)
       val worker = ctx.spawn(workerB, s"moveWorker-${System.currentTimeMillis}")
 
       worker ! Start(ctx.self)

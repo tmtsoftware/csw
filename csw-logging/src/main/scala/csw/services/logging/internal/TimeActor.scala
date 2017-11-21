@@ -17,8 +17,7 @@ private[logging] class TimeActor(tdone: Promise[Unit]) extends GenericLogger.Act
 
   private case class TimeStep(name: String, start: Long, var end: Long = 0, first: Boolean = false)
 
-  private case class TimeItem(start: Long,
-                              steps: mutable.HashMap[String, TimeStep] = mutable.HashMap[String, TimeStep]())
+  private case class TimeItem(start: Long, steps: mutable.HashMap[String, TimeStep] = mutable.HashMap[String, TimeStep]())
 
   private val items = mutable.HashMap[String, TimeItem]()
 
