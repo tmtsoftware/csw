@@ -3,6 +3,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.ccs.internal.matchers.PublishedStateMatcher
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
@@ -32,14 +33,14 @@ class SetAngleCommand(
 
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
-    matchCompletion(AssemblyMatchers.idleMatcher, tromboneHCD.get, 5.seconds) {
+    new PublishedStateMatcher(ctx).executeMatch(tromboneHCD.get, AssemblyMatchers.idleMatcher)({
       case MatchCompleted =>
         publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
         Completed(s.runId)
       case MatchFailed(ex) =>
         println(s"setElevation command failed with message: ${ex.getMessage}")
         Error(s.runId, ex.getMessage)
-    }
+    })
   }
 
   override def stopCommand(): Unit = {

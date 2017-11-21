@@ -111,7 +111,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         val domainCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val domainDemandState  = DemandState(prefix, Set(choiceKey.set(domainChoice)))
-        DemandMatcher(domainDemandState).check(domainCurrentState.data) shouldBe true
+        DemandMatcher(domainDemandState, timeout = 5.seconds).check(domainCurrentState.data) shouldBe true
       }
     }
   }
@@ -144,18 +144,21 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         // verify that validateSubmit handler is invoked
         val submitSetupValidationCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitSetupValidationDemandState  = DemandState(prefix, Set(choiceKey.set(submitValidationChoice)))
-        DemandMatcher(submitSetupValidationDemandState).check(submitSetupValidationCurrentState.data) shouldBe true
+        DemandMatcher(submitSetupValidationDemandState, timeout = 5.seconds)
+          .check(submitSetupValidationCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted(setup.runId))
 
         // verify that onSubmit handler is invoked
         val submitSetupCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitSetupCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
-        DemandMatcher(submitSetupCommandDemandState).check(submitSetupCommandCurrentState.data) shouldBe true
+        DemandMatcher(submitSetupCommandDemandState, timeout = 5.seconds)
+          .check(submitSetupCommandCurrentState.data) shouldBe true
 
         // verify that setup config is received by handler and provide check that data is transferred
         val submitSetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitSetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice), param))
-        DemandMatcher(submitSetupConfigDemandState).check(submitSetupConfigCurrentState.data) shouldBe true
+        DemandMatcher(submitSetupConfigDemandState, timeout = 5.seconds)
+          .check(submitSetupConfigCurrentState.data) shouldBe true
 
         val observe: Observe = Observe(obsId, successPrefix, Set(param))
 
@@ -164,18 +167,20 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         // verify that validateSubmit handler is invoked
         val submitValidationCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitValidationDemandState  = DemandState(prefix, Set(choiceKey.set(submitValidationChoice)))
-        DemandMatcher(submitValidationDemandState).check(submitValidationCurrentState.data) shouldBe true
+        DemandMatcher(submitValidationDemandState, timeout = 5.seconds)
+          .check(submitValidationCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted(observe.runId))
 
         // verify that onSubmit handler is invoked
         val submitCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitCommandDemandState  = DemandState(prefix, Set(choiceKey.set(submitCommandChoice)))
-        DemandMatcher(submitCommandDemandState).check(submitCommandCurrentState.data) shouldBe true
+        DemandMatcher(submitCommandDemandState, timeout = 5.seconds).check(submitCommandCurrentState.data) shouldBe true
 
         // verify that observe config is received by handler and provide check that data is transferred
         val submitObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val submitObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(observeConfigChoice), param))
-        DemandMatcher(submitObserveConfigDemandState).check(submitObserveConfigCurrentState.data) shouldBe true
+        DemandMatcher(submitObserveConfigDemandState, timeout = 5.seconds)
+          .check(submitObserveConfigCurrentState.data) shouldBe true
       }
     }
   }
@@ -207,18 +212,21 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         // verify that validateOneway handler is invoked
         val onewaySetupValidationCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val onewaySetupValidationDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayValidationChoice)))
-        DemandMatcher(onewaySetupValidationDemandState).check(onewaySetupValidationCurrentState.data) shouldBe true
+        DemandMatcher(onewaySetupValidationDemandState, timeout = 5.seconds)
+          .check(onewaySetupValidationCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted(setup.runId))
 
         // verify that onSetup handler is invoked and that data is transferred
         val onewaySetupCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val onewaySetupCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
-        DemandMatcher(onewaySetupCommandDemandState).check(onewaySetupCommandCurrentState.data) shouldBe true
+        DemandMatcher(onewaySetupCommandDemandState, timeout = 5.seconds)
+          .check(onewaySetupCommandCurrentState.data) shouldBe true
 
         // verify that OneWay command is received by handler
         val onewaySetupConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val onewaySetupConfigDemandState  = DemandState(prefix, Set(choiceKey.set(setupConfigChoice), param))
-        DemandMatcher(onewaySetupConfigDemandState).check(onewaySetupConfigCurrentState.data) shouldBe true
+        DemandMatcher(onewaySetupConfigDemandState, timeout = 5.seconds)
+          .check(onewaySetupConfigCurrentState.data) shouldBe true
 
         val observe: Observe = Observe(obsId, successPrefix, Set(param))
 
@@ -227,18 +235,21 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         // verify that validateOneway handler is invoked
         val oneWayObserveValidationCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val oneWayObserveValidationDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayValidationChoice)))
-        DemandMatcher(oneWayObserveValidationDemandState).check(oneWayObserveValidationCurrentState.data) shouldBe true
+        DemandMatcher(oneWayObserveValidationDemandState, timeout = 5.seconds)
+          .check(oneWayObserveValidationCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted(observe.runId))
 
         // verify that onObserve handler is invoked and parameter is successfully transferred
         val oneWayObserveCommandCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val oneWayObserveCommandDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayCommandChoice)))
-        DemandMatcher(oneWayObserveCommandDemandState).check(oneWayObserveCommandCurrentState.data) shouldBe true
+        DemandMatcher(oneWayObserveCommandDemandState, timeout = 5.seconds)
+          .check(oneWayObserveCommandCurrentState.data) shouldBe true
 
         // verify that OneWay command is received by handler
         val oneWayObserveConfigCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val oneWayObserveConfigDemandState  = DemandState(prefix, Set(choiceKey.set(observeConfigChoice), param))
-        DemandMatcher(oneWayObserveConfigDemandState).check(oneWayObserveConfigCurrentState.data) shouldBe true
+        DemandMatcher(oneWayObserveConfigDemandState, timeout = 5.seconds)
+          .check(oneWayObserveConfigCurrentState.data) shouldBe true
       }
     }
   }
@@ -284,13 +295,13 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         val offlineCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val offlineDemandState  = DemandState(prefix, Set(choiceKey.set(offlineChoice)))
-        DemandMatcher(offlineDemandState).check(offlineCurrentState.data) shouldBe true
+        DemandMatcher(offlineDemandState, timeout = 5.seconds).check(offlineCurrentState.data) shouldBe true
 
         supervisorRef ! Lifecycle(GoOnline)
 
         val onlineCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
         val onlineDemandState  = DemandState(prefix, Set(choiceKey.set(onlineChoice)))
-        DemandMatcher(onlineDemandState).check(onlineCurrentState.data) shouldBe true
+        DemandMatcher(onlineDemandState, timeout = 5.seconds).check(onlineCurrentState.data) shouldBe true
       }
     }
   }

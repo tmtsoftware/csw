@@ -2,8 +2,8 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.ccs.internal.matchers.Matcher
 import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.ccs.internal.matchers.PublishedStateMatcher
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
@@ -16,7 +16,6 @@ import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
 
 class PositionCommand(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
@@ -56,7 +55,7 @@ class PositionCommand(
 
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
 
-      Matcher.matchState(ctx, stateMatcher, tromboneHCD.get, 5.seconds).map {
+      new PublishedStateMatcher(ctx).executeMatch(tromboneHCD.get, stateMatcher) {
         case MatchCompleted =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed(s.runId)

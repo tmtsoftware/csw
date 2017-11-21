@@ -1,21 +1,22 @@
 package csw.ccs.internal.matchers
 
+import akka.util.Timeout
 import csw.messages.params.generics.Parameter
 import csw.messages.params.states.{CurrentState, DemandState}
 
 trait StateMatcher {
   def prefix: String
-
   def check(current: CurrentState): Boolean
+  def timeout: Timeout
 }
 
-case class DemandMatcherAll(demand: DemandState) extends StateMatcher {
+case class DemandMatcherAll(demand: DemandState, timeout: Timeout) extends StateMatcher {
   def prefix: String = demand.prefixStr
 
   def check(current: CurrentState): Boolean = demand.paramSet == current.paramSet
 }
 
-case class DemandMatcher(demand: DemandState, withUnits: Boolean = false) extends StateMatcher {
+case class DemandMatcher(demand: DemandState, withUnits: Boolean = false, timeout: Timeout) extends StateMatcher {
 
   def prefix: String = demand.prefixStr
 
@@ -27,6 +28,6 @@ case class DemandMatcher(demand: DemandState, withUnits: Boolean = false) extend
   }
 }
 
-case class PresenceMatcher(prefix: String) extends StateMatcher {
+case class PresenceMatcher(prefix: String, timeout: Timeout) extends StateMatcher {
   def check(current: CurrentState) = true
 }

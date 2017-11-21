@@ -3,6 +3,7 @@ package csw.trombone.assembly.commands
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.ccs.internal.matchers.PublishedStateMatcher
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
@@ -14,7 +15,6 @@ import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext, Assem
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationLong
 
 class DatumCommand(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
@@ -44,14 +44,14 @@ class DatumCommand(
         _ ! Submit(Setup(s.obsId, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore))
       )
 
-      matchCompletion(AssemblyMatchers.idleMatcher, tromboneHCD.get, 5.seconds) {
+      new PublishedStateMatcher(ctx).executeMatch(tromboneHCD.get, AssemblyMatchers.idleMatcher)({
         case MatchCompleted =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed(s.runId)
         case MatchFailed(ex) =>
           println(s"Data command match failed with error: ${ex.getMessage}")
           Error(s.runId, ex.getMessage)
-      }
+      })
     }
   }
 

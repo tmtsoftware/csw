@@ -3,6 +3,7 @@ package csw.trombone.assembly.commands
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.ccs.internal.matchers.PublishedStateMatcher
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
@@ -15,7 +16,6 @@ import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationDouble
 
 class MoveCommand(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
@@ -52,7 +52,7 @@ class MoveCommand(
 
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
 
-      matchCompletion(stateMatcher, tromboneHCD.get, 5.seconds) {
+      new PublishedStateMatcher(ctx).executeMatch(tromboneHCD.get, stateMatcher)({
         case MatchCompleted =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss))
           Completed(s.runId)
@@ -60,7 +60,7 @@ class MoveCommand(
           println(s"Move command match failed with message: ${ex.getMessage}")
           Error(s.runId, ex.getMessage)
         case _ ⇒ Error(s.runId, "")
-      }
+      })
     }
   }
 

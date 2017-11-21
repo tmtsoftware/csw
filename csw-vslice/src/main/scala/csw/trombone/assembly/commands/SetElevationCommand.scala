@@ -3,6 +3,7 @@ package csw.trombone.assembly.commands
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.ccs.internal.matchers.PublishedStateMatcher
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
@@ -15,7 +16,6 @@ import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationDouble
 
 class SetElevationCommand(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
@@ -53,7 +53,7 @@ class SetElevationCommand(
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
 
-      matchCompletion(stateMatcher, tromboneHCD.get, 5.seconds) {
+      new PublishedStateMatcher(ctx).executeMatch(tromboneHCD.get, stateMatcher)({
         case MatchCompleted =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed(s.runId)
@@ -61,7 +61,7 @@ class SetElevationCommand(
           println(s"Data command match failed with error: ${ex.getMessage}")
           Error(s.runId, ex.getMessage)
         case _ ⇒ Error(s.runId, "")
-      }
+      })
     }
   }
 

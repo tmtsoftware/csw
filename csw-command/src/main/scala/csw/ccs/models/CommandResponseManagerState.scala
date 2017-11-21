@@ -6,7 +6,7 @@ import csw.messages.ccs.commands.CommandResponse.CommandNotAvailable
 import csw.messages.params.models.RunId
 
 case class CommandResponseManagerState(cmdToCmdStatus: Map[RunId, CommandState]) {
-  def add(runId: RunId, initialState: CommandResponse) =
+  def add(runId: RunId, initialState: CommandResponse): CommandResponseManagerState =
     CommandResponseManagerState(cmdToCmdStatus.updated(runId, CommandState.init(runId, initialState)))
 
   def get(runId: RunId): CommandResponse = cmdToCmdStatus.get(runId) match {

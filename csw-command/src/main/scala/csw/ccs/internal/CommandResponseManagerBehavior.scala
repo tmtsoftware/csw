@@ -38,7 +38,7 @@ class CommandResponseManagerBehavior(
     }
 
   private def updateCommand(commandId: RunId, commandResponse: CommandResponse): Unit =
-    if (!commandStatus.get(commandId).equals(commandResponse)) {
+    if (commandStatus.get(commandId) != commandResponse) {
       commandStatus = commandStatus.updateCommandStatus(commandResponse)
       publishToSubscribers(commandResponse, commandStatus.cmdToCmdStatus(commandResponse.runId).subscribers)
     }
