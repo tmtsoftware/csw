@@ -5,7 +5,7 @@
 It is an observation Id and can be constructed by creating instance of `ObsId`. 
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #obsid }
+:   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #obsid }
 
 ### Prefix
 
@@ -14,7 +14,7 @@ It is a combination of [Subsystem](subsystem.html) and Subsystem's prefix. Compo
 See below examples:
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #prefix }
+:   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #prefix }
 
 ### Setup Command
 
@@ -25,26 +25,26 @@ This command is used to describe a goal that a system should match. Component de
  * **paramSet:** Optional Set of Parameters. Default is empty.
  
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #setup }
+:   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #setup }
  
  
 ### Observe Command
 This command describes a science observation. Sent only to Science Detector Assemblies and Sequencers.
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #observe }
+:   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #observe }
 
 ### Wait Command
 This command causes a Sequencer to wait until notified.
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #wait }
+:   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #wait }
 
 ### JSON serialization
 Commands can be serialized in JSON. The library has provided JsonSupport helper class and methods to serialize Setup, Observe and Wait commands.
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #json-serialization }
+:   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #json-serialization }
 
 ### Unique Key constraint
 
@@ -59,4 +59,4 @@ Parameters are stored in a Set, which is an unordered collection of items. Hence
 Here are some examples that illustrate this point:
 
 Scala
-:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #unique-key }
+:   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #unique-key }

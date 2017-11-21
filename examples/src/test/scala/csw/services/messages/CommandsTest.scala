@@ -31,17 +31,14 @@ class CommandsTest extends FunSpec with Matchers {
       val badPrefix: Prefix = Prefix("abcdefgh")
 
       //use implicit conversion to convert from String to Prefix
-      val prefix4: Prefix = "wfos.prog.cloudcover"
-
-      //use subsystem companion(static for Java) method to get subsystem from prefix string
-      Prefix
+      val prefix3: Prefix = "wfos.prog.cloudcover"
 
       //#prefix
 
       //validations
       assert(prefix1.subsystem === Subsystem.NFIRAOS)
       assert(prefix2.subsystem === Subsystem.TCS)
-      assert(prefix4.subsystem === Subsystem.WFOS)
+      assert(prefix3.subsystem === Subsystem.WFOS)
       assert(badPrefix.subsystem === Subsystem.BAD)
     }
   }
@@ -223,9 +220,9 @@ class CommandsTest extends FunSpec with Matchers {
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       //commands
-      val sc = Setup(obsId, Prefix("wfos.blue.filter")).add(i1)
-      val oc = Observe(obsId, Prefix("wfos.blue.filter")).add(i1)
-      val wc = Wait(obsId, Prefix("wfos.blue.filter")).add(i1)
+      val sc: Setup   = Setup(obsId, Prefix("wfos.blue.filter")).add(i1)
+      val oc: Observe = Observe(obsId, Prefix("wfos.blue.filter")).add(i1)
+      val wc: Wait    = Wait(obsId, Prefix("wfos.blue.filter")).add(i1)
 
       //json support - write
       val scJson: JsValue = JsonSupport.writeSequenceCommand(sc)

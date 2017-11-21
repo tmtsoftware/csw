@@ -1,0 +1,340 @@
+package csw.services.messages
+
+import java.time.Instant
+import java.util.UUID
+
+import csw.messages.ccs.events._
+import csw.messages.params.formats.JsonSupport
+import csw.messages.params.generics.KeyType.DoubleMatrixKey
+import csw.messages.params.generics.{Key, KeyType, Parameter}
+import csw.messages.params.models.{MatrixData, ObsId, Prefix, Units}
+import org.scalatest.{FunSpec, Matchers}
+
+class EventsTest extends FunSpec with Matchers {
+
+  describe("Examples of EventTime") {
+    it("should show usage of utility functions") {
+
+      //#eventtime
+
+      //default constructor will return current time in UTC
+      val now: EventTime = EventTime()
+
+      //using constructor
+      val anHourAgo: EventTime = EventTime(Instant.now().minusSeconds(3600))
+
+      //current event time using utility function
+      val currentTime: EventTime = EventTime.toCurrent
+
+      //some past time using utility function
+      val aDayAgo = EventTime.toEventTime(Instant.now.minusSeconds(86400))
+
+      //#eventtime
+
+      //validations
+      assert(now.time.isAfter(anHourAgo.time))
+      assert(anHourAgo.time.isAfter(aDayAgo.time))
+      assert(currentTime.time.isAfter(anHourAgo.time))
+    }
+  }
+
+  describe("Examples of EventInfo") {
+    it("should show usage of utility functions") {
+
+      //#eventinfo
+      //with only a subsystem, time will default to now
+      val info1: EventInfo = EventInfo("wfos.blue.filter")
+
+      //given subsystem and time is an hour ago
+      val info2: EventInfo = EventInfo("wfos.blue.filter", EventTime(Instant.now()))
+
+      //supply subsystem, time, ObsId
+      val info3 = EventInfo(
+        "wfos.blue.filter",
+        EventTime(),
+        ObsId("Obs001")
+      )
+
+      //with all values
+      val info4 = EventInfo(
+        Prefix("wfos.prog.cloudcover"),
+        Instant.now(),
+        Some(ObsId("Obs001")),
+        UUID.randomUUID().toString
+      )
+      //#eventinfo
+
+      //validations
+      assert(info1.equals(info2))
+      assert(!info3.equals(info4))
+    }
+  }
+
+  describe("Examples of Events") {
+    it("should show usages of StatusEvent") {
+
+      //#statusevent
+      //keys
+      val k1: Key[Int]    = KeyType.IntKey.make("encoder")
+      val k2: Key[Int]    = KeyType.IntKey.make("windspeed")
+      val k3: Key[String] = KeyType.StringKey.make("filter")
+      val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
+
+      //prefixes
+      val ck1 = "wfos.prog.cloudcover"
+      val ck3 = "wfos.red.detector"
+
+      //parameters
+      val p1: Parameter[Int]    = k1.set(22)
+      val p2: Parameter[Int]    = k2.set(44)
+      val p3: Parameter[String] = k3.set("A", "B", "C", "D")
+
+      //Create StatusEvent using madd
+      val se1: StatusEvent = StatusEvent(ck1).madd(p1, p2)
+      //Create StatusEvent using apply
+      val se2: StatusEvent = StatusEvent(EventInfo(ck3), Set(p1, p2))
+      //Create StatusEvent and use add
+      val se3: StatusEvent = StatusEvent(EventInfo(ck3)).add(p1).add(p2).add(p3)
+
+      //access keys
+      val k1Exists: Boolean = se1.exists(k1) //true
+
+      //access Parameters
+      val p4: Option[Parameter[Int]] = se1.get(k1)
+
+      //access values
+      val v1: Array[Int] = se1(k1).values
+      val v2: Array[Int] = se2.parameter(k2).values
+      //k4 is missing
+      val missingKeys: Set[String] = se3.missingKeys(k1, k2, k3, k4)
+
+      //remove keys
+      val se4: StatusEvent = se3.remove(k3)
+
+      //#statusevent
+
+      //validations
+      assert(k1Exists === true)
+      assert(p4.get === p1)
+      assert(v1 === p1.values)
+      assert(v2 === p2.values)
+      assert(missingKeys === Set(k4.keyName))
+      assert(se2 === se4)
+    }
+
+    it("should show usages of ObserveEvent") {
+
+      //#observeevent
+      //keys
+      val k1: Key[Int]    = KeyType.IntKey.make("encoder")
+      val k2: Key[Int]    = KeyType.IntKey.make("windspeed")
+      val k3: Key[String] = KeyType.StringKey.make("filter")
+      val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
+
+      //prefixes
+      val ck1 = "wfos.prog.cloudcover"
+      val ck3 = "wfos.red.detector"
+
+      //parameters
+      val p1: Parameter[Int]    = k1.set(22)
+      val p2: Parameter[Int]    = k2.set(44)
+      val p3: Parameter[String] = k3.set("A", "B", "C", "D")
+
+      //Create ObserveEvent using madd
+      val se1: ObserveEvent = ObserveEvent(ck1).madd(p1, p2)
+      //Create ObserveEvent using apply
+      val se2: ObserveEvent = ObserveEvent(EventInfo(ck3), Set(p1, p2))
+      //Create ObserveEvent and use add
+      val se3: ObserveEvent = ObserveEvent(EventInfo(ck3)).add(p1).add(p2).add(p3)
+
+      //access keys
+      val k1Exists: Boolean = se1.exists(k1) //true
+
+      //access Parameters
+      val p4: Option[Parameter[Int]] = se1.get(k1)
+
+      //access values
+      val v1: Array[Int] = se1(k1).values
+      val v2: Array[Int] = se2.parameter(k2).values
+      //k4 is missing
+      val missingKeys: Set[String] = se3.missingKeys(k1, k2, k3, k4)
+
+      //remove keys
+      val se4: ObserveEvent = se3.remove(k3)
+
+      //#observeevent
+
+      //validations
+      assert(k1Exists === true)
+      assert(p4.get === p1)
+      assert(v1 === p1.values)
+      assert(v2 === p2.values)
+      assert(missingKeys === Set(k4.keyName))
+      assert(se2 === se4)
+    }
+
+    it("should show usages of SystemEvent") {
+
+      //#systemevent
+      //keys
+      val k1: Key[Int]    = KeyType.IntKey.make("encoder")
+      val k2: Key[Int]    = KeyType.IntKey.make("windspeed")
+      val k3: Key[String] = KeyType.StringKey.make("filter")
+      val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
+
+      //prefixes
+      val ck1 = "wfos.prog.cloudcover"
+      val ck3 = "wfos.red.detector"
+
+      //parameters
+      val p1: Parameter[Int]    = k1.set(22)
+      val p2: Parameter[Int]    = k2.set(44)
+      val p3: Parameter[String] = k3.set("A", "B", "C", "D")
+
+      //Create SystemEvent using madd
+      val se1: SystemEvent = SystemEvent(ck1).madd(p1, p2)
+      //Create SystemEvent using apply
+      val se2: SystemEvent = SystemEvent(EventInfo(ck3), Set(p1, p2))
+      //Create SystemEvent and use add
+      val se3: SystemEvent = SystemEvent(EventInfo(ck3)).add(p1).add(p2).add(p3)
+
+      //access keys
+      val k1Exists: Boolean = se1.exists(k1) //true
+
+      //access Parameters
+      val p4: Option[Parameter[Int]] = se1.get(k1)
+
+      //access values
+      val v1: Array[Int] = se1(k1).values
+      val v2: Array[Int] = se2.parameter(k2).values
+      //k4 is missing
+      val missingKeys: Set[String] = se3.missingKeys(k1, k2, k3, k4)
+
+      //remove keys
+      val se4: SystemEvent = se3.remove(k3)
+
+      //add more than one parameters, using madd
+      val se5: SystemEvent = se4.madd(k3.set("X", "Y", "Z").withUnits(Units.day), k4.set(99, 100))
+      val paramSize: Int   = se5.size
+
+      //update existing key with set
+      val se6: SystemEvent = se5.add(k2.set(5, 6, 7, 8))
+
+      //#systemevent
+
+      //validations
+      assert(k1Exists === true)
+      assert(p4.get === p1)
+      assert(v1 === p1.values)
+      assert(v2 === p2.values)
+      assert(missingKeys === Set(k4.keyName))
+      assert(se2 === se4)
+      assert(paramSize === 4)
+      assert(se6(k2).values === Array(5, 6, 7, 8))
+    }
+  }
+
+  describe("Examples of serialization") {
+    it("should show reading and writing of events") {
+
+      //#json-serialization
+      import play.api.libs.json.{JsValue, Json}
+
+      //key
+      val k1: Key[MatrixData[Double]] = DoubleMatrixKey.make("myMatrix")
+      //values
+      val m1: MatrixData[Double] = MatrixData.fromArrays(
+        Array(1.0, 2.0, 3.0),
+        Array(4.1, 5.1, 6.1),
+        Array(7.2, 8.2, 9.2)
+      )
+
+      //parameter
+      val i1: Parameter[MatrixData[Double]] = k1.set(m1)
+
+      //commands
+      val statusEvent: StatusEvent   = StatusEvent("wfos.blue.filter").add(i1)
+      val observeEvent: ObserveEvent = ObserveEvent("wfos.blue.filter").add(i1)
+      val systemEvent: SystemEvent   = SystemEvent("wfos.blue.filter").add(i1)
+
+      //json support - write
+      val scJson: JsValue = JsonSupport.writeEvent(statusEvent)
+      val ocJson: JsValue = JsonSupport.writeEvent(observeEvent)
+      val wcJson: JsValue = JsonSupport.writeEvent(systemEvent)
+
+      //optionally prettify
+      val str: String = Json.prettyPrint(scJson)
+
+      //construct command from string
+      val statusEventFromPrettyStr = JsonSupport.readEvent[StatusEvent](Json.parse(str))
+
+      //json support - read
+      val statusEvent1: StatusEvent   = JsonSupport.readEvent[StatusEvent](scJson)
+      val observeEvent1: ObserveEvent = JsonSupport.readEvent[ObserveEvent](ocJson)
+      val systemEvent1: SystemEvent   = JsonSupport.readEvent[SystemEvent](wcJson)
+      //#json-serialization
+
+      //validations
+      assert(statusEvent === statusEvent1)
+      assert(observeEvent === observeEvent1)
+      assert(systemEvent === systemEvent1)
+      assert(statusEventFromPrettyStr === statusEvent)
+    }
+  }
+
+  describe("Examples of unique key constraint") {
+    it("should show duplicate keys are removed") {
+
+      //#unique-key
+
+      //keys
+      val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
+      val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
+      val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
+
+      //prefix
+      val prefix = "wfos.blue.filter"
+
+      //params
+      val encParam1 = encoderKey.set(1)
+      val encParam2 = encoderKey.set(2)
+      val encParam3 = encoderKey.set(3)
+
+      val filterParam1 = filterKey.set(1)
+      val filterParam2 = filterKey.set(2)
+      val filterParam3 = filterKey.set(3)
+
+      val miscParam1 = miscKey.set(100)
+
+      //StatusEvent with duplicate key via constructor
+      val statusEvent = StatusEvent(
+        prefix,
+        Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
+      )
+      //four duplicate keys are removed; now contains one Encoder and one Filter key
+      val uniqueKeys1 = statusEvent.paramSet.toList.map(_.keyName)
+
+      //try adding duplicate keys via add + madd
+      val changedStatusEvent = statusEvent
+        .add(encParam3)
+        .madd(
+          filterParam1,
+          filterParam2,
+          filterParam3
+        )
+      //duplicate keys will not be added. Should contain one Encoder and one Filter key
+      val uniqueKeys2 = changedStatusEvent.paramSet.toList.map(_.keyName)
+
+      //miscKey(unique) will be added; encoderKey(duplicate) will not be added
+      val finalStatusEvent = statusEvent.madd(Set(miscParam1, encParam1))
+      //now contains encoderKey, filterKey, miscKey
+      val uniqueKeys3 = finalStatusEvent.paramSet.toList.map(_.keyName)
+      //#unique-key
+
+      //validations
+      uniqueKeys1 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
+      uniqueKeys2 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
+      uniqueKeys3 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
+    }
+  }
+}
