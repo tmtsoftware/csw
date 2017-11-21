@@ -33,14 +33,16 @@ class SetAngleCommand(
 
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
-    new PublishedStateMatcher(ctx).executeMatch(tromboneHCD.get, AssemblyMatchers.idleMatcher)({
-      case MatchCompleted =>
-        publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
-        Completed(s.runId)
-      case MatchFailed(ex) =>
-        println(s"setElevation command failed with message: ${ex.getMessage}")
-        Error(s.runId, ex.getMessage)
-    })
+    new PublishedStateMatcher(ctx, tromboneHCD.get, AssemblyMatchers.idleMatcher).executeMatch {
+      {
+        case MatchCompleted =>
+          publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
+          Completed(s.runId)
+        case MatchFailed(ex) =>
+          println(s"setElevation command failed with message: ${ex.getMessage}")
+          Error(s.runId, ex.getMessage)
+      }
+    }
   }
 
   override def stopCommand(): Unit = {

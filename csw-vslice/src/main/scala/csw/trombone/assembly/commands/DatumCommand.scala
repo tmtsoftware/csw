@@ -44,14 +44,14 @@ class DatumCommand(
         _ ! Submit(Setup(s.obsId, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore))
       )
 
-      new PublishedStateMatcher(ctx).executeMatch(tromboneHCD.get, AssemblyMatchers.idleMatcher)({
+      new PublishedStateMatcher(ctx, tromboneHCD.get, AssemblyMatchers.idleMatcher).executeMatch {
         case MatchCompleted =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed(s.runId)
         case MatchFailed(ex) =>
           println(s"Data command match failed with error: ${ex.getMessage}")
           Error(s.runId, ex.getMessage)
-      })
+      }
     }
   }
 

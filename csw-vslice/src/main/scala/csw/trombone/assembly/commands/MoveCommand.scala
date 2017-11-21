@@ -52,15 +52,17 @@ class MoveCommand(
 
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
 
-      new PublishedStateMatcher(ctx).executeMatch(tromboneHCD.get, stateMatcher)({
-        case MatchCompleted =>
-          publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss))
-          Completed(s.runId)
-        case MatchFailed(ex) =>
-          println(s"Move command match failed with message: ${ex.getMessage}")
-          Error(s.runId, ex.getMessage)
-        case _ ⇒ Error(s.runId, "")
-      })
+      new PublishedStateMatcher(ctx, tromboneHCD.get, stateMatcher).executeMatch {
+        {
+          case MatchCompleted =>
+            publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss))
+            Completed(s.runId)
+          case MatchFailed(ex) =>
+            println(s"Move command match failed with message: ${ex.getMessage}")
+            Error(s.runId, ex.getMessage)
+          case _ ⇒ Error(s.runId, "")
+        }
+      }
     }
   }
 

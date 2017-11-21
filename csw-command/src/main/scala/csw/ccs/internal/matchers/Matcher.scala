@@ -21,7 +21,14 @@ abstract class Matcher(ctx: ActorContext[_]) {
   implicit val mat: ActorMaterializer       = ActorMaterializer()(ctx.system.toUntyped)
 
 }
-class PublishedStateMatcher(ctx: ActorContext[_]) extends Matcher(ctx) {
+class PublishedStateMatcher(
+    ctx: ActorContext[_],
+    currentStateSource: ActorRef[ComponentStateSubscription],
+    stateMatcher: StateMatcher
+) extends Matcher(ctx) {
+
+  def executeMatch(partialFunction: PartialFunction[MatcherResponse, CommandResponse]): Future[CommandResponse] =
+    matchState(stateMatcher, currentStateSource).map(partialFunction)
 
   private def matchState(
       stateMatcher: StateMatcher,
@@ -43,17 +50,18 @@ class PublishedStateMatcher(ctx: ActorContext[_]) extends Matcher(ctx) {
       }
   }
 
-  final def executeMatch(currentStateSource: ActorRef[ComponentStateSubscription], stateMatcher: StateMatcher)(
-      partialFunction: PartialFunction[MatcherResponse, CommandResponse]
-  ): Future[CommandResponse] = matchState(stateMatcher, currentStateSource).map(partialFunction)
-
 }
 
-class ResponseMatcher(ctx: ActorContext[_]) extends Matcher(ctx) {
-  final def executeMatch[T](destination: ActorRef[T], command: T, timeout: Timeout)(
-      partialFunction: PartialFunction[CommandResponse, CommandResponse]
-  ): Future[CommandResponse] =
+class ResponseMatcher[T](
+    ctx: ActorContext[_],
+    destination: ActorRef[T],
+    command: T,
+    timeout: Timeout
+) extends Matcher(ctx) {
+
+  def executeMatch(partialFunction: PartialFunction[CommandResponse, CommandResponse]): Future[CommandResponse] =
     (destination ? execute(command))(timeout, ctx.system.scheduler).map(partialFunction)
 
-  private def execute[T](x: T)(replyTo: ActorRef[CommandResponse]): T = x
+  private def execute(x: T)(replyTo: ActorRef[CommandResponse]): T = x
+
 }

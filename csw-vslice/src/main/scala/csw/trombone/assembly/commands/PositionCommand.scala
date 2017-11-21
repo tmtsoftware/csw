@@ -55,7 +55,7 @@ class PositionCommand(
 
       tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
 
-      new PublishedStateMatcher(ctx).executeMatch(tromboneHCD.get, stateMatcher) {
+      new PublishedStateMatcher(ctx, tromboneHCD.get, stateMatcher).executeMatch {
         case MatchCompleted =>
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           Completed(s.runId)
