@@ -6,6 +6,7 @@ import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.CommandResponse.{Completed, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
+import csw.messages.models.PubSub
 import csw.trombone.assembly.actors.TromboneState.{TromboneState, _}
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext}
 

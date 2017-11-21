@@ -2,8 +2,8 @@ package csw.framework.internal.pubsub
 
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior, Signal, Terminated}
-import csw.messages.PubSub
-import csw.messages.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.models.PubSub
 import csw.services.logging.scaladsl.ComponentLogger
 
 /**

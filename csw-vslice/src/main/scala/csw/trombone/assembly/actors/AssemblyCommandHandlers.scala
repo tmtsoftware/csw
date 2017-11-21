@@ -4,6 +4,7 @@ import akka.typed.ActorRef
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.location.Connection
+import csw.messages.models.PubSub
 import csw.trombone.assembly.commands.{AssemblyCommand, AssemblyState}
 
 trait AssemblyCommandHandlers {

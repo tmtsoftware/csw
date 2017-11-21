@@ -5,7 +5,7 @@ import akka.typed.scaladsl.ActorContext
 import com.typesafe.config.ConfigFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.CommandMessage.Submit
-import csw.messages.PubSub.PublisherMessage
+import csw.messages.models.PubSub.PublisherMessage
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands._

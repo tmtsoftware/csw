@@ -9,6 +9,7 @@ import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.CommandResponse.{Completed, Error, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
+import csw.messages.models.PubSub
 import csw.messages.params.models.RunId
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext, AssemblyMatchers}

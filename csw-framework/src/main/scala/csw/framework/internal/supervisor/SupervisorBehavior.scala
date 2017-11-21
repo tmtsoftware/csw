@@ -11,22 +11,24 @@ import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.LockingResponse._
-import csw.messages.PubSub.Publish
-import csw.messages.RunningMessage.{Lifecycle, Lock, Unlock}
+import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage._
 import csw.messages.SupervisorIdleMessage._
+import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.messages._
 import csw.messages.ccs.CommandIssue.UnsupportedCommandInStateIssue
 import csw.messages.ccs.commands.CommandResponse.Invalid
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
-import csw.messages.framework.SupervisorLifecycleState.Idle
+import csw.messages.framework.SupervisorLifecycleState.{Idle, RunningOffline}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.models.LockingResponse._
+import csw.messages.models.PubSub.Publish
+import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToComponentLifecycleMessage}
 import csw.messages.params.states.CurrentState
+import csw.messages.{models, _}
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.ComponentLogger
@@ -101,17 +103,20 @@ class SupervisorBehavior(
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
+      case (SupervisorLifecycleState.Lock, lockMessage: SupervisorLockMessage)          ⇒ onRunning(lockMessage)
+      case (SupervisorLifecycleState.Lock, message)                                     ⇒ ignore(message)
       case (_, commonMessage: SupervisorCommonMessage)                                  ⇒ onCommon(commonMessage)
       case (SupervisorLifecycleState.Idle, idleMessage: SupervisorIdleMessage)          ⇒ onIdle(idleMessage)
       case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage) ⇒ onRestarting(restartMessage)
-      case (SupervisorLifecycleState.Running | SupervisorLifecycleState.RunningOffline,
-            runningMessage: SupervisorRunningMessage) ⇒
-        onRunning(runningMessage)
-      case (_, message) =>
-        log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")
+      case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage) ⇒ onRunning(runningMessage)
+      case (RunningOffline, runningMessage: SupervisorRunningMessage)                   ⇒ onRunning(runningMessage)
+      case (_, message)                                                                 ⇒ ignore(message)
     }
     this
   }
+
+  private def ignore(message: SupervisorMessage): Unit =
+    log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")
 
   /**
    * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
@@ -146,16 +151,19 @@ class SupervisorBehavior(
     case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
     case GetSupervisorLifecycleState(replyTo)          ⇒ replyTo ! lifecycleState
     case Restart                                       ⇒ onRestart()
-    case Shutdown ⇒
-      log.debug(
-        s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Shutdown}]"
-      )
-      lifecycleState = SupervisorLifecycleState.Shutdown
-      ctx.child(componentActorName) match {
-        case Some(componentRef) ⇒
-          ctx.stop(componentRef) // stop component actor for a graceful shutdown before shutting down the actor system
-        case None ⇒ coordinatedShutdown()
-      }
+    case Shutdown                                      ⇒ onShutdown
+  }
+
+  private def onShutdown = {
+    log.debug(
+      s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Shutdown}]"
+    )
+    lifecycleState = SupervisorLifecycleState.Shutdown
+    ctx.child(componentActorName) match {
+      case Some(componentRef) ⇒
+        ctx.stop(componentRef) // stop component actor for a graceful shutdown before shutting down the actor system
+      case None ⇒ coordinatedShutdown()
+    }
   }
 
   /**
@@ -190,20 +198,7 @@ class SupervisorBehavior(
     runningMessage match {
       case Lock(prefix, token, replyTo)   ⇒ lockComponent(prefix, token, replyTo)
       case Unlock(prefix, token, replyTo) ⇒ unlockComponent(prefix, token, replyTo)
-      case runningMessage: RunningMessage ⇒
-        runningMessage match {
-          case Lifecycle(message) ⇒
-            onLifeCycle(message)
-            runningComponent.get ! runningMessage
-          case commandMessage: CommandMessage ⇒
-            maybeLockToken match {
-              case Some((currentPrefix, lockToken)) ⇒
-                allowOrRejectCommand(commandMessage, currentPrefix, lockToken, runningMessage)
-              case None ⇒ runningComponent.get ! runningMessage
-            }
-          case _ ⇒ runningComponent.get ! runningMessage
-        }
-
+      case runningMessage: RunningMessage ⇒ handleRunningMessage(runningMessage)
       case msg @ Running(_) ⇒
         log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
     }
@@ -212,19 +207,20 @@ class SupervisorBehavior(
   private def lockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): Unit = {
     maybeLockToken match {
       case Some((`prefix`, `token`)) ⇒
-        log.info(s"The lock is re-acquired by component: [$prefix]")
-        //TODO: re-start the timer for lock lease
+        log.info(s"The lock is re-acquired by component: [$prefix]") //TODO: re-start the timer for lock lease
         replyTo ! LockAcquired
       case Some((currentPrefix, _)) ⇒
-        log.error(
+        val failureReason =
           s"Invalid prefix [$prefix] or token [$token] for re-acquiring the lock. Currently it is acquired by component: [$currentPrefix]"
-        )
-        replyTo ! ReAcquiringLockFailed(
-          s"Invalid prefix [$prefix] or token [$token] for re-acquiring the lock. Currently it is acquired by component: [$currentPrefix]"
-        )
+        log.error(failureReason)
+        replyTo ! ReAcquiringLockFailed(failureReason)
       case None ⇒
-        log.info(s"The lock is successfully acquired by component: [$prefix]")
+        log.debug(
+          s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Lock}]"
+        )
+        lifecycleState = SupervisorLifecycleState.Lock
         maybeLockToken = Some((prefix, token)) //TODO: Start the timer for lock lease
+        log.info(s"The lock is successfully acquired by component: [$prefix]")
         replyTo ! LockAcquired
     }
   }
@@ -232,19 +228,36 @@ class SupervisorBehavior(
   private def unlockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): Unit = {
     maybeLockToken match {
       case Some((`prefix`, `token`)) ⇒
+        log.debug(
+          s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
+        )
+        lifecycleState = SupervisorLifecycleState.Running
         maybeLockToken = None // TODO: Stop the timer for lock lease
         log.info(s"The lock is successfully released by component: [$prefix]")
         replyTo ! LockReleased
       case Some((currentPrefix, _)) ⇒
-        log.error(
+        val failureReason =
           s"Invalid prefix [$prefix] or token [$token] for releasing the lock. Currently it is acquired by component: [$currentPrefix]"
-        )
-        replyTo ! ReleasingLockFailed(
-          s"Invalid prefix [$prefix] or token [$token] for releasing the lock. Currently it is acquired by component: [$currentPrefix]"
-        )
+        log.error(failureReason)
+        replyTo ! ReleasingLockFailed(failureReason)
       case _ ⇒
         log.warn(s"Cannot release lock for [$prefix] as it is already released")
         replyTo ! LockAlreadyReleased
+    }
+  }
+
+  private def handleRunningMessage(runningMessage: RunningMessage): Unit = {
+    runningMessage match {
+      case Lifecycle(message) ⇒
+        onLifeCycle(message)
+        runningComponent.get ! runningMessage
+      case commandMessage: CommandMessage ⇒
+        maybeLockToken match {
+          case Some((currentPrefix, lockToken)) ⇒
+            allowOrRejectCommand(commandMessage, currentPrefix, lockToken, runningMessage)
+          case None ⇒ runningComponent.get ! runningMessage
+        }
+      case _ ⇒ runningComponent.get ! runningMessage
     }
   }
 
@@ -306,13 +319,11 @@ class SupervisorBehavior(
   private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = message match {
     case GoOffline ⇒
       if (lifecycleState == SupervisorLifecycleState.Running) {
-        log.debug(
-          s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.RunningOffline}]"
-        )
-        lifecycleState = SupervisorLifecycleState.RunningOffline
+        log.debug(s"Supervisor is changing lifecycle state from [$lifecycleState] to [$RunningOffline]")
+        lifecycleState = RunningOffline
       }
     case GoOnline ⇒
-      if (lifecycleState == SupervisorLifecycleState.RunningOffline) {
+      if (lifecycleState == RunningOffline) {
         log.debug(
           s"Supervisor is changing lifecycle state from [$lifecycleState] to [${SupervisorLifecycleState.Running}]"
         )
@@ -347,7 +358,7 @@ class SupervisorBehavior(
       container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
       log.debug(s"Supervisor acknowledged container :[$container] for lifecycle state :[$lifecycleState]")
     }
-    pubSubLifecycle ! Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
+    pubSubLifecycle ! Publish(models.LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
   }
 
   private def spawnAndWatchComponent(): Unit = {
@@ -375,9 +386,5 @@ class SupervisorBehavior(
     component.foreach(ctx.watch)
   }
 
-  /**
-   * Trigger actor system shutdown with graceful exit from the cluster
-   * @return
-   */
   private def coordinatedShutdown(): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run()
 }

@@ -2,9 +2,9 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.messages.PubSub.Publish
-import csw.messages._
 import csw.messages.ccs.commands.CommandResponse
+import csw.messages.models.PubSub
+import csw.messages.models.PubSub.Publish
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs
 
 import scala.concurrent.Future

@@ -6,7 +6,7 @@ import csw.common.components.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.ComponentMessage;
-import csw.messages.PubSub;
+import csw.messages.models.PubSub;
 import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;

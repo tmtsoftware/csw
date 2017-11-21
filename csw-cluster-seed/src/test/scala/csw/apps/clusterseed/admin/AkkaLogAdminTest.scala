@@ -15,11 +15,12 @@ import csw.apps.clusterseed.utils.AdminLogTestSuite
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.ContainerCommonMessage.GetComponents
+import csw.messages.ContainerMessage
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.{Component, Components, ContainerMessage}
+import csw.messages.models.{Component, Components}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._

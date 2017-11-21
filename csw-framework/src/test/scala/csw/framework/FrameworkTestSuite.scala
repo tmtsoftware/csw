@@ -7,10 +7,10 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.common.components.ComponentDomainMessage
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
-import csw.messages.PubSub.PublisherMessage
 import csw.messages.framework.ComponentInfo
+import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.LocationService
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

@@ -12,4 +12,5 @@ object SupervisorLifecycleState {
   case object RunningOffline extends SupervisorLifecycleState
   case object Restart        extends SupervisorLifecycleState
   case object Shutdown       extends SupervisorLifecycleState
+  case object Lock           extends SupervisorLifecycleState
 }

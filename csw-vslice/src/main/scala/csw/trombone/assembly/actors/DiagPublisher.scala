@@ -7,7 +7,8 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.params.states.CurrentState
-import csw.messages.{PubSub, SupervisorExternalMessage}
+import csw.messages.SupervisorExternalMessage
+import csw.messages.models.PubSub
 import csw.trombone.assembly.DiagPublisherMessages._
 import csw.trombone.assembly.TrombonePublisherMsg.{AxisStateUpdate, AxisStatsUpdate}
 import csw.trombone.assembly.actors.DiagPublisher.Mode.{Diagnostic, Operations}

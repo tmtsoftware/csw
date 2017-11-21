@@ -6,9 +6,9 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter._
 import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.messages.PubSub.Subscribe
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages.ccs.commands.CommandResponse
+import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
 
 import scala.concurrent.Future

@@ -16,11 +16,12 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.Submit
-import csw.messages.PubSub.{Publish, PublisherMessage}
+import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
-import csw.messages._
+import csw.messages.{models, _}
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.models.{LifecycleStateChanged, PubSub}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
@@ -123,7 +124,9 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
-    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+    lifecycleStateProbe.expectMsg(
+      Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+    )
 
     Thread.sleep(100)
     // DEOPSCSW-180: Generic and Specific Log messages
@@ -166,7 +169,9 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
-    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+    lifecycleStateProbe.expectMsg(
+      Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+    )
 
     // Supervisor sends component a submit command which will fail with FailureRestart exception on calling onSubmit Handler
     supervisorRef ! Submit(setup, TestProbe[CommandResponse].ref)

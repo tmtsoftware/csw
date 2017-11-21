@@ -7,12 +7,13 @@ import akka.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.messages.PubSub.PublisherMessage
+import csw.messages.models.PubSub.PublisherMessage
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
+import csw.messages.models.PubSub
 import csw.messages.params.models.Units.encoder
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService

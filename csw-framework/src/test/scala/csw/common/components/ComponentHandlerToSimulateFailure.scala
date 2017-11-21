@@ -2,10 +2,10 @@ package csw.common.components
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
-import csw.messages.PubSub.PublisherMessage
 import csw.messages.framework.ComponentInfo
+import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.Future

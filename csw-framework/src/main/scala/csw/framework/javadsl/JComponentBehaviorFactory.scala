@@ -5,8 +5,9 @@ import akka.typed.{scaladsl, ActorRef}
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages.framework.ComponentInfo
+import csw.messages.models.PubSub
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage, PubSub}
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 

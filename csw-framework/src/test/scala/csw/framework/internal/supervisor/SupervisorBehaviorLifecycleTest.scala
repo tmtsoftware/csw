@@ -12,14 +12,15 @@ import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.messages.SupervisorIdleMessage.{InitializeTimeout, RegistrationNotRequired, RegistrationSuccess}
-import csw.messages._
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.models.{LifecycleStateChanged, PubSub, ToComponentLifecycleMessage}
 import csw.messages.params.states.CurrentState
+import csw.messages.{models, _}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -115,7 +116,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
     childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(
-      LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running)
+      models.LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running)
     )
   }
 
@@ -127,7 +128,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
     childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(
-      LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running)
+      models.LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running)
     )
   }
   // *************** End of testing onIdleMessages ***************

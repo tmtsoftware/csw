@@ -12,19 +12,20 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.{ComponentStatistics, SampleComponentState}
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ContainerCommonMessage.GetComponents
-import csw.messages.PubSub.Subscribe
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
-import csw.messages.ToComponentLifecycleMessage.GoOffline
 import csw.messages.ccs.commands.CommandResponse.Invalid
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.models.Components
+import csw.messages.models.PubSub.Subscribe
+import csw.messages.models.ToComponentLifecycleMessage.GoOffline
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
-import csw.messages.{Components, ContainerExternalMessage, Shutdown, SupervisorExternalMessage}
+import csw.messages.{ContainerExternalMessage, Shutdown, SupervisorExternalMessage}
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils

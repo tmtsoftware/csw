@@ -10,8 +10,9 @@ import csw.apps.clusterseed.components.StartLogging
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.ContainerCommonMessage.GetComponents
+import csw.messages.ContainerMessage
 import csw.messages.framework.ContainerLifecycleState
-import csw.messages.{Component, Components, ContainerMessage}
+import csw.messages.models.{Component, Components}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.scaladsl.{CommonComponentLogger, LoggingSystemFactory}
 

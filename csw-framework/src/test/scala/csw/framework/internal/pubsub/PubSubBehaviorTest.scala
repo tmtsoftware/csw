@@ -6,9 +6,10 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
-import csw.messages.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.framework.SupervisorLifecycleState
-import csw.messages.{LifecycleStateChanged, PubSub, SupervisorExternalMessage}
+import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.models.{LifecycleStateChanged, PubSub}
+import csw.messages.{models, SupervisorExternalMessage}
 import csw.services.logging.scaladsl.{ComponentLogger, Logger}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -56,9 +57,11 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe1.ref))
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe2.ref))
 
-    pubSubBehavior.onMessage(Publish(LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running)))
-    lifecycleProbe1.expectMsg(LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running))
-    lifecycleProbe2.expectMsg(LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running))
+    pubSubBehavior.onMessage(
+      Publish(models.LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running))
+    )
+    lifecycleProbe1.expectMsg(models.LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running))
+    lifecycleProbe2.expectMsg(models.LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running))
   }
 
   test("should not receive messages on un-subscription") {
@@ -69,9 +72,11 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe2.ref))
     pubSubBehavior.onMessage(Unsubscribe(lifecycleProbe1.ref))
 
-    pubSubBehavior.onMessage(Publish(LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running)))
+    pubSubBehavior.onMessage(
+      Publish(models.LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running))
+    )
 
-    lifecycleProbe2.expectMsg(LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running))
+    lifecycleProbe2.expectMsg(models.LifecycleStateChanged(supervisorProbe.ref, SupervisorLifecycleState.Running))
     lifecycleProbe1.expectNoMsg(50.millis)
   }
 }

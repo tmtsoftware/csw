@@ -3,7 +3,6 @@ package csw.common.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.PubSub.{Publish, PublisherMessage}
 import csw.messages._
 import csw.messages.ccs.CommandIssue.OtherIssue
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
@@ -11,6 +10,7 @@ import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
+import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.params.generics.GChoiceKey
 import csw.messages.params.generics.KeyType.ChoiceKey
 import csw.messages.params.models.{Choice, Choices, Prefix}

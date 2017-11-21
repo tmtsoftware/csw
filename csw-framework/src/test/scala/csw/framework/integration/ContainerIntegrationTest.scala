@@ -12,20 +12,21 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.PubSub.Subscribe
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.messages.models.PubSub.Subscribe
+import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.models.{Components, LifecycleStateChanged}
 import csw.messages.params.states.CurrentState
-import csw.messages.{Components, LifecycleStateChanged, Restart, Shutdown}
+import csw.messages.{models, Restart, Shutdown}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -156,9 +157,15 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     filterProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
-    assemblyLifecycleStateProbe.expectMsg(LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running))
-    filterLifecycleStateProbe.expectMsg(LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running))
-    disperserLifecycleStateProbe.expectMsg(LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running))
+    assemblyLifecycleStateProbe.expectMsg(
+      models.LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running)
+    )
+    filterLifecycleStateProbe.expectMsg(
+      models.LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running)
+    )
+    disperserLifecycleStateProbe.expectMsg(
+      models.LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running)
+    )
 
     assertThatContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)
 

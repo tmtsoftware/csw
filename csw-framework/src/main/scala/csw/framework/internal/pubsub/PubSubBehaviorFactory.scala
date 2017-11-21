@@ -2,7 +2,8 @@ package csw.framework.internal.pubsub
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.messages.{PubSub, SupervisorMessage}
+import csw.messages.SupervisorMessage
+import csw.messages.models.PubSub
 
 /**
  * Factory for creating [[akka.typed.scaladsl.Actor.MutableBehavior]] of a pub sub actor

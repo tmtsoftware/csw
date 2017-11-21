@@ -9,12 +9,13 @@ import csw.messages.CommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
-import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.framework.ComponentInfo
 import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
+import csw.messages.models.ToComponentLifecycleMessage
+import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.ComponentLogger
 

@@ -3,7 +3,7 @@ package csw.apps.clusterseed.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.PubSub.PublisherMessage
+import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.Accepted

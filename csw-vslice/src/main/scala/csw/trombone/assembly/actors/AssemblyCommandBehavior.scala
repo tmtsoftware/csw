@@ -3,7 +3,7 @@ package csw.trombone.assembly.actors
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.PubSub.Subscribe
+import csw.messages.models.PubSub.Subscribe
 import csw.messages.ccs.commands.CommandResponse
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs.{CommandComplete, CommandMessageE}
 import csw.trombone.assembly.CommonMsgs.{AssemblyStateE, UpdateHcdLocations}

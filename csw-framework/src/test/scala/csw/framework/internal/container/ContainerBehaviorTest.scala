@@ -12,10 +12,11 @@ import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
-import csw.messages.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages._
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.models.{Component, Components, SupervisorInfo}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}

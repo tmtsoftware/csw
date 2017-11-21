@@ -7,7 +7,7 @@ import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.ComponentMessage;
-import csw.messages.PubSub;
+import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 
