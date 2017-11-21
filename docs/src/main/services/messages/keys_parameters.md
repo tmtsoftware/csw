@@ -26,7 +26,7 @@ A **Parameter** is a collection of Keys and values or binary data. A key is **un
 | Timestamp       | KeyType.TimestampKey        | JKeyTypes.TimestampKey         |
 
 Scala
-:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #primitives }
+:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #primitives }
 
 ### Arrays
 
@@ -40,7 +40,7 @@ Scala
 | DoubleArray     | KeyType.DoubleArrayKey      | JKeyTypes.DoubleArrayKey       |
 
 Scala
-:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #arrays }
+:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #arrays }
 
 ### Matrices
 
@@ -54,7 +54,7 @@ Scala
 | DoubleMatrix    | KeyType.DoubleMatrixKey     | JKeyTypes.DoubleMatrixKey      |
 
 Scala
-:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #matrices }
+:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #matrices }
 
 ### Domain Specific Types
 
@@ -69,18 +69,18 @@ Scala
 A key for a choice item similar to an enumeration.
 
 Scala
-:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #choice }
+:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #choice }
 
 #### RaDec
 
 Holds Ra(Right Ascension) and Dec(Declination) values
 
 Scala
-:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #radec }
+:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #radec }
 
 #### Struct
 
-A configuration for setting telescope and instrument parameters.
+Stores a set of Parameters for telescope and instrument control. Lot of utility functions available for store, add, remove, list Keys and Paramete
 
 Scala
-:   @@snip [KeysAndParameters.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParameters.scala) { #struct }
+:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #struct }

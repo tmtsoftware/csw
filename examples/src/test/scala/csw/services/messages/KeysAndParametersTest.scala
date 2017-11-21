@@ -5,10 +5,10 @@ import csw.messages.params.generics.{GChoiceKey, Key, KeyType, Parameter}
 import csw.messages.params.models._
 import org.scalatest.{FunSpec, Matchers}
 
-class KeysAndParameters extends FunSpec with Matchers {
-  describe("tests for supported keys and parameters") {
+class KeysAndParametersTest extends FunSpec with Matchers {
+  describe("Examples of keys and parameters") {
 
-    it("primitive") {
+    it("should show usage of primitive types") {
 
       //#primitives
       //declare keyname
@@ -53,7 +53,7 @@ class KeysAndParameters extends FunSpec with Matchers {
       assert(paramWithUnits1.values === paramWithUnits2.values)
     }
 
-    it("arrays") {
+    it("should show usage of arrays") {
       //#arrays
       //make some arrays
       val arr1: Array[Double] = Array(1.0, 2.0, 3.0, 4.0, 5.0)
@@ -84,7 +84,7 @@ class KeysAndParameters extends FunSpec with Matchers {
       assert(p1AsCount.units === Units.count)
     }
 
-    it("matrices") {
+    it("should show usage of matrices") {
       //#matrices
       //make some arrays
       val m1: Array[Array[Byte]] = Array(Array[Byte](1, 2, 3), Array[Byte](4, 5, 6), Array[Byte](7, 8, 9))
@@ -115,7 +115,7 @@ class KeysAndParameters extends FunSpec with Matchers {
       assert(p1AsLiter.units === Units.liter)
     }
 
-    it("choice") {
+    it("should show usage of choice") {
       //#choice
       //Choice
       val choices = Choices.from("A", "B", "C")
@@ -146,7 +146,7 @@ class KeysAndParameters extends FunSpec with Matchers {
       paramWithDegree.units should be(Units.foot)
     }
 
-    it("radec") {
+    it("should show usage of radec") {
       //#radec
       //RaDec
       val raDec1: RaDec = RaDec(1.0, 2.0)
@@ -176,7 +176,7 @@ class KeysAndParameters extends FunSpec with Matchers {
       paramWithDegree.units should be(Units.degree)
     }
 
-    it("struct") {
+    it("should show usage of struct") {
       //#struct
       //keys
       val skey: Key[Struct] = StructKey.make("myStruct")
