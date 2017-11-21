@@ -41,7 +41,7 @@ Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #wait }
 
 ### JSON serialization
-Commands can be serialized in JSON. The library has provided JsonSupport helper class and methods to serialize Setup, Observe and Wait commands.
+Commands can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize Setup, Observe and Wait commands.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #json-serialization }

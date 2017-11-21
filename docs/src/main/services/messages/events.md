@@ -43,7 +43,7 @@ Scala
 :   @@snip [EventsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #systemevent }
 
 ### JSON serialization
-Events can be serialized in JSON. The library has provided JsonSupport helper class and methods to serialize Status, Observe and System events.
+Events can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize Status, Observe and System events.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #json-serialization }

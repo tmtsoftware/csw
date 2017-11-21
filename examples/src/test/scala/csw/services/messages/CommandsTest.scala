@@ -253,7 +253,6 @@ class CommandsTest extends FunSpec with Matchers {
     it("should show duplicate keys are removed") {
 
       //#unique-key
-
       //keys
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")

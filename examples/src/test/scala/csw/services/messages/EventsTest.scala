@@ -252,7 +252,7 @@ class EventsTest extends FunSpec with Matchers {
       //parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
-      //commands
+      //events
       val statusEvent: StatusEvent   = StatusEvent("wfos.blue.filter").add(i1)
       val observeEvent: ObserveEvent = ObserveEvent("wfos.blue.filter").add(i1)
       val systemEvent: SystemEvent   = SystemEvent("wfos.blue.filter").add(i1)
@@ -266,7 +266,7 @@ class EventsTest extends FunSpec with Matchers {
       val str: String = Json.prettyPrint(scJson)
 
       //construct command from string
-      val statusEventFromPrettyStr = JsonSupport.readEvent[StatusEvent](Json.parse(str))
+      val statusEventFromPrettyStr: StatusEvent = JsonSupport.readEvent[StatusEvent](Json.parse(str))
 
       //json support - read
       val statusEvent1: StatusEvent   = JsonSupport.readEvent[StatusEvent](scJson)
@@ -286,7 +286,6 @@ class EventsTest extends FunSpec with Matchers {
     it("should show duplicate keys are removed") {
 
       //#unique-key
-
       //keys
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")

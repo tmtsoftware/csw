@@ -38,18 +38,18 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   /**
    * Writes a SequenceParameterSet to JSON
    *
-   * @param sequenceCommand any instance of SequenceCommand
+   * @param result any instance of SequenceCommand
    * @tparam A the type of the command (implied)
    * @return a JsValue object representing the SequenceCommand
    */
-  def writeSequenceCommand[A <: SequenceCommand](sequenceCommand: A): JsValue = {
+  def writeSequenceCommand[A <: SequenceCommand](result: A): JsValue = {
     JsObject(
       Seq(
-        "type"     -> JsString(sequenceCommand.typeName),
-        "runId"    -> runIdFormat.writes(sequenceCommand.runId),
-        "obsId"    -> obsIdFormat.writes(sequenceCommand.obsId),
-        "prefix"   -> prefixFormat.writes(sequenceCommand.prefix),
-        "paramSet" -> Json.toJson(sequenceCommand.paramSet)
+        "type"     -> JsString(result.typeName),
+        "runId"    -> runIdFormat.writes(result.runId),
+        "obsId"    -> obsIdFormat.writes(result.obsId),
+        "prefix"   -> prefixFormat.writes(result.prefix),
+        "paramSet" -> Json.toJson(result.paramSet)
       )
     )
   }
@@ -159,6 +159,41 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
               case `systemEventType`  => SystemEvent(info, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
               case _                  => unexpectedJsValueError(json)
             }
+          case _ => unexpectedJsValueError(json)
+        }
+      case _ => unexpectedJsValueError(json)
+    }
+  }
+
+  /**
+   * Writes a Result to JSON
+   *
+   * @param result any instance of Result
+   * @return a JsValue object representing the Result
+   */
+  def writeResult(result: Result): JsValue = {
+    JsObject(
+      Seq(
+        "runId"    -> runIdFormat.writes(result.runId),
+        "obsId"    -> obsIdFormat.writes(result.obsId),
+        "prefix"   -> prefixFormat.writes(result.prefix),
+        "paramSet" -> Json.toJson(result.paramSet)
+      )
+    )
+  }
+
+  /**
+   * Reads a Result back from JSON
+   *
+   * @param json the parsed JSON
+   * @return an instance of Result, or an exception if the JSON is not valid for that type
+   */
+  def readResult(json: JsValue): Result = {
+    json match {
+      case JsObject(fields) =>
+        (fields("runId"), fields("obsId"), fields("prefix"), fields("paramSet")) match {
+          case (runId, obsId, prefix, paramSet) =>
+            Result(runId.as[RunId], obsId.as[ObsId], prefix.as[Prefix], paramSetFormat.reads(paramSet).get)
           case _ => unexpectedJsValueError(json)
         }
       case _ => unexpectedJsValueError(json)

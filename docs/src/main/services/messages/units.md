@@ -2,7 +2,7 @@
 
 Listed below are Units of Measurement, supported by TMT pbservatory framework and are available as Enumerated values. *Units* are optionally attached to Keys. 
 
-Default unit for a **Key** is `NoUnits` except for `KeyType.TimestampKey` or `JKeyTypes.TimestampKey`. The usage examples can be found in [Keys and Parameters](keys_parameters.html)
+Default unit for a **Key** is `NoUnits` except for `KeyType.TimestampKey` or `JKeyTypes.TimestampKey`. The usage examples can be found in [Keys and Parameters](keys-parameters.html)
 
 ### SI units
 
