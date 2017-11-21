@@ -6,7 +6,7 @@ import csw.messages.params.models.{ObsId, Prefix, RunId}
 /**
  * Common trait for Setup, Observe and Wait commands
  */
-sealed trait Command { self: ParameterSetType[_] ⇒
+sealed trait Command {
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".
@@ -38,8 +38,7 @@ sealed trait Command { self: ParameterSetType[_] ⇒
 /**
  * Trait for sequence parameter sets
  */
-sealed trait SequenceCommand extends Command { self: ParameterSetType[_] ⇒
-}
+sealed trait SequenceCommand extends Command
 
 /**
  * Marker trait for control parameter sets

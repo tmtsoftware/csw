@@ -34,7 +34,7 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
 ) {
   var isOnline: Boolean = false
 
-  protected val LockToken: String = UUID.randomUUID().toString
+  protected lazy val LockToken: String = UUID.randomUUID().toString
 
   def initialize(): Future[Unit]
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit
