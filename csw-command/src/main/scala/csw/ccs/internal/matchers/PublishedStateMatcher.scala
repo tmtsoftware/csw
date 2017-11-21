@@ -18,10 +18,10 @@ class PublishedStateMatcher(
     ctx: ActorContext[_],
     currentStateSource: ActorRef[ComponentStateSubscription],
     stateMatcher: StateMatcher
-) extends Matcher(ctx) {
+) extends Matcher[MatcherResponse](ctx) {
 
-  def executeMatch(partialFunction: PartialFunction[MatcherResponse, CommandResponse]): Future[CommandResponse] =
-    matchState(stateMatcher, currentStateSource).map(partialFunction)
+  def executeMatch(transformResponse: MatcherResponse ⇒ CommandResponse): Future[CommandResponse] =
+    matchState(stateMatcher, currentStateSource).map(transformResponse)
 
   private def matchState(
       stateMatcher: StateMatcher,

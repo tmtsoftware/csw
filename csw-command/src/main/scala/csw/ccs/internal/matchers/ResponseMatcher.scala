@@ -13,10 +13,10 @@ class ResponseMatcher[T](
     destination: ActorRef[T],
     command: T,
     timeout: Timeout
-) extends Matcher(ctx) {
+) extends Matcher[CommandResponse](ctx) {
 
-  def executeMatch(partialFunction: PartialFunction[CommandResponse, CommandResponse]): Future[CommandResponse] =
-    (destination ? execute(command))(timeout, ctx.system.scheduler).map(partialFunction)
+  def executeMatch(transformResponse: CommandResponse ⇒ CommandResponse): Future[CommandResponse] =
+    (destination ? execute(command))(timeout, ctx.system.scheduler).map(transformResponse)
 
   private def execute(x: T)(replyTo: ActorRef[CommandResponse]): T = x
 
