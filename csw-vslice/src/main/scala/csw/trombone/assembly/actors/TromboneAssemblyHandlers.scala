@@ -85,15 +85,13 @@ class TromboneAssemblyHandlers(
     case _                                   ⇒
   }
 
-  override def validateSubmit(controlCommand: ControlCommand): CommandResponse = controlCommand match {
+  override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand match {
     case _: Setup   => validateOneSetup(controlCommand.asInstanceOf[Setup])
     case _: Observe => Accepted(controlCommand.runId)
   }
 
   override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit =
     commandHandler ! CommandMessageE(Submit(controlCommand, replyTo))
-
-  override def validateOneway(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
 
   override def onOneway(controlCommand: ControlCommand): Unit = println("One way command received")
 

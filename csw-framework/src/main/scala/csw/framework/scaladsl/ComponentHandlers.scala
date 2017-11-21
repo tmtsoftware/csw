@@ -35,9 +35,8 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
   def initialize(): Future[Unit]
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit
   def onDomainMsg(msg: Msg): Unit
-  def validateSubmit(controlCommand: ControlCommand): CommandResponse
+  def validateCommand(controlCommand: ControlCommand): CommandResponse
   def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit
-  def validateOneway(controlCommand: ControlCommand): CommandResponse
   def onOneway(controlCommand: ControlCommand): Unit
   def onShutdown(): Future[Unit]
   def onGoOffline(): Unit

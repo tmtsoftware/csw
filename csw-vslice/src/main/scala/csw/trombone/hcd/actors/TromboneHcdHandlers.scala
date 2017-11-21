@@ -86,15 +86,13 @@ class TromboneHcdHandlers(
     }
   }
 
-  override def validateSubmit(controlCommand: ControlCommand): CommandResponse = controlCommand match {
+  override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand match {
     case setup: Setup     => ParamValidation.validateSetup(setup)
     case observe: Observe => ParamValidation.validateObserve(observe)
   }
 
   override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit =
     onSetup(controlCommand.asInstanceOf[Setup])
-
-  override def validateOneway(controlCommand: ControlCommand) = Accepted(controlCommand.runId)
 
   override def onOneway(controlCommand: ControlCommand): Unit = println("One way command received")
 

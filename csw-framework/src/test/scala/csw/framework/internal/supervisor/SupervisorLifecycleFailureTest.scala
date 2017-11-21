@@ -158,7 +158,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     doThrow(FailureRestart(failureRestartExMsg))
       .when(componentHandlers)
-      .validateSubmit(any[ControlCommand])
+      .validateCommand(any[ControlCommand])
 
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 

@@ -143,7 +143,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         // verify that validateSubmit handler is invoked
         val submitSetupValidationCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val submitSetupValidationDemandState  = DemandState(prefix, Set(choiceKey.set(submitValidationChoice)))
+        val submitSetupValidationDemandState  = DemandState(prefix, Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(submitSetupValidationDemandState, timeout = 5.seconds)
           .check(submitSetupValidationCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted(setup.runId))
@@ -166,7 +166,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         // verify that validateSubmit handler is invoked
         val submitValidationCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val submitValidationDemandState  = DemandState(prefix, Set(choiceKey.set(submitValidationChoice)))
+        val submitValidationDemandState  = DemandState(prefix, Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(submitValidationDemandState, timeout = 5.seconds)
           .check(submitValidationCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted(observe.runId))
@@ -211,7 +211,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         // verify that validateOneway handler is invoked
         val onewaySetupValidationCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val onewaySetupValidationDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayValidationChoice)))
+        val onewaySetupValidationDemandState  = DemandState(prefix, Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(onewaySetupValidationDemandState, timeout = 5.seconds)
           .check(onewaySetupValidationCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted(setup.runId))
@@ -234,7 +234,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         // verify that validateOneway handler is invoked
         val oneWayObserveValidationCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val oneWayObserveValidationDemandState  = DemandState(prefix, Set(choiceKey.set(oneWayValidationChoice)))
+        val oneWayObserveValidationDemandState  = DemandState(prefix, Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(oneWayObserveValidationDemandState, timeout = 5.seconds)
           .check(oneWayObserveValidationCurrentState.data) shouldBe true
         commandValidationResponseProbe.expectMsg(Accepted(observe.runId))
