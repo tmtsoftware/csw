@@ -453,13 +453,11 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val lockingStateProbe    = TestProbe[LockingResponse]
     val commandResponseProbe = TestProbe[CommandResponse]
 
-    val client1Prefix    = Prefix("wfos.prog.cloudcover.Client1.success")
-    val token1           = UUID.randomUUID().toString
-    val uuidParamClient1 = LockToken.Key.set(token1)
-
-    val client2Prefix    = Prefix("wfos.prog.cloudcover.Client2.success")
-    val token2           = UUID.randomUUID().toString
-    val uuidParamClient2 = LockToken.Key.set(token2)
+    val client1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
+    val token1        = "token-1"
+    val client2Prefix = Prefix("wfos.prog.cloudcover.Client2.success")
+    val token2        = "token-2"
+    val obsId         = ObsId("Obs001")
 
     val mocks = frameworkTestMocks()
     import mocks._
@@ -475,11 +473,11 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 1 sends submit command with tokenId in parameter set
-    supervisorRef ! Submit(Setup(ObsId("Obs001"), client1Prefix).add(uuidParamClient1), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup.withLockToken(obsId, client1Prefix, token1), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
 
     // Client 2 tries to send submit command while Client 1 has the lock
-    supervisorRef ! Submit(Setup(ObsId("Obs001"), client2Prefix).add(uuidParamClient2), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup.withLockToken(obsId, client2Prefix, token2), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Invalid]
 
     // Client 1 unlocks the assembly
@@ -487,7 +485,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockReleased)
 
     // Client 2 tries to send submit command again after lock is released
-    supervisorRef ! Submit(Setup(ObsId("Obs001"), client2Prefix).add(uuidParamClient2), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup.withLockToken(obsId, client2Prefix, token2), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
   }
 }

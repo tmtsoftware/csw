@@ -1,5 +1,7 @@
 package csw.framework.scaladsl
 
+import java.util.UUID
+
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.messages.CommonMessage.TrackingEventReceived
@@ -31,6 +33,8 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
     locationService: LocationService
 ) {
   var isOnline: Boolean = false
+
+  protected val LockToken: String = UUID.randomUUID().toString
 
   def initialize(): Future[Unit]
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit

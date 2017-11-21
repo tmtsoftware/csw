@@ -77,6 +77,9 @@ object Setup {
   // The apply method is used to create Setup command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
   def apply(obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty): Setup =
     new Setup(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
+
+  def withLockToken(obsId: ObsId, prefix: Prefix, token: String): Setup =
+    apply(obsId, prefix, Set(LockToken.Key.set(token)))
 }
 
 /**
@@ -108,6 +111,9 @@ object Observe {
   // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
   def apply(obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty): Observe =
     new Observe(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
+
+  def withLockToken(obsId: ObsId, prefix: Prefix, token: String): Observe =
+    apply(obsId, prefix, Set(LockToken.Key.set(token)))
 }
 
 /**
@@ -138,4 +144,7 @@ object Wait {
   // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
   def apply(obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty): Wait =
     new Wait(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
+
+  def withLockToken(obsId: ObsId, prefix: Prefix, token: String): Wait =
+    apply(obsId, prefix, Set(LockToken.Key.set(token)))
 }
