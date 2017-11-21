@@ -12,7 +12,7 @@ import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
-import csw.messages.ccs.commands.CommandResponse.Accepted
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}
@@ -161,4 +161,53 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     commandResponseProbe.expectMsg(Accepted(sc1.runId))
     commandStatusServiceProbe.expectNoMsg(3.seconds)
   }
+
+  //DEOPSCSW-313: Support short running actions by providing immediate response
+  test("A running component can send an immediate response to a submit command and avoid invoking further processing") {
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
+    val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
+    val commandResponseProbe      = TestProbe[CommandResponse]
+    val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
+    import runningComponent._
+
+    val obsId: ObsId = ObsId("Obs001")
+    val sc1          = Setup(obsId, Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
+
+    when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Completed(sc1.runId))
+
+    doNothing()
+      .when(sampleHcdHandler)
+      .onSubmit(ArgumentMatchers.any[Setup](), ArgumentMatchers.any[ActorRef[CommandResponse]]())
+
+    runningComponentBehavior.onMessage(Submit(sc1, commandResponseProbe.ref))
+
+    verify(sampleHcdHandler).validateCommand(sc1)
+    verify(sampleHcdHandler, never()).onSubmit(sc1, commandResponseProbe.ref)
+    commandResponseProbe.expectMsg(Completed(sc1.runId))
+    commandStatusServiceProbe.expectMsg(AddOrUpdateCommand(sc1.runId, Completed(sc1.runId)))
+  }
+
+  //DEOPSCSW-313: Support short running actions by providing immediate response
+  test("A running component can send an immediate response to a oneway command and avoid invoking further processing") {
+    val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
+    val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
+    val commandResponseProbe      = TestProbe[CommandResponse]
+    val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
+    import runningComponent._
+
+    val obsId: ObsId = ObsId("Obs001")
+    val sc1          = Observe(obsId, Prefix("wfos.prog.cloudcover")).add(KeyType.IntKey.make("encoder").set(22))
+
+    val error = Error(sc1.runId, "error from the test command")
+    when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(error)
+    doNothing().when(sampleHcdHandler).onOneway(ArgumentMatchers.any[Setup]())
+
+    runningComponentBehavior.onMessage(Oneway(sc1, commandResponseProbe.ref))
+
+    verify(sampleHcdHandler).validateCommand(sc1)
+    verify(sampleHcdHandler, never()).onOneway(sc1)
+    commandResponseProbe.expectMsg(error)
+    commandStatusServiceProbe.expectNoMsg(3.seconds)
+  }
+
 }
