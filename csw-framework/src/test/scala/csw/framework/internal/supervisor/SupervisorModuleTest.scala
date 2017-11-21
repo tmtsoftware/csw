@@ -11,7 +11,7 @@ import csw.framework.javadsl.components.JComponentDomainMessage
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.LockingResponses._
+import csw.messages.LockingResponse._
 import csw.messages.PubSub.Publish
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle, Lock, Unlock}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
@@ -385,7 +385,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   //DEOPSCSW-222: Locking a component for a specific duration
   test("should able to lock and unlock a component") {
-    val lockingStateProbe = TestProbe[LockingResponses]
+    val lockingStateProbe = TestProbe[LockingResponse]
     val mocks             = frameworkTestMocks()
     import mocks._
 
@@ -401,7 +401,11 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Client 2 tries to lock the assembly while Client 1 already has the lock
     supervisorRef ! Lock("wfos.prog.cloudcover.Client2", "token-2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAlreadyAcquiredBy("wfos.prog.cloudcover.Client1"))
+    lockingStateProbe.expectMsg(
+      ReAcquiringLockFailed(
+        s"Invalid prefix [wfos.prog.cloudcover.Client2] or token [token-2] for re-acquiring the lock. Currently it is acquired by component: [wfos.prog.cloudcover.Client1]"
+      )
+    )
 
     // Client 1 re-acquires the lock by sending the same token again
     supervisorRef ! Lock("wfos.prog.cloudcover.Client1", "token-1", lockingStateProbe.ref)
@@ -410,8 +414,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     // Client 2 tries to unlock the assembly while Client 1 already has the lock
     supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", "token-2", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(
-      UnlockFailed(
-        s"Cannot release lock for [wfos.prog.cloudcover.Client2] as it is acquired by other component: [wfos.prog.cloudcover.Client1]"
+      ReleasingLockFailed(
+        s"Invalid prefix [wfos.prog.cloudcover.Client2] or token [token-2] for releasing the lock. Currently it is acquired by component: [wfos.prog.cloudcover.Client1]"
       )
     )
 
@@ -431,7 +435,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-222: Locking a component for a specific duration
   // DEOPSCSW-301: Support UnLocking
   test("should forward command messages from client that locked the component and reject for other clients ") {
-    val lockingStateProbe    = TestProbe[LockingResponses]
+    val lockingStateProbe    = TestProbe[LockingResponse]
     val commandResponseProbe = TestProbe[CommandResponse]
 
     val client1Prefix    = Prefix("wfos.prog.cloudcover.Client1.success")

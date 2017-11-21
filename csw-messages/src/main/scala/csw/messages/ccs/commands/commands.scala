@@ -45,10 +45,7 @@ sealed trait SequenceCommand extends Command { self: ParameterSetType[_] ⇒
  * Marker trait for control parameter sets
  */
 sealed trait ControlCommand extends Command { self: ParameterSetType[_] ⇒
-  def getLockToken: Option[String] = self.get(LockToken.key) match {
-    case Some(tokenParam) ⇒ tokenParam.get(0)
-    case None             ⇒ None
-  }
+  def getLockToken: Option[String] = self.get(LockToken.Key).flatMap(_.get(0))
 }
 
 /**

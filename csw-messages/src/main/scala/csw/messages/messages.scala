@@ -44,13 +44,13 @@ object IdleMessage {
   case object Initialize extends IdleMessage
 }
 
-sealed trait LockingResponses
-object LockingResponses {
-  case object LockAcquired                                 extends LockingResponses
-  case class LockAlreadyAcquiredBy(otherComponent: String) extends LockingResponses
-  case object LockReleased                                 extends LockingResponses
-  case object LockAlreadyReleased                          extends LockingResponses
-  case class UnlockFailed(reason: String)                  extends LockingResponses
+sealed trait LockingResponse
+object LockingResponse {
+  case object LockAcquired                         extends LockingResponse
+  case class ReAcquiringLockFailed(reason: String) extends LockingResponse
+  case object LockReleased                         extends LockingResponse
+  case object LockAlreadyReleased                  extends LockingResponse
+  case class ReleasingLockFailed(reason: String)   extends LockingResponse
 }
 
 sealed trait CommandMessage extends RunningMessage {
@@ -65,10 +65,10 @@ object CommandMessage {
 
 sealed trait RunningMessage extends ComponentMessage with SupervisorRunningMessage
 object RunningMessage {
-  case class Lifecycle(message: ToComponentLifecycleMessage)                            extends RunningMessage with ContainerExternalMessage
-  trait DomainMessage                                                                   extends RunningMessage
-  case class Lock(prefix: String, token: String, replyTo: ActorRef[LockingResponses])   extends RunningMessage
-  case class Unlock(prefix: String, token: String, replyTo: ActorRef[LockingResponses]) extends RunningMessage
+  case class Lifecycle(message: ToComponentLifecycleMessage)                           extends RunningMessage with ContainerExternalMessage
+  trait DomainMessage                                                                  extends RunningMessage
+  case class Lock(prefix: String, token: String, replyTo: ActorRef[LockingResponse])   extends RunningMessage
+  case class Unlock(prefix: String, token: String, replyTo: ActorRef[LockingResponse]) extends RunningMessage
 }
 
 case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage
