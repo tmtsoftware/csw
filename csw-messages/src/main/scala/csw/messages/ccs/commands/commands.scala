@@ -56,12 +56,8 @@ sealed trait ControlCommand extends Command { self: ParameterSetType[_] ⇒
  * @param prefix identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Setup private (
-    runId: RunId,
-    obsId: ObsId,
-    prefix: Prefix,
-    paramSet: Set[Parameter[_]] = Set.empty
-) extends ParameterSetType[Setup]
+case class Setup private (runId: RunId, obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty)
+    extends ParameterSetType[Setup]
     with ParameterSetKeyData
     with SequenceCommand
     with ControlCommand {
@@ -75,20 +71,12 @@ case class Setup private (
 object Setup {
 
   // The default apply method is used only internally while reading the incoming json and de-serializing it to setup model
-  private[messages] def apply(
-      runId: RunId,
-      obsId: ObsId,
-      prefix: Prefix,
-      paramSet: Set[Parameter[_]]
-  ): Setup =
+  private[messages] def apply(runId: RunId, obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]]): Setup =
     new Setup(runId, obsId, prefix, paramSet) //madd is not required as this version of apply is only used for reading json
 
   // The apply method is used to create Setup command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
-  def apply(
-      obsId: ObsId,
-      prefix: Prefix,
-      paramSet: Set[Parameter[_]] = Set.empty
-  ): Setup = new Setup(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
+  def apply(obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty): Setup =
+    new Setup(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
 }
 
 /**
@@ -99,12 +87,8 @@ object Setup {
  * @param prefix identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Observe private (
-    runId: RunId,
-    obsId: ObsId,
-    prefix: Prefix,
-    paramSet: Set[Parameter[_]] = Set.empty
-) extends ParameterSetType[Observe]
+case class Observe private (runId: RunId, obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty)
+    extends ParameterSetType[Observe]
     with ParameterSetKeyData
     with SequenceCommand
     with ControlCommand {
@@ -118,20 +102,11 @@ case class Observe private (
 object Observe {
 
   // The default apply method is used only internally while reading the incoming json and de-serializing it to observe model
-  private[messages] def apply(
-      runId: RunId,
-      obsId: ObsId,
-      prefix: Prefix,
-      paramSet: Set[Parameter[_]]
-  ): Observe =
+  private[messages] def apply(runId: RunId, obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]]): Observe =
     new Observe(runId, obsId, prefix, paramSet) //madd is not required as this version of apply is only used for reading json
 
   // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
-  def apply(
-      obsId: ObsId,
-      prefix: Prefix,
-      paramSet: Set[Parameter[_]] = Set.empty
-  ): Observe =
+  def apply(obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty): Observe =
     new Observe(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
 }
 
@@ -143,12 +118,8 @@ object Observe {
  * @param prefix identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Wait private (
-    runId: RunId,
-    obsId: ObsId,
-    prefix: Prefix,
-    paramSet: Set[Parameter[_]] = Set.empty
-) extends ParameterSetType[Wait]
+case class Wait private (runId: RunId, obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty)
+    extends ParameterSetType[Wait]
     with ParameterSetKeyData
     with SequenceCommand {
 
@@ -161,18 +132,10 @@ case class Wait private (
 object Wait {
 
   // The default apply method is used only internally while reading the incoming json and de-serializing it to observe model
-  private[messages] def apply(
-      runId: RunId,
-      obsId: ObsId,
-      prefix: Prefix,
-      paramSet: Set[Parameter[_]]
-  ): Wait =
+  private[messages] def apply(runId: RunId, obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]]): Wait =
     new Wait(runId, obsId, prefix, paramSet) //madd is not required as this version of apply is only used for reading json
 
   // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
-  def apply(
-      obsId: ObsId,
-      prefix: Prefix,
-      paramSet: Set[Parameter[_]] = Set.empty
-  ): Wait = new Wait(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
+  def apply(obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty): Wait =
+    new Wait(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
 }
