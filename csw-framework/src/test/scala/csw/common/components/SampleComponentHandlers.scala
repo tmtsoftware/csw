@@ -38,9 +38,9 @@ object SampleComponentState {
   val httpLocationRemovedChoice = Choice("HttpLocationRemoved")
   val tcpLocationUpdatedChoice  = Choice("TcpLocationUpdated")
   val tcpLocationRemovedChoice  = Choice("TcpLocationRemoved")
-  val prefix: Prefix            = Prefix("wfos.prog.cloudcover")
-  val successPrefix: Prefix     = Prefix("wfos.prog.cloudcover.success")
-  val failedPrefix: Prefix      = Prefix("wfos.prog.cloudcover.failure")
+  val prefix                    = Prefix("wfos.prog.cloudcover")
+  val successPrefix             = Prefix("wfos.prog.cloudcover.success")
+  val failedPrefix              = Prefix("wfos.prog.cloudcover.failure")
 
   val choices: Choices =
     Choices.fromChoices(
@@ -73,13 +73,7 @@ class SampleComponentHandlers(
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
-) extends ComponentHandlers[ComponentDomainMessage](
-      ctx,
-      componentInfo,
-      commandResponseManager,
-      pubSubRef,
-      locationService
-    )
+) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
     with FrameworkLogger.Simple {
 
   import SampleComponentState._

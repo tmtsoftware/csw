@@ -18,9 +18,7 @@ class ComponentHandlerToSimulateFailure(
     locationService: LocationService
 ) extends SampleComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService) {
 
-  override def onShutdown(): Future[Unit] = {
-    throw new RuntimeException(ComponentHandlerToSimulateFailure.exceptionMsg)
-  }
+  override def onShutdown(): Future[Unit] = throw new RuntimeException(ComponentHandlerToSimulateFailure.exceptionMsg)
 }
 
 object ComponentHandlerToSimulateFailure {
