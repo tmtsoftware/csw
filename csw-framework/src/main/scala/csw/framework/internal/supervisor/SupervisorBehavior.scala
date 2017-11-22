@@ -14,6 +14,7 @@ import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage._
 import csw.messages.SupervisorIdleMessage._
+import csw.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
 import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.messages._
@@ -105,6 +106,8 @@ class SupervisorBehavior(
       case (_, commonMessage: SupervisorCommonMessage)                                  ⇒ onCommon(commonMessage)
       case (SupervisorLifecycleState.Idle, idleMessage: SupervisorIdleMessage)          ⇒ onIdle(idleMessage)
       case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage) ⇒ onRestarting(restartMessage)
+      case (SupervisorLifecycleState.Running, internalMessage: SupervisorInternalRunningMessage) ⇒
+        onInternalRunning(internalMessage)
       case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage) ⇒ onRunning(runningMessage)
       case (RunningOffline, runningMessage: SupervisorRunningMessage)                   ⇒ onRunning(runningMessage)
       case (_, message)                                                                 ⇒ ignore(message)
@@ -152,11 +155,8 @@ class SupervisorBehavior(
    * @param idleMessage  Message representing a message received in [[SupervisorLifecycleState.Idle]] state
    */
   private def onIdle(idleMessage: SupervisorIdleMessage): Unit = idleMessage match {
-    case RegistrationSuccess(componentRef)     ⇒ onRegistrationComplete(componentRef)
-    case RegistrationNotRequired(componentRef) ⇒ onRegistrationComplete(componentRef)
-    case RegistrationFailed(throwable)         ⇒ onRegistrationFailed(throwable)
-    case Running(componentRef)                 ⇒ onComponentRunning(componentRef)
-    case InitializeTimeout                     ⇒ onInitializeTimeout()
+    case Running(componentRef) ⇒ onComponentRunning(componentRef)
+    case InitializeTimeout     ⇒ onInitializeTimeout()
   }
 
   /**
@@ -171,6 +171,17 @@ class SupervisorBehavior(
     case UnRegistrationFailed(throwable) ⇒
       log.error(throwable.getMessage, ex = throwable)
       respawnComponent()
+  }
+
+  /**
+   * Defines action for messages which can be received in [[SupervisorLifecycleState.Running]] state
+   *
+   * @param internalRunningMessage Message representing a message received in [[SupervisorLifecycleState.Running]] state
+   */
+  private def onInternalRunning(internalRunningMessage: SupervisorInternalRunningMessage): Unit = internalRunningMessage match {
+    case RegistrationSuccess(componentRef)     ⇒ onRegistrationComplete(componentRef)
+    case RegistrationNotRequired(componentRef) ⇒ onRegistrationComplete(componentRef)
+    case RegistrationFailed(throwable)         ⇒ onRegistrationFailed(throwable)
   }
 
   /**
@@ -321,8 +332,6 @@ class SupervisorBehavior(
   }
 
   private def onRegistrationComplete(componentRef: ActorRef[RunningMessage]): Unit = {
-    updateLifecycleState(SupervisorLifecycleState.Running)
-    runningComponent = Some(componentRef)
     maybeContainerRef.foreach { container ⇒
       container ! SupervisorLifecycleStateChanged(ctx.self, lifecycleState)
       log.debug(s"Supervisor acknowledged container :[$container] for lifecycle state :[$lifecycleState]")
@@ -369,10 +378,15 @@ class SupervisorBehavior(
   private def onComponentRunning(componentRef: ActorRef[RunningMessage]): Unit = {
     log.info("Received Running message from component within timeout, cancelling InitializeTimer")
     timerScheduler.cancel(InitializeTimerKey)
+
+    updateLifecycleState(SupervisorLifecycleState.Running)
+    runningComponent = Some(componentRef)
     registerWithLocationService(componentRef)
   }
 
   private def onRegistrationFailed(throwable: Throwable) = {
+    updateLifecycleState(SupervisorLifecycleState.Idle)
+    runningComponent = None
     log.error(throwable.getMessage, ex = throwable)
     throw throwable
   }

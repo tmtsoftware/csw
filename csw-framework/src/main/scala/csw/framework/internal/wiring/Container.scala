@@ -12,10 +12,7 @@ import scala.concurrent.Future
  * Start a container actor in it's own actor system, using the container information provided in a configuration file
  */
 object Container {
-  def spawn(
-      config: Config,
-      wiring: FrameworkWiring
-  ): Future[ActorRef[ContainerMessage]] = {
+  def spawn(config: Config, wiring: FrameworkWiring): Future[ActorRef[ContainerMessage]] = {
     import wiring._
     val containerInfo = ConfigParser.parseContainer(config)
     val containerBehavior: Behavior[ContainerMessage] =

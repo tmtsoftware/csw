@@ -4,6 +4,8 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages._
+import csw.messages.ccs.CommandIssue.{OtherIssue, UnsupportedCommandIssue, WrongPrefixIssue}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
@@ -23,13 +25,22 @@ class ComponentHandlerForCommand(
 ) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
     with FrameworkLogger.Simple {
 
-  override def initialize(): Future[Unit] = ???
+  import ComponentStateForCommand._
+
+  override protected def componentName(): String = "ComponentHandlerForCommand"
+
+  override def initialize(): Future[Unit] = Future.unit
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
   override def onDomainMsg(msg: ComponentDomainMessage): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = ???
+  override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand.prefix match {
+    case `acceptedCmdPrefix`  ⇒ Accepted(controlCommand.runId)
+    case `immediateCmdPrefix` ⇒ Completed(controlCommand.runId)
+    case `invalidCmdPrefix`   ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.prefix.prefix}"))
+    case _                    ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.prefix.prefix}"))
+  }
 
   override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = ???
 
@@ -40,6 +51,4 @@ class ComponentHandlerForCommand(
   override def onGoOffline(): Unit = ???
 
   override def onGoOnline(): Unit = ???
-
-  override protected def componentName(): String = ???
 }

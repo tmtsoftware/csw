@@ -134,8 +134,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       enterBarrier("running")
 
       // resolve and send message to component running in different jvm or on different physical machine
-      val etonSupervisorF =
-        locationService.resolve(AkkaConnection(ComponentId("Eton", ComponentType.HCD)), 2.seconds)
+      val etonSupervisorF        = locationService.resolve(AkkaConnection(ComponentId("Eton", ComponentType.HCD)), 2.seconds)
       val etonSupervisorLocation = Await.result(etonSupervisorF, 15.seconds).get
 
       val etonSupervisorTypedRef = etonSupervisorLocation.componentRef()
@@ -189,9 +188,8 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       // when sbt-assembly creates fat jar
       val standaloneConfFilePath = createStandaloneTmpFile()
 
-      val args = Array("--standalone", "--local", standaloneConfFilePath.toString)
-      val supervisorRef =
-        containerCmd.start(args).asInstanceOf[ActorRef[SupervisorExternalMessage]]
+      val args          = Array("--standalone", "--local", standaloneConfFilePath.toString)
+      val supervisorRef = containerCmd.start(args).asInstanceOf[ActorRef[SupervisorExternalMessage]]
 
       assertThatSupervisorIsRunning(supervisorRef, testProbe, 5.seconds)
       enterBarrier("running")
