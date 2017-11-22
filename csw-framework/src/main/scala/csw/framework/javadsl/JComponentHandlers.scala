@@ -42,7 +42,7 @@ abstract class JComponentHandlers[Msg <: DomainMessage](
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
 
-  protected lazy val jLogger: JLoggerFactory = new JLoggerFactory(componentInfo.name)
+  protected lazy val jLoggerFactory: JLoggerFactory = new JLoggerFactory(componentInfo.name)
 
   def jInitialize(): CompletableFuture[Unit]
   def jOnShutdown(): CompletableFuture[Unit]

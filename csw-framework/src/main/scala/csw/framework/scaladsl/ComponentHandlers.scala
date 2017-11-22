@@ -36,8 +36,8 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
 ) {
   var isOnline: Boolean = false
 
-  protected lazy val lockToken: String     = UUID.randomUUID().toString
-  protected lazy val logger: LoggerFactory = new scaladsl.LoggerFactory(componentInfo.name)
+  protected lazy val lockToken: String            = UUID.randomUUID().toString
+  protected lazy val loggerFactory: LoggerFactory = new scaladsl.LoggerFactory(componentInfo.name)
 
   def initialize(): Future[Unit]
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit
