@@ -7,20 +7,23 @@ import akka.typed.javadsl.ActorContext;
 import akka.typed.javadsl.ReceiveBuilder;
 import csw.services.logging.LogCommand;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JComponentLoggerMutableActor;
+import csw.services.logging.javadsl.JLoggerFactory;
 
-public class JIrisSupervisorMutableActor extends JComponentLoggerMutableActor<LogCommand> {
+public class JIrisSupervisorMutableActor extends MutableBehavior<LogCommand> {
 
     private ActorContext<LogCommand> actorContext;
     private ILogger log;
 
-    private JIrisSupervisorMutableActor(ActorContext<LogCommand> actorContext, String componentName) {
+    private JIrisSupervisorMutableActor(ActorContext<LogCommand> actorContext, JLoggerFactory loggerFactory) {
         this.actorContext = actorContext;
-        this.log = getLogger(actorContext, componentName);
+        this.log = loggerFactory.getLogger(actorContext.getSelf(), getClass());
     }
 
     public static <LogCommand> Behavior<LogCommand> irisBeh(String componentName) {
-        return Actor.mutable(ctx -> (MutableBehavior<LogCommand>) new JIrisSupervisorMutableActor((ActorContext<csw.services.logging.LogCommand>) ctx, componentName));
+        return Actor.mutable(ctx -> {
+            JLoggerFactory loggerFactory = new JLoggerFactory(componentName);
+            return (MutableBehavior<LogCommand>) new JIrisSupervisorMutableActor((ActorContext<csw.services.logging.LogCommand>) ctx, loggerFactory);
+        });
     }
 
     @Override

@@ -1,14 +1,15 @@
 package csw.services.logging.components.trombone;
 
+import akka.actor.AbstractActor;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JComponentLoggerActor;
+import csw.services.logging.javadsl.JLoggerFactory;
 
-public class JTromboneHCDSupervisorActor extends JComponentLoggerActor {
+public class JTromboneHCDSupervisorActor extends AbstractActor {
 
     private ILogger log;
 
-    public JTromboneHCDSupervisorActor(String componentName) {
-        this.log = getLogger(componentName);
+    public JTromboneHCDSupervisorActor(JLoggerFactory loggerFactory) {
+        this.log = loggerFactory.getLogger(self(), getClass());
     }
 
     @Override

@@ -13,6 +13,8 @@ import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl
+import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
@@ -34,7 +36,8 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
 ) {
   var isOnline: Boolean = false
 
-  protected lazy val lockToken: String = UUID.randomUUID().toString
+  protected lazy val lockToken: String     = UUID.randomUUID().toString
+  protected lazy val logger: LoggerFactory = new scaladsl.LoggerFactory(componentInfo.name)
 
   def initialize(): Future[Unit]
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit

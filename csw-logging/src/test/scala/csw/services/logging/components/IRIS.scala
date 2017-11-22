@@ -1,12 +1,14 @@
 package csw.services.logging.components
 
-import akka.actor.Props
+import akka.actor.{Actor, Props}
 import csw.services.logging.components.IRIS._
-import csw.services.logging.scaladsl.{FrameworkLogger, GenericLogger, LibraryLogger}
+import csw.services.logging.scaladsl.{GenericLogger, LibraryLogger, Logger, LoggerFactory}
 
-object IRISLogger extends LibraryLogger(IRIS.COMPONENT_NAME)
+object IRISLibraryLogger extends LibraryLogger(IRIS.COMPONENT_NAME)
 
-class IRIS(componentName: String) extends FrameworkLogger.Actor(componentName) {
+class IRIS(logger: LoggerFactory) extends Actor {
+
+  private val log: Logger = logger.getLogger(self)
 
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers
@@ -24,7 +26,7 @@ class IRIS(componentName: String) extends FrameworkLogger.Actor(componentName) {
 
 object IRIS {
 
-  val TRACE_LINE_NO = 15
+  val TRACE_LINE_NO = 17
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3
@@ -43,7 +45,7 @@ object IRIS {
   case object LogError
   case object LogFatal
 
-  def props(componentName: String) = Props(new IRIS(componentName))
+  def props(componentName: String) = Props(new IRIS(new LoggerFactory(componentName)))
 
   val irisLogs = Map(
     "trace" → "iris: trace",
@@ -55,7 +57,7 @@ object IRIS {
   )
 }
 
-class IrisTLA extends IRISLogger.Simple {
+class IrisTLA extends IRISLibraryLogger.Simple {
   import IRIS._
 
   def startLogging(): Unit = {

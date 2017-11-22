@@ -10,14 +10,17 @@ import csw.services.logging.utils.LoggingTestSuite
 
 object TromboneMutableActor {
   def beh(componentName: String): Behavior[LogCommand] =
-    Actor.mutable(ctx ⇒ new TromboneMutableActor(ctx, componentName))
+    Actor.mutable(ctx ⇒ new TromboneMutableActor(ctx, new LoggerFactory(componentName)))
 }
 
 class TromboneMutableActor(
     ctx: ActorContext[LogCommand],
-    componentName: String
-) extends FrameworkLogger.MutableActor[LogCommand](ctx, componentName) {
+    loggerFactory: LoggerFactory
+) extends Actor.MutableBehavior[LogCommand] {
   override def onMessage(msg: LogCommand): Behavior[LogCommand] = {
+
+    val log: Logger = loggerFactory.getLogger(ctx.self)
+
     msg match {
       case LogTrace => log.trace("Level is trace")
       case LogDebug => log.debug("Level is debug")

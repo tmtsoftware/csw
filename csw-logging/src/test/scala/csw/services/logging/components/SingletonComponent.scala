@@ -1,10 +1,10 @@
 package csw.services.logging.components
 
-import csw.services.logging.scaladsl.FrameworkLogger
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
-object SingletonComponent extends FrameworkLogger.Simple {
+object SingletonComponent {
 
-  override protected def componentName(): String = "SingletonComponent"
+  val log: Logger = new LoggerFactory("SingletonComponent").getLogger
 
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers

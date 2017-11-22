@@ -1,10 +1,12 @@
 package csw.services.logging.components
 
-import csw.services.logging.scaladsl.LibraryLogger
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
-object InnerSourceLogger extends LibraryLogger("InnerSourceComponent")
+object InnerSourceLogger extends LoggerFactory("InnerSourceComponent")
 
-class InnerSourceComponent extends InnerSourceLogger.Simple {
+class InnerSourceComponent {
+
+  val log: Logger = InnerSourceLogger.getLogger
 
   def startLogging(logs: Map[String, String]): Unit = new InnerSource().startLogging(logs)
 
@@ -25,7 +27,7 @@ class InnerSourceComponent extends InnerSourceLogger.Simple {
 }
 
 object InnerSourceComponent {
-  val TRACE_LINE_NO = 17
+  val TRACE_LINE_NO = 19
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3

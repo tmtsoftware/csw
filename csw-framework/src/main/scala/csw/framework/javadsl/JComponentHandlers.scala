@@ -11,6 +11,7 @@ import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.javadsl.ILocationService
+import csw.services.logging.javadsl.JLoggerFactory
 
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -40,6 +41,8 @@ abstract class JComponentHandlers[Msg <: DomainMessage](
     )(ClassTag(klass)) {
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
+
+  protected lazy val jLogger: JLoggerFactory = new JLoggerFactory(componentInfo.name)
 
   def jInitialize(): CompletableFuture[Unit]
   def jOnShutdown(): CompletableFuture[Unit]

@@ -50,7 +50,7 @@ public class ILoggerTest {
     private static List<JsonObject> tromboneHcdLogBuffer = new ArrayList<>();
 
     private static ActorRef irisSupervisorActor = actorSystem.actorOf(Props.create(JIrisSupervisorActor.class), "JIRISActor");
-    private static ActorRef tromboneSupervisorActor = actorSystem.actorOf(Props.create(JTromboneHCDSupervisorActor.class, "jTromboneHcdActor"), "JTromboneActor");
+    private static ActorRef tromboneSupervisorActor = actorSystem.actorOf(Props.create(JTromboneHCDSupervisorActor.class, new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor");
     private static ActorRef genericActor = actorSystem.actorOf(Props.create(JGenericActor.class), "JGenericActor");
 
 
@@ -72,7 +72,7 @@ public class ILoggerTest {
     }
 
     private void allComponentsStartLogging() {
-        JIrisTLA irisTLA = new JIrisTLA();
+        JIrisTLA irisTLA = new JIrisTLA(new JLoggerFactory("jIRIS"));
         JGenericSimple genericSimple = new JGenericSimple();
 
         //componentName = jIRIS
@@ -115,7 +115,7 @@ public class ILoggerTest {
 
     @Test
     public void testDefaultLogConfigurationAndDefaultComponentLogLevel() throws InterruptedException {
-        JTromboneHCDTLA jTromboneHCD = new JTromboneHCDTLA("tromboneHcd");
+        JTromboneHCDTLA jTromboneHCD = new JTromboneHCDTLA(new JLoggerFactory("tromboneHcd"));
         String tromboneHcdClassName = jTromboneHCD.getClass().getName();
 
         jTromboneHCD.startLogging();
