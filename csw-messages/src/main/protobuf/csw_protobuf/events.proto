@@ -3,13 +3,7 @@ syntax = "proto3";
 package csw_protobuf;
 
 import "csw_protobuf/parameter.proto";
-import "scalapb/scalapb.proto";
 import "google/protobuf/timestamp.proto";
-
-option (scalapb.options) = {
-    import: "csw.messages.params.pb.Implicits._"
-    single_file: true
-};
 
 message PbEvent {
     enum PbEventType {
