@@ -1,5 +1,7 @@
 package csw.services.messages
 
+import java.time.Instant
+
 import csw.messages.params.generics.KeyType.{ChoiceKey, StructKey}
 import csw.messages.params.generics.{GChoiceKey, Key, KeyType, Parameter}
 import csw.messages.params.models._
@@ -232,6 +234,47 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       firstKey.get shouldBe struct1.parameter(ra)
       secondKey.get shouldBe struct1.parameter(dec)
       thirdKey.get shouldBe struct1.parameter(epoch)
+    }
+
+    it("should show usage of units") {
+
+      //#units
+      //declare keyname
+      val s1: String = "encoder"
+
+      //making 3 keys
+      val k1: Key[Boolean] = KeyType.BooleanKey.make(s1)
+      val k2: Key[Short]   = KeyType.ShortKey.make("RandomKeyName")
+      val k3: Key[String]  = KeyType.StringKey.make(s1)
+
+      //storing a single value, default unit is NoUnits
+      val bParam: Parameter[Boolean] = k1.set(true)
+      val bDefaultUnitSet: Boolean   = bParam.units === Units.NoUnits //true
+
+      //default unit for TimestampKey
+      val tParam: Parameter[Instant] = KeyType.TimestampKey.make("now").set(Instant.now())
+      val defaultTimeUnit: Units     = tParam.units //is second
+
+      //storing multiple values
+      val paramOfShorts: Parameter[Short] = k2.set(1, 2, 3, 4)
+
+      //values to store
+      val weekDays: Array[String] = Array("Sunday", "Monday", "Tuesday")
+
+      //associating units via set
+      val paramWithUnits1: Parameter[String] = k3.set(weekDays, Units.day)
+      //associating units via withUnits
+      val paramWithUnits2: Parameter[String] = k3 -> weekDays withUnits Units.count
+      //change existing unit
+      val paramWithUnits3: Parameter[Short] = paramOfShorts.withUnits(Units.meter)
+      //#units
+
+      //validations
+      assert(bDefaultUnitSet === true)
+      assert(defaultTimeUnit === Units.second)
+      assert(paramWithUnits1.units === Units.day)
+      assert(paramWithUnits2.units === Units.count)
+      assert(paramWithUnits3.units === Units.meter)
     }
   }
 }

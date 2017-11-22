@@ -44,7 +44,7 @@ public class JUnits {
     public static final Units centimeter = Units.centimeter$.MODULE$;
     public static final Units erg = Units.erg$.MODULE$;
 
-    // Astrophsics units
+    // Astrophsyics units
     public static final Units au = Units.au$.MODULE$;
     public static final Units jansky = Units.jansky$.MODULE$;
     public static final Units lightyear = Units.lightyear$.MODULE$;

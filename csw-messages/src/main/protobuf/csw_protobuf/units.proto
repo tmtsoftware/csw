@@ -50,7 +50,7 @@ enum PbUnits {
     centimeter = 35;
     erg        = 36;
 
-    // Astrophsics units
+    // Astropyhsics units
     au        = 37;
     jansky    = 38;
     lightyear = 39;

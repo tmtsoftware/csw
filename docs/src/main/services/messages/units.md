@@ -1,8 +1,19 @@
 ## Units
 
-Listed below are Units of Measurement, supported by TMT pbservatory framework and are available as Enumerated values. *Units* are optionally attached to Keys. 
+Listed below are Units of Measurement, supported by TMT observatory framework and are available as Enumerated values. *Units* are optionally attached to Keys.
 
-Default unit for a **Key** is `NoUnits` except for `KeyType.TimestampKey` or `JKeyTypes.TimestampKey`. The usage examples can be found in [Keys and Parameters](keys-parameters.html)
+@@@ note
+
+Units are made available via separate files, for consumption in Scala and Java code.
+
+ * Import `csw.messages.params.models.Units` for **Scala** 
+ * Import `csw.messages.javadsl.JUnits` for **Java**.  
+
+@@@
+
+### Default units for Keys
+
+The default unit for `TimestampKey`(in Scala and Java both) is `second`. For all the remaining keys, default unit is NoUnits.  
 
 ### SI units
 
@@ -45,7 +56,7 @@ Default unit for a **Key** is `NoUnits` except for `KeyType.TimestampKey` or `JK
 | centimeter | cm                 | centimeter |
 | erg        | erg                | erg: CGS unit of energy |
 
-### Astrophsics units
+### Astropyhsics units
 | Name          | Abbreviation    | Description                                                                |
 | :-----------: |:--------------: | :--------------------------------------------------------------------------|
 | au         | AU                 | astronomical unit: approximately the mean Earth-Sun distance |
@@ -73,3 +84,8 @@ Default unit for a **Key** is `NoUnits` except for `KeyType.TimestampKey` or `JK
 | encoder    | enc                | encoder counts |
 | count      | ct                 | counts as for an encoder or detector |
 | pix        | pix                | pixel |
+
+### Usage examples
+
+Scala
+:   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #units }

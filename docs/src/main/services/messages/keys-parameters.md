@@ -4,7 +4,7 @@ Library offers a flexible and typesafe means to create Parameters to store value
 
 A **Parameter** is a collection of Keys and values or binary data. A key is **unique** in a Parameter. A Parameter is **immutable**, in a sense, a modification to an existing Parameter will return a new instance.  
 
-### How to create a Parameter - 
+### How to create a Parameter
  
  * choose appropriate KeyType from below tables for your language(Scala/Java).    
  * calling `make` function on KeyType and supplying a String keyName will return a suitably typed Key instance.    

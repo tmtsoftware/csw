@@ -59,7 +59,7 @@ object Units extends Enum[Units] with PlayJsonEnum[Units] {
   case object centimeter extends Units("cm", "centimeter")
   case object erg        extends Units("erg", "erg: CGS unit of energy")
 
-  // Astrophsics units
+  // Astropyhsics units
   case object au        extends Units("AU", "astronomical unit: approximately the mean Earth-Sun distance")
   case object jansky    extends Units("Jy", "Jansky: spectral flux density - 10-26 W/Hz m+2")
   case object lightyear extends Units("lyr", "light year - 9.4607x10+15 m")

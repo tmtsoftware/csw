@@ -44,4 +44,5 @@ gradle
 * [Events](messages/events.md)
 * [States](messages/states.md)
 * [Result](messages/result.md)
+* [Protobuf support](messages/protobuf-support.md)
 @@@
