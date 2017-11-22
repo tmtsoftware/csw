@@ -1,5 +1,8 @@
 package csw.messages.params.pb
 
+import java.time.Instant
+import java.util.UUID
+
 import csw.messages.ccs.events._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.generics.KeyType.{ChoiceKey, RaDecKey, StructKey}
@@ -10,13 +13,12 @@ import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 // DEOPSCSW-297: Merge protobuf branch in master
 class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfterAll {
-  private final val prefixStr = "wfos.prog.cloudcover"
 
   describe("Test protobuf serialization of Events") {
-    val eventInfo = EventInfo(prefixStr)
 
     it("should serialize StatusEvent") {
-      val raDecKey = RaDecKey.make("raDecKey")
+      val eventInfo = EventInfo("wfos.blue.filter")
+      val raDecKey  = RaDecKey.make("raDecKey")
 
       val raDec1 = RaDec(10.20, 40.20)
       val raDec2 = RaDec(100.20, 400.20)
@@ -32,6 +34,8 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     }
 
     it("should serialize ObserveEvent") {
+      val eventInfo = EventInfo("wfos.blue.filter", Instant.now().minusSeconds(60))
+
       val jupiter   = Choice("Jupiter")
       val saturn    = Choice("Saturn")
       val pluto     = Choice("Pluto")
@@ -49,6 +53,14 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     }
 
     it("should serialize SystemEvent") {
+      val eventInfo1 = EventInfo("wfos.blue.filter", Instant.now().minusSeconds(60), ObsId("Obs002"))
+      val eventInfo2 = EventInfo(
+        Prefix("wfos.blue.filter"),
+        EventTime(Instant.now().minusSeconds(3600)),
+        Some(ObsId("Obs002")),
+        UUID.randomUUID().toString()
+      )
+
       val structKey = StructKey.make("structKey")
 
       val ra     = KeyType.StringKey.make("ra")
@@ -58,13 +70,16 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val param = structKey.set(struct).withUnits(joule)
 
-      val systemEvent: SystemEvent = SystemEvent(eventInfo).add(param)
+      val systemEvent1: SystemEvent = SystemEvent(eventInfo1).add(param)
+      val systemEvent2: SystemEvent = SystemEvent(eventInfo2).add(param)
 
       //able to generate protobuf from event
-      SystemEvent.fromPb(systemEvent.toPb) shouldBe systemEvent
+      SystemEvent.fromPb(systemEvent1.toPb) shouldBe systemEvent1
+      SystemEvent.fromPb(systemEvent2.toPb) shouldBe systemEvent2
 
       //able to generate event from protobuf byteArray
-      SystemEvent.fromPb(PbEvent.parseFrom(systemEvent.toPb.toByteArray)) shouldBe systemEvent
+      SystemEvent.fromPb(PbEvent.parseFrom(systemEvent1.toPb.toByteArray)) shouldBe systemEvent1
+      SystemEvent.fromPb(PbEvent.parseFrom(systemEvent2.toPb.toByteArray)) shouldBe systemEvent2
     }
   }
 }

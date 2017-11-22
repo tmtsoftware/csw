@@ -1,5 +1,6 @@
 package csw.messages.params.models
 
+import com.trueaccord.scalapb.TypeMapper
 import play.api.libs.json._
 
 import scala.language.implicitConversions
@@ -20,6 +21,12 @@ object ObsId {
   implicit val format: Format[ObsId] = new Format[ObsId] {
     override def writes(obj: ObsId): JsValue           = JsString(obj.obsId)
     override def reads(json: JsValue): JsResult[ObsId] = JsSuccess(ObsId(json.as[String]))
+  }
+
+  implicit val mapper: TypeMapper[String, Option[ObsId]] = TypeMapper[String, Option[ObsId]] { x ⇒
+    if (x.isEmpty) None else Some(ObsId(x))
+  } { x ⇒
+    x.getOrElse(empty).obsId
   }
 
   def empty: ObsId = ObsId("")

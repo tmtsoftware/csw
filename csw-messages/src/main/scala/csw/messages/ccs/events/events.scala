@@ -63,7 +63,14 @@ object EventType {
         case PbEventType.SystemEvent      ⇒ SystemEvent.apply
         case PbEventType.Unrecognized(dd) ⇒ throw new RuntimeException(s"unknown event type=$dd")
       }
-      factory(EventInfo(base.prefix), mapper.toCustom(base.paramSet)).asInstanceOf[T]
+
+      factory(
+        EventInfo(Prefix(base.prefix),
+                  base.eventTime.map(EventTime.typeMapper.toCustom).get,
+                  ObsId.mapper.toCustom(base.obsId),
+                  base.eventId),
+        mapper.toCustom(base.paramSet)
+      ).asInstanceOf[T]
     }
 
     override def toBase(custom: T): PbEvent = {
@@ -75,6 +82,9 @@ object EventType {
       PbEvent()
         .withPrefix(custom.prefixStr)
         .withEventType(pbEventType)
+        .withEventTime(EventTime.typeMapper.toBase(custom.eventTime))
+        .withObsId(ObsId.mapper.toBase(custom.obsIdOption))
+        .withEventId(custom.eventId)
         .withParamSet(mapper.toBase(custom.paramSet))
     }
   }

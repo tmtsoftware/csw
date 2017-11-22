@@ -4,8 +4,10 @@ package csw_protobuf;
 
 import "csw_protobuf/parameter.proto";
 import "scalapb/scalapb.proto";
+import "google/protobuf/timestamp.proto";
 
 option (scalapb.options) = {
+    import: "csw.messages.params.pb.Implicits._"
     single_file: true
 };
 
@@ -16,6 +18,9 @@ message PbEvent {
         SystemEvent = 2;
     }
     string prefix = 10;
-    repeated PbParameter paramSet = 11;
-    PbEventType eventType = 12;
+    google.protobuf.Timestamp eventTime = 11;
+    string obsId = 12;
+    string eventId = 13;
+    repeated PbParameter paramSet = 14;
+    PbEventType eventType = 15;
 }
