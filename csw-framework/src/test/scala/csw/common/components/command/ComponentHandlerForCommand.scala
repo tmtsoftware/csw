@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages._
-import csw.messages.ccs.CommandIssue.{OtherIssue, UnsupportedCommandIssue, WrongPrefixIssue}
+import csw.messages.ccs.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo

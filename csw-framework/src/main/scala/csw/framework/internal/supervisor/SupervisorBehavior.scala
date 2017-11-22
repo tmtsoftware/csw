@@ -5,7 +5,6 @@ import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
@@ -18,18 +17,16 @@ import csw.messages.SupervisorInternalRunningMessage.{RegistrationFailed, Regist
 import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.messages._
-import csw.messages.ccs.CommandIssue.UnsupportedCommandInStateIssue
-import csw.messages.ccs.commands.CommandResponse.Invalid
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.SupervisorLifecycleState.{Idle, RunningOffline}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.LockingResponse._
 import csw.messages.models.PubSub.Publish
 import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToComponentLifecycleMessage}
 import csw.messages.params.states.CurrentState
+import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.FrameworkLogger
@@ -89,7 +86,7 @@ class SupervisorBehavior(
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
   var component: Option[ActorRef[Nothing]]               = None
-  var maybeLockToken: Option[(String, String)]           = None
+  var lockManager: LockManager                           = new LockManager(None, componentName)
 
   spawnAndWatchComponent()
 
@@ -192,86 +189,20 @@ class SupervisorBehavior(
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
     case Lock(prefix, token, replyTo)   ⇒ lockComponent(prefix, token, replyTo)
     case Unlock(prefix, token, replyTo) ⇒ unlockComponent(prefix, token, replyTo)
-    case commandMessage: CommandMessage ⇒ allowOrRejectCommand(commandMessage)
+    case commandMessage: CommandMessage ⇒
+      if (lockManager.allowCommand(commandMessage)) runningComponent.get ! commandMessage
     case runningMessage: RunningMessage ⇒ handleRunningMessage(runningMessage)
     case msg @ Running(_)               ⇒ log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
   }
 
-  private def lockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): Unit = maybeLockToken match {
-    case None                      ⇒ onAcquiringLock(prefix, token, replyTo)
-    case Some((`prefix`, `token`)) ⇒ onReAcquiringLock(prefix, replyTo)
-    case Some((currentPrefix, _))  ⇒ onReAcquiringFailed(replyTo, prefix, token, currentPrefix)
+  private def lockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): Unit = {
+    lockManager = lockManager.lockComponent(prefix, token, replyTo)
+    if (lockManager.lock.isDefined) updateLifecycleState(SupervisorLifecycleState.Lock)
   }
 
-  private def unlockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): Unit = maybeLockToken match {
-    case Some((`prefix`, `token`)) ⇒ onLockReleased(prefix, replyTo)
-    case Some((currentPrefix, _))  ⇒ onLockReleaseFailed(replyTo, prefix, token, currentPrefix)
-    case _                         ⇒ onLockAlreadyReleased(prefix, replyTo)
-  }
-
-  private def onAcquiringLock(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): Unit = {
-    updateLifecycleState(SupervisorLifecycleState.Lock)
-    maybeLockToken = Some((prefix, token)) //TODO: Start the timer for lock lease
-    log.info(s"The lock is successfully acquired by component: [$prefix]")
-    replyTo ! LockAcquired
-  }
-
-  private def onReAcquiringLock(prefix: String, replyTo: ActorRef[LockingResponse]): Unit = {
-    log.info(s"The lock is re-acquired by component: [$prefix]") //TODO: re-start the timer for lock lease
-    replyTo ! LockAcquired
-  }
-
-  private def onReAcquiringFailed(
-      replyTo: ActorRef[LockingResponse],
-      prefix: String,
-      token: String,
-      currentPrefix: String
-  ): Unit = {
-    val failureReason =
-      s"Invalid prefix [$prefix] or token [$token] for re-acquiring the lock. Currently it is acquired by component: [$currentPrefix]"
-    log.error(failureReason)
-    replyTo ! ReAcquiringLockFailed(failureReason)
-  }
-
-  private def onLockReleased(prefix: String, replyTo: ActorRef[LockingResponse]): Unit = {
-    updateLifecycleState(SupervisorLifecycleState.Running)
-    maybeLockToken = None // TODO: Stop the timer for lock lease
-    log.info(s"The lock is successfully released by component: [$prefix]")
-    replyTo ! LockReleased
-  }
-
-  private def onLockReleaseFailed(
-      replyTo: ActorRef[LockingResponse],
-      prefix: String,
-      token: String,
-      currentPrefix: String
-  ): Unit = {
-    val failureReason =
-      s"Invalid prefix [$prefix] or token [$token] for releasing the lock. Currently it is acquired by component: [$currentPrefix]"
-    log.error(failureReason)
-    replyTo ! ReleasingLockFailed(failureReason)
-  }
-
-  private def onLockAlreadyReleased(prefix: String, replyTo: ActorRef[LockingResponse]): Unit = {
-    log.warn(s"Cannot release lock for [$prefix] as it is already released")
-    replyTo ! LockAlreadyReleased
-  }
-
-  private def allowOrRejectCommand(commandMessage: CommandMessage): Unit = maybeLockToken match {
-    case None ⇒ runningComponent.get ! commandMessage
-    case Some((prefix, lockToken)) ⇒
-      val command = commandMessage.command
-      command.getLockToken match {
-        case Some(`lockToken`) ⇒
-          log.info(s"Forwarding message [${commandMessage.toString}]")
-          runningComponent.get ! commandMessage
-        case _ ⇒
-          log.error(s"Cannot process the command [${command.toString}] as the lock is acquired by component: [$prefix]")
-          commandMessage.replyTo ! Invalid(
-            command.runId,
-            UnsupportedCommandInStateIssue(s"This component is locked by component [$prefix]")
-          )
-      }
+  private def unlockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): Unit = {
+    lockManager = lockManager.unlockComponent(prefix, token, replyTo)
+    if (lockManager.lock.isEmpty) updateLifecycleState(SupervisorLifecycleState.Running)
   }
 
   private def handleRunningMessage(runningMessage: RunningMessage): Unit = {
