@@ -8,7 +8,7 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
-import csw.common.components.SampleComponentState._
+import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.Shutdown
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
@@ -85,7 +85,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
   /**
    * If component writer wants to track additional connections which are not specified in configuration file,
    * then using trackConnection(connection: Connection) hook which is added in ComponentHandlers can be used
-   * Uses of this are shown in [[csw.common.components.SampleComponentHandlers]]
+   * Uses of this are shown in [[csw.common.components.framework.SampleComponentHandlers]]
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {

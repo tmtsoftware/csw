@@ -6,7 +6,7 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
 import csw.ccs.internal.matchers.DemandMatcher
-import csw.common.components.ComponentStatistics
+import csw.common.components.framework.ComponentStatistics
 import csw.framework.ComponentInfos._
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
 import csw.framework.javadsl.components.JComponentDomainMessage
@@ -46,7 +46,7 @@ import scala.concurrent.duration.DurationInt
 // DEOPSCSW-176: Provide Infrastructure to manage TMT lifecycle
 // DEOPSCSW-177: Hooks for lifecycle management
 class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
-  import csw.common.components.SampleComponentState._
+  import csw.common.components.framework.SampleComponentState._
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
   var supervisorBehavior: Behavior[SupervisorExternalMessage]            = _

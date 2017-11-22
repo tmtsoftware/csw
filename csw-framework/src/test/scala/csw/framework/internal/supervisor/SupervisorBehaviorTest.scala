@@ -5,7 +5,7 @@ import akka.typed.testkit.Effect._
 import akka.typed.testkit.EffectfulActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{Behavior, Props}
-import csw.common.components.SampleComponentBehaviorFactory
+import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks.MutableActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory

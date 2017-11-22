@@ -7,8 +7,8 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import csw.common.FrameworkAssertions._
-import csw.common.components.ComponentDomainMessage
-import csw.common.components.SampleComponentState._
+import csw.common.components.framework.SampleComponentState._
+import csw.common.components.framework.ComponentDomainMessage
 import csw.common.utils.TestAppender
 import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.ComponentInfos._

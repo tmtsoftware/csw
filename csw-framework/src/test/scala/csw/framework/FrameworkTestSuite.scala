@@ -5,7 +5,7 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.testkit.TestKitSettings
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.common.components.ComponentDomainMessage
+import csw.common.components.framework.ComponentDomainMessage
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.framework.ComponentInfo
 import csw.messages.models.PubSub.PublisherMessage

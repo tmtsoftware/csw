@@ -1,4 +1,4 @@
-package csw.common.components
+package csw.common.components.framework
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext

@@ -12,8 +12,8 @@ import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
-import csw.common.components.SampleComponentState._
-import csw.common.components.{ComponentDomainMessage, SampleComponentHandlers}
+import csw.common.components.framework.SampleComponentState._
+import csw.common.components.framework.{ComponentDomainMessage, SampleComponentHandlers}
 import csw.common.utils.TestAppender
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}

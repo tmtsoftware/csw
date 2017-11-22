@@ -13,7 +13,7 @@ object ComponentInfos {
       "SampleAssembly",
       Assembly,
       "wfos",
-      "csw.common.components.SampleComponentBehaviorFactory",
+      "csw.common.components.framework.SampleComponentBehaviorFactory",
       DoNotRegister,
       Set.empty
     )
@@ -23,7 +23,7 @@ object ComponentInfos {
       "trombone",
       Assembly,
       "wfos",
-      "csw.common.components.ComponentBehaviorFactoryToSimulateFailure",
+      "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
       DoNotRegister,
       Set.empty
     )
@@ -33,7 +33,7 @@ object ComponentInfos {
       "SampleHcd",
       HCD,
       "wfos",
-      "csw.common.components.SampleComponentBehaviorFactory",
+      "csw.common.components.framework.SampleComponentBehaviorFactory",
       RegisterOnly,
       Set.empty
     )
@@ -42,7 +42,7 @@ object ComponentInfos {
     "SampleHcd",
     HCD,
     "wfos",
-    "csw.common.components.SampleComponentBehaviorFactory",
+    "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
     0.seconds
@@ -52,7 +52,7 @@ object ComponentInfos {
     "SampleHcd",
     HCD,
     "wfos",
-    "csw.common.components.SampleComponentBehaviorFactory",
+    "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
     5.seconds

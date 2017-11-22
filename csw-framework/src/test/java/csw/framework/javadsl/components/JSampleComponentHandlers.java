@@ -2,7 +2,7 @@ package csw.framework.javadsl.components;
 
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
-import csw.common.components.SampleComponentState;
+import csw.common.components.framework.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.ComponentMessage;
