@@ -20,7 +20,7 @@ import csw.messages.models.{Component, Components, SupervisorInfo}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.scaladsl.{ComponentLogger, Logger}
+import csw.services.logging.scaladsl.{FrameworkLogger, Logger}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
@@ -37,7 +37,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   implicit val untypedSystem: actor.ActorSystem  = ActorSystemFactory.remote()
   implicit val typedSystem: ActorSystem[Nothing] = untypedSystem.toTyped
   implicit val settings: TestKitSettings         = TestKitSettings(typedSystem)
-  trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
+  trait MutableActorMock[T] { this: FrameworkLogger.MutableActor[T] ⇒
     override protected lazy val log: Logger = mock[Logger]
   }
 

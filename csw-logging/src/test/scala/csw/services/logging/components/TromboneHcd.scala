@@ -1,9 +1,9 @@
 package csw.services.logging.components
 
 import csw.services.logging.commons.LoggingKeys
-import csw.services.logging.scaladsl.{CommonComponentLogger, RichException}
+import csw.services.logging.scaladsl.{LibraryLogger, RichException}
 
-object TromboneHcdLogger extends CommonComponentLogger(TromboneHcd.COMPONENT_NAME)
+object TromboneHcdLogger extends LibraryLogger(TromboneHcd.COMPONENT_NAME)
 
 class TromboneHcd() extends TromboneHcdLogger.Simple {
 

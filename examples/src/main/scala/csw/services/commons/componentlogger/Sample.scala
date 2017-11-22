@@ -1,9 +1,9 @@
 package csw.services.commons.componentlogger
 
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.FrameworkLogger
 
 //#component-logger
-class Sample(_componentName: String) extends ComponentLogger.Simple {
+class Sample(_componentName: String) extends FrameworkLogger.Simple {
 
   override protected def componentName(): String = _componentName
 

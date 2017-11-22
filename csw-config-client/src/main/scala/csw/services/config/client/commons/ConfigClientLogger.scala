@@ -1,5 +1,5 @@
 package csw.services.config.client.commons
 
-import csw.services.logging.scaladsl.CommonComponentLogger
+import csw.services.logging.scaladsl.LibraryLogger
 
-object ConfigClientLogger extends CommonComponentLogger("ConfigClient")
+object ConfigClientLogger extends LibraryLogger("ConfigClient")

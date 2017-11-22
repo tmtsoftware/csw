@@ -9,7 +9,7 @@ import csw.framework.models.ConfigFileLocation.{Local, Remote}
 import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, HostBootstrapInfo}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.FrameworkLogger
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
@@ -30,7 +30,7 @@ object HostConfig {
 }
 
 private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSettings, startLogging: Boolean = false)
-    extends ComponentLogger.Simple {
+    extends FrameworkLogger.Simple {
 
   lazy val actorSystem: ActorSystem           = clusterSettings.system
   lazy val wiring: FrameworkWiring            = FrameworkWiring.make(actorSystem)

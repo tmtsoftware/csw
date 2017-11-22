@@ -1,8 +1,8 @@
 package csw.services.logging.components
 
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.FrameworkLogger
 
-object SingletonComponent extends ComponentLogger.Simple {
+object SingletonComponent extends FrameworkLogger.Simple {
 
   override protected def componentName(): String = "SingletonComponent"
 

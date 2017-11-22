@@ -4,7 +4,7 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.Actor
 import csw.services.commons.ComponentDomainMessage
 import csw.services.commons.commonlogger.SampleLogger
-import csw.services.logging.scaladsl.{ComponentLogger, GenericLogger}
+import csw.services.logging.scaladsl.{FrameworkLogger, GenericLogger}
 
 //#common-component-logger
 object CommonImmutableSample {
@@ -20,7 +20,7 @@ object CommonImmutableSample {
 //#component-logger
 object ImmutableSample {
   def behavior(_componentName: String): Behavior[ComponentDomainMessage] = Actor.immutable[ComponentDomainMessage] { (ctx, msg) ⇒
-    val log = ComponentLogger.immutable(ctx, _componentName)
+    val log = FrameworkLogger.immutable(ctx, _componentName)
 
     log.info(s"Received msg: [$msg]")
     Actor.same

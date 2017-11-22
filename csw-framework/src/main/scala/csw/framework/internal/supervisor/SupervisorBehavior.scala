@@ -31,7 +31,7 @@ import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToCo
 import csw.messages.params.states.CurrentState
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.FrameworkLogger
 
 import scala.concurrent.Future
 import scala.concurrent.duration.{Duration, FiniteDuration}
@@ -69,7 +69,7 @@ class SupervisorBehavior(
     pubSubBehaviorFactory: PubSubBehaviorFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
-) extends ComponentLogger.MutableActor[SupervisorMessage](ctx, componentInfo.name) {
+) extends FrameworkLogger.MutableActor[SupervisorMessage](ctx, componentInfo.name) {
 
   import SupervisorBehavior._
   import ctx.executionContext

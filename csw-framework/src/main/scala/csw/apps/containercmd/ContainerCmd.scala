@@ -9,7 +9,7 @@ import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.FrameworkLogger
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
@@ -35,7 +35,7 @@ private[containercmd] class ContainerCmd(
     clusterSettings: ClusterSettings,
     startLogging: Boolean,
     defaultConfig: Option[Config] = None
-) extends ComponentLogger.Simple {
+) extends FrameworkLogger.Simple {
 
   override protected def componentName(): String = name
 

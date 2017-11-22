@@ -1,5 +1,5 @@
 package csw.services.csclient.cli
 
-import csw.services.logging.scaladsl.CommonComponentLogger
+import csw.services.logging.scaladsl.LibraryLogger
 
-object ConfigClientCliLogger extends CommonComponentLogger("config-client-cli")
+object ConfigClientCliLogger extends LibraryLogger("config-client-cli")

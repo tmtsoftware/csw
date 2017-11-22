@@ -16,7 +16,7 @@ import csw.messages.params.generics.KeyType.ChoiceKey
 import csw.messages.params.models.{Choice, Choices, Prefix}
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.FrameworkLogger
 
 import scala.concurrent.Future
 
@@ -80,7 +80,7 @@ class SampleComponentHandlers(
       pubSubRef,
       locationService
     )
-    with ComponentLogger.Simple {
+    with FrameworkLogger.Simple {
 
   import SampleComponentState._
 

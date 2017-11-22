@@ -8,7 +8,7 @@ import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage, FromComponentLifecycleMessage}
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.{ComponentLogger, Logger}
+import csw.services.logging.scaladsl.{FrameworkLogger, Logger}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
@@ -18,7 +18,7 @@ import scala.concurrent.Future
 // DEOPSCSW-166-CSW HCD Creation
 class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
-  trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
+  trait MutableActorMock[T] { this: FrameworkLogger.MutableActor[T] ⇒
     override protected lazy val log: Logger = mock[Logger]
   }
 

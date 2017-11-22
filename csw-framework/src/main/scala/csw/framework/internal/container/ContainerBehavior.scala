@@ -18,7 +18,7 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.{Components, SupervisorInfo}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.FrameworkLogger
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -39,7 +39,7 @@ class ContainerBehavior(
     supervisorInfoFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
-) extends ComponentLogger.MutableActor[ContainerMessage](ctx, containerInfo.name) {
+) extends FrameworkLogger.MutableActor[ContainerMessage](ctx, containerInfo.name) {
 
   import ctx.executionContext
 

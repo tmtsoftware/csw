@@ -1,8 +1,8 @@
 package csw.services.logging.components
 
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.FrameworkLogger
 
-class TromboneAssembly(compName: String) extends ComponentLogger.Simple {
+class TromboneAssembly(compName: String) extends FrameworkLogger.Simple {
   def startLogging(logs: Map[String, String]): Unit = {
     log.trace(logs("trace"))
     log.debug(logs("debug"))

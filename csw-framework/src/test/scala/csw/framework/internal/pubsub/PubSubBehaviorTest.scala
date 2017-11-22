@@ -10,7 +10,7 @@ import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.models.{LifecycleStateChanged, PubSub}
 import csw.messages.{models, SupervisorExternalMessage}
-import csw.services.logging.scaladsl.{ComponentLogger, Logger}
+import csw.services.logging.scaladsl.{FrameworkLogger, Logger}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -19,7 +19,7 @@ import scala.concurrent.duration.DurationInt
 
 class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
+  trait MutableActorMock[T] { this: FrameworkLogger.MutableActor[T] ⇒
     override protected lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 

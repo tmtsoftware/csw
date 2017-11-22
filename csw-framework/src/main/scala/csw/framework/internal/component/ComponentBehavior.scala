@@ -17,7 +17,7 @@ import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
 import csw.messages.models.ToComponentLifecycleMessage
 import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.FrameworkLogger
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Await
@@ -43,7 +43,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     lifecycleHandlers: ComponentHandlers[Msg],
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     locationService: LocationService
-) extends ComponentLogger.MutableActor[ComponentMessage](ctx, componentInfo.name) {
+) extends FrameworkLogger.MutableActor[ComponentMessage](ctx, componentInfo.name) {
 
   import ctx.executionContext
 

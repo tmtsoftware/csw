@@ -15,7 +15,7 @@ import csw.messages.params.states.CurrentState
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.scaladsl.{ComponentLogger, Logger}
+import csw.services.logging.scaladsl.{FrameworkLogger, Logger}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -60,7 +60,7 @@ class FrameworkTestMocks(
 }
 
 object FrameworkTestMocks {
-  trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
+  trait MutableActorMock[T] { this: FrameworkLogger.MutableActor[T] ⇒
     override lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 }

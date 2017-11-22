@@ -12,7 +12,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.ComponentLogger
+import csw.services.logging.scaladsl.FrameworkLogger
 
 import scala.concurrent.Future
 
@@ -25,7 +25,7 @@ class GalilComponentHandlers(
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
 ) extends ComponentHandlers[StartLogging](ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
-    with ComponentLogger.Simple {
+    with FrameworkLogger.Simple {
 
   override def initialize(): Future[Unit] = Future.successful(())
 

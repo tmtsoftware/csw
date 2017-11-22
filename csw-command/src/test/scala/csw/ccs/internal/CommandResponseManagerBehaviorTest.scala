@@ -10,7 +10,7 @@ import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.params.models.RunId
-import csw.services.logging.scaladsl.{ComponentLogger, Logger}
+import csw.services.logging.scaladsl.{FrameworkLogger, Logger}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
@@ -18,7 +18,7 @@ import org.scalatest.{FunSuite, Matchers}
 // DEOPSCSW-208: Report failure on Configuration Completion command
 class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
 
-  trait MutableActorMock[T] { this: ComponentLogger.MutableActor[T] ⇒
+  trait MutableActorMock[T] { this: FrameworkLogger.MutableActor[T] ⇒
     override protected lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 

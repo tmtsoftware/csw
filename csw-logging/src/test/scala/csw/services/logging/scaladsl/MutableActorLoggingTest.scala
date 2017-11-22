@@ -16,7 +16,7 @@ object TromboneMutableActor {
 class TromboneMutableActor(
     ctx: ActorContext[LogCommand],
     componentName: String
-) extends ComponentLogger.MutableActor[LogCommand](ctx, componentName) {
+) extends FrameworkLogger.MutableActor[LogCommand](ctx, componentName) {
   override def onMessage(msg: LogCommand): Behavior[LogCommand] = {
     msg match {
       case LogTrace => log.trace("Level is trace")
