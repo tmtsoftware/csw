@@ -52,32 +52,6 @@ pipeline {
             }
         }
 
-        stage('Multi-Node Test') { // These tests cover the scenario of multiple components in multiple containers on different machines.
-            steps {
-                sh "sbt -DenableCoverage=false csw-location/multiNodeTest"
-                sh "sbt -DenableCoverage=false csw-config-client/multiNodeTest"
-                sh "sbt -DenableCoverage=false csw-framework/multiNodeTest"
-            }
-        }
-
-        stage('Package') {
-            steps {
-                sh "./integration/scripts/package_integration.sh"
-            }
-        }
-
-        stage('Multi-Container Docker') {
-            steps {
-                sh "./integration/scripts/runner.sh"
-            }
-        }
-
-        stage('Multi-NICs Docker') {
-            steps {
-                sh "./integration/scripts/multiple_nic_test.sh"
-            }
-        }
-
         stage('Deploy') {
             steps {
                 sh "./publish.sh"
