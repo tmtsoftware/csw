@@ -52,7 +52,7 @@ class FollowActor(
   override def onMessage(msg: FollowActorMessages): Behavior[FollowActorMessages] = msg match {
 
     case StopFollowing => this
-    case UpdatedEventData(zenithAngleIn, focusErrorIn, time) => {
+    case UpdatedEventData(zenithAngleIn, focusErrorIn, time) =>
       if (zenithAngleIn.units != zenithAngleUnits || focusErrorIn.units != focusErrorUnits) {
         println(
           s"Ignoring event data received with improper units: zenithAngle: ${zenithAngleIn.units}, focusError: ${focusErrorIn.units}"
@@ -81,7 +81,6 @@ class FollowActor(
         cZenithAngle = zenithAngleIn
       }
       this
-    }
     case SetElevation(elevation) =>
       cElevation = elevation
       ctx.self ! UpdatedEventData(cZenithAngle, cFocusError, EventTime())

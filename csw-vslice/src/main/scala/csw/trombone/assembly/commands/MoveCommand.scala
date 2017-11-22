@@ -1,13 +1,16 @@
 package csw.trombone.assembly.commands
 
+import akka.actor.Scheduler
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.ccs.internal.matchers.PublishedStateMatcher
+import akka.util.Timeout
+import csw.services.ccs.common.ActorRefExts.RichActor
+import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.services.ccs.internal.matchers.{DemandMatcher, PublishedStateMatcher}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
-import csw.messages.ccs.commands.CommandResponse.{Completed, Error, NoLongerValid}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.RunId
@@ -29,11 +32,14 @@ class MoveCommand(
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
-  val stagePosition   = s(ac.stagePositionKey)
-  val encoderPosition = Algorithms.stagePositionToEncoder(ac.controlConfig, stagePosition.head)
-  val stateMatcher    = AssemblyMatchers.posMatcher(encoderPosition)
-  val scOut = Setup(s.obsId, TromboneHcdState.axisMoveCK)
-    .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
+  implicit val timeout: Timeout     = AssemblyMatchers.idleMatcher.timeout
+  implicit val scheduler: Scheduler = ctx.system.scheduler
+
+  val stagePosition               = s(ac.stagePositionKey)
+  val encoderPosition: Int        = Algorithms.stagePositionToEncoder(ac.controlConfig, stagePosition.head)
+  val stateMatcher: DemandMatcher = AssemblyMatchers.posMatcher(encoderPosition)
+  val scOut: Setup =
+    Setup(s.obsId, TromboneHcdState.axisMoveCK).add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
 
   def startCommand(): Future[CommandResponse] = {
     if (tromboneHCD.isEmpty)
@@ -51,18 +57,18 @@ class MoveCommand(
     } else {
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss))
 
-      tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
-
-      new PublishedStateMatcher(ctx, tromboneHCD.get, stateMatcher).executeMatch {
-        {
-          case MatchCompleted =>
-            publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss))
-            Completed(s.runId)
-          case MatchFailed(ex) =>
-            println(s"Move command match failed with message: ${ex.getMessage}")
-            Error(s.runId, ex.getMessage)
-          case _ ⇒ Error(s.runId, "")
-        }
+      tromboneHCD.get.ask[CommandResponse](Submit(scOut, ctx.spawnAnonymous(Actor.ignore))).flatMap {
+        case _: Accepted ⇒
+          PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher, ctx).map {
+            case MatchCompleted =>
+              publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss))
+              Completed(s.runId)
+            case MatchFailed(ex) =>
+              println(s"Move command match failed with message: ${ex.getMessage}")
+              Error(s.runId, ex.getMessage)
+            case _ ⇒ Error(s.runId, "")
+          }
+        case _ ⇒ Future.successful(Error(scOut.runId, ""))
       }
     }
   }

@@ -1,8 +1,8 @@
-package csw.ccs.internal
+package csw.services.ccs.internal
 
 import akka.typed.scaladsl.ActorContext
 import akka.typed.{ActorRef, Behavior}
-import csw.ccs.models.{CommandCorrelation, CommandResponseManagerState}
+import csw.services.ccs.models.{CommandCorrelation, CommandResponseManagerState}
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.CommandResponse.CommandNotAvailable

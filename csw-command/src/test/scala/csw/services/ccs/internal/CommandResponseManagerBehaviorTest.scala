@@ -1,4 +1,4 @@
-package csw.ccs.internal
+package csw.services.ccs.internal
 
 import akka.actor.ActorSystem
 import akka.typed

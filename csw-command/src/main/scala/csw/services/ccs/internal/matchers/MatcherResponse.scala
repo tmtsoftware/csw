@@ -1,4 +1,4 @@
-package csw.ccs.internal.matchers
+package csw.services.ccs.internal.matchers
 
 sealed trait MatcherResponse
 object MatcherResponse {

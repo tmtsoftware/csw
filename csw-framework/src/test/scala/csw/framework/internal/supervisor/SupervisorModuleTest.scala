@@ -5,7 +5,6 @@ import java.util.UUID
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
-import csw.ccs.internal.matchers.DemandMatcher
 import csw.common.components.framework.ComponentStatistics
 import csw.framework.ComponentInfos._
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
@@ -29,6 +28,7 @@ import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{CurrentState, DemandState}
 import csw.messages.{models, _}
+import csw.services.ccs.internal.matchers.DemandMatcher
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

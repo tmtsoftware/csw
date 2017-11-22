@@ -1,4 +1,4 @@
-package csw.ccs.models
+package csw.services.ccs.models
 
 import csw.messages.params.models.RunId
 

@@ -1,4 +1,4 @@
-package csw.ccs.models
+package csw.services.ccs.models
 
 import akka.typed.ActorRef
 import csw.messages.ccs.commands.CommandResponse

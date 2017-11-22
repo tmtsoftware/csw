@@ -1,13 +1,16 @@
 package csw.trombone.assembly.commands
 
+import akka.actor.Scheduler
 import akka.typed.ActorRef
 import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.ccs.internal.matchers.PublishedStateMatcher
+import akka.util.Timeout
+import csw.services.ccs.common.ActorRefExts.RichActor
+import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.services.ccs.internal.matchers.PublishedStateMatcher
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
-import csw.messages.ccs.commands.CommandResponse.{Completed, Error, NoLongerValid}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.RunId
@@ -30,6 +33,7 @@ class SetElevationCommand(
   import TromboneHcdState._
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
+  implicit val scheduler: Scheduler = ctx.system.scheduler
 
   def startCommand(): Future[CommandResponse] = {
     if (startState.cmdChoice == cmdUninitialized || startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving) {
@@ -48,22 +52,25 @@ class SetElevationCommand(
         s"Using elevation as rangeDistance: ${elevationItem.head} to get stagePosition: $stagePosition to encoder: $encoderPosition"
       )
 
-      val stateMatcher = AssemblyMatchers.posMatcher(encoderPosition)
-      val scOut        = Setup(ac.obsId, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
+      val stateMatcher              = AssemblyMatchers.posMatcher(encoderPosition)
+      implicit val timeout: Timeout = stateMatcher.timeout
+
+      val scOut = Setup(ac.obsId, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
 
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
-      tromboneHCD.foreach(_ ! Submit(scOut, ctx.spawnAnonymous(Actor.ignore)))
 
-      new PublishedStateMatcher(ctx, tromboneHCD.get, stateMatcher).executeMatch {
-        {
-          case MatchCompleted =>
-            publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
-            Completed(s.runId)
-          case MatchFailed(ex) =>
-            println(s"Data command match failed with error: ${ex.getMessage}")
-            Error(s.runId, ex.getMessage)
-          case _ ⇒ Error(s.runId, "")
-        }
+      tromboneHCD.get.ask[CommandResponse](Submit(scOut, ctx.spawnAnonymous(Actor.ignore))).flatMap {
+        case Accepted(_) ⇒
+          PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher, ctx).map {
+            case MatchCompleted =>
+              publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
+              Completed(s.runId)
+            case MatchFailed(ex) =>
+              println(s"Data command match failed with error: ${ex.getMessage}")
+              Error(s.runId, ex.getMessage)
+            case _ ⇒ Error(s.runId, "")
+          }
+        case _ ⇒ Future.successful(Error(s.runId, ""))
       }
     }
   }
@@ -71,5 +78,4 @@ class SetElevationCommand(
   def stopCommand(): Unit = {
     tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(RunId(), s.obsId), ctx.spawnAnonymous(Actor.ignore)))
   }
-
 }

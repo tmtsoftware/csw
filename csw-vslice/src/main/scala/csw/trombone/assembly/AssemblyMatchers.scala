@@ -1,6 +1,6 @@
 package csw.trombone.assembly
 
-import csw.ccs.internal.matchers.DemandMatcher
+import csw.services.ccs.internal.matchers.DemandMatcher
 import csw.messages.params.states.DemandState
 import csw.trombone.hcd.TromboneHcdState
 
