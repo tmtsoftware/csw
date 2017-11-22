@@ -1,10 +1,21 @@
 ## Subsystem
 
-Below table lists enumerated values of available **subsystems** in TMT observatory. **Susbsystem** values are used in Commands, Events and States.
+TMT Observatory system is composed of many subsystems. The subsystems that are known participants in the TMT Software System are predefined and the list is covered under `Subsystem` enumeration. They are identified using a 3 letter abbreviation. 
 
-The usage examples can be found in [Events](events.html), [Commands](commands.html), [States](states.html) 
+**Susbsystem** values are used to construct **[Prefix](commands.html#Prefix)** and are used in communication vehicles such as Commands, Events and States.
 
-| Primitive       | Scala KeyType               |
+@@@ note
+
+Subsystems are made available via separate files, for consumption in Scala and Java code.
+
+ * Import `csw.messages.params.models.Subsystem` for **Scala** 
+ * Import `csw.messages.javadsl.JSubsystem` for **Java**.  
+
+@@@
+
+### List of Subsystems
+ 
+| Abbreviation    | Susbsystem name             |
 | :-------------: |:----------------------------| 
 |  AOESW          | AO Executive Software |
 |  APS            | Alignment and Phasing System |
@@ -39,3 +50,6 @@ The usage examples can be found in [Events](events.html), [Commands](commands.ht
 |  WFOS           | Wide Field Optical Spectrometer |
 |  TEST           | Testing System |
 |  BAD            | Unknown/default Subsystem |
+
+### Usage examples
+The usage examples can be found in [Events](events.html), [Commands](commands.html), [States](states.html)

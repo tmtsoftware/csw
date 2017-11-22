@@ -5,9 +5,10 @@ import java.util.UUID
 
 import csw.messages.ccs.events._
 import csw.messages.params.formats.JsonSupport
-import csw.messages.params.generics.KeyType.DoubleMatrixKey
+import csw.messages.params.generics.KeyType.{DoubleMatrixKey, RaDecKey}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
-import csw.messages.params.models.{MatrixData, ObsId, Prefix, Units}
+import csw.messages.params.models.Units.arcmin
+import csw.messages.params.models._
 import org.scalatest.{FunSpec, Matchers}
 
 class EventsTest extends FunSpec with Matchers {
@@ -334,6 +335,60 @@ class EventsTest extends FunSpec with Matchers {
       uniqueKeys1 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys2 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys3 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
+    }
+  }
+
+  describe("Examples of protobuf") {
+    it("should show usage of converting events to/from protobuf") {
+
+      //#protobuf
+      import csw_protobuf.events.PbEvent
+
+      //Some variety in EventInfo
+      val info1 = EventInfo("wfos.blue.filter")
+      val info2 = EventInfo("wfos.blue.filter", Instant.now().minusSeconds(60))
+      val info3 = EventInfo("wfos.blue.filter", Instant.now(), ObsId("Obs002"))
+      val info4 = EventInfo(
+        Prefix("wfos.blue.filter"),
+        EventTime(Instant.now().minusSeconds(3600)),
+        Some(ObsId("Obs002")),
+        UUID.randomUUID().toString()
+      )
+
+      //Key
+      val raDecKey = RaDecKey.make("raDecKey")
+
+      //values
+      val raDec1 = RaDec(10.20, 40.20)
+      val raDec2 = RaDec(100.20, 400.20)
+
+      //parameters
+      val param = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
+
+      //events
+      val statusEvent: StatusEvent   = StatusEvent(info1).add(param)
+      val observeEvent: ObserveEvent = ObserveEvent(info2).add(param)
+      val systemEvent1: SystemEvent  = SystemEvent(info3).add(param)
+      val systemEvent2: SystemEvent  = SystemEvent(info4).add(param)
+
+      //convert events to protobuf bytestring
+      val byteArray1: Array[Byte] = statusEvent.toPb.toByteString.toByteArray
+      val byteArray2: Array[Byte] = observeEvent.toPb.toByteString.toByteArray
+      val byteArray3: Array[Byte] = systemEvent1.toPb.toByteString.toByteArray
+      val byteArray4: Array[Byte] = systemEvent2.toPb.toByteString.toByteArray
+
+      //convert protobuf bytestring to events
+      val pbStatusEvent: StatusEvent   = StatusEvent.fromPb(PbEvent.parseFrom(byteArray1))
+      val pbObserveEvent: ObserveEvent = ObserveEvent.fromPb(PbEvent.parseFrom(byteArray2))
+      val pbSystemEvent1: SystemEvent  = SystemEvent.fromPb(PbEvent.parseFrom(byteArray3))
+      val pbSystemEvent2: SystemEvent  = SystemEvent.fromPb(PbEvent.parseFrom(byteArray4))
+      //#protobuf
+
+      //validations
+      assert(pbStatusEvent === statusEvent)
+      assert(pbObserveEvent === observeEvent)
+      assert(pbSystemEvent1 === systemEvent1)
+      assert(pbSystemEvent2 === systemEvent2)
     }
   }
 }

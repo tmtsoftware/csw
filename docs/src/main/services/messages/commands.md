@@ -9,7 +9,7 @@ Scala
 
 ### Prefix
 
-It is a combination of [Subsystem](subsystem.html) and Subsystem's prefix. Component developer should supply a valid prefix string and the subsystem will be automatically parsed from it. 
+Identifies a [Subsystem](subsystem.html) in TMT observatory. Component developer should supply a valid prefix string and the subsystem will be automatically parsed from it. 
 
 See below examples:
 
@@ -29,12 +29,14 @@ Scala
  
  
 ### Observe Command
+
 This command describes a science observation. Sent only to Science Detector Assemblies and Sequencers.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #observe }
 
 ### Wait Command
+
 This command causes a Sequencer to wait until notified.
 
 Scala
