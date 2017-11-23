@@ -10,12 +10,11 @@ import akka.typed.scaladsl.adapter._
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.services.commons.commonlogger.SampleLogger
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LogControlMessages
-import csw.services.logging.scaladsl.{Logger, LoggingSystemFactory}
+import csw.services.logging.scaladsl.{Logger, LoggerFactory, LoggingSystemFactory}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -54,7 +53,7 @@ object LocationServiceExampleComponent {
  * A dummy akka test service that registers with the location service
  */
 class LocationServiceExampleComponent(locationService: LocationService) extends Actor {
-  val log: Logger = SampleLogger.getLogger(context)
+  val log: Logger = new LoggerFactory("my-component-name").getLogger(context)
 
   log.info("In actor LocationServiceExampleComponent")
   val logAdminActorRef: typed.ActorRef[LogControlMessages] =

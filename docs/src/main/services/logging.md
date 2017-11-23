@@ -170,73 +170,65 @@ All messages are logged by default as Json. Logs can contain following fields:
 @@@
 
 ## Enable component logging
-Component developers are expected to mix-in one of the following trait/classes in order to access `log` instance in the class.
-
-Scala Mutable Actor
-:   @@snip [MutableActorSample](../../../../examples/src/main/scala/csw/services/commons/componentlogger/MutableActorSample.scala) { #component-logger-mutable-actor }
-
-Scala Actor
-:   @@snip [ActorSample](../../../../examples/src/main/scala/csw/services/commons/componentlogger/ActorSample.scala) { #component-logger-actor }
+Component developers will have an instance of `LoggerFactory` available from `csw-framework`. This instance will already have a `componentName` set by `csw-framework` which will
+appear in log statements against `@componentName` tag. Next, to get the `Logger` from `LoggerFactory` use one of the following ways:  
 
 Scala Class
-:   @@snip [Sample](../../../../examples/src/main/scala/csw/services/commons/componentlogger/Sample.scala) { #component-logger }
+:   @@snip [SampleClass](../../../../examples/src/main/scala/csw/services/commons/componentlogger/loggers.scala) { #component-logger-class }
 
+Scala Actor
+:   @@snip [SampleActor](../../../../examples/src/main/scala/csw/services/commons/componentlogger/loggers.scala) { #component-logger-actor }
 
-Java Mutable Actor
-:   @@snip [JMutableActorSample](../../../../examples/src/main/java/csw/services/commons/componentlogger/JMutableActorSample.java) { #component-logger-mutable-actor }
+Scala Typed Actor
+:   @@snip [SampleTypedActor](../../../../examples/src/main/scala/csw/services/commons/componentlogger/loggers.scala) { #component-logger-typed-actor }
 
-Java Actor
-:   @@snip [JActorSample](../../../../examples/src/main/java/csw/services/commons/componentlogger/JActorSample.java) { #component-logger-actor }
 
 Java Class
-:   @@snip [JSample](../../../../examples/src/main/java/csw/services/commons/componentlogger/JSample.java) { #component-logger }
+:   @@snip [JSampleClass](../../../../examples/src/main/java/csw/services/commons/componentlogger/JSampleClass.java) { #component-logger-class }
 
-For immutable actors, refer the following example:
+Java Actor
+:   @@snip [JSampleActor](../../../../examples/src/main/java/csw/services/commons/componentlogger/JSampleClass.java) { #component-logger-actor }
 
-Scala Immutable Actor
-:   @@snip [immutableloggers](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #component-logger }
+Java Typed Actor
+:   @@snip [JSampleTypedActor](../../../../examples/src/main/java/csw/services/commons/componentlogger/JSampleClass.java) { #component-logger-typed-actor }
 
-Java Immutable Actor
-:   @@snip [JImmutableSample](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JImmutableSample.java) { #component-logger}
-
-Considering there is a domain message hierarchy for component as follows:
-
-Scala
-:   @@snip [messages](../../../../examples/src/main/scala/csw/services/commons/messages.scala) { #message-hierarchy }
-
-For reference, `csw-framework` uses similar steps and it can referred
-for [Simple Logger](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorInfoFactory.scala)
-and [Mutable Actor](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/container/ContainerBehavior.scala).
- 
 @@@ note
 
-*While writing java code make sure to call `getLogger` method in concrete class only as shown in above java example.
-The runtime class from where the `getLogger` method is called, will be picked to display against `class` tag in log statements*  
+The `LoggerFactory` can be changed to `JLoggerFactory` by using `asJava` method and similarly `JLoggerFactory` can be changed to `LoggerFactory` by using `asScala` method 
 
 @@@
 
 ## Enable generic logging
-To enable logging for some utility code that does not require `@componentName` in log statements, inherit from following traits:
+In case there is a need to log statements without `@componentName` tag, which can be due to unavailability of componentName in some utility code, then use the `GenericLoggerFactory`
+as follows:
 
-Scala
-:   * For typed mutable actor class extend `GenericLogger.MutableActor`
-:   * For actor class extend `GenericLogger.Actor`
-    * For non-actor class extend `GenericLogger.Simple`
+Scala Class
+:   @@snip [GenericClass](../../../../examples/src/main/scala/csw/services/commons/genericlogger/loggers.scala) { #generic-logger-class }
 
-Java
-:   * For typed mutable actor class inherit `JGenericLoggerMutableActor`
-:   * For actor class inherit `JGenericLoggerActor`
-    * For non-actor class inherit `JGenericLogger`
-    
-For immutable actors, refer the following example:
+Scala Actor
+:   @@snip [GenericActor](../../../../examples/src/main/scala/csw/services/commons/genericlogger/loggers.scala) { #generic-logger-actor }
 
-Scala Immutable Actor
-:   @@snip [immutableloggers](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #generic-logger }
+Scala Typed Actor
+:   @@snip [GenericTypedActor](../../../../examples/src/main/scala/csw/services/commons/genericlogger/loggers.scala) { #generic-logger-typed-actor }
 
-Java Immutable Actor
-:   @@snip [JGenericImmutableSample](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JGenericImmutableSample.java) { #generic-logger}
+
+Java Class
+:   @@snip [JGenericClass](../../../../examples/src/main/java/csw/services/commons/genericlogger/JGenericClass.java) { #generic-logger-class }
+
+Java Actor
+:   @@snip [JGenericActor](../../../../examples/src/main/java/csw/services/commons/genericlogger/JGenericClass.java) { #generic-logger-actor }
+
+Java Typed Actor
+:   @@snip [JGenericTypedActor](../../../../examples/src/main/java/csw/services/commons/genericlogger/JGenericClass.java) { #generic-logger-typed-actor }
 
 `log` variable is now available in scala and java classes to write log statements as explained in next segment.
+
+@@@ note { title="The `ComponentDomainMessage` shown in above examples is defiined as follows"}
+
+Scala
+:   @@snip [messages](../../../../examples/src/main/scala/csw/services/commons/messages.scala) { #message-hierarchy }
+
+@@@
 
 ## Log statements
 
@@ -380,71 +372,14 @@ Java (Supplier)
  :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error-supplier }
  
 
-## Enable common component logging
-### Available for custom(non-component) implementations of logging
-If log statements appearing from multiple actors/classes has same `@componentName` to be displayed and it is a constant, then this is the recommended approach. This approach is
-less-likely to be used by component developers. For reference, it is used in `csw-location` service and can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-location/src/main/scala/csw/services/location/commons/LocationServiceLogger.scala).
-To use this approach, create an object/abstract class/interface as follows:
+## Create LoggerFactory
 
 Scala
-:   @@snip [SampleLogger](../../../../examples/src/main/scala/csw/services/commons/commonlogger/SampleLogger.scala) { #common-component-logger }
-
-
-Java Mutable Actor
-:   @@snip [JMutableActorSample](../../../../examples/src/main/java/csw/services/commons/commonlogger/JMutableActorSample.java) { #common-component-logger-mutable-actor }
-
-Java Actor
-:   @@snip [JActorSample](../../../../examples/src/main/java/csw/services/commons/commonlogger/JActorSample.java) { #common-component-logger-actor }
-
-Java class
-:   @@snip [JSample](../../../../examples/src/main/java/csw/services/commons/commonlogger/JSample.java) { #common-component-logger }
-
-
-Then, inherit following object/interface:
-
-Scala
-:   * For all mutable actors that need 'my-component-name', extend `ExampleLogger.MutableActor`
-:   * For all untyped actors that need 'my-component-name', extend `ExampleLogger.Actor`
-    * For all non-actor classes that need 'my-component-name', extend `ExampleLogger.Simple`
-    
-Java
-:   * For all  mutable actors that need 'my-component-name', inherit `JExampleLoggerMutableActor`
-:   * For all untyped actors that need 'my-component-name', inherit `JExampleLoggerActor`
-    * For all non-actor classes that need 'my-component-name', inherit `JExampleLogger`
-
-
-@@@ note { title="Example to mixin above loggers in actors "}
-
-Scala
-:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #actor-mixin }
+:   @@snip [Sample](../../../../examples/src/main/scala/csw/services/commons/componentlogger/loggers.scala) { #logger-factory-creation }
 
 Java
-:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #actor-mixin }
+:   @@snip [JSample](../../../../examples/src/main/java/csw/services/commons/componentlogger/JSampleClass.java) { #logger-factory-creation }
 
-Loggers for Mutable actors and classes can be mixed in a similar way.
-
-@@@
-
-For immutable actors, refer the following example:
-
-Scala Immutable Actor
-:   @@snip [immutableloggers](../../../../examples/src/main/scala/csw/services/commons/immutablelogger/immutableloggers.scala) { #common-component-logger }
-
-Java Immutable Actor
-:   @@snip [JImmutableSample](../../../../examples/src/main/java/csw/services/commons/immutablelogger/JImmutableSample.java) { #component-logger}
-
-Considering there is a domain message hierarchy for component as follows:
-
-Scala
-:   @@snip [messages](../../../../examples/src/main/scala/csw/services/commons/messages.scala) { #message-hierarchy }
- 
- 
-@@@ note
-
-*While writing java code make sure to call `getLogger` method in concrete class only as shown in above java example.
-The runtime class from where the `getLogger` method is called, will be picked to display against `class` tag in log statements*  
-
-@@@
  
 ## Create LoggingSystem 
 ### Available for test/understanding purpose

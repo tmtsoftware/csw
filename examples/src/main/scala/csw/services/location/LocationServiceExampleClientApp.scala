@@ -10,7 +10,6 @@ import akka.typed.{ActorRef, Behavior}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage}
-import csw.services.commons.commonlogger.SampleLogger
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
@@ -67,7 +66,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     {
   import LocationServiceExampleClient._
 
-  val log: Logger = SampleLogger.getLogger(context)
+  val log: Logger = new LoggerFactory("my-component-name").getLogger(context)
 
   private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds
