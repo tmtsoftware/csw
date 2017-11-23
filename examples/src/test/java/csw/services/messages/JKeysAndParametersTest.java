@@ -261,8 +261,8 @@ public class JKeysAndParametersTest {
         Struct mutated2 = struct1.remove(firstKey.get());
 
         //find out missing keys
-        Set<String> missingKeySet = mutated1.jMissingKeys(ra, dec, epoch);
-        HashSet<String> expectedMissingKeys = new HashSet<>(Collections.singletonList("ra"));
+        Set<String> missingKeySet = mutated1.jMissingKeys(ra, dec, epoch, JKeyTypes.StringKey().make("someRandomKey"));
+        List<String> expectedMissingKeys = Arrays.asList("ra", "someRandomKey");
         //#struct
 
         //validations
@@ -271,7 +271,7 @@ public class JKeysAndParametersTest {
         Assert.assertEquals(JUnits.lightyear, paramWithLightYear.units());
         Assert.assertEquals(struct1.parameter(dec), secondKey.get());
         Assert.assertEquals(struct1.parameter(epoch), thirdKey.get());
-        Assert.assertEquals(expectedMissingKeys, missingKeySet);
+        Assert.assertEquals(new HashSet<>(expectedMissingKeys), missingKeySet);
         Assert.assertTrue(!mutated1.exists(ra));
         Assert.assertTrue(!mutated2.exists(ra));
     }

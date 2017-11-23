@@ -7,6 +7,9 @@ It is an observation Id and can be constructed by creating instance of `ObsId`.
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #obsid }
 
+Java
+:   @@snip [JCommandsTest.java](../../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #obsid }
+
 ### Prefix
 
 Identifies a [Subsystem](subsystem.html) in TMT observatory. Component developer should supply a valid prefix string and the subsystem will be automatically parsed from it. 
@@ -15,6 +18,9 @@ See below examples:
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #prefix }
+
+Java
+:   @@snip [JCommandsTest.java](../../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #prefix }
 
 ### Setup Command
 
@@ -26,6 +32,9 @@ This command is used to describe a goal that a system should match. Component de
  
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #setup }
+
+Java
+:   @@snip [JCommandsTest.java](../../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #setup }
  
  
 ### Observe Command
@@ -35,6 +44,9 @@ This command describes a science observation. Sent only to Science Detector Asse
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #observe }
 
+Java
+:   @@snip [JCommandsTest.java](../../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #observe }
+
 ### Wait Command
 
 This command causes a Sequencer to wait until notified.
@@ -42,11 +54,17 @@ This command causes a Sequencer to wait until notified.
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #wait }
 
+Java
+:   @@snip [JCommandsTest.java](../../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #wait }
+
 ### JSON serialization
 Commands can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize Setup, Observe and Wait commands.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #json-serialization }
+
+Java
+:   @@snip [JCommandsTest.java](../../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #json-serialization }
 
 ### Unique Key constraint
 
@@ -62,3 +80,6 @@ Here are some examples that illustrate this point:
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #unique-key }
+
+Java
+:   @@snip [JCommandsTest.java](../../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #unique-key }
