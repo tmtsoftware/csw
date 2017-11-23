@@ -2,9 +2,9 @@ package csw.services.logging.components
 
 import akka.actor.{Actor, Props}
 import csw.services.logging.components.IRIS._
-import csw.services.logging.scaladsl.{GenericLogger, LibraryLogger, Logger, LoggerFactory}
+import csw.services.logging.scaladsl._
 
-object IRISLibraryLogger extends LibraryLogger(IRIS.COMPONENT_NAME)
+object IRISLibraryLogger extends LoggerFactory(IRIS.COMPONENT_NAME)
 
 class IRIS(logger: LoggerFactory) extends Actor {
 
@@ -57,9 +57,10 @@ object IRIS {
   )
 }
 
-class IrisTLA extends IRISLibraryLogger.Simple {
+class IrisTLA {
   import IRIS._
 
+  val log: Logger = IRISLibraryLogger.getLogger
   def startLogging(): Unit = {
     log.trace(irisLogs("trace"))
     log.debug(irisLogs("debug"))
@@ -70,7 +71,10 @@ class IrisTLA extends IRISLibraryLogger.Simple {
   }
 }
 
-class IrisUtil extends GenericLogger.Simple {
+class IrisUtil {
+
+  val log: Logger = GenericLoggerFactory.getLogger
+
   def startLogging(logs: Map[String, String]): Unit = {
     log.trace(irisLogs("trace"))
     log.debug(irisLogs("debug"))
@@ -81,7 +85,10 @@ class IrisUtil extends GenericLogger.Simple {
   }
 }
 
-class IrisActorUtil extends GenericLogger.Actor {
+class IrisActorUtil extends Actor {
+
+  val log: Logger = GenericLoggerFactory.getLogger(context)
+
   def receive = {
     case LogTrace => log.trace(irisLogs("trace"))
     case LogDebug => log.debug(irisLogs("debug"))

@@ -3,6 +3,7 @@ package csw.services.location.scaladsl
 import akka.actor.ActorSystem
 import csw.services.location.commons.{ClusterSettings, CswCluster, LocationServiceLogger}
 import csw.services.location.internal._
+import csw.services.logging.scaladsl.Logger
 
 /**
  * The factory is used to create LocationService instance. With each creation, a new ActorSystem will be created and will
@@ -10,7 +11,9 @@ import csw.services.location.internal._
  *
  * @note Hence, it is recommended to create a single instance of LocationService and use it throughout the application
  */
-object LocationServiceFactory extends LocationServiceLogger.Simple {
+object LocationServiceFactory {
+
+  val log: Logger = LocationServiceLogger.getLogger
 
   /**
    * Create a LocationService instance to manage registrations

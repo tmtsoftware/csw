@@ -7,15 +7,15 @@ import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
+import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage}
 import csw.services.commons.commonlogger.SampleLogger
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
-import csw.services.logging.scaladsl.{Keys, LogAdminActorFactory, LoggingSystemFactory}
+import csw.services.logging.scaladsl._
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -62,10 +62,12 @@ object LocationServiceExampleClient {
 //#actor-mixin
 class LocationServiceExampleClient(locationService: LocationService, loggingSystem: LoggingSystem)(
     implicit mat: Materializer
-) extends SampleLogger.Actor
+) extends akka.actor.Actor
     //#actor-mixin
     {
   import LocationServiceExampleClient._
+
+  val log: Logger = SampleLogger.getLogger(context)
 
   private val timeout             = 5.seconds
   private val waitForResolveLimit = 30.seconds

@@ -20,13 +20,16 @@ import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
-private[location] class LocationServiceImpl(cswCluster: CswCluster) extends LocationService with LocationServiceLogger.Simple {
+private[location] class LocationServiceImpl(cswCluster: CswCluster) extends LocationService {
   outer ⇒
+
+  val log: Logger = LocationServiceLogger.getLogger
 
   import cswCluster._
   implicit val timeout: Timeout = Timeout(5.seconds)

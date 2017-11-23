@@ -3,6 +3,7 @@ package csw.framework.internal.pubsub
 import akka.actor.ActorSystem
 import akka.typed
 import akka.typed.ActorRef
+import akka.typed.scaladsl.Actor
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
@@ -10,7 +11,7 @@ import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.models.{LifecycleStateChanged, PubSub}
 import csw.messages.{models, SupervisorExternalMessage}
-import csw.services.logging.scaladsl.{FrameworkLogger, Logger}
+import csw.services.logging.scaladsl.Logger
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -19,8 +20,8 @@ import scala.concurrent.duration.DurationInt
 
 class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  trait MutableActorMock[T] { this: FrameworkLogger.MutableActor[T] ⇒
-    override protected lazy val log: Logger = MockitoSugar.mock[Logger]
+  trait MutableActorMock[T] { this: Actor.MutableBehavior[T] ⇒
+    protected lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 
   private val actorSystem                        = ActorSystem("test-1")
@@ -32,8 +33,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   private val lifecycleProbe1 = TestProbe[LifecycleStateChanged]
   private val lifecycleProbe2 = TestProbe[LifecycleStateChanged]
 
-  def createPubSubBehavior(): PubSubBehavior[LifecycleStateChanged] =
-    new PubSubBehavior(ctx, "test-component") with MutableActorMock[PubSub[LifecycleStateChanged]]
+  def createPubSubBehavior(): PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, "test-component")
 
   override protected def afterAll(): Unit = Await.result(actorSystem.terminate(), 5.seconds)
 

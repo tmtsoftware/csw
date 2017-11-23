@@ -1,11 +1,13 @@
 package csw.services.logging.components
 
 import csw.services.logging.commons.LoggingKeys
-import csw.services.logging.scaladsl.{LibraryLogger, RichException}
+import csw.services.logging.scaladsl.{Logger, LoggerFactory, RichException}
 
-object TromboneHcdLogger extends LibraryLogger(TromboneHcd.COMPONENT_NAME)
+object TromboneHcdLogger extends LoggerFactory(TromboneHcd.COMPONENT_NAME)
 
-class TromboneHcd() extends TromboneHcdLogger.Simple {
+class TromboneHcd() {
+
+  val log: Logger = TromboneHcdLogger.getLogger
 
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers
@@ -39,7 +41,7 @@ class TromboneHcd() extends TromboneHcdLogger.Simple {
 }
 
 object TromboneHcd {
-  val TRACE_LINE_NO = 16
+  val TRACE_LINE_NO = 18
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3

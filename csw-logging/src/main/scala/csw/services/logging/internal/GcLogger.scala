@@ -6,7 +6,7 @@ import javax.management.{Notification, NotificationEmitter, NotificationListener
 
 import com.persist.JsonOps._
 import com.sun.management.GarbageCollectionNotificationInfo
-import csw.services.logging.scaladsl.GenericLogger
+import csw.services.logging.scaladsl.{GenericLoggerFactory, Logger}
 
 import scala.collection.JavaConverters._
 
@@ -14,7 +14,9 @@ import scala.collection.JavaConverters._
  * When enabled by the gc configuration option, Garbage collection events are logged to the 'gc' log following the same structure as the other logs.
  */
 // $COVERAGE-OFF$
-private[logging] class GcLogger extends GenericLogger.Simple {
+private[logging] class GcLogger {
+
+  val log: Logger = GenericLoggerFactory.getLogger
 
   private[this] val gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans
   private[this] val emitters = for (gcbean <- gcbeans.asScala) yield {

@@ -6,6 +6,7 @@ import akka.stream.scaladsl.{FileIO, Keep}
 import csw.services.config.api.models.ConfigData
 import csw.services.config.server.commons.ConfigServerLogger
 import csw.services.config.server.{ActorRuntime, Settings}
+import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -16,10 +17,11 @@ import scala.concurrent.Future
  * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
  * the SHA-1 hash value.
   **/
-class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime)
-    extends ConfigServerLogger.Simple {
+class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
+
+  val log: Logger = ConfigServerLogger.getLogger
 
   def post(configData: ConfigData): Future[String] = async {
     log.debug("Creating temporary file and calculating it's sha")

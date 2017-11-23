@@ -59,7 +59,7 @@ public class ILoggerActorTest {
     @Test
     public void testDefaultLogConfigurationForActor() throws InterruptedException {
         ActorRef tromboneActor = actorSystem.actorOf(Props.create(JTromboneHCDSupervisorActor.class, new JLoggerFactory("jTromboneHcdActor")), "JTromboneActor");
-        String actorPath = tromboneActor.path().toString();
+        String actorPath = tromboneActor.toString();
         String className = JTromboneHCDSupervisorActor.class.getName();
 
         JLogUtil.sendLogMsgToActorInBulk(tromboneActor);

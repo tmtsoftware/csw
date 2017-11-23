@@ -13,7 +13,7 @@ import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.FrameworkLogger
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Future
 
@@ -23,8 +23,8 @@ class SampleComponentHandlers(
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
-) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
-    with FrameworkLogger.Simple {
+) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, commandResponseManager, pubSubRef, locationService) {
+  val log: Logger = new LoggerFactory(componentInfo.name).getLogger
 
   import SampleComponentState._
 
@@ -87,8 +87,6 @@ class SampleComponentHandlers(
     Thread.sleep(100)
     Future.unit
   }
-
-  override protected def componentName(): String = componentInfo.name
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
     case LocationUpdated(location) ⇒

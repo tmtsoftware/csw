@@ -14,11 +14,13 @@ import akka.util.ByteString
 import csw.services.config.api.internal.JsonSupport
 import csw.services.config.api.models.{ConfigData, ConfigId, FileType}
 import csw.services.config.server.commons.{ConfigServerLogger, PathValidator}
+import csw.services.logging.scaladsl.Logger
 
 /**
  * Helper class for ConfigServiceRoute
  */
-trait HttpSupport extends Directives with JsonSupport with ConfigServerLogger.Simple {
+trait HttpSupport extends Directives with JsonSupport {
+  val log: Logger = ConfigServerLogger.getLogger
 
   def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>
     validate(PathValidator.isValid(path), PathValidator.message(path)).tmap[Path] { _ =>

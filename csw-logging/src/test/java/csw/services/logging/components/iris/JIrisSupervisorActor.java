@@ -1,10 +1,12 @@
 package csw.services.logging.components.iris;
 
+import akka.actor.AbstractActor;
 import csw.services.logging.javadsl.ILogger;
+import csw.services.logging.javadsl.JLoggerFactory;
 
-public class JIrisSupervisorActor extends JIrisActorLogger {
+public class JIrisSupervisorActor extends AbstractActor {
 
-    private ILogger log = getLogger();
+    private ILogger log = new JLoggerFactory("jIRIS").getLogger(context(), getClass());
 
     @Override
     public Receive createReceive() {

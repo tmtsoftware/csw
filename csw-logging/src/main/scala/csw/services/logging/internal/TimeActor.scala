@@ -1,8 +1,9 @@
 package csw.services.logging.internal
 
+import akka.actor.Actor
 import com.persist.JsonOps._
 import csw.services.logging.commons.LoggingKeys
-import csw.services.logging.scaladsl.{GenericLogger, RequestId}
+import csw.services.logging.scaladsl.{GenericLoggerFactory, Logger, RequestId}
 
 import scala.collection.mutable
 import scala.concurrent.Promise
@@ -11,7 +12,9 @@ import scala.concurrent.Promise
  * Actor responsible for writing logs which time a functional block
  * @param tdone A promise to let the caller know when this actors responsibility is done
  */
-private[logging] class TimeActor(tdone: Promise[Unit]) extends GenericLogger.Actor {
+private[logging] class TimeActor(tdone: Promise[Unit]) extends Actor {
+
+  val log: Logger = GenericLoggerFactory.getLogger(context)
 
   import TimeActorMessages._
 

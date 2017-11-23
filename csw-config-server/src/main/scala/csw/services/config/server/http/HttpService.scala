@@ -9,7 +9,7 @@ import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.LogAdminActorFactory
+import csw.services.logging.scaladsl.{LogAdminActorFactory, Logger}
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -27,9 +27,11 @@ class HttpService(
     configServiceRoute: ConfigServiceRoute,
     settings: Settings,
     actorRuntime: ActorRuntime
-) extends ConfigServerLogger.Simple {
+) {
 
   import actorRuntime._
+
+  val log: Logger = ConfigServerLogger.getLogger
 
   lazy val registeredLazyBinding: Future[(ServerBinding, RegistrationResult)] = async {
     val binding            = await(bind())

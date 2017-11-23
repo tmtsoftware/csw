@@ -3,10 +3,13 @@ package csw.apps.clusterseed.admin.internal
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.models.LogMetadata
+import csw.services.logging.scaladsl.Logger
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json._
 
-trait JsonSupport extends PlayJsonSupport with ClusterSeedLogger.Simple {
+trait JsonSupport extends PlayJsonSupport {
+  val log: Logger = ClusterSeedLogger.getLogger
+
   implicit val levelFormat: Format[Level] = new Format[Level] {
     override def writes(obj: Level): JsValue = JsString(obj.name)
 
@@ -19,5 +22,5 @@ trait JsonSupport extends PlayJsonSupport with ClusterSeedLogger.Simple {
     }
   }
 
-  implicit val logMetadataFormat = Json.format[LogMetadata]
+  implicit val logMetadataFormat: Format[LogMetadata] = Json.format[LogMetadata]
 }

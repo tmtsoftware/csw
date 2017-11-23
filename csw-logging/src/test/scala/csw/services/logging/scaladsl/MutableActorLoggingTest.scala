@@ -64,7 +64,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
       log.contains("@componentName") shouldBe true
       log.contains("actor") shouldBe true
       log("@componentName") shouldBe "tromboneMutableHcdActor"
-      log("actor") shouldBe tromboneActorRef.path.toString
+      log("actor") shouldBe tromboneActorRef.toString
       log("file") shouldBe "MutableActorLoggingTest.scala"
       log.contains("line") shouldBe true
       log("class") shouldBe "csw.services.logging.scaladsl.TromboneMutableActor"

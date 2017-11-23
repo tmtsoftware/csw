@@ -5,6 +5,7 @@ import akka.http.scaladsl.Http.ServerBinding
 import csw.apps.clusterseed.admin.internal.{ActorRuntime, Settings}
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.services.location.commons.ClusterAwareSettings
+import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -13,8 +14,8 @@ import scala.util.control.NonFatal
 /**
  * Initialise AdminServer
  */
-class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, settings: Settings)
-    extends ClusterSeedLogger.Simple {
+class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, settings: Settings) {
+  val log: Logger = ClusterSeedLogger.getLogger
 
   import actorRuntime._
 

@@ -1,20 +1,21 @@
 package csw.services.ccs.internal
 
-import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.services.ccs.models.{CommandCorrelation, CommandResponseManagerState}
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.CommandResponse.CommandNotAvailable
 import csw.messages.ccs.commands.CommandResultType.{Final, Intermediate}
 import csw.messages.ccs.commands.{CommandResponse, CommandResultType}
 import csw.messages.params.models.RunId
-import csw.services.logging.scaladsl.FrameworkLogger
+import csw.services.ccs.models.{CommandCorrelation, CommandResponseManagerState}
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 class CommandResponseManagerBehavior(
     ctx: ActorContext[CommandResponseManagerMessage],
     componentName: String
-) extends FrameworkLogger.MutableActor[CommandResponseManagerMessage](ctx, componentName) {
+) extends Actor.MutableBehavior[CommandResponseManagerMessage] {
+  val log: Logger = new LoggerFactory(componentName).getLogger(ctx)
 
   var commandStatus: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
   var commandCoRelation: CommandCorrelation      = CommandCorrelation(Map.empty, Map.empty)

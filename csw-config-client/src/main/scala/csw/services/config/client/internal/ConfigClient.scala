@@ -15,6 +15,7 @@ import csw.services.config.api.internal.JsonSupport
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.commons.ConfigClientLogger
+import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -24,9 +25,8 @@ import scala.concurrent.Future
  * @param configServiceResolver       ConfigServiceResolver to get the uri of Configuration Service
  * @param actorRuntime                ActorRuntime instance for actor system, execution context and dispatcher
  */
-class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
-    extends ConfigService
-    with ConfigClientLogger.Simple {
+class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime) extends ConfigService {
+  val log: Logger = ConfigClientLogger.getLogger
 
   //Importing JsonSupport using an object to prevent JsonSupport methods appearing in ConfigClient scala documentation
   private object JsonSupport extends JsonSupport

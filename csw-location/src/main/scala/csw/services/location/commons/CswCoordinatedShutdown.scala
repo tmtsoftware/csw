@@ -5,11 +5,14 @@ import akka.actor.{ActorSystem, CoordinatedShutdown, PoisonPill}
 import akka.cluster.Cluster
 import akka.util.Timeout
 import csw.services.location.commons.ClusterConfirmationActor.IsMemberUp
+import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 
-object CswCoordinatedShutdown extends LocationServiceLogger.Simple {
+object CswCoordinatedShutdown {
+
+  val log: Logger = LocationServiceLogger.getLogger
 
   private def isMemberUp(actorSystem: ActorSystem): Boolean = {
     import akka.pattern.ask

@@ -10,6 +10,7 @@ import csw.services.config.api.models.FileType
 import csw.services.config.server.Settings
 import csw.services.config.server.commons.ConfigServerLogger
 import csw.services.config.server.commons.SVNDirEntryExt.RichSvnDirEntry
+import csw.services.logging.scaladsl.Logger
 import org.tmatesoft.svn.core._
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory
@@ -25,9 +26,10 @@ import scala.concurrent.Future
  * @param settings                  server runtime configuration
  * @param blockingIoDispatcher      dispatcher to be used for blocking operations
  */
-class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) extends ConfigServerLogger.Simple {
+class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
+  val log: Logger = ConfigServerLogger.getLogger
 
-  private implicit val _blockingIoDispatcher = blockingIoDispatcher
+  private implicit val _blockingIoDispatcher: MessageDispatcher = blockingIoDispatcher
 
   // Intitialize repository
   def initSvnRepo(): Unit =

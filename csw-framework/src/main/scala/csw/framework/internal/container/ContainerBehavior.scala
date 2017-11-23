@@ -2,8 +2,8 @@ package csw.framework.internal.container
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
-import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
@@ -18,7 +18,7 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.{Components, SupervisorInfo}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.scaladsl.FrameworkLogger
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -39,10 +39,10 @@ class ContainerBehavior(
     supervisorInfoFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService
-) extends FrameworkLogger.MutableActor[ContainerMessage](ctx, containerInfo.name) {
+) extends Actor.MutableBehavior[ContainerMessage] {
 
   import ctx.executionContext
-
+  val log: Logger                        = new LoggerFactory(containerInfo.name).getLogger(ctx)
   val akkaConnection                     = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
   val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
 

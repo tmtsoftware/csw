@@ -3,6 +3,7 @@ package csw.services.location.commons
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.location.internal.Networks
+import csw.services.logging.scaladsl.Logger
 
 import scala.collection.JavaConverters._
 
@@ -48,8 +49,8 @@ import scala.collection.JavaConverters._
  *  - the `ClusterSettings` api of providing values should be used for testing purpose only.
  *
  */
-case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty)
-    extends LocationServiceLogger.Simple {
+case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
+  val log: Logger       = LocationServiceLogger.getLogger
   val InterfaceNameKey  = "interfaceName"
   val ClusterSeedsKey   = "clusterSeeds"
   val ClusterPortKey    = "clusterPort"

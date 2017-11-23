@@ -9,6 +9,7 @@ import akka.cluster.{Cluster, MemberStatus}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.services.location.commons.ClusterConfirmationActor.HasJoinedCluster
+import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -19,7 +20,9 @@ import scala.util.control.NonFatal
  *
  * ''Note: '' It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
  */
-class CswCluster private (_actorSystem: ActorSystem) extends LocationServiceLogger.Simple {
+class CswCluster private (_actorSystem: ActorSystem) {
+
+  val log: Logger = LocationServiceLogger.getLogger
 
   /**
    * Identifies the hostname where ActorSystem is running
@@ -111,7 +114,10 @@ class CswCluster private (_actorSystem: ActorSystem) extends LocationServiceLogg
  *
  * ''Note: '' The creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
  */
-object CswCluster extends LocationServiceLogger.Simple {
+object CswCluster {
+
+  val log: Logger = LocationServiceLogger.getLogger
+
   //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
 
   /**

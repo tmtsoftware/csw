@@ -1,6 +1,6 @@
 package csw.framework.internal.component
 
-import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
@@ -17,7 +17,7 @@ import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
 import csw.messages.models.ToComponentLifecycleMessage
 import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.FrameworkLogger
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Await
@@ -43,9 +43,11 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     lifecycleHandlers: ComponentHandlers[Msg],
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     locationService: LocationService
-) extends FrameworkLogger.MutableActor[ComponentMessage](ctx, componentInfo.name) {
+) extends Actor.MutableBehavior[ComponentMessage] {
 
   import ctx.executionContext
+
+  val log: Logger = new LoggerFactory(componentInfo.name).getLogger(ctx)
 
   val shutdownTimeout: FiniteDuration = 10.seconds
 

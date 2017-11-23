@@ -4,12 +4,15 @@ import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.apps.clusterseed.cli.{ArgsParser, Options}
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 // $COVERAGE-OFF$
-class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) extends ClusterSeedLogger.Simple {
+class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
+  val log: Logger = ClusterSeedLogger.getLogger
+
   def start(args: Array[String]): Unit =
     new ArgsParser().parse(args).map {
       case Options(clusterPort, maybeAdminPort) =>

@@ -5,18 +5,17 @@ import ch.qos.logback.core.{Appender, UnsynchronizedAppenderBase}
 import csw.services.logging.internal.{LogSlf4j, MessageHandler}
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.noException
-import csw.services.logging.scaladsl.GenericLogger
+import csw.services.logging.scaladsl.{GenericLoggerFactory, Logger}
 
 import scala.collection.mutable
 
 /**
  *This class is used to allow the logs logged using SLF4J API to be routed to logback that in turn sends Slf4j messages to the common log.
  */
-private[logging] class Slf4jAppender[E]()
-    extends UnsynchronizedAppenderBase[E]
-    with AppenderAttachable[E]
-    with GenericLogger.Simple {
+private[logging] class Slf4jAppender[E]() extends UnsynchronizedAppenderBase[E] with AppenderAttachable[E] {
   import csw.services.logging.internal.LoggingLevels._
+
+  val log: Logger = GenericLoggerFactory.getLogger
 
   val appenders: mutable.HashSet[Appender[E]] = scala.collection.mutable.HashSet[Appender[E]]()
 

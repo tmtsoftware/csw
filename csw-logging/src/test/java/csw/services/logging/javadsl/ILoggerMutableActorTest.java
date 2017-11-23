@@ -62,7 +62,7 @@ public class ILoggerMutableActorTest {
 
         ActorRef<LogCommand> irisTyped = Adapter.spawn(actorSystem, JIrisSupervisorMutableActor.irisBeh("jIRISTyped"), "irisTyped");
 
-        String actorPath = irisTyped.path().toString();
+        String actorPath = irisTyped.toString();
         String className = JIrisSupervisorMutableActor.class.getName();
 
         sendLogMsgToTypedActorInBulk(irisTyped);

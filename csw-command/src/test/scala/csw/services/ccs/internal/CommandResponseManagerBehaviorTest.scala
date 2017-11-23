@@ -10,17 +10,11 @@ import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.params.models.RunId
-import csw.services.logging.scaladsl.{FrameworkLogger, Logger}
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-207: Report on Configuration Command Completion
 // DEOPSCSW-208: Report failure on Configuration Completion command
 class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
-
-  trait MutableActorMock[T] { this: FrameworkLogger.MutableActor[T] ⇒
-    override protected lazy val log: Logger = MockitoSugar.mock[Logger]
-  }
 
   private val actorSystem                        = ActorSystem("test-command-status-service-system")
   implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
@@ -29,8 +23,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
   private val ctx: StubbedActorContext[CommandResponseManagerMessage] =
     new StubbedActorContext[CommandResponseManagerMessage]("ctx-command-status-service", 100, typedSystem)
 
-  def createCommandStatusService(): CommandResponseManagerBehavior =
-    new CommandResponseManagerBehavior(ctx, "test-component") with MutableActorMock[CommandResponseManagerMessage]
+  def createCommandStatusService(): CommandResponseManagerBehavior = new CommandResponseManagerBehavior(ctx, "test-component")
 
   test("should be able to add command entry in Command Response Manager") {
     val commandStatusService = createCommandStatusService()

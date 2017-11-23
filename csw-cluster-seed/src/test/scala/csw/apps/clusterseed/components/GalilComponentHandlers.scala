@@ -3,16 +3,16 @@ package csw.apps.clusterseed.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
+import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.FrameworkLogger
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Future
 
@@ -24,8 +24,8 @@ class GalilComponentHandlers(
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
-) extends ComponentHandlers[StartLogging](ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
-    with FrameworkLogger.Simple {
+) extends ComponentHandlers[StartLogging](ctx, componentInfo, commandResponseManager, pubSubRef, locationService) {
+  val log: Logger = new LoggerFactory(componentInfo.name).getLogger
 
   override def initialize(): Future[Unit] = Future.successful(())
 
@@ -51,6 +51,4 @@ class GalilComponentHandlers(
   override def onGoOffline(): Unit = ()
 
   override def onGoOnline(): Unit = ()
-
-  override protected def componentName(): String = componentInfo.name
 }

@@ -1,10 +1,11 @@
 package csw.services.logging.utils;
 
+import akka.actor.AbstractActor;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JGenericLoggerActor;
+import csw.services.logging.javadsl.JGenericLoggerFactory;
 
-public class JGenericActor extends JGenericLoggerActor {
-    private ILogger logger = getLogger();
+public class JGenericActor extends AbstractActor {
+    private ILogger logger = JGenericLoggerFactory.getLogger(context(), getClass());
 
     @Override
     public Receive createReceive() {

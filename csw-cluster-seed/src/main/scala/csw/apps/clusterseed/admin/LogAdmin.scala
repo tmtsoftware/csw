@@ -11,12 +11,14 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.internal.{GetComponentLogMetadata, LogControlMessages, SetComponentLogLevel}
 import csw.services.logging.models.LogMetadata
+import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) extends ClusterSeedLogger.Simple {
+class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
+  val log: Logger = ClusterSeedLogger.getLogger
 
   import actorRuntime._
 

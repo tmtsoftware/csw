@@ -7,18 +7,21 @@ import java.time.Instant
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models.{FileType, _}
 import csw.services.config.api.scaladsl.ConfigService
+import csw.services.config.server.commons.ConfigServerLogger
 import csw.services.config.server.files.AnnexFileService
 import csw.services.config.server.{ActorRuntime, Settings}
-import csw.services.config.server.commons.ConfigServerLogger
+import csw.services.logging.scaladsl.Logger
 import org.tmatesoft.svn.core.wc.SVNRevision
+
 import scala.async.Async._
 import scala.concurrent.Future
 
 class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorRuntime: ActorRuntime, svnRepo: SvnRepo)
-    extends ConfigService
-    with ConfigServerLogger.Simple {
+    extends ConfigService {
 
   import actorRuntime._
+
+  val log: Logger = ConfigServerLogger.getLogger
 
   override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String = ""): Future[ConfigId] =
     async {

@@ -3,6 +3,7 @@ package csw.services.location.internal
 import java.net.{Inet6Address, InetAddress, NetworkInterface}
 
 import csw.services.location.commons.LocationServiceLogger
+import csw.services.logging.scaladsl.Logger
 
 import scala.collection.JavaConverters._
 
@@ -13,7 +14,9 @@ case class NetworkInterfaceNotFound(message: String) extends Exception(message)
  *
  * @param interfaceName Provide the name of network interface where csw cluster is running
  */
-class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider) extends LocationServiceLogger.Simple {
+class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider) {
+
+  val log: Logger = LocationServiceLogger.getLogger
 
   /**
    * Picks an appropriate ipv4 address from the network interface provided
@@ -65,7 +68,9 @@ class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider)
 /**
  *  Provides InetAddresses for network interface
  */
-class NetworkInterfaceProvider extends LocationServiceLogger.Simple {
+class NetworkInterfaceProvider {
+
+  val log: Logger = LocationServiceLogger.getLogger
 
   /**
    * Get Seq of (Index -> List of InetAddress) mapping for each interface

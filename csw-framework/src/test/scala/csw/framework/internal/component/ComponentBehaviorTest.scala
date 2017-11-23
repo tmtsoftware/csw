@@ -1,5 +1,6 @@
 package csw.framework.internal.component
 
+import akka.typed.scaladsl.Actor
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.framework.scaladsl.ComponentHandlers
@@ -8,7 +9,7 @@ import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.IdleMessage.Initialize
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage, FromComponentLifecycleMessage}
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.{FrameworkLogger, Logger}
+import csw.services.logging.scaladsl.Logger
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 
@@ -18,8 +19,8 @@ import scala.concurrent.Future
 // DEOPSCSW-166-CSW HCD Creation
 class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
-  trait MutableActorMock[T] { this: FrameworkLogger.MutableActor[T] ⇒
-    override protected lazy val log: Logger = mock[Logger]
+  trait MutableActorMock[T] { this: Actor.MutableBehavior[T] ⇒
+    protected lazy val log: Logger = mock[Logger]
   }
 
   class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
@@ -36,7 +37,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
         sampleComponentHandler,
         TestProbe[CommandResponseManagerMessage].ref,
         locationService
-      ) with MutableActorMock[ComponentMessage]
+      )
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
   }
 

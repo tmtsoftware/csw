@@ -7,13 +7,14 @@ import csw.messages.location.{AkkaLocation, HttpLocation, Location, TcpLocation}
 import csw.services.location.commons.{CswCluster, LocationServiceLogger}
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.Logger
 
 /**
  * DeathWatchActor tracks the health of all Actors registered with LocationService.
  *
  * @param locationService is used to unregister Actors that are no more alive
  */
-class DeathwatchActor(locationService: LocationService) extends LocationServiceLogger.Simple {
+class DeathwatchActor(locationService: LocationService) {
   import DeathwatchActor.Msg
 
   /**
@@ -24,6 +25,8 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
    */
   def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
     Actor.immutable[Msg] { (context, changeMsg) ⇒
+      val log: Logger = LocationServiceLogger.getLogger(context)
+
       val allLocations = changeMsg.get(AllServices.Key).entries.values.toSet
 
       //find out the ones that are not being watched and watch them
@@ -42,6 +45,8 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
       behavior(allLocations)
     } onSignal {
       case (ctx, Terminated(deadActorRef)) ⇒
+        val log: Logger = LocationServiceLogger.getLogger(ctx)
+
         log.warn(s"Un-watching terminated actor: ${deadActorRef.toString}")
         //stop watching the terminated actor
         ctx.unwatch(deadActorRef)
@@ -62,7 +67,10 @@ class DeathwatchActor(locationService: LocationService) extends LocationServiceL
     }
 }
 
-object DeathwatchActor extends LocationServiceLogger.Simple {
+object DeathwatchActor {
+
+  val log: Logger = LocationServiceLogger.getLogger
+
   import akka.typed.scaladsl.adapter._
   //message type handled by the for the typed deathwatch actor
   type Msg = Changed[AllServices.Value]

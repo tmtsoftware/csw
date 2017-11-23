@@ -5,7 +5,9 @@ import java.net.InetAddress
 import akka.actor.ActorSystem
 import csw.services.logging.internal.LoggingSystem
 
-object LoggingSystemFactory extends GenericLogger.Simple {
+object LoggingSystemFactory {
+
+  val log: Logger = GenericLoggerFactory.getLogger
 
   //To be used for testing purpose only
   private[logging] def start(): LoggingSystem =

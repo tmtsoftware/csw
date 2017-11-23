@@ -11,6 +11,7 @@ import csw.messages.location._
 import csw.services.location.commons.LocationServiceLogger
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.logging.internal.LogControlMessages
+import csw.services.logging.scaladsl.Logger
 
 /**
  * Registration holds information about a connection and its live location. This model is used to register a connection with LocationService.
@@ -37,8 +38,9 @@ final case class AkkaRegistration(
     prefix: Option[String],
     actorRef: ActorRef[_],
     logAdminActorRef: ActorRef[LogControlMessages]
-) extends Registration
-    with LocationServiceLogger.Simple {
+) extends Registration {
+
+  val log: Logger = LocationServiceLogger.getLogger
 
   // ActorPath represents the akka path of an Actor
   private val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef.toUntyped))

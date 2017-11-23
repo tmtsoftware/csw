@@ -1,11 +1,9 @@
 package csw.services.commons.componentlogger
 
-import csw.services.logging.scaladsl.FrameworkLogger
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 //#component-logger
-class Sample(_componentName: String) extends FrameworkLogger.Simple {
-
-  override protected def componentName(): String = _componentName
-
+class Sample(_componentName: String) {
+  val log: Logger = new LoggerFactory(_componentName).getLogger
 }
 //#component-logger

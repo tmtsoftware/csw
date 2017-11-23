@@ -9,7 +9,7 @@ import csw.framework.models.ConfigFileLocation.{Local, Remote}
 import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, HostBootstrapInfo}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.logging.scaladsl.FrameworkLogger
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
@@ -29,14 +29,12 @@ object HostConfig {
     new HostConfig(name, ClusterAwareSettings, startLogging = true).start(args)
 }
 
-private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSettings, startLogging: Boolean = false)
-    extends FrameworkLogger.Simple {
+private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSettings, startLogging: Boolean = false) {
+  val log: Logger = new LoggerFactory(name).getLogger
 
   lazy val actorSystem: ActorSystem           = clusterSettings.system
   lazy val wiring: FrameworkWiring            = FrameworkWiring.make(actorSystem)
   private var processes: Set[process.Process] = _
-
-  override protected def componentName(): String = name
 
   def start(args: Array[String]): Unit =
     if (clusterSettings.seedNodes.isEmpty)

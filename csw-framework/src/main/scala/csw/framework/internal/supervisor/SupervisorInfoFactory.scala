@@ -8,7 +8,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.models.{Component, SupervisorInfo}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.scaladsl.FrameworkLogger
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -17,9 +17,8 @@ import scala.util.control.NonFatal
 /**
  * The factory for creating supervisor actors of a component specified by [[csw.messages.framework.ComponentInfo]]
  */
-class SupervisorInfoFactory(containerName: String) extends FrameworkLogger.Simple {
-
-  override protected def componentName(): String = containerName
+class SupervisorInfoFactory(containerName: String) {
+  val log: Logger = new LoggerFactory(containerName).getLogger
 
   def make(
       containerRef: ActorRef[ContainerIdleMessage],

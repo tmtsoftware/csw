@@ -1,5 +1,5 @@
 package csw.services.location.commons
 
-import csw.services.logging.scaladsl.LibraryLogger
+import csw.services.logging.scaladsl.LoggerFactory
 
-object LocationServiceLogger extends LibraryLogger(Constants.LocationService)
+object LocationServiceLogger extends LoggerFactory(Constants.LocationService)

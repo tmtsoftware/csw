@@ -7,8 +7,11 @@ import csw.apps.clusterseed.admin.internal.JsonSupport
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels.Level
+import csw.services.logging.scaladsl.Logger
 
-trait HttpSupport extends Directives with JsonSupport with ClusterSeedLogger.Simple {
+trait HttpSupport extends Directives with JsonSupport {
+  override val log: Logger = ClusterSeedLogger.getLogger
+
   val logLevelParam: Directive1[Level] = parameter('value).flatMap {
     case value if Level.hasLevel(value) => provide(Level(value))
     case _ =>

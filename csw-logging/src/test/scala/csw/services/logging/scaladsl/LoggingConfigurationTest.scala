@@ -24,12 +24,9 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-123: Allow local component logs to be output to a file
 // DEOPSCSW-126: Configurability of logging characteristics for component / log instance
 // DEOPSCSW-142: Flexibility of logging approaches
-class LoggingConfigurationTest
-    extends FunSuite
-    with Matchers
-    with BeforeAndAfterEach
-    with BeforeAndAfterAll
-    with GenericLogger.Simple {
+class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
+
+  val log: Logger = GenericLoggerFactory.getLogger
 
   private val logFileDir                     = Paths.get("/tmp/csw-test-logs").toFile
   private val sampleLogMessage               = "Sample log message"
@@ -344,7 +341,7 @@ class LoggingConfigurationTest
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 97)"
+    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 94)"
 
     os.toString.trim shouldBe expectedOneLineLog
 

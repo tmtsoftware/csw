@@ -5,6 +5,7 @@ import akka.http.scaladsl.server.{Directives, ExceptionHandler}
 import csw.apps.clusterseed.admin.exceptions.UnresolvedAkkaOrHttpLocationException
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.commons.http.{JsonRejectionHandler, JsonSupport}
+import csw.services.logging.scaladsl.Logger
 import play.api.libs.json.{Json, OFormat}
 
 import scala.util.control.NonFatal
@@ -23,7 +24,8 @@ case object ErrorMessage {
 /**
  * Maps server side exceptions to Http Status codes
  */
-class AdminHandlers extends Directives with JsonRejectionHandler with ClusterSeedLogger.Simple {
+class AdminHandlers extends Directives with JsonRejectionHandler {
+  val log: Logger = ClusterSeedLogger.getLogger
 
   val jsonExceptionHandler: ExceptionHandler = ExceptionHandler {
     case ex: UnresolvedAkkaOrHttpLocationException ⇒

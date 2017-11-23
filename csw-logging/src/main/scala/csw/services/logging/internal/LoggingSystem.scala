@@ -12,7 +12,7 @@ import csw.services.logging.exceptions.AppenderNotFoundException
 import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.models.LogMetadata
-import csw.services.logging.scaladsl.GenericLogger
+import csw.services.logging.scaladsl.{GenericLoggerFactory, Logger}
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
@@ -27,9 +27,11 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param host             host name (to log).
  * @param system           actor system which will be used to create log actors
  */
-class LoggingSystem(name: String, version: String, host: String, system: ActorSystem) extends GenericLogger.Simple {
+class LoggingSystem(name: String, version: String, host: String, system: ActorSystem) {
 
   import LoggingLevels._
+
+  val log: Logger = GenericLoggerFactory.getLogger
 
   private[this] val loggingConfig = system.settings.config.getConfig("csw-logging")
 

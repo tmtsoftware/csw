@@ -1,7 +1,7 @@
 package csw.framework
 
-import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter._
+import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
@@ -15,7 +15,7 @@ import csw.messages.params.states.CurrentState
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.scaladsl.{FrameworkLogger, Logger}
+import csw.services.logging.scaladsl.Logger
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -56,11 +56,4 @@ class FrameworkTestMocks(
       any[String]
     )
   ).thenReturn(compStateProbe.ref)
-
-}
-
-object FrameworkTestMocks {
-  trait MutableActorMock[T] { this: FrameworkLogger.MutableActor[T] ⇒
-    override lazy val log: Logger = MockitoSugar.mock[Logger]
-  }
 }

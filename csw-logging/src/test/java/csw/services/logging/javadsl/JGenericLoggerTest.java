@@ -57,8 +57,8 @@ public class JGenericLoggerTest {
         Await.result(actorSystem.terminate(), Duration.create(10, TimeUnit.SECONDS));
     }
 
-    private class JGenericLoggerUtil implements JGenericLogger {
-        private ILogger logger = getLogger();
+    private class JGenericLoggerUtil {
+        private ILogger logger = JGenericLoggerFactory.getLogger(getClass());
 
        public void start() {
            JLogUtil.logInBulk(logger);
@@ -87,7 +87,7 @@ public class JGenericLoggerTest {
     @Test
     public void testGenericLoggerActorWithoutComponentName() throws InterruptedException {
         ActorRef utilActor = actorSystem.actorOf(Props.create(JGenericActor.class), "JActorUtil");
-        String actorPath = utilActor.path().toString();
+        String actorPath = utilActor.toString();
         String className = JGenericActor.class.getName();
 
         JLogUtil.sendLogMsgToActorInBulk(utilActor);

@@ -8,7 +8,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import csw.services.logging.appenders.LogAppenderBuilder;
 import csw.services.logging.commons.LoggingKeys$;
-import csw.services.logging.components.iris.JIrisActorLogger;
 import csw.services.logging.components.iris.JIrisSupervisorActor;
 import csw.services.logging.components.iris.JIrisTLA;
 import csw.services.logging.components.trombone.JTromboneHCDSupervisorActor;
@@ -100,7 +99,7 @@ public class ILoggerTest {
                 genericLogBuffer.add(log);
         });
 
-        irisLogBuffer = componentLogBuffer.get(JIrisActorLogger.NAME);
+        irisLogBuffer = componentLogBuffer.get("jIRIS");
         tromboneHcdLogBuffer = componentLogBuffer.get("jTromboneHcdActor");
 
         logBuffer.clear();
@@ -160,7 +159,7 @@ public class ILoggerTest {
         testLogBuffer(genericLogBuffer, LoggingLevels.TRACE$.MODULE$);
 
         // Set log level of IRIS component to FATAL
-        loggingSystem.setComponentLogLevel(JIrisActorLogger.NAME, LoggingLevels.FATAL$.MODULE$);
+        loggingSystem.setComponentLogLevel("jIRIS", LoggingLevels.FATAL$.MODULE$);
 
         allComponentsStartLogging();
         Thread.sleep(200);

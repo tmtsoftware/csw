@@ -4,7 +4,7 @@ import akka.actor.ActorSystem;
 import csw.services.logging.internal.LoggingLevels;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JGenericLogger;
+import csw.services.logging.javadsl.JGenericLoggerFactory;
 import csw.services.logging.javadsl.JLogAppenderBuilders;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
 import org.openjdk.jmh.annotations.*;
@@ -32,14 +32,14 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 5)
 @Measurement(iterations = 10)
 @Fork(value = 1)
-public class JE2ELoggingBenchmark implements JGenericLogger {
+public class JE2ELoggingBenchmark {
     private ILogger log;
     private static ActorSystem actorSystem;
     private JPerson person;
 
     @Setup
     public void setup() {
-        log = getLogger();
+        log = JGenericLoggerFactory.getLogger(getClass());
         actorSystem = ActorSystem.create("JE2E");
         LoggingSystem loggingSystem = JLoggingSystemFactory.start("JE2E-Bench", "SNAPSHOT-1.0", "localhost", actorSystem, Collections.singletonList(JLogAppenderBuilders.FileAppender));
         loggingSystem.setDefaultLogLevel(LoggingLevels.INFO$.MODULE$);

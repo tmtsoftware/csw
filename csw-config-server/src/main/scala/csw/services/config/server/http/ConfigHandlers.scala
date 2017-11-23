@@ -5,13 +5,15 @@ import akka.http.scaladsl.server.{Directives, ExceptionHandler}
 import csw.commons.http.{JsonRejectionHandler, JsonSupport}
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
 import csw.services.config.server.commons.ConfigServerLogger
+import csw.services.logging.scaladsl.Logger
 
 import scala.util.control.NonFatal
 
 /**
  * Maps server side exceptions to Http Status codes
  */
-class ConfigHandlers extends Directives with JsonRejectionHandler with ConfigServerLogger.Simple {
+class ConfigHandlers extends Directives with JsonRejectionHandler {
+  val log: Logger = ConfigServerLogger.getLogger
 
   val jsonExceptionHandler: ExceptionHandler = ExceptionHandler {
     case ex: FileAlreadyExists ⇒

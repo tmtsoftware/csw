@@ -19,16 +19,16 @@ import csw.messages.SupervisorExternalMessage;
 import csw.messages.location.*;
 import csw.messages.location.Connection.AkkaConnection;
 import csw.messages.location.Connection.HttpConnection;
-import csw.services.commons.commonlogger.JActorSample;
+import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.javadsl.*;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
-import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.scaladsl.RegistrationFactory;
 import csw.services.logging.internal.LogControlMessages;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JKeys;
+import csw.services.logging.javadsl.JLoggerFactory;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
 import csw.services.logging.scaladsl.LogAdminActorFactory;
 import scala.concurrent.duration.Duration;
@@ -47,9 +47,9 @@ import java.util.concurrent.TimeUnit;
  * An example location service client application.
  */
 //#actor-mixin
-public class JLocationServiceExampleClient extends JActorSample {
+public class JLocationServiceExampleClient extends AbstractActor {
 
-    private ILogger log = getLogger();
+    private ILogger log = new JLoggerFactory("my-component-name").getLogger(context(), getClass());
 //#actor-mixin
     //#create-location-service
     private ILocationService locationService = JLocationServiceFactory.make();

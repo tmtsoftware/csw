@@ -7,7 +7,6 @@ import akka.typed.testkit.{Inbox, StubbedActorContext}
 import csw.common.components.framework.ComponentDomainMessage
 import csw.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
-import csw.framework.FrameworkTestMocks.MutableActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -41,6 +40,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val ctx                                                         = new StubbedActorContext[SupervisorMessage]("test-supervisor", 100, system)
     val timer: TimerScheduler[SupervisorMessage]                    = mock[TimerScheduler[SupervisorMessage]]
     val containerIdleMessageProbe: TestProbe[ContainerIdleMessage]  = TestProbe[ContainerIdleMessage]
+
     val supervisor =
       new SupervisorBehavior(
         ctx,
@@ -51,7 +51,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
         new PubSubBehaviorFactory,
         registrationFactory,
         locationService
-      ) with MutableActorMock[SupervisorMessage]
+      )
 
     verify(timer).startSingleTimer(SupervisorBehavior.InitializeTimerKey, InitializeTimeout, supervisor.initializeTimeout)
 

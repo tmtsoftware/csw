@@ -18,13 +18,15 @@ import csw.messages.location.*;
 import csw.messages.location.Connection.AkkaConnection;
 import csw.messages.location.Connection.HttpConnection;
 import csw.messages.location.Connection.TcpConnection;
+import csw.services.location.commons.ActorSystemFactory;
+import csw.services.location.commons.Constants;
 import csw.services.location.commons.RegistrationFactory;
 import csw.services.location.internal.Networks;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
 import csw.services.location.models.TcpRegistration;
-import csw.services.location.commons.ActorSystemFactory;
 import csw.services.logging.javadsl.ILogger;
+import csw.services.logging.javadsl.JLoggerFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -36,8 +38,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("ConstantConditions")
-public class JLocationServiceImplTest implements JLocationServiceLogger {
-    private ILogger jLogger = getLogger();
+public class JLocationServiceImplTest {
+
+    public ILogger log = new JLoggerFactory(Constants.LocationService()).getLogger(getClass());
 
     private static ILocationService locationService = JLocationServiceFactory.make();
     private ActorSystem actorSystem = ActorSystemFactory.remote();
@@ -70,7 +73,7 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
     public void testRegistrationAndUnregistrationOfHttpComponent() throws ExecutionException, InterruptedException {
         int port = 8080;
 
-        jLogger.info(() -> "in the test class");
+        log.info(() -> "in the test class");
 
         HttpRegistration httpRegistration = RegistrationFactory.http(httpServiceConnection, port, Path);
 
@@ -345,11 +348,13 @@ public class JLocationServiceImplTest implements JLocationServiceLogger {
         probe.expectNoMessage(new FiniteDuration(200, TimeUnit.MILLISECONDS));
     }
 
-    class TestActor extends JLocationServiceLoggerActor {
-        private ILogger jLogger = getLogger();
+    class TestActor extends AbstractActor {
+
+        private ILogger log = new JLoggerFactory(Constants.LocationService()).getLogger(context(), getClass());
+
         @Override
         public AbstractActor.Receive createReceive() {
-            jLogger.info(() -> "in the test actor");
+            log.info(() -> "in the test actor");
             return receiveBuilder().build();
         }
     }

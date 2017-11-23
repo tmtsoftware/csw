@@ -6,26 +6,26 @@ import csw.common.components.framework.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.ComponentMessage;
-import csw.messages.models.PubSub;
 import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
+import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JCommonComponentLogger;
+import csw.services.logging.javadsl.JLoggerFactory;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
 
-import static csw.messages.ccs.commands.CommandResponse.*;
+import static csw.messages.ccs.commands.CommandResponse.Accepted;
+import static csw.messages.ccs.commands.CommandResponse.Invalid;
 
-public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> implements JCommonComponentLogger {
+public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> {
 
-    private String componentName;
     // Demonstrating logger accessibility in Java Component handlers
     private ILogger log;
 
@@ -43,8 +43,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     ) {
         super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, klass);
         this.pubSubRef = pubSubRef;
-        this.componentName = componentInfo.name();
-        this.log = getLogger();
+        this.log = new JLoggerFactory(componentInfo.name()).getLogger(getClass());
     }
 
     @Override
@@ -144,10 +143,5 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(onlineState);
 
         pubSubRef.tell(publish);
-    }
-
-    @Override
-    public String componentName() {
-        return componentName;
     }
 }

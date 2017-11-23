@@ -5,11 +5,12 @@ import akka.typed.scaladsl.Actor
 import csw.services.logging.commons.Constants
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.models.LogMetadata
-import csw.services.logging.scaladsl.GenericLogger
+import csw.services.logging.scaladsl.{GenericLoggerFactory, Logger}
 
 object LogAdminActor {
   private[logging] def behavior(): Behavior[LogControlMessages] = Actor.immutable[LogControlMessages] { (ctx, msg) ⇒
-    val log = GenericLogger.immutable(ctx)
+    val log: Logger = GenericLoggerFactory.getLogger(ctx)
+
     log.debug(s"LogAdminActor received message :[$msg]")
     msg match {
       case GetComponentLogMetadata(componentName, replyTo) ⇒ replyTo ! getLogMetadata(componentName)

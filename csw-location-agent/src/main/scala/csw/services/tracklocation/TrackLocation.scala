@@ -7,7 +7,7 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.CswCluster
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.logging.scaladsl.LogAdminActorFactory
+import csw.services.logging.scaladsl.{LogAdminActorFactory, Logger}
 import csw.services.tracklocation.commons.LocationAgentLogger
 import csw.services.tracklocation.models.Command
 
@@ -20,7 +20,8 @@ import scala.util.control.NonFatal
 /**
  * Starts a given external program, registers it with the location service and unregisters it when the program exits.
  */
-class TrackLocation(names: List[String], command: Command, actorSystem: ActorSystem) extends LocationAgentLogger.Simple {
+class TrackLocation(names: List[String], command: Command, actorSystem: ActorSystem) {
+  val log: Logger = LocationAgentLogger.getLogger
 
   private val cswCluster      = CswCluster.withSystem(actorSystem)
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
