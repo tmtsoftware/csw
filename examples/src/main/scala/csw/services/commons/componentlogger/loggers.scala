@@ -1,5 +1,6 @@
 package csw.services.commons.componentlogger
 
+import akka.typed.scaladsl.ActorContext
 import csw.services.commons.ComponentDomainMessage
 import csw.services.logging.javadsl.JLoggerFactory
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -21,7 +22,7 @@ class SampleActor(loggerFactory: LoggerFactory) extends akka.actor.Actor {
 //#component-logger-actor
 
 //#component-logger-typed-actor
-class SampleTypedActor(loggerFactory: LoggerFactory, ctx: akka.typed.scaladsl.ActorContext[ComponentDomainMessage]) {
+class SampleTypedActor(loggerFactory: LoggerFactory, ctx: ActorContext[ComponentDomainMessage]) {
 
   val log: Logger = loggerFactory.getLogger(ctx)
 }
@@ -30,9 +31,8 @@ class SampleTypedActor(loggerFactory: LoggerFactory, ctx: akka.typed.scaladsl.Ac
 object Sample {
   //#logger-factory-creation
   val loggerFactory: LoggerFactory = new LoggerFactory("my-component-name")
-  //#logger-factory-creation
 
-  //logger-as-java
-  private val jLoggerFactory: JLoggerFactory = loggerFactory.asJava
-  //logger-as-java
+  // convert a scala LoggerFactory to java JLoggerFactory
+  val jLoggerFactory: JLoggerFactory = loggerFactory.asJava
+  //#logger-factory-creation
 }

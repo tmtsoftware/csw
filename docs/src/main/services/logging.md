@@ -92,16 +92,16 @@ pretty=true
 :   @@@vars
     ```
     {"@componentName":"my-component-name",
+     "@host":"INsaloni.local",
+     "@name":"LocationServiceExampleClient",
      "@severity":"INFO",
-     "actor":
-       "akka.tcp://csw-examples-locationServiceClient@10.131.124.238:51256/user/$a",
+     "@version":"0.1",
+     "actor":"Actor[akka://csw-examples-locationServiceClient/user/$a#174153634]",
      "class":"csw.services.location.LocationServiceExampleClient",
-     "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
      "file":"LocationServiceExampleClientApp.scala",
-     "line":131,
-     "message":"Attempting to find connection",
-     "obsId":"foo_obs_id",
-     "timestamp":"2017-07-20T08:15:01.657Z"
+     "line":149,
+     "message":"Result of the find call: None",
+     "timestamp":"2017-11-23T14:09:23.721Z"
     }
     ```
     @@@
@@ -109,7 +109,7 @@ pretty=true
 pretty=false
 :   @@@vars
     ```
-    {"@componentName":"my-component-name","@severity":"INFO","actor":"akka.tcp://csw-examples-locationServiceClient@10.131.124.238:51172/user/$a","class":"csw.services.location.LocationServiceExampleClient","exampleConnection":"LocationServiceExampleComponent-assembly-akka","file":"LocationServiceExampleClientApp.scala","line":131,"message":"Attempting to find connection","obsId":"foo_obs_id","timestamp":"2017-07-20T08:03:08.065Z"}
+    {"@componentName":"my-component-name","@host":"INsaloni.local","@name":"LocationServiceExampleClient","@severity":"INFO","@version":"0.1","actor":"Actor[akka://csw-examples-locationServiceClient/user/$a#-602810834]","class":"csw.services.location.LocationServiceExampleClient","file":"LocationServiceExampleClientApp.scala","line":149,"message":"Result of the find call: None","timestamp":"2017-11-23T14:12:09.979Z"}
     ```
     @@@
     
@@ -194,7 +194,7 @@ Java Typed Actor
 
 @@@ note
 
-The `LoggerFactory` can be changed to `JLoggerFactory` by using `asJava` method and similarly `JLoggerFactory` can be changed to `LoggerFactory` by using `asScala` method 
+The `LoggerFactory` can be changed to `JLoggerFactory` by using `asJava` method and `JLoggerFactory` can be changed to `LoggerFactory` by using `asScala` method 
 
 @@@
 
@@ -251,14 +251,16 @@ Scala
 :   @@@vars
     ```
 {"@componentName":"my-component-name",
+ "@host":"INsaloni.local",
+ "@name":"LocationServiceExampleClient",
  "@severity":"INFO",
- "actor":
-   "akka.tcp://csw-examples-locationServiceClient@131.215.210.170:55532/user/$a",
+ "@version":"0.1",
+ "actor":"Actor[akka://csw-examples-locationServiceClient/user/$a#174153634]",
  "class":"csw.services.location.LocationServiceExampleClient",
  "file":"LocationServiceExampleClientApp.scala",
- "line":116,
+ "line":149,
  "message":"Result of the find call: None",
- "timestamp":"2017-07-26T19:39:59.764Z"
+ "timestamp":"2017-11-23T14:09:23.721Z"
 }
     ```
     @@@
@@ -310,17 +312,19 @@ Scala
 :   @@@vars
     ```
 {"@componentName":"my-component-name",
+ "@host":"INsaloni.local",
+ "@name":"LocationServiceExampleClient",
  "@severity":"INFO",
- "actor":
-   "akka.tcp://csw-examples-locationServiceClient@131.215.210.170:55532/user/$a",
+ "@version":"0.1",
+ "actor":"Actor[akka://csw-examples-locationServiceClient/user/$a#174153634]",
  "class":"csw.services.location.LocationServiceExampleClient",
  "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
  "file":"LocationServiceExampleClientApp.scala",
- "line":110,
+ "line":143,
  "message":
    "Attempting to find AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))",
  "obsId":"foo_obs_id",
- "timestamp":"2017-07-26T19:39:59.756Z"
+ "timestamp":"2017-11-23T14:09:23.716Z"
 }
     ```
     @@@
@@ -373,7 +377,9 @@ Java (Supplier)
  
 
 ## Create LoggerFactory
-
+### Available for test/understanding purpose
+In order to create a LoggerFactory with a custom componentName refer the following code:
+ 
 Scala
 :   @@snip [Sample](../../../../examples/src/main/scala/csw/services/commons/componentlogger/loggers.scala) { #logger-factory-creation }
 
