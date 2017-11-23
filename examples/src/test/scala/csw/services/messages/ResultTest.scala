@@ -91,7 +91,7 @@ class ResultTest extends FunSpec with Matchers {
       //parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
-      //commands
+      //result
       val result: Result = Result(runId, obsId, prefix).add(i1)
 
       //json support - write
@@ -100,7 +100,7 @@ class ResultTest extends FunSpec with Matchers {
       //optionally prettify
       val str: String = Json.prettyPrint(resultJson)
 
-      //construct command from string
+      //construct result from string
       val scFromPrettyStr: Result = JsonSupport.readResult(Json.parse(str))
 
       //json support - read

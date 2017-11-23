@@ -9,6 +9,9 @@ Represents a unique id for each running command. To create new RunId, use parame
 Scala
 :   @@snip [ResultTest.scala](../../../../../examples/src/test/scala/csw/services/messages/ResultTest.scala) { #runid }
 
+Java
+:   @@snip [JResultTest.java](../../../../../examples/src/test/java/csw/services/messages/JResultTest.java) { #runid }
+
 Creating a Result requires:
 
  * **[RunId](result.html)**
@@ -19,11 +22,17 @@ Creating a Result requires:
 Scala
 :   @@snip [ResultTest.scala](../../../../../examples/src/test/scala/csw/services/messages/ResultTest.scala) { #result }
 
+Java
+:   @@snip [JResultTest.java](../../../../../examples/src/test/java/csw/services/messages/JResultTest.java) { #result }
+
 ### JSON serialization
 State variables can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize DemandState and CurrentState.
 
 Scala
 :   @@snip [ResultTest.scala](../../../../../examples/src/test/scala/csw/services/messages/ResultTest.scala) { #json-serialization }
+
+Java
+:   @@snip [JResultTest.java](../../../../../examples/src/test/java/csw/services/messages/JResultTest.java) { #json-serialization }
 
 ### Unique Key constraint
 
@@ -39,3 +48,6 @@ Here are some examples that illustrate this point:
 
 Scala
 :   @@snip [ResultTest.scala](../../../../../examples/src/test/scala/csw/services/messages/ResultTest.scala) { #unique-key }
+
+Java
+:   @@snip [JResultTest.java](../../../../../examples/src/test/java/csw/services/messages/JResultTest.java) { #unique-key }
