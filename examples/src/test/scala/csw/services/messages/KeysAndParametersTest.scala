@@ -25,9 +25,9 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       val booleanParam: Parameter[Boolean] = k1.set(true)
 
       //storing multiple values
-      val paramWithManyShorts1: Parameter[Short] = k2.set(1, 2, 3, 4)
-      val paramWithManyShorts2: Parameter[Short] = k2 -> (1, 2, 3, 4)
-      val paramWithManyShorts3: Parameter[Short] = k2 -> Array[Short](1, 2, 3, 4)
+      val paramWithShorts1: Parameter[Short] = k2.set(1, 2, 3, 4)
+      val paramWithShorts2: Parameter[Short] = k2 -> (1, 2, 3, 4)
+      val paramWithShorts3: Parameter[Short] = k2 -> Array[Short](1, 2, 3, 4)
 
       //associating units
       val weekDays: Array[String]            = Array("Sunday", "Monday", "Tuesday")
@@ -37,21 +37,22 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       //deault unit is NoUnits
       assert(booleanParam.units === Units.NoUnits)
 
-      //set units explicitly or an existing Parameter
-      paramWithManyShorts1.withUnits(Units.meter)
+      //set units explicitly on an existing Parameter
+      val paramWithUnits3: Parameter[Short] = paramWithShorts1.withUnits(Units.meter)
 
-      //retrieve values rom Parameter
-      val allValues: Array[Short] = paramWithManyShorts1.values
+      //retrieve values from Parameter
+      val allValues: Array[Short] = paramWithShorts1.values
 
       //retrieve just top value
-      val head: Short = paramWithManyShorts1.head
+      val head: Short = paramWithShorts1.head
       //#primitives
 
       //validations
       assert(head === 1)
       assert(allValues === Array(1, 2, 3, 4))
-      assert(paramWithManyShorts1.values === paramWithManyShorts2.values)
-      assert(paramWithManyShorts2.values === paramWithManyShorts3.values)
+      assert(paramWithShorts1.values === paramWithShorts2.values)
+      assert(paramWithShorts2.values === paramWithShorts3.values)
+      assert(paramWithUnits3.units === Units.meter)
       assert(paramWithUnits1.values === paramWithUnits2.values)
     }
 
@@ -124,15 +125,19 @@ class KeysAndParametersTest extends FunSpec with Matchers {
 
       //keys
       val choice1Key: GChoiceKey = ChoiceKey.make("mode", choices)
-      val choice2Key: GChoiceKey =
-        ChoiceKey.make("mode-reset", Choices.fromChoices(Choice("c"), Choice("b"), Choice("a")))
+      val choice2Key: GChoiceKey = ChoiceKey.make(
+        "mode-reset",
+        Choices.fromChoices(Choice("c"), Choice("b"), Choice("a"))
+      )
 
       //store values
-      val p1: Parameter[Choice] = choice1Key.set(Array(Choice("A"))).withUnits(Units.foot)
+      val p1: Parameter[Choice] = choice1Key
+        .set(Array(Choice("A")))
+        .withUnits(Units.foot)
       val p2: Parameter[Choice] = choice2Key.set(Array(Choice("c")))
 
       //add units
-      val paramWithDegree = p1.withUnits(Units.foot)
+      val paramWithFoot = p1.withUnits(Units.foot)
 
       //default unit is NoUnits
       assert(p2.units === Units.NoUnits)
@@ -145,7 +150,7 @@ class KeysAndParametersTest extends FunSpec with Matchers {
       //validations
       head should be(Choice("A"))
       values should be(Array(Choice("c")))
-      paramWithDegree.units should be(Units.foot)
+      paramWithFoot.units should be(Units.foot)
     }
 
     it("should show usage of radec") {

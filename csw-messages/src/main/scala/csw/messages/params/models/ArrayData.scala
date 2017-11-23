@@ -30,17 +30,13 @@ object ArrayData {
 
   implicit def fromArray[T](xs: Array[T]): ArrayData[T] = new ArrayData(xs)
 
+  //scala
   def fromArray[T: ClassTag](xs: T*): ArrayData[T] = new ArrayData(xs.toArray[T])
+  //A Java helper to instantiate ArrayData
+  def fromJavaArray[T](array: Array[T]): ArrayData[T] = ArrayData.fromArray(array)
 
   implicit def typeMapper[T: ClassTag, S <: ItemType[T]: ItemTypeCompanion]: TypeMapper[S, ArrayData[T]] =
     TypeMapper[S, ArrayData[T]](x ⇒ ArrayData(x.values.toArray[T]))(x ⇒ ItemTypeCompanion.make(x.data))
 
   implicit def conversion[A, B](implicit conversion: A ⇒ B): ArrayData[A] ⇒ ArrayData[B] = _.asInstanceOf[ArrayData[B]]
-}
-
-/**
- * A Java helper to instantiate ArrayData
- */
-object JArrayData {
-  def fromArray[T](array: Array[T]): ArrayData[T] = ArrayData.fromArray(array)
 }

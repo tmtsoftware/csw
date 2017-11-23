@@ -1,6 +1,5 @@
 package csw.messages.params.models;
 
-import csw.messages.params.models.JMatrixData;
 import csw.messages.params.models.MatrixData;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,12 +16,12 @@ public class JMatrixDataTest {
         Float[][] floatData = {{10000.10f, 20000.20f, 30000.30f}, {40000.40f, 50000f, 60000f}};
         Double[][] doubleData = {{100000.100d, 200000.200d, 300000.300d}, {400000.400d, 500000d, 600000d}};
 
-        MatrixData<Byte> byteMatrixData = JMatrixData.fromArrays(Byte.class, byteData);
-        MatrixData<Short> shortMatrixData = JMatrixData.fromArrays(Short.class, shortData);
-        MatrixData<Long> longMatrixData = JMatrixData.fromArrays(Long.class, longData);
-        MatrixData<Integer> integerMatrixData = JMatrixData.fromArrays(Integer.class, intData);
-        MatrixData<Float> floatMatrixData = JMatrixData.fromArrays(Float.class, floatData);
-        MatrixData<Double> doubleMatrixData = JMatrixData.fromArrays(Double.class, doubleData);
+        MatrixData<Byte> byteMatrixData = MatrixData.fromJavaArrays(Byte.class, byteData);
+        MatrixData<Short> shortMatrixData = MatrixData.fromJavaArrays(Short.class, shortData);
+        MatrixData<Long> longMatrixData = MatrixData.fromJavaArrays(Long.class, longData);
+        MatrixData<Integer> integerMatrixData = MatrixData.fromJavaArrays(Integer.class, intData);
+        MatrixData<Float> floatMatrixData = MatrixData.fromJavaArrays(Float.class, floatData);
+        MatrixData<Double> doubleMatrixData = MatrixData.fromJavaArrays(Double.class, doubleData);
 
         Byte[][] actualByteValuesArray = (Byte[][])byteMatrixData.values();
         Short[][] actualShortValuesArray = (Short[][])shortMatrixData.values();

@@ -1,7 +1,6 @@
 package csw.messages.params.generics;
 
 import csw.messages.params.models.ArrayData;
-import csw.messages.params.models.JArrayData;
 import csw.messages.params.models.Units;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,7 +16,7 @@ public class JArrayKeyTypeTest {
 
     private final Units NoUnit = NoUnits;
 
-    void commonAssertions(String keyName, KeyType keyType, ArrayData[] testData, Parameter parameter, Units unit) {
+    private void commonAssertions(String keyName, KeyType keyType, ArrayData[] testData, Parameter parameter, Units unit) {
         Assert.assertEquals(keyName, keyName);
         Assert.assertEquals(keyType,parameter.keyType());
 
@@ -43,8 +42,8 @@ public class JArrayKeyTypeTest {
         Byte[] byteArray1 = {1, 2, 3};
         Byte[] byteArray2 = {4, 5, 6, 7};
 
-        ArrayData<Byte> data1 = JArrayData.fromArray(byteArray1);
-        ArrayData<Byte> data2 = JArrayData.fromArray(byteArray2);
+        ArrayData<Byte> data1 = ArrayData.fromJavaArray(byteArray1);
+        ArrayData<Byte> data2 = ArrayData.fromJavaArray(byteArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -63,8 +62,8 @@ public class JArrayKeyTypeTest {
         Short[] shortArray1 = {10, 20, 30};
         Short[] shortArray2 = {100, 200, 300, 400};
 
-        ArrayData<Short> data1 = JArrayData.fromArray(shortArray1);
-        ArrayData<Short> data2 = JArrayData.fromArray(shortArray2);
+        ArrayData<Short> data1 = ArrayData.fromJavaArray(shortArray1);
+        ArrayData<Short> data2 = ArrayData.fromJavaArray(shortArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -83,8 +82,8 @@ public class JArrayKeyTypeTest {
         Long[] longArray1 = {100L, 200L, 300L};
         Long[] longArray2 = {400L, 500L, 600L, 700L};
 
-        ArrayData<Long> data1 = JArrayData.fromArray(longArray1);
-        ArrayData<Long> data2 = JArrayData.fromArray(longArray2);
+        ArrayData<Long> data1 = ArrayData.fromJavaArray(longArray1);
+        ArrayData<Long> data2 = ArrayData.fromJavaArray(longArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -103,8 +102,8 @@ public class JArrayKeyTypeTest {
         Integer[] integerArray1 = {100, 200, 300};
         Integer[] integerArray2 = {400, 500, 600, 700};
 
-        ArrayData<Integer> data1 = JArrayData.fromArray(integerArray1);
-        ArrayData<Integer> data2 = JArrayData.fromArray(integerArray2);
+        ArrayData<Integer> data1 = ArrayData.fromJavaArray(integerArray1);
+        ArrayData<Integer> data2 = ArrayData.fromJavaArray(integerArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -124,8 +123,8 @@ public class JArrayKeyTypeTest {
         Float[] floatArray1 = {100f, 200f, 300f};
         Float[] floatArray2 = {400f, 500f, 600f, 700f};
 
-        ArrayData<Float> data1 = JArrayData.fromArray(floatArray1);
-        ArrayData<Float> data2 = JArrayData.fromArray(floatArray2);
+        ArrayData<Float> data1 = ArrayData.fromJavaArray(floatArray1);
+        ArrayData<Float> data2 = ArrayData.fromJavaArray(floatArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};
@@ -144,8 +143,8 @@ public class JArrayKeyTypeTest {
         Double[] doubleArray1 = {100d, 200d, 300d};
         Double[] doubleArray2 = {400d, 500d, 600d, 700d};
 
-        ArrayData<Double> data1 = JArrayData.fromArray(doubleArray1);
-        ArrayData<Double> data2 = JArrayData.fromArray(doubleArray2);
+        ArrayData<Double> data1 = ArrayData.fromJavaArray(doubleArray1);
+        ArrayData<Double> data2 = ArrayData.fromJavaArray(doubleArray2);
 
         // key.set without Units
         ArrayData[] arrayData = new ArrayData[]{data1, data2};

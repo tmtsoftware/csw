@@ -50,6 +50,12 @@ object MatrixData {
   def fromArrays[T: ClassTag](xs: Array[T]*): MatrixData[T] =
     new MatrixData[T](xs.toArray.map(x ⇒ x: mutable.WrappedArray[T]))
 
+  /**
+   * Java helper to construct a MatrixData from a given Array[T]
+   */
+  def fromJavaArrays[T](klass: Class[T], xs: Array[Array[T]]): MatrixData[T] =
+    new MatrixData[T](xs.map(x ⇒ x: mutable.WrappedArray[T]))(ClassTag(klass))
+
   //Protobuf converter
   implicit def typeMapper[T: ClassTag, S <: ItemType[ArrayData[T]]: ItemTypeCompanion]: TypeMapper[S, MatrixData[T]] =
     TypeMapper[S, MatrixData[T]](x ⇒ MatrixData.fromArrays(x.values.toArray.map(a ⇒ a.data.array)))(
@@ -58,12 +64,4 @@ object MatrixData {
 
   implicit def conversion[A, B](implicit conversion: A ⇒ B): MatrixData[A] ⇒ MatrixData[B] =
     _.asInstanceOf[MatrixData[B]]
-}
-
-/**
- * Helper functions for Java
- */
-object JMatrixData {
-  def fromArrays[T](klass: Class[T], xs: Array[Array[T]]): MatrixData[T] =
-    new MatrixData[T](xs.map(x ⇒ x: mutable.WrappedArray[T]))(ClassTag(klass))
 }

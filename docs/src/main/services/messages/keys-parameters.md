@@ -28,6 +28,9 @@ A **Parameter** is a collection of Keys and values or binary data. A key is **un
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #primitives }
 
+Java
+:   @@snip [JKeysAndParametersTest.java](../../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #primitives }
+
 ### Arrays
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
@@ -42,6 +45,9 @@ Scala
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #arrays }
 
+Java
+:   @@snip [JKeysAndParametersTest.java](../../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #arrays }
+
 ### Matrices
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
@@ -55,6 +61,10 @@ Scala
 
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #matrices }
+
+Java
+:   @@snip [JKeysAndParametersTest.java](../../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #matrices }
+
 
 ### Domain Specific Types
 
@@ -71,6 +81,10 @@ A key for a choice item similar to an enumeration.
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #choice }
 
+Java
+:   @@snip [JKeysAndParametersTest.java](../../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #choice }
+
+
 #### RaDec
 
 Holds Ra(Right Ascension) and Dec(Declination) values
@@ -78,9 +92,16 @@ Holds Ra(Right Ascension) and Dec(Declination) values
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #radec }
 
+Java
+:   @@snip [JKeysAndParametersTest.java](../../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #radec }
+
+
 #### Struct
 
 Stores a set of Parameters for telescope and instrument control. Lot of utility functions available for store, add, remove, list Keys and Paramete
 
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #struct }
+
+Java
+:   @@snip [JKeysAndParametersTest.java](../../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #struct }

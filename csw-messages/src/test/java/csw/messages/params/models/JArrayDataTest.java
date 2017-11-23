@@ -1,7 +1,5 @@
 package csw.messages.params.models;
 
-import csw.messages.params.models.ArrayData;
-import csw.messages.params.models.JArrayData;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,12 +15,12 @@ public class JArrayDataTest {
         Float[] floatData = {10000.10f, 20000.20f, 30000.30f};
         Double[] doubleData = {100000.100d, 200000.200d, 300000.300d};
 
-        ArrayData<Byte> byteArrayData = JArrayData.fromArray(byteData);
-        ArrayData<Short> shortArrayData = JArrayData.fromArray(shortData);
-        ArrayData<Long> longArrayData = JArrayData.fromArray(longData);
-        ArrayData<Integer> integerArrayData = JArrayData.fromArray(intData);
-        ArrayData<Float> floatArrayData = JArrayData.fromArray(floatData);
-        ArrayData<Double> doubleArrayData = JArrayData.fromArray(doubleData);
+        ArrayData<Byte> byteArrayData = ArrayData.fromJavaArray(byteData);
+        ArrayData<Short> shortArrayData = ArrayData.fromJavaArray(shortData);
+        ArrayData<Long> longArrayData = ArrayData.fromJavaArray(longData);
+        ArrayData<Integer> integerArrayData = ArrayData.fromJavaArray(intData);
+        ArrayData<Float> floatArrayData = ArrayData.fromJavaArray(floatData);
+        ArrayData<Double> doubleArrayData = ArrayData.fromJavaArray(doubleData);
 
         Byte[] actualByteValuesArray = (Byte[])byteArrayData.values();
         Short[] actualShortValuesArray = (Short[])shortArrayData.values();

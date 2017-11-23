@@ -1,6 +1,5 @@
 package csw.messages.params.generics;
 
-import csw.messages.params.models.JMatrixData;
 import csw.messages.params.models.MatrixData;
 import csw.messages.params.models.Units;
 import org.junit.Assert;
@@ -61,7 +60,7 @@ public class JMatrixKeyTypeTest {
     @Test
     public void matrixKeyParameterTest() {
         Parameter parameter;
-        MatrixData matrixData = JMatrixData.fromArrays(Object.class, data);
+        MatrixData matrixData = MatrixData.fromJavaArrays(Object.class, data);
         MatrixData[] paramValues = {matrixData};
 
         if (units.isPresent()) parameter = matrixKey.make(keyName).set(paramValues, units.get());
