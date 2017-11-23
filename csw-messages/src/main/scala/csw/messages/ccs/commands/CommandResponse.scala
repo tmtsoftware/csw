@@ -32,6 +32,7 @@ object CommandResponse {
     case error: Error                             => error.copy(runId = id)
     case cancelled: Cancelled                     => cancelled.copy(runId = id)
     case commandNotAvailable: CommandNotAvailable => commandNotAvailable.copy(runId = id)
+    case notAllowed: NotAllowed                   => notAllowed.copy(runId = id)
   }
 }
 
