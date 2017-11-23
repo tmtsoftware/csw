@@ -2,25 +2,29 @@ package csw.command
 
 import java.util.UUID
 
+import akka.actor.Scheduler
 import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
+import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.Submit
+import csw.messages.CommandResponseManagerMessage
 import csw.messages.SupervisorLockMessage.Lock
 import csw.messages.ccs.CommandIssue.ComponentLockedIssue
-import csw.messages.ccs.commands.CommandResponse.{Completed, NotAllowed}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid, NotAllowed}
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.LockingResponse
 import csw.messages.params.models.ObsId
+import csw.services.ccs.common.ActorRefExts.RichActor
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContextExecutor}
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 
 class CommandServiceTestMultiJvm1 extends CommandServiceTest(0)
 class CommandServiceTestMultiJvm2 extends CommandServiceTest(0)
@@ -35,6 +39,8 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
   implicit val actorSystem: ActorSystem[_]  = system.toTyped
   implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
+  implicit val timeout: Timeout             = 5.seconds
+  implicit val scheduler: Scheduler         = actorSystem.scheduler
   implicit val testkit: TestKitSettings     = TestKitSettings(actorSystem)
 
   test("sender of command should receive appropriate responses") {
@@ -79,6 +85,26 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       assemblyRef ! Submit(assemblySetup, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(5.seconds, Completed(runId))
+
+      // short running command
+      val commandResponse =
+        Await.result(assemblyRef.ask[CommandResponse](Submit(Setup(obsId, invalidCmdPrefix), _)), timeout.duration)
+
+      commandResponse shouldBe a[Invalid]
+
+      // long running command which does not use matcher
+      val longCommandResponse = Await.result(
+        assemblyRef.ask[CommandResponse](Submit(Setup(obsId, acceptedCmdPrefix), _)).flatMap {
+          case _: Accepted ⇒ assemblyRef.ask[CommandResponse](CommandResponseManagerMessage.Subscribe(runId, _))
+          case x           ⇒ Future.successful(x)
+        },
+        timeout.duration
+      )
+
+      longCommandResponse shouldBe Completed(runId)
+
+      // long running command which uses matcher
+
       enterBarrier("immediate-setup-complete")
 
       // acquire lock on assembly

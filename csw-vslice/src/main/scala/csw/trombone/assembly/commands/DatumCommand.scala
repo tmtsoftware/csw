@@ -48,7 +48,7 @@ class DatumCommand(
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
       tromboneHCD.get
-        .ask[CommandResponse](Submit(Setup(s.obsId, TromboneHcdState.axisDatumCK), ctx.spawnAnonymous(Actor.ignore)))
+        .ask[CommandResponse](Submit(Setup(s.obsId, TromboneHcdState.axisDatumCK), _))
         .flatMap {
           case _: Accepted ⇒
             PublishedStateMatcher.ask(tromboneHCD.get, AssemblyMatchers.idleMatcher, ctx).map {

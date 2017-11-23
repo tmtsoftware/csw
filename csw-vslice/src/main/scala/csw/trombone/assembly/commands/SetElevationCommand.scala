@@ -59,7 +59,7 @@ class SetElevationCommand(
 
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
-      tromboneHCD.get.ask[CommandResponse](Submit(scOut, ctx.spawnAnonymous(Actor.ignore))).flatMap {
+      tromboneHCD.get.ask[CommandResponse](Submit(scOut, _)).flatMap {
         case Accepted(_) ⇒
           PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher, ctx).map {
             case MatchCompleted =>

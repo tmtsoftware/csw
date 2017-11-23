@@ -3,13 +3,15 @@ package csw.common.components.command
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
+import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{OtherIssue, WrongPrefixIssue}
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, CompletedWithResult, Invalid}
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.messages.models.PubSub.PublisherMessage
+import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.FrameworkLogger
@@ -42,7 +44,11 @@ class ComponentHandlerForCommand(
     case _                    ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.prefix.prefix}"))
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = ???
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = {
+    val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
+    val result                = Result(controlCommand.runId, controlCommand.obsId, controlCommand.prefix, Set(param))
+    commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
+  }
 
   override def onOneway(controlCommand: ControlCommand): Unit = ???
 

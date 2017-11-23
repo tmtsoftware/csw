@@ -60,7 +60,7 @@ class PositionCommand(
         .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
-      tromboneHCD.get.ask[CommandResponse](Submit(scOut, ctx.spawnAnonymous(Actor.ignore))).flatMap {
+      tromboneHCD.get.ask[CommandResponse](Submit(scOut, _)).flatMap {
         case _: Accepted ⇒
           PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher, ctx).map {
             case MatchCompleted =>

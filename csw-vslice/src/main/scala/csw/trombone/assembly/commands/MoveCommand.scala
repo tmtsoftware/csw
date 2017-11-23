@@ -57,7 +57,7 @@ class MoveCommand(
     } else {
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveMoving), startState.sodiumLayer, startState.nss))
 
-      tromboneHCD.get.ask[CommandResponse](Submit(scOut, ctx.spawnAnonymous(Actor.ignore))).flatMap {
+      tromboneHCD.get.ask[CommandResponse](Submit(scOut, _)).flatMap {
         case _: Accepted ⇒
           PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher, ctx).map {
             case MatchCompleted =>

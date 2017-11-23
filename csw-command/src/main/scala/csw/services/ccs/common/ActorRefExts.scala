@@ -9,7 +9,6 @@ import scala.concurrent.Future
 
 object ActorRefExts {
   implicit class RichActor[A](val ref: ActorRef[A]) extends AnyVal {
-    def ask[B](command: A)(implicit timeout: Timeout, scheduler: Scheduler): Future[B] = ref ? execute(command)
-    private def execute[B](command: A)(replyTo: ActorRef[B]): A                        = command
+    def ask[B](f: ActorRef[B] ⇒ A)(implicit timeout: Timeout, scheduler: Scheduler): Future[B] = ref ? f
   }
 }
