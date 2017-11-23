@@ -8,7 +8,7 @@ object IRISLibraryLogger extends LibraryLogger(IRIS.COMPONENT_NAME)
 
 class IRIS(logger: LoggerFactory) extends Actor {
 
-  private val log: Logger = logger.getLogger(self)
+  private val log: Logger = logger.getLogger(context)
 
   // Do not add any lines before this method
   // Tests are written to assert on this line numbers

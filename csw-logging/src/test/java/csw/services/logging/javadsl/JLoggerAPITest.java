@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 // DEOPSCSW-278: Create Java API without arguments as suppliers
 public class JLoggerAPITest extends JGenericSimple {
 
-    private ILogger logger = getLogger();
+    private ILogger logger = JGenericLoggerFactory.getLogger(getClass());;
 
     private String message = "Sample log message";
     private String exceptionMessage = "Sample exception message";

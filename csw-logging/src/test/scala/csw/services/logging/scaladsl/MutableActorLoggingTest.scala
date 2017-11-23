@@ -19,7 +19,7 @@ class TromboneMutableActor(
 ) extends Actor.MutableBehavior[LogCommand] {
   override def onMessage(msg: LogCommand): Behavior[LogCommand] = {
 
-    val log: Logger = loggerFactory.getLogger(ctx.self)
+    val log: Logger = loggerFactory.getLogger(ctx)
 
     msg match {
       case LogTrace => log.trace("Level is trace")

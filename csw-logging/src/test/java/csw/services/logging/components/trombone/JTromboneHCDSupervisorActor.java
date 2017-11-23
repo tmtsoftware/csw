@@ -9,7 +9,7 @@ public class JTromboneHCDSupervisorActor extends AbstractActor {
     private ILogger log;
 
     public JTromboneHCDSupervisorActor(JLoggerFactory loggerFactory) {
-        this.log = loggerFactory.getLogger(self(), getClass());
+        this.log = loggerFactory.getLogger(context(), getClass());
     }
 
     @Override
