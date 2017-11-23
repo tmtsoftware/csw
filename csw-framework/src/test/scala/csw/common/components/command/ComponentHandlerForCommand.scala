@@ -1,7 +1,11 @@
 package csw.common.components.command
 
+import akka.actor
+import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.{ActorMaterializer, ThrottleMode}
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages._
@@ -16,6 +20,7 @@ import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
+import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 class ComponentHandlerForCommand(
@@ -28,7 +33,9 @@ class ComponentHandlerForCommand(
   val log: Logger = new LoggerFactory("ComponentHandlerForCommand").getLogger(ctx)
 
   import ComponentStateForCommand._
-  implicit val ec: ExecutionContext = ctx.executionContext
+  implicit val actorSystem: actor.ActorSystem = ctx.system.toUntyped
+  implicit val ec: ExecutionContext           = ctx.executionContext
+  implicit val mat: ActorMaterializer         = ActorMaterializer()
 
   override def initialize(): Future[Unit] = Future.unit
 
@@ -52,9 +59,10 @@ class ComponentHandlerForCommand(
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = {
-    Thread.sleep(2000)
-    for (i <- 1 to 10)
-      pubSubRef ! Publish(CurrentState(controlCommand.prefix, Set(KeyType.IntKey.make("encoder").set(i * 10))))
+    Source(1 to 10)
+      .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.prefix, Set(KeyType.IntKey.make("encoder").set(i * 10)))))
+      .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
+      .runWith(Sink.ignore)
   }
 
   override def onShutdown(): Future[Unit] = ???
