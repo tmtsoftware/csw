@@ -11,15 +11,18 @@ import csw.framework.FrameworkTestMocks.MutableActorMock
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
+import csw.messages.CommandResponseManagerMessage.Query
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.ccs.commands.CommandResponse
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.models.{LifecycleStateChanged, PubSub, ToComponentLifecycleMessage}
+import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 import csw.messages.{models, _}
 import org.mockito.ArgumentMatchers
@@ -55,6 +58,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val childComponentInbox: Inbox[ComponentMessage]                    = ctx.childInbox(supervisor.component.get.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)
+    val childCmdResponseMgrInbox: Inbox[CommandResponseManagerMessage]  = ctx.childInbox(supervisor.commandResponseManager)
   }
 
   test("supervisor should start in Idle lifecycle state and spawn four actors") {
@@ -282,5 +286,25 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     intercept[InitializationFailed.type] {
       supervisor.onSignal(Terminated(childComponentInbox.ref)(FailureStop("reason of failing")))
     }
+  }
+
+  test("supervisor should handle Command Response Manager messages by forwarding it to Command Response Manager") {
+    val testData = new TestData(hcdInfo)
+    import testData._
+
+    val childRef        = childComponentInbox.ref.upcast
+    val subscriberProbe = TestProbe[CommandResponse]
+    val testCmdId       = RunId()
+
+    supervisor.onMessage(Running(childRef))
+
+    supervisor.onMessage(Query(testCmdId, subscriberProbe.ref))
+    childCmdResponseMgrInbox.receiveMsg() shouldBe Query(testCmdId, subscriberProbe.ref)
+
+    supervisor.onMessage(CommandResponseManagerMessage.Subscribe(testCmdId, subscriberProbe.ref))
+    childCmdResponseMgrInbox.receiveMsg() shouldBe CommandResponseManagerMessage.Subscribe(testCmdId, subscriberProbe.ref)
+
+    supervisor.onMessage(CommandResponseManagerMessage.Unsubscribe(testCmdId, subscriberProbe.ref))
+    childCmdResponseMgrInbox.receiveMsg() shouldBe CommandResponseManagerMessage.Unsubscribe(testCmdId, subscriberProbe.ref)
   }
 }

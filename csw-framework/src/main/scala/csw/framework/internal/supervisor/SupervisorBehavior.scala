@@ -8,6 +8,7 @@ import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Ter
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
@@ -187,8 +188,11 @@ class SupervisorBehavior(
    * @param runningMessage Message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
-    case Lock(prefix, token, replyTo)   ⇒ lockComponent(prefix, token, replyTo)
-    case Unlock(prefix, token, replyTo) ⇒ unlockComponent(prefix, token, replyTo)
+    case Query(commandId, replyTo)       ⇒ commandResponseManager ! Query(commandId, replyTo)
+    case Subscribe(commandId, replyTo)   ⇒ commandResponseManager ! Subscribe(commandId, replyTo)
+    case Unsubscribe(commandId, replyTo) ⇒ commandResponseManager ! Unsubscribe(commandId, replyTo)
+    case Lock(prefix, token, replyTo)    ⇒ lockComponent(prefix, token, replyTo)
+    case Unlock(prefix, token, replyTo)  ⇒ unlockComponent(prefix, token, replyTo)
     case commandMessage: CommandMessage ⇒
       if (lockManager.allowCommand(commandMessage)) runningComponent.get ! commandMessage
     case runningMessage: RunningMessage ⇒ handleRunningMessage(runningMessage)

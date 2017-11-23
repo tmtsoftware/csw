@@ -116,12 +116,12 @@ object CommandResponseManagerMessage {
   case class UpdateSubCommand(subCommandId: RunId, commandResponse: CommandResponse) extends CommandResponseManagerMessage
   case class Query(commandId: RunId, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
-      with SupervisorExternalMessage
+      with SupervisorRunningMessage
   case class Subscribe(commandId: RunId, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
-      with SupervisorExternalMessage
-  case class UnSubscribe(commandId: RunId, replyTo: ActorRef[CommandResponse])
+      with SupervisorRunningMessage
+  case class Unsubscribe(commandId: RunId, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
-      with SupervisorExternalMessage
+      with SupervisorRunningMessage
 
 }

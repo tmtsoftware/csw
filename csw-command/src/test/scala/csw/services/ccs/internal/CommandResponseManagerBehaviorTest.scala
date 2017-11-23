@@ -78,7 +78,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe.ref))
     commandStatusService.commandStatus.cmdToCmdStatus(runId).subscribers should contain(commandResponseProbe.ref)
 
-    commandStatusService.onMessage(UnSubscribe(runId, commandResponseProbe.ref))
+    commandStatusService.onMessage(Unsubscribe(runId, commandResponseProbe.ref))
     commandStatusService.commandStatus.cmdToCmdStatus(runId).subscribers should not contain commandResponseProbe.ref
   }
 
