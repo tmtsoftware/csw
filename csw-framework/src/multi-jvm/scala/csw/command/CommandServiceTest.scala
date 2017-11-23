@@ -3,6 +3,7 @@ package csw.command
 import java.util.UUID
 
 import akka.actor.Scheduler
+import akka.stream.ActorMaterializer
 import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
@@ -10,17 +11,21 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.CommandMessage.Submit
+import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.SupervisorLockMessage.Lock
 import csw.messages.ccs.CommandIssue.ComponentLockedIssue
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid, NotAllowed}
+import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.LockingResponse
+import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
+import csw.messages.params.states.DemandState
 import csw.services.ccs.common.ActorRefExts.RichActor
+import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.services.ccs.internal.matchers.{DemandMatcher, PublishedStateMatcher}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.concurrent.duration.DurationDouble
@@ -88,7 +93,10 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       // short running command
       val commandResponse =
-        Await.result(assemblyRef.ask[CommandResponse](Submit(Setup(obsId, invalidCmdPrefix), _)), timeout.duration)
+        Await.result(
+          assemblyRef.ask[CommandResponse](Submit(Setup(obsId, invalidCmdPrefix), _)),
+          timeout.duration
+        )
 
       commandResponse shouldBe a[Invalid]
 
@@ -104,6 +112,24 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       longCommandResponse shouldBe Completed(runId)
 
       // long running command which uses matcher
+      val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
+      val demandMatcher         = DemandMatcher(DemandState(acceptedCmdPrefix, Set(param)), withUnits = false, timeout)
+
+      val matchedResponse = Await.result(
+        assemblyRef.ask[CommandResponse](Oneway(Setup(obsId, acceptedCmdPrefix), _)).flatMap {
+          case _: Accepted ⇒
+            PublishedStateMatcher
+              .ask(assemblyRef, demandMatcher)(actorSystem.executionContext, ActorMaterializer())
+              .map {
+                case MatchCompleted ⇒ Completed(runId)
+                case MatchFailed(_) ⇒ Error(runId, "Demand could not be matched")
+              }
+          case x ⇒ Future.successful(x)
+        },
+        timeout.duration
+      )
+
+      matchedResponse shouldBe Completed(runId)
 
       enterBarrier("immediate-setup-complete")
 

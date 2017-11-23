@@ -1,7 +1,9 @@
 package csw.trombone.assembly.commands
 
-import akka.actor.Scheduler
+import akka.actor.{ActorSystem, Scheduler}
+import akka.stream.ActorMaterializer
 import akka.typed.ActorRef
+import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
 import csw.services.ccs.common.ActorRefExts.RichActor
@@ -33,7 +35,9 @@ class SetElevationCommand(
   import TromboneHcdState._
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
-  implicit val scheduler: Scheduler = ctx.system.scheduler
+  implicit val scheduler: Scheduler     = ctx.system.scheduler
+  implicit val actorSystem: ActorSystem = ctx.system.toUntyped
+  implicit val mat: ActorMaterializer   = ActorMaterializer()
 
   def startCommand(): Future[CommandResponse] = {
     if (startState.cmdChoice == cmdUninitialized || startState.moveChoice != moveIndexed && startState.moveChoice != moveMoving) {
@@ -61,7 +65,7 @@ class SetElevationCommand(
 
       tromboneHCD.get.ask[CommandResponse](Submit(scOut, _)).flatMap {
         case Accepted(_) ⇒
-          PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher, ctx).map {
+          PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher).map {
             case MatchCompleted =>
               publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
               Completed(s.runId)

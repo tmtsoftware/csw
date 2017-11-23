@@ -1,12 +1,11 @@
 package csw.trombone.assembly.commands
 
-import akka.actor.Scheduler
+import akka.actor.{ActorSystem, Scheduler}
+import akka.stream.ActorMaterializer
 import akka.typed.ActorRef
+import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
-import csw.services.ccs.common.ActorRefExts.RichActor
-import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.services.ccs.internal.matchers.PublishedStateMatcher
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
@@ -15,6 +14,9 @@ import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
+import csw.services.ccs.common.ActorRefExts.RichActor
+import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.services.ccs.internal.matchers.PublishedStateMatcher
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
@@ -32,6 +34,9 @@ class PositionCommand(
 
   import csw.trombone.assembly.actors.TromboneState._
   import ctx.executionContext
+
+  implicit val actorSystem: ActorSystem = ctx.system.toUntyped
+  implicit val mat: ActorMaterializer   = ActorMaterializer()
 
   implicit val scheduler: Scheduler = ctx.system.scheduler
 
@@ -62,7 +67,7 @@ class PositionCommand(
 
       tromboneHCD.get.ask[CommandResponse](Submit(scOut, _)).flatMap {
         case _: Accepted ⇒
-          PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher, ctx).map {
+          PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher).map {
             case MatchCompleted =>
               publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
               Completed(s.runId)

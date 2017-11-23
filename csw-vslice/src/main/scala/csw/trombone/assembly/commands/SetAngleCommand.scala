@@ -1,13 +1,16 @@
 package csw.trombone.assembly.commands
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
-import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.services.ccs.internal.matchers.PublishedStateMatcher
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
+import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.services.ccs.internal.matchers.PublishedStateMatcher
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState._
@@ -25,8 +28,10 @@ class SetAngleCommand(
     stateActor: ActorRef[PubSub[AssemblyState]]
 ) extends AssemblyCommand(ctx, startState, stateActor) {
 
-  implicit val timeout: Timeout     = Timeout(5.seconds)
-  implicit val ec: ExecutionContext = ctx.executionContext
+  implicit val timeout: Timeout         = Timeout(5.seconds)
+  implicit val ec: ExecutionContext     = ctx.executionContext
+  implicit val actorSystem: ActorSystem = ctx.system.toUntyped
+  implicit val mat: ActorMaterializer   = ActorMaterializer()
 
   override def startCommand(): Future[CommandResponse] = {
     publishState(TromboneState(cmdItem(cmdBusy), startState.move, startState.sodiumLayer, startState.nss))
@@ -35,7 +40,7 @@ class SetAngleCommand(
 
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
-    PublishedStateMatcher.ask(tromboneHCD.get, AssemblyMatchers.idleMatcher, ctx).map {
+    PublishedStateMatcher.ask(tromboneHCD.get, AssemblyMatchers.idleMatcher).map {
       case MatchCompleted =>
         publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
         Completed(s.runId)

@@ -10,13 +10,13 @@ import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Completed
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.messages.models.PubSub.PublisherMessage
+import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ComponentHandlerForCommand(
     ctx: ActorContext[ComponentMessage],
@@ -28,6 +28,7 @@ class ComponentHandlerForCommand(
   val log: Logger = new LoggerFactory("ComponentHandlerForCommand").getLogger(ctx)
 
   import ComponentStateForCommand._
+  implicit val ec: ExecutionContext = ctx.executionContext
 
   override def initialize(): Future[Unit] = Future.unit
 
@@ -35,11 +36,13 @@ class ComponentHandlerForCommand(
 
   override def onDomainMsg(msg: ComponentDomainMessage): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand.prefix match {
-    case `acceptedCmdPrefix`  ⇒ Accepted(controlCommand.runId)
-    case `immediateCmdPrefix` ⇒ Completed(controlCommand.runId)
-    case `invalidCmdPrefix`   ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.prefix.prefix}"))
-    case _                    ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.prefix.prefix}"))
+  override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
+    controlCommand.prefix match {
+      case `acceptedCmdPrefix`  ⇒ Accepted(controlCommand.runId)
+      case `immediateCmdPrefix` ⇒ Completed(controlCommand.runId)
+      case `invalidCmdPrefix`   ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.prefix.prefix}"))
+      case _                    ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.prefix.prefix}"))
+    }
   }
 
   override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = {
@@ -48,7 +51,11 @@ class ComponentHandlerForCommand(
     commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
   }
 
-  override def onOneway(controlCommand: ControlCommand): Unit = ???
+  override def onOneway(controlCommand: ControlCommand): Unit = {
+    Thread.sleep(2000)
+    for (i <- 1 to 10)
+      pubSubRef ! Publish(CurrentState(controlCommand.prefix, Set(KeyType.IntKey.make("encoder").set(i * 10))))
+  }
 
   override def onShutdown(): Future[Unit] = ???
 

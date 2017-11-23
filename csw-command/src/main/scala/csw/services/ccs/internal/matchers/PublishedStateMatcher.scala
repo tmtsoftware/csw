@@ -1,26 +1,23 @@
 package csw.services.ccs.internal.matchers
 
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.{ActorMaterializer, OverflowStrategy}
 import akka.typed.ActorRef
-import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter._
-import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
+import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 object PublishedStateMatcher {
 
-  def ask(currentStateSource: ActorRef[ComponentStateSubscription],
-          stateMatcher: StateMatcher,
-          ctx: ActorContext[_]): Future[MatcherResponse] = {
-
-    implicit val ec: ExecutionContextExecutor = ctx.executionContext
-    implicit val mat: ActorMaterializer       = ActorMaterializer()(ctx.system.toUntyped)
+  def ask(
+      currentStateSource: ActorRef[ComponentStateSubscription],
+      stateMatcher: StateMatcher
+  )(implicit ec: ExecutionContext, mat: ActorMaterializer): Future[MatcherResponse] = {
 
     val source = Source
       .actorRef[CurrentState](256, OverflowStrategy.fail)
