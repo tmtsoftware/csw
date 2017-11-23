@@ -2,16 +2,16 @@ package csw.framework.internal.supervisor
 
 import akka.typed.ActorRef
 import csw.messages.CommandMessage
-import csw.messages.ccs.CommandIssue.{ComponentLockedIssue, UnsupportedCommandInStateIssue}
-import csw.messages.ccs.commands.CommandResponse.{Invalid, NotAllowed}
+import csw.messages.ccs.CommandIssue.ComponentLockedIssue
+import csw.messages.ccs.commands.CommandResponse.NotAllowed
 import csw.messages.models.LockingResponse
 import csw.messages.models.LockingResponse._
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 case class ComponentLock(_prefix: String, _token: String)
 
-class LockManager(val lock: Option[ComponentLock], _componentName: String) {
-  val log: Logger = new LoggerFactory(_componentName).getLogger
+class LockManager(val lock: Option[ComponentLock], loggerFactory: LoggerFactory) {
+  val log: Logger = loggerFactory.getLogger
 
   def lockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): LockManager = lock match {
     case None                                   ⇒ onAcquiringLock(prefix, token, replyTo)
@@ -46,7 +46,7 @@ class LockManager(val lock: Option[ComponentLock], _componentName: String) {
   private def onAcquiringLock(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): LockManager = {
     log.info(s"The lock is successfully acquired by component: [$prefix]")
     replyTo ! LockAcquired
-    new LockManager(Some(ComponentLock(prefix, token)), _componentName) //TODO: Start the timer for lock lease
+    new LockManager(Some(ComponentLock(prefix, token)), loggerFactory) //TODO: Start the timer for lock lease
   }
 
   private def onReAcquiringLock(prefix: String, replyTo: ActorRef[LockingResponse]): LockManager = {
@@ -65,13 +65,13 @@ class LockManager(val lock: Option[ComponentLock], _componentName: String) {
       s"Invalid prefix [$prefix] or token [$token] for re-acquiring the lock. Currently it is acquired by component: [$currentPrefix]"
     log.error(failureReason)
     replyTo ! ReAcquiringLockFailed(failureReason)
-    new LockManager(None, _componentName)
+    new LockManager(None, loggerFactory)
   }
 
   private def onLockReleased(prefix: String, replyTo: ActorRef[LockingResponse]): LockManager = {
     log.info(s"The lock is successfully released by component: [$prefix]")
     replyTo ! LockReleased
-    new LockManager(None, _componentName) // TODO: Stop the timer for lock lease
+    new LockManager(None, loggerFactory) // TODO: Stop the timer for lock lease
   }
 
   private def onLockReleaseFailed(

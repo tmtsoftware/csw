@@ -9,11 +9,11 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 /**
  * The actor which can be used by a component to publish its data of a given type, to all the components who subscribe
  * @param ctx             The Actor Context under which the actor instance of this behavior is created
- * @param componentName   The name of the component using this actor for publishing its data
+ * @param loggerFactory   The LoggerFactory used for logging with component name
  * @tparam T              The type of the data which will be published or subscribed to using this actor
  */
-class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], componentName: String) extends Actor.MutableBehavior[PubSub[T]] {
-  val log: Logger = new LoggerFactory(componentName).getLogger(ctx)
+class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], loggerFactory: LoggerFactory) extends Actor.MutableBehavior[PubSub[T]] {
+  val log: Logger = loggerFactory.getLogger(ctx)
   // list of subscribers who subscribe to the component using this pub-sub actor for the data of type [[T]]
   var subscribers: Set[ActorRef[T]] = Set.empty
 

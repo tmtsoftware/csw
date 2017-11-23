@@ -73,7 +73,8 @@ class SupervisorBehavior(
   import SupervisorBehavior._
   import ctx.executionContext
 
-  val log: Logger                        = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  val loggerFactory                      = new LoggerFactory(componentInfo.name)
+  val log: Logger                        = loggerFactory.getLogger(ctx)
   val componentName: String              = componentInfo.name
   val componentActorName: String         = s"$componentName-$ComponentActorNameSuffix"
   val initializeTimeout: FiniteDuration  = componentInfo.initializeTimeout
@@ -88,7 +89,7 @@ class SupervisorBehavior(
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
   var component: Option[ActorRef[Nothing]]               = None
-  var lockManager: LockManager                           = new LockManager(None, componentName)
+  var lockManager: LockManager                           = new LockManager(None, loggerFactory)
 
   spawnAndWatchComponent()
 
@@ -294,13 +295,13 @@ class SupervisorBehavior(
 
   private def coordinatedShutdown(): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run()
 
-  private def makePubSubComponent: ActorRef[PubSub[CurrentState]] =
-    pubSubBehaviorFactory.make(ctx, PubSubComponentActor, componentName)
+  private def makePubSubComponent(): ActorRef[PubSub[CurrentState]] =
+    pubSubBehaviorFactory.make(ctx, PubSubComponentActor, loggerFactory)
 
-  private def makePubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] =
-    pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, componentName)
+  private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged]] =
+    pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, loggerFactory)
 
-  private def makeCommandResponseManager = CommandResponseManagerFactory.make(ctx, CommandResponseManagerActor, componentName)
+  private def makeCommandResponseManager() = CommandResponseManagerFactory.make(ctx, CommandResponseManagerActor, loggerFactory)
 
   private def ignore(message: SupervisorMessage): Unit =
     log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")

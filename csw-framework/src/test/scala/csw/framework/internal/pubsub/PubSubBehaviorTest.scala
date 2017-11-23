@@ -11,7 +11,7 @@ import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.models.{LifecycleStateChanged, PubSub}
 import csw.messages.{models, SupervisorExternalMessage}
-import csw.services.logging.scaladsl.Logger
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -33,7 +33,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   private val lifecycleProbe1 = TestProbe[LifecycleStateChanged]
   private val lifecycleProbe2 = TestProbe[LifecycleStateChanged]
 
-  def createPubSubBehavior(): PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, "test-component")
+  def createPubSubBehavior(): PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, new LoggerFactory("test-component"))
 
   override protected def afterAll(): Unit = Await.result(actorSystem.terminate(), 5.seconds)
 

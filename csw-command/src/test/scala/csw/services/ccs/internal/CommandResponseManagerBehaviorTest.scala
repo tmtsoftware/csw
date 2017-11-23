@@ -10,6 +10,7 @@ import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.params.models.RunId
+import csw.services.logging.scaladsl.LoggerFactory
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-207: Report on Configuration Command Completion
@@ -23,7 +24,8 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
   private val ctx: StubbedActorContext[CommandResponseManagerMessage] =
     new StubbedActorContext[CommandResponseManagerMessage]("ctx-command-status-service", 100, typedSystem)
 
-  def createCommandStatusService(): CommandResponseManagerBehavior = new CommandResponseManagerBehavior(ctx, "test-component")
+  def createCommandStatusService(): CommandResponseManagerBehavior =
+    new CommandResponseManagerBehavior(ctx, new LoggerFactory("test-component"))
 
   test("should be able to add command entry in Command Response Manager") {
     val commandStatusService = createCommandStatusService()

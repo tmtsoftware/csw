@@ -24,7 +24,6 @@ import csw.messages.models.{LifecycleStateChanged, PubSub, ToComponentLifecycleM
 import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 import csw.messages.{models, _}
-import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
@@ -245,7 +244,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
     supervisor.onMessage(TestCompMessage)
     supervisor.runningComponent shouldBe empty
-    verify(supervisor.log, times(1)).error(ArgumentMatchers.any())
   }
 
   test("should not forward Domain message to a TLA when supervisor is in Restart lifecycle state") {
@@ -265,7 +263,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     // TestCompMessage (DomainMessage) is sent to supervisor when lifecycle state is running
     // in this case, verify that log.error is never called
     supervisor.onMessage(TestCompMessage)
-    verify(supervisor.log, never()).error(ArgumentMatchers.any())
     childComponentInbox.receiveMsg() shouldBe TestCompMessage
 
     // TestCompMessage (DomainMessage) is sent to supervisor when lifecycle state is Restart
@@ -275,7 +272,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Restart
     supervisor.onMessage(TestCompMessage)
     childComponentInbox.receiveAll() shouldBe Seq.empty
-    verify(supervisor.log, times(1)).error(ArgumentMatchers.any())
   }
 
   test("supervisor should handle Terminated signal for Idle lifecycle state") {

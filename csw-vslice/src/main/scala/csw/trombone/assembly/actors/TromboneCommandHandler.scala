@@ -6,13 +6,14 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.framework.internal.pubsub.PubSubBehavior
 import csw.messages.CommandMessage.Submit
-import csw.messages.models.PubSub.Publish
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{UnsupportedCommandInStateIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.CommandResponse.{Cancelled, Completed, Invalid, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.location.Connection
 import csw.messages.models.PubSub
+import csw.messages.models.PubSub.Publish
+import csw.services.logging.scaladsl.LoggerFactory
 import csw.trombone.assembly._
 import csw.trombone.assembly.commands._
 
@@ -47,7 +48,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   override var currentState: AssemblyState                                        = defaultTromboneState
   override var currentCommand: Option[List[AssemblyCommand]]                      = _
   override var tromboneStateActor: ActorRef[PubSub[AssemblyState]] =
-    ctx.spawnAnonymous(Actor.mutable[PubSub[AssemblyState]](ctx ⇒ new PubSubBehavior(ctx, "")))
+    ctx.spawnAnonymous(Actor.mutable[PubSub[AssemblyState]](ctx ⇒ new PubSubBehavior(ctx, new LoggerFactory(""))))
 
   override def onNotFollowing(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
     case Submit(s: Setup, replyTo) =>

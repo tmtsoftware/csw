@@ -13,9 +13,9 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 class CommandResponseManagerBehavior(
     ctx: ActorContext[CommandResponseManagerMessage],
-    componentName: String
+    loggerFactory: LoggerFactory
 ) extends Actor.MutableBehavior[CommandResponseManagerMessage] {
-  val log: Logger = new LoggerFactory(componentName).getLogger(ctx)
+  val log: Logger = loggerFactory.getLogger(ctx)
 
   var commandStatus: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
   var commandCoRelation: CommandCorrelation      = CommandCorrelation(Map.empty, Map.empty)
