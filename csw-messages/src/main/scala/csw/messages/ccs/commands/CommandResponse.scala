@@ -20,6 +20,7 @@ object CommandResponse {
   case class Error(runId: RunId, message: String)               extends CommandResponse(Negative)
   case class Cancelled(runId: RunId)                            extends CommandResponse(Negative)
   case class CommandNotAvailable(runId: RunId)                  extends CommandResponse(Negative)
+  case class NotAllowed(runId: RunId, issue: CommandIssue)      extends CommandResponse(Negative)
 
   def withRunId(id: RunId, commandResponse: CommandResponse): CommandResponse = commandResponse match {
     case accepted: Accepted                       => accepted.copy(runId = id)

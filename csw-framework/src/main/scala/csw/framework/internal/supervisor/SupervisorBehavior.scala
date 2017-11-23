@@ -193,10 +193,9 @@ class SupervisorBehavior(
     case Unsubscribe(commandId, replyTo) ⇒ commandResponseManager ! Unsubscribe(commandId, replyTo)
     case Lock(prefix, token, replyTo)    ⇒ lockComponent(prefix, token, replyTo)
     case Unlock(prefix, token, replyTo)  ⇒ unlockComponent(prefix, token, replyTo)
-    case commandMessage: CommandMessage ⇒
-      if (lockManager.allowCommand(commandMessage)) runningComponent.get ! commandMessage
-    case runningMessage: RunningMessage ⇒ handleRunningMessage(runningMessage)
-    case msg @ Running(_)               ⇒ log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
+    case commandMessage: CommandMessage  ⇒ if (lockManager.allowCommand(commandMessage)) runningComponent.get ! commandMessage
+    case runningMessage: RunningMessage  ⇒ handleRunningMessage(runningMessage)
+    case msg @ Running(_)                ⇒ log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
   }
 
   private def lockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): Unit = {

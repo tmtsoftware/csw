@@ -2,8 +2,8 @@ package csw.framework.internal.supervisor
 
 import akka.typed.ActorRef
 import csw.messages.CommandMessage
-import csw.messages.ccs.CommandIssue.UnsupportedCommandInStateIssue
-import csw.messages.ccs.commands.CommandResponse.Invalid
+import csw.messages.ccs.CommandIssue.{ComponentLockedIssue, UnsupportedCommandInStateIssue}
+import csw.messages.ccs.commands.CommandResponse.{Invalid, NotAllowed}
 import csw.messages.models.LockingResponse
 import csw.messages.models.LockingResponse._
 import csw.services.logging.scaladsl.FrameworkLogger
@@ -33,9 +33,9 @@ class LockManager(val lock: Option[ComponentLock], _componentName: String) exten
           true
         case _ ⇒
           log.error(s"Cannot process the command [${command.toString}] as the lock is acquired by component: [$prefix]")
-          commandMessage.replyTo ! Invalid(
+          commandMessage.replyTo ! NotAllowed(
             command.runId,
-            UnsupportedCommandInStateIssue(s"This component is locked by component [$prefix]")
+            ComponentLockedIssue(s"This component is locked by component [$prefix]")
           )
           false
       }

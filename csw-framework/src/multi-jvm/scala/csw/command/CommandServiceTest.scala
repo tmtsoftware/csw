@@ -1,5 +1,7 @@
 package csw.command
 
+import java.util.UUID
+
 import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
@@ -7,10 +9,13 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.Submit
-import csw.messages.ccs.commands.CommandResponse.Completed
-import csw.messages.ccs.commands.{CommandResponse, Setup}
+import csw.messages.SupervisorLockMessage.Lock
+import csw.messages.ccs.CommandIssue.ComponentLockedIssue
+import csw.messages.ccs.commands.CommandResponse.{Completed, NotAllowed}
+import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.models.LockingResponse
 import csw.messages.params.models.ObsId
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
@@ -21,6 +26,7 @@ class CommandServiceTestMultiJvm1 extends CommandServiceTest(0)
 class CommandServiceTestMultiJvm2 extends CommandServiceTest(0)
 class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 
+// DEOPSCSW-222: Locking a component for a specific duration
 // DEOPSCSW-313: Support short running actions by providing immediate response
 class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
@@ -36,7 +42,22 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
     runOn(seed) {
       // cluster seed is running on jvm-1
       enterBarrier("spawned")
+
+      // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
+      val assemblyLocF = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
+      val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.componentRef()).get
+
       enterBarrier("immediate-setup-complete")
+      enterBarrier("assembly-locked")
+
+      val obsId            = ObsId("Obs002")
+      val cmdResponseProbe = TestProbe[CommandResponse]
+
+      // try to send a command to assembly which is already locked
+      val assemblyObserve = Observe(obsId, acceptedCmdPrefix)
+      assemblyRef ! Submit(assemblyObserve, cmdResponseProbe.ref)
+      val response = cmdResponseProbe.expectMsgType[NotAllowed]
+      response.issue shouldBe an[ComponentLockedIssue]
     }
 
     runOn(member1) {
@@ -59,6 +80,12 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       assemblyRef ! Submit(assemblySetup, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(5.seconds, Completed(runId))
       enterBarrier("immediate-setup-complete")
+
+      // acquire lock on assembly
+      val token             = UUID.randomUUID().toString
+      val lockResponseProbe = TestProbe[LockingResponse]
+      assemblyRef ! Lock(lockPrefix.prefix, token, lockResponseProbe.ref)
+      enterBarrier("assembly-locked")
     }
 
     runOn(member2) {
@@ -68,6 +95,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       Await.result(Container.spawn(containerConf, wiring), 5.seconds)
       enterBarrier("spawned")
       enterBarrier("immediate-setup-complete")
+      enterBarrier("assembly-locked")
     }
 
     enterBarrier("end")

@@ -8,4 +8,5 @@ object ComponentStateForCommand {
   val immediateCmdPrefix   = Prefix("wfos.prog.cloudcover.immediate")
   val invalidCmdPrefix     = Prefix("wfos.prog.cloudcover.failure")
   val longRunningCmdPrefix = Prefix("wfos.prog.cloudcover.longRunning")
+  val lockPrefix           = Prefix("wfos.prog.cloudcover.lock")
 }
