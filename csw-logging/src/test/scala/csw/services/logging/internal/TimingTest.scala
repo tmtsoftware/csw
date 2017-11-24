@@ -106,7 +106,7 @@ class TimingTest extends LoggingTestSuite with Timing {
         log(LoggingKeys.MESSAGE).toString shouldBe IRIS.irisLogs(currentLogLevel)
 
         log(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
-        log(LoggingKeys.ACTOR) shouldBe irisActorRef.toString
+        log(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
         log(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
         log(LoggingKeys.CLASS) shouldBe IRIS.CLASS_NAME
         log.contains(LoggingKeys.LINE) shouldBe true

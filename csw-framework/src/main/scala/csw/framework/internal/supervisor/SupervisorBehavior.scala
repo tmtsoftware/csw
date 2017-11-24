@@ -82,9 +82,9 @@ class SupervisorBehavior(
   val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
   val isStandalone: Boolean              = maybeContainerRef.isEmpty
 
-  val pubSubComponent: ActorRef[PubSub[CurrentState]]                 = makePubSubComponent
-  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]]        = makePubSubLifecycle
-  val commandResponseManager: ActorRef[CommandResponseManagerMessage] = makeCommandResponseManager
+  val pubSubComponent: ActorRef[PubSub[CurrentState]]                 = makePubSubComponent()
+  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]]        = makePubSubLifecycle()
+  val commandResponseManager: ActorRef[CommandResponseManagerMessage] = makeCommandResponseManager()
 
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None

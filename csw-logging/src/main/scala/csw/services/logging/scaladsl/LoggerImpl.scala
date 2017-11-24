@@ -11,7 +11,7 @@ import csw.services.logging.macros.{SourceFactory, SourceLocation}
 import csw.services.logging.models.ComponentLoggingState
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
-class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName: ⇒ Option[String]) extends Logger {
+class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName: Option[String]) extends Logger {
 
   // this is to apply default log level for non-component classes like some common file utility classes
   private[this] val componentName: String = maybeComponentName.getOrElse(Constants.DEFAULT_KEY)

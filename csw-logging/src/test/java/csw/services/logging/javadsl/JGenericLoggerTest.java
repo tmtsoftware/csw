@@ -87,7 +87,7 @@ public class JGenericLoggerTest {
     @Test
     public void testGenericLoggerActorWithoutComponentName() throws InterruptedException {
         ActorRef utilActor = actorSystem.actorOf(Props.create(JGenericActor.class), "JActorUtil");
-        String actorPath = utilActor.toString();
+        String actorPath = utilActor.path().toString();
         String className = JGenericActor.class.getName();
 
         JLogUtil.sendLogMsgToActorInBulk(utilActor);
