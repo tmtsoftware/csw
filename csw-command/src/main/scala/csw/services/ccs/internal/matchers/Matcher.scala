@@ -12,9 +12,9 @@ import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, Match
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-object PublishedStateMatcher {
+object Matcher {
 
-  def ask(
+  def matchPublishedState(
       currentStateSource: ActorRef[ComponentStateSubscription],
       stateMatcher: StateMatcher
   )(implicit ec: ExecutionContext, mat: Materializer): Future[MatcherResponse] = {

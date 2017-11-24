@@ -16,7 +16,7 @@ import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
 import csw.services.ccs.common.ActorRefExts.RichActor
 import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.services.ccs.internal.matchers.PublishedStateMatcher
+import csw.services.ccs.internal.matchers.Matcher
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
@@ -67,7 +67,7 @@ class PositionCommand(
 
       tromboneHCD.get.ask[CommandResponse](Submit(scOut, _)).flatMap {
         case _: Accepted ⇒
-          PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher).map {
+          Matcher.matchPublishedState(tromboneHCD.get, stateMatcher).map {
             case MatchCompleted =>
               publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
               Completed(s.runId)

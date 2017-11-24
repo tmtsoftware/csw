@@ -16,7 +16,7 @@ import csw.messages.models.PubSub
 import csw.messages.params.models.RunId
 import csw.services.ccs.common.ActorRefExts.RichActor
 import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.services.ccs.internal.matchers.PublishedStateMatcher
+import csw.services.ccs.internal.matchers.Matcher
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext, AssemblyMatchers}
 import csw.trombone.hcd.TromboneHcdState
@@ -57,7 +57,7 @@ class DatumCommand(
         .ask[CommandResponse](Submit(Setup(s.obsId, TromboneHcdState.axisDatumCK), _))
         .flatMap {
           case _: Accepted ⇒
-            PublishedStateMatcher.ask(tromboneHCD.get, AssemblyMatchers.idleMatcher).map {
+            Matcher.matchPublishedState(tromboneHCD.get, AssemblyMatchers.idleMatcher).map {
               case MatchCompleted =>
                 publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
                 Completed(s.runId)

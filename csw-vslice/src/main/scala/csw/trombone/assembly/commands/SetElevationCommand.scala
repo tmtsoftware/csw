@@ -8,7 +8,7 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
 import csw.services.ccs.common.ActorRefExts.RichActor
 import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.services.ccs.internal.matchers.PublishedStateMatcher
+import csw.services.ccs.internal.matchers.Matcher
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
@@ -65,7 +65,7 @@ class SetElevationCommand(
 
       tromboneHCD.get.ask[CommandResponse](Submit(scOut, _)).flatMap {
         case Accepted(_) ⇒
-          PublishedStateMatcher.ask(tromboneHCD.get, stateMatcher).map {
+          Matcher.matchPublishedState(tromboneHCD.get, stateMatcher).map {
             case MatchCompleted =>
               publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
               Completed(s.runId)

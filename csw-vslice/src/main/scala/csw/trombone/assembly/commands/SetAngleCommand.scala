@@ -10,7 +10,7 @@ import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
 import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.services.ccs.internal.matchers.PublishedStateMatcher
+import csw.services.ccs.internal.matchers.Matcher
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState._
@@ -40,7 +40,7 @@ class SetAngleCommand(
 
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
-    PublishedStateMatcher.ask(tromboneHCD.get, AssemblyMatchers.idleMatcher).map {
+    Matcher.matchPublishedState(tromboneHCD.get, AssemblyMatchers.idleMatcher).map {
       case MatchCompleted =>
         publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
         Completed(s.runId)

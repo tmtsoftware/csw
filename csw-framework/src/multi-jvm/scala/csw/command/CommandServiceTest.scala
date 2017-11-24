@@ -24,7 +24,7 @@ import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.services.ccs.internal.matchers.{DemandMatcher, PublishedStateMatcher}
+import csw.services.ccs.internal.matchers.{DemandMatcher, Matcher}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.concurrent.duration.DurationDouble
@@ -109,7 +109,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
       val demandMatcher         = DemandMatcher(DemandState(acceptWithMatcherCmdPrefix, Set(param)), withUnits = false, timeout)
       val setupWithMatcher      = Setup(obsId, acceptWithMatcherCmdPrefix)
-      val matcherResponseF      = PublishedStateMatcher.ask(assemblyRef, demandMatcher)
+      val matcherResponseF      = Matcher.matchPublishedState(assemblyRef, demandMatcher)
 
       val matchedResponse = Await.result(
         assemblyRef.oneway(setupWithMatcher).flatMap {
