@@ -34,6 +34,8 @@ class CommandServiceTestMultiJvm1 extends CommandServiceTest(0)
 class CommandServiceTestMultiJvm2 extends CommandServiceTest(0)
 class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 
+// DEOPSCSW-207: Report on Configuration Command Completion
+// DEOPSCSW-208: Report failure on Configuration Completion command
 // DEOPSCSW-222: Locking a component for a specific duration
 // DEOPSCSW-313: Support short running actions by providing immediate response
 class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
@@ -88,13 +90,11 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.componentRef()).get
 
       // short running command
-      val commandResponse = Await.result(assemblyRef.submit(Setup(obsId, invalidCmdPrefix)), timeout.duration)
-      commandResponse shouldBe a[Invalid]
+      val shortCommandResponse = Await.result(assemblyRef.submit(Setup(obsId, invalidCmdPrefix)), timeout.duration)
+      shortCommandResponse shouldBe a[Invalid]
 
       // long running command which does not use matcher
-      val setupWithoutMatcher = Setup(obsId, acceptedCmdPrefix)
-
-      // long running command which does not use matcher
+      val setupWithoutMatcher = Setup(obsId, acceptWithNoMatcherCmdPrefix)
       val longCommandResponse = Await.result(
         assemblyRef.submit(setupWithoutMatcher).flatMap {
           case _: Accepted ⇒ assemblyRef.getCommandResponse(setupWithoutMatcher.runId)
@@ -107,8 +107,8 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
-      val demandMatcher         = DemandMatcher(DemandState(acceptedCmdPrefix, Set(param)), withUnits = false, timeout)
-      val setupWithMatcher      = Setup(obsId, acceptedCmdPrefix)
+      val demandMatcher         = DemandMatcher(DemandState(acceptWithMatcherCmdPrefix, Set(param)), withUnits = false, timeout)
+      val setupWithMatcher      = Setup(obsId, acceptWithMatcherCmdPrefix)
       val matcherResponseF      = PublishedStateMatcher.ask(assemblyRef, demandMatcher)
 
       val matchedResponse = Await.result(

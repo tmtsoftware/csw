@@ -10,7 +10,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{OtherIssue, WrongPrefixIssue}
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, CompletedWithResult, Invalid}
+import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
@@ -44,22 +44,32 @@ class ComponentHandlerForCommand(
 
   override def onDomainMsg(msg: ComponentDomainMessage): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
-    controlCommand.prefix match {
-      case `acceptedCmdPrefix`  ⇒ Accepted(controlCommand.runId)
-      case `immediateCmdPrefix` ⇒ Completed(controlCommand.runId)
-      case `invalidCmdPrefix`   ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.prefix.prefix}"))
-      case _                    ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.prefix.prefix}"))
-    }
+  override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand.prefix match {
+    case `acceptedCmdPrefix`            ⇒ Accepted(controlCommand.runId)
+    case `acceptWithNoMatcherCmdPrefix` ⇒ Accepted(controlCommand.runId)
+    case `acceptWithMatcherCmdPrefix`   ⇒ Accepted(controlCommand.runId)
+    case `immediateCmdPrefix`           ⇒ Completed(controlCommand.runId)
+    case `invalidCmdPrefix`             ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.prefix.prefix}"))
+    case _                              ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.prefix.prefix}"))
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = {
+  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = controlCommand.prefix match {
+    case `acceptWithNoMatcherCmdPrefix` ⇒ processCommandWithoutMatcher(controlCommand)
+    case _                              ⇒ CommandNotAvailable(controlCommand.runId)
+  }
+
+  override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.prefix match {
+    case `acceptWithMatcherCmdPrefix` ⇒ processCommandWithMatcher(controlCommand)
+    case _                            ⇒ CommandNotAvailable(controlCommand.runId)
+  }
+
+  private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
     val result                = Result(controlCommand.runId, controlCommand.obsId, controlCommand.prefix, Set(param))
     commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
   }
 
-  override def onOneway(controlCommand: ControlCommand): Unit = {
+  private def processCommandWithMatcher(controlCommand: ControlCommand): Unit = {
     Source(1 to 10)
       .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.prefix, Set(KeyType.IntKey.make("encoder").set(i * 10)))))
       .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
