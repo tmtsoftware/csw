@@ -43,6 +43,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
   implicit val actorSystem: ActorSystem[_]  = system.toTyped
   implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
+  implicit val mat: ActorMaterializer       = ActorMaterializer()
   implicit val timeout: Timeout             = 5.seconds
   implicit val scheduler: Scheduler         = actorSystem.scheduler
   implicit val testkit: TestKitSettings     = TestKitSettings(actorSystem)
@@ -57,7 +58,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val assemblyLocF = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
       val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.componentRef()).get
 
-      enterBarrier("immediate-setup-complete")
+      enterBarrier("short-long-commands")
       enterBarrier("assembly-locked")
 
       val obsId            = ObsId("Obs002")
@@ -68,6 +69,8 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       assemblyRef ! Submit(assemblyObserve, cmdResponseProbe.ref)
       val response = cmdResponseProbe.expectMsgType[NotAllowed]
       response.issue shouldBe an[ComponentLockedIssue]
+
+      enterBarrier("command-when-locked")
     }
 
     runOn(member1) {
@@ -84,58 +87,56 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val assemblyLocF = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
       val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.componentRef()).get
 
-      val assemblySetup = Setup(obsId, immediateCmdPrefix)
-      val runId         = assemblySetup.runId
-
-      assemblyRef ! Submit(assemblySetup, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMsg(5.seconds, Completed(runId))
-
       // short running command
       val commandResponse = Await.result(assemblyRef.submit(Setup(obsId, invalidCmdPrefix)), timeout.duration)
       commandResponse shouldBe a[Invalid]
 
       // long running command which does not use matcher
-      val setup = Setup(obsId, acceptedCmdPrefix)
+      val setupWithoutMatcher = Setup(obsId, acceptedCmdPrefix)
+
+      // long running command which does not use matcher
       val longCommandResponse = Await.result(
-        assemblyRef.submit(setup).flatMap {
-          case _: Accepted ⇒ assemblyRef.getCommandResponse(setup.runId)
+        assemblyRef.submit(setupWithoutMatcher).flatMap {
+          case _: Accepted ⇒ assemblyRef.getCommandResponse(setupWithoutMatcher.runId)
           case x           ⇒ Future.successful(x)
         },
         timeout.duration
       )
-
       longCommandResponse shouldBe a[CompletedWithResult]
-      longCommandResponse.runId shouldBe setup.runId
+      longCommandResponse.runId shouldBe setupWithoutMatcher.runId
 
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
       val demandMatcher         = DemandMatcher(DemandState(acceptedCmdPrefix, Set(param)), withUnits = false, timeout)
-
-      val eventualMatcherResponse =
-        PublishedStateMatcher.ask(assemblyRef, demandMatcher)(actorSystem.executionContext, ActorMaterializer())
+      val setupWithMatcher      = Setup(obsId, acceptedCmdPrefix)
+      val matcherResponseF      = PublishedStateMatcher.ask(assemblyRef, demandMatcher)
 
       val matchedResponse = Await.result(
-        assemblyRef.oneway(Setup(obsId, acceptedCmdPrefix)).flatMap {
+        assemblyRef.oneway(setupWithMatcher).flatMap {
           case _: Accepted ⇒
-            eventualMatcherResponse
+            matcherResponseF
               .map {
-                case MatchCompleted ⇒ Completed(runId)
-                case MatchFailed(_) ⇒ Error(runId, "Demand could not be matched")
+                case MatchCompleted  ⇒ Completed(setupWithMatcher.runId)
+                case MatchFailed(ex) ⇒ Error(setupWithMatcher.runId, ex.getMessage)
               }
           case x ⇒ Future.successful(x)
         },
         timeout.duration
       )
-
-      matchedResponse shouldBe Completed(runId)
-
-      enterBarrier("immediate-setup-complete")
+      matchedResponse shouldBe Completed(setupWithMatcher.runId)
+      enterBarrier("short-long-commands")
 
       // acquire lock on assembly
       val token             = UUID.randomUUID().toString
       val lockResponseProbe = TestProbe[LockingResponse]
       assemblyRef ! Lock(lockPrefix.prefix, token, lockResponseProbe.ref)
       enterBarrier("assembly-locked")
+
+      // send command with lock token and expect command processing response
+      val assemblySetup = Setup.withLockToken(obsId, immediateCmdPrefix, token)
+      assemblyRef ! Submit(assemblySetup, cmdResponseProbe.ref)
+      cmdResponseProbe.expectMsg(5.seconds, Completed(assemblySetup.runId))
+      enterBarrier("command-when-locked")
     }
 
     runOn(member2) {
@@ -144,8 +145,9 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val containerConf = ConfigFactory.load("command/container.conf")
       Await.result(Container.spawn(containerConf, wiring), 5.seconds)
       enterBarrier("spawned")
-      enterBarrier("immediate-setup-complete")
+      enterBarrier("short-long-commands")
       enterBarrier("assembly-locked")
+      enterBarrier("command-when-locked")
     }
 
     enterBarrier("end")
