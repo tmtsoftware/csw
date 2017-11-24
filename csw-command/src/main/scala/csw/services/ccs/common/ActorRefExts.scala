@@ -23,8 +23,8 @@ object ActorRefExts {
     def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
       ref ? (Oneway(controlCommand, _))
 
-    def getCommandResponse(commandId: RunId)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
-      ref ? (CommandResponseManagerMessage.Subscribe(commandId, _))
+    def getCommandResponse(commandRunId: RunId)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
+      ref ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
   }
 }

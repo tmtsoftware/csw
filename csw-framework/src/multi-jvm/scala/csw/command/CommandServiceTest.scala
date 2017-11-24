@@ -3,7 +3,7 @@ package csw.command
 import java.util.UUID
 
 import akka.actor.Scheduler
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
@@ -42,8 +42,8 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
   import csw.common.components.command.ComponentStateForCommand._
 
   implicit val actorSystem: ActorSystem[_]  = system.toTyped
+  implicit val mat: Materializer            = ActorMaterializer()
   implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
-  implicit val mat: ActorMaterializer       = ActorMaterializer()
   implicit val timeout: Timeout             = 5.seconds
   implicit val scheduler: Scheduler         = actorSystem.scheduler
   implicit val testkit: TestKitSettings     = TestKitSettings(actorSystem)

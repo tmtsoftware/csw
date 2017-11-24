@@ -1,7 +1,7 @@
 package csw.services.ccs.internal.matchers
 
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{ActorMaterializer, OverflowStrategy}
+import akka.stream.{Materializer, OverflowStrategy}
 import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter._
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
@@ -17,7 +17,7 @@ object PublishedStateMatcher {
   def ask(
       currentStateSource: ActorRef[ComponentStateSubscription],
       stateMatcher: StateMatcher
-  )(implicit ec: ExecutionContext, mat: ActorMaterializer): Future[MatcherResponse] = {
+  )(implicit ec: ExecutionContext, mat: Materializer): Future[MatcherResponse] = {
 
     val source = Source
       .actorRef[CurrentState](256, OverflowStrategy.fail)
