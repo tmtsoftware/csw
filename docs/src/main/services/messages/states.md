@@ -9,6 +9,9 @@ A state variable that indicates the demand or requested state.
 Scala
 :   @@snip [StateVariablesTest.scala](../../../../../examples/src/test/scala/csw/services/messages/StateVariablesTest.scala) { #demandstate }
 
+Java
+:   @@snip [JStateVariablesTest.java](../../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #demandstate }
+
 
 ### CurrentState
 
@@ -17,11 +20,18 @@ A state variable that is published by a component that describes its internal st
 Scala
 :   @@snip [StateVariablesTest.scala](../../../../../examples/src/test/scala/csw/services/messages/StateVariablesTest.scala) { #currentstate }
 
+Java
+:   @@snip [JStateVariablesTest.java](../../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #currentstate }
+
+
 ### JSON serialization
 State variables can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize DemandState and CurrentState.
 
 Scala
 :   @@snip [StateVariablesTest.scala](../../../../../examples/src/test/scala/csw/services/messages/StateVariablesTest.scala) { #json-serialization }
+
+Java
+:   @@snip [JStateVariablesTest.java](../../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #json-serialization }
 
 ### Unique Key constraint
 
@@ -37,3 +47,6 @@ Here are some examples that illustrate this point:
 
 Scala
 :   @@snip [StateVariablesTest.scala](../../../../../examples/src/test/scala/csw/services/messages/StateVariablesTest.scala) { #unique-key }
+
+Java
+:   @@snip [JStateVariablesTest.java](../../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #unique-key }

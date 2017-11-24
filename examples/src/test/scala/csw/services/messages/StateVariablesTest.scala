@@ -20,27 +20,27 @@ class StateVariablesTest extends FunSpec with Matchers {
       val prefix = Prefix("wfos.prog.cloudcover")
 
       //key
-      val charKey      = KeyType.CharKey.make("charKey")
-      val intKey       = KeyType.IntKey.make("intKey")
-      val booleanKey   = KeyType.BooleanKey.make("booleanKey")
-      val timestampKey = KeyType.TimestampKey.make("timestampKey")
-      val notUsedKey   = KeyType.StringKey.make("notUsed")
+      val charKey: Key[Char]         = KeyType.CharKey.make("charKey")
+      val intKey: Key[Int]           = KeyType.IntKey.make("intKey")
+      val booleanKey: Key[Boolean]   = KeyType.BooleanKey.make("booleanKey")
+      val timestampKey: Key[Instant] = KeyType.TimestampKey.make("timestampKey")
+      val notUsedKey: Key[String]    = KeyType.StringKey.make("notUsed")
 
       //parameters
-      val charParam    = charKey.set('A', 'B', 'C').withUnits(NoUnits)
-      val intParam     = intKey.set(1, 2, 3).withUnits(meter)
-      val booleanParam = booleanKey.set(true, false)
-      val timestamp    = timestampKey.set(Instant.now)
+      val charParam: Parameter[Char]       = charKey.set('A', 'B', 'C').withUnits(NoUnits)
+      val intParam: Parameter[Int]         = intKey.set(1, 2, 3).withUnits(meter)
+      val booleanParam: Parameter[Boolean] = booleanKey.set(true, false)
+      val timestamp: Parameter[Instant]    = timestampKey.set(Instant.now)
 
       //create DemandState and use sequential add
-      val ds1 = DemandState(prefix).add(charParam).add(intParam)
+      val ds1: DemandState = DemandState(prefix).add(charParam).add(intParam)
       //create DemandState and add more than one Parameters using madd
-      val ds2 = DemandState(prefix).madd(intParam, booleanParam)
+      val ds2: DemandState = DemandState(prefix).madd(intParam, booleanParam)
       //create DemandState using apply
-      val ds3 = DemandState(prefix, Set(timestamp))
+      val ds3: DemandState = DemandState(prefix, Set(timestamp))
 
       //access keys
-      val charKeyExists = ds1.exists(charKey) //true
+      val charKeyExists: Boolean = ds1.exists(charKey) //true
 
       //access Parameters
       val p1: Option[Parameter[Int]] = ds1.get(intKey)
@@ -57,10 +57,10 @@ class StateVariablesTest extends FunSpec with Matchers {
       )
 
       //remove keys
-      val ds4 = ds3.remove(timestampKey)
+      val ds4: DemandState = ds3.remove(timestampKey)
 
       //update existing keys - set it back by an hour
-      val ds5 = ds3.add(timestampKey.set(Instant.now().minusSeconds(3600)))
+      val ds5: DemandState = ds3.add(timestampKey.set(Instant.now().minusSeconds(3600)))
 
       //#demandstate
       //validations
