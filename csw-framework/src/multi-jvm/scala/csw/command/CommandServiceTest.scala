@@ -11,8 +11,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage
+import csw.messages.CommandMessage.Submit
 import csw.messages.SupervisorLockMessage.Lock
 import csw.messages.ccs.CommandIssue.ComponentLockedIssue
 import csw.messages.ccs.commands.CommandResponse._
@@ -23,7 +22,7 @@ import csw.messages.models.LockingResponse
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
-import csw.services.ccs.common.ActorRefExts.RichActor
+import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.services.ccs.internal.matchers.{DemandMatcher, PublishedStateMatcher}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
@@ -92,34 +91,33 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       cmdResponseProbe.expectMsg(5.seconds, Completed(runId))
 
       // short running command
-      val commandResponse =
-        Await.result(
-          assemblyRef.ask[CommandResponse](Submit(Setup(obsId, invalidCmdPrefix), _)),
-          timeout.duration
-        )
-
+      val commandResponse = Await.result(assemblyRef.submit(Setup(obsId, invalidCmdPrefix)), timeout.duration)
       commandResponse shouldBe a[Invalid]
 
       // long running command which does not use matcher
+      val setup = Setup(obsId, acceptedCmdPrefix)
       val longCommandResponse = Await.result(
-        assemblyRef.ask[CommandResponse](Submit(Setup(obsId, acceptedCmdPrefix), _)).flatMap {
-          case _: Accepted ⇒ assemblyRef.ask[CommandResponse](CommandResponseManagerMessage.Subscribe(runId, _))
+        assemblyRef.submit(setup).flatMap {
+          case _: Accepted ⇒ assemblyRef.getCommandResponse(setup.runId)
           case x           ⇒ Future.successful(x)
         },
         timeout.duration
       )
 
-      longCommandResponse shouldBe Completed(runId)
+      longCommandResponse shouldBe a[CompletedWithResult]
+      longCommandResponse.runId shouldBe setup.runId
 
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
       val demandMatcher         = DemandMatcher(DemandState(acceptedCmdPrefix, Set(param)), withUnits = false, timeout)
 
+      val eventualMatcherResponse =
+        PublishedStateMatcher.ask(assemblyRef, demandMatcher)(actorSystem.executionContext, ActorMaterializer())
+
       val matchedResponse = Await.result(
-        assemblyRef.ask[CommandResponse](Oneway(Setup(obsId, acceptedCmdPrefix), _)).flatMap {
+        assemblyRef.oneway(Setup(obsId, acceptedCmdPrefix)).flatMap {
           case _: Accepted ⇒
-            PublishedStateMatcher
-              .ask(assemblyRef, demandMatcher)(actorSystem.executionContext, ActorMaterializer())
+            eventualMatcherResponse
               .map {
                 case MatchCompleted ⇒ Completed(runId)
                 case MatchFailed(_) ⇒ Error(runId, "Demand could not be matched")
