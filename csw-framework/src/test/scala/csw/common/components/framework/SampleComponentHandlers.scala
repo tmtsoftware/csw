@@ -63,23 +63,16 @@ class SampleComponentHandlers(
   private def processCommand(controlCommand: ControlCommand): Unit =
     controlCommand match {
       case Setup(_, _, somePrefix, _) ⇒
-        pubSubRef ! Publish(
-          CurrentState(somePrefix, Set(choiceKey.set(setupConfigChoice), controlCommand.paramSet.head))
-        )
+        pubSubRef ! Publish(CurrentState(somePrefix, Set(choiceKey.set(setupConfigChoice), controlCommand.paramSet.head)))
       case Observe(_, _, somePrefix, _) ⇒
-        pubSubRef ! Publish(
-          CurrentState(somePrefix, Set(choiceKey.set(observeConfigChoice), controlCommand.paramSet.head))
-        )
+        pubSubRef ! Publish(CurrentState(somePrefix, Set(choiceKey.set(observeConfigChoice), controlCommand.paramSet.head)))
       case _ ⇒
     }
 
   def validateCommand(command: ControlCommand): CommandResponse = {
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
-    if (command.prefix.prefix.contains("success")) {
-      Accepted(command.runId)
-    } else {
-      Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))
-    }
+    if (command.prefix.prefix.contains("success")) Accepted(command.runId)
+    else Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))
   }
 
   override def onShutdown(): Future[Unit] = {

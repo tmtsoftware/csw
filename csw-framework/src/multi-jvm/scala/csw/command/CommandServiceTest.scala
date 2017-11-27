@@ -34,6 +34,8 @@ class CommandServiceTestMultiJvm1 extends CommandServiceTest(0)
 class CommandServiceTestMultiJvm2 extends CommandServiceTest(0)
 class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 
+// DEOPSCSW-201: Destination component to receive a submit command
+// DEOPSCSW-202: Verification of submit commands
 // DEOPSCSW-207: Report on Configuration Command Completion
 // DEOPSCSW-208: Report failure on Configuration Completion command
 // DEOPSCSW-222: Locking a component for a specific duration

@@ -120,6 +120,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-198: Enable Assembly to accept a Setup or an Observe configuration
   // DEOPSCSW-199: Enable HCD to accept a Setup configuration
   // DEOPSCSW-200: Send Submit Configuration command
+  // DEOPSCSW-201: Destination component to receive a submit command
   // DEOPSCSW-203: Write component-specific verification code
   // DEOPSCSW-204: Sender to know that Submit configuration command's validation was successful
   // DEOPSCSW-213: Sender to know that oneway configuration command's validation was successful
