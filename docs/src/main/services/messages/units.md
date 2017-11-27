@@ -51,7 +51,10 @@ The default unit for `TimestampKey`(in Scala and Java both) is `second`. For all
 | watt        | W                 | Watt: power |
 | week        | wk                | week - 7 d |
 | year        | yr                | year - 3.6525x10+2 d |
-| CGS units|
+
+### CGS units
+| Name          | Abbreviation    | Description               |
+| :-----------: |:--------------: | :-------------------------|
 | coulomb    | C                  | coulomb: electric charge |
 | centimeter | cm                 | centimeter |
 | erg        | erg                | erg: CGS unit of energy |
