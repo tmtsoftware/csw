@@ -25,7 +25,7 @@ public class JEventsTest {
     public void showUsageOfEventTime() {
         //#eventtime
 
-        //apply return current time in UTC
+        //apply returns current time in UTC
         EventTime now = EventTime.apply();
 
         //using constructor
@@ -154,7 +154,7 @@ public class JEventsTest {
 
         //remove keys
         ObserveEvent oc4 = oc3.remove(k3);
-        //#statusevent
+        //#observeevent
 
         Assert.assertTrue(k1Exists);
         Assert.assertTrue(p4.get() == p1);
@@ -165,7 +165,7 @@ public class JEventsTest {
     }
 
     @Test
-    public void showUsageOfWaitEvent() {
+    public void showUsageOfSystemEvent() {
         //#systemevent
         //keys
         Key<Integer> k1 = JKeyTypes.IntKey().make("encoder");
@@ -203,7 +203,7 @@ public class JEventsTest {
 
         //remove keys
         SystemEvent oc4 = se3.remove(k3);
-        //#statusevent
+        //#systemevent
 
         Assert.assertTrue(k1Exists);
         Assert.assertTrue(p4.get() == p1);

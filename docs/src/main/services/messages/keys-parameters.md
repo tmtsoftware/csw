@@ -105,3 +105,8 @@ Scala
 
 Java
 :   @@snip [JKeysAndParametersTest.java](../../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #struct }
+
+## Source code for examples
+
+* @github[Scala Example](/examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala)
+* @github[Java Example](/examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java)

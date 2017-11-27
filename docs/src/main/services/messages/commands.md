@@ -83,3 +83,8 @@ Scala
 
 Java
 :   @@snip [JCommandsTest.java](../../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #unique-key }
+
+## Source code for examples
+
+* @github[Scala Example](/examples/src/test/scala/csw/services/messages/CommandsTest.scala)
+* @github[Java Example](/examples/src/test/java/csw/services/messages/JCommandsTest.java)

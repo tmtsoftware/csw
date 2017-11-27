@@ -15,6 +15,9 @@ It captures the instance of a time in UTC format. To create current instance of 
 
 Scala
 :   @@snip [EventsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #eventtime }
+
+Java
+:   @@snip [JEventsTest.java](../../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #eventtime }
   
 ### EventInfo
 
@@ -27,6 +30,9 @@ It captures all the relevant information about an event that occurred during obs
  
 Scala
 :   @@snip [EventsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #eventinfo }
+
+Java
+:   @@snip [JEventsTest.java](../../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #eventinfo }
  
 
 ### Status Event
@@ -36,12 +42,20 @@ StatusEvents are the published internal state or status values of a component th
 Scala
 :   @@snip [EventsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #statusevent }
 
+Java
+:   @@snip [JEventsTest.java](../../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #statusevent }
+
+
 ### Observe Event
 
 ObserveEvent is used to describe an event within a standardized data acquisition process. Published only by Science Detector Assemblies, who emit ObserveEvents during their exposures to signal the occurrence of specific activities/actions during the acquisition of data. Observe Events are published by the detector system using the Event Service.
 
 Scala
 :   @@snip [EventsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #observeevent }
+
+Java
+:   @@snip [JEventsTest.java](../../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #observeevent }
+
 
 ### System Event
 
@@ -50,11 +64,18 @@ SystemEvent is used to describe a demand or other algorithm input from one compo
 Scala
 :   @@snip [EventsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #systemevent }
 
+Java
+:   @@snip [JEventsTest.java](../../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #systemevent }
+
+
 ### JSON serialization
 Events can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize Status, Observe and System events.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #json-serialization }
+
+Java
+:   @@snip [JEventsTest.java](../../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #json-serialization }
 
 ### Unique Key constraint
 
@@ -70,6 +91,9 @@ Here are some examples that illustrate this point:
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #unique-key }
+
+Java
+:   @@snip [JEventsTest.java](../../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #unique-key }
 
 ### Protobuf
 
@@ -89,3 +113,11 @@ Here are some examples:
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #protobuf }
+
+Java
+:   @@snip [JEventsTest.java](../../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #protobuf }
+
+## Source code for examples
+
+* @github[Scala Example](/examples/src/test/scala/csw/services/messages/EventsTest.scala)
+* @github[Java Example](/examples/src/test/java/csw/services/messages/JEventsTest.java)

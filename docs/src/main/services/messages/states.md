@@ -50,3 +50,8 @@ Scala
 
 Java
 :   @@snip [JStateVariablesTest.java](../../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #unique-key }
+
+## Source code for examples
+
+* @github[Scala Example](/examples/src/test/scala/csw/services/messages/StateVariablesTest.scala)
+* @github[Java Example](/examples/src/test/java/csw/services/messages/JStateVariablesTest.java)

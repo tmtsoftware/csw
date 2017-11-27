@@ -51,3 +51,8 @@ Scala
 
 Java
 :   @@snip [JResultTest.java](../../../../../examples/src/test/java/csw/services/messages/JResultTest.java) { #unique-key }
+
+## Source code for examples
+
+* @github[Scala Example](/examples/src/test/scala/csw/services/messages/ResultTest.scala)
+* @github[Java Example](/examples/src/test/java/csw/services/messages/JResultTest.java)
