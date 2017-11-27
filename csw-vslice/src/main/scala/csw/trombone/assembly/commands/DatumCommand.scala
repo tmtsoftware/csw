@@ -57,7 +57,7 @@ class DatumCommand(
         .ask[CommandResponse](Submit(Setup(s.obsId, TromboneHcdState.axisDatumCK), _))
         .flatMap {
           case _: Accepted ⇒
-            Matcher.matchPublishedState(tromboneHCD.get, AssemblyMatchers.idleMatcher).map {
+            new Matcher(tromboneHCD.get, AssemblyMatchers.idleMatcher).response.map {
               case MatchCompleted =>
                 publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
                 Completed(s.runId)
