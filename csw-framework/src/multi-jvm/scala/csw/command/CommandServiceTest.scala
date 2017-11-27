@@ -109,16 +109,18 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
       val demandMatcher         = DemandMatcher(DemandState(acceptWithMatcherCmdPrefix, Set(param)), withUnits = false, timeout)
       val setupWithMatcher      = Setup(obsId, acceptWithMatcherCmdPrefix)
-      val matcherResponseF      = Matcher.matchPublishedState(assemblyRef, demandMatcher)
+      val matcher               = new Matcher(assemblyRef, demandMatcher)
 
       val matchedResponse = Await.result(
         assemblyRef.oneway(setupWithMatcher).flatMap {
           case _: Accepted ⇒
-            matcherResponseF
-              .map {
-                case MatchCompleted  ⇒ Completed(setupWithMatcher.runId)
-                case MatchFailed(ex) ⇒ Error(setupWithMatcher.runId, ex.getMessage)
-              }
+            matcher.response.map {
+              case MatchCompleted  ⇒ Completed(setupWithMatcher.runId)
+              case MatchFailed(ex) ⇒ Error(setupWithMatcher.runId, ex.getMessage)
+            }
+          case x: Invalid ⇒
+            matcher.stop()
+            Future.successful(x)
           case x ⇒ Future.successful(x)
         },
         timeout.duration
