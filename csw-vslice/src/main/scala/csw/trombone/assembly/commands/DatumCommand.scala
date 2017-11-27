@@ -14,9 +14,9 @@ import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, No
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.RunId
-import csw.services.ccs.common.ActorRefExts.RichActor
-import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.ccs.internal.matchers.Matcher
+import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext, AssemblyMatchers}
 import csw.trombone.hcd.TromboneHcdState
@@ -54,7 +54,7 @@ class DatumCommand(
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
       tromboneHCD.get
-        .ask[CommandResponse](Submit(Setup(s.obsId, TromboneHcdState.axisDatumCK), _))
+        .submit(Setup(s.obsId, TromboneHcdState.axisDatumCK))
         .flatMap {
           case _: Accepted ⇒
             new Matcher(tromboneHCD.get, AssemblyMatchers.idleMatcher).response.map {

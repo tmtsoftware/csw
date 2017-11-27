@@ -6,9 +6,6 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
-import csw.services.ccs.common.ActorRefExts.RichActor
-import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.services.ccs.internal.matchers.Matcher
 import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
@@ -17,6 +14,9 @@ import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.RunId
 import csw.messages.params.models.Units.encoder
+import csw.services.ccs.common.ActorRefExts.RichComponentActor
+import csw.services.ccs.internal.matchers.Matcher
+import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
@@ -63,7 +63,7 @@ class SetElevationCommand(
 
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
-      tromboneHCD.get.ask[CommandResponse](Submit(scOut, _)).flatMap {
+      tromboneHCD.get.submit(scOut).flatMap {
         case Accepted(_) ⇒
           new Matcher(tromboneHCD.get, stateMatcher).response.map {
             case MatchCompleted =>

@@ -43,7 +43,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     ) {
         super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, klass);
         this.pubSubRef = pubSubRef;
-        this.log = new JLoggerFactory(componentInfo.name()).getLogger(getClass());
+        this.log = jLoggerFactory().getLogger(getClass());
     }
 
     @Override
