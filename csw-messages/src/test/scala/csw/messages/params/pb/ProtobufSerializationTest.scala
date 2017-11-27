@@ -8,7 +8,6 @@ import csw.messages.params.generics.KeyType
 import csw.messages.params.generics.KeyType.{ChoiceKey, RaDecKey, StructKey}
 import csw.messages.params.models.Units.{arcmin, joule}
 import csw.messages.params.models._
-import csw_protobuf.events.PbEvent
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 // DEOPSCSW-297: Merge protobuf branch in master
