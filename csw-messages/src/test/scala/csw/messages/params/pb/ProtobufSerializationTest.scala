@@ -28,9 +28,6 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       //able to generate protobuf from event
       StatusEvent.fromPb(statusEvent.toPb) shouldBe statusEvent
-
-      //able to generate event from protobuf byteArray
-      StatusEvent.fromPb(PbEvent.parseFrom(statusEvent.toPb.toByteArray)) shouldBe statusEvent
     }
 
     it("should serialize ObserveEvent") {
@@ -49,7 +46,7 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       ObserveEvent.fromPb(observeEvent.toPb) shouldBe observeEvent
 
       //able to generate event from protobuf byteArray
-      ObserveEvent.fromPb(PbEvent.parseFrom(observeEvent.toPb.toByteArray)) shouldBe observeEvent
+      ObserveEvent.fromPb(observeEvent.toPb) shouldBe observeEvent
     }
 
     it("should serialize SystemEvent") {
@@ -76,10 +73,6 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       //able to generate protobuf from event
       SystemEvent.fromPb(systemEvent1.toPb) shouldBe systemEvent1
       SystemEvent.fromPb(systemEvent2.toPb) shouldBe systemEvent2
-
-      //able to generate event from protobuf byteArray
-      SystemEvent.fromPb(PbEvent.parseFrom(systemEvent1.toPb.toByteArray)) shouldBe systemEvent1
-      SystemEvent.fromPb(PbEvent.parseFrom(systemEvent2.toPb.toByteArray)) shouldBe systemEvent2
     }
   }
 }

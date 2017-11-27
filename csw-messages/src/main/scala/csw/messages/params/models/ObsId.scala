@@ -1,5 +1,7 @@
 package csw.messages.params.models
 
+import java.util.Optional
+
 import com.trueaccord.scalapb.TypeMapper
 import play.api.libs.json._
 
@@ -32,7 +34,10 @@ object ObsId {
   def empty: ObsId = ObsId("")
 }
 
-case class ObsId(obsId: String)
+case class ObsId(obsId: String) {
+  def asOption: Option[ObsId]     = Some(new ObsId(obsId))
+  def asOptional: Optional[ObsId] = Optional.of(new ObsId(obsId))
+}
 
 case class ObsId2(year: String, sem: String, kind: String, prog: String, obs: String, file: Option[String]) {
   // private final val PROG_KIND_INDEX = 6

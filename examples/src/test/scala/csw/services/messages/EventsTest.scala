@@ -15,9 +15,7 @@ class EventsTest extends FunSpec with Matchers {
 
   describe("Examples of EventTime") {
     it("should show usage of utility functions") {
-
       //#eventtime
-
       //default constructor will return current time in UTC
       val now: EventTime = EventTime()
 
@@ -47,7 +45,7 @@ class EventsTest extends FunSpec with Matchers {
       val info1: EventInfo = EventInfo("wfos.blue.filter")
 
       //given subsystem and time is an hour ago
-      val info2: EventInfo = EventInfo("wfos.blue.filter", EventTime(Instant.now()))
+      val info2: EventInfo = EventInfo("wfos.blue.filter", EventTime(Instant.now().minusSeconds(3600)))
 
       //supply subsystem, time, ObsId
       val info3 = EventInfo(
@@ -259,20 +257,20 @@ class EventsTest extends FunSpec with Matchers {
       val systemEvent: SystemEvent   = SystemEvent("wfos.blue.filter").add(i1)
 
       //json support - write
-      val scJson: JsValue = JsonSupport.writeEvent(statusEvent)
-      val ocJson: JsValue = JsonSupport.writeEvent(observeEvent)
-      val wcJson: JsValue = JsonSupport.writeEvent(systemEvent)
+      val statusJson: JsValue  = JsonSupport.writeEvent(statusEvent)
+      val observeJson: JsValue = JsonSupport.writeEvent(observeEvent)
+      val systemJson: JsValue  = JsonSupport.writeEvent(systemEvent)
 
       //optionally prettify
-      val str: String = Json.prettyPrint(scJson)
+      val str: String = Json.prettyPrint(statusJson)
 
       //construct command from string
       val statusEventFromPrettyStr: StatusEvent = JsonSupport.readEvent[StatusEvent](Json.parse(str))
 
       //json support - read
-      val statusEvent1: StatusEvent   = JsonSupport.readEvent[StatusEvent](scJson)
-      val observeEvent1: ObserveEvent = JsonSupport.readEvent[ObserveEvent](ocJson)
-      val systemEvent1: SystemEvent   = JsonSupport.readEvent[SystemEvent](wcJson)
+      val statusEvent1: StatusEvent   = JsonSupport.readEvent[StatusEvent](statusJson)
+      val observeEvent1: ObserveEvent = JsonSupport.readEvent[ObserveEvent](observeJson)
+      val systemEvent1: SystemEvent   = JsonSupport.readEvent[SystemEvent](systemJson)
       //#json-serialization
 
       //validations
@@ -342,8 +340,6 @@ class EventsTest extends FunSpec with Matchers {
     it("should show usage of converting events to/from protobuf") {
 
       //#protobuf
-      import csw_protobuf.events.PbEvent
-
       //Some variety in EventInfo
       val info1 = EventInfo("wfos.blue.filter")
       val info2 = EventInfo("wfos.blue.filter", Instant.now().minusSeconds(60))
@@ -372,16 +368,16 @@ class EventsTest extends FunSpec with Matchers {
       val systemEvent2: SystemEvent  = SystemEvent(info4).add(param)
 
       //convert events to protobuf bytestring
-      val byteArray1: Array[Byte] = statusEvent.toPb.toByteString.toByteArray
-      val byteArray2: Array[Byte] = observeEvent.toPb.toByteString.toByteArray
-      val byteArray3: Array[Byte] = systemEvent1.toPb.toByteString.toByteArray
-      val byteArray4: Array[Byte] = systemEvent2.toPb.toByteString.toByteArray
+      val byteArray1: Array[Byte] = statusEvent.toPb
+      val byteArray2: Array[Byte] = observeEvent.toPb
+      val byteArray3: Array[Byte] = systemEvent1.toPb
+      val byteArray4: Array[Byte] = systemEvent2.toPb
 
       //convert protobuf bytestring to events
-      val pbStatusEvent: StatusEvent   = StatusEvent.fromPb(PbEvent.parseFrom(byteArray1))
-      val pbObserveEvent: ObserveEvent = ObserveEvent.fromPb(PbEvent.parseFrom(byteArray2))
-      val pbSystemEvent1: SystemEvent  = SystemEvent.fromPb(PbEvent.parseFrom(byteArray3))
-      val pbSystemEvent2: SystemEvent  = SystemEvent.fromPb(PbEvent.parseFrom(byteArray4))
+      val pbStatusEvent: StatusEvent   = StatusEvent.fromPb(byteArray1)
+      val pbObserveEvent: ObserveEvent = ObserveEvent.fromPb(byteArray2)
+      val pbSystemEvent1: SystemEvent  = SystemEvent.fromPb(byteArray3)
+      val pbSystemEvent2: SystemEvent  = SystemEvent.fromPb(byteArray4)
       //#protobuf
 
       //validations

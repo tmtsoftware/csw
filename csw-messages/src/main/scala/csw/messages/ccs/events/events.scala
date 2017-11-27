@@ -55,6 +55,9 @@ object EventType {
       _.map(Parameter.typeMapper2.toBase).toSeq
     }
 
+  /**
+   * TypeMapper definitions are required for to/from conversion PbEvent(Protobuf) <==> System, Observe, Status event.
+   */
   implicit def typeMapper[T <: EventType[_]]: TypeMapper[PbEvent, T] = new TypeMapper[PbEvent, T] {
     override def toCustom(base: PbEvent): T = {
       val factory: (EventInfo, Set[Parameter[_]]) ⇒ Any = base.eventType match {
@@ -121,7 +124,11 @@ case class StatusEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = S
   def this(prefix: String, time: EventTime, obsId: ObsId) = this(EventInfo(prefix, time, obsId))
 
   override protected def create(data: Set[Parameter[_]]) = new StatusEvent(info, data)
-  def toPb: PbEvent                                      = EventType.typeMapper[StatusEvent].toBase(this)
+
+  /**
+   * Returns Protobuf representation of StatusEvent
+   */
+  def toPb: Array[Byte] = EventType.typeMapper[StatusEvent].toBase(this).toByteArray
 }
 
 object StatusEvent {
@@ -131,7 +138,15 @@ object StatusEvent {
   def apply(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): StatusEvent =
     new StatusEvent(info).madd(paramSet)
 
-  def fromPb(pbEvent: PbEvent): StatusEvent = EventType.typeMapper[StatusEvent].toCustom(pbEvent)
+  /**
+   * Constructs StatusEvent from EventInfo
+   */
+  def from(info: EventInfo): StatusEvent = new StatusEvent(info)
+
+  /**
+   * Constructs from byte array containing Protobuf representation of StatusEvent
+   */
+  def fromPb(array: Array[Byte]): StatusEvent = EventType.typeMapper[StatusEvent].toCustom(PbEvent.parseFrom(array))
 }
 
 /**
@@ -146,10 +161,14 @@ case class ObserveEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = 
 
   // Java API
   def this(prefix: String) = this(EventInfo(prefix))
+  def this(prefix: String, time: EventTime, obsId: ObsId) = this(EventInfo(prefix, time, obsId))
 
   override protected def create(data: Set[Parameter[_]]) = new ObserveEvent(info, data)
 
-  def toPb: PbEvent = EventType.typeMapper[ObserveEvent].toBase(this)
+  /**
+   * Returns Protobuf representation of ObserveEvent
+   */
+  def toPb: Array[Byte] = EventType.typeMapper[ObserveEvent].toBase(this).toByteArray
 }
 
 object ObserveEvent {
@@ -159,7 +178,15 @@ object ObserveEvent {
   def apply(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): ObserveEvent =
     new ObserveEvent(info).madd(paramSet)
 
-  def fromPb(pbEvent: PbEvent): ObserveEvent = EventType.typeMapper[ObserveEvent].toCustom(pbEvent)
+  /**
+   * Constructs ObserveEvent from EventInfo
+   */
+  def from(info: EventInfo): ObserveEvent = new ObserveEvent(info)
+
+  /**
+   * Constructs from byte array containing Protobuf representation of ObserveEvent
+   */
+  def fromPb(array: Array[Byte]): ObserveEvent = EventType.typeMapper[ObserveEvent].toCustom(PbEvent.parseFrom(array))
 }
 
 /**
@@ -174,10 +201,14 @@ case class SystemEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = S
 
   // Java API
   def this(prefix: String) = this(EventInfo(prefix))
+  def this(prefix: String, time: EventTime, obsId: ObsId) = this(EventInfo(prefix, time, obsId))
 
   override protected def create(data: Set[Parameter[_]]) = new SystemEvent(info, data)
 
-  def toPb: PbEvent = EventType.typeMapper[SystemEvent].toBase(this)
+  /**
+   * Returns Protobuf representation of SystemEvent
+   */
+  def toPb: Array[Byte] = EventType.typeMapper[SystemEvent].toBase(this).toByteArray
 }
 
 object SystemEvent {
@@ -187,5 +218,13 @@ object SystemEvent {
   def apply(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): SystemEvent =
     new SystemEvent(info).madd(paramSet)
 
-  def fromPb(pbEvent: PbEvent): SystemEvent = EventType.typeMapper[SystemEvent].toCustom(pbEvent)
+  /**
+   * Constructs SystemEvent from EventInfo
+   */
+  def from(info: EventInfo): SystemEvent = new SystemEvent(info)
+
+  /**
+   * Constructs from byte array containing Protobuf representation of SystemEvent
+   */
+  def fromPb(array: Array[Byte]): SystemEvent = EventType.typeMapper[SystemEvent].toCustom(PbEvent.parseFrom(array))
 }
