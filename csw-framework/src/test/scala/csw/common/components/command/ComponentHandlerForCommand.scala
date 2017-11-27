@@ -31,7 +31,7 @@ class ComponentHandlerForCommand(
     locationService: LocationService
 ) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, commandResponseManager, pubSubRef, locationService) {
 
-  val log: Logger = new LoggerFactory("ComponentHandlerForCommand").getLogger(ctx)
+  val log: Logger = loggerFactory.getLogger(ctx)
 
   import ComponentStateForCommand._
   implicit val actorSystem: actor.ActorSystem = ctx.system.toUntyped
