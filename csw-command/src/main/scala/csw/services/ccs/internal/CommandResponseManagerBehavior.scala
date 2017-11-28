@@ -87,6 +87,7 @@ class CommandResponseManagerBehavior(
   }
 
   private def subscribe(runId: RunId, replyTo: ActorRef[CommandResponse]): Unit = {
+    ctx.watchWith(replyTo, Unsubscribe(runId, replyTo))
     commandStatus = commandStatus.subscribe(runId, replyTo)
     publishToSubscribers(commandStatus.get(runId), Set(replyTo))
   }
