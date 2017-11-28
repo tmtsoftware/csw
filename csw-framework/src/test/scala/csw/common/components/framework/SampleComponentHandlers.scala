@@ -63,9 +63,9 @@ class SampleComponentHandlers(
   private def processCommand(controlCommand: ControlCommand): Unit =
     controlCommand match {
       case Setup(_, _, somePrefix, _) ⇒
-        pubSubRef ! Publish(CurrentState(somePrefix, Set(choiceKey.set(setupConfigChoice), controlCommand.paramSet.head)))
+        pubSubRef ! Publish(CurrentState(somePrefix, controlCommand.paramSet + choiceKey.set(setupConfigChoice)))
       case Observe(_, _, somePrefix, _) ⇒
-        pubSubRef ! Publish(CurrentState(somePrefix, Set(choiceKey.set(observeConfigChoice), controlCommand.paramSet.head)))
+        pubSubRef ! Publish(CurrentState(somePrefix, controlCommand.paramSet + choiceKey.set(observeConfigChoice)))
       case _ ⇒
     }
 

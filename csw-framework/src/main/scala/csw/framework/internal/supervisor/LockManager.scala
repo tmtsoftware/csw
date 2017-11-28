@@ -24,22 +24,17 @@ class LockManager(val lock: Option[Prefix], loggerFactory: LoggerFactory) {
     case _                   ⇒ onLockAlreadyReleased(prefix, replyTo)
   }
 
-  def allowCommand(commandMessage: CommandMessage): Boolean = lock match {
+  def allowCommand(msg: CommandMessage): Boolean = lock match {
     case None ⇒ true
-    case Some(prefix) ⇒
-      val command = commandMessage.command
-      command.getLockToken match {
-        case Some(`prefix`) ⇒
-          log.info(s"Forwarding message [${commandMessage.toString}]")
+    case Some(currentPrefix) ⇒
+      msg.command.prefix match {
+        case `currentPrefix` ⇒
+          log.info(s"Forwarding message ${msg.toString} to TLA for component: $currentPrefix")
           true
         case _ ⇒
-          log.error(
-            s"Cannot process the command [${command.toString}] as the lock is acquired by component: $prefix"
-          )
-          commandMessage.replyTo ! NotAllowed(
-            command.runId,
-            ComponentLockedIssue(s"This component is locked by component $prefix")
-          )
+          log.error(s"Cannot process the command [${msg.command.toString}] as the lock is acquired by component: $currentPrefix")
+          msg.replyTo ! NotAllowed(msg.command.runId,
+                                   ComponentLockedIssue(s"This component is locked by component $currentPrefix"))
           false
       }
   }

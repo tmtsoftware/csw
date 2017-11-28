@@ -483,11 +483,11 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 1 sends submit command with tokenId in parameter set
-    supervisorRef ! Submit(Setup.withLockToken(obsId, client1Prefix), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(obsId, client1Prefix), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
 
     // Client 2 tries to send submit command while Client 1 has the lock
-    supervisorRef ! Submit(Setup.withLockToken(obsId, client2Prefix), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(obsId, client2Prefix), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[NotAllowed]
 
     // Client 1 unlocks the assembly
@@ -495,7 +495,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockReleased)
 
     // Client 2 tries to send submit command again after lock is released
-    supervisorRef ! Submit(Setup.withLockToken(obsId, client2Prefix), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(obsId, client2Prefix), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
   }
 }

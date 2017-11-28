@@ -136,7 +136,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       enterBarrier("assembly-locked")
 
       // send command with lock token and expect command processing response
-      val assemblySetup = Setup.withLockToken(obsId, immediateCmdPrefix)
+      val assemblySetup = Setup(obsId, immediateCmdPrefix)
       assemblyRef ! Submit(assemblySetup, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(5.seconds, Completed(assemblySetup.runId))
       enterBarrier("command-when-locked")
