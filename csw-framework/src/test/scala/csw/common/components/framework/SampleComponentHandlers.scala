@@ -3,8 +3,9 @@ package csw.common.components.framework
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
+import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.ccs.CommandIssue.OtherIssue
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Observe, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -44,12 +45,12 @@ class SampleComponentHandlers(
 
   override def onGoOnline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
 
-  override def onDomainMsg(msg: ComponentDomainMessage): Unit = {
+  override def onDomainMsg(msg: ComponentDomainMessage): Unit =
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
-  }
 
   override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = {
     // Adding passed in parameter to see if data is transferred properly
+    commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
     processCommand(controlCommand)
   }

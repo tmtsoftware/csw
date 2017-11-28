@@ -9,11 +9,12 @@ import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInit
 import csw.framework.javadsl.components.JComponentDomainMessage
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
 import csw.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid, NotAllowed}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid, NotAllowed}
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.{Assembly, HCD}
@@ -497,5 +498,48 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     // Client 2 tries to send submit command again after lock is released
     supervisorRef ! Submit(Setup(obsId, client2Prefix), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
+  }
+
+  // DEOPSCSW-222: Locking a component for a specific duration
+  // DEOPSCSW-301: Support UnLocking
+  test("should forward messages that are of type SupervisorLockMessage to TLA") {
+    val lockingStateProbe    = TestProbe[LockingResponse]
+    val commandResponseProbe = TestProbe[CommandResponse]()(untypedSystem.toTyped, settings)
+
+    val client1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
+    val obsId         = ObsId("Obs001")
+
+    val mocks = frameworkTestMocks()
+    import mocks._
+
+    createSupervisorAndStartTLA(assemblyInfo, mocks)
+
+    // Assure that component is in running state
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+
+    // Client 1 will lock an assembly
+    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref)
+    lockingStateProbe.expectMsg(LockAcquired)
+
+    // Ensure Domain messages can be sent to component even in locked state
+    supervisorRef ! ComponentStatistics(1)
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice)))))
+
+    // Client 1 sends submit command with tokenId in parameter set
+    val setup = Setup(obsId, client1Prefix)
+    supervisorRef ! Submit(setup, commandResponseProbe.ref)
+    commandResponseProbe.expectMsgType[Accepted]
+
+    // Ensure Query can be sent to component even in locked state
+    supervisorRef ! Query(setup.runId, commandResponseProbe.ref)
+    commandResponseProbe.expectMsgType[CommandResponse]
+
+    // Ensure Subscribe can be sent to component even in locked state
+    supervisorRef ! Subscribe(setup.runId, commandResponseProbe.ref)
+    commandResponseProbe.expectMsg(Completed(setup.runId))
+
+    // Ensure Unsubscribe can be sent to component even in locked state
+    supervisorRef ! Unsubscribe(setup.runId, commandResponseProbe.ref)
   }
 }
