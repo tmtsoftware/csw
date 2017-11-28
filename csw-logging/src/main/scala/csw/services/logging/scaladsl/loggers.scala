@@ -11,8 +11,14 @@ private[logging] abstract class BaseLoggerFactory(maybeComponentName: Option[Str
   def getLogger: Logger                          = new LoggerImpl(maybeComponentName, None)
 }
 
+/**
+ * When using the `LoggerFactory`, log statements will have `@componentName` tag with provided `componentName`
+ */
 class LoggerFactory(componentName: String) extends BaseLoggerFactory(Some(componentName)) {
   def asJava: JLoggerFactory = new JLoggerFactory(componentName)
 }
 
+/**
+ * When using the `GenericLoggerFactory`, log statements will not have `@componentName` tag
+ */
 object GenericLoggerFactory extends BaseLoggerFactory(None)

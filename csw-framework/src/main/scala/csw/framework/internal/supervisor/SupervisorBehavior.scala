@@ -26,6 +26,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.PubSub.Publish
 import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToComponentLifecycleMessage}
+import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
 import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.services.location.models.AkkaRegistration
@@ -193,20 +194,20 @@ class SupervisorBehavior(
     case Query(commandId, replyTo)       ⇒ commandResponseManager ! Query(commandId, replyTo)
     case Subscribe(commandId, replyTo)   ⇒ commandResponseManager ! Subscribe(commandId, replyTo)
     case Unsubscribe(commandId, replyTo) ⇒ commandResponseManager ! Unsubscribe(commandId, replyTo)
-    case Lock(prefix, token, replyTo)    ⇒ lockComponent(prefix, token, replyTo)
-    case Unlock(prefix, token, replyTo)  ⇒ unlockComponent(prefix, token, replyTo)
+    case Lock(prefix, replyTo)           ⇒ lockComponent(prefix, replyTo)
+    case Unlock(prefix, replyTo)         ⇒ unlockComponent(prefix, replyTo)
     case commandMessage: CommandMessage  ⇒ if (lockManager.allowCommand(commandMessage)) runningComponent.get ! commandMessage
     case runningMessage: RunningMessage  ⇒ handleRunningMessage(runningMessage)
     case msg @ Running(_)                ⇒ log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
   }
 
-  private def lockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): Unit = {
-    lockManager = lockManager.lockComponent(prefix, token, replyTo)
+  private def lockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse]): Unit = {
+    lockManager = lockManager.lockComponent(prefix, replyTo)
     if (lockManager.lock.isDefined) updateLifecycleState(SupervisorLifecycleState.Lock)
   }
 
-  private def unlockComponent(prefix: String, token: String, replyTo: ActorRef[LockingResponse]): Unit = {
-    lockManager = lockManager.unlockComponent(prefix, token, replyTo)
+  private def unlockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse]): Unit = {
+    lockManager = lockManager.unlockComponent(prefix, replyTo)
     if (lockManager.lock.isEmpty) updateLifecycleState(SupervisorLifecycleState.Running)
   }
 

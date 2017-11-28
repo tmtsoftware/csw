@@ -1,7 +1,5 @@
 package csw.framework.internal.supervisor
 
-import java.util.UUID
-
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
@@ -424,42 +422,40 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
     lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
-    val token1 = UUID.randomUUID().toString
-    val token2 = UUID.randomUUID().toString
     // Client 1 will lock an assembly
-    supervisorRef ! Lock("wfos.prog.cloudcover.Client1", token1, lockingStateProbe.ref)
+    supervisorRef ! Lock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 2 tries to lock the assembly while Client 1 already has the lock
-    supervisorRef ! Lock("wfos.prog.cloudcover.Client2", token2, lockingStateProbe.ref)
+    supervisorRef ! Lock("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(
       ReAcquiringLockFailed(
-        s"Invalid prefix [wfos.prog.cloudcover.Client2] or token [$token2] for re-acquiring the lock. Currently it is acquired by component: [wfos.prog.cloudcover.Client1]"
+        s"Invalid prefix [WFOS, wfos.prog.cloudcover.Client2] for re-acquiring lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
       )
     )
 
     // Client 1 re-acquires the lock by sending the same token again
-    supervisorRef ! Lock("wfos.prog.cloudcover.Client1", token1, lockingStateProbe.ref)
+    supervisorRef ! Lock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 2 tries to unlock the assembly while Client 1 already has the lock
-    supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", token2, lockingStateProbe.ref)
+    supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(
       ReleasingLockFailed(
-        s"Invalid prefix [wfos.prog.cloudcover.Client2] or token [$token2] for releasing the lock. Currently it is acquired by component: [wfos.prog.cloudcover.Client1]"
+        s"Invalid prefix [WFOS, wfos.prog.cloudcover.Client2] for releasing lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
       )
     )
 
     // Client 1 unlocks the assembly successfully
-    supervisorRef ! Unlock("wfos.prog.cloudcover.Client1", token1, lockingStateProbe.ref)
+    supervisorRef ! Unlock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockReleased)
 
     // Client 1 tries to unlock the same assembly again while the lock is already released
-    supervisorRef ! Unlock("wfos.prog.cloudcover.Client1", token1, lockingStateProbe.ref)
+    supervisorRef ! Unlock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAlreadyReleased)
 
     // Client 2 tries to unlock the same assembly while the lock is already released
-    supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", token2, lockingStateProbe.ref)
+    supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAlreadyReleased)
   }
 
@@ -470,9 +466,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val commandResponseProbe = TestProbe[CommandResponse]
 
     val client1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
-    val token1        = "token-1"
     val client2Prefix = Prefix("wfos.prog.cloudcover.Client2.success")
-    val token2        = "token-2"
     val obsId         = ObsId("Obs001")
 
     val mocks = frameworkTestMocks()
@@ -485,23 +479,23 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
     // Client 1 will lock an assembly
-    supervisorRef ! Lock(client1Prefix.toString, token1, lockingStateProbe.ref)
+    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 1 sends submit command with tokenId in parameter set
-    supervisorRef ! Submit(Setup.withLockToken(obsId, client1Prefix, token1), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup.withLockToken(obsId, client1Prefix), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
 
     // Client 2 tries to send submit command while Client 1 has the lock
-    supervisorRef ! Submit(Setup.withLockToken(obsId, client2Prefix, token2), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup.withLockToken(obsId, client2Prefix), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[NotAllowed]
 
     // Client 1 unlocks the assembly
-    supervisorRef ! Unlock(client1Prefix.toString, token1, lockingStateProbe.ref)
+    supervisorRef ! Unlock(client1Prefix, lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockReleased)
 
     // Client 2 tries to send submit command again after lock is released
-    supervisorRef ! Submit(Setup.withLockToken(obsId, client2Prefix, token2), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup.withLockToken(obsId, client2Prefix), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
   }
 }

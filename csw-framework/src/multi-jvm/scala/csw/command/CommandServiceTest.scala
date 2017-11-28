@@ -1,7 +1,5 @@
 package csw.command
 
-import java.util.UUID
-
 import akka.actor.Scheduler
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.ActorSystem
@@ -19,6 +17,7 @@ import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.LockingResponse
+import csw.messages.models.LockingResponse.LockAcquired
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
@@ -131,13 +130,13 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       enterBarrier("short-long-commands")
 
       // acquire lock on assembly
-      val token             = UUID.randomUUID().toString
       val lockResponseProbe = TestProbe[LockingResponse]
-      assemblyRef ! Lock(lockPrefix.prefix, token, lockResponseProbe.ref)
+      assemblyRef ! Lock(immediateCmdPrefix, lockResponseProbe.ref)
+      lockResponseProbe.expectMsg(LockAcquired)
       enterBarrier("assembly-locked")
 
       // send command with lock token and expect command processing response
-      val assemblySetup = Setup.withLockToken(obsId, immediateCmdPrefix, token)
+      val assemblySetup = Setup.withLockToken(obsId, immediateCmdPrefix)
       assemblyRef ! Submit(assemblySetup, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(5.seconds, Completed(assemblySetup.runId))
       enterBarrier("command-when-locked")

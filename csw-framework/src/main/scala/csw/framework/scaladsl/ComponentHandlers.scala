@@ -1,7 +1,5 @@
 package csw.framework.scaladsl
 
-import java.util.UUID
-
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.messages.CommonMessage.TrackingEventReceived
@@ -35,7 +33,6 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
 ) {
   var isOnline: Boolean = false
 
-  protected lazy val lockToken: String            = UUID.randomUUID().toString
   protected lazy val loggerFactory: LoggerFactory = new LoggerFactory(componentInfo.name)
 
   def initialize(): Future[Unit]

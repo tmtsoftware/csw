@@ -6,7 +6,7 @@ import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState
 import csw.messages.location.TrackingEvent
 import csw.messages.models.PubSub.SubscriberMessage
 import csw.messages.models._
-import csw.messages.params.models.RunId
+import csw.messages.params.models.{Prefix, RunId}
 import csw.messages.params.states.CurrentState
 
 sealed trait ComponentMessage
@@ -34,8 +34,8 @@ object CommandMessage {
 
 sealed trait SupervisorLockMessage extends SupervisorRunningMessage
 object SupervisorLockMessage {
-  case class Lock(prefix: String, token: String, replyTo: ActorRef[LockingResponse])   extends SupervisorLockMessage
-  case class Unlock(prefix: String, token: String, replyTo: ActorRef[LockingResponse]) extends SupervisorLockMessage
+  case class Lock(prefix: Prefix, replyTo: ActorRef[LockingResponse])   extends SupervisorLockMessage
+  case class Unlock(prefix: Prefix, replyTo: ActorRef[LockingResponse]) extends SupervisorLockMessage
 }
 
 sealed trait RunningMessage extends ComponentMessage with SupervisorRunningMessage

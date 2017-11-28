@@ -18,7 +18,7 @@ import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}

@@ -44,7 +44,7 @@ sealed trait SequenceCommand extends Command
  * Marker trait for control parameter sets
  */
 sealed trait ControlCommand extends Command { self: ParameterSetType[_] ⇒
-  def getLockToken: Option[String] = self.get(LockToken.Key).flatMap(_.get(0))
+  def getLockToken: Option[Prefix] = self.get(LockToken.Key).flatMap(_.get(0).map(prefixStr ⇒ Prefix(prefixStr)))
 }
 
 /**
@@ -77,8 +77,8 @@ object Setup {
   def apply(obsId: ObsId, prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty): Setup =
     new Setup(RunId(), obsId, prefix).madd(paramSet) //madd ensures check for duplicate key
 
-  def withLockToken(obsId: ObsId, prefix: Prefix, token: String): Setup =
-    apply(obsId, prefix, Set(LockToken.Key.set(token)))
+  def withLockToken(obsId: ObsId, prefix: Prefix): Setup =
+    apply(obsId, prefix, Set(LockToken.Key.set(prefix.prefix)))
 }
 
 /**
