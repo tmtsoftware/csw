@@ -1,16 +1,19 @@
 package csw.framework
 
 import akka.actor
+import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.testkit.TestKitSettings
+import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.common.components.framework.ComponentDomainMessage
+import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.framework.ComponentInfo
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage, ContainerIdleMessage, SupervisorExternalMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.LocationService
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -58,5 +61,24 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
       ): ComponentHandlers[ComponentDomainMessage] =
         assemblyHandlers
     }
+
+  def createSupervisorAndStartTLA(
+      componentInfo: ComponentInfo,
+      testMocks: FrameworkTestMocks,
+      containerRef: ActorRef[ContainerIdleMessage] = TestProbe[ContainerIdleMessage].ref
+  ): ActorRef[SupervisorExternalMessage] = {
+    import testMocks._
+
+    val supervisorBehavior = SupervisorBehaviorFactory.make(
+      Some(containerRef),
+      componentInfo,
+      locationService,
+      registrationFactory,
+      pubSubBehaviorFactory
+    )
+
+    // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
+    untypedSystem.spawnAnonymous(supervisorBehavior)
+  }
 
 }

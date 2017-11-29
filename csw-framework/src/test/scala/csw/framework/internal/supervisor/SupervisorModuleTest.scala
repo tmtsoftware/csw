@@ -1,30 +1,25 @@
 package csw.framework.internal.supervisor
 
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{ActorRef, Behavior}
 import csw.common.components.framework.ComponentStatistics
 import csw.framework.ComponentInfos._
+import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
 import csw.framework.javadsl.components.JComponentDomainMessage
-import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
-import csw.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid, NotAllowed}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.LockingResponse._
+import csw.messages.models.LifecycleStateChanged
 import csw.messages.models.PubSub.Publish
 import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
-import csw.messages.models.{LifecycleStateChanged, LockingResponse}
 import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.{ObsId, Prefix}
+import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, DemandState}
 import csw.messages.{models, _}
 import csw.services.ccs.internal.matchers.DemandMatcher
@@ -47,32 +42,11 @@ import scala.concurrent.duration.DurationInt
 class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   import csw.common.components.framework.SampleComponentState._
 
-  val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
-  var supervisorBehavior: Behavior[SupervisorExternalMessage]            = _
-  var supervisorRef: ActorRef[SupervisorExternalMessage]                 = _
-  var containerIdleMessageProbe: TestProbe[ContainerIdleMessage]         = _
-
   val testData = Table(
     "componentInfo",
     hcdInfo,
     jHcdInfo,
   )
-
-  private def createSupervisorAndStartTLA(componentInfo: ComponentInfo, testMocks: FrameworkTestMocks): Unit = {
-    import testMocks._
-    containerIdleMessageProbe = TestProbe[ContainerIdleMessage]
-
-    supervisorBehavior = SupervisorBehaviorFactory.make(
-      Some(containerIdleMessageProbe.ref),
-      componentInfo,
-      locationService,
-      registrationFactory,
-      pubSubBehaviorFactory
-    )
-
-    // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
-    supervisorRef = untypedSystem.spawnAnonymous(supervisorBehavior)
-  }
 
   test("onInitialized and onRun hooks of comp handlers should be invoked when supervisor creates comp") {
 
@@ -80,7 +54,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(info, mocks)
+        val containerIdleMessageProbe = TestProbe[ContainerIdleMessage]
+        val supervisorRef             = createSupervisorAndStartTLA(info, mocks, containerIdleMessageProbe.ref)
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
@@ -102,7 +77,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(info, mocks)
+        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
@@ -142,7 +117,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(info, mocks)
+        val supervisorRef                                              = createSupervisorAndStartTLA(info, mocks)
         val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
@@ -212,7 +187,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(info, mocks)
+        val supervisorRef                                              = createSupervisorAndStartTLA(info, mocks)
         val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
@@ -279,7 +254,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val mocks                                                      = frameworkTestMocks()
         val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
         import mocks._
-        createSupervisorAndStartTLA(hcdInfo, mocks)
+        val supervisorRef = createSupervisorAndStartTLA(hcdInfo, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
@@ -303,7 +278,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(info, mocks)
+        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
@@ -328,7 +303,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(info, mocks)
+        val containerIdleMessageProbe = TestProbe[ContainerIdleMessage]
+        val supervisorRef             = createSupervisorAndStartTLA(info, mocks, containerIdleMessageProbe.ref)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
@@ -340,9 +316,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
         lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
-        containerIdleMessageProbe.expectMsg(
-          SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
-        )
+        containerIdleMessageProbe.expectMsg(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
         verify(locationService).unregister(any[AkkaConnection])
         verify(locationService, times(2)).register(akkaRegistration)
@@ -355,7 +329,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(info, mocks)
+        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
@@ -371,7 +345,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(info, mocks)
+        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
@@ -390,6 +364,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   // DEOPSCSW-284: Move Timeouts to Config file
   test("handle InitializeTimeout by stopping TLA") {
+    val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
 
     val testData = Table(
       "componentInfo",
@@ -401,7 +376,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        createSupervisorAndStartTLA(info, mocks)
+        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
 
         supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
@@ -409,137 +384,5 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         verify(locationService, never()).register(akkaRegistration)
       }
     }
-  }
-
-  //DEOPSCSW-222: Locking a component for a specific duration
-  test("should able to lock and unlock a component") {
-    val lockingStateProbe = TestProbe[LockingResponse]
-    val mocks             = frameworkTestMocks()
-    import mocks._
-
-    createSupervisorAndStartTLA(assemblyInfo, mocks)
-
-    // Assure that component is in running state
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
-
-    // Client 1 will lock an assembly
-    supervisorRef ! Lock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAcquired)
-
-    // Client 2 tries to lock the assembly while Client 1 already has the lock
-    supervisorRef ! Lock("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(
-      ReAcquiringLockFailed(
-        s"Invalid prefix [WFOS, wfos.prog.cloudcover.Client2] for re-acquiring lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
-      )
-    )
-
-    // Client 1 re-acquires the lock by sending the same token again
-    supervisorRef ! Lock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAcquired)
-
-    // Client 2 tries to unlock the assembly while Client 1 already has the lock
-    supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(
-      ReleasingLockFailed(
-        s"Invalid prefix [WFOS, wfos.prog.cloudcover.Client2] for releasing lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
-      )
-    )
-
-    // Client 1 unlocks the assembly successfully
-    supervisorRef ! Unlock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockReleased)
-
-    // Client 1 tries to unlock the same assembly again while the lock is already released
-    supervisorRef ! Unlock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAlreadyReleased)
-
-    // Client 2 tries to unlock the same assembly while the lock is already released
-    supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAlreadyReleased)
-  }
-
-  // DEOPSCSW-222: Locking a component for a specific duration
-  // DEOPSCSW-301: Support UnLocking
-  test("should forward command messages from client that locked the component and reject for other clients ") {
-    val lockingStateProbe    = TestProbe[LockingResponse]
-    val commandResponseProbe = TestProbe[CommandResponse]
-
-    val client1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
-    val client2Prefix = Prefix("wfos.prog.cloudcover.Client2.success")
-    val obsId         = ObsId("Obs001")
-
-    val mocks = frameworkTestMocks()
-    import mocks._
-
-    createSupervisorAndStartTLA(assemblyInfo, mocks)
-
-    // Assure that component is in running state
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
-
-    // Client 1 will lock an assembly
-    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAcquired)
-
-    // Client 1 sends submit command with tokenId in parameter set
-    supervisorRef ! Submit(Setup(obsId, client1Prefix), commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[Accepted]
-
-    // Client 2 tries to send submit command while Client 1 has the lock
-    supervisorRef ! Submit(Setup(obsId, client2Prefix), commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[NotAllowed]
-
-    // Client 1 unlocks the assembly
-    supervisorRef ! Unlock(client1Prefix, lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockReleased)
-
-    // Client 2 tries to send submit command again after lock is released
-    supervisorRef ! Submit(Setup(obsId, client2Prefix), commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[Accepted]
-  }
-
-  // DEOPSCSW-222: Locking a component for a specific duration
-  // DEOPSCSW-301: Support UnLocking
-  test("should forward messages that are of type SupervisorLockMessage to TLA") {
-    val lockingStateProbe    = TestProbe[LockingResponse]
-    val commandResponseProbe = TestProbe[CommandResponse]()(untypedSystem.toTyped, settings)
-
-    val client1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
-    val obsId         = ObsId("Obs001")
-
-    val mocks = frameworkTestMocks()
-    import mocks._
-
-    createSupervisorAndStartTLA(assemblyInfo, mocks)
-
-    // Assure that component is in running state
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
-
-    // Client 1 will lock an assembly
-    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAcquired)
-
-    // Ensure Domain messages can be sent to component even in locked state
-    supervisorRef ! ComponentStatistics(1)
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice)))))
-
-    // Client 1 sends submit command with tokenId in parameter set
-    val setup = Setup(obsId, client1Prefix)
-    supervisorRef ! Submit(setup, commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[Accepted]
-
-    // Ensure Query can be sent to component even in locked state
-    supervisorRef ! Query(setup.runId, commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[CommandResponse]
-
-    // Ensure Subscribe can be sent to component even in locked state
-    supervisorRef ! Subscribe(setup.runId, commandResponseProbe.ref)
-    commandResponseProbe.expectMsg(Completed(setup.runId))
-
-    // Ensure Unsubscribe can be sent to component even in locked state
-    supervisorRef ! Unsubscribe(setup.runId, commandResponseProbe.ref)
   }
 }
