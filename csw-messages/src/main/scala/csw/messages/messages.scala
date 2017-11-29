@@ -9,6 +9,8 @@ import csw.messages.models._
 import csw.messages.params.models.{Prefix, RunId}
 import csw.messages.params.states.CurrentState
 
+import scala.concurrent.duration.FiniteDuration
+
 sealed trait ComponentMessage
 
 sealed trait CommonMessage extends ComponentMessage
@@ -32,10 +34,12 @@ object CommandMessage {
   case class Oneway(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends CommandMessage
 }
 
+case class LockTimeout(replyTo: ActorRef[LockingResponse]) extends SupervisorMessage
+
 sealed trait SupervisorLockMessage extends SupervisorRunningMessage
 object SupervisorLockMessage {
-  case class Lock(prefix: Prefix, replyTo: ActorRef[LockingResponse])   extends SupervisorLockMessage
-  case class Unlock(prefix: Prefix, replyTo: ActorRef[LockingResponse]) extends SupervisorLockMessage
+  case class Lock(prefix: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration) extends SupervisorLockMessage
+  case class Unlock(prefix: Prefix, replyTo: ActorRef[LockingResponse])                              extends SupervisorLockMessage
 }
 
 sealed trait RunningMessage extends ComponentMessage with SupervisorRunningMessage

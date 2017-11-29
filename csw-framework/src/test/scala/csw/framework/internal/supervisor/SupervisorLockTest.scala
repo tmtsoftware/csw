@@ -4,6 +4,7 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.common.components.framework.ComponentStatistics
 import csw.common.components.framework.SampleComponentState.{choiceKey, domainChoice, initChoice, prefix}
+import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
 import csw.messages.CommandMessage.Submit
@@ -37,19 +38,19 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
     // Client 1 will lock an assembly
-    supervisorRef ! Lock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
+    supervisorRef ! LockCommandFactory.make("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 2 tries to lock the assembly while Client 1 already has the lock
-    supervisorRef ! Lock("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
+    supervisorRef ! LockCommandFactory.make("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(
-      ReAcquiringLockFailed(
-        s"Invalid prefix [WFOS, wfos.prog.cloudcover.Client2] for re-acquiring lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
+      AcquiringLockFailed(
+        s"Invalid prefix [WFOS, wfos.prog.cloudcover.Client2] for acquiring lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
       )
     )
 
     // Client 1 re-acquires the lock by sending the same token again
-    supervisorRef ! Lock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
+    supervisorRef ! LockCommandFactory.make("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 2 tries to unlock the assembly while Client 1 already has the lock
@@ -93,7 +94,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
     // Client 1 will lock an assembly
-    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref)
+    supervisorRef ! LockCommandFactory.make(client1Prefix, lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 1 sends submit command with tokenId in parameter set
@@ -132,7 +133,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
     // Client 1 will lock an assembly
-    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref)
+    supervisorRef ! LockCommandFactory.make(client1Prefix, lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Ensure Domain messages can be sent to component even in locked state
@@ -161,4 +162,22 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     commandResponseProbe.expectNoMsg(200.millis)
   }
 
+  test("should expire lock after timeout") {
+    val lockingStateProbe = TestProbe[LockingResponse]
+    val client1Prefix     = Prefix("wfos.prog.cloudcover.Client1.success")
+
+    val mocks = frameworkTestMocks()
+    import mocks._
+
+    val supervisorRef = createSupervisorAndStartTLA(assemblyInfo, mocks)
+
+    // Assure that component is in running state
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+
+    // Client 1 will lock an assembly
+    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref, 100.millis)
+    lockingStateProbe.expectMsg(LockAcquired)
+    lockingStateProbe.expectMsg(200.millis, LockExpired)
+  }
 }

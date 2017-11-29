@@ -8,9 +8,9 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.Submit
-import csw.messages.SupervisorLockMessage.Lock
 import csw.messages.ccs.CommandIssue.ComponentLockedIssue
 import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
@@ -142,7 +142,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       // acquire lock on assembly
       val lockResponseProbe = TestProbe[LockingResponse]
-      assemblyRef ! Lock(immediateCmdPrefix, lockResponseProbe.ref)
+      assemblyRef ! LockCommandFactory.make(immediateCmdPrefix, lockResponseProbe.ref)
       lockResponseProbe.expectMsg(LockAcquired)
       enterBarrier("assembly-locked")
 

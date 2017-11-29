@@ -1,6 +1,5 @@
 package csw.services.commons.componentlogger
 
-import akka.actor.Actor
 import akka.typed.scaladsl.ActorContext
 import csw.services.commons.ComponentDomainMessage
 import csw.services.logging.javadsl.JLoggerFactory

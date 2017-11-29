@@ -9,22 +9,22 @@ import csw.messages.models.LockingResponse._
 import csw.messages.params.models.Prefix
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
-class LockManager(val lock: Option[Prefix], loggerFactory: LoggerFactory) {
+class LockManager(lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {
   val log: Logger = loggerFactory.getLogger
 
-  def lockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse]): LockManager = lock match {
-    case None                ⇒ onAcquiringLock(prefix, replyTo)
-    case Some(`prefix`)      ⇒ onReAcquiringLock(prefix, replyTo)
-    case Some(currentPrefix) ⇒ onReAcquiringFailed(replyTo, prefix, currentPrefix)
+  def lockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: ⇒ Unit): LockManager = lockPrefix match {
+    case None                ⇒ onAcquiringLock(prefix, replyTo, startTimer)
+    case Some(`prefix`)      ⇒ onReAcquiringLock(prefix, replyTo, startTimer)
+    case Some(currentPrefix) ⇒ onAcquiringFailed(replyTo, prefix, currentPrefix)
   }
 
-  def unlockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse]): LockManager = lock match {
-    case Some(`prefix`)      ⇒ onLockReleased(prefix, replyTo)
+  def unlockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse])(stopTimer: ⇒ Unit): LockManager = lockPrefix match {
+    case Some(`prefix`)      ⇒ onLockReleased(prefix, replyTo, stopTimer)
     case Some(currentPrefix) ⇒ onLockReleaseFailed(replyTo, prefix, currentPrefix)
-    case _                   ⇒ onLockAlreadyReleased(prefix, replyTo)
+    case None                ⇒ onLockAlreadyReleased(prefix, replyTo)
   }
 
-  def allowCommand(msg: CommandMessage): Boolean = lock match {
+  def allowCommand(msg: CommandMessage): Boolean = lockPrefix match {
     case None ⇒ true
     case Some(currentPrefix) ⇒
       msg.command.prefix match {
@@ -39,33 +39,36 @@ class LockManager(val lock: Option[Prefix], loggerFactory: LoggerFactory) {
       }
   }
 
-  def isLocked: Boolean = lock.isDefined
+  def isLocked: Boolean = lockPrefix.isDefined
 
-  def isUnLocked: Boolean = lock.isEmpty
+  def isUnLocked: Boolean = lockPrefix.isEmpty
 
-  private def onAcquiringLock(prefix: Prefix, replyTo: ActorRef[LockingResponse]) = {
+  private def onAcquiringLock(prefix: Prefix, replyTo: ActorRef[LockingResponse], startTimer: ⇒ Unit): LockManager = {
     log.info(s"The lock is successfully acquired by component: $prefix")
     replyTo ! LockAcquired
-    new LockManager(Some(prefix), loggerFactory) //TODO: Start the timer for lock lease
+    startTimer
+    new LockManager(Some(prefix), loggerFactory)
   }
 
-  private def onReAcquiringLock(prefix: Prefix, replyTo: ActorRef[LockingResponse]): LockManager = {
-    log.info(s"The lock is re-acquired by component: $prefix") //TODO: re-start the timer for lock lease
+  private def onReAcquiringLock(prefix: Prefix, replyTo: ActorRef[LockingResponse], startTimer: ⇒ Unit): LockManager = {
+    log.info(s"The lock is re-acquired by component: $prefix")
     replyTo ! LockAcquired
+    startTimer
     this
   }
 
-  private def onReAcquiringFailed(replyTo: ActorRef[LockingResponse], prefix: Prefix, currentPrefix: Prefix) = {
-    val failureReason = s"Invalid prefix $prefix for re-acquiring lock. Currently it is acquired by component: $currentPrefix"
+  private def onAcquiringFailed(replyTo: ActorRef[LockingResponse], prefix: Prefix, currentPrefix: Prefix) = {
+    val failureReason = s"Invalid prefix $prefix for acquiring lock. Currently it is acquired by component: $currentPrefix"
     log.error(failureReason)
-    replyTo ! ReAcquiringLockFailed(failureReason)
-    new LockManager(None, loggerFactory)
+    replyTo ! AcquiringLockFailed(failureReason)
+    this
   }
 
-  private def onLockReleased(prefix: Prefix, replyTo: ActorRef[LockingResponse]): LockManager = {
+  private def onLockReleased(prefix: Prefix, replyTo: ActorRef[LockingResponse], stopTimer: ⇒ Unit): LockManager = {
     log.info(s"The lock is successfully released by component: $prefix")
     replyTo ! LockReleased
-    new LockManager(None, loggerFactory) // TODO: Stop the timer for lock lease
+    stopTimer
+    new LockManager(None, loggerFactory)
   }
 
   private def onLockReleaseFailed(replyTo: ActorRef[LockingResponse], prefix: Prefix, currentPrefix: Prefix) = {
