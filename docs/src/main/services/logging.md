@@ -176,18 +176,19 @@ appear in log statements against `@componentName` tag. Next, to get the `Logger`
 Scala Class
 :   @@snip [SampleClass](../../../../examples/src/main/scala/csw/services/commons/componentlogger/loggers.scala) { #component-logger-class }
 
-Scala Actor
-:   @@snip [SampleActor](../../../../examples/src/main/scala/csw/services/commons/componentlogger/loggers.scala) { #component-logger-actor }
-
-Scala Typed Actor
-:   @@snip [SampleTypedActor](../../../../examples/src/main/scala/csw/services/commons/componentlogger/loggers.scala) { #component-logger-typed-actor }
-
-
 Java Class
 :   @@snip [JSampleClass](../../../../examples/src/main/java/csw/services/commons/componentlogger/JSampleClass.java) { #component-logger-class }
 
+
+Scala Actor
+:   @@snip [SampleActor](../../../../examples/src/main/scala/csw/services/commons/componentlogger/loggers.scala) { #component-logger-actor }
+
 Java Actor
 :   @@snip [JSampleActor](../../../../examples/src/main/java/csw/services/commons/componentlogger/JSampleClass.java) { #component-logger-actor }
+
+
+Scala Typed Actor
+:   @@snip [SampleTypedActor](../../../../examples/src/main/scala/csw/services/commons/componentlogger/loggers.scala) { #component-logger-typed-actor }
 
 Java Typed Actor
 :   @@snip [JSampleTypedActor](../../../../examples/src/main/java/csw/services/commons/componentlogger/JSampleClass.java) { #component-logger-typed-actor }
@@ -205,18 +206,19 @@ as follows:
 Scala Class
 :   @@snip [GenericClass](../../../../examples/src/main/scala/csw/services/commons/genericlogger/loggers.scala) { #generic-logger-class }
 
-Scala Actor
-:   @@snip [GenericActor](../../../../examples/src/main/scala/csw/services/commons/genericlogger/loggers.scala) { #generic-logger-actor }
-
-Scala Typed Actor
-:   @@snip [GenericTypedActor](../../../../examples/src/main/scala/csw/services/commons/genericlogger/loggers.scala) { #generic-logger-typed-actor }
-
-
 Java Class
 :   @@snip [JGenericClass](../../../../examples/src/main/java/csw/services/commons/genericlogger/JGenericClass.java) { #generic-logger-class }
 
+
+Scala Actor
+:   @@snip [GenericActor](../../../../examples/src/main/scala/csw/services/commons/genericlogger/loggers.scala) { #generic-logger-actor }
+
 Java Actor
 :   @@snip [JGenericActor](../../../../examples/src/main/java/csw/services/commons/genericlogger/JGenericClass.java) { #generic-logger-actor }
+
+
+Scala Typed Actor
+:   @@snip [GenericTypedActor](../../../../examples/src/main/scala/csw/services/commons/genericlogger/loggers.scala) { #generic-logger-typed-actor }
 
 Java Typed Actor
 :   @@snip [JGenericTypedActor](../../../../examples/src/main/java/csw/services/commons/genericlogger/JGenericClass.java) { #generic-logger-typed-actor }
