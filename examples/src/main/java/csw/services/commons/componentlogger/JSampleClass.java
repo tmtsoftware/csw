@@ -20,6 +20,8 @@ public class JSampleClass {
 class JSampleActor extends akka.actor.AbstractActor {
 
     public JSampleActor(JLoggerFactory loggerFactory) {
+
+        //context() is available from akka.actor.AbstractActor
         ILogger log = loggerFactory.getLogger(context(), getClass());
     }
 

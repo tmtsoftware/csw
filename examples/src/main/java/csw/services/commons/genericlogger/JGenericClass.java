@@ -17,6 +17,7 @@ public class JGenericClass {
 //#generic-logger-actor
 class JGenericActor extends akka.actor.AbstractActor {
 
+    //context() is available from akka.actor.AbstractActor
     ILogger log = JGenericLoggerFactory.getLogger(context(), getClass());
 
     @Override

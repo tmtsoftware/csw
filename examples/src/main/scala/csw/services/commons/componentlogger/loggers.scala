@@ -1,5 +1,6 @@
 package csw.services.commons.componentlogger
 
+import akka.actor.Actor
 import akka.typed.scaladsl.ActorContext
 import csw.services.commons.ComponentDomainMessage
 import csw.services.logging.javadsl.JLoggerFactory
@@ -15,6 +16,7 @@ class SampleClass(loggerFactory: LoggerFactory) {
 //#component-logger-actor
 class SampleActor(loggerFactory: LoggerFactory) extends akka.actor.Actor {
 
+  //context is available from akka.actor.Actor
   val log: Logger = loggerFactory.getLogger(context)
 
   override def receive = ???

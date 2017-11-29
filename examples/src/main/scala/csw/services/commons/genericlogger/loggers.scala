@@ -14,6 +14,7 @@ class GenericClass {
 //#generic-logger-actor
 class GenericActor extends akka.actor.AbstractActor {
 
+  //context is available from akka.actor.Actor
   val log: Logger = GenericLoggerFactory.getLogger(context)
 
   override def createReceive() = ???
