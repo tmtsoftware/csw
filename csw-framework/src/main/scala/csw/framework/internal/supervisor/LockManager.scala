@@ -39,6 +39,10 @@ class LockManager(val lock: Option[Prefix], loggerFactory: LoggerFactory) {
       }
   }
 
+  def isLocked: Boolean = lock.isDefined
+
+  def isUnLocked: Boolean = lock.isEmpty
+
   private def onAcquiringLock(prefix: Prefix, replyTo: ActorRef[LockingResponse]) = {
     log.info(s"The lock is successfully acquired by component: $prefix")
     replyTo ! LockAcquired

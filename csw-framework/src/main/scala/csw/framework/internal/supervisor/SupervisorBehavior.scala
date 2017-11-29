@@ -203,12 +203,12 @@ class SupervisorBehavior(
 
   private def lockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse]): Unit = {
     lockManager = lockManager.lockComponent(prefix, replyTo)
-    if (lockManager.lock.isDefined) updateLifecycleState(SupervisorLifecycleState.Lock)
+    if (lockManager.isLocked) updateLifecycleState(SupervisorLifecycleState.Lock)
   }
 
   private def unlockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse]): Unit = {
     lockManager = lockManager.unlockComponent(prefix, replyTo)
-    if (lockManager.lock.isEmpty) updateLifecycleState(SupervisorLifecycleState.Running)
+    if (lockManager.isUnLocked) updateLifecycleState(SupervisorLifecycleState.Running)
   }
 
   private def handleRunningMessage(runningMessage: RunningMessage): Unit = {
