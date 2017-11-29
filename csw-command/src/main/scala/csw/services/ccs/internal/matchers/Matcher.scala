@@ -18,9 +18,9 @@ class Matcher(
     stateMatcher: StateMatcher
 )(implicit ec: ExecutionContext, mat: Materializer) {
 
-  def response: Future[MatcherResponse] = currentStateF.transform {
-    case Success(currentState) ⇒ Success(MatchCompleted)
-    case Failure(ex)           ⇒ Success(MatchFailed(ex))
+  def start: Future[MatcherResponse] = currentStateF.transform {
+    case Success(_)  ⇒ Success(MatchCompleted)
+    case Failure(ex) ⇒ Success(MatchFailed(ex))
   }
 
   def stop(): Unit = killSwitch.abort(MatchAborted(stateMatcher.prefix))

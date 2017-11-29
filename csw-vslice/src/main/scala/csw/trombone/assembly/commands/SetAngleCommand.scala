@@ -40,7 +40,7 @@ class SetAngleCommand(
 
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
-    new Matcher(tromboneHCD.get, AssemblyMatchers.idleMatcher).response.map {
+    new Matcher(tromboneHCD.get, AssemblyMatchers.idleMatcher).start.map {
       case MatchCompleted =>
         publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
         Completed(s.runId)

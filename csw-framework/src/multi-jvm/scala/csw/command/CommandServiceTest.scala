@@ -23,9 +23,10 @@ import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
-import csw.services.ccs.internal.matchers.{DemandMatcher, Matcher}
+import csw.services.ccs.internal.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
+import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 
@@ -96,13 +97,17 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       // long running command which does not use matcher
       val setupWithoutMatcher = Setup(obsId, acceptWithNoMatcherCmdPrefix)
-      val longCommandResponse = Await.result(
-        assemblyRef.submit(setupWithoutMatcher).flatMap {
-          case _: Accepted ⇒ assemblyRef.getCommandResponse(setupWithoutMatcher.runId)
-          case x           ⇒ Future.successful(x)
-        },
-        timeout.duration
-      )
+
+      val eventualLongCommandResponse = async {
+        val initialCommandResponse = await(assemblyRef.submit(setupWithoutMatcher))
+        initialCommandResponse match {
+          case _: Accepted ⇒ await(assemblyRef.getCommandResponse(setupWithoutMatcher.runId))
+          case x           ⇒ x
+        }
+      }
+
+      val longCommandResponse = Await.result(eventualLongCommandResponse, timeout.duration)
+
       longCommandResponse shouldBe a[CompletedWithResult]
       longCommandResponse.runId shouldBe setupWithoutMatcher.runId
 
@@ -112,21 +117,27 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val setupWithMatcher      = Setup(obsId, acceptWithMatcherCmdPrefix)
       val matcher               = new Matcher(assemblyRef, demandMatcher)
 
-      val matchedResponse = Await.result(
-        assemblyRef.oneway(setupWithMatcher).flatMap {
+      val matcherResponseF: Future[MatcherResponse] = matcher.start
+
+      val eventualCommandResponse: Future[CommandResponse] = async {
+        val initialResponse = await(assemblyRef.oneway(setupWithMatcher))
+        initialResponse match {
           case _: Accepted ⇒
-            matcher.response.map {
+            val matcherResponse = await(matcherResponseF)
+            matcherResponse match {
               case MatchCompleted  ⇒ Completed(setupWithMatcher.runId)
               case MatchFailed(ex) ⇒ Error(setupWithMatcher.runId, ex.getMessage)
             }
-          case x: Invalid ⇒
+          case invalid: Invalid ⇒
             matcher.stop()
-            Future.successful(x)
-          case x ⇒ Future.successful(x)
-        },
-        timeout.duration
-      )
-      matchedResponse shouldBe Completed(setupWithMatcher.runId)
+            invalid
+          case x ⇒ x
+        }
+      }
+
+      val commandResponse = Await.result(eventualCommandResponse, timeout.duration)
+
+      commandResponse shouldBe Completed(setupWithMatcher.runId)
       enterBarrier("short-long-commands")
 
       // acquire lock on assembly

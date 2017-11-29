@@ -65,7 +65,7 @@ class MoveCommand(
 
       tromboneHCD.get.submit(scOut).flatMap {
         case _: Accepted ⇒
-          new Matcher(tromboneHCD.get, stateMatcher).response.map {
+          new Matcher(tromboneHCD.get, stateMatcher).start.map {
             case MatchCompleted =>
               publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), startState.nss))
               Completed(s.runId)
