@@ -9,10 +9,11 @@ public class JIrisTLA {
     private ILogger logger;
 
     public JIrisTLA(JLoggerFactory loggerFactory) {
+        // DEOPSCSW-316: Improve Logger accessibility for component developers
         this.logger = loggerFactory.getLogger(getClass());
     }
 
     public void startLogging() {
-        new JLogUtil().logInBulk(logger);
+        JLogUtil.logInBulk(logger);
     }
 }

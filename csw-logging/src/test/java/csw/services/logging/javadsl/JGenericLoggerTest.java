@@ -19,6 +19,7 @@ import scala.concurrent.duration.Duration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -30,15 +31,14 @@ public class JGenericLoggerTest {
 
     private static JsonObject parse(String json) {
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject();
-        return jsonObject;
+        return gson.fromJson(json, JsonElement.class).getAsJsonObject();
     }
 
     private static TestAppender testAppender     = new TestAppender(x -> {
         logBuffer.add(parse(x.toString()));
         return null;
     });
-    private static List<LogAppenderBuilder> appenderBuilders = Arrays.asList(testAppender);
+    private static List<LogAppenderBuilder> appenderBuilders = Collections.singletonList(testAppender);
 
 
     @BeforeClass

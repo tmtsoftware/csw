@@ -11,6 +11,7 @@ import csw.services.logging.utils.LoggingTestSuite
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
+// DEOPSCSW-316: Improve Logger accessibility for component developers
 class LoggerCompTest extends LoggingTestSuite {
 
   private val irisSupervisorActorRef = actorSystem.actorOf(IRIS.props(IRIS.COMPONENT_NAME))
@@ -20,11 +21,11 @@ class LoggerCompTest extends LoggingTestSuite {
   private val tromboneHcd            = new TromboneHcd()
 
   private var componentLogBuffer: mutable.Map[String, ArrayBuffer[JsonObject]] = mutable.Map.empty
-  var genericLogBuffer                                                         = mutable.Buffer.empty[JsonObject]
+  var genericLogBuffer: mutable.Buffer[JsonObject]                             = mutable.Buffer.empty[JsonObject]
   private var irisLogBuffer                                                    = mutable.Buffer.empty[JsonObject]
   private var tromboneHcdLogBuffer                                             = mutable.Buffer.empty[JsonObject]
 
-  def sendMessagesToActor(actorRef: ActorRef) = {
+  def sendMessagesToActor(actorRef: ActorRef): Unit = {
     actorRef ! LogTrace
     actorRef ! LogDebug
     actorRef ! LogInfo
@@ -33,7 +34,7 @@ class LoggerCompTest extends LoggingTestSuite {
     actorRef ! LogFatal
   }
 
-  def allComponentsStartLogging() = {
+  def allComponentsStartLogging(): Unit = {
     //componentName = IRIS
     sendMessagesToActor(irisSupervisorActorRef)
     irisTLA.startLogging()
@@ -45,7 +46,7 @@ class LoggerCompTest extends LoggingTestSuite {
     Thread.sleep(200)
   }
 
-  def splitAndGroupLogs() = {
+  def splitAndGroupLogs(): Unit = {
     // clear all logs
     componentLogBuffer = mutable.Map.empty
     irisLogBuffer.clear()
@@ -73,10 +74,10 @@ class LoggerCompTest extends LoggingTestSuite {
   // DEOPSCSW-117: Provide unique name for each logging instance of components
   // DEOPSCSW-127: Runtime update for logging characteristics
   test("changing log level of component should only affect component specific classes") {
-    allComponentsStartLogging
+    allComponentsStartLogging()
 
     // extract component and non-component logs and group them
-    splitAndGroupLogs
+    splitAndGroupLogs()
 
     def testLogBuffer(logBuffer: mutable.Buffer[JsonObject],
                       configuredLogLevel: Level,
@@ -86,7 +87,7 @@ class LoggerCompTest extends LoggingTestSuite {
       logBuffer.foreach { log ⇒
         val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
         Level(currentLogLevel) >= configuredLogLevel shouldBe true
-        if (!expectedLogsMap.isEmpty) log(LoggingKeys.MESSAGE).toString shouldBe expectedLogsMap(currentLogLevel)
+        if (expectedLogsMap.nonEmpty) log(LoggingKeys.MESSAGE).toString shouldBe expectedLogsMap(currentLogLevel)
         if (!expectedFileName.isEmpty) log(LoggingKeys.FILE).toString shouldBe expectedFileName
       }
     }
@@ -104,10 +105,10 @@ class LoggerCompTest extends LoggingTestSuite {
     loggingSystem.setComponentLogLevel(IRIS.COMPONENT_NAME, FATAL)
 
     // start logging at all component levels
-    allComponentsStartLogging
+    allComponentsStartLogging()
 
     // extract component and non-component logs and group them
-    splitAndGroupLogs
+    splitAndGroupLogs()
 
     irisLogBuffer.size shouldBe 2
     testLogBuffer(irisLogBuffer, FATAL, IRIS.irisLogs, IRIS.FILE_NAME, IRIS.COMPONENT_NAME)

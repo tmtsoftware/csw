@@ -25,6 +25,7 @@ import scala.concurrent.duration.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+// DEOPSCSW-316: Improve Logger accessibility for component developers
 public class ILoggerTest {
     private static ActorSystem actorSystem = ActorSystem.create("base-system");
     private static LoggingSystem loggingSystem;

@@ -4,10 +4,12 @@ import akka.actor.{Actor, Props}
 import csw.services.logging.components.IRIS._
 import csw.services.logging.scaladsl._
 
+// DEOPSCSW-316: Improve Logger accessibility for component developers
 object IRISLibraryLogger extends LoggerFactory(IRIS.COMPONENT_NAME)
 
 class IRIS(logger: LoggerFactory) extends Actor {
 
+  // DEOPSCSW-316: Improve Logger accessibility for component developers
   private val log: Logger = logger.getLogger(context)
 
   // Do not add any lines before this method
@@ -26,7 +28,7 @@ class IRIS(logger: LoggerFactory) extends Actor {
 
 object IRIS {
 
-  val TRACE_LINE_NO = 17
+  val TRACE_LINE_NO = 19
   val DEBUG_LINE_NO = TRACE_LINE_NO + 1
   val INFO_LINE_NO  = TRACE_LINE_NO + 2
   val WARN_LINE_NO  = TRACE_LINE_NO + 3
@@ -60,7 +62,9 @@ object IRIS {
 class IrisTLA {
   import IRIS._
 
+  // DEOPSCSW-316: Improve Logger accessibility for component developers
   val log: Logger = IRISLibraryLogger.getLogger
+
   def startLogging(): Unit = {
     log.trace(irisLogs("trace"))
     log.debug(irisLogs("debug"))
@@ -73,6 +77,7 @@ class IrisTLA {
 
 class IrisUtil {
 
+  // DEOPSCSW-316: Improve Logger accessibility for component developers
   val log: Logger = GenericLoggerFactory.getLogger
 
   def startLogging(logs: Map[String, String]): Unit = {
@@ -87,6 +92,7 @@ class IrisUtil {
 
 class IrisActorUtil extends Actor {
 
+  // DEOPSCSW-316: Improve Logger accessibility for component developers
   val log: Logger = GenericLoggerFactory.getLogger(context)
 
   def receive = {
@@ -101,5 +107,5 @@ class IrisActorUtil extends Actor {
 }
 
 object IrisActorUtil {
-  def props = Props(new IrisActorUtil)
+  def props: Props = Props(new IrisActorUtil)
 }

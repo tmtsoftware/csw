@@ -25,7 +25,8 @@ class SampleComponentHandlers(
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService
 ) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, commandResponseManager, pubSubRef, locationService) {
-  val log: Logger = new LoggerFactory(componentInfo.name).getLogger
+
+  val log: Logger = new LoggerFactory(componentInfo.name).getLogger(ctx)
 
   import SampleComponentState._
 

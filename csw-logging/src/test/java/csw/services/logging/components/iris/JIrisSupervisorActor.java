@@ -6,6 +6,7 @@ import csw.services.logging.javadsl.JLoggerFactory;
 
 public class JIrisSupervisorActor extends AbstractActor {
 
+    // DEOPSCSW-316: Improve Logger accessibility for component developers
     private ILogger log = new JLoggerFactory("jIRIS").getLogger(context(), getClass());
 
     @Override
