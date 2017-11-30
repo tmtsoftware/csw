@@ -8,7 +8,7 @@ import play.api.libs.json._
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component
  */
-sealed abstract class Connection(val connectionType: ConnectionType) extends TMTSerializable {
+sealed abstract class Connection(val connectionType: ConnectionType) extends TMTSerializable { self: TypedConnection[_] ⇒
 
   type L <: Location
 
@@ -23,6 +23,8 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends TMT
    * Creates a unique name for Connection based on Component name, ComponentType and ConnectionType
    */
   def name: String = connectionInfo.toString
+
+  def of[T <: Location]: TypedConnection[T] = self.asInstanceOf[TypedConnection[T]]
 }
 
 abstract sealed class TypedConnection[T <: Location](connectionType: ConnectionType) extends Connection(connectionType) {
