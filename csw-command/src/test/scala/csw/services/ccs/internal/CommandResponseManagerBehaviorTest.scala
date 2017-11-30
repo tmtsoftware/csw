@@ -1,21 +1,25 @@
 package csw.services.ccs.internal
 
 import akka.actor.ActorSystem
-import akka.typed
+import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
+import akka.{actor, typed}
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.params.models.RunId
-import csw.services.logging.scaladsl.LoggerFactory
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-207: Report on Configuration Command Completion
 // DEOPSCSW-208: Report failure on Configuration Completion command
-class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
+class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
   private val actorSystem                        = ActorSystem("test-command-status-service-system")
   implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
@@ -25,7 +29,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     new StubbedActorContext[CommandResponseManagerMessage]("ctx-command-status-service", 100, typedSystem)
 
   def createCommandStatusService(): CommandResponseManagerBehavior =
-    new CommandResponseManagerBehavior(ctx, new LoggerFactory("test-component"))
+    new CommandResponseManagerBehavior(ctx, getMockedLogger)
 
   test("should be able to add command entry in Command Response Manager") {
     val commandStatusService = createCommandStatusService()
@@ -182,5 +186,16 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers {
     // Update of final sub command as Completed where other sub commands have completed earlier
     // should update the status of parent command as Completed
     commandResponseProbe.expectMsg(Completed(commandId))
+  }
+
+  private def getMockedLogger: LoggerFactory = {
+    val loggerFactory: LoggerFactory = mock[LoggerFactory]
+    val logger: Logger               = mock[Logger]
+
+    when(loggerFactory.getLogger).thenReturn(logger)
+    when(loggerFactory.getLogger(any[actor.ActorContext])).thenReturn(logger)
+    when(loggerFactory.getLogger(any[ActorContext[_]])).thenReturn(logger)
+
+    loggerFactory
   }
 }
