@@ -7,11 +7,13 @@ import akka.typed.scaladsl.Actor
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
+import csw.framework.FrameworkTestMocks
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.models.{LifecycleStateChanged, PubSub}
 import csw.messages.{models, SupervisorExternalMessage}
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.services.location.commons.ActorSystemFactory
+import csw.services.logging.scaladsl.Logger
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -24,18 +26,19 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
     protected lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 
-  private val actorSystem                        = ActorSystem("test-1")
-  implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
-  implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
+  implicit val untypedSystem: ActorSystem       = ActorSystemFactory.remote("test-1")
+  implicit val system: typed.ActorSystem[_]     = untypedSystem.toTyped
+  implicit val testKitSettings: TestKitSettings = TestKitSettings(system)
+  private val mocks                             = new FrameworkTestMocks()
 
-  private val ctx = new StubbedActorContext[PubSub[LifecycleStateChanged]]("test-supervisor", 100, typedSystem)
+  private val ctx = new StubbedActorContext[PubSub[LifecycleStateChanged]]("test-supervisor", 100, system)
 
   private val lifecycleProbe1 = TestProbe[LifecycleStateChanged]
   private val lifecycleProbe2 = TestProbe[LifecycleStateChanged]
 
-  def createPubSubBehavior(): PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, new LoggerFactory("test-component"))
+  def createPubSubBehavior(): PubSubBehavior[LifecycleStateChanged] = new PubSubBehavior(ctx, mocks.loggerFactory)
 
-  override protected def afterAll(): Unit = Await.result(actorSystem.terminate(), 5.seconds)
+  override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
 
   test("initially set of subscribers should be empty") {
     createPubSubBehavior().subscribers shouldBe Set.empty[ActorRef[LifecycleStateChanged]]

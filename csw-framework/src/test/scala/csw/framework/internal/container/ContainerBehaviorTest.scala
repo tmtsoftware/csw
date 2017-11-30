@@ -1,14 +1,15 @@
 package csw.framework.internal.container
 
-import akka.typed.scaladsl.Actor
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, Done}
 import csw.framework.ComponentInfos._
+import csw.framework.FrameworkTestMocks
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory}
+import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
@@ -21,7 +22,6 @@ import csw.messages.models.{Component, Components, SupervisorInfo}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.scaladsl.Logger
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
@@ -38,9 +38,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   implicit val untypedSystem: actor.ActorSystem  = ActorSystemFactory.remote()
   implicit val typedSystem: ActorSystem[Nothing] = untypedSystem.toTyped
   implicit val settings: TestKitSettings         = TestKitSettings(typedSystem)
-  trait MutableActorMock[T] { this: Actor.MutableBehavior[T] ⇒
-    protected lazy val log: Logger = mock[Logger]
-  }
+  private val mocks                              = new FrameworkTestMocks()
 
   class IdleContainer() {
     val ctx                                                  = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
@@ -53,13 +51,18 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     var supervisorInfos: Set[SupervisorInfo]                 = Set.empty
     val answer = new Answer[Future[Option[SupervisorInfo]]] {
       override def answer(invocation: InvocationOnMock): Future[Option[SupervisorInfo]] = {
-        val componentInfo = invocation.getArgument[ComponentInfo](1)
+        val componentInfo            = invocation.getArgument[ComponentInfo](1)
+        val componentWiringClass     = Class.forName(componentInfo.behaviorFactoryClassName)
+        val componentBehaviorFactory = componentWiringClass.newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
+
         val supervisorBehaviorFactory = SupervisorBehaviorFactory.make(
           Some(ctx.self),
           componentInfo,
           locationService,
           registrationFactory,
-          pubSubBehaviorFactory
+          pubSubBehaviorFactory,
+          componentBehaviorFactory,
+          mocks.loggerFactory
         )
         val supervisorInfo = SupervisorInfo(
           untypedSystem,
@@ -97,7 +100,8 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     when(locationService.register(akkaRegistration)).thenReturn(eventualRegistrationResult)
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
-    val containerBehavior = new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService)
+    val containerBehavior =
+      new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService, mocks.loggerFactory)
   }
 
   class RunningContainer() extends IdleContainer {

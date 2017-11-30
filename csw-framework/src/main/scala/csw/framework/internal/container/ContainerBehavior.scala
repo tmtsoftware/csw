@@ -38,11 +38,12 @@ class ContainerBehavior(
     containerInfo: ContainerInfo,
     supervisorInfoFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
-    locationService: LocationService
+    locationService: LocationService,
+    loggerFactory: LoggerFactory
 ) extends Actor.MutableBehavior[ContainerMessage] {
 
   import ctx.executionContext
-  val log: Logger                        = new LoggerFactory(containerInfo.name).getLogger(ctx)
+  val log: Logger                        = loggerFactory.getLogger(ctx)
   val akkaConnection                     = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
   val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
 

@@ -37,7 +37,7 @@ object SupervisorBehaviorFactory {
     )
   }
 
-  private[supervisor] def make(
+  private[framework] def make(
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       componentInfo: ComponentInfo,
       locationService: LocationService,

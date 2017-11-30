@@ -28,6 +28,7 @@ import csw.messages.{models, _}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem
+import csw.services.logging.scaladsl.LoggerFactory
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.Answer
@@ -206,7 +207,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       registrationFactory,
       pubSubBehaviorFactory,
       new SampleBehaviorFactory(componentHandlers),
-      loggerFactory
+      new LoggerFactory(hcdInfo.name)
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA

@@ -42,12 +42,13 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers[Msg],
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
-    locationService: LocationService
+    locationService: LocationService,
+    loggerFactory: LoggerFactory
 ) extends Actor.MutableBehavior[ComponentMessage] {
 
   import ctx.executionContext
 
-  val log: Logger = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  val log: Logger = loggerFactory.getLogger(ctx)
 
   val shutdownTimeout: FiniteDuration = 10.seconds
 

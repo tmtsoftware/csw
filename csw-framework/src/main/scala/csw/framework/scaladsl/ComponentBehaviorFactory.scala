@@ -9,6 +9,7 @@ import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage, FromComponentLifecycleMessage}
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.reflect.ClassTag
 
@@ -49,7 +50,8 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
       supervisor: ActorRef[FromComponentLifecycleMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
-      locationService: LocationService
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
   ): Behavior[Nothing] =
     Actor
       .mutable[ComponentMessage](
@@ -60,7 +62,8 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
             supervisor,
             handlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService),
             commandResponseManager,
-            locationService
+            locationService,
+            loggerFactory
         )
       )
       .narrow

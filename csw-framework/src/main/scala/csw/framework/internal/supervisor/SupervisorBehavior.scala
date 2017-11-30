@@ -297,7 +297,8 @@ class SupervisorBehavior(
   private def createTLA(): ActorRef[Nothing] = {
     val behavior = Actor
       .supervise[Nothing](
-        componentBehaviorFactory.make(componentInfo, ctx.self, pubSubComponent, commandResponseManager, locationService)
+        componentBehaviorFactory
+          .make(componentInfo, ctx.self, pubSubComponent, commandResponseManager, locationService, loggerFactory)
       )
       .onFailure[FailureRestart](SupervisorStrategy.restartWithLimit(3, Duration.Zero).withLoggingEnabled(true))
 

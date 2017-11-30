@@ -45,7 +45,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
         supervisorProbe.ref,
         sampleHcdHandler,
         commandStatusServiceProbe.ref,
-        locationService
+        locationService,
+        frameworkTestMocks().loggerFactory
       )
 
     val runningComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
