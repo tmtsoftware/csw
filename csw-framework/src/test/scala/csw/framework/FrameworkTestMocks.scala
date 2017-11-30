@@ -15,7 +15,7 @@ import csw.messages.params.states.CurrentState
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.scaladsl.LoggerFactory
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -28,20 +28,25 @@ class FrameworkTestMocks(
     system: ActorSystem[Nothing],
     settings: TestKitSettings
 ) extends MockitoSugar {
-  val testActor: ActorRef[Any]                                      = testkit.TestProbe("test-probe").testActor
-  val akkaRegistration                                              = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
-  val locationService: LocationService                              = mock[LocationService]
-  val registrationResult: RegistrationResult                        = mock[RegistrationResult]
-  val registrationFactory: RegistrationFactory                      = mock[RegistrationFactory]
-  val pubSubBehaviorFactory: PubSubBehaviorFactory                  = mock[PubSubBehaviorFactory]
-  val lifecycleStateProbe: TestProbe[PubSub[LifecycleStateChanged]] = TestProbe[PubSub[LifecycleStateChanged]]
-  val compStateProbe: TestProbe[PubSub[CurrentState]]               = TestProbe[PubSub[CurrentState]]
+
+  ///////////////////////////////////////////////
+  val testActor: ActorRef[Any]                 = testkit.TestProbe("test-probe").testActor
+  val akkaRegistration                         = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
+  val locationService: LocationService         = mock[LocationService]
+  val registrationResult: RegistrationResult   = mock[RegistrationResult]
+  val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
 
   when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]]))
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
   when(locationService.asJava).thenReturn(mock[ILocationService])
+
+  ///////////////////////////////////////////////
+  val pubSubBehaviorFactory: PubSubBehaviorFactory                  = mock[PubSubBehaviorFactory]
+  val lifecycleStateProbe: TestProbe[PubSub[LifecycleStateChanged]] = TestProbe[PubSub[LifecycleStateChanged]]
+  val compStateProbe: TestProbe[PubSub[CurrentState]]               = TestProbe[PubSub[CurrentState]]
+
   when(
     pubSubBehaviorFactory.make[LifecycleStateChanged](
       any[ActorContext[SupervisorMessage]],
@@ -56,4 +61,12 @@ class FrameworkTestMocks(
       any[LoggerFactory]
     )
   ).thenReturn(compStateProbe.ref)
+
+  ///////////////////////////////////////////////
+  val loggerFactory: LoggerFactory = mock[LoggerFactory]
+  val logger: Logger               = mock[Logger]
+
+  when(loggerFactory.getLogger).thenReturn(logger)
+  when(loggerFactory.getLogger(any[actor.ActorContext])).thenReturn(logger)
+  when(loggerFactory.getLogger(any[ActorContext[_]])).thenReturn(logger)
 }

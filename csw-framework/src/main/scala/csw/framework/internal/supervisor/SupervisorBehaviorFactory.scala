@@ -7,6 +7,7 @@ import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
 import csw.messages.{ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
+import csw.services.logging.scaladsl.LoggerFactory
 
 /**
  * The factory for creating [[akka.typed.scaladsl.Actor.MutableBehavior]] of the supervisor of a component
@@ -23,6 +24,7 @@ object SupervisorBehaviorFactory {
 
     val componentWiringClass     = Class.forName(componentInfo.behaviorFactoryClassName)
     val componentBehaviorFactory = componentWiringClass.newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
+    val loggerFactory            = new LoggerFactory(componentInfo.name)
 
     make(
       containerRef,
@@ -30,7 +32,8 @@ object SupervisorBehaviorFactory {
       locationService,
       registrationFactory,
       pubSubBehaviorFactory,
-      componentBehaviorFactory
+      componentBehaviorFactory,
+      loggerFactory
     )
   }
 
@@ -40,7 +43,8 @@ object SupervisorBehaviorFactory {
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
       pubSubBehaviorFactory: PubSubBehaviorFactory,
-      componentBehaviorFactory: ComponentBehaviorFactory[_]
+      componentBehaviorFactory: ComponentBehaviorFactory[_],
+      loggerFactory: LoggerFactory
   ): Behavior[SupervisorExternalMessage] = {
     Actor
       .withTimers[SupervisorMessage](
@@ -56,7 +60,8 @@ object SupervisorBehaviorFactory {
                   componentBehaviorFactory,
                   pubSubBehaviorFactory,
                   registrationFactory,
-                  locationService
+                  locationService,
+                  loggerFactory
               )
           )
       )

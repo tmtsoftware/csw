@@ -71,13 +71,13 @@ class SupervisorBehavior(
     componentBehaviorFactory: ComponentBehaviorFactory[_],
     pubSubBehaviorFactory: PubSubBehaviorFactory,
     registrationFactory: RegistrationFactory,
-    locationService: LocationService
+    locationService: LocationService,
+    loggerFactory: LoggerFactory
 ) extends Actor.MutableBehavior[SupervisorMessage] {
 
   import SupervisorBehavior._
   import ctx.executionContext
 
-  val loggerFactory                      = new LoggerFactory(componentInfo.name)
   val log: Logger                        = loggerFactory.getLogger(ctx)
   val componentName: String              = componentInfo.name
   val componentActorName: String         = s"$componentName-$ComponentActorNameSuffix"

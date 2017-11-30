@@ -205,7 +205,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       locationService,
       registrationFactory,
       pubSubBehaviorFactory,
-      new SampleBehaviorFactory(componentHandlers)
+      new SampleBehaviorFactory(componentHandlers),
+      loggerFactory
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
