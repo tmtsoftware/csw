@@ -23,7 +23,7 @@ import csw.messages.framework.SupervisorLifecycleState.{Idle, RunningOffline}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.LockingResponse.LockExpired
+import csw.messages.models.LockingResponse.{LockExpired, LockExpiringShortly}
 import csw.messages.models.PubSub.Publish
 import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
 import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToComponentLifecycleMessage}
@@ -44,6 +44,8 @@ object SupervisorBehavior {
   val InitializeTimerKey          = "initialize-timer"
   val ComponentActorNameSuffix    = "component-actor"
   val CommandResponseManagerActor = "command-response-manager"
+  val lockNotificationKey         = "lockNotification"
+  val lockExpirationKey           = "lockExpiration"
 }
 
 /**
@@ -103,17 +105,17 @@ class SupervisorBehavior(
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
-      case (SupervisorLifecycleState.Lock, LockTimeout(replyTo))                        ⇒ replyTo ! LockExpired
-      case (SupervisorLifecycleState.Lock, lockMessage: SupervisorLockMessage)          ⇒ onRunning(lockMessage)
-      case (SupervisorLifecycleState.Lock, message)                                     ⇒ ignore(message)
-      case (_, commonMessage: SupervisorCommonMessage)                                  ⇒ onCommon(commonMessage)
-      case (SupervisorLifecycleState.Idle, idleMessage: SupervisorIdleMessage)          ⇒ onIdle(idleMessage)
-      case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage) ⇒ onRestarting(restartMessage)
-      case (SupervisorLifecycleState.Running, internalMessage: SupervisorInternalRunningMessage) ⇒
-        onInternalRunning(internalMessage)
-      case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage) ⇒ onRunning(runningMessage)
-      case (RunningOffline, runningMessage: SupervisorRunningMessage)                   ⇒ onRunning(runningMessage)
-      case (_, message)                                                                 ⇒ ignore(message)
+      case (SupervisorLifecycleState.Lock, LockAboutToTimeout(replyTo))                  ⇒ replyTo ! LockExpiringShortly
+      case (SupervisorLifecycleState.Lock, LockTimeout(replyTo))                         ⇒ replyTo ! LockExpired
+      case (SupervisorLifecycleState.Lock, lockMessage: SupervisorLockMessage)           ⇒ onRunning(lockMessage)
+      case (SupervisorLifecycleState.Lock, message)                                      ⇒ ignore(message)
+      case (_, commonMessage: SupervisorCommonMessage)                                   ⇒ onCommon(commonMessage)
+      case (SupervisorLifecycleState.Idle, idleMessage: SupervisorIdleMessage)           ⇒ onIdle(idleMessage)
+      case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage)  ⇒ onRestarting(restartMessage)
+      case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage) ⇒ onInternalRunning(message)
+      case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)  ⇒ onRunning(runningMessage)
+      case (RunningOffline, runningMessage: SupervisorRunningMessage)                    ⇒ onRunning(runningMessage)
+      case (_, message)                                                                  ⇒ ignore(message)
     }
     this
   }
@@ -205,13 +207,17 @@ class SupervisorBehavior(
 
   private def lockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration): Unit = {
     lockManager = lockManager.lockComponent(prefix, replyTo) {
-      timerScheduler.startSingleTimer(prefix.prefix, LockTimeout(replyTo), leaseDuration)
+      timerScheduler.startSingleTimer(lockNotificationKey, LockAboutToTimeout(replyTo), leaseDuration - (leaseDuration / 10))
+      timerScheduler.startSingleTimer(lockExpirationKey, LockTimeout(replyTo), leaseDuration)
     }
     if (lockManager.isLocked) updateLifecycleState(SupervisorLifecycleState.Lock)
   }
 
   private def unlockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse]): Unit = {
-    lockManager = lockManager.unlockComponent(prefix, replyTo)(timerScheduler.cancel(prefix.prefix))
+    lockManager = lockManager.unlockComponent(prefix, replyTo) {
+      timerScheduler.cancel(lockNotificationKey)
+      timerScheduler.cancel(lockExpirationKey)
+    }
     if (lockManager.isUnLocked) updateLifecycleState(SupervisorLifecycleState.Running)
   }
 

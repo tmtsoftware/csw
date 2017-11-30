@@ -11,4 +11,5 @@ object LockingResponse {
   case object LockAlreadyReleased                extends LockingResponse
   case class ReleasingLockFailed(reason: String) extends LockingResponse
   case object LockExpired                        extends LockingResponse
+  case object LockExpiringShortly                extends LockingResponse
 }

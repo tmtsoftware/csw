@@ -34,7 +34,8 @@ object CommandMessage {
   case class Oneway(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends CommandMessage
 }
 
-case class LockTimeout(replyTo: ActorRef[LockingResponse]) extends SupervisorMessage
+case class LockTimeout(replyTo: ActorRef[LockingResponse])        extends SupervisorMessage
+case class LockAboutToTimeout(replyTo: ActorRef[LockingResponse]) extends SupervisorMessage
 
 sealed trait SupervisorLockMessage extends SupervisorRunningMessage
 object SupervisorLockMessage {

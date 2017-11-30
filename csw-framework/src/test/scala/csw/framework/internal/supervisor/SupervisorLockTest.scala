@@ -178,6 +178,8 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     // Client 1 will lock an assembly
     supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref, 100.millis)
     lockingStateProbe.expectMsg(LockAcquired)
+
+    lockingStateProbe.expectMsg(LockExpiringShortly)
     lockingStateProbe.expectMsg(200.millis, LockExpired)
   }
 }
