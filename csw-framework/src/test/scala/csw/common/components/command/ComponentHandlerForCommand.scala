@@ -61,7 +61,7 @@ class ComponentHandlerForCommand(
     case _                              ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.prefix.prefix}"))
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = controlCommand.prefix match {
+  override def onSubmit(controlCommand: ControlCommand): Unit = controlCommand.prefix match {
     case `acceptWithNoMatcherCmdPrefix` ⇒ processCommandWithoutMatcher(controlCommand)
     case _                              ⇒ CommandNotAvailable(controlCommand.runId)
   }

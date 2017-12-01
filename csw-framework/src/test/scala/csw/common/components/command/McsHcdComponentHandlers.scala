@@ -58,7 +58,7 @@ class McsHcdComponentHandlers(
     }
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = {
+  override def onSubmit(controlCommand: ControlCommand): Unit = {
     controlCommand.prefix match {
       case `longRunningCmdPrefix` ⇒
         ctx.schedule(5.seconds, ctx.self, LongCommandCompleted(Completed(controlCommand.runId)))

@@ -72,7 +72,7 @@ class McsAssemblyComponentHandlers(
     }
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = {
+  override def onSubmit(controlCommand: ControlCommand): Unit = {
     commandId = controlCommand.runId
     processCommand(Setup(controlCommand.obsId, `shortRunningCmdPrefix`))
     processCommand(Setup(controlCommand.obsId, `mediumRunningCmdPrefix`))

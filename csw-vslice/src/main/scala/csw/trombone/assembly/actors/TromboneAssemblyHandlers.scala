@@ -17,7 +17,7 @@ import csw.services.logging.scaladsl.LoggerFactory
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs.CommandMessageE
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.CommonMsgs.UpdateHcdLocations
-import csw.trombone.assembly.DiagPublisherMessages.{DiagnosticState, OperationsState}
+import csw.trombone.assembly.DiagPublisherMessages.{CommandResponseE, DiagnosticState, OperationsState}
 import csw.trombone.assembly.ParamValidation._
 import csw.trombone.assembly._
 
@@ -56,6 +56,8 @@ class TromboneAssemblyHandlers(
 
   private var commandHandler: ActorRef[AssemblyCommandHandlerMsgs] = _
 
+  private val commandResponseAdapter: ActorRef[CommandResponse] = ctx.spawnAdapter(CommandResponseE)
+
   implicit var ac: AssemblyContext  = _
   implicit val ec: ExecutionContext = ctx.executionContext
 
@@ -93,8 +95,8 @@ class TromboneAssemblyHandlers(
     case _: Observe => Accepted(controlCommand.runId)
   }
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit =
-    commandHandler ! CommandMessageE(Submit(controlCommand, replyTo))
+  override def onSubmit(controlCommand: ControlCommand): Unit =
+    commandHandler ! CommandMessageE(Submit(controlCommand, commandResponseAdapter))
 
   override def onOneway(controlCommand: ControlCommand): Unit = println("One way command received")
 

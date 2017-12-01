@@ -1,8 +1,8 @@
 package csw.framework.internal.component
 
+import akka.typed.PostStop
 import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{ActorRef, PostStop}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
@@ -132,12 +132,12 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     doNothing()
       .when(sampleHcdHandler)
-      .onSubmit(ArgumentMatchers.any[Setup](), ArgumentMatchers.any[ActorRef[CommandResponse]]())
+      .onSubmit(ArgumentMatchers.any[Setup]())
 
     runningComponentBehavior.onMessage(Submit(sc1, commandResponseProbe.ref))
 
     verify(sampleHcdHandler).validateCommand(sc1)
-    verify(sampleHcdHandler).onSubmit(sc1, commandResponseProbe.ref)
+    verify(sampleHcdHandler).onSubmit(sc1)
     commandResponseProbe.expectMsg(Accepted(sc1.runId))
     commandStatusServiceProbe.expectMsg(AddOrUpdateCommand(sc1.runId, Accepted(sc1.runId)))
   }
@@ -178,12 +178,12 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     doNothing()
       .when(sampleHcdHandler)
-      .onSubmit(ArgumentMatchers.any[Setup](), ArgumentMatchers.any[ActorRef[CommandResponse]]())
+      .onSubmit(ArgumentMatchers.any[Setup]())
 
     runningComponentBehavior.onMessage(Submit(sc1, commandResponseProbe.ref))
 
     verify(sampleHcdHandler).validateCommand(sc1)
-    verify(sampleHcdHandler, never()).onSubmit(sc1, commandResponseProbe.ref)
+    verify(sampleHcdHandler, never()).onSubmit(sc1)
     commandResponseProbe.expectMsg(Completed(sc1.runId))
     commandStatusServiceProbe.expectMsg(AddOrUpdateCommand(sc1.runId, Completed(sc1.runId)))
   }

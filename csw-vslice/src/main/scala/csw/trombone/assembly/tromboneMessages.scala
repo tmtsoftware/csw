@@ -76,6 +76,7 @@ object DiagPublisherMessages {
   final case object OperationsState                                                        extends DiagPublisherMessages
   final case class CurrentStateE(cs: CurrentState)                                         extends DiagPublisherMessages
   final case class UpdateTromboneHcd(running: Option[ActorRef[SupervisorExternalMessage]]) extends DiagPublisherMessages
+  final case class CommandResponseE(cmdRes: CommandResponse)                               extends DiagPublisherMessages
 }
 
 ////////////////////

@@ -43,7 +43,7 @@ class GalilComponentHandlers(
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = ()
+  override def onSubmit(controlCommand: ControlCommand): Unit = ()
 
   override def onOneway(controlCommand: ControlCommand): Unit = ()
 

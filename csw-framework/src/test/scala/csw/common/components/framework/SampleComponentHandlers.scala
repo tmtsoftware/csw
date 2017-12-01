@@ -57,7 +57,7 @@ class SampleComponentHandlers(
   override def onDomainMsg(msg: ComponentDomainMessage): Unit =
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
 
-  override def onSubmit(controlCommand: ControlCommand, replyTo: ActorRef[CommandResponse]): Unit = {
+  override def onSubmit(controlCommand: ControlCommand): Unit = {
     // Adding passed in parameter to see if data is transferred properly
     commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))

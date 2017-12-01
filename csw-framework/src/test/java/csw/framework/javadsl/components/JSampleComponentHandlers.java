@@ -16,7 +16,6 @@ import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JLoggerFactory;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
@@ -76,7 +75,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public void onSubmit(ControlCommand controlCommand, ActorRef<CommandResponse> actorRef) {
+    public void onSubmit(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(submitState);

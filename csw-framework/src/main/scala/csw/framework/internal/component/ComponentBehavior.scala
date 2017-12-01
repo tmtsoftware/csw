@@ -189,7 +189,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
         commandMessage match {
           case _: Submit ⇒
             log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
-            lifecycleHandlers.onSubmit(commandMessage.command, commandMessage.replyTo)
+            lifecycleHandlers.onSubmit(commandMessage.command)
           case _: Oneway ⇒
             log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
             lifecycleHandlers.onOneway(commandMessage.command)
