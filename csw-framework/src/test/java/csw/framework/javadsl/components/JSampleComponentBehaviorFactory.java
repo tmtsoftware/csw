@@ -10,6 +10,7 @@ import csw.messages.ComponentMessage;
 import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
+import csw.services.logging.javadsl.JLoggerFactory;
 
 public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory<JComponentDomainMessage> {
     public JSampleComponentBehaviorFactory() {
@@ -22,7 +23,8 @@ public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory<J
             ComponentInfo componentInfo,
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
             ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
-            ILocationService locationService) {
-        return new JSampleComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, JComponentDomainMessage.class);
+            ILocationService locationService,
+            JLoggerFactory loggerFactory) {
+        return new JSampleComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, JComponentDomainMessage.class);
     }
 }

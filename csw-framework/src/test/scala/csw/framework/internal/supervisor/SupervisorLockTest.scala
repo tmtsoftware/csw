@@ -162,6 +162,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     commandResponseProbe.expectNoMsg(200.millis)
   }
 
+  // DEOPSCSW-223 Expiry of component Locking mode
   test("should expire lock after timeout") {
     val lockingStateProbe = TestProbe[LockingResponse]
     val client1Prefix     = Prefix("wfos.prog.cloudcover.Client1.success")

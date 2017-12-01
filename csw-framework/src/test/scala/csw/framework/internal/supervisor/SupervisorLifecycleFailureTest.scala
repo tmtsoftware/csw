@@ -239,6 +239,7 @@ class SampleBehaviorFactory(componentHandlers: ComponentHandlers[ComponentDomain
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-      locationService: LocationService
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
   ): ComponentHandlers[ComponentDomainMessage] = componentHandlers
 }

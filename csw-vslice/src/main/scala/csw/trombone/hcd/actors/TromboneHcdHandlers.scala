@@ -16,6 +16,7 @@ import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.models.Units.encoder
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.LoggerFactory
 import csw.trombone.hcd.AxisRequest._
 import csw.trombone.hcd.AxisResponse._
 import csw.trombone.hcd.TromboneEngineering.{GetAxisConfig, GetAxisStats, GetAxisUpdate, GetAxisUpdateNow}
@@ -31,9 +32,10 @@ class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessag
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-      locationService: LocationService
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
   ): ComponentHandlers[TromboneMessage] =
-    new TromboneHcdHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
+    new TromboneHcdHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }
 
 class TromboneHcdHandlers(
@@ -41,8 +43,16 @@ class TromboneHcdHandlers(
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-    locationService: LocationService
-) extends ComponentHandlers[TromboneMessage](ctx, componentInfo, commandResponseManager, pubSubRef, locationService) {
+    locationService: LocationService,
+    loggerFactory: LoggerFactory
+) extends ComponentHandlers[TromboneMessage](
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      pubSubRef,
+      locationService,
+      loggerFactory
+    ) {
 
   implicit val timeout: Timeout             = Timeout(2.seconds)
   implicit val scheduler: Scheduler         = ctx.system.scheduler

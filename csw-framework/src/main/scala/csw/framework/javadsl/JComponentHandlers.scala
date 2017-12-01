@@ -31,18 +31,18 @@ abstract class JComponentHandlers[Msg <: DomainMessage](
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: ILocationService,
+    loggerFactory: JLoggerFactory,
     klass: Class[Msg]
 ) extends ComponentHandlers[Msg](
       ctx.asScala,
       componentInfo,
       commandResponseManager,
       pubSubRef,
-      locationService.asScala
+      locationService.asScala,
+      loggerFactory.asScala
     )(ClassTag(klass)) {
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
-
-  protected lazy val jLoggerFactory: JLoggerFactory = new JLoggerFactory(componentInfo.name)
 
   def jInitialize(): CompletableFuture[Unit]
   def jOnShutdown(): CompletableFuture[Unit]

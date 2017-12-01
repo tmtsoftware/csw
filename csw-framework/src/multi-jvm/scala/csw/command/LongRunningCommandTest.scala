@@ -5,7 +5,6 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.components.command.ComponentStateForCommand._
@@ -17,7 +16,6 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.models.ObsId
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}

@@ -29,11 +29,10 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-    locationService: LocationService
+    locationService: LocationService,
+    loggerFactory: LoggerFactory
 ) {
   var isOnline: Boolean = false
-
-  protected lazy val loggerFactory: LoggerFactory = new LoggerFactory(componentInfo.name)
 
   def initialize(): Future[Unit]
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit

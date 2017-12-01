@@ -23,8 +23,9 @@ class GalilComponentHandlers(
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-    locationService: LocationService
-) extends ComponentHandlers[StartLogging](ctx, componentInfo, commandResponseManager, pubSubRef, locationService) {
+    locationService: LocationService,
+    loggerFactory: LoggerFactory
+) extends ComponentHandlers[StartLogging](ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory) {
   val log: Logger = new LoggerFactory(componentInfo.name).getLogger
 
   override def initialize(): Future[Unit] = Future.successful(())

@@ -13,6 +13,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.LoggerFactory
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs.CommandMessageE
 import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.CommonMsgs.UpdateHcdLocations
@@ -29,9 +30,10 @@ class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPubli
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-      locationService: LocationService
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
   ): ComponentHandlers[DiagPublisherMessages] =
-    new TromboneAssemblyHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
+    new TromboneAssemblyHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }
 
 class TromboneAssemblyHandlers(
@@ -39,13 +41,15 @@ class TromboneAssemblyHandlers(
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-    locationService: LocationService
+    locationService: LocationService,
+    loggerFactory: LoggerFactory
 ) extends ComponentHandlers[DiagPublisherMessages](
       ctx,
       componentInfo,
       commandResponseManager,
       pubSubRef,
-      locationService
+      locationService,
+      loggerFactory
     ) {
 
   private var diagPublsher: ActorRef[DiagPublisherMessages] = _

@@ -18,6 +18,7 @@ import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage, SupervisorExternalMessage}
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,8 +28,16 @@ class McsAssemblyComponentHandlers(
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
-    locationService: LocationService
-) extends ComponentHandlers[ComponentDomainMessage](ctx, componentInfo, commandResponseManager, pubSubRef, locationService) {
+    locationService: LocationService,
+    loggerFactory: LoggerFactory
+) extends ComponentHandlers[ComponentDomainMessage](
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      pubSubRef,
+      locationService,
+      loggerFactory
+    ) {
 
   implicit val timeout: Timeout                   = 10.seconds
   implicit val scheduler: Scheduler               = ctx.system.scheduler

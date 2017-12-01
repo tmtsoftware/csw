@@ -33,7 +33,8 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-      locationService: LocationService
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
   ): ComponentHandlers[Msg]
 
   /**
@@ -60,7 +61,7 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
             ctx,
             componentInfo,
             supervisor,
-            handlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService),
+            handlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory),
             commandResponseManager,
             locationService,
             loggerFactory

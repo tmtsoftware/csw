@@ -7,6 +7,7 @@ import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.Future
 
@@ -15,8 +16,16 @@ class ComponentHandlerToSimulateFailure(
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-    locationService: LocationService
-) extends SampleComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService) {
+    locationService: LocationService,
+    loggerFactory: LoggerFactory
+) extends SampleComponentHandlers(
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      pubSubRef,
+      locationService,
+      loggerFactory: LoggerFactory
+    ) {
 
   override def onShutdown(): Future[Unit] = throw new RuntimeException(ComponentHandlerToSimulateFailure.exceptionMsg)
 }

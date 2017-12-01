@@ -8,6 +8,7 @@ import csw.messages.models.PubSub
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.LoggerFactory
 
 class GalilBehaviorFactory extends ComponentBehaviorFactory[StartLogging] {
   override def handlers(
@@ -15,7 +16,8 @@ class GalilBehaviorFactory extends ComponentBehaviorFactory[StartLogging] {
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
-      locationService: LocationService
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
   ): ComponentHandlers[StartLogging] =
-    new GalilComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
+    new GalilComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }

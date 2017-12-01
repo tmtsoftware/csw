@@ -10,6 +10,8 @@ import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.javadsl.JLoggerFactory
+import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.reflect.ClassTag
 
@@ -26,15 +28,17 @@ abstract class JComponentBehaviorFactory[Msg <: DomainMessage](
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
-      locationService: LocationService
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
   ): ComponentHandlers[Msg] =
-    jHandlers(ctx.asJava, componentInfo, commandResponseManager, pubSubRef, locationService.asJava)
+    jHandlers(ctx.asJava, componentInfo, commandResponseManager, pubSubRef, locationService.asJava, loggerFactory.asJava)
 
   protected[framework] def jHandlers(
       ctx: ActorContext[ComponentMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
-      locationService: ILocationService
+      locationService: ILocationService,
+      loggerFactory: JLoggerFactory
   ): JComponentHandlers[Msg]
 }

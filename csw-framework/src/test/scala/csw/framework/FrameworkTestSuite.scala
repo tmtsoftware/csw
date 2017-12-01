@@ -16,6 +16,7 @@ import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage, ContainerIdleMessage, SupervisorExternalMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.LoggerFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -43,7 +44,8 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
           componentInfo: ComponentInfo,
           commandResponseManager: ActorRef[CommandResponseManagerMessage],
           pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-          locationService: LocationService
+          locationService: LocationService,
+          loggerFactory: LoggerFactory
       ): ComponentHandlers[ComponentDomainMessage] =
         componentHandlers
     }
@@ -57,7 +59,8 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
           componentInfo: ComponentInfo,
           commandResponseManager: ActorRef[CommandResponseManagerMessage],
           pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-          locationService: LocationService
+          locationService: LocationService,
+          loggerFactory: LoggerFactory
       ): ComponentHandlers[ComponentDomainMessage] =
         assemblyHandlers
     }

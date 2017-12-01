@@ -8,6 +8,7 @@ import csw.messages.models.PubSub
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.LoggerFactory
 
 class ComponentBehaviorFactoryForCommand extends ComponentBehaviorFactory[ComponentDomainMessage] {
   override def handlers(
@@ -15,9 +16,10 @@ class ComponentBehaviorFactoryForCommand extends ComponentBehaviorFactory[Compon
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
-      locationService: LocationService
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
   ): ComponentHandlers[ComponentDomainMessage] =
-    new ComponentHandlerForCommand(ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
+    new ComponentHandlerForCommand(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }
 
 class McsAssemblyBehaviorFactory extends ComponentBehaviorFactory[ComponentDomainMessage] {
@@ -26,9 +28,10 @@ class McsAssemblyBehaviorFactory extends ComponentBehaviorFactory[ComponentDomai
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
-      locationService: LocationService
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
   ): ComponentHandlers[ComponentDomainMessage] =
-    new McsAssemblyComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
+    new McsAssemblyComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }
 
 class McsHcdBehaviorFactory extends ComponentBehaviorFactory[ComponentDomainMessage] {
@@ -37,7 +40,8 @@ class McsHcdBehaviorFactory extends ComponentBehaviorFactory[ComponentDomainMess
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
-      locationService: LocationService
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
   ): ComponentHandlers[ComponentDomainMessage] =
-    new McsHcdComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService)
+    new McsHcdComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }

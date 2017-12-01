@@ -39,11 +39,12 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
             ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
             ILocationService locationService,
+            JLoggerFactory loggerFactory,
             Class<JComponentDomainMessage> klass
     ) {
-        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, klass);
+        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, klass);
         this.pubSubRef = pubSubRef;
-        this.log = jLoggerFactory().getLogger(getClass());
+        this.log = loggerFactory.getLogger(getClass());
     }
 
     @Override
