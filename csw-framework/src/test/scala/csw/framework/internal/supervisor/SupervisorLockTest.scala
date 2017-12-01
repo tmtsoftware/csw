@@ -190,4 +190,26 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockExpiringShortly)
     lockingStateProbe.expectMsg(LockExpired)
   }
+
+  // DEOPSCSW-223 Expiry of component Locking mode
+  test("should not publish LockExpired or LockExpiringShortly messages if component is unlocked within timeout") {
+    val lockingStateProbe = TestProbe[LockingResponse]
+    val client1Prefix     = Prefix("wfos.prog.cloudcover.Client1.success")
+
+    val mocks = frameworkTestMocks()
+    import mocks._
+
+    val supervisorRef = createSupervisorAndStartTLA(assemblyInfo, mocks)
+
+    // Assure that component is in running state
+    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+
+    // Client 1 will lock an assembly
+    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref, 100.millis)
+    lockingStateProbe.expectMsg(LockAcquired)
+    supervisorRef ! Unlock(client1Prefix, lockingStateProbe.ref)
+    lockingStateProbe.expectMsg(LockReleased)
+    lockingStateProbe.expectNoMsg(100.millis)
+  }
 }

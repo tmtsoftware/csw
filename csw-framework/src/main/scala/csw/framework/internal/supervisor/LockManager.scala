@@ -33,8 +33,7 @@ class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) 
           true
         case _ ⇒
           log.error(s"Cannot process the command [${msg.command.toString}] as the lock is acquired by component: $currentPrefix")
-          msg.replyTo ! NotAllowed(msg.command.runId,
-                                   ComponentLockedIssue(s"This component is locked by component $currentPrefix"))
+          msg.replyTo ! NotAllowed(msg.command.runId, ComponentLockedIssue(s"This component is locked by component $currentPrefix"))
           false
       }
   }
