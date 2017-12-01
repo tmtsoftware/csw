@@ -106,7 +106,7 @@ class SupervisorBehavior(
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
       case (SupervisorLifecycleState.Lock, LockAboutToTimeout(replyTo))                  ⇒ replyTo ! LockExpiringShortly
-      case (SupervisorLifecycleState.Lock, LockTimeout(replyTo))                         ⇒ replyTo ! LockExpired
+      case (SupervisorLifecycleState.Lock, LockTimedout(replyTo))                        ⇒ replyTo ! LockExpired
       case (SupervisorLifecycleState.Lock, lockMessage: SupervisorLockMessage)           ⇒ onRunning(lockMessage)
       case (SupervisorLifecycleState.Lock, message)                                      ⇒ ignore(message)
       case (_, commonMessage: SupervisorCommonMessage)                                   ⇒ onCommon(commonMessage)
@@ -208,7 +208,7 @@ class SupervisorBehavior(
   private def lockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration): Unit = {
     lockManager = lockManager.lockComponent(prefix, replyTo) {
       timerScheduler.startSingleTimer(lockNotificationKey, LockAboutToTimeout(replyTo), leaseDuration - (leaseDuration / 10))
-      timerScheduler.startSingleTimer(lockExpirationKey, LockTimeout(replyTo), leaseDuration)
+      timerScheduler.startSingleTimer(lockExpirationKey, LockTimedout(replyTo), leaseDuration)
     }
     if (lockManager.isLocked) updateLifecycleState(SupervisorLifecycleState.Lock)
   }
