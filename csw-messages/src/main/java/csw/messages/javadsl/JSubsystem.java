@@ -39,5 +39,4 @@ public class JSubsystem {
     // for testing
     public static final Subsystem TEST      = Subsystem.TEST$.MODULE$;
     public static final Subsystem BAD       = Subsystem.BAD$.MODULE$;
-
 }

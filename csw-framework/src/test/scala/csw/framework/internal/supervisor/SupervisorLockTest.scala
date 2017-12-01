@@ -179,8 +179,15 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     // Client 1 will lock an assembly
     supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref, 100.millis)
     lockingStateProbe.expectMsg(LockAcquired)
-
     lockingStateProbe.expectMsg(LockExpiringShortly)
-    lockingStateProbe.expectMsg(200.millis, LockExpired)
+
+    // Reacquire lock before it gets expired
+    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref, 100.millis)
+    lockingStateProbe.expectMsg(LockAcquired)
+
+    // this is to prove that timeout gets reset after renewing lock
+    lockingStateProbe.expectNoMsg(50.millis)
+    lockingStateProbe.expectMsg(LockExpiringShortly)
+    lockingStateProbe.expectMsg(LockExpired)
   }
 }

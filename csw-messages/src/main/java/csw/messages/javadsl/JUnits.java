@@ -64,7 +64,4 @@ public class JUnits {
     public static final Units encoder = Units.encoder$.MODULE$;
     public static final Units count = Units.count$.MODULE$;
     public static final Units pix = Units.pix$.MODULE$;
-
-
 }
-
