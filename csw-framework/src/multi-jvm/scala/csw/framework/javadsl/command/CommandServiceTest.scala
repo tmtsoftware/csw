@@ -1,4 +1,4 @@
-package csw.command
+package csw.framework.javadsl.command
 
 import akka.actor.Scheduler
 import akka.stream.{ActorMaterializer, Materializer}

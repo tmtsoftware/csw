@@ -16,20 +16,20 @@ import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
+import csw.services.logging.javadsl.JLoggerFactory;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
 
-import static csw.messages.ccs.commands.CommandResponse.Accepted;
-import static csw.messages.ccs.commands.CommandResponse.Invalid;
+import static csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand;
+import static csw.messages.ccs.commands.CommandResponse.*;
 
 public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> {
 
     // Demonstrating logger accessibility in Java Component handlers
     private ILogger log;
-
+    private ActorRef<CommandResponseManagerMessage> commandResponseManagerRef;
     private ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef;
-
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
 
     JSampleComponentHandlers(
@@ -44,6 +44,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, klass);
         this.pubSubRef = pubSubRef;
         this.log = loggerFactory.getLogger(getClass());
+        this.commandResponseManagerRef = commandResponseManager;
     }
 
     @Override
@@ -55,7 +56,6 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         return CompletableFuture.supplyAsync(() -> {
             CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
             PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(initState);
-
             pubSubRef.tell(publish);
             return BoxedUnit.UNIT;
         });
@@ -113,6 +113,10 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         else {
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());
         }
+
+        CommandResponseManagerMessage updateCommand = new AddOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
+
+        commandResponseManagerRef.tell(updateCommand);
 
         PubSub.Publish<CurrentState> publish = new PubSub.Publish<>(commandState);
         pubSubRef.tell(publish);
