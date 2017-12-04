@@ -71,7 +71,7 @@ public class JCommandIntegrationTest {
         Key<Integer> encoder = JKeyTypes.IntKey().make("encoder");
         Parameter<Integer> parameter = encoder.set(22, 23);
 
-        Setup controlCommand = new Setup(new ObsId(""), "success").add(parameter);
+        Setup controlCommand = new Setup("success", new ObsId("")).add(parameter);
 
         Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
         CompletableFuture<CommandResponse> commandResponseCompletableFuture = CommandExecutionService

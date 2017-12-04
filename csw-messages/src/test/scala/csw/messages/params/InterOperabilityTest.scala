@@ -1,5 +1,7 @@
 package csw.messages.params
 
+import java.util.Optional
+
 import akka.actor
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
@@ -16,7 +18,10 @@ import scala.collection.JavaConverters.collectionAsScalaIterableConverter
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-case class CommandMsg(command: Command, ackTo: ActorRef[java.util.Set[Parameter[_]]], replyTo: ActorRef[StatusEvent])
+case class CommandMsg(command: Command,
+                      ackTo: ActorRef[java.util.Set[Parameter[_]]],
+                      replyTo: ActorRef[StatusEvent],
+                      obsIdAck: ActorRef[Optional[ObsId]])
 
 // DEOPSCSW-184: Change configurations - attributes and values
 class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll {
@@ -33,7 +38,7 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
   implicit val typedSystem: ActorSystem[Nothing] = system.toTyped
   implicit val testKit: TestKitSettings          = TestKitSettings(typedSystem)
 
-  private val scalaSetup = Setup(obsId, Prefix(prefixStr)).add(intParam).add(stringParam)
+  private val scalaSetup = Setup(Prefix(prefixStr), Some(obsId)).add(intParam).add(stringParam)
 
   private val javaCmdHandlerBehavior: Future[ActorRef[CommandMsg]] =
     typedSystem.systemActorOf[CommandMsg](JavaCommandHandler.behavior(), "javaCommandHandler")
@@ -48,14 +53,17 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
   test("should able to send commands/events from scala code to java and vice a versa") {
     val ackProbe     = TestProbe[java.util.Set[Parameter[_]]]
     val replyToProbe = TestProbe[StatusEvent]
+    val obsIdProbe   = TestProbe[Optional[ObsId]]
 
-    jCommandHandlerActor ! CommandMsg(scalaSetup, ackProbe.ref, replyToProbe.ref)
+    jCommandHandlerActor ! CommandMsg(scalaSetup, ackProbe.ref, replyToProbe.ref, obsIdProbe.ref)
 
     val set = ackProbe.expectMsgType[java.util.Set[Parameter[_]]]
     set.asScala.toSet shouldBe Set(intParam, stringParam)
 
     val eventFromJava = replyToProbe.expectMsgType[StatusEvent]
     eventFromJava.paramSet shouldBe Set(JavaCommandHandler.encoderParam, JavaCommandHandler.epochStringParam)
+
+    obsIdProbe.expectMsgType[Optional[ObsId]]
   }
 
 }

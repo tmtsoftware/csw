@@ -149,8 +149,8 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val obsId: ObsId          = ObsId("Obs001")
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
       // setup to receive Success in validation result
-      val setupSuccess: Setup = Setup(obsId, successPrefix, Set(param))
-      val setupFailure: Setup = Setup(obsId, failedPrefix, Set(param))
+      val setupSuccess: Setup = Setup(successPrefix, Some(obsId), Set(param))
+      val setupFailure: Setup = Setup(failedPrefix, Some(obsId), Set(param))
 
       val laserAssemblySupervisor = laserContainerComponents.head.supervisor
       val laserCompStateProbe     = TestProbe[CurrentState]

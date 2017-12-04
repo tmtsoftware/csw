@@ -13,7 +13,7 @@ import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternal
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
-import csw.messages.params.models.RunId
+import csw.messages.params.models.{ObsId, RunId}
 import csw.messages.params.models.Units.encoder
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
@@ -45,7 +45,7 @@ class MoveCommand(
   val encoderPosition: Int        = Algorithms.stagePositionToEncoder(ac.controlConfig, stagePosition.head)
   val stateMatcher: DemandMatcher = AssemblyMatchers.posMatcher(encoderPosition)
   val scOut: Setup =
-    Setup(s.obsId, TromboneHcdState.axisMoveCK).add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
+    Setup(TromboneHcdState.axisMoveCK, s.maybeObsId).add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
 
   def startCommand(): Future[CommandResponse] = {
     if (tromboneHCD.isEmpty)
@@ -80,6 +80,8 @@ class MoveCommand(
   }
 
   def stopCommand(): Unit = {
-    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(RunId(), s.obsId), ctx.spawnAnonymous(Actor.ignore)))
+    tromboneHCD.foreach(
+      _ ! Submit(TromboneHcdState.cancelSC(RunId(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
+    )
   }
 }

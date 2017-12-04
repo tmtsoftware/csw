@@ -12,7 +12,7 @@ import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
-import csw.messages.params.models.RunId
+import csw.messages.params.models.{ObsId, RunId}
 import csw.messages.params.models.Units.encoder
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.ccs.internal.matchers.Matcher
@@ -59,7 +59,7 @@ class SetElevationCommand(
       val stateMatcher              = AssemblyMatchers.posMatcher(encoderPosition)
       implicit val timeout: Timeout = stateMatcher.timeout
 
-      val scOut = Setup(ac.obsId, axisMoveCK).add(positionKey -> encoderPosition withUnits encoder)
+      val scOut = Setup(axisMoveCK, Some(ac.obsId)).add(positionKey -> encoderPosition withUnits encoder)
 
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
@@ -80,6 +80,8 @@ class SetElevationCommand(
   }
 
   def stopCommand(): Unit = {
-    tromboneHCD.foreach(_ ! Submit(TromboneHcdState.cancelSC(RunId(), s.obsId), ctx.spawnAnonymous(Actor.ignore)))
+    tromboneHCD.foreach(
+      _ ! Submit(TromboneHcdState.cancelSC(RunId(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
+    )
   }
 }

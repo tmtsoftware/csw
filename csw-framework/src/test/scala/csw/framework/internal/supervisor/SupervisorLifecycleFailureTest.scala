@@ -158,7 +158,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     val obsId: ObsId          = ObsId("Obs001")
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
-    val setup: Setup          = Setup(obsId, successPrefix, Set(param))
+    val setup: Setup          = Setup(successPrefix, Some(obsId), Set(param))
 
     doThrow(FailureRestart(failureRestartExMsg))
       .when(componentHandlers)

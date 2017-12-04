@@ -35,11 +35,11 @@ class ResultTest extends FunSpec with Matchers {
       val p3: Parameter[String] = k3.set("A", "B", "C", "D")
 
       //Create Result using madd
-      val r1: Result = Result(runId, obsId, prefix).madd(p1, p2)
+      val r1: Result = Result(runId, prefix, Some(obsId)).madd(p1, p2)
       //Create Result using apply
-      val r2: Result = Result(runId, obsId, prefix, Set(p1, p2))
+      val r2: Result = Result(runId, prefix, Some(obsId), Set(p1, p2))
       //Create Result and use add
-      val r3: Result = Result(runId, obsId, prefix).add(p1).add(p2).add(p3)
+      val r3: Result = Result(runId, prefix, Some(obsId)).add(p1).add(p2).add(p3)
 
       //access keys
       val k1Exists: Boolean = r1.exists(k1) //true
@@ -92,7 +92,7 @@ class ResultTest extends FunSpec with Matchers {
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       //result
-      val result: Result = Result(runId, obsId, prefix).add(i1)
+      val result: Result = Result(runId, prefix, Some(obsId)).add(i1)
 
       //json support - write
       val resultJson: JsValue = JsonSupport.writeResult(result)
@@ -140,12 +140,8 @@ class ResultTest extends FunSpec with Matchers {
       val miscParam1 = miscKey.set(100)
 
       //Setup command with duplicate key via constructor
-      val result = Result(
-        runId,
-        obsId,
-        prefix,
-        Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
-      )
+      val result =
+        Result(runId, prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       //four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = result.paramSet.toList.map(_.keyName)
 

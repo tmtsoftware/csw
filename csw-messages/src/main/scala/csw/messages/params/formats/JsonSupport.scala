@@ -19,7 +19,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   lazy val paramSetFormat    = implicitly[Format[Set[Parameter[_]]]]
   lazy val commandInfoFormat = implicitly[Format[CommandInfo]]
   lazy val runIdFormat       = implicitly[Format[RunId]]
-  lazy val obsIdFormat       = implicitly[Format[ObsId]]
+  lazy val obsIdFormat       = implicitly[Format[Option[ObsId]]]
   lazy val prefixFormat      = implicitly[Format[Prefix]]
   lazy val eventInfoFormat   = implicitly[Format[EventInfo]]
 
@@ -47,7 +47,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
       Seq(
         "type"     -> JsString(result.typeName),
         "runId"    -> runIdFormat.writes(result.runId),
-        "obsId"    -> obsIdFormat.writes(result.obsId),
+        "obsId"    -> obsIdFormat.writes(result.maybeObsId),
         "prefix"   -> prefixFormat.writes(result.prefix),
         "paramSet" -> Json.toJson(result.paramSet)
       )
@@ -67,13 +67,13 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
           case (JsString(typeName), runId, obsId, prefix, paramSet) =>
             typeName match {
               case `setupType` =>
-                Setup(runId.as[RunId], obsId.as[ObsId], prefix.as[Prefix], paramSetFormat.reads(paramSet).get)
+                Setup(runId.as[RunId], prefix.as[Prefix], obsId.as[Option[ObsId]], paramSetFormat.reads(paramSet).get)
                   .asInstanceOf[A]
               case `observeType` =>
-                Observe(runId.as[RunId], obsId.as[ObsId], prefix.as[Prefix], paramSetFormat.reads(paramSet).get)
+                Observe(runId.as[RunId], prefix.as[Prefix], obsId.as[Option[ObsId]], paramSetFormat.reads(paramSet).get)
                   .asInstanceOf[A]
               case `waitType` =>
-                Wait(runId.as[RunId], obsId.as[ObsId], prefix.as[Prefix], paramSetFormat.reads(paramSet).get)
+                Wait(runId.as[RunId], prefix.as[Prefix], obsId.as[Option[ObsId]], paramSetFormat.reads(paramSet).get)
                   .asInstanceOf[A]
               case _ => unexpectedJsValueError(json)
             }
@@ -175,7 +175,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
     JsObject(
       Seq(
         "runId"    -> runIdFormat.writes(result.runId),
-        "obsId"    -> obsIdFormat.writes(result.obsId),
+        "obsId"    -> obsIdFormat.writes(result.maybeObsId),
         "prefix"   -> prefixFormat.writes(result.prefix),
         "paramSet" -> Json.toJson(result.paramSet)
       )
@@ -193,7 +193,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
       case JsObject(fields) =>
         (fields("runId"), fields("obsId"), fields("prefix"), fields("paramSet")) match {
           case (runId, obsId, prefix, paramSet) =>
-            Result(runId.as[RunId], obsId.as[ObsId], prefix.as[Prefix], paramSetFormat.reads(paramSet).get)
+            Result(runId.as[RunId], prefix.as[Prefix], obsId.as[Option[ObsId]], paramSetFormat.reads(paramSet).get)
           case _ => unexpectedJsValueError(json)
         }
       case _ => unexpectedJsValueError(json)

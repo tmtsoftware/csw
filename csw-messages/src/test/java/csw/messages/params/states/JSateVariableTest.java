@@ -46,7 +46,7 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateCurrentStateFromSetup() {
-        Setup setup = new Setup(obsId, prefix).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(prefix, obsId).add(encoderParam).add(epochStringParam);
         CurrentState currentState = new CurrentState(setup);
 
         // typeName and prefix
@@ -81,7 +81,7 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateDemandStateFromSetup() {
-        Setup setup = new Setup(obsId, prefix).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(prefix, obsId).add(encoderParam).add(epochStringParam);
         DemandState demandState = new DemandState(setup);
 
         // typeName and prefix

@@ -48,7 +48,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
         )
       val assemblyRef = Await.result(assemblyLocF, 5.seconds).map(_.componentRef()).get
 
-      val setup = Setup(obsId, longRunningCmdPrefix)
+      val setup = Setup(longRunningCmdPrefix, Some(obsId))
 
       val eventualCommandResponse = assemblyRef.submit(setup).flatMap {
         case _: Accepted ⇒ assemblyRef.getCommandResponse(setup.runId)

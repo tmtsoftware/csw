@@ -30,8 +30,8 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
   implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
 
   private val intParam: Parameter[Int] = KeyType.IntKey.make("intKey").set(1, 2, 3)
-  private val setup: Setup             = Setup(ObsId("obs1001"), prefix, Set(intParam))
-  private val invalidSetup: Setup      = Setup(ObsId("obs1001"), invalidPrefix, Set(intParam))
+  private val setup: Setup             = Setup(prefix, Some(ObsId("obs1001")), Set(intParam))
+  private val invalidSetup: Setup      = Setup(invalidPrefix, Some(ObsId("obs1001")), Set(intParam))
 
   private val mockedLoggerFactory = mock[LoggerFactory]
   private val mockedLogger        = mock[Logger]

@@ -13,7 +13,7 @@ class RunIdTest extends FunSuite with Matchers {
     // Create 10 setup commands. For each command created, fetch the runId and add it in a Set[RunId].
     // Since Set can contain only unique values, asserting 10 runIds in set determines the uniquely created runId for all 10 setup commands.
     1 to 10 foreach { _ ⇒
-      val setup = Setup(ObsId("Obs001"), Prefix(""), Set.empty)
+      val setup = Setup(Prefix(""), Some(ObsId("Obs001")), Set.empty)
       runIds = runIds + setup.runId // runId is available in created setup command
     }
 
@@ -27,7 +27,7 @@ class RunIdTest extends FunSuite with Matchers {
     // Create 10 observe commands. For each command created, fetch the runId and add it in a Set[RunId].
     // Since Set can contain only unique values, asserting 10 runIds in set determines the uniquely created runId for all 10 observe commands.
     1 to 10 foreach { _ ⇒
-      val observe = Observe(ObsId("Obs001"), Prefix(""), Set.empty)
+      val observe = Observe(Prefix(""), Some(ObsId("Obs001")), Set.empty)
       runIds = runIds + observe.runId // runId is available in created observe command
     }
 
@@ -41,7 +41,7 @@ class RunIdTest extends FunSuite with Matchers {
     // Create 10 wait commands. For each command created, fetch the runId and add it in a Set[RunId].
     // Since Set can contain only unique values, asserting 10 runIds in set determines the uniquely created runId for all 10 wait commands.
     1 to 10 foreach { _ ⇒
-      val wait = Wait(ObsId("Obs001"), Prefix(""), Set.empty)
+      val wait = Wait(Prefix(""), Some(ObsId("Obs001")), Set.empty)
       runIds = runIds + wait.runId // runId is available in created wait command
     }
 

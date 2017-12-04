@@ -74,9 +74,9 @@ class McsAssemblyComponentHandlers(
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     commandId = controlCommand.runId
-    processCommand(Setup(controlCommand.obsId, `shortRunningCmdPrefix`))
-    processCommand(Setup(controlCommand.obsId, `mediumRunningCmdPrefix`))
-    processCommand(Setup(controlCommand.obsId, `longRunningCmdPrefix`))
+    processCommand(Setup(`shortRunningCmdPrefix`, controlCommand.maybeObsId))
+    processCommand(Setup(`mediumRunningCmdPrefix`, controlCommand.maybeObsId))
+    processCommand(Setup(`longRunningCmdPrefix`, controlCommand.maybeObsId))
   }
 
   private def processCommand(controlCommand: ControlCommand) = {

@@ -33,16 +33,19 @@ public abstract class JavaCommandHandler {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);
                     msg.replyTo().tell(statusEvent);
+                    msg.obsIdAck().tell(msg.command().jMaybeObsId());
                     return Actor.same();
                 })
                 .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Wait.class),(ctx, msg) -> {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);
+                    msg.obsIdAck().tell(msg.command().jMaybeObsId());
                     return Actor.same();
                 })
                 .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Observe.class),(ctx, msg) -> {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);
+                    msg.obsIdAck().tell(msg.command().jMaybeObsId());
                     return Actor.same();
                 })
                 .build();

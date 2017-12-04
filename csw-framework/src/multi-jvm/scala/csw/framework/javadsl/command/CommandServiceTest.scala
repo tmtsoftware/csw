@@ -69,7 +69,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val cmdResponseProbe = TestProbe[CommandResponse]
 
       // try to send a command to assembly which is already locked
-      val assemblyObserve = Observe(obsId, acceptedCmdPrefix)
+      val assemblyObserve = Observe(acceptedCmdPrefix, Some(obsId))
       assemblyRef ! Submit(assemblyObserve, cmdResponseProbe.ref)
       val response = cmdResponseProbe.expectMsgType[NotAllowed]
       response.issue shouldBe an[ComponentLockedIssue]
@@ -92,11 +92,11 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.componentRef()).get
 
       // short running command
-      val shortCommandResponse = Await.result(assemblyRef.submit(Setup(obsId, invalidCmdPrefix)), timeout.duration)
+      val shortCommandResponse = Await.result(assemblyRef.submit(Setup(invalidCmdPrefix, Some(obsId))), timeout.duration)
       shortCommandResponse shouldBe a[Invalid]
 
       // long running command which does not use matcher
-      val setupWithoutMatcher = Setup(obsId, acceptWithNoMatcherCmdPrefix)
+      val setupWithoutMatcher = Setup(acceptWithNoMatcherCmdPrefix, Some(obsId))
 
       val eventualLongCommandResponse = async {
         val initialCommandResponse = await(assemblyRef.submit(setupWithoutMatcher))
@@ -114,7 +114,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
       val demandMatcher         = DemandMatcher(DemandState(acceptWithMatcherCmdPrefix, Set(param)), withUnits = false, timeout)
-      val setupWithMatcher      = Setup(obsId, acceptWithMatcherCmdPrefix)
+      val setupWithMatcher      = Setup(acceptWithMatcherCmdPrefix, Some(obsId))
       val matcher               = new Matcher(assemblyRef, demandMatcher)
 
       val matcherResponseF: Future[MatcherResponse] = matcher.start
@@ -147,7 +147,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       enterBarrier("assembly-locked")
 
       // send command with lock token and expect command processing response
-      val assemblySetup = Setup(obsId, immediateCmdPrefix)
+      val assemblySetup = Setup(immediateCmdPrefix, Some(obsId))
       assemblyRef ! Submit(assemblySetup, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(5.seconds, Completed(assemblySetup.runId))
       enterBarrier("command-when-locked")

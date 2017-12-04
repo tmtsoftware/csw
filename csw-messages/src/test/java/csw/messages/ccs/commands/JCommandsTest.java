@@ -76,11 +76,11 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessSetupCommand() {
-        Setup setup = new Setup(obsId, prefix).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(prefix, obsId).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(setup.runId());
-        Assert.assertEquals(obsId, setup.obsId());
+        Assert.assertEquals(obsId, setup.maybeObsId());
         Assert.assertEquals(prefix, setup.prefixStr());
         Assert.assertEquals(new Prefix(prefix), setup.prefix());
         Assert.assertEquals(WFOS, setup.subsystem());
@@ -91,11 +91,11 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessObserveCommand() {
-        Observe observe = new Observe(obsId, prefix).add(encoderParam).add(epochStringParam);
+        Observe observe = new Observe(prefix, obsId).add(encoderParam).add(epochStringParam);
 
-        // runId, obsId, prefix, subsystem
+        // runId, prefix, obsId, subsystem
         Assert.assertNotNull(observe.runId());
-        Assert.assertEquals(obsId, observe.obsId());
+        Assert.assertEquals(obsId, observe.maybeObsId());
         Assert.assertEquals(prefix, observe.prefixStr());
         Assert.assertEquals(new Prefix(prefix), observe.prefix());
         Assert.assertEquals(WFOS, observe.subsystem());
@@ -106,11 +106,11 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessWaitCommand() {
-        Wait wait = new Wait(obsId, prefix).add(encoderParam).add(epochStringParam);
+        Wait wait = new Wait(prefix, obsId).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(wait.runId());
-        Assert.assertEquals(obsId, wait.obsId());
+        Assert.assertEquals(obsId, wait.maybeObsId());
         Assert.assertEquals(prefix, wait.prefixStr());
         Assert.assertEquals(new Prefix(prefix), wait.prefix());
         Assert.assertEquals(WFOS, wait.subsystem());

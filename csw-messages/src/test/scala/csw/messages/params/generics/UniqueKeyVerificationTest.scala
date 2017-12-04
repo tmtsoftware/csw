@@ -34,7 +34,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val setup =
-        Setup(obsId, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Setup(prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       setup.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
@@ -52,7 +52,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val observe =
-        Observe(obsId, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Observe(prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       observe.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
@@ -70,7 +70,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val wait =
-        Wait(obsId, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Wait(prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       wait.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
@@ -91,7 +91,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val result =
-        Result(runId, obsId, prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Result(runId, prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       result.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
