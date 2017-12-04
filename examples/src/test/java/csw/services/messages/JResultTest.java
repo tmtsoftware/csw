@@ -43,11 +43,11 @@ public class JResultTest {
         Parameter<String> p3 = k3.set("A", "B", "C", "D");
 
         //Create Result using madd
-        Result r1 = new Result(runId, prefix, Optional.of(obsId)).madd(p1, p2);
+        Result r1 = new Result(runId, prefix, obsId).madd(p1, p2);
         //Create Result using madd
-        Result r2 = new Result(runId, prefix, Optional.of(obsId)).madd(p1, p2);
+        Result r2 = new Result(runId, prefix, obsId).madd(p1, p2);
         //Create Result and use madd, add
-        Result r3 = new Result(runId, prefix, Optional.of(obsId)).madd(p1, p2).add(p3);
+        Result r3 = new Result(runId, prefix, obsId).madd(p1, p2).add(p3);
 
         //access keys
         Boolean k1Exists = r1.exists(k1); //true
@@ -94,7 +94,7 @@ public class JResultTest {
         String prefix = "wfos.prog.cloudcover";
 
         //result
-        Result result = new Result(runId, prefix, Optional.of(obsId)).add(i1);
+        Result result = new Result(runId, prefix, obsId).add(i1);
 
         //json support - write
         JsValue resultJson = JavaJsonSupport.writeResult(result);
@@ -135,7 +135,7 @@ public class JResultTest {
         Parameter<Integer> miscParam1 = miscKey.set(100);
 
         //Setup command with duplicate key via madd
-        Result result = new Result(runId, prefix, Optional.of(obsId)).madd(
+        Result result = new Result(runId, prefix, obsId).madd(
                 encParam1,
                 encParam2,
                 encParam3,
