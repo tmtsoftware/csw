@@ -9,7 +9,7 @@ import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
-import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.services.ccs.internal.matchers.Matcher
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly._

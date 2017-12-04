@@ -22,13 +22,13 @@ import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
-import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.services.ccs.internal.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContextExecutor, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class CommandServiceTestMultiJvm1 extends CommandServiceTest(0)
 class CommandServiceTestMultiJvm2 extends CommandServiceTest(0)
@@ -45,12 +45,12 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
   import config._
   import csw.common.components.command.ComponentStateForCommand._
 
-  implicit val actorSystem: ActorSystem[_]  = system.toTyped
-  implicit val mat: Materializer            = ActorMaterializer()
-  implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
-  implicit val timeout: Timeout             = 5.seconds
-  implicit val scheduler: Scheduler         = actorSystem.scheduler
-  implicit val testkit: TestKitSettings     = TestKitSettings(actorSystem)
+  implicit val actorSystem: ActorSystem[_] = system.toTyped
+  implicit val mat: Materializer           = ActorMaterializer()
+  implicit val ec: ExecutionContext        = actorSystem.executionContext
+  implicit val timeout: Timeout            = 5.seconds
+  implicit val scheduler: Scheduler        = actorSystem.scheduler
+  implicit val testkit: TestKitSettings    = TestKitSettings(actorSystem)
 
   test("sender of command should receive appropriate responses") {
 

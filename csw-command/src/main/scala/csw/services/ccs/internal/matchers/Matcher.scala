@@ -1,5 +1,7 @@
 package csw.services.ccs.internal.matchers
 
+import java.util.concurrent.CompletableFuture
+
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import akka.typed.ActorRef
@@ -8,8 +10,9 @@ import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
 import csw.services.ccs.exceptions.MatchAborted
-import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 
+import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -22,6 +25,8 @@ class Matcher(
     case Success(_)  ⇒ Success(MatchCompleted)
     case Failure(ex) ⇒ Success(MatchFailed(ex))
   }
+
+  def jStart: CompletableFuture[MatcherResponse] = start.toJava.toCompletableFuture
 
   def stop(): Unit = killSwitch.abort(MatchAborted(stateMatcher.prefix))
 

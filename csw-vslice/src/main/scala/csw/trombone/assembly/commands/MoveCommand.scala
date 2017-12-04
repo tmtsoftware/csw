@@ -16,7 +16,7 @@ import csw.messages.models.PubSub
 import csw.messages.params.models.{ObsId, RunId}
 import csw.messages.params.models.Units.encoder
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
-import csw.services.ccs.internal.matchers.MatcherResponse.{MatchCompleted, MatchFailed}
+import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.services.ccs.internal.matchers.{DemandMatcher, Matcher}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
