@@ -5,7 +5,7 @@ import java.util.Optional
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.messages.params.models.{ObsId, Prefix, RunId}
 
-import scala.compat.java8.OptionConverters.RichOptionForJava8
+import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
 /**
  * Common trait for Setup, Observe and Wait commands
@@ -71,8 +71,7 @@ case class Setup private (runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId
   override protected def create(data: Set[Parameter[_]]): Setup = new Setup(runId, prefix, maybeObsId, data)
 
   // This is here for Java to construct with String
-  def this(prefix: String, obsId: ObsId) = this(RunId(), Prefix(prefix), Some(obsId))
-  def this(prefix: String) = this(RunId(), Prefix(prefix), None)
+  def this(prefix: String, maybeObsId: Optional[ObsId]) = this(RunId(), Prefix(prefix), maybeObsId.asScala)
 }
 
 object Setup {
@@ -82,8 +81,8 @@ object Setup {
     new Setup(runId, prefix, maybeObsId, paramSet) //madd is not required as this version of apply is only used for reading json
 
   // The apply method is used to create Setup command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
-  def apply(prefix: Prefix, obsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty): Setup =
-    new Setup(RunId(), prefix, obsId).madd(paramSet) //madd ensures check for duplicate key
+  def apply(prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty): Setup =
+    new Setup(RunId(), prefix, maybeObsId).madd(paramSet) //madd ensures check for duplicate key
 }
 
 /**
@@ -103,8 +102,7 @@ case class Observe private (runId: RunId, prefix: Prefix, maybeObsId: Option[Obs
   override protected def create(data: Set[Parameter[_]]) = new Observe(runId, prefix, maybeObsId, data)
 
   // This is here for Java to construct with String
-  def this(prefix: String, obsId: ObsId) = this(RunId(), Prefix(prefix), Some(obsId))
-  def this(prefix: String) = this(RunId(), Prefix(prefix), None)
+  def this(prefix: String, maybeObsId: Optional[ObsId]) = this(RunId(), Prefix(prefix), maybeObsId.asScala)
 }
 
 object Observe {
@@ -114,8 +112,8 @@ object Observe {
     new Observe(runId, prefix, maybeObsId, paramSet) //madd is not required as this version of apply is only used for reading json
 
   // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
-  def apply(prefix: Prefix, obsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty): Observe =
-    new Observe(RunId(), prefix, obsId).madd(paramSet) //madd ensures check for duplicate key
+  def apply(prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty): Observe =
+    new Observe(RunId(), prefix, maybeObsId).madd(paramSet) //madd ensures check for duplicate key
 }
 
 /**
@@ -134,8 +132,7 @@ case class Wait private (runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId]
   override protected def create(data: Set[Parameter[_]]) = new Wait(runId, prefix, maybeObsId, data)
 
   // This is here for Java to construct with String
-  def this(prefix: String, obsId: ObsId) = this(RunId(), Prefix(prefix), Some(obsId))
-  def this(prefix: String) = this(RunId(), Prefix(prefix), None)
+  def this(prefix: String, maybeObsId: Optional[ObsId]) = this(RunId(), Prefix(prefix), maybeObsId.asScala)
 }
 
 object Wait {
@@ -145,6 +142,6 @@ object Wait {
     new Wait(runId, prefix, maybeObsId, paramSet) //madd is not required as this version of apply is only used for reading json
 
   // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
-  def apply(prefix: Prefix, obsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty): Wait =
-    new Wait(RunId(), prefix, obsId).madd(paramSet) //madd ensures check for duplicate key
+  def apply(prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty): Wait =
+    new Wait(RunId(), prefix, maybeObsId).madd(paramSet) //madd ensures check for duplicate key
 }

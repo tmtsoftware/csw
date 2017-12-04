@@ -5,7 +5,7 @@ import java.util.Optional
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.messages.params.models.{ObsId, Prefix, RunId}
 
-import scala.compat.java8.OptionConverters.RichOptionForJava8
+import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
 /**
  * A parameters set for returning results
@@ -24,8 +24,7 @@ case class Result private (
   override protected def create(data: Set[Parameter[_]]) = new Result(runId, prefix, maybeObsId, data)
 
   // This is here for Java to construct with String
-  def this(runId: RunId, prefix: String, obsId: ObsId) = this(runId, new Prefix(prefix), Some(obsId))
-  def this(runId: RunId, prefix: String) = this(runId, new Prefix(prefix), None)
+  def this(runId: RunId, prefix: String, maybeObsId: Optional[ObsId]) = this(runId, Prefix(prefix), maybeObsId.asScala)
 
   def jMaybeObsId: Optional[ObsId] = maybeObsId.asJava
 }

@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
@@ -46,7 +47,7 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateCurrentStateFromSetup() {
-        Setup setup = new Setup(prefix, obsId).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(prefix, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
         CurrentState currentState = new CurrentState(setup);
 
         // typeName and prefix
@@ -81,7 +82,7 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateDemandStateFromSetup() {
-        Setup setup = new Setup(prefix, obsId).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(prefix, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
         DemandState demandState = new DemandState(setup);
 
         // typeName and prefix
