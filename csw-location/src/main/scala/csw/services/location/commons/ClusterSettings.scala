@@ -5,6 +5,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.location.internal.Networks
 import csw.services.logging.scaladsl.Logger
 
+import scala.annotation.varargs
 import scala.collection.JavaConverters._
 
 /**
@@ -73,6 +74,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
 
   //Tries to connect to seed which is running locally on the provided port.
   //This method should be used for testing only.
+  @varargs
   def joinLocal(port: Int, ports: Int*): ClusterSettings = {
     val seeds = s"$hostname:$port" +: ports.map(port ⇒ s"$hostname:$port")
     joinSeeds(seeds.mkString(","))

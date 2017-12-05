@@ -109,10 +109,10 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         Publish<CurrentState> publish = new Publish<>(submitState);
         pubSubRef.tell(publish);
 
-        if (controlCommand.prefix().prefix().contains("success")) {
-            return new Accepted(controlCommand.runId());
-        } else {
+        if (controlCommand.prefix().prefix().contains("failure")) {
             return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+        } else {
+            return new Accepted(controlCommand.runId());
         }
     }
 
@@ -120,7 +120,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
         publishCurrentState(controlCommand);
         if(controlCommand.prefix().equals(ComponentStateForCommand.acceptWithMatcherCmdPrefix()))
             processCommandWithMatcher(controlCommand);
-        else
+        if(controlCommand.prefix().equals(ComponentStateForCommand.acceptWithNoMatcherCmdPrefix()))
             processCommandWithoutMatcher(controlCommand);
     }
 
@@ -131,21 +131,21 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
                 .runWith(Sink.ignore(), ActorMaterializer.create(akka.typed.javadsl.Adapter.toUntyped(actorContext.getSystem())));
     }
 
-    private void publishCurrentState(ControlCommand controlCommand) {
-        CurrentState commandState;
-        if(controlCommand instanceof Setup) {
-            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
-        }
-        else {
-            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());
-        }
-        Publish<CurrentState> publish = new Publish<>(commandState);
-        pubSubRef.tell(publish);
-    }
-
     private void processCommandWithoutMatcher(ControlCommand controlCommand) {
         CommandResponseManagerMessage updateCommand = new AddOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
         commandResponseManagerRef.tell(updateCommand);
+    }
+
+    private void publishCurrentState(ControlCommand controlCommand) {
+        CurrentState commandState;
+
+        if(controlCommand instanceof Setup)
+            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
+        else
+            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());
+
+        Publish<CurrentState> publish = new Publish<>(commandState);
+        pubSubRef.tell(publish);
     }
 
     @Override

@@ -13,6 +13,4 @@ object ComponentStateForCommand {
   val longRunningCmdPrefix   = Prefix("mcs.mobie.blue.longCmd")
   val shortRunningCmdPrefix  = Prefix("mcs.mobie.blue.shortCmd")
   val mediumRunningCmdPrefix = Prefix("mcs.mobie.blue.mediumCmd")
-
-  val success = Prefix("success")
 }
