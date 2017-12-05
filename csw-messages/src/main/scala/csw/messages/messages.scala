@@ -119,15 +119,6 @@ object FromSupervisorMessage {
       extends FromSupervisorMessage
 }
 
-case class LifecycleStateChanged(publisher: ComponentRef, state: SupervisorLifecycleState)
-    extends TMTSerializable
-
-case class Components(components: Set[Component]) extends TMTSerializable
-
-case class Component(supervisor: ComponentRef, info: ComponentInfo) extends TMTSerializable
-
-case class SupervisorInfo(system: ActorSystem, component: Component)
-
 ////////////////
 
 sealed trait CommandResponseManagerMessage
