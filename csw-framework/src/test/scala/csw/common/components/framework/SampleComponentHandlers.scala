@@ -12,20 +12,20 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Future
 
 class SampleComponentHandlers(
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[ComponentDomainMessage](
+) extends ComponentHandlers[TopLevelActorDomainMessage](
       ctx,
       componentInfo,
       commandResponseManager,
@@ -54,7 +54,7 @@ class SampleComponentHandlers(
 
   override def onGoOnline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
 
-  override def onDomainMsg(msg: ComponentDomainMessage): Unit =
+  override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit =
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {

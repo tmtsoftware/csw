@@ -4,7 +4,7 @@ import java.net.URI
 
 import acyclic.skipped
 import akka.typed.ActorRef
-import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage, TMTSerializable}
+import csw.messages.{ComponentMessage, ContainerExternalMessage, TMTSerializable}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 import scala.reflect.ClassTag
@@ -43,7 +43,7 @@ final case class AkkaLocation(
   }
 
   // If the component type is HCD or Assembly, use this to get the correct ActorRef
-  def componentRef(): ActorRef[SupervisorExternalMessage] = typedRef[SupervisorExternalMessage]
+  def componentRef(): ActorRef[ComponentMessage] = typedRef[ComponentMessage]
 
   // If the component type is Container, use this to get the correct ActorRef
   def containerRef(): ActorRef[ContainerExternalMessage] = typedRef[ContainerExternalMessage]

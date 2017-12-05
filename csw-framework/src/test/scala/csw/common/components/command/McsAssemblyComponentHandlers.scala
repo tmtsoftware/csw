@@ -4,7 +4,7 @@ import akka.actor.Scheduler
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
-import csw.common.components.command.ComponentDomainMessage.CommandCompleted
+import csw.common.components.command.TopLevelActorDomainMessage.CommandCompleted
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
@@ -15,7 +15,7 @@ import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.models.PubSub
 import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage, SupervisorExternalMessage}
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage, TopLevelActorMessage}
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
@@ -24,13 +24,13 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 
 class McsAssemblyComponentHandlers(
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[ComponentDomainMessage](
+) extends ComponentHandlers[TopLevelActorDomainMessage](
       ctx,
       componentInfo,
       commandResponseManager,
@@ -39,12 +39,12 @@ class McsAssemblyComponentHandlers(
       loggerFactory
     ) {
 
-  implicit val timeout: Timeout                   = 10.seconds
-  implicit val scheduler: Scheduler               = ctx.system.scheduler
-  implicit val ec: ExecutionContext               = ctx.executionContext
-  var completedCommands: Int                      = 0
-  var hcdRef: ActorRef[SupervisorExternalMessage] = _
-  var commandId: RunId                            = _
+  implicit val timeout: Timeout          = 10.seconds
+  implicit val scheduler: Scheduler      = ctx.system.scheduler
+  implicit val ec: ExecutionContext      = ctx.executionContext
+  var completedCommands: Int             = 0
+  var hcdRef: ActorRef[ComponentMessage] = _
+  var commandId: RunId                   = _
 
   override def initialize(): Future[Unit] =
     Future.successful(componentInfo.connections.headOption match {
@@ -58,7 +58,7 @@ class McsAssemblyComponentHandlers(
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = Unit
 
-  override def onDomainMsg(msg: ComponentDomainMessage): Unit = msg match {
+  override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit = msg match {
     case CommandCompleted(_) ⇒
       completedCommands += 1
       if (completedCommands == 3) commandResponseManager ! AddOrUpdateCommand(commandId, Completed(commandId))

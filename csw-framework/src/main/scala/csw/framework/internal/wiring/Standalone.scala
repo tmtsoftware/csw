@@ -3,7 +3,7 @@ package csw.framework.internal.wiring
 import akka.typed.ActorRef
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
-import csw.messages.SupervisorExternalMessage
+import csw.messages.ComponentMessage
 
 import scala.concurrent.Future
 
@@ -15,7 +15,7 @@ object Standalone {
   def spawn(
       config: com.typesafe.config.Config,
       wiring: FrameworkWiring
-  ): Future[ActorRef[SupervisorExternalMessage]] = {
+  ): Future[ActorRef[ComponentMessage]] = {
     import wiring._
     val componentInfo = ConfigParser.parseStandalone(config)
     val supervisorBehavior = SupervisorBehaviorFactory.make(

@@ -1,6 +1,6 @@
 package csw.messages.location
 
-import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage, TMTSerializable}
+import csw.messages.{ComponentMessage, ContainerExternalMessage, TMTSerializable}
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
@@ -30,12 +30,12 @@ object ComponentType extends Enum[ComponentType] with PlayJsonEnum[ComponentType
   /**
    * Represents a component that controls a hardware device
    */
-  case object HCD extends ComponentType(classOf[SupervisorExternalMessage].getSimpleName)
+  case object HCD extends ComponentType(classOf[ComponentMessage].getSimpleName)
 
   /**
    * Represents a component that controls one or more HCDs or assemblies
    */
-  case object Assembly extends ComponentType(classOf[SupervisorExternalMessage].getSimpleName)
+  case object Assembly extends ComponentType(classOf[ComponentMessage].getSimpleName)
 
   /**
    * Represents a general purpose service component e.g. actor and/or web service application

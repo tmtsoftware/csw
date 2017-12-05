@@ -5,8 +5,8 @@ import akka.typed.testkit.scaladsl.TestProbe
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.IdleMessage.Initialize
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage, FromComponentLifecycleMessage}
+import csw.messages.TopLevelActorIdleMessage.Initialize
+import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -19,13 +19,13 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
   class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
 
-    val sampleComponentHandler: ComponentHandlers[ComponentDomainMessage] =
-      mock[ComponentHandlers[ComponentDomainMessage]]
+    val sampleComponentHandler: ComponentHandlers[TopLevelActorDomainMessage] =
+      mock[ComponentHandlers[TopLevelActorDomainMessage]]
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
     val locationService: LocationService = mock[LocationService]
-    val ctx                              = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
+    val ctx                              = new StubbedActorContext[TopLevelActorMessage]("test-component", 100, system)
     val componentBehavior =
-      new ComponentBehavior[ComponentDomainMessage](
+      new ComponentBehavior[TopLevelActorDomainMessage](
         ctx,
         ComponentInfos.hcdInfo,
         supervisorProbe.ref,

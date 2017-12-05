@@ -8,7 +8,7 @@ import csw.messages.models.PubSub
 import csw.trombone.assembly.commands.{AssemblyCommand, AssemblyState}
 
 trait AssemblyCommandHandlers {
-  var hcds: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]]
+  var hcds: Map[Connection, Option[ActorRef[ComponentMessage]]]
   var currentState: AssemblyState
   var currentCommand: Option[List[AssemblyCommand]]
   var tromboneStateActor: ActorRef[PubSub[AssemblyState]]

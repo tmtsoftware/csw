@@ -5,14 +5,14 @@ import akka.typed.scaladsl.ActorContext
 import csw.messages.framework.ComponentInfo
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.Future
 
 class ComponentHandlerToSimulateFailure(
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],

@@ -9,7 +9,7 @@ import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.{ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
+import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import org.scalatest.mockito.MockitoSugar
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
@@ -18,11 +18,11 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   import testMocks._
 
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
-  val supervisorBehavior: Behavior[SupervisorExternalMessage]    = createBehavior()
+  val supervisorBehavior: Behavior[ComponentMessage]             = createBehavior()
   val componentTLAName                                           = s"${hcdInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
 
   test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state") {
-    val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
+    val ctx = new EffectfulActorContext[ComponentMessage]("supervisor", supervisorBehavior, 100, system)
 
     ctx.getAllEffects() should contain allOf (
       Spawned(componentTLAName, Props.empty),
@@ -32,7 +32,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   }
 
   test("Supervisor should watch child component actor [TLA]") {
-    val ctx = new EffectfulActorContext[SupervisorExternalMessage]("supervisor", supervisorBehavior, 100, system)
+    val ctx = new EffectfulActorContext[ComponentMessage]("supervisor", supervisorBehavior, 100, system)
 
     val componentActor       = ctx.childInbox(componentTLAName).ref
     val pubSubLifecycleActor = ctx.childInbox(SupervisorBehavior.PubSubLifecycleActor).ref
@@ -43,7 +43,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     ctx.getAllEffects() should not contain Watched(pubSubComponentActor)
   }
 
-  private def createBehavior(): Behavior[SupervisorExternalMessage] = {
+  private def createBehavior(): Behavior[ComponentMessage] = {
     Actor
       .withTimers[SupervisorMessage](
         timerScheduler ⇒

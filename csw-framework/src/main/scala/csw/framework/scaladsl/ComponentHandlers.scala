@@ -2,14 +2,14 @@ package csw.framework.scaladsl
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.messages.CommonMessage.TrackingEventReceived
+import csw.messages.TopLevelActorCommonMessage.TrackingEventReceived
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{Connection, TrackingEvent}
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -25,7 +25,7 @@ import scala.reflect.ClassTag
  * @tparam Msg              The type of messages created for domain specific message hierarchy of any component
  */
 abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],

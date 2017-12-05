@@ -10,7 +10,7 @@ import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
-import csw.messages.ComponentMessage;
+import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
@@ -33,23 +33,23 @@ import java.util.concurrent.TimeUnit;
 import static csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand;
 import static csw.messages.ccs.commands.CommandResponse.*;
 
-public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomainMessage> {
+public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorDomainMessage> {
 
     // Demonstrating logger accessibility in Java Component handlers
     private ILogger log;
     private ActorRef<CommandResponseManagerMessage> commandResponseManagerRef;
     private ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef;
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
-    private ActorContext<ComponentMessage> actorContext;
+    private ActorContext<TopLevelActorMessage> actorContext;
 
     JSampleComponentHandlers(
-            ActorContext<ComponentMessage> ctx,
+            ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
             ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
             ILocationService locationService,
             JLoggerFactory loggerFactory,
-            Class<JComponentDomainMessage> klass
+            Class<JTopLevelActorDomainMessage> klass
     ) {
         super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, klass);
         this.pubSubRef = pubSubRef;
@@ -78,7 +78,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JComponentDomai
     }
 
     @Override
-    public void onDomainMsg(JComponentDomainMessage hcdDomainMsg) {
+    public void onDomainMsg(JTopLevelActorDomainMessage hcdDomainMsg) {
         CurrentState domainState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.domainChoice()));
         Publish<CurrentState> publish = new Publish<>(domainState);
 

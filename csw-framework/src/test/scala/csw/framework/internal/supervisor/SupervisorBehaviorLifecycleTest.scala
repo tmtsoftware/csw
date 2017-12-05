@@ -4,7 +4,7 @@ import akka.typed.Terminated
 import akka.typed.scaladsl.TimerScheduler
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
-import csw.common.components.framework.ComponentDomainMessage
+import csw.common.components.framework.TopLevelActorDomainMessage
 import csw.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
@@ -13,7 +13,7 @@ import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandResponseManagerMessage.Query
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
-import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
@@ -38,10 +38,10 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testMocks: FrameworkTestMocks = frameworkTestMocks()
     import testMocks._
 
-    val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
-    val ctx                                                         = new StubbedActorContext[SupervisorMessage]("test-supervisor", 100, system)
-    val timer: TimerScheduler[SupervisorMessage]                    = mock[TimerScheduler[SupervisorMessage]]
-    val containerIdleMessageProbe: TestProbe[ContainerIdleMessage]  = TestProbe[ContainerIdleMessage]
+    val sampleHcdHandler: ComponentHandlers[TopLevelActorDomainMessage] = mock[ComponentHandlers[TopLevelActorDomainMessage]]
+    val ctx                                                             = new StubbedActorContext[SupervisorMessage]("test-supervisor", 100, system)
+    val timer: TimerScheduler[SupervisorMessage]                        = mock[TimerScheduler[SupervisorMessage]]
+    val containerIdleMessageProbe: TestProbe[ContainerIdleMessage]      = TestProbe[ContainerIdleMessage]
 
     val supervisor =
       new SupervisorBehavior(
@@ -58,7 +58,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     verify(timer).startSingleTimer(SupervisorBehavior.InitializeTimerKey, InitializeTimeout, supervisor.initializeTimeout)
 
-    val childComponentInbox: Inbox[ComponentMessage]                    = ctx.childInbox(supervisor.component.get.upcast)
+    val childComponentInbox: Inbox[TopLevelActorMessage]                = ctx.childInbox(supervisor.component.get.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)
     val childCmdResponseMgrInbox: Inbox[CommandResponseManagerMessage]  = ctx.childInbox(supervisor.commandResponseManager)

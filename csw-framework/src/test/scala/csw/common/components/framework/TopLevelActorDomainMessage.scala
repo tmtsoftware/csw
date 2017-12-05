@@ -1,8 +1,6 @@
-package csw.services.commons
+package csw.common.components.framework
 
 import csw.messages.RunningMessage.DomainMessage
 
-//#message-hierarchy
 sealed trait TopLevelActorDomainMessage        extends DomainMessage
 case class TopLevelActorStatistics(value: Int) extends TopLevelActorDomainMessage
-//#message-hierarchy

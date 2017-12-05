@@ -5,9 +5,9 @@ import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.messages.CommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
+import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.IdleMessage.Initialize
+import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse
@@ -37,14 +37,14 @@ import scala.util.control.NonFatal
  * @tparam Msg                 The type of messages created for domain specific message hierarchy of any component
  */
 class ComponentBehavior[Msg <: DomainMessage: ClassTag](
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers[Msg],
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends Actor.MutableBehavior[ComponentMessage] {
+) extends Actor.MutableBehavior[TopLevelActorMessage] {
 
   import ctx.executionContext
 
@@ -57,17 +57,18 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
   ctx.self ! Initialize
 
   /**
-   * Defines processing for a [[csw.messages.ComponentMessage]] received by the actor instance.
+   * Defines processing for a [[csw.messages.TopLevelActorMessage]] received by the actor instance.
+   *
    * @param msg      ComponentMessage received from supervisor
    * @return         The existing behavior
    */
-  def onMessage(msg: ComponentMessage): Behavior[ComponentMessage] = {
+  def onMessage(msg: TopLevelActorMessage): Behavior[TopLevelActorMessage] = {
     log.debug(s"Component TLA in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
-      case (_, msg: CommonMessage)                                ⇒ onCommon(msg)
-      case (ComponentLifecycleState.Idle, msg: IdleMessage)       ⇒ onIdle(msg)
-      case (ComponentLifecycleState.Running, msg: RunningMessage) ⇒ onRun(msg)
-      case _                                                      ⇒ log.error(s"Unexpected message :[$msg] received by component in lifecycle state :[$lifecycleState]")
+      case (_, msg: TopLevelActorCommonMessage)                          ⇒ onCommon(msg)
+      case (ComponentLifecycleState.Idle, msg: TopLevelActorIdleMessage) ⇒ onIdle(msg)
+      case (ComponentLifecycleState.Running, msg: RunningMessage)        ⇒ onRun(msg)
+      case _                                                             ⇒ log.error(s"Unexpected message :[$msg] received by component in lifecycle state :[$lifecycleState]")
     }
     this
   }
@@ -76,7 +77,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
    * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
    * @return        The existing behavior
    */
-  override def onSignal: PartialFunction[Signal, Behavior[ComponentMessage]] = {
+  override def onSignal: PartialFunction[Signal, Behavior[TopLevelActorMessage]] = {
     case PostStop ⇒
       log.warn("Component TLA is shutting down")
       try {
@@ -92,7 +93,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
    * Defines action for messages which can be received in any [[ComponentLifecycleState]] state
    * @param commonMessage Message representing a message received in any lifecycle state
    */
-  private def onCommon(commonMessage: CommonMessage): Unit = commonMessage match {
+  private def onCommon(commonMessage: TopLevelActorCommonMessage): Unit = commonMessage match {
     case UnderlyingHookFailed(exception) ⇒
       log.error(exception.getMessage, ex = exception)
       throw exception
@@ -104,7 +105,7 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
    * Defines action for messages which can be received in [[ComponentLifecycleState.Idle]] state
    * @param idleMessage  Message representing a message received in [[ComponentLifecycleState.Idle]] state
    */
-  private def onIdle(idleMessage: IdleMessage): Unit = idleMessage match {
+  private def onIdle(idleMessage: TopLevelActorIdleMessage): Unit = idleMessage match {
     case Initialize ⇒
       async {
         log.info("Invoking lifecycle handler's initialize hook")

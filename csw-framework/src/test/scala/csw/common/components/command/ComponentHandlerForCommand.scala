@@ -24,13 +24,13 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 class ComponentHandlerForCommand(
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[ComponentDomainMessage](
+) extends ComponentHandlers[TopLevelActorDomainMessage](
       ctx,
       componentInfo,
       commandResponseManager,
@@ -50,7 +50,7 @@ class ComponentHandlerForCommand(
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
-  override def onDomainMsg(msg: ComponentDomainMessage): Unit = ???
+  override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit = ???
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand.prefix match {
     case `acceptedCmdPrefix`            ⇒ Accepted(controlCommand.runId)

@@ -19,7 +19,7 @@ import scala.concurrent.Future
 case class StartLogging() extends DomainMessage
 
 class GalilComponentHandlers(
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],

@@ -4,9 +4,9 @@ import akka.typed.ActorRef
 import akka.typed.testkit.scaladsl.TestProbe
 import com.persist.JsonOps.JsonObject
 import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
-import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
+import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage}
+import csw.messages.{ComponentMessage, ContainerExternalMessage}
 import csw.services.location.commons.BlockingUtils
 import csw.services.logging.internal.LoggingLevels.Level
 import org.scalatest.Matchers
@@ -33,7 +33,7 @@ object FrameworkAssertions extends Matchers {
   }
 
   def assertThatSupervisorIsRunning(
-      actorRef: ActorRef[SupervisorExternalMessage],
+      actorRef: ActorRef[ComponentMessage],
       probe: TestProbe[SupervisorLifecycleState],
       duration: Duration
   ): Unit = {

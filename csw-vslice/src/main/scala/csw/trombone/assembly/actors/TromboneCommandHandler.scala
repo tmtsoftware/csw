@@ -23,7 +23,7 @@ class TromboneAssemblyCommandBehaviorFactory extends AssemblyCommandBehaviorFact
   override protected def assemblyCommandHandlers(
       ctx: ActorContext[AssemblyCommandHandlerMsgs],
       ac: AssemblyContext,
-      tromboneHCDs: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
+      tromboneHCDs: Map[Connection, Option[ActorRef[ComponentMessage]]],
       allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
   ): TromboneCommandHandler =
     new TromboneCommandHandler(ctx, ac, tromboneHCDs, allEventPublisher)
@@ -31,7 +31,7 @@ class TromboneAssemblyCommandBehaviorFactory extends AssemblyCommandBehaviorFact
 
 class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                              ac: AssemblyContext,
-                             tromboneHCDs: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
+                             tromboneHCDs: Map[Connection, Option[ActorRef[ComponentMessage]]],
                              allEventPublisher: Option[ActorRef[TrombonePublisherMsg]])
     extends AssemblyFollowingCommandHandlers {
 
@@ -44,9 +44,9 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   private var setElevationItem                                    = naElevation(calculationConfig.defaultInitialElevation)
   private var followCommandActor: ActorRef[FollowCommandMessages] = _
 
-  override var hcds: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]] = tromboneHCDs
-  override var currentState: AssemblyState                                        = defaultTromboneState
-  override var currentCommand: Option[List[AssemblyCommand]]                      = _
+  override var hcds: Map[Connection, Option[ActorRef[ComponentMessage]]] = tromboneHCDs
+  override var currentState: AssemblyState                               = defaultTromboneState
+  override var currentCommand: Option[List[AssemblyCommand]]             = _
   override var tromboneStateActor: ActorRef[PubSub[AssemblyState]] =
     ctx.spawnAnonymous(Actor.mutable[PubSub[AssemblyState]](ctx ⇒ new PubSubBehavior(ctx, new LoggerFactory(""))))
 

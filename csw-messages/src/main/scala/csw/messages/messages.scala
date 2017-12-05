@@ -11,17 +11,17 @@ import csw.messages.params.states.CurrentState
 
 import scala.concurrent.duration.FiniteDuration
 
-sealed trait ComponentMessage
+sealed trait TopLevelActorMessage
 
-sealed trait CommonMessage extends ComponentMessage
-object CommonMessage {
-  case class UnderlyingHookFailed(throwable: Throwable)          extends CommonMessage
-  case class TrackingEventReceived(trackingEvent: TrackingEvent) extends CommonMessage
+sealed trait TopLevelActorCommonMessage extends TopLevelActorMessage
+object TopLevelActorCommonMessage {
+  case class UnderlyingHookFailed(throwable: Throwable)          extends TopLevelActorCommonMessage
+  case class TrackingEventReceived(trackingEvent: TrackingEvent) extends TopLevelActorCommonMessage
 }
 
-sealed trait IdleMessage extends ComponentMessage
-object IdleMessage {
-  case object Initialize extends IdleMessage
+sealed trait TopLevelActorIdleMessage extends TopLevelActorMessage
+object TopLevelActorIdleMessage {
+  case object Initialize extends TopLevelActorIdleMessage
 }
 
 sealed trait CommandMessage extends RunningMessage with SupervisorLockMessage {
@@ -43,26 +43,26 @@ object SupervisorLockMessage {
   case class Unlock(prefix: Prefix, replyTo: ActorRef[LockingResponse])                              extends SupervisorLockMessage
 }
 
-sealed trait RunningMessage extends ComponentMessage with SupervisorRunningMessage
+sealed trait RunningMessage extends TopLevelActorMessage with SupervisorRunningMessage
 object RunningMessage {
   case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerExternalMessage
   trait DomainMessage                                        extends RunningMessage with SupervisorLockMessage
 }
 
-sealed trait SupervisorContainerCommonMessage extends SupervisorCommonMessage with ContainerCommonMessage
+sealed trait CommonMessage extends ComponentCommonMessage with ContainerCommonMessage
 object SupervisorContainerCommonMessages {
-  case object Shutdown extends SupervisorContainerCommonMessage
-  case object Restart  extends SupervisorContainerCommonMessage
+  case object Shutdown extends CommonMessage
+  case object Restart  extends CommonMessage
 
-  def jShutdown(): SupervisorContainerCommonMessage = Shutdown
-  def jRestart(): SupervisorContainerCommonMessage  = Restart
+  def jShutdown(): CommonMessage = Shutdown
+  def jRestart(): CommonMessage  = Restart
 }
 ////////////////////
 
 sealed trait SupervisorMessage
 
-sealed trait SupervisorExternalMessage extends SupervisorMessage with TMTSerializable
-sealed trait SupervisorRunningMessage  extends SupervisorExternalMessage
+sealed trait ComponentMessage         extends SupervisorMessage with TMTSerializable
+sealed trait SupervisorRunningMessage extends ComponentMessage
 
 sealed trait SupervisorInternalRunningMessage extends SupervisorMessage
 object SupervisorInternalRunningMessage {
@@ -77,12 +77,12 @@ object SupervisorRestartMessage {
   case class UnRegistrationFailed(throwable: Throwable) extends SupervisorRestartMessage
 }
 
-sealed trait SupervisorCommonMessage extends SupervisorExternalMessage
-object SupervisorCommonMessage {
+sealed trait ComponentCommonMessage extends ComponentMessage
+object ComponentCommonMessage {
   case class LifecycleStateSubscription(subscriberMessage: SubscriberMessage[LifecycleStateChanged])
-      extends SupervisorCommonMessage
-  case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState]) extends SupervisorCommonMessage
-  case class GetSupervisorLifecycleState(replyTo: ActorRef[SupervisorLifecycleState])       extends SupervisorCommonMessage
+      extends ComponentCommonMessage
+  case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState]) extends ComponentCommonMessage
+  case class GetSupervisorLifecycleState(replyTo: ActorRef[SupervisorLifecycleState])       extends ComponentCommonMessage
 }
 
 sealed trait SupervisorIdleMessage extends SupervisorMessage
@@ -113,7 +113,7 @@ object ContainerIdleMessage {
 
 sealed trait FromSupervisorMessage extends ContainerIdleMessage
 object FromSupervisorMessage {
-  case class SupervisorLifecycleStateChanged(supervisor: ActorRef[SupervisorExternalMessage],
+  case class SupervisorLifecycleStateChanged(supervisor: ActorRef[ComponentMessage],
                                              supervisorLifecycleState: SupervisorLifecycleState)
       extends FromSupervisorMessage
 }
@@ -134,5 +134,4 @@ object CommandResponseManagerMessage {
   case class Unsubscribe(commandId: RunId, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
-
 }

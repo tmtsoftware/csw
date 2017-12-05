@@ -9,11 +9,11 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
-import csw.common.components.framework.ComponentStatistics
+import csw.common.components.framework.TopLevelActorStatistics
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.ccs.commands.CommandResponse.Invalid
 import csw.messages.ccs.commands.{CommandResponse, Setup}
@@ -26,7 +26,7 @@ import csw.messages.models.ToComponentLifecycleMessages.GoOffline
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
-import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage}
+import csw.messages.{ComponentMessage, ContainerExternalMessage}
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
@@ -142,7 +142,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val eatonCompStateProbe    = TestProbe[CurrentState]
 
       etonSupervisorTypedRef ! ComponentStateSubscription(Subscribe(eatonCompStateProbe.ref))
-      etonSupervisorTypedRef ! ComponentStatistics(1)
+      etonSupervisorTypedRef ! TopLevelActorStatistics(1)
 
       import csw.common.components.framework.SampleComponentState._
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
@@ -190,7 +190,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val standaloneConfFilePath = createStandaloneTmpFile()
 
       val args          = Array("--standalone", "--local", standaloneConfFilePath.toString)
-      val supervisorRef = containerCmd.start(args).asInstanceOf[ActorRef[SupervisorExternalMessage]]
+      val supervisorRef = containerCmd.start(args).asInstanceOf[ActorRef[ComponentMessage]]
 
       assertThatSupervisorIsRunning(supervisorRef, testProbe, 5.seconds)
       enterBarrier("running")

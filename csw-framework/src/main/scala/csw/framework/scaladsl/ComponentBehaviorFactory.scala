@@ -7,7 +7,7 @@ import csw.messages.RunningMessage.DomainMessage
 import csw.messages.framework.ComponentInfo
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage, FromComponentLifecycleMessage}
+import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -29,7 +29,7 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
    * @return                  ComponentHandlers to be used by this component
    */
   protected[framework] def handlers(
-      ctx: ActorContext[ComponentMessage],
+      ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
@@ -55,7 +55,7 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
       loggerFactory: LoggerFactory
   ): Behavior[Nothing] =
     Actor
-      .mutable[ComponentMessage](
+      .mutable[TopLevelActorMessage](
         ctx ⇒
           new ComponentBehavior[Msg](
             ctx,

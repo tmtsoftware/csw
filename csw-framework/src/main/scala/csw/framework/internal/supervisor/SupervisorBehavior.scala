@@ -12,7 +12,7 @@ import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorCommonMessage._
+import csw.messages.ComponentCommonMessage._
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.SupervisorIdleMessage._
@@ -110,7 +110,7 @@ class SupervisorBehavior(
       case (SupervisorLifecycleState.Lock, LockTimedout(replyTo))                        ⇒ replyTo ! LockExpired
       case (SupervisorLifecycleState.Lock, lockMessage: SupervisorLockMessage)           ⇒ onRunning(lockMessage)
       case (SupervisorLifecycleState.Lock, message)                                      ⇒ ignore(message)
-      case (_, commonMessage: SupervisorCommonMessage)                                   ⇒ onCommon(commonMessage)
+      case (_, commonMessage: ComponentCommonMessage)                                    ⇒ onCommon(commonMessage)
       case (SupervisorLifecycleState.Idle, idleMessage: SupervisorIdleMessage)           ⇒ onIdle(idleMessage)
       case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage)  ⇒ onRestarting(restartMessage)
       case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage) ⇒ onInternalRunning(message)
@@ -147,7 +147,7 @@ class SupervisorBehavior(
    * Defines action for messages which can be received in any [[SupervisorLifecycleState]] state
    * @param commonMessage Message representing a message received in any lifecycle state
    */
-  private def onCommon(commonMessage: SupervisorCommonMessage): Unit = commonMessage match {
+  private def onCommon(commonMessage: ComponentCommonMessage): Unit = commonMessage match {
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
     case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
     case GetSupervisorLifecycleState(replyTo)          ⇒ replyTo ! lifecycleState

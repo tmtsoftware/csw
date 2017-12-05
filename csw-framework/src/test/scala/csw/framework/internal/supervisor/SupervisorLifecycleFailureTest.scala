@@ -7,7 +7,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import csw.common.FrameworkAssertions._
-import csw.common.components.framework.ComponentDomainMessage
+import csw.common.components.framework.TopLevelActorDomainMessage
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
 import csw.exceptions.{FailureRestart, FailureStop}
@@ -16,7 +16,7 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.Submit
-import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
+import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
@@ -42,7 +42,7 @@ import scala.concurrent.Future
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
-  var supervisorRef: ActorRef[SupervisorExternalMessage]                 = _
+  var supervisorRef: ActorRef[ComponentMessage]                          = _
   var initializeAnswer: Answer[Future[Unit]]                             = _
   var submitAnswer: Answer[Future[Unit]]                                 = _
   var shutdownAnswer: Answer[Future[Unit]]                               = _
@@ -81,7 +81,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       "SampleHcd",
       failureStopExMsg,
       ERROR,
-      classOf[ComponentBehavior[ComponentDomainMessage]].getName,
+      classOf[ComponentBehavior[TopLevelActorDomainMessage]].getName,
       FailureStop.getClass.getName,
       failureStopExMsg
     )
@@ -138,7 +138,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       "SampleHcd",
       failureRestartExMsg,
       ERROR,
-      classOf[ComponentBehavior[ComponentDomainMessage]].getName,
+      classOf[ComponentBehavior[TopLevelActorDomainMessage]].getName,
       FailureRestart.getClass.getName,
       failureRestartExMsg
     )
@@ -197,7 +197,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
   private def createSupervisorAndStartTLA(
       testMocks: FrameworkTestMocks,
-      componentHandlers: ComponentHandlers[ComponentDomainMessage]
+      componentHandlers: ComponentHandlers[TopLevelActorDomainMessage]
   ): Unit = {
     import testMocks._
 
@@ -220,7 +220,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     createAnswers(compStateProbe)
 
-    val componentHandlers = mock[ComponentHandlers[ComponentDomainMessage]]
+    val componentHandlers = mock[ComponentHandlers[TopLevelActorDomainMessage]]
     when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
     when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
     componentHandlers
@@ -233,14 +233,14 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   }
 }
 
-class SampleBehaviorFactory(componentHandlers: ComponentHandlers[ComponentDomainMessage])
-    extends ComponentBehaviorFactory[ComponentDomainMessage] {
+class SampleBehaviorFactory(componentHandlers: ComponentHandlers[TopLevelActorDomainMessage])
+    extends ComponentBehaviorFactory[TopLevelActorDomainMessage] {
   override protected[framework] def handlers(
-      ctx: ActorContext[ComponentMessage],
+      ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
       locationService: LocationService,
       loggerFactory: LoggerFactory
-  ): ComponentHandlers[ComponentDomainMessage] = componentHandlers
+  ): ComponentHandlers[TopLevelActorDomainMessage] = componentHandlers
 }

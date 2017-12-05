@@ -7,13 +7,13 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.common.components.framework.ComponentDomainMessage
+import csw.common.components.framework.TopLevelActorDomainMessage
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.framework.ComponentInfo
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage, ContainerIdleMessage, SupervisorExternalMessage}
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
@@ -35,33 +35,33 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
   }
 
   def getSampleHcdWiring(
-      componentHandlers: ComponentHandlers[ComponentDomainMessage]
-  ): ComponentBehaviorFactory[ComponentDomainMessage] =
-    new ComponentBehaviorFactory[ComponentDomainMessage] {
+      componentHandlers: ComponentHandlers[TopLevelActorDomainMessage]
+  ): ComponentBehaviorFactory[TopLevelActorDomainMessage] =
+    new ComponentBehaviorFactory[TopLevelActorDomainMessage] {
 
       override def handlers(
-          ctx: ActorContext[ComponentMessage],
+          ctx: ActorContext[TopLevelActorMessage],
           componentInfo: ComponentInfo,
           commandResponseManager: ActorRef[CommandResponseManagerMessage],
           pubSubRef: ActorRef[PublisherMessage[CurrentState]],
           locationService: LocationService,
           loggerFactory: LoggerFactory
-      ): ComponentHandlers[ComponentDomainMessage] =
+      ): ComponentHandlers[TopLevelActorDomainMessage] =
         componentHandlers
     }
 
   def getSampleAssemblyWiring(
-      assemblyHandlers: ComponentHandlers[ComponentDomainMessage]
-  ): ComponentBehaviorFactory[ComponentDomainMessage] =
-    new ComponentBehaviorFactory[ComponentDomainMessage] {
+      assemblyHandlers: ComponentHandlers[TopLevelActorDomainMessage]
+  ): ComponentBehaviorFactory[TopLevelActorDomainMessage] =
+    new ComponentBehaviorFactory[TopLevelActorDomainMessage] {
       override def handlers(
-          ctx: ActorContext[ComponentMessage],
+          ctx: ActorContext[TopLevelActorMessage],
           componentInfo: ComponentInfo,
           commandResponseManager: ActorRef[CommandResponseManagerMessage],
           pubSubRef: ActorRef[PublisherMessage[CurrentState]],
           locationService: LocationService,
           loggerFactory: LoggerFactory
-      ): ComponentHandlers[ComponentDomainMessage] =
+      ): ComponentHandlers[TopLevelActorDomainMessage] =
         assemblyHandlers
     }
 
@@ -69,7 +69,7 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
       componentInfo: ComponentInfo,
       testMocks: FrameworkTestMocks,
       containerRef: ActorRef[ContainerIdleMessage] = TestProbe[ContainerIdleMessage].ref
-  ): ActorRef[SupervisorExternalMessage] = {
+  ): ActorRef[ComponentMessage] = {
     import testMocks._
 
     val supervisorBehavior = SupervisorBehaviorFactory.make(

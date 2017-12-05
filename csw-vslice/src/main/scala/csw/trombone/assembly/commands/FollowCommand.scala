@@ -15,7 +15,7 @@ import scala.concurrent.Future
 class FollowCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                     ac: AssemblyContext,
                     s: Setup,
-                    tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+                    tromboneHCD: Option[ActorRef[ComponentMessage]],
                     startState: TromboneState,
                     stateActor: ActorRef[PubSub[AssemblyState]])
     extends AssemblyCommand(ctx, startState, stateActor) {

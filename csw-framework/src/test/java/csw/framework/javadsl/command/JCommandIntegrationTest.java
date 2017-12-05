@@ -9,7 +9,7 @@ import com.typesafe.config.ConfigFactory;
 import csw.common.components.command.ComponentStateForCommand;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
-import csw.messages.SupervisorExternalMessage;
+import csw.messages.ComponentMessage;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.CommandResponse.Completed;
 import csw.messages.ccs.commands.Setup;
@@ -59,7 +59,7 @@ public class JCommandIntegrationTest {
     @Test
     public void testCommandExecutionBetweenComponents() throws Exception {
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem);
-        ActorRef<SupervisorExternalMessage> hcdRef =
+        ActorRef<ComponentMessage> hcd =
                 Await.result(Standalone.spawn(ConfigFactory.load("mcs_hcd_java.conf"), wiring),
                         new FiniteDuration(5, TimeUnit.SECONDS));
 
@@ -76,11 +76,11 @@ public class JCommandIntegrationTest {
         Setup controlCommand = new Setup(ComponentStateForCommand.acceptWithNoMatcherCmdPrefix().prefix(), Optional.empty()).add(parameter);
 
         CompletableFuture<CommandResponse> commandResponseCompletableFuture = CommandExecutionService
-                .submit(hcdRef, controlCommand, timeout, hcdActorSystem.scheduler());
+                .submit(hcd, controlCommand, timeout, hcdActorSystem.scheduler());
 
         CompletableFuture<CommandResponse> testCommandResponse = commandResponseCompletableFuture.thenCompose(commandResponse -> {
             if (commandResponse instanceof CommandResponse.Accepted)
-                return CommandExecutionService.getCommandResponse(hcdRef, commandResponse.runId(), timeout, hcdActorSystem.scheduler());
+                return CommandExecutionService.getCommandResponse(hcd, commandResponse.runId(), timeout, hcdActorSystem.scheduler());
             else
                 return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
         });
@@ -93,12 +93,12 @@ public class JCommandIntegrationTest {
         Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(100);
         DemandMatcher demandMatcher = new DemandMatcher(new DemandState(ComponentStateForCommand.acceptWithMatcherCmdPrefix().prefix()).add(param), false, timeout);
         Setup setup = new Setup(ComponentStateForCommand.acceptWithMatcherCmdPrefix().prefix(), Optional.empty()).add(parameter);
-        Matcher matcher = new Matcher(hcdRef.narrow(), demandMatcher, ec, mat);
+        Matcher matcher = new Matcher(hcd.narrow(), demandMatcher, ec, mat);
 
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
 
         CompletableFuture<CommandResponse> commandResponseToBeMatched = CommandExecutionService
-                .submit(hcdRef, setup, timeout, hcdActorSystem.scheduler())
+                .submit(hcd, setup, timeout, hcdActorSystem.scheduler())
                 .thenCompose(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
                         return matcherResponseFuture.thenApply(matcherResponse -> {

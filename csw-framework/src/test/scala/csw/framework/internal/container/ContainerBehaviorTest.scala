@@ -154,7 +154,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Idle
 
     containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
+      .map(component ⇒ ctx.childInbox[ComponentMessage](component.name))
       .map(_.receiveMsg()) should contain only Restart
   }
 
@@ -183,14 +183,14 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
     containerBehavior.onMessage(Lifecycle(GoOnline))
     containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
+      .map(component ⇒ ctx.childInbox[ComponentMessage](component.name))
       .map(_.receiveMsg()) should contain only Lifecycle(GoOnline)
 
     initialLifecycleState shouldBe containerBehavior.lifecycleState
 
     containerBehavior.onMessage(Lifecycle(GoOffline))
     containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[SupervisorExternalMessage](component.name))
+      .map(component ⇒ ctx.childInbox[ComponentMessage](component.name))
       .map(_.receiveMsg()) should contain only Lifecycle(GoOffline)
 
     initialLifecycleState shouldBe containerBehavior.lifecycleState

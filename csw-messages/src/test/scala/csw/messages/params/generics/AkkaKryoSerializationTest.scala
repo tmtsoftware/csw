@@ -12,9 +12,9 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
-import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.SupervisorExternalMessage
+import csw.messages.ComponentMessage
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands._
@@ -241,7 +241,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     it("should serialize Common messages for container") {
       val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
       val componentsProbe              = TestProbe[Components]
-      val supExtMsgProbe               = TestProbe[SupervisorExternalMessage]
+      val supExtMsgProbe               = TestProbe[ComponentMessage]
       val connection                   = Connection.from("Trombone-hcd-akka")
       val componentInfo = ComponentInfo(
         "name",
@@ -286,7 +286,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
         Completed(RunId()),
         Error(RunId(), "test"),
         Cancelled(RunId()),
-        BehaviorChanged(RunId(), TestProbe[SupervisorExternalMessage].ref)
+        BehaviorChanged(RunId(), TestProbe[ComponentMessage].ref)
       )
 
       forAll(testData) { commandResponse ⇒

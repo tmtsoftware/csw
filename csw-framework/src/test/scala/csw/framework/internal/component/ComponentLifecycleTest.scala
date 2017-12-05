@@ -8,7 +8,7 @@ import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.IdleMessage.Initialize
+import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
@@ -32,14 +32,14 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
       supervisorProbe: TestProbe[FromComponentLifecycleMessage],
       commandStatusServiceProbe: TestProbe[CommandResponseManagerMessage]
   ) {
-    private val ctx = new StubbedActorContext[ComponentMessage]("test-component", 100, system)
+    private val ctx = new StubbedActorContext[TopLevelActorMessage]("test-component", 100, system)
 
-    val locationService: LocationService                            = mock[LocationService]
-    val sampleHcdHandler: ComponentHandlers[ComponentDomainMessage] = mock[ComponentHandlers[ComponentDomainMessage]]
+    val locationService: LocationService                                = mock[LocationService]
+    val sampleHcdHandler: ComponentHandlers[TopLevelActorDomainMessage] = mock[ComponentHandlers[TopLevelActorDomainMessage]]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
     val behavior =
-      new ComponentBehavior[ComponentDomainMessage](
+      new ComponentBehavior[TopLevelActorDomainMessage](
         ctx,
         ComponentInfos.hcdInfo,
         supervisorProbe.ref,
@@ -49,7 +49,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
         frameworkTestMocks().loggerFactory
       )
 
-    val runningComponentBehavior: ComponentBehavior[ComponentDomainMessage] = {
+    val runningComponentBehavior: ComponentBehavior[TopLevelActorDomainMessage] = {
       behavior.onMessage(Initialize)
       supervisorProbe.expectMsgType[Running]
       behavior

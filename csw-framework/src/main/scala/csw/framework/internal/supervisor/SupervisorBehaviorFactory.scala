@@ -5,7 +5,7 @@ import akka.typed.{ActorRef, Behavior}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
-import csw.messages.{ContainerIdleMessage, SupervisorExternalMessage, SupervisorMessage}
+import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -20,7 +20,7 @@ object SupervisorBehaviorFactory {
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
       pubSubBehaviorFactory: PubSubBehaviorFactory
-  ): Behavior[SupervisorExternalMessage] = {
+  ): Behavior[ComponentMessage] = {
 
     val componentWiringClass     = Class.forName(componentInfo.behaviorFactoryClassName)
     val componentBehaviorFactory = componentWiringClass.newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
@@ -45,7 +45,7 @@ object SupervisorBehaviorFactory {
       pubSubBehaviorFactory: PubSubBehaviorFactory,
       componentBehaviorFactory: ComponentBehaviorFactory[_],
       loggerFactory: LoggerFactory
-  ): Behavior[SupervisorExternalMessage] = {
+  ): Behavior[ComponentMessage] = {
     Actor
       .withTimers[SupervisorMessage](
         timerScheduler ⇒

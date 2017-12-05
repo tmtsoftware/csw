@@ -7,7 +7,7 @@ import csw.messages.RunningMessage.DomainMessage
 import csw.messages.framework.ComponentInfo
 import csw.messages.models.PubSub
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.javadsl.JLoggerFactory
@@ -24,7 +24,7 @@ abstract class JComponentBehaviorFactory[Msg <: DomainMessage](
 ) extends ComponentBehaviorFactory[Msg]()(ClassTag(klass)) {
 
   protected[framework] def handlers(
-      ctx: scaladsl.ActorContext[ComponentMessage],
+      ctx: scaladsl.ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
@@ -34,7 +34,7 @@ abstract class JComponentBehaviorFactory[Msg <: DomainMessage](
     jHandlers(ctx.asJava, componentInfo, commandResponseManager, pubSubRef, locationService.asJava, loggerFactory.asJava)
 
   protected[framework] def jHandlers(
-      ctx: ActorContext[ComponentMessage],
+      ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],

@@ -2,7 +2,11 @@ package csw.common.components.command
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.common.components.command.ComponentDomainMessage.{LongCommandCompleted, MediumCommandCompleted, ShortCommandCompleted}
+import csw.common.components.command.TopLevelActorDomainMessage.{
+  LongCommandCompleted,
+  MediumCommandCompleted,
+  ShortCommandCompleted
+}
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
@@ -12,7 +16,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.models.PubSub
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -20,13 +24,13 @@ import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
 class McsHcdComponentHandlers(
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[ComponentDomainMessage](
+) extends ComponentHandlers[TopLevelActorDomainMessage](
       ctx,
       componentInfo,
       commandResponseManager,
@@ -39,7 +43,7 @@ class McsHcdComponentHandlers(
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
-  override def onDomainMsg(msg: ComponentDomainMessage): Unit = msg match {
+  override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit = msg match {
     case LongCommandCompleted(commandResponse) =>
       commandResponseManager ! AddOrUpdateCommand(commandResponse.runId, commandResponse)
     case MediumCommandCompleted(commandResponse) =>

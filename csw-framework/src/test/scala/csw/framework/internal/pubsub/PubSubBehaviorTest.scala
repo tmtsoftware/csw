@@ -11,7 +11,7 @@ import csw.framework.FrameworkTestMocks
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.models.{LifecycleStateChanged, PubSub}
-import csw.messages.{models, SupervisorExternalMessage}
+import csw.messages.{models, ComponentMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.logging.scaladsl.Logger
 import org.scalatest.mockito.MockitoSugar
@@ -55,7 +55,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   test("message should be published to all the subscribers") {
     val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = createPubSubBehavior()
-    val supervisorProbe                                       = TestProbe[SupervisorExternalMessage]
+    val supervisorProbe                                       = TestProbe[ComponentMessage]
 
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe1.ref))
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe2.ref))
@@ -69,7 +69,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   test("should not receive messages on un-subscription") {
     val pubSubBehavior: PubSubBehavior[LifecycleStateChanged] = createPubSubBehavior()
-    val supervisorProbe                                       = TestProbe[SupervisorExternalMessage]
+    val supervisorProbe                                       = TestProbe[ComponentMessage]
 
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe1.ref))
     pubSubBehavior.onMessage(Subscribe(lifecycleProbe2.ref))

@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPublisherMessages] {
   override def handlers(
-      ctx: ActorContext[ComponentMessage],
+      ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
@@ -37,7 +37,7 @@ class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPubli
 }
 
 class TromboneAssemblyHandlers(
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
@@ -61,7 +61,7 @@ class TromboneAssemblyHandlers(
   implicit var ac: AssemblyContext  = _
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  private var runningHcds: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]] = Map.empty
+  private var runningHcds: Map[Connection, Option[ActorRef[ComponentMessage]]] = Map.empty
 
   def onRun(): Future[Unit] = Future.unit
 

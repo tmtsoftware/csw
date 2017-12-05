@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessage] {
   override def handlers(
-      ctx: ActorContext[ComponentMessage],
+      ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
@@ -39,7 +39,7 @@ class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessag
 }
 
 class TromboneHcdHandlers(
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],

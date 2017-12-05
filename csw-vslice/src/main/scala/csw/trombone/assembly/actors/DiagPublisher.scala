@@ -7,7 +7,7 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.params.states.CurrentState
-import csw.messages.SupervisorExternalMessage
+import csw.messages.ComponentMessage
 import csw.messages.models.PubSub
 import csw.trombone.assembly.DiagPublisherMessages._
 import csw.trombone.assembly.TrombonePublisherMsg.{AxisStateUpdate, AxisStatsUpdate}
@@ -23,7 +23,7 @@ object DiagPublisher {
 
   def make(
       assemblyContext: AssemblyContext,
-      runningIn: Option[ActorRef[SupervisorExternalMessage]],
+      runningIn: Option[ActorRef[ComponentMessage]],
       eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
   ): Behavior[DiagPublisherMessages] =
     Actor.mutable(ctx ⇒ new DiagPublisher(ctx, assemblyContext, runningIn, eventPublisher))
@@ -42,17 +42,17 @@ object DiagPublisher {
 class DiagPublisher(
     ctx: ActorContext[DiagPublisherMessages],
     assemblyContext: AssemblyContext,
-    runningIn: Option[ActorRef[SupervisorExternalMessage]],
+    runningIn: Option[ActorRef[ComponentMessage]],
     eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
 ) extends MutableBehavior[DiagPublisherMessages] {
 
   val currentStateAdapter: ActorRef[CurrentState] = ctx.spawnAdapter(CurrentStateE)
 
-  val pubSubRef: ActorRef[PubSub[CurrentState]]            = ctx.system.deadLetters
-  var stateMessageCounter: Int                             = 0
-  var running: Option[ActorRef[SupervisorExternalMessage]] = runningIn
-  var context: Mode                                        = _
-  var cancelToken: Cancellable                             = _
+  val pubSubRef: ActorRef[PubSub[CurrentState]]   = ctx.system.deadLetters
+  var stateMessageCounter: Int                    = 0
+  var running: Option[ActorRef[ComponentMessage]] = runningIn
+  var context: Mode                               = _
+  var cancelToken: Cancellable                    = _
 
   pubSubRef ! PubSub.Subscribe(currentStateAdapter)
 

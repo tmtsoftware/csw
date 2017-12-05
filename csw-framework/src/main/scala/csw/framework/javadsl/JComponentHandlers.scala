@@ -9,7 +9,7 @@ import csw.messages.RunningMessage.DomainMessage
 import csw.messages.framework.ComponentInfo
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.javadsl.ILocationService
 import csw.services.logging.javadsl.JLoggerFactory
 
@@ -26,7 +26,7 @@ import scala.reflect.ClassTag
  * @tparam Msg              The type of messages created for domain specific message hierarchy of any component
  */
 abstract class JComponentHandlers[Msg <: DomainMessage](
-    ctx: ActorContext[ComponentMessage],
+    ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],

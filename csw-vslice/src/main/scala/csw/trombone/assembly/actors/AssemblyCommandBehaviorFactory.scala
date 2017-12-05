@@ -2,7 +2,7 @@ package csw.trombone.assembly.actors
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.SupervisorExternalMessage
+import csw.messages.ComponentMessage
 import csw.messages.location.Connection
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext, TrombonePublisherMsg}
 
@@ -11,13 +11,13 @@ abstract class AssemblyCommandBehaviorFactory {
   protected def assemblyCommandHandlers(
       ctx: ActorContext[AssemblyCommandHandlerMsgs],
       ac: AssemblyContext,
-      tromboneHCDs: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
+      tromboneHCDs: Map[Connection, Option[ActorRef[ComponentMessage]]],
       allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
   ): AssemblyFollowingCommandHandlers
 
   def make(
       assemblyContext: AssemblyContext,
-      hcds: Map[Connection, Option[ActorRef[SupervisorExternalMessage]]],
+      hcds: Map[Connection, Option[ActorRef[ComponentMessage]]],
       allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
   ): Behavior[AssemblyCommandHandlerMsgs] =
     Actor

@@ -9,7 +9,7 @@ import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage}
+import csw.messages.{ComponentMessage, ContainerExternalMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
@@ -153,7 +153,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   findResult.foreach(akkaLocation ⇒ {
     //#typed-ref
     // If the component type is HCD or Assembly, use this to get the correct ActorRef
-    val typedComponentRef: ActorRef[SupervisorExternalMessage] = akkaLocation.componentRef()
+    val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.componentRef()
 
     // If the component type is Container, use this to get the correct ActorRef
     val typedContainerRef: ActorRef[ContainerExternalMessage] = akkaLocation.containerRef()

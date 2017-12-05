@@ -23,7 +23,7 @@ class SetAngleCommand(
     ac: AssemblyContext,
     s: Setup,
     followCommandActor: ActorRef[FollowCommandMessages],
-    tromboneHCD: Option[ActorRef[SupervisorExternalMessage]],
+    tromboneHCD: Option[ActorRef[ComponentMessage]],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
 ) extends AssemblyCommand(ctx, startState, stateActor) {
