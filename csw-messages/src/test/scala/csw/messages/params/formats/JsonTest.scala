@@ -197,6 +197,7 @@ class JsonTest extends FunSpec {
       assert(c1in == c1)
     }
 
+    // DEOPSCSW-315: Make ObsID optional in commands
     it("Should encode/decode an Observe") {
       val c1 = Observe(Prefix(ck), Some(obsId)).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(c1.size == 7)
@@ -204,15 +205,18 @@ class JsonTest extends FunSpec {
       val c1in  = JsonSupport.readSequenceCommand[Observe](c1out)
       assert(c1in(k3).head == 1234L)
       assert(c1in == c1)
+      assert(c1in.maybeObsId.contains(obsId))
     }
 
+    // DEOPSCSW-315: Make ObsID optional in commands
     it("Should encode/decode an Wait") {
-      val c1 = Wait(Prefix(ck), Some(obsId)).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
+      val c1 = Wait(Prefix(ck), None).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(c1.size == 7)
       val c1out = JsonSupport.writeSequenceCommand(c1)
       val c1in  = JsonSupport.readSequenceCommand[Wait](c1out)
       assert(c1in(k3).head == 1234L)
       assert(c1in == c1)
+      assert(c1in.maybeObsId.isEmpty)
     }
 
     it("Should encode/decode an StatusEvent") {

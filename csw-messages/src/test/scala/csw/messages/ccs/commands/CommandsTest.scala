@@ -122,6 +122,17 @@ class CommandsTest extends FunSpec {
       sc = sc.add(i2)
       assert(sc(k1).head == 33)
     }
+
+    // DEOPSCSW-315: Make ObsID optional in commands
+    it("Should allow to create setup without obsId") {
+      val i1 = k1.set(22)
+
+      val sc = Setup(Prefix(ck1), None).add(i1)
+      // Use option
+      assert(sc.get(k1).get == i1)
+      assert(sc.get(k1).get.head == 22)
+      assert(sc.maybeObsId.isEmpty)
+    }
   }
 
   describe("Observe config tests") {
@@ -139,10 +150,12 @@ class CommandsTest extends FunSpec {
       assert(oc1.get(k2).get.head == 44)
     }
 
+    // DEOPSCSW-315: Make ObsID optional in commands
     it("Should allow setting") {
       var oc1 = Observe(Prefix(ck1), Some(obsId))
       oc1 = oc1.add(k1.set(22)).add(k2.set(44))
       assert(oc1.size == 2)
+      assert(oc1.maybeObsId.contains(obsId))
       assert(oc1.exists(k1))
       assert(oc1.exists(k2))
     }

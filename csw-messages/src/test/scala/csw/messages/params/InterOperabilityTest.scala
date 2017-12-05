@@ -18,10 +18,12 @@ import scala.collection.JavaConverters.collectionAsScalaIterableConverter
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
-case class CommandMsg(command: Command,
-                      ackTo: ActorRef[java.util.Set[Parameter[_]]],
-                      replyTo: ActorRef[StatusEvent],
-                      obsIdAck: ActorRef[Optional[ObsId]])
+case class CommandMsg(
+    command: Command,
+    ackTo: ActorRef[java.util.Set[Parameter[_]]],
+    replyTo: ActorRef[StatusEvent],
+    obsIdAck: ActorRef[Optional[ObsId]]
+)
 
 // DEOPSCSW-184: Change configurations - attributes and values
 class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll {

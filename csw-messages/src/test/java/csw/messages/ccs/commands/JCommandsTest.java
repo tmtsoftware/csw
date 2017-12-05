@@ -74,13 +74,14 @@ public class JCommandsTest {
         Assert.assertEquals(expectedParamMap, command.jGetStringMap());
     }
 
+    // DEOPSCSW-315: Make ObsID optional in commands
     @Test
     public void shouldAbleToCreateAndAccessSetupCommand() {
         Setup setup = new Setup(prefix, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(setup.runId());
-        Assert.assertEquals(obsId, setup.jMaybeObsId().get());
+        Assert.assertEquals(Optional.of(obsId), setup.jMaybeObsId());
         Assert.assertEquals(prefix, setup.prefixStr());
         Assert.assertEquals(new Prefix(prefix), setup.prefix());
         Assert.assertEquals(WFOS, setup.subsystem());
@@ -89,13 +90,14 @@ public class JCommandsTest {
         assertOnCommandAPI(setup);
     }
 
+    // DEOPSCSW-315: Make ObsID optional in commands
     @Test
     public void shouldAbleToCreateAndAccessObserveCommand() {
-        Observe observe = new Observe(prefix, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Observe observe = new Observe(prefix, Optional.empty()).add(encoderParam).add(epochStringParam);
 
         // runId, prefix, obsId, subsystem
         Assert.assertNotNull(observe.runId());
-        Assert.assertEquals(obsId, observe.jMaybeObsId().get());
+        Assert.assertEquals(Optional.empty(), observe.jMaybeObsId());
         Assert.assertEquals(prefix, observe.prefixStr());
         Assert.assertEquals(new Prefix(prefix), observe.prefix());
         Assert.assertEquals(WFOS, observe.subsystem());
