@@ -17,7 +17,7 @@ import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.LifecycleStateChanged
 import csw.messages.models.PubSub.Publish
-import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, DemandState}

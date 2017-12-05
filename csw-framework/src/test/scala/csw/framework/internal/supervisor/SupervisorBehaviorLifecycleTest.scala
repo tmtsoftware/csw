@@ -20,7 +20,8 @@ import csw.messages.ccs.commands.CommandResponse
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.messages.models.{LifecycleStateChanged, PubSub, ToComponentLifecycleMessage}
+import csw.messages.models.ToComponentLifecycleMessages._
+import csw.messages.models.{LifecycleStateChanged, PubSub}
 import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 import csw.messages.{models, _}
@@ -199,9 +200,9 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisor.onMessage(Running(childRef))
     supervisor.onMessage(RegistrationSuccess(childRef))
-    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
+    supervisor.onMessage(Lifecycle(GoOffline))
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.RunningOffline
-    childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.GoOffline))
+    childComponentInbox.receiveAll() should contain(Lifecycle(GoOffline))
   }
 
   test("supervisor should handle lifecycle GoOnline message") {
@@ -212,10 +213,10 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     supervisor.onMessage(Running(childRef))
     supervisor.onMessage(RegistrationSuccess(childRef))
-    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
-    supervisor.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
+    supervisor.onMessage(Lifecycle(GoOffline))
+    supervisor.onMessage(Lifecycle(GoOnline))
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
-    childComponentInbox.receiveAll() should contain(Lifecycle(ToComponentLifecycleMessage.GoOnline))
+    childComponentInbox.receiveAll() should contain(Lifecycle(GoOnline))
   }
 
   test("supervisor should accept and forward Domain message to a TLA") {

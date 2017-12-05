@@ -21,7 +21,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.Components
 import csw.messages.models.PubSub.Subscribe
-import csw.messages.models.ToComponentLifecycleMessage.GoOffline
+import csw.messages.models.ToComponentLifecycleMessages.GoOffline
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState

@@ -25,7 +25,7 @@ import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.LockingResponse.{LockExpired, LockExpiringShortly}
 import csw.messages.models.PubSub.Publish
-import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToComponentLifecycleMessage}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState

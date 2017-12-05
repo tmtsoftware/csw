@@ -13,7 +13,8 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
-import csw.messages.models.ToComponentLifecycleMessage
+import csw.messages.models.ToComponentLifecycleMessages
+import csw.messages.models.ToComponentLifecycleMessages._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.services.location.scaladsl.LocationService
@@ -64,7 +65,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     when(sampleHcdHandler.isOnline).thenReturn(true)
 
     val previousComponentLifecyleState = runningComponentBehavior.lifecycleState
-    runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
+    runningComponentBehavior.onMessage(Lifecycle(GoOffline))
     verify(sampleHcdHandler).onGoOffline()
     verify(sampleHcdHandler).isOnline
     previousComponentLifecyleState shouldBe runningComponentBehavior.lifecycleState
@@ -78,7 +79,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     when(sampleHcdHandler.isOnline).thenReturn(false)
 
     val previousComponentLifecyleState = runningComponentBehavior.lifecycleState
-    runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOffline))
+    runningComponentBehavior.onMessage(Lifecycle(GoOffline))
     verify(sampleHcdHandler, never).onGoOffline()
     previousComponentLifecyleState shouldBe runningComponentBehavior.lifecycleState
   }
@@ -91,7 +92,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     when(sampleHcdHandler.isOnline).thenReturn(false)
 
     val previousComponentLifecyleState = runningComponentBehavior.lifecycleState
-    runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
+    runningComponentBehavior.onMessage(Lifecycle(GoOnline))
     verify(sampleHcdHandler).onGoOnline()
     previousComponentLifecyleState shouldBe runningComponentBehavior.lifecycleState
   }
@@ -104,7 +105,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     when(sampleHcdHandler.isOnline).thenReturn(true)
 
-    runningComponentBehavior.onMessage(Lifecycle(ToComponentLifecycleMessage.GoOnline))
+    runningComponentBehavior.onMessage(Lifecycle(GoOnline))
     verify(sampleHcdHandler, never).onGoOnline()
   }
 

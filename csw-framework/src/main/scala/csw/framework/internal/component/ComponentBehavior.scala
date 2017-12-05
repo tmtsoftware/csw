@@ -15,7 +15,7 @@ import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.framework.ComponentInfo
 import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
 import csw.messages.models.ToComponentLifecycleMessage
-import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

@@ -17,7 +17,7 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{Component, Components, SupervisorInfo}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}

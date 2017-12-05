@@ -19,7 +19,7 @@ import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.messages.models.PubSub.Subscribe
-import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{Components, LifecycleStateChanged}
 import csw.messages.params.states.CurrentState
 import csw.messages.{models, Restart, Shutdown}

@@ -22,7 +22,7 @@ import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, Superviso
 import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection
 import csw.messages.models.PubSub.Subscribe
-import csw.messages.models.ToComponentLifecycleMessage.{GoOffline, GoOnline}
+import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{Component, Components, LifecycleStateChanged}
 import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, RaDecKey, StructKey}
 import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
