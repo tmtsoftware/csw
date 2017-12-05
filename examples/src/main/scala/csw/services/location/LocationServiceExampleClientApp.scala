@@ -7,16 +7,14 @@ import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
+import csw.messages.ActorTypes.{ComponentRef, ContainerRef}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.messages.{ComponentMessage, ContainerExternalMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
-import csw.services.logging.scaladsl.{Keys, LogAdminActorFactory, LoggingSystemFactory}
-import csw.messages.ActorTypes.{ComponentRef, ContainerRef}
-import csw.services.logging.scaladsl._
+import csw.services.logging.scaladsl.{Keys, LogAdminActorFactory, LoggingSystemFactory, _}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext.Implicits.global

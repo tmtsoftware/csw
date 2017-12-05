@@ -3,12 +3,11 @@ package csw.framework.internal.container
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.typed.{Behavior, PostStop, Signal, Terminated}
-import csw.messages.ActorTypes.ComponentRef
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
+import akka.typed.{Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
+import csw.messages.ActorTypes.ComponentRef
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
