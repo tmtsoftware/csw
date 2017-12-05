@@ -10,7 +10,8 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.messages.framework.ContainerLifecycleState
-import csw.messages.{ContainerMessage, Restart}
+import csw.messages.ContainerMessage
+import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.services.location.commons.ClusterSettings
 
 import scala.concurrent.Await

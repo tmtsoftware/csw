@@ -13,7 +13,6 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
-import csw.messages.models.ToComponentLifecycleMessages
 import csw.messages.models.ToComponentLifecycleMessages._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}

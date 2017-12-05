@@ -17,6 +17,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.Submit
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
+import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.models.PubSub.{Publish, PublisherMessage}

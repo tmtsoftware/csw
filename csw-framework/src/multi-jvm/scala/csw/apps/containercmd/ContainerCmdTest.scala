@@ -14,6 +14,7 @@ import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
+import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.ccs.commands.CommandResponse.Invalid
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
@@ -25,7 +26,7 @@ import csw.messages.models.ToComponentLifecycleMessages.GoOffline
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
-import csw.messages.{ContainerExternalMessage, Shutdown, SupervisorExternalMessage}
+import csw.messages.{ContainerExternalMessage, SupervisorExternalMessage}
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils

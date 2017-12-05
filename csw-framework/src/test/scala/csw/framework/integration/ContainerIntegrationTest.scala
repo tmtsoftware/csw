@@ -14,15 +14,16 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.messages.models
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{Components, LifecycleStateChanged}
 import csw.messages.params.states.CurrentState
-import csw.messages.{models, Restart, Shutdown}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

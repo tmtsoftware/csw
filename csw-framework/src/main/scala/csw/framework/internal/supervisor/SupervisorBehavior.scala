@@ -13,6 +13,7 @@ import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorCommonMessage._
+import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.SupervisorIdleMessage._
 import csw.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}

@@ -14,6 +14,7 @@ import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages._
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection

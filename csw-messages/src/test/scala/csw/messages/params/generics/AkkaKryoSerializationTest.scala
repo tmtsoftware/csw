@@ -13,6 +13,8 @@ import com.twitter.chill.akka.AkkaSerializer
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.SupervisorExternalMessage
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands._
@@ -28,7 +30,6 @@ import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatr
 import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.messages.params.models._
 import csw.messages.params.states.{CurrentState, DemandState}
-import csw.messages.{Restart, Shutdown, SupervisorExternalMessage}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}

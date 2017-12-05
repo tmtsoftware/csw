@@ -14,6 +14,7 @@ import csw.messages.CommandResponseManagerMessage.Query
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
 import csw.messages.ccs.commands.CommandResponse

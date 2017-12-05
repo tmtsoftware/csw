@@ -10,8 +10,8 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.Shutdown
 import csw.messages.SupervisorCommonMessage.ComponentStateSubscription
+import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}

@@ -49,8 +49,14 @@ object RunningMessage {
   trait DomainMessage                                        extends RunningMessage with SupervisorLockMessage
 }
 
-case object Shutdown extends SupervisorCommonMessage with ContainerCommonMessage
-case object Restart  extends SupervisorCommonMessage with ContainerCommonMessage
+sealed trait SupervisorContainerCommonMessage extends SupervisorCommonMessage with ContainerCommonMessage
+object SupervisorContainerCommonMessages {
+  case object Shutdown extends SupervisorContainerCommonMessage
+  case object Restart  extends SupervisorContainerCommonMessage
+
+  def jShutdown(): SupervisorContainerCommonMessage = Shutdown
+  def jRestart(): SupervisorContainerCommonMessage  = Restart
+}
 ////////////////////
 
 sealed trait SupervisorMessage

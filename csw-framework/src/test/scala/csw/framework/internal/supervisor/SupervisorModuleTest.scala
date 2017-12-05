@@ -10,6 +10,7 @@ import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorCommonMessage.GetSupervisorLifecycleState
+import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
 import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
