@@ -53,8 +53,8 @@ class ContainerBehavior(
   var supervisors: Set[SupervisorInfo] = Set.empty
 
   // Set of created supervisors which moved into Running state
-  var runningComponents: Set[ComponentRef] = Set.empty
-  var lifecycleState: ContainerLifecycleState                     = ContainerLifecycleState.Idle
+  var runningComponents: Set[ComponentRef]    = Set.empty
+  var lifecycleState: ContainerLifecycleState = ContainerLifecycleState.Idle
 
   registerWithLocationService()
 

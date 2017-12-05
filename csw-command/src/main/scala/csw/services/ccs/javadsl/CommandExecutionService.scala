@@ -13,12 +13,11 @@ import scala.compat.java8.FutureConverters._
 
 object CommandExecutionService {
   def submit(
-              actorRef: ComponentRef,
-              controlCommand: ControlCommand,
-              timeout: Timeout,
-              scheduler: Scheduler
-  ): CompletableFuture[CommandResponse] =
-    actorRef.submit(controlCommand)(timeout, scheduler).toJava.toCompletableFuture
+      actorRef: ComponentRef,
+      controlCommand: ControlCommand,
+      timeout: Timeout,
+      scheduler: Scheduler
+  ): CompletableFuture[CommandResponse] = actorRef.submit(controlCommand)(timeout, scheduler).toJava.toCompletableFuture
 
   def oneway(
       actorRef: ComponentRef,
