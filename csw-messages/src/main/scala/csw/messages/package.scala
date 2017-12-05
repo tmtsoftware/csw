@@ -170,7 +170,7 @@ import akka.typed.ActorRef
 package object messages {
 
   object ActorTypes {
-    type ComponentRef = ActorRef[SupervisorExternalMessage]
+    type ComponentRef = ActorRef[ComponentMessage]
     type ContainerRef = ActorRef[ContainerExternalMessage]
   }
 
