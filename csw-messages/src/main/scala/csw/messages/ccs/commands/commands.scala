@@ -13,13 +13,13 @@ import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGene
 sealed trait Command {
 
   /**
-   * A name identifying the type of parameter paramSet, such as "setup", "observe".
+   * A name identifying the type of parameter set, such as "setup", "observe".
    * This is used in the JSON and toString output.
    */
   def typeName: String
 
   /**
-   * unique ID for command parameter paramSet
+   * unique ID for command parameter set
    */
   val runId: RunId
 
@@ -34,7 +34,7 @@ sealed trait Command {
   val prefix: Prefix
 
   /**
-   * an optional initial paramSet of parameters (keys with values)
+   * an optional initial set of parameters (keys with values)
    */
   val paramSet: Set[Parameter[_]]
 
@@ -55,12 +55,12 @@ sealed trait SequenceCommand extends Command
 sealed trait ControlCommand extends Command
 
 /**
- * A parameter paramSet for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
+ * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  *
- * @param runId unique ID for this parameter paramSet
- * @param maybeObsId the observation id
+ * @param runId unique ID for this parameter set
  * @param prefix identifies the target subsystem
- * @param paramSet an optional initial paramSet of parameters (keys with values)
+ * @param maybeObsId the observation id
+ * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Setup private (runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty)
     extends ParameterSetType[Setup]
@@ -86,12 +86,12 @@ object Setup {
 }
 
 /**
- * A parameter paramSet for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
+ * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  *
- * @param runId unique ID for this parameter paramSet
- * @param maybeObsId the observation id
+ * @param runId unique ID for this parameter set
  * @param prefix identifies the target subsystem
- * @param paramSet an optional initial paramSet of parameters (keys with values)
+ * @param maybeObsId the observation id
+ * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Observe private (runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty)
     extends ParameterSetType[Observe]
@@ -101,28 +101,25 @@ case class Observe private (runId: RunId, prefix: Prefix, maybeObsId: Option[Obs
 
   override protected def create(data: Set[Parameter[_]]): Observe = copy(paramSet = data)
 
-  // This is here for Java to construct with String
   def this(prefix: String, maybeObsId: Optional[ObsId]) = this(RunId(), Prefix(prefix), maybeObsId.asScala)
 }
 
 object Observe {
 
-  // The default apply method is used only internally while reading the incoming json and de-serializing it to observe model
   private[messages] def apply(runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]) =
-    new Observe(runId, prefix, maybeObsId, paramSet) //madd is not required as this version of apply is only used for reading json
+    new Observe(runId, prefix, maybeObsId, paramSet)
 
-  // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
   def apply(prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty): Observe =
-    new Observe(RunId(), prefix, maybeObsId).madd(paramSet) //madd ensures check for duplicate key
+    new Observe(RunId(), prefix, maybeObsId).madd(paramSet)
 }
 
 /**
- * A parameter paramSet for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
+ * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
  *
- * @param runId unique ID for this parameter paramSet
- * @param maybeObsId the observation id
+ * @param runId unique ID for this parameter set
  * @param prefix identifies the target subsystem
- * @param paramSet an optional initial paramSet of parameters (keys with values)
+ * @param maybeObsId the observation id
+ * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Wait private (runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty)
     extends ParameterSetType[Wait]
@@ -131,21 +128,26 @@ case class Wait private (runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId]
 
   override protected def create(data: Set[Parameter[_]]): Wait = copy(paramSet = data)
 
-  // This is here for Java to construct with String
   def this(prefix: String, maybeObsId: Optional[ObsId]) = this(RunId(), Prefix(prefix), maybeObsId.asScala)
 }
 
 object Wait {
 
-  // The default apply method is used only internally while reading the incoming json and de-serializing it to observe model
   private[messages] def apply(runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]) =
-    new Wait(runId, prefix, maybeObsId, paramSet) //madd is not required as this version of apply is only used for reading json
+    new Wait(runId, prefix, maybeObsId, paramSet)
 
-  // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
   def apply(prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty): Wait =
-    new Wait(RunId(), prefix, maybeObsId).madd(paramSet) //madd ensures check for duplicate key
+    new Wait(RunId(), prefix, maybeObsId).madd(paramSet)
 }
 
+/**
+ * A command for cancelling an ongoing command. Constructor is private to ensure RunId is created internally to guarantee unique value.
+ *
+ * @param runId unique ID for this parameter set
+ * @param prefix identifies the target subsystem
+ * @param maybeObsId the observation id
+ * @param paramSet an optional initial set of parameters (keys with values)
+ */
 case class Cancel private (runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty)
     extends ParameterSetType[Cancel]
     with ParameterSetKeyData
@@ -154,21 +156,18 @@ case class Cancel private (runId: RunId, prefix: Prefix, maybeObsId: Option[ObsI
 
   override protected def create(data: Set[Parameter[_]]): Cancel = copy(paramSet = data)
 
-  // This is here for Java to construct with String
-  def this(prefix: String, maybeObsId: Optional[ObsId], runIdToCancel: RunId) =
-    this(RunId(), Prefix(prefix), maybeObsId.asScala, Cancel.paramSet(runIdToCancel))
+  def this(prefix: String, maybeObsId: Optional[ObsId], cancelId: RunId) =
+    this(RunId(), Prefix(prefix), maybeObsId.asScala, Cancel.paramSet(cancelId))
 
-  def runIdToCancel: RunId = RunId(paramSet.head.head.asInstanceOf)
+  def cancelId: RunId = RunId(paramSet.head.head.asInstanceOf[String])
 }
 
 object Cancel {
-  // The default apply method is used only internally while reading the incoming json and de-serializing it to observe model
   private[messages] def apply(runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]) =
-    new Cancel(runId, prefix, maybeObsId, paramSet) //madd is not required as this version of apply is only used for reading json
+    new Cancel(runId, prefix, maybeObsId, paramSet)
 
-  // The apply method is used to create Observe command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
-  def apply(prefix: Prefix, maybeObsId: Option[ObsId], runIdToCancel: RunId): Cancel =
-    new Cancel(RunId(), prefix, maybeObsId).madd(paramSet(runIdToCancel)) //madd ensures check for duplicate key
+  def apply(prefix: Prefix, maybeObsId: Option[ObsId], cancelId: RunId): Cancel =
+    new Cancel(RunId(), prefix, maybeObsId).madd(paramSet(cancelId))
 
-  private def paramSet(runIdToCancel: RunId): Set[Parameter[_]] = Set(Keys.runIdToCancelKey.set(runIdToCancel.id))
+  private def paramSet(cancelId: RunId): Set[Parameter[_]] = Set(Keys.CancelKey.set(cancelId.id))
 }

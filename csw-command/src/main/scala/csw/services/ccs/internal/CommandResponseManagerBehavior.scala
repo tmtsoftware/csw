@@ -73,13 +73,9 @@ class CommandResponseManagerBehavior(
       case _ ⇒ log.debug("Validation response will not affect status of Parent command.")
     }
 
-  private def publishToSubscribers(
-      commandResponse: CommandResponse,
-      subscribers: Set[ActorRef[CommandResponse]]
-  ): Unit = {
+  private def publishToSubscribers(commandResponse: CommandResponse, subscribers: Set[ActorRef[CommandResponse]]): Unit = {
     commandResponse.resultType match {
-      case _: Final ⇒
-        subscribers.foreach(_ ! commandResponse)
+      case _: Final     ⇒ subscribers.foreach(_ ! commandResponse)
       case Intermediate ⇒
         // Do not send updates for validation response as it is send by the framework
         log.debug("Validation response will not affect status of Parent command.")

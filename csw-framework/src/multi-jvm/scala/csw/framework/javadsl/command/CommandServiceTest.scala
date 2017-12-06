@@ -11,13 +11,15 @@ import com.typesafe.config.ConfigFactory
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.Submit
+import csw.messages.CommandResponseManagerMessage.Subscribe
+import csw.messages.SupervisorLockMessage.Unlock
 import csw.messages.ccs.CommandIssue.ComponentLockedIssue
 import csw.messages.ccs.commands.CommandResponse._
-import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
+import csw.messages.ccs.commands.{Cancel, CommandResponse, Observe, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.LockingResponse
-import csw.messages.models.LockingResponse.LockAcquired
+import csw.messages.models.LockingResponse.{LockAcquired, LockReleased}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
@@ -78,7 +80,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
     }
 
     runOn(member1) {
-      val obsId            = ObsId("Obs001")
+      val obsId            = Some(ObsId("Obs001"))
       val cmdResponseProbe = TestProbe[CommandResponse]
 
       // spawn single assembly running in Standalone mode in jvm-2
@@ -92,11 +94,11 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.componentRef()).get
 
       // short running command
-      val shortCommandResponse = Await.result(assemblyRef.submit(Setup(invalidCmdPrefix, Some(obsId))), timeout.duration)
+      val shortCommandResponse = Await.result(assemblyRef.submit(Setup(invalidCmdPrefix, obsId)), timeout.duration)
       shortCommandResponse shouldBe a[Invalid]
 
       // long running command which does not use matcher
-      val setupWithoutMatcher = Setup(acceptWithNoMatcherCmdPrefix, Some(obsId))
+      val setupWithoutMatcher = Setup(acceptWithNoMatcherCmdPrefix, obsId)
 
       val eventualLongCommandResponse = async {
         val initialCommandResponse = await(assemblyRef.submit(setupWithoutMatcher))
@@ -114,7 +116,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
       val demandMatcher         = DemandMatcher(DemandState(acceptWithMatcherCmdPrefix, Set(param)), withUnits = false, timeout)
-      val setupWithMatcher      = Setup(acceptWithMatcherCmdPrefix, Some(obsId))
+      val setupWithMatcher      = Setup(acceptWithMatcherCmdPrefix, obsId)
       val matcher               = new Matcher(assemblyRef, demandMatcher)
 
       val matcherResponseF: Future[MatcherResponse] = matcher.start
@@ -147,10 +149,27 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       enterBarrier("assembly-locked")
 
       // send command with lock token and expect command processing response
-      val assemblySetup = Setup(immediateCmdPrefix, Some(obsId))
+      val assemblySetup = Setup(immediateCmdPrefix, obsId)
       assemblyRef ! Submit(assemblySetup, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(5.seconds, Completed(assemblySetup.runId))
       enterBarrier("command-when-locked")
+
+      assemblyRef ! Unlock(immediateCmdPrefix, lockResponseProbe.ref)
+      lockResponseProbe.expectMsg(LockReleased)
+
+      val cancellableSetup = Setup(cancellableCmdPrefix, obsId)
+      assemblyRef ! Submit(cancellableSetup, cmdResponseProbe.ref)
+      cmdResponseProbe.expectMsg(Accepted(cancellableSetup.runId))
+
+      val cancelSetup = Cancel(cancelCmdPrefix, obsId, cancellableSetup.runId)
+      assemblyRef ! Submit(cancelSetup, cmdResponseProbe.ref)
+      cmdResponseProbe.expectMsg(Accepted(cancelSetup.runId))
+
+      assemblyRef ! Subscribe(cancelSetup.runId, cmdResponseProbe.ref)
+      cmdResponseProbe.expectMsg(Completed(cancelSetup.runId))
+
+      assemblyRef ! Subscribe(cancellableSetup.runId, cmdResponseProbe.ref)
+      cmdResponseProbe.expectMsg(Cancelled(cancellableSetup.runId))
     }
 
     runOn(member2) {

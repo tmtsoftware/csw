@@ -56,6 +56,8 @@ class ComponentHandlerForCommand(
     case `acceptedCmdPrefix`            ⇒ Accepted(controlCommand.runId)
     case `acceptWithNoMatcherCmdPrefix` ⇒ Accepted(controlCommand.runId)
     case `acceptWithMatcherCmdPrefix`   ⇒ Accepted(controlCommand.runId)
+    case `cancellableCmdPrefix`         ⇒ Accepted(controlCommand.runId)
+    case `cancelCmdPrefix`              ⇒ Accepted(controlCommand.runId)
     case `immediateCmdPrefix`           ⇒ Completed(controlCommand.runId)
     case `invalidCmdPrefix`             ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.prefix.prefix}"))
     case _                              ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.prefix.prefix}"))
@@ -63,6 +65,8 @@ class ComponentHandlerForCommand(
 
   override def onSubmit(controlCommand: ControlCommand): Unit = controlCommand.prefix match {
     case `acceptWithNoMatcherCmdPrefix` ⇒ processCommandWithoutMatcher(controlCommand)
+    case `cancelCmdPrefix`              ⇒ processCancelCommand(controlCommand)
+    case `cancellableCmdPrefix`         ⇒ // Mimic a long running process by not updating CSRM with `Completed` state
     case _                              ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
@@ -75,6 +79,15 @@ class ComponentHandlerForCommand(
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
     val result                = Result(controlCommand.prefix, Set(param))
     commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
+  }
+
+  private def processCancelCommand(controlCommand: ControlCommand): Unit = {
+    val cancelCommand: Cancel = controlCommand.asInstanceOf[Cancel]
+    //    import akka.typed.scaladsl.AskPattern._
+    //    val eventualResponse: Future[CommandResponse] = commandResponseManager ? (Query(cancelCommand.cancelId, _))
+    // Check that eventualResponse is not a final state response or `CommandNotAvailable` Response
+    commandResponseManager ! AddOrUpdateCommand(cancelCommand.cancelId, Cancelled(cancelCommand.cancelId))
+    commandResponseManager ! AddOrUpdateCommand(cancelCommand.runId, Completed(cancelCommand.runId))
   }
 
   private def processCommandWithMatcher(controlCommand: ControlCommand): Unit = {
