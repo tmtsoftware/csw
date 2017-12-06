@@ -178,8 +178,6 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   def writeResult(result: Result): JsValue = {
     JsObject(
       Seq(
-        "runId"    -> runIdFormat.writes(result.runId),
-        "obsId"    -> obsIdFormat.writes(result.maybeObsId),
         "prefix"   -> prefixFormat.writes(result.prefix),
         "paramSet" -> Json.toJson(result.paramSet)
       )
@@ -195,9 +193,9 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   def readResult(json: JsValue): Result = {
     json match {
       case JsObject(fields) =>
-        (fields("runId"), fields("obsId"), fields("prefix"), fields("paramSet")) match {
-          case (runId, obsId, prefix, paramSet) =>
-            Result(runId.as[RunId], prefix.as[Prefix], obsId.as[Option[ObsId]], paramSetFormat.reads(paramSet).get)
+        (fields("prefix"), fields("paramSet")) match {
+          case (prefix, paramSet) =>
+            Result(prefix.as[Prefix], paramSetFormat.reads(paramSet).get)
           case _ => unexpectedJsValueError(json)
         }
       case _ => unexpectedJsValueError(json)

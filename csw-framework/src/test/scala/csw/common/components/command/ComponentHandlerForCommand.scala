@@ -73,7 +73,7 @@ class ComponentHandlerForCommand(
 
   private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
-    val result                = Result(controlCommand.runId, controlCommand.prefix, controlCommand.maybeObsId, Set(param))
+    val result                = Result(controlCommand.prefix, Set(param))
     commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
   }
 

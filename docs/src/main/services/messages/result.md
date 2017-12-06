@@ -2,20 +2,8 @@
 
 Components use **Results** to return results in the form of a **ParameterSet**. 
 
-### RunId
-
-Represents a unique id for each running command. To create new RunId, use parameter-less `apply` method, which will do required initialization create and store a new **UUID** automatically.
-
-Scala
-:   @@snip [ResultTest.scala](../../../../../examples/src/test/scala/csw/services/messages/ResultTest.scala) { #runid }
-
-Java
-:   @@snip [JResultTest.java](../../../../../examples/src/test/java/csw/services/messages/JResultTest.java) { #runid }
-
 Creating a Result requires:
 
- * **[RunId](result.html)**
- * **[ObsId](commands.html#ObsId)**
  * **[Prefix](commands.html#Prefix)**
  * **[Set[Parameter]](keys-parameters.html)**
 

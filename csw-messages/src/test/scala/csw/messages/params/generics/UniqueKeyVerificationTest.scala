@@ -91,7 +91,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val result =
-        Result(runId, prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Result(prefix, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       result.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd

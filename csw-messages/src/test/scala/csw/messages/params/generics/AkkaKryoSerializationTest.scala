@@ -281,7 +281,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     it("should serialize CommandExecutionResponse messages") {
       val testData = Table(
         "CommandExecutionResponse models",
-        CompletedWithResult(RunId(), Result(runId, Prefix(prefixStr), Some(obsId))),
+        CompletedWithResult(RunId(), Result(Prefix(prefixStr))),
         NoLongerValid(RunId(), CommandIssue.OtherIssue("test issue")),
         Completed(RunId()),
         Error(RunId(), "test"),
