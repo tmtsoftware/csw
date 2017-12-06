@@ -27,7 +27,7 @@ class CommandResponseManagerBehavior(
       case UpdateSubCommand(subCommandId, cmdStatus) ⇒ updateSubCommand(subCommandId, cmdStatus)
       case Query(runId, replyTo)                     ⇒ replyTo ! commandStatus.get(runId)
       case Subscribe(runId, replyTo)                 ⇒ subscribe(runId, replyTo)
-      case Unsubscribe(runId, replyTo)               ⇒ commandStatus = commandStatus.unSubscribe(runId, replyTo)
+      case Unsubscribe(runId, subscriber)            ⇒ commandStatus = commandStatus.unSubscribe(runId, subscriber)
     }
     this
   }

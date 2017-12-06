@@ -1,13 +1,15 @@
 package csw.common.components.command
 
 import akka.actor
+import akka.actor.Scheduler
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, ThrottleMode}
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.util.Timeout
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query}
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.messages.ccs.commands.CommandResponse._
@@ -72,6 +74,8 @@ class ComponentHandlerForCommand(
 
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.prefix match {
     case `acceptWithMatcherCmdPrefix` ⇒ processCommandWithMatcher(controlCommand)
+    case `cancellableCmdPrefix`       ⇒ // Mimic a long running hardware execution by not matching on demand state
+    case `cancelCmdPrefix`            ⇒ processOriginalCommand(controlCommand)
     case _                            ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
@@ -82,12 +86,21 @@ class ComponentHandlerForCommand(
   }
 
   private def processCancelCommand(controlCommand: ControlCommand): Unit = {
-    val cancelCommand: Cancel = controlCommand.asInstanceOf[Cancel]
-    //    import akka.typed.scaladsl.AskPattern._
-    //    val eventualResponse: Future[CommandResponse] = commandResponseManager ? (Query(cancelCommand.cancelId, _))
-    // Check that eventualResponse is not a final state response or `CommandNotAvailable` Response
-    commandResponseManager ! AddOrUpdateCommand(cancelCommand.cancelId, Cancelled(cancelCommand.cancelId))
-    commandResponseManager ! AddOrUpdateCommand(cancelCommand.runId, Completed(cancelCommand.runId))
+    processOriginalCommand(controlCommand)
+    commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+  }
+
+  private def processOriginalCommand(controlCommand: ControlCommand): Unit = {
+    val cancelCommand = controlCommand.asInstanceOf[Cancel]
+
+    import akka.typed.scaladsl.AskPattern._
+    implicit val timeout: Timeout     = 5.seconds
+    implicit val scheduler: Scheduler = ctx.system.scheduler
+
+    val eventualResponse: Future[CommandResponse] = commandResponseManager ? (Query(cancelCommand.cancelId, _))
+    eventualResponse.foreach { _ ⇒
+      commandResponseManager ! AddOrUpdateCommand(cancelCommand.cancelId, Cancelled(cancelCommand.cancelId))
+    }
   }
 
   private def processCommandWithMatcher(controlCommand: ControlCommand): Unit = {
