@@ -1,4 +1,4 @@
-package csw.framework.javadsl.command;
+package csw.framework.command;
 
 import akka.actor.ActorSystem;
 import akka.stream.ActorMaterializer;
@@ -42,6 +42,9 @@ import java.util.concurrent.TimeUnit;
 import static csw.messages.location.Connection.AkkaConnection;
 import static csw.services.location.javadsl.JComponentType.HCD;
 
+// DEOPSCSW-217: Execute RPC like commands
+// DEOPSCSW-224: Inter component command sending
+// DEOPSCSW-225: Allow components to receive commands
 public class JCommandIntegrationTest {
     private static ILocationService locationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
 

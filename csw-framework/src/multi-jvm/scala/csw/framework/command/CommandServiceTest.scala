@@ -1,4 +1,4 @@
-package csw.framework.javadsl.command
+package csw.framework.command
 
 import akka.actor.Scheduler
 import akka.stream.{ActorMaterializer, Materializer}
@@ -32,6 +32,34 @@ import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future}
 
+/**
+ * Test Configuration :
+ * JVM-1 : Seed node
+ * JVM-2 : Assembly running in Standalone mode (Commanding Assembly)
+ * JVM-2 : Assembly and HCD running in Container Mode
+ *
+ * Scenario 1 : Short Running Command
+ * 1. Assembly running in JVM-2 (Commanding Assembly) resolves Assembly running in JVM-3
+ * 2. Commanding Assembly sends short running command to another assembly (JVM-3)
+ * 3. Assembly (JVM-3) receives command and update its status as Invalid in CSRM
+ * 4. Commanding Assembly (JVM-2) receives Command Completion response which is Invalid
+ *
+ * Scenario 2 : Long Running Command without matcher
+ * 1. Commanding Assembly sends long running command to another assembly (JVM-3)
+ * 2. Assembly (JVM-3) receives command and update its validation status as Accepted in CSRM
+ * 3. Commanding Assembly (JVM-2) receives validation response as Accepted
+ * 4. Commanding Assembly then waits for Command Completion response
+ * 5. Assembly from JVM-3 updates Command Completion status which is CompletedWithResult in CSRM
+ * 6. Commanding Assembly (JVM-2) receives Command Completion response which is CompletedWithResult
+ *
+ * Scenario 3 : Long Running Command with matcher
+ * 1. Commanding Assembly sends long running command to another assembly (JVM-3)
+ * 2. Assembly (JVM-3) receives command and update its validation status as Accepted in CSRM
+ * 3. Commanding Assembly (JVM-2) receives validation response as Accepted
+ * 4. Commanding Assembly starts state matcher
+ * 5. Assembly (JVM-3) keeps publishing its current state
+ * 6. Commanding Assembly marks status of Command as Completed when demand state matches with current state=
+**/
 class CommandServiceTestMultiJvm1 extends CommandServiceTest(0)
 class CommandServiceTestMultiJvm2 extends CommandServiceTest(0)
 class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
@@ -40,7 +68,10 @@ class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 // DEOPSCSW-202: Verification of submit commands
 // DEOPSCSW-207: Report on Configuration Command Completion
 // DEOPSCSW-208: Report failure on Configuration Completion command
+// DEOPSCSW-217: Execute RPC like commands
 // DEOPSCSW-222: Locking a component for a specific duration
+// DEOPSCSW-224: Inter component command sending
+// DEOPSCSW-225: Allow components to receive commands
 // DEOPSCSW-313: Support short running actions by providing immediate response
 class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 

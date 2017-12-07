@@ -13,6 +13,7 @@ import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.models.PubSub
+import csw.messages.models.PubSub.Publish
 import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage, TopLevelActorMessage}
@@ -45,21 +46,33 @@ class McsAssemblyComponentHandlers(
   var completedCommands: Int             = 0
   var hcdRef: ActorRef[ComponentMessage] = _
   var commandId: RunId                   = _
+  var shortSetup: Setup                  = _
+  var mediumSetup: Setup                 = _
+  var longSetup: Setup                   = _
 
   override def initialize(): Future[Unit] =
-    Future.successful(componentInfo.connections.headOption match {
+    componentInfo.connections.headOption match {
       case Some(hcd) ⇒
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
           case Some(akkaLocation) ⇒ hcdRef = akkaLocation.componentRef()
-          case None               ⇒
+          case None               ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
-      case None ⇒
-    })
+      case None ⇒ Future.successful(Unit)
+    }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = Unit
 
   override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit = msg match {
-    case CommandCompleted(_) ⇒
+    case CommandCompleted(response) ⇒
+      response.runId match {
+        case id if id == shortSetup.runId ⇒
+          pubSubRef ! Publish(CurrentState(shortSetup.prefix, Set(choiceKey.set(shortCmdCompleted))))
+        case id if id == mediumSetup.runId ⇒
+          pubSubRef ! Publish(CurrentState(mediumSetup.prefix, Set(choiceKey.set(mediumCmdCompleted))))
+        case id if id == longSetup.runId ⇒
+          pubSubRef ! Publish(CurrentState(longSetup.prefix, Set(choiceKey.set(longCmdCompleted))))
+      }
+
       completedCommands += 1
       if (completedCommands == 3) commandResponseManager ! AddOrUpdateCommand(commandId, Completed(commandId))
     case _ ⇒
@@ -74,9 +87,17 @@ class McsAssemblyComponentHandlers(
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     commandId = controlCommand.runId
-    processCommand(Setup(`shortRunningCmdPrefix`, controlCommand.maybeObsId))
-    processCommand(Setup(`mediumRunningCmdPrefix`, controlCommand.maybeObsId))
-    processCommand(Setup(`longRunningCmdPrefix`, controlCommand.maybeObsId))
+    shortSetup = Setup(`shortRunningCmdPrefix`, controlCommand.maybeObsId)
+    mediumSetup = Setup(`mediumRunningCmdPrefix`, controlCommand.maybeObsId)
+    longSetup = Setup(`longRunningCmdPrefix`, controlCommand.maybeObsId)
+
+    // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
+    // longSetup takes 5 seconds to finish
+    // shortSetup takes 1 second to finish
+    // mediumSetup takes 3 seconds to finish
+    processCommand(longSetup)
+    processCommand(shortSetup)
+    processCommand(mediumSetup)
   }
 
   private def processCommand(controlCommand: ControlCommand) = {
@@ -94,7 +115,7 @@ class McsAssemblyComponentHandlers(
 
   override def onOneway(controlCommand: ControlCommand): Unit = ???
 
-  override def onShutdown(): Future[Unit] = ???
+  override def onShutdown(): Future[Unit] = Future.successful(Unit)
 
   override def onGoOffline(): Unit = ???
 

@@ -1,6 +1,8 @@
 package csw.common.components.command
 
-import csw.messages.params.models.Prefix
+import csw.messages.params.generics.GChoiceKey
+import csw.messages.params.generics.KeyType.ChoiceKey
+import csw.messages.params.models.{Choice, Choices, Prefix}
 
 object ComponentStateForCommand {
   val prefix                       = Prefix("wfos.prog.cloudcover")
@@ -15,4 +17,11 @@ object ComponentStateForCommand {
   val longRunningCmdPrefix   = Prefix("mcs.mobie.blue.longCmd")
   val shortRunningCmdPrefix  = Prefix("mcs.mobie.blue.shortCmd")
   val mediumRunningCmdPrefix = Prefix("mcs.mobie.blue.mediumCmd")
+
+  val shortCmdCompleted  = Choice("Short Running Cmd Completed")
+  val mediumCmdCompleted = Choice("Medium Running Cmd Completed")
+  val longCmdCompleted   = Choice("Long Running Cmd Completed")
+
+  val choices: Choices      = Choices.fromChoices(shortCmdCompleted, mediumCmdCompleted, longCmdCompleted)
+  val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", choices)
 }
