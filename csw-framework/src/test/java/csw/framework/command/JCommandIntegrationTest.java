@@ -45,6 +45,7 @@ import static csw.services.location.javadsl.JComponentType.HCD;
 // DEOPSCSW-217: Execute RPC like commands
 // DEOPSCSW-224: Inter component command sending
 // DEOPSCSW-225: Allow components to receive commands
+// DEOPSCSW-228: Assist Components with command completion
 public class JCommandIntegrationTest {
     private static ILocationService locationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
 
@@ -92,6 +93,7 @@ public class JCommandIntegrationTest {
         CommandResponse actualCmdResponse = testCommandResponse.get();
         Assert.assertEquals(expectedCmdResponse, actualCmdResponse);
 
+        // DEOPSCSW-229: Provide matchers infrastructure for comparison
         // long running command which uses matcher
         Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(100);
         DemandMatcher demandMatcher = new DemandMatcher(new DemandState(ComponentStateForCommand.acceptWithMatcherCmdPrefix().prefix()).add(param), false, timeout);

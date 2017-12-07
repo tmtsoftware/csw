@@ -29,6 +29,7 @@ class LongRunningCommandTestMultiJvm2 extends LongRunningCommandTest(0)
 class LongRunningCommandTestMultiJvm3 extends LongRunningCommandTest(0)
 
 // DEOPSCSW-194: Support long running actions asynchronously
+// DEOPSCSW-228: Assist Components with command completion
 class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
   import config._
 

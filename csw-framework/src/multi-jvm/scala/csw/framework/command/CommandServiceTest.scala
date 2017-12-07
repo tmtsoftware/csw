@@ -36,7 +36,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
  * Test Configuration :
  * JVM-1 : Seed node
  * JVM-2 : Assembly running in Standalone mode (Commanding Assembly)
- * JVM-2 : Assembly and HCD running in Container Mode
+ * JVM-3 : Assembly and HCD running in Container Mode
  *
  * Scenario 1 : Short Running Command
  * 1. Assembly running in JVM-2 (Commanding Assembly) resolves Assembly running in JVM-3
@@ -72,6 +72,7 @@ class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 // DEOPSCSW-222: Locking a component for a specific duration
 // DEOPSCSW-224: Inter component command sending
 // DEOPSCSW-225: Allow components to receive commands
+// DEOPSCSW-228: Assist Components with command completion
 // DEOPSCSW-313: Support short running actions by providing immediate response
 class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
@@ -144,6 +145,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       longCommandResponse shouldBe a[CompletedWithResult]
       longCommandResponse.runId shouldBe setupWithoutMatcher.runId
 
+      // DEOPSCSW-229: Provide matchers infrastructure for comparison
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
       val demandMatcher         = DemandMatcher(DemandState(acceptWithMatcherCmdPrefix, Set(param)), withUnits = false, timeout)
