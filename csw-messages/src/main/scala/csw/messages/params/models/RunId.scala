@@ -7,7 +7,7 @@ import play.api.libs.json._
 /**
  * Implementation of unique id for each running command (returned from a queue submit).
  */
-case class RunId private (id: String)
+case class RunId(id: String)
 
 object RunId {
   def apply(): RunId = new RunId(UUID.randomUUID().toString)

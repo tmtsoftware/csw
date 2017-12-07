@@ -77,7 +77,7 @@ public class JCommandIntegrationTest {
         // long running command which does not use matcher
         Key<Integer> encoder = JKeyTypes.IntKey().make("encoder");
         Parameter<Integer> parameter = encoder.set(22, 23);
-        Setup controlCommand = new Setup(ComponentStateForCommand.acceptWithNoMatcherCmdPrefix().prefix(), Optional.empty()).add(parameter);
+        Setup controlCommand = new Setup(ComponentStateForCommand.withoutMatcherPrefix().prefix(), Optional.empty()).add(parameter);
 
         CompletableFuture<CommandResponse> commandResponseCompletableFuture = CommandExecutionService
                 .submit(hcd, controlCommand, timeout, hcdActorSystem.scheduler());
@@ -96,8 +96,8 @@ public class JCommandIntegrationTest {
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
         // long running command which uses matcher
         Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(100);
-        DemandMatcher demandMatcher = new DemandMatcher(new DemandState(ComponentStateForCommand.acceptWithMatcherCmdPrefix().prefix()).add(param), false, timeout);
-        Setup setup = new Setup(ComponentStateForCommand.acceptWithMatcherCmdPrefix().prefix(), Optional.empty()).add(parameter);
+        DemandMatcher demandMatcher = new DemandMatcher(new DemandState(ComponentStateForCommand.matcherPrefix().prefix()).add(param), false, timeout);
+        Setup setup = new Setup(ComponentStateForCommand.matcherPrefix().prefix(), Optional.empty()).add(parameter);
         Matcher matcher = new Matcher(hcd.narrow(), demandMatcher, ec, mat);
 
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();

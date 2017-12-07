@@ -10,16 +10,14 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.Subscribe
-import csw.messages.SupervisorLockMessage.Unlock
+import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.ComponentLockedIssue
 import csw.messages.ccs.commands.CommandResponse._
-import csw.messages.ccs.commands.{Cancel, CommandResponse, Observe, Setup}
+import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.LockingResponse
-import csw.messages.models.LockingResponse.{LockAcquired, LockReleased}
+import csw.messages.models.LockingResponse.LockAcquired
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
@@ -130,7 +128,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       shortCommandResponse shouldBe a[Invalid]
 
       // long running command which does not use matcher
-      val setupWithoutMatcher = Setup(acceptWithNoMatcherCmdPrefix, obsId)
+      val setupWithoutMatcher = Setup(withoutMatcherPrefix, obsId)
 
       val eventualLongCommandResponse = async {
         val initialCommandResponse = await(assemblyRef.submit(setupWithoutMatcher))
@@ -148,8 +146,8 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // DEOPSCSW-229: Provide matchers infrastructure for comparison
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
-      val demandMatcher         = DemandMatcher(DemandState(acceptWithMatcherCmdPrefix, Set(param)), withUnits = false, timeout)
-      val setupWithMatcher      = Setup(acceptWithMatcherCmdPrefix, obsId)
+      val demandMatcher         = DemandMatcher(DemandState(matcherPrefix, Set(param)), withUnits = false, timeout)
+      val setupWithMatcher      = Setup(matcherPrefix, obsId)
       val matcher               = new Matcher(assemblyRef, demandMatcher)
 
       val matcherResponseF: Future[MatcherResponse] = matcher.start

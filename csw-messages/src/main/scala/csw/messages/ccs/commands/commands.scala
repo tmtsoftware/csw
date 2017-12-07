@@ -10,7 +10,9 @@ import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGene
 /**
  * Common trait for Setup, Observe and Wait commands
  */
-sealed trait Command {
+sealed trait Command { self: ParameterSetType[_] ⇒
+
+  def paramType: ParameterSetType[_] = self
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".
@@ -47,12 +49,14 @@ sealed trait Command {
 /**
  * Trait for sequence parameter sets
  */
-sealed trait SequenceCommand extends Command
+sealed trait SequenceCommand extends Command { self: ParameterSetType[_] ⇒
+}
 
 /**
  * Marker trait for control parameter sets
  */
-sealed trait ControlCommand extends Command
+sealed trait ControlCommand extends Command { self: ParameterSetType[_] ⇒
+}
 
 /**
  * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
@@ -138,36 +142,4 @@ object Wait {
 
   def apply(prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty): Wait =
     new Wait(RunId(), prefix, maybeObsId).madd(paramSet)
-}
-
-/**
- * A command for cancelling an ongoing command. Constructor is private to ensure RunId is created internally to guarantee unique value.
- *
- * @param runId unique ID for this parameter set
- * @param prefix identifies the target subsystem
- * @param maybeObsId the observation id
- * @param paramSet an optional initial set of parameters (keys with values)
- */
-case class Cancel private (runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty)
-    extends ParameterSetType[Cancel]
-    with ParameterSetKeyData
-    with SequenceCommand
-    with ControlCommand {
-
-  override protected def create(data: Set[Parameter[_]]): Cancel = copy(paramSet = data)
-
-  def this(prefix: String, maybeObsId: Optional[ObsId], cancelId: RunId) =
-    this(RunId(), Prefix(prefix), maybeObsId.asScala, Cancel.paramSet(cancelId))
-
-  def cancelId: RunId = RunId(paramSet.head.head.asInstanceOf[String])
-}
-
-object Cancel {
-  private[messages] def apply(runId: RunId, prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]) =
-    new Cancel(runId, prefix, maybeObsId, paramSet)
-
-  def apply(prefix: Prefix, maybeObsId: Option[ObsId], cancelId: RunId): Cancel =
-    new Cancel(RunId(), prefix, maybeObsId).madd(paramSet(cancelId))
-
-  private def paramSet(cancelId: RunId): Set[Parameter[_]] = Set(Keys.CancelKey.set(cancelId.id))
 }

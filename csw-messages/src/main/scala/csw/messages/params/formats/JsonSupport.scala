@@ -27,7 +27,6 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   private val setupType        = classOf[Setup].getSimpleName
   private val observeType      = classOf[Observe].getSimpleName
   private val waitType         = classOf[Wait].getSimpleName
-  private val cancelType       = classOf[Cancel].getSimpleName
   private val statusEventType  = classOf[StatusEvent].getSimpleName
   private val observeEventType = classOf[ObserveEvent].getSimpleName
   private val systemEventType  = classOf[SystemEvent].getSimpleName
@@ -75,9 +74,6 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
                   .asInstanceOf[A]
               case `waitType` =>
                 Wait(runId.as[RunId], prefix.as[Prefix], obsId.as[Option[ObsId]], paramSet.as[Set[Parameter[_]]])
-                  .asInstanceOf[A]
-              case `cancelType` ⇒
-                Cancel(runId.as[RunId], prefix.as[Prefix], obsId.as[Option[ObsId]], paramSet.as[Set[Parameter[_]]])
                   .asInstanceOf[A]
               case _ => unexpectedJsValueError(json)
             }
