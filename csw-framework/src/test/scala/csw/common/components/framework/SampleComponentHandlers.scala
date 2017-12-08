@@ -6,7 +6,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.ccs.CommandIssue.OtherIssue
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Observe, Setup}
+import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
@@ -72,9 +72,9 @@ class SampleComponentHandlers(
 
   private def processCommand(controlCommand: ControlCommand): Unit =
     controlCommand match {
-      case Setup(_, somePrefix, _, _) ⇒
+      case Setup(_, _, somePrefix, _, _) ⇒
         pubSubRef ! Publish(CurrentState(somePrefix, controlCommand.paramSet + choiceKey.set(setupConfigChoice)))
-      case Observe(_, somePrefix, _, _) ⇒
+      case Observe(_, _, somePrefix, _, _) ⇒
         pubSubRef ! Publish(CurrentState(somePrefix, controlCommand.paramSet + choiceKey.set(observeConfigChoice)))
       case _ ⇒
     }

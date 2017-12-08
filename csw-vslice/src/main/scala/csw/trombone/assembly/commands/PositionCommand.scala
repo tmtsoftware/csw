@@ -61,7 +61,7 @@ class PositionCommand(
 
       val stateMatcher              = AssemblyMatchers.posMatcher(encoderPosition)
       implicit val timeout: Timeout = stateMatcher.timeout
-      val scOut = Setup(TromboneHcdState.axisMoveCK, s.maybeObsId)
+      val scOut = Setup("originationPrefix", TromboneHcdState.axisMoveCK, s.maybeObsId)
         .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 

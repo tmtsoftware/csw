@@ -40,7 +40,7 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
   implicit val typedSystem: ActorSystem[Nothing] = system.toTyped
   implicit val testKit: TestKitSettings          = TestKitSettings(typedSystem)
 
-  private val scalaSetup = Setup(Prefix(prefixStr), Some(obsId)).add(intParam).add(stringParam)
+  private val scalaSetup = Setup(Prefix(prefixStr), Prefix(prefixStr), Some(obsId)).add(intParam).add(stringParam)
 
   private val javaCmdHandlerBehavior: Future[ActorRef[CommandMsg]] =
     typedSystem.systemActorOf[CommandMsg](JavaCommandHandler.behavior(), "javaCommandHandler")

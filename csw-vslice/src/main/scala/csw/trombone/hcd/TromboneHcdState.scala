@@ -80,19 +80,22 @@ object TromboneHcdState {
 
   val axisMovePrefix     = s"$trombonePrefix.move"
   val axisMoveCK: Prefix = Prefix(axisMovePrefix)
+  val originationPrefix  = "originationPrefix"
 
   def positionSC(runId: RunId, obsId: ObsId, value: Int): Setup =
-    Setup(axisMoveCK, Some(obsId)).add(positionKey -> value withUnits encoder)
+    Setup(originationPrefix, axisMoveCK, Some(obsId)).add(positionKey -> value withUnits encoder)
 
-  val axisDatumPrefix                     = s"$trombonePrefix.datum"
-  val axisDatumCK: Prefix                 = Prefix(axisDatumPrefix)
-  def datumSC(runId: RunId, obsId: ObsId) = Setup(axisDatumCK, Some(obsId))
+  val axisDatumPrefix     = s"$trombonePrefix.datum"
+  val axisDatumCK: Prefix = Prefix(axisDatumPrefix)
+  def datumSC(runId: RunId, obsId: ObsId) = {
+    Setup(originationPrefix, axisDatumCK, Some(obsId))
+  }
 
   val axisHomePrefix                     = s"$trombonePrefix.home"
   val axisHomeCK: Prefix                 = Prefix(axisHomePrefix)
-  def homeSC(runId: RunId, obsId: ObsId) = Setup(axisHomeCK, Some(obsId))
+  def homeSC(runId: RunId, obsId: ObsId) = Setup(originationPrefix, axisHomeCK, Some(obsId))
 
   val axisCancelPrefix                     = s"$trombonePrefix.cancel"
   val axisCancelCK: Prefix                 = Prefix(axisCancelPrefix)
-  def cancelSC(runId: RunId, obsId: ObsId) = Setup(axisCancelCK, Some(obsId))
+  def cancelSC(runId: RunId, obsId: ObsId) = Setup(originationPrefix, axisCancelCK, Some(obsId))
 }

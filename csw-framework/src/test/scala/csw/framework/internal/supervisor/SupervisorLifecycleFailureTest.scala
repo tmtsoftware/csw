@@ -159,7 +159,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     val obsId: ObsId          = ObsId("Obs001")
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
-    val setup: Setup          = Setup(successPrefix, Some(obsId), Set(param))
+    val setup: Setup          = Setup(prefix, successPrefix, Some(obsId), Set(param))
 
     doThrow(FailureRestart(failureRestartExMsg))
       .when(componentHandlers)
@@ -189,10 +189,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     Thread.sleep(100)
 
     // Assert that the error log statement of type "Unexpected message received in Running lifecycle state" is not generated
-    assertThatExceptionIsNotLogged(
-      logBuffer,
-      unexpectedMessage,
-    )
+    assertThatExceptionIsNotLogged(logBuffer, unexpectedMessage)
   }
 
   private def createSupervisorAndStartTLA(

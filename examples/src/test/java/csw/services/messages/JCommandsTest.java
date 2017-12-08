@@ -1,5 +1,6 @@
 package csw.services.messages;
 
+import csw.messages.ccs.commands.CommandInfo;
 import csw.messages.ccs.commands.Observe;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.ccs.commands.Wait;
@@ -62,14 +63,13 @@ public class JCommandsTest {
 
         //prefix
         String prefixName = "wfos.red.detector";
-        Prefix prefix = new Prefix(prefixName);
 
         //parameters
         Parameter<Integer> i1 = k1.set(22);
         Parameter<String> i2 = k2.set("A");
 
         //create setup, add sequentially using add
-        Setup sc1 = new Setup(prefixName, Optional.of(obsId)).add(i1).add(i2);
+        Setup sc1 = new Setup(prefixName, prefixName, Optional.of(obsId)).add(i1).add(i2);
 
         //access keys
         Boolean k1Exists = sc1.exists(k1); //true
@@ -91,7 +91,7 @@ public class JCommandsTest {
         Parameter<Byte> b1 = byteKey1.set(bytes1);
         Parameter<Byte> b2 = byteKey2.set(bytes2);
 
-        Setup sc3 = new Setup(prefixName, Optional.of(obsId)).add(b1).add(b2);
+        Setup sc3 = new Setup(prefixName, prefixName, Optional.of(obsId)).add(b1).add(b2);
 
         //remove a key
         Setup sc4 = sc3.remove(b1);
@@ -122,7 +122,7 @@ public class JCommandsTest {
 
         //prefix
         String prefixName = "wfos.red.detector";
-        Prefix prefix = new Prefix(prefixName);
+        CommandInfo commandInfo = new CommandInfo(prefixName, prefixName, Optional.of(obsId));
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
@@ -130,7 +130,7 @@ public class JCommandsTest {
         Parameter<Integer> i2 = k2.set(1, 2, 3, 4);
 
         //create Observe, add sequentially using add
-        Observe oc1 = new Observe(prefixName, Optional.of(obsId)).add(i1).add(i2);
+        Observe oc1 = new Observe(prefixName, prefixName, Optional.of(obsId)).add(i1).add(i2);
 
         //access parameters
         Optional<Parameter<Boolean>> k1Param = oc1.jGet(k1); //present
@@ -175,7 +175,6 @@ public class JCommandsTest {
 
         //prefix
         String prefixName = "wfos.red.detector";
-        Prefix prefix = new Prefix(prefixName);
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
@@ -183,7 +182,7 @@ public class JCommandsTest {
         Parameter<Integer> i2 = k2.set(1, 2, 3, 4);
 
         //create Wait, add sequentially using add
-        Wait wc1 = new Wait(prefixName, Optional.of(obsId)).add(i1).add(i2);
+        Wait wc1 = new Wait(prefixName, prefixName, Optional.of(obsId)).add(i1).add(i2);
 
         //access parameters using jGet
         Optional<Parameter<Boolean>> k1Param = wc1.jGet(k1); //present
@@ -229,10 +228,12 @@ public class JCommandsTest {
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
+        String prefixName = "wfos.blue.filter";
+
         //commands
-        Setup sc = new Setup("wfos.blue.filter", Optional.of(obsId)).add(i1);
-        Observe oc = new Observe("wfos.blue.filter", Optional.of(obsId)).add(i1);
-        Wait wc = new Wait("wfos.blue.filter", Optional.of(obsId)).add(i1);
+        Setup sc = new Setup(prefixName, prefixName, Optional.of(obsId)).add(i1);
+        Observe oc = new Observe(prefixName, prefixName, Optional.of(obsId)).add(i1);
+        Wait wc = new Wait(prefixName, prefixName, Optional.of(obsId)).add(i1);
 
         //json support - write
         JsValue scJson = JavaJsonSupport.writeSequenceCommand(sc);
@@ -276,7 +277,7 @@ public class JCommandsTest {
         Parameter<Integer> miscParam1 = miscKey.set(100);
 
         //Setup command with duplicate key via madd
-        Setup setup = new Setup(prefix, Optional.of(obsId)).madd(
+        Setup setup = new Setup(prefix, prefix, Optional.of(obsId)).madd(
                 encParam1,
                 encParam2,
                 encParam3,

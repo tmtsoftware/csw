@@ -26,7 +26,6 @@ public class JSateVariableTest {
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
 
     private final String prefix = "wfos.red.detector";
-    private final ObsId obsId = new ObsId("obsId");
 
     @Test
     public void shouldAbleToCreateCurrentState() {
@@ -47,7 +46,7 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateCurrentStateFromSetup() {
-        Setup setup = new Setup(prefix, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(prefix, prefix, Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
         CurrentState currentState = new CurrentState(setup);
 
         // typeName and prefix
@@ -82,7 +81,7 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateDemandStateFromSetup() {
-        Setup setup = new Setup(prefix, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(prefix, prefix, Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
         DemandState demandState = new DemandState(setup);
 
         // typeName and prefix

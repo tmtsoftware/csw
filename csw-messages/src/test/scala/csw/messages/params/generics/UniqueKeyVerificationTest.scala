@@ -14,9 +14,8 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
   val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
   val runId     = RunId()
-  val obsId     = ObsId("Obs001")
-  val eventInfo = EventInfo("wfos.blue.filter", EventTime(), None)
   val prefix    = "wfos.blue.filter"
+  val eventInfo = EventInfo(prefix, EventTime(), None)
 
   private val encParam1 = encoderKey.set(1)
   private val encParam2 = encoderKey.set(2)
@@ -34,7 +33,10 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val setup =
-        Setup(prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Setup(prefix,
+              prefix,
+              Some(ObsId("Obs001")),
+              Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       setup.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
@@ -52,7 +54,10 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val observe =
-        Observe(prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Observe(prefix,
+                prefix,
+                Some(ObsId("Obs001")),
+                Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       observe.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
@@ -70,7 +75,10 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val wait =
-        Wait(prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Wait(prefix,
+             prefix,
+             Some(ObsId("Obs001")),
+             Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       wait.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd

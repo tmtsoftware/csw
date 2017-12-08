@@ -59,7 +59,7 @@ class SetElevationCommand(
       val stateMatcher              = AssemblyMatchers.posMatcher(encoderPosition)
       implicit val timeout: Timeout = stateMatcher.timeout
 
-      val scOut = Setup(axisMoveCK, Some(ac.obsId)).add(positionKey -> encoderPosition withUnits encoder)
+      val scOut = Setup("originationPrefix", axisMoveCK, Some(ac.obsId)).add(positionKey -> encoderPosition withUnits encoder)
 
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 

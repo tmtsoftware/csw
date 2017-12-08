@@ -16,6 +16,7 @@ class CommandsTest extends FunSpec with Matchers {
   //#obsid
   val obsId: ObsId = ObsId("Obs001")
   //#obsid
+  val prefix: Prefix = Prefix("wfos.red.detector")
 
   describe("Examples of Prefix") {
     it("should show usage of utility functions") {
@@ -54,15 +55,12 @@ class CommandsTest extends FunSpec with Matchers {
       val k3: Key[Int]    = KeyType.IntKey.make("filter")
       val k4: Key[Float]  = KeyType.FloatKey.make("correction")
 
-      //prefix
-      val prefix: Prefix = Prefix("wfos.red.detector")
-
       //parameters
       val i1: Parameter[Int]    = k1.set(22)
       val i2: Parameter[String] = k2.set("A")
 
       //create Setup, add sequentially using add
-      val sc1: Setup = Setup(prefix, Some(obsId)).add(i1).add(i2)
+      val sc1: Setup = Setup(prefix, prefix, Some(obsId)).add(i1).add(i2)
 
       //access keys
       val k1Exists: Boolean = sc1.exists(k1) //true
@@ -84,7 +82,7 @@ class CommandsTest extends FunSpec with Matchers {
       val b1: Parameter[Byte] = byteKey1.set(bytes1)
       val b2: Parameter[Byte] = byteKey2.set(bytes2)
 
-      val sc3: Setup = Setup(prefix, Some(obsId), Set(b1, b2))
+      val sc3: Setup = Setup(prefix, prefix, Some(obsId), Set(b1, b2))
 
       //remove a key
       val sc4: Setup = sc3.remove(b1)
@@ -113,15 +111,12 @@ class CommandsTest extends FunSpec with Matchers {
       val k3: Key[Int]     = KeyType.IntKey.make("filter")
       val k4: Key[Instant] = KeyType.TimestampKey.make("creation-time")
 
-      //prefix
-      val prefix: Prefix = Prefix("wfos.red.detector")
-
       //parameters
       val i1: Parameter[Boolean] = k1.set(true, false, true, false)
       val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
 
       //create Observe, add sequentially using add
-      val oc1: Observe = Observe(prefix, Some(obsId)).add(i1).add(i2)
+      val oc1: Observe = Observe(prefix, prefix, Some(obsId)).add(i1).add(i2)
 
       //access parameters using apply method
       val k1Param: Parameter[Boolean] = oc1.get(k1).get //true
@@ -161,15 +156,12 @@ class CommandsTest extends FunSpec with Matchers {
       val k3: Key[Int]     = KeyType.IntKey.make("filter")
       val k4: Key[Instant] = KeyType.TimestampKey.make("creation-time")
 
-      //prefix
-      val prefix: Prefix = Prefix("wfos.red.detector")
-
       //parameters
       val i1: Parameter[Boolean] = k1.set(true, false, true, false)
       val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
 
       //create wait, add sequentially using add
-      val wc1: Wait = Wait(prefix, Some(obsId)).add(i1).add(i2)
+      val wc1: Wait = Wait(prefix, prefix, Some(obsId)).add(i1).add(i2)
 
       //access params using get method
       val k1Param: Option[Parameter[Boolean]] = wc1.get(k1)
@@ -220,9 +212,9 @@ class CommandsTest extends FunSpec with Matchers {
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       //commands
-      val sc: Setup   = Setup(Prefix("wfos.blue.filter"), Some(obsId)).add(i1)
-      val oc: Observe = Observe(Prefix("wfos.blue.filter"), Some(obsId)).add(i1)
-      val wc: Wait    = Wait(Prefix("wfos.blue.filter"), Some(obsId)).add(i1)
+      val sc: Setup   = Setup(prefix, prefix, Some(obsId)).add(i1)
+      val oc: Observe = Observe(prefix, prefix, Some(obsId)).add(i1)
+      val wc: Wait    = Wait(prefix, prefix, Some(obsId)).add(i1)
 
       //json support - write
       val scJson: JsValue = JsonSupport.writeSequenceCommand(sc)
@@ -258,12 +250,6 @@ class CommandsTest extends FunSpec with Matchers {
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
-      //ObsId
-      val obsId = ObsId("Obs001")
-
-      //prefix
-      val prefix = "wfos.blue.filter"
-
       //params
       val encParam1: Parameter[Int] = encoderKey.set(1)
       val encParam2: Parameter[Int] = encoderKey.set(2)
@@ -277,7 +263,7 @@ class CommandsTest extends FunSpec with Matchers {
 
       //Setup command with duplicate key via constructor
       val setup: Setup =
-        Setup(prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Setup(prefix, prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       //four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = setup.paramSet.toList.map(_.keyName)
 

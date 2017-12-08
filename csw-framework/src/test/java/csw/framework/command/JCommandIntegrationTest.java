@@ -39,6 +39,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static csw.common.components.command.ComponentStateForCommand.matcherPrefix;
+import static csw.common.components.command.ComponentStateForCommand.prefix;
+import static csw.common.components.command.ComponentStateForCommand.withoutMatcherPrefix;
 import static csw.messages.location.Connection.AkkaConnection;
 import static csw.services.location.javadsl.JComponentType.HCD;
 
@@ -77,7 +80,7 @@ public class JCommandIntegrationTest {
         // long running command which does not use matcher
         Key<Integer> encoder = JKeyTypes.IntKey().make("encoder");
         Parameter<Integer> parameter = encoder.set(22, 23);
-        Setup controlCommand = new Setup(ComponentStateForCommand.withoutMatcherPrefix().prefix(), Optional.empty()).add(parameter);
+        Setup controlCommand = new Setup(prefix().prefix(), withoutMatcherPrefix().prefix(), Optional.empty()).add(parameter);
 
         CompletableFuture<CommandResponse> commandResponseCompletableFuture = CommandExecutionService
                 .submit(hcd, controlCommand, timeout, hcdActorSystem.scheduler());
@@ -97,7 +100,7 @@ public class JCommandIntegrationTest {
         // long running command which uses matcher
         Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(100);
         DemandMatcher demandMatcher = new DemandMatcher(new DemandState(ComponentStateForCommand.matcherPrefix().prefix()).add(param), false, timeout);
-        Setup setup = new Setup(ComponentStateForCommand.matcherPrefix().prefix(), Optional.empty()).add(parameter);
+        Setup setup = new Setup(prefix().prefix(), matcherPrefix().prefix(), Optional.empty()).add(parameter);
         Matcher matcher = new Matcher(hcd.narrow(), demandMatcher, ec, mat);
 
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();

@@ -1,11 +1,15 @@
 {
   "type": "Setup",
   "runId": "test-runId",
-  "obsId": "Obs001",
+  "originationPrefix": {
+    "subsystem": "wfos",
+    "prefix": "wfos.blue.filter"
+  },
   "prefix": {
     "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },
+  "obsId": "Obs001",
   "paramSet" : [ {
     "keyName" : "LongKey",
     "keyType" : "LongKey",

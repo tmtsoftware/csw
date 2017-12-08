@@ -54,7 +54,7 @@ class DatumCommand(
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
       tromboneHCD.get
-        .submit(Setup(TromboneHcdState.axisDatumCK, s.maybeObsId))
+        .submit(Setup("originationPrefix", TromboneHcdState.axisDatumCK, s.maybeObsId))
         .flatMap {
           case _: Accepted ⇒
             new Matcher(tromboneHCD.get, AssemblyMatchers.idleMatcher).start.map {

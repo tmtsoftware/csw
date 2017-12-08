@@ -126,7 +126,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
 
     val obsId: ObsId = ObsId("Obs001")
-    val sc1          = Setup(Prefix("wfos.prog.cloudcover"), Some(obsId)).add(KeyType.IntKey.make("encoder").set(22))
+    val sc1 = Setup(Prefix("wfos.prog.cloudcover"), Prefix("wfos.prog.cloudcover"), Some(obsId))
+      .add(KeyType.IntKey.make("encoder").set(22))
 
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
 
@@ -150,7 +151,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
 
     val obsId: ObsId = ObsId("Obs001")
-    val sc1          = Observe(Prefix("wfos.prog.cloudcover"), Some(obsId)).add(KeyType.IntKey.make("encoder").set(22))
+    val sc1 = Observe(Prefix("wfos.prog.cloudcover"), Prefix("wfos.prog.cloudcover"), Some(obsId))
+      .add(KeyType.IntKey.make("encoder").set(22))
 
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
     doNothing().when(sampleHcdHandler).onOneway(ArgumentMatchers.any[Setup]())
@@ -172,7 +174,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
 
     val obsId: ObsId = ObsId("Obs001")
-    val sc1          = Setup(Prefix("wfos.prog.cloudcover"), Some(obsId)).add(KeyType.IntKey.make("encoder").set(22))
+    val sc1 = Setup(Prefix("wfos.prog.cloudcover"), Prefix("wfos.prog.cloudcover"), Some(obsId))
+      .add(KeyType.IntKey.make("encoder").set(22))
 
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Completed(sc1.runId))
 
@@ -197,7 +200,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
 
     val obsId: ObsId = ObsId("Obs001")
-    val sc1          = Observe(Prefix("wfos.prog.cloudcover"), Some(obsId)).add(KeyType.IntKey.make("encoder").set(22))
+    val sc1 = Observe(Prefix("wfos.prog.cloudcover"), Prefix("wfos.prog.cloudcover"), Some(obsId))
+      .add(KeyType.IntKey.make("encoder").set(22))
 
     val error = Error(sc1.runId, "error from the test command")
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(error)

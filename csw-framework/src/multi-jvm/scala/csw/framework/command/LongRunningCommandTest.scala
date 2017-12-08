@@ -54,7 +54,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
         )
       val assemblyRef = Await.result(assemblyLocF, 5.seconds).map(_.componentRef()).get
 
-      val setup = Setup(longRunningCmdPrefix, Some(obsId))
+      val setup = Setup(prefix, longRunningCmdPrefix, Some(obsId))
       val probe = TestProbe[CurrentState]
       assemblyRef ! ComponentStateSubscription(Subscribe(probe.ref))
 

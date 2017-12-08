@@ -64,7 +64,7 @@ class ImageDeSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(binaryData)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe(Prefix(prefixStr), Some(obsId)).add(param)
+    val observe           = Observe("originationPrefix", Prefix(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     (observeSerializer.toBinary(observe), observe)

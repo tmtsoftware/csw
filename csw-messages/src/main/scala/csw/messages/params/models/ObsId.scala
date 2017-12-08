@@ -3,6 +3,7 @@ package csw.messages.params.models
 import java.util.Optional
 
 import com.trueaccord.scalapb.TypeMapper
+import csw.messages.TMTSerializable
 import play.api.libs.json._
 
 import scala.language.implicitConversions
@@ -34,7 +35,7 @@ object ObsId {
   def empty: ObsId = ObsId("")
 }
 
-case class ObsId(obsId: String) {
+case class ObsId(obsId: String) extends TMTSerializable {
   def asOption: Option[ObsId]     = Some(new ObsId(obsId))
   def asOptional: Optional[ObsId] = Optional.of(new ObsId(obsId))
 }

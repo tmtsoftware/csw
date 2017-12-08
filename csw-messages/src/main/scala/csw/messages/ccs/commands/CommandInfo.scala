@@ -1,27 +1,23 @@
 package csw.messages.ccs.commands
 
-import ai.x.play.json.Jsonx
-import csw.messages.params.models.{ObsId, RunId}
-import play.api.libs.json.OFormat
+import java.util.Optional
 
-import scala.language.implicitConversions
+import csw.messages.TMTSerializable
+import csw.messages.params.models.{ObsId, Prefix}
+import play.api.libs.json.{Format, Json}
+
+import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
 /**
  * This will include information related to the observation that is tied to a parameter set
- * This will grow and develop.
- *
- * @param obsId the observation id
- * @param runId unique ID for this parameter set
  */
-case class CommandInfo(obsId: ObsId, runId: RunId = RunId()) {
-
-  /**
-   * Creates an instance with the given obsId and a unique runId
-   */
-  def this(obsId: String) = this(ObsId(obsId))
+case class CommandInfo private (originationPrefix: Prefix, prefix: Prefix, maybeObsId: Option[ObsId]) extends TMTSerializable {
+  def this(originationPrefix: String, prefix: String, maybeObsId: Optional[ObsId]) =
+    this(originationPrefix, prefix, maybeObsId.asScala)
+  def jMaybeObsId: Optional[ObsId] = maybeObsId.asJava
 }
 
 object CommandInfo {
-  implicit val format: OFormat[CommandInfo]                  = Jsonx.formatCaseClassUseDefaults[CommandInfo]
-  implicit def strToParamSetInfo(obsId: String): CommandInfo = CommandInfo(ObsId(obsId))
+  implicit val format: Format[CommandInfo] = Json.format[CommandInfo]
+//  implicit def strToParamSetInfo(obsId: String): CommandInfo = CommandInfo(ObsId(obsId))
 }

@@ -10,11 +10,11 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.ComponentMessage
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.ComponentMessage
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands._
@@ -42,8 +42,6 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
   private final val system        = ActorSystem("example")
   private final val serialization = SerializationExtension(system)
   private final val prefixStr     = "wfos.prog.cloudcover"
-  private val runId: RunId        = RunId()
-  private val obsId: ObsId        = ObsId("Obs001")
 
   override protected def afterAll(): Unit = Await.result(system.terminate(), 2.seconds)
 
@@ -53,7 +51,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val intKey = IntKey.make("intKey")
       val param  = intKey.set(1, 2, 3).withUnits(coulomb)
 
-      val setup           = Setup(Prefix(prefixStr), Some(obsId)).add(param)
+      val setup           = Setup(Prefix(prefixStr), Prefix(prefixStr), Some(ObsId("Obs001"))).add(param)
       val setupSerializer = serialization.findSerializerFor(setup)
 
       setupSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -72,7 +70,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(imgBytes)
       val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-      val observe           = Observe(Prefix(prefixStr), Some(obsId)).add(param)
+      val observe           = Observe(Prefix(prefixStr), Prefix(prefixStr), Some(ObsId("Obs001"))).add(param)
       val observeSerializer = serialization.findSerializerFor(observe)
 
       observeSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -91,7 +89,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val doubleMatrixKey = DoubleMatrixKey.make(keyName)
       val param           = doubleMatrixKey.set(Array(matrixData1, matrixData2), lightyear)
 
-      val wait: Wait     = Wait(Prefix(prefixStr), Some(obsId)).add(param)
+      val wait: Wait     = Wait(Prefix(prefixStr), Prefix(prefixStr), Some(ObsId("Obs001"))).add(param)
       val waitSerializer = serialization.findSerializerFor(wait)
 
       waitSerializer.getClass shouldBe classOf[AkkaSerializer]

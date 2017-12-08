@@ -4,8 +4,8 @@ import akka.actor.Scheduler
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
-import csw.common.components.command.TopLevelActorDomainMessage.CommandCompleted
 import csw.common.components.command.ComponentStateForCommand._
+import csw.common.components.command.TopLevelActorDomainMessage.CommandCompleted
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
@@ -87,9 +87,9 @@ class McsAssemblyComponentHandlers(
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     commandId = controlCommand.runId
-    shortSetup = Setup(`shortRunningCmdPrefix`, controlCommand.maybeObsId)
-    mediumSetup = Setup(`mediumRunningCmdPrefix`, controlCommand.maybeObsId)
-    longSetup = Setup(`longRunningCmdPrefix`, controlCommand.maybeObsId)
+    shortSetup = Setup(`prefix`, `shortRunningCmdPrefix`, controlCommand.maybeObsId)
+    mediumSetup = Setup(`prefix`, `mediumRunningCmdPrefix`, controlCommand.maybeObsId)
+    longSetup = Setup(`prefix`, `longRunningCmdPrefix`, controlCommand.maybeObsId)
 
     // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
     // longSetup takes 5 seconds to finish

@@ -45,26 +45,29 @@ case class AssemblyContext(
   val movePrefix     = s"$componentPrefix.move"
   val moveCK: Prefix = Prefix(movePrefix)
 
+  val originationPrefix = "originationPrefix"
+
   def moveSC(runId: RunId, position: Double): Setup =
-    Setup(moveCK, Some(obsId)).add(stagePositionKey -> position withUnits stagePositionUnits)
+    Setup(originationPrefix, moveCK, Some(obsId)).add(stagePositionKey -> position withUnits stagePositionUnits)
 
   // Position submit command
   val positionPrefix     = s"$componentPrefix.position"
   val positionCK: Prefix = Prefix(positionPrefix)
 
   def positionSC(runId: RunId, rangeDistance: Double): Setup =
-    Setup(positionCK, Some(obsId)).add(naRangeDistanceKey -> rangeDistance withUnits naRangeDistanceUnits)
+    Setup(originationPrefix, positionCK, Some(obsId)).add(naRangeDistanceKey -> rangeDistance withUnits naRangeDistanceUnits)
 
   // setElevation submit command
   val setElevationPrefix     = s"$componentPrefix.setElevation"
   val setElevationCK: Prefix = Prefix(setElevationPrefix)
   def setElevationSC(runId: RunId, elevation: Double): Setup =
-    Setup(setElevationCK, Some(obsId)).add(naElevation(elevation))
+    Setup(originationPrefix, setElevationCK, Some(obsId)).add(naElevation(elevation))
 
   // setAngle submit command
-  val setAnglePrefx                                        = s"$componentPrefix.setAngle"
-  val setAngleCK: Prefix                                   = Prefix(setAnglePrefx)
-  def setAngleSC(runId: RunId, zenithAngle: Double): Setup = Setup(setAngleCK, Some(obsId)).add(za(zenithAngle))
+  val setAnglePrefx      = s"$componentPrefix.setAngle"
+  val setAngleCK: Prefix = Prefix(setAnglePrefx)
+  def setAngleSC(runId: RunId, zenithAngle: Double): Setup =
+    Setup(originationPrefix, setAngleCK, Some(obsId)).add(za(zenithAngle))
 
   // Follow submit command
   val followPrefix     = s"$componentPrefix.follow"
@@ -73,7 +76,8 @@ case class AssemblyContext(
 
   def setNssInUse(value: Boolean): Parameter[Boolean] = nssInUseKey -> value
 
-  def followSC(runId: RunId, nssInUse: Boolean): Setup = Setup(followCK, Some(obsId)).add(nssInUseKey -> nssInUse)
+  def followSC(runId: RunId, nssInUse: Boolean): Setup =
+    Setup(originationPrefix, followCK, Some(obsId)).add(nssInUseKey -> nssInUse)
 
   // A list of all commands
   val allCommandKeys: List[Prefix] =

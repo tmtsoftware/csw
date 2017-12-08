@@ -83,7 +83,6 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
   implicit val timeout: Timeout            = 5.seconds
   implicit val scheduler: Scheduler        = actorSystem.scheduler
   implicit val testkit: TestKitSettings    = TestKitSettings(actorSystem)
-
   test("sender of command should receive appropriate responses") {
 
     runOn(seed) {
@@ -97,11 +96,10 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       enterBarrier("short-long-commands")
       enterBarrier("assembly-locked")
 
-      val obsId            = ObsId("Obs002")
       val cmdResponseProbe = TestProbe[CommandResponse]
 
       // try to send a command to assembly which is already locked
-      val assemblyObserve = Observe(acceptedCmdPrefix, Some(obsId))
+      val assemblyObserve = Observe(prefix, acceptedCmdPrefix, Some(ObsId("Obs001")))
       assemblyRef ! Submit(assemblyObserve, cmdResponseProbe.ref)
       val response = cmdResponseProbe.expectMsgType[NotAllowed]
       response.issue shouldBe an[ComponentLockedIssue]
@@ -110,8 +108,8 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
     }
 
     runOn(member1) {
-      val obsId            = Some(ObsId("Obs001"))
       val cmdResponseProbe = TestProbe[CommandResponse]
+      val obsId            = Some(ObsId("Obs001"))
 
       // spawn single assembly running in Standalone mode in jvm-2
       val wiring        = FrameworkWiring.make(system, locationService)
@@ -124,11 +122,11 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.componentRef()).get
 
       // short running command
-      val shortCommandResponse = Await.result(assemblyRef.submit(Setup(invalidCmdPrefix, obsId)), timeout.duration)
+      val shortCommandResponse = Await.result(assemblyRef.submit(Setup(prefix, invalidCmdPrefix, obsId)), timeout.duration)
       shortCommandResponse shouldBe a[Invalid]
 
       // long running command which does not use matcher
-      val setupWithoutMatcher = Setup(withoutMatcherPrefix, obsId)
+      val setupWithoutMatcher = Setup(prefix, withoutMatcherPrefix, obsId)
 
       val eventualLongCommandResponse = async {
         val initialCommandResponse = await(assemblyRef.submit(setupWithoutMatcher))
@@ -147,7 +145,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
       val demandMatcher         = DemandMatcher(DemandState(matcherPrefix, Set(param)), withUnits = false, timeout)
-      val setupWithMatcher      = Setup(matcherPrefix, obsId)
+      val setupWithMatcher      = Setup(prefix, matcherPrefix, obsId)
       val matcher               = new Matcher(assemblyRef, demandMatcher)
 
       val matcherResponseF: Future[MatcherResponse] = matcher.start
@@ -180,7 +178,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       enterBarrier("assembly-locked")
 
       // send command with lock token and expect command processing response
-      val assemblySetup = Setup(immediateCmdPrefix, obsId)
+      val assemblySetup = Setup(prefix, immediateCmdPrefix, obsId)
       assemblyRef ! Submit(assemblySetup, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(5.seconds, Completed(assemblySetup.runId))
       enterBarrier("command-when-locked")

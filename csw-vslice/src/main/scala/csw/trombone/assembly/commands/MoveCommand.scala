@@ -44,8 +44,10 @@ class MoveCommand(
   val stagePosition               = s(ac.stagePositionKey)
   val encoderPosition: Int        = Algorithms.stagePositionToEncoder(ac.controlConfig, stagePosition.head)
   val stateMatcher: DemandMatcher = AssemblyMatchers.posMatcher(encoderPosition)
+
   val scOut: Setup =
-    Setup(TromboneHcdState.axisMoveCK, s.maybeObsId).add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
+    Setup("originationPrefix", TromboneHcdState.axisMoveCK, s.maybeObsId)
+      .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
 
   def startCommand(): Future[CommandResponse] = {
     if (tromboneHCD.isEmpty)
