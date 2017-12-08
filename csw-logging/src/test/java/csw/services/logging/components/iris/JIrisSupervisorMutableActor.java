@@ -14,7 +14,7 @@ public class JIrisSupervisorMutableActor extends MutableBehavior<LogCommand> {
     private ActorContext<LogCommand> actorContext;
     private ILogger log;
 
-    private JIrisSupervisorMutableActor(ActorContext<LogCommand> actorContext, JLoggerFactory loggerFactory) {
+    private JIrisSupervisorMutableActor('ActorContext<LogCommand> actorContext, JLoggerFactory loggerFactory) {
         this.actorContext = actorContext;
         this.log = loggerFactory.getLogger(actorContext, getClass());
     }
