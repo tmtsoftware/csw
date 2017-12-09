@@ -7,14 +7,14 @@ import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
+import csw.messages.ActorTypes.{ComponentRef, ContainerRef}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.messages.{ComponentMessage, ContainerExternalMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
-import csw.services.logging.scaladsl._
+import csw.services.logging.scaladsl.{Keys, LogAdminActorFactory, LoggingSystemFactory, _}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -153,10 +153,10 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   findResult.foreach(akkaLocation ⇒ {
     //#typed-ref
     // If the component type is HCD or Assembly, use this to get the correct ActorRef
-    val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.componentRef()
+    val typedComponentRef: ComponentRef = akkaLocation.componentRef()
 
     // If the component type is Container, use this to get the correct ActorRef
-    val typedContainerRef: ActorRef[ContainerExternalMessage] = akkaLocation.containerRef()
+    val typedContainerRef: ContainerRef = akkaLocation.containerRef()
     //#typed-ref
   })
   //#resolve

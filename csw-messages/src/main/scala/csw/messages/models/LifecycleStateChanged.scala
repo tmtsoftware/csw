@@ -1,7 +1,7 @@
 package csw.messages.models
 
-import akka.typed.ActorRef
+import csw.messages.ActorTypes.ComponentRef
+import csw.messages.TMTSerializable
 import csw.messages.framework.SupervisorLifecycleState
-import csw.messages.{ComponentMessage, TMTSerializable}
 
-case class LifecycleStateChanged(publisher: ActorRef[ComponentMessage], state: SupervisorLifecycleState) extends TMTSerializable
+case class LifecycleStateChanged(publisher: ComponentRef, state: SupervisorLifecycleState) extends TMTSerializable
