@@ -2,7 +2,10 @@ syntax = "proto3";
 
 package csw_protobuf;
 
+import "scalapb/scalapb.proto";
+
 enum PbUnits {
+    option (scalapb.enum_options).type = "csw.messages.params.models.Units";
     //default unit
     NoUnits = 0;
 

@@ -15,8 +15,8 @@ option (scalapb.options) = {
 
 message PbParameter {
     string name = 1;
-    PbUnits units = 2 [(scalapb.field).type = "csw.messages.params.models.Units"];
-    PbKeyType keyType = 3 [(scalapb.field).type = "csw.messages.params.generics.KeyType[_]"];
+    PbUnits units = 2;
+    PbKeyType keyType = 3;
     oneof items {
         ChoiceItems choiceItems = 50;
         RaDecItems raDecItems = 51;
