@@ -1,0 +1,12 @@
+[Unit]
+Description = Service launches multiple container's on a host based on the provided configuration file.
+After = network.target
+
+[Service]
+Environment="clusterSeeds=<ip>:<port>"
+
+ExecStart = /tmt/bin/trombone-host-config-app --local hostConfig.conf -s /tmt/bin/trombone-container-cmd-app
+Type=forking
+
+[Install]
+WantedBy = multi-user.target
