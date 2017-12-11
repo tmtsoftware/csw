@@ -45,12 +45,12 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   def writeSequenceCommand[A <: SequenceCommand](result: A): JsValue = {
     JsObject(
       Seq(
-        "type"              → JsString(result.typeName),
-        "runId"             → runIdFormat.writes(result.runId),
-        "originationPrefix" → prefixFormat.writes(result.originationPrefix),
-        "prefix"            → prefixFormat.writes(result.prefix),
-        "obsId"             → obsIdFormat.writes(result.maybeObsId),
-        "paramSet"          → Json.toJson(result.paramSet)
+        "type"     → JsString(result.typeName),
+        "runId"    → runIdFormat.writes(result.runId),
+        "source"   → prefixFormat.writes(result.source),
+        "target"   → prefixFormat.writes(result.target),
+        "obsId"    → obsIdFormat.writes(result.maybeObsId),
+        "paramSet" → Json.toJson(result.paramSet)
       )
     )
   }
@@ -64,25 +64,25 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   def readSequenceCommand[A <: SequenceCommand](json: JsValue): A = {
     json match {
       case JsObject(fields) =>
-        (fields("type"), fields("runId"), fields("originationPrefix"), fields("prefix"), fields("obsId"), fields("paramSet")) match {
-          case (JsString(typeName), runId, originationPrefix, prefix, obsId, paramSet) =>
+        (fields("type"), fields("runId"), fields("source"), fields("target"), fields("obsId"), fields("paramSet")) match {
+          case (JsString(typeName), runId, source, target, obsId, paramSet) =>
             typeName match {
               case `setupType` =>
                 Setup(runId.as[RunId],
-                      originationPrefix.as[Prefix],
-                      prefix.as[Prefix],
+                      source.as[Prefix],
+                      target.as[Prefix],
                       obsId.as[Option[ObsId]],
                       paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
               case `observeType` =>
                 Observe(runId.as[RunId],
-                        originationPrefix.as[Prefix],
-                        prefix.as[Prefix],
+                        source.as[Prefix],
+                        target.as[Prefix],
                         obsId.as[Option[ObsId]],
                         paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
               case `waitType` =>
                 Wait(runId.as[RunId],
-                     originationPrefix.as[Prefix],
-                     prefix.as[Prefix],
+                     source.as[Prefix],
+                     target.as[Prefix],
                      obsId.as[Option[ObsId]],
                      paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
               case _ => unexpectedJsValueError(json)

@@ -80,9 +80,10 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val lockingStateProbe    = TestProbe[LockingResponse]
     val commandResponseProbe = TestProbe[CommandResponse]
 
-    val senderPrefix  = Prefix("wfos.prog.cloudcover.sender")
-    val client1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
-    val client2Prefix = Prefix("wfos.prog.cloudcover.Client2.success")
+    val source1Prefix = Prefix("wfos.prog.cloudcover.source1")
+    val target1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
+    val source2Prefix = Prefix("wfos.prog.cloudcover.source2")
+    val target2Prefix = Prefix("wfos.prog.cloudcover.Client2.success")
     val obsId         = ObsId("Obs001")
 
     val mocks = frameworkTestMocks()
@@ -95,23 +96,23 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
     // Client 1 will lock an assembly
-    supervisorRef ! LockCommandFactory.make(client1Prefix, lockingStateProbe.ref)
+    supervisorRef ! LockCommandFactory.make(source1Prefix, lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 1 sends submit command with tokenId in parameter set
-    supervisorRef ! Submit(Setup(senderPrefix, client1Prefix, Some(obsId)), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(source1Prefix, target1Prefix, Some(obsId)), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
 
     // Client 2 tries to send submit command while Client 1 has the lock
-    supervisorRef ! Submit(Setup(senderPrefix, client2Prefix, Some(obsId)), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(source2Prefix, target2Prefix, Some(obsId)), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[NotAllowed]
 
     // Client 1 unlocks the assembly
-    supervisorRef ! Unlock(client1Prefix, lockingStateProbe.ref)
+    supervisorRef ! Unlock(source1Prefix, lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockReleased)
 
     // Client 2 tries to send submit command again after lock is released
-    supervisorRef ! Submit(Setup(senderPrefix, client2Prefix, Some(obsId)), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(source2Prefix, target2Prefix, Some(obsId)), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
   }
 
@@ -121,9 +122,9 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val lockingStateProbe    = TestProbe[LockingResponse]
     val commandResponseProbe = TestProbe[CommandResponse]()(untypedSystem.toTyped, settings)
 
-    val senderPrefix  = Prefix("wfos.prog.cloudcover.sender")
-    val client1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
-    val obsId         = ObsId("Obs001")
+    val sourcePrefix = Prefix("wfos.prog.cloudcover.source")
+    val targetPrefix = Prefix("wfos.prog.cloudcover.Client1.success")
+    val obsId        = ObsId("Obs001")
 
     val mocks = frameworkTestMocks()
     import mocks._
@@ -135,7 +136,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
     // Client 1 will lock an assembly
-    supervisorRef ! LockCommandFactory.make(client1Prefix, lockingStateProbe.ref)
+    supervisorRef ! LockCommandFactory.make(sourcePrefix, lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Ensure Domain messages can be sent to component even in locked state
@@ -143,7 +144,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice)))))
 
     // Client 1 sends submit command with tokenId in parameter set
-    val setup = Setup(senderPrefix, client1Prefix, Some(obsId))
+    val setup = Setup(sourcePrefix, targetPrefix, Some(obsId))
     supervisorRef ! Submit(setup, commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
 

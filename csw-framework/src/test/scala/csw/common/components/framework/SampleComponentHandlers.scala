@@ -81,7 +81,7 @@ class SampleComponentHandlers(
 
   def validateCommand(command: ControlCommand): CommandResponse = {
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
-    if (command.prefix.prefix.contains("success")) Accepted(command.runId)
+    if (command.target.prefix.contains("success")) Accepted(command.runId)
     else Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))
   }
 

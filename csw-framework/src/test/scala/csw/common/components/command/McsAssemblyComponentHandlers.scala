@@ -66,11 +66,11 @@ class McsAssemblyComponentHandlers(
     case CommandCompleted(response) ⇒
       response.runId match {
         case id if id == shortSetup.runId ⇒
-          pubSubRef ! Publish(CurrentState(shortSetup.prefix, Set(choiceKey.set(shortCmdCompleted))))
+          pubSubRef ! Publish(CurrentState(shortSetup.target, Set(choiceKey.set(shortCmdCompleted))))
         case id if id == mediumSetup.runId ⇒
-          pubSubRef ! Publish(CurrentState(mediumSetup.prefix, Set(choiceKey.set(mediumCmdCompleted))))
+          pubSubRef ! Publish(CurrentState(mediumSetup.target, Set(choiceKey.set(mediumCmdCompleted))))
         case id if id == longSetup.runId ⇒
-          pubSubRef ! Publish(CurrentState(longSetup.prefix, Set(choiceKey.set(longCmdCompleted))))
+          pubSubRef ! Publish(CurrentState(longSetup.target, Set(choiceKey.set(longCmdCompleted))))
       }
 
       completedCommands += 1
@@ -79,7 +79,7 @@ class McsAssemblyComponentHandlers(
   }
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
-    controlCommand.prefix match {
+    controlCommand.target match {
       case `longRunningCmdPrefix` ⇒ Accepted(controlCommand.runId)
       case _                      ⇒ CommandResponse.Error(controlCommand.runId, "")
     }

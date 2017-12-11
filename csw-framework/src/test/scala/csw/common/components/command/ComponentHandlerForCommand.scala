@@ -17,7 +17,7 @@ import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.messages.models.PubSub.{Publish, PublisherMessage}
-import csw.messages.params.generics.{Key, KeyType, Parameter}
+import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
@@ -42,8 +42,8 @@ class ComponentHandlerForCommand(
       loggerFactory
     ) {
 
-  val log: Logger              = loggerFactory.getLogger(ctx)
-  val cancel_move: Key[String] = KeyType.StringKey.make("cancel_move")
+  val log: Logger = loggerFactory.getLogger(ctx)
+  val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
 
   import ComponentStateForCommand._
   implicit val actorSystem: actor.ActorSystem = ctx.system.toUntyped
@@ -56,40 +56,42 @@ class ComponentHandlerForCommand(
 
   override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand.prefix match {
+  override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand.target match {
     case `acceptedCmdPrefix`    ⇒ Accepted(controlCommand.runId)
     case `withoutMatcherPrefix` ⇒ Accepted(controlCommand.runId)
     case `matcherPrefix`        ⇒ Accepted(controlCommand.runId)
+    case `cancelCmdPrefix`      ⇒ Accepted(controlCommand.runId)
     case `immediateCmdPrefix`   ⇒ Completed(controlCommand.runId)
-    case `invalidCmdPrefix`     ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.prefix.prefix}"))
-    case _                      ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.prefix.prefix}"))
+    case `invalidCmdPrefix` ⇒
+      Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.target.prefix}"))
+    case _ ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.target.prefix}"))
   }
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = controlCommand.prefix match {
-    case `acceptedCmdPrefix`    ⇒ processAcceptedSubmitCmd(controlCommand)
+  override def onSubmit(controlCommand: ControlCommand): Unit = controlCommand.target match {
+    case `cancelCmdPrefix`      ⇒ processAcceptedSubmitCmd(controlCommand)
     case `withoutMatcherPrefix` ⇒ processCommandWithoutMatcher(controlCommand)
+    case `acceptedCmdPrefix`    ⇒ //mimic long running process by not updating CSRM
     case _                      ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
-  override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.prefix match {
-    case `acceptedCmdPrefix` ⇒ processAcceptedOnewayCmd(controlCommand)
+  override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.target match {
+    case `cancelCmdPrefix`   ⇒ processAcceptedOnewayCmd(controlCommand)
     case `matcherPrefix`     ⇒ processCommandWithMatcher(controlCommand)
+    case `acceptedCmdPrefix` ⇒ //mimic long running process by publishing any state
     case _                   ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
-  //If the command is cancel, only then process otherwise do nothing to mimic long running process
   private def processAcceptedSubmitCmd(controlCommand: ControlCommand): Unit =
-    controlCommand.paramType.get(cancel_move).foreach { param ⇒
+    controlCommand.paramType.get(cancelCmdId).foreach { param ⇒
       processCancelCommand(controlCommand.runId, RunId(param.head))
     }
 
-  //If the command is cancel, only then process otherwise do nothing to mimic long running process
   private def processAcceptedOnewayCmd(controlCommand: ControlCommand): Unit =
-    controlCommand.paramType.get(cancel_move).foreach(param ⇒ processOriginalCommand(RunId(param.head)))
+    controlCommand.paramType.get(cancelCmdId).foreach(param ⇒ processOriginalCommand(RunId(param.head)))
 
   private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
-    val result                = Result(controlCommand.prefix, Set(param))
+    val result                = Result(controlCommand.target, Set(param))
     commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
   }
 
@@ -111,7 +113,7 @@ class ComponentHandlerForCommand(
 
   private def processCommandWithMatcher(controlCommand: ControlCommand): Unit = {
     Source(1 to 10)
-      .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.prefix, Set(KeyType.IntKey.make("encoder").set(i * 10)))))
+      .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.target, Set(KeyType.IntKey.make("encoder").set(i * 10)))))
       .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
       .runWith(Sink.ignore)
   }

@@ -93,7 +93,7 @@ class TromboneHcdHandlers(
     import csw.trombone.hcd.TromboneHcdState._
     println(s"Trombone process received sc: $sc")
 
-    sc.prefix match {
+    sc.target match {
       case `axisMoveCK` =>
         tromboneAxis ! Move(sc(positionKey).head, diagFlag = true)
       case `axisDatumCK` =>

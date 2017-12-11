@@ -82,9 +82,9 @@ public class JCommandsTest {
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(setup.runId());
         Assert.assertEquals(Optional.of(obsId), setup.jMaybeObsId());
-        Assert.assertEquals(prefix, setup.prefix().prefix());
-        Assert.assertEquals(new Prefix(prefix), setup.prefix());
-        Assert.assertEquals(WFOS, setup.prefix().subsystem());
+        Assert.assertEquals(prefix, setup.target().prefix());
+        Assert.assertEquals(new Prefix(prefix), setup.target());
+        Assert.assertEquals(WFOS, setup.target().subsystem());
 
         // complete API
         assertOnCommandAPI(setup);
@@ -98,9 +98,9 @@ public class JCommandsTest {
         // runId, prefix, obsId, subsystem
         Assert.assertNotNull(observe.runId());
         Assert.assertEquals(Optional.empty(), observe.jMaybeObsId());
-        Assert.assertEquals(prefix, observe.prefix().prefix());
-        Assert.assertEquals(new Prefix(prefix), observe.prefix());
-        Assert.assertEquals(WFOS, observe.prefix().subsystem());
+        Assert.assertEquals(prefix, observe.target().prefix());
+        Assert.assertEquals(new Prefix(prefix), observe.target());
+        Assert.assertEquals(WFOS, observe.target().subsystem());
 
         // complete API
         assertOnCommandAPI(observe);
@@ -113,9 +113,9 @@ public class JCommandsTest {
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(wait.runId());
         Assert.assertEquals(obsId, wait.jMaybeObsId().get());
-        Assert.assertEquals(prefix, wait.prefix().prefix());
-        Assert.assertEquals(new Prefix(prefix), wait.prefix());
-        Assert.assertEquals(WFOS, wait.prefix().subsystem());
+        Assert.assertEquals(prefix, wait.target().prefix());
+        Assert.assertEquals(new Prefix(prefix), wait.target());
+        Assert.assertEquals(WFOS, wait.target().subsystem());
 
         // complete API
         assertOnCommandAPI(wait);

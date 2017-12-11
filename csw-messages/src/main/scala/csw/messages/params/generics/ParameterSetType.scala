@@ -59,6 +59,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
   @varargs
   def madd[P <: Parameter[_]](parametersToAdd: P*): T = madd(parametersToAdd.toSet)
 
+  //madd ensures check for duplicate key
   def madd[P <: Parameter[_]](parametersToAdd: Set[P]): T =
     parametersToAdd.foldLeft(this)((c, parameter) => doAdd(c, parameter))
 

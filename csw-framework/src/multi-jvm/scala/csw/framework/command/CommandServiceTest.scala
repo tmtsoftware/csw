@@ -99,7 +99,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val cmdResponseProbe = TestProbe[CommandResponse]
 
       // try to send a command to assembly which is already locked
-      val assemblyObserve = Observe(prefix, acceptedCmdPrefix, Some(ObsId("Obs001")))
+      val assemblyObserve = Observe(invalidCmdPrefix, acceptedCmdPrefix, Some(ObsId("Obs001")))
       assemblyRef ! Submit(assemblyObserve, cmdResponseProbe.ref)
       val response = cmdResponseProbe.expectMsgType[NotAllowed]
       response.issue shouldBe an[ComponentLockedIssue]
@@ -173,7 +173,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       // acquire lock on assembly
       val lockResponseProbe = TestProbe[LockingResponse]
-      assemblyRef ! LockCommandFactory.make(immediateCmdPrefix, lockResponseProbe.ref)
+      assemblyRef ! LockCommandFactory.make(prefix, lockResponseProbe.ref)
       lockResponseProbe.expectMsg(LockAcquired)
       enterBarrier("assembly-locked")
 

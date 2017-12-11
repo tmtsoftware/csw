@@ -52,7 +52,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
 
   override def onNotFollowing(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
     case Submit(s: Setup, replyTo) =>
-      s.prefix match {
+      s.target match {
         case ac.initCK =>
           replyTo ! Completed(s.runId)
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
@@ -134,7 +134,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
 
   override def onFollowing(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
     case Submit(s: Setup, replyTo) =>
-      s.prefix match {
+      s.target match {
         case ac.datumCK | ac.moveCK | ac.positionCK | ac.followCK | ac.setElevationCK =>
           replyTo ! Invalid(
             s.runId,

@@ -54,7 +54,7 @@ class McsHcdComponentHandlers(
   }
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
-    controlCommand.prefix match {
+    controlCommand.target match {
       case `longRunningCmdPrefix`   ⇒ Accepted(controlCommand.runId)
       case `mediumRunningCmdPrefix` ⇒ Accepted(controlCommand.runId)
       case `shortRunningCmdPrefix`  ⇒ Accepted(controlCommand.runId)
@@ -63,7 +63,7 @@ class McsHcdComponentHandlers(
   }
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
-    controlCommand.prefix match {
+    controlCommand.target match {
       case `longRunningCmdPrefix` ⇒
         ctx.schedule(5.seconds, ctx.self, LongCommandCompleted(Completed(controlCommand.runId)))
       case `mediumRunningCmdPrefix` ⇒

@@ -30,10 +30,17 @@ sealed trait Command { self: ParameterSetType[_] ⇒
    */
   val paramSet: Set[Parameter[_]]
 
-  val originationPrefix: Prefix
-  val prefix: Prefix
-  val maybeObsId: Option[ObsId]
+  /**
+   * Prefix representing source of the command
+   */
+  val source: Prefix
 
+  /**
+   * Prefix representing target of the command
+   */
+  val target: Prefix
+
+  val maybeObsId: Option[ObsId]
   def jMaybeObsId: Optional[ObsId] = maybeObsId.asJava
 }
 
@@ -55,18 +62,15 @@ sealed trait ControlCommand extends Command { self: ParameterSetType[_] ⇒
  * @param runId unique ID for this parameter set
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Setup private (
-    runId: RunId,
-    originationPrefix: Prefix,
-    prefix: Prefix,
-    maybeObsId: Option[ObsId],
-    paramSet: Set[Parameter[_]] = Set.empty
-) extends ParameterSetType[Setup]
+case class Setup private (runId: RunId, source: Prefix, target: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]])
+    extends ParameterSetType[Setup]
     with SequenceCommand
     with ControlCommand {
+
+  def this(source: String, target: String, maybeObsId: Optional[ObsId]) =
+    this(RunId(), source, target, maybeObsId.asScala, Set.empty)
+
   override protected def create(data: Set[Parameter[_]]): Setup = copy(paramSet = data)
-  def this(originationPrefix: String, prefix: String, maybeObsId: Optional[ObsId]) =
-    this(RunId(), originationPrefix, prefix, maybeObsId.asScala) // Provided for Java construction
 }
 
 object Setup {
@@ -74,21 +78,18 @@ object Setup {
   // The default apply method is used only internally while reading the incoming json and de-serializing it to setup model
   private[messages] def apply(
       runId: RunId,
-      originationPrefix: Prefix,
-      prefix: Prefix,
+      source: Prefix,
+      target: Prefix,
       maybeObsId: Option[ObsId],
       paramSet: Set[Parameter[_]]
-  ): Setup =
-    new Setup(runId, originationPrefix, prefix, maybeObsId, paramSet) //madd is not required as this version of apply is only used for reading json
+  ): Setup = new Setup(runId, source, target, maybeObsId, paramSet)
 
   // The apply method is used to create Setup command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
-  def apply(
-      originationPrefix: Prefix,
-      prefix: Prefix,
-      maybeObsId: Option[ObsId],
-      paramSet: Set[Parameter[_]] = Set.empty
-  ): Setup =
-    new Setup(RunId(), originationPrefix, prefix, maybeObsId).madd(paramSet) //madd ensures check for duplicate key
+  def apply(source: Prefix, target: Prefix, maybeObsId: Option[ObsId]): Setup =
+    apply(RunId(), source, target, maybeObsId, Set.empty)
+
+  def apply(source: Prefix, target: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Setup =
+    apply(source, target, maybeObsId).madd(paramSet)
 }
 
 /**
@@ -97,38 +98,31 @@ object Setup {
  * @param runId unique ID for this parameter set
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Observe private (
-    runId: RunId,
-    originationPrefix: Prefix,
-    prefix: Prefix,
-    maybeObsId: Option[ObsId],
-    paramSet: Set[Parameter[_]] = Set.empty
-) extends ParameterSetType[Observe]
+case class Observe private (runId: RunId, source: Prefix, target: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]])
+    extends ParameterSetType[Observe]
     with SequenceCommand
     with ControlCommand {
 
+  def this(source: String, prefix: String, maybeObsId: Optional[ObsId]) =
+    this(RunId(), source, prefix, maybeObsId.asScala, Set.empty)
   override protected def create(data: Set[Parameter[_]]): Observe = copy(paramSet = data)
-  def this(originationPrefix: String, prefix: String, maybeObsId: Optional[ObsId]) =
-    this(RunId(), originationPrefix, prefix, maybeObsId.asScala) // Provided for Java construction
 }
 
 object Observe {
+
   private[messages] def apply(
       runId: RunId,
-      originationPrefix: Prefix,
+      source: Prefix,
       prefix: Prefix,
       maybeObsId: Option[ObsId],
       paramSet: Set[Parameter[_]]
-  ) =
-    new Observe(runId, originationPrefix, prefix, maybeObsId, paramSet)
+  ) = new Observe(runId, source, prefix, maybeObsId, paramSet)
 
-  def apply(
-      originationPrefix: Prefix,
-      prefix: Prefix,
-      maybeObsId: Option[ObsId],
-      paramSet: Set[Parameter[_]] = Set.empty
-  ): Observe =
-    new Observe(RunId(), originationPrefix, prefix, maybeObsId).madd(paramSet)
+  def apply(source: Prefix, target: Prefix, maybeObsId: Option[ObsId]): Observe =
+    apply(RunId(), source, target, maybeObsId, Set.empty)
+
+  def apply(source: Prefix, target: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Observe =
+    apply(source, target, maybeObsId).madd(paramSet)
 }
 
 /**
@@ -137,31 +131,28 @@ object Observe {
  * @param runId unique ID for this parameter set
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-case class Wait private (
-    runId: RunId,
-    originationPrefix: Prefix,
-    prefix: Prefix,
-    maybeObsId: Option[ObsId],
-    paramSet: Set[Parameter[_]] = Set.empty
-) extends ParameterSetType[Wait]
+case class Wait private (runId: RunId, source: Prefix, target: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]])
+    extends ParameterSetType[Wait]
     with SequenceCommand {
 
+  def this(source: String, prefix: String, maybeObsId: Optional[ObsId]) =
+    this(RunId(), source, prefix, maybeObsId.asScala, Set.empty)
   override protected def create(data: Set[Parameter[_]]): Wait = copy(paramSet = data)
-  def this(originationPrefix: String, prefix: String, maybeObsId: Optional[ObsId]) =
-    this(RunId(), originationPrefix, prefix, maybeObsId.asScala) // Provided for Java construction
 }
 
 object Wait {
 
   private[messages] def apply(
       runId: RunId,
-      originationPrefix: Prefix,
+      source: Prefix,
       prefix: Prefix,
       maybeObsId: Option[ObsId],
       paramSet: Set[Parameter[_]]
-  ) =
-    new Wait(runId, originationPrefix, prefix, maybeObsId, paramSet)
+  ) = new Wait(runId, source, prefix, maybeObsId, paramSet)
 
-  def apply(originationPrefix: Prefix, prefix: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]] = Set.empty): Wait =
-    new Wait(RunId(), originationPrefix, prefix, maybeObsId).madd(paramSet)
+  def apply(source: Prefix, target: Prefix, maybeObsId: Option[ObsId]): Wait =
+    apply(RunId(), source, target, maybeObsId, Set.empty)
+
+  def apply(source: Prefix, target: Prefix, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Wait =
+    apply(source, target, maybeObsId).madd(paramSet)
 }

@@ -8,7 +8,7 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.common.components.command.ComponentStateForCommand.{acceptedCmdPrefix, prefix}
+import csw.common.components.command.ComponentStateForCommand.{acceptedCmdPrefix, cancelCmdPrefix, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.Subscribe
@@ -48,8 +48,8 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
 
     runOn(member) {
       val cmdResponseProbe = TestProbe[CommandResponse]
-      val cancel_move      = KeyType.StringKey.make("cancel_move")
       val obsId            = Some(ObsId("Obs001"))
+      val cancelCmdId      = KeyType.StringKey.make("cancelCmdId")
 
       enterBarrier("spawned")
 
@@ -63,7 +63,7 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
       assemblyRef ! Submit(originalSetup, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(Accepted(originalSetup.runId))
 
-      val cancelSetup = Setup(prefix, acceptedCmdPrefix, obsId, Set(cancel_move.set(originalSetup.runId.id)))
+      val cancelSetup = Setup(prefix, cancelCmdPrefix, obsId, Set(cancelCmdId.set(originalSetup.runId.id)))
       assemblyRef ! Submit(cancelSetup, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(Accepted(cancelSetup.runId))
 
@@ -78,7 +78,7 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
       assemblyRef ! Submit(originalSetup2, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(Accepted(originalSetup2.runId))
 
-      val cancelSetup2 = Setup(prefix, acceptedCmdPrefix, obsId, Set(cancel_move.set(originalSetup2.runId.id)))
+      val cancelSetup2 = Setup(prefix, cancelCmdPrefix, obsId, Set(cancelCmdId.set(originalSetup2.runId.id)))
       assemblyRef ! Oneway(cancelSetup2, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(Accepted(cancelSetup2.runId))
 
@@ -90,7 +90,7 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
       assemblyRef ! Oneway(originalSetup3, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(Accepted(originalSetup3.runId))
 
-      val cancelSetup3 = Setup(prefix, acceptedCmdPrefix, obsId, Set(cancel_move.set(originalSetup3.runId.id)))
+      val cancelSetup3 = Setup(prefix, cancelCmdPrefix, obsId, Set(cancelCmdId.set(originalSetup3.runId.id)))
       assemblyRef ! Submit(cancelSetup3, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(Accepted(cancelSetup3.runId))
 
@@ -102,7 +102,7 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
       assemblyRef ! Oneway(originalSetup4, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(Accepted(originalSetup4.runId))
 
-      val cancelSetup4 = Setup(prefix, acceptedCmdPrefix, obsId, Set(cancel_move.set(originalSetup4.runId.id)))
+      val cancelSetup4 = Setup(prefix, cancelCmdPrefix, obsId, Set(cancelCmdId.set(originalSetup4.runId.id)))
       assemblyRef ! Oneway(cancelSetup4, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(Accepted(cancelSetup4.runId))
     }

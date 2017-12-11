@@ -27,7 +27,7 @@ class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) 
   def allowCommand(msg: CommandMessage): Boolean = lockPrefix match {
     case None ⇒ true
     case Some(currentPrefix) ⇒
-      msg.command.prefix match {
+      msg.command.source match {
         case `currentPrefix` ⇒
           log.info(s"Forwarding message ${msg.toString} to TLA for component: $currentPrefix")
           true
