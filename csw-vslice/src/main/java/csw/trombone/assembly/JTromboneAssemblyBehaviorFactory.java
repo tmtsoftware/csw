@@ -12,9 +12,10 @@ import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.JLoggerFactory;
 
-public class TromboneAssemblyBehaviorFactory extends JComponentBehaviorFactory<DiagPublisherMessages> {
+//#jcomponent-factory
+public class JTromboneAssemblyBehaviorFactory extends JComponentBehaviorFactory<DiagPublisherMessages> {
 
-    public TromboneAssemblyBehaviorFactory() {
+    public JTromboneAssemblyBehaviorFactory() {
         super(DiagPublisherMessages.class);
     }
 
@@ -27,6 +28,7 @@ public class TromboneAssemblyBehaviorFactory extends JComponentBehaviorFactory<D
             ILocationService locationService,
             JLoggerFactory loggerFactory
     ) {
-        return new TromboneAssemblyHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, DiagPublisherMessages.class);
+        return new JTromboneAssemblyHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, DiagPublisherMessages.class);
     }
 }
+//#jcomponent-factory

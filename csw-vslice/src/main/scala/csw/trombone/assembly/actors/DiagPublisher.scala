@@ -1,14 +1,15 @@
 package csw.trombone.assembly.actors
 
 import java.time.Instant
+import java.util.Optional
 
 import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.params.states.CurrentState
 import csw.messages.ComponentMessage
 import csw.messages.models.PubSub
+import csw.messages.params.states.CurrentState
 import csw.trombone.assembly.DiagPublisherMessages._
 import csw.trombone.assembly.TrombonePublisherMsg.{AxisStateUpdate, AxisStatsUpdate}
 import csw.trombone.assembly.actors.DiagPublisher.Mode.{Diagnostic, Operations}
@@ -17,6 +18,7 @@ import csw.trombone.assembly.{AssemblyContext, DiagPublisherMessages, TrombonePu
 import csw.trombone.hcd.TromboneEngineering.GetAxisStats
 import csw.trombone.hcd.TromboneHcdState
 
+import scala.compat.java8.OptionConverters.RichOptionalGeneric
 import scala.concurrent.duration.DurationDouble
 
 object DiagPublisher {
@@ -27,6 +29,13 @@ object DiagPublisher {
       eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
   ): Behavior[DiagPublisherMessages] =
     Actor.mutable(ctx ⇒ new DiagPublisher(ctx, assemblyContext, runningIn, eventPublisher))
+
+  def jMake(
+      assemblyContext: AssemblyContext,
+      runningIn: Optional[ActorRef[ComponentMessage]],
+      eventPublisher: Optional[ActorRef[TrombonePublisherMsg]]
+  ): Behavior[DiagPublisherMessages] =
+    Actor.mutable(ctx ⇒ new DiagPublisher(ctx, assemblyContext, runningIn.asScala, eventPublisher.asScala))
 
   sealed trait Mode
   object Mode {

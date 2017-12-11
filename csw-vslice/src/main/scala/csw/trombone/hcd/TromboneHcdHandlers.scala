@@ -1,4 +1,4 @@
-package csw.trombone.hcd.actors
+package csw.trombone.hcd
 
 import akka.actor.Scheduler
 import akka.typed.ActorRef
@@ -20,12 +20,12 @@ import csw.services.logging.scaladsl.LoggerFactory
 import csw.trombone.hcd.AxisRequest._
 import csw.trombone.hcd.AxisResponse._
 import csw.trombone.hcd.TromboneEngineering.{GetAxisConfig, GetAxisStats, GetAxisUpdate, GetAxisUpdateNow}
-import csw.trombone.hcd._
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
+//#component-factory
 class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessage] {
   override def handlers(
       ctx: ActorContext[TopLevelActorMessage],
@@ -37,7 +37,9 @@ class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessag
   ): ComponentHandlers[TromboneMessage] =
     new TromboneHcdHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }
+//#component-factory
 
+//#component-handler
 class TromboneHcdHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
@@ -53,7 +55,9 @@ class TromboneHcdHandlers(
       locationService,
       loggerFactory
     ) {
+  //#component-handler
 
+  //private state of this component
   implicit val timeout: Timeout             = Timeout(2.seconds)
   implicit val scheduler: Scheduler         = ctx.system.scheduler
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
@@ -63,12 +67,19 @@ class TromboneHcdHandlers(
   var tromboneAxis: ActorRef[AxisRequest] = _
   var axisConfig: AxisConfig              = _
 
+  //#initialize-handler
   override def initialize(): Future[Unit] = async {
+    // fetch config (preferably from configuration service)
     axisConfig = await(getAxisConfig)
-    tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behavior(axisConfig, Some(ctx.self)))
+
+    // create a worker actor which is used by this hcd
+    tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behavior(axisConfig, ctx.self))
+
+    // initialise some state by using the worker actor created above
     current = await(tromboneAxis ? InitialState)
     stats = await(tromboneAxis ? GetStatistics)
   }
+  //#initialize-handler
 
   override def onShutdown(): Future[Unit] = {
     Future.successful(println("shutdown complete during Running context"))

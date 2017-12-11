@@ -1,29 +1,30 @@
-package csw.trombone.assembly.actors
+package csw.trombone.assembly
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import com.typesafe.config.ConfigFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.CommandMessage.Submit
-import csw.messages.models.PubSub.PublisherMessage
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
+import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs.CommandMessageE
-import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.CommonMsgs.UpdateHcdLocations
 import csw.trombone.assembly.DiagPublisherMessages.{CommandResponseE, DiagnosticState, OperationsState}
 import csw.trombone.assembly.ParamValidation._
-import csw.trombone.assembly._
+import csw.trombone.assembly.actors.{DiagPublisher, TromboneAssemblyCommandBehaviorFactory, TrombonePublisher}
 
 import scala.async.Async.{async, await}
+import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
+//#component-factory
 class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPublisherMessages] {
   override def handlers(
       ctx: ActorContext[TopLevelActorMessage],
@@ -35,7 +36,9 @@ class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPubli
   ): ComponentHandlers[DiagPublisherMessages] =
     new TromboneAssemblyHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }
+//#component-factory
 
+//#component-handler
 class TromboneAssemblyHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
@@ -51,31 +54,50 @@ class TromboneAssemblyHandlers(
       locationService,
       loggerFactory
     ) {
+  //#component-handler
 
-  private var diagPublsher: ActorRef[DiagPublisherMessages] = _
-
-  private var commandHandler: ActorRef[AssemblyCommandHandlerMsgs] = _
+  //private state of this component
+  private var diagPublisher: ActorRef[DiagPublisherMessages]                   = _
+  private var commandHandler: ActorRef[AssemblyCommandHandlerMsgs]             = _
+  private var runningHcds: Map[Connection, Option[ActorRef[ComponentMessage]]] = Map.empty
 
   private val commandResponseAdapter: ActorRef[CommandResponse] = ctx.spawnAdapter(CommandResponseE)
 
   implicit var ac: AssemblyContext  = _
   implicit val ec: ExecutionContext = ctx.executionContext
 
-  private var runningHcds: Map[Connection, Option[ActorRef[ComponentMessage]]] = Map.empty
-
   def onRun(): Future[Unit] = Future.unit
 
+  //#initialize-handler
   def initialize(): Future[Unit] = async {
+    // fetch config (preferably from configuration service)
     val (calculationConfig, controlConfig) = await(getAssemblyConfigs)
     ac = AssemblyContext(componentInfo, calculationConfig, controlConfig)
 
+    // create a worker actor which is used by this assembly
     val eventPublisher = ctx.spawnAnonymous(TrombonePublisher.make(ac))
 
-    commandHandler = ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcds, Some(eventPublisher)))
+    // find a Hcd connection from the connections provided in componentInfo
+    val maybeConnection =
+      componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
 
-    val hcdRef = if (runningHcds.nonEmpty) runningHcds.head._2 else None
-    diagPublsher = ctx.spawnAnonymous(DiagPublisher.make(ac, hcdRef, Some(eventPublisher)))
+    // If an Hcd is found as a connection, resolve its location from location service and create other
+    // required worker actors required by this assembly
+    maybeConnection match {
+      case hcdConnection @ Some(hcd) ⇒
+        locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
+          case Some(akkaLocation) ⇒
+            runningHcds = runningHcds.updated(hcdConnection.get, Some(akkaLocation.componentRef()))
+            diagPublisher = ctx.spawnAnonymous(DiagPublisher.make(ac, runningHcds(maybeConnection.get), Some(eventPublisher)))
+            commandHandler =
+              ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcds, Some(eventPublisher)))
+          case None ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
+        }
+      case None ⇒ Future.successful(Unit)
+    }
+
   }
+  //#initialize-handler
 
   override def onShutdown(): Future[Unit] = {
     Future.successful(println("Received Shutdown"))
@@ -86,7 +108,7 @@ class TromboneAssemblyHandlers(
   override def onGoOnline(): Unit = println("Received GoOnline")
 
   def onDomainMsg(mode: DiagPublisherMessages): Unit = mode match {
-    case (DiagnosticState | OperationsState) => diagPublsher ! mode
+    case (DiagnosticState | OperationsState) => diagPublisher ! mode
     case _                                   ⇒
   }
 

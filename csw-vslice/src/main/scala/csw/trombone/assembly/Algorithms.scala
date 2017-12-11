@@ -1,7 +1,6 @@
 package csw.trombone.assembly
 
 import csw.messages.params.generics.Parameter
-import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 
 /**
  * This object contains functions that implement this test version of the trombone assembly algorithms.

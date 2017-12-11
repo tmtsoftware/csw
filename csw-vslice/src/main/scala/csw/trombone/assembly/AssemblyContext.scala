@@ -7,7 +7,6 @@ import csw.messages.location.ComponentId
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.Units.{degree, kilometer, micrometer, millimeter}
 import csw.messages.params.models.{ObsId, Prefix, RunId}
-import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 
 /**
  * TMT Source Code: 10/4/16.
@@ -137,66 +136,63 @@ case class AssemblyContext(
   val obsId: ObsId = ObsId("Obs001")
 }
 
-object AssemblyContext {
+/**
+ * Configuration class
+ *
+ * @param positionScale   value used to scale
+ * @param stageZero       zero point in stage conversion
+ * @param minStageEncoder minimum
+ * @param minEncoderLimit minimum
+ */
+case class TromboneControlConfig(
+    positionScale: Double,
+    stageZero: Double,
+    minStageEncoder: Int,
+    minEncoderLimit: Int,
+    maxEncoderLimit: Int
+)
 
-  /**
-   * Configuration class
-   *
-   * @param positionScale   value used to scale
-   * @param stageZero       zero point in stage conversion
-   * @param minStageEncoder minimum
-   * @param minEncoderLimit minimum
-   */
-  case class TromboneControlConfig(
-      positionScale: Double,
-      stageZero: Double,
-      minStageEncoder: Int,
-      minEncoderLimit: Int,
-      maxEncoderLimit: Int
-  )
+object TromboneControlConfig {
+  def apply(config: Config): TromboneControlConfig = {
+    // Main prefix for keys used below
+    val prefix = "csw.examples.trombone.assembly"
 
-  object TromboneControlConfig {
-    def apply(config: Config): TromboneControlConfig = {
-      // Main prefix for keys used below
-      val prefix = "csw.examples.trombone.assembly"
-
-      val positionScale   = config.getDouble(s"$prefix.control-config.positionScale")
-      val stageZero       = config.getDouble(s"$prefix.control-config.stageZero")
-      val minStageEncoder = config.getInt(s"$prefix.control-config.minStageEncoder")
-      val minEncoderLimit = config.getInt(s"$prefix.control-config.minEncoderLimit")
-      val maxEncoderLimit = config.getInt(s"$prefix.control-config.maxEncoderLimit")
-      TromboneControlConfig(positionScale, stageZero, minStageEncoder, minEncoderLimit, maxEncoderLimit)
-    }
+    val positionScale   = config.getDouble(s"$prefix.control-config.positionScale")
+    val stageZero       = config.getDouble(s"$prefix.control-config.stageZero")
+    val minStageEncoder = config.getInt(s"$prefix.control-config.minStageEncoder")
+    val minEncoderLimit = config.getInt(s"$prefix.control-config.minEncoderLimit")
+    val maxEncoderLimit = config.getInt(s"$prefix.control-config.maxEncoderLimit")
+    TromboneControlConfig(positionScale, stageZero, minStageEncoder, minEncoderLimit, maxEncoderLimit)
   }
+}
 
-  /**
-   * Configuration class
-   *
-   * @param defaultInitialElevation a default initial eleveation (possibly remove once workign)
-   * @param focusErrorGain          gain value for focus error
-   * @param upperFocusLimit         check for maximum focus error
-   * @param lowerFocusLimit         check for minimum focus error
-   * @param zenithFactor            an algorithm value for scaling zenith angle term
-   */
-  case class TromboneCalculationConfig(
-      defaultInitialElevation: Double,
-      focusErrorGain: Double,
-      upperFocusLimit: Double,
-      lowerFocusLimit: Double,
-      zenithFactor: Double
-  )
+/**
+ * Configuration class
+ *
+ * @param defaultInitialElevation a default initial eleveation (possibly remove once workign)
+ * @param focusErrorGain          gain value for focus error
+ * @param upperFocusLimit         check for maximum focus error
+ * @param lowerFocusLimit         check for minimum focus error
+ * @param zenithFactor            an algorithm value for scaling zenith angle term
+ */
+case class TromboneCalculationConfig(
+    defaultInitialElevation: Double,
+    focusErrorGain: Double,
+    upperFocusLimit: Double,
+    lowerFocusLimit: Double,
+    zenithFactor: Double
+)
 
-  object TromboneCalculationConfig {
-    def apply(config: Config): TromboneCalculationConfig = {
-      // Main prefix for keys used below
-      val prefix = "csw.examples.trombone.assembly"
+object TromboneCalculationConfig {
+  def apply(config: Config): TromboneCalculationConfig = {
+    // Main prefix for keys used below
+    val prefix = "csw.examples.trombone.assembly"
 
-      val defaultInitialElevation = config.getDouble(s"$prefix.calculation-config.defaultInitialElevation")
-      val focusGainError          = config.getDouble(s"$prefix.calculation-config.focusErrorGain")
-      val upperFocusLimit         = config.getDouble(s"$prefix.calculation-config.upperFocusLimit")
-      val lowerFocusLimit         = config.getDouble(s"$prefix.calculation-config.lowerFocusLimit")
-      val zenithFactor            = config.getDouble(s"$prefix.calculation-config.zenithFactor")
-      TromboneCalculationConfig(defaultInitialElevation, focusGainError, upperFocusLimit, lowerFocusLimit, zenithFactor)
-    }
+    val defaultInitialElevation = config.getDouble(s"$prefix.calculation-config.defaultInitialElevation")
+    val focusGainError          = config.getDouble(s"$prefix.calculation-config.focusErrorGain")
+    val upperFocusLimit         = config.getDouble(s"$prefix.calculation-config.upperFocusLimit")
+    val lowerFocusLimit         = config.getDouble(s"$prefix.calculation-config.lowerFocusLimit")
+    val zenithFactor            = config.getDouble(s"$prefix.calculation-config.zenithFactor")
+    TromboneCalculationConfig(defaultInitialElevation, focusGainError, upperFocusLimit, lowerFocusLimit, zenithFactor)
   }
 }

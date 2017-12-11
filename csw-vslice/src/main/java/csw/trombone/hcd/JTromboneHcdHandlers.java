@@ -22,15 +22,17 @@ import scala.runtime.BoxedUnit;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class TromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
+//#jcomponent-handler
+public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
 
+    // private state of this component
     private AxisResponse.AxisUpdate current;
     private AxisResponse.AxisStatistics stats;
     private ActorRef<AxisRequest> tromboneAxis;
     private AxisConfig axisConfig;
-    private ActorContext<TopLevelActorMessage> context;
+    private ActorContext<TopLevelActorMessage> ctx;
 
-    public TromboneHcdHandlers(
+    public JTromboneHcdHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
@@ -40,34 +42,40 @@ public class TromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
             Class<TromboneMessage> klass
     ) {
         super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, klass);
-        context = ctx;
+        this.ctx = ctx;
     }
+    //#jcomponent-handler
 
+    //#jInitialize-handler
     @Override
     public CompletableFuture<BoxedUnit> jInitialize() {
-        CompletableFuture<Void> future = getAxisConfig()
+        // fetch config (preferably from configuration service)
+        CompletableFuture<Void> configInitialisation = getAxisConfig()
                 .thenAccept(config -> {
                     axisConfig = config;
-                    tromboneAxis = context.spawnAnonymous(AxisSimulator.behavior(axisConfig, context.getSelf().narrow()));
+                    // create a worker actor which is used by this hcd
+                    tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behavior(axisConfig, ctx.getSelf().narrow()));
                 });
 
-        CompletableFuture<Void> voidCompletableFuture1 = AskPattern.ask(
+        // initialise some state by using the worker actor created above
+        CompletableFuture<Void> initialAxisState = AskPattern.ask(
                 tromboneAxis,
                 AxisRequest.InitialState::new,
                 new Timeout(5, TimeUnit.SECONDS),
-                context.getSystem().scheduler()
+                ctx.getSystem().scheduler()
         ).thenAccept(axisUpdate -> current = axisUpdate).toCompletableFuture();
 
-        CompletableFuture<Void> voidCompletableFuture = AskPattern.ask(
+        // initialise some state by using the worker actor created above
+        CompletableFuture<Void> initialAxisStats = AskPattern.ask(
                 tromboneAxis,
                 AxisRequest.GetStatistics::new,
                 new Timeout(5, TimeUnit.SECONDS),
-                context.getSystem().scheduler()
+                ctx.getSystem().scheduler()
         ).thenAccept(axisStatistics -> stats = axisStatistics).toCompletableFuture();
 
-        return CompletableFuture.allOf(future, voidCompletableFuture, voidCompletableFuture1).thenApply(x -> BoxedUnit.UNIT);
-
+        return CompletableFuture.allOf(configInitialisation, initialAxisStats, initialAxisState).thenApply(x -> BoxedUnit.UNIT);
     }
+    //#jInitialize-handler
 
     @Override
     public CompletableFuture<BoxedUnit> jOnShutdown() {

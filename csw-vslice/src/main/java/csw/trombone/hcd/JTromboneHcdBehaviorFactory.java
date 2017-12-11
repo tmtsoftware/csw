@@ -12,9 +12,10 @@ import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.JLoggerFactory;
 
-public class TromboneHcdBehaviorFactory extends JComponentBehaviorFactory<TromboneMessage> {
+//#jcomponent-factory
+public class JTromboneHcdBehaviorFactory extends JComponentBehaviorFactory<TromboneMessage> {
 
-    public TromboneHcdBehaviorFactory() {
+    public JTromboneHcdBehaviorFactory() {
         super(TromboneMessage.class);
     }
 
@@ -30,3 +31,4 @@ public class TromboneHcdBehaviorFactory extends JComponentBehaviorFactory<Trombo
         return null;
     }
 }
+//#jcomponent-factory

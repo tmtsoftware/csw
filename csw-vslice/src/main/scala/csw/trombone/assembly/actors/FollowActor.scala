@@ -5,7 +5,6 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.ccs.events.EventTime
 import csw.messages.params.generics.Parameter
-import csw.trombone.assembly.AssemblyContext.{TromboneCalculationConfig, TromboneControlConfig}
 import csw.trombone.assembly.FollowActorMessages.{SetElevation, SetZenithAngle, StopFollowing, UpdatedEventData}
 import csw.trombone.assembly.TromboneControlMsg.GoToStagePosition
 import csw.trombone.assembly.TrombonePublisherMsg.{AOESWUpdate, EngrUpdate}
