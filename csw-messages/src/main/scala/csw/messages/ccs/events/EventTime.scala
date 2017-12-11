@@ -3,7 +3,7 @@ package csw.messages.ccs.events
 import java.time.{Clock, Instant}
 
 import com.google.protobuf.timestamp.Timestamp
-import com.trueaccord.scalapb.TypeMapper
+import scalapb.TypeMapper
 import csw.messages.params.pb.Implicits.instantMapper
 import play.api.libs.json._
 

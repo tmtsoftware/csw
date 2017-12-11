@@ -1,6 +1,6 @@
 package csw.messages.params.models
 
-import com.trueaccord.scalapb.TypeMapper
+import scalapb.TypeMapper
 import csw.messages.TMTSerializable
 import csw_protobuf.units.PbUnits
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}

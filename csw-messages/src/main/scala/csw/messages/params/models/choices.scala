@@ -2,7 +2,7 @@ package csw.messages.params.models
 
 import java.util
 
-import com.trueaccord.scalapb.TypeMapper
+import scalapb.TypeMapper
 import play.api.libs.json.{Json, OFormat}
 
 import scala.annotation.varargs

@@ -2,7 +2,7 @@ package csw.messages.params.models
 
 import java.util.Optional
 
-import com.trueaccord.scalapb.TypeMapper
+import scalapb.TypeMapper
 import csw.messages.TMTSerializable
 import play.api.libs.json._
 

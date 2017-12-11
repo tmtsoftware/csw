@@ -2,7 +2,7 @@ package csw.messages.params.generics
 
 import java.time.Instant
 
-import com.trueaccord.scalapb.TypeMapper
+import scalapb.TypeMapper
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.models.Units.second
 import csw.messages.params.models.{Units, _}

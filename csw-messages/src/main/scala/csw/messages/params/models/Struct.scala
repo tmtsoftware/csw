@@ -1,6 +1,6 @@
 package csw.messages.params.models
 
-import com.trueaccord.scalapb.TypeMapper
+import scalapb.TypeMapper
 import csw.messages.params.generics.{Parameter, ParameterSetType}
 import csw_protobuf.parameter.PbStruct
 import play.api.libs.json.{Json, OFormat}

@@ -4,7 +4,7 @@ import java.time.Instant
 
 import com.google.protobuf.ByteString
 import com.google.protobuf.timestamp.Timestamp
-import com.trueaccord.scalapb.TypeMapper
+import scalapb.TypeMapper
 
 /**
  * Type mappers for implicit conversions of data types that are not directly supported by Protobuf.

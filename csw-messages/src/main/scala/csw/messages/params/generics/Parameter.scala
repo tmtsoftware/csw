@@ -3,7 +3,7 @@ package csw.messages.params.generics
 import java.util
 import java.util.Optional
 
-import com.trueaccord.scalapb.TypeMapper
+import scalapb.TypeMapper
 import csw.messages.TMTSerializable
 import csw.messages.params.models.Units
 import csw.messages.params.pb.{ItemType, ItemsFactory}
