@@ -124,7 +124,6 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     commandResponseProbe.expectMsgType[NotAllowed]
   }
 
-
   // DEOPSCSW-222: Locking a component for a specific duration
   // DEOPSCSW-301: Support UnLocking
   test("should forward messages that are of type SupervisorLockMessage to TLA") {
@@ -176,13 +175,13 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   // DEOPSCSW-223 Expiry of component Locking mode
   test("should expire lock after timeout") {
-    val lockingStateProbe = TestProbe[LockingResponse]
+    val lockingStateProbe    = TestProbe[LockingResponse]
     val commandResponseProbe = TestProbe[CommandResponse]
 
     val source2Prefix = Prefix("wfos.prog.cloudcover.source2")
     val target2Prefix = Prefix("wfos.prog.cloudcover.Client2.success")
     val obsId         = ObsId("Obs001")
-    val client1Prefix     = Prefix("wfos.prog.cloudcover.Client1.success")
+    val client1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
 
     val mocks = frameworkTestMocks()
     import mocks._
@@ -212,8 +211,8 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockExpired)
 
     // Client 2 tries to send submit command again after lock is released
-//    supervisorRef ! Submit(Setup(source2Prefix, target2Prefix, Some(obsId)), commandResponseProbe.ref)
-//    commandResponseProbe.expectMsgType[Accepted]
+    //    supervisorRef ! Submit(Setup(source2Prefix, target2Prefix, Some(obsId)), commandResponseProbe.ref)
+    //    commandResponseProbe.expectMsgType[Accepted]
   }
 
   // DEOPSCSW-223 Expiry of component Locking mode
