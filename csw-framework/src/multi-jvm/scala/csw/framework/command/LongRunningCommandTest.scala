@@ -54,7 +54,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
         )
       val assemblyRef = Await.result(assemblyLocF, 5.seconds).map(_.componentRef()).get
 
-      val setup = Setup(prefix, longRunningCmdPrefix, Some(obsId))
+      val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
       assemblyRef ! ComponentStateSubscription(Subscribe(probe.ref))
 
@@ -73,9 +73,9 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
-      probe.expectMsg(CurrentState(shortRunningCmdPrefix, Set(choiceKey.set(shortCmdCompleted))))
-      probe.expectMsg(CurrentState(mediumRunningCmdPrefix, Set(choiceKey.set(mediumCmdCompleted))))
-      probe.expectMsg(CurrentState(longRunningCmdPrefix, Set(choiceKey.set(longCmdCompleted))))
+      probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shortCmdCompleted))))
+      probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(mediumCmdCompleted))))
+      probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(longCmdCompleted))))
       enterBarrier("long-commands")
     }
 

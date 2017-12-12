@@ -2,7 +2,7 @@ package csw.services.messages
 
 import java.time.Instant
 
-import csw.messages.ccs.commands.{Observe, Setup, Wait}
+import csw.messages.ccs.commands.{CommandName, Observe, Setup, Wait}
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType.{ByteKey, DoubleMatrixKey}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
@@ -60,7 +60,7 @@ class CommandsTest extends FunSpec with Matchers {
       val i2: Parameter[String] = k2.set("A")
 
       //create Setup, add sequentially using add
-      val sc1: Setup = Setup(prefix, prefix, Some(obsId)).add(i1).add(i2)
+      val sc1: Setup = Setup(prefix, CommandName("move"), Some(obsId)).add(i1).add(i2)
 
       //access keys
       val k1Exists: Boolean = sc1.exists(k1) //true
@@ -82,7 +82,7 @@ class CommandsTest extends FunSpec with Matchers {
       val b1: Parameter[Byte] = byteKey1.set(bytes1)
       val b2: Parameter[Byte] = byteKey2.set(bytes2)
 
-      val sc3: Setup = Setup(prefix, prefix, Some(obsId), Set(b1, b2))
+      val sc3: Setup = Setup(prefix, CommandName("move"), Some(obsId), Set(b1, b2))
 
       //remove a key
       val sc4: Setup = sc3.remove(b1)
@@ -116,7 +116,7 @@ class CommandsTest extends FunSpec with Matchers {
       val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
 
       //create Observe, add sequentially using add
-      val oc1: Observe = Observe(prefix, prefix, Some(obsId)).add(i1).add(i2)
+      val oc1: Observe = Observe(prefix, CommandName("move"), Some(obsId)).add(i1).add(i2)
 
       //access parameters using apply method
       val k1Param: Parameter[Boolean] = oc1.get(k1).get //true
@@ -161,7 +161,7 @@ class CommandsTest extends FunSpec with Matchers {
       val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
 
       //create wait, add sequentially using add
-      val wc1: Wait = Wait(prefix, prefix, Some(obsId)).add(i1).add(i2)
+      val wc1: Wait = Wait(prefix, CommandName("move"), Some(obsId)).add(i1).add(i2)
 
       //access params using get method
       val k1Param: Option[Parameter[Boolean]] = wc1.get(k1)
@@ -212,9 +212,9 @@ class CommandsTest extends FunSpec with Matchers {
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       //commands
-      val sc: Setup   = Setup(prefix, prefix, Some(obsId)).add(i1)
-      val oc: Observe = Observe(prefix, prefix, Some(obsId)).add(i1)
-      val wc: Wait    = Wait(prefix, prefix, Some(obsId)).add(i1)
+      val sc: Setup   = Setup(prefix, CommandName("move"), Some(obsId)).add(i1)
+      val oc: Observe = Observe(prefix, CommandName("move"), Some(obsId)).add(i1)
+      val wc: Wait    = Wait(prefix, CommandName("move"), Some(obsId)).add(i1)
 
       //json support - write
       val scJson: JsValue = JsonSupport.writeSequenceCommand(sc)
@@ -263,7 +263,10 @@ class CommandsTest extends FunSpec with Matchers {
 
       //Setup command with duplicate key via constructor
       val setup: Setup =
-        Setup(prefix, prefix, Some(obsId), Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        Setup(prefix,
+              CommandName("move"),
+              Some(obsId),
+              Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       //four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = setup.paramSet.toList.map(_.keyName)
 

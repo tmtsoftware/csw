@@ -34,7 +34,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
       //parameters with duplicate key via constructor
       val setup =
         Setup(prefix,
-              prefix,
+              CommandName("move"),
               Some(ObsId("Obs001")),
               Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       setup.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
@@ -55,7 +55,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
       //parameters with duplicate key via constructor
       val observe =
         Observe(prefix,
-                prefix,
+                CommandName("move"),
                 Some(ObsId("Obs001")),
                 Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       observe.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
@@ -76,7 +76,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
       //parameters with duplicate key via constructor
       val wait =
         Wait(prefix,
-             prefix,
+             CommandName("move"),
              Some(ObsId("Obs001")),
              Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       wait.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)

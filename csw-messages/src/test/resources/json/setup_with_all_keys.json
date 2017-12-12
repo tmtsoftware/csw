@@ -5,9 +5,8 @@
     "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },
-  "target": {
-    "subsystem": "wfos",
-    "prefix": "wfos.blue.filter"
+  "commandName": {
+    "name": "move"
   },
   "obsId": "Obs001",
   "paramSet" : [ {

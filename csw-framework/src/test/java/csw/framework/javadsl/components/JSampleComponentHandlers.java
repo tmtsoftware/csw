@@ -109,7 +109,7 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
         Publish<CurrentState> publish = new Publish<>(submitState);
         pubSubRef.tell(publish);
 
-        if (controlCommand.target().prefix().contains("failure")) {
+        if (controlCommand.commandName().name().contains("failure")) {
             return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         } else {
             return new Accepted(controlCommand.runId());
@@ -118,15 +118,15 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
 
     private void processCommand(ControlCommand controlCommand) {
         publishCurrentState(controlCommand);
-        if(controlCommand.target().equals(ComponentStateForCommand.matcherPrefix()))
+        if(controlCommand.commandName().equals(ComponentStateForCommand.matcherCmd()))
             processCommandWithMatcher(controlCommand);
-        if(controlCommand.target().equals(ComponentStateForCommand.withoutMatcherPrefix()))
+        if(controlCommand.commandName().equals(ComponentStateForCommand.withoutMatcherCmd()))
             processCommandWithoutMatcher(controlCommand);
     }
 
     private void processCommandWithMatcher(ControlCommand controlCommand) {
         Source.range(1, 10)
-                .map(i -> {pubSubRef.tell(new Publish(new CurrentState(controlCommand.target().prefix()).add(JKeyTypes.IntKey().make("encoder").set(i * 10)))); return i;})
+                .map(i -> {pubSubRef.tell(new Publish(new CurrentState(controlCommand.source().prefix()).add(JKeyTypes.IntKey().make("encoder").set(i * 10)))); return i;})
                 .throttle(1, Duration.create(100, TimeUnit.MILLISECONDS), 1, ThrottleMode.shaping())
                 .runWith(Sink.ignore(), ActorMaterializer.create(akka.typed.javadsl.Adapter.toUntyped(actorContext.getSystem())));
     }

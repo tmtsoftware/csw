@@ -8,7 +8,7 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.messages.ccs.commands.{Command, Setup}
+import csw.messages.ccs.commands.{Command, CommandName, Setup}
 import csw.messages.ccs.events.StatusEvent
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
@@ -40,7 +40,7 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
   implicit val typedSystem: ActorSystem[Nothing] = system.toTyped
   implicit val testKit: TestKitSettings          = TestKitSettings(typedSystem)
 
-  private val scalaSetup = Setup(Prefix(prefixStr), Prefix(prefixStr), Some(obsId)).add(intParam).add(stringParam)
+  private val scalaSetup = Setup(Prefix(prefixStr), CommandName(prefixStr), Some(obsId)).add(intParam).add(stringParam)
 
   private val javaCmdHandlerBehavior: Future[ActorRef[CommandMsg]] =
     typedSystem.systemActorOf[CommandMsg](JavaCommandHandler.behavior(), "javaCommandHandler")

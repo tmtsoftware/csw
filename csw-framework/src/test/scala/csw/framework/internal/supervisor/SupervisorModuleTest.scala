@@ -12,7 +12,7 @@ import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
-import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
+import csw.messages.ccs.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
@@ -128,7 +128,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         val obsId: ObsId          = ObsId("Obs001")
         val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
-        val setup: Setup          = Setup(prefix, successPrefix, Some(obsId), Set(param))
+        val setup: Setup          = Setup(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
         supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
 
@@ -151,7 +151,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         DemandMatcher(submitSetupConfigDemandState, timeout = 5.seconds)
           .check(submitSetupConfigCurrentState.data) shouldBe true
 
-        val observe: Observe = Observe(prefix, successPrefix, Some(obsId), Set(param))
+        val observe: Observe = Observe(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
         supervisorRef ! Submit(observe, commandValidationResponseProbe.ref)
 
@@ -198,7 +198,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         val obsId: ObsId          = ObsId("Obs001")
         val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
-        val setup: Setup          = Setup(prefix, successPrefix, Some(obsId), Set(param))
+        val setup: Setup          = Setup(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
         supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
 
@@ -221,7 +221,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         DemandMatcher(onewaySetupConfigDemandState, timeout = 5.seconds)
           .check(onewaySetupConfigCurrentState.data) shouldBe true
 
-        val observe: Observe = Observe(prefix, successPrefix, Some(obsId), Set(param))
+        val observe: Observe = Observe(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
         supervisorRef ! Oneway(observe, commandValidationResponseProbe.ref)
 
@@ -263,7 +263,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val obsId: ObsId          = ObsId("Obs001")
         val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
         // setup to receive Success in validation result
-        val setup: Setup = Setup(prefix, failedPrefix, Some(obsId), Set(param))
+        val setup: Setup = Setup(prefix, CommandName("move.failure"), Some(obsId), Set(param))
 
         supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
         commandValidationResponseProbe.expectMsgType[Invalid]

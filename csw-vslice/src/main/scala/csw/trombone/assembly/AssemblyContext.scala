@@ -1,7 +1,7 @@
 package csw.trombone.assembly
 
 import com.typesafe.config.Config
-import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.commands.{CommandName, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.ComponentId
 import csw.messages.params.generics.{KeyType, Parameter}
@@ -29,57 +29,48 @@ case class AssemblyContext(
 
   // Public command configurations
   // Init submit command
-  val initPrefix     = s"$componentPrefix.init"
-  val initCK: Prefix = Prefix(initPrefix)
+  val initCK = CommandName("init")
 
   // Dataum submit command
-  val datumPrefix     = s"$componentPrefix.datum"
-  val datumCK: Prefix = Prefix(datumPrefix)
+  val datumCK = CommandName("datum")
 
   // Stop submit command
-  val stopPrefix     = s"$componentPrefix.stop"
-  val stopCK: Prefix = Prefix(stopPrefix)
+  val stopCK = CommandName("stop")
 
   // Move submit command
-  val movePrefix     = s"$componentPrefix.move"
-  val moveCK: Prefix = Prefix(movePrefix)
-
-  val originationPrefix = "originationPrefix"
+  val moveCK = CommandName("move")
 
   def moveSC(runId: RunId, position: Double): Setup =
-    Setup(originationPrefix, moveCK, Some(obsId)).add(stagePositionKey -> position withUnits stagePositionUnits)
+    Setup(componentPrefix, moveCK, Some(obsId)).add(stagePositionKey -> position withUnits stagePositionUnits)
 
   // Position submit command
-  val positionPrefix     = s"$componentPrefix.position"
-  val positionCK: Prefix = Prefix(positionPrefix)
+  val positionPrefix = s"$componentPrefix.position"
+  val positionCK     = CommandName(positionPrefix)
 
   def positionSC(runId: RunId, rangeDistance: Double): Setup =
-    Setup(originationPrefix, positionCK, Some(obsId)).add(naRangeDistanceKey -> rangeDistance withUnits naRangeDistanceUnits)
+    Setup(componentPrefix, positionCK, Some(obsId)).add(naRangeDistanceKey -> rangeDistance withUnits naRangeDistanceUnits)
 
   // setElevation submit command
-  val setElevationPrefix     = s"$componentPrefix.setElevation"
-  val setElevationCK: Prefix = Prefix(setElevationPrefix)
+  val setElevationCK: CommandName = CommandName("setElevation")
   def setElevationSC(runId: RunId, elevation: Double): Setup =
-    Setup(originationPrefix, setElevationCK, Some(obsId)).add(naElevation(elevation))
+    Setup(componentPrefix, setElevationCK, Some(obsId)).add(naElevation(elevation))
 
   // setAngle submit command
-  val setAnglePrefx      = s"$componentPrefix.setAngle"
-  val setAngleCK: Prefix = Prefix(setAnglePrefx)
+  val setAngleCK = CommandName("setAngle")
   def setAngleSC(runId: RunId, zenithAngle: Double): Setup =
-    Setup(originationPrefix, setAngleCK, Some(obsId)).add(za(zenithAngle))
+    Setup(componentPrefix, setAngleCK, Some(obsId)).add(za(zenithAngle))
 
   // Follow submit command
-  val followPrefix     = s"$componentPrefix.follow"
-  val followCK: Prefix = Prefix(followPrefix)
-  val nssInUseKey      = KeyType.BooleanKey.make("nssInUse")
+  val followCK    = CommandName("follow")
+  val nssInUseKey = KeyType.BooleanKey.make("nssInUse")
 
   def setNssInUse(value: Boolean): Parameter[Boolean] = nssInUseKey -> value
 
   def followSC(runId: RunId, nssInUse: Boolean): Setup =
-    Setup(originationPrefix, followCK, Some(obsId)).add(nssInUseKey -> nssInUse)
+    Setup(componentPrefix, followCK, Some(obsId)).add(nssInUseKey -> nssInUse)
 
   // A list of all commands
-  val allCommandKeys: List[Prefix] =
+  val allCommandKeys: List[CommandName] =
     List(initCK, datumCK, stopCK, moveCK, positionCK, setElevationCK, setAngleCK, followCK)
 
   // Shared key values --

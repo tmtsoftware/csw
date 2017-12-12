@@ -66,11 +66,11 @@ class McsAssemblyComponentHandlers(
     case CommandCompleted(response) ⇒
       response.runId match {
         case id if id == shortSetup.runId ⇒
-          pubSubRef ! Publish(CurrentState(shortSetup.target, Set(choiceKey.set(shortCmdCompleted))))
+          pubSubRef ! Publish(CurrentState(shortSetup.source, Set(choiceKey.set(shortCmdCompleted))))
         case id if id == mediumSetup.runId ⇒
-          pubSubRef ! Publish(CurrentState(mediumSetup.target, Set(choiceKey.set(mediumCmdCompleted))))
+          pubSubRef ! Publish(CurrentState(mediumSetup.source, Set(choiceKey.set(mediumCmdCompleted))))
         case id if id == longSetup.runId ⇒
-          pubSubRef ! Publish(CurrentState(longSetup.target, Set(choiceKey.set(longCmdCompleted))))
+          pubSubRef ! Publish(CurrentState(longSetup.source, Set(choiceKey.set(longCmdCompleted))))
       }
 
       completedCommands += 1
@@ -79,17 +79,17 @@ class McsAssemblyComponentHandlers(
   }
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
-    controlCommand.target match {
-      case `longRunningCmdPrefix` ⇒ Accepted(controlCommand.runId)
-      case _                      ⇒ CommandResponse.Error(controlCommand.runId, "")
+    controlCommand.commandName match {
+      case `longRunning` ⇒ Accepted(controlCommand.runId)
+      case _             ⇒ CommandResponse.Error(controlCommand.runId, "")
     }
   }
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     commandId = controlCommand.runId
-    shortSetup = Setup(`prefix`, `shortRunningCmdPrefix`, controlCommand.maybeObsId)
-    mediumSetup = Setup(`prefix`, `mediumRunningCmdPrefix`, controlCommand.maybeObsId)
-    longSetup = Setup(`prefix`, `longRunningCmdPrefix`, controlCommand.maybeObsId)
+    shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
+    mediumSetup = Setup(prefix, mediumRunning, controlCommand.maybeObsId)
+    longSetup = Setup(prefix, longRunning, controlCommand.maybeObsId)
 
     // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
     // longSetup takes 5 seconds to finish

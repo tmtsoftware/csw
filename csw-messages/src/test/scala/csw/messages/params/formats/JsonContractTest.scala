@@ -2,7 +2,7 @@ package csw.messages.params.formats
 
 import java.time.Instant
 
-import csw.messages.ccs.commands.{Observe, Setup, Wait}
+import csw.messages.ccs.commands.{CommandName, Observe, Setup, Wait}
 import csw.messages.ccs.events._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.generics.KeyType.{LongMatrixKey, StructKey}
@@ -35,7 +35,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val raDec2     = RaDec(9.1, 2.9)
       val raDecParam = raDecKey.set(raDec1, raDec2)
 
-      val setup       = Setup(prefix, prefix, Some(obsId)).add(raDecParam)
+      val setup       = Setup(prefix, CommandName("move"), Some(obsId)).add(raDecParam)
       val setupToJson = Json.prettyPrint(JsonSupport.writeSequenceCommand(setup))
 
       val expectedSetupJson = Json.prettyPrint(
@@ -54,7 +54,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val k2      = KeyType.StringKey.make("expTime")
       val i1      = k1.set(22)
       val i2      = k2.set("11:10")
-      val observe = Observe(prefix, prefix, Some(obsId)).add(i1).add(i2)
+      val observe = Observe(prefix, CommandName("move"), Some(obsId)).add(i1).add(i2)
 
       val observeToJson = Json.prettyPrint(JsonSupport.writeSequenceCommand(observe))
 
@@ -70,7 +70,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val m2: MatrixData[Long] = MatrixData.fromArrays(Array(2, 3, 4), Array(5, 6, 7), Array(8, 9, 10))
       val matrixParam          = k1.set(m1, m2)
 
-      val wait       = Wait(prefix, prefix, Some(obsId)).add(matrixParam)
+      val wait       = Wait(prefix, CommandName("move"), Some(obsId)).add(matrixParam)
       val waitToJson = Json.prettyPrint(JsonSupport.writeSequenceCommand(wait))
 
       val expectedWaitJson = Json.prettyPrint(
@@ -207,7 +207,7 @@ class JsonContractTest extends FunSpec with Matchers {
     val p25 = StringKey.make("StringKey").set("Str1", "Str2")
 
     it("should able to serialize and deserialize Setup command with all keys to and from json") {
-      val setup = Setup(prefix, prefix, Some(obsId)).madd(
+      val setup = Setup(prefix, CommandName("move"), Some(obsId)).madd(
         p1,
         p2,
         p3,

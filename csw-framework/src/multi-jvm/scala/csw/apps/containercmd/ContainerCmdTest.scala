@@ -16,7 +16,7 @@ import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.ccs.commands.CommandResponse.Invalid
-import csw.messages.ccs.commands.{CommandResponse, Setup}
+import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
@@ -150,8 +150,8 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val obsId: ObsId          = ObsId("Obs001")
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
       // setup to receive Success in validation result
-      val setupSuccess: Setup = Setup(successPrefix, successPrefix, Some(obsId), Set(param))
-      val setupFailure: Setup = Setup(failedPrefix, failedPrefix, Some(obsId), Set(param))
+      val setupSuccess: Setup = Setup(successPrefix, CommandName("move.success"), Some(obsId), Set(param))
+      val setupFailure: Setup = Setup(failedPrefix, CommandName("move.failure"), Some(obsId), Set(param))
 
       val laserAssemblySupervisor = laserContainerComponents.head.supervisor
       val laserCompStateProbe     = TestProbe[CurrentState]

@@ -54,21 +54,21 @@ class McsHcdComponentHandlers(
   }
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
-    controlCommand.target match {
-      case `longRunningCmdPrefix`   ⇒ Accepted(controlCommand.runId)
-      case `mediumRunningCmdPrefix` ⇒ Accepted(controlCommand.runId)
-      case `shortRunningCmdPrefix`  ⇒ Accepted(controlCommand.runId)
-      case _                        ⇒ CommandResponse.Error(controlCommand.runId, "")
+    controlCommand.commandName match {
+      case `longRunning`   ⇒ Accepted(controlCommand.runId)
+      case `mediumRunning` ⇒ Accepted(controlCommand.runId)
+      case `shortRunning`  ⇒ Accepted(controlCommand.runId)
+      case _               ⇒ CommandResponse.Error(controlCommand.runId, "")
     }
   }
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
-    controlCommand.target match {
-      case `longRunningCmdPrefix` ⇒
+    controlCommand.commandName match {
+      case `longRunning` ⇒
         ctx.schedule(5.seconds, ctx.self, LongCommandCompleted(Completed(controlCommand.runId)))
-      case `mediumRunningCmdPrefix` ⇒
+      case `mediumRunning` ⇒
         ctx.schedule(3.seconds, ctx.self, MediumCommandCompleted(Completed(controlCommand.runId)))
-      case `shortRunningCmdPrefix` ⇒
+      case `shortRunning` ⇒
         ctx.schedule(1.seconds, ctx.self, ShortCommandCompleted(Completed(controlCommand.runId)))
       case _ ⇒
     }

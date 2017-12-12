@@ -1,21 +1,26 @@
 package csw.common.components.command
 
+import csw.messages.ccs.commands.CommandName
 import csw.messages.params.generics.GChoiceKey
 import csw.messages.params.generics.KeyType.ChoiceKey
 import csw.messages.params.models.{Choice, Choices, Prefix}
 
 object ComponentStateForCommand {
-  val prefix               = Prefix("wfos.prog.cloudcover")
-  val acceptedCmdPrefix    = Prefix("wfos.prog.cloudcover.accepted")
-  val withoutMatcherPrefix = Prefix("wfos.prog.cloudcover.accept.result")
-  val matcherPrefix        = Prefix("wfos.prog.cloudcover.accept.matcher.success.result")
-  val immediateCmdPrefix   = Prefix("wfos.prog.cloudcover.immediate")
-  val invalidCmdPrefix     = Prefix("wfos.prog.cloudcover.failure")
-  val cancelCmdPrefix      = Prefix("wfos.prog.cloudcover.cancel")
+  val prefix        = Prefix("wfos.prog.cloudcover")
+  val invalidPrefix = Prefix("wfos.prog.cloudcover.invalid")
+  val matcherPrefix = Prefix("wfos.prog.cloudcover.accept.matcher.success.result")
 
-  val longRunningCmdPrefix   = Prefix("mcs.mobie.blue.longCmd")
-  val shortRunningCmdPrefix  = Prefix("mcs.mobie.blue.shortCmd")
-  val mediumRunningCmdPrefix = Prefix("mcs.mobie.blue.mediumCmd")
+  val moveCmd           = CommandName("move")
+  val acceptedCmd       = CommandName("move.accepted")
+  val withoutMatcherCmd = CommandName("move.accept.result")
+  val matcherCmd        = CommandName("move.accept.matcher.success.result")
+  val immediateCmd      = CommandName("move.immediate")
+  val invalidCmd        = CommandName("move.failure")
+  val cancelCmd         = CommandName("move.cancel")
+
+  val longRunning   = CommandName("move.longCmd")
+  val shortRunning  = CommandName("move.shortCmd")
+  val mediumRunning = CommandName("move.mediumCmd")
 
   val shortCmdCompleted  = Choice("Short Running Cmd Completed")
   val mediumCmdCompleted = Choice("Medium Running Cmd Completed")

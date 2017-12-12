@@ -56,29 +56,28 @@ class ComponentHandlerForCommand(
 
   override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand.target match {
-    case `acceptedCmdPrefix`    ⇒ Accepted(controlCommand.runId)
-    case `withoutMatcherPrefix` ⇒ Accepted(controlCommand.runId)
-    case `matcherPrefix`        ⇒ Accepted(controlCommand.runId)
-    case `cancelCmdPrefix`      ⇒ Accepted(controlCommand.runId)
-    case `immediateCmdPrefix`   ⇒ Completed(controlCommand.runId)
-    case `invalidCmdPrefix` ⇒
-      Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.target.prefix}"))
-    case _ ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.target.prefix}"))
+  override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand.commandName match {
+    case `acceptedCmd`       ⇒ Accepted(controlCommand.runId)
+    case `withoutMatcherCmd` ⇒ Accepted(controlCommand.runId)
+    case `matcherCmd`        ⇒ Accepted(controlCommand.runId)
+    case `cancelCmd`         ⇒ Accepted(controlCommand.runId)
+    case `immediateCmd`      ⇒ Completed(controlCommand.runId)
+    case `invalidCmd`        ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.commandName}"))
+    case _                   ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
   }
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = controlCommand.target match {
-    case `cancelCmdPrefix`      ⇒ processAcceptedSubmitCmd(controlCommand)
-    case `withoutMatcherPrefix` ⇒ processCommandWithoutMatcher(controlCommand)
-    case `acceptedCmdPrefix`    ⇒ //mimic long running process by not updating CSRM
-    case _                      ⇒ CommandNotAvailable(controlCommand.runId)
-  }
-
-  override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.target match {
-    case `cancelCmdPrefix`   ⇒ processAcceptedOnewayCmd(controlCommand)
-    case `matcherPrefix`     ⇒ processCommandWithMatcher(controlCommand)
-    case `acceptedCmdPrefix` ⇒ //mimic long running process by publishing any state
+  override def onSubmit(controlCommand: ControlCommand): Unit = controlCommand.commandName match {
+    case `cancelCmd`         ⇒ processAcceptedSubmitCmd(controlCommand)
+    case `withoutMatcherCmd` ⇒ processCommandWithoutMatcher(controlCommand)
+    case `acceptedCmd`       ⇒ //mimic long running process by not updating CSRM
     case _                   ⇒ CommandNotAvailable(controlCommand.runId)
+  }
+
+  override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.commandName match {
+    case `cancelCmd`   ⇒ processAcceptedOnewayCmd(controlCommand)
+    case `matcherCmd`  ⇒ processCommandWithMatcher(controlCommand)
+    case `acceptedCmd` ⇒ //mimic long running process by publishing any state
+    case _             ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
   private def processAcceptedSubmitCmd(controlCommand: ControlCommand): Unit =
@@ -91,7 +90,7 @@ class ComponentHandlerForCommand(
 
   private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
-    val result                = Result(controlCommand.target, Set(param))
+    val result                = Result(controlCommand.source, Set(param))
     commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
   }
 
@@ -113,7 +112,7 @@ class ComponentHandlerForCommand(
 
   private def processCommandWithMatcher(controlCommand: ControlCommand): Unit = {
     Source(1 to 10)
-      .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.target, Set(KeyType.IntKey.make("encoder").set(i * 10)))))
+      .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 10)))))
       .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
       .runWith(Sink.ignore)
   }

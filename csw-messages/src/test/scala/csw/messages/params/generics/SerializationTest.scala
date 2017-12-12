@@ -2,7 +2,7 @@ package csw.messages.params.generics
 
 import java.time.Instant
 
-import csw.messages.ccs.commands.{Observe, Setup, Wait}
+import csw.messages.ccs.commands.{CommandName, Observe, Setup, Wait}
 import csw.messages.ccs.events.{EventServiceEvent, SystemEvent}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{CurrentState, CurrentStates}
@@ -28,7 +28,7 @@ class SerializationTest extends FunSuite {
   val test: Key[Int]            = KeyType.IntKey.make("test")
   val timestamp: Key[Instant]   = KeyType.TimestampKey.make("ts")
 
-  val sc1: Setup = Setup(Prefix("tcs.pos"), Prefix("tcs.pos"), Some(obsId)).madd(
+  val sc1: Setup = Setup(Prefix("tcs.pos"), CommandName("move"), Some(obsId)).madd(
     ra.set("12:32:11"),
     dec.set("30:22:22"),
     epoch.set(1950.0),
@@ -46,15 +46,15 @@ class SerializationTest extends FunSuite {
 
   val disperser: Key[String] = KeyType.StringKey.make("disperser")
   val filter1: Key[String]   = KeyType.StringKey.make("filter1")
-  val sc2: Setup = Setup(Prefix("wfos.blue"), Prefix("wfos.blue"), Some(obsId))
+  val sc2: Setup = Setup(Prefix("wfos.blue"), CommandName("move"), Some(obsId))
     .add(disperser.set("gr243"))
     .add(filter1.set("GG433"))
 
-  val ob1: Observe = Observe(Prefix("wfos.blue.camera"), Prefix("wfos.blue.camera"), Some(obsId))
+  val ob1: Observe = Observe(Prefix("wfos.blue.camera"), CommandName("move"), Some(obsId))
     .add(exposureTime.set(22.3)) // .sec,
     .add(repeats.set(3))
 
-  val wc1: Wait = Wait(Prefix("wfos.blue.camera"), Prefix("wfos.blue.camera"), Some(obsId))
+  val wc1: Wait = Wait(Prefix("wfos.blue.camera"), CommandName("move"), Some(obsId))
 
   test("ConfigType kryo serialization") {
     import csw.messages.params.generics.ParamSetSerializer._

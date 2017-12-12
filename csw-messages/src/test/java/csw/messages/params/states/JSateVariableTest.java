@@ -1,5 +1,6 @@
 package csw.messages.params.states;
 
+import csw.messages.ccs.commands.CommandName;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
@@ -46,12 +47,13 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateCurrentStateFromSetup() {
-        Setup setup = new Setup(prefix, prefix, Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
+        Prefix source = new Prefix(prefix);
+        Setup setup = new Setup(source, new CommandName("move"), Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
         CurrentState currentState = new CurrentState(setup);
 
         // typeName and prefix
         Assert.assertEquals(CurrentState.class.getSimpleName(), currentState.typeName());
-        Assert.assertEquals(new Prefix(prefix), currentState.prefix());
+        Assert.assertEquals(source, currentState.prefix());
 
         // exists
         Assert.assertTrue(currentState.exists(epochStringKey));
@@ -81,12 +83,13 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateDemandStateFromSetup() {
-        Setup setup = new Setup(prefix, prefix, Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
+        Prefix source = new Prefix(prefix);
+        Setup setup = new Setup(source, new CommandName("move"), Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
         DemandState demandState = new DemandState(setup);
 
         // typeName and prefix
         Assert.assertEquals(DemandState.class.getSimpleName(), demandState.typeName());
-        Assert.assertEquals(new Prefix(prefix), demandState.prefix());
+        Assert.assertEquals(source, demandState.prefix());
 
         // exists
         Assert.assertTrue(demandState.exists(epochStringKey));

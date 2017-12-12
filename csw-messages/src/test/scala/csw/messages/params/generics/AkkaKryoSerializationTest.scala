@@ -51,7 +51,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val intKey = IntKey.make("intKey")
       val param  = intKey.set(1, 2, 3).withUnits(coulomb)
 
-      val setup           = Setup(Prefix(prefixStr), Prefix(prefixStr), Some(ObsId("Obs001"))).add(param)
+      val setup           = Setup(Prefix(prefixStr), CommandName("move"), Some(ObsId("Obs001"))).add(param)
       val setupSerializer = serialization.findSerializerFor(setup)
 
       setupSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -70,7 +70,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(imgBytes)
       val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-      val observe           = Observe(Prefix(prefixStr), Prefix(prefixStr), Some(ObsId("Obs001"))).add(param)
+      val observe           = Observe(Prefix(prefixStr), CommandName("move"), Some(ObsId("Obs001"))).add(param)
       val observeSerializer = serialization.findSerializerFor(observe)
 
       observeSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -89,7 +89,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val doubleMatrixKey = DoubleMatrixKey.make(keyName)
       val param           = doubleMatrixKey.set(Array(matrixData1, matrixData2), lightyear)
 
-      val wait: Wait     = Wait(Prefix(prefixStr), Prefix(prefixStr), Some(ObsId("Obs001"))).add(param)
+      val wait: Wait     = Wait(Prefix(prefixStr), CommandName("move"), Some(ObsId("Obs001"))).add(param)
       val waitSerializer = serialization.findSerializerFor(wait)
 
       waitSerializer.getClass shouldBe classOf[AkkaSerializer]

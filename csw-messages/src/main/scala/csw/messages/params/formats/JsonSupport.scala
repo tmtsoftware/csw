@@ -16,11 +16,12 @@ object JsonSupport extends JsonSupport with DerivedJsonFormats with WrappedArray
 trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
 
   // JSON formats
-  lazy val paramSetFormat  = implicitly[Format[Set[Parameter[_]]]]
-  lazy val runIdFormat     = implicitly[Format[RunId]]
-  lazy val obsIdFormat     = implicitly[Format[Option[ObsId]]]
-  lazy val prefixFormat    = implicitly[Format[Prefix]]
-  lazy val eventInfoFormat = implicitly[Format[EventInfo]]
+  lazy val paramSetFormat: Format[Set[Parameter[_]]] = implicitly[Format[Set[Parameter[_]]]]
+  lazy val runIdFormat: Format[RunId]                = implicitly[Format[RunId]]
+  lazy val obsIdFormat: Format[Option[ObsId]]        = implicitly[Format[Option[ObsId]]]
+  lazy val prefixFormat: Format[Prefix]              = implicitly[Format[Prefix]]
+  lazy val commandTypeFormat: Format[CommandName]    = implicitly[Format[CommandName]]
+  lazy val eventInfoFormat: Format[EventInfo]        = implicitly[Format[EventInfo]]
 
   // config and event type JSON tags
   private val setupType        = classOf[Setup].getSimpleName
@@ -44,12 +45,12 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   def writeSequenceCommand[A <: SequenceCommand](result: A): JsValue = {
     JsObject(
       Seq(
-        "type"     → JsString(result.typeName),
-        "runId"    → runIdFormat.writes(result.runId),
-        "source"   → prefixFormat.writes(result.source),
-        "target"   → prefixFormat.writes(result.target),
-        "obsId"    → obsIdFormat.writes(result.maybeObsId),
-        "paramSet" → Json.toJson(result.paramSet)
+        "type"        → JsString(result.typeName),
+        "runId"       → runIdFormat.writes(result.runId),
+        "source"      → prefixFormat.writes(result.source),
+        "commandName" → commandTypeFormat.writes(result.commandName),
+        "obsId"       → obsIdFormat.writes(result.maybeObsId),
+        "paramSet"    → Json.toJson(result.paramSet)
       )
     )
   }
@@ -63,25 +64,25 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   def readSequenceCommand[A <: SequenceCommand](json: JsValue): A = {
     json match {
       case JsObject(fields) =>
-        (fields("type"), fields("runId"), fields("source"), fields("target"), fields("obsId"), fields("paramSet")) match {
-          case (JsString(typeName), runId, source, target, obsId, paramSet) =>
+        (fields("type"), fields("runId"), fields("source"), fields("commandName"), fields("obsId"), fields("paramSet")) match {
+          case (JsString(typeName), runId, source, commandName, obsId, paramSet) =>
             typeName match {
               case `setupType` =>
                 Setup(runId.as[RunId],
                       source.as[Prefix],
-                      target.as[Prefix],
+                      commandName.as[CommandName],
                       obsId.as[Option[ObsId]],
                       paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
               case `observeType` =>
                 Observe(runId.as[RunId],
                         source.as[Prefix],
-                        target.as[Prefix],
+                        commandName.as[CommandName],
                         obsId.as[Option[ObsId]],
                         paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
               case `waitType` =>
                 Wait(runId.as[RunId],
                      source.as[Prefix],
-                     target.as[Prefix],
+                     commandName.as[CommandName],
                      obsId.as[Option[ObsId]],
                      paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
               case _ => unexpectedJsValueError(json)

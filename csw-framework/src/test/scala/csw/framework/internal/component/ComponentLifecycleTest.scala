@@ -12,7 +12,7 @@ import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
-import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
+import csw.messages.ccs.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.messages.models.ToComponentLifecycleMessages._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}
@@ -126,7 +126,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
 
     val obsId: ObsId = ObsId("Obs001")
-    val sc1 = Setup(Prefix("wfos.prog.cloudcover"), Prefix("wfos.prog.cloudcover"), Some(obsId))
+    val sc1 = Setup(Prefix("wfos.prog.cloudcover"), CommandName("wfos.prog.cloudcover"), Some(obsId))
       .add(KeyType.IntKey.make("encoder").set(22))
 
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
@@ -151,7 +151,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
 
     val obsId: ObsId = ObsId("Obs001")
-    val sc1 = Observe(Prefix("wfos.prog.cloudcover"), Prefix("wfos.prog.cloudcover"), Some(obsId))
+    val sc1 = Observe(Prefix("wfos.prog.cloudcover"), CommandName("wfos.prog.cloudcover"), Some(obsId))
       .add(KeyType.IntKey.make("encoder").set(22))
 
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
@@ -174,7 +174,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
 
     val obsId: ObsId = ObsId("Obs001")
-    val sc1 = Setup(Prefix("wfos.prog.cloudcover"), Prefix("wfos.prog.cloudcover"), Some(obsId))
+    val sc1 = Setup(Prefix("wfos.prog.cloudcover"), CommandName("wfos.prog.cloudcover"), Some(obsId))
       .add(KeyType.IntKey.make("encoder").set(22))
 
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Completed(sc1.runId))
@@ -200,7 +200,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     import runningComponent._
 
     val obsId: ObsId = ObsId("Obs001")
-    val sc1 = Observe(Prefix("wfos.prog.cloudcover"), Prefix("wfos.prog.cloudcover"), Some(obsId))
+    val sc1 = Observe(Prefix("wfos.prog.cloudcover"), CommandName("wfos.prog.cloudcover"), Some(obsId))
       .add(KeyType.IntKey.make("encoder").set(22))
 
     val error = Error(sc1.runId, "error from the test command")

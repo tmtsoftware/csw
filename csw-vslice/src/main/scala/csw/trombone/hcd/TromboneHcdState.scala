@@ -2,7 +2,7 @@ package csw.trombone.hcd
 
 import java.io.File
 
-import csw.messages.ccs.commands.Setup
+import csw.messages.ccs.commands.{CommandName, Setup}
 import csw.messages.params.generics.KeyType.ChoiceKey
 import csw.messages.params.generics.{GChoiceKey, Key, KeyType}
 import csw.messages.params.models.Units.encoder
@@ -78,24 +78,20 @@ object TromboneHcdState {
     axisNameKey -> tromboneAxisName
   )
 
-  val axisMovePrefix     = s"$trombonePrefix.move"
-  val axisMoveCK: Prefix = Prefix(axisMovePrefix)
-  val originationPrefix  = "originationPrefix"
+  val axisMoveCK: CommandName = CommandName("move")
+  val sourcePrefix            = Prefix("sourcePrefix")
 
   def positionSC(runId: RunId, obsId: ObsId, value: Int): Setup =
-    Setup(originationPrefix, axisMoveCK, Some(obsId)).add(positionKey -> value withUnits encoder)
+    Setup(sourcePrefix, axisMoveCK, Some(obsId)).add(positionKey -> value withUnits encoder)
 
-  val axisDatumPrefix     = s"$trombonePrefix.datum"
-  val axisDatumCK: Prefix = Prefix(axisDatumPrefix)
+  val axisDatumCK: CommandName = CommandName("datum")
   def datumSC(runId: RunId, obsId: ObsId) = {
-    Setup(originationPrefix, axisDatumCK, Some(obsId))
+    Setup(sourcePrefix, axisDatumCK, Some(obsId))
   }
 
-  val axisHomePrefix                     = s"$trombonePrefix.home"
-  val axisHomeCK: Prefix                 = Prefix(axisHomePrefix)
-  def homeSC(runId: RunId, obsId: ObsId) = Setup(originationPrefix, axisHomeCK, Some(obsId))
+  val axisHomeCK: CommandName            = CommandName("home")
+  def homeSC(runId: RunId, obsId: ObsId) = Setup(sourcePrefix, axisHomeCK, Some(obsId))
 
-  val axisCancelPrefix                     = s"$trombonePrefix.cancel"
-  val axisCancelCK: Prefix                 = Prefix(axisCancelPrefix)
-  def cancelSC(runId: RunId, obsId: ObsId) = Setup(originationPrefix, axisCancelCK, Some(obsId))
+  val axisCancelCK: CommandName            = CommandName("cancel")
+  def cancelSC(runId: RunId, obsId: ObsId) = Setup(sourcePrefix, axisCancelCK, Some(obsId))
 }

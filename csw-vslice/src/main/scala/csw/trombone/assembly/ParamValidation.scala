@@ -16,7 +16,7 @@ object ParamValidation {
    * @return
    */
   def validateOneSetup(s: Setup)(implicit ac: AssemblyContext): CommandResponse = {
-    s.target match {
+    s.commandName match {
       case ac.initCK         => initValidation(s)
       case ac.datumCK        => datumValidation(s)
       case ac.stopCK         => stopValidation(s)
@@ -37,7 +37,7 @@ object ParamValidation {
   def initValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
 
     val size = sc.size
-    if (sc.target != ac.initCK) Invalid(sc.runId, WrongPrefixIssue("The Setup is not an init configuration"))
+    if (sc.commandName != ac.initCK) Invalid(sc.runId, WrongPrefixIssue("The Setup is not an init configuration"))
     else // If no arguments, then this is okay
     if (sc.size == 0)
       Accepted(sc.runId)
@@ -84,7 +84,7 @@ object ParamValidation {
    * @return Accepted or Invalid
    */
   def moveValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
-    if (sc.target != ac.moveCK) {
+    if (sc.commandName != ac.moveCK) {
       Invalid(sc.runId, WrongPrefixIssue("The Setup is not a move configuration."))
     } else if (sc.size == 0)
       Accepted(sc.runId)
@@ -109,7 +109,7 @@ object ParamValidation {
    * @return Accepted or Invalid
    */
   def positionValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
-    if (sc.target != ac.positionCK) {
+    if (sc.commandName != ac.positionCK) {
       Invalid(sc.runId, WrongPrefixIssue("The Setup is not a position configuration."))
     } else {
       // The spec says parameter is not required, but doesn't explain so requiring parameter
@@ -146,7 +146,7 @@ object ParamValidation {
    * @return Accepted or Invalid
    */
   def setElevationValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
-    if (sc.target != ac.setElevationCK) {
+    if (sc.commandName != ac.setElevationCK) {
       Invalid(sc.runId, WrongPrefixIssue("The Setup is not a setElevation configuration"))
     } else if (sc.missingKeys(ac.naElevationKey).nonEmpty) {
       // Check for correct key and type -- only checks that essential key is present, not strict
@@ -170,7 +170,7 @@ object ParamValidation {
    * @return Accepted or Invalid
    */
   def setAngleValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
-    if (sc.target != ac.setAngleCK) {
+    if (sc.commandName != ac.setAngleCK) {
       Invalid(sc.runId, WrongPrefixIssue("The Setup is not a setAngle configuration"))
     } else // Check for correct key and type -- only checks that essential key is present, not strict
     if (!sc.exists(ac.zenithAngleKey)) {
@@ -191,7 +191,7 @@ object ParamValidation {
    * @return Accepted or Invalid
    */
   def followValidation(sc: Setup)(implicit ac: AssemblyContext): CommandResponse = {
-    if (sc.target != ac.followCK) {
+    if (sc.commandName != ac.followCK) {
       Invalid(sc.runId, WrongPrefixIssue("The Setup is not a follow configuration"))
     } else if (!sc.exists(ac.nssInUseKey)) {
       // Check for correct key and type -- only checks that essential key is present, not strict

@@ -5,11 +5,11 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import akka.serialization.{Serialization, SerializationExtension}
-import csw.messages.ccs.commands.Observe
+import csw.messages.ccs.commands.{CommandName, Observe}
 import csw.messages.params.generics.KeyType.ByteArrayKey
 import csw.messages.params.generics.{Key, Parameter}
 import csw.messages.params.models.Units.pascal
-import csw.messages.params.models.{ArrayData, ObsId, Prefix}
+import csw.messages.params.models.{ArrayData, ObsId}
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await
@@ -73,7 +73,7 @@ class ImageSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_32k_Bytes)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe("originationPrefix", Prefix(prefixStr), Some(obsId)).add(param)
+    val observe           = Observe("originationPrefix", CommandName(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     observeSerializer.toBinary(observe)
@@ -88,7 +88,7 @@ class ImageSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_128k_Bytes)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe("originationPrefix", Prefix(prefixStr), Some(obsId)).add(param)
+    val observe           = Observe("originationPrefix", CommandName(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     observeSerializer.toBinary(observe)
@@ -103,7 +103,7 @@ class ImageSerializationBenchmark {
     val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(img_512k_Bytes)
     val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-    val observe           = Observe("originationPrefix", Prefix(prefixStr), Some(obsId)).add(param)
+    val observe           = Observe("originationPrefix", CommandName(prefixStr), Some(obsId)).add(param)
     val observeSerializer = serialization.findSerializerFor(observe)
 
     observeSerializer.toBinary(observe)

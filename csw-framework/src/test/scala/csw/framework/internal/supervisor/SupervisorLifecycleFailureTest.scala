@@ -18,7 +18,7 @@ import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.Submit
 import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
+import csw.messages.ccs.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.models.{LifecycleStateChanged, PubSub}
@@ -159,7 +159,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     val obsId: ObsId          = ObsId("Obs001")
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
-    val setup: Setup          = Setup(prefix, successPrefix, Some(obsId), Set(param))
+    val setup: Setup          = Setup(prefix, CommandName("move"), Some(obsId), Set(param))
 
     doThrow(FailureRestart(failureRestartExMsg))
       .when(componentHandlers)

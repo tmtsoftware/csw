@@ -8,7 +8,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.ComponentLockedIssue
 import csw.messages.ccs.commands.CommandResponse.NotAllowed
-import csw.messages.ccs.commands.{CommandResponse, Setup}
+import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.models.LockingResponse
 import csw.messages.models.LockingResponse._
 import csw.messages.params.generics.{KeyType, Parameter}
@@ -23,7 +23,6 @@ import org.scalatest.{FunSuite, Matchers}
 class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
 
   private val prefix        = Prefix("tcs.mobie.blue.filter")
-  private val targetPrefix  = Prefix("tcs.mobie.blue.filter.target")
   private val invalidPrefix = Prefix("tcs.mobie.blue.filter.invalid")
 
   implicit val system: ActorSystem                     = ActorSystem()
@@ -31,8 +30,8 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
   implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
 
   private val intParam: Parameter[Int] = KeyType.IntKey.make("intKey").set(1, 2, 3)
-  private val setup: Setup             = Setup(prefix, targetPrefix, Some(ObsId("obs1001")), Set(intParam))
-  private val invalidSetup: Setup      = Setup(invalidPrefix, targetPrefix, Some(ObsId("obs1001")), Set(intParam))
+  private val setup: Setup             = Setup(prefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
+  private val invalidSetup: Setup      = Setup(invalidPrefix, CommandName("move"), Some(ObsId("obs1001")), Set(intParam))
 
   private val mockedLoggerFactory = mock[LoggerFactory]
   private val mockedLogger        = mock[Logger]

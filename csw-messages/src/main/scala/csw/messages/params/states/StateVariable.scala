@@ -88,7 +88,7 @@ case class DemandState private (prefix: Prefix, paramSet: Set[Parameter[_]] = Se
   /**
    * Java API to create a DemandState from a Setup
    */
-  def this(command: Setup) = this(command.target, command.paramSet)
+  def this(command: Setup) = this(command.source, command.paramSet)
 }
 
 object DemandState {
@@ -96,7 +96,7 @@ object DemandState {
   /**
    * Converts a Setup to a DemandState
    */
-  implicit def apply(command: Setup): DemandState = DemandState(command.target, command.paramSet)
+  implicit def apply(command: Setup): DemandState = DemandState(command.source, command.paramSet)
 
   def apply(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): DemandState =
     new DemandState(prefix).madd(paramSet)
@@ -123,7 +123,7 @@ case class CurrentState private (prefix: Prefix, paramSet: Set[Parameter[_]] = S
   /**
    * Java API to create a DemandState from a Setup
    */
-  def this(command: Setup) = this(command.target, command.paramSet)
+  def this(command: Setup) = this(command.source, command.paramSet)
 }
 
 object CurrentState {

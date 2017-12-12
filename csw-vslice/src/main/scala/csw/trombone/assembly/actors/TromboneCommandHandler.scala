@@ -52,7 +52,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
 
   override def onNotFollowing(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
     case Submit(s: Setup, replyTo) =>
-      s.target match {
+      s.commandName match {
         case ac.initCK =>
           replyTo ! Completed(s.runId)
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
@@ -121,7 +121,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
           replyTo ! Invalid(
             s.runId,
             UnsupportedCommandInStateIssue(
-              s"""Trombone assembly does not support the command \"${otherCommand.prefix}\" in the current state."""
+              s"""Trombone assembly does not support the command \"$otherCommand\" in the current state."""
             )
           )
           AssemblyCommandState(None, CommandExecutionState.NotFollowing)
@@ -134,7 +134,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
 
   override def onFollowing(commandMessage: CommandMessage): AssemblyCommandState = commandMessage match {
     case Submit(s: Setup, replyTo) =>
-      s.target match {
+      s.commandName match {
         case ac.datumCK | ac.moveCK | ac.positionCK | ac.followCK | ac.setElevationCK =>
           replyTo ! Invalid(
             s.runId,

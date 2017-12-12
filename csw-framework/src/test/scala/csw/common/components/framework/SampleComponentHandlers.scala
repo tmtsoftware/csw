@@ -72,16 +72,16 @@ class SampleComponentHandlers(
 
   private def processCommand(controlCommand: ControlCommand): Unit =
     controlCommand match {
-      case Setup(_, _, somePrefix, _, _) ⇒
+      case Setup(_, somePrefix, _, _, _) ⇒
         pubSubRef ! Publish(CurrentState(somePrefix, controlCommand.paramSet + choiceKey.set(setupConfigChoice)))
-      case Observe(_, _, somePrefix, _, _) ⇒
+      case Observe(_, somePrefix, _, _, _) ⇒
         pubSubRef ! Publish(CurrentState(somePrefix, controlCommand.paramSet + choiceKey.set(observeConfigChoice)))
       case _ ⇒
     }
 
   def validateCommand(command: ControlCommand): CommandResponse = {
     pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
-    if (command.target.prefix.contains("success")) Accepted(command.runId)
+    if (command.commandName.name.contains("success")) Accepted(command.runId)
     else Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))
   }
 

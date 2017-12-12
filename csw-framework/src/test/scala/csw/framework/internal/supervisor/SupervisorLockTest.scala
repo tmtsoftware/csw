@@ -11,7 +11,7 @@ import csw.messages.CommandMessage.Submit
 import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, NotAllowed}
-import csw.messages.ccs.commands.{CommandResponse, Setup}
+import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.models
 import csw.messages.models.LockingResponse
@@ -81,9 +81,9 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val commandResponseProbe = TestProbe[CommandResponse]
 
     val source1Prefix = Prefix("wfos.prog.cloudcover.source1")
-    val target1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
+    val commandName1  = CommandName("move.Client1.success")
     val source2Prefix = Prefix("wfos.prog.cloudcover.source2")
-    val target2Prefix = Prefix("wfos.prog.cloudcover.Client2.success")
+    val commandName2  = CommandName("move.Client2.success")
     val obsId         = ObsId("Obs001")
 
     val mocks = frameworkTestMocks()
@@ -100,11 +100,11 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 1 sends submit command with tokenId in parameter set
-    supervisorRef ! Submit(Setup(source1Prefix, target1Prefix, Some(obsId)), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(source1Prefix, commandName1, Some(obsId)), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
 
     // Client 2 tries to send submit command while Client 1 has the lock
-    supervisorRef ! Submit(Setup(source2Prefix, target2Prefix, Some(obsId)), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(source2Prefix, commandName2, Some(obsId)), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[NotAllowed]
 
     // Client 1 unlocks the assembly
@@ -112,7 +112,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockReleased)
 
     // Client 2 tries to send submit command again after lock is released
-    supervisorRef ! Submit(Setup(source2Prefix, target2Prefix, Some(obsId)), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(source2Prefix, commandName2, Some(obsId)), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
 
     // Client 2 will lock an assembly
@@ -131,7 +131,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val commandResponseProbe = TestProbe[CommandResponse]()(untypedSystem.toTyped, settings)
 
     val sourcePrefix = Prefix("wfos.prog.cloudcover.source")
-    val targetPrefix = Prefix("wfos.prog.cloudcover.Client1.success")
+    val commandName  = CommandName("move.Client1.success")
     val obsId        = ObsId("Obs001")
 
     val mocks = frameworkTestMocks()
@@ -152,7 +152,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice)))))
 
     // Client 1 sends submit command with tokenId in parameter set
-    val setup = Setup(sourcePrefix, targetPrefix, Some(obsId))
+    val setup = Setup(sourcePrefix, commandName, Some(obsId))
     supervisorRef ! Submit(setup, commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
 

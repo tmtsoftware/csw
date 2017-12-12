@@ -77,14 +77,13 @@ public class JCommandsTest {
     // DEOPSCSW-315: Make ObsID optional in commands
     @Test
     public void shouldAbleToCreateAndAccessSetupCommand() {
-        Setup setup = new Setup(prefix, prefix, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(new Prefix(prefix), new CommandName("move"), Optional.of(obsId)).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(setup.runId());
         Assert.assertEquals(Optional.of(obsId), setup.jMaybeObsId());
-        Assert.assertEquals(prefix, setup.target().prefix());
-        Assert.assertEquals(new Prefix(prefix), setup.target());
-        Assert.assertEquals(WFOS, setup.target().subsystem());
+        Assert.assertEquals(prefix, setup.source().prefix());
+        Assert.assertEquals(WFOS, setup.source().subsystem());
 
         // complete API
         assertOnCommandAPI(setup);
@@ -93,14 +92,14 @@ public class JCommandsTest {
     // DEOPSCSW-315: Make ObsID optional in commands
     @Test
     public void shouldAbleToCreateAndAccessObserveCommand() {
-        Observe observe = new Observe(prefix, prefix, Optional.empty()).add(encoderParam).add(epochStringParam);
+        Observe observe = new Observe(new Prefix(prefix), new CommandName("move"), Optional.empty()).add(encoderParam).add(epochStringParam);
 
         // runId, prefix, obsId, subsystem
         Assert.assertNotNull(observe.runId());
         Assert.assertEquals(Optional.empty(), observe.jMaybeObsId());
-        Assert.assertEquals(prefix, observe.target().prefix());
-        Assert.assertEquals(new Prefix(prefix), observe.target());
-        Assert.assertEquals(WFOS, observe.target().subsystem());
+        Assert.assertEquals(prefix, observe.source().prefix());
+        Assert.assertEquals(WFOS, observe.source().subsystem());
+
 
         // complete API
         assertOnCommandAPI(observe);
@@ -108,14 +107,14 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessWaitCommand() {
-        Wait wait = new Wait(prefix, prefix, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Wait wait = new Wait(new Prefix(prefix), new CommandName("move"), Optional.of(obsId)).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(wait.runId());
         Assert.assertEquals(obsId, wait.jMaybeObsId().get());
-        Assert.assertEquals(prefix, wait.target().prefix());
-        Assert.assertEquals(new Prefix(prefix), wait.target());
-        Assert.assertEquals(WFOS, wait.target().subsystem());
+        Assert.assertEquals(prefix, wait.source().prefix());
+        Assert.assertEquals(WFOS, wait.source().subsystem());
+
 
         // complete API
         assertOnCommandAPI(wait);

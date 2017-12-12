@@ -26,7 +26,7 @@ class CommandsTest extends FunSpec {
     it("Should allow adding keys using single set") {
       val i1  = k1.set(22)
       val i2  = k2.set("A")
-      val sc1 = Setup(Prefix(ck3), Prefix(ck3), Some(obsId)).add(i1).add(i2)
+      val sc1 = Setup(Prefix(ck3), CommandName(ck3), Some(obsId)).add(i1).add(i2)
       assert(sc1.size == 2)
       assert(sc1.exists(k1))
       assert(sc1.exists(k2))
@@ -46,7 +46,7 @@ class CommandsTest extends FunSpec {
 
     // DEOPSCSW-190: Implement Unit Support
     it("Should allow setting with units") {
-      var sc1 = Setup(Prefix(ck3), Prefix(ck3), Some(obsId))
+      var sc1 = Setup(Prefix(ck3), CommandName(ck3), Some(obsId))
       sc1 = sc1.madd(k1.set(22).withUnits(degree), k2.set("B"))
       assert(sc1.size == 2)
       assert(sc1.exists(k1))
@@ -56,7 +56,7 @@ class CommandsTest extends FunSpec {
     }
 
     it("Should allow apply which returns values") {
-      var sc1 = Setup(Prefix(ck3), Prefix(ck3), Some(obsId))
+      var sc1 = Setup(Prefix(ck3), CommandName(ck3), Some(obsId))
       sc1 = sc1.madd(k1.set(22).withUnits(degree), k2.set("C"))
 
       val v1: Parameter[Int]    = sc1(k1)
@@ -70,7 +70,7 @@ class CommandsTest extends FunSpec {
 
     // DEOPSCSW-190: Implement Unit Support
     it("should update for the same key with set") {
-      var sc1 = Setup(Prefix(ck3), Prefix(ck3), Some(obsId))
+      var sc1 = Setup(Prefix(ck3), CommandName(ck3), Some(obsId))
       sc1 = sc1.add(k2.set("D"))
       assert(sc1.exists(k2))
       assert(sc1(k2).values === Array("D"))
@@ -91,7 +91,7 @@ class CommandsTest extends FunSpec {
       val i1 = byteKey1.set(bytes1)
       val i2 = byteKey2.set(bytes2)
 
-      val sc1 = Setup(Prefix(ck3), Prefix(ck3), Some(obsId), Set(i1, i2))
+      val sc1 = Setup(Prefix(ck3), CommandName(ck3), Some(obsId), Set(i1, i2))
       assert(sc1.size == 2)
       assert(sc1.exists(byteKey1))
       assert(sc1.exists(byteKey2))
@@ -111,7 +111,7 @@ class CommandsTest extends FunSpec {
       assert(i2.head == 33)
       assert(i2.units == NoUnits)
 
-      var sc = Setup(Prefix(ck3), Prefix(ck3), Some(obsId)).add(i1)
+      var sc = Setup(Prefix(ck3), CommandName(ck3), Some(obsId)).add(i1)
       // Use option
       assert(sc.get(k1).get == i1)
       assert(sc.get(k1).get.head == 22)
@@ -126,7 +126,7 @@ class CommandsTest extends FunSpec {
     it("Should allow to create setup without obsId") {
       val i1 = k1.set(22)
 
-      val sc = Setup(Prefix(ck1), Prefix(ck1), None).add(i1)
+      val sc = Setup(Prefix(ck1), CommandName(ck1), None).add(i1)
       // Use option
       assert(sc.get(k1).get == i1)
       assert(sc.get(k1).get.head == 22)
@@ -141,7 +141,7 @@ class CommandsTest extends FunSpec {
     it("Should allow adding keys") {
       val i1  = k1.set(22)
       val i2  = k2.set(44)
-      val oc1 = Observe(Prefix(ck3), Prefix(ck3), Some(obsId)).add(i1).add(i2)
+      val oc1 = Observe(Prefix(ck3), CommandName(ck3), Some(obsId)).add(i1).add(i2)
       assert(oc1.size == 2)
       assert(oc1.exists(k1))
       assert(oc1.exists(k2))
@@ -151,7 +151,7 @@ class CommandsTest extends FunSpec {
 
     // DEOPSCSW-315: Make ObsID optional in commands
     it("Should allow setting") {
-      var oc1 = Observe(Prefix(ck3), Prefix(ck3), Some(obsId))
+      var oc1 = Observe(Prefix(ck3), CommandName(ck3), Some(obsId))
       oc1 = oc1.add(k1.set(22)).add(k2.set(44))
       assert(oc1.size == 2)
       assert(oc1.maybeObsId.contains(obsId))
@@ -160,7 +160,7 @@ class CommandsTest extends FunSpec {
     }
 
     it("Should allow apply") {
-      var oc1 = Observe(Prefix(ck3), Prefix(ck3), Some(obsId))
+      var oc1 = Observe(Prefix(ck3), CommandName(ck3), Some(obsId))
       oc1 = oc1.add(k1.set(22)).add(k2.set(44))
 
       val v1 = oc1(k1)
@@ -172,7 +172,7 @@ class CommandsTest extends FunSpec {
     }
 
     it("should update for the same key with set") {
-      var oc1 = Observe(Prefix(ck3), Prefix(ck3), Some(obsId))
+      var oc1 = Observe(Prefix(ck3), CommandName(ck3), Some(obsId))
       oc1 = oc1.add(k2.set(22))
       assert(oc1.exists(k2))
       assert(oc1(k2).values === Array(22))
@@ -183,7 +183,7 @@ class CommandsTest extends FunSpec {
     }
 
     it("should update for the same key with add") {
-      var oc1 = Observe(Prefix(ck3), Prefix(ck3), Some(obsId))
+      var oc1 = Observe(Prefix(ck3), CommandName(ck3), Some(obsId))
       oc1 = oc1.add(k2.set(22).withUnits(NoUnits))
       assert(oc1.exists(k2))
       assert(oc1(k2).values === Array(22))
@@ -196,7 +196,7 @@ class CommandsTest extends FunSpec {
 
   describe("testing for getting typed items") {
     val t1  = KeyType.IntKey.make("test1")
-    val sc1 = Setup(Prefix(ck3), Prefix(ck3), Some(obsId)).add(t1.set(Array(22), degree))
+    val sc1 = Setup(Prefix(ck3), CommandName(ck3), Some(obsId)).add(t1.set(Array(22), degree))
 
     val item: Option[Parameter[Int]] = sc1.get(t1) // Works now!
     val itm: Parameter[Int]          = item.get
@@ -219,7 +219,7 @@ class CommandsTest extends FunSpec {
     val i3 = k3.set("A", "B", "C")
 
     it("Should get as IntItem") {
-      val sc = Setup(Prefix(ck3), Prefix(ck3), Some(obsId)).add(i1).add(i2).add(i3)
+      val sc = Setup(Prefix(ck3), CommandName(ck3), Some(obsId)).add(i1).add(i2).add(i3)
 
       val out1: Option[Parameter[Int]]    = sc.get(k1)
       val out2: Option[Parameter[Double]] = sc.get(k2)
@@ -241,7 +241,7 @@ class CommandsTest extends FunSpec {
     val i3 = k3.set("A", "B", "C")
 
     it("Should allow vararg add") {
-      val sc = Setup(Prefix(ck3), Prefix(ck3), Some(obsId)).madd(i1, i2, i3)
+      val sc = Setup(Prefix(ck3), CommandName(ck3), Some(obsId)).madd(i1, i2, i3)
       assert(sc.size == 3)
       assert(sc.exists(k1))
       assert(sc.exists(k2))
@@ -261,7 +261,7 @@ class CommandsTest extends FunSpec {
     val i4 = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
 
     it("Setup command should allow removing one at a time") {
-      var sc1 = Setup(Prefix(ck3), Prefix(ck3), Some(obsId)).madd(i1, i2, i3, i4)
+      var sc1 = Setup(Prefix(ck3), CommandName(ck3), Some(obsId)).madd(i1, i2, i3, i4)
       assert(sc1.size == 4)
       assert(sc1.get(k1).isDefined)
       assert(sc1.get(k2).isDefined)
@@ -314,7 +314,7 @@ class CommandsTest extends FunSpec {
     }
 
     it("Observe command should allow removing one at a time") {
-      var sc1 = Observe(Prefix(ck3), Prefix(ck3), Some(obsId)).madd(i1, i2, i3, i4)
+      var sc1 = Observe(Prefix(ck3), CommandName(ck3), Some(obsId)).madd(i1, i2, i3, i4)
       assert(sc1.size == 4)
       assert(sc1.get(k1).isDefined)
       assert(sc1.get(k2).isDefined)
@@ -346,7 +346,7 @@ class CommandsTest extends FunSpec {
     }
 
     it("Wait command should allow removing one at a time") {
-      var sc1 = Wait(Prefix(ck3), Prefix(ck3), Some(obsId)).madd(i1, i2, i3, i4)
+      var sc1 = Wait(Prefix(ck3), CommandName(ck3), Some(obsId)).madd(i1, i2, i3, i4)
       assert(sc1.size == 4)
       assert(sc1.get(k1).isDefined)
       assert(sc1.get(k2).isDefined)
@@ -392,7 +392,7 @@ class CommandsTest extends FunSpec {
     val i5  = k1.set(22) // This is not added for testing not present removal
 
     it("Should allow removing one at a time") {
-      var sc1 = Setup(Prefix(ck3), Prefix(ck3), Some(obsId)).madd(i1, i2, i3, i4)
+      var sc1 = Setup(Prefix(ck3), CommandName(ck3), Some(obsId)).madd(i1, i2, i3, i4)
       assert(sc1.size == 4)
       assert(sc1.get(k1).isDefined)
       assert(sc1.get(k2).isDefined)
