@@ -16,12 +16,11 @@ object JsonSupport extends JsonSupport with DerivedJsonFormats with WrappedArray
 trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
 
   // JSON formats
-  lazy val paramSetFormat    = implicitly[Format[Set[Parameter[_]]]]
-  lazy val commandInfoFormat = implicitly[Format[CommandInfo]]
-  lazy val runIdFormat       = implicitly[Format[RunId]]
-  lazy val obsIdFormat       = implicitly[Format[Option[ObsId]]]
-  lazy val prefixFormat      = implicitly[Format[Prefix]]
-  lazy val eventInfoFormat   = implicitly[Format[EventInfo]]
+  lazy val paramSetFormat  = implicitly[Format[Set[Parameter[_]]]]
+  lazy val runIdFormat     = implicitly[Format[RunId]]
+  lazy val obsIdFormat     = implicitly[Format[Option[ObsId]]]
+  lazy val prefixFormat    = implicitly[Format[Prefix]]
+  lazy val eventInfoFormat = implicitly[Format[EventInfo]]
 
   // config and event type JSON tags
   private val setupType        = classOf[Setup].getSimpleName
