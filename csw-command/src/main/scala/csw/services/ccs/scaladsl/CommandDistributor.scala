@@ -1,16 +1,18 @@
 package csw.services.ccs.scaladsl
 
+import akka.actor.Scheduler
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{Sink, Source}
 import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter._
+import akka.util.Timeout
 import csw.messages.CommandResponseManagerMessage.Subscribe
 import csw.messages.ComponentMessage
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands.{CommandResponse, CommandResultType, ControlCommand}
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class CommandDistributor(controlCommand: ControlCommand) {
 
@@ -26,7 +28,7 @@ class CommandDistributor(controlCommand: ControlCommand) {
     this
   }
 
-  def execute(): Future[CommandResponse] = {
+  def execute()(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Future[CommandResponse] = {
     var finalResponse: CommandResponse = CommandResponse.Completed(controlCommand.runId)
 
     Source
