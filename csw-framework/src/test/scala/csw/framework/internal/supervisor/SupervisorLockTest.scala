@@ -120,7 +120,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockAcquired)
 
     // Client 1 tries to send submit command while Client 2 has the lock
-    supervisorRef ! Submit(Setup(source1Prefix, target1Prefix, Some(obsId)), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(source1Prefix, commandName1, Some(obsId)), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[NotAllowed]
   }
 
@@ -179,9 +179,9 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val commandResponseProbe = TestProbe[CommandResponse]
 
     val source2Prefix = Prefix("wfos.prog.cloudcover.source2")
-    val target2Prefix = Prefix("wfos.prog.cloudcover.Client2.success")
+    val client2Prefix = CommandName("wfos.prog.cloudcover.Client2.success")
     val obsId         = ObsId("Obs001")
-    val client1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
+    val source1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
 
     val mocks = frameworkTestMocks()
     import mocks._
@@ -193,16 +193,16 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
     // Client 1 will lock an assembly
-    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref, 100.millis)
+    supervisorRef ! Lock(source1Prefix, lockingStateProbe.ref, 100.millis)
     lockingStateProbe.expectMsg(LockAcquired)
     lockingStateProbe.expectMsg(LockExpiringShortly)
 
     // Client 2 tries to send submit command while Client 1 has the lock
-    supervisorRef ! Submit(Setup(source2Prefix, target2Prefix, Some(obsId)), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(source2Prefix, client2Prefix, Some(obsId)), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[NotAllowed]
 
     // Reacquire lock before it gets expired
-    supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref, 100.millis)
+    supervisorRef ! Lock(source1Prefix, lockingStateProbe.ref, 100.millis)
     lockingStateProbe.expectMsg(LockAcquired)
 
     // this is to prove that timeout gets reset after renewing lock
@@ -211,7 +211,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockExpired)
 
     // Client 2 tries to send submit command again after lock is released
-    //    supervisorRef ! Submit(Setup(source2Prefix, target2Prefix, Some(obsId)), commandResponseProbe.ref)
+    //    supervisorRef ! Submit(Setup(source2Prefix, client2Prefix, Some(obsId)), commandResponseProbe.ref)
     //    commandResponseProbe.expectMsgType[Accepted]
   }
 
