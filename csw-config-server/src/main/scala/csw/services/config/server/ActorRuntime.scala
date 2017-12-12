@@ -3,6 +3,7 @@ package csw.services.config.server
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
+import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.dispatch.MessageDispatcher
 import akka.stream.{ActorMaterializer, Materializer}
@@ -29,7 +30,7 @@ class ActorRuntime(_actorSystem: ActorSystem, settings: Settings) {
   def startLogging(): LoggingSystem =
     LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
-  def shutdown(): Future[Done] = coordinatedShutdown.run()
+  def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
 
-  def jShutdown(): CompletableFuture[Done] = shutdown().toJava.toCompletableFuture
+  def jShutdown(reason: Reason): CompletableFuture[Done] = shutdown(reason).toJava.toCompletableFuture
 }

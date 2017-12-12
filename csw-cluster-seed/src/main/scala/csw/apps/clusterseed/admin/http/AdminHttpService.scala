@@ -4,6 +4,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.apps.clusterseed.admin.internal.{ActorRuntime, Settings}
 import csw.apps.clusterseed.commons.ClusterSeedLogger
+import csw.messages.models.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.scaladsl.Logger
 
@@ -26,7 +27,7 @@ class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, set
   } recoverWith {
     case NonFatal(ex) ⇒
       log.error("can not start admin http server", ex = ex)
-      shutdown().map(_ ⇒ throw ex)
+      shutdown(FailureReason(ex)).map(_ ⇒ throw ex)
   }
 
   private def bind() = Http().bindAndHandle(

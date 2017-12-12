@@ -2,6 +2,7 @@ package csw.framework.internal.supervisor
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
+import akka.actor.CoordinatedShutdown.Reason
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
@@ -24,6 +25,7 @@ import csw.messages.framework.SupervisorLifecycleState.{Idle, RunningOffline}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.models.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.messages.models.LockingResponse.{LockExpired, LockExpiringShortly}
 import csw.messages.models.PubSub.Publish
 import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
@@ -132,7 +134,7 @@ class SupervisorBehavior(
 
       lifecycleState match {
         case SupervisorLifecycleState.Restart  ⇒ spawn()
-        case SupervisorLifecycleState.Shutdown ⇒ coordinatedShutdown()
+        case SupervisorLifecycleState.Shutdown ⇒ coordinatedShutdown(ShutdownMessageReceivedReason)
         case SupervisorLifecycleState.Idle     ⇒ if (isStandalone) throw InitializationFailed
         case _                                 ⇒ updateLifecycleState(SupervisorLifecycleState.Idle) // Change to idle and expect Restart/Shutdown from outside
       }
@@ -239,7 +241,7 @@ class SupervisorBehavior(
     updateLifecycleState(SupervisorLifecycleState.Shutdown)
     ctx.child(componentActorName) match {
       case Some(ref) ⇒ ctx.stop(ref) // stop component actor for a graceful shutdown before shutting down the actor system
-      case None      ⇒ coordinatedShutdown()
+      case None      ⇒ coordinatedShutdown(ShutdownMessageReceivedReason)
     }
   }
 
@@ -306,7 +308,7 @@ class SupervisorBehavior(
     ctx.spawn[Nothing](behavior, componentActorName)
   }
 
-  private def coordinatedShutdown(): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run()
+  private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
 
   private def makePubSubComponent(): ActorRef[PubSub[CurrentState]] =
     pubSubBehaviorFactory.make(ctx, PubSubComponentActor, loggerFactory)

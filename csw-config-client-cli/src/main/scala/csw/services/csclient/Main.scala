@@ -1,5 +1,6 @@
 package csw.services.csclient
 
+import csw.messages.models.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.BuildInfo
 import csw.services.config.client.commons.ConfigClientLogger
 import csw.services.csclient.cli.{ArgsParser, ClientCliWiring, Options}
@@ -29,7 +30,7 @@ object Main extends App {
     try {
       wiring.cliApp.start(options)
     } finally {
-      wiring.actorRuntime.shutdown()
+      wiring.actorRuntime.shutdown(ApplicationFinishedReason)
     }
   }
 }

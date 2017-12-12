@@ -2,6 +2,7 @@ package csw.services.config.client.internal
 
 import akka.Done
 import akka.actor.ActorSystem
+import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.location.commons.CswCoordinatedShutdown
 
@@ -15,5 +16,5 @@ class ActorRuntime(_actorSystem: ActorSystem = ActorSystem()) {
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   implicit val mat: Materializer            = ActorMaterializer()
 
-  def shutdown(): Future[Done] = CswCoordinatedShutdown.run(actorSystem)
+  def shutdown(reason: Reason): Future[Done] = CswCoordinatedShutdown.run(actorSystem, reason)
 }

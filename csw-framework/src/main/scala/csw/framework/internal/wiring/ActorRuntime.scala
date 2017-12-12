@@ -2,6 +2,7 @@ package csw.framework.internal.wiring
 
 import akka.Done
 import akka.actor.ActorSystem
+import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, CswCoordinatedShutdown}
@@ -21,5 +22,5 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   def startLogging(): LoggingSystem =
     LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
-  def shutdown(): Future[Done] = CswCoordinatedShutdown.run(actorSystem)
+  def shutdown(reason: Reason): Future[Done] = CswCoordinatedShutdown.run(actorSystem, reason)
 }

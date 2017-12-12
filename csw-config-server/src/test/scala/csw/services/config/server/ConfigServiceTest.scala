@@ -6,6 +6,7 @@ import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models._
 import csw.services.config.api.scaladsl.ConfigService
@@ -938,7 +939,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
         .await
         .get
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
-    serverWiringAnnexTest.actorRuntime.shutdown().await
+    serverWiringAnnexTest.actorRuntime.shutdown(TestFinishedReason).await
   }
 
   //DEOPSCSW-75 List the names of configuration files that match a path
@@ -1084,6 +1085,6 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     metadata.annexPath shouldBe "/test/csw-config-temp"
     metadata.annexMinFileSize shouldBe "333 MiB"
     metadata.maxConfigFileSize shouldBe "500 MiB"
-    serverWiringMetadataTest.actorRuntime.shutdown().await
+    serverWiringMetadataTest.actorRuntime.shutdown(TestFinishedReason).await
   }
 }

@@ -2,6 +2,7 @@ package csw.services.integtration.tests
 
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.CswCluster
 import csw.services.location.scaladsl.LocationServiceFactory
@@ -16,7 +17,7 @@ class LocationServiceMultipleNICTest(cswCluster: CswCluster)
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
 
   override protected def afterAll(): Unit =
-    locationService.shutdown()
+    locationService.shutdown(TestFinishedReason)
 
   test("should list and resolve component having multiple-nic's") {
 

@@ -9,6 +9,7 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory}
 import csw.services.location.exceptions.OtherLocationIsRegistered
@@ -33,7 +34,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     locationService.unregisterAll().await
 
   override protected def afterAll(): Unit = {
-    locationService.shutdown().await
+    locationService.shutdown(TestFinishedReason).await
     actorSystem.terminate().await
   }
 

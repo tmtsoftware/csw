@@ -7,6 +7,7 @@ import akka.typed.ActorRef
 import com.typesafe.config.ConfigFactory
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.internal.Networks
 import csw.services.location.scaladsl.LocationServiceFactory
@@ -27,7 +28,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
   private val clusterSettings: ClusterSettings = ClusterAwareSettings.onPort(3552)
   private val locationService                  = LocationServiceFactory.withSystem(clusterSettings.system)
 
-  override protected def afterAll(): Unit = locationService.shutdown().await
+  override protected def afterAll(): Unit = locationService.shutdown(TestFinishedReason).await
 
   test("Test with command line args") {
     val name = "test1"

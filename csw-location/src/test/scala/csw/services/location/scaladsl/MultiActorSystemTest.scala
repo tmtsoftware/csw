@@ -1,7 +1,8 @@
 package csw.services.location.scaladsl
 
-import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.location.Connection.TcpConnection
+import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ClusterSettings, CswCluster, RegistrationFactory}
 import csw.services.location.internal.Networks
@@ -21,7 +22,7 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
     LocationServiceFactory.withCluster(CswCluster.withSettings(ClusterSettings().joinLocal(3552)))
 
   override protected def afterAll(): Unit =
-    locationService2.shutdown().await
+    locationService2.shutdown(TestFinishedReason).await
 
   test("ensure that location service works across two actorSystems within the same JVM") {
     locationService.register(tcpRegistration).await
@@ -29,7 +30,7 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
       new Networks().hostname()
     )
 
-    locationService.shutdown().await
+    locationService.shutdown(TestFinishedReason).await
     locationService2.resolve(connection, 5.seconds).await.get shouldBe tcpRegistration.location(
       new Networks().hostname()
     )

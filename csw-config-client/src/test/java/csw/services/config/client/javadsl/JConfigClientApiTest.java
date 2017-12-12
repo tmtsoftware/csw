@@ -2,6 +2,7 @@ package csw.services.config.client.javadsl;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
+import csw.messages.models.CoordinatedShutdownReasons;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.javadsl.IConfigService;
 import csw.services.config.api.models.ConfigData;
@@ -59,8 +60,8 @@ public class JConfigClientApiTest {
 
     @AfterClass
     public static void afterAll() throws Exception {
-        Await.result(httpService.shutdown(), Duration.create(20, "seconds"));
-        clientLocationService.shutdown().get();
+        Await.result(httpService.shutdown(CoordinatedShutdownReasons.testFinishedReason()), Duration.create(20, "seconds"));
+        clientLocationService.shutdown(CoordinatedShutdownReasons.testFinishedReason()).get();
         Await.result(actorRuntime.actorSystem().terminate(), Duration.create(20, "seconds"));
     }
 

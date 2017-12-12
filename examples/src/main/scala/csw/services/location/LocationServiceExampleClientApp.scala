@@ -9,6 +9,7 @@ import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
+import csw.messages.models.CoordinatedShutdownReasons.ActorTerminatedReason
 import csw.messages.{ComponentMessage, ContainerExternalMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
@@ -272,7 +273,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
     //#shutdown
     // Only call this once per application
-    Await.result(locationService.shutdown(), 20.seconds)
+    Await.result(locationService.shutdown(ActorTerminatedReason), 20.seconds)
     //#shutdown
 
     //#stop-logging-system

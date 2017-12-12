@@ -1,6 +1,7 @@
 package csw.apps.hostconfig
 
 import akka.actor.ActorSystem
+import akka.actor.CoordinatedShutdown.Reason
 import csw.apps.hostconfig.cli.{ArgsParser, Options}
 import csw.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
 import csw.framework.internal.configparser.ConfigParser
@@ -8,6 +9,7 @@ import csw.framework.internal.wiring.FrameworkWiring
 import csw.framework.models.ConfigFileLocation.{Local, Remote}
 import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, HostBootstrapInfo}
+import csw.messages.models.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -57,7 +59,7 @@ private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSetti
             // once all the processes are started for each container,
             // host applications actor system is no longer needed,
             // otherwise it will keep taking part of cluster decisions
-            shutdown()
+            shutdown(ApplicationFinishedReason)
             waitForProcessTermination(processes)
             log.warn("Exiting HostConfigApp as all the processes start by this app are terminated")
           }
@@ -88,6 +90,6 @@ private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSetti
     log.warn(s"Container exited with code: [$exitCode]")
   }
 
-  private def shutdown() = Await.result(wiring.actorRuntime.shutdown(), 10.seconds)
+  private def shutdown(reason: Reason) = Await.result(wiring.actorRuntime.shutdown(reason), 10.seconds)
 }
 // $COVERAGE-ON$

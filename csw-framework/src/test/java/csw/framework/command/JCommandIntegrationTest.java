@@ -15,6 +15,7 @@ import csw.messages.ccs.commands.CommandResponse.Completed;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.location.AkkaLocation;
 import csw.messages.location.ComponentId;
+import csw.messages.models.CoordinatedShutdownReasons;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
@@ -59,7 +60,7 @@ public class JCommandIntegrationTest {
 
     @AfterClass
     public static void teardown() throws Exception {
-        locationService.shutdown().get();
+        locationService.shutdown(CoordinatedShutdownReasons.testFinishedReason()).get();
         Await.result(hcdActorSystem.terminate(), Duration.create(20, "seconds"));
     }
 

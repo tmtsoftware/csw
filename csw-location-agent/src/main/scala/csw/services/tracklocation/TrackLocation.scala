@@ -1,9 +1,11 @@
 package csw.services.tracklocation
 
 import akka.Done
+import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.models.CoordinatedShutdownReasons.{FailureReason, ProcessTerminatedReason}
 import csw.services.location.commons.CswCluster
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
@@ -35,7 +37,7 @@ class TrackLocation(names: List[String], command: Command, actorSystem: ActorSys
       unregisterOnTermination(results)
     } catch {
       case NonFatal(ex) ⇒
-        shutdown()
+        shutdown(FailureReason(ex))
         throw ex
     }
 
@@ -61,7 +63,7 @@ class TrackLocation(names: List[String], command: Command, actorSystem: ActorSys
 
     log.info(s"Executing specified command: ${command.commandText}")
     val process = command.commandText.run()
-    Future(process.exitValue()).onComplete(_ ⇒ shutdown())
+    Future(process.exitValue()).onComplete(_ ⇒ shutdown(ProcessTerminatedReason))
     process
   }
 
@@ -76,5 +78,5 @@ class TrackLocation(names: List[String], command: Command, actorSystem: ActorSys
     }
   }
 
-  private def shutdown() = Await.result(cswCluster.shutdown(), 10.seconds)
+  private def shutdown(reason: Reason) = Await.result(cswCluster.shutdown(reason), 10.seconds)
 }

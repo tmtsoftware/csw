@@ -3,11 +3,13 @@ package csw.apps.containercmd
 import java.nio.file.Path
 
 import akka.actor.ActorSystem
+import akka.actor.CoordinatedShutdown.Reason
 import akka.typed.ActorRef
 import com.typesafe.config.Config
 import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+import csw.messages.models.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -60,7 +62,7 @@ private[containercmd] class ContainerCmd(
           } catch {
             case NonFatal(ex) ⇒
               log.error(s"${ex.getMessage}", ex = ex)
-              shutdown()
+              shutdown(FailureReason(ex))
               throw ex
           }
       }
@@ -89,5 +91,5 @@ private[containercmd] class ContainerCmd(
     else Container.spawn(config, wiring)
   }
 
-  private def shutdown() = Await.result(wiring.actorRuntime.shutdown(), 10.seconds)
+  private def shutdown(reason: Reason) = Await.result(wiring.actorRuntime.shutdown(reason), 10.seconds)
 }

@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
 import akka.Done
+import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.messages.location._
@@ -59,7 +60,7 @@ private[location] class JLocationServiceImpl(locationService: LocationService, c
   override def subscribe(connection: Connection, consumer: Consumer[TrackingEvent]): KillSwitch =
     locationService.subscribe(connection, consumer.accept)
 
-  override def shutdown(): CompletableFuture[Done] = locationService.shutdown().toJava.toCompletableFuture
+  override def shutdown(reason: Reason): CompletableFuture[Done] = locationService.shutdown(reason).toJava.toCompletableFuture
 
   override def asScala: LocationService = locationService
 

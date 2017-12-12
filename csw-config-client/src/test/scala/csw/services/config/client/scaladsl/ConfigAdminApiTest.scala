@@ -2,6 +2,7 @@ package csw.services.config.client.scaladsl
 
 import java.nio.file.Paths
 
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.api.exceptions.InvalidInput
 import csw.services.config.api.models.{ConfigData, FileType}
 import csw.services.config.api.scaladsl.ConfigService
@@ -33,8 +34,8 @@ class ConfigAdminApiTest extends ConfigServiceTest {
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await
-    httpService.shutdown().await
-    clientLocationService.shutdown().await
+    httpService.shutdown(TestFinishedReason).await
+    clientLocationService.shutdown(TestFinishedReason).await
     super.afterAll()
   }
 

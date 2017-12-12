@@ -6,6 +6,7 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.integtration.apps.TromboneHCD
 import csw.services.integtration.apps.TromboneHCD.Unregister
 import csw.services.integtration.common.TestFutureExtension.RichFuture
@@ -25,7 +26,7 @@ class LocationServiceIntegrationTest
   val locationService = LocationServiceFactory.make()
 
   override protected def afterAll(): Unit = {
-    locationService.shutdown()
+    locationService.shutdown(TestFinishedReason)
     TestKit.shutdownActorSystem(system)
   }
 

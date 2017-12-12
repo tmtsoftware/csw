@@ -2,6 +2,7 @@ package csw.framework.internal.container
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
+import akka.actor.CoordinatedShutdown.Reason
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
@@ -16,6 +17,7 @@ import csw.messages._
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.models.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
 import csw.messages.models.{Components, SupervisorInfo}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -89,7 +91,7 @@ class ContainerBehavior(
       supervisors = supervisors.filterNot(_.component.supervisor == supervisor)
       if (supervisors.isEmpty) {
         log.warn("All supervisors from this container are terminated. Initiating co-ordinated shutdown.")
-        coordinatedShutdown()
+        coordinatedShutdown(AllActorsWithinContainerTerminatedReason)
       }
       this
     case PostStop ⇒
@@ -126,7 +128,7 @@ class ContainerBehavior(
     case SupervisorsCreated(supervisorInfos) ⇒
       if (supervisorInfos.isEmpty) {
         log.error(s"Failed to spawn supervisors for ComponentInfo's :[${containerInfo.components.mkString(", ")}]")
-        coordinatedShutdown()
+        coordinatedShutdown(FailedToCreateSupervisorsReason)
       } else {
         supervisors = supervisorInfos
         log.info(s"Container created following supervisors :[${supervisors.map(_.component.supervisor).mkString(",")}]")
@@ -173,5 +175,5 @@ class ContainerBehavior(
     }
   }
 
-  private def coordinatedShutdown(): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run()
+  private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
 }

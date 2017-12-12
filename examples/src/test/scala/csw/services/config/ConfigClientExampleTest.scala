@@ -4,6 +4,7 @@ import java.io.InputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.api.models.{ConfigData, ConfigId, ConfigMetadata, FileType}
 import csw.services.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -44,8 +45,8 @@ class ConfigClientExampleTest extends FunSuite with Matchers with BeforeAndAfter
 
   override protected def afterAll(): Unit = {
     val doneF = async {
-      await(httpService.shutdown())
-      await(locationService.shutdown())
+      await(httpService.shutdown(TestFinishedReason))
+      await(locationService.shutdown(TestFinishedReason))
     }
     Await.result(doneF, 10.seconds)
   }

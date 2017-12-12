@@ -7,6 +7,7 @@ import java.util.function.Consumer
 import java.{util ⇒ ju}
 
 import akka.Done
+import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.messages.location._
@@ -118,7 +119,7 @@ trait ILocationService {
    *''See Also: '' terminate method in [[csw.services.location.commons.CswCluster]]
    * @return A CompletableFuture which completes when the location service has shutdown successfully
    */
-  def shutdown(): CompletableFuture[Done]
+  def shutdown(reason: Reason): CompletableFuture[Done]
 
   /**
    * Returns the Scala API for this instance of location service

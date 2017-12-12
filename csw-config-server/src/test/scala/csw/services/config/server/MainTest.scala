@@ -6,6 +6,7 @@ import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.services.location.commons.ClusterSettings
@@ -34,7 +35,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await
-    locationService.shutdown().await
+    locationService.shutdown(TestFinishedReason).await
   }
 
   test("should not start HTTP server if repo does not exist") {
@@ -61,7 +62,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
       response.status shouldBe StatusCodes.OK
       response.discardEntityBytes()
     } finally {
-      httpService.shutdown().await
+      httpService.shutdown(TestFinishedReason).await
     }
   }
 
@@ -69,7 +70,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
 
     // temporary start a server to create a repo and then shutdown the server
     val tmpHttpService = new Main(clusterSettings).start(Array("--initRepo")).get
-    tmpHttpService.shutdown().await
+    tmpHttpService.shutdown(TestFinishedReason).await
 
     val httpService = new Main(clusterSettings).start(Array.empty).get
 
@@ -83,7 +84,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
       val response = Http().singleRequest(request).await
       response.status shouldBe StatusCodes.OK
     } finally {
-      httpService.shutdown().await
+      httpService.shutdown(TestFinishedReason).await
     }
   }
 }

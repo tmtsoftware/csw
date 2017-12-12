@@ -4,6 +4,7 @@ import akka.actor.CoordinatedShutdown
 import akka.typed.scaladsl.Actor
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.{ActorRef, Behavior, Props, Terminated}
+import csw.messages.models.CoordinatedShutdownReasons.ActorTerminatedReason
 
 /**
  * This actor should be used for spawning actors which needs to be spawned directly from the actor system.
@@ -28,7 +29,7 @@ object CswFrameworkGuardian {
         Actor.same
     } onSignal {
       case (ctx, Terminated(_)) ⇒
-        CoordinatedShutdown(ctx.system.toUntyped).run()
+        CoordinatedShutdown(ctx.system.toUntyped).run(ActorTerminatedReason)
         Actor.stopped
     }
 }

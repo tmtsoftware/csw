@@ -2,6 +2,7 @@ package csw.services.config.client.scaladsl
 
 import java.nio.file.Paths
 
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.services.config.server.ServerWiring
@@ -38,8 +39,8 @@ class ConfigClientApiTest extends FunSuite with Matchers with BeforeAndAfterEach
     httpService.registeredLazyBinding.await
 
   override protected def afterAll(): Unit = {
-    httpService.shutdown().await
-    clientLocationService.shutdown().await
+    httpService.shutdown(TestFinishedReason).await
+    clientLocationService.shutdown(TestFinishedReason).await
   }
 
   val configValue1: String =

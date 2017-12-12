@@ -16,6 +16,7 @@ import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
 import csw.services.location.commons.ClusterSettings
@@ -79,7 +80,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     // if one of the HCD shuts down, then assembly should know and receive LocationRemoved event
     disperserSupervisor ! Shutdown
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
-    Await.result(wiring.locationService.shutdown(), 5.seconds)
+    Await.result(wiring.locationService.shutdown(TestFinishedReason), 5.seconds)
   }
 
   /**
@@ -141,7 +142,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     locationService.unregister(tcpConnection)
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(tcpLocationRemovedChoice))))
 
-    Await.result(wiring.locationService.shutdown(), 5.seconds)
+    Await.result(wiring.locationService.shutdown(TestFinishedReason), 5.seconds)
   }
 
 }

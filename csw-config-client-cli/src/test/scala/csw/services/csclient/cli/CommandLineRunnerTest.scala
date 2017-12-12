@@ -3,6 +3,7 @@ package csw.services.csclient.cli
 import java.nio.file.{Files, Paths}
 import java.time.Instant
 
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.api.models.ConfigId
 import csw.services.config.server.ServerWiring
 import csw.services.csclient.commons.TestFutureExtension.RichFuture
@@ -33,8 +34,8 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     if (Files.exists(Paths.get(outputFilePath))) Files.delete(Paths.get(outputFilePath))
   }
   override protected def afterAll(): Unit = {
-    httpService.shutdown().await
-    wiring.actorRuntime.shutdown().await
+    httpService.shutdown(TestFinishedReason).await
+    wiring.actorRuntime.shutdown(TestFinishedReason).await
     Files.delete(Paths.get(inputFilePath))
     Files.delete(Paths.get(updatedInputFilePath))
   }

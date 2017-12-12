@@ -14,11 +14,12 @@ import akka.stream.javadsl.Sink;
 import akka.typed.Behavior;
 import akka.typed.javadsl.Actor;
 import akka.typed.javadsl.Adapter;
-import csw.messages.ContainerExternalMessage;
 import csw.messages.ComponentMessage;
+import csw.messages.ContainerExternalMessage;
 import csw.messages.location.*;
 import csw.messages.location.Connection.AkkaConnection;
 import csw.messages.location.Connection.HttpConnection;
+import csw.messages.models.CoordinatedShutdownReasons;
 import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.javadsl.*;
 import csw.services.location.models.AkkaRegistration;
@@ -280,7 +281,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         try {
             //#shutdown
-            locationService.shutdown().get();
+            locationService.shutdown(CoordinatedShutdownReasons.actorTerminatedReason()).get();
             //#shutdown
         // #log-info-error
         } catch (InterruptedException | ExecutionException ex) {

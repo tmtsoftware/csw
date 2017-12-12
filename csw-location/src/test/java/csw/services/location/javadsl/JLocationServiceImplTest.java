@@ -18,6 +18,7 @@ import csw.messages.location.*;
 import csw.messages.location.Connection.AkkaConnection;
 import csw.messages.location.Connection.HttpConnection;
 import csw.messages.location.Connection.TcpConnection;
+import csw.messages.models.CoordinatedShutdownReasons;
 import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.commons.Constants;
 import csw.services.location.commons.RegistrationFactory;
@@ -66,7 +67,7 @@ public class JLocationServiceImplTest {
 
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
-        locationService.shutdown().get();
+        locationService.shutdown(CoordinatedShutdownReasons.testFinishedReason()).get();
     }
 
     @Test

@@ -7,6 +7,7 @@ import akka.typed.scaladsl.adapter._
 import csw.messages.RunningMessage.DomainMessage
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.CswCluster
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
@@ -38,6 +39,6 @@ class TromboneHCD extends Actor {
   import cswCluster._
 
   override def receive: Receive = {
-    case Unregister => registrationResult.unregister().onComplete(_ => locationService.shutdown())
+    case Unregister => registrationResult.unregister().onComplete(_ => locationService.shutdown(TestFinishedReason))
   }
 }

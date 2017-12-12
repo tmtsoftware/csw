@@ -1,6 +1,7 @@
 package csw.services.location.commons
 
 import akka.Done
+import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorRef, ActorSystem, CoordinatedShutdown, PoisonPill}
 import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.Replicator.{GetReplicaCount, ReplicaCount}
@@ -8,6 +9,7 @@ import akka.cluster.http.management.ClusterHttpManagement
 import akka.cluster.{Cluster, MemberStatus}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
+import csw.messages.models.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.ClusterConfirmationActor.HasJoinedCluster
 import csw.services.logging.scaladsl.Logger
 
@@ -32,7 +34,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
   implicit val actorSystem: ActorSystem = _actorSystem
   implicit val ec: ExecutionContext     = actorSystem.dispatcher
   implicit val mat: Materializer        = makeMat()
-  implicit val cluster                  = Cluster(actorSystem)
+  implicit val cluster: Cluster         = Cluster(actorSystem)
 
   /**
    * Gives the replicator for the current ActorSystem
@@ -70,8 +72,8 @@ class CswCluster private (_actorSystem: ActorSystem) {
       cluster.join(cluster.selfAddress)
     }
 
-    val confirmationActor = actorSystem.actorOf(ClusterConfirmationActor.props())
-    implicit val timeout  = Timeout(5.seconds)
+    val confirmationActor         = actorSystem.actorOf(ClusterConfirmationActor.props())
+    implicit val timeout: Timeout = Timeout(5.seconds)
     import akka.pattern.ask
     def statusF = (confirmationActor ? HasJoinedCluster).mapTo[Option[Done]]
     def status  = Await.result(statusF, 5.seconds)
@@ -106,7 +108,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * Terminates the ActorSystem and gracefully leaves the cluster
    */
-  def shutdown(): Future[Done] = coordinatedShutdown.run()
+  def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
 }
 
 /**
@@ -144,7 +146,7 @@ object CswCluster {
       cswCluster
     } catch {
       case NonFatal(ex) ⇒
-        Await.result(cswCluster.shutdown(), 10.seconds)
+        Await.result(cswCluster.shutdown(FailureReason(ex)), 10.seconds)
         log.error(ex.getMessage, ex = ex)
         throw ex
     }

@@ -2,6 +2,7 @@ package csw.services.location.scaladsl
 
 import acyclic.skipped
 import akka.Done
+import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
 import csw.messages.location._
@@ -116,7 +117,7 @@ trait LocationService {
    * @note It is recommended not to perform any operation on LocationService after calling this method
    * @return A Future which completes when the location service has shutdown successfully
    */
-  def shutdown(): Future[Done]
+  def shutdown(reason: Reason): Future[Done]
 
   /**
    * Returns the Java API for this instance of location service

@@ -4,6 +4,7 @@ import java.net.InetAddress
 
 import com.persist.JsonOps.{Json, JsonObject}
 import csw.apps.clusterseed.admin.internal.AdminWiring
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.LoggingSystemFactory
@@ -35,7 +36,7 @@ abstract class AdminLogTestSuite extends FunSuite with Matchers with BeforeAndAf
 
   override protected def afterAll(): Unit = {
     Await.result(loggingSystem.stop, 10.seconds)
-    Await.result(adminWiring.actorRuntime.shutdown(), 10.seconds)
+    Await.result(adminWiring.actorRuntime.shutdown(TestFinishedReason), 10.seconds)
   }
 
 }

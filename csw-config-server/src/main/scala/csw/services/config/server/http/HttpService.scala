@@ -2,8 +2,10 @@ package csw.services.config.server.http
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
+import akka.actor.CoordinatedShutdown.Reason
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
+import csw.messages.models.CoordinatedShutdownReasons.FailureReason
 import csw.services.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.commons.ClusterAwareSettings
@@ -45,10 +47,10 @@ class HttpService(
     log.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
     (binding, registrationResult)
   } recoverWith {
-    case NonFatal(ex) ⇒ shutdown().map(_ ⇒ throw ex)
+    case NonFatal(ex) ⇒ shutdown(FailureReason(ex)).map(_ ⇒ throw ex)
   }
 
-  def shutdown(): Future[Done] = actorRuntime.shutdown()
+  def shutdown(reason: Reason): Future[Done] = actorRuntime.shutdown(reason)
 
   private def bind() = Http().bindAndHandle(
     handler = configServiceRoute.route,

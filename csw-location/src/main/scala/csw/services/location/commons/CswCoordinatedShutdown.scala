@@ -1,6 +1,7 @@
 package csw.services.location.commons
 
 import akka.Done
+import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown, PoisonPill}
 import akka.cluster.Cluster
 import akka.util.Timeout
@@ -26,10 +27,10 @@ object CswCoordinatedShutdown {
     success
   }
 
-  def run(actorSystem: ActorSystem): Future[Done] = {
+  def run(actorSystem: ActorSystem, reason: Reason): Future[Done] = {
     if (CswCoordinatedShutdown.isMemberUp(actorSystem)) {
       log.info("Starting csw co-ordinated shutdown")
-      CoordinatedShutdown(actorSystem).run
+      CoordinatedShutdown(actorSystem).run(reason)
     } else {
       // this means that Member is not able to state change to Up status and it is most probably in Joining/WeaklyUp state
       // State transition for cluster member is: Joining -> WeaklyUp -> Unreachable -> Down -> Removed

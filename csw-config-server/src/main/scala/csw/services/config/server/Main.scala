@@ -1,5 +1,6 @@
 package csw.services.config.server
 
+import csw.messages.models.CoordinatedShutdownReasons.FailureReason
 import csw.services.config.server.cli.{ArgsParser, Options}
 import csw.services.config.server.commons.ConfigServerLogger
 import csw.services.config.server.http.HttpService
@@ -31,7 +32,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
           httpService
         } catch {
           case ex: SVNException ⇒
-            Await.result(actorRuntime.shutdown(), 10.seconds)
+            Await.result(actorRuntime.shutdown(FailureReason(ex)), 10.seconds)
             val runtimeException =
               new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex)
             log.error(runtimeException.getMessage, ex = runtimeException)

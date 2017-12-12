@@ -1,6 +1,7 @@
 package csw.apps.clusterseed.admin.internal
 
 import akka.Done
+import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.BuildInfo
@@ -21,6 +22,5 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   def startLogging(): LoggingSystem =
     LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
-  def shutdown(): Future[Done] = coordinatedShutdown.run()
-
+  def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
 }
