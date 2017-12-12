@@ -103,8 +103,9 @@ case class Observe private (runId: RunId, source: Prefix, target: Prefix, maybeO
     with SequenceCommand
     with ControlCommand {
 
-  def this(source: String, prefix: String, maybeObsId: Optional[ObsId]) =
-    this(RunId(), source, prefix, maybeObsId.asScala, Set.empty)
+  def this(source: String, target: String, maybeObsId: Optional[ObsId]) =
+    this(RunId(), source, target, maybeObsId.asScala, Set.empty)
+
   override protected def create(data: Set[Parameter[_]]): Observe = copy(paramSet = data)
 }
 
@@ -113,10 +114,10 @@ object Observe {
   private[messages] def apply(
       runId: RunId,
       source: Prefix,
-      prefix: Prefix,
+      target: Prefix,
       maybeObsId: Option[ObsId],
       paramSet: Set[Parameter[_]]
-  ) = new Observe(runId, source, prefix, maybeObsId, paramSet)
+  ) = new Observe(runId, source, target, maybeObsId, paramSet)
 
   def apply(source: Prefix, target: Prefix, maybeObsId: Option[ObsId]): Observe =
     apply(RunId(), source, target, maybeObsId, Set.empty)
@@ -135,8 +136,9 @@ case class Wait private (runId: RunId, source: Prefix, target: Prefix, maybeObsI
     extends ParameterSetType[Wait]
     with SequenceCommand {
 
-  def this(source: String, prefix: String, maybeObsId: Optional[ObsId]) =
-    this(RunId(), source, prefix, maybeObsId.asScala, Set.empty)
+  def this(source: String, target: String, maybeObsId: Optional[ObsId]) =
+    this(RunId(), source, target, maybeObsId.asScala, Set.empty)
+
   override protected def create(data: Set[Parameter[_]]): Wait = copy(paramSet = data)
 }
 
@@ -145,10 +147,10 @@ object Wait {
   private[messages] def apply(
       runId: RunId,
       source: Prefix,
-      prefix: Prefix,
+      target: Prefix,
       maybeObsId: Option[ObsId],
       paramSet: Set[Parameter[_]]
-  ) = new Wait(runId, source, prefix, maybeObsId, paramSet)
+  ) = new Wait(runId, source, target, maybeObsId, paramSet)
 
   def apply(source: Prefix, target: Prefix, maybeObsId: Option[ObsId]): Wait =
     apply(RunId(), source, target, maybeObsId, Set.empty)
