@@ -24,6 +24,8 @@ class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) 
     case None                ⇒ onLockAlreadyReleased(prefix, replyTo)
   }
 
+  def releaseLockOnTimeout(): LockManager = new LockManager(None, loggerFactory)
+
   def allowCommand(msg: CommandMessage): Boolean = lockPrefix match {
     case None ⇒ true
     case Some(currentPrefix) ⇒

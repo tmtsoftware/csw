@@ -178,10 +178,10 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val lockingStateProbe    = TestProbe[LockingResponse]
     val commandResponseProbe = TestProbe[CommandResponse]
 
-    val source2Prefix = Prefix("wfos.prog.cloudcover.source2")
-    val client2Prefix = CommandName("wfos.prog.cloudcover.Client2.success")
-    val obsId         = ObsId("Obs001")
     val source1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
+    val source2Prefix = Prefix("wfos.prog.cloudcover.source2.success")
+    val commandName   = CommandName("success.move")
+    val obsId         = ObsId("Obs001")
 
     val mocks = frameworkTestMocks()
     import mocks._
@@ -198,7 +198,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockExpiringShortly)
 
     // Client 2 tries to send submit command while Client 1 has the lock
-    supervisorRef ! Submit(Setup(source2Prefix, client2Prefix, Some(obsId)), commandResponseProbe.ref)
+    supervisorRef ! Submit(Setup(source2Prefix, commandName, Some(obsId)), commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[NotAllowed]
 
     // Reacquire lock before it gets expired
@@ -211,8 +211,8 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMsg(LockExpired)
 
     // Client 2 tries to send submit command again after lock is released
-    //    supervisorRef ! Submit(Setup(source2Prefix, client2Prefix, Some(obsId)), commandResponseProbe.ref)
-    //    commandResponseProbe.expectMsgType[Accepted]
+    supervisorRef ! Submit(Setup(source2Prefix, commandName, Some(obsId)), commandResponseProbe.ref)
+    commandResponseProbe.expectMsgType[Accepted]
   }
 
   // DEOPSCSW-223 Expiry of component Locking mode
