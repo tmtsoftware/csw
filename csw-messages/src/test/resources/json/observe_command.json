@@ -1,11 +1,11 @@
 {
   "type": "Observe",
   "runId": "test-runId",
-  "originationPrefix": {
+  "source": {
     "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },
-  "prefix": {
+  "target": {
     "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },

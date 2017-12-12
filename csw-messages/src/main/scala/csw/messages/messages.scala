@@ -39,8 +39,8 @@ case class LockAboutToTimeout(replyTo: ActorRef[LockingResponse]) extends Superv
 
 sealed trait SupervisorLockMessage extends SupervisorRunningMessage
 object SupervisorLockMessage {
-  case class Lock(prefix: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration) extends SupervisorLockMessage
-  case class Unlock(prefix: Prefix, replyTo: ActorRef[LockingResponse])                              extends SupervisorLockMessage
+  case class Lock(source: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration) extends SupervisorLockMessage
+  case class Unlock(source: Prefix, replyTo: ActorRef[LockingResponse])                              extends SupervisorLockMessage
 }
 
 sealed trait RunningMessage extends TopLevelActorMessage with SupervisorRunningMessage

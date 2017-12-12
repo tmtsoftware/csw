@@ -199,23 +199,23 @@ class SupervisorBehavior(
     case Query(commandId, replyTo)            ⇒ commandResponseManager ! Query(commandId, replyTo)
     case Subscribe(commandId, replyTo)        ⇒ commandResponseManager ! Subscribe(commandId, replyTo)
     case Unsubscribe(commandId, replyTo)      ⇒ commandResponseManager ! Unsubscribe(commandId, replyTo)
-    case Lock(prefix, replyTo, leaseDuration) ⇒ lockComponent(prefix, replyTo, leaseDuration)
-    case Unlock(prefix, replyTo)              ⇒ unlockComponent(prefix, replyTo)
+    case Lock(source, replyTo, leaseDuration) ⇒ lockComponent(source, replyTo, leaseDuration)
+    case Unlock(source, replyTo)              ⇒ unlockComponent(source, replyTo)
     case command: CommandMessage              ⇒ if (lockManager.allowCommand(command)) runningComponent.get ! command
     case runningMessage: RunningMessage       ⇒ handleRunningMessage(runningMessage)
     case msg @ Running(_)                     ⇒ log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
   }
 
-  private def lockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration): Unit = {
-    lockManager = lockManager.lockComponent(prefix, replyTo) {
+  private def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse], leaseDuration: FiniteDuration): Unit = {
+    lockManager = lockManager.lockComponent(source, replyTo) {
       timerScheduler.startSingleTimer(lockNotificationKey, LockAboutToTimeout(replyTo), leaseDuration - (leaseDuration / 10))
       timerScheduler.startSingleTimer(lockExpirationKey, LockTimedout(replyTo), leaseDuration)
     }
     if (lockManager.isLocked) updateLifecycleState(SupervisorLifecycleState.Lock)
   }
 
-  private def unlockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse]): Unit = {
-    lockManager = lockManager.unlockComponent(prefix, replyTo) {
+  private def unlockComponent(source: Prefix, replyTo: ActorRef[LockingResponse]): Unit = {
+    lockManager = lockManager.unlockComponent(source, replyTo) {
       timerScheduler.cancel(lockNotificationKey)
       timerScheduler.cancel(lockExpirationKey)
     }
