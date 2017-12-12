@@ -1,6 +1,5 @@
 package csw.services.messages;
 
-import csw.messages.ccs.commands.CommandInfo;
 import csw.messages.ccs.commands.Observe;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.ccs.commands.Wait;
@@ -122,7 +121,6 @@ public class JCommandsTest {
 
         //prefix
         String prefixName = "wfos.red.detector";
-        CommandInfo commandInfo = new CommandInfo(prefixName, prefixName, Optional.of(obsId));
 
         //parameters
         Boolean[] boolArray = {true, false, true, false};
