@@ -1,17 +1,22 @@
 package csw.framework.integration
 
 import akka.actor
+import akka.actor.Scheduler
+import akka.pattern.AskTimeoutException
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
+import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.messages.ccs.commands
+import csw.messages.ccs.commands.CommandName
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
@@ -19,6 +24,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
+import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.{HttpRegistration, TcpRegistration}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
@@ -80,6 +86,13 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     // if one of the HCD shuts down, then assembly should know and receive LocationRemoved event
     disperserSupervisor ! Shutdown
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
+
+    implicit val timeout: Timeout     = Timeout(100.millis)
+    implicit val scheduler: Scheduler = typedSystem.scheduler
+    intercept[AskTimeoutException] {
+      Await.result(disperserSupervisor.submit(commands.Setup(prefix, CommandName("isAlive"), None)), 200.millis)
+    }
+
     Await.result(wiring.locationService.shutdown(TestFinishedReason), 5.seconds)
   }
 
