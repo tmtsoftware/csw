@@ -7,14 +7,12 @@ import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
-import csw.messages._
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, NoLongerValid}
-import csw.messages.ccs.commands.{CommandResponse, Setup}
+import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
-import csw.messages.params.models.{ObsId, RunId}
 import csw.messages.params.models.Units.encoder
-import csw.messages.ccs.commands.ActorRefExts.RichComponentActor
+import csw.messages.params.models.{ObsId, RunId}
 import csw.services.ccs.internal.matchers.Matcher
 import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly._
@@ -27,7 +25,7 @@ class PositionCommand(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
     ac: AssemblyContext,
     s: Setup,
-    tromboneHCD: Option[ActorRef[ComponentMessage]],
+    tromboneHCD: Option[ComponentRef],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
 ) extends AssemblyCommand(ctx, startState, stateActor) {
@@ -67,7 +65,7 @@ class PositionCommand(
 
       tromboneHCD.get.submit(scOut).flatMap {
         case _: Accepted ⇒
-          new Matcher(tromboneHCD.get, stateMatcher).start.map {
+          new Matcher(tromboneHCD.get.ref, stateMatcher).start.map {
             case MatchCompleted =>
               publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
               Completed(s.runId)
@@ -84,7 +82,7 @@ class PositionCommand(
 
   def stopCommand(): Unit = {
     tromboneHCD.foreach(
-      _ ! Submit(TromboneHcdState.cancelSC(RunId(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
+      _.ref ! Submit(TromboneHcdState.cancelSC(RunId(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
     )
   }
 

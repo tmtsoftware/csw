@@ -1,18 +1,8 @@
 package csw.services.ccs.scaladsl
 
-import akka.NotUsed
-import akka.actor.Scheduler
-import akka.stream.Materializer
-import akka.stream.scaladsl.{Sink, Source}
 import akka.typed.ActorRef
-import akka.util.Timeout
 import csw.messages.ComponentMessage
-import csw.messages.ccs.commands.ActorRefExts.RichComponentActor
-import csw.messages.ccs.commands.{CommandResponse, CommandResultType, ControlCommand}
-import csw.messages.params.models.RunId
-
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import csw.messages.ccs.commands.ControlCommand
 
 case class CommandDistributor(componentToCommands: Map[ActorRef[ComponentMessage], List[ControlCommand]] = Map.empty) {
 
@@ -24,7 +14,7 @@ case class CommandDistributor(componentToCommands: Map[ActorRef[ComponentMessage
     }
   }
 
-  def execute()(
+  /*def execute()(
       implicit timeout: Timeout,
       scheduler: Scheduler,
       ec: ExecutionContext,
@@ -47,5 +37,5 @@ case class CommandDistributor(componentToCommands: Map[ActorRef[ComponentMessage
       case Success(_)  ⇒ Success(CommandResponse.Completed(RunId()))
       case Failure(ex) ⇒ Success(CommandResponse.Error(RunId(), s"One of the command failed : ${ex.getMessage}"))
     }
-  }
+  }*/
 }

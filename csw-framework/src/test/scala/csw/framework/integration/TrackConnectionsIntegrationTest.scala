@@ -24,7 +24,6 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.common.ActorRefExts.RichComponentActor
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.{HttpRegistration, TcpRegistration}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
@@ -73,8 +72,8 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     val filterAssemblyLocation = Await.result(locationService.find(filterAssemblyConnection), 5.seconds)
     val disperserHcdLocation   = Await.result(locationService.find(disperserHcdConnection), 5.seconds)
 
-    val assemblySupervisor  = filterAssemblyLocation.get.componentRef()
-    val disperserSupervisor = disperserHcdLocation.get.componentRef()
+    val assemblySupervisor = filterAssemblyLocation.get.componentRef().ref
+    val disperserComponent = disperserHcdLocation.get.componentRef()
 
     // Subscribe to component's current state
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))
@@ -84,13 +83,13 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(akkaLocationUpdatedChoice))))
 
     // if one of the HCD shuts down, then assembly should know and receive LocationRemoved event
-    disperserSupervisor ! Shutdown
+    disperserComponent.ref ! Shutdown
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
 
     implicit val timeout: Timeout     = Timeout(100.millis)
     implicit val scheduler: Scheduler = typedSystem.scheduler
     intercept[AskTimeoutException] {
-      Await.result(disperserSupervisor.submit(commands.Setup(prefix, CommandName("isAlive"), None)), 200.millis)
+      Await.result(disperserComponent.submit(commands.Setup(prefix, CommandName("isAlive"), None)), 200.millis)
     }
 
     Await.result(wiring.locationService.shutdown(TestFinishedReason), 5.seconds)
@@ -119,7 +118,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     val resolvedAkkaLocation = maybeLocation.get
     resolvedAkkaLocation.connection shouldBe akkaConnection
 
-    val assemblySupervisor = resolvedAkkaLocation.componentRef()
+    val assemblySupervisor = resolvedAkkaLocation.componentRef().ref
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 
     val assemblyProbe = TestProbe[CurrentState]("assembly-state-probe")

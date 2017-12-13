@@ -9,7 +9,7 @@ import com.typesafe.config.ConfigFactory;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.messages.ComponentMessage;
-import csw.messages.ccs.commands.CommandExecutionService;
+import csw.messages.ccs.commands.JComponentRef;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.CommandResponse.Completed;
 import csw.messages.ccs.commands.Setup;
@@ -80,12 +80,12 @@ public class JCommandIntegrationTest {
         Parameter<Integer> parameter = encoder.set(22, 23);
         Setup controlCommand = new Setup(prefix(), withoutMatcherCmd(), Optional.empty()).add(parameter);
 
-        CompletableFuture<CommandResponse> commandResponseCompletableFuture = CommandExecutionService
-                .submit(hcd, controlCommand, timeout, hcdActorSystem.scheduler());
+        JComponentRef hcdComponent = new JComponentRef(hcd);
+        CompletableFuture<CommandResponse> commandResponseCompletableFuture = hcdComponent.submit(controlCommand, timeout, hcdActorSystem.scheduler());
 
         CompletableFuture<CommandResponse> testCommandResponse = commandResponseCompletableFuture.thenCompose(commandResponse -> {
             if (commandResponse instanceof CommandResponse.Accepted)
-                return CommandExecutionService.getCommandResponse(hcd, commandResponse.runId(), timeout, hcdActorSystem.scheduler());
+                return hcdComponent.getCommandResponse(commandResponse.runId(), timeout, hcdActorSystem.scheduler());
             else
                 return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
         });
@@ -103,8 +103,8 @@ public class JCommandIntegrationTest {
 
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
 
-        CompletableFuture<CommandResponse> commandResponseToBeMatched = CommandExecutionService
-                .submit(hcd, setup, timeout, hcdActorSystem.scheduler())
+        CompletableFuture<CommandResponse> commandResponseToBeMatched = hcdComponent
+                .submit(setup, timeout, hcdActorSystem.scheduler())
                 .thenCompose(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
                         return matcherResponseFuture.thenApply(matcherResponse -> {

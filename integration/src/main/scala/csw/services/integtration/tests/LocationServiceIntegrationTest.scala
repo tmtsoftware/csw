@@ -53,7 +53,7 @@ class LocationServiceIntegrationTest
 
     val hcdAkkaLocation = hcdLocation.asInstanceOf[AkkaLocation]
 
-    hcdAkkaLocation.componentRef() ! Unregister()
+    hcdAkkaLocation.componentRef().ref ! Unregister()
 
     Thread.sleep(3000)
 

@@ -18,7 +18,6 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
-import csw.messages.ccs.commands.ActorRefExts.RichComponentActor
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.concurrent.duration.DurationDouble
@@ -52,11 +51,11 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
           AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.Assembly)),
           5.seconds
         )
-      val assemblyRef = Await.result(assemblyLocF, 5.seconds).map(_.componentRef()).get
+      val assemblyComponent = Await.result(assemblyLocF, 5.seconds).map(_.componentRef()).get
 
       val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
-      assemblyRef ! ComponentStateSubscription(Subscribe(probe.ref))
+      assemblyComponent.ref ! ComponentStateSubscription(Subscribe(probe.ref))
 
       // send submit with setup to assembly running in JVM-2
       // then assembly will split it into three sub commands [McsAssemblyComponentHandlers]
@@ -64,8 +63,8 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       // 1. longSetup which takes 5 seconds to finish
       // 2. shortSetup which takes 1 second to finish
       // 3. mediumSetup which takes 3 seconds to finish
-      val eventualCommandResponse = assemblyRef.submit(setup).flatMap {
-        case _: Accepted ⇒ assemblyRef.getCommandResponse(setup.runId)
+      val eventualCommandResponse = assemblyComponent.submit(setup).flatMap {
+        case _: Accepted ⇒ assemblyComponent.getCommandResponse(setup.runId)
         case _           ⇒ Future(CommandResponse.Error(setup.runId, ""))
       }
 

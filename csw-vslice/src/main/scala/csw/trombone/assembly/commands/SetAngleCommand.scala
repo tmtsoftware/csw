@@ -5,12 +5,11 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
-import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
-import csw.messages.ccs.commands.{CommandResponse, Setup}
+import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
-import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.services.ccs.internal.matchers.Matcher
+import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState._
@@ -23,7 +22,7 @@ class SetAngleCommand(
     ac: AssemblyContext,
     s: Setup,
     followCommandActor: ActorRef[FollowCommandMessages],
-    tromboneHCD: Option[ActorRef[ComponentMessage]],
+    tromboneHCD: Option[ComponentRef],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
 ) extends AssemblyCommand(ctx, startState, stateActor) {
@@ -40,7 +39,7 @@ class SetAngleCommand(
 
     followCommandActor ! SetZenithAngle(zenithAngleItem)
 
-    new Matcher(tromboneHCD.get, AssemblyMatchers.idleMatcher).start.map {
+    new Matcher(tromboneHCD.get.ref, AssemblyMatchers.idleMatcher).start.map {
       case MatchCompleted =>
         publishState(TromboneState(cmdItem(cmdContinuous), startState.move, startState.sodiumLayer, startState.nss))
         Completed(s.runId)

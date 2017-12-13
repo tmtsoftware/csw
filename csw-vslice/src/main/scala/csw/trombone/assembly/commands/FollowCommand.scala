@@ -2,10 +2,9 @@ package csw.trombone.assembly.commands
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.messages._
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.CommandResponse.{Completed, NoLongerValid}
-import csw.messages.ccs.commands.{CommandResponse, Setup}
+import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
 import csw.trombone.assembly.actors.TromboneState.{TromboneState, _}
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext}
@@ -15,7 +14,7 @@ import scala.concurrent.Future
 class FollowCommand(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                     ac: AssemblyContext,
                     s: Setup,
-                    tromboneHCD: Option[ActorRef[ComponentMessage]],
+                    tromboneHCD: Option[ComponentRef],
                     startState: TromboneState,
                     stateActor: ActorRef[PubSub[AssemblyState]])
     extends AssemblyCommand(ctx, startState, stateActor) {
