@@ -10,7 +10,7 @@ import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, NoLongerValid}
-import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
+import csw.messages.ccs.commands.{CommandResponse, Setup, WrappedComponent}
 import csw.messages.models.PubSub
 import csw.messages.params.models.{ObsId, Prefix, RunId}
 import csw.services.ccs.internal.matchers.Matcher
@@ -25,7 +25,7 @@ class DatumCommand(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
     ac: AssemblyContext,
     s: Setup,
-    tromboneHCD: Option[ComponentRef],
+    tromboneHCD: Option[WrappedComponent],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
 ) extends AssemblyCommand(ctx, startState, stateActor) {

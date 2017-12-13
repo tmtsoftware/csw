@@ -51,7 +51,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
           AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.Assembly)),
           5.seconds
         )
-      val assemblyComponent = Await.result(assemblyLocF, 5.seconds).map(_.componentRef()).get
+      val assemblyComponent = Await.result(assemblyLocF, 5.seconds).map(_.component()).get
 
       val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]

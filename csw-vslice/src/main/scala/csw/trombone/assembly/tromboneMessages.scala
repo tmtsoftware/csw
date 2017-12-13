@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import csw.messages.CommandMessage
 import csw.messages.CommandMessage.Submit
 import csw.messages.RunningMessage.DomainMessage
-import csw.messages.ccs.commands.{CommandResponse, ComponentRef}
+import csw.messages.ccs.commands.{CommandResponse, WrappedComponent}
 import csw.messages.ccs.events.EventTime
 import csw.messages.location.Connection
 import csw.messages.params.generics.Parameter
@@ -71,12 +71,12 @@ object TromboneControlMsg {
 
 sealed trait DiagPublisherMessages extends DomainMessage
 object DiagPublisherMessages {
-  final case class TimeForAxisStats(periodInseconds: Int)           extends DiagPublisherMessages
-  final case object DiagnosticState                                 extends DiagPublisherMessages
-  final case object OperationsState                                 extends DiagPublisherMessages
-  final case class CurrentStateE(cs: CurrentState)                  extends DiagPublisherMessages
-  final case class UpdateTromboneHcd(running: Option[ComponentRef]) extends DiagPublisherMessages
-  final case class CommandResponseE(cmdRes: CommandResponse)        extends DiagPublisherMessages
+  final case class TimeForAxisStats(periodInseconds: Int)               extends DiagPublisherMessages
+  final case object DiagnosticState                                     extends DiagPublisherMessages
+  final case object OperationsState                                     extends DiagPublisherMessages
+  final case class CurrentStateE(cs: CurrentState)                      extends DiagPublisherMessages
+  final case class UpdateTromboneHcd(running: Option[WrappedComponent]) extends DiagPublisherMessages
+  final case class CommandResponseE(cmdRes: CommandResponse)            extends DiagPublisherMessages
 }
 
 ////////////////////
@@ -97,8 +97,8 @@ sealed trait AssemblyCommandHandlerMsgs
 
 sealed trait CommonMsgs extends AssemblyCommandHandlerMsgs
 object CommonMsgs {
-  case class AssemblyStateE(state: AssemblyState)                           extends CommonMsgs
-  case class UpdateHcdLocations(hcd: Map[Connection, Option[ComponentRef]]) extends CommonMsgs
+  case class AssemblyStateE(state: AssemblyState)                               extends CommonMsgs
+  case class UpdateHcdLocations(hcd: Map[Connection, Option[WrappedComponent]]) extends CommonMsgs
 }
 sealed trait NotFollowingMsgs extends AssemblyCommandHandlerMsgs
 sealed trait FollowingMsgs    extends AssemblyCommandHandlerMsgs

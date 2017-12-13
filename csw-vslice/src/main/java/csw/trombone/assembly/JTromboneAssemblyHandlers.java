@@ -5,11 +5,10 @@ import akka.typed.javadsl.ActorContext;
 import com.typesafe.config.ConfigFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
-import csw.messages.ComponentMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
-import csw.messages.ccs.commands.JComponentRef;
+import csw.messages.ccs.commands.JWrappedComponent;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.AkkaLocation;
 import csw.messages.location.Connection;
@@ -38,7 +37,7 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
     private ComponentInfo componentInfo;
     private ActorContext<TopLevelActorMessage> ctx;
     private ILocationService locationService;
-    private Map<Connection, Optional<JComponentRef>> runningHcds;
+    private Map<Connection, Optional<JWrappedComponent>> runningHcds;
     private ActorRef<DiagPublisherMessages> diagPublisher;
 
     public JTromboneAssemblyHandlers(
@@ -82,8 +81,8 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
 
             return eventualEventPublisher.thenAcceptBoth(eventualHcdLocation, (eventPublisher, hcdLocation) -> {
                 hcdLocation.map(hcd -> {
-                    runningHcds.put(connection, Optional.of(hcd.jComponentRef()));
-                    diagPublisher = ctx.spawnAnonymous(DiagPublisher.jMake(ac, Optional.of(hcd.componentRef()), Optional.of(eventPublisher)));
+                    runningHcds.put(connection, Optional.of(hcd.jComponent()));
+                    diagPublisher = ctx.spawnAnonymous(DiagPublisher.jMake(ac, Optional.of(hcd.component()), Optional.of(eventPublisher)));
                     return Optional.empty();
                 });
             });

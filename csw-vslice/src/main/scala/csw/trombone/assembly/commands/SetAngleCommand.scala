@@ -6,7 +6,7 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
-import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
+import csw.messages.ccs.commands.{CommandResponse, Setup, WrappedComponent}
 import csw.messages.models.PubSub
 import csw.services.ccs.internal.matchers.Matcher
 import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
@@ -22,7 +22,7 @@ class SetAngleCommand(
     ac: AssemblyContext,
     s: Setup,
     followCommandActor: ActorRef[FollowCommandMessages],
-    tromboneHCD: Option[ComponentRef],
+    tromboneHCD: Option[WrappedComponent],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
 ) extends AssemblyCommand(ctx, startState, stateActor) {

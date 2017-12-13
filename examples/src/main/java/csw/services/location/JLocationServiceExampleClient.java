@@ -159,7 +159,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         findResult.ifPresent(akkaLocation -> {
             //#typed-ref
             // If the component type is HCD or Assembly, use this to get the correct ActorRef
-            akka.typed.ActorRef<ComponentMessage> typedComponentRef = akkaLocation.jComponentRef().ref();
+            akka.typed.ActorRef<ComponentMessage> typedComponentRef = akkaLocation.jComponent().ref();
 
             // If the component type is Container, use this to get the correct ActorRef
             akka.typed.ActorRef<ContainerExternalMessage> typedContainerRef = akkaLocation.containerRef();

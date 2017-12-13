@@ -9,7 +9,7 @@ import csw.common.components.command.TopLevelActorDomainMessage.CommandCompleted
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
-import csw.messages.ccs.commands.{CommandResponse, ComponentRef, ControlCommand, Setup}
+import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup, WrappedComponent}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.models.PubSub
@@ -39,21 +39,21 @@ class McsAssemblyComponentHandlers(
       loggerFactory
     ) {
 
-  implicit val timeout: Timeout     = 10.seconds
-  implicit val scheduler: Scheduler = ctx.system.scheduler
-  implicit val ec: ExecutionContext = ctx.executionContext
-  var completedCommands: Int        = 0
-  var hcdComponent: ComponentRef    = _
-  var commandId: RunId              = _
-  var shortSetup: Setup             = _
-  var mediumSetup: Setup            = _
-  var longSetup: Setup              = _
+  implicit val timeout: Timeout      = 10.seconds
+  implicit val scheduler: Scheduler  = ctx.system.scheduler
+  implicit val ec: ExecutionContext  = ctx.executionContext
+  var completedCommands: Int         = 0
+  var hcdComponent: WrappedComponent = _
+  var commandId: RunId               = _
+  var shortSetup: Setup              = _
+  var mediumSetup: Setup             = _
+  var longSetup: Setup               = _
 
   override def initialize(): Future[Unit] =
     componentInfo.connections.headOption match {
       case Some(hcd) ⇒
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) ⇒ hcdComponent = akkaLocation.componentRef()
+          case Some(akkaLocation) ⇒ hcdComponent = akkaLocation.component()
           case None               ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
       case None ⇒ Future.successful(Unit)

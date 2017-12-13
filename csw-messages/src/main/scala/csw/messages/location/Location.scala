@@ -4,7 +4,7 @@ import java.net.URI
 
 import akka.typed.ActorRef
 import csw.messages.ccs.commands
-import csw.messages.ccs.commands.JComponentRef
+import csw.messages.ccs.commands.{JWrappedComponent, WrappedComponent}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.{ComponentMessage, ContainerExternalMessage, TMTSerializable}
 
@@ -44,8 +44,8 @@ final case class AkkaLocation(
   }
 
   // If the component type is HCD or Assembly, use this to get the correct ActorRef
-  def componentRef(): commands.ComponentRef = new commands.ComponentRef(typedRef[ComponentMessage])
-  def jComponentRef(): JComponentRef        = new JComponentRef(typedRef[ComponentMessage])
+  def component(): WrappedComponent   = new WrappedComponent(typedRef[ComponentMessage])
+  def jComponent(): JWrappedComponent = new JWrappedComponent(typedRef[ComponentMessage])
 
   // If the component type is Container, use this to get the correct ActorRef
   def containerRef(): ActorRef[ContainerExternalMessage] = typedRef[ContainerExternalMessage]

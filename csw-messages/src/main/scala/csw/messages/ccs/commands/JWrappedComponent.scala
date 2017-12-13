@@ -11,8 +11,8 @@ import csw.messages.params.models.RunId
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
-class JComponentRef(val ref: ActorRef[ComponentMessage]) {
-  private val componentRef = new ComponentRef(ref)
+class JWrappedComponent(val ref: ActorRef[ComponentMessage]) {
+  private val componentRef = new WrappedComponent(ref)
 
   def submit(controlCommand: ControlCommand, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
     componentRef.submit(controlCommand)(timeout, scheduler).toJava.toCompletableFuture

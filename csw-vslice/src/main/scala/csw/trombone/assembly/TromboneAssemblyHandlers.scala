@@ -57,9 +57,9 @@ class TromboneAssemblyHandlers(
   //#component-handler
 
   //private state of this component
-  private var diagPublisher: ActorRef[DiagPublisherMessages]       = _
-  private var commandHandler: ActorRef[AssemblyCommandHandlerMsgs] = _
-  private var runningHcds: Map[Connection, Option[ComponentRef]]   = Map.empty
+  private var diagPublisher: ActorRef[DiagPublisherMessages]         = _
+  private var commandHandler: ActorRef[AssemblyCommandHandlerMsgs]   = _
+  private var runningHcds: Map[Connection, Option[WrappedComponent]] = Map.empty
 
   private val commandResponseAdapter: ActorRef[CommandResponse] = ctx.spawnAdapter(CommandResponseE)
 
@@ -87,7 +87,7 @@ class TromboneAssemblyHandlers(
       case hcdConnection @ Some(hcd) ⇒
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
           case Some(akkaLocation) ⇒
-            runningHcds = runningHcds.updated(hcdConnection.get, Some(akkaLocation.componentRef()))
+            runningHcds = runningHcds.updated(hcdConnection.get, Some(akkaLocation.component()))
             diagPublisher = ctx.spawnAnonymous(DiagPublisher.make(ac, runningHcds(maybeConnection.get), Some(eventPublisher)))
             commandHandler =
               ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcds, Some(eventPublisher)))
@@ -131,7 +131,7 @@ class TromboneAssemblyHandlers(
     trackingEvent match {
       case LocationUpdated(location) =>
         runningHcds = runningHcds + (location.connection → Some(
-          location.asInstanceOf[AkkaLocation].componentRef()
+          location.asInstanceOf[AkkaLocation].component()
         ))
       case LocationRemoved(connection) =>
         runningHcds = runningHcds + (connection → None)
