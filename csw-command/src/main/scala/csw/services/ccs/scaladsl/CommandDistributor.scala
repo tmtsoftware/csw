@@ -1,52 +1,51 @@
 package csw.services.ccs.scaladsl
 
+import akka.NotUsed
 import akka.actor.Scheduler
-import akka.stream.OverflowStrategy
+import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import akka.typed.ActorRef
-import akka.typed.scaladsl.adapter._
 import akka.util.Timeout
-import csw.messages.CommandResponseManagerMessage.Subscribe
 import csw.messages.ComponentMessage
-import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands.{CommandResponse, CommandResultType, ControlCommand}
+import csw.messages.params.models.RunId
 import csw.services.ccs.common.ActorRefExts.RichComponentActor
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
-class CommandDistributor(controlCommand: ControlCommand) {
-
-  var commandToComponent: Map[ActorRef[ComponentMessage], ControlCommand] = _
+case class CommandDistributor(componentToCommands: Map[ActorRef[ComponentMessage], List[ControlCommand]] = Map.empty) {
 
   def addSubCommand(componentRef: ActorRef[ComponentMessage], controlCommand: ControlCommand): CommandDistributor = {
-    commandToComponent = commandToComponent + (componentRef → controlCommand)
-    this
+    componentToCommands.get(componentRef) match {
+      case Some(commands) =>
+        this.copy(componentToCommands + (componentRef → (controlCommand :: commands)))
+      case None => this.copy(componentToCommands + (componentRef → List(controlCommand)))
+    }
   }
 
-  def addSubCommand(subCommands: Map[ActorRef[ComponentMessage], ControlCommand]): CommandDistributor = {
-    commandToComponent = commandToComponent ++ subCommands
-    this
-  }
+  def execute()(
+      implicit timeout: Timeout,
+      scheduler: Scheduler,
+      ec: ExecutionContext,
+      mat: Materializer
+  ): Future[CommandResponse] = {
 
-  def execute()(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Future[CommandResponse] = {
-    var finalResponse: CommandResponse = CommandResponse.Completed(controlCommand.runId)
+    val componentToCommand: Map[ActorRef[ComponentMessage], ControlCommand] = componentToCommands.flatMap {
+      case (component, commands) ⇒ commands.map(component → _)
+    }
 
-    Source
-      .actorRef[CommandResponse](256, OverflowStrategy.fail)
-      .mapMaterializedValue { ref ⇒
-        commandToComponent.foreach { kv ⇒
-          kv._1.submit(kv._2).map {
-            case _: Accepted ⇒ kv._1 ! Subscribe(kv._2.runId, ref)
-            case response    ⇒ response
-          }
-        }
+    val source: Source[CommandResponse, NotUsed] = Source(componentToCommand)
+      .mapAsyncUnordered(10) {
+        case (component, command) ⇒ component.submitAndGetCommandResponse(command)
       }
-      .to(Sink.foreach { x ⇒
-        finalResponse = x
-        if (x.resultType == CommandResultType.Negative)
-          throw new RuntimeException("")
-      })
+      .map {
+        case x if x.resultType == CommandResultType.Negative ⇒ throw new RuntimeException
+      }
 
-    Future.successful(finalResponse)
+    source.runWith(Sink.ignore).transform {
+      case Success(_)  ⇒ Success(CommandResponse.Completed(RunId()))
+      case Failure(ex) ⇒ Success(CommandResponse.Error(RunId(), s"One of the command failed : ${ex.getMessage}"))
+    }
   }
 }

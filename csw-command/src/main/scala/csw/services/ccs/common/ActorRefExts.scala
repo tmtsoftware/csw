@@ -5,11 +5,12 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.params.models.RunId
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object ActorRefExts {
   implicit class RichComponentActor(val componentActor: ActorRef[ComponentMessage]) extends AnyVal {
@@ -21,5 +22,13 @@ object ActorRefExts {
 
     def getCommandResponse(commandRunId: RunId)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
       componentActor ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
+
+    def submitAndGetCommandResponse(
+        controlCommand: ControlCommand
+    )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Future[CommandResponse] =
+      submit(controlCommand).flatMap {
+        case _: Accepted ⇒ getCommandResponse(controlCommand.runId)
+        case x           ⇒ Future.successful(x)
+      }
   }
 }
