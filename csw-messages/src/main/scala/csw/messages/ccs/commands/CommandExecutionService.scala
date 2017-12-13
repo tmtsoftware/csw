@@ -1,19 +1,15 @@
-package csw.services.ccs.javadsl
+package csw.messages.ccs.commands
 
 import java.util.concurrent.CompletableFuture
 
 import akka.actor.Scheduler
-import akka.stream.Materializer
 import akka.typed.ActorRef
+import akka.util.Timeout
 import csw.messages.ComponentMessage
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
+import csw.messages.ccs.commands.ActorRefExts.RichComponentActor
+import csw.messages.params.models.RunId
 
 import scala.compat.java8.FutureConverters._
-import akka.util.Timeout
-import csw.messages.params.models.RunId
-import csw.services.ccs.common.ActorRefExts.RichComponentActor
-
-import scala.collection.JavaConverters.collectionAsScalaIterableConverter
 import scala.concurrent.ExecutionContext
 
 object CommandExecutionService {
@@ -48,7 +44,7 @@ object CommandExecutionService {
   ): CompletableFuture[CommandResponse] =
     actorRef.submitAndGetCommandResponse(controlCommand)(timeout, scheduler, ec).toJava.toCompletableFuture
 
-  def submitManyAndGetCommandResponse(
+  /*def submitManyAndGetCommandResponse(
       actorRef: ActorRef[ComponentMessage],
       controlCommands: java.util.Set[ControlCommand],
       timeout: Timeout,
@@ -59,5 +55,5 @@ object CommandExecutionService {
     actorRef
       .submitManyAndGetCommandResponse(controlCommands.asScala.toSet)(timeout, scheduler, ec, mat)
       .toJava
-      .toCompletableFuture
+      .toCompletableFuture*/
 }

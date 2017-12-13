@@ -17,7 +17,7 @@ import csw.messages.models.PubSub.Publish
 import csw.messages.params.models.RunId
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage, TopLevelActorMessage}
-import csw.services.ccs.common.ActorRefExts.RichComponentActor
+import csw.messages.ccs.commands.ActorRefExts.RichComponentActor
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 

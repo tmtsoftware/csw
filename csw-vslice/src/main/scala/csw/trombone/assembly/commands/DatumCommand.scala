@@ -14,7 +14,7 @@ import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, No
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.{ObsId, Prefix, RunId}
-import csw.services.ccs.common.ActorRefExts.RichComponentActor
+import csw.messages.ccs.commands.ActorRefExts.RichComponentActor
 import csw.services.ccs.internal.matchers.Matcher
 import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly.actors.TromboneState.TromboneState

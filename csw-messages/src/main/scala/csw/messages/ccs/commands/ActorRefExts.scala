@@ -1,16 +1,13 @@
-package csw.services.ccs.common
+package csw.messages.ccs.commands
 
 import akka.actor.Scheduler
-import akka.stream.Materializer
 import akka.typed.ActorRef
 import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ccs.commands.CommandResponse.Accepted
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.params.models.RunId
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
-import csw.services.ccs.scaladsl.CommandDistributor
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,10 +30,10 @@ object ActorRefExts {
         case x           ⇒ Future.successful(x)
       }
 
-    def submitManyAndGetCommandResponse(
+    /*def submitManyAndGetCommandResponse(
         controlCommands: Set[ControlCommand]
     )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
       CommandDistributor(Map(componentActor → controlCommands.toList)).execute()
-    }
+    }*/
   }
 }

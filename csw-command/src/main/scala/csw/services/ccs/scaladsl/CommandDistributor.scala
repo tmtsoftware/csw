@@ -7,9 +7,9 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.typed.ActorRef
 import akka.util.Timeout
 import csw.messages.ComponentMessage
+import csw.messages.ccs.commands.ActorRefExts.RichComponentActor
 import csw.messages.ccs.commands.{CommandResponse, CommandResultType, ControlCommand}
 import csw.messages.params.models.RunId
-import csw.services.ccs.common.ActorRefExts.RichComponentActor
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

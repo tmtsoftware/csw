@@ -21,7 +21,7 @@ import csw.messages.models.LockingResponse.LockAcquired
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
-import csw.services.ccs.common.ActorRefExts.RichComponentActor
+import csw.messages.ccs.commands.ActorRefExts.RichComponentActor
 import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.services.ccs.internal.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
