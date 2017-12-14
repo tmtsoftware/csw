@@ -21,7 +21,7 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
     componentRef.submit(controlCommand)(timeout, scheduler).toJava.toCompletableFuture
 
   def getCommandResponse(commandRunId: RunId, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
-    componentRef.getCommandResponse(commandRunId)(timeout, scheduler).toJava.toCompletableFuture
+    componentRef.subscribe(commandRunId)(timeout, scheduler).toJava.toCompletableFuture
 
   def submitAndGetCommandResponse(
       controlCommand: ControlCommand,
@@ -29,7 +29,7 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
       scheduler: Scheduler,
       ec: ExecutionContext
   ): CompletableFuture[CommandResponse] =
-    componentRef.submitAndGetCommandResponse(controlCommand)(timeout, scheduler, ec).toJava.toCompletableFuture
+    componentRef.submitAndSubscribe(controlCommand)(timeout, scheduler, ec).toJava.toCompletableFuture
 
   /*def submitManyAndGetCommandResponse(
       controlCommands: java.util.Set[ControlCommand],

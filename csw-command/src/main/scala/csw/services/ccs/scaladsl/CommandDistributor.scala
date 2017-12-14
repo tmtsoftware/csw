@@ -1,41 +1,29 @@
 package csw.services.ccs.scaladsl
 
+import akka.NotUsed
+import akka.actor.Scheduler
+import akka.stream.Materializer
+import akka.stream.scaladsl.Source
 import akka.typed.ActorRef
+import akka.util.Timeout
 import csw.messages.ComponentMessage
-import csw.messages.ccs.commands.ControlCommand
+import csw.messages.ccs.commands.{CommandResponse, ComponentRef, ControlCommand}
 
-case class CommandDistributor(componentToCommands: Map[ActorRef[ComponentMessage], List[ControlCommand]] = Map.empty) {
+import scala.concurrent.{ExecutionContext, Future}
 
-  def addSubCommand(componentRef: ActorRef[ComponentMessage], controlCommand: ControlCommand): CommandDistributor = {
-    componentToCommands.get(componentRef) match {
-      case Some(commands) =>
-        this.copy(componentToCommands + (componentRef → (controlCommand :: commands)))
-      case None => this.copy(componentToCommands + (componentRef → List(controlCommand)))
-    }
-  }
+case class CommandDistributor(componentToCommands: Map[ActorRef[ComponentMessage], Set[ControlCommand]]) {
 
-  /*def execute()(
+  def execute()(
       implicit timeout: Timeout,
       scheduler: Scheduler,
       ec: ExecutionContext,
       mat: Materializer
   ): Future[CommandResponse] = {
 
-    val componentToCommand: Map[ActorRef[ComponentMessage], ControlCommand] = componentToCommands.flatMap {
-      case (component, commands) ⇒ commands.map(component → _)
-    }
-
-    val source: Source[CommandResponse, NotUsed] = Source(componentToCommand)
-      .mapAsyncUnordered(10) {
-        case (component, command) ⇒ component.submitAndGetCommandResponse(command)
-      }
-      .map {
-        case x if x.resultType == CommandResultType.Negative ⇒ throw new RuntimeException
-      }
-
-    source.runWith(Sink.ignore).transform {
-      case Success(_)  ⇒ Success(CommandResponse.Completed(RunId()))
-      case Failure(ex) ⇒ Success(CommandResponse.Error(RunId(), s"One of the command failed : ${ex.getMessage}"))
-    }
-  }*/
+    val commandResponsesF: Source[CommandResponse, NotUsed] = Source(componentToCommands).flatMapMerge(
+      10,
+      { case (component, commands) ⇒ ComponentRef(component).submitAllAndSubscribe(commands) }
+    )
+    CommandResponse.aggregateResponse(commandResponsesF)
+  }
 }

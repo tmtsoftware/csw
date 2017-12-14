@@ -131,7 +131,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val eventualLongCommandResponse = async {
         val initialCommandResponse = await(assemblyComponent.submit(setupWithoutMatcher))
         initialCommandResponse match {
-          case _: Accepted ⇒ await(assemblyComponent.getCommandResponse(setupWithoutMatcher.runId))
+          case _: Accepted ⇒ await(assemblyComponent.subscribe(setupWithoutMatcher.runId))
           case x           ⇒ x
         }
       }

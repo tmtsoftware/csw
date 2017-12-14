@@ -1,6 +1,9 @@
 package csw.messages.ccs.commands
 
+import akka.NotUsed
 import akka.actor.Scheduler
+import akka.stream.Materializer
+import akka.stream.scaladsl.Source
 import akka.typed.ActorRef
 import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
@@ -18,20 +21,27 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
   def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
     value ? (Oneway(controlCommand, _))
 
-  def getCommandResponse(commandRunId: RunId)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
+  def subscribe(commandRunId: RunId)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
     value ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
-  def submitAndGetCommandResponse(
+  def submitAndSubscribe(
       controlCommand: ControlCommand
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Future[CommandResponse] =
     submit(controlCommand).flatMap {
-      case _: Accepted ⇒ getCommandResponse(controlCommand.runId)
+      case _: Accepted ⇒ subscribe(controlCommand.runId)
       case x           ⇒ Future.successful(x)
     }
 
-  /*def submitManyAndGetCommandResponse(
-        controlCommands: Set[ControlCommand]
-    )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
-      CommandDistributor(Map(componentActor → controlCommands.toList)).execute()
-    }*/
+  def submitAllAndSubscribe(
+      controlCommands: Set[ControlCommand]
+  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Source[CommandResponse, NotUsed] = {
+    Source(controlCommands).mapAsyncUnordered(10)(this.submitAndSubscribe)
+  }
+
+  def submitAll(
+      controlCommands: Set[ControlCommand]
+  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
+    val value = Source(controlCommands).mapAsyncUnordered(10)(this.submitAndSubscribe)
+    CommandResponse.aggregateResponse(value)
+  }
 }

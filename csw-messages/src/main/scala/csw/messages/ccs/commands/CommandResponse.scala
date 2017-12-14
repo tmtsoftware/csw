@@ -1,10 +1,16 @@
 package csw.messages.ccs.commands
 
+import akka.NotUsed
+import akka.stream.Materializer
+import akka.stream.scaladsl.Source
 import akka.typed.ActorRef
 import csw.messages.TMTSerializable
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResultType.{Intermediate, Negative, Positive}
 import csw.messages.params.models.RunId
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 sealed abstract class CommandResponse(val resultType: CommandResultType) extends TMTSerializable {
   def runId: RunId
@@ -33,6 +39,21 @@ object CommandResponse {
     case cancelled: Cancelled                     => cancelled.copy(runId = id)
     case commandNotAvailable: CommandNotAvailable => commandNotAvailable.copy(runId = id)
     case notAllowed: NotAllowed                   => notAllowed.copy(runId = id)
+  }
+
+  def aggregateResponse(
+      commandResponses: Source[CommandResponse, NotUsed]
+  )(implicit ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
+    commandResponses
+      .runForeach { x ⇒
+        if (x.resultType == CommandResultType.Negative)
+          throw new RuntimeException
+      }
+      .transform {
+        case Success(_) ⇒ Success(CommandResponse.Completed(RunId()))
+        case Failure(ex) ⇒
+          Success(CommandResponse.Error(RunId(), s"One of the submitted commands failed ${ex.getMessage}"))
+      }
   }
 }
 

@@ -104,7 +104,7 @@ class McsAssemblyComponentHandlers(
       .submit(controlCommand)
       .map {
         case _: Accepted ⇒
-          hcdComponent.getCommandResponse(controlCommand.runId).map {
+          hcdComponent.subscribe(controlCommand.runId).map {
             case _: Completed ⇒ ctx.self ! CommandCompleted(Completed(controlCommand.runId))
             case _            ⇒ // Do nothing
           }

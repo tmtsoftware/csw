@@ -64,7 +64,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       // 2. shortSetup which takes 1 second to finish
       // 3. mediumSetup which takes 3 seconds to finish
       val eventualCommandResponse = assemblyComponent.submit(setup).flatMap {
-        case _: Accepted ⇒ assemblyComponent.getCommandResponse(setup.runId)
+        case _: Accepted ⇒ assemblyComponent.subscribe(setup.runId)
         case _           ⇒ Future(CommandResponse.Error(setup.runId, ""))
       }
 
