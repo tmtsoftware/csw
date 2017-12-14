@@ -3,7 +3,6 @@ package csw.messages.location
 import java.net.URI
 
 import akka.typed.ActorRef
-import csw.messages.ccs.commands
 import csw.messages.ccs.commands.{JWrappedComponent, WrappedComponent}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.{ComponentMessage, ContainerExternalMessage, TMTSerializable}
@@ -21,7 +20,8 @@ sealed abstract class Location extends TMTSerializable {
 
 // *************** IMPORTANT ***********************
 // Do not directly access actorRef from constructor,
-// Use one of componentRef() or containerRef() method to get correct reference.
+// Use one of component(), jComponent() or containerRef() method to get the wrapped component
+// and then use wrappedComponent.ref to get correct actor reference.
 // *************************************************
 /**
  * Represents a live Akka connection of an Actor

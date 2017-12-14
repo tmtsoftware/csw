@@ -13,7 +13,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.ComponentLockedIssue
 import csw.messages.ccs.commands.CommandResponse._
-import csw.messages.ccs.commands.{CommandResponse, Observe, Setup}
+import csw.messages.ccs.commands.{CommandResponse, Observe, Setup, WrappedComponent}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.LockingResponse
@@ -71,6 +71,7 @@ class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 // DEOPSCSW-225: Allow components to receive commands
 // DEOPSCSW-228: Assist Components with command completion
 // DEOPSCSW-313: Support short running actions by providing immediate response
+// DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
 
   import config._
@@ -117,8 +118,8 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF      = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
-      val assemblyComponent = Await.result(assemblyLocF, 10.seconds).map(_.component()).get
+      val assemblyLocF                        = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
+      val assemblyComponent: WrappedComponent = Await.result(assemblyLocF, 10.seconds).map(_.component()).get
 
       // short running command
       val shortCommandResponse = Await.result(assemblyComponent.submit(Setup(prefix, invalidCmd, obsId)), timeout.duration)

@@ -3,15 +3,13 @@ package csw.framework.command;
 import akka.actor.ActorSystem;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
-import akka.typed.ActorRef;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
-import csw.messages.ComponentMessage;
-import csw.messages.ccs.commands.JWrappedComponent;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.CommandResponse.Completed;
+import csw.messages.ccs.commands.JWrappedComponent;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.location.AkkaLocation;
 import csw.messages.location.ComponentId;
@@ -47,6 +45,7 @@ import static csw.services.location.javadsl.JComponentType.HCD;
 // DEOPSCSW-224: Inter component command sending
 // DEOPSCSW-225: Allow components to receive commands
 // DEOPSCSW-228: Assist Components with command completion
+// DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 public class JCommandIntegrationTest {
     private static ILocationService locationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
 
@@ -64,8 +63,7 @@ public class JCommandIntegrationTest {
     @Test
     public void testCommandExecutionBetweenComponents() throws Exception {
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem);
-        ActorRef<ComponentMessage> hcd =
-                Await.result(Standalone.spawn(ConfigFactory.load("mcs_hcd_java.conf"), wiring),
+        Await.result(Standalone.spawn(ConfigFactory.load("mcs_hcd_java.conf"), wiring),
                         new FiniteDuration(5, TimeUnit.SECONDS));
 
         AkkaConnection akkaConnection = new AkkaConnection(new ComponentId("Test_Component_Running_Long_Command_Java", HCD));
@@ -80,7 +78,7 @@ public class JCommandIntegrationTest {
         Parameter<Integer> parameter = encoder.set(22, 23);
         Setup controlCommand = new Setup(prefix(), withoutMatcherCmd(), Optional.empty()).add(parameter);
 
-        JWrappedComponent hcdComponent = new JWrappedComponent(hcd);
+        JWrappedComponent hcdComponent = maybeLocation.get().jComponent();
         CompletableFuture<CommandResponse> commandResponseCompletableFuture = hcdComponent.submit(controlCommand, timeout, hcdActorSystem.scheduler());
 
         CompletableFuture<CommandResponse> testCommandResponse = commandResponseCompletableFuture.thenCompose(commandResponse -> {
@@ -99,7 +97,7 @@ public class JCommandIntegrationTest {
         Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(100);
         DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix().prefix()).add(param), false, timeout);
         Setup setup = new Setup(prefix(), matcherCmd(), Optional.empty()).add(parameter);
-        Matcher matcher = new Matcher(hcd.narrow(), demandMatcher, ec, mat);
+        Matcher matcher = new Matcher(hcdComponent.ref().narrow(), demandMatcher, ec, mat);
 
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
 
