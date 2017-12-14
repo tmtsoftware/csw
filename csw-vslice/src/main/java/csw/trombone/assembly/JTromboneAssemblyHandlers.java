@@ -10,9 +10,7 @@ import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
 import csw.messages.ccs.commands.JWrappedComponent;
 import csw.messages.framework.ComponentInfo;
-import csw.messages.location.AkkaLocation;
-import csw.messages.location.Connection;
-import csw.messages.location.TrackingEvent;
+import csw.messages.location.*;
 import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
@@ -29,7 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-//#jcomponent-handler
+//#jcomponent-handlers-class
 public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherMessages> {
 
     // private state of this component
@@ -56,7 +54,7 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
         this.locationService = locationService;
         runningHcds = new HashMap<>();
     }
-    //#jcomponent-handler
+    //#jcomponent-handlers-class
     //#jInitialize-handler
     @Override
     public CompletableFuture<BoxedUnit> jInitialize() {
@@ -97,10 +95,17 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
         return null;
     }
 
+    //#onLocationTrackingEvent-handler
     @Override
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
-
+        if (trackingEvent instanceof LocationUpdated) {
+            // do something for the tracked location when it is updated
+        }
+        else if (trackingEvent instanceof LocationRemoved) {
+            // do something for the tracked location when it is no longer available
+        }
     }
+    //#onLocationTrackingEvent-handler
 
     @Override
     public void onDomainMsg(DiagPublisherMessages diagPublisherMessages) {

@@ -10,7 +10,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages._
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
-import csw.messages.location.TrackingEvent
+import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.models.PubSub
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.models.Units.encoder
@@ -39,7 +39,7 @@ class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessag
 }
 //#component-factory
 
-//#component-handler
+//#component-handlers-class
 class TromboneHcdHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
@@ -55,7 +55,7 @@ class TromboneHcdHandlers(
       locationService,
       loggerFactory
     ) {
-  //#component-handler
+  //#component-handlers-class
 
   //private state of this component
   implicit val timeout: Timeout             = Timeout(2.seconds)
@@ -172,7 +172,11 @@ class TromboneHcdHandlers(
 
   private def getAxisConfig: Future[AxisConfig] = Future(AxisConfig(ConfigFactory.load("tromboneHCDAxisConfig.conf")))
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit =
-    println(s"Received tracking event: [$trackingEvent]")
+  //#onLocationTrackingEvent-handler
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
+    case LocationUpdated(location)   => // do something for the tracked location when it is updated
+    case LocationRemoved(connection) => // do something for the tracked location when it is no longer available
+  }
+  //#onLocationTrackingEvent-handler
 
 }

@@ -38,7 +38,7 @@ class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPubli
 }
 //#component-factory
 
-//#component-handler
+//#component-handlers-class
 class TromboneAssemblyHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
@@ -54,7 +54,7 @@ class TromboneAssemblyHandlers(
       locationService,
       loggerFactory
     ) {
-  //#component-handler
+  //#component-handlers-class
 
   //private state of this component
   private var diagPublisher: ActorRef[DiagPublisherMessages]         = _
@@ -127,6 +127,7 @@ class TromboneAssemblyHandlers(
     Future((TromboneCalculationConfig(config), TromboneControlConfig(config)))
   }
 
+  //#onLocationTrackingEvent-handler
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {
     trackingEvent match {
       case LocationUpdated(location) =>
@@ -138,4 +139,5 @@ class TromboneAssemblyHandlers(
     }
     commandHandler ! UpdateHcdLocations(runningHcds)
   }
+  //#onLocationTrackingEvent-handler
 }

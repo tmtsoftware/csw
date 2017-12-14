@@ -12,6 +12,8 @@ import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
 import csw.messages.framework.ComponentInfo;
+import csw.messages.location.LocationRemoved;
+import csw.messages.location.LocationUpdated;
 import csw.messages.location.TrackingEvent;
 import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
@@ -22,7 +24,7 @@ import scala.runtime.BoxedUnit;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-//#jcomponent-handler
+//#jcomponent-handlers-class
 public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
 
     // private state of this component
@@ -44,7 +46,7 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
         super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, klass);
         this.ctx = ctx;
     }
-    //#jcomponent-handler
+    //#jcomponent-handlers-class
 
     //#jInitialize-handler
     @Override
@@ -82,10 +84,17 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
         return null;
     }
 
+    //#onLocationTrackingEvent-handler
     @Override
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
-
+        if (trackingEvent instanceof LocationUpdated) {
+            // do something for the tracked location when it is updated
+        }
+        else if (trackingEvent instanceof LocationRemoved) {
+            // do something for the tracked location when it is no longer available
+        }
     }
+    //#onLocationTrackingEvent-handler
 
     @Override
     public void onDomainMsg(TromboneMessage tromboneMessage) {
