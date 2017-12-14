@@ -16,6 +16,7 @@ import static csw.messages.javadsl.JSubsystem.WFOS;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
+// DEOPSCSW-320: Add command type in Setup, observe and wait
 public class JCommandsTest {
 
     private final Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
@@ -29,6 +30,7 @@ public class JCommandsTest {
 
     private final ObsId obsId = new ObsId("obsId");
     private final String prefix = "wfos.red.detector";
+    private final CommandName commandName = new CommandName("move");
 
     private void assertOnCommandAPI(ParameterSetType<?> command) {
         // contains and exists
@@ -77,13 +79,14 @@ public class JCommandsTest {
     // DEOPSCSW-315: Make ObsID optional in commands
     @Test
     public void shouldAbleToCreateAndAccessSetupCommand() {
-        Setup setup = new Setup(new Prefix(prefix), new CommandName("move"), Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Setup setup = new Setup(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(setup.runId());
         Assert.assertEquals(Optional.of(obsId), setup.jMaybeObsId());
         Assert.assertEquals(prefix, setup.source().prefix());
         Assert.assertEquals(WFOS, setup.source().subsystem());
+        Assert.assertEquals(commandName, setup.commandName());
 
         // complete API
         assertOnCommandAPI(setup);
@@ -92,12 +95,13 @@ public class JCommandsTest {
     // DEOPSCSW-315: Make ObsID optional in commands
     @Test
     public void shouldAbleToCreateAndAccessObserveCommand() {
-        Observe observe = new Observe(new Prefix(prefix), new CommandName("move"), Optional.empty()).add(encoderParam).add(epochStringParam);
+        Observe observe = new Observe(new Prefix(prefix), commandName, Optional.empty()).add(encoderParam).add(epochStringParam);
 
         // runId, prefix, obsId, subsystem
         Assert.assertNotNull(observe.runId());
         Assert.assertEquals(Optional.empty(), observe.jMaybeObsId());
         Assert.assertEquals(prefix, observe.source().prefix());
+        Assert.assertEquals(commandName, observe.commandName());
         Assert.assertEquals(WFOS, observe.source().subsystem());
 
 
@@ -107,12 +111,13 @@ public class JCommandsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessWaitCommand() {
-        Wait wait = new Wait(new Prefix(prefix), new CommandName("move"), Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Wait wait = new Wait(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
 
         // runId, obsId, prefix, subsystem
         Assert.assertNotNull(wait.runId());
         Assert.assertEquals(obsId, wait.jMaybeObsId().get());
         Assert.assertEquals(prefix, wait.source().prefix());
+        Assert.assertEquals(commandName, wait.commandName());
         Assert.assertEquals(WFOS, wait.source().subsystem());
 
 
