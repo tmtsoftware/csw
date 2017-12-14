@@ -91,7 +91,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val assemblyLocF = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
-      val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.component().ref).get
+      val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.component.ref).get
 
       enterBarrier("short-long-commands")
       enterBarrier("assembly-locked")
@@ -119,7 +119,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val assemblyLocF                        = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
-      val assemblyComponent: WrappedComponent = Await.result(assemblyLocF, 10.seconds).map(_.component()).get
+      val assemblyComponent: WrappedComponent = Await.result(assemblyLocF, 10.seconds).map(_.component).get
 
       // short running command
       val shortCommandResponse = Await.result(assemblyComponent.submit(Setup(prefix, invalidCmd, obsId)), timeout.duration)

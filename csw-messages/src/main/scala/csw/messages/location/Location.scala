@@ -44,11 +44,11 @@ final case class AkkaLocation(
   }
 
   // If the component type is HCD or Assembly, use this to get the correct ActorRef
-  def component(): WrappedComponent   = new WrappedComponent(typedRef[ComponentMessage])
-  def jComponent(): JWrappedComponent = new JWrappedComponent(typedRef[ComponentMessage])
+  lazy val component: WrappedComponent   = new WrappedComponent(typedRef[ComponentMessage])
+  lazy val jComponent: JWrappedComponent = new JWrappedComponent(typedRef[ComponentMessage])
 
   // If the component type is Container, use this to get the correct ActorRef
-  def containerRef(): ActorRef[ContainerExternalMessage] = typedRef[ContainerExternalMessage]
+  def containerRef: ActorRef[ContainerExternalMessage] = typedRef[ContainerExternalMessage]
 }
 
 /**

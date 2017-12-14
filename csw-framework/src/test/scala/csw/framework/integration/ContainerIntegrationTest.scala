@@ -11,9 +11,9 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.RunningMessage.Lifecycle
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.{Assembly, HCD}
@@ -81,7 +81,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     val containerLocation = Await.result(locationService.resolve(irisContainerConnection, 5.seconds), 5.seconds)
 
     containerLocation.isDefined shouldBe true
-    val resolvedContainerRef = containerLocation.get.containerRef()
+    val resolvedContainerRef = containerLocation.get.containerRef
 
     // ********** Message: GetComponents **********
     resolvedContainerRef ! GetComponents(componentsProbe.ref)
@@ -97,9 +97,9 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     instrumentHcdLocation.isDefined shouldBe true
     disperserHcdLocation.isDefined shouldBe true
 
-    val assemblySupervisor  = filterAssemblyLocation.get.component().ref
-    val filterSupervisor    = instrumentHcdLocation.get.component().ref
-    val disperserSupervisor = disperserHcdLocation.get.component().ref
+    val assemblySupervisor  = filterAssemblyLocation.get.component.ref
+    val filterSupervisor    = instrumentHcdLocation.get.component.ref
+    val disperserSupervisor = disperserHcdLocation.get.component.ref
 
     // Subscribe to component's current state
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))
