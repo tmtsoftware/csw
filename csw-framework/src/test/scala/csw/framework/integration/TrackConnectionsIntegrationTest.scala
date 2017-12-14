@@ -72,7 +72,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     val filterAssemblyLocation = Await.result(locationService.find(filterAssemblyConnection), 5.seconds)
     val disperserHcdLocation   = Await.result(locationService.find(disperserHcdConnection), 5.seconds)
 
-    val assemblySupervisor = filterAssemblyLocation.get.component.ref
+    val assemblySupervisor = filterAssemblyLocation.get.component.value
     val disperserComponent = disperserHcdLocation.get.component
 
     // Subscribe to component's current state
@@ -83,7 +83,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(akkaLocationUpdatedChoice))))
 
     // if one of the HCD shuts down, then assembly should know and receive LocationRemoved event
-    disperserComponent.ref ! Shutdown
+    disperserComponent.value ! Shutdown
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
 
     implicit val timeout: Timeout     = Timeout(100.millis)
@@ -118,7 +118,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     val resolvedAkkaLocation = maybeLocation.get
     resolvedAkkaLocation.connection shouldBe akkaConnection
 
-    val assemblySupervisor = resolvedAkkaLocation.component.ref
+    val assemblySupervisor = resolvedAkkaLocation.component.value
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 
     val assemblyProbe = TestProbe[CurrentState]("assembly-state-probe")

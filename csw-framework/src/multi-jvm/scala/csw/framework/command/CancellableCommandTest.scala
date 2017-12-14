@@ -56,7 +56,7 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
       // resolve the assembly running on seed
       val assemblyLocF =
         locationService.resolve(AkkaConnection(ComponentId("Monitor_Assembly", ComponentType.Assembly)), 5.seconds)
-      val assemblyRef = Await.result(assemblyLocF, 10.seconds).map(_.component.ref).get
+      val assemblyRef = Await.result(assemblyLocF, 10.seconds).map(_.component.value).get
 
       // original command is submit and Cancel command is also submit
       val originalSetup = Setup(prefix, acceptedCmd, obsId)

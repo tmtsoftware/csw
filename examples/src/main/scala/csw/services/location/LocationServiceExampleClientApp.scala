@@ -154,7 +154,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   findResult.foreach(akkaLocation ⇒ {
     //#typed-ref
     // If the component type is HCD or Assembly, use this to get the correct ActorRef
-    val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.component.ref
+    val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.component.value
 
     // If the component type is Container, use this to get the correct ActorRef
     val typedContainerRef: ActorRef[ContainerExternalMessage] = akkaLocation.containerRef
@@ -179,7 +179,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   if (resolveResult.isDefined) {
     resolveResult.get match {
       case c: AkkaLocation =>
-        c.component.ref ! LocationServiceExampleComponent.ClientMessage
+        c.component.value ! LocationServiceExampleComponent.ClientMessage
       case x => log.error(s"Received unexpected location type: $x")
     }
   }

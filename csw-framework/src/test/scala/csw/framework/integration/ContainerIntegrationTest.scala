@@ -97,9 +97,9 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     instrumentHcdLocation.isDefined shouldBe true
     disperserHcdLocation.isDefined shouldBe true
 
-    val assemblySupervisor  = filterAssemblyLocation.get.component.ref
-    val filterSupervisor    = instrumentHcdLocation.get.component.ref
-    val disperserSupervisor = disperserHcdLocation.get.component.ref
+    val assemblySupervisor  = filterAssemblyLocation.get.component.value
+    val filterSupervisor    = instrumentHcdLocation.get.component.value
+    val disperserSupervisor = disperserHcdLocation.get.component.value
 
     // Subscribe to component's current state
     assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))

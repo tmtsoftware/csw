@@ -129,7 +129,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
       val resolvedLocation = Await.result(locationService.resolve(akkaConnection, 5.seconds), 5.seconds).get
 
-      val assemblyActorRef = resolvedLocation.component.ref
+      val assemblyActorRef = resolvedLocation.component.value
 
       assemblyActorRef ! UnregisterConnection(akkaConnection)
       Thread.sleep(2000)

@@ -57,9 +57,9 @@ class TromboneAssemblyHandlers(
   //#component-handlers-class
 
   //private state of this component
-  private var diagPublisher: ActorRef[DiagPublisherMessages]         = _
-  private var commandHandler: ActorRef[AssemblyCommandHandlerMsgs]   = _
-  private var runningHcds: Map[Connection, Option[WrappedComponent]] = Map.empty
+  private var diagPublisher: ActorRef[DiagPublisherMessages]       = _
+  private var commandHandler: ActorRef[AssemblyCommandHandlerMsgs] = _
+  private var runningHcds: Map[Connection, Option[ComponentRef]]   = Map.empty
 
   private val commandResponseAdapter: ActorRef[CommandResponse] = ctx.spawnAdapter(CommandResponseE)
 

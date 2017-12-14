@@ -138,7 +138,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val etonSupervisorF        = locationService.resolve(AkkaConnection(ComponentId("Eton", ComponentType.HCD)), 2.seconds)
       val etonSupervisorLocation = Await.result(etonSupervisorF, 15.seconds).get
 
-      val etonSupervisorTypedRef = etonSupervisorLocation.component.ref
+      val etonSupervisorTypedRef = etonSupervisorLocation.component.value
       val eatonCompStateProbe    = TestProbe[CurrentState]
 
       etonSupervisorTypedRef ! ComponentStateSubscription(Subscribe(eatonCompStateProbe.ref))

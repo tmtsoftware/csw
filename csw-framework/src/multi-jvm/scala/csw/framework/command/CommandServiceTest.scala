@@ -13,7 +13,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.ComponentLockedIssue
 import csw.messages.ccs.commands.CommandResponse._
-import csw.messages.ccs.commands.{CommandResponse, Observe, Setup, WrappedComponent}
+import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Observe, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.LockingResponse
@@ -91,7 +91,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val assemblyLocF = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
-      val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.component.ref).get
+      val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.component.value).get
 
       enterBarrier("short-long-commands")
       enterBarrier("assembly-locked")
@@ -118,8 +118,8 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF                        = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
-      val assemblyComponent: WrappedComponent = Await.result(assemblyLocF, 10.seconds).map(_.component).get
+      val assemblyLocF                    = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
+      val assemblyComponent: ComponentRef = Await.result(assemblyLocF, 10.seconds).map(_.component).get
 
       // short running command
       val shortCommandResponse = Await.result(assemblyComponent.submit(Setup(prefix, invalidCmd, obsId)), timeout.duration)
@@ -146,7 +146,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
       val demandMatcher         = DemandMatcher(DemandState(prefix, Set(param)), withUnits = false, timeout)
       val setupWithMatcher      = Setup(prefix, matcherCmd, obsId)
-      val matcher               = new Matcher(assemblyComponent.ref, demandMatcher)
+      val matcher               = new Matcher(assemblyComponent.value, demandMatcher)
 
       val matcherResponseF: Future[MatcherResponse] = matcher.start
 
@@ -173,13 +173,13 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       // acquire lock on assembly
       val lockResponseProbe = TestProbe[LockingResponse]
-      assemblyComponent.ref ! LockCommandFactory.make(prefix, lockResponseProbe.ref)
+      assemblyComponent.value ! LockCommandFactory.make(prefix, lockResponseProbe.ref)
       lockResponseProbe.expectMsg(LockAcquired)
       enterBarrier("assembly-locked")
 
       // send command with lock token and expect command processing response
       val assemblySetup = Setup(prefix, immediateCmd, obsId)
-      assemblyComponent.ref ! Submit(assemblySetup, cmdResponseProbe.ref)
+      assemblyComponent.value ! Submit(assemblySetup, cmdResponseProbe.ref)
       cmdResponseProbe.expectMsg(5.seconds, Completed(assemblySetup.runId))
       enterBarrier("command-when-locked")
     }

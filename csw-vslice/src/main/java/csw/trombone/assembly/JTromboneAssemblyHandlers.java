@@ -8,7 +8,7 @@ import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
-import csw.messages.ccs.commands.JWrappedComponent;
+import csw.messages.ccs.commands.JComponentRef;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
 import csw.messages.models.PubSub;
@@ -35,7 +35,7 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
     private ComponentInfo componentInfo;
     private ActorContext<TopLevelActorMessage> ctx;
     private ILocationService locationService;
-    private Map<Connection, Optional<JWrappedComponent>> runningHcds;
+    private Map<Connection, Optional<JComponentRef>> runningHcds;
     private ActorRef<DiagPublisherMessages> diagPublisher;
 
     public JTromboneAssemblyHandlers(

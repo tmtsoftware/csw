@@ -55,7 +55,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
-      assemblyComponent.ref ! ComponentStateSubscription(Subscribe(probe.ref))
+      assemblyComponent.value ! ComponentStateSubscription(Subscribe(probe.ref))
 
       // send submit with setup to assembly running in JVM-2
       // then assembly will split it into three sub commands [McsAssemblyComponentHandlers]

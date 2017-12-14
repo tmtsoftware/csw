@@ -9,7 +9,7 @@ import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.WrongInternalStateIssue
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, NoLongerValid}
-import csw.messages.ccs.commands.{CommandResponse, Setup, WrappedComponent}
+import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.Units.encoder
 import csw.messages.params.models.{ObsId, RunId}
@@ -25,7 +25,7 @@ class SetElevationCommand(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
     ac: AssemblyContext,
     s: Setup,
-    tromboneHCD: Option[WrappedComponent],
+    tromboneHCD: Option[ComponentRef],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
 ) extends AssemblyCommand(ctx, startState, stateActor) {
@@ -63,7 +63,7 @@ class SetElevationCommand(
 
       tromboneHCD.get.submit(scOut).flatMap {
         case Accepted(_) ⇒
-          new Matcher(tromboneHCD.get.ref, stateMatcher).start.map {
+          new Matcher(tromboneHCD.get.value, stateMatcher).start.map {
             case MatchCompleted =>
               publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
               Completed(s.runId)
@@ -79,7 +79,7 @@ class SetElevationCommand(
 
   def stopCommand(): Unit = {
     tromboneHCD.foreach(
-      _.ref ! Submit(TromboneHcdState.cancelSC(RunId(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
+      _.value ! Submit(TromboneHcdState.cancelSC(RunId(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
     )
   }
 }

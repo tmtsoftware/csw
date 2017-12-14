@@ -9,7 +9,7 @@ import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.CommandResponse.Completed;
-import csw.messages.ccs.commands.JWrappedComponent;
+import csw.messages.ccs.commands.JComponentRef;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.location.AkkaLocation;
 import csw.messages.location.ComponentId;
@@ -78,7 +78,7 @@ public class JCommandIntegrationTest {
         Parameter<Integer> parameter = encoder.set(22, 23);
         Setup controlCommand = new Setup(prefix(), withoutMatcherCmd(), Optional.empty()).add(parameter);
 
-        JWrappedComponent hcdComponent = maybeLocation.get().jComponent();
+        JComponentRef hcdComponent = maybeLocation.get().jComponent();
         CompletableFuture<CommandResponse> commandResponseCompletableFuture = hcdComponent.submit(controlCommand, timeout, hcdActorSystem.scheduler());
 
         CompletableFuture<CommandResponse> testCommandResponse = commandResponseCompletableFuture.thenCompose(commandResponse -> {
@@ -97,7 +97,7 @@ public class JCommandIntegrationTest {
         Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(100);
         DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix().prefix()).add(param), false, timeout);
         Setup setup = new Setup(prefix(), matcherCmd(), Optional.empty()).add(parameter);
-        Matcher matcher = new Matcher(hcdComponent.ref().narrow(), demandMatcher, ec, mat);
+        Matcher matcher = new Matcher(hcdComponent.value().narrow(), demandMatcher, ec, mat);
 
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
 

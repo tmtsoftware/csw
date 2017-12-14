@@ -7,7 +7,7 @@ import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.ccs.commands.WrappedComponent
+import csw.messages.ccs.commands.ComponentRef
 import csw.messages.models.PubSub
 import csw.messages.params.states.CurrentState
 import csw.trombone.assembly.DiagPublisherMessages._
@@ -25,14 +25,14 @@ object DiagPublisher {
 
   def make(
       assemblyContext: AssemblyContext,
-      runningIn: Option[WrappedComponent],
+      runningIn: Option[ComponentRef],
       eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
   ): Behavior[DiagPublisherMessages] =
     Actor.mutable(ctx ⇒ new DiagPublisher(ctx, assemblyContext, runningIn, eventPublisher))
 
   def jMake(
       assemblyContext: AssemblyContext,
-      runningIn: Optional[WrappedComponent],
+      runningIn: Optional[ComponentRef],
       eventPublisher: Optional[ActorRef[TrombonePublisherMsg]]
   ): Behavior[DiagPublisherMessages] =
     Actor.mutable(ctx ⇒ new DiagPublisher(ctx, assemblyContext, runningIn.asScala, eventPublisher.asScala))
@@ -51,7 +51,7 @@ object DiagPublisher {
 class DiagPublisher(
     ctx: ActorContext[DiagPublisherMessages],
     assemblyContext: AssemblyContext,
-    runningIn: Option[WrappedComponent],
+    runningIn: Option[ComponentRef],
     eventPublisher: Option[ActorRef[TrombonePublisherMsg]]
 ) extends MutableBehavior[DiagPublisherMessages] {
 
@@ -59,7 +59,7 @@ class DiagPublisher(
 
   val pubSubRef: ActorRef[PubSub[CurrentState]] = ctx.system.deadLetters
   var stateMessageCounter: Int                  = 0
-  var running: Option[WrappedComponent]         = runningIn
+  var running: Option[ComponentRef]             = runningIn
   var context: Mode                             = _
   var cancelToken: Cancellable                  = _
 
@@ -108,7 +108,7 @@ class DiagPublisher(
       publishStatsUpdate(cs)
 
     case TimeForAxisStats(periodInSeconds) =>
-      running.foreach(_.ref ! GetAxisStats)
+      running.foreach(_.value ! GetAxisStats)
       val canceltoken: Cancellable =
         ctx.schedule(Instant.now().plusSeconds(periodInSeconds).toEpochMilli.millis, ctx.self, TimeForAxisStats(periodInSeconds))
       this.cancelToken = canceltoken

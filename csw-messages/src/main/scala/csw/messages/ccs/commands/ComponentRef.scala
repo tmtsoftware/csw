@@ -11,15 +11,15 @@ import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WrappedComponent(val ref: ActorRef[ComponentMessage]) {
+case class ComponentRef(value: ActorRef[ComponentMessage]) {
   def submit(controlCommand: ControlCommand)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
-    ref ? (Submit(controlCommand, _))
+    value ? (Submit(controlCommand, _))
 
   def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
-    ref ? (Oneway(controlCommand, _))
+    value ? (Oneway(controlCommand, _))
 
   def getCommandResponse(commandRunId: RunId)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
-    ref ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
+    value ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
   def submitAndGetCommandResponse(
       controlCommand: ControlCommand

@@ -9,7 +9,7 @@ import csw.messages.CommandMessage.Submit
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{UnsupportedCommandInStateIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.CommandResponse.{Cancelled, Completed, Invalid, NoLongerValid}
-import csw.messages.ccs.commands.{CommandResponse, Setup, WrappedComponent}
+import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.location.Connection
 import csw.messages.models.PubSub
 import csw.messages.models.PubSub.Publish
@@ -23,7 +23,7 @@ class TromboneAssemblyCommandBehaviorFactory extends AssemblyCommandBehaviorFact
   override protected def assemblyCommandHandlers(
       ctx: ActorContext[AssemblyCommandHandlerMsgs],
       ac: AssemblyContext,
-      tromboneHCDs: Map[Connection, Option[WrappedComponent]],
+      tromboneHCDs: Map[Connection, Option[ComponentRef]],
       allEventPublisher: Option[ActorRef[TrombonePublisherMsg]]
   ): TromboneCommandHandler =
     new TromboneCommandHandler(ctx, ac, tromboneHCDs, allEventPublisher)
@@ -31,7 +31,7 @@ class TromboneAssemblyCommandBehaviorFactory extends AssemblyCommandBehaviorFact
 
 class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
                              ac: AssemblyContext,
-                             tromboneHCDs: Map[Connection, Option[WrappedComponent]],
+                             tromboneHCDs: Map[Connection, Option[ComponentRef]],
                              allEventPublisher: Option[ActorRef[TrombonePublisherMsg]])
     extends AssemblyFollowingCommandHandlers {
 
@@ -44,9 +44,9 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
   private var setElevationItem                                    = naElevation(calculationConfig.defaultInitialElevation)
   private var followCommandActor: ActorRef[FollowCommandMessages] = _
 
-  override var hcds: Map[Connection, Option[WrappedComponent]] = tromboneHCDs
-  override var currentState: AssemblyState                     = defaultTromboneState
-  override var currentCommand: Option[List[AssemblyCommand]]   = _
+  override var hcds: Map[Connection, Option[ComponentRef]]   = tromboneHCDs
+  override var currentState: AssemblyState                   = defaultTromboneState
+  override var currentCommand: Option[List[AssemblyCommand]] = _
   override var tromboneStateActor: ActorRef[PubSub[AssemblyState]] =
     ctx.spawnAnonymous(Actor.mutable[PubSub[AssemblyState]](ctx ⇒ new PubSubBehavior(ctx, new LoggerFactory(""))))
 
@@ -98,7 +98,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
         case ac.followCK =>
           val nssItem = s(ac.nssInUseKey)
           followCommandActor = ctx.spawnAnonymous(
-            FollowCommandActor.make(ac, setElevationItem, nssItem, hcds.head._2.map(_.ref), allEventPublisher)
+            FollowCommandActor.make(ac, setElevationItem, nssItem, hcds.head._2.map(_.value), allEventPublisher)
           )
           AssemblyCommandState(
             Some(

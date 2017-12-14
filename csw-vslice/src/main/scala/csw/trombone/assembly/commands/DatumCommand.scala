@@ -10,7 +10,7 @@ import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, NoLongerValid}
-import csw.messages.ccs.commands.{CommandResponse, Setup, WrappedComponent}
+import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.{ObsId, Prefix, RunId}
 import csw.services.ccs.internal.matchers.Matcher
@@ -25,7 +25,7 @@ class DatumCommand(
     ctx: ActorContext[AssemblyCommandHandlerMsgs],
     ac: AssemblyContext,
     s: Setup,
-    tromboneHCD: Option[WrappedComponent],
+    tromboneHCD: Option[ComponentRef],
     startState: TromboneState,
     stateActor: ActorRef[PubSub[AssemblyState]]
 ) extends AssemblyCommand(ctx, startState, stateActor) {
@@ -55,7 +55,7 @@ class DatumCommand(
         .submit(Setup(Prefix("sourcePrefix"), TromboneHcdState.axisDatumCK, s.maybeObsId))
         .flatMap {
           case _: Accepted ⇒
-            new Matcher(tromboneHCD.get.ref, AssemblyMatchers.idleMatcher).start.map {
+            new Matcher(tromboneHCD.get.value, AssemblyMatchers.idleMatcher).start.map {
               case MatchCompleted =>
                 publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
                 Completed(s.runId)
@@ -71,7 +71,7 @@ class DatumCommand(
 
   def stopCommand(): Unit = {
     tromboneHCD.foreach(
-      _.ref ! Submit(TromboneHcdState.cancelSC(RunId(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
+      _.value ! Submit(TromboneHcdState.cancelSC(RunId(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
     )
   }
 
