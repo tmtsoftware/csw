@@ -169,7 +169,12 @@ lazy val `csw-commons` = project
   )
 
 lazy val `csw-benchmark` = project
-  .dependsOn(`csw-logging`, `csw-messages`)
+  .dependsOn(
+    `csw-logging`,
+    `csw-messages`,
+    `csw-framework`      % "compile->compile;test->test",
+    `csw-command`
+  )
   .enablePlugins(JmhPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Benchmark
