@@ -11,6 +11,7 @@ object ComponentStateForCommand {
   val matcherPrefix = Prefix("wfos.prog.cloudcover.accept.matcher.success.result")
 
   val moveCmd           = CommandName("move")
+  val initCmd           = CommandName("init")
   val acceptedCmd       = CommandName("move.accepted")
   val withoutMatcherCmd = CommandName("move.accept.result")
   val matcherCmd        = CommandName("move.accept.matcher.success.result")

@@ -80,23 +80,31 @@ class McsAssemblyComponentHandlers(
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
     controlCommand.commandName match {
       case `longRunning` ⇒ Accepted(controlCommand.runId)
+      case `moveCmd`     ⇒ Accepted(controlCommand.runId)
+      case `initCmd`     ⇒ Accepted(controlCommand.runId)
       case _             ⇒ CommandResponse.Error(controlCommand.runId, "")
     }
   }
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
-    commandId = controlCommand.runId
-    shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
-    mediumSetup = Setup(prefix, mediumRunning, controlCommand.maybeObsId)
-    longSetup = Setup(prefix, longRunning, controlCommand.maybeObsId)
+    controlCommand.commandName match {
+      case `longRunning` ⇒
+        commandId = controlCommand.runId
+        shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
+        mediumSetup = Setup(prefix, mediumRunning, controlCommand.maybeObsId)
+        longSetup = Setup(prefix, longRunning, controlCommand.maybeObsId)
 
-    // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
-    // longSetup takes 5 seconds to finish
-    // shortSetup takes 1 second to finish
-    // mediumSetup takes 3 seconds to finish
-    processCommand(longSetup)
-    processCommand(shortSetup)
-    processCommand(mediumSetup)
+        // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
+        // longSetup takes 5 seconds to finish
+        // shortSetup takes 1 second to finish
+        // mediumSetup takes 3 seconds to finish
+        processCommand(longSetup)
+        processCommand(shortSetup)
+        processCommand(mediumSetup)
+
+      case `initCmd` ⇒ commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+      case `moveCmd` ⇒ commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+    }
   }
 
   private def processCommand(controlCommand: ControlCommand) = {

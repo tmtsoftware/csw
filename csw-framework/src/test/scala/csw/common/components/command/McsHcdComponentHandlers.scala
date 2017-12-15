@@ -64,13 +64,10 @@ class McsHcdComponentHandlers(
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     controlCommand.commandName match {
-      case `longRunning` ⇒
-        ctx.schedule(5.seconds, ctx.self, LongCommandCompleted(Completed(controlCommand.runId)))
-      case `mediumRunning` ⇒
-        ctx.schedule(3.seconds, ctx.self, MediumCommandCompleted(Completed(controlCommand.runId)))
-      case `shortRunning` ⇒
-        ctx.schedule(1.seconds, ctx.self, ShortCommandCompleted(Completed(controlCommand.runId)))
-      case _ ⇒
+      case `longRunning`   ⇒ ctx.schedule(5.seconds, ctx.self, LongCommandCompleted(Completed(controlCommand.runId)))
+      case `mediumRunning` ⇒ ctx.schedule(3.seconds, ctx.self, MediumCommandCompleted(Completed(controlCommand.runId)))
+      case `shortRunning`  ⇒ ctx.schedule(1.seconds, ctx.self, ShortCommandCompleted(Completed(controlCommand.runId)))
+      case _               ⇒
     }
   }
 

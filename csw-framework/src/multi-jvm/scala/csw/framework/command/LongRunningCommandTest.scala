@@ -12,13 +12,15 @@ import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
-import csw.messages.ccs.commands.{CommandResponse, Setup}
+import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
+import csw.services.ccs.scaladsl.CommandDistributor
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}
@@ -29,7 +31,7 @@ class LongRunningCommandTestMultiJvm3 extends LongRunningCommandTest(0)
 
 // DEOPSCSW-194: Support long running actions asynchronously
 // DEOPSCSW-228: Assist Components with command completion
-class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
+class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) with ScalaFutures {
   import config._
 
   implicit val actorSystem: ActorSystem[_]  = system.toTyped
@@ -51,7 +53,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
           AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.Assembly)),
           5.seconds
         )
-      val assemblyComponent = Await.result(assemblyLocF, 5.seconds).map(_.component).get
+      val assemblyComponent: ComponentRef = Await.result(assemblyLocF, 5.seconds).map(_.component).get
 
       val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
@@ -76,6 +78,28 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(mediumCmdCompleted))))
       probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(longCmdCompleted))))
       enterBarrier("long-commands")
+
+      val hcdLocF =
+        locationService.resolve(
+          AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.HCD)),
+          5.seconds
+        )
+      val hcdComponent: ComponentRef = Await.result(hcdLocF, 5.seconds).map(_.component).get
+
+      val setupAssembly1 = Setup(prefix, moveCmd, Some(obsId))
+      val setupAssembly2 = Setup(prefix, initCmd, Some(obsId))
+      val setupHcd1      = Setup(prefix, shortRunning, Some(obsId))
+      val setupHcd2      = Setup(prefix, mediumRunning, Some(obsId))
+
+      val aggregatedResponse = CommandDistributor(
+        Map(assemblyComponent → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
+      ).submitAllAndSubscribe()
+
+      whenReady(aggregatedResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
+        result shouldBe a[Completed]
+      }
+
+      enterBarrier("multiple-components-multiple-commands")
     }
 
     runOn(member1) {
@@ -85,6 +109,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       Await.result(Standalone.spawn(assemblyConf, wiring), 5.seconds)
       enterBarrier("spawned")
       enterBarrier("long-commands")
+      enterBarrier("multiple-components-multiple-commands")
     }
 
     runOn(member2) {
@@ -94,6 +119,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       Await.result(Standalone.spawn(hcdConf, wiring), 5.seconds)
       enterBarrier("spawned")
       enterBarrier("long-commands")
+      enterBarrier("multiple-components-multiple-commands")
     }
     enterBarrier("end")
   }

@@ -15,8 +15,15 @@ import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class ComponentRef(value: ActorRef[ComponentMessage]) {
+
   def submit(controlCommand: ControlCommand)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
     value ? (Submit(controlCommand, _))
+
+  def submitAll(
+      controlCommands: Set[ControlCommand]
+  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Source[CommandResponse, NotUsed] = {
+    Source(controlCommands).mapAsyncUnordered(10)(this.submit)
+  }
 
   def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
     value ? (Oneway(controlCommand, _))
@@ -38,7 +45,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
     Source(controlCommands).mapAsyncUnordered(10)(this.submitAndSubscribe)
   }
 
-  def submitAll(
+  def submitAllAndSubscribe(
       controlCommands: Set[ControlCommand]
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(10)(this.submitAndSubscribe)
