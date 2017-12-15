@@ -9,8 +9,11 @@ import com.typesafe.config.ConfigFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
+import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
+import csw.messages.ccs.commands.Observe;
+import csw.messages.ccs.commands.Setup;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.LocationRemoved;
 import csw.messages.location.LocationUpdated;
@@ -101,10 +104,18 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
 
     }
 
+    // #validateCommand-handler
     @Override
     public CommandResponse validateCommand(ControlCommand controlCommand) {
-        return null;
+        if (controlCommand instanceof Setup) {
+            return new CommandResponse.Completed(controlCommand.runId());
+        } else if (controlCommand instanceof Observe) {
+            return new CommandResponse.Completed(controlCommand.runId());
+        } else {
+            return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue("command" + controlCommand + "is not supported by this component."));
+        }
     }
+    // #validateCommand-handler
 
     @Override
     public void onSubmit(ControlCommand controlCommand) {

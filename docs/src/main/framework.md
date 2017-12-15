@@ -29,6 +29,39 @@ gradle
     }
     ```
     @@@
+    
+## ComponentInfo
+
+`ComponentInfo` model describes a component by specifying following details
+It is usually described as a configuration file but can also be created programmatically.
+
+AssemblyInfo
+:   @@@vars
+    ```
+    name = "Sample_Assembly"
+    componentType = assembly
+    behaviorFactoryClassName = package.component.SampleAssembly
+    prefix = abc.sample.prefix
+    locationServiceUsage = RegisterAndTrackServices
+    connections = [
+        {
+          name: "Sample_Hcd"
+          componentType: hcd
+          connectionType: akka
+        }
+      ]
+    ```
+    @@@
+    
+HcdInfo
+:   @@@vars
+    ```
+    name = "Sample_Hcd"
+    componentType = hcd
+    behaviorFactoryClassName = package.component.SampleHcd
+    prefix = abc.sample.prefix
+    locationServiceUsage = RegisterOnly
+    ```
 
 ## Creating an Assembly or Hcd
 
@@ -92,9 +125,31 @@ Hcd/Java
 
 #### validateCommand
 
+On receiving a command a component developer is required to validate the `ControlCommand` received. If the command is valid to be processed, `Accepted` response
+should be returned from this method. Otherwise, `Invalid` response should be returned.
+
+Assembly/Scala
+:   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #validateCommand-handler }
+
+Assembly/Java
+:   @@snip [JTromboneAssemblyHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #validateCommand-handler }
+
+Hcd/Scala
+:   @@snip [TromboneHcdHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #validateCommand-handler }
+
+Hcd/Java
+:   @@snip [JTromboneHcdHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #validateCommand-handler }
+ 
+If a response can be provided immediately, a final `CommandResponse` such as `CommandCompleted` or `Error` can be sent from this handler.
+
 #### onSubmit
 
+In case a command is received as a submit command, command response should be updated in the `CommandResponseManager`. `CommandResponseManager` is an actor whose reference 
+`commandResponseManager` is available in the `ComponentHandlers` 
+
 #### onOneway
+
+In case a command is received as a oneway command, command response should not be provided to the sender. 
 
 ### Tracking Connections
 

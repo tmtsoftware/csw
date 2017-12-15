@@ -6,9 +6,8 @@ import com.typesafe.config.ConfigFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
-import csw.messages.ccs.commands.CommandResponse;
-import csw.messages.ccs.commands.ControlCommand;
-import csw.messages.ccs.commands.JComponentRef;
+import csw.messages.ccs.CommandIssue;
+import csw.messages.ccs.commands.*;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
 import csw.messages.models.PubSub;
@@ -54,6 +53,7 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
         this.locationService = locationService;
         runningHcds = new HashMap<>();
     }
+
     //#jcomponent-handlers-class
     //#jInitialize-handler
     @Override
@@ -100,8 +100,7 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
         if (trackingEvent instanceof LocationUpdated) {
             // do something for the tracked location when it is updated
-        }
-        else if (trackingEvent instanceof LocationRemoved) {
+        } else if (trackingEvent instanceof LocationRemoved) {
             // do something for the tracked location when it is no longer available
         }
     }
@@ -112,10 +111,18 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
 
     }
 
+    // #validateCommand-handler
     @Override
     public CommandResponse validateCommand(ControlCommand controlCommand) {
-        return null;
+        if (controlCommand instanceof Setup) {
+            return new CommandResponse.Completed(controlCommand.runId());
+        } else if (controlCommand instanceof Observe) {
+            return new CommandResponse.Completed(controlCommand.runId());
+        } else {
+            return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue("command" + controlCommand + "is not supported by this component."));
+        }
     }
+    // #validateCommand-handler
 
     @Override
     public void onSubmit(ControlCommand controlCommand) {

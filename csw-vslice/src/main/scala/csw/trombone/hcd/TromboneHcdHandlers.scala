@@ -8,6 +8,8 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages._
+import csw.messages.ccs.CommandIssue.UnsupportedCommandIssue
+import csw.messages.ccs.commands.CommandResponse.Invalid
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
@@ -107,10 +109,13 @@ class TromboneHcdHandlers(
     }
   }
 
+  // #validateCommand-handler
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand match {
-    case setup: Setup     => ParamValidation.validateSetup(setup)
-    case observe: Observe => ParamValidation.validateObserve(observe)
+    case setup: Setup     ⇒ ParamValidation.validateSetup(setup)
+    case observe: Observe ⇒ ParamValidation.validateObserve(observe)
+    case x                ⇒ Invalid(controlCommand.runId, UnsupportedCommandIssue(s"command $x is not supported by this component."))
   }
+  // #validateCommand-handler
 
   override def onSubmit(controlCommand: ControlCommand): Unit =
     onSetup(controlCommand.asInstanceOf[Setup])

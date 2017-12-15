@@ -6,7 +6,8 @@ import com.typesafe.config.ConfigFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.CommandMessage.Submit
 import csw.messages._
-import csw.messages.ccs.commands.CommandResponse.Accepted
+import csw.messages.ccs.CommandIssue.UnsupportedCommandIssue
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
@@ -112,10 +113,13 @@ class TromboneAssemblyHandlers(
     case _                                   ⇒
   }
 
+  // #validateCommand-handler
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand match {
-    case _: Setup   => validateOneSetup(controlCommand.asInstanceOf[Setup])
-    case _: Observe => Accepted(controlCommand.runId)
+    case _: Setup   ⇒ validateOneSetup(controlCommand.asInstanceOf[Setup])
+    case _: Observe ⇒ Accepted(controlCommand.runId)
+    case x          ⇒ Invalid(controlCommand.runId, UnsupportedCommandIssue(s"command $x is not supported by this component."))
   }
+  // #validateCommand-handler
 
   override def onSubmit(controlCommand: ControlCommand): Unit =
     commandHandler ! CommandMessageE(Submit(controlCommand, commandResponseAdapter))
