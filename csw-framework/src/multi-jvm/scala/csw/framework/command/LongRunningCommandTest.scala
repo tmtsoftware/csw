@@ -91,6 +91,16 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       val setupHcd1      = Setup(prefix, shortRunning, Some(obsId))
       val setupHcd2      = Setup(prefix, mediumRunning, Some(obsId))
 
+      val aggregatedValidationResponse = CommandDistributor(
+        Map(assemblyComponent → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
+      ).submitAll()
+
+      whenReady(aggregatedValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
+        result shouldBe a[Completed]
+      }
+
+      enterBarrier("multiple-components-submit-multiple-commands")
+
       val aggregatedResponse = CommandDistributor(
         Map(assemblyComponent → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
       ).submitAllAndSubscribe()
@@ -99,7 +109,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
         result shouldBe a[Completed]
       }
 
-      enterBarrier("multiple-components-multiple-commands")
+      enterBarrier("multiple-components-submit-subscribe-multiple-commands")
     }
 
     runOn(member1) {
@@ -109,7 +119,8 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       Await.result(Standalone.spawn(assemblyConf, wiring), 5.seconds)
       enterBarrier("spawned")
       enterBarrier("long-commands")
-      enterBarrier("multiple-components-multiple-commands")
+      enterBarrier("multiple-components-submit-multiple-commands")
+      enterBarrier("multiple-components-submit-subscribe-multiple-commands")
     }
 
     runOn(member2) {
@@ -119,7 +130,8 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       Await.result(Standalone.spawn(hcdConf, wiring), 5.seconds)
       enterBarrier("spawned")
       enterBarrier("long-commands")
-      enterBarrier("multiple-components-multiple-commands")
+      enterBarrier("multiple-components-submit-multiple-commands")
+      enterBarrier("multiple-components-submit-subscribe-multiple-commands")
     }
     enterBarrier("end")
   }
