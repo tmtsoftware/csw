@@ -45,6 +45,7 @@ import static csw.services.location.javadsl.JComponentType.HCD;
 // DEOPSCSW-224: Inter component command sending
 // DEOPSCSW-225: Allow components to receive commands
 // DEOPSCSW-228: Assist Components with command completion
+// DEOPSCSW-317: Use state values of HCD to determine command completion
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 public class JCommandIntegrationTest {
     private static ILocationService locationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));

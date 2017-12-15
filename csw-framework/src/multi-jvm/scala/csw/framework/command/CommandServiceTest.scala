@@ -142,6 +142,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       longCommandResponse.runId shouldBe setupWithoutMatcher.runId
 
       // DEOPSCSW-229: Provide matchers infrastructure for comparison
+      // DEOPSCSW-317: Use state values of HCD to determine command completion
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
       val demandMatcher         = DemandMatcher(DemandState(prefix, Set(param)), withUnits = false, timeout)
