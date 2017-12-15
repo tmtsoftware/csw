@@ -172,7 +172,7 @@ lazy val `csw-benchmark` = project
   .dependsOn(
     `csw-logging`,
     `csw-messages`,
-    `csw-framework`      % "compile->compile;test->test",
+    `csw-framework` % "compile->compile;test->test",
     `csw-command`
   )
   .enablePlugins(JmhPlugin)
