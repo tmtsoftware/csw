@@ -45,8 +45,8 @@ AssemblyInfo
     locationServiceUsage = RegisterAndTrackServices
     connections = [
         {
-          name: "Sample_Hcd"
-          componentType: hcd
+          name: "Sample_Assembly"
+          componentType: assembly
           connectionType: akka
         }
       ]
@@ -62,6 +62,17 @@ HcdInfo
     prefix = abc.sample.prefix
     locationServiceUsage = RegisterOnly
     ```
+    
+Following summaries the properties to be defined in the ComponentInfo model:
+
+* **name** : The name of the component
+* **componentType** : The type of the component which could be `Container`, `Assembly`, `Hcd` or `Service`
+* **behaviorFactoryClassName** : The fully qualified name of the class which extends the factory class `ComponentBehaviorFactory`
+* **prefix** : A valid subsystem to which this component belongs.
+* **locationServiceUsage** : Indicates how the location service should be leveraged for this component by the framework. Following values are supported:
+    * DoNotRegister : Do not register this component with location service
+    * RegisterOnly : Register this component with location service
+    * RegisterAndTrackServices : Register this component with location service as well as track the components/services mentioned against `connections` property
 
 ## Creating an Assembly or Hcd
 
@@ -183,7 +194,8 @@ In case a command is received as a oneway command, command response should not b
 
 The component framework tracks the set of connections specified for a component in `ComponentInfo`.
 The framework also provides a helper `trackConnection` method to track any connection other than those present in `ComponentInfo`.
- 
+
+#### onLocationTrackingEvent
 The `onLocationTrackingEvent` handler can be used to take action on the `TrackingEvent` for a particular connection. 
 
 Assembly/Scala
@@ -198,13 +210,60 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onLocationTrackingEvent-handler }
 
-
-#### onLocationTrackingEvent
-
 ### Publishing State
+A component has access to an actor `pubSubRef` which can be used to publish its `CurrentState`. Any subscriber of this component will receive the 
+published state.
 
 ## Container for deployment
-
+A container is a component which starts one or more Components and keeps track of the components within a single JVM process. When started, the container also registers itself with the Location Service.
+The components to be hosted by the container is defined using a `ContainerInfo` model which has a set of ComponentInfo objects. It is usually described as a configuration file but can also be created programmatically.
+SampleContainerInfo
+:   @@@vars
+    ```
+    name = "Sample_Container"
+    components: [
+      {
+        name = "SampleAssembly"
+        componentType = assembly
+        behaviorFactoryClassName = package.component.SampleAssembly
+        prefix = abc.sample.prefix
+        locationServiceUsage = RegisterAndTrackServices
+        connections = [
+          {
+            name: Sample_Hcd_1
+            componentType: hcd
+            connectionType: akka
+          },
+          {
+            name: Sample_Hcd_2
+            componentType: hcd
+            connectionType: akka
+          },
+          {
+            name: Sample_Hcd_3
+            componentType: hcd
+            connectionType: akka
+          }
+        ]
+      },
+      {
+        name = "Sample_Hcd_1"
+        componentType = hcd
+        behaviorFactoryClassName = package.component.SampleHcd
+        prefix = abc.sample.prefix
+        locationServiceUsage = RegisterOnly
+      },
+      {
+        name = "Sample_Hcd_2"
+        componentType: hcd
+        behaviorFactoryClassName: package.component.SampleHcd
+        prefix: abc.sample.prefix
+        locationServiceUsage = RegisterOnly
+      }
+    ]
+    ```
+    @@@
 ## Standalone components
+A component can be run alone in a Standalone mode without sharing it's jvm space with any other component. 
 
 
