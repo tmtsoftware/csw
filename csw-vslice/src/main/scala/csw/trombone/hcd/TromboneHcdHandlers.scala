@@ -87,9 +87,17 @@ class TromboneHcdHandlers(
     Future.successful(println("shutdown complete during Running context"))
   }
 
-  override def onGoOffline(): Unit = println("Received running offline")
+  //#onGoOffline-handler
+  override def onGoOffline(): Unit = {
+    // do something when going offline
+  }
+  //#onGoOffline-handler
 
-  override def onGoOnline(): Unit = println("Received running offline")
+  //#onGoOnline-handler
+  override def onGoOnline(): Unit = {
+    // do something when going online
+  }
+  //#onGoOnline-handler
 
   private def onSetup(sc: Setup): Unit = {
     import csw.trombone.hcd.TromboneHcdState._

@@ -104,9 +104,17 @@ class TromboneAssemblyHandlers(
     Future.successful(println("Received Shutdown"))
   }
 
-  override def onGoOffline(): Unit = println("Received running offline")
+  //#onGoOffline-handler
+  override def onGoOffline(): Unit = {
+    // do something when going offline
+  }
+  //#onGoOffline-handler
 
-  override def onGoOnline(): Unit = println("Received GoOnline")
+  //#onGoOnline-handler
+  override def onGoOnline(): Unit = {
+    // do something when going online
+  }
+  //#onGoOnline-handler
 
   def onDomainMsg(mode: DiagPublisherMessages): Unit = mode match {
     case (DiagnosticState | OperationsState) => diagPublisher ! mode

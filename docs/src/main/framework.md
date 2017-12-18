@@ -114,12 +114,40 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #jInitialize-handler }
 
-
 #### onShutdown
 
+#### isOnline
+A component has access to `isOnline` boolean flag which can be used to determine if the component is online or offline state.
+
 #### onGoOffline
+A component can be notified to run in offline mode in case it is not in use. The component can change its behavior if needed as a part of this handler.
+
+Assembly/Scala
+:   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onGoOffline-handler }
+
+Assembly/Java
+:   @@snip [JTromboneAssemblyHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #onGoOffline-handler }
+
+Hcd/Scala
+:   @@snip [TromboneHcdHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #onGoOffline-handler }
+
+Hcd/Java
+:   @@snip [JTromboneHcdHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onGoOffline-handler }
 
 #### onGoOnline
+A component can be notified to run in online mode again in case it was put to run in offline mode. The component can change its behavior if needed as a part of this handler.
+
+Assembly/Scala
+:   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onGoOnline-handler }
+
+Assembly/Java
+:   @@snip [JTromboneAssemblyHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #onGoOnline-handler }
+
+Hcd/Scala
+:   @@snip [TromboneHcdHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #onGoOnline-handler }
+
+Hcd/Java
+:   @@snip [JTromboneHcdHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onGoOnline-handler }
 
 ### Handling commands
 

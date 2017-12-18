@@ -127,15 +127,19 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
 
     }
 
+    //#onGoOffline-handler
     @Override
     public void onGoOffline() {
-
+        // do something when going offline
     }
+    //#onGoOffline-handler
 
+    //#onGoOnline-handler
     @Override
     public void onGoOnline() {
-
+        // do something when going online
     }
+    //#onGoOnline-handler
 
     private CompletableFuture<AxisConfig> getAxisConfig() {
         return CompletableFuture.supplyAsync(() -> {

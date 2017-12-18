@@ -134,15 +134,19 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
 
     }
 
+    //#onGoOffline-handler
     @Override
     public void onGoOffline() {
-
+        // do something when going offline
     }
+    //#onGoOffline-handler
 
+    //#onGoOnline-handler
     @Override
     public void onGoOnline() {
-
+        // do something when going online
     }
+    //#onGoOnline-handler
 
     private CompletableFuture<TromboneCalculationConfig> getAssemblyCalculationConfig() {
         return CompletableFuture.supplyAsync(() -> ConfigFactory.load("tromboneAssemblyContext.conf"))
