@@ -7,7 +7,7 @@ In the distributed environment of TMT observatory, **Components** communicate wi
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-messages_$scala.binaryVersion$" % "$version$"
+    libraryDependencies += "org.tmt" %% "csw-messages" % "$version$"
     ```
     @@@
 

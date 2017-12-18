@@ -26,7 +26,7 @@ An example of location information is:
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-location_$scala.binaryVersion$" % "$version$"
+    libraryDependencies += "org.tmt" %% "csw-location" % "$version$"
     ```
     @@@
 

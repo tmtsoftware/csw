@@ -7,7 +7,7 @@ Logging Service library provides an advanced logging facility for csw components
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-logging_$scala.binaryVersion$" % "$version$"
+    libraryDependencies += "org.tmt" %% "csw-logging" % "$version$"
     ```
     @@@
 

@@ -19,7 +19,7 @@ manage configuration files.
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-config-client_$scala.binaryVersion$" % "$version$"
+    libraryDependencies += "org.tmt" %% "csw-config-client" % "$version$"
     ```
     @@@
 
