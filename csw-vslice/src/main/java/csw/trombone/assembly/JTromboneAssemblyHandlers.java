@@ -26,6 +26,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static csw.messages.CommandMessage.Submit;
+import static csw.trombone.assembly.AssemblyCommandHandlerMsgs.CommandMessageE;
+
 //#jcomponent-handlers-class
 public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherMessages> {
 
@@ -36,6 +39,8 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
     private ILocationService locationService;
     private Map<Connection, Optional<JComponentRef>> runningHcds;
     private ActorRef<DiagPublisherMessages> diagPublisher;
+    private ActorRef<AssemblyCommandHandlerMsgs> commandHandler;
+    private ActorRef<CommandResponse> commandResponseAdapter;
 
     public JTromboneAssemblyHandlers(
             akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
@@ -52,6 +57,7 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
         this.ctx = ctx;
         this.locationService = locationService;
         runningHcds = new HashMap<>();
+        commandResponseAdapter = ctx.spawnAdapter(DiagPublisherMessages.CommandResponseE::new);
     }
 
     //#jcomponent-handlers-class
@@ -124,15 +130,21 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
     }
     // #validateCommand-handler
 
+    // #onSubmit-handler
     @Override
     public void onSubmit(ControlCommand controlCommand) {
-
+        // forward the received command to an actor created as a worker actor for this component to process commands
+        commandHandler.tell(new CommandMessageE(new Submit(controlCommand, commandResponseAdapter)));
     }
+    // #onSubmit-handler
 
+    // #onOneway-handler
     @Override
     public void onOneway(ControlCommand controlCommand) {
-
+        // forward the received command to an actor created as a worker actor for this component to process commands
+        commandHandler.tell(new CommandMessageE(new Submit(controlCommand, commandResponseAdapter)));
     }
+    // #onOneway-handler
 
     //#onGoOffline-handler
     @Override

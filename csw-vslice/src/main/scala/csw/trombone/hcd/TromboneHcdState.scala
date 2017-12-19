@@ -4,7 +4,7 @@ import java.io.File
 
 import csw.messages.ccs.commands.{CommandName, Setup}
 import csw.messages.params.generics.KeyType.ChoiceKey
-import csw.messages.params.generics.{GChoiceKey, Key, KeyType}
+import csw.messages.params.generics.{GChoiceKey, JKeyTypes, Key, KeyType}
 import csw.messages.params.models.Units.encoder
 import csw.messages.params.models.{Choice, ObsId, Prefix, RunId}
 import csw.messages.params.states.CurrentState
@@ -33,6 +33,8 @@ object TromboneHcdState {
   val inLowLimitKey: Key[Boolean]  = KeyType.BooleanKey.make("lowLimit")
   val inHighLimitKey: Key[Boolean] = KeyType.BooleanKey.make("highLimit")
   val inHomeKey: Key[Boolean]      = KeyType.BooleanKey.make("homed")
+
+  def jPositionKey: Key[Integer] = JKeyTypes.IntKey.make("position")
 
   val defaultAxisState: CurrentState = CurrentState(axisStateCK).madd(
     axisNameKey    -> tromboneAxisName,

@@ -4,7 +4,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import com.typesafe.config.ConfigFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.messages.CommandMessage.Submit
+import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages._
 import csw.messages.ccs.CommandIssue.UnsupportedCommandIssue
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
@@ -129,12 +129,19 @@ class TromboneAssemblyHandlers(
   }
   // #validateCommand-handler
 
+  // #onSubmit-handler
   override def onSubmit(controlCommand: ControlCommand): Unit = {
+    // forward the received command to an actor created as a worker actor for this component to process commands
     commandHandler ! CommandMessageE(Submit(controlCommand, commandResponseAdapter))
-
   }
+  //#onSubmit-handler
 
-  override def onOneway(controlCommand: ControlCommand): Unit = println("One way command received")
+  // #onOneway-handler
+  override def onOneway(controlCommand: ControlCommand): Unit = {
+    // forward the received command to an actor created as a worker actor for this component to process commands
+    commandHandler ! CommandMessageE(Oneway(controlCommand, commandResponseAdapter))
+  }
+  //#onOneway-handler
 
   private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = {
     val config = ConfigFactory.load("tromboneAssemblyContext.conf")

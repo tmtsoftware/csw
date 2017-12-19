@@ -104,6 +104,7 @@ class McsAssemblyComponentHandlers(
 
       case `initCmd` ⇒ commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
       case `moveCmd` ⇒ commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+      case _         ⇒ //do nothing
     }
   }
 

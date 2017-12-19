@@ -19,7 +19,7 @@ import csw.messages.params.models.Units.encoder
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
-import csw.trombone.hcd.AxisRequest._
+import csw.trombone.hcd.AxisRequests.{CancelMove, Datum, Home, Move, _}
 import csw.trombone.hcd.AxisResponse._
 import csw.trombone.hcd.TromboneEngineering.{GetAxisConfig, GetAxisStats, GetAxisUpdate, GetAxisUpdateNow}
 
@@ -125,10 +125,19 @@ class TromboneHcdHandlers(
   }
   // #validateCommand-handler
 
-  override def onSubmit(controlCommand: ControlCommand): Unit =
+  //#onSubmit-handler
+  override def onSubmit(controlCommand: ControlCommand): Unit = {
+    // process command
     onSetup(controlCommand.asInstanceOf[Setup])
+  }
+  //#onSubmit-handler
 
-  override def onOneway(controlCommand: ControlCommand): Unit = println("One way command received")
+  //#onOneway-handler
+  override def onOneway(controlCommand: ControlCommand): Unit = {
+    // process command
+    onSetup(controlCommand.asInstanceOf[Setup])
+  }
+  //#onOneway-handler
 
   def onDomainMsg(tromboneMsg: TromboneMessage): Unit = tromboneMsg match {
     case x: TromboneEngineering => onEngMsg(x)

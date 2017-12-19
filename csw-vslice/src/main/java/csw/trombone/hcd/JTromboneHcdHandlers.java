@@ -21,6 +21,7 @@ import csw.messages.location.TrackingEvent;
 import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
+import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
 import scala.runtime.BoxedUnit;
 
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
 
     // private state of this component
+    private ILogger log;
     private AxisResponse.AxisUpdate current;
     private AxisResponse.AxisStatistics stats;
     private ActorRef<AxisRequest> tromboneAxis;
@@ -48,6 +50,7 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
     ) {
         super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, klass);
         this.ctx = ctx;
+        this.log = loggerFactory.getLogger(getClass());
     }
     //#jcomponent-handlers-class
 
@@ -65,7 +68,7 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
         // initialise some state by using the worker actor created above
         CompletableFuture<Void> initialAxisState = AskPattern.ask(
                 tromboneAxis,
-                AxisRequest.InitialState::new,
+                AxisRequests.InitialState::new,
                 new Timeout(5, TimeUnit.SECONDS),
                 ctx.getSystem().scheduler()
         ).thenAccept(axisUpdate -> current = axisUpdate).toCompletableFuture();
@@ -73,7 +76,7 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
         // initialise some state by using the worker actor created above
         CompletableFuture<Void> initialAxisStats = AskPattern.ask(
                 tromboneAxis,
-                AxisRequest.GetStatistics::new,
+                AxisRequests.GetStatistics::new,
                 new Timeout(5, TimeUnit.SECONDS),
                 ctx.getSystem().scheduler()
         ).thenAccept(axisStatistics -> stats = axisStatistics).toCompletableFuture();
@@ -107,9 +110,7 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
     // #validateCommand-handler
     @Override
     public CommandResponse validateCommand(ControlCommand controlCommand) {
-        if (controlCommand instanceof Setup) {
-            return new CommandResponse.Completed(controlCommand.runId());
-        } else if (controlCommand instanceof Observe) {
+        if (controlCommand instanceof Setup || controlCommand instanceof Observe) {
             return new CommandResponse.Completed(controlCommand.runId());
         } else {
             return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue("command" + controlCommand + "is not supported by this component."));
@@ -117,15 +118,21 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
     }
     // #validateCommand-handler
 
+    // #onSubmit-handler
     @Override
     public void onSubmit(ControlCommand controlCommand) {
-
+        // process command
+        onSetup((Setup)controlCommand);
     }
+    // #onSubmit-handler
 
+    // #onOneway-handler
     @Override
     public void onOneway(ControlCommand controlCommand) {
-
+        // process command
+        onSetup((Setup)controlCommand);
     }
+    // #onOneway-handler
 
     //#onGoOffline-handler
     @Override
@@ -147,5 +154,23 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
             return AxisConfig.apply(config);
         });
     }
+
+    private void onSetup(Setup sc) {
+        log.info("Trombone process received sc:" + sc);
+
+        if(sc.commandName() == TromboneHcdState.axisMoveCK()) {
+            tromboneAxis.tell(new AxisRequests.Move(sc.apply(TromboneHcdState.jPositionKey()).head(),  true));
+        } else if(sc.commandName() == TromboneHcdState.axisDatumCK()) {
+            log.info("Received Datum");
+            tromboneAxis.tell(AxisRequests.jDatum());
+        } else if(sc.commandName() == TromboneHcdState.axisHomeCK()) {
+            tromboneAxis.tell(AxisRequests.jHome());
+        } else if(sc.commandName() == TromboneHcdState.axisCancelCK()) {
+            tromboneAxis.tell(AxisRequests.jCancelMove());
+        } else {
+            log.error("Unknown command key: " + sc.commandName());
+        }
+    }
+
 
 }

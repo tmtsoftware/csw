@@ -8,7 +8,7 @@ import csw.trombone.hcd.AxisResponse.{AxisStatistics, AxisUpdate}
 sealed trait SimulatorCommand extends TMTSerializable
 
 sealed trait AxisRequest extends SimulatorCommand
-object AxisRequest {
+object AxisRequests {
   case object Home                                            extends AxisRequest
   case object Datum                                           extends AxisRequest
   case class Move(position: Int, diagFlag: Boolean = false)   extends AxisRequest
@@ -16,6 +16,10 @@ object AxisRequest {
   case class GetStatistics(replyTo: ActorRef[AxisStatistics]) extends AxisRequest
   case object PublishAxisUpdate                               extends AxisRequest
   case class InitialState(replyTo: ActorRef[AxisUpdate])      extends AxisRequest
+
+  def jHome(): AxisRequest       = Home
+  def jDatum(): AxisRequest      = Datum
+  def jCancelMove(): AxisRequest = CancelMove
 }
 
 // Internal

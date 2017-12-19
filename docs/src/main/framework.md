@@ -109,9 +109,9 @@ Hcd/Java
 
 #### initialize
 
-The `initialize` handler is invoked when the component is created. The component can initialize state such as configuration to be fetched
-from configuration service, location of components or services to be fetched from location service etc. The API is future based to favour non-blocking 
-asynchronous operations.
+The `initialize` handler is invoked when the component is created. This is different than constructor initialization to allow non-blocking 
+asynchronous operations. The component can initialize state such as configuration to be fetched from configuration service, 
+location of components or services to be fetched from location service etc.
 
 Assembly/Scala
 :   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #initialize-handler }
@@ -191,9 +191,33 @@ If a response can be provided immediately, a final `CommandResponse` such as `Co
 In case a command is received as a submit, command response should be updated in the `CommandResponseManager`. `CommandResponseManager` is an actor whose reference 
 `commandResponseManager` is available in the `ComponentHandlers`. 
 
+Assembly/Scala
+:   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onSubmit-handler }
+
+Assembly/Java
+:   @@snip [JTromboneAssemblyHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #onSubmit-handler }
+
+Hcd/Scala
+:   @@snip [TromboneHcdHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #onSubmit-handler }
+
+Hcd/Java
+:   @@snip [JTromboneHcdHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onSubmit-handler }
+
 #### onOneway
 
-In case a command is received as a oneway, command response should not be provided to the sender. 
+In case a command is received as a oneway, command response should not be provided to the sender.
+
+Assembly/Scala
+:   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onOneway-handler }
+
+Assembly/Java
+:   @@snip [JTromboneAssemblyHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #onOneway-handler }
+
+Hcd/Scala
+:   @@snip [TromboneHcdHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #onOneway-handler }
+
+Hcd/Java
+:   @@snip [JTromboneHcdHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onOneway-handler } 
 
 ### Tracking Connections
 
@@ -221,8 +245,10 @@ A component has access to an actor `pubSubRef` which can be used to publish its 
 published state.
 
 ## Container for deployment
+
 A container is a component which starts one or more Components and keeps track of the components within a single JVM process. When started, the container also registers itself with the Location Service.
 The components to be hosted by the container is defined using a `ContainerInfo` model which has a set of ComponentInfo objects. It is usually described as a configuration file but can also be created programmatically.
+
 SampleContainerInfo
 :   @@@vars
     ```

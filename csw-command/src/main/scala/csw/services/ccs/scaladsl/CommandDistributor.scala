@@ -8,7 +8,6 @@ import akka.util.Timeout
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef, ControlCommand}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.implicitConversions
 
 case class CommandDistributor(componentToCommands: Map[ComponentRef, Set[ControlCommand]]) {
 
