@@ -1,4 +1,4 @@
-package csw.services.ccs.jmh
+package csw.services.ccs.perf
 
 import akka.actor.ActorSystem
 import akka.typed

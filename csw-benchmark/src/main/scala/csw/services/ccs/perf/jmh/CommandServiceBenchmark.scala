@@ -1,4 +1,4 @@
-package csw.services.ccs.jmh
+package csw.services.ccs.perf.jmh
 
 import java.util.concurrent.TimeUnit
 
@@ -8,7 +8,7 @@ import com.typesafe.config.ConfigFactory
 import csw.messages.ccs.commands
 import csw.messages.ccs.commands.{CommandName, CommandResponse, ComponentRef}
 import csw.messages.params.models.Prefix
-import csw.services.ccs.jmh.BenchmarkHelpers.spawnStandaloneComponent
+import csw.services.ccs.perf.BenchmarkHelpers.spawnStandaloneComponent
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.{Logger, LoggerFactory, LoggingSystemFactory}
@@ -17,6 +17,16 @@ import org.openjdk.jmh.annotations._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
+// ============================== HOW TO RUN THIS TEST: ====================================
+//
+// single thread:
+// sbt csw-benchmark/jmh:run -f 1 -wi 10 -i 20 .*CommandServiceBenchmark.*
+//
+// multiple threads (for example, 4 threads):
+// sbt csw-benchmark/jmh:run -f 1 -wi 10 -i 20 -t 4 -si true .*CommandServiceBenchmark.*
+//
+
+// DEOPSCSW-231 :Measure Performance of Command Service
 @State(Scope.Benchmark)
 @Fork(1)
 @Threads(1)
@@ -57,17 +67,13 @@ class CommandServiceBenchmark {
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
   def commandThroughput(): CommandResponse = {
-    log.info(s"Sending command : ${System.nanoTime()}")
-    val commandResponse = Await.result(componentRef.submit(setupCommand), 5.seconds)
-    commandResponse
+    Await.result(componentRef.submit(setupCommand), 5.seconds)
   }
 
   @Benchmark
   @BenchmarkMode(Array(Mode.AverageTime))
   @OutputTimeUnit(TimeUnit.MILLISECONDS)
   def commandLatency(): CommandResponse = {
-    log.info(s"Sending command : ${System.nanoTime()}")
-    val commandResponse = Await.result(componentRef.submit(setupCommand), 5.seconds)
-    commandResponse
+    Await.result(componentRef.submit(setupCommand), 5.seconds)
   }
 }
