@@ -25,6 +25,8 @@ object Libs {
   val `akka-http-play-json`          = "de.heikoseeberger"      %% "akka-http-play-json"          % "1.18.1" //Apache 2.0
   val `scalapb-runtime`              = "com.thesamet.scalapb"   %% "scalapb-runtime"              % scalapbVersion % "protobuf"
   val `scalapb-json4s`               = "com.thesamet.scalapb"   %% "scalapb-json4s"               % "0.7.0-rc1"
+  val `hdrHistogram`                 = "org.hdrhistogram"       % "HdrHistogram"                  % "2.1.10"
+
 }
 
 object Jackson {

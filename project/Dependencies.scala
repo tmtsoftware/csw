@@ -130,7 +130,8 @@ object Dependencies {
     Libs.`scalatest`           % Test,
     Libs.`junit`               % Test,
     Libs.`junit-interface`     % Test,
-    Libs.`mockito-core`        % Test
+    Libs.`mockito-core`        % Test,
+    Libs.`hdrHistogram`        % Test
   )
 
   val CswCommand = Seq(

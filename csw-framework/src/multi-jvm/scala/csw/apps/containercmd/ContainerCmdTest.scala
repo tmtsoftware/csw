@@ -185,7 +185,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val containerCmd = new ContainerCmd("eaton_hcd_standalone_app", ClusterAwareSettings.joinLocal(3552), false)
 
-      // this step is required for multi-node, as eaton_hcd_standalone.conf file is not directly available
+      // this step is required for multi-node, as eaton_hcd_standalone_app.conf file is not directly available
       // when sbt-assembly creates fat jar
       val standaloneConfFilePath = createStandaloneTmpFile()
 
