@@ -16,6 +16,7 @@ object ComponentStateForCommand {
   val withoutMatcherCmd = CommandName("move.accept.result")
   val matcherCmd        = CommandName("move.accept.matcher.success.result")
   val immediateCmd      = CommandName("move.immediate")
+  val immediateResCmd   = CommandName("move.immediate.result")
   val invalidCmd        = CommandName("move.failure")
   val cancelCmd         = CommandName("move.cancel")
 

@@ -62,6 +62,7 @@ class ComponentHandlerForCommand(
     case `matcherCmd`        ⇒ Accepted(controlCommand.runId)
     case `cancelCmd`         ⇒ Accepted(controlCommand.runId)
     case `immediateCmd`      ⇒ Completed(controlCommand.runId)
+    case `immediateResCmd`   ⇒ CompletedWithResult(controlCommand.runId, Result(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(20))))
     case `invalidCmd`        ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.commandName}"))
     case _                   ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
   }
