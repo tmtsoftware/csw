@@ -9,12 +9,10 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, NoLongerValid}
+import csw.messages.ccs.commands.CommandResponse.{Completed, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.{ObsId, Prefix, RunId}
-import csw.services.ccs.internal.matchers.Matcher
-import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.assembly.{AssemblyCommandHandlerMsgs, AssemblyContext, AssemblyMatchers}
 import csw.trombone.hcd.TromboneHcdState
@@ -51,21 +49,14 @@ class DatumCommand(
     } else {
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
-      tromboneHCD.get
-        .submit(Setup(Prefix("sourcePrefix"), TromboneHcdState.axisDatumCK, s.maybeObsId))
-        .flatMap {
-          case _: Accepted ⇒
-            new Matcher(tromboneHCD.get.value, AssemblyMatchers.idleMatcher).start.map {
-              case MatchCompleted =>
-                publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
-                Completed(s.runId)
-              case MatchFailed(ex) =>
-                println(s"Data command match failed with error: ${ex.getMessage}")
-                Error(s.runId, ex.getMessage)
-            }
-          case _ => Future.successful(Error(s.runId, ""))
-        }
+      val setup = Setup(Prefix("sourcePrefix"), TromboneHcdState.axisDatumCK, s.maybeObsId)
 
+      tromboneHCD.get.submitAndMatch(setup, AssemblyMatchers.idleMatcher).map {
+        case response: Completed ⇒
+          publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
+          response
+        case otherResponse ⇒ otherResponse
+      }
     }
   }
 

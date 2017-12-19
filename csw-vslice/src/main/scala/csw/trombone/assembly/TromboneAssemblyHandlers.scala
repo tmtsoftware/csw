@@ -129,8 +129,10 @@ class TromboneAssemblyHandlers(
   }
   // #validateCommand-handler
 
-  override def onSubmit(controlCommand: ControlCommand): Unit =
+  override def onSubmit(controlCommand: ControlCommand): Unit = {
     commandHandler ! CommandMessageE(Submit(controlCommand, commandResponseAdapter))
+
+  }
 
   override def onOneway(controlCommand: ControlCommand): Unit = println("One way command received")
 

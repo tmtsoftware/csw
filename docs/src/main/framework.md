@@ -62,8 +62,9 @@ HcdInfo
     prefix = abc.sample.prefix
     locationServiceUsage = RegisterOnly
     ```
+    @@@
     
-Following summaries the properties to be defined in the ComponentInfo model:
+Following is the summary of properties in the ComponentInfo config/model:
 
 * **name** : The name of the component
 * **componentType** : The type of the component which could be `Container`, `Assembly`, `Hcd` or `Service`
@@ -104,7 +105,6 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JTromboneHcdBehaviorFactory.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdBehaviorFactory.java) { #jcomponent-factory }
  
-
 ### Lifecycle support
 
 #### initialize
@@ -127,10 +127,14 @@ Hcd/Java
 
 #### onShutdown
 
+The `onShutdown` handler can be used for carrying out the tasks which will allow the component to shutdown gracefully. 
+
 #### isOnline
+
 A component has access to `isOnline` boolean flag which can be used to determine if the component is online or offline state.
 
 #### onGoOffline
+
 A component can be notified to run in offline mode in case it is not in use. The component can change its behavior if needed as a part of this handler.
 
 Assembly/Scala
@@ -146,6 +150,7 @@ Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onGoOffline-handler }
 
 #### onGoOnline
+
 A component can be notified to run in online mode again in case it was put to run in offline mode. The component can change its behavior if needed as a part of this handler.
 
 Assembly/Scala
@@ -183,12 +188,12 @@ If a response can be provided immediately, a final `CommandResponse` such as `Co
 
 #### onSubmit
 
-In case a command is received as a submit command, command response should be updated in the `CommandResponseManager`. `CommandResponseManager` is an actor whose reference 
-`commandResponseManager` is available in the `ComponentHandlers` 
+In case a command is received as a submit, command response should be updated in the `CommandResponseManager`. `CommandResponseManager` is an actor whose reference 
+`commandResponseManager` is available in the `ComponentHandlers`. 
 
 #### onOneway
 
-In case a command is received as a oneway command, command response should not be provided to the sender. 
+In case a command is received as a oneway, command response should not be provided to the sender. 
 
 ### Tracking Connections
 
@@ -211,6 +216,7 @@ Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onLocationTrackingEvent-handler }
 
 ### Publishing State
+
 A component has access to an actor `pubSubRef` which can be used to publish its `CurrentState`. Any subscriber of this component will receive the 
 published state.
 
@@ -263,7 +269,9 @@ SampleContainerInfo
     ]
     ```
     @@@
+    
 ## Standalone components
+
 A component can be run alone in a Standalone mode without sharing it's jvm space with any other component. 
 
 

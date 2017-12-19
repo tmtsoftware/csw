@@ -6,10 +6,10 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
+import csw.messages.ccs.commands.matchers.Matcher
+import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
-import csw.services.ccs.internal.matchers.Matcher
-import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly.FollowActorMessages.{SetZenithAngle, StopFollowing}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState._

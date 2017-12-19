@@ -8,13 +8,11 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error, NoLongerValid}
+import csw.messages.ccs.commands.CommandResponse.{Completed, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.Units.encoder
 import csw.messages.params.models.{ObsId, RunId}
-import csw.services.ccs.internal.matchers.Matcher
-import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
@@ -63,20 +61,12 @@ class PositionCommand(
         .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
-      tromboneHCD.get.submit(scOut).flatMap {
-        case _: Accepted ⇒
-          new Matcher(tromboneHCD.get.value, stateMatcher).start.map {
-            case MatchCompleted =>
-              publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
-              Completed(s.runId)
-            case MatchFailed(ex) =>
-              println(s"Data command match failed with error: ${ex.getMessage}")
-              Error(s.runId, ex.getMessage)
-            case _ ⇒ Error(s.runId, "")
-          }
-        case _ ⇒ Future.successful(Error(scOut.runId, ""))
+      tromboneHCD.get.submitAndMatch(scOut, stateMatcher).map {
+        case response: Completed ⇒
+          publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
+          response
+        case otherResponse ⇒ otherResponse
       }
-
     }
   }
 

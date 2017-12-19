@@ -8,7 +8,9 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.ccs.commands.CommandResponse.Accepted
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
+import csw.messages.ccs.commands.matchers.Matcher
+import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.params.models.RunId
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 
@@ -21,7 +23,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
 
   def submitAll(
       controlCommands: Set[ControlCommand]
-  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Source[CommandResponse, NotUsed] = {
+  )(implicit timeout: Timeout, scheduler: Scheduler): Source[CommandResponse, NotUsed] = {
     Source(controlCommands).mapAsyncUnordered(10)(this.submit)
   }
 
@@ -38,6 +40,24 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
       case _: Accepted ⇒ subscribe(controlCommand.runId)
       case x           ⇒ Future.successful(x)
     }
+
+  def submitAndMatch(
+      controlCommand: ControlCommand,
+      stateMatcher: StateMatcher
+  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
+    val matcher          = new Matcher(value, stateMatcher)
+    val matcherResponseF = matcher.start
+    submit(controlCommand).flatMap {
+      case _: Accepted ⇒
+        matcherResponseF.map {
+          case MatchCompleted  ⇒ Completed(controlCommand.runId)
+          case MatchFailed(ex) ⇒ Error(controlCommand.runId, ex.getMessage)
+        }
+      case x ⇒
+        matcher.stop()
+        Future.successful(x)
+    }
+  }
 
   def submitAllAndSubscribe(
       controlCommands: Set[ControlCommand]

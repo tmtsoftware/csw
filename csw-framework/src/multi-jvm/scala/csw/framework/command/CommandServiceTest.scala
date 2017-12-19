@@ -13,7 +13,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.ComponentLockedIssue
 import csw.messages.ccs.commands.CommandResponse._
-import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Observe, Setup}
+import csw.messages.ccs.commands._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.LockingResponse
@@ -21,8 +21,8 @@ import csw.messages.models.LockingResponse.LockAcquired
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
-import csw.services.ccs.internal.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.services.ccs.internal.matchers.{DemandMatcher, Matcher, MatcherResponse}
+import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.messages.ccs.commands.matchers.{Matcher, MatcherResponse}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.async.Async._
