@@ -15,7 +15,7 @@ import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.models
 import csw.messages.models.LockingResponse
-import csw.messages.models.LockingResponse._
+import csw.messages.models.LockingResponses._
 import csw.messages.models.PubSub.Publish
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.CurrentState

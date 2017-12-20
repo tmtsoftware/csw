@@ -14,12 +14,15 @@ import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
+import csw.messages.ccs.commands.Result;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
 import csw.messages.models.PubSub;
 import csw.messages.models.PubSub.Publish;
 import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.Key;
+import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
@@ -30,6 +33,8 @@ import scala.runtime.BoxedUnit;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static csw.common.components.command.ComponentStateForCommand.immediateCmd;
+import static csw.common.components.command.ComponentStateForCommand.immediateResCmd;
 import static csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand;
 import static csw.messages.ccs.commands.CommandResponse.*;
 
@@ -111,6 +116,12 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
 
         if (controlCommand.commandName().name().contains("failure")) {
             return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+        } else if(controlCommand.commandName().equals(immediateCmd())) {
+          return new Completed(controlCommand.runId());
+        } else if(controlCommand.commandName().equals(immediateResCmd())) {
+            Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(22);
+            Result result = new Result(controlCommand.source().prefix()).add(param);
+            return new CompletedWithResult(controlCommand.runId(), result);
         } else {
             return new Accepted(controlCommand.runId());
         }

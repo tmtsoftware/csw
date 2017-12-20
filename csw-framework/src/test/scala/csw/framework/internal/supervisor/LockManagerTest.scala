@@ -10,7 +10,7 @@ import csw.messages.ccs.CommandIssue.ComponentLockedIssue
 import csw.messages.ccs.commands.CommandResponse.NotAllowed
 import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.models.LockingResponse
-import csw.messages.models.LockingResponse._
+import csw.messages.models.LockingResponses._
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}

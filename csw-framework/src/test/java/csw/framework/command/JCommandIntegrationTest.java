@@ -3,25 +3,32 @@ package csw.framework.command;
 import akka.actor.ActorSystem;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
+import akka.typed.internal.adapter.ActorSystemAdapter;
+import akka.typed.testkit.TestKitSettings;
+import akka.typed.testkit.javadsl.TestProbe;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
+import csw.messages.SupervisorLockMessage;
+import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.CommandResponse.Completed;
+import csw.messages.ccs.commands.DemandMatcher;
 import csw.messages.ccs.commands.JComponentRef;
 import csw.messages.ccs.commands.Setup;
+import csw.messages.ccs.commands.matchers.Matcher;
+import csw.messages.ccs.commands.matchers.MatcherResponse;
+import csw.messages.ccs.commands.matchers.MatcherResponses;
 import csw.messages.location.AkkaLocation;
 import csw.messages.location.ComponentId;
 import csw.messages.models.CoordinatedShutdownReasons;
+import csw.messages.models.LockingResponse;
+import csw.messages.models.LockingResponses;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.DemandState;
-import csw.messages.ccs.commands.DemandMatcher;
-import csw.messages.ccs.commands.matchers.Matcher;
-import csw.messages.ccs.commands.matchers.MatcherResponse;
-import csw.messages.ccs.commands.matchers.MatcherResponses;
 import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JLocationServiceFactory;
@@ -65,7 +72,7 @@ public class JCommandIntegrationTest {
     public void testCommandExecutionBetweenComponents() throws Exception {
         FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem);
         Await.result(Standalone.spawn(ConfigFactory.load("mcs_hcd_java.conf"), wiring),
-                        new FiniteDuration(5, TimeUnit.SECONDS));
+                new FiniteDuration(5, TimeUnit.SECONDS));
 
         AkkaConnection akkaConnection = new AkkaConnection(new ComponentId("Test_Component_Running_Long_Command_Java", HCD));
         CompletableFuture<Optional<AkkaLocation>> eventualLocation = locationService.resolve(akkaConnection, new FiniteDuration(5, TimeUnit.SECONDS));
@@ -73,13 +80,31 @@ public class JCommandIntegrationTest {
         Assert.assertTrue(maybeLocation.isPresent());
 
         Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
+        JComponentRef hcdComponent = maybeLocation.get().jComponent();
+
+        // immediate response - CompletedWithResult
+        Key<Integer> intKey1 = JKeyTypes.IntKey().make("encoder");
+        Parameter<Integer> intParameter1 = intKey1.set(22, 23);
+        Setup imdResCommand = new Setup(prefix(), immediateResCmd(), Optional.empty()).add(intParameter1);
+
+        CompletableFuture<CommandResponse> imdResCmdResponseCompletableFuture = hcdComponent.submit(imdResCommand, timeout, hcdActorSystem.scheduler());
+        CommandResponse actualImdCmdResponse = imdResCmdResponseCompletableFuture.get();
+        Assert.assertTrue(actualImdCmdResponse instanceof CommandResponse.CompletedWithResult);
+
+        // immediate response - Invalid
+        Key<Integer> intKey2 = JKeyTypes.IntKey().make("encoder");
+        Parameter<Integer> intParameter2 = intKey2.set(22, 23);
+        Setup imdInvalidCommand = new Setup(prefix(), invalidCmd(), Optional.empty()).add(intParameter2);
+
+        CompletableFuture<CommandResponse> imdInvalidCmdResponseCompletableFuture = hcdComponent.submit(imdInvalidCommand, timeout, hcdActorSystem.scheduler());
+        CommandResponse actualImdInvalidCmdResponse = imdInvalidCmdResponseCompletableFuture.get();
+        Assert.assertTrue(actualImdInvalidCmdResponse instanceof CommandResponse.Invalid);
 
         // long running command which does not use matcher
         Key<Integer> encoder = JKeyTypes.IntKey().make("encoder");
         Parameter<Integer> parameter = encoder.set(22, 23);
         Setup controlCommand = new Setup(prefix(), withoutMatcherCmd(), Optional.empty()).add(parameter);
 
-        JComponentRef hcdComponent = maybeLocation.get().jComponent();
         CompletableFuture<CommandResponse> commandResponseCompletableFuture = hcdComponent.submit(controlCommand, timeout, hcdActorSystem.scheduler());
 
         CompletableFuture<CommandResponse> testCommandResponse = commandResponseCompletableFuture.thenCompose(commandResponse -> {
@@ -121,6 +146,33 @@ public class JCommandIntegrationTest {
         Completed expectedResponse = new Completed(setup.runId());
         CommandResponse actualResponse = commandResponseToBeMatched.get();
         Assert.assertEquals(expectedResponse, actualResponse);
-    }
 
+        // ******************** Lock scenarios ********************
+        akka.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
+        TestKitSettings settings = new TestKitSettings(hcdActorSystem.settings().config());
+        TestProbe<LockingResponse> probe = new TestProbe<>(typedSystem, settings);
+        FiniteDuration duration = new FiniteDuration(5, TimeUnit.SECONDS);
+
+        // Lock component
+        hcdComponent.value().tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
+        probe.expectMsg(LockingResponses.lockAcquired());
+
+        // Send command to locked component and verify that it is not allowed
+        Setup imdSetupCommand = new Setup(invalidPrefix(), immediateCmd(), Optional.empty()).add(intParameter2);
+        CompletableFuture<CommandResponse> imdSetupCommandResCompletableFuture = hcdComponent.submit(imdSetupCommand, timeout, typedSystem.scheduler());
+        CommandResponse imdSetupCommandResponse = imdSetupCommandResCompletableFuture.get();
+
+        String reason = "This component is locked by component " + prefix();
+        CommandResponse.NotAllowed expectedLockedCmdResponse = new CommandResponse.NotAllowed(imdSetupCommand.runId(), new CommandIssue.ComponentLockedIssue(reason));
+        Assert.assertEquals(expectedLockedCmdResponse, imdSetupCommandResponse);
+
+        // Unlock component
+        hcdComponent.value().tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
+        probe.expectMsg(LockingResponses.lockReleased());
+
+        // Verify that component is allowing commands after unlock
+        CompletableFuture<CommandResponse> imdCommandResCompletableFuture = hcdComponent.submit(imdSetupCommand, timeout, typedSystem.scheduler());
+        CommandResponse actualCmdResponseAfterUnlock = imdCommandResCompletableFuture.get();
+        Assert.assertTrue(actualCmdResponseAfterUnlock instanceof CommandResponse.Completed);
+    }
 }

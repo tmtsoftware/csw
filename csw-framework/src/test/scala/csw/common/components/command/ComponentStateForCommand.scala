@@ -8,7 +8,6 @@ import csw.messages.params.models.{Choice, Choices, Prefix}
 object ComponentStateForCommand {
   val prefix        = Prefix("wfos.prog.cloudcover")
   val invalidPrefix = Prefix("wfos.prog.cloudcover.invalid")
-  val matcherPrefix = Prefix("wfos.prog.cloudcover.accept.matcher.success.result")
 
   val moveCmd           = CommandName("move")
   val initCmd           = CommandName("init")

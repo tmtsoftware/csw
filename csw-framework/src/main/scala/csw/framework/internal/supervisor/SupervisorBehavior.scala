@@ -10,14 +10,14 @@ import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
+import csw.messages.ComponentCommonMessage._
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
-import csw.messages.ComponentCommonMessage._
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.SupervisorIdleMessage._
 import csw.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.messages._
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
@@ -26,7 +26,7 @@ import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
-import csw.messages.models.LockingResponse.{LockExpired, LockExpiringShortly}
+import csw.messages.models.LockingResponses.{LockExpired, LockExpiringShortly}
 import csw.messages.models.PubSub.Publish
 import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToComponentLifecycleMessage}
