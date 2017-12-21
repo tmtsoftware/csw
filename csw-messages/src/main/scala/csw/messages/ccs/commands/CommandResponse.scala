@@ -29,16 +29,16 @@ object CommandResponse {
   case class NotAllowed(runId: RunId, issue: CommandIssue)      extends CommandResponse(Negative)
 
   def withRunId(id: RunId, commandResponse: CommandResponse): CommandResponse = commandResponse match {
-    case accepted: Accepted                       => accepted.copy(runId = id)
-    case invalid: Invalid                         => invalid.copy(runId = id)
-    case completedWithResult: CompletedWithResult => completedWithResult.copy(runId = id)
-    case completed: Completed                     => completed.copy(runId = id)
-    case behaviorChanged: BehaviorChanged[t]      => behaviorChanged.copy(runId = id)
-    case noLongerValid: NoLongerValid             => noLongerValid.copy(runId = id)
-    case error: Error                             => error.copy(runId = id)
-    case cancelled: Cancelled                     => cancelled.copy(runId = id)
-    case commandNotAvailable: CommandNotAvailable => commandNotAvailable.copy(runId = id)
-    case notAllowed: NotAllowed                   => notAllowed.copy(runId = id)
+    case accepted: Accepted                       ⇒ accepted.copy(runId = id)
+    case invalid: Invalid                         ⇒ invalid.copy(runId = id)
+    case completedWithResult: CompletedWithResult ⇒ completedWithResult.copy(runId = id)
+    case completed: Completed                     ⇒ completed.copy(runId = id)
+    case behaviorChanged: BehaviorChanged[t]      ⇒ behaviorChanged.copy(runId = id)
+    case noLongerValid: NoLongerValid             ⇒ noLongerValid.copy(runId = id)
+    case error: Error                             ⇒ error.copy(runId = id)
+    case cancelled: Cancelled                     ⇒ cancelled.copy(runId = id)
+    case commandNotAvailable: CommandNotAvailable ⇒ commandNotAvailable.copy(runId = id)
+    case notAllowed: NotAllowed                   ⇒ notAllowed.copy(runId = id)
   }
 
   def aggregateResponse(

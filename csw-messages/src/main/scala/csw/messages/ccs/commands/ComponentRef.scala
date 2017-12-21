@@ -27,6 +27,16 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
     Source(controlCommands).mapAsyncUnordered(10)(this.submit)
   }
 
+  def submitAll(
+      controlCommands: Set[ControlCommand]
+  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
+    val value = Source(controlCommands).mapAsyncUnordered(10)(this.submit)
+    CommandResponse.aggregateResponse(value).map {
+      case _: Completed  ⇒ CommandResponse.Accepted(RunId())
+      case otherResponse ⇒ otherResponse
+    }
+  }
+
   def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
     value ? (Oneway(controlCommand, _))
 
@@ -62,13 +72,13 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
   def submitAllAndSubscribe(
       controlCommands: Set[ControlCommand]
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Source[CommandResponse, NotUsed] = {
-    Source(controlCommands).mapAsyncUnordered(10)(this.submitAndSubscribe)
+    Source(controlCommands).mapAsyncUnordered(10)(submitAndSubscribe)
   }
 
   def submitAllAndSubscribe(
       controlCommands: Set[ControlCommand]
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
-    val value = Source(controlCommands).mapAsyncUnordered(10)(this.submitAndSubscribe)
+    val value = Source(controlCommands).mapAsyncUnordered(10)(submitAndSubscribe)
     CommandResponse.aggregateResponse(value)
   }
 }

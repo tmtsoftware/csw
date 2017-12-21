@@ -96,7 +96,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       ).submitAll()
 
       whenReady(aggregatedValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
-        result shouldBe a[Completed]
+        result shouldBe a[Accepted]
       }
 
       enterBarrier("multiple-components-submit-multiple-commands")
