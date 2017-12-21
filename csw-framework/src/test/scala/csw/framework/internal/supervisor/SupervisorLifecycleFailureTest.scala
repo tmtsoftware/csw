@@ -64,7 +64,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     val failureStopExMsg = "testing FailureStop"
     // Throw a `FailureStop` on the first attempt to initialize but initialize successfully on the next attempt
-    doThrow(FailureStop(failureStopExMsg)).doAnswer(initializeAnswer).when(componentHandlers).initialize()
+    doThrow(TestFailureStop(failureStopExMsg)).doAnswer(initializeAnswer).when(componentHandlers).initialize()
 
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
@@ -82,7 +82,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       failureStopExMsg,
       ERROR,
       classOf[ComponentBehavior[TopLevelActorDomainMessage]].getName,
-      FailureStop.getClass.getName,
+      TestFailureStop.getClass.getName,
       failureStopExMsg
     )
 
@@ -118,7 +118,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     val failureRestartExMsg = "testing FailureRestart"
 
     // Throw a `FailureRestart` on the first attempt to initialize but initialize successfully on the next attempt
-    doThrow(FailureRestart(failureRestartExMsg)).doAnswer(initializeAnswer).when(componentHandlers).initialize()
+    doThrow(TestFailureRestart(failureRestartExMsg)).doAnswer(initializeAnswer).when(componentHandlers).initialize()
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
     // component fails to initialize with `FailureRestart`. The akka supervision strategy specified in SupervisorBehavior
@@ -139,7 +139,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       failureRestartExMsg,
       ERROR,
       classOf[ComponentBehavior[TopLevelActorDomainMessage]].getName,
-      FailureRestart.getClass.getName,
+      TestFailureRestart.getClass.getName,
       failureRestartExMsg
     )
 
@@ -161,7 +161,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
     val setup: Setup          = Setup(prefix, CommandName("move"), Some(obsId), Set(param))
 
-    doThrow(FailureRestart(failureRestartExMsg))
+    doThrow(TestFailureRestart(failureRestartExMsg))
       .when(componentHandlers)
       .validateCommand(any[ControlCommand])
 
@@ -241,3 +241,6 @@ class SampleBehaviorFactory(componentHandlers: ComponentHandlers[TopLevelActorDo
       loggerFactory: LoggerFactory
   ): ComponentHandlers[TopLevelActorDomainMessage] = componentHandlers
 }
+
+case class TestFailureStop(msg: String)    extends FailureStop(msg)
+case class TestFailureRestart(msg: String) extends FailureRestart(msg)

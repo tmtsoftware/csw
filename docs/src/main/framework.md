@@ -91,6 +91,20 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #jcomponent-handlers-class }
 
+@@@ note { title=Note }
+
+**converting typed actor system to untyped actor system** 
+
+The `ctx` available to the component is of type `akka.typed.scaladsl.ActorContext` in scala or `akka.typed.javadsl.ActorContext` 
+in java. This context can be used to get resources such as actor system which is also typed. In order to get the untyped 
+version of actor system or actor references, akka has  provided some implicit extension methods in scala and static
+methods in java which can be used by adding the following import 
+
+`import akka.typed.scaladsl.adapter._`  for scala and,
+`import akka.typed.javadsl.Adapter.*` for java
+
+@@@
+
 A component can be created by a factory which extends `ComponentBehaviorFactory` base class and provides a definition of `handlers` method to return the appropriate implementation of `ComponentHandlers`.
 
 Assembly/Scala
@@ -169,7 +183,7 @@ Hcd/Java
 
 #### validateCommand
 
-On receiving a command a component developer is required to validate the `ControlCommand` received. If the command is valid to be processed, `Accepted` response
+On receiving a command a component is required to validate the `ControlCommand` received. If the command is valid to be processed, `Accepted` response
 should be returned from this method. Otherwise, `Invalid` response should be returned.
 
 Assembly/Scala
@@ -244,6 +258,28 @@ Hcd/Java
 A component has access to an actor `pubSubRef` which can be used to publish its `CurrentState`. Any subscriber of this component will receive the 
 published state.
 
+### Handling Exceptions
+
+A component should create exceptions belonging to following two types:
+
+1. **FailureRestart** : As a part of any handler, if an exception can be handled by restarting the component, an exception of type `FailureRestart` should be 
+    thrown to let the framework restart the component. The component's state will be cleared/reinitialized. The `onInitialize` handler will be invoked again.
+    
+    Scala
+    :   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #failureRestart-Exception }
+        
+    Java
+    :   @@snip [JTromboneAssemblyHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #failureRestart-Exception }
+        
+2. **FailureStop** : As a part of any handler, an exception can be thrown of type `FailureStop` which will result in terminating the component. The `onShutdown` 
+    handler will be invoked to facilitate graceful shutdown.
+    
+    Scala
+    :   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #failureStop-Exception }
+    
+    Java
+    :   @@snip [JTromboneAssemblyHandlers.java](../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #failureStop-Exception }
+    
 ## Container for deployment
 
 A container is a component which starts one or more Components and keeps track of the components within a single JVM process. When started, the container also registers itself with the Location Service.

@@ -1,7 +1,11 @@
 package csw.trombone.assembly;
 
+import akka.actor.ActorSystem;
+import akka.stream.ActorMaterializer;
+import akka.stream.Materializer;
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
+import akka.typed.javadsl.Adapter;
 import com.typesafe.config.ConfigFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
@@ -12,14 +16,19 @@ import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
 import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
+import csw.services.config.api.javadsl.IConfigClientService;
+import csw.services.config.client.javadsl.JConfigClientFactory;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JComponentType;
 import csw.services.logging.javadsl.JLoggerFactory;
+import csw.trombone.ConfigNotAvailableException;
+import csw.trombone.HcdNotFoundException;
 import csw.trombone.assembly.actors.DiagPublisher;
 import csw.trombone.assembly.actors.TrombonePublisher;
 import scala.concurrent.duration.FiniteDuration;
 import scala.runtime.BoxedUnit;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -41,6 +50,9 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
     private ActorRef<DiagPublisherMessages> diagPublisher;
     private ActorRef<AssemblyCommandHandlerMsgs> commandHandler;
     private ActorRef<CommandResponse> commandResponseAdapter;
+    private IConfigClientService configClient;
+    private ActorSystem actorSystem;
+    private Materializer mat;
 
     public JTromboneAssemblyHandlers(
             akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
@@ -58,6 +70,9 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
         this.locationService = locationService;
         runningHcds = new HashMap<>();
         commandResponseAdapter = ctx.spawnAdapter(DiagPublisherMessages.CommandResponseE::new);
+        actorSystem = Adapter.toUntyped(ctx.getSystem());
+        mat = ActorMaterializer.create(actorSystem);
+        configClient = JConfigClientFactory.clientApi(actorSystem, locationService);
     }
 
     //#jcomponent-handlers-class
@@ -65,8 +80,8 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
     @Override
     public CompletableFuture<BoxedUnit> jInitialize() {
         // fetch config (preferably from configuration service)
-        CompletableFuture<AssemblyContext> assemblyContextCompletableFuture = getAssemblyCalculationConfig()
-                .thenCombine(getAssemblyControlConfig(),
+        CompletableFuture<AssemblyContext> assemblyContextCompletableFuture = getAssemblyLocalCalculationConfig()
+                .thenCombine(getAssemblyLocalControlConfig(),
                         (calculationConf, controlConf) -> ac = new AssemblyContext(componentInfo, calculationConf, controlConf));
 
         // create a worker actor which is used by this assembly
@@ -82,15 +97,16 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
         // required worker actors required by this assembly
         Optional<CompletableFuture<Void>> voidCompletableFuture = mayBeConnection.map(connection -> {
             CompletableFuture<Optional<AkkaLocation>> eventualHcdLocation = locationService.resolve(connection.<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
-
+            // #failureRestart-Exception
             return eventualEventPublisher.thenAcceptBoth(eventualHcdLocation, (eventPublisher, hcdLocation) -> {
-                hcdLocation.map(hcd -> {
-                    runningHcds.put(connection, Optional.of(hcd.jComponent()));
-                    diagPublisher = ctx.spawnAnonymous(DiagPublisher.jMake(ac, Optional.of(hcd.component()), Optional.of(eventPublisher)));
-                    return Optional.empty();
+                if(!hcdLocation.isPresent())
+                    throw new HcdNotFoundException();
+                else
+                    runningHcds.put(connection, Optional.of(hcdLocation.get().jComponent()));
+                    diagPublisher = ctx.spawnAnonymous(DiagPublisher.jMake(ac, Optional.of(hcdLocation.get().component()), Optional.of(eventPublisher)));
                 });
             });
-        });
+        // #failureRestart-Exception
 
         return voidCompletableFuture.get().thenApply(x -> BoxedUnit.UNIT);
     }
@@ -160,14 +176,31 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
     }
     //#onGoOnline-handler
 
-    private CompletableFuture<TromboneCalculationConfig> getAssemblyCalculationConfig() {
+    private CompletableFuture<TromboneCalculationConfig> getAssemblyLocalCalculationConfig() {
         return CompletableFuture.supplyAsync(() -> ConfigFactory.load("tromboneAssemblyContext.conf"))
                 .thenApply(TromboneCalculationConfig::apply);
     }
+
+    private CompletableFuture<TromboneControlConfig> getAssemblyLocalControlConfig() {
+        return CompletableFuture.supplyAsync(() -> ConfigFactory.load("tromboneAssemblyContext.conf"))
+                .thenApply(TromboneControlConfig::apply);
+    }
+
+    // #failureStop-Exception
+    private CompletableFuture<TromboneCalculationConfig> getAssemblyCalculationConfig() {
+        return configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).thenCompose((mayBeConfig) -> {
+            if(mayBeConfig.isPresent())
+                return (mayBeConfig.get().toJConfigObject(mat).thenApply(TromboneCalculationConfig::apply));
+            else
+                // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
+                // cofiguration service and started again
+                throw new ConfigNotAvailableException();
+        });
+    }
+    // #failureStop-Exception
 
     private CompletableFuture<TromboneControlConfig> getAssemblyControlConfig() {
         return CompletableFuture.supplyAsync(() -> ConfigFactory.load("tromboneAssemblyContext.conf"))
                 .thenApply(TromboneControlConfig::apply);
     }
-
 }

@@ -1,8 +1,14 @@
 package csw.trombone.assembly
 
+import java.nio.file.Paths
+
+import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.adapter._
 import com.typesafe.config.ConfigFactory
+import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages._
@@ -13,6 +19,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
+import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs.CommandMessageE
@@ -64,15 +71,22 @@ class TromboneAssemblyHandlers(
 
   private val commandResponseAdapter: ActorRef[CommandResponse] = ctx.spawnAdapter(CommandResponseE)
 
-  implicit var ac: AssemblyContext  = _
-  implicit val ec: ExecutionContext = ctx.executionContext
+  private val configClient = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+
+  case class HcdNotFoundException()        extends FailureRestart("Could not resolve hcd location. Initialization failure.")
+  case class ConfigNotAvailableException() extends FailureStop("Configuration not available. Initialization failure.")
+
+  implicit var ac: AssemblyContext     = _
+  implicit val ec: ExecutionContext    = ctx.executionContext
+  implicit val atorSystem: ActorSystem = ctx.system.toUntyped
+  implicit val mat: Materializer       = ActorMaterializer()
 
   def onRun(): Future[Unit] = Future.unit
 
   //#initialize-handler
   def initialize(): Future[Unit] = async {
     // fetch config (preferably from configuration service)
-    val (calculationConfig, controlConfig) = await(getAssemblyConfigs)
+    val (calculationConfig, controlConfig) = await(getAssemblyConfigsLocal)
     ac = AssemblyContext(componentInfo, calculationConfig, controlConfig)
 
     // create a worker actor which is used by this assembly
@@ -86,17 +100,21 @@ class TromboneAssemblyHandlers(
     // required worker actors required by this assembly
     maybeConnection match {
       case hcdConnection @ Some(hcd) ⇒
+        // #failureRestart-Exception
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
           case Some(akkaLocation) ⇒
             runningHcds = runningHcds.updated(hcdConnection.get, Some(akkaLocation.component))
             diagPublisher = ctx.spawnAnonymous(DiagPublisher.make(ac, runningHcds(maybeConnection.get), Some(eventPublisher)))
             commandHandler =
               ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcds, Some(eventPublisher)))
-          case None ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
+          case None ⇒
+            // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
+            // for the Hcd to be available
+            throw HcdNotFoundException()
+          // #failureRestart-Exception
         }
       case None ⇒ Future.successful(Unit)
     }
-
   }
   //#initialize-handler
 
@@ -143,10 +161,22 @@ class TromboneAssemblyHandlers(
   }
   //#onOneway-handler
 
-  private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = {
+  private def getAssemblyConfigsLocal: Future[(TromboneCalculationConfig, TromboneControlConfig)] = {
     val config = ConfigFactory.load("tromboneAssemblyContext.conf")
     Future((TromboneCalculationConfig(config), TromboneControlConfig(config)))
   }
+
+  // #failureStop-Exception
+  private def getAssemblyConfigs: Future[(TromboneCalculationConfig, TromboneControlConfig)] = {
+    configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
+      case Some(config) ⇒ config.toConfigObject.map(x ⇒ (TromboneCalculationConfig(x), TromboneControlConfig(x)))
+      case None         ⇒
+        // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
+        // cofiguration service and started again
+        throw ConfigNotAvailableException()
+    }
+  }
+  // #failureStop-Exception
 
   //#onLocationTrackingEvent-handler
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {

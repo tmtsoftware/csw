@@ -2,8 +2,9 @@ package csw.exceptions
 
 import java.nio.file.Path
 
-case class FailureStop(message: String)    extends RuntimeException(message)
-case class FailureRestart(message: String) extends RuntimeException(message)
+abstract class FailureStop(message: String)    extends RuntimeException(message)
+abstract class FailureRestart(message: String) extends RuntimeException(message)
+
 case class FileNotFound(filePath: Path)
     extends RuntimeException(s"File does not exist in configuration service at path ${filePath.toString}")
 case class LocalFileNotFound(filePath: Path)
