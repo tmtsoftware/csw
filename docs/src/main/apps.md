@@ -7,4 +7,5 @@
 * [csw-location-agent](apps/cswlocationagent.md)
 * [csw-config-server](apps/cswonfigserverapp.md)
 * [csw-config-client-cli](apps/cswconfigclientcli.md)
+* [csw-host-config](apps/hostconfig.md)
 @@@
