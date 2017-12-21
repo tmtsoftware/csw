@@ -25,11 +25,11 @@ Java
 
 ## Examples
 
-**Example:** ./trombone-host-config-app hostConfig.conf -s ./trombone-container-cmd-app  
+**Example:** `./trombone-host-config-app hostConfig.conf -s ./trombone-container-cmd-app`  
 **Explanation:** Fetch hostconfig.conf from configuration service which contains multiple container configuration, 
 then invoke trombone-container-cmd-app script per container configuration which spawns container
 
-**Example:** ./trombone-host-config-app --local hostConfig.conf -s ./trombone-container-cmd-app  
+**Example:** `./trombone-host-config-app --local hostConfig.conf -s ./trombone-container-cmd-app`  
 **Explanation:** Fetch and parse hostconfig.conf from current directory which contains multiple container configuration, 
 then invoke trombone-container-cmd-app script per container configuration which spawns container
  
@@ -37,6 +37,11 @@ then invoke trombone-container-cmd-app script per container configuration which 
 
 ![TMT_Deployment_Strategy](../images/hostconfig/tmt-deployment.png)
  
+## Custom Host Configuration
+
+hostconfig.conf
+:   @@snip [hostconfig.conf](../../../../csw-vslice/src/main/resources/hostConfig.conf) { #host-conf }
+
 ## Help
 Use the following command to get help on the options available with this app
   
