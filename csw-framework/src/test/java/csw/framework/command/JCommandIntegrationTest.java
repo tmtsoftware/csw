@@ -202,7 +202,7 @@ public class JCommandIntegrationTest {
 
         HashMap<JComponentRef, Set<ControlCommand>> componentsToCommands = new HashMap<>() {
             {
-                put(hcdComponent, new HashSet<>(Arrays.asList(setupHcd1, setupHcd2)));
+                put(hcdComponent, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
             }
         };
 
