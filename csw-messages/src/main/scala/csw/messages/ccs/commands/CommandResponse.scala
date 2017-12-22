@@ -47,12 +47,11 @@ object CommandResponse {
     commandResponses
       .runForeach { x ⇒
         if (x.resultType == CommandResultType.Negative)
-          throw new RuntimeException
+          throw new RuntimeException(s"Command with runId [${x.runId}] failed with response [$x]")
       }
       .transform {
-        case Success(_) ⇒ Success(CommandResponse.Completed(RunId()))
-        case Failure(ex) ⇒
-          Success(CommandResponse.Error(RunId(), s"One of the submitted commands failed ${ex.getMessage}"))
+        case Success(_)  ⇒ Success(CommandResponse.Completed(RunId()))
+        case Failure(ex) ⇒ Success(CommandResponse.Error(RunId(), s"${ex.getMessage}"))
       }
   }
 }

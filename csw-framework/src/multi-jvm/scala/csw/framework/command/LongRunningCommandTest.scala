@@ -93,7 +93,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       val aggregatedValidationResponse = CommandDistributor(
         Map(assemblyComponent → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
-      ).submitAll()
+      ).aggregatedValidationResponse()
 
       whenReady(aggregatedValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Accepted]
@@ -103,7 +103,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       val aggregatedResponse = CommandDistributor(
         Map(assemblyComponent → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
-      ).submitAllAndSubscribe()
+      ).aggregatedCompletionResponse()
 
       whenReady(aggregatedResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Completed]

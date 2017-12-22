@@ -18,19 +18,21 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class ComponentRef(value: ActorRef[ComponentMessage]) {
 
+  private val parallelism = 10
+
   def submit(controlCommand: ControlCommand)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
     value ? (Submit(controlCommand, _))
 
   def submitAll(
       controlCommands: Set[ControlCommand]
   )(implicit timeout: Timeout, scheduler: Scheduler): Source[CommandResponse, NotUsed] = {
-    Source(controlCommands).mapAsyncUnordered(10)(this.submit)
+    Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
   }
 
   def submitAll(
       controlCommands: Set[ControlCommand]
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
-    val value = Source(controlCommands).mapAsyncUnordered(10)(this.submit)
+    val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
     CommandResponse.aggregateResponse(value).map {
       case _: Completed  ⇒ CommandResponse.Accepted(RunId())
       case otherResponse ⇒ otherResponse
@@ -72,13 +74,13 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
   def submitAllAndSubscribe(
       controlCommands: Set[ControlCommand]
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Source[CommandResponse, NotUsed] = {
-    Source(controlCommands).mapAsyncUnordered(10)(submitAndSubscribe)
+    Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
   }
 
   def submitAllAndSubscribe(
       controlCommands: Set[ControlCommand]
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
-    val value = Source(controlCommands).mapAsyncUnordered(10)(submitAndSubscribe)
+    val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
     CommandResponse.aggregateResponse(value)
   }
 }

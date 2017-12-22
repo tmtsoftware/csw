@@ -131,8 +131,10 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
         publishCurrentState(controlCommand);
         if(controlCommand.commandName().equals(ComponentStateForCommand.matcherCmd()))
             processCommandWithMatcher(controlCommand);
-        if(controlCommand.commandName().equals(ComponentStateForCommand.withoutMatcherCmd()))
+        else if(controlCommand.commandName().equals(ComponentStateForCommand.withoutMatcherCmd()))
             processCommandWithoutMatcher(controlCommand);
+        else processCommandWithoutMatcher(controlCommand);
+
     }
 
     private void processCommandWithMatcher(ControlCommand controlCommand) {

@@ -13,7 +13,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class CommandDistributor(componentToCommands: Map[ComponentRef, Set[ControlCommand]]) {
 
-  def submitAll()(
+  private val breadth = 10
+
+  def aggregatedValidationResponse()(
       implicit timeout: Timeout,
       scheduler: Scheduler,
       ec: ExecutionContext,
@@ -21,7 +23,7 @@ case class CommandDistributor(componentToCommands: Map[ComponentRef, Set[Control
   ): Future[CommandResponse] = {
 
     val commandResponsesF: Source[CommandResponse, NotUsed] = Source(componentToCommands).flatMapMerge(
-      10,
+      breadth,
       { case (component, commands) ⇒ component.submitAll(commands) }
     )
     CommandResponse.aggregateResponse(commandResponsesF).map {
@@ -30,7 +32,7 @@ case class CommandDistributor(componentToCommands: Map[ComponentRef, Set[Control
     }
   }
 
-  def submitAllAndSubscribe()(
+  def aggregatedCompletionResponse()(
       implicit timeout: Timeout,
       scheduler: Scheduler,
       ec: ExecutionContext,
@@ -38,7 +40,7 @@ case class CommandDistributor(componentToCommands: Map[ComponentRef, Set[Control
   ): Future[CommandResponse] = {
 
     val commandResponsesF: Source[CommandResponse, NotUsed] = Source(componentToCommands).flatMapMerge(
-      10,
+      breadth,
       { case (component, commands) ⇒ component.submitAllAndSubscribe(commands) }
     )
     CommandResponse.aggregateResponse(commandResponsesF)
