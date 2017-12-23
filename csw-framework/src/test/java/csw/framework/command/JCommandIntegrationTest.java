@@ -200,7 +200,7 @@ public class JCommandIntegrationTest {
         Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
         Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
 
-        HashMap<JComponentRef, Set<ControlCommand>> componentsToCommands = new HashMap<>() {
+        HashMap<JComponentRef, Set<ControlCommand>> componentsToCommands = new HashMap<JComponentRef, Set<ControlCommand>>() {
             {
                 put(hcdComponent, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
             }
