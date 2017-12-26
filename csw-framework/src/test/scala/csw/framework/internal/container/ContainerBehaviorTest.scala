@@ -52,9 +52,10 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     var supervisorInfos: Set[SupervisorInfo]                 = Set.empty
     val answer = new Answer[Future[Option[SupervisorInfo]]] {
       override def answer(invocation: InvocationOnMock): Future[Option[SupervisorInfo]] = {
-        val componentInfo            = invocation.getArgument[ComponentInfo](1)
-        val componentWiringClass     = Class.forName(componentInfo.behaviorFactoryClassName)
-        val componentBehaviorFactory = componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
+        val componentInfo        = invocation.getArgument[ComponentInfo](1)
+        val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
+        val componentBehaviorFactory =
+          componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
 
         val supervisorBehaviorFactory = SupervisorBehaviorFactory.make(
           Some(ctx.self),

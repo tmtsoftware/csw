@@ -22,9 +22,10 @@ object SupervisorBehaviorFactory {
       pubSubBehaviorFactory: PubSubBehaviorFactory
   ): Behavior[ComponentMessage] = {
 
-    val componentWiringClass     = Class.forName(componentInfo.behaviorFactoryClassName)
-    val componentBehaviorFactory = componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
-    val loggerFactory            = new LoggerFactory(componentInfo.name)
+    val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
+    val componentBehaviorFactory =
+      componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
+    val loggerFactory = new LoggerFactory(componentInfo.name)
 
     make(
       containerRef,
