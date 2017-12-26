@@ -1,5 +1,6 @@
 package csw.services.logging.internal
 
+import java.nio.ByteBuffer
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
@@ -254,8 +255,16 @@ class LoggingSystem(name: String, version: String, host: String, system: ActorSy
     try {
       if (appender.endsWith("$"))
         Class.forName(appender).getField("MODULE$").get(null).asInstanceOf[LogAppenderBuilder]
-      else
-        Class.forName(appender).newInstance().asInstanceOf[LogAppenderBuilder]
+      else {
+        val buf = ByteBuffer.allocateDirect(1)
+        try {
+          val directByteBufferConstr = buf.getClass.getDeclaredConstructor(classOf[Long], classOf[Int], classOf[Any])
+          directByteBufferConstr.setAccessible(true)
+        } catch {
+          case e: Exception ⇒
+        }
+        Class.forName(appender).getDeclaredConstructor().newInstance().asInstanceOf[LogAppenderBuilder]
+      }
     } catch {
       case _: Throwable ⇒ throw AppenderNotFoundException(appender)
     }
