@@ -25,18 +25,15 @@ import csw.messages.models.LockingResponses;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
-import csw.messages.params.models.ObsId;
 import csw.messages.params.states.DemandState;
 import csw.services.ccs.javadsl.JCommandDistributor;
 import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JLocationServiceFactory;
-import csw.services.logging.javadsl.JLoggingSystemFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scalatest.concurrent.PatienceConfiguration;
 import scala.concurrent.Await;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.Duration;
@@ -121,7 +118,7 @@ public class JCommandIntegrationTest {
 
         CompletableFuture<CommandResponse> testCommandResponse = commandResponseCompletableFuture.thenCompose(commandResponse -> {
             if (commandResponse instanceof CommandResponse.Accepted)
-                return hcdComponent.getCommandResponse(commandResponse.runId(), timeout, hcdActorSystem.scheduler());
+                return hcdComponent.subscribe(commandResponse.runId(), timeout, hcdActorSystem.scheduler());
             else
                 return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
         });

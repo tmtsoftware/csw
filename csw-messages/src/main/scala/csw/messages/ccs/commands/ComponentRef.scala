@@ -53,7 +53,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    * @param controlCommands the set of [[csw.messages.ccs.commands.ControlCommand]] payloads
    * @return [[csw.messages.ccs.commands.CommandResponse.Accepted]] or [[csw.messages.ccs.commands.CommandResponse.Error]] CommandResponse as a Future.
    */
-  def submitAll(
+  def submitAllAndGetResponse(
       controlCommands: Set[ControlCommand]
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
@@ -134,7 +134,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    * @param controlCommands the [[csw.messages.ccs.commands.ControlCommand]] payload.
    * @return a CommandResponse as a Future value.
    */
-  def submitAllAndSubscribe(
+  def submitAllAndGetFinalResponse(
       controlCommands: Set[ControlCommand]
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
