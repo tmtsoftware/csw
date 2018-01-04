@@ -10,7 +10,8 @@ import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.CommandResponse.{Completed, NoLongerValid}
-import csw.messages.ccs.commands.{CommandResponse, ComponentRef, DemandMatcher, Setup}
+import csw.messages.ccs.commands.matchers.DemandMatcher
+import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.Units.encoder
 import csw.messages.params.models.{ObsId, RunId}

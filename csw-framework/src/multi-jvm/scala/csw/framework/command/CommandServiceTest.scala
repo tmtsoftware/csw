@@ -15,7 +15,7 @@ import csw.messages.ccs.CommandIssue.ComponentLockedIssue
 import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands._
 import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.messages.ccs.commands.matchers.{Matcher, MatcherResponse}
+import csw.messages.ccs.commands.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.LockingResponse

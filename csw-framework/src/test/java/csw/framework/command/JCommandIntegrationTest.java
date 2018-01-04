@@ -14,6 +14,7 @@ import csw.messages.SupervisorLockMessage;
 import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.*;
 import csw.messages.ccs.commands.CommandResponse.Completed;
+import csw.messages.ccs.commands.matchers.DemandMatcher;
 import csw.messages.ccs.commands.matchers.Matcher;
 import csw.messages.ccs.commands.matchers.MatcherResponse;
 import csw.messages.ccs.commands.matchers.MatcherResponses;

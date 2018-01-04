@@ -9,6 +9,7 @@ import akka.stream.javadsl.Source
 import akka.typed.ActorRef
 import akka.util.Timeout
 import csw.messages.ComponentMessage
+import csw.messages.ccs.commands.matchers.StateMatcher
 import csw.messages.params.models.RunId
 
 import scala.compat.java8.FutureConverters.FutureOps

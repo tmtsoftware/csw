@@ -11,10 +11,20 @@ import csw.messages.params.models.RunId
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * The ConfigDistributor enables distributing multiple commands to multiple components and get one aggregated command
+ * response as a final response
+ * @param componentToCommands a map of Component and the set of commands to be sent to that component
+ */
 case class CommandDistributor(componentToCommands: Map[ComponentRef, Set[ControlCommand]]) {
 
   private val breadth = 10
 
+  /**
+   * Submit multiple long running commands to components and get an aggregated response as `Accepted` if all the commands
+   * were validated successfully, an `Error` otherwise
+   * @return an aggregated response as Future value of CommandResponse
+   */
   def aggregatedValidationResponse()(
       implicit timeout: Timeout,
       scheduler: Scheduler,
@@ -32,6 +42,12 @@ case class CommandDistributor(componentToCommands: Map[ComponentRef, Set[Control
     }
   }
 
+  /**
+   * Submit multiple commands to components and subscribe for the final result for long running commands to create
+   * an aggregated response as `Completed` if all the commands completed successfully or `Error` if any one of the
+   * commands failed.
+   * @return an aggregated response as Future value of CommandResponse
+   */
   def aggregatedCompletionResponse()(
       implicit timeout: Timeout,
       scheduler: Scheduler,

@@ -9,7 +9,7 @@ import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
-import csw.messages.ccs.commands.matchers.Matcher
+import csw.messages.ccs.commands.matchers.{Matcher, StateMatcher}
 import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.params.models.RunId
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
@@ -91,7 +91,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
     }
 
   /**
-   * Submit a command and match the published state from the component using a [[csw.messages.ccs.commands.StateMatcher]]. If the match is successful a `Completed` response is
+   * Submit a command and match the published state from the component using a [[StateMatcher]]. If the match is successful a `Completed` response is
    * provided as a future. In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
    * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload.
    * @param stateMatcher the StateMatcher implementation for matching received state against a demand state.
