@@ -5,6 +5,9 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
 import csw.services.logging.scaladsl.LoggerFactory
 
+/**
+ * The factory for creating [[csw.services.ccs.internal.CommandResponseManagerBehavior]]
+ */
 object CommandResponseManagerFactory {
   def make(
       ctx: ActorContext[SupervisorMessage],

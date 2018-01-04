@@ -65,6 +65,7 @@ object SupervisorBehavior {
  * @param registrationFactory        The factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
  *                                   [[csw.messages.location.Connection.AkkaConnection]]
  * @param locationService            The single instance of Location service created for a running application
+ * @param loggerFactory              The factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
 class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
