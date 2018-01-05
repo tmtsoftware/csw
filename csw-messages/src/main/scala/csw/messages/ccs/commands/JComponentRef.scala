@@ -87,7 +87,7 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
     componentRef.submitAndSubscribe(controlCommand)(timeout, scheduler, ec).toJava.toCompletableFuture
 
   /**
-   * Submit a command and match the published state from the component using a [[StateMatcher]]. If the match is successful a `Completed` response is
+   * Submit a command and match the published state from the component using a [[csw.messages.ccs.commands.matchers.StateMatcher]]. If the match is successful a `Completed` response is
    * provided as a future. In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
    * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload.
    * @param stateMatcher the StateMatcher implementation for matching received state against a demand state.
