@@ -5,4 +5,3 @@ package csw.messages.ccs.commands.matchers
  * @param prefix the subsystem identifier for which matching was in progress
  */
 case class MatchAborted(prefix: String) extends RuntimeException(s"Matching demand state aborted for $prefix")
-`
