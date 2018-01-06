@@ -149,14 +149,14 @@ class TromboneAssemblyHandlers(
 
   // #onSubmit-handler
   override def onSubmit(controlCommand: ControlCommand): Unit = {
-    // forward the received command to an actor created as a worker actor for this component to process commands
+    // commandHandler is a worker actor created for this component to process commands
     commandHandler ! CommandMessageE(Submit(controlCommand, commandResponseAdapter))
   }
   //#onSubmit-handler
 
   // #onOneway-handler
   override def onOneway(controlCommand: ControlCommand): Unit = {
-    // forward the received command to an actor created as a worker actor for this component to process commands
+    // commandHandler is a worker actor created for this component to process commands
     commandHandler ! CommandMessageE(Oneway(controlCommand, commandResponseAdapter))
   }
   //#onOneway-handler

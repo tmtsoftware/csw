@@ -75,9 +75,10 @@ Following is the summary of properties in the ComponentInfo config/model:
     * RegisterOnly : Register this component with location service
     * RegisterAndTrackServices : Register this component with location service as well as track the components/services mentioned against `connections` property
 
-## Creating an Assembly or Hcd
+## Creating an Assembly or Hcd Component
 
-A component is implemented by extending the `ComponentHandlers` base class. 
+A component is implemented by extending the `ComponentHandlers` base class. These handlers are executed under an actor (Top Level Actor or TLA)
+defined in the framework which handles the lifecycle and supervision of this component.
 
 Assembly/Scala
 :   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #component-handlers-class }
@@ -183,8 +184,10 @@ Hcd/Java
 
 #### validateCommand
 
-On receiving a command a component is required to validate the `ControlCommand` received. If the command is valid to be processed, `Accepted` response
-should be returned from this method. Otherwise, `Invalid` response should be returned.
+A command can be sent as a `Submit` or `Oneway` message to the component actor. If a command can be completed immediately, a `CommandResponse` indicating 
+the final response for the command can be returned. If a command requires time for processing, the component is required to validate the `ControlCommand` received
+and return a validation result as `Accepted` or `Invalid`. The final response for a command sent as `Submit` can be obtained by the sender command by querying or
+subscribing for this response to the component as described here. 
 
 Assembly/Scala
 :   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #validateCommand-handler }
@@ -202,8 +205,9 @@ If a response can be provided immediately, a final `CommandResponse` such as `Co
 
 #### onSubmit
 
-In case a command is received as a submit, command response should be updated in the `CommandResponseManager`. `CommandResponseManager` is an actor whose reference 
-`commandResponseManager` is available in the `ComponentHandlers`. 
+On receiving a command as `Submit`, the `onSubmit` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`. In case a command 
+is received as a submit, command response should be updated in the `CommandResponseManager`. `CommandResponseManager` is an actor whose reference `commandResponseManager` 
+is available in the `ComponentHandlers`. 
 
 Assembly/Scala
 :   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onSubmit-handler }
@@ -219,7 +223,8 @@ Hcd/Java
 
 #### onOneway
 
-In case a command is received as a oneway, command response should not be provided to the sender.
+On receiving a command as `Oneway`, the `onOneway` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`.In case a command 
+is received as a oneway, command response should not be provided to the sender.
 
 Assembly/Scala
 :   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onOneway-handler }
@@ -235,11 +240,12 @@ Hcd/Java
 
 ### Tracking Connections
 
-The component framework tracks the set of connections specified for a component in `ComponentInfo`.
+The component framework tracks the set of connections specified for a component in `ComponentInfo` if the `locationServiceUsage` property is set to `RegisterAndTrackServices`.
 The framework also provides a helper `trackConnection` method to track any connection other than those present in `ComponentInfo`.
 
 #### onLocationTrackingEvent
-The `onLocationTrackingEvent` handler can be used to take action on the `TrackingEvent` for a particular connection. 
+The `onLocationTrackingEvent` handler can be used to take action on the `TrackingEvent` for a particular connection. This event could be for the connections in 
+`ComponentInfo` tracked automatically or for the connections tracked explicitly using `trackConnection` method.
 
 Assembly/Scala
 :   @@snip [TromboneAssemblyHandlers.scala](../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onLocationTrackingEvent-handler }

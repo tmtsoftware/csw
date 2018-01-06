@@ -149,7 +149,7 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
     // #onSubmit-handler
     @Override
     public void onSubmit(ControlCommand controlCommand) {
-        // forward the received command to an actor created as a worker actor for this component to process commands
+        // commandHandler is a worker actor created for this component to process commands
         commandHandler.tell(new CommandMessageE(new Submit(controlCommand, commandResponseAdapter)));
     }
     // #onSubmit-handler
@@ -157,7 +157,7 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
     // #onOneway-handler
     @Override
     public void onOneway(ControlCommand controlCommand) {
-        // forward the received command to an actor created as a worker actor for this component to process commands
+        // commandHandler is a worker actor created for this component to process commands
         commandHandler.tell(new CommandMessageE(new Submit(controlCommand, commandResponseAdapter)));
     }
     // #onOneway-handler
