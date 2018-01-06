@@ -18,7 +18,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh "sbt scalafmtCheck"
-                sh "sbt -Dcheck.cycles=true clean scalastyle compile"
+                sh "sbt -Dcheck.cycles=true -Dformat.on.compile=false clean scalastyle compile"
             }
         }
 

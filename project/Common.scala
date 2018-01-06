@@ -1,4 +1,5 @@
 import Libs._
+import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
@@ -54,11 +55,17 @@ object Common extends AutoPlugin {
     detectCycles := true,
     libraryDependencies += `acyclic`,
     autoCompilerPlugins := true,
+    if (formatOnCompile) scalafmtOnCompile := true else scalafmtOnCompile := false,
     addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7")
   )
 
+  private def formatOnCompile = sys.props.get("format.on.compile") match {
+    case Some("false") ⇒ false
+    case _             ⇒ true
+  }
+
   private def cycleCheckEnabled = sys.props.get("check.cycles") match {
-    case Some("true") => true
-    case _            => false
+    case Some("true") ⇒ true
+    case _            ⇒ false
   }
 }
