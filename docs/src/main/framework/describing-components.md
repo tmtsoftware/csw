@@ -38,6 +38,8 @@ Following is the summary of properties in the ComponentInfo config/model:
 * **componentType** : The type of the component which could be `Container`, `Assembly`, `Hcd` or `Service`
 * **behaviorFactoryClassName** : The fully qualified name of the class which extends the factory class `ComponentBehaviorFactory`
 * **prefix** : A valid subsystem to which this component belongs.
+* **connections** : A collection of `connections` of the components or services which will be used by this component. This information can 
+be used in accordance with the `locationServiceUsage` property to track these components or services by the framework.
 * **locationServiceUsage** : Indicates how the location service should be leveraged for this component by the framework. Following values are supported:
     * DoNotRegister : Do not register this component with location service
     * RegisterOnly : Register this component with location service

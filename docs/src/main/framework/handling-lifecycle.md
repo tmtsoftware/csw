@@ -4,7 +4,7 @@
 
 The `initialize` handler is invoked when the component is created. This is different than constructor initialization to allow non-blocking 
 asynchronous operations. The component can initialize state such as configuration to be fetched from configuration service, 
-location of components or services to be fetched from location service etc.
+location of components or services to be fetched from location service etc. These vary from component to component.
 
 Assembly/Scala
 :   @@snip [TromboneAssemblyHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #initialize-handler }
